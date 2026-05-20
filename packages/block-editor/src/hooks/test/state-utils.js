@@ -50,6 +50,24 @@ describe( 'buildScopedBlockSelector', () => {
 		).toBe( `${ BASE } .wp-block-button__link:hover` );
 	} );
 
+	it( 'preserves modifier classes on the first compound selector', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-search.wp-block-search__button-outside .wp-block-search__input',
+				':hover'
+			)
+		).toBe(
+			`${ BASE }.wp-block-search__button-outside .wp-block-search__input:hover`
+		);
+	} );
+
+	it( 'preserves child combinators without surrounding spaces', () => {
+		expect(
+			buildScopedBlockSelector( BASE, '.wp-block-foo>.inner', ':hover' )
+		).toBe( `${ BASE }>.inner:hover` );
+	} );
+
 	it( 'works for :focus and :active states', () => {
 		expect(
 			buildScopedBlockSelector(

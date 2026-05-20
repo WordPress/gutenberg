@@ -121,6 +121,44 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that modifier classes on the first compound selector are preserved
+	 * when state selectors are scoped to the block wrapper.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 */
+	public function test_build_state_selector_preserves_first_compound_modifier_classes() {
+		$actual = gutenberg_build_state_selector(
+			'.wp-states-test',
+			'.wp-block-search.wp-block-search__button-outside .wp-block-search__input',
+			':hover'
+		);
+
+		$this->assertSame(
+			'.wp-states-test.wp-block-search__button-outside .wp-block-search__input:hover',
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that child combinators without surrounding spaces are preserved when
+	 * state selectors are scoped to the block wrapper.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 */
+	public function test_build_state_selector_preserves_child_combinator_without_spaces() {
+		$actual = gutenberg_build_state_selector(
+			'.wp-states-test',
+			'.wp-block-foo>.inner',
+			':hover'
+		);
+
+		$this->assertSame(
+			'.wp-states-test>.inner:hover',
+			$actual
+		);
+	}
+
+	/**
 	 * Tests that preset values are converted to CSS custom property references.
 	 *
 	 * @covers ::gutenberg_normalize_state_preset_vars

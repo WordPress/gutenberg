@@ -277,8 +277,14 @@ function gutenberg_build_state_selector( $base_selector, $block_selector, $state
 			continue;
 		}
 
-		if ( preg_match( '/^[^ >+~]+[ >+~](.*)$/', $selector, $matches ) ) {
-			$scoped_selectors[] = $base_selector . ' ' . trim( $matches[1] ) . $state;
+		/*
+		 * Replace only the leading block selector part (e.g. class name,
+		 * attribute selector, ID, or tag name) with the block instance selector.
+		 * Preserve anything after that prefix, including modifier classes on the
+		 * same element and combinators without spaces.
+		 */
+		if ( preg_match( '/^([.#]?[-_a-zA-Z0-9]+|\[[^\]]+\])/', $selector, $matches ) ) {
+			$scoped_selectors[] = $base_selector . substr( $selector, strlen( $matches[0] ) ) . $state;
 			continue;
 		}
 

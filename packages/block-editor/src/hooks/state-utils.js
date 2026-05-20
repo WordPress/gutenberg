@@ -68,21 +68,33 @@ export function buildScopedBlockSelector(
 
 	return selectors
 		.map( ( selector ) => {
-			const relativeSelector = getRelativeRootSelector( selector );
-			if ( relativeSelector ) {
+			selector = selector.trim();
+
+			/*
+			 * Replace only the leading block selector part (e.g. class name,
+			 * attribute selector, ID, or tag name) with the block instance selector.
+			 * Preserve anything after that prefix, including modifier classes on the
+			 * same element and combinators without spaces.
+			 */
+			const match = selector.match( /^([.#]?[-_a-zA-Z0-9]+|\[[^\]]+\])/ );
+			if ( match ) {
 				return baseSelectors
 					.map(
 						( base ) =>
-							`${ base.trim() } ${ relativeSelector.trim() }${ suffix }`
+							`${ base.trim() }${ selector.slice(
+								match[ 0 ].length
+							) }${ suffix }`
 					)
 					.join( ', ' );
 			}
+
 			return baseSelectors
 				.map( ( base ) => `${ base.trim() }${ suffix }` )
 				.join( ', ' );
 		} )
 		.join( ', ' );
 }
+
 /**
  * Builds the scoped selector for root block style state styles.
  *
