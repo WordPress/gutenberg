@@ -116,6 +116,7 @@ const SiteLogo = ( {
 		}
 	}, [ isSelected ] );
 
+	// Always apply modal updates as snackbar Undo may restore the original id.
 	const handleMediaUpdate = ( { id: newId } ) => {
 		if ( typeof newId === 'number' ) {
 			setLogo( newId );
