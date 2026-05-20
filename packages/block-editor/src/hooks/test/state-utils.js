@@ -68,6 +68,18 @@ describe( 'buildScopedBlockSelector', () => {
 		).toBe( `${ BASE }>.inner:hover` );
 	} );
 
+	it( 'splits selector lists without splitting selector-function arguments', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-example:not(.foo, .bar) .inner, .wp-block-example .fallback',
+				':hover'
+			)
+		).toBe(
+			`${ BASE }:not(.foo, .bar) .inner:hover, ${ BASE } .fallback:hover`
+		);
+	} );
+
 	it( 'works for :focus and :active states', () => {
 		expect(
 			buildScopedBlockSelector(

@@ -159,6 +159,24 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that selector lists are split without splitting selector-function arguments.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 */
+	public function test_build_state_selector_splits_selector_lists_without_splitting_selector_function_arguments() {
+		$actual = gutenberg_build_state_selector(
+			'.wp-states-test',
+			'.wp-block-example:not(.foo, .bar) .inner, .wp-block-example .fallback',
+			':hover'
+		);
+
+		$this->assertSame(
+			'.wp-states-test:not(.foo, .bar) .inner:hover, .wp-states-test .fallback:hover',
+			$actual
+		);
+	}
+
+	/**
 	 * Tests that preset values are converted to CSS custom property references.
 	 *
 	 * @covers ::gutenberg_normalize_state_preset_vars
