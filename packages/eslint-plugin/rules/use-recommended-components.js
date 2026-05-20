@@ -89,7 +89,7 @@ const rule = {
 						return;
 					}
 
-					const name = getImportedName( specifier );
+					const name = specifier.imported.name;
 					if ( name === 'unlock' ) {
 						trackedUnlockImports.add( specifier.local.name );
 					}
@@ -196,16 +196,6 @@ function resolveMessage( template, name, source ) {
 	return template
 		.replace( /\{\{\s*name\s*\}\}/g, name )
 		.replace( /\{\{\s*source\s*\}\}/g, source );
-}
-
-/**
- * @param {import('estree').ImportSpecifier} specifier
- * @return {string} Imported name.
- */
-function getImportedName( specifier ) {
-	return specifier.imported.type === 'Identifier'
-		? specifier.imported.name
-		: String( specifier.imported.value );
 }
 
 /**
