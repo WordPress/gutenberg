@@ -66,13 +66,7 @@ const MORPH_LINE_TRANSFORM = [
 ];
 const MORPH_LINE_IDENTITY = 'translateY(0px) rotate(0deg) scaleX(1)';
 
-/**
- * Animate a phantom's two hamburger-line rects from one transform to another.
- *
- * @param {HTMLElement} phantom - The phantom element.
- * @param {boolean}     toMorphed - true to animate horizontal lines → X;
- *                                  false to animate X → horizontal lines.
- */
+// Animate a phantom's two hamburger-line rects from one transform to another.
 function animatePhantomLines( phantom, toMorphed ) {
 	const lines = phantom.querySelectorAll(
 		'.wp-block-navigation__hamburger-line'
@@ -90,10 +84,7 @@ function animatePhantomLines( phantom, toMorphed ) {
 		// the CSS default doesn't match the animation's first keyframe).
 		line.style.transform = startTransform;
 		line.animate(
-			[
-				{ transform: startTransform },
-				{ transform: endTransform },
-			],
+			[ { transform: startTransform }, { transform: endTransform } ],
 			{
 				duration: MORPH_DURATION,
 				easing: MORPH_EASING,
@@ -106,20 +97,12 @@ function animatePhantomLines( phantom, toMorphed ) {
 // Track active morph animations per navigation block element.
 const activeMorphAnimations = new WeakMap();
 
-/**
- * Whether morph animation should play (respects reduced motion preference).
- *
- * @return {boolean} True if animation should play.
- */
+// Whether morph animation should play (respects reduced motion preference).
 function shouldAnimateMorph() {
 	return ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 }
 
-/**
- * Cancel and clean up any in-progress morph animation for a navigation block.
- *
- * @param {HTMLElement} nav - The navigation block element.
- */
+// Cancel and clean up any in-progress morph animation for a navigation block.
 function cleanupMorphAnimation( nav ) {
 	const morph = activeMorphAnimations.get( nav );
 	if ( morph ) {
@@ -132,15 +115,7 @@ function cleanupMorphAnimation( nav ) {
 	}
 }
 
-/**
- * Create a phantom element (clone of the hamburger button) for the flight
- * animation. The phantom is positioned fixed above the overlay and is inert
- * (no click handlers, not focusable, hidden from screen readers).
- *
- * @param {HTMLElement} hamburgerBtn - The hamburger button to clone.
- * @param {boolean}     isMorphed   - Whether to start in the morphed (X) state.
- * @return {HTMLElement} The phantom element, already appended to document.body.
- */
+// Create an inert clone of the hamburger button for the flight animation.
 function createMorphPhantom( hamburgerBtn, isMorphed ) {
 	const phantom = hamburgerBtn.cloneNode( true );
 	// Remove Interactivity API directives so the clone is inert.
@@ -162,14 +137,7 @@ function createMorphPhantom( hamburgerBtn, isMorphed ) {
 	return phantom;
 }
 
-/**
- * Run the open morph animation: hamburger flies to close button, lines → X.
- *
- * @param {HTMLElement} nav          - The navigation block element.
- * @param {HTMLElement} hamburgerBtn - The hamburger button element.
- * @param {HTMLElement} closeBtn     - The overlay close button element.
- * @param {DOMRect}     startRect   - The hamburger's bounding rect (captured before overlay opened).
- */
+// Run the open morph animation: hamburger flies to close button, lines → X.
 function runOpenMorphAnimation( nav, hamburgerBtn, closeBtn, startRect ) {
 	cleanupMorphAnimation( nav );
 
@@ -177,7 +145,7 @@ function runOpenMorphAnimation( nav, hamburgerBtn, closeBtn, startRect ) {
 		return;
 	}
 
-	requestAnimationFrame( () => {
+	window.requestAnimationFrame( () => {
 		const endRect = closeBtn.getBoundingClientRect();
 
 		// Hide the real close button visually but keep it focusable. Using
@@ -233,15 +201,7 @@ function runOpenMorphAnimation( nav, hamburgerBtn, closeBtn, startRect ) {
 	} );
 }
 
-/**
- * Run the close morph animation: X flies back to hamburger, lines restore.
- *
- * @param {HTMLElement} nav           - The navigation block element.
- * @param {HTMLElement} hamburgerBtn  - The hamburger button element.
- * @param {HTMLElement} closeBtn      - The overlay close button element.
- * @param {DOMRect}     hamburgerRect - The hamburger's original bounding rect.
- * @param {Function}    onComplete    - Callback to run after animation finishes.
- */
+// Run the close morph animation: X flies back to hamburger, lines restore.
 function runCloseMorphAnimation(
 	nav,
 	hamburgerBtn,
@@ -376,9 +336,7 @@ const { state, actions } = store(
 				// Capture hamburger position before the overlay covers it.
 				// Only for the "handle" icon variant (has rect-based SVG lines).
 				if (
-					ref.querySelector(
-						'.wp-block-navigation__hamburger-line'
-					)
+					ref.querySelector( '.wp-block-navigation__hamburger-line' )
 				) {
 					const rect = ref.getBoundingClientRect();
 					ctx.morphStartRect = {
@@ -580,8 +538,7 @@ const { state, actions } = store(
 							// exact viewport position so the morph ends
 							// where it started.
 							closeBtn.style.position = 'fixed';
-							closeBtn.style.top =
-								ctx.morphStartRect.top + 'px';
+							closeBtn.style.top = ctx.morphStartRect.top + 'px';
 							closeBtn.style.left =
 								ctx.morphStartRect.left + 'px';
 							closeBtn.style.right = 'auto';
