@@ -8,7 +8,7 @@ import type { DataRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { FONT_WEIGHTS, FONT_STYLES } from './constants';
+import { FONT_STYLES } from './constants';
 import { fetchInstallFontFace } from '../api';
 import { formatFontFaceName } from './preview-styles';
 import type { FontFamilyToUpload, FontUploadResult } from '../types';
@@ -41,12 +41,22 @@ export function isUrlEncoded( url: string ): boolean {
 }
 
 export function getFontFaceVariantName( face: FontFace ): string {
-	const weightName = FONT_WEIGHTS[ face.fontWeight ?? '' ] || face.fontWeight;
 	const styleName =
-		face.fontStyle === 'normal'
-			? ''
-			: FONT_STYLES[ face.fontStyle ?? '' ] || face.fontStyle;
-	return `${ weightName } ${ styleName }`;
+		FONT_STYLES[ face.fontStyle ?? 'normal' ] || face.fontStyle;
+	const fontWeight = String( face.fontWeight ?? '' ).trim();
+	const rangeMatch = fontWeight.match( /^(\d+)\s+\d+$/ );
+	const keywordToWeight: Record< string, string > = {
+		normal: '400',
+		bold: '700',
+	};
+	const weightValue =
+		rangeMatch?.[ 1 ] || keywordToWeight[ fontWeight ] || fontWeight;
+
+	if ( rangeMatch ) {
+		return `${ weightValue } ${ styleName }`;
+	}
+
+	return `${ weightValue } ${ styleName }`;
 }
 
 export function mergeFontFaces(
