@@ -256,6 +256,43 @@ function gutenberg_get_block_state_unique_class( $block_name, $css_rules ) {
 }
 
 /**
+ * Splits a selector list by top-level commas.
+ *
+ * @param string $selector CSS selector list.
+ * @return string[] Selectors.
+ */
+function gutenberg_split_selector_list( $selector ) {
+	if ( ! str_contains( $selector, ',' ) ) {
+		return array( $selector );
+	}
+
+	$selectors         = array();
+	$current_selector  = '';
+	$parentheses_depth = 0;
+	$selector_length   = strlen( $selector );
+
+	for ( $i = 0; $i < $selector_length; $i++ ) {
+		$char = $selector[ $i ];
+
+		if ( '(' === $char ) {
+			++$parentheses_depth;
+		} elseif ( ')' === $char && $parentheses_depth > 0 ) {
+			--$parentheses_depth;
+		} elseif ( ',' === $char && 0 === $parentheses_depth ) {
+			$selectors[]      = $current_selector;
+			$current_selector = '';
+			continue;
+		}
+
+		$current_selector .= $char;
+	}
+
+	$selectors[] = $current_selector;
+
+	return $selectors;
+}
+
+/**
  * Builds a scoped selector from a block selector and optional pseudo-state.
  *
  * @param string      $base_selector  Block-instance scoping selector.
@@ -268,7 +305,7 @@ function gutenberg_build_state_selector( $base_selector, $block_selector, $state
 		return $base_selector . $state;
 	}
 
-	$selectors        = explode( ',', $block_selector );
+	$selectors        = gutenberg_split_selector_list( $block_selector );
 	$scoped_selectors = array();
 
 	foreach ( $selectors as $selector ) {
