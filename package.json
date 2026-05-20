@@ -242,6 +242,7 @@
 		"test/performance",
 		"test/storybook-playwright",
 		"test/unit",
-		"tools/*"
+		"tools/*",
+		"widgets/*"
 	]
 }
