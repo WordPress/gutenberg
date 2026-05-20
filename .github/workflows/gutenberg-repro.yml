@@ -1,0 +1,76 @@
+name: Gutenberg Repro (Claude)
+
+on:
+    issues:
+        types: [labeled]
+
+permissions:
+    contents: read
+    issues: write
+    id-token: write
+
+concurrency:
+    group: gutenberg-repro-${{ github.event.issue.number }}
+    cancel-in-progress: false
+
+jobs:
+    repro:
+        if: github.event.label.name == 'ai-reproduce'
+        runs-on: ubuntu-latest
+        timeout-minutes: 25
+        env:
+            GUTENBERG_REPRO_CI: '1'
+            GUTENBERG_REPRO_ISSUE: ${{ github.event.issue.html_url }}
+            GUTENBERG_REPRO_WORKSPACE: ${{ runner.temp }}/gutenberg-repro
+            TARGET_REPO: ${{ github.repository }}
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.2'
+                  tools: composer
+
+            - name: Install dependencies
+              run: |
+                  npm ci
+                  composer install --no-interaction --prefer-dist
+
+            - name: Build
+              run: npm run build
+
+            - name: Install Playwright browsers
+              run: npx playwright install --with-deps chromium
+
+            - name: Prepare workspace
+              run: mkdir -p "$GUTENBERG_REPRO_WORKSPACE"
+
+            - name: Run Claude repro
+              uses: anthropics/claude-code-action@v1
+              with:
+                  anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                  github_token: ${{ github.token }}
+                  claude_args: |
+                      --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["-y","@playwright/mcp@latest"]}}}'
+                      --allowedTools mcp__playwright__browser_navigate,mcp__playwright__browser_snapshot,mcp__playwright__browser_click,mcp__playwright__browser_type,mcp__playwright__browser_fill_form,mcp__playwright__browser_press_key,mcp__playwright__browser_evaluate,mcp__playwright__browser_wait_for,mcp__playwright__browser_console_messages,mcp__playwright__browser_network_requests,mcp__playwright__browser_take_screenshot,mcp__playwright__browser_close,Bash,Read,Write,Edit
+                  prompt: |
+                      Invoke the /gutenberg-repro skill against issue ${{ github.event.issue.html_url }}.
+                      CI mode is active (GUTENBERG_REPRO_CI=1, GUTENBERG_REPRO_ISSUE, GUTENBERG_REPRO_WORKSPACE all set).
+                      Follow the Execution mode section in SKILL.md: no consent gates, auto-proceed on low confidence with a flag in the report, tear down cleanly at the end, and post the comment per Step 8.5's gating (Reproduced/Not reproduced AND source repo == $TARGET_REPO).
+
+            - name: Upload artifacts
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: gutenberg-repro-${{ github.event.issue.number }}
+                  path: ${{ env.GUTENBERG_REPRO_WORKSPACE }}
+                  retention-days: 14
+
+            - name: Teardown (best-effort)
+              if: always()
+              run: npm run wp-env stop || true

@@ -1,6 +1,15 @@
 # Playwright MCP patterns for Gutenberg
 
-Tactical guidance for driving the Gutenberg editor via Playwright MCP tools. The skill drives the browser directly through `mcp__plugin_playwright_playwright__*` tool calls — it does not write `.spec.js` files and does not use the `e2e-test-utils-playwright` package.
+Tactical guidance for driving the Gutenberg editor via Playwright MCP tools. The skill drives the browser directly through Playwright MCP tool calls — it does not write `.spec.js` files and does not use the `e2e-test-utils-playwright` package.
+
+## Tool naming across modes
+
+The same Playwright MCP server (`@playwright/mcp`) is loaded by two different paths, and the tool names exposed to Claude differ:
+
+- **Interactive mode** (locally installed via the Claude Code plugin marketplace): tools are exposed as `mcp__plugin_playwright_playwright__browser_*`.
+- **CI mode** (loaded by `anthropics/claude-code-action` via `--mcp-config`): tools are exposed as `mcp__playwright__browser_*`.
+
+The bare tool names (`browser_navigate`, `browser_snapshot`, `browser_click`, …) are identical in both modes; only the prefix differs. This document uses the bare names throughout — the loaded prefix in each session is whatever the runtime exposes.
 
 ## Tool inventory
 
@@ -17,7 +26,7 @@ The relevant Playwright MCP tools:
 - `browser_wait_for({text, textGone, time})` — wait condition
 - `browser_console_messages()` — read accumulated console messages
 - `browser_network_requests()` — read accumulated network requests
-- `browser_close()` — close the browser session (the skill does NOT call this; see SKILL.md "Leave running")
+- `browser_close()` — close the browser session. In interactive mode the skill does NOT call this (see SKILL.md Step 9 "Leave running"); in CI mode the skill DOES call it as part of teardown.
 
 ## Login flow
 
@@ -121,6 +130,6 @@ Between attempts, open a fresh browser context rather than reusing the previous 
 
 - Do not use `browser_run_code_unsafe`. It is not needed for repro work.
 - Do not write `.spec.js` files. The skill is ad-hoc-only.
-- Do not call `browser_close` at the end of the run — SKILL.md Step 9 explicitly leaves the browser open.
+- Do not call `browser_close` at the end of the run in interactive mode — SKILL.md Step 9 explicitly leaves the browser open. In CI mode, DO call `browser_close` as part of teardown.
 - Do not interact with elements via raw selectors. Always go through `browser_snapshot` and refs.
 - Do not silently retry a step that timed out within an attempt. Record the timeout and let the attempt-level loop decide.
