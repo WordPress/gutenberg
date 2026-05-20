@@ -1,4 +1,8 @@
 /**
+ * Shared helpers for ESLint rules that inspect `unlock( privateApis )` usage.
+ */
+
+/**
  * @typedef {{ privateApisSources: Map<string, string>, trackedUnlockImports: Set<string> }} PrivateApisState
  */
 
@@ -13,6 +17,8 @@ function createPrivateApisState() {
 }
 
 /**
+ * Records the local name of an imported `unlock` function.
+ *
  * @param {PrivateApisState}                 state
  * @param {import('estree').ImportSpecifier} specifier
  */
@@ -23,6 +29,8 @@ function trackUnlockImport( state, specifier ) {
 }
 
 /**
+ * Maps a `privateApis` import's local name to its package source.
+ *
  * @param {PrivateApisState}                 state
  * @param {import('estree').ImportSpecifier} specifier
  * @param {string}                           source
@@ -65,7 +73,7 @@ function isUnlockCall( node, sourceCode, trackedUnlockImports ) {
 
 /**
  * @param {import('estree').Expression|import('estree').PrivateIdentifier} key
- * @return {string|null} Property name.
+ * @return {string|null} Static name of an object pattern property key.
  */
 function getPropertyName( key ) {
 	if ( key.type === 'Identifier' ) {
@@ -80,6 +88,8 @@ function getPropertyName( key ) {
 }
 
 /**
+ * Parses `const { … } = unlock( privateApis )` and returns the package source and properties.
+ *
  * @param {import('estree').VariableDeclarator} node
  * @param {import('eslint').SourceCode}         sourceCode
  * @param {PrivateApisState}                    state
