@@ -23,6 +23,15 @@ type InlineNoticesProps = {
 	context?: string;
 };
 
+function hasRenderableChildren( children: ReactNode ): boolean {
+	return (
+		children !== null &&
+		children !== undefined &&
+		children !== false &&
+		children !== ''
+	);
+}
+
 export default function InlineNotices( {
 	children,
 	className,
@@ -43,7 +52,8 @@ export default function InlineNotices( {
 	);
 
 	const hasPinnedNotices = nonDismissibleNotices.length > 0;
-	const hasDismissibleNotices = dismissibleNotices.length > 0 || !! children;
+	const hasDismissibleNotices =
+		dismissibleNotices.length > 0 || hasRenderableChildren( children );
 
 	if ( ! hasPinnedNotices && ! hasDismissibleNotices ) {
 		return null;

@@ -38,6 +38,14 @@ describe( 'InlineNotices', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
+	it( 'should return null when children is false and there are no notices', () => {
+		const { container } = renderInlineNotices( {
+			children: false,
+		} );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
 	it( 'should render the inline notices wrapper with a custom class name', () => {
 		const { container } = renderInlineNotices( {
 			className: 'my-inline-notices',
