@@ -31,7 +31,6 @@
 		"build.mjs",
 		"cherry-pick.mjs",
 		"dev.mjs",
-		"generate-php-sync-issue.mjs",
 		"log-performance-results.js",
 		"packages/build-vendors.mjs",
 		"packages/build.mjs",
