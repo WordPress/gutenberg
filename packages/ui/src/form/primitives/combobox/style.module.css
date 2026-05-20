@@ -6,8 +6,7 @@
 	}
 
 	.chip {
-		/* TODO: Use or create new control/interactive padding token */
-		--wp-ui-combobox-chip-content-padding-inline-start: calc(2 * var(--wpds-dimension-base));
+		--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-sm);
 
 		overflow: hidden;
 		display: flex;
@@ -44,8 +43,7 @@
 		}
 
 		&:has(.chip-prefix) {
-			/* TODO: Use or create new control/interactive padding token */
-			--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-base);
+			--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-xs);
 		}
 	}
 
