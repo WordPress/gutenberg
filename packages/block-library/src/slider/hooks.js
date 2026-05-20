@@ -104,21 +104,19 @@ function usePaginationPlacement( clientId ) {
 			const { getBlockOrder, getBlockName } = select( blockEditorStore );
 			const orderedIds = getBlockOrder( clientId );
 
-			let foundPaginationId = null;
-			let paginationPos = -1;
+			const paginationEntries = [];
 			const slidePositions = [];
 
 			for ( let i = 0; i < orderedIds.length; i++ ) {
 				const name = getBlockName( orderedIds[ i ] );
 				if ( name === PAGINATION_BLOCK ) {
-					foundPaginationId = orderedIds[ i ];
-					paginationPos = i;
+					paginationEntries.push( { id: orderedIds[ i ], pos: i } );
 				} else if ( name === SLIDE_BLOCK ) {
 					slidePositions.push( i );
 				}
 			}
 
-			if ( ! foundPaginationId || slidePositions.length < 2 ) {
+			if ( paginationEntries.length === 0 || slidePositions.length < 2 ) {
 				return {
 					paginationClientId: null,
 					needsCorrection: false,
@@ -128,22 +126,24 @@ function usePaginationPlacement( clientId ) {
 
 			const firstSlide = slidePositions[ 0 ];
 			const lastSlide = slidePositions[ slidePositions.length - 1 ];
-			const isBetweenSlides =
-				paginationPos > firstSlide && paginationPos < lastSlide;
+			const misplacedPagination = paginationEntries.find(
+				( { pos } ) => pos > firstSlide && pos < lastSlide
+			);
 
-			if ( ! isBetweenSlides ) {
+			if ( ! misplacedPagination ) {
 				return {
-					paginationClientId: foundPaginationId,
+					paginationClientId: null,
 					needsCorrection: false,
 					destinationIndex: 0,
 				};
 			}
 
 			const moveToStart =
-				paginationPos - firstSlide <= lastSlide - paginationPos;
+				misplacedPagination.pos - firstSlide <=
+				lastSlide - misplacedPagination.pos;
 
 			return {
-				paginationClientId: foundPaginationId,
+				paginationClientId: misplacedPagination.id,
 				needsCorrection: true,
 				destinationIndex: moveToStart ? 0 : orderedIds.length,
 			};
