@@ -1,7 +1,6 @@
 const {
 	createPrivateApisState,
-	trackPrivateApisImport,
-	trackUnlockImport,
+	trackPrivateApisSpecifier,
 	getPropertyName,
 	getUnlockDestructuring,
 } = require( '../utils/private-apis' );
@@ -97,18 +96,15 @@ const rule = {
 					}
 
 					const name = specifier.imported.name;
-					trackUnlockImport( privateApisState, specifier );
+					trackPrivateApisSpecifier(
+						privateApisState,
+						specifier,
+						source,
+						!! denylistEntry
+					);
 
 					if ( ! allowlistEntry && ! denylistEntry ) {
 						return;
-					}
-
-					if ( denylistEntry && name === 'privateApis' ) {
-						trackPrivateApisImport(
-							privateApisState,
-							specifier,
-							source
-						);
 					}
 
 					if (

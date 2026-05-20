@@ -17,26 +17,24 @@ function createPrivateApisState() {
 }
 
 /**
- * Records the local name of an imported `unlock` function.
- *
- * @param {PrivateApisState}                 state
- * @param {import('estree').ImportSpecifier} specifier
- */
-function trackUnlockImport( state, specifier ) {
-	if ( specifier.imported.name === 'unlock' ) {
-		state.trackedUnlockImports.add( specifier.local.name );
-	}
-}
-
-/**
- * Maps a `privateApis` import's local name to its package source.
+ * Records imported `unlock` aliases and, when requested, `privateApis` → package source.
  *
  * @param {PrivateApisState}                 state
  * @param {import('estree').ImportSpecifier} specifier
  * @param {string}                           source
+ * @param {boolean}                          trackPrivateApis
  */
-function trackPrivateApisImport( state, specifier, source ) {
-	if ( specifier.imported.name === 'privateApis' ) {
+function trackPrivateApisSpecifier(
+	state,
+	specifier,
+	source,
+	trackPrivateApis
+) {
+	const name = specifier.imported.name;
+	if ( name === 'unlock' ) {
+		state.trackedUnlockImports.add( specifier.local.name );
+	}
+	if ( trackPrivateApis && name === 'privateApis' ) {
 		state.privateApisSources.set( specifier.local.name, source );
 	}
 }
@@ -126,8 +124,7 @@ function getUnlockDestructuring( node, sourceCode, state ) {
 
 module.exports = {
 	createPrivateApisState,
-	trackUnlockImport,
-	trackPrivateApisImport,
+	trackPrivateApisSpecifier,
 	getPropertyName,
 	getUnlockDestructuring,
 };
