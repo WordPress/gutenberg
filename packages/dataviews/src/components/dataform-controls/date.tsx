@@ -18,7 +18,7 @@ import {
 import {
 	BaseControl,
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
@@ -269,7 +269,7 @@ function ValidatedDateControl< Item >( {
 								: undefined
 						) }
 					>
-						<Icon
+						<WCIcon
 							className="components-validated-control__indicator-icon"
 							icon={ errorIcon }
 							size={ 16 }

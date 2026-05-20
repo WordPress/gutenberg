@@ -17,9 +17,11 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/blocks',
 	'@wordpress/boot',
 	'@wordpress/commands',
+	'@wordpress/compose',
 	'@wordpress/connectors',
 	'@wordpress/workflows',
 	'@wordpress/components',
+	'@wordpress/content-types',
 	'@wordpress/core-commands',
 	'@wordpress/core-data',
 	'@wordpress/customize-widgets',
@@ -47,8 +49,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/upload-media',
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
-	'@wordpress/user-post-types',
-	'@wordpress/user-taxonomies',
 	'@wordpress/views',
 ];
 

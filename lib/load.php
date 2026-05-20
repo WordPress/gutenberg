@@ -76,8 +76,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
-	require __DIR__ . '/compat/wordpress-7.0/connectors.php';
 
 	// WordPress 7.1 compat.
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
@@ -121,11 +119,19 @@ require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
+require __DIR__ . '/compat/wordpress-7.0/fonts.php';
+
+if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
+	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
+	require __DIR__ . '/compat/wordpress-7.0/connectors.php';
+	require __DIR__ . '/compat/wordpress-7.0/default-connectors.php';
+}
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
 
 // Experimental features.
+require __DIR__ . '/experimental/admin-bar-in-editor/load.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
@@ -133,9 +139,8 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
-require __DIR__ . '/experimental/fonts/load.php';
-if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
-	require __DIR__ . '/experimental/connectors/load.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
+	require __DIR__ . '/experimental/media-editor/load.php';
 }
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
@@ -202,6 +207,7 @@ require __DIR__ . '/block-supports/aria-label.php';
 require __DIR__ . '/block-supports/anchor.php';
 require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
+require __DIR__ . '/block-supports/states.php';
 
 // Client-side media processing.
 require_once __DIR__ . '/media/load.php';
@@ -232,4 +238,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/load.php';
 	require __DIR__ . '/experimental/dashboard-widgets/widget-types.php';
+	require __DIR__ . '/experimental/dashboard-widgets/dashboard-layout.php';
+	require __DIR__ . '/experimental/dashboard-widgets/default-layout-seed.php';
 }

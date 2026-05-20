@@ -193,6 +193,7 @@ export default dedupePlugins( [
 			'**/build-wp/**',
 			'**/node_modules/**',
 			'packages/block-serialization-spec-parser/parser.js',
+			'packages/global-styles-ui/src/font-library/lib/**',
 			'packages/icons/src/library/*.tsx',
 			'packages/react-native-editor/bundle/**',
 			'packages/vips/src/worker-code.ts',
@@ -264,6 +265,8 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Icon: 'WCIcon',
+						Tooltip: 'WCTooltip',
 					},
 				},
 			],
@@ -363,6 +366,19 @@ export default dedupePlugins( [
 		files: [ 'packages/react-native-*/**/*.js' ],
 		settings: {
 			'import/ignore': [ 'react-native' ], // Workaround for https://github.com/facebook/react-native/issues/28549.
+		},
+	},
+
+	// Override: Package source files — non-module stylesheets should be
+	// bundled through package stylesheet entry points, not runtime injected.
+	{
+		files: [ 'packages/*/src/**/*.[tj]s?(x)', 'routes/**/*.[tj]s?(x)' ],
+		ignores: [
+			...developmentFiles,
+			'**/*.@(android|ios|native).[tj]s?(x)',
+		],
+		rules: {
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
 	},
 
@@ -551,12 +567,7 @@ export default dedupePlugins( [
 
 	// Override: CLI/bin/env files — allow console.
 	{
-		files: [
-			'bin/**/*.js',
-			'bin/**/*.mjs',
-			'packages/env/**',
-			'packages/theme/bin/**/*.[tj]s?(x)',
-		],
+		files: [ '**/{bin,scripts,tools}/**', 'packages/env/**' ],
 		rules: {
 			'no-console': 'off',
 		},

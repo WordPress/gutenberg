@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Icon, Tooltip } from '@wordpress/components';
+import { Icon as WCIcon, Tooltip as WCTooltip } from '@wordpress/components';
 import { error as errorIcon } from '@wordpress/icons';
 
 function getLabelContent(
@@ -10,12 +10,12 @@ function getLabelContent(
 	fieldLabel?: string
 ) {
 	return showError ? (
-		<Tooltip text={ errorMessage } placement="top">
+		<WCTooltip text={ errorMessage } placement="top">
 			<span className="dataforms-layouts-panel__field-label-error-content">
-				<Icon icon={ errorIcon } size={ 16 } />
+				<WCIcon icon={ errorIcon } size={ 16 } />
 				{ fieldLabel }
 			</span>
-		</Tooltip>
+		</WCTooltip>
 	) : (
 		fieldLabel
 	);
