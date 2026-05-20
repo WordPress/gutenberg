@@ -449,20 +449,20 @@ function gutenberg_enqueue_vips_loader() {
 }
 
 /**
- * Enqueue the mediabunny loader script module in the block editor.
+ * Enqueue the video-conversion loader script module in the block editor.
  *
- * This registers @wordpress/mediabunny/worker as a dynamic dependency in the
- * import map, enabling on-demand loading of the WebCodecs-based GIF-to-video
- * processing module when animated GIF conversion is triggered via
- * @wordpress/upload-media.
+ * This registers @wordpress/video-conversion/worker as a dynamic dependency
+ * in the import map, enabling on-demand loading of the WebCodecs-based
+ * GIF-to-video processing module when animated GIF conversion is triggered
+ * via @wordpress/upload-media.
  *
- * @see packages/mediabunny/src/loader.ts
+ * @see packages/video-conversion/src/loader.ts
  */
 if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_mediabunny_loader' );
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_video_conversion_loader' );
 }
-function gutenberg_enqueue_mediabunny_loader() {
-	wp_enqueue_script_module( '@wordpress/mediabunny/loader' );
+function gutenberg_enqueue_video_conversion_loader() {
+	wp_enqueue_script_module( '@wordpress/video-conversion/loader' );
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );

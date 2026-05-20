@@ -34,9 +34,9 @@ import {
 	maybeRecycleVipsWorker,
 } from './utils';
 import {
-	mediabunnyConvertGifToVideo,
+	convertGifToVideo,
 	isUnsupportedConversionError,
-} from './utils/mediabunny';
+} from './utils/video-conversion';
 import type {
 	AccumulateSubSizeAction,
 	AddAction,
@@ -1182,7 +1182,7 @@ export function transcodeGifItem(
 		const outputMimeType = `video/${ outputFormat }`;
 
 		try {
-			const file = await mediabunnyConvertGifToVideo(
+			const file = await convertGifToVideo(
 				item.id,
 				item.file,
 				outputMimeType
@@ -1214,7 +1214,7 @@ export function transcodeGifItem(
 			// what the user thinks of as an image upload.
 			// eslint-disable-next-line no-console
 			console.error(
-				'[mediabunny] GIF to video conversion failed:',
+				'[video-conversion] GIF to video conversion failed:',
 				error
 			);
 			dispatch.cancelItem(

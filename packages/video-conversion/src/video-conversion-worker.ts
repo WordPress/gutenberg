@@ -26,7 +26,7 @@ let workerAPI: Remote< WorkerAPI > | undefined;
 let workerBlobUrl: string | undefined;
 
 /**
- * Gets or creates the mediabunny worker instance.
+ * Gets or creates the video conversion worker instance.
  * Uses lazy initialization to only create the worker when needed.
  *
  * The worker code is bundled inline and loaded via a Blob URL.
@@ -50,7 +50,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 }
 
 /**
- * Converts an animated GIF to a video file using mediabunny in a worker.
+ * Converts an animated GIF to a video file using the worker pipeline.
  *
  * @param id             Item ID.
  * @param gifSource      GIF file as a Blob/File or ArrayBuffer.
@@ -58,7 +58,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
  * @param maxDimensions  Optional maximum dimension for downscaling.
  * @return Video file buffer.
  */
-export async function mediabunnyConvertGifToVideo(
+export async function convertGifToVideo(
 	id: ItemId,
 	gifSource: ArrayBuffer | Blob,
 	outputMimeType: string,
@@ -74,12 +74,12 @@ export async function mediabunnyConvertGifToVideo(
 }
 
 /**
- * Cancels all ongoing operations for a given item ID.
+ * Cancels all ongoing GIF-to-video conversions for a given item ID.
  *
  * @param id Item ID.
  * @return Whether any operation was cancelled.
  */
-export async function mediabunnyCancelOperations(
+export async function cancelGifToVideoOperations(
 	id: ItemId
 ): Promise< boolean > {
 	const api = getWorkerAPI();
@@ -87,10 +87,10 @@ export async function mediabunnyCancelOperations(
 }
 
 /**
- * Terminates the mediabunny worker if it exists.
- * Call this to free up resources when mediabunny processing is no longer needed.
+ * Terminates the video conversion worker if it exists.
+ * Call this to free up resources when video conversion is no longer needed.
  */
-export function terminateMediabunnyWorker(): void {
+export function terminateVideoConversionWorker(): void {
 	if ( workerAPI ) {
 		terminate( workerAPI );
 		workerAPI = undefined;

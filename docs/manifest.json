@@ -1902,9 +1902,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/mediabunny",
-		"slug": "packages-mediabunny",
-		"markdown_source": "../packages/mediabunny/README.md",
+		"title": "@wordpress/video-conversion",
+		"slug": "packages-video-conversion",
+		"markdown_source": "../packages/video-conversion/README.md",
 		"parent": "packages"
 	},
 	{

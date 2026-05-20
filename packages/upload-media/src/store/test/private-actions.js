@@ -15,7 +15,7 @@ import {
 } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { vipsHasTransparency } from '../utils';
-import { mediabunnyConvertGifToVideo } from '../utils/mediabunny';
+import { convertGifToVideo } from '../utils/video-conversion';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -36,15 +36,15 @@ jest.mock( '../utils', () => {
 	};
 } );
 
-// Mock the mediabunny wrapper so the dynamic worker import is never executed.
-// isUnsupportedConversionError is kept real so transcodeGifItem's
+// Mock the video-conversion wrapper so the dynamic worker import is never
+// executed. isUnsupportedConversionError is kept real so transcodeGifItem's
 // graceful-skip vs. hard-failure branching is genuinely exercised.
-jest.mock( '../utils/mediabunny', () => {
-	const actual = jest.requireActual( '../utils/mediabunny' );
+jest.mock( '../utils/video-conversion', () => {
+	const actual = jest.requireActual( '../utils/video-conversion' );
 	return {
-		mediabunnyConvertGifToVideo: jest.fn(),
-		mediabunnyCancelOperations: jest.fn(),
-		terminateMediabunnyWorker: jest.fn(),
+		convertGifToVideo: jest.fn(),
+		cancelGifToVideoOperations: jest.fn(),
+		terminateVideoConversionWorker: jest.fn(),
 		isUnsupportedConversionError: actual.isUnsupportedConversionError,
 	};
 } );
@@ -645,7 +645,7 @@ describe( 'private actions', () => {
 		let consoleError;
 
 		beforeEach( () => {
-			mediabunnyConvertGifToVideo.mockReset();
+			convertGifToVideo.mockReset();
 			createBlobURL.mockClear();
 			consoleError = jest
 				.spyOn( console, 'error' )
@@ -660,7 +660,7 @@ describe( 'private actions', () => {
 			const videoFile = new File( [ 'mp4' ], 'animation.mp4', {
 				type: 'video/mp4',
 			} );
-			mediabunnyConvertGifToVideo.mockResolvedValue( videoFile );
+			convertGifToVideo.mockResolvedValue( videoFile );
 			const { select, dispatch } = buildArgs();
 
 			await transcodeGifItem( 'gif-1', { outputFormat: 'mp4' } )( {
@@ -668,7 +668,7 @@ describe( 'private actions', () => {
 				dispatch,
 			} );
 
-			expect( mediabunnyConvertGifToVideo ).toHaveBeenCalledWith(
+			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
 				gifFile,
 				'video/mp4'
@@ -686,14 +686,14 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'defaults to mp4 when no output format is given', async () => {
-			mediabunnyConvertGifToVideo.mockResolvedValue(
+			convertGifToVideo.mockResolvedValue(
 				new File( [ 'mp4' ], 'animation.mp4', { type: 'video/mp4' } )
 			);
 			const { select, dispatch } = buildArgs();
 
 			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
 
-			expect( mediabunnyConvertGifToVideo ).toHaveBeenCalledWith(
+			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
 				gifFile,
 				'video/mp4'
@@ -705,7 +705,7 @@ describe( 'private actions', () => {
 			// to "upload the original GIF" here would write a meaningless
 			// animated_video meta entry pointing at the GIF itself. Just
 			// cancel the sideload — silently — and let the GIF stand alone.
-			mediabunnyConvertGifToVideo.mockRejectedValue(
+			convertGifToVideo.mockRejectedValue(
 				new Error( 'Unsupported: WebCodecs unavailable' )
 			);
 			const { select, dispatch } = buildArgs();
@@ -726,7 +726,7 @@ describe( 'private actions', () => {
 			// user thinks of as an image upload: log the cause, cancel
 			// the sideload silently, leave the GIF attachment untouched.
 			const cause = new Error( 'Encoder produced empty output' );
-			mediabunnyConvertGifToVideo.mockRejectedValue( cause );
+			convertGifToVideo.mockRejectedValue( cause );
 			const { select, dispatch } = buildArgs();
 
 			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
@@ -748,7 +748,7 @@ describe( 'private actions', () => {
 
 			await transcodeGifItem( 'missing' )( { select, dispatch } );
 
-			expect( mediabunnyConvertGifToVideo ).not.toHaveBeenCalled();
+			expect( convertGifToVideo ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
 		} );

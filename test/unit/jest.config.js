@@ -31,10 +31,10 @@ module.exports = {
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/vips/worker':
 			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
-		// Mock @wordpress/mediabunny/worker before the general pattern so it doesn't try to load the real file.
+		// Mock @wordpress/video-conversion/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
-		'@wordpress/mediabunny/worker':
-			'<rootDir>/test/unit/config/mediabunny-worker-code-stub.js',
+		'@wordpress/video-conversion/worker':
+			'<rootDir>/test/unit/config/video-conversion-worker-code-stub.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':

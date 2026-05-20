@@ -1,7 +1,7 @@
 /**
- * Worker entry point for mediabunny video processing.
+ * Worker entry point for video conversion.
  *
- * This file exposes all mediabunny functions to be available in the Web Worker
+ * This file exposes the video conversion functions in the Web Worker
  * context. The @wordpress/worker-threads library handles the RPC
  * communication with the main thread.
  */
@@ -17,7 +17,7 @@ import { expose } from '@wordpress/worker-threads';
 import { cancelOperations, convertGifToVideo } from './index';
 
 /**
- * The API object that exposes all mediabunny functions to the main thread.
+ * The API object that exposes the video conversion functions to the main thread.
  */
 const api = {
 	cancelOperations,

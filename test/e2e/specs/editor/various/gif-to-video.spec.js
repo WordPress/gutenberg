@@ -81,7 +81,7 @@ class GifToVideoUtils {
 	}
 
 	/**
-	 * Skip this test if the mediabunny GIF-to-video path is not active.
+	 * Skip this test if the GIF-to-video path is not active.
 	 *
 	 * The conversion requires:
 	 *   - client-side media processing enabled globally,
@@ -108,12 +108,12 @@ class GifToVideoUtils {
 		} );
 		testInstance.skip(
 			! isActive,
-			'mediabunny GIF-to-video is not active in this environment (requires WebCodecs + cross-origin isolation)'
+			'GIF-to-video conversion is not active in this environment (requires WebCodecs + cross-origin isolation)'
 		);
 	}
 }
 
-test.describe( 'Mediabunny: animated GIF to video conversion', () => {
+test.describe( 'Video conversion: animated GIF to video', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );

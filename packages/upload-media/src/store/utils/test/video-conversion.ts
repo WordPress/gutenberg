@@ -1,15 +1,15 @@
 /**
  * Internal dependencies
  */
-import { isUnsupportedConversionError } from '../mediabunny';
+import { isUnsupportedConversionError } from '../video-conversion';
 
 describe( 'isUnsupportedConversionError', () => {
-	// These are the exact messages thrown by @wordpress/mediabunny's
-	// convertGifToVideo (see packages/mediabunny/src/index.ts). They are
-	// duplicated here intentionally: the worker RPC layer (comctx) serializes
-	// a thrown error to its message string only, so the cross-boundary
-	// contract is the message prefix. If the worker wording drifts without
-	// updating this guard, this test fails.
+	// These are the exact messages thrown by @wordpress/video-conversion's
+	// convertGifToVideo (see packages/video-conversion/src/index.ts). They
+	// are duplicated here intentionally: the worker RPC layer (comctx)
+	// serializes a thrown error to its message string only, so the
+	// cross-boundary contract is the message prefix. If the worker wording
+	// drifts without updating this guard, this test fails.
 	it.each( [
 		'Unsupported: WebCodecs unavailable',
 		'Unsupported: encoder codec not supported',
