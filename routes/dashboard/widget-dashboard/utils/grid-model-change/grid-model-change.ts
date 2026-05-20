@@ -14,25 +14,27 @@ export function getGridModel( settings: WidgetGridSettings ): WidgetGridModel {
 	return settings.model ?? 'grid';
 }
 
+type computeGridModelChangeProps = {
+	layout: DashboardWidget[];
+	gridSettings: WidgetGridSettings;
+	targetModel: WidgetGridModel;
+};
+
+type computeGridModelChangeResult = {
+	layout: DashboardWidget[];
+	gridSettings: WidgetGridSettings;
+} | null;
+
 /**
  * Computes the staged layout and grid settings after a layout-model change.
- * @param root0
- * @param root0.layout
- * @param root0.gridSettings
- * @param root0.targetModel
+ * @param {computeGridModelChangeProps} params - The parameters for the function.
+ * @return {computeGridModelChangeResult} The function result.
  */
 export function computeGridModelChange( {
 	layout,
 	gridSettings,
 	targetModel,
-}: {
-	layout: DashboardWidget[];
-	gridSettings: WidgetGridSettings;
-	targetModel: WidgetGridModel;
-} ): {
-	layout: DashboardWidget[];
-	gridSettings: WidgetGridSettings;
-} | null {
+}: computeGridModelChangeProps ): computeGridModelChangeResult {
 	const currentModel = getGridModel( gridSettings );
 
 	if ( currentModel === targetModel ) {
