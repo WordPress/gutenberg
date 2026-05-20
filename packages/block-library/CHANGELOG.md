@@ -2,6 +2,78 @@
 
 ## Unreleased
 
+### Internal
+
+-   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 9.46.0 (2026-05-14)
+
+## 9.45.0 (2026-04-29)
+
+## 9.44.0 (2026-04-15)
+
+## 9.43.0 (2026-04-01)
+
+## 9.42.0 (2026-03-18)
+
+## 9.41.0 (2026-03-04)
+
+## 9.40.0 (2026-02-18)
+
+## 9.39.0 (2026-01-29)
+
+## 9.38.0 (2026-01-16)
+
+-   Post Date Block: Improve semantic HTML to add `<time>` inside link element.
+
+## 9.37.0 (2025-12-23)
+
+## 9.36.0 (2025-11-26)
+
+## 9.35.0 (2025-11-12)
+
+## 9.34.0 (2025-10-29)
+
+## 9.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Enable the Query Loop "Force Page Reload" setting to be false when the Post Content block is used. ([#72160](https://github.com/WordPress/gutenberg/pull/72160))
+
+## 9.32.0 (2025-10-01)
+
+## 9.31.0 (2025-09-17)
+
+## 9.30.0 (2025-09-03)
+
+## 9.29.0 (2025-08-20)
+
+## 9.28.0 (2025-08-07)
+
+## 9.27.0 (2025-07-23)
+
+## 9.26.0 (2025-06-25)
+
+## 9.25.0 (2025-06-04)
+
+## 9.24.0 (2025-05-22)
+
+## 9.23.0 (2025-05-07)
+
+## 9.22.0 (2025-04-11)
+
+## 9.21.0 (2025-03-27)
+
+## 9.20.0 (2025-03-13)
+
+### Enhancements
+
+-   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
+
+## 9.19.0 (2025-02-28)
+
+## 9.18.0 (2025-02-12)
+
 ## 9.17.0 (2025-01-29)
 
 ## 9.16.0 (2025-01-15)

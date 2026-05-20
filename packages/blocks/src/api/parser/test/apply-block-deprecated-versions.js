@@ -17,6 +17,7 @@ import {
 
 describe( 'applyBlockDeprecatedVersions', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			fruit: {
 				type: 'string',

@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import _style, { getInlineStyles, omitStyle } from '../style';
+import _style, {
+	getInlineStyles,
+	getStateStylesCSS,
+	omitStyle,
+} from '../style';
 
 describe( 'getInlineStyles', () => {
 	it( 'should return an empty object when called with undefined', () => {
@@ -25,6 +29,7 @@ describe( 'getInlineStyles', () => {
 				},
 				dimensions: {
 					minHeight: '50vh',
+					minWidth: '200px',
 				},
 				spacing: {
 					blockGap: '1em',
@@ -44,6 +49,7 @@ describe( 'getInlineStyles', () => {
 			fontSize: 10,
 			marginBottom: '15px',
 			minHeight: '50vh',
+			minWidth: '200px',
 			paddingTop: '10px',
 		} );
 	} );
@@ -111,6 +117,88 @@ describe( 'getInlineStyles', () => {
 			margin: '10px',
 			padding: '20px',
 		} );
+	} );
+} );
+
+describe( 'getStateStylesCSS', () => {
+	it( 'adds fallback border style without important', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					border: {
+						color: '#000000',
+						width: '2px',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { border-color: #000000 !important; border-width: 2px !important; }\n.wp-block-test:hover { border-style: solid; }'
+		);
+	} );
+
+	it( 'adds important to authored border style', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					border: {
+						style: 'solid',
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe( '.wp-block-test:hover { border-style: solid !important; }' );
+	} );
+
+	it( 'adds important to authored side border style', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					border: {
+						top: {
+							style: 'dashed',
+						},
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { border-top-style: dashed !important; }'
+		);
+	} );
+
+	it( 'adds fallback side border style without important', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					border: {
+						top: {
+							width: '2px',
+						},
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { border-top-width: 2px !important; }\n.wp-block-test:hover { border-top-style: solid; }'
+		);
+	} );
+
+	it( 'adds important to side border color', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					border: {
+						top: {
+							color: '#0000ff',
+						},
+					},
+				},
+				'.wp-block-test:hover'
+			)
+		).toBe(
+			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
+		);
 	} );
 } );
 

@@ -122,9 +122,9 @@ export default function SidebarNavigationScreen( {
 				</HStack>
 				<div className="edit-site-sidebar-navigation-screen__content">
 					{ description && (
-						<p className="edit-site-sidebar-navigation-screen__description">
+						<div className="edit-site-sidebar-navigation-screen__description">
 							{ description }
-						</p>
+						</div>
 					) }
 					{ content }
 				</div>

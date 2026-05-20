@@ -3,13 +3,14 @@
 exports[`Notice should match snapshot 1`] = `
 <div>
   <div
-    class="components-notice is-success is-dismissible"
+    class="components-notice is-success"
   >
     <div
-      class="components-visually-hidden emotion-0 emotion-1"
+      class="components-visually-hidden css-1ragr82-PolymorphicDiv emotion-0"
+      data-visually-hidden=""
       data-wp-c16t="true"
       data-wp-component="VisuallyHidden"
-      style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
+      style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
     >
       Notice
     </div>
@@ -17,28 +18,28 @@ exports[`Notice should match snapshot 1`] = `
       class="components-notice__content"
     >
       Example
-      <div
-        class="components-notice__actions"
+    </div>
+    <div
+      class="components-notice__actions"
+    >
+      <a
+        class="components-button components-notice__action is-compact is-link"
+        href="https://example.com"
       >
-        <a
-          class="components-button components-notice__action is-next-40px-default-size is-link"
-          href="https://example.com"
-        >
-          More information
-        </a>
-        <button
-          class="components-button components-notice__action is-next-40px-default-size is-secondary"
-          type="button"
-        >
-          Cancel
-        </button>
-        <button
-          class="components-button components-notice__action is-next-40px-default-size is-primary"
-          type="button"
-        >
-          Submit
-        </button>
-      </div>
+        More information
+      </a>
+      <button
+        class="components-button components-notice__action is-secondary is-compact"
+        type="button"
+      >
+        Cancel
+      </button>
+      <button
+        class="components-button components-notice__action is-primary is-compact"
+        type="button"
+      >
+        Submit
+      </button>
     </div>
     <button
       aria-label="Close"
@@ -54,7 +55,7 @@ exports[`Notice should match snapshot 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"
+          d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
         />
       </svg>
     </button>

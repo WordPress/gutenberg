@@ -11,7 +11,7 @@ import {
 	FlexItem,
 	Dropdown,
 	Composite,
-	Tooltip,
+	Tooltip as WCTooltip,
 } from '@wordpress/components';
 import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
@@ -46,6 +46,8 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => onShadowChange( undefined ) }
+						disabled={ ! shadow }
+						accessibleWhenDisabled
 					>
 						{ __( 'Clear' ) }
 					</Button>
@@ -80,7 +82,7 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<Tooltip text={ label }>
+		<WCTooltip text={ label }>
 			<Composite.Item
 				role="option"
 				aria-label={ label }
@@ -104,7 +106,7 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 					</button>
 				}
 			/>
-		</Tooltip>
+		</WCTooltip>
 	);
 }
 
@@ -134,12 +136,15 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 }
 
 function renderShadowToggle( shadow, onShadowChange ) {
-	return ( { onToggle, isOpen } ) => {
+	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
 		const toggleProps = {
 			onClick: onToggle,
-			className: clsx( { 'is-open': isOpen } ),
+			className: clsx(
+				'block-editor-global-styles__shadow-dropdown-toggle',
+				{ 'is-open': isOpen }
+			),
 			'aria-expanded': isOpen,
 			ref: shadowButtonRef,
 		};

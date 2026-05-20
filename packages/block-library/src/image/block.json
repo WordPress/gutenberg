@@ -8,9 +8,11 @@
 		"allowResize",
 		"imageCrop",
 		"fixedHeight",
+		"navigationButtonType",
 		"postId",
 		"postType",
-		"queryId"
+		"queryId",
+		"galleryId"
 	],
 	"description": "Insert an image to make a visual statement.",
 	"keywords": [ "img", "photo", "picture" ],
@@ -89,6 +91,9 @@
 		"scale": {
 			"type": "string"
 		},
+		"focalPoint": {
+			"type": "object"
+		},
 		"sizeSlug": {
 			"type": "string"
 		},
@@ -100,6 +105,10 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"isDecorative": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

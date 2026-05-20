@@ -77,7 +77,7 @@ test.describe( 'Content-only lock', () => {
 		] );
 	} );
 
-	test( 'should be able to automatically stop temporarily modify as blocks when an outside block is selected', async ( {
+	test( 'should be able to edit all blocks via Edit pattern button and exit via Exit pattern button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -90,23 +90,27 @@ test.describe( 'Content-only lock', () => {
 			<div class="wp-block-group"><!-- wp:paragraph -->
 			<p>Locked block a</p>
 			<!-- /wp:paragraph -->
-			
+
 			<!-- wp:paragraph -->
 			<p>Locked block b</p>
 			<!-- /wp:paragraph --></div>
 			<!-- /wp:group -->
-			
+
 			<!-- wp:heading -->
 			<h2 class="wp-block-heading"><strong>outside block</strong></h2>
 			<!-- /wp:heading -->` );
 
 		await pageUtils.pressKeys( 'secondary+M' );
+		await editor.openDocumentSettingsSidebar();
 		// Select the content locked block.
 		await editor.canvas
 			.locator( 'role=document[name="Block: Group"i]' )
 			.click();
-		// Press modify to temporarily edit as blocks.
-		await editor.clickBlockOptionsMenuItem( 'Modify' );
+		// Click "Edit pattern" button to temporarily edit as blocks.
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
 		// Selected a nest paragraph verify Block is not content locked
 		// Styles can be changed and nested blocks can be removed
 		await editor.canvas
@@ -117,15 +121,746 @@ test.describe( 'Content-only lock', () => {
 			page.locator( '.color-block-support-panel' )
 		).toBeAttached();
 		await editor.clickBlockOptionsMenuItem( 'Delete' );
-		// Select an outside block
-		await editor.canvas
-			.locator( 'role=document[name="Block: Heading"i]' )
+		// Click "Exit pattern" button to exit edit mode
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Exit pattern' } )
 			.click();
+
 		// Select a locked nested paragraph block again
-		await pageUtils.pressKeys( 'ArrowUp' );
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.click();
+		// Block is content locked again, simple styles like color cannot be changed.
+		await expect(
+			page.locator( '.color-block-support-panel' )
+		).not.toBeAttached();
+	} );
+
+	test( 'allows editing all blocks via Edit pattern toolbar button and exiting via Exit pattern toolbar button', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block in the code editor.
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:paragraph -->
+			<p>Locked block a</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>Locked block b</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group -->
+
+			<!-- wp:heading -->
+			<h2 class="wp-block-heading"><strong>outside block</strong></h2>
+			<!-- /wp:heading -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// Select the content locked block.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.click();
+		// Click "Edit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit pattern' );
+		// Select a nested paragraph — verify block is not content locked.
+		// Style panels are visible when the block is unlocked for editing.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Color' } )
+		).toBeVisible();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Typography' } )
+		).toBeVisible();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+		).toBeVisible();
+
+		// Re-select the group to access its toolbar.
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Block: Group"i]' )
+		);
+		// Click "Exit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Exit pattern' );
+
+		// Select a locked nested paragraph block again.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		// Block is content locked again — style panels are hidden.
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Color' } )
+		).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Typography' } )
+		).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+		).toBeHidden();
+	} );
+
+	test( 'should be able to edit all blocks via double-click and exit by clicking outside', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block in the code editor
+		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:paragraph -->
+			<p>Locked block a</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:separator -->
+			<hr class="wp-block-separator has-alpha-channel-opacity"/>
+			<!-- /wp:separator -->
+
+			<!-- wp:paragraph -->
+			<p>Locked block b</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group -->
+
+			<!-- wp:heading -->
+			<h2 class="wp-block-heading"><strong>outside block</strong></h2>
+			<!-- /wp:heading -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+		await editor.openDocumentSettingsSidebar();
+		// Double-click the separator (structural block) to enter edit mode
+		const separator = editor.canvas.getByRole( 'document', {
+			name: 'Block: Separator',
+		} );
+		await separator.dblclick( { force: true } );
+
+		// Wait for edit mode to be entered - "Edit pattern" button should disappear
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Edit pattern' } )
+		).toBeHidden();
+
+		// Select first paragraph to verify it's not content locked
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+
+		// Verify Block is not content locked
+		// Styles can be changed and nested blocks can be removed
+		await expect(
+			page.locator( '.color-block-support-panel' )
+		).toBeAttached();
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+		// Select an outside block to exit edit mode
+		await editor.canvas
+			.locator( 'role=document[name="Block: Heading 2"i]' )
+			.click( { force: true } );
+
+		// Select the remaining locked paragraph block to verify we're back in content-only mode
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.click();
+
 		// Block is content locked again simple styles like position can not be changed.
 		await expect(
 			page.locator( '.color-block-support-panel' )
 		).not.toBeAttached();
+	} );
+
+	test( 'non-paragraph content role blocks not within a `content` role container cannot be duplicated, inserted before/after, or moved', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block with paragraph and list
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:heading -->
+<h2 class="wp-block-heading">Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>List item one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List item two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		const heading = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Heading',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'Heading' } );
+
+		// Select the content-locked group block.
+		await editor.selectBlocks( groupBlock );
+
+		await test.step( 'Blocks cannot be inserted before/after or duplicated', async () => {
+			// Test paragraph.
+			await editor.selectBlocks( heading );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Options' } )
+			).toBeHidden();
+		} );
+
+		await test.step( 'Blocks cannot be moved', async () => {
+			// Test paragraph.
+			await editor.selectBlocks( heading );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move up' } )
+			).toBeHidden();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move down' } )
+			).toBeHidden();
+		} );
+	} );
+
+	test( 'paragraph blocks that are within a `content` role container can be duplicated, inserted before/after, or moved', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block with paragraph and list
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+
+		await test.step( 'Blocks can be inserted before/after or duplicated', async () => {
+			// Test first list item.
+			await editor.selectBlocks( paragraph );
+			await editor.showBlockToolbar();
+
+			const firstOptionsButton = page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await expect( firstOptionsButton ).toBeVisible();
+
+			// Open the options menu.
+			await firstOptionsButton.click();
+
+			// Verify Insert Before, Insert After, and Duplicate menu items are present.
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add before' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add after' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Duplicate' } )
+			).toBeVisible();
+
+			// Close the menu.
+			await page.keyboard.press( 'Escape' );
+		} );
+	} );
+
+	test( 'content role blocks that are within a `content` role container can be duplicated, inserted before/after, or moved', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block with paragraph and list
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>List item one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>List item two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		const firstListItem = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: List item',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'List item one' } );
+		const secondListItem = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: List item',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'List item two' } );
+
+		// Select the content-locked group block.
+		await editor.selectBlocks( groupBlock );
+
+		await test.step( 'Blocks can be inserted before/after or duplicated', async () => {
+			// Test first list item.
+			await editor.selectBlocks( firstListItem );
+			await editor.showBlockToolbar();
+
+			const firstOptionsButton = page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await expect( firstOptionsButton ).toBeVisible();
+
+			// Open the options menu.
+			await firstOptionsButton.click();
+
+			// Verify Insert Before, Insert After, and Duplicate menu items are present.
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add before' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add after' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Duplicate' } )
+			).toBeVisible();
+
+			// Close the menu.
+			await page.keyboard.press( 'Escape' );
+
+			// Test second list item.
+			await editor.selectBlocks( secondListItem );
+			await editor.showBlockToolbar();
+
+			const secondOptionsButton = page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } );
+
+			await expect( secondOptionsButton ).toBeVisible();
+
+			// Open the options menu.
+			await secondOptionsButton.click();
+
+			// Verify Insert Before, Insert After, and Duplicate menu items are present.
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add before' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Add after' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Options' } )
+					.getByRole( 'menuitem', { name: 'Duplicate' } )
+			).toBeVisible();
+
+			// Close the menu.
+			await page.keyboard.press( 'Escape' );
+		} );
+
+		await test.step( 'Blocks cannot be moved', async () => {
+			// Test first list item.
+			await editor.selectBlocks( firstListItem );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move up' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move down' } )
+			).toBeVisible();
+
+			// Test second list item.
+			await editor.selectBlocks( secondListItem );
+			await editor.showBlockToolbar();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move up' } )
+			).toBeVisible();
+
+			await expect(
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Move down' } )
+			).toBeVisible();
+		} );
+	} );
+
+	test( 'pressing Enter on a non-text block in a contentOnly section should not insert a paragraph', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// The Cover is nested inside a Column so that its parent has no
+		// templateLock of its own. This mirrors real patterns like
+		// Event RSVP where the Cover sits inside Columns > Column.
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:paragraph -->
+<p>A paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:cover {"overlayColor":"black","isDark":false} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-black-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph -->
+<p>Cover content</p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+
+		// Select the content-locked group block first (enters section editing).
+		await editor.selectBlocks( groupBlock );
+
+		// Select the Cover block within the nested column.
+		await editor.selectBlocks( coverBlock );
+
+		// The Cover's parent Column should have exactly one child.
+		const initialBlocks = await editor.getBlocks();
+		const coverColumn =
+			initialBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 1 ];
+		const initialColumnChildren = coverColumn.innerBlocks.length;
+		expect( initialColumnChildren ).toBe( 1 );
+
+		// Press Enter on the selected Cover block.
+		await page.keyboard.press( 'Enter' );
+
+		// Verify no new paragraph was inserted in the Column.
+		const afterBlocks = await editor.getBlocks();
+		const afterColumn = afterBlocks[ 0 ].innerBlocks[ 0 ].innerBlocks[ 1 ];
+		expect( afterColumn.innerBlocks ).toHaveLength( initialColumnChildren );
+	} );
+
+	test( 'should insert blocks via Add before and Add after for paragraphs in contentOnly mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Original</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+
+		// Select the paragraph and click "Add after".
+		await editor.selectBlocks( paragraph );
+		await editor.clickBlockOptionsMenuItem( 'Add after' );
+
+		// Verify a new default block was inserted after the original.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Original' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: '' },
+					},
+				],
+			},
+		] );
+
+		// Re-select the first paragraph and click "Add before".
+		const firstParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.first();
+		await editor.selectBlocks( firstParagraph );
+		await editor.clickBlockOptionsMenuItem( 'Add before' );
+
+		// Verify a new default block was inserted before the original.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: '' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Original' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: '' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should duplicate paragraphs in contentOnly mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Hello</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+
+		// Select the paragraph and duplicate it.
+		await editor.selectBlocks( paragraph );
+		await editor.clickBlockOptionsMenuItem( 'Duplicate' );
+
+		// Verify the block tree now has two paragraphs with the same content.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Hello' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Hello' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should allow removing a default block when siblings exist but not the last one', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		// Select the first paragraph and delete it.
+		const firstParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+				includeHidden: true,
+			} )
+			.first();
+		await editor.selectBlocks( firstParagraph );
+		await editor.clickBlockOptionsMenuItem( 'Delete' );
+
+		// Verify only the second paragraph remains.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Second' },
+					},
+				],
+			},
+		] );
+
+		// Select the remaining paragraph and open the Options menu —
+		// "Delete" should not be available since it is the last default block.
+		const remainingParagraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+		await editor.selectBlocks( remainingParagraph );
+		await editor.showBlockToolbar();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'menu', { name: 'Options' } )
+				.getByRole( 'menuitem', { name: 'Delete' } )
+		).toBeHidden();
+	} );
+
+	test( 'should not allow removing non-content-role blocks via keyboard shortcut in contentOnly mode', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:heading -->
+<h2 class="wp-block-heading">My Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>A paragraph</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		const heading = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Heading',
+				includeHidden: true,
+			} )
+			.filter( { hasText: 'My Heading' } );
+
+		// Select the content-locked group block first.
+		await editor.selectBlocks( groupBlock );
+
+		// Select the heading and attempt to delete via keyboard shortcut.
+		await editor.selectBlocks( heading );
+		await pageUtils.pressKeys( 'access+z' );
+
+		// Verify both blocks still exist — the heading was not removed.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/heading',
+						attributes: { content: 'My Heading' },
+					},
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'A paragraph' },
+					},
+				],
+			},
+		] );
 	} );
 } );

@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+
 /**
  * WordPress dependencies
  */
@@ -13,19 +15,28 @@ import { useState } from '@wordpress/element';
 import GradientPicker from '..';
 
 const meta: Meta< typeof GradientPicker > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Color/GradientPicker',
 	id: 'components-gradientpicker',
 	component: GradientPicker,
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		actions: { argTypesRegex: '^on.*' },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
+	args: {
+		onChange: fn(),
 	},
 	argTypes: {
 		value: { control: false },
 	},
 };
 export default meta;
+
+type GradientPickerStory = StoryObj< typeof GradientPicker >;
 
 const GRADIENTS = [
 	{
@@ -64,12 +75,24 @@ const GRADIENTS = [
 			'linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)',
 		slug: 'cool-to-warm-spectrum',
 	},
+	{
+		name: 'HSL blue to purple',
+		gradient:
+			'linear-gradient(135deg,hsl(200, 100%, 50%) 0%,hsl(280, 100%, 60%) 100%)',
+		slug: 'hsl-blue-to-purple',
+	},
+	{
+		name: 'HSLA green to red',
+		gradient:
+			'linear-gradient(135deg,hsla(120, 100%, 40%, 0.85) 0%,hsla(0, 100%, 50%, 0.85) 100%)',
+		slug: 'hsla-green-to-red',
+	},
 ];
 
-const Template: StoryFn< typeof GradientPicker > = ( {
+const Template = ( {
 	onChange,
 	...props
-} ) => {
+}: React.ComponentProps< typeof GradientPicker > ) => {
 	const [ gradient, setGradient ] =
 		useState< ( typeof props )[ 'value' ] >( null );
 	return (
@@ -84,22 +107,62 @@ const Template: StoryFn< typeof GradientPicker > = ( {
 	);
 };
 
-export const Default = Template.bind( {} );
-Default.args = {
-	gradients: GRADIENTS,
+export const Default: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: GRADIENTS,
+	},
 };
 
-export const WithNoExistingGradients = Template.bind( {} );
-WithNoExistingGradients.args = {
-	...Default.args,
-	gradients: [],
+export const WithNoExistingGradients: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: [],
+	},
 };
 
-export const MultipleOrigins = Template.bind( {} );
-MultipleOrigins.args = {
-	...Default.args,
-	gradients: [
-		{ name: 'Origin 1', gradients: GRADIENTS },
-		{ name: 'Origin 2', gradients: GRADIENTS },
-	],
+export const MultipleOrigins: GradientPickerStory = {
+	render: Template,
+	args: {
+		gradients: [
+			{ name: 'Origin 1', gradients: GRADIENTS },
+			{ name: 'Origin 2', gradients: GRADIENTS },
+		],
+	},
+};
+
+export const CSSVariables: GradientPickerStory = {
+	render: ( args ) => (
+		<div
+			style={ {
+				'--red': '#f00',
+				'--yellow': '#ff0',
+				'--blue': '#00f',
+			} }
+		>
+			<Template { ...args } />
+		</div>
+	),
+	args: {
+		gradients: [
+			{
+				name: 'Red to Yellow',
+				gradient:
+					'linear-gradient(135deg,var(--red) 0%,var(--yellow) 100%)',
+				slug: 'red-to-yellow',
+			},
+			{
+				name: 'Yellow to Blue',
+				gradient:
+					'linear-gradient(135deg,var(--yellow) 0%,var(--blue) 100%)',
+				slug: 'yellow-to-blue',
+			},
+			{
+				name: 'Blue to Red',
+				gradient:
+					'linear-gradient(135deg,var(--blue) 0%,var(--red) 100%)',
+				slug: 'blue-to-red',
+			},
+		],
+	},
 };

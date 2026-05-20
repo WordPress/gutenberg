@@ -1,5 +1,8 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-patterns-list__list-item {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	margin-bottom: $grid-unit-20;
 
 	// The list item contains absolutely positioned visually hidden text,
@@ -30,7 +33,6 @@
 
 	.block-editor-block-patterns-list__item-title {
 		flex-grow: 1;
-		font-size: $helptext-font-size;
 		text-align: left;
 	}
 

@@ -117,9 +117,8 @@ const DimensionControls = ( {
 			>
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Aspect ratio' ) }
-					value={ aspectRatio }
+					value={ aspectRatio || 'auto' }
 					options={ aspectRatioOptions }
 					onChange={ ( nextAspectRatio ) =>
 						setAttributes( { aspectRatio: nextAspectRatio } )
@@ -189,7 +188,6 @@ const DimensionControls = ( {
 				>
 					<ToggleGroupControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ scaleLabel }
 						value={ scale }
 						help={ scaleHelp[ scale ] }

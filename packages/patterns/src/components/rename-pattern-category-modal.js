@@ -137,7 +137,6 @@ export default function RenamePatternCategoryModal( {
 					<VStack spacing="2">
 						<TextControl
 							ref={ textControlRef }
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Name' ) }
 							value={ name }

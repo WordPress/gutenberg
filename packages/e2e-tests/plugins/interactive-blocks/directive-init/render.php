@@ -20,7 +20,7 @@
 		data-testid="multiple inits"
 		data-wp-context='{"isReady":[false,false],"calls":[0,0]}'
 		data-wp-init--one="actions.initOne"
-		data-wp-init--two="actions.initTwo"
+		data-wp-init---two="actions.initTwo"
 	>
 		<p data-wp-text="state.isReady" data-testid="isReady">false,false</p>
 		<p data-wp-text="state.calls" data-testid="calls">0,0</p>

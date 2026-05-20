@@ -23,6 +23,13 @@ test.use( {
 test.describe( 'Post Editor Template mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-templates' );
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Template creation involves page reload and preview opens frontend
+		// pages without the DIP header, creating an agent cluster mismatch
+		// that breaks cross-window communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -35,6 +42,9 @@ test.describe( 'Post Editor Template mode', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-templates' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test( 'Allow to switch to template mode, edit the template and check the result', async ( {
@@ -89,24 +99,20 @@ test.describe( 'Post Editor Template mode', () => {
 		await postEditorTemplateMode.disableTemplateWelcomeGuide();
 		await postEditorTemplateMode.openTemplatePopover();
 		// Change to a custom template, save and reload.
-		await page
-			.getByRole( 'menuitem', {
-				name: 'Change template',
-			} )
-			.click();
-		await page
-			.getByRole( 'option', {
-				name: 'Custom',
-			} )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
+		await page.getByRole( 'option', { name: 'Custom' } ).click();
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Custom' );
 		await editor.saveDraft();
 		await page.reload();
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Custom' );
 		// Change to the default template.
 		await postEditorTemplateMode.openTemplatePopover();
 		await page
-			.getByRole( 'menuitem', {
-				name: 'Use default template',
-			} )
+			.getByRole( 'menuitem', { name: 'Use default template' } )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Template options' } )
@@ -247,12 +253,14 @@ class PostEditorTemplateMode {
 			)
 		).toBeVisible();
 
-		// Wait for the editor to be loaded and ready before making changes.
-		// Without this, the editor will move focus to body while still typing.
-		// And the save states will not be counted as dirty.
-		// There is likely a bug in the code, waiting for the snackbar above should be enough.
-		// eslint-disable-next-line playwright/no-networkidle
-		await this.page.waitForLoadState( 'networkidle' );
+		// Wait for the editor to be fully loaded and ready before making changes.
+		// Without this, the editor may move focus to body while still typing,
+		// and save states will not be counted as dirty.
+		await this.page.waitForFunction(
+			() =>
+				window.wp?.data?.select( 'core/block-editor' )?.getBlocks()
+					?.length > 0
+		);
 	}
 
 	async saveTemplateWithoutPublishing() {
@@ -268,8 +276,10 @@ class PostEditorTemplateMode {
 			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
 		// Avoid publishing the post.
-		await editorPublishRegion
-			.getByRole( 'button', { name: 'Cancel' } )
-			.click();
+		const cancelButton = editorPublishRegion.getByRole( 'button', {
+			name: 'Cancel',
+		} );
+		await expect( cancelButton ).toBeEnabled();
+		await cancelButton.click();
 	}
 }

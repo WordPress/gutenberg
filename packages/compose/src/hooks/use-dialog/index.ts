@@ -1,33 +1,40 @@
 /**
  * External dependencies
  */
-import type { RefCallback, SyntheticEvent } from 'react';
+import type {
+	KeyboardEvent,
+	KeyboardEventHandler,
+	RefCallback,
+	SyntheticEvent,
+} from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useRef, useEffect, useCallback } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import useConstrainedTabbing from '../use-constrained-tabbing';
-import useFocusOnMount from '../use-focus-on-mount';
+import { useFocusOnMount } from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
 
 type DialogOptions = {
 	/**
-	 * Determines whether focus should be automatically moved to the popover
-	 * when it mounts. `false` causes no focus shift, `true` causes the popover
-	 * itself to gain focus, and `firstElement` focuses the first focusable
-	 * element within the popover.
+	 * Determines focus behavior when the dialog mounts.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
 	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	focusOnMount?: useFocusOnMount.Mode;
 	/**
 	 * Determines whether tabbing is constrained to within the popover,
 	 * preventing keyboard focus from leaving the popover content without
@@ -41,6 +48,10 @@ type DialogOptions = {
 	constrainTabbing?: boolean;
 	onClose?: () => void;
 	/**
+	 * Optional `onKeyDown` handler, merged with the built-in one.
+	 */
+	onKeyDown?: KeyboardEventHandler< HTMLElement >;
+	/**
 	 * Use the `onClose` prop instead.
 	 *
 	 * @deprecated
@@ -53,7 +64,9 @@ type DialogOptions = {
 
 type useDialogReturn = [
 	RefCallback< HTMLElement >,
-	ReturnType< typeof useFocusOutside > & Pick< HTMLElement, 'tabIndex' >,
+	ReturnType< typeof useFocusOutside > & {
+		onKeyDown: ( event: KeyboardEvent< HTMLElement > ) => void;
+	} & Pick< HTMLElement, 'tabIndex' >,
 ];
 
 /**
@@ -66,7 +79,7 @@ type useDialogReturn = [
  * @param options Dialog Options.
  */
 function useDialog( options: DialogOptions ): useDialogReturn {
-	const currentOptions = useRef< DialogOptions | undefined >();
+	const currentOptions = useRef< DialogOptions >( undefined );
 	const { constrainTabbing = options.focusOnMount !== false } = options;
 	useEffect( () => {
 		currentOptions.current = options;
@@ -83,22 +96,23 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 			currentOptions.current.onClose();
 		}
 	} );
-	const closeOnEscapeRef = useCallback( ( node: HTMLElement ) => {
-		if ( ! node ) {
-			return;
+	// Close on Escape via a React `onKeyDown` (rather than a native listener)
+	// so portaled descendants that handle Escape and call
+	// `event.stopPropagation()` correctly prevent the dialog from closing.
+	// See https://github.com/WordPress/gutenberg/issues/78432.
+	const onKeyDown = useCallback( ( event: KeyboardEvent< HTMLElement > ) => {
+		// Let the consumer-provided handler (if any) run first so it can
+		// call `preventDefault()` to opt out of close-on-Escape.
+		currentOptions.current?.onKeyDown?.( event );
+		if (
+			event.key === 'Escape' &&
+			! event.defaultPrevented &&
+			currentOptions.current?.onClose
+		) {
+			event.preventDefault();
+			event.stopPropagation();
+			currentOptions.current.onClose();
 		}
-
-		node.addEventListener( 'keydown', ( event: KeyboardEvent ) => {
-			// Close on escape.
-			if (
-				event.keyCode === ESCAPE &&
-				! event.defaultPrevented &&
-				currentOptions.current?.onClose
-			) {
-				event.preventDefault();
-				currentOptions.current.onClose();
-			}
-		} );
 	}, [] );
 
 	return [
@@ -106,10 +120,10 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 			constrainTabbing ? constrainedTabbingRef : null,
 			options.focusOnMount !== false ? focusReturnRef : null,
 			options.focusOnMount !== false ? focusOnMountRef : null,
-			closeOnEscapeRef,
 		] ),
 		{
 			...focusOutsideProps,
+			onKeyDown,
 			tabIndex: -1,
 		},
 	];

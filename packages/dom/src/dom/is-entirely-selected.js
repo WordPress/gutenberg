@@ -5,6 +5,12 @@ import { assertIsDefined } from '../utils/assert-is-defined';
 import isInputOrTextArea from './is-input-or-text-area';
 
 /**
+ * Zero width non-breaking space, used as padding in the editable DOM tree when
+ * it is empty otherwise.
+ */
+const ZWNBSP = '\ufeff';
+
+/**
  * Check whether the contents of the element have been entirely selected.
  * Returns true if there is no possibility of selection.
  *
@@ -21,6 +27,14 @@ export default function isEntirelySelected( element ) {
 	}
 
 	if ( ! element.isContentEditable ) {
+		return true;
+	}
+
+	// If the element is effectively empty (contains only the ZWNBSP
+	// placeholder or nothing), consider it entirely selected since there's
+	// nothing meaningful to select.
+	const text = element.textContent || '';
+	if ( text === '' || text === ZWNBSP ) {
 		return true;
 	}
 
@@ -79,6 +93,18 @@ function isDeepChild( query, container, propName ) {
 			return true;
 		}
 		candidate = candidate[ propName ];
+		// There may be empty text nodes between the first/last child, so ignore
+		// them.
+		while (
+			candidate &&
+			candidate.nodeType === candidate.TEXT_NODE &&
+			candidate.nodeValue === ''
+		) {
+			candidate =
+				candidate[
+					propName === 'lastChild' ? 'previousSibling' : 'nextSibling'
+				];
+		}
 	} while ( candidate );
 	return false;
 }

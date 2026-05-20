@@ -8,7 +8,6 @@
 				"requireEndingPeriod": true
 			}
 		],
-		"prefer-no-devDependencies": "error",
 		"require-publishConfig": "error",
 		"require-repository-directory": "error",
 		"valid-values-author": [ "error", [ "The WordPress Contributors" ] ],
@@ -26,16 +25,14 @@
 			"patterns": [ "./package.json" ],
 			"rules": {
 				"require-publishConfig": "off",
-				"require-repository-directory": "off",
-				"prefer-no-devDependencies": "off"
+				"require-repository-directory": "off"
 			}
 		},
 		{
 			"patterns": [ "./platform-docs/package.json" ],
 			"rules": {
 				"require-publishConfig": "off",
-				"require-repository-directory": "off",
-				"prefer-no-devDependencies": "off"
+				"require-repository-directory": "off"
 			}
 		}
 	]

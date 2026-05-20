@@ -304,13 +304,13 @@ class BottomSheetCell extends Component {
 			}
 			return ! help
 				? sprintf(
-						/* translators: accessibility text. Inline textinput title and value.%1: Cell title, %2: cell value. */
+						/* translators: accessibility text. Inline textinput title and value. %1: Cell title, %2: cell value. */
 						_x( '%1$s, %2$s', 'inline textinput cell' ),
 						label,
 						value
 				  ) // Separating by ',' is necessary to make a pause on urls (non-capitalized text)
 				: sprintf(
-						/* translators: accessibility text. Inline textinput title, value and help text.%1: Cell title, %2: cell value, , %3: cell help. */
+						/* translators: accessibility text. Inline textinput title, value and help text. %1: Cell title, %2: cell value, , %3: cell help. */
 						_x( '%1$s, %2$s, %3$s', 'inline textinput cell' ),
 						label,
 						value,

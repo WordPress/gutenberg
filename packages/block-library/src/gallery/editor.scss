@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // Adding `figure` to the selector increases the specificity above the global
 // styles specificity, which is levelled at 0-1-0. We should figure out why
 // `figure` is needed.
@@ -14,20 +19,6 @@
 
 	> .blocks-gallery-media-placeholder-wrapper {
 		flex-basis: 100%;
-	}
-
-	.wp-block-image {
-		.components-notice.is-error {
-			display: block;
-		}
-		.components-notice__content {
-			margin: 4px 0;
-		}
-		.components-notice__dismiss {
-			position: absolute;
-			top: 0;
-			right: 5px;
-		}
 	}
 
 	// @todo this deserves a refactor, by being moved to the toolbar.
@@ -65,23 +56,6 @@
 .gallery-settings-buttons {
 	.components-button:first-child {
 		margin-right: 8px;
-	}
-}
-
-.gallery-image-sizes {
-	.components-base-control__label {
-		margin-bottom: 4px;
-	}
-
-	.gallery-image-sizes__loading {
-		display: flex;
-		align-items: center;
-		color: $gray-700;
-		font-size: $helptext-font-size;
-	}
-
-	.components-spinner {
-		margin: 0 8px 0 4px;
 	}
 }
 
