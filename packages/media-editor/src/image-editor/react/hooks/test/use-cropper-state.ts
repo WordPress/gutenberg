@@ -54,6 +54,65 @@ describe( 'useCropperState', () => {
 		expect( result.current.state.zoom ).toBe( 3 );
 	} );
 
+	it( 'leaves pan at zero on setZoom when the cropRect is centered', () => {
+		// Sanity: the default cropRect spans the full image, so its
+		// center coincides with the image center and the crop-center
+		// focal-point correction degenerates to "no pan change."
+		// Guards against regressions where setZoom accidentally pans.
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoom( 4 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 4 );
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+
+		act( () => {
+			result.current.setZoom( 2 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 2 );
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+	} );
+
+	it( 'anchors setZoom at the crop-rect center', () => {
+		// With an off-center crop, setZoom must shift pan toward the
+		// crop center as zoom decreases — otherwise `enforceContainment`
+		// would translate the image toward the nearest viewport corner
+		// (the original bug this method fixes).
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoom( 4 );
+		} );
+		// Place the crop in the bottom-right quadrant — center
+		// at ( 0.7, 0.7 ), i.e. ( +0.2, +0.2 ) in pan coords.
+		act( () => {
+			result.current.setCropRect( {
+				x: 0.6,
+				y: 0.6,
+				width: 0.2,
+				height: 0.2,
+			} );
+		} );
+		act( () => {
+			result.current.setPan( { x: 0, y: 0 } );
+		} );
+
+		expect( result.current.state.pan ).toEqual( { x: 0, y: 0 } );
+
+		// Zoom out — pan should move toward the focal point in +x, +y,
+		// not stay at the origin (which would corner-snap on containment).
+		act( () => {
+			result.current.setZoom( 2 );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 2 );
+		expect( result.current.state.pan.x ).toBeGreaterThan( 0 );
+		expect( result.current.state.pan.y ).toBeGreaterThan( 0 );
+	} );
+
 	it( 'should dispatch SET_ZOOM_AT_POINT via setZoomAtPoint', () => {
 		const { result } = renderHook( () => useCropperState() );
 
@@ -79,6 +138,30 @@ describe( 'useCropperState', () => {
 		} );
 
 		expect( result.current.state.zoom ).toBe( 1 );
+	} );
+
+	it( 'allows setZoom below 1 when the coverage minimum permits', () => {
+		// Thin, fine-rotated crop on a portrait image: the coverage
+		// minimum drops below 1, so `setZoom` (slider / keyboard path)
+		// must honour values below 1 rather than clamping at MIN_ZOOM.
+		const { result } = renderHook( () =>
+			useCropperState( {
+				image: {
+					src: 'portrait.jpg',
+					naturalWidth: 900,
+					naturalHeight: 1600,
+				},
+				rotation: 19,
+				cropRect: { x: 0.48, y: 0, width: 0.04, height: 1 },
+			} )
+		);
+
+		act( () => {
+			result.current.setZoom( 0.9 );
+		} );
+
+		expect( result.current.state.zoom ).toBeLessThan( 1 );
+		expect( result.current.state.zoom ).toBeGreaterThanOrEqual( 0.9 );
 	} );
 
 	it( 'should dispatch SET_ROTATION via setRotation', () => {

@@ -35,8 +35,8 @@ import { ItemSubmenuIcon } from './icons';
 import {
 	Controls,
 	LinkUI,
-	updateAttributes,
 	useEntityBinding,
+	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
 	useEnableLinkStatusValidation,
@@ -92,15 +92,17 @@ export default function NavigationSubmenuEdit( {
 		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
-	const {
-		clearBinding,
-		createBinding,
-		hasUrlBinding,
-		isBoundEntityAvailable,
-		entityRecord,
-	} = useEntityBinding( {
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
+
+	const handleLinkChange = useHandleLinkChange( {
 		clientId,
 		attributes,
+		setAttributes,
+		allowTextUpdate: true,
 	} );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
@@ -398,26 +400,7 @@ export default function NavigationSubmenuEdit( {
 								setAttributes( { url: '' } );
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
-							onChange={ ( updatedValue ) => {
-								// updateAttributes determines the final state and returns metadata
-								const {
-									isEntityLink,
-									attributes: updatedAttributes,
-								} = updateAttributes(
-									updatedValue,
-									setAttributes,
-									attributes
-								);
-
-								// Handle URL binding based on the final computed state
-								// Only create bindings for entity links (posts, pages, taxonomies)
-								// Never create bindings for custom links (manual URLs)
-								if ( isEntityLink ) {
-									createBinding( updatedAttributes );
-								} else {
-									clearBinding();
-								}
-							} }
+							onChange={ handleLinkChange }
 						/>
 					) }
 				</ParentElement>

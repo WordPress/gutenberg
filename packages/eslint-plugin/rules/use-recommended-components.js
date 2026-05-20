@@ -14,8 +14,10 @@ const ALLOWLIST = {
 			'Collapsible',
 			'CollapsibleCard',
 			'EmptyState',
+			'Icon',
 			'Link',
 			'Stack',
+			'Tabs',
 			'Text',
 			'VisuallyHidden',
 		],
@@ -49,6 +51,8 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
+		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
 };

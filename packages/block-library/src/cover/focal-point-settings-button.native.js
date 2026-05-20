@@ -8,7 +8,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon, BottomSheet } from '@wordpress/components';
+import { Icon as WCIcon, BottomSheet } from '@wordpress/components';
 import { blockSettingsScreens } from '@wordpress/block-editor';
 import { chevronRight } from '@wordpress/icons';
 
@@ -44,7 +44,7 @@ function FocalPointSettingsButton( {
 			 * issue: https://github.com/react-native-svg/react-native-svg/issues/1345
 			 */ }
 			<View style={ disabled && styles.dimmedActionButton }>
-				<Icon icon={ chevronRight } />
+				<WCIcon icon={ chevronRight } />
 			</View>
 		</BottomSheet.Cell>
 	);
