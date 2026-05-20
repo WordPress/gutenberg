@@ -13,8 +13,13 @@
 /**
  * External dependencies
  */
-import type { IconType } from '@wordpress/components';
+import type { ComponentProps } from 'react';
 import type { Field } from '@wordpress/dataviews';
+// Dashboard is still experimental.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import type { Icon } from '@wordpress/ui';
+
+type IconProps = ComponentProps< typeof Icon >;
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -58,15 +63,26 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	description?: string;
 
 	/**
-	 * Visual identifier shown in the widget header; dashicon string, React node, or SVG component.
+	 * Visual identifier shown in the widget header.
 	 */
-	icon?: IconType;
+	icon?: IconProps[ 'icon' ];
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
 	 * register custom categories.
 	 */
 	category?: string;
+
+	/**
+	 * Authoring intent about how the widget wants to render. Static
+	 * and declarative; not a user-editable attribute.
+	 *
+	 * - `'framed'` (default when absent): the widget renders its
+	 *   content only.
+	 * - `'full-bleed'`: the widget renders edge-to-edge with no
+	 *   surrounding chrome.
+	 */
+	presentation?: 'framed' | 'full-bleed';
 
 	/**
 	 * Search aliases used to surface the widget from the inserter.
@@ -77,6 +93,11 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 * Widget version, used for asset cache invalidation.
 	 */
 	version?: string;
+
+	/**
+	 * Gettext text domain for translations.
+	 */
+	textdomain?: string;
 
 	/**
 	 * Experiment gate; boolean `true`, or a specific experiment name.

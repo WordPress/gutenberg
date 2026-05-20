@@ -23,6 +23,13 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 	class WP_Widget_Type {
 
 		/**
+		 * Allowed values for the `presentation` field. Treated as the
+		 * single source of truth across the registry, REST schema, and
+		 * any consumer that needs to validate or enumerate the set.
+		 */
+		const PRESENTATION_VALUES = array( 'framed', 'full-bleed' );
+
+		/**
 		 * Widget type key. Namespaced identifier, e.g. `core/hello-world`.
 		 *
 		 * @var string
@@ -48,6 +55,17 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		 * @var string|null
 		 */
 		public $widget_module = null;
+
+		/**
+		 * Authoring intent about how the widget wants to render. Static
+		 * and declarative; not a user-editable attribute.
+		 *
+		 * One of {@see self::PRESENTATION_VALUES} (first entry is the
+		 * default). Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $presentation = null;
 
 		/**
 		 * Constructor.

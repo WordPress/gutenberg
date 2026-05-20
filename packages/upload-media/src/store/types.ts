@@ -223,6 +223,10 @@ export interface Settings {
 	) => Promise< Partial< Attachment > | void >;
 	// Retry settings for automatic retry on failure.
 	retry?: RetrySettings;
+	// Function for deleting an attachment from the server. Used to clean up
+	// the parent attachment when client-side sub-size processing fails after
+	// the parent file has already been uploaded.
+	mediaDelete?: ( id: number ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.

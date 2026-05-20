@@ -14,8 +14,8 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import ResizeHandle from '../shared/resize-handle';
-import { LANES_DATA_KEY } from './use-lane-placement';
-import type { ResizeSnapSize } from '../shared/resize-snap';
+import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
+import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import type { ResizeDelta, ResizeHandleRenderProps } from '../shared/types';
 import styles from './lanes-item.module.css';
 
@@ -38,7 +38,7 @@ function getItemCursor(
 export type LanesItemProps = {
 	/**
 	 * Item key. Forwarded to dnd-kit and emitted as the
-	 * `data-lanes-key` attribute the hook reads to map measured DOM
+	 * `data-wp-grid-item-key` attribute the hook reads to map measured DOM
 	 * nodes back to logical items.
 	 */
 	itemKey: string;
@@ -73,6 +73,11 @@ export type LanesItemProps = {
 	 */
 	resizeSnapPreview?: ResizeSnapSize | null;
 
+	/**
+	 * Minimum tile width while resizing, in pixels (one column track).
+	 */
+	minResizeWidthPx: number;
+
 	onResizeEnd: () => void;
 
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
@@ -88,6 +93,7 @@ export function LanesItem( {
 	onResize,
 	onResizeEnd,
 	resizeSnapPreview = null,
+	minResizeWidthPx,
 	renderResizeHandle,
 }: LanesItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
@@ -126,11 +132,18 @@ export function LanesItem( {
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
-		const clamped = { width: delta.width, height: 0 };
 		const contentNode = contentRef.current;
-		if ( contentNode && ! initialContentSize ) {
+		let baselineSize = initialContentSize;
+		if ( contentNode && ! baselineSize ) {
 			const { width, height } = contentNode.getBoundingClientRect();
-			setInitialContentSize( { width, height } );
+			baselineSize = { width, height };
+			setInitialContentSize( baselineSize );
+		}
+		let clamped: ResizeDelta = { width: delta.width, height: 0 };
+		if ( baselineSize ) {
+			clamped = clampResizeDelta( clamped, baselineSize, {
+				width: minResizeWidthPx,
+			} );
 		}
 		setResizeDelta( clamped );
 		onResize( itemKey, clamped );
@@ -164,7 +177,7 @@ export function LanesItem( {
 			ref={ mergedRef }
 			className={ itemClassName }
 			style={ style }
-			{ ...{ [ LANES_DATA_KEY ]: itemKey } }
+			{ ...{ [ GRID_ITEM_DATA_KEY ]: itemKey } }
 		>
 			{ actionableArea ? (
 				<div

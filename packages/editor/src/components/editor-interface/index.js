@@ -10,7 +10,11 @@ import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	BlockToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -47,14 +51,21 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-const Notices = () => (
-	<InlineNotices
-		pinnedNoticesClassName="editor-notices__pinned"
-		dismissibleNoticesClassName="editor-notices__dismissible"
-	>
-		<TemplateValidationNotice />
-	</InlineNotices>
-);
+function Notices() {
+	const isValidTemplate = useSelect( ( select ) => {
+		return select( blockEditorStore ).isValidTemplate();
+	}, [] );
+
+	return (
+		<InlineNotices
+			className="editor-notices"
+			pinnedNoticesClassName="editor-notices__pinned"
+			dismissibleNoticesClassName="editor-notices__dismissible"
+		>
+			{ ! isValidTemplate && <TemplateValidationNotice /> }
+		</InlineNotices>
+	);
+}
 
 export default function EditorInterface( {
 	className,

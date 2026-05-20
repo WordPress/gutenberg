@@ -260,13 +260,18 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
+									// Trigger a minimal save to persist the CRDT document. The
+									// entity's pre-persist hooks will create the persisted CRDT
+									// document and apply it to the record's meta.
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
 									dispatch.saveEntityRecord(
 										kind,
 										name,
-										editedRecord,
+										{
+											[ entityIdKey ]:
+												editedRecord[ entityIdKey ],
+										},
 										{ __unstableSkipSyncUpdate: true }
 									);
 								} );
