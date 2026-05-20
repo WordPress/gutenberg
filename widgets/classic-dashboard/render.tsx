@@ -5,7 +5,7 @@ import { Spinner } from '@wordpress/components';
 import { useRefEffect } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Stack, Text } from '@wordpress/ui';
+import { Card, Stack, Text } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -30,6 +30,23 @@ function getPreviewUrl( classicId: string ): string {
 	} );
 }
 
+function measureIframeContentHeight( iframe: HTMLIFrameElement ): number {
+	const doc = iframe.contentDocument;
+	if ( ! doc ) {
+		return 0;
+	}
+
+	const postbox = doc.querySelector( '.postbox' );
+	if ( postbox ) {
+		return postbox.getBoundingClientRect().height;
+	}
+
+	return Math.max(
+		doc.documentElement?.scrollHeight ?? 0,
+		doc.body?.scrollHeight ?? 0
+	);
+}
+
 /**
  * Renders a classic `wp_add_dashboard_widget()` registration via an admin
  * iframe so plugin scripts and styles can load normally.
@@ -50,36 +67,45 @@ export default function ClassicDashboardWidgetRender( {
 				return;
 			}
 
-			function setHeight() {
-				const doc = iframe.contentDocument;
-				if ( ! doc ) {
-					return;
-				}
-
-				const height = Math.max(
-					doc.documentElement?.offsetHeight ?? 0,
-					doc.body?.offsetHeight ?? 0
-				);
-
-				iframe.style.height = `${ height !== 0 ? height : 100 }px`;
+			const container = iframe.parentElement;
+			if ( ! container ) {
+				return;
 			}
+
+			function syncIframeHeight() {
+				const containerHeight = container.clientHeight;
+				const contentHeight = measureIframeContentHeight( iframe );
+				const height = Math.max( containerHeight, contentHeight );
+
+				iframe.style.height = `${
+					height > 0 ? height : containerHeight
+				}px`;
+			}
+
+			const resizeObserver = new ResizeObserver( () => {
+				syncIframeHeight();
+			} );
+			resizeObserver.observe( container );
 
 			const { IntersectionObserver } = iframe.ownerDocument.defaultView;
 
 			const intersectionObserver = new IntersectionObserver(
 				( [ entry ] ) => {
 					if ( entry.isIntersecting ) {
-						setHeight();
+						syncIframeHeight();
 					}
 				},
-				{ threshold: 1 }
+				{ threshold: 0 }
 			);
 			intersectionObserver.observe( iframe );
-			iframe.addEventListener( 'load', setHeight );
+
+			iframe.addEventListener( 'load', syncIframeHeight );
+			syncIframeHeight();
 
 			return () => {
+				resizeObserver.disconnect();
 				intersectionObserver.disconnect();
-				iframe.removeEventListener( 'load', setHeight );
+				iframe.removeEventListener( 'load', syncIframeHeight );
 			};
 		},
 		[ isLoaded ]
@@ -102,7 +128,13 @@ export default function ClassicDashboardWidgetRender( {
 	const previewUrl = getPreviewUrl( classicId );
 
 	return (
-		<>
+		<Card.FullBleed
+			className={
+				isLoaded
+					? styles.classicDashboardWidget
+					: `${ styles.classicDashboardWidget } ${ styles.isOffscreen }`
+			}
+		>
 			{ ! isLoaded && (
 				<Stack
 					align="center"
@@ -112,30 +144,16 @@ export default function ClassicDashboardWidgetRender( {
 					<Spinner />
 				</Stack>
 			) }
-			<div
-				className={
-					isLoaded
-						? styles.classicDashboardWidget
-						: `${ styles.classicDashboardWidget } ${ styles.isOffscreen }`
-				}
-			>
-				<iframe
-					ref={ resizeRef }
-					className={ styles.classicDashboardWidgetIframe }
-					title={ __( 'Classic dashboard widget preview' ) }
-					src={ previewUrl }
-					tabIndex={ -1 }
-					onLoad={ ( event ) => {
-						const target = event.target as HTMLIFrameElement;
-						if ( target.contentDocument?.body ) {
-							target.contentDocument.body.style.overflow =
-								'hidden';
-						}
-						setIsLoaded( true );
-					} }
-					height={ 100 }
-				/>
-			</div>
-		</>
+			<iframe
+				ref={ resizeRef }
+				className={ styles.classicDashboardWidgetIframe }
+				title={ __( 'Classic dashboard widget preview' ) }
+				src={ previewUrl }
+				tabIndex={ -1 }
+				onLoad={ () => {
+					setIsLoaded( true );
+				} }
+			/>
+		</Card.FullBleed>
 	);
 }

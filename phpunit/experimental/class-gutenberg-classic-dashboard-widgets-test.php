@@ -6,6 +6,7 @@
  *
  * @covers gutenberg_classic_dashboard_widget_type_name
  * @covers gutenberg_register_classic_dashboard_widget_types
+ * @covers gutenberg_register_core_dashboard_widgets_for_discovery
  */
 class Gutenberg_Classic_Dashboard_Widgets_Test extends WP_UnitTestCase {
 
@@ -46,6 +47,27 @@ class Gutenberg_Classic_Dashboard_Widgets_Test extends WP_UnitTestCase {
 			'wp-classic/dashboard-primary',
 			gutenberg_classic_dashboard_widget_type_name( 'dashboard_primary' )
 		);
+	}
+
+	public function test_register_core_dashboard_widgets_for_discovery_registers_glance_and_activity() {
+		if ( ! function_exists( 'gutenberg_register_core_dashboard_widgets_for_discovery' ) ) {
+			$this->markTestSkipped( 'Classic dashboard widgets are not loaded.' );
+		}
+
+		global $wp_meta_boxes;
+
+		$wp_meta_boxes = array();
+
+		set_current_screen( 'dashboard' );
+
+		gutenberg_register_core_dashboard_widgets_for_discovery();
+
+		$this->assertArrayHasKey( 'dashboard', $wp_meta_boxes );
+		$this->assertArrayHasKey( 'dashboard_activity', $wp_meta_boxes['dashboard']['normal']['core'] );
+
+		if ( current_user_can( 'edit_posts' ) ) {
+			$this->assertArrayHasKey( 'dashboard_right_now', $wp_meta_boxes['dashboard']['normal']['core'] );
+		}
 	}
 
 	public function test_register_classic_dashboard_widget_types_registers_meta_boxes() {

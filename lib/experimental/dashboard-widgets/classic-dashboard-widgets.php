@@ -55,6 +55,65 @@ function gutenberg_load_dashboard_admin_dependencies() {
 }
 
 /**
+ * Registers core dashboard widgets for discovery without browser/PHP nag checks.
+ *
+ * Mirrors the widget-registration portion of `wp_dashboard_setup()` in core,
+ * omitting `wp_check_browser_version()` and `wp_check_php_version()` which are
+ * not available outside a full admin bootstrap.
+ */
+function gutenberg_register_core_dashboard_widgets_for_discovery() {
+	if ( is_network_admin() ) {
+		wp_add_dashboard_widget( 'network_dashboard_right_now', __( 'Right Now' ), 'wp_network_dashboard_right_now' );
+		return;
+	}
+
+	if ( is_user_admin() ) {
+		return;
+	}
+
+	// Site Health.
+	if ( current_user_can( 'view_site_health_checks' ) ) {
+		if ( ! class_exists( 'WP_Site_Health' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-site-health.php';
+		}
+
+		WP_Site_Health::get_instance();
+
+		wp_add_dashboard_widget( 'dashboard_site_health', __( 'Site Health Status' ), 'wp_dashboard_site_health' );
+	}
+
+	// At a Glance.
+	if ( is_blog_admin() && current_user_can( 'edit_posts' ) ) {
+		wp_add_dashboard_widget( 'dashboard_right_now', __( 'At a Glance' ), 'wp_dashboard_right_now' );
+	}
+
+	// Activity.
+	if ( is_blog_admin() ) {
+		wp_add_dashboard_widget( 'dashboard_activity', __( 'Activity' ), 'wp_dashboard_site_activity' );
+	}
+
+	// Welcome panel (not a meta box on the classic dashboard, but exposed as one here).
+	if ( is_blog_admin() && function_exists( 'wp_welcome_panel' ) ) {
+		wp_add_dashboard_widget( 'dashboard_welcome', __( 'Welcome' ), 'wp_welcome_panel' );
+	}
+
+	// Quick Draft.
+	$post_type = get_post_type_object( 'post' );
+
+	if ( is_blog_admin() && $post_type && current_user_can( $post_type->cap->create_posts ) ) {
+		$quick_draft_title = sprintf(
+			'<span class="hide-if-no-js">%1$s</span> <span class="hide-if-js">%2$s</span>',
+			__( 'Quick Draft' ),
+			__( 'Your Recent Drafts' )
+		);
+		wp_add_dashboard_widget( 'dashboard_quick_press', $quick_draft_title, 'wp_dashboard_quick_press' );
+	}
+
+	// WordPress Events and News.
+	wp_add_dashboard_widget( 'dashboard_primary', __( 'WordPress Events and News' ), 'wp_dashboard_events_news' );
+}
+
+/**
  * Registers dashboard meta boxes for discovery without running `wp_dashboard_setup()`.
  *
  * The full setup routine pulls in browser/PHP nag checks and other admin-only
@@ -71,9 +130,9 @@ function gutenberg_register_dashboard_meta_boxes_for_discovery() {
 	$wp_dashboard_control_callbacks = array();
 	$dashboard_widgets              = array();
 
-	if ( is_network_admin() ) {
-		wp_add_dashboard_widget( 'network_dashboard_right_now', __( 'Right Now' ), 'wp_network_dashboard_right_now' );
+	gutenberg_register_core_dashboard_widgets_for_discovery();
 
+	if ( is_network_admin() ) {
 		/** This action is documented in wp-admin/includes/dashboard.php */
 		do_action( 'wp_network_dashboard_setup' );
 
@@ -86,19 +145,6 @@ function gutenberg_register_dashboard_meta_boxes_for_discovery() {
 		/** This filter is documented in wp-admin/includes/dashboard.php */
 		$dashboard_widgets = apply_filters( 'wp_user_dashboard_widgets', array() );
 	} else {
-		$post_type = get_post_type_object( 'post' );
-
-		if ( $post_type && current_user_can( $post_type->cap->create_posts ) ) {
-			$quick_draft_title = sprintf(
-				'<span class="hide-if-no-js">%1$s</span> <span class="hide-if-js">%2$s</span>',
-				__( 'Quick Draft' ),
-				__( 'Your Recent Drafts' )
-			);
-			wp_add_dashboard_widget( 'dashboard_quick_press', $quick_draft_title, 'wp_dashboard_quick_press' );
-		}
-
-		wp_add_dashboard_widget( 'dashboard_primary', __( 'WordPress Events and News' ), 'wp_dashboard_events_news' );
-
 		/** This action is documented in wp-admin/includes/dashboard.php */
 		do_action( 'wp_dashboard_setup' );
 
@@ -338,6 +384,22 @@ function gutenberg_prepare_classic_dashboard_widget_preview_admin_context() {
 }
 
 /**
+ * Enqueues baseline wp-admin styles used by the classic dashboard (common.css, dashboard.css, etc.).
+ *
+ * Mirrors admin-header.php on index.php, where `colors` depends on the `wp-admin` bundle.
+ */
+function gutenberg_enqueue_classic_dashboard_widget_preview_base_styles() {
+	wp_enqueue_style( 'colors' );
+	wp_enqueue_style( 'common' );
+	wp_enqueue_style( 'forms' );
+	wp_enqueue_style( 'dashboard' );
+
+	if ( wp_style_is( 'list-tables', 'registered' ) ) {
+		wp_enqueue_style( 'list-tables' );
+	}
+}
+
+/**
  * Enqueues admin scripts and styles for the classic dashboard widget preview iframe.
  *
  * Call after rendering the widget so callbacks can register assets first.
@@ -350,9 +412,7 @@ function gutenberg_enqueue_classic_dashboard_widget_preview_assets() {
 		$hook_suffix = 'index.php';
 	}
 
-	wp_enqueue_style( 'common' );
-	wp_enqueue_style( 'forms' );
-	wp_enqueue_style( 'dashboard' );
+	gutenberg_enqueue_classic_dashboard_widget_preview_base_styles();
 	wp_enqueue_script( 'jquery' );
 
 	if ( wp_script_is( 'dashboard', 'registered' ) ) {
@@ -380,8 +440,14 @@ function gutenberg_print_classic_dashboard_widget_preview_head_assets() {
 		$hook_suffix = 'index.php';
 	}
 
-	wp_admin_css( 'dashboard', true );
-	wp_admin_css();
+	// Ensure core admin stylesheets are output even if nothing hooked admin_enqueue_scripts.
+	foreach ( array( 'colors', 'common', 'forms', 'dashboard' ) as $style_handle ) {
+		if ( wp_style_is( $style_handle, 'registered' ) ) {
+			wp_enqueue_style( $style_handle );
+		} elseif ( function_exists( 'wp_admin_css' ) ) {
+			wp_admin_css( $style_handle, true );
+		}
+	}
 
 	do_action( "admin_print_styles-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 	do_action( 'admin_print_styles' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
@@ -493,7 +559,7 @@ function gutenberg_handle_classic_dashboard_widget_preview_iframe() {
 		<?php gutenberg_print_classic_dashboard_widget_preview_head_assets(); ?>
 		<style><?php echo gutenberg_get_classic_dashboard_widget_preview_isolation_styles(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></style>
 	</head>
-	<body <?php body_class(); ?>>
+	<body <?php body_class( 'wp-admin wp-core-ui index-php dashboard' ); ?>>
 		<div id="page" class="site">
 			<div id="content" class="site-content">
 				<?php echo $widget_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
