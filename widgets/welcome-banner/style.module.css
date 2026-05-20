@@ -13,8 +13,6 @@
 	--banner-line-info: color-mix(in srgb, var(--wpds-color-bg-interactive-brand-strong) 60%, var(--banner-bg));
 
 	position: relative;
-	/* overflow: hidden; */
-	/* min-block-size: 240px; */
 	padding: var(--wpds-dimension-padding-3xl);
 	background-color: var(--banner-bg);
 	color: var(--banner-fg);
@@ -68,6 +66,8 @@
 
 .wide .banner {
 	flex: 0 0 35%;
+	min-inline-size: 280px;
+	min-block-size: 0;
 	min-height: 0;
 	max-height: none;
 }
