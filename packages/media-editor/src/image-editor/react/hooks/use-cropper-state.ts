@@ -29,6 +29,38 @@ import {
 } from '../../core/state';
 
 /**
+ * Configuration for registering a history "satellite" — an opaque
+ * piece of consumer-owned state that should be snapshotted alongside
+ * each cropper history entry and restored on undo/redo.
+ *
+ * Use this to bring sidebar UI state (e.g. aspect-ratio preset,
+ * freeform toggle) into the cropper's undo history without leaking
+ * those concepts into the framework-agnostic `CropperState`.
+ */
+export interface HistorySatelliteConfig< Snapshot > {
+	/**
+	 * Return the current satellite snapshot. Called by the hook just
+	 * before recording a history entry. Should read from refs (not
+	 * captured state) so it always returns the freshest value.
+	 */
+	getSnapshot: () => Snapshot;
+	/**
+	 * Apply a previously-recorded snapshot to consumer state. Called
+	 * by the hook on undo/redo. Should use side-effect-free setters —
+	 * any "smart" wrapper logic (e.g. auto-toggling related state) will
+	 * be replayed twice, once at the user action and once at restore.
+	 */
+	restoreSnapshot: ( snapshot: Snapshot ) => void;
+	/**
+	 * Compare two snapshots for equality. Used to dedup history entries
+	 * and decide whether a satellite-only change warrants a push.
+	 * Defaults to `Object.is` — supply a structural comparator if
+	 * `getSnapshot` returns fresh object references each call.
+	 */
+	areSnapshotsEqual?: ( a: Snapshot, b: Snapshot ) => boolean;
+}
+
+/**
  * The return type of the useCropperState hook.
  *
  * The hook exposes its state through named setter methods rather
@@ -113,6 +145,28 @@ export interface UseCropperStateReturn {
 	 * try/catch if you need to recover.
 	 */
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
+	/**
+	 * Register a single "satellite" whose snapshot is bundled into
+	 * each history entry and restored on undo/redo. Calling twice
+	 * replaces the previous registration. Returns an unregister
+	 * function.
+	 */
+	registerHistorySatellite: < Snapshot >(
+		config: HistorySatelliteConfig< Snapshot >
+	) => () => void;
+	/**
+	 * Notify the hook that the registered satellite's value has
+	 * changed. Wakes the debounce machinery so satellite-only edits
+	 * (changes that don't move cropper state) still produce history
+	 * entries. Safe to call from a `useEffect` that depends on the
+	 * satellite values.
+	 */
+	notifySatelliteChanged: () => void;
+}
+
+interface HistoryEntry {
+	state: CropperState;
+	satellite: unknown;
 }
 
 /** Milliseconds of inactivity after which a continuous interaction is committed to history. */
@@ -178,73 +232,145 @@ export function useCropperState(
 	const stateRef = useRef( state );
 	stateRef.current = state;
 
-	// History stack for undo/redo. Using refs for the arrays avoids
-	// unnecessary re-renders on every push; a pair of boolean state values
-	// drives the enabled/disabled state of the undo/redo buttons.
-	const historyRef = useRef< CropperState[] >( [] );
-	const redoStackRef = useRef< CropperState[] >( [] );
+	// History stack for undo/redo. Each entry pairs a cropper state with
+	// an opaque satellite snapshot (consumer-owned UI state). Using refs
+	// for the arrays avoids unnecessary re-renders on every push; a pair
+	// of boolean state values drives the enabled/disabled state of the
+	// undo/redo buttons.
+	const historyRef = useRef< HistoryEntry[] >( [] );
+	const redoStackRef = useRef< HistoryEntry[] >( [] );
 	const [ hasUndo, setHasUndo ] = useState( false );
 	const [ hasRedo, setHasRedo ] = useState( false );
 
-	// Debounce-based history: tracks the last committed state and a pending
-	// timer. Any state change resets the timer; when it expires the
-	// pre-change state is pushed to history.
+	// Single optional satellite registration. The hook treats the
+	// snapshot as opaque — it just bundles it into entries and hands it
+	// back on restore. Stored in a ref so callbacks read the latest
+	// registration without re-creating themselves.
+	const satelliteRef = useRef< HistorySatelliteConfig< unknown > | null >(
+		null
+	);
+
+	// Debounce-based history: tracks the last committed state/satellite
+	// and a pending timer. Any state or satellite change resets the
+	// timer; when it expires the pre-change snapshots are pushed.
 	const lastCommittedStateRef = useRef< CropperState | null >( state );
+	const lastCommittedSatelliteRef = useRef< unknown >( undefined );
 	const debounceTimerRef = useRef< ReturnType< typeof setTimeout > >();
 	// Set to true before dispatching actions that must not produce a debounce
 	// history entry (undo, redo, reset, setImage, discrete actions).
 	const suppressDebounceRef = useRef( false );
 
-	// Pushes `entry` (defaults to current state) onto the undo stack and
-	// clears the redo stack. Skips if `entry` is already the last item,
-	// so rapid discrete actions on unchanged state don't create duplicates.
-	const pushToHistory = useCallback( ( entry?: CropperState ) => {
-		const target = entry ?? stateRef.current;
-		const previousEntry =
-			historyRef.current[ historyRef.current.length - 1 ];
-		if ( previousEntry && areHistoryStatesEqual( previousEntry, target ) ) {
+	// Compare two satellite snapshots using the registered comparator,
+	// falling back to Object.is. Safe to call when no satellite is
+	// registered: both args will be `undefined` and Object.is returns true.
+	const areSatellitesEqual = useCallback(
+		( a: unknown, b: unknown ): boolean => {
+			const eq = satelliteRef.current?.areSnapshotsEqual;
+			return eq ? eq( a, b ) : Object.is( a, b );
+		},
+		[]
+	);
+
+	// Compare two history entries by both halves.
+	const areHistoryEntriesEqual = useCallback(
+		( a: HistoryEntry, b: HistoryEntry ): boolean => {
+			return (
+				areHistoryStatesEqual( a.state, b.state ) &&
+				areSatellitesEqual( a.satellite, b.satellite )
+			);
+		},
+		[ areSatellitesEqual ]
+	);
+
+	// Pushes `entry` (defaults to current state + current satellite) onto
+	// the undo stack and clears the redo stack. Skips if `entry` is
+	// already the last item, so rapid discrete actions on unchanged
+	// state don't create duplicates.
+	const pushToHistory = useCallback(
+		( entry?: HistoryEntry ) => {
+			const target: HistoryEntry = entry ?? {
+				state: stateRef.current,
+				satellite: satelliteRef.current?.getSnapshot(),
+			};
+			const previousEntry =
+				historyRef.current[ historyRef.current.length - 1 ];
+			if (
+				previousEntry &&
+				areHistoryEntriesEqual( previousEntry, target )
+			) {
+				return;
+			}
+			historyRef.current = [ ...historyRef.current, target ];
+			redoStackRef.current = [];
+			setHasUndo( true );
+			setHasRedo( false );
+		},
+		[ areHistoryEntriesEqual ]
+	);
+
+	// Core debounce logic, callable from both the state-watching
+	// useEffect and the consumer-driven `notifySatelliteChanged`.
+	// Schedules a push if either the cropper state OR the satellite
+	// snapshot differs from its last committed value.
+	const scheduleDebouncedPush = useCallback( () => {
+		const currentState = stateRef.current;
+		const currentSatellite = satelliteRef.current?.getSnapshot();
+
+		// Suppress flag: undo/redo/reset/setImage/discrete actions set
+		// this to opt out of the debounce for their own state changes.
+		if ( suppressDebounceRef.current ) {
+			suppressDebounceRef.current = false;
+			lastCommittedStateRef.current = currentState;
+			lastCommittedSatelliteRef.current = currentSatellite;
 			return;
 		}
-		historyRef.current = [ ...historyRef.current, target ];
-		redoStackRef.current = [];
-		setHasUndo( true );
-		setHasRedo( false );
-	}, [] );
+
+		const stateUnchanged =
+			lastCommittedStateRef.current !== null &&
+			areHistoryStatesEqual(
+				lastCommittedStateRef.current,
+				currentState
+			);
+		const satelliteUnchanged = areSatellitesEqual(
+			lastCommittedSatelliteRef.current,
+			currentSatellite
+		);
+		if ( stateUnchanged && satelliteUnchanged ) {
+			lastCommittedStateRef.current = currentState;
+			lastCommittedSatelliteRef.current = currentSatellite;
+			return;
+		}
+		clearTimeout( debounceTimerRef.current );
+		debounceTimerRef.current = setTimeout( () => {
+			const stateSnap = lastCommittedStateRef.current;
+			const satSnap = lastCommittedSatelliteRef.current;
+			const nowState = stateRef.current;
+			const nowSat = satelliteRef.current?.getSnapshot();
+			if ( stateSnap !== null ) {
+				const stateChanged = ! areHistoryStatesEqual(
+					stateSnap,
+					nowState
+				);
+				const satChanged = ! areSatellitesEqual( satSnap, nowSat );
+				if ( stateChanged || satChanged ) {
+					pushToHistory( {
+						state: stateSnap,
+						satellite: satSnap,
+					} );
+				}
+			}
+			lastCommittedStateRef.current = nowState;
+			lastCommittedSatelliteRef.current = nowSat;
+		}, HISTORY_DEBOUNCE_MS );
+	}, [ pushToHistory, areSatellitesEqual ] );
 
 	// Watch state and debounce history commits. Any dispatch resets the
 	// timer; once the state has settled for HISTORY_DEBOUNCE_MS the
 	// pre-change snapshot is pushed to the undo stack.
 	useEffect( () => {
-		// Suppress flag: undo/redo/reset/setImage/discrete actions set this
-		// to opt out of the debounce for their own state changes.
-		if ( suppressDebounceRef.current ) {
-			suppressDebounceRef.current = false;
-			lastCommittedStateRef.current = stateRef.current;
-			return;
-		}
-		if (
-			lastCommittedStateRef.current !== null &&
-			areHistoryStatesEqual(
-				lastCommittedStateRef.current,
-				stateRef.current
-			)
-		) {
-			lastCommittedStateRef.current = stateRef.current;
-			return;
-		}
-		clearTimeout( debounceTimerRef.current );
-		debounceTimerRef.current = setTimeout( () => {
-			const snapshot = lastCommittedStateRef.current;
-			if (
-				snapshot !== null &&
-				! areHistoryStatesEqual( snapshot, stateRef.current )
-			) {
-				pushToHistory( snapshot );
-			}
-			lastCommittedStateRef.current = stateRef.current;
-		}, HISTORY_DEBOUNCE_MS );
+		scheduleDebouncedPush();
 		return () => clearTimeout( debounceTimerRef.current );
-	}, [ state, pushToHistory ] );
+	}, [ state, scheduleDebouncedPush ] );
 
 	// Flush the pending debounce immediately: cancel the timer and push the
 	// pre-change snapshot if the state has actually changed. Used by
@@ -252,15 +378,26 @@ export function useCropperState(
 	// undo/redo/discrete actions before recording their own history entry.
 	const commitHistory = useCallback( () => {
 		clearTimeout( debounceTimerRef.current );
-		const snapshot = lastCommittedStateRef.current;
-		if (
-			snapshot !== null &&
-			! areHistoryStatesEqual( snapshot, stateRef.current )
-		) {
-			pushToHistory( snapshot );
+		const stateSnap = lastCommittedStateRef.current;
+		const satSnap = lastCommittedSatelliteRef.current;
+		const currentState = stateRef.current;
+		const currentSatellite = satelliteRef.current?.getSnapshot();
+		if ( stateSnap !== null ) {
+			const stateChanged = ! areHistoryStatesEqual(
+				stateSnap,
+				currentState
+			);
+			const satChanged = ! areSatellitesEqual(
+				satSnap,
+				currentSatellite
+			);
+			if ( stateChanged || satChanged ) {
+				pushToHistory( { state: stateSnap, satellite: satSnap } );
+			}
 		}
-		lastCommittedStateRef.current = stateRef.current;
-	}, [ pushToHistory ] );
+		lastCommittedStateRef.current = currentState;
+		lastCommittedSatelliteRef.current = currentSatellite;
+	}, [ pushToHistory, areSatellitesEqual ] );
 
 	const undo = useCallback( () => {
 		// Flush any pending gesture so it becomes a distinct undo step
@@ -271,12 +408,25 @@ export function useCropperState(
 		if ( ! prev ) {
 			return;
 		}
-		redoStackRef.current = [ stateRef.current, ...redoStackRef.current ];
+		const currentEntry: HistoryEntry = {
+			state: stateRef.current,
+			satellite: satelliteRef.current?.getSnapshot(),
+		};
+		redoStackRef.current = [ currentEntry, ...redoStackRef.current ];
 		historyRef.current = historyRef.current.slice( 0, -1 );
 		suppressDebounceRef.current = true;
 		setHasUndo( historyRef.current.length > 0 );
 		setHasRedo( true );
-		dispatch( { type: 'RESET', payload: prev } );
+		dispatch( { type: 'RESET', payload: prev.state } );
+		// Restore satellite state. Set the last-committed ref to the
+		// restored value so the consumer's follow-up
+		// `notifySatelliteChanged` (fired from their useEffect after the
+		// React state setters run) sees no diff and won't schedule a
+		// spurious push.
+		if ( satelliteRef.current ) {
+			satelliteRef.current.restoreSnapshot( prev.satellite );
+		}
+		lastCommittedSatelliteRef.current = prev.satellite;
 	}, [ dispatch, commitHistory ] );
 
 	const redo = useCallback( () => {
@@ -287,13 +437,45 @@ export function useCropperState(
 		if ( ! next ) {
 			return;
 		}
-		historyRef.current = [ ...historyRef.current, stateRef.current ];
+		const currentEntry: HistoryEntry = {
+			state: stateRef.current,
+			satellite: satelliteRef.current?.getSnapshot(),
+		};
+		historyRef.current = [ ...historyRef.current, currentEntry ];
 		redoStackRef.current = redoStackRef.current.slice( 1 );
 		suppressDebounceRef.current = true;
 		setHasUndo( true );
 		setHasRedo( redoStackRef.current.length > 0 );
-		dispatch( { type: 'RESET', payload: next } );
+		dispatch( { type: 'RESET', payload: next.state } );
+		if ( satelliteRef.current ) {
+			satelliteRef.current.restoreSnapshot( next.satellite );
+		}
+		lastCommittedSatelliteRef.current = next.satellite;
 	}, [ dispatch, commitHistory ] );
+
+	const registerHistorySatellite = useCallback(
+		< Snapshot >(
+			config: HistorySatelliteConfig< Snapshot >
+		): ( () => void ) => {
+			// Treat snapshot as opaque inside the hook — we only ever
+			// hand snapshots back to consumer-supplied callbacks.
+			const opaque =
+				config as unknown as HistorySatelliteConfig< unknown >;
+			satelliteRef.current = opaque;
+			lastCommittedSatelliteRef.current = config.getSnapshot();
+			return () => {
+				if ( satelliteRef.current === opaque ) {
+					satelliteRef.current = null;
+					lastCommittedSatelliteRef.current = undefined;
+				}
+			};
+		},
+		[]
+	);
+
+	const notifySatelliteChanged = useCallback( () => {
+		scheduleDebouncedPush();
+	}, [ scheduleDebouncedPush ] );
 
 	const setImage = useCallback(
 		( image: CropperState[ 'image' ] ) => {
@@ -308,6 +490,12 @@ export function useCropperState(
 				...initialRef.current,
 				image,
 			} );
+			// Refresh the satellite committed ref too — `setImage` is a
+			// "fresh start" boundary and any satellite-only edit made
+			// during the prior image's session should not be replayed as
+			// the pre-change snapshot for the next session.
+			lastCommittedSatelliteRef.current =
+				satelliteRef.current?.getSnapshot();
 		},
 		[ dispatch ]
 	);
@@ -500,6 +688,8 @@ export function useCropperState(
 		undo,
 		redo,
 		commitHistory,
+		registerHistorySatellite,
+		notifySatelliteChanged,
 	};
 	return controller;
 }

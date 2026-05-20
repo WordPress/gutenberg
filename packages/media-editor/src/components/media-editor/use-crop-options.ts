@@ -18,9 +18,15 @@ import {
 	ORIGINAL_ASPECT_RATIO,
 } from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { useCropper } from '../../image-editor';
 
 const FREE_ASPECT_RATIO_VALUE = '0';
 const DEFAULT_FREEFORM_CROP = true;
+
+interface CropOptionsSatelliteSnapshot {
+	aspectRatioValue: string;
+	freeformCrop: boolean;
+}
 
 interface UseCropOptionsArgs {
 	id: number;
@@ -99,6 +105,7 @@ export function useCropOptions( {
 	media,
 	aspectRatioPresets,
 }: UseCropOptionsArgs ): UseCropOptionsReturn {
+	const cropper = useCropper();
 	const [ aspectRatioValue, setAspectRatioValueState ] = useState(
 		FREE_ASPECT_RATIO_VALUE
 	);
@@ -137,6 +144,56 @@ export function useCropOptions( {
 		previousIdRef.current = id;
 		resetCropOptions();
 	}, [ id, resetCropOptions ] );
+
+	// Latest-value refs so the satellite snapshot getter (called by the
+	// cropper hook just before recording a history entry) always reads
+	// the freshest values without forcing callback identity changes.
+	// The write happens in an effect (not at render time) to satisfy
+	// `react-hooks/refs`; the effect flushes after commit and runs
+	// before the notify-on-change effect below (source order), so any
+	// `getSnapshot` call triggered downstream sees up-to-date values.
+	const aspectRatioValueRef = useRef( aspectRatioValue );
+	const freeformCropRef = useRef( freeformCrop );
+	useEffect( () => {
+		aspectRatioValueRef.current = aspectRatioValue;
+		freeformCropRef.current = freeformCrop;
+	}, [ aspectRatioValue, freeformCrop ] );
+
+	// Register the satellite once. The cropper hook calls `getSnapshot`
+	// before each push and `restoreSnapshot` on undo/redo — wiring the
+	// sidebar UI state into the cropper's existing undo history so a
+	// CMD+Z after an aspect-ratio change reverts both the canvas and
+	// the sidebar control.
+	const { registerHistorySatellite, notifySatelliteChanged } = cropper;
+	useEffect( () => {
+		const unregister =
+			registerHistorySatellite< CropOptionsSatelliteSnapshot >( {
+				getSnapshot: () => ( {
+					aspectRatioValue: aspectRatioValueRef.current,
+					freeformCrop: freeformCropRef.current,
+				} ),
+				// Use the raw `useState` setters, not the public
+				// `setAspectRatioValue` wrapper — the wrapper auto-enables
+				// freeform when the new value is "Free", which would
+				// corrupt a restored `(Free, freeform=false)` pairing.
+				restoreSnapshot: ( snapshot ) => {
+					setAspectRatioValueState( snapshot.aspectRatioValue );
+					setFreeformCrop( snapshot.freeformCrop );
+				},
+				areSnapshotsEqual: ( a, b ) =>
+					a.aspectRatioValue === b.aspectRatioValue &&
+					a.freeformCrop === b.freeformCrop,
+			} );
+		return unregister;
+	}, [ registerHistorySatellite ] );
+
+	// Tell the cropper hook to re-evaluate the debounce whenever the
+	// sidebar state changes. Required so satellite-only edits (e.g.
+	// toggling Resize-crop on, which doesn't move the crop rect) still
+	// produce an undo step.
+	useEffect( () => {
+		notifySatelliteChanged();
+	}, [ aspectRatioValue, freeformCrop, notifySatelliteChanged ] );
 
 	return {
 		aspectRatioValue,

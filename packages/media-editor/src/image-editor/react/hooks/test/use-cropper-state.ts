@@ -1196,6 +1196,164 @@ describe( 'useCropperState', () => {
 		} );
 	} );
 
+	describe( 'history satellite', () => {
+		const DEBOUNCE_MS = 300;
+
+		beforeEach( () => jest.useFakeTimers() );
+		afterEach( () => jest.useRealTimers() );
+
+		// Helper that mirrors how a real consumer (e.g. useCropOptions)
+		// uses a closure variable in place of a ref, and a jest mock for
+		// restoreSnapshot.
+		function makeSatellite( initial: string ) {
+			const state = { value: initial };
+			const restoreSnapshot = jest.fn( ( s: string ) => {
+				state.value = s;
+			} );
+			return {
+				state,
+				config: {
+					getSnapshot: () => state.value,
+					restoreSnapshot,
+				},
+				restoreSnapshot,
+			};
+		}
+
+		it( 'bundles the satellite snapshot into a debounced push', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const sat = makeSatellite( 'a' );
+			act( () => {
+				result.current.registerHistorySatellite( sat.config );
+			} );
+			act( () => result.current.setZoom( 3 ) );
+			sat.state.value = 'b';
+			act( () => result.current.notifySatelliteChanged() );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+
+			expect( result.current.hasUndo ).toBe( true );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( sat.restoreSnapshot ).toHaveBeenLastCalledWith( 'a' );
+			expect( sat.state.value ).toBe( 'a' );
+		} );
+
+		it( 'records a satellite-only change with the pre-change snapshot', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const sat = makeSatellite( 'a' );
+			act( () => {
+				result.current.registerHistorySatellite( sat.config );
+			} );
+
+			sat.state.value = 'b';
+			act( () => result.current.notifySatelliteChanged() );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+
+			expect( result.current.hasUndo ).toBe( true );
+
+			act( () => result.current.undo() );
+
+			expect( sat.restoreSnapshot ).toHaveBeenLastCalledWith( 'a' );
+			expect( sat.state.value ).toBe( 'a' );
+		} );
+
+		it( 'redo re-applies the satellite snapshot', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const sat = makeSatellite( 'a' );
+			act( () => {
+				result.current.registerHistorySatellite( sat.config );
+			} );
+
+			sat.state.value = 'b';
+			act( () => result.current.notifySatelliteChanged() );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			act( () => result.current.undo() );
+			expect( sat.state.value ).toBe( 'a' );
+
+			act( () => result.current.redo() );
+
+			expect( sat.restoreSnapshot ).toHaveBeenLastCalledWith( 'b' );
+			expect( sat.state.value ).toBe( 'b' );
+		} );
+
+		it( 'collapses rapid satellite-only changes within the debounce window', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const sat = makeSatellite( 'a' );
+			act( () => {
+				result.current.registerHistorySatellite( sat.config );
+			} );
+
+			sat.state.value = 'b';
+			act( () => result.current.notifySatelliteChanged() );
+			sat.state.value = 'c';
+			act( () => result.current.notifySatelliteChanged() );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+
+			// One push, capturing the original pre-change snapshot.
+			act( () => result.current.undo() );
+			expect( sat.restoreSnapshot ).toHaveBeenLastCalledWith( 'a' );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'dedups satellite no-op changes via areSnapshotsEqual', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const sat = makeSatellite( 'a' );
+			act( () => {
+				result.current.registerHistorySatellite( {
+					...sat.config,
+					areSnapshotsEqual: ( a, b ) => a === b,
+				} );
+			} );
+
+			// "Change" to the same value — nothing should be recorded.
+			act( () => result.current.notifySatelliteChanged() );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'discrete actions bundle the current satellite snapshot', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const sat = makeSatellite( 'a' );
+			act( () => {
+				result.current.registerHistorySatellite( sat.config );
+			} );
+
+			// Mutate the satellite (without notifying), then fire a
+			// discrete action that pushes synchronously. The pushed
+			// entry should carry the latest satellite value as the
+			// pre-action snapshot.
+			sat.state.value = 'b';
+			act( () => result.current.snapRotate90( 1 ) );
+
+			act( () => result.current.undo() );
+			expect( sat.restoreSnapshot ).toHaveBeenLastCalledWith( 'b' );
+		} );
+
+		it( 'unregister stops snapshotting the satellite', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const sat = makeSatellite( 'a' );
+			let unregister: () => void = () => {};
+			act( () => {
+				unregister = result.current.registerHistorySatellite(
+					sat.config
+				);
+			} );
+			act( () => unregister() );
+
+			// A subsequent push happens, but with no satellite registered
+			// there is nothing to restore. Undo must not throw.
+			act( () => result.current.setZoom( 3 ) );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			act( () => result.current.undo() );
+
+			expect( sat.restoreSnapshot ).not.toHaveBeenCalled();
+			expect( result.current.state.zoom ).toBe( 1 );
+		} );
+	} );
+
 	describe( 'public controller contract', () => {
 		it( 'does not expose the raw reducer dispatch', () => {
 			const { result } = renderHook( () => useCropperState() );

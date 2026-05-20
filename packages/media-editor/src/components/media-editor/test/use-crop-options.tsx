@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -9,6 +9,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { useCropOptions } from '../use-crop-options';
 import type { Media } from '../../media-editor-provider';
 import { ORIGINAL_ASPECT_RATIO } from '../../../image-editor/core/constants';
+import { CropperProvider, useCropper } from '../../../image-editor';
 
 const media = {
 	id: 1,
@@ -18,13 +19,14 @@ const media = {
 	},
 } as Media;
 
-function CropOptionsHarness( {
+function CropOptionsInner( {
 	id = 1,
 	isImage = true,
 }: {
 	id?: number;
 	isImage?: boolean;
 } ) {
+	const cropper = useCropper();
 	const cropOptions = useCropOptions( {
 		id,
 		isImage,
@@ -51,6 +53,9 @@ function CropOptionsHarness( {
 					.map( ( option ) => option.value )
 					.join( ',' ) }
 			</div>
+			<div data-testid="has-undo">
+				{ cropper.hasUndo ? 'true' : 'false' }
+			</div>
 			<button
 				onClick={ () =>
 					cropOptions.setAspectRatioValue(
@@ -69,8 +74,21 @@ function CropOptionsHarness( {
 			<button onClick={ () => cropOptions.setFreeformCrop( false ) }>
 				Disable handles
 			</button>
+			<button onClick={ () => cropOptions.setFreeformCrop( true ) }>
+				Enable handles
+			</button>
 			<button onClick={ cropOptions.resetCropOptions }>Reset</button>
+			<button onClick={ cropper.undo }>Undo</button>
+			<button onClick={ cropper.redo }>Redo</button>
 		</div>
+	);
+}
+
+function CropOptionsHarness( props: { id?: number; isImage?: boolean } ) {
+	return (
+		<CropperProvider>
+			<CropOptionsInner { ...props } />
+		</CropperProvider>
 	);
 }
 
@@ -122,5 +140,122 @@ describe( 'useCropOptions', () => {
 		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
 			'true'
 		);
+	} );
+
+	describe( 'undo/redo via history satellite', () => {
+		beforeEach( () => {
+			jest.useFakeTimers();
+		} );
+		afterEach( () => {
+			jest.useRealTimers();
+		} );
+
+		const advanceDebounce = () => {
+			act( () => {
+				jest.advanceTimersByTime( 300 );
+			} );
+		};
+
+		it( 'records an aspect-ratio change so undo reverts the sidebar', () => {
+			render( <CropOptionsHarness /> );
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
+			advanceDebounce();
+
+			expect(
+				screen.getByTestId( 'aspect-ratio-value' )
+			).toHaveTextContent( '1' );
+			expect( screen.getByTestId( 'has-undo' ) ).toHaveTextContent(
+				'true'
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'Undo' } ) );
+
+			expect(
+				screen.getByTestId( 'aspect-ratio-value' )
+			).toHaveTextContent( '0' );
+		} );
+
+		it( 'records a Resize-crop toggle even when the crop rect does not move', () => {
+			render( <CropOptionsHarness /> );
+
+			fireEvent.click(
+				screen.getByRole( 'button', { name: 'Disable handles' } )
+			);
+			advanceDebounce();
+
+			expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
+				'false'
+			);
+			expect( screen.getByTestId( 'has-undo' ) ).toHaveTextContent(
+				'true'
+			);
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'Undo' } ) );
+
+			expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
+				'true'
+			);
+		} );
+
+		it( 'redoes a satellite change after undo', () => {
+			render( <CropOptionsHarness /> );
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
+			advanceDebounce();
+			fireEvent.click( screen.getByRole( 'button', { name: 'Undo' } ) );
+
+			expect(
+				screen.getByTestId( 'aspect-ratio-value' )
+			).toHaveTextContent( '0' );
+
+			fireEvent.click( screen.getByRole( 'button', { name: 'Redo' } ) );
+
+			expect(
+				screen.getByTestId( 'aspect-ratio-value' )
+			).toHaveTextContent( '1' );
+		} );
+
+		it( 'restores both aspect ratio and freeform together (Free auto-enables freeform)', () => {
+			render( <CropOptionsHarness /> );
+
+			// Establish a non-default starting point: Square + handles off.
+			fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
+			advanceDebounce();
+			fireEvent.click(
+				screen.getByRole( 'button', { name: 'Disable handles' } )
+			);
+			advanceDebounce();
+
+			expect(
+				screen.getByTestId( 'aspect-ratio-value' )
+			).toHaveTextContent( '1' );
+			expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
+				'false'
+			);
+
+			// Picking Free flips freeform back on via the setter side-effect.
+			fireEvent.click( screen.getByRole( 'button', { name: 'Free' } ) );
+			advanceDebounce();
+
+			expect(
+				screen.getByTestId( 'aspect-ratio-value' )
+			).toHaveTextContent( '0' );
+			expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
+				'true'
+			);
+
+			// Undo should restore the (Square, handles-off) pair — proving the
+			// satellite captures both fields atomically and the auto-enable
+			// side-effect doesn't leak into the restored state.
+			fireEvent.click( screen.getByRole( 'button', { name: 'Undo' } ) );
+
+			expect(
+				screen.getByTestId( 'aspect-ratio-value' )
+			).toHaveTextContent( '1' );
+			expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
+				'false'
+			);
+		} );
 	} );
 } );
