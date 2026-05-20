@@ -20,13 +20,12 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
-import { useBlockEditorAutocompleteProps } from '../../autocomplete';
-import { getAllowedFormats } from '../utils';
-import FormatEdit from '../format-edit';
-import shortcutsListener from '../event-listeners/shortcuts';
-import inputEventsListener from '../event-listeners/input-events';
-import { keyboardShortcutContext, inputEventContext } from '../';
+import { unlock } from './lock-unlock';
+import { getAllowedFormats } from './utils';
+import FormatEdit from './format-edit';
+import shortcutsListener from './event-listeners/shortcuts';
+import inputEventsListener from './event-listeners/input-events';
+import { keyboardShortcutContext, inputEventContext } from './contexts';
 
 const { useRichText } = unlock( richTextPrivateApis );
 
@@ -34,11 +33,12 @@ const { useRichText } = unlock( richTextPrivateApis );
  * A rich text control component that provides a contenteditable field with
  * formatting capabilities.
  *
- * Unlike the in-canvas `RichText` component, `RichTextControl` is intended for
- * standalone form fields (DataForms, sidebar inputs, etc.). It exposes a
- * straightforward `value` / `onChange` interface and skips block-editor
- * selection coupling, while still wiring registered format types and
- * (optionally) autocompleters such as inline mentions.
+ * Unlike the in-canvas `RichText` component from `@wordpress/block-editor`,
+ * `RichTextControl` is intended for standalone form fields (DataForms, sidebar
+ * inputs, etc.). It exposes a straightforward `value` / `onChange` interface
+ * and skips block-editor selection coupling, while still wiring registered
+ * format types so familiar keyboard shortcuts (Cmd+B, Cmd+I, Cmd+K) continue
+ * to work.
  *
  * @param {Object}   props                                Component properties.
  * @param {string}   props.label                          Label text for the control.
@@ -54,8 +54,7 @@ const { useRichText } = unlock( richTextPrivateApis );
  * @param {boolean}  [props.withoutInteractiveFormatting] Whether to disable interactive formatting features.
  * @param {boolean}  [props.preserveWhiteSpace]           Whether to preserve whitespace in the content.
  * @param {boolean}  [props.disableLineBreaks]            Whether to disable line breaks in the content.
- * @param {Array}    [props.autocompleters]               Optional list of autocompleters (e.g. `@`-mention completers).
- * @param {boolean}  [props.focusOnMount]                 Whether to move focus to the field when it mounts. Off by default; opt in for standalone forms (e.g. a note form) where the old in-canvas `RichText` would have received focus via block-editor selection.
+ * @param {boolean}  [props.focusOnMount]                 Whether to move focus to the field when it mounts. Off by default; opt in for standalone forms where no other code lands focus on the field.
  *
  * @return {Element} The rendered RichTextControl component.
  */
@@ -73,7 +72,6 @@ export default function RichTextControl( {
 	withoutInteractiveFormatting,
 	preserveWhiteSpace,
 	disableLineBreaks,
-	autocompleters,
 	focusOnMount,
 } ) {
 	const [ selection, setSelection ] = useState( {
@@ -124,12 +122,6 @@ export default function RichTextControl( {
 		),
 	} );
 
-	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		completers: autocompleters,
-		record: value,
-		onChange: onRichTextChange,
-	} );
-
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		hideLabelFromVision,
 		label,
@@ -140,9 +132,8 @@ export default function RichTextControl( {
 	}
 
 	// Optionally move focus to the field when it mounts. `RichTextControl`
-	// drops the block-editor selection coupling that focuses the in-canvas
-	// `RichText`, so standalone consumers (e.g. a note form) have no other
-	// way to land the caret in the field on open.
+	// has no block-editor selection to land focus, so standalone consumers
+	// (e.g. a note form) need a way to land the caret on open.
 	const focusOnMountRef = useRefEffect(
 		( element ) => {
 			if ( focusOnMount ) {
@@ -189,10 +180,8 @@ export default function RichTextControl( {
 			)( element );
 
 			// Apply format-level input rules (e.g. `core/code`'s
-			// backtick→inline-code transform). Mirrors the format-rule
-			// branch of `block-editor`'s `input-rules.js` listener without
-			// pulling in its block-transform machinery, which doesn't
-			// apply to a standalone field.
+			// backtick→inline-code transform). Block-transform input rules
+			// don't apply to a standalone field.
 			function onFormatInput( event ) {
 				if (
 					event.inputType !== 'insertText' &&
@@ -251,19 +240,13 @@ export default function RichTextControl( {
 			) }
 			<BaseControl { ...baseControlProps }>
 				<div
-					{ ...autocompleteProps }
-					className={ clsx(
-						'block-editor-rich-text-control',
-						className,
-						autocompleteProps.className
-					) }
+					className={ clsx( 'wp-rich-text-control', className ) }
 					role="textbox"
 					aria-multiline={ ! disableLineBreaks }
 					aria-label={ label }
 					ref={ useMergeRefs( [
 						richTextRef,
 						anchorRef,
-						autocompleteProps.ref,
 						eventListenersRef,
 						focusOnMountRef,
 					] ) }

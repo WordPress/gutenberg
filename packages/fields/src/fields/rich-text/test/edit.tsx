@@ -4,14 +4,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-// The `RichTextControl` private API depends on the block-editor's rich-text
-// machinery; mock before importing the wrapper so it never resolves the real
-// editor module graph (which can't load without a build).
-// machinery (rich-text package, format types, event listeners, etc.) which is
-// integration-heavy. Mock the block-editor module entirely so this file can
-// verify the wrapper's prop wiring in isolation without loading the full
-// editor module graph.
-jest.mock( '@wordpress/block-editor', () => ( {
+// The `RichTextControl` private API depends on `@wordpress/rich-text`'s
+// useRichText hook (format types, event listeners, etc.) which is
+// integration-heavy. Mock the rich-text-control module entirely so this file
+// can verify the wrapper's prop wiring in isolation without standing up the
+// real editing pipeline.
+jest.mock( '@wordpress/rich-text-control', () => ( {
 	privateApis: {},
 } ) );
 

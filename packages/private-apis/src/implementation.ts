@@ -35,6 +35,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/preferences',
 	'@wordpress/reusable-blocks',
 	'@wordpress/rich-text',
+	'@wordpress/rich-text-control',
 	'@wordpress/route',
 	'@wordpress/router',
 	'@wordpress/routes',

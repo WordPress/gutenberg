@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-// @ts-ignore — `@wordpress/block-editor` ships no `.d.ts` files, so the
+// @ts-ignore — `@wordpress/rich-text-control` ships no `.d.ts` files, so the
 // type-declaration build cannot resolve this import even though the package
 // is declared as a dependency.
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as richTextControlPrivateApis } from '@wordpress/rich-text-control';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 
 /**
@@ -12,7 +12,7 @@ import type { DataFormControlProps } from '@wordpress/dataviews';
  */
 import { unlock } from '../../lock-unlock';
 
-const { RichTextControl } = unlock( blockEditorPrivateApis );
+const { RichTextControl } = unlock( richTextControlPrivateApis );
 
 /**
  * Configuration specific to rich text fields.
@@ -30,7 +30,6 @@ interface RichTextFieldConfig {
 	withoutInteractiveFormatting?: boolean;
 	preserveWhiteSpace?: boolean;
 	disableLineBreaks?: boolean;
-	autocompleters?: unknown[];
 }
 
 export default function RichTextEdit< Item >( {
@@ -60,7 +59,6 @@ export default function RichTextEdit< Item >( {
 			}
 			preserveWhiteSpace={ richTextConfig?.preserveWhiteSpace }
 			disableLineBreaks={ richTextConfig?.disableLineBreaks }
-			autocompleters={ richTextConfig?.autocompleters }
 		/>
 	);
 }

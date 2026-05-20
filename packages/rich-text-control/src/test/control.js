@@ -11,11 +11,10 @@ import { unregisterFormatType, registerFormatType } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import RichTextControl from '../';
-import { RichTextShortcut } from '../../shortcut';
+import RichTextControl from '../control';
 
 function getTextbox( container ) {
-	return container.querySelector( '.block-editor-rich-text-control' );
+	return container.querySelector( '.wp-rich-text-control' );
 }
 
 describe( 'RichTextControl', () => {
@@ -111,7 +110,7 @@ describe( 'RichTextControl', () => {
 		);
 
 		const textbox = getTextbox( container );
-		expect( textbox ).toHaveClass( 'block-editor-rich-text-control' );
+		expect( textbox ).toHaveClass( 'wp-rich-text-control' );
 		expect( textbox ).toHaveClass( 'my-custom-class' );
 	} );
 
@@ -143,18 +142,41 @@ describe( 'RichTextControl', () => {
 		// `act(...)`), while each test can still assert on a fresh mock.
 		let currentOnUse;
 
+		// Re-implement `RichTextShortcut` locally to avoid pulling the
+		// block-editor package into this unit test. The component just
+		// registers a callback into the `keyboardShortcutContext` set the
+		// control sets up. Mirrors the contract of
+		// `packages/block-editor/src/components/rich-text/shortcut.js`.
+		function TestShortcut( { onUse } ) {
+			const { useContext, useEffect } = require( '@wordpress/element' );
+
+			const { keyboardShortcutContext } = require( '../contexts' );
+			const keyboardShortcuts = useContext( keyboardShortcutContext );
+			useEffect( () => {
+				const shortcuts = keyboardShortcuts.current;
+				const handler = ( event ) => {
+					if (
+						event.key === 'b' &&
+						( event.ctrlKey || event.metaKey )
+					) {
+						event.preventDefault();
+						onUse();
+					}
+				};
+				shortcuts.add( handler );
+				return () => {
+					shortcuts.delete( handler );
+				};
+			}, [ onUse, keyboardShortcuts ] );
+			return null;
+		}
+
 		beforeAll( () => {
 			registerFormatType( 'core/test-shortcut', {
 				title: 'Test Shortcut',
 				tagName: 'mark',
 				className: null,
-				edit: () => (
-					<RichTextShortcut
-						type="primary"
-						character="b"
-						onUse={ () => currentOnUse() }
-					/>
-				),
+				edit: () => <TestShortcut onUse={ () => currentOnUse() } />,
 			} );
 		} );
 
@@ -219,9 +241,6 @@ describe( 'RichTextControl', () => {
 			const dispatched = dispatchPrimaryB( textbox );
 
 			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
-			// `RichTextShortcut` calls `preventDefault()` so global Cmd+K
-			// (the command palette, which bails on `defaultPrevented`) does
-			// not fire when the link format consumes it.
 			expect( dispatched ).toBe( false );
 		} );
 
