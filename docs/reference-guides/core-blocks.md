@@ -967,7 +967,7 @@ A single slide within a slider. ([Source](https://github.com/WordPress/gutenberg
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/slider
--	**Supports:** anchor, color (background, gradients, text), shadow, spacing (padding, ~~margin~~), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, text), ~~html~~, ~~reusable~~
 
 ## Slider
 
@@ -977,7 +977,7 @@ Display content in a scrolling slider. ([Source](https://github.com/WordPress/gu
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/slider-pagination, core/slide
--	**Supports:** align, ariaLabel, color (background, gradients, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
+-	**Supports:** align, ariaLabel, interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin), ~~html~~
 -	**Attributes:** loop, slidesToShow
 
 ## Slider Pagination
@@ -989,7 +989,7 @@ Container for slider controls and indicators. ([Source](https://github.com/WordP
 -	**Category:** design
 -	**Ancestor:** core/slider
 -	**Allowed Blocks:** core/slider-pagination-button, core/slider-pagination-indicator
--	**Supports:** color (background, text), layout (default), spacing (blockGap, margin, padding), ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Supports:** color (background, text), layout (allowJustification, default, ~~allowOrientation~~), spacing (blockGap, margin, padding), ~~anchor~~, ~~html~~, ~~reusable~~
 -	**Attributes:** arrowIcon, indicatorStyle, navigationButtonType
 
 ## Slider Pagination Button

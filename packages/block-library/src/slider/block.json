@@ -32,13 +32,7 @@
 			"allowJustification": false
 		},
 		"spacing": {
-			"margin": true,
-			"padding": true
-		},
-		"color": {
-			"background": true,
-			"gradients": true,
-			"text": false
+			"margin": true
 		}
 	},
 	"editorScript": "file:./index.js",

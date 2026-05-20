@@ -12,10 +12,6 @@
 		"anchor": true,
 		"html": false,
 		"reusable": false,
-		"spacing": {
-			"padding": true,
-			"margin": false
-		},
 		"color": {
 			"background": true,
 			"text": true,
@@ -26,8 +22,7 @@
 			"color": true,
 			"width": true,
 			"style": true
-		},
-		"shadow": true
+		}
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "wp-block-slide-editor",

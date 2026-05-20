@@ -43,7 +43,9 @@
 				"type": "flex",
 				"flexWrap": "nowrap",
 				"justifyContent": "center"
-			}
+			},
+			"allowOrientation": false,
+			"allowJustification": true
 		},
 		"spacing": {
 			"margin": true,
