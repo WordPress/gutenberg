@@ -9,9 +9,7 @@ import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
-	useCallback,
 	useEffect,
-	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -77,7 +75,6 @@ const SiteLogo = ( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const logoIdRef = useRef( logoId );
 
 	// Check if we're in contentOnly mode
 	const blockEditingMode = useBlockEditingMode();
@@ -105,10 +102,6 @@ const SiteLogo = ( {
 	}, [] );
 
 	useEffect( () => {
-		logoIdRef.current = logoId;
-	}, [ logoId ] );
-
-	useEffect( () => {
 		// Turn the `Use as site icon` toggle off if it is on but the logo and icon have
 		// fallen out of sync. This can happen if the toggle is saved in the `on` position,
 		// but changes are later made to the site icon in the Customizer.
@@ -123,15 +116,11 @@ const SiteLogo = ( {
 		}
 	}, [ isSelected ] );
 
-	const handleMediaUpdate = useCallback(
-		( { id: newId } ) => {
-			if ( typeof newId === 'number' && newId !== logoIdRef.current ) {
-				logoIdRef.current = newId;
-				setLogo( newId );
-			}
-		},
-		[ setLogo ]
-	);
+	const handleMediaUpdate = ( { id: newId } ) => {
+		if ( typeof newId === 'number' ) {
+			setLogo( newId );
+		}
+	};
 
 	function onResizeStart() {
 		toggleSelection( false );
