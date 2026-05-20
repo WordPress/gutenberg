@@ -32,7 +32,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @since 7.0.0
 		 * @var string
 		 */
-		const AWARENESS_META_KEY = 'wp_sync_awareness';
+		const AWARENESS_META_KEY = 'wp_sync_awareness_state';
 
 		/**
 		 * Meta key for sync updates.
@@ -40,7 +40,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @since 7.0.0
 		 * @var string
 		 */
-		const SYNC_UPDATE_META_KEY = 'wp_sync_update';
+		const SYNC_UPDATE_META_KEY = 'wp_sync_update_data';
 
 		/**
 		 * Cache of cursors by room.
@@ -71,58 +71,32 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
 		 * @param string $room   Room identifier.
 		 * @param mixed  $update Sync update.
 		 * @return bool True on success, false on failure.
 		 */
 		public function add_update( string $room, $update ): bool {
+			global $wpdb;
+
 			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
 				return false;
 			}
 
-			// Create an envelope and stamp each update to enable cursor-based filtering.
-			$envelope = array(
-				'timestamp' => $this->get_time_marker(),
-				'value'     => $update,
+			// Use direct database operation to avoid cache invalidation performed by
+			// post meta functions (`wp_cache_set_posts_last_changed()` and direct
+			// `wp_cache_delete()` calls).
+			return (bool) $wpdb->insert(
+				$wpdb->postmeta,
+				array(
+					'post_id'    => $post_id,
+					'meta_key'   => self::SYNC_UPDATE_META_KEY,
+					'meta_value' => wp_json_encode( $update ),
+				),
+				array( '%d', '%s', '%s' )
 			);
-
-			return (bool) add_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope, false );
-		}
-
-		/**
-		 * Retrieves all sync updates for a given room.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param string $room Room identifier.
-		 * @return array<int, array{ timestamp: int, value: mixed }> Sync updates.
-		 */
-		private function get_all_updates( string $room ): array {
-			$this->room_cursors[ $room ] = $this->get_time_marker() - 100; // Small buffer to ensure consistency.
-
-			$post_id = $this->get_storage_post_id( $room );
-			if ( null === $post_id ) {
-				return array();
-			}
-
-			$updates = get_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, false );
-
-			if ( ! is_array( $updates ) ) {
-				$updates = array();
-			}
-
-			// Filter out any updates that don't have the expected structure.
-			$updates = array_filter(
-				$updates,
-				static function ( $update ): bool {
-					return is_array( $update ) && isset( $update['timestamp'], $update['value'] ) && is_int( $update['timestamp'] );
-				}
-			);
-
-			$this->room_update_counts[ $room ] = count( $updates );
-
-			return $updates;
 		}
 
 		/**
@@ -130,16 +104,35 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
 		 * @param string $room Room identifier.
 		 * @return array<int, mixed> Awareness state.
 		 */
 		public function get_awareness_state( string $room ): array {
+			global $wpdb;
+
 			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
 				return array();
 			}
 
-			$awareness = get_post_meta( $post_id, self::AWARENESS_META_KEY, true );
+			// Use direct database operation to avoid updating the post meta cache.
+			// ORDER BY meta_id DESC ensures the latest row wins if duplicates exist
+			// from a past race condition in set_awareness_state().
+			$meta_value = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_value FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1",
+					$post_id,
+					self::AWARENESS_META_KEY
+				)
+			);
+
+			if ( null === $meta_value ) {
+				return array();
+			}
+
+			$awareness = json_decode( $meta_value, true );
 
 			if ( ! is_array( $awareness ) ) {
 				return array();
@@ -153,27 +146,61 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
 		 * @param string            $room      Room identifier.
 		 * @param array<int, mixed> $awareness Serializable awareness state.
 		 * @return bool True on success, false on failure.
 		 */
 		public function set_awareness_state( string $room, array $awareness ): bool {
+			global $wpdb;
+
 			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
 				return false;
 			}
 
-			// update_post_meta returns false if the value is the same as the existing value.
-			update_post_meta( $post_id, self::AWARENESS_META_KEY, $awareness );
-			return true;
+			// Use direct database operation to avoid cache invalidation performed by
+			// post meta functions (`wp_cache_set_posts_last_changed()` and direct
+			// `wp_cache_delete()` calls).
+			//
+			// If two concurrent requests both see no row and both INSERT, the
+			// duplicate is harmless: get_awareness_state() reads the latest row
+			// (ORDER BY meta_id DESC).
+			$meta_id = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_id FROM $wpdb->postmeta WHERE post_id = %d AND meta_key = %s ORDER BY meta_id DESC LIMIT 1",
+					$post_id,
+					self::AWARENESS_META_KEY
+				)
+			);
+
+			if ( $meta_id ) {
+				return (bool) $wpdb->update(
+					$wpdb->postmeta,
+					array( 'meta_value' => wp_json_encode( $awareness ) ),
+					array( 'meta_id' => $meta_id ),
+					array( '%s' ),
+					array( '%d' )
+				);
+			}
+
+			return (bool) $wpdb->insert(
+				$wpdb->postmeta,
+				array(
+					'post_id'    => $post_id,
+					'meta_key'   => self::AWARENESS_META_KEY,
+					'meta_value' => wp_json_encode( $awareness ),
+				),
+				array( '%d', '%s', '%s' )
+			);
 		}
 
 		/**
 		 * Gets the current cursor for a given room.
 		 *
 		 * The cursor is set during get_updates_after_cursor() and represents the
-		 * point in time just before the updates were retrieved, with a small buffer
-		 * to ensure consistency.
+		 * highest meta_id seen for the room's sync updates.
 		 *
 		 * @since 7.0.0
 		 *
@@ -210,6 +237,8 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 					'post_status'    => 'publish',
 					'name'           => $room_hash,
 					'fields'         => 'ids',
+					'orderby'        => 'ID',
+					'order'          => 'ASC',
 				)
 			);
 
@@ -235,23 +264,130 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				)
 			);
 
-			if ( is_int( $post_id ) ) {
-				self::$storage_post_ids[ $room_hash ] = $post_id;
-				return $post_id;
+			if ( is_int( $post_id ) && $post_id > 0 ) {
+				$canonical_post_id = $this->resolve_canonical_storage_post_id_after_insert( $room_hash, $post_id );
+				if ( null === $canonical_post_id ) {
+					return null;
+				}
+
+				self::$storage_post_ids[ $room_hash ] = $canonical_post_id;
+				return $canonical_post_id;
 			}
 
 			return null;
 		}
 
 		/**
-		 * Gets the current time in milliseconds as a comparable time marker.
+		 * Resolves the canonical room storage post after inserting a new post.
+		 *
+		 * Two concurrent first writers can both miss the lookup above and create
+		 * storage posts for the same room hash. Depending on the exact interleaving,
+		 * WordPress may create either a duplicate exact slug or a suffixed slug.
+		 * When this request receives a non-canonical post, redirect it to the
+		 * canonical storage before any sync or awareness data is written.
 		 *
 		 * @since 7.0.0
 		 *
-		 * @return int Current time in milliseconds.
+		 * @param string $room_hash        MD5 hash of the room identifier.
+		 * @param int    $inserted_post_id Post ID returned by wp_insert_post().
+		 * @return int|null Canonical storage post ID.
 		 */
-		private function get_time_marker(): int {
-			return (int) floor( microtime( true ) * 1000 );
+		private function resolve_canonical_storage_post_id_after_insert( string $room_hash, int $inserted_post_id ): ?int {
+			$canonical_post_id = $this->find_canonical_storage_post_id( $room_hash );
+			if ( null === $canonical_post_id ) {
+				$canonical_post_id = $this->promote_storage_post_to_canonical_slug( $room_hash, $inserted_post_id );
+			}
+
+			if ( null === $canonical_post_id ) {
+				wp_delete_post( $inserted_post_id, true );
+				return null;
+			}
+
+			if ( $inserted_post_id !== $canonical_post_id ) {
+				/*
+				 * This request just created a duplicate empty storage post because
+				 * another first writer won the exact-slug race. Delete only that
+				 * just-created empty post and write this request's data to canonical
+				 * storage.
+				 *
+				 * Do not merge or delete older duplicate storage posts here. A stale
+				 * request may already hold a duplicate post ID, and MySQL advisory
+				 * locks/raw transactions are not a reliable cross-server fence under
+				 * HyperDB or database proxies. Future historical repair should be
+				 * bounded and idempotent, or run out of band with primary-pinned
+				 * verification and a grace period before deleting duplicates.
+				 */
+				wp_delete_post( $inserted_post_id, true );
+			}
+
+			return $canonical_post_id;
+		}
+
+		/**
+		 * Finds the canonical storage post for a room hash.
+		 *
+		 * The canonical post is the oldest published storage post with the exact
+		 * room hash slug. Suffixed slugs are repair candidates, not canonical.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room_hash MD5 hash of the room identifier.
+		 * @return int|null Canonical storage post ID.
+		 */
+		private function find_canonical_storage_post_id( string $room_hash ): ?int {
+			$posts = get_posts(
+				array(
+					'post_type'      => self::POST_TYPE,
+					'posts_per_page' => 1,
+					'post_status'    => 'publish',
+					'name'           => $room_hash,
+					'fields'         => 'ids',
+					'orderby'        => 'ID',
+					'order'          => 'ASC',
+				)
+			);
+
+			if ( empty( $posts ) ) {
+				return null;
+			}
+
+			return $posts[0];
+		}
+
+		/**
+		 * Promotes a storage post to the canonical room slug.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room_hash MD5 hash of the room identifier.
+		 * @param int    $post_id   Post ID to promote.
+		 * @return int|null Promoted post ID on success.
+		 */
+		private function promote_storage_post_to_canonical_slug( string $room_hash, int $post_id ): ?int {
+			global $wpdb;
+
+			/*
+			 * @todo Could this be replaced by {@see wp_update_post()}? Could we experience
+			 *       a race with other posts having a different post type or post status?
+			 */
+			$result = $wpdb->update(
+				$wpdb->posts,
+				array( 'post_name' => $room_hash ),
+				array(
+					'ID'          => $post_id,
+					'post_type'   => self::POST_TYPE,
+					'post_status' => 'publish',
+				),
+				array( '%s' ),
+				array( '%d', '%s', '%s' )
+			);
+
+			if ( false === $result ) {
+				return null;
+			}
+
+			clean_post_cache( $post_id );
+			return $post_id;
 		}
 
 		/**
@@ -267,32 +403,68 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		}
 
 		/**
-		 * Retrieves sync updates from a room for a given client and cursor. Updates
-		 * from the specified client should be excluded.
+		 * Retrieves sync updates from a room after the given cursor.
 		 *
 		 * @since 7.0.0
 		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
 		 * @param string $room   Room identifier.
-		 * @param int    $cursor Return updates after this cursor.
+		 * @param int    $cursor Return updates after this cursor (meta_id).
 		 * @return array<int, mixed> Sync updates.
 		 */
 		public function get_updates_after_cursor( string $room, int $cursor ): array {
-			$all_updates = $this->get_all_updates( $room );
-			$updates     = array();
+			global $wpdb;
 
-			foreach ( $all_updates as $update ) {
-				if ( $update['timestamp'] > $cursor ) {
-					$updates[] = $update;
+			$post_id = $this->get_storage_post_id( $room );
+			if ( null === $post_id ) {
+				$this->room_cursors[ $room ]       = 0;
+				$this->room_update_counts[ $room ] = 0;
+				return array();
+			}
+
+			// Capture the current room state first so the returned cursor is race-safe.
+			$stats = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT COUNT(*) AS total_updates, COALESCE( MAX(meta_id), 0 ) AS max_meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s",
+					$post_id,
+					self::SYNC_UPDATE_META_KEY
+				)
+			);
+
+			$total_updates = $stats ? (int) $stats->total_updates : 0;
+			$max_meta_id   = $stats ? (int) $stats->max_meta_id : 0;
+
+			$this->room_update_counts[ $room ] = $total_updates;
+			$this->room_cursors[ $room ]       = $max_meta_id;
+
+			if ( $max_meta_id <= $cursor ) {
+				return array();
+			}
+
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s AND meta_id > %d AND meta_id <= %d ORDER BY meta_id ASC",
+					$post_id,
+					self::SYNC_UPDATE_META_KEY,
+					$cursor,
+					$max_meta_id
+				)
+			);
+
+			if ( ! $rows ) {
+				return array();
+			}
+
+			$updates = array();
+			foreach ( $rows as $row ) {
+				$decoded = json_decode( $row->meta_value, true );
+				if ( null !== $decoded ) {
+					$updates[] = $decoded;
 				}
 			}
 
-			// Sort by timestamp to ensure order.
-			usort(
-				$updates,
-				fn ( $a, $b ) => $a['timestamp'] <=> $b['timestamp']
-			);
-
-			return wp_list_pluck( $updates, 'value' );
+			return $updates;
 		}
 
 		/**
@@ -300,32 +472,34 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 *
 		 * @since 7.0.0
 		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
+		 *
 		 * @param string $room   Room identifier.
-		 * @param int    $cursor Remove updates with markers < this cursor.
+		 * @param int    $cursor Remove updates with meta_id < this cursor.
 		 * @return bool True on success, false on failure.
 		 */
 		public function remove_updates_before_cursor( string $room, int $cursor ): bool {
+			global $wpdb;
+
 			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
 				return false;
 			}
 
-			$all_updates = $this->get_all_updates( $room );
+			$deleted_rows = $wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s AND meta_id < %d",
+					$post_id,
+					self::SYNC_UPDATE_META_KEY,
+					$cursor
+				)
+			);
 
-			// Remove all updates for the room and re-store only those that are newer than the cursor.
-			if ( ! delete_post_meta( $post_id, self::SYNC_UPDATE_META_KEY ) ) {
+			if ( false === $deleted_rows ) {
 				return false;
 			}
 
-			// Re-store envelopes directly to avoid double-wrapping by add_update().
-			$add_result = true;
-			foreach ( $all_updates as $envelope ) {
-				if ( $add_result && $envelope['timestamp'] >= $cursor ) {
-					$add_result = (bool) add_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope, false );
-				}
-			}
-
-			return $add_result;
+			return true;
 		}
 	}
 }

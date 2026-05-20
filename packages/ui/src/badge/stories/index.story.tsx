@@ -3,8 +3,15 @@ import { Fragment } from '@wordpress/element';
 import { Badge } from '../index';
 
 const meta: Meta< typeof Badge > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Badge',
 	component: Badge,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

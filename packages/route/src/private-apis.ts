@@ -6,6 +6,7 @@ import {
 	createBrowserHistory,
 	createLazyRoute,
 	createLink,
+	createMemoryHistory,
 	createRootRoute,
 	createRoute,
 	createRouter,
@@ -38,6 +39,7 @@ lock( privateApis, {
 	// Router creation and setup
 	createBrowserHistory,
 	createLazyRoute,
+	createMemoryHistory,
 	createRouter,
 	createRootRoute,
 	createRoute,

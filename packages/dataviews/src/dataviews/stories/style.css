@@ -3,11 +3,6 @@
 	text-wrap: pretty;
 }
 
-.free-composition {
-	height: 600px;
-	overflow: auto;
-}
-
 .free-composition-heading,
 .free-composition-header {
 	padding: 16px 48px;

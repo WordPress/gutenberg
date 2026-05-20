@@ -10,6 +10,7 @@ import { fn } from 'storybook/test';
 import SandBox from '..';
 
 const meta: Meta< typeof SandBox > = {
+	tags: [ 'manifest' ],
 	component: SandBox,
 	title: 'Components/Utilities/SandBox',
 	id: 'components-sandbox',
@@ -23,7 +24,7 @@ const meta: Meta< typeof SandBox > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

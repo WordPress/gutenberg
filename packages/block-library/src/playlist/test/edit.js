@@ -5,7 +5,7 @@
 /**
  * Internal dependencies
  */
-import { getTrackAttributes } from '../edit';
+import { getTrackAttributes } from '../utils';
 
 // Mock uuid to return predictable values.
 jest.mock( 'uuid', () => ( {

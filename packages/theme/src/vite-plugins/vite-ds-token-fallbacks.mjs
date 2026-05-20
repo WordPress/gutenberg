@@ -21,7 +21,10 @@ const plugin = () => ( {
 		}
 		// Sourcemap omitted: replacements are small, inline substitutions
 		// that preserve line structure, so the debugging impact is negligible.
-		return { code: addFallbackToVar( code ), map: null };
+		return {
+			code: addFallbackToVar( code, { escapeQuotes: true } ),
+			map: null,
+		};
 	},
 } );
 

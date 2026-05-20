@@ -101,11 +101,24 @@ function context( state = 'root', action ) {
 	return state;
 }
 
+function loaderStates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_LOADER_LOADING':
+			return {
+				...state,
+				[ action.name ]: action.isLoading,
+			};
+	}
+
+	return state;
+}
+
 const reducer = combineReducers( {
 	commands,
 	commandLoaders,
 	isOpen,
 	context,
+	loaderStates,
 } );
 
 export default reducer;

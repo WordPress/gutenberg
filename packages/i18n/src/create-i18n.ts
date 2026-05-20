@@ -3,6 +3,12 @@
  */
 import type { TanninLocaleDomain } from 'tannin';
 import Tannin from 'tannin';
+
+/**
+ * WordPress dependencies
+ */
+import type { Hooks } from '@wordpress/hooks';
+
 /**
  * Internal dependencies
  */
@@ -11,13 +17,9 @@ import type {
 	I18n,
 	LocaleData,
 	SubscribeCallback,
-	TranslatableText,
+	TransformedText,
 	UnsubscribeCallback,
 } from './types';
-/**
- * WordPress dependencies
- */
-import type { Hooks } from '@wordpress/hooks';
 /**
  * Default locale data to use for Tannin domain when not otherwise provided.
  * Assumes an English plural forms expression.
@@ -178,7 +180,7 @@ export const createI18n = < TextDomain extends string >(
 	const __: I18n< TextDomain >[ '__' ] = ( text, domain ) => {
 		let translation = dcnpgettext( domain, undefined, text );
 		if ( ! hooks ) {
-			return translation as TranslatableText< typeof text >;
+			return translation as TransformedText< typeof text >;
 		}
 
 		/**
@@ -193,20 +195,20 @@ export const createI18n = < TextDomain extends string >(
 			translation,
 			text,
 			domain
-		) as TranslatableText< typeof text >;
+		) as TransformedText< typeof text >;
 
 		return hooks.applyFilters(
 			'i18n.gettext_' + getFilterDomain( domain ),
 			translation,
 			text,
 			domain
-		) as TranslatableText< typeof text >;
+		) as TransformedText< typeof text >;
 	};
 
 	const _x: I18n< TextDomain >[ '_x' ] = ( text, context, domain ) => {
 		let translation = dcnpgettext( domain, context, text );
 		if ( ! hooks ) {
-			return translation as TranslatableText< typeof text >;
+			return translation as TransformedText< typeof text >;
 		}
 
 		/**
@@ -223,7 +225,7 @@ export const createI18n = < TextDomain extends string >(
 			text,
 			context,
 			domain
-		) as TranslatableText< typeof text >;
+		) as TransformedText< typeof text >;
 
 		return hooks.applyFilters(
 			'i18n.gettext_with_context_' + getFilterDomain( domain ),
@@ -231,7 +233,7 @@ export const createI18n = < TextDomain extends string >(
 			text,
 			context,
 			domain
-		) as TranslatableText< typeof text >;
+		) as TransformedText< typeof text >;
 	};
 
 	const _n: I18n< TextDomain >[ '_n' ] = (
@@ -248,7 +250,7 @@ export const createI18n = < TextDomain extends string >(
 			number
 		);
 		if ( ! hooks ) {
-			return translation as TranslatableText<
+			return translation as TransformedText<
 				typeof single | typeof plural
 			>;
 		}
@@ -269,7 +271,7 @@ export const createI18n = < TextDomain extends string >(
 			plural,
 			number,
 			domain
-		) as TranslatableText< typeof single | typeof plural >;
+		) as TransformedText< typeof single | typeof plural >;
 
 		return hooks.applyFilters(
 			'i18n.ngettext_' + getFilterDomain( domain ),
@@ -278,7 +280,7 @@ export const createI18n = < TextDomain extends string >(
 			plural,
 			number,
 			domain
-		) as TranslatableText< typeof single | typeof plural >;
+		) as TransformedText< typeof single | typeof plural >;
 	};
 
 	const _nx: I18n< TextDomain >[ '_nx' ] = (
@@ -296,7 +298,7 @@ export const createI18n = < TextDomain extends string >(
 			number
 		);
 		if ( ! hooks ) {
-			return translation as TranslatableText<
+			return translation as TransformedText<
 				typeof single | typeof plural
 			>;
 		}
@@ -319,7 +321,7 @@ export const createI18n = < TextDomain extends string >(
 			number,
 			context,
 			domain
-		) as TranslatableText< typeof single | typeof plural >;
+		) as TransformedText< typeof single | typeof plural >;
 
 		return hooks.applyFilters(
 			'i18n.ngettext_with_context_' + getFilterDomain( domain ),
@@ -329,7 +331,7 @@ export const createI18n = < TextDomain extends string >(
 			number,
 			context,
 			domain
-		) as TranslatableText< typeof single | typeof plural >;
+		) as TransformedText< typeof single | typeof plural >;
 	};
 
 	const isRTL: I18n< TextDomain >[ 'isRTL' ] = () => {

@@ -9,19 +9,23 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 		// Enable the template activation feature.
 		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
+
+	test.beforeEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		// Disable the template activation feature.
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
-	test.beforeEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-	} );
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-	} );
+
 	test( 'should work as expected', async ( { admin, page } ) => {
 		await admin.visitSiteEditor();
 		await page.evaluate( async () => {

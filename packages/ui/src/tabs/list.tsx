@@ -21,7 +21,6 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 			variant = 'default',
 			className,
 			activateOnFocus,
-			render,
 			...otherProps
 		},
 		forwardedRef

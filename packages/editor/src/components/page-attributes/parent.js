@@ -60,7 +60,7 @@ export const getItemPriority = ( name, searchValue ) => {
  */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
-	const [ fieldValue, setFieldValue ] = useState( false );
+	const [ fieldValue, setFieldValue ] = useState( '' );
 	const {
 		isHierarchical,
 		parentPostId,
@@ -226,6 +226,7 @@ function PostParentToggle( { isOpen, onClick } ) {
 	return (
 		<Button
 			size="compact"
+			className="editor-post-parent__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={

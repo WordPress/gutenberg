@@ -11,6 +11,7 @@
 		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/compose": "file:../../packages/compose",
+		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
 		"@wordpress/editor": "file:../../packages/editor",
 		"@wordpress/element": "file:../../packages/element",

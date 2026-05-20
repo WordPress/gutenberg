@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	Tooltip,
+	Tooltip as WCTooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
@@ -36,7 +36,7 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getBlockVisibilityLabel } from '../block-visibility';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
@@ -136,9 +136,9 @@ function ListViewBlockSelectButton(
 				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Badge className="block-editor-list-view-block-select-button__anchor">
+						<WCBadge className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
-						</Badge>
+						</WCBadge>
 					</span>
 				) }
 				{ isSticky && (
@@ -164,14 +164,14 @@ function ListViewBlockSelectButton(
 					</span>
 				) : null }
 				{ !! visibilityLabel && (
-					<Tooltip text={ visibilityLabel }>
+					<WCTooltip text={ visibilityLabel }>
 						<span
 							className="block-editor-list-view-block-select-button__block-visibility"
 							aria-hidden="true"
 						>
 							<Icon icon={ unseen } />
 						</span>
-					</Tooltip>
+					</WCTooltip>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">

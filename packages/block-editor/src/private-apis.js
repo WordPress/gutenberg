@@ -24,7 +24,7 @@ import {
 	setBackgroundStyleDefaults,
 	useLayoutClasses,
 	useLayoutStyles,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 	useZoomOut,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
@@ -48,6 +48,9 @@ import {
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -57,8 +60,8 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
-import CommentIconSlotFill from './components/collab/block-comment-icon-slot';
-import CommentIconToolbarSlotFill from './components/collab/block-comment-icon-toolbar-slot';
+import NoteIconSlotFill from './components/collab/note-icon-slot';
+import NoteIconToolbarSlotFill from './components/collab/note-icon-toolbar-slot';
 import HTMLElementControl from './components/html-element-control';
 import {
 	useBlockElementRef,
@@ -119,16 +122,19 @@ lock( privateApis, {
 	PrivatePublishDateTimePicker,
 	useSpacingSizes,
 	useBlockDisplayTitle,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
-	CommentIconSlotFill,
-	CommentIconToolbarSlotFill,
+	NoteIconSlotFill,
+	NoteIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

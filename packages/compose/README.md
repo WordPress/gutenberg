@@ -220,9 +220,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `React.RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
--   _text_ `string|Function`: The text to copy.
--   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _ref_ `RefObject< string | Element | NodeListOf< Element > >`: Reference with the element.
+-   _text_ `string | ( () => string )`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -234,12 +234,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
--   _onSuccess_ `Function`: Called when to text is copied.
+-   _text_ `string | ( () => string )`: The text to copy. Use a function if not already available and expensive to compute.
+-   _onSuccess_ `() => void`: Called when to text is copied.
 
 _Returns_
 
--   `React.Ref<TElementType>`: A ref to assign to the target element.
+-   `RefCallback< T >`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -394,17 +394,17 @@ _Returns_
 
 ### useInstanceId
 
-Provides a unique instance ID.
+Specify the useInstanceId _function_ signatures.
+
+More accurately, useInstanceId distinguishes between three different signatures:
+
+1.  When only object is given, the returned value is a number
+2.  When object and prefix is given, the returned value is a string
+3.  When preferredId is given, the returned value is the type of preferredId
 
 _Parameters_
 
 -   _object_ `object`: Object reference to create an id for.
--   _prefix_ `[string]`: Prefix for the unique id.
--   _preferredId_ `[string | number]`: Default ID to use.
-
-_Returns_
-
--   `string | number`: The unique instance id.
 
 ### useIsomorphicLayoutEffect
 
@@ -431,6 +431,7 @@ Runs a media query and returns its value when it changes.
 _Parameters_
 
 -   _query_ `[string]`: Media Query.
+-   _view_ `[Window]`: Window instance, else default to global window
 
 _Returns_
 
@@ -592,6 +593,7 @@ _Parameters_
 
 -   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
 -   _operator_ `[WPViewportOperator]`: Viewport operator.
+-   _view_ `[Window]`: Window instance in which to perform viewport matching.
 
 _Returns_
 

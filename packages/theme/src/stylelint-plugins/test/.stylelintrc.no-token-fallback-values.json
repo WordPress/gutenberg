@@ -1,0 +1,6 @@
+{
+	"plugins": [ "../no-token-fallback-values.mjs" ],
+	"rules": {
+		"plugin-wpds/no-token-fallback-values": true
+	}
+}

@@ -103,7 +103,7 @@ export const editMediaEntity =
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
-						[ newRecord ],
+						newRecord,
 						undefined,
 						true,
 						undefined,
@@ -173,3 +173,50 @@ export const setCollaborationSupported =
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
 	};
+
+/**
+ * Returns an action object used to receive view config.
+ *
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {Object} config View config object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveViewConfig( kind, name, config ) {
+	return {
+		type: 'RECEIVE_VIEW_CONFIG',
+		kind,
+		name,
+		config,
+	};
+}
+
+/**
+ * Returns an action object used to set the sync connection status for an entity or collection.
+ *
+ * @param {string}             kind   Kind of the entity.
+ * @param {string}             name   Name of the entity.
+ * @param {number|string|null} key    The entity key, or null for collections.
+ * @param {Object|null}        status The connection state object or null on unload.
+ *
+ * @return {Object} Action object.
+ */
+export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! status ) {
+		return {
+			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+			kind,
+			name,
+			key,
+		};
+	}
+
+	return {
+		type: 'SET_SYNC_CONNECTION_STATUS',
+		kind,
+		name,
+		key,
+		status,
+	};
+}

@@ -26,7 +26,7 @@ import './style.css';
  * This component is deprecated. Consider using `Navigator` instead.
  */
 const meta: Meta< typeof Navigation > = {
-	title: 'Components (Deprecated)/Navigation',
+	title: 'Components/Deprecated/Navigation',
 	id: 'components-navigation',
 	component: Navigation,
 	subcomponents: {

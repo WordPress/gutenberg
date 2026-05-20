@@ -32,6 +32,6 @@ jobs:
             # See https://github.com/rhysd/actionlint.
             # Configuration file: .github/actionlint.yml
             - name: Run actionlint
-              uses: docker://rhysd/actionlint:1.7.7
+              uses: docker://rhysd/actionlint:1.7.11
               with:
                   args: '-color -verbose'
