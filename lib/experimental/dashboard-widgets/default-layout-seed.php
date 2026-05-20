@@ -33,7 +33,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 	if ( ! in_array( 'default-welcome-banner-widget-instance', $uuids, true ) ) {
 		$dashboard_layout[] = array(
 			'uuid'      => 'default-welcome-banner-widget-instance',
-			'type'      => 'gutenberg/welcome-banner',
+			'type'      => 'core/welcome',
 			'placement' => array(
 				'width'  => 'full',
 				'height' => 2,
