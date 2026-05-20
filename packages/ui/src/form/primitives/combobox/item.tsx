@@ -34,9 +34,7 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 				) : (
 					<Icon
 						icon={ check }
-						className={ clsx(
-							itemPopupStyles[ 'item-indicator-icon' ]
-						) }
+						className={ itemPopupStyles[ 'item-indicator-icon' ] }
 						size={ 24 }
 					/>
 				) }
