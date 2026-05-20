@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { subscribeSharedListener } from '@wordpress/compose';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -9,6 +9,9 @@ import { subscribeSharedListener } from '@wordpress/compose';
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 /**
  * All inserting input types that would insert HTML into the DOM.

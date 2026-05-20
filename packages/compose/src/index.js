@@ -6,8 +6,9 @@ export * from './utils/debounce';
 export * from './utils/throttle';
 // The `ObservableMap` data structure
 export * from './utils/observable-map';
-// The `subscribeSharedListener` helper for event delegation.
-export { default as subscribeSharedListener } from './utils/subscribe-shared-listener';
+
+// Private APIs.
+export { privateApis } from './private-apis';
 
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';

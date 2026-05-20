@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect, subscribeSharedListener } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -11,6 +14,9 @@ import { useSelect } from '@wordpress/data';
  */
 import useIndentListItem from './use-indent-list-item';
 import useOutdentListItem from './use-outdent-list-item';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 export default function useSpace( clientId ) {
 	const { getSelectionStart, getSelectionEnd, getBlockIndex } =

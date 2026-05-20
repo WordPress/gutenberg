@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { subscribeSharedListener } from '@wordpress/compose';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 /**
  * Prevents focus from being captured by the element when clicking _outside_

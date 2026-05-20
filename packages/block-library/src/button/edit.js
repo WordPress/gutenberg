@@ -42,7 +42,7 @@ import {
 import {
 	useMergeRefs,
 	useRefEffect,
-	subscribeSharedListener,
+	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
@@ -53,6 +53,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
 const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,

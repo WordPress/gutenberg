@@ -12,7 +12,7 @@ import {
 	useInstanceId,
 	useMergeRefs,
 	useRefEffect,
-	subscribeSharedListener,
+	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import {
 	create,
@@ -41,6 +41,9 @@ import type {
 	UseAutocompleteProps,
 } from './types';
 import getNodeText from '../utils/get-node-text';
+import { unlock } from '../lock-unlock';
+
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -398,18 +401,18 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 			function _onKeyDown( event: Event ) {
 				onKeyDownRef.current?.( event as KeyboardEvent );
 			}
+			// Capture phase. When the autocomplete popover is open,
+			// Up/Down/Enter/Escape must navigate the completion list —
+			// they shouldn't be consumed by ancestor handlers (e.g.
+			// block-editor's writing-flow) for block navigation, block
+			// splitting, or "move out of parent" actions. Those handlers
+			// fire at bubble phase and gate on `event.defaultPrevented`,
+			// so firing in capture lets us preventDefault first when the
+			// popover is active.
 			return subscribeSharedListener(
 				element,
 				'keydown',
 				_onKeyDown,
-				// Capture phase. When the autocomplete popover is open,
-				// Up/Down/Enter/Escape must navigate the completion list
-				// — they shouldn't be consumed by ancestor handlers
-				// (e.g. block-editor's writing-flow) for block navigation,
-				// block splitting, or "move out of parent" actions.
-				// Those handlers fire at bubble phase and gate on
-				// `event.defaultPrevented`, so firing in capture lets us
-				// preventDefault first when the popover is active.
 				true
 			);
 		}, [] ),

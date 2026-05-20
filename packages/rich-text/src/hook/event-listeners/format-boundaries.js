@@ -2,12 +2,15 @@
  * WordPress dependencies
  */
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import { subscribeSharedListener } from '@wordpress/compose';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { isCollapsed } from '../../is-collapsed';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 const EMPTY_ACTIVE_FORMATS = [];
 

@@ -147,15 +147,15 @@ _Related_
 
 -   <https://lodash.com/docs/4#flow>
 
+### privateApis
+
+Private @wordpress/compose APIs.
+
 ### pure
 
 > **Deprecated** Use `memo` or `PureComponent` instead.
 
 Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
-
-### subscribeSharedListener
-
-Undocumented declaration.
 
 ### throttle
 

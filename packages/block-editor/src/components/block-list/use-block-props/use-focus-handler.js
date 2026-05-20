@@ -2,13 +2,19 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect, subscribeSharedListener } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 /**
  * Selects the block if it receives focus.

@@ -2,12 +2,15 @@
  * WordPress dependencies
  */
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { subscribeSharedListener } from '@wordpress/compose';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { remove } from '../../remove';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeSharedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
