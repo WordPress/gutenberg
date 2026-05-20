@@ -4,6 +4,9 @@
 
 ### Enhancements
 
+-   Clamp tile resize so width cannot shrink below a single column
+    track (and height below a single row on `DashboardGrid` when
+    vertical resize is enabled).
 -   Rework the default edit-mode `GridOverlay` to paint per-row marker
     tiles (with `border-radius` md) inside each column instead of
     column backgrounds, outlines, and repeating row dividers. Theme via
