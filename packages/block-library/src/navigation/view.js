@@ -63,7 +63,7 @@ const MORPH_LINE_TRANSFORM = [
 	'translateY(3.75px) rotate(45deg) scaleX(1.24)',
 	'translateY(-3.75px) rotate(-45deg) scaleX(1.24)',
 ];
-const MORPH_LINE_IDENTITY = 'translateY(0) rotate(0) scaleX(1)';
+const MORPH_LINE_IDENTITY = 'translateY(0px) rotate(0deg) scaleX(1)';
 
 /**
  * Animate a phantom's two hamburger-line rects from one transform to another.
@@ -77,16 +77,22 @@ function animatePhantomLines( phantom, toMorphed ) {
 		'.wp-block-navigation__hamburger-line'
 	);
 	lines.forEach( ( line, i ) => {
+		const startTransform = toMorphed
+			? MORPH_LINE_IDENTITY
+			: MORPH_LINE_TRANSFORM[ i ];
+		const endTransform = toMorphed
+			? MORPH_LINE_TRANSFORM[ i ]
+			: MORPH_LINE_IDENTITY;
+		// Pre-set the starting transform inline so the first paint shows
+		// the correct state even if the WAAPI effect hasn't been sampled
+		// yet (particularly important for the reverse direction, where
+		// the CSS default doesn't match the animation's first keyframe).
+		line.style.transform = startTransform;
 		line.animate(
-			toMorphed
-				? [
-						{ transform: MORPH_LINE_IDENTITY },
-						{ transform: MORPH_LINE_TRANSFORM[ i ] },
-				  ]
-				: [
-						{ transform: MORPH_LINE_TRANSFORM[ i ] },
-						{ transform: MORPH_LINE_IDENTITY },
-				  ],
+			[
+				{ transform: startTransform },
+				{ transform: endTransform },
+			],
 			{
 				duration: MORPH_DURATION,
 				easing: MORPH_EASING,
@@ -119,7 +125,7 @@ function cleanupMorphAnimation( nav ) {
 		morph.animation?.cancel();
 		morph.phantom?.remove();
 		if ( morph.closeBtn ) {
-			morph.closeBtn.style.visibility = '';
+			morph.closeBtn.style.opacity = '';
 		}
 		activeMorphAnimations.delete( nav );
 	}
@@ -173,8 +179,12 @@ function runOpenMorphAnimation( nav, hamburgerBtn, closeBtn, startRect ) {
 	requestAnimationFrame( () => {
 		const endRect = closeBtn.getBoundingClientRect();
 
-		// Hide the real close button during the animation.
-		closeBtn.style.visibility = 'hidden';
+		// Hide the real close button visually but keep it focusable. Using
+		// visibility/display would remove focus from the close button after
+		// it's clicked, firing a focusout with a null relatedTarget that
+		// handleMenuFocusout reads as "focus left the menu" — closing it
+		// and aborting our morph.
+		closeBtn.style.opacity = '0';
 
 		// Create phantom at the hamburger's captured position (un-morphed).
 		const phantom = createMorphPhantom( hamburgerBtn, false );
@@ -216,7 +226,7 @@ function runOpenMorphAnimation( nav, hamburgerBtn, closeBtn, startRect ) {
 
 		animation.onfinish = () => {
 			phantom.remove();
-			closeBtn.style.visibility = '';
+			closeBtn.style.opacity = '';
 			activeMorphAnimations.delete( nav );
 		};
 	} );
@@ -247,8 +257,9 @@ function runCloseMorphAnimation(
 
 	const closeRect = closeBtn.getBoundingClientRect();
 
-	// Hide the real close button.
-	closeBtn.style.visibility = 'hidden';
+	// Hide the real close button visually but keep it focusable; see the
+	// matching comment in runOpenMorphAnimation.
+	closeBtn.style.opacity = '0';
 
 	// Create the phantom without the morphed class; WAAPI applies the
 	// X transform as its first keyframe and then animates back.
