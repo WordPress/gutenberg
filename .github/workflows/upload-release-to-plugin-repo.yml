@@ -227,7 +227,20 @@ jobs:
                   name: changelog trunk
                   path: trunk
 
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache 2>/dev/null | grep -q .; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping release commit to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "exists=false" >> "$GITHUB_OUTPUT"
+                  fi
+
             - name: Commit the release
+              if: steps.check_svn_tag.outputs.exists != 'true'
               working-directory: ./trunk
               run: |
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
@@ -279,7 +292,20 @@ jobs:
                   name: changelog trunk
                   path: ${{ github.event.release.name }}
 
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache 2>/dev/null | grep -q .; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping svn import to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "exists=false" >> "$GITHUB_OUTPUT"
+                  fi
+
             - name: Add the new version directory and commit changes to the SVN repository
+              if: steps.check_svn_tag.outputs.exists != 'true'
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
