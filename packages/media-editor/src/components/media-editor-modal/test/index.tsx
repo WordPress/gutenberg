@@ -18,7 +18,6 @@ let mockSaveResult = {
 	id: 11,
 	url: 'edited.jpg',
 	media: { id: 11, source_url: 'edited.jpg' },
-	imageEdited: true,
 	previous: {
 		id: 10,
 		url: 'original.jpg',
@@ -71,7 +70,6 @@ describe( 'MediaEditorModal', () => {
 			id: 11,
 			url: 'edited.jpg',
 			media: { id: 11, source_url: 'edited.jpg' },
-			imageEdited: true,
 			previous: {
 				id: 10,
 				url: 'original.jpg',
@@ -131,7 +129,7 @@ describe( 'MediaEditorModal', () => {
 	it( 'does not show the image edited snackbar for metadata-only saves', () => {
 		mockSaveResult = {
 			...mockSaveResult,
-			imageEdited: false,
+			previous: undefined,
 		};
 
 		render( <MediaEditorModal /> );

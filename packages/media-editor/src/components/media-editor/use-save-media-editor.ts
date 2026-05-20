@@ -37,7 +37,6 @@ export interface MediaEditorSaveResult {
 	id: number;
 	url?: string;
 	media: Media;
-	imageEdited?: boolean;
 	previous?: {
 		id: number;
 		url?: string;
@@ -109,9 +108,8 @@ export function useSaveMediaEditor( {
 		try {
 			let saved: Media | null | undefined;
 			const modifiers = getCropModifiers( cropper );
-			const imageEdited = modifiers.length > 0;
 			const previous =
-				imageEdited && media
+				modifiers.length > 0 && media
 					? {
 							id,
 							url: media.source_url,
@@ -169,7 +167,6 @@ export function useSaveMediaEditor( {
 					id: next.id,
 					url: next.source_url,
 					media: next,
-					imageEdited,
 					previous,
 				} );
 			}

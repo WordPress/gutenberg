@@ -76,7 +76,7 @@ export function MediaEditorModal( {
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
 			onClose={ closeMediaEditorModal }
-			onSaved={ ( { id: savedId, url, imageEdited, previous } ) => {
+			onSaved={ ( { id: savedId, url, previous } ) => {
 				if ( savedId && onUpdate ) {
 					const update: MediaEditorModalUpdate = {
 						id: savedId,
@@ -85,12 +85,7 @@ export function MediaEditorModal( {
 					onUpdate( update );
 				}
 				closeMediaEditorModal();
-				if (
-					imageEdited &&
-					previous &&
-					savedId !== previous.id &&
-					onUpdate
-				) {
+				if ( previous && savedId !== previous.id && onUpdate ) {
 					// Intentionally unscoped: the modal is closing, so the
 					// snackbar surfaces in the host editor (not the media
 					// editor's `MEDIA_EDITOR_NOTICES_CONTEXT` region).
