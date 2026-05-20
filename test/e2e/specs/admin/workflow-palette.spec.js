@@ -5,9 +5,14 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Workflow palette', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-workflow-palette',
-		] );
+		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
+			[ 'gutenberg-workflow-palette' ]
+		);
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! experimentsAvailable,
+			'gutenberg-workflow-palette experiment requires Gutenberg plugin'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {

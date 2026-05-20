@@ -64,6 +64,16 @@ test.describe( 'Template ID Format', () => {
 	let pageId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Probe whether the active_templates experiment is available;
+		// the rest of this suite assumes it can be toggled.
+		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
+			[]
+		);
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! experimentsAvailable,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 		await requestUtils.activateTheme( 'twentytwentyfive' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
