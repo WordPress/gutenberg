@@ -152,7 +152,7 @@ function TileActions( {
 				variant="solid"
 				tone={ isFill ? 'brand' : 'neutral' }
 				icon={ justifyStretch }
-				label="Fill width"
+				label="Fill available width"
 				aria-pressed={ isFill }
 				onClick={ onToggleFill }
 			/>

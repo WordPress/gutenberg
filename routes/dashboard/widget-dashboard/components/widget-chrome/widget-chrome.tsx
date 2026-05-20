@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Spinner } from '@wordpress/components';
+import { Icon as WCIcon, Spinner } from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -18,7 +18,7 @@ import {
 import { __ } from '@wordpress/i18n';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Icon, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
+import { Card, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -78,6 +78,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 	if ( ! widgetType.title ) {
 		return null;
 	}
+
 	return (
 		<Card.Header>
 			<Stack direction="row" align="center" gap="sm">
@@ -86,9 +87,10 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						className={ styles.widgetChromeHeaderIcon }
 						aria-hidden="true"
 					>
-						<Icon icon={ widgetType.icon } />
+						<WCIcon icon={ widgetType.icon } />
 					</span>
 				) }
+
 				<Card.Title id={ titleId } render={ <h3 /> }>
 					{ widgetType.title }
 				</Card.Title>
@@ -100,6 +102,14 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 export interface WidgetChromeProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
+	/**
+	 * Lifted by the surrounding `@wordpress/grid` surface into a sibling
+	 * slot of the grid item; not rendered by `WidgetChrome` itself.
+	 * Living outside `Card.Root` is what keeps these controls interactive
+	 * while edit mode applies `inert` to the chrome.
+	 */
+	actionableArea?: ReactNode;
+	className?: string;
 }
 
 /**
@@ -109,7 +119,7 @@ export interface WidgetChromeProps {
  * or is still resolving.
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome( { widget, index }, ref ) {
+	function WidgetChrome( { widget, index, className }, ref ) {
 		const { widgetTypes, editMode } = useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();
@@ -142,7 +152,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 				<Card.Root
 					render={ <section /> }
 					ref={ ref }
-					className={ styles.widgetChrome }
+					className={ clsx( styles.widgetChrome, className ) }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
