@@ -28,6 +28,7 @@ export {
 	getValueFromVariable,
 	getPresetVariableFromValue,
 	getResolvedValue,
+	splitSelectorList,
 } from './utils/common';
 
 // Types
