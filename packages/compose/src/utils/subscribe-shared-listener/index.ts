@@ -23,12 +23,15 @@
  *                  to `false`.
  * @return Unsubscribe function.
  */
-type Listener = ( event: Event ) => void;
-
 // root -> eventTypeKey -> subscribedTarget -> Set<callback>
+//
+// Inner registry is a `WeakMap`: element subscribers are held weakly so
+// an iframe removal lets the iframe's Elements (and through them, its
+// `ownerDocument`) be garbage-collected. The native listener is
+// attached to the document itself, so it goes when the document goes.
 const registries = new WeakMap<
 	EventTarget,
-	Map< string, Map< EventTarget, Set< Listener > > >
+	Map< string, WeakMap< EventTarget, Set< EventListener > > >
 >();
 
 function getRoot( target: EventTarget ): EventTarget {
@@ -48,7 +51,7 @@ function getRoot( target: EventTarget ): EventTarget {
 export default function subscribeSharedListener(
 	target: EventTarget,
 	eventType: string,
-	callback: Listener,
+	callback: EventListener,
 	capture: boolean = false
 ): () => void {
 	const root = getRoot( target );
@@ -63,16 +66,17 @@ export default function subscribeSharedListener(
 	const key = capture ? `${ eventType }:capture` : eventType;
 	let perEvent = perRoot.get( key );
 	if ( ! perEvent ) {
-		perEvent = new Map< EventTarget, Set< Listener > >();
+		perEvent = new WeakMap< EventTarget, Set< EventListener > >();
 		perRoot.set( key, perEvent );
 		const subscribers = perEvent;
 		root.addEventListener(
 			eventType,
 			( event ) => {
 				if ( isWindow ) {
-					// Window has no DOM ancestry — fan out to all
-					// window-bound callbacks.
-					for ( const set of subscribers.values() ) {
+					// Window has no DOM ancestry — all subscribers share
+					// the window key; fetch its set and fan out.
+					const set = subscribers.get( root );
+					if ( set ) {
 						for ( const cb of set ) {
 							cb( event );
 						}
@@ -127,6 +131,6 @@ export default function subscribeSharedListener(
 	}
 	set.add( callback );
 	return () => {
-		set?.delete( callback );
+		set.delete( callback );
 	};
 }
