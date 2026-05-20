@@ -49,3 +49,9 @@
 	min-height: 0;
 	max-height: none;
 }
+
+.banner.tiny {
+	min-block-size: 0;
+	min-height: 0;
+	padding: var(--wpds-dimension-padding-md);
+}

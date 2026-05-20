@@ -14,17 +14,20 @@ const DISPLAY_VERSION = '7.1';
 
 interface BannerProps {
 	isWide?: boolean;
+	isTiny?: boolean;
 }
 
-export function Banner( { isWide = false }: BannerProps ) {
+export function Banner( { isWide = false, isTiny = false }: BannerProps ) {
+	const className = [
+		styles.banner,
+		isWide && styles.wide,
+		isTiny && styles.tiny,
+	]
+		.filter( Boolean )
+		.join( ' ' );
+
 	return (
-		<Stack
-			className={ `${ styles.banner }${
-				isWide ? ` ${ styles.wide }` : ''
-			}` }
-			direction="column"
-			justify="center"
-		>
+		<Stack className={ className } direction="column" justify="center">
 			<HeaderBackground />
 
 			<Stack
