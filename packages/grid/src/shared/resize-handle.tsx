@@ -8,7 +8,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { useMergeRefs, useThrottle } from '@wordpress/compose';
 
 /**
@@ -16,6 +16,29 @@ import { useMergeRefs, useThrottle } from '@wordpress/compose';
  */
 import type { ResizeDelta, ResizeHandleProps } from './types';
 import styles from './resize-handle.module.css';
+
+/**
+ * Sets `document.documentElement.style.cursor` for the duration of a drag
+ * and restores it on cleanup. Lives outside the component so cursor writes
+ * are not analyzed as mutating values derived from refs in the component
+ * body (react-hooks/immutability).
+ *
+ * @param getDocument Returns the document whose root element should receive
+ *                    the cursor (handle owner, or global `document`).
+ * @param cursor      CSS cursor value while active.
+ * @return Cleanup that restores the previous cursor.
+ */
+function lockDocumentCursorWhileActive(
+	getDocument: () => Document,
+	cursor: string
+): () => void {
+	const root = getDocument().documentElement;
+	const previous = root.style.cursor;
+	root.style.cursor = cursor;
+	return () => {
+		root.style.cursor = previous;
+	};
+}
 
 function ResizeHandle( {
 	itemId,
@@ -27,11 +50,13 @@ function ResizeHandle( {
 		data: { itemId },
 	} );
 
-	// Track the rendered node so we can resolve `ownerDocument` for the
-	// cursor lock — needed when the grid lives inside an iframe (e.g.
-	// the block-editor canvas).
-	const nodeRef = useRef< HTMLElement | null >( null );
-	const mergedRef = useMergeRefs( [ nodeRef, setNodeRef ] );
+	// Snapshot owner document on mount/update via ref callback so the
+	// cursor-lock effect can resolve the correct document in an iframe.
+	const ownerDocumentRef = useRef< Document | null >( null );
+	const setOwnerDocumentRef = useCallback( ( node: HTMLElement | null ) => {
+		ownerDocumentRef.current = node?.ownerDocument ?? null;
+	}, [] );
+	const mergedRef = useMergeRefs( [ setOwnerDocumentRef, setNodeRef ] );
 
 	// Lock the document cursor while the gesture is active. Without
 	// this, the OS pointer reverts to the default arrow as soon as it
@@ -42,13 +67,10 @@ function ResizeHandle( {
 			return;
 		}
 		const cursor = verticalResizable ? 'nwse-resize' : 'ew-resize';
-		const root = ( nodeRef.current?.ownerDocument ?? document )
-			.documentElement;
-		const previous = root.style.cursor;
-		root.style.cursor = cursor;
-		return () => {
-			root.style.cursor = previous;
-		};
+		return lockDocumentCursorWhileActive(
+			() => ownerDocumentRef.current ?? document,
+			cursor
+		);
 	}, [ isDragging, verticalResizable ] );
 
 	if ( renderResizeHandle ) {

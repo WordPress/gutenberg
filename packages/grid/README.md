@@ -131,9 +131,9 @@ interface DashboardGridLayoutItem {
 `style`, etc.) flow through. The grid's own layout styles
 (`gridTemplateColumns`, `gridAutoRows`) override any user-supplied
 `style` for those properties. The gap between tiles is owned by the
-design-system gap token (`--wpds-dimension-gap-md` by default) and
-is not configurable per instance; theme it through a `ThemeProvider`
-density change or token override.
+design-system gap token (`--wpds-dimension-gap-xl` by default). Set
+`--wp-grid-gap` on the grid root or an ancestor to use another gap
+step.
 
 #### Child-level props
 
@@ -477,6 +477,7 @@ root itself via `style`). All values fall back to sensible defaults.
 
 | Variable | Default | Applies to |
 |----------|---------|------------|
+| `--wp-grid-gap` | `var(--wpds-dimension-gap-xl)` | Gap between tiles on `DashboardGrid`, `DashboardLanes`, and the edit overlay. |
 | `--wp-grid-drag-preview-scale` | `1.05` | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift. |
 | `--wp-grid-placeholder-opacity` | `0.4` | Opacity of the placeholder tile (the original item while a drag is in flight). |
 | `--wp-grid-placeholder-outline-style` | `dashed` | Outline style of the drag placeholder (for example `solid` or `dotted`). |

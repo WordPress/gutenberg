@@ -20,6 +20,7 @@ import type {
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetChrome } from '../widget-chrome';
+import { WidgetChromeActionableArea } from './widget-chrome-actionable-area';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type {
@@ -105,8 +106,9 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
 		const { layout, onLayoutChange, editMode, gridSettings } =
 			useDashboardInternalContext();
-
 		const isMasonry = gridSettings.model === 'masonry';
+		const minColumnWidth =
+			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
 
 		const gridLayout = useMemo(
 			() =>
@@ -131,15 +133,19 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		);
 
 		const children = layout.map( ( widget, index ) => (
-			<div
+			<WidgetChrome
 				key={ widget.uuid }
+				widget={ widget }
+				index={ index }
 				className={ clsx( styles.tile, {
 					[ styles.tileEditMode ]: editMode,
 				} ) }
-				tabIndex={ editMode ? 0 : undefined }
-			>
-				<WidgetChrome widget={ widget } index={ index } />
-			</div>
+				actionableArea={
+					editMode ? (
+						<WidgetChromeActionableArea widget={ widget } />
+					) : undefined
+				}
+			/>
 		) );
 
 		const renderDragPreview = useCallback(
@@ -155,9 +161,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			renderResizeHandle:
 				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
-
-		const minColumnWidth =
-			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
 
 		const surface: React.ReactNode = isMasonry ? (
 			<DashboardLanes

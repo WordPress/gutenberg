@@ -4,7 +4,7 @@
 
 .widgetChromeHeaderIcon {
 	display: inline-flex;
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-fg-content-neutral);
 }
 
 .widgetChromeContent {

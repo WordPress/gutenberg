@@ -51,10 +51,10 @@ import type { ResizeDelta } from '../shared/types';
 import styles from './lanes.module.css';
 
 // Fallback gap in pixels for math that runs before the computed gap
-// can be read from the DOM. Matches the `'md'` step the surface
-// resolves to in CSS (`--wpds-dimension-gap-md`); the next layout
+// can be read from the DOM. Matches the `'xl'` step the surface
+// resolves to in CSS (`--wpds-dimension-gap-xl`); the next layout
 // effect overwrites this with the actual computed value.
-const FALLBACK_GAP_PX = 12;
+const FALLBACK_GAP_PX = 24;
 
 // Default lane cap when no explicit `columns` or `minColumnWidth` is
 // supplied. Layered semantics: `columns` acts as a cap and
