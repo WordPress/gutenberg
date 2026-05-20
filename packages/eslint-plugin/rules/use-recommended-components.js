@@ -165,13 +165,7 @@ const rule = {
 					}
 
 					const name = getPropertyName( property.key );
-					if (
-						! name ||
-						! Object.prototype.hasOwnProperty.call(
-							denylistEntry,
-							name
-						)
-					) {
+					if ( ! name || ! denylistEntry.hasOwnProperty( name ) ) {
 						return;
 					}
 
