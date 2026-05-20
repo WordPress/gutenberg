@@ -1,24 +1,35 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
 /*
  * Compat overlay slot — body-level positioned container that hosts
  * `@wordpress/ui` overlays so they reliably stack in mixed-library
  * compositions. See `getWpCompatOverlaySlot()` for the runtime side.
  *
- * Authored unlayered (outside `@layer wp-ui-*`) so the slot's z-index and
- * positioning win against any `@layer`-scoped rule.
+ * The `.slot` rule is authored unlayered (outside `@layer wp-ui-*`) so the
+ * slot's z-index and positioning win against any `@layer`-scoped rule.
  */
 
 .slot {
-	/* `position: fixed` is load-bearing: `z-index` is ignored on `static`,
-	 * and the slot must be a containing block at viewport `(0, 0)` so
-	 * floating-ui's viewport-relative `top`/`left` resolve correctly. */
+	/* Viewport-sized so `position: absolute` overlay positioners inside
+	 * the slot have a non-zero containing block — otherwise `width: auto`
+	 * popups collapse to their min-content width. */
 	position: fixed;
-	top: 0;
-	/* Physical, not logical. `inset-inline-start: 0` would resolve to
-	 * `right: 0` in RTL and offset every absolute child off-viewport. */
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- See comment above. */
-	left: 0;
-	/* Sits in a reserved billion-scale band above the legacy z-index map in
+	inset: 0;
+	/* Reserved band above the legacy z-index map in
 	 * `packages/base-styles/_z-index.scss`. */
 	z-index: 1000000003;
 	isolation: isolate;
+	/* The slot itself doesn't capture clicks; portaled overlays opt back in
+	 * via the `.slot > *` rule below. */
+	pointer-events: none;
+}
+
+/*
+ * Re-enable interaction for portaled overlays. Placed in the lowest layer
+ * so any consumer can override with a higher-layer (or unlayered) rule.
+ */
+@layer wp-ui-utilities {
+	.slot > * {
+		pointer-events: auto;
+	}
 }

@@ -222,6 +222,10 @@ export interface Settings {
 	// Output format for GIF-to-video conversion.
 	// Accepts 'video/mp4' or 'video/webm'. Default is 'video/mp4'.
 	videoOutputFormat?: 'video/mp4' | 'video/webm';
+	// Function for deleting an attachment from the server. Used to clean up
+	// the parent attachment when client-side sub-size processing fails after
+	// the parent file has already been uploaded.
+	mediaDelete?: ( id: number ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.

@@ -9,6 +9,7 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
+	CheckboxControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -295,6 +296,7 @@ export default function Image( {
 		sizeSlug,
 		lightbox,
 		metadata,
+		isDecorative,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -513,6 +515,7 @@ export default function Image( {
 		if ( enable && ! lightboxSetting?.enabled ) {
 			setAttributes( {
 				lightbox: { enabled: true },
+				isDecorative: false,
 			} );
 		} else if ( ! enable && lightboxSetting?.enabled ) {
 			setAttributes( {
@@ -549,6 +552,20 @@ export default function Image( {
 
 	function updateAlt( newAlt ) {
 		setAttributes( { alt: newAlt } );
+	}
+
+	function updateIsDecorative( value ) {
+		setAttributes( {
+			isDecorative: value || undefined,
+			...( value && {
+				alt: '',
+				caption: undefined,
+				href: undefined,
+				linkDestination: undefined,
+				linkTarget: undefined,
+				rel: undefined,
+			} ),
+		} );
 	}
 
 	const imperativeFocalPointPreview = ( value ) => {
@@ -794,7 +811,8 @@ export default function Image( {
 		isSingleSelected &&
 		! isEditingImage &&
 		! lockHrefControls &&
-		! lockUrlControls;
+		! lockUrlControls &&
+		! isDecorative;
 
 	const showCoverControls =
 		isSingleSelected && canInsertCover && ! isContentOnlyMode;
@@ -896,7 +914,10 @@ export default function Image( {
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
-						resetAll={ () => onSelectImage( undefined ) }
+						resetAll={ () => {
+							onSelectImage( undefined );
+							setAttributes( { isDecorative: false } );
+						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
 						{ ! lockUrlControls && (
@@ -926,24 +947,24 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
-						<ToolsPanelItem
-							label={ __( 'Alternative text' ) }
-							isShownByDefault
-							hasValue={ () => !! alt }
-							onDeselect={ () =>
-								setAttributes( { alt: undefined } )
-							}
-						>
-							<TextareaControl
+						{ ! isDecorative && (
+							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
-								value={ alt || '' }
-								onChange={ updateAlt }
-								readOnly={ lockAltControls }
-								help={
-									lockAltControls ? (
-										<>{ lockAltControlsMessage }</>
-									) : (
-										<>
+								isShownByDefault
+								hasValue={ () => !! alt }
+								onDeselect={ () =>
+									setAttributes( { alt: undefined } )
+								}
+							>
+								<TextareaControl
+									label={ __( 'Alternative text' ) }
+									value={ alt || '' }
+									onChange={ updateAlt }
+									readOnly={ lockAltControls }
+									help={
+										lockAltControls ? (
+											<>{ lockAltControlsMessage }</>
+										) : (
 											<ExternalLink
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
@@ -956,15 +977,32 @@ export default function Image( {
 													'Describe the purpose of the image.'
 												) }
 											</ExternalLink>
-											<br />
-											{ __(
-												'Leave empty if decorative.'
-											) }
-										</>
-									)
+										)
+									}
+								/>
+							</ToolsPanelItem>
+						) }
+
+						{ ! lockAltControls && ! lightboxChecked && (
+							<ToolsPanelItem
+								label={ __( 'Mark as decorative' ) }
+								isShownByDefault
+								hasValue={ () => !! isDecorative }
+								onDeselect={ () =>
+									setAttributes( { isDecorative: false } )
 								}
-							/>
-						</ToolsPanelItem>
+							>
+								<CheckboxControl
+									__nextHasNoMarginBottom
+									label={ __( 'Mark as decorative' ) }
+									checked={ !! isDecorative }
+									onChange={ updateIsDecorative }
+									help={ __(
+										'Hidden from assistive technologies.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
@@ -1054,7 +1092,17 @@ export default function Image( {
 	const filename = getFilename( url );
 	let defaultedAlt;
 
-	if ( alt ) {
+	if ( isDecorative ) {
+		defaultedAlt = filename
+			? sprintf(
+					/* translators: %s: file name */
+					__(
+						'This image has been marked as decorative; its file name is %s'
+					),
+					filename
+			  )
+			: __( 'This image has been marked as decorative.' );
+	} else if ( alt ) {
 		defaultedAlt = alt;
 	} else if ( filename ) {
 		defaultedAlt = sprintf(
@@ -1335,18 +1383,20 @@ export default function Image( {
 			{ img }
 			{ resizableBox }
 
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption text' ) }
-				showToolbarButton={
-					isSingleSelected &&
-					( hasNonContentControls || isContentOnlyMode ) &&
-					! hideCaptionControls
-				}
-			/>
+			{ ! isDecorative && (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Image caption text' ) }
+					showToolbarButton={
+						isSingleSelected &&
+						( hasNonContentControls || isContentOnlyMode ) &&
+						! hideCaptionControls
+					}
+				/>
+			) }
 		</>
 	);
 }

@@ -15,7 +15,8 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useLanePlacement, LANES_DATA_KEY } from '../use-lane-placement';
+import { GRID_ITEM_DATA_KEY } from '../../shared/grid-item-key';
+import { useLanePlacement } from '../use-lane-placement';
 import type {
 	UseLanePlacementInput,
 	UseLanePlacementResult,
@@ -144,7 +145,7 @@ function Harness( { input, measuredHeights, onResult }: HarnessProps ) {
 			{ input.items.map( ( item ) => (
 				<div
 					key={ item.key }
-					{ ...{ [ LANES_DATA_KEY ]: item.key } }
+					{ ...{ [ GRID_ITEM_DATA_KEY ]: item.key } }
 					data-testid={ `item-${ item.key }` }
 					style={ {
 						...result.itemStyles.get( item.key ),
