@@ -68,15 +68,7 @@ export type AutocompletePopupProps = ComponentProps<
 	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 };
 
-export type AutocompleteRootProps = ComponentProps<
-	typeof _Autocomplete.Root
-> & {
-	children?: React.ReactNode;
-};
+export type AutocompleteRootProps< Value = unknown > =
+	_Autocomplete.Root.Props< Value >;
 
-export type AutocompleteValueProps = {
-	/**
-	 * Can be used to override the current value of the autocomplete.
-	 */
-	children?: _Autocomplete.Value.Props[ 'children' ];
-};
+export type AutocompleteValueProps = _Autocomplete.Value.Props;

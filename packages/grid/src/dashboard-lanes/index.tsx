@@ -189,6 +189,13 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;
+		const minResizeWidthPx = gridSpanToPixelSize(
+			1,
+			1,
+			columnWidth,
+			gapPx,
+			null
+		).widthPx;
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardLanesLayoutItem >();
@@ -551,6 +558,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 											? resizeSnapPreview.snap
 											: null
 									}
+									minResizeWidthPx={ minResizeWidthPx }
 									actionableArea={ actionableAreaMap.get(
 										id
 									) }

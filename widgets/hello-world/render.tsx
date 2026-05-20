@@ -1,16 +1,24 @@
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
+ * WordPress dependencies
+ */
 import { Stack, Text } from '@wordpress/ui';
+
+/**
+ * Internal dependencies
+ */
+import styles from './style.module.css';
 
 export default function HelloWorld() {
 	return (
 		<Stack
 			align="center"
 			justify="center"
-			style={ {
-				height: '100%',
-				padding: 'var(--wpds-dimension-padding-2xl)',
-				backgroundColor: 'var(--wpds-color-bg-surface-brand)',
-				color: 'var(--wpds-color-fg-interactive-brand)',
-			} }
+			className={ clsx( styles.root ) }
 		>
 			<Text variant="heading-2xl">Hello World</Text>
 		</Stack>
