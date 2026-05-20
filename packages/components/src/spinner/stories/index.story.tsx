@@ -19,10 +19,6 @@ const meta: Meta< typeof Spinner > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 };
 export default meta;

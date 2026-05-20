@@ -32,11 +32,6 @@ const meta: Meta< typeof FormTokenField > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `SearchableChipSelect` in `@wordpress/ui`, but continue using for now.',
-		},
 	},
 };
 export default meta;

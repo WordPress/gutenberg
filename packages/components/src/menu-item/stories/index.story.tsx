@@ -37,11 +37,6 @@ const meta: Meta< typeof MenuItem > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Subcomponent of `DropdownMenu`.',
-		},
 	},
 };
 export default meta;

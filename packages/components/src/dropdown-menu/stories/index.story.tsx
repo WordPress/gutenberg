@@ -30,11 +30,6 @@ const meta: Meta< typeof DropdownMenu > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'use-with-caution',
-			whereUsed: 'global',
-			notes: 'When building for the Gutenberg repo, use `Menu` instead. Otherwise, continue using for now.',
-		},
 	},
 	args: {
 		onToggle: fn(),

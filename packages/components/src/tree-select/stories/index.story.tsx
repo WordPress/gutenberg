@@ -30,10 +30,6 @@ const meta: Meta< typeof TreeSelect > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 };
 

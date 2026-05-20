@@ -42,10 +42,6 @@ const meta: Meta< typeof Dropdown > = {
 		controls: {
 			expanded: true,
 		},
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 };
 export default meta;

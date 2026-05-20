@@ -32,11 +32,6 @@ const meta: Meta< typeof TextareaControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `TextareaControl` in `@wordpress/ui`, but continue using for now.',
-		},
 	},
 };
 export default meta;

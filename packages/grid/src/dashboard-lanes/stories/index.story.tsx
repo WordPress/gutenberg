@@ -53,13 +53,6 @@ const meta: Meta< typeof DashboardLanes > = {
 		onChangeLayout: { action: 'onChangeLayout' },
 		onPreviewLayout: { action: 'onPreviewLayout' },
 	},
-	parameters: {
-		componentStatus: {
-			status: 'use-with-caution',
-			whereUsed: 'global',
-			notes: 'This package is under heavy development and likely to change.',
-		},
-	},
 };
 export default meta;
 

@@ -6,12 +6,6 @@ const meta: Meta< typeof Text > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Text',
 	component: Text,
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
-	},
 };
 export default meta;
 

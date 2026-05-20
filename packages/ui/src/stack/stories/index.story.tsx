@@ -5,12 +5,6 @@ const meta: Meta< typeof Stack > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Stack',
 	component: Stack,
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
-	},
 };
 export default meta;
 

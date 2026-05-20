@@ -14,12 +14,6 @@ const meta: Meta< typeof EmptyState.Root > = {
 		'EmptyState.Description': EmptyState.Description,
 		'EmptyState.Actions': EmptyState.Actions,
 	},
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
-	},
 };
 export default meta;
 

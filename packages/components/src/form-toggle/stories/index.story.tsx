@@ -27,11 +27,6 @@ const meta: Meta< typeof FormToggle > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'For standard toggles with labels, use `ToggleControl` instead.',
-		},
 	},
 };
 export default meta;

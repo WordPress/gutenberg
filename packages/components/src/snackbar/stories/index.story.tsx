@@ -38,10 +38,6 @@ const meta: Meta< typeof Snackbar > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 };
 export default meta;

@@ -56,10 +56,6 @@ const meta: Meta< typeof Popover > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 };
 

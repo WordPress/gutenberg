@@ -13,12 +13,6 @@ const meta: Meta< typeof Tabs.Root > = {
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.Panel': Tabs.Panel,
 	},
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
-	},
 };
 export default meta;
 

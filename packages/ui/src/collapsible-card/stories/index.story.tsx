@@ -35,12 +35,6 @@ const meta: Meta< typeof CollapsibleCard.Root > = {
 		'CollapsibleCard.Content': CollapsibleCard.Content,
 		'Card.FullBleed': Card.FullBleed,
 	},
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
-	},
 };
 export default meta;
 

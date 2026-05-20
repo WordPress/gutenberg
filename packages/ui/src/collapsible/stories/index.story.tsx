@@ -10,12 +10,6 @@ const meta: Meta< typeof Collapsible.Root > = {
 		'Collapsible.Trigger': Collapsible.Trigger,
 		'Collapsible.Panel': Collapsible.Panel,
 	},
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
-	},
 };
 export default meta;
 

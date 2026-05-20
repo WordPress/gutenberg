@@ -10,11 +10,6 @@ const meta: Meta< typeof TabPanel > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'not-recommended',
-			whereUsed: 'global',
-			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
-		},
 	},
 	args: {
 		onSelect: fn(),

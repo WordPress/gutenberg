@@ -6,12 +6,6 @@ const meta: Meta< typeof Badge > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Badge',
 	component: Badge,
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
-	},
 };
 export default meta;
 
