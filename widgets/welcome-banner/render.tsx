@@ -5,8 +5,6 @@ import { useResizeObserver } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
@@ -16,13 +14,17 @@ import { FeatureHighlight, HeaderBackground } from './components';
 import styles from './style.module.css';
 
 const DISPLAY_VERSION = '7.1';
-const WIDE_LAYOUT_BREAKPOINT = 900;
+const ROW_LAYOUT_MIN_WIDTH = 1200;
+const ROW_LAYOUT_MAX_HEIGHT = 390;
 
 export default function WelcomeBanner() {
 	const [ isWide, setIsWide ] = useState( false );
 
 	const setRef = useResizeObserver< HTMLDivElement >( ( [ entry ] ) => {
-		setIsWide( entry.contentRect.width >= WIDE_LAYOUT_BREAKPOINT );
+		setIsWide(
+			entry.contentRect.width >= ROW_LAYOUT_MIN_WIDTH ||
+				entry.contentRect.height <= ROW_LAYOUT_MAX_HEIGHT
+		);
 	} );
 
 	return (
