@@ -3,13 +3,21 @@
  */
 import type { StoryObj, Meta } from '@storybook/react-vite';
 import { css } from '@emotion/react';
-import { fn } from 'storybook/test';
+import { fn, expect, userEvent, within, screen, waitFor } from 'storybook/test';
 
 /**
  * WordPress dependencies
  */
 import { customLink, formatCapitalize } from '@wordpress/icons';
-import { useState, useMemo, useContext } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useContext,
+	useRef,
+	useEffect,
+	render,
+	unmountComponentAtNode,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -685,6 +693,126 @@ export const InsideModal: StoryObj< typeof Menu > = {
 
 	args: {
 		...Default.args,
+	},
+
+	parameters: {
+		docs: {
+			source: { type: 'code' },
+		},
+	},
+};
+
+/**
+ * Runs `callback` with the React 18 `ReactDOM.render` / `unmountComponentAtNode`
+ * deprecation warnings filtered out — they are expected here, since the legacy
+ * API is used intentionally (see `LegacyRoot`).
+ */
+/* eslint-disable no-console -- Intentionally filters known legacy-API warnings. */
+function withoutLegacyReactWarnings( callback: () => void ) {
+	const original = console.error;
+	console.error = ( ...args: unknown[] ) => {
+		if (
+			typeof args[ 0 ] === 'string' &&
+			/ReactDOM\.render|unmountComponentAtNode/.test( args[ 0 ] )
+		) {
+			return;
+		}
+		original( ...args );
+	};
+	try {
+		callback();
+	} finally {
+		console.error = original;
+	}
+}
+/* eslint-enable no-console */
+
+/**
+ * Mounts its children into a legacy `ReactDOM.render` root.
+ *
+ * The popover bug below only reproduces under React 17 update timing, which
+ * does not batch state updates triggered outside React event handlers (e.g.
+ * inside `requestAnimationFrame` callbacks). React 18's automatic batching
+ * masks the bug, so reproducing it deterministically requires a legacy root
+ * that restores React 17 timing.
+ */
+function LegacyRoot( { children }: { children: React.ReactElement } ) {
+	const ref = useRef< HTMLDivElement >( null );
+
+	useEffect( () => {
+		const node = ref.current;
+		if ( ! node ) {
+			return;
+		}
+		withoutLegacyReactWarnings( () => render( children, node ) );
+		return () => {
+			withoutLegacyReactWarnings( () => unmountComponentAtNode( node ) );
+		};
+	}, [ children ] );
+
+	return <div ref={ ref } />;
+}
+
+/**
+ * Regression test for `Menu.Popover` rendering stuck at `opacity: 0`.
+ *
+ * `Menu.Popover` puts Ariakit's props (ref, `data-enter`) on the inner
+ * `MenuSurface` while the opacity/transform motion lives on the
+ * `MenuMotionRoot` wrapper — so the surface has no transition of its own and
+ * reports `transitionDuration: 0s`. Ariakit's `useDisclosureContent` reads
+ * that `0s` and calls `store.setState( "animated", false )`. A modal menu
+ * shares one Ariakit store between its dialog backdrop and this surface, so
+ * that flag flip can starve the surface's own enter transition: `data-enter`
+ * is never stamped, the `MenuMotionRoot` `:has( … [data-enter] )` rule never
+ * matches, and the popover renders fully invisible while still in the DOM and
+ * keyboard-reachable.
+ *
+ * The menu is mounted in a `LegacyRoot` so the React 17 timing the bug needs
+ * is deterministic here. The `play` function opens the menu and asserts the
+ * popover actually becomes visible. Remove the `transition` rule from
+ * `MenuSurface` in `menu/styles.ts` and this story fails — the popover stays
+ * at `opacity: 0`.
+ */
+export const PopoverVisibleInLegacyRoot: StoryObj< typeof Menu > = {
+	render: () => (
+		<LegacyRoot>
+			<Menu>
+				<Menu.TriggerButton
+					render={
+						<Button __next40pxDefaultSize variant="secondary" />
+					}
+				>
+					Open menu
+				</Menu.TriggerButton>
+				<Menu.Popover>
+					<Menu.Item>
+						<Menu.ItemLabel>One</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Two</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Popover>
+			</Menu>
+		</LegacyRoot>
+	),
+
+	play: async ( { canvasElement } ) => {
+		const canvas = within( canvasElement );
+
+		await userEvent.click(
+			await canvas.findByRole( 'button', { name: 'Open menu' } )
+		);
+
+		// The popover portals out of the story root, so query the document.
+		const surface = await screen.findByRole( 'menu' );
+		const motionRoot = surface.parentElement as HTMLElement;
+
+		// Without the fix the surface never receives `data-enter` and its
+		// `MenuMotionRoot` wrapper stays at `opacity: 0` — invisible.
+		await waitFor( () => {
+			expect( surface.hasAttribute( 'data-enter' ) ).toBe( true );
+			expect( getComputedStyle( motionRoot ).opacity ).toBe( '1' );
+		} );
 	},
 
 	parameters: {
