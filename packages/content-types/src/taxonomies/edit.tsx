@@ -24,9 +24,12 @@ import { Stack } from '@wordpress/ui';
 import {
 	addNewItemLabelField,
 	addOrRemoveItemsField,
+	advancedFormFields,
 	allItemsField,
 	backToItemsField,
 	chooseFromMostUsedField,
+	defaultTermEnabledField,
+	defaultTermNameField,
 	descriptionField,
 	editItemField,
 	generalFormFields,
@@ -38,7 +41,6 @@ import {
 	notFoundField,
 	parentItemColonField,
 	parentItemField,
-	pluralLabelField,
 	popularItemsField,
 	publicField,
 	publiclyQueryableField,
@@ -51,17 +53,27 @@ import {
 	showInRestField,
 	showTagcloudField,
 	showUiField,
-	singularLabelField,
-	statusField,
+	sortField,
 	updateItemField,
 	useObjectTypeField,
 	useSlugField,
 	viewItemField,
 	visibilityFormFields,
 } from './fields';
+import {
+	pluralLabelField,
+	singularLabelField,
+	statusField,
+} from '../utils/fields';
 import type { TaxonomyFormData, TaxonomyRecord } from './types';
 import { BLANK_RECORD, serializeForSave, toFormData } from './utils';
-import { NEW_ID, TAXONOMIES_PATH, TAXONOMY_ENTITY } from '../constants';
+import { useMaybeInvalidateContentTypeCache } from '../utils/use-maybe-invalidate-content-type-cache';
+import {
+	NEW_ID,
+	POST_TYPE_ENTITY,
+	TAXONOMIES_PATH,
+	TAXONOMY_ENTITY,
+} from '../constants';
 
 type TaxonomyPageProps = {
 	isAddMode: boolean;
@@ -135,45 +147,50 @@ function TaxonomyPage( {
 	const originalSlug = ! isAddMode ? initialData.slug : undefined;
 	const slugField = useSlugField( originalSlug, data.slug );
 	const objectTypeField = useObjectTypeField();
-	const fields = useMemo< Field< TaxonomyFormData >[] >(
-		() => [
-			// General
-			pluralLabelField,
-			singularLabelField,
-			slugField,
-			descriptionField,
-			objectTypeField,
-			hierarchicalField,
-			statusField,
-			// Visibility
-			publicField,
-			showInRestField,
-			publiclyQueryableField,
-			showUiField,
-			showInMenuField,
-			showInQuickEditField,
-			showAdminColumnField,
-			showInNavMenusField,
-			showTagcloudField,
-			// Labels
-			labelsActionsField,
-			menuNameField,
-			allItemsField,
-			editItemField,
-			viewItemField,
-			updateItemField,
-			addNewItemLabelField,
-			newItemNameField,
-			searchItemsField,
-			notFoundField,
-			backToItemsField,
-			parentItemField,
-			popularItemsField,
-			separateItemsField,
-			parentItemColonField,
-			addOrRemoveItemsField,
-			chooseFromMostUsedField,
-		],
+	const fields = useMemo(
+		() =>
+			[
+				// General
+				pluralLabelField,
+				singularLabelField,
+				slugField,
+				descriptionField,
+				objectTypeField,
+				hierarchicalField,
+				statusField,
+				// Visibility
+				publicField,
+				showInRestField,
+				publiclyQueryableField,
+				showUiField,
+				showInMenuField,
+				showInQuickEditField,
+				showAdminColumnField,
+				showInNavMenusField,
+				showTagcloudField,
+				// Labels
+				labelsActionsField,
+				menuNameField,
+				allItemsField,
+				editItemField,
+				viewItemField,
+				updateItemField,
+				addNewItemLabelField,
+				newItemNameField,
+				searchItemsField,
+				notFoundField,
+				backToItemsField,
+				parentItemField,
+				popularItemsField,
+				separateItemsField,
+				parentItemColonField,
+				addOrRemoveItemsField,
+				chooseFromMostUsedField,
+				// Advanced
+				sortField,
+				defaultTermEnabledField,
+				defaultTermNameField,
+			] as Field< TaxonomyFormData >[],
 		[ slugField, objectTypeField ]
 	);
 
@@ -217,6 +234,16 @@ function TaxonomyPage( {
 					},
 					children: labelsFormFields,
 				},
+				{
+					id: 'advanced',
+					label: __( 'Advanced' ),
+					layout: {
+						type: 'card',
+						isCollapsible: true,
+						isOpened: false,
+					},
+					children: advancedFormFields,
+				},
 			],
 		} ),
 		[]
@@ -229,6 +256,7 @@ function TaxonomyPage( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const maybeInvalidateCache = useMaybeInvalidateContentTypeCache();
 
 	async function onSave() {
 		if ( isSaving || ! isValid ) {
@@ -254,6 +282,11 @@ function TaxonomyPage( {
 						data.title.raw
 				  );
 			createSuccessNotice( successMessage, { type: 'snackbar' } );
+			maybeInvalidateCache(
+				initialData.config.object_type,
+				data.config.object_type,
+				POST_TYPE_ENTITY
+			);
 			if ( saved?.id !== undefined ) {
 				onSaved?.( { ...data, id: saved.id } );
 			}

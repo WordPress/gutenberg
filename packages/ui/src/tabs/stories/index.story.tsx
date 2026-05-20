@@ -7,10 +7,17 @@ import * as Tooltip from '../../tooltip';
 const meta: Meta< typeof Tabs.Root > = {
 	title: 'Design System/Components/Tabs',
 	component: Tabs.Root,
+	tags: [ 'manifest' ],
 	subcomponents: {
 		'Tabs.List': Tabs.List,
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.Panel': Tabs.Panel,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -281,7 +288,14 @@ export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
 										} }
 									/>
 								</Tooltip.Trigger>
-								<Tooltip.Popup align="center" side="top">
+								<Tooltip.Popup
+									positioner={
+										<Tooltip.Positioner
+											align="center"
+											side="top"
+										/>
+									}
+								>
 									{ label }
 								</Tooltip.Popup>
 							</Tooltip.Root>

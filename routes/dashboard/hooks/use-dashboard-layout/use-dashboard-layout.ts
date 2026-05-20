@@ -32,7 +32,7 @@ export type DashboardName = `${ string }_${ string }`;
  *                      `{name}` segment of the default-layout route.
  * @return Tuple `[ layout, setLayout, resetLayout ]`.
  */
-function useDashboardLayout(
+export function useDashboardLayout(
 	dashboardName: DashboardName
 ): [
 	DashboardWidget[],
@@ -63,5 +63,3 @@ function useDashboardLayout(
 
 	return [ layout, setLayout, resetLayout ];
 }
-
-export default useDashboardLayout;
