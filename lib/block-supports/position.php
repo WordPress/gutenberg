@@ -108,6 +108,39 @@ function gutenberg_render_position_support( $block_content, $block ) {
 					'z-index'  => '10', // TODO: Replace hard-coded z-index value with a z-index preset approach in theme.json.
 				),
 			);
+
+		/*
+		 * If the block has a sticky or fixed position but no background color set,
+		 * automatically apply the site's background color from Global Styles so
+		 * that the content does not appear to float without a visible background.
+		 */
+		$block_attrs         = $block['attrs'] ?? array();
+		$has_background      = ! empty( $block_attrs['backgroundColor'] ) ||
+			! empty( $block_attrs['style']['color']['background'] ) ||
+			! empty( $block_attrs['gradient'] ) ||
+			! empty( $block_attrs['style']['color']['gradient'] ) ||
+			! empty( $block_attrs['style']['background']['backgroundImage'] );
+
+		if ( ! $has_background ) {
+			$global_styles     = gutenberg_get_global_styles();
+			$global_background = $global_styles['color']['background'] ?? null;
+
+			if ( $global_background ) {
+				// Convert internal variable format (e.g. var:preset|color|base)
+				// to a CSS custom property (e.g. var(--wp--preset--color--base)).
+				if ( str_starts_with( $global_background, 'var:' ) ) {
+					$unwrapped_name    = str_replace( '|', '--', substr( $global_background, 4 ) );
+					$global_background = "var(--wp--$unwrapped_name)";
+				}
+
+				$position_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array(
+						'background-color' => $global_background,
+					),
+				);
+			}
+		}
 	}
 
 	if ( ! empty( $position_styles ) ) {
