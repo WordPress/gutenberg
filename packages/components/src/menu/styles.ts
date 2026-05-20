@@ -64,6 +64,24 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 			? TOOLBAR_VARIANT_BOX_SHADOW
 			: DEFAULT_BOX_SHADOW };
 	` }
+
+	@media not ( prefers-reduced-motion ) {
+		/*
+		 * \`Menu.Popover\` spreads Ariakit's props (ref, \`data-enter\`) onto this
+		 * inner surface, but the real opacity/transform motion lives on
+		 * \`MenuMotionRoot\` above — so this element has no transition of its
+		 * own. Ariakit's \`useDisclosureContent\` reads
+		 * \`getComputedStyle( contentElement ).transitionDuration\` here and, on
+		 * \`0s\`, calls \`store.setState( "animated", false )\`. A modal menu
+		 * shares one Ariakit store between its dialog backdrop and this
+		 * surface, so that flag flip can starve the surface's own enter
+		 * transition: it never receives \`data-enter\` and stays stuck at
+		 * \`opacity: 0\`. A no-op transition keeps this element out of the
+		 * \`animated\`-disable path; the real fade/slide motion still comes
+		 * from \`MenuMotionRoot\`.
+		 */
+		transition: opacity 1ms;
+	}
 `;
 
 /**

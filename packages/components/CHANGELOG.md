@@ -10,6 +10,7 @@
 ### Bug Fixes
 
 -   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, or is restored to the popover from any portaled descendant. This unblocks nested overlays such as `@wordpress/ui` `Select`, which previously dismissed the host `Popover` on hover and on overlay dismissal ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
+-   `Menu`: Stabilize popover animation so it no longer renders stuck at `opacity: 0` when an ancestor component re-renders during the first commit ([#78452](https://github.com/WordPress/gutenberg/pull/78452)).
 
 ## 33.1.0 (2026-05-14)
 
