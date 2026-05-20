@@ -152,7 +152,7 @@ function TileActions( {
 				variant="solid"
 				tone={ isFill ? 'brand' : 'neutral' }
 				icon={ justifyStretch }
-				label="Fill width"
+				label="Fill available width"
 				aria-pressed={ isFill }
 				onClick={ onToggleFill }
 			/>
@@ -827,7 +827,7 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: 'var(--wpds-dimension-gap-md)',
+				gap: 'var(--wpds-dimension-gap-xl)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',
