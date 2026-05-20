@@ -308,6 +308,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setCurrentRevisionId,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
 
@@ -387,6 +388,35 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				setRenderingMode( defaultMode );
 			}
 		}, [ defaultMode, setRenderingMode ] );
+
+		// If the URL contains ?revision=<id>, open that revision.
+		useEffect( () => {
+			if ( typeof window === 'undefined' ) {
+				return;
+			}
+			const urlParams = new URLSearchParams( window.location.search );
+			const revisionParam = urlParams.get( 'revision' );
+			if ( revisionParam ) {
+				setCurrentRevisionId( parseInt( revisionParam, 10 ) );
+			}
+			// Run once on mount only.
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [] );
+
+		// Whenever the active revision changes, keep the URL in sync so the
+		// revision is bookmarkable / shareable.
+		useEffect( () => {
+			if ( typeof window === 'undefined' ) {
+				return;
+			}
+			const url = new URL( window.location.href );
+			if ( currentRevisionId ) {
+				url.searchParams.set( 'revision', currentRevisionId );
+			} else {
+				url.searchParams.delete( 'revision' );
+			}
+			window.history.replaceState( {}, '', url.toString() );
+		}, [ currentRevisionId ] );
 
 		useHideBlocksFromInserter( post.type, mode );
 
