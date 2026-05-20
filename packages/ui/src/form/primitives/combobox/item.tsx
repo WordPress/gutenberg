@@ -24,7 +24,6 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 					resetStyles[ 'box-sizing' ],
 					itemPopupStyles.item,
 					itemPopupStyles[ `is-size-${ size }` ],
-					itemPopupStyles[ `is-${ variant }` ],
 					className
 				) }
 				ref={ ref }
