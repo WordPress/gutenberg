@@ -28,7 +28,6 @@
 }
 
 .wide .columns {
-	flex: 1;
 	padding: var(--wpds-dimension-padding-2xl);
 	margin: 0;
 }

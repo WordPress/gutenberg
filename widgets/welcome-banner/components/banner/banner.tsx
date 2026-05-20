@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -18,13 +23,11 @@ interface BannerProps {
 }
 
 export function Banner( { isWide = false, isTiny = false }: BannerProps ) {
-	const className = [
+	const className = clsx(
 		styles.banner,
 		isWide && styles.wide,
-		isTiny && styles.tiny,
-	]
-		.filter( Boolean )
-		.join( ' ' );
+		isTiny && styles.tiny
+	);
 
 	return (
 		<Stack className={ className } direction="column" justify="center">

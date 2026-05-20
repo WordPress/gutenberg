@@ -13,7 +13,6 @@ import { Icon, Link, Stack, Text } from '@wordpress/ui'; // eslint-disable-line 
  */
 import styles from './feature-highlight.module.css';
 
-// Infer the icon type from the Icon component
 type IconType = React.ComponentProps< typeof Icon >[ 'icon' ];
 
 interface FeatureHighlightProps {
