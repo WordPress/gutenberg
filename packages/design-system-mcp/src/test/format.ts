@@ -49,6 +49,20 @@ A badge.`
 ## Button`
 		);
 	} );
+
+	it( 'should not surface notes in the list output', () => {
+		const result = formatComponents( [
+			{
+				name: 'Button',
+				description: 'A button.',
+				packageName: '@wordpress/components',
+				notes: 'Will be superseded by `Button` in `@wordpress/ui`.',
+			},
+		] );
+
+		expect( result ).not.toContain( 'superseded' );
+		expect( result ).not.toContain( 'Notes:' );
+	} );
 } );
 
 describe( 'formatComponentDetail', () => {
@@ -182,6 +196,48 @@ Button content.
 			`# Button
 
 **Package:** \`@wordpress/ui\``
+		);
+	} );
+
+	it( 'should render notes as a labeled line after the package', () => {
+		const result = formatComponentDetail( {
+			name: 'Button',
+			description: 'A button.',
+			packageName: '@wordpress/components',
+			importStatement: null,
+			notes: 'Will be superseded by `Button` in `@wordpress/ui`.',
+			props: [],
+			stories: [],
+		} );
+
+		expect( result ).toBe(
+			`# Button
+
+A button.
+
+**Package:** \`@wordpress/components\`
+
+**Notes:** Will be superseded by \`Button\` in \`@wordpress/ui\`.`
+		);
+	} );
+
+	it( 'should render notes when description is absent', () => {
+		const result = formatComponentDetail( {
+			name: 'Button',
+			description: '',
+			packageName: '@wordpress/components',
+			importStatement: null,
+			notes: 'A short note.',
+			props: [],
+			stories: [],
+		} );
+
+		expect( result ).toBe(
+			`# Button
+
+**Package:** \`@wordpress/components\`
+
+**Notes:** A short note.`
 		);
 	} );
 } );

@@ -12,6 +12,7 @@
 			"name": "Button",
 			"path": "../packages/components/src/button/stories/index.story.tsx",
 			"description": "A button.",
+			"notes": "Will be superseded by `Button` in `@wordpress/ui`, but continue using for now.",
 			"reactDocgen": {
 				"props": {
 					"variant": {
