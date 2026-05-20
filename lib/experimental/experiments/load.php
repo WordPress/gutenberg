@@ -135,6 +135,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-admin-bar-in-editor',
+					'label'       => __( 'Toolbar in editor', 'gutenberg' ),
+					'description' => __( 'Shows the Toolbar in the fullscreen Post and Site Editor.', 'gutenberg' ),
+				),
 			),
 		),
 	);
