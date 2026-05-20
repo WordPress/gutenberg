@@ -11,10 +11,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-
-/**
- * Internal dependencies
- */
 import { DEFAULT_DEVICE_TYPE } from '../block-editor/use-viewport-sync';
 
 export function useAdaptEditorToCanvas( canvas ) {
