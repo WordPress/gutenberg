@@ -150,11 +150,15 @@ export function useToolsPanelItem(
 		}
 
 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
-			onSelect?.();
+			if ( typeof onSelect === 'function' ) {
+				onSelect();
+			}
 		}
 
 		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
-			onDeselect?.();
+			if ( typeof onDeselect === 'function' ) {
+				onDeselect();
+			}
 		}
 	}, [
 		hasMatchingPanel,

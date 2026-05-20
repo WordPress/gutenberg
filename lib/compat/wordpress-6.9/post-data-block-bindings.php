@@ -101,3 +101,60 @@ function gutenberg_register_block_bindings_post_data_source() {
 }
 
 add_action( 'init', 'gutenberg_register_block_bindings_post_data_source' );
+
+/**
+ * Filters the value from the core/post-data source to add support for button block.
+ *
+ * Button block stores entity info (id, kind, type) in metadata, not in context or attributes.
+ * This filter intercepts the Core callback and adds button block support.
+ *
+ * @since 7.1.0
+ *
+ * @param mixed  $value          The computed value for the source.
+ * @param string $source_name    The name of the source.
+ * @param array  $source_args    The arguments for the source.
+ * @param mixed  $block_instance The block instance.
+ * @param string $attribute_name The name of the attribute.
+ * @return mixed The filtered value.
+ */
+function gutenberg_filter_block_bindings_post_data_value( $value, $source_name, $source_args, $block_instance, $attribute_name ) {
+	if ( 'core/post-data' !== $source_name ) {
+		return $value;
+	}
+
+	$block_name = $block_instance->name ?? '';
+
+	// Only handle button block - navigation blocks and others are handled by Core.
+	if ( 'core/button' !== $block_name ) {
+		return $value;
+	}
+
+	// Button block: read from metadata (id, kind, type stored in metadata).
+	$post_id = $block_instance->attributes['metadata']['id'] ?? null;
+	$kind    = $block_instance->attributes['metadata']['kind'] ?? null;
+
+	// Only handle post-type entities for post-data source.
+	if ( empty( $post_id ) || 'post-type' !== $kind ) {
+		return $value;
+	}
+
+	$field = $source_args['field'] ?? $source_args['key'] ?? null;
+	if ( empty( $field ) ) {
+		return $value;
+	}
+
+	// If a post isn't public, we need to prevent unauthorized users from accessing the post data.
+	$post = get_post( $post_id );
+	if ( ( ! is_post_publicly_viewable( $post ) && ! current_user_can( 'read_post', $post_id ) ) || post_password_required( $post ) ) {
+		return null;
+	}
+
+	if ( 'link' === $field ) {
+		$permalink = get_permalink( $post_id );
+		return false === $permalink ? null : esc_url( $permalink );
+	}
+
+	return $value;
+}
+
+add_filter( 'block_bindings_source_value', 'gutenberg_filter_block_bindings_post_data_value', 10, 5 );
