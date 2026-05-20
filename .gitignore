@@ -61,3 +61,6 @@ packages/react-native-editor/src/setup-local.js
 # Files related to applying patches
 *.rej
 *.orig
+
+# Playwright MCP scratch directory (console logs, snapshots, screenshots)
+.playwright-mcp/
