@@ -213,6 +213,19 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;
+		const minResizeWidthPx = gridSpanToPixelSize(
+			1,
+			1,
+			columnWidth,
+			gapPx,
+			null
+		).widthPx;
+		const rowHeightPx = typeof rowHeight === 'number' ? rowHeight : null;
+		const minResizeHeightPx =
+			rowHeightPx === null
+				? undefined
+				: gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
+						.heightPx ?? undefined;
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardGridLayoutItem >();
@@ -461,8 +474,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				1,
 				baseline.height + relativeDelta.height
 			);
-			const rowHeightPx =
-				typeof rowHeight === 'number' ? rowHeight : null;
 
 			setResizeSnapPreview( {
 				id,
@@ -636,6 +647,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 										? resizeSnapPreview.snap
 										: null
 								}
+								minResizeWidthPx={ minResizeWidthPx }
+								minResizeHeightPx={ minResizeHeightPx }
 								actionableArea={ actionableAreaMap.get( id ) }
 								renderResizeHandle={ renderResizeHandle }
 							>
