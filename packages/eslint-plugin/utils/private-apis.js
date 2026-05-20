@@ -128,7 +128,6 @@ module.exports = {
 	createPrivateApisState,
 	trackUnlockImport,
 	trackPrivateApisImport,
-	isUnlockCall,
 	getPropertyName,
 	getUnlockDestructuring,
 };
