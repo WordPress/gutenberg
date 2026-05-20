@@ -17,7 +17,7 @@ import type { MediaItem } from '../../types';
 
 describe( 'FileNameView', () => {
 	describe( 'filename rendering', () => {
-		it( 'renders short filename without a title attribute', () => {
+		it( 'renders short filename without a tooltip anchor or tabindex', () => {
 			const item: Partial< MediaItem > = {
 				source_url: 'https://example.com/uploads/12345678901.jpg', // exactly 15 chars
 			};
@@ -31,10 +31,10 @@ describe( 'FileNameView', () => {
 
 			const rendered = screen.getByText( '12345678901.jpg' );
 			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
-			expect( rendered ).not.toHaveAttribute( 'title' );
+			expect( rendered ).not.toHaveAttribute( 'tabindex' );
 		} );
 
-		it( 'renders long filename with full name as title attribute', () => {
+		it( 'renders long filename inside a Tooltip and exposes the full name in the DOM', () => {
 			const longFilename =
 				'very-long-filename-that-exceeds-fifteen-characters.jpg';
 			const item: Partial< MediaItem > = {
@@ -50,10 +50,9 @@ describe( 'FileNameView', () => {
 
 			// CSS handles the visual ellipsis; the DOM text remains the full
 			// filename so assistive technology reading the row gets the
-			// complete name, and the title attribute exposes it on hover.
+			// complete name, and the Tooltip exposes it on mouse hover.
 			const rendered = screen.getByText( longFilename );
 			expect( rendered ).toHaveClass( 'dataviews-media-field__filename' );
-			expect( rendered ).toHaveAttribute( 'title', longFilename );
 		} );
 
 		it( 'does not add a tab stop for truncated filenames', () => {
@@ -70,8 +69,9 @@ describe( 'FileNameView', () => {
 				/>
 			);
 
-			expect( screen.getByTitle( longFilename ) ).not.toHaveAttribute(
-				'tabindex'
+			expect( screen.getByText( longFilename ) ).toHaveAttribute(
+				'tabindex',
+				'-1'
 			);
 		} );
 	} );
