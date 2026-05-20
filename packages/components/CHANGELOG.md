@@ -2,9 +2,16 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
+    -   Removed the `is-dismissible` class name on the root wrapper.
+    -   Moved the `.components-notice__actions` wrapper as a sibling of `.components-notice__content` (it was previously nested inside it).
+
 ### Enhancements
 
 -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
+-   `NoticeList`: Add vertical spacing between notices in a list.
 -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
 
 ### Bug Fixes
@@ -19,6 +26,7 @@
 -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
 -   `Modal`: render as a bottom sheet on mobile so the height adapts to the content and CTAs stay within thumb reach ([#77956](https://github.com/WordPress/gutenberg/pull/77956)).
 -   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
+-   `Notice`: Align appearance with `Notice` from `@wordpress/ui` (full border, rounded corners, tinted intent surfaces, design-token-driven colors and spacing, `closeSmall` dismiss icon, compact action buttons, and grid layout that places actions in their own row for symmetric padding) ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
 
 ### Bug Fixes
 
