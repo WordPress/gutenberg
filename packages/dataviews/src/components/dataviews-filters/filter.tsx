@@ -11,13 +11,13 @@ import {
 	Dropdown,
 	FlexItem,
 	SelectControl,
-	Tooltip as WCTooltip,
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Stack, Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -257,6 +257,10 @@ export default function Filter( {
 	const isLocked = filterInView?.isLocked;
 	const hasValues = ! isLocked && filterInView?.value !== undefined;
 	const canResetOrRemove = ! isLocked && ( ! isPrimary || hasValues );
+	// TODO: revisit once `@wordpress/ui`'s `IconButton` is ready — it should
+	// collapse the manual icon-only `<button>` + `aria-label` + Tooltip
+	// composition below into a single primitive.
+	const resetOrRemoveLabel = isPrimary ? __( 'Reset' ) : __( 'Remove' );
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
@@ -267,83 +271,95 @@ export default function Filter( {
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<div className="dataviews-filters__summary-chip-container">
-					<WCTooltip
-						text={ sprintf(
-							/* translators: 1: Filter name. */
-							__( 'Filter by: %1$s' ),
-							filter.name.toLowerCase()
-						) }
-						placement="top"
-					>
-						<div
-							className={ clsx(
-								'dataviews-filters__summary-chip',
-								{
-									'has-reset': canResetOrRemove,
-									'has-values': hasValues,
-									'is-not-clickable': isLocked,
-								}
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<div
+									className={ clsx(
+										'dataviews-filters__summary-chip',
+										{
+											'has-reset': canResetOrRemove,
+											'has-values': hasValues,
+											'is-not-clickable': isLocked,
+										}
+									) }
+									role="button"
+									tabIndex={ isLocked ? -1 : 0 }
+									onClick={ () => {
+										if ( ! isLocked ) {
+											onToggle();
+										}
+									} }
+									onKeyDown={ ( event ) => {
+										if (
+											! isLocked &&
+											[ ENTER, SPACE ].includes(
+												event.key
+											)
+										) {
+											onToggle();
+											event.preventDefault();
+										}
+									} }
+									aria-disabled={ isLocked }
+									aria-pressed={ isOpen }
+									aria-expanded={ isOpen }
+									ref={ toggleRef }
+								>
+									<FilterText
+										activeElements={ activeElements }
+										filterInView={ filterInView }
+										filter={ filter }
+									/>
+								</div>
+							}
+						/>
+						<Tooltip.Popup>
+							{ sprintf(
+								/* translators: 1: Filter name. */
+								__( 'Filter by: %1$s' ),
+								filter.name.toLowerCase()
 							) }
-							role="button"
-							tabIndex={ isLocked ? -1 : 0 }
-							onClick={ () => {
-								if ( ! isLocked ) {
-									onToggle();
-								}
-							} }
-							onKeyDown={ ( event ) => {
-								if (
-									! isLocked &&
-									[ ENTER, SPACE ].includes( event.key )
-								) {
-									onToggle();
-									event.preventDefault();
-								}
-							} }
-							aria-disabled={ isLocked }
-							aria-pressed={ isOpen }
-							aria-expanded={ isOpen }
-							ref={ toggleRef }
-						>
-							<FilterText
-								activeElements={ activeElements }
-								filterInView={ filterInView }
-								filter={ filter }
-							/>
-						</div>
-					</WCTooltip>
+						</Tooltip.Popup>
+					</Tooltip.Root>
 					{ canResetOrRemove && (
-						<WCTooltip
-							text={ isPrimary ? __( 'Reset' ) : __( 'Remove' ) }
-							placement="top"
-						>
-							<button
-								className={ clsx(
-									'dataviews-filters__summary-chip-remove',
-									{ 'has-values': hasValues }
-								) }
-								onClick={ () => {
-									onChangeView( {
-										...view,
-										page: 1,
-										filters: view.filters?.filter(
-											( _filter ) =>
-												_filter.field !== filter.field
-										),
-									} );
-									// If the filter is not primary and can be removed, it will be added
-									// back to the available filters from `Add filter` component.
-									if ( ! isPrimary ) {
-										addFilterRef.current?.focus();
-									} else {
-										// If is primary, focus the toggle button.
-										toggleRef.current?.focus();
-									}
-								} }
-							>
-								<WCIcon icon={ closeSmall } />
-							</button>
-						</WCTooltip>
+						<Tooltip.Root>
+							<Tooltip.Trigger
+								render={
+									<button
+										className={ clsx(
+											'dataviews-filters__summary-chip-remove',
+											{ 'has-values': hasValues }
+										) }
+										aria-label={ resetOrRemoveLabel }
+										onClick={ () => {
+											onChangeView( {
+												...view,
+												page: 1,
+												filters: view.filters?.filter(
+													( _filter ) =>
+														_filter.field !==
+														filter.field
+												),
+											} );
+											// If the filter is not primary and can be removed, it will be added
+											// back to the available filters from `Add filter` component.
+											if ( ! isPrimary ) {
+												addFilterRef.current?.focus();
+											} else {
+												// If is primary, focus the toggle button.
+												toggleRef.current?.focus();
+											}
+										} }
+									>
+										<WCIcon icon={ closeSmall } />
+									</button>
+								}
+							/>
+							<Tooltip.Popup>
+								{ resetOrRemoveLabel }
+							</Tooltip.Popup>
+						</Tooltip.Root>
 					) }
 				</div>
 			) }
