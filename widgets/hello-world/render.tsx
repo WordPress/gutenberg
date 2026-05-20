@@ -1,6 +1,14 @@
 import { Stack, Text } from '@wordpress/ui';
 
-export default function HelloWorld() {
+interface HelloWorldAttributes {
+	message?: string;
+}
+
+export default function HelloWorld( {
+	attributes,
+}: {
+	attributes?: HelloWorldAttributes;
+} ) {
 	return (
 		<Stack
 			align="center"
@@ -12,7 +20,9 @@ export default function HelloWorld() {
 				color: 'var(--wpds-color-fg-interactive-brand)',
 			} }
 		>
-			<Text variant="heading-2xl">Hello World</Text>
+			<Text variant="heading-2xl">
+				{ attributes?.message || 'Hello World' }
+			</Text>
 		</Stack>
 	);
 }
