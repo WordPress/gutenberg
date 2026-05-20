@@ -30,9 +30,9 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 
 	$uuids = array_column( $dashboard_layout, 'uuid' );
 
-	if ( ! in_array( 'default-welcome-banner-widget-instance', $uuids, true ) ) {
+	if ( ! in_array( 'default-welcome-widget-instance', $uuids, true ) ) {
 		$dashboard_layout[] = array(
-			'uuid'      => 'default-welcome-banner-widget-instance',
+			'uuid'      => 'default-welcome-widget-instance',
 			'type'      => 'core/welcome',
 			'placement' => array(
 				'width'  => 'full',

@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/welcome-banner-widget",
+	"name": "@wordpress/welcome-widget",
 	"version": "1.0.0",
 	"private": true,
 	"dependencies": {
@@ -9,6 +9,7 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/primitives": "file:../../packages/primitives",
-		"clsx": "^2.1.1"
+		"clsx": "^2.1.1",
+		"react": "18.3.1"
 	}
 }
