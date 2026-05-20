@@ -162,8 +162,8 @@ function MetaBoxesMain( { isLegacy } ) {
 		if ( ! container ) {
 			return;
 		}
-		const noticeLists = container.querySelectorAll(
-			':scope > .components-notice-list'
+		const noticeContainer = container.querySelector(
+			':scope > .notices-inline-notices-wrapper'
 		);
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'
@@ -171,16 +171,16 @@ function MetaBoxesMain( { isLegacy } ) {
 		const deriveConstraints = () => {
 			const fullHeight = container.offsetHeight;
 			let nextMax = fullHeight;
-			for ( const element of noticeLists ) {
-				nextMax -= element.offsetHeight;
+			if ( noticeContainer ) {
+				nextMax -= noticeContainer.offsetHeight;
 			}
-			const nextMin = resizeHandle.offsetHeight;
+			const nextMin = resizeHandle?.offsetHeight ?? 0;
 			setHeightConstraints( { min: nextMin, max: nextMax } );
 		};
 		const observer = new window.ResizeObserver( deriveConstraints );
 		observer.observe( container );
-		for ( const element of noticeLists ) {
-			observer.observe( element );
+		if ( noticeContainer ) {
+			observer.observe( noticeContainer );
 		}
 		return () => observer.disconnect();
 	}, [] );

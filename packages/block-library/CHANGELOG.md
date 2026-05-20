@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
 ## 9.46.0 (2026-05-14)
 
 ## 9.45.0 (2026-04-29)
