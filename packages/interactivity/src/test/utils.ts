@@ -196,7 +196,7 @@ describe( 'Interactivity API', () => {
 						namespace: getNamespace(),
 					} );
 					a = yield Promise.reject( new Error( 'CatchMe' ) );
-				} catch ( e ) {
+				} catch {
 					steps.push( {
 						scope: getScope(),
 						namespace: getNamespace(),

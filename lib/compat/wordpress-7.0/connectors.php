@@ -42,33 +42,42 @@ if ( ! function_exists( 'wp_get_connector' ) ) {
 	 *     @type string $name           The connector's display name.
 	 *     @type string $description    The connector's description.
 	 *     @type string $logo_url       Optional. URL to the connector's logo image.
-	 *     @type string $type           The connector type. Currently, only 'ai_provider' is supported.
+	 *     @type string $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *     @type array  $authentication {
 	 *         Authentication configuration. When method is 'api_key', includes
-	 *         credentials_url and setting_name. When 'none', only method is present.
+	 *         credentials_url, setting_name, and optionally constant_name and
+	 *         env_var_name. When 'none', only method is present.
 	 *
 	 *         @type string $method          The authentication method: 'api_key' or 'none'.
 	 *         @type string $credentials_url Optional. URL where users can obtain API credentials.
 	 *         @type string $setting_name    Optional. The setting name for the API key.
+	 *         @type string $constant_name   Optional. PHP constant name for the API key.
+	 *         @type string $env_var_name    Optional. Environment variable name for the API key.
 	 *     }
 	 *     @type array  $plugin         {
 	 *         Optional. Plugin data for install/activate UI.
 	 *
-	 *         @type string $slug The WordPress.org plugin slug.
+	 *         @type string   $file      The plugin's main file path relative to the plugins
+	 *                                   directory (e.g. 'my-plugin/my-plugin.php' or 'hello.php').
+	 *         @type callable $is_active Callback to determine whether the plugin is active. Receives no arguments and must return bool.
+	 *                                   Defaults to `__return_true`.
 	 *     }
 	 * }
 	 * @phpstan-return ?array{
 	 *     name: non-empty-string,
-	 *     description: non-empty-string,
+	 *     description: string,
 	 *     logo_url?: non-empty-string,
-	 *     type: 'ai_provider',
+	 *     type: non-empty-string,
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,
-	 *         setting_name?: non-empty-string
+	 *         setting_name?: non-empty-string,
+	 *         constant_name?: non-empty-string,
+	 *         env_var_name?: non-empty-string
 	 *     },
-	 *     plugin?: array{
-	 *         slug: non-empty-string
+	 *     plugin: array{
+	 *         file?: non-empty-string,
+	 *         is_active: callable(): bool,
 	 *     }
 	 * }
 	 */
@@ -99,34 +108,43 @@ if ( ! function_exists( 'wp_get_connectors' ) ) {
 	 *         @type string      $name           The connector's display name.
 	 *         @type string      $description    The connector's description.
 	 *         @type string      $logo_url       Optional. URL to the connector's logo image.
-	 *         @type string      $type           The connector type. Currently, only 'ai_provider' is supported.
+	 *         @type string      $type           The connector type, e.g. 'ai_provider' or 'spam_filtering'.
 	 *         @type array       $authentication {
 	 *             Authentication configuration. When method is 'api_key', includes
-	 *             credentials_url and setting_name. When 'none', only method is present.
+	 *             credentials_url, setting_name, and optionally constant_name and
+	 *             env_var_name. When 'none', only method is present.
 	 *
 	 *             @type string $method          The authentication method: 'api_key' or 'none'.
 	 *             @type string $credentials_url Optional. URL where users can obtain API credentials.
 	 *             @type string $setting_name    Optional. The setting name for the API key.
+	 *             @type string $constant_name   Optional. PHP constant name for the API key.
+	 *             @type string $env_var_name    Optional. Environment variable name for the API key.
 	 *         }
 	 *         @type array       $plugin         {
 	 *             Optional. Plugin data for install/activate UI.
 	 *
-	 *             @type string $slug The WordPress.org plugin slug.
+	 *             @type string   $file      The plugin's main file path relative to the plugins
+	 *                                       directory (e.g. 'my-plugin/my-plugin.php' or 'hello.php').
+	 *             @type callable $is_active Callback to determine whether the plugin is active. Receives no arguments and must return bool.
+	 *                                       Defaults to `__return_true`.
 	 *         }
 	 *     }
 	 * }
 	 * @phpstan-return array<string, array{
 	 *     name: non-empty-string,
-	 *     description: non-empty-string,
+	 *     description: string,
 	 *     logo_url?: non-empty-string,
-	 *     type: 'ai_provider',
+	 *     type: non-empty-string,
 	 *     authentication: array{
 	 *         method: 'api_key'|'none',
 	 *         credentials_url?: non-empty-string,
-	 *         setting_name?: non-empty-string
+	 *         setting_name?: non-empty-string,
+	 *         constant_name?: non-empty-string,
+	 *         env_var_name?: non-empty-string
 	 *     },
-	 *     plugin?: array{
-	 *         slug: non-empty-string
+	 *     plugin: array{
+	 *         file?: non-empty-string,
+	 *         is_active: callable(): bool,
 	 *     }
 	 * }>
 	 */
@@ -153,7 +171,7 @@ if ( ! function_exists( '_wp_connectors_resolve_ai_provider_logo_url' ) ) {
 	 * @param string $path Absolute file path to the logo. Must be within
 	 *                     WP_PLUGIN_DIR or WPMU_PLUGIN_DIR; triggers
 	 *                     _doing_it_wrong() otherwise.
-	 * @return string|null The logo URL, or null if the path is empty or
+	 * @return non-empty-string|null The logo URL, or null if the path is empty or
 	 *                     outside the supported directories.
 	 */
 	function _wp_connectors_resolve_ai_provider_logo_url( string $path ): ?string {
@@ -169,12 +187,14 @@ if ( ! function_exists( '_wp_connectors_resolve_ai_provider_logo_url' ) ) {
 
 		$mu_plugin_dir = wp_normalize_path( WPMU_PLUGIN_DIR );
 		if ( str_starts_with( $path, $mu_plugin_dir . '/' ) ) {
-			return plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
+			$logo_url = plugins_url( substr( $path, strlen( $mu_plugin_dir ) ), WPMU_PLUGIN_DIR . '/.' );
+			return $logo_url ? $logo_url : null;
 		}
 
 		$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
 		if ( str_starts_with( $path, $plugin_dir . '/' ) ) {
-			return plugins_url( substr( $path, strlen( $plugin_dir ) ) );
+			$logo_url = plugins_url( substr( $path, strlen( $plugin_dir ) ) );
+			return $logo_url ? $logo_url : null;
 		}
 
 		_doing_it_wrong(
@@ -185,4 +205,33 @@ if ( ! function_exists( '_wp_connectors_resolve_ai_provider_logo_url' ) ) {
 
 		return null;
 	}
+}
+
+// Priority 11 to run after Core's menu.php sets up the connectors menu.
+add_action( 'admin_menu', '_gutenberg_connectors_add_settings_menu_item', 11 );
+
+/**
+ * Registers the Connectors menu item under Settings.
+ * Removes Core's connectors menu item first to prevent duplication.
+ *
+ * @access private
+ */
+function _gutenberg_connectors_add_settings_menu_item(): void {
+	if ( ! class_exists( '\WordPress\AiClient\AiClient' ) || ! function_exists( 'gutenberg_options_connectors_wp_admin_render_page' ) ) {
+		return;
+	}
+
+	// Remove Core's connectors menu item if it exists.
+	remove_submenu_page( 'options-general.php', 'connectors-wp-admin' );
+	remove_submenu_page( 'options-general.php', 'options-connectors.php' );
+
+	add_submenu_page(
+		'options-general.php',
+		__( 'Connectors', 'gutenberg' ),
+		__( 'Connectors', 'gutenberg' ),
+		'manage_options',
+		'options-connectors-wp-admin',
+		'gutenberg_options_connectors_wp_admin_render_page',
+		1
+	);
 }

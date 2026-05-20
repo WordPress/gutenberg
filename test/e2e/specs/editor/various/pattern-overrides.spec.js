@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -12,9 +7,7 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			await requestUtils.activatePlugin(
-				'gutenberg-test-block-bindings'
-			),
+			requestUtils.activatePlugin( 'gutenberg-test-block-bindings' ),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -698,10 +691,10 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Disconnect' } )
+			.getByRole( 'button', { name: 'Detach' } )
 			.click();
 
 		// Check that the overrides remain.
@@ -744,10 +737,10 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Disconnect' } )
+			.getByRole( 'button', { name: 'Detach' } )
 			.click();
 
 		// Check that the overrides remain.
@@ -774,7 +767,7 @@ test.describe( 'Pattern Overrides', () => {
 			title: 'Button with target',
 			content: `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"${ buttonName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noopener nofollow">Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
 			status: 'publish',
@@ -838,10 +831,7 @@ test.describe( 'Pattern Overrides', () => {
 		const buttonLink = previewPage.getByRole( 'link', { name: 'Button' } );
 
 		await expect( buttonLink ).toHaveAttribute( 'target', '_blank' );
-		await expect( buttonLink ).toHaveAttribute(
-			'rel',
-			'noreferrer noopener'
-		);
+		await expect( buttonLink ).toHaveAttribute( 'rel', 'noopener' );
 
 		// Uncheck both checkboxes.
 		await editLinkButton.click();
@@ -930,8 +920,7 @@ test.describe( 'Pattern Overrides', () => {
 		await nonEditableButton.click();
 		const initialText = await nonEditableButton.textContent();
 		await page.keyboard.type( 'Edited' );
-		const finalText = await nonEditableButton.textContent();
-		expect( initialText ).toBe( finalText );
+		await expect( nonEditableButton ).toHaveText( initialText );
 
 		await nonEditableButton.click();
 		await editor.showBlockToolbar();
@@ -1126,10 +1115,7 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 	} ) => {
 		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
+		const TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
@@ -1186,10 +1172,7 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 	} ) => {
 		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
+		const TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
@@ -1242,17 +1225,11 @@ test.describe( 'Pattern Overrides', () => {
 		// Upload two images, one for the original pattern, one for the override.
 		const { id: originalImageId, source_url: originalImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-				)
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
-				)
+				'./assets/1024x768_e2e_test_image_size.jpeg'
 			);
 		const overrideName = 'test';
 
@@ -1311,17 +1288,11 @@ test.describe( 'Pattern Overrides', () => {
 		// Upload two images, one for the original pattern, one for the override.
 		const { id: originalImageId, source_url: originalImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-				)
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
-				)
+				'./assets/1024x768_e2e_test_image_size.jpeg'
 			);
 		const overrideName = 'test';
 

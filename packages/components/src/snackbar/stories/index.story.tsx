@@ -15,6 +15,7 @@ import Icon from '../../icon';
 import Snackbar from '..';
 
 const meta: Meta< typeof Snackbar > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Snackbar',
 	id: 'components-snackbar',
 	component: Snackbar,
@@ -38,7 +39,7 @@ const meta: Meta< typeof Snackbar > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

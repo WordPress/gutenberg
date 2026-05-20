@@ -3,7 +3,6 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	ExternalLink,
 	FocalPointPicker,
 	RangeControl,
 	TextareaControl,
@@ -27,6 +26,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -193,8 +193,8 @@ export default function CoverInspectorControls( {
 
 	return (
 		<>
-			<InspectorControls>
-				{ ( !! url || useFeaturedImage ) && (
+			{ ( !! url || useFeaturedImage ) && (
+				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
@@ -299,7 +299,8 @@ export default function CoverInspectorControls( {
 									}
 									help={
 										<>
-											<ExternalLink
+											<Link
+												openInNewTab
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 													__(
@@ -310,7 +311,7 @@ export default function CoverInspectorControls( {
 												{ __(
 													'Describe the purpose of the image.'
 												) }
-											</ExternalLink>
+											</Link>
 											<br />
 											{ __(
 												'Leave empty if decorative.'
@@ -329,8 +330,8 @@ export default function CoverInspectorControls( {
 							/>
 						) }
 					</ToolsPanel>
-				) }
-			</InspectorControls>
+				</InspectorControls>
+			) }
 			{ colorGradientSettings.hasColorsOrGradients && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown

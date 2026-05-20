@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/z-index" as *;
 
 .wp-block-cover-image,
 .wp-block-cover {
@@ -348,15 +347,18 @@ body:not(.editor-styles-wrapper) .wp-block-cover:not(
 )
 ) {
 	.wp-block-cover__video-background {
-		z-index: z-index(".wp-block-cover__video-background");
+		// Background media sits at the base of the stack.
+		z-index: 0;
 	}
 
 	.wp-block-cover__embed-background {
-		z-index: z-index(".wp-block-cover__video-background");
+		// Shares the same base layer as the video background.
+		z-index: 0;
 	}
 
 	.wp-block-cover__image-background {
-		z-index: z-index(".wp-block-cover__image-background");
+		// Background media sits at the base of the stack.
+		z-index: 0;
 	}
 
 	// The first selector is required for old Cover markup/
@@ -364,11 +366,13 @@ body:not(.editor-styles-wrapper) .wp-block-cover:not(
 	&.has-background-dim:not(.has-background-gradient)::before,
 	.wp-block-cover__background,
 	.wp-block-cover__gradient-background {
-		z-index: z-index(".wp-block-cover.has-background-dim::before");
+		// Sit above the video/image/embed background media.
+		z-index: 1;
 	}
 
 	.wp-block-cover__inner-container {
-		z-index: z-index(".wp-block-cover__inner-container");
+		// Lift the inner blocks above the background media and overlay.
+		z-index: 1;
 
 		// Reset the z-index to auto when the body has a modal open. So when the
 		// modal is inside the cover, it doesn't create a stacking context.

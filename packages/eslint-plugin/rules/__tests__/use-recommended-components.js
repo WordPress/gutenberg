@@ -1,5 +1,3 @@
-/* eslint-env jest */
-
 /**
  * External dependencies
  */
@@ -11,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -29,8 +27,11 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
+		"import { Icon } from '@wordpress/ui';",
+		"import { Link } from '@wordpress/ui';",
 		"import { Stack } from '@wordpress/ui';",
-		"import { Badge, Stack } from '@wordpress/ui';",
+		"import { Text } from '@wordpress/ui';",
+		"import { Badge, Icon, Link, Stack, Tabs, Text } from '@wordpress/ui';",
 	],
 
 	invalid: [
@@ -73,6 +74,17 @@ ruleTester.run( 'use-recommended-components', rule, {
 				{
 					message:
 						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
+				},
+			],
+		},
+		{
+			code: "import { Tabs, TabPanel } from '@wordpress/components';",
+			errors: [
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
 				},
 			],
 		},

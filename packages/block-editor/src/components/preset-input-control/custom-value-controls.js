@@ -3,7 +3,7 @@
  */
 import {
 	RangeControl,
-	Tooltip,
+	Tooltip as WCTooltip,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 
@@ -93,11 +93,11 @@ export default function CustomValueControls( {
 	);
 
 	const wrappedUnitControl = showTooltip ? (
-		<Tooltip text={ ariaLabel } placement="top">
+		<WCTooltip text={ ariaLabel } placement="top">
 			<div className="preset-input-control__tooltip-wrapper">
 				{ unitControl }
 			</div>
-		</Tooltip>
+		</WCTooltip>
 	) : (
 		unitControl
 	);

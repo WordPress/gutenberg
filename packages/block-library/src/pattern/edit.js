@@ -78,7 +78,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 		if ( ! hasRecursionError && selectedPattern?.blocks ) {
 			try {
 				parsePatternDependencies( selectedPattern );
-			} catch ( error ) {
+			} catch {
 				setHasRecursionError( true );
 				return;
 			}

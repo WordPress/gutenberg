@@ -2,11 +2,13 @@ import { RuleTester } from 'eslint';
 import rule from '../components-no-missing-40px-size-prop';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );

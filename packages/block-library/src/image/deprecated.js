@@ -11,7 +11,13 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { mediaPosition } from './utils';
 
 /**
  * Deprecation for adding the `wp-image-${id}` class to the image block for
@@ -854,11 +860,12 @@ const v7 = {
 			},
 		},
 	},
-	migrate( { width, height, ...attributes } ) {
+	migrate( attributes ) {
+		const { width, height } = attributes;
 		return {
 			...attributes,
-			width: `${ width }px`,
-			height: `${ height }px`,
+			width: typeof width === 'number' ? `${ width }px` : width,
+			height: typeof height === 'number' ? `${ height }px` : height,
 		};
 	},
 	save( { attributes } ) {
@@ -1166,4 +1173,229 @@ const v8 = {
 	},
 };
 
-export default [ v8, v7, v6, v5, v4, v3, v2, v1 ];
+/**
+ * Deprecation for adding height: auto when only one dimension is explicitly
+ * set, to prevent theme CSS from squishing images.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/70575
+ */
+const v9 = {
+	attributes: {
+		blob: {
+			type: 'string',
+			role: 'local',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+			role: 'content',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+			role: 'content',
+		},
+		caption: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'figcaption',
+			role: 'content',
+		},
+		lightbox: {
+			type: 'object',
+			enabled: {
+				type: 'boolean',
+			},
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'title',
+			role: 'content',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'href',
+			role: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'rel',
+		},
+		linkClass: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'class',
+		},
+		id: {
+			type: 'number',
+			role: 'content',
+		},
+		width: {
+			type: 'string',
+		},
+		height: {
+			type: 'string',
+		},
+		aspectRatio: {
+			type: 'string',
+		},
+		scale: {
+			type: 'string',
+		},
+		focalPoint: {
+			type: 'object',
+		},
+		sizeSlug: {
+			type: 'string',
+		},
+		linkDestination: {
+			type: 'string',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'target',
+		},
+	},
+	supports: {
+		interactivity: true,
+		align: [ 'left', 'center', 'right', 'wide', 'full' ],
+		anchor: true,
+		color: {
+			text: false,
+			background: false,
+		},
+		filter: {
+			duotone: true,
+		},
+		spacing: {
+			margin: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				width: true,
+			},
+		},
+		shadow: {
+			__experimentalSkipSerialization: true,
+		},
+	},
+	save( { attributes } ) {
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			aspectRatio,
+			scale,
+			focalPoint,
+			id,
+			linkTarget,
+			sizeSlug,
+			title,
+			metadata: { bindings = {} } = {},
+		} = attributes;
+
+		const newRel = ! rel ? undefined : rel;
+		const borderProps = getBorderClassesAndStyles( attributes );
+		const shadowProps = getShadowClassesAndStyles( attributes );
+
+		const classes = clsx( {
+			alignnone: 'none' === align,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
+			'is-resized': width || height,
+			'has-custom-border':
+				!! borderProps.className ||
+				( borderProps.style &&
+					Object.keys( borderProps.style ).length > 0 ),
+		} );
+
+		const imageClasses = clsx( borderProps.className, {
+			[ `wp-image-${ id }` ]: !! id,
+		} );
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ imageClasses || undefined }
+				style={ {
+					...borderProps.style,
+					...shadowProps.style,
+					aspectRatio,
+					objectFit: scale,
+					objectPosition:
+						focalPoint && scale
+							? mediaPosition( focalPoint )
+							: undefined,
+					width,
+					height,
+				} }
+				title={ title }
+			/>
+		);
+
+		const displayCaption =
+			! RichText.isEmpty( caption ) ||
+			bindings.caption ||
+			bindings?.__default?.source === 'core/pattern-overrides';
+
+		const figure = (
+			<>
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ newRel }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
+				{ displayCaption && (
+					<RichText.Content
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</>
+		);
+
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	},
+};
+
+export default [ v9, v8, v7, v6, v5, v4, v3, v2, v1 ];

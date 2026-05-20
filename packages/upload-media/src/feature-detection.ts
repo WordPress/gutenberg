@@ -166,6 +166,23 @@ export function isClientSideMediaSupported(): boolean {
 }
 
 /**
+ * Detects whether the browser can decode HEIC images via canvas APIs.
+ *
+ * This checks for createImageBitmap and OffscreenCanvas support,
+ * which are sufficient to convert HEIC to JPEG without VIPS/WASM.
+ * Safari supports both APIs and can natively decode HEIC via
+ * createImageBitmap(), leveraging macOS platform codecs.
+ *
+ * @return Whether HEIC canvas-based processing is supported.
+ */
+export function isHeicCanvasSupported(): boolean {
+	return (
+		typeof createImageBitmap !== 'undefined' &&
+		typeof OffscreenCanvas !== 'undefined'
+	);
+}
+
+/**
  * Clears the cached feature detection result.
  *
  * This is primarily useful for testing purposes.

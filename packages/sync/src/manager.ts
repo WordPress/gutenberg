@@ -170,6 +170,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // Already bootstrapped.
 		}
 
+		if ( false === syncConfig.shouldSync?.( objectType, objectId ) ) {
+			log( 'loadEntity', 'shouldSync false, skipping', entityId );
+			return; // Sync config indicates that this entity should not be synced.
+		}
+
 		log( 'loadEntity', 'loading', entityId );
 
 		handlers = {
@@ -281,15 +286,19 @@ export function createSyncManager( debug = false ): SyncManager {
 			} )
 		);
 
-		// Attach observers.
-		recordMap.observeDeep( onRecordUpdate );
-		stateMap.observe( onStateMapUpdate );
-
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
 
 		// Get and apply the persisted CRDT document, if it exists.
+		// Observers are attached after hydration so the applyUpdateV2 inside
+		// _applyPersistedCrdtDoc does not trigger _updateEntityRecord with the
+		// just-loaded state, which would dispatch a redundant editRecord whose
+		// blocks already match the editor's parsed content.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
+
+		// Attach observers.
+		recordMap.observeDeep( onRecordUpdate );
+		stateMap.observe( onStateMapUpdate );
 	}
 
 	/**
@@ -315,6 +324,11 @@ export function createSyncManager( debug = false ): SyncManager {
 		if ( collectionStates.has( objectType ) ) {
 			log( 'loadCollection', 'already loaded', entityId );
 			return; // Already loaded.
+		}
+
+		if ( false === syncConfig.shouldSync?.( objectType, null ) ) {
+			log( 'loadCollection', 'shouldSync false, skipping', entityId );
+			return; // Sync config indicates that this entity should not be synced.
 		}
 
 		log( 'loadCollection', 'loading', entityId );

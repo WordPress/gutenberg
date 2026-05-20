@@ -13,7 +13,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	__experimentalVStack as VStack,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -21,8 +21,9 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { appendSelectors, getBlockGapCSS } from './utils';
-import { getGapCSSValue } from '../hooks/gap';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 const RANGE_CONTROL_MAX_VALUES = {
@@ -69,6 +70,8 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
+		clientId,
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
 
@@ -78,29 +81,87 @@ export default {
 		const showMinWidthControl =
 			! layout?.isManualPlacement ||
 			window.__experimentalEnableGridInteractivity;
+		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const hasGridTypeValue = () =>
+			hasLayoutValue( 'isManualPlacement', false );
+		const hasColumnsAndRowsValue = () =>
+			hasLayoutValue( 'columnCount', defaultColumnCount ) ||
+			hasLayoutValue( 'rowCount' );
+		const hasMinimumColumnWidthValue = () =>
+			hasLayoutValue( 'minimumColumnWidth' );
+		const resetGridType = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					isManualPlacement: resetLayout?.isManualPlacement,
+					rowCount: resetLayout?.rowCount,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+		const resetColumnsAndRows = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					columnCount: resetLayout?.columnCount ?? defaultColumnCount,
+					rowCount: resetLayout?.rowCount,
+				} )
+			);
+		const resetMinimumColumnWidth = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+
 		return (
 			<>
 				{ window.__experimentalEnableGridInteractivity && (
-					<GridLayoutTypeControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
+					<ToolsPanelItem
+						label={ __( 'Grid item position' ) }
+						hasValue={ hasGridTypeValue }
+						onDeselect={ resetGridType }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<GridLayoutTypeControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
 				) }
-				<VStack spacing={ 4 }>
-					{ showColumnsControl && (
+				{ showColumnsControl && (
+					<ToolsPanelItem
+						label={ __( 'Columns and rows' ) }
+						hasValue={ hasColumnsAndRowsValue }
+						onDeselect={ resetColumnsAndRows }
+						isShownByDefault
+						panelId={ clientId }
+					>
 						<GridLayoutColumnsAndRowsControl
 							layout={ layout }
 							onChange={ onChange }
 							allowSizingOnChildren={ allowSizingOnChildren }
 						/>
-					) }
-					{ showMinWidthControl && (
+					</ToolsPanelItem>
+				) }
+				{ showMinWidthControl && (
+					<ToolsPanelItem
+						label={ __( 'Min. column width' ) }
+						hasValue={ hasMinimumColumnWidthValue }
+						onDeselect={ resetMinimumColumnWidth }
+						isShownByDefault
+						panelId={ clientId }
+					>
 						<GridLayoutMinimumWidthControl
 							layout={ layout }
 							onChange={ onChange }
 						/>
-					) }
-				</VStack>
+					</ToolsPanelItem>
+				) }
 			</>
 		);
 	},
@@ -143,10 +204,12 @@ export default {
 		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations.
 		let fallbackGapValue = '1.2rem';
 		if ( globalBlockGapValue ) {
-			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
-			const gapParts = processedGap.split( ' ' );
+			const gapBox =
+				getGapBoxControlValueFromStyle( globalBlockGapValue );
 			fallbackGapValue =
-				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+				getSpacingPresetCssVar( gapBox?.left ) ||
+				getSpacingPresetCssVar( gapBox?.top ) ||
+				'1.2rem';
 		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,

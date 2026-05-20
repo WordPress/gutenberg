@@ -397,6 +397,20 @@ function GHcommentAndRemoveLabel( pr ) {
 			] );
 		}
 
+		if ( LABEL === 'Backport to Gutenberg RC' ) {
+			const milestone = getMilestoneFromBranch();
+			if ( milestone ) {
+				cli( 'gh', [
+					'pr',
+					'edit',
+					number,
+					...repo,
+					'--milestone',
+					milestone,
+				] );
+			}
+		}
+
 		console.log( `✅ ${ number }: ${ comment }` );
 	} catch ( e ) {
 		console.log( `❌ ${ number }. ${ comment } ` );
@@ -459,6 +473,18 @@ function prUrl( number ) {
  */
 function prComment( cherryPickHash ) {
 	return `I just cherry-picked this PR to the ${ BRANCH } branch to get it included in the next release: ${ cherryPickHash }`;
+}
+
+/**
+ * Derives the Gutenberg milestone name from the current release branch.
+ *
+ * For example, "release/22.7" becomes "Gutenberg 22.7".
+ *
+ * @return {string|null} Milestone name, or null if the branch doesn't match.
+ */
+function getMilestoneFromBranch() {
+	const match = BRANCH.match( /release\/(\d+\.\d+)/ );
+	return match ? `Gutenberg ${ match[ 1 ] }` : null;
 }
 
 /**

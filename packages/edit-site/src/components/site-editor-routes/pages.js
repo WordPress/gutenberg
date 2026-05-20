@@ -16,6 +16,7 @@ import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-uns
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
+import { isThemeDataLoaded } from './utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -51,8 +52,10 @@ export const pagesRoute = {
 	path: '/page',
 	areas: {
 		sidebar( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<SidebarNavigationScreen
 					title={ __( 'Pages' ) }
 					backPath="/"
@@ -75,8 +78,10 @@ export const pagesRoute = {
 			return isList ? <Editor /> : undefined;
 		},
 		mobile( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return <></>;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<MobilePagesView />
 			) : (
 				<SidebarNavigationScreenUnsupported />
