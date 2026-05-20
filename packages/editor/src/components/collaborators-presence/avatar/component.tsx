@@ -10,8 +10,10 @@ extend( [ a11yPlugin ] );
 /**
  * WordPress dependencies
  */
-import { Icon as WCIcon, Tooltip as WCTooltip } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -114,7 +116,12 @@ function Avatar( {
 	);
 
 	if ( name && ( ! showBadge || label ) ) {
-		return <WCTooltip text={ name }>{ avatar }</WCTooltip>;
+		return (
+			<Tooltip.Root>
+				<Tooltip.Trigger render={ avatar } />
+				<Tooltip.Popup>{ name }</Tooltip.Popup>
+			</Tooltip.Root>
+		);
 	}
 
 	return avatar;
