@@ -41,14 +41,6 @@
 			"type": "boolean",
 			"default": false
 		},
-		"postLayout": {
-			"type": "string",
-			"default": "list"
-		},
-		"columns": {
-			"type": "number",
-			"default": 3
-		},
 		"order": {
 			"type": "string",
 			"default": "desc"

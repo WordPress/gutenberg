@@ -5,8 +5,16 @@ import metadata from './block.json';
 
 const attributes = {
 	...metadata.attributes,
-	layout: {
-		type: 'object',
+};
+
+const legacyLayoutAttributes = {
+	postLayout: {
+		type: 'string',
+		default: 'list',
+	},
+	columns: {
+		type: 'number',
+		default: 3,
 	},
 };
 
@@ -46,6 +54,7 @@ export default [
 	{
 		attributes: {
 			...attributes,
+			...legacyLayoutAttributes,
 			categories: {
 				type: [ 'array', 'string' ],
 			},
