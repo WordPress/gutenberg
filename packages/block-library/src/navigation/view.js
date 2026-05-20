@@ -55,6 +55,47 @@ document.addEventListener( 'click', () => {} );
 const MORPH_DURATION = 350;
 const MORPH_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
+// Morphed-state transforms for the two hamburger lines. Mirror of the
+// .is-morphed CSS rules in style.scss; driven via WAAPI so the morph
+// fires reliably in both directions (CSS transitions on
+// freshly-inserted elements can fail to trigger).
+const MORPH_LINE_TRANSFORM = [
+	'translateY(3.75px) rotate(45deg) scaleX(1.24)',
+	'translateY(-3.75px) rotate(-45deg) scaleX(1.24)',
+];
+const MORPH_LINE_IDENTITY = 'translateY(0) rotate(0) scaleX(1)';
+
+/**
+ * Animate a phantom's two hamburger-line rects from one transform to another.
+ *
+ * @param {HTMLElement} phantom - The phantom element.
+ * @param {boolean}     toMorphed - true to animate horizontal lines → X;
+ *                                  false to animate X → horizontal lines.
+ */
+function animatePhantomLines( phantom, toMorphed ) {
+	const lines = phantom.querySelectorAll(
+		'.wp-block-navigation__hamburger-line'
+	);
+	lines.forEach( ( line, i ) => {
+		line.animate(
+			toMorphed
+				? [
+						{ transform: MORPH_LINE_IDENTITY },
+						{ transform: MORPH_LINE_TRANSFORM[ i ] },
+				  ]
+				: [
+						{ transform: MORPH_LINE_TRANSFORM[ i ] },
+						{ transform: MORPH_LINE_IDENTITY },
+				  ],
+			{
+				duration: MORPH_DURATION,
+				easing: MORPH_EASING,
+				fill: 'forwards',
+			}
+		);
+	} );
+}
+
 // Track active morph animations per navigation block element.
 const activeMorphAnimations = new WeakMap();
 
@@ -151,39 +192,33 @@ function runOpenMorphAnimation( nav, hamburgerBtn, closeBtn, startRect ) {
 			( endRect.height - startRect.height ) / 2 -
 			startRect.top;
 
-		// Use a second rAF so the browser paints the phantom at start position
-		// before the transition begins.
-		requestAnimationFrame( () => {
-			// Trigger the CSS morph transition (horizontal lines → X).
-			phantom.classList.add( 'is-morphed' );
+		animatePhantomLines( phantom, true );
 
-			// Fly the phantom from hamburger to close button position.
-			const animation = phantom.animate(
-				[
-					{ transform: 'translate(0, 0)' },
-					{
-						transform: `translate(${ dx }px, ${ dy }px)`,
-					},
-				],
+		const animation = phantom.animate(
+			[
+				{ transform: 'translate(0, 0)' },
 				{
-					duration: MORPH_DURATION,
-					easing: MORPH_EASING,
-					fill: 'forwards',
-				}
-			);
+					transform: `translate(${ dx }px, ${ dy }px)`,
+				},
+			],
+			{
+				duration: MORPH_DURATION,
+				easing: MORPH_EASING,
+				fill: 'forwards',
+			}
+		);
 
-			activeMorphAnimations.set( nav, {
-				animation,
-				phantom,
-				closeBtn,
-			} );
-
-			animation.onfinish = () => {
-				phantom.remove();
-				closeBtn.style.visibility = '';
-				activeMorphAnimations.delete( nav );
-			};
+		activeMorphAnimations.set( nav, {
+			animation,
+			phantom,
+			closeBtn,
 		} );
+
+		animation.onfinish = () => {
+			phantom.remove();
+			closeBtn.style.visibility = '';
+			activeMorphAnimations.delete( nav );
+		};
 	} );
 }
 
@@ -215,12 +250,12 @@ function runCloseMorphAnimation(
 	// Hide the real close button.
 	closeBtn.style.visibility = 'hidden';
 
-	// Create phantom at close button's position (morphed as X).
-	const phantom = createMorphPhantom( hamburgerBtn, true );
+	// Create the phantom without the morphed class; WAAPI applies the
+	// X transform as its first keyframe and then animates back.
+	const phantom = createMorphPhantom( hamburgerBtn, false );
 	phantom.style.top = closeRect.top + 'px';
 	phantom.style.left = closeRect.left + 'px';
 
-	// Calculate translation back to hamburger position.
 	const dx =
 		hamburgerRect.left +
 		( hamburgerRect.width - closeRect.width ) / 2 -
@@ -230,31 +265,27 @@ function runCloseMorphAnimation(
 		( hamburgerRect.height - closeRect.height ) / 2 -
 		closeRect.top;
 
-	requestAnimationFrame( () => {
-		// Trigger the CSS morph transition (X → horizontal lines).
-		phantom.classList.remove( 'is-morphed' );
+	animatePhantomLines( phantom, false );
 
-		// Fly the phantom from close button to hamburger position.
-		const animation = phantom.animate(
-			[
-				{ transform: 'translate(0, 0)' },
-				{ transform: `translate(${ dx }px, ${ dy }px)` },
-			],
-			{
-				duration: MORPH_DURATION,
-				easing: MORPH_EASING,
-				fill: 'forwards',
-			}
-		);
+	const animation = phantom.animate(
+		[
+			{ transform: 'translate(0, 0)' },
+			{ transform: `translate(${ dx }px, ${ dy }px)` },
+		],
+		{
+			duration: MORPH_DURATION,
+			easing: MORPH_EASING,
+			fill: 'forwards',
+		}
+	);
 
-		activeMorphAnimations.set( nav, { animation, phantom, closeBtn } );
+	activeMorphAnimations.set( nav, { animation, phantom, closeBtn } );
 
-		animation.onfinish = () => {
-			phantom.remove();
-			activeMorphAnimations.delete( nav );
-			onComplete();
-		};
-	} );
+	animation.onfinish = () => {
+		phantom.remove();
+		activeMorphAnimations.delete( nav );
+		onComplete();
+	};
 }
 
 const { state, actions } = store(
