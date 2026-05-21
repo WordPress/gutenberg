@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+
+/**
+ * External dependencies
+ */
 import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -6,6 +10,14 @@ import path from 'path';
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
+/**
+ * Execute a command and return a promise.
+ *
+ * @param {string}   command Command to execute.
+ * @param {string[]} args    Command arguments.
+ * @param {Object}   options Spawn options.
+ * @return {Promise<void>} Promise that resolves when command completes.
+ */
 function exec( command, args = [], options = {} ) {
 	const silent = options.silent || false;
 	const spawnOptions = { ...options };
@@ -20,6 +32,7 @@ function exec( command, args = [], options = {} ) {
 
 		const child = spawn( command, args, childOptions );
 
+		// If silent, capture output to show only on error
 		let stdout = '';
 		let stderr = '';
 
@@ -40,6 +53,7 @@ function exec( command, args = [], options = {} ) {
 			if ( code === 0 ) {
 				resolve();
 			} else {
+				// On error, show captured output if it was silent
 				if ( silent && ( stdout || stderr ) ) {
 					if ( stdout ) {
 						process.stdout.write( stdout );
@@ -60,6 +74,9 @@ function exec( command, args = [], options = {} ) {
 	} );
 }
 
+/**
+ * Main build orchestration function.
+ */
 async function build() {
 	const skipTypes = process.argv.includes( '--skip-types' );
 
@@ -68,6 +85,7 @@ async function build() {
 	const startTime = Date.now();
 
 	try {
+		// Step 0: Verify node_modules is in sync with package-lock.json
 		console.log( '🔍 Checking dependencies...' );
 		await exec( 'npm', [
 			'run',
@@ -89,12 +107,12 @@ async function build() {
 			{ silent: true }
 		);
 
+		// This must happen before TypeScript compilation because some packages
+		// (like vips) have source files that import from generated worker-code.ts
 		await exec( 'npm', [
 			'run',
 			'--silent',
 			'generate-worker-placeholders',
-			'--workspace',
-			'@wordpress/build-tools',
 		] );
 
 		if ( ! skipTypes ) {
@@ -124,8 +142,6 @@ async function build() {
 			'run',
 			'--silent',
 			'build-vendors',
-			'--workspace',
-			'@wordpress/build-tools',
 		] );
 
 		console.log( '\n📦 Building packages (production mode)...' );

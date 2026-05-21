@@ -37,6 +37,12 @@ const VENDOR_SCRIPTS = [
 	},
 ];
 
+/**
+ * Read the version from a package's package.json in node_modules.
+ *
+ * @param {string} packageName npm package name (e.g., 'react', 'react-dom').
+ * @return {Promise<string>} The package version string.
+ */
 async function getPackageVersion( packageName ) {
 	const packageJsonPath = path.join(
 		ROOT_DIR,
@@ -50,9 +56,18 @@ async function getPackageVersion( packageName ) {
 	return packageJson.version;
 }
 
+/**
+ * Generate a .asset.php file for a vendor script.
+ *
+ * @param {Object}   config              Vendor script configuration.
+ * @param {string}   config.handle       WordPress script handle.
+ * @param {string}   config.name         Package name (e.g., 'react', 'react/jsx-runtime').
+ * @param {string[]} config.dependencies WordPress script dependencies.
+ */
 async function generateAssetFile( config ) {
 	const { handle, name, dependencies } = config;
 
+	// The npm package name is the first segment of the name (e.g., 'react/jsx-runtime' -> 'react').
 	const packageName = name.split( '/' )[ 0 ];
 	const version = await getPackageVersion( packageName );
 
@@ -66,9 +81,21 @@ async function generateAssetFile( config ) {
 	await writeFile( assetFilePath, assetContent );
 }
 
+/**
+ * Bundle a vendor script from node_modules into an IIFE script.
+ * This is used to build packages like React that don't ship UMD builds.
+ *
+ * @param {Object}   config              Vendor script configuration.
+ * @param {string}   config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string}   config.global       Global variable name (e.g., 'React', 'ReactDOM').
+ * @param {string}   config.handle       WordPress script handle (e.g., 'react', 'react-dom').
+ * @param {string[]} config.dependencies WordPress script dependencies.
+ * @return {Promise<void>} Promise that resolves when all builds are finished.
+ */
 async function bundleVendorScript( config ) {
 	const { name, global, handle, contents } = config;
 
+	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
 		name: 'react-external',
 		setup( build ) {
@@ -126,6 +153,9 @@ async function bundleVendorScript( config ) {
 	] );
 }
 
+/**
+ * Main build function.
+ */
 async function buildVendors() {
 	console.log( '\n📦 Bundling vendor scripts...\n' );
 
