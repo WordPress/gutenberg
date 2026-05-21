@@ -3,6 +3,7 @@
  */
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { layout, plus } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { AlertDialog, Button, Stack } from '@wordpress/ui';
 
@@ -22,13 +23,10 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
  * - **Customize** (layout edits): toggles edit mode, surfaces the Add
  *   widgets / Cancel / Done toolbar. Commits the layout staging buffer
  *   on Done.
- * - **Layout settings** (more-actions dropdown entry): opens a side
- *   drawer with model, column behavior, and row height. Commits the
- *   settings staging buffer on Save inside the drawer.
- *
- * The two flows are mutually exclusive: the Layout settings entry is
- * disabled while edit mode is on so the settings drawer cannot
- * accumulate changes on top of pending layout edits, and vice versa.
+ * - **Layout** (customize-mode toolbar): opens a side drawer with
+ *   model, column behavior, and row height. Commits the settings
+ *   staging buffer on Save inside the drawer. Only shown while
+ *   `editMode` is on and `onGridSettingsChange` is provided.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
  * so surfaces that don't expose edit mode can keep `Actions` in their
@@ -104,15 +102,6 @@ export function Actions(): React.ReactNode {
 		},
 	];
 
-	if ( canEditGridSettings ) {
-		moreActionsItems.unshift( {
-			label: __( 'Layout settings' ),
-			onClick: openLayoutSettings,
-			disabled: editMode,
-			disabledTooltip: __( 'Disabled while editing widgets' ),
-		} );
-	}
-
 	if ( ! onEditChange ) {
 		return null;
 	}
@@ -135,8 +124,26 @@ export function Actions(): React.ReactNode {
 						size="compact"
 						onClick={ insert }
 					>
-						{ __( 'Add widgets' ) }
+						<Button.Icon icon={ plus } />
+						{ __( 'Add widget' ) }
 					</Button>
+
+					{ canEditGridSettings && (
+						<Button
+							variant="minimal"
+							tone="brand"
+							size="compact"
+							onClick={ openLayoutSettings }
+						>
+							<Button.Icon icon={ layout } />
+							{ __( 'Layout' ) }
+						</Button>
+					) }
+
+					<div
+						className={ styles.editActionsDivider }
+						aria-hidden="true"
+					/>
 
 					<Button
 						variant="minimal"
@@ -159,7 +166,7 @@ export function Actions(): React.ReactNode {
 				</Stack>
 			) : (
 				<Button
-					variant="outline"
+					variant="minimal"
 					tone="brand"
 					size="compact"
 					onClick={ handleEditMode }

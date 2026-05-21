@@ -211,11 +211,8 @@ interface LayoutSettingsProps {
  * an Escape press, or any path other than the explicit Cancel/Save
  * buttons is treated as Cancel.
  *
- * Settings and layout-editing are kept as separate flows on the
- * dashboard surface (the Layout settings entry that opens this
- * drawer is disabled while edit mode is on), so the drawer's
- * commit never publishes layout edits that the user is in the
- * middle of staging through the toolbar.
+ * The Layout toolbar button that opens this drawer is only available
+ * in customize mode, alongside the widget layout editing controls.
  *
  * @param {LayoutSettingsProps} props Layout settings props.
  * @return {React.ReactNode} The layout settings component.

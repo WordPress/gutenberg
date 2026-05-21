@@ -47,7 +47,9 @@ function Dashboard() {
 			onEditChange={ setEditMode }
 		>
 			<Page
-				title={ __( 'Dashboard' ) }
+				title={
+					editMode ? __( 'Customize Dashboard' ) : __( 'Dashboard' )
+				}
 				actions={ <WidgetDashboard.Actions /> }
 				hasPadding
 			>
