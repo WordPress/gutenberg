@@ -452,7 +452,28 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	public function delete_item( $request ) {
 		$existing       = get_post( (int) $request['id'] );
 		$was_registered = $existing instanceof WP_Post && 'publish' === $existing->post_status;
-		$response       = parent::delete_item( $request );
+		$taxonomy_slug  = $existing instanceof WP_Post ? $existing->post_name : '';
+
+		// Delete all terms belonging to this taxonomy before removing the
+		// record, so no orphaned rows are left in wp_terms / wp_term_taxonomy.
+		// Note: only active (published) taxonomies are registered in-memory;
+		// terms under inactive taxonomies are not cleaned up here.
+		if ( $request['delete_terms'] && '' !== $taxonomy_slug && taxonomy_exists( $taxonomy_slug ) ) {
+			$term_ids = get_terms(
+				array(
+					'taxonomy'   => $taxonomy_slug,
+					'hide_empty' => false,
+					'fields'     => 'ids',
+				)
+			);
+			if ( is_array( $term_ids ) ) {
+				foreach ( $term_ids as $term_id ) {
+					wp_delete_term( (int) $term_id, $taxonomy_slug );
+				}
+			}
+		}
+
+		$response = parent::delete_item( $request );
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}

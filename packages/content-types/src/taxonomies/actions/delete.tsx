@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, CheckboxControl } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import type { Action } from '@wordpress/dataviews';
@@ -29,6 +29,7 @@ function DeleteTaxonomyModal( {
 	onActionPerformed?: ( items: TaxonomyFormData[] ) => void;
 } ) {
 	const [ isDeleting, setIsDeleting ] = useState( false );
+	const [ deleteTerms, setDeleteTerms ] = useState( false );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -46,7 +47,10 @@ function DeleteTaxonomyModal( {
 					'postType',
 					TAXONOMY_ENTITY,
 					item.id as number,
-					{ force: true },
+					{
+						force: true,
+						...( deleteTerms ? { delete_terms: true } : {} ),
+					},
 					{ throwOnError: true }
 				)
 			)
@@ -150,6 +154,17 @@ function DeleteTaxonomyModal( {
 							items[ 0 ].title.raw
 					  ) }
 			</Text>
+			<CheckboxControl
+				__nextHasNoMarginBottom
+				label={
+					items.length > 1
+						? __( 'Also delete all terms in these taxonomies' )
+						: __( 'Also delete all terms in this taxonomy' )
+				}
+				checked={ deleteTerms }
+				onChange={ setDeleteTerms }
+				disabled={ isDeleting }
+			/>
 			<Stack direction="row" justify="flex-end" gap="sm">
 				<Button
 					__next40pxDefaultSize
