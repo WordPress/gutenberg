@@ -101,6 +101,12 @@ export interface WidgetRenderProps< Item = unknown > {
 	 * dashboard with the updated layout.
 	 */
 	setAttributes?: ( next: Partial< Item > ) => void;
+
+	/**
+	 * Removes this widget instance from the dashboard layout. When the
+	 * dashboard is not in edit mode, the removal commits immediately.
+	 */
+	removeWidget?: () => void;
 }
 
 /**

@@ -7,6 +7,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useRemoveDashboardWidget } from '../../hooks/use-remove-dashboard-widget';
 import { getLazyWidgetComponent } from '../../utils/get-lazy-widget-component';
 import type { DashboardWidget, WidgetType } from '../../types';
 
@@ -43,6 +44,8 @@ function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
 		[ widget.uuid, layout, onLayoutChange ]
 	);
 
+	const removeWidget = useRemoveDashboardWidget( widget.uuid );
+
 	return (
 		<>
 			{ /* WidgetComponent is a cached `lazy()` keyed by renderModule, so its identity stays stable across renders. */ }
@@ -50,6 +53,7 @@ function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
 			<WidgetComponent
 				attributes={ widget.attributes }
 				setAttributes={ setAttributes }
+				removeWidget={ removeWidget }
 			/>
 		</>
 	);

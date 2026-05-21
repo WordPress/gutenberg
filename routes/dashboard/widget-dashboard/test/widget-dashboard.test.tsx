@@ -27,6 +27,7 @@ type Attrs = { greeting: string };
 function TestWidget( {
 	attributes,
 	setAttributes,
+	removeWidget,
 }: WidgetRenderProps< Attrs > ) {
 	return (
 		<div>
@@ -36,6 +37,9 @@ function TestWidget( {
 			>
 				Update
 			</button>
+			{ removeWidget && (
+				<button onClick={ removeWidget }>Remove widget</button>
+			) }
 		</div>
 	);
 }
@@ -130,6 +134,20 @@ describe( 'WidgetDashboard', () => {
 			type: 'test/greet',
 			attributes: { greeting: 'updated' },
 		} );
+	} );
+
+	it( 'removes a widget immediately when removeWidget is invoked outside edit mode', async () => {
+		const onChange = jest.fn();
+		const user = userEvent.setup();
+
+		render( <Harness onLayoutChange={ onChange } /> );
+
+		await user.click(
+			await screen.findByRole( 'button', { name: 'Remove widget' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange ).toHaveBeenCalledWith( [] );
 	} );
 
 	it( 'renders nothing for an unknown widget type (no crash)', () => {

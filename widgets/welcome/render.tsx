@@ -6,12 +6,20 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
+import {
+	closeSmall,
+	layout,
+	pencil,
+	styles as stylesIcon,
+} from '@wordpress/icons';
+// Dashboard is still experimental.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { IconButton, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import type { WidgetRenderProps } from '../../routes/dashboard/widget-dashboard';
 import { Banner, FeatureHighlight } from './components';
 import styles from './style.module.css';
 
@@ -19,7 +27,7 @@ const ROW_LAYOUT_MIN_WIDTH = 800;
 const ROW_LAYOUT_MAX_HEIGHT = 390;
 const TINY_LAYOUT_MAX_SIZE = 120;
 
-export default function WelcomeBanner() {
+export default function WelcomeBanner( { removeWidget }: WidgetRenderProps ) {
 	const [ isWide, setIsWide ] = useState( false );
 	const [ isTiny, setIsTiny ] = useState( false );
 
@@ -89,6 +97,18 @@ export default function WelcomeBanner() {
 			direction={ isWide ? 'row' : 'column' }
 			gap="lg"
 		>
+			{ removeWidget && (
+				<IconButton
+					className={ styles.dismiss }
+					icon={ closeSmall }
+					label={ __( 'Dismiss' ) }
+					size="small"
+					variant="minimal"
+					tone="neutral"
+					onClick={ removeWidget }
+				/>
+			) }
+
 			<Banner isWide={ isWide } isTiny={ isTiny } />
 
 			{ ! isTiny && (

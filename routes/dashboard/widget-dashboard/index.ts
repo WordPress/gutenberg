@@ -1,2 +1,3 @@
 export { WidgetDashboard } from './widget-dashboard';
-export type { DashboardWidget, WidgetType } from './types';
+export { useRemoveDashboardWidget } from './hooks';
+export type { DashboardWidget, WidgetType, WidgetRenderProps } from './types';

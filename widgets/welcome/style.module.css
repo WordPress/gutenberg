@@ -1,6 +1,14 @@
 .root {
 	container-type: size;
 	height: 100%;
+	position: relative;
+}
+
+.dismiss {
+	position: absolute;
+	top: var(--wpds-dimension-padding-md);
+	right: var(--wpds-dimension-padding-md);
+	z-index: 2;
 }
 
 .columns {

@@ -129,10 +129,13 @@ Widget render modules receive only what they need to render and edit:
 interface WidgetRenderProps< Item = unknown > {
 	attributes: Item;
 	setAttributes?: ( next: Partial< Item > ) => void;
+	removeWidget?: () => void;
 }
 ```
 
-`setAttributes` flows back through `onLayoutChange` on the dashboard. Removal, badges, and error chrome are not part of this contract — those belong to the surface.
+`setAttributes` flows back through `onLayoutChange` on the dashboard. `removeWidget` removes the current instance from the layout; when the dashboard is not in edit mode, the change commits immediately.
+
+For compound components and other dashboard internals, `useRemoveDashboardWidget()` is also exported from this module. Pass an explicit `uuid` when calling outside a widget render subtree (for example, edit-mode chrome that renders in a grid `actionableArea` slot).
 
 ## Types
 

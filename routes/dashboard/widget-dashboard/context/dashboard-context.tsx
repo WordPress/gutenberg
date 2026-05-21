@@ -19,6 +19,7 @@ import {
 /**
  * Internal dependencies
  */
+import { removeWidgetFromLayout } from '../utils/remove-widget-from-layout';
 import type {
 	ResolveWidgetModule,
 	WidgetGridSettings,
@@ -133,6 +134,12 @@ interface InternalDashboardContextValue {
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
+
+	/**
+	 * Removes a widget instance from the staging layout. Commits
+	 * immediately when not in edit mode.
+	 */
+	removeDashboardWidget: ( uuid: string ) => void;
 }
 
 const Context = createContext< InternalDashboardContextValue | null >( null );
@@ -313,6 +320,18 @@ export function WidgetDashboardProvider( {
 		setStagingGridSettings( DEFAULT_GRID );
 	}, [] );
 
+	const removeDashboardWidget = useCallback(
+		( uuid: string ) => {
+			const next = removeWidgetFromLayout( stagingLayout, uuid );
+			setStagingLayout( next );
+
+			if ( ! editMode ) {
+				onLayoutChange( canonicalize( next ) );
+			}
+		},
+		[ stagingLayout, editMode, onLayoutChange ]
+	);
+
 	useEffect( () => {
 		if ( stagingLayout.length === 0 ) {
 			onEditChange?.( true );
@@ -342,6 +361,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			removeDashboardWidget,
 		} ),
 		[
 			widgetTypes,
@@ -356,6 +376,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
+			removeDashboardWidget,
 		]
 	);
 

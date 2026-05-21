@@ -163,4 +163,10 @@ export interface WidgetRenderProps< Item = unknown > {
 	 * surfaces render widgets in read-only contexts.
 	 */
 	setAttributes?: ( next: Partial< Item > ) => void;
+
+	/**
+	 * Removes this widget instance from the consuming surface's layout.
+	 * Optional because some surfaces render widgets in read-only contexts.
+	 */
+	removeWidget?: () => void;
 }

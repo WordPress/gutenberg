@@ -7,13 +7,21 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	privateApis as themePrivateApis,
+	type ThemeProvider as ThemeProviderType,
+} from '@wordpress/theme';
 import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { HeaderBackground } from '../header-background';
 import styles from './banner.module.css';
+
+const ThemeProvider: typeof ThemeProviderType =
+	unlock( themePrivateApis ).ThemeProvider;
 
 const DISPLAY_VERSION = '7.1';
 
@@ -30,32 +38,34 @@ export function Banner( { isWide = false, isTiny = false }: BannerProps ) {
 	);
 
 	return (
-		<Stack className={ className } direction="column" justify="center">
-			<HeaderBackground />
+		<ThemeProvider color={ { bg: '#000000' } }>
+			<Stack className={ className } direction="column" justify="center">
+				<HeaderBackground />
 
-			<Stack
-				className={ styles.bannerContent }
-				gap="sm"
-				direction="column"
-			>
-				<Text variant="heading-2xl">
-					{ __( 'Welcome to WordPress!' ) }
-				</Text>
+				<Stack
+					className={ styles.bannerContent }
+					gap="sm"
+					direction="column"
+				>
+					<Text variant="heading-2xl">
+						{ __( 'Welcome to WordPress!' ) }
+					</Text>
 
-				<Text variant="heading-lg">
-					<Link
-						className={ styles.bannerLink }
-						href="/wp-admin/about.php"
-						variant="unstyled"
-					>
-						{ sprintf(
-							/* translators: %s: Current WordPress version. */
-							__( 'Learn more about the %s version.' ),
-							DISPLAY_VERSION
-						) }
-					</Link>
-				</Text>
+					<Text variant="heading-lg">
+						<Link
+							className={ styles.bannerLink }
+							href="/wp-admin/about.php"
+							variant="unstyled"
+						>
+							{ sprintf(
+								/* translators: %s: Current WordPress version. */
+								__( 'Learn more about the %s version.' ),
+								DISPLAY_VERSION
+							) }
+						</Link>
+					</Text>
+				</Stack>
 			</Stack>
-		</Stack>
+		</ThemeProvider>
 	);
 }
