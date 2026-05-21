@@ -300,6 +300,12 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 				'globalStyles' === $resource['name']
 			) {
 				$base = '/wp/v2/global-styles';
+			} elseif (
+				'root' === $resource['kind'] &&
+				'site' === $resource['name']
+			) {
+				// The site entity is keyless and lives at /wp/v2/settings.
+				$base = '/wp/v2/settings';
 			} else {
 				return null;
 			}
@@ -358,7 +364,16 @@ function gutenberg_preload_selectors_for_hydration( array $specs ) {
 		} else {
 			$paths[] = array( $req['path'], $req['method'] );
 		}
-		$by_key[ gutenberg_preload_path_key( $req['path'], $req['method'] ) ] = $spec;
+
+		// Multiple specs can share a URL (e.g. `getEntitiesConfig('root')`
+		// and `canUser('read', { kind: 'root', name: 'site' })` both hit
+		// `OPTIONS /wp/v2/settings`). Bucket the specs so each one gets
+		// its own payload entry from the deduped REST response.
+		$key = gutenberg_preload_path_key( $req['path'], $req['method'] );
+		if ( ! isset( $by_key[ $key ] ) ) {
+			$by_key[ $key ] = array();
+		}
+		$by_key[ $key ][] = $spec;
 	}
 
 	$preloaded = array_reduce( $paths, 'rest_preload_api_request', array() );
@@ -368,16 +383,22 @@ function gutenberg_preload_selectors_for_hydration( array $specs ) {
 	foreach ( $preloaded as $key => $value ) {
 		if ( in_array( $key, array( 'OPTIONS', 'POST', 'PUT', 'DELETE', 'PATCH' ), true ) ) {
 			foreach ( $value as $path => $response ) {
-				$spec = $by_key[ gutenberg_preload_path_key( $path, $key ) ] ?? null;
-				if ( $spec && isset( $response['body'] ) ) {
+				if ( ! isset( $response['body'] ) ) {
+					continue;
+				}
+				$specs_for_path = $by_key[ gutenberg_preload_path_key( $path, $key ) ] ?? array();
+				foreach ( $specs_for_path as $spec ) {
 					$payload[] = gutenberg_build_hydration_entry( $spec, $response );
 				}
 			}
 			continue;
 		}
 
-		$spec = $by_key[ gutenberg_preload_path_key( $key ) ] ?? null;
-		if ( $spec && isset( $value['body'] ) ) {
+		if ( ! isset( $value['body'] ) ) {
+			continue;
+		}
+		$specs_for_path = $by_key[ gutenberg_preload_path_key( $key ) ] ?? array();
+		foreach ( $specs_for_path as $spec ) {
 			$payload[] = gutenberg_build_hydration_entry( $spec, $value );
 		}
 	}
@@ -496,6 +517,16 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 		array(
 			'selector' => 'getEntityRecord',
 			'args'     => array( 'root', 'site' ),
+		),
+		array(
+			'selector' => 'canUser',
+			'args'     => array(
+				'read',
+				array(
+					'kind' => 'root',
+					'name' => 'site',
+				),
+			),
 		),
 	);
 
