@@ -275,7 +275,21 @@ describe( 'RichTextControl', () => {
 			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
 
-		it( 'keeps dispatching shortcuts when focus moves to a `.components-popover`', async () => {
+		// Focus the textbox, move focus into the supplied stand-in popover,
+		// then blur the textbox and flush the deferred deselection timer.
+		async function blurWithFocusInPopover( textbox, popoverButton ) {
+			await focusTextbox( textbox );
+			// Focus the popover-internal button before firing the textbox
+			// blur so `document.activeElement` is the popover descendant by
+			// the time the deferred check runs.
+			popoverButton.focus();
+			fireEvent.blur( textbox );
+			await act( async () => {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			} );
+		}
+
+		it( 'keeps dispatching shortcuts when focus moves into the control popover slot', async () => {
 			const { container } = render(
 				<>
 					<RichTextControl
@@ -283,32 +297,81 @@ describe( 'RichTextControl', () => {
 						value=""
 						onChange={ () => {} }
 					/>
-					{ /* Stand-in for the inline link UI popover, which
-					   portals into `document.body` with this class. */ }
-					<div className="components-popover">
+					{ /* Stand-in for the inline link UI popover, which the
+					   control scopes into its own slot, marked with this
+					   attribute. */ }
+					<div data-rich-text-control-popover-slot>
 						<button type="button">Inside popover</button>
 					</div>
 				</>
 			);
 			const textbox = getTextbox( container );
-			const popoverButton = screen.getByRole( 'button', {
-				name: 'Inside popover',
-			} );
 
-			await focusTextbox( textbox );
-			// Manually focus the popover-internal button before firing
-			// the textbox blur so `document.activeElement` is the
-			// popover descendant by the time the deferred check runs.
-			popoverButton.focus();
-			fireEvent.blur( textbox );
-			await act( async () => {
-				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-			} );
+			await blurWithFocusInPopover(
+				textbox,
+				screen.getByRole( 'button', { name: 'Inside popover' } )
+			);
 
 			// `FormatEdit` should stay mounted, so the shortcut still
 			// fires on a subsequent keydown delivered to the textbox.
 			dispatchPrimaryB( textbox );
 			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'keeps dispatching shortcuts when focus moves into a `@wordpress/ui` compat overlay', async () => {
+			const { container } = render(
+				<>
+					<RichTextControl
+						label="Shortcut overlay"
+						value=""
+						onChange={ () => {} }
+					/>
+					{ /* Stand-in for a popover migrated to `@wordpress/ui`,
+					   which portals into the shared compat overlay slot. */ }
+					<div data-wp-compat-overlay-slot>
+						<button type="button">Inside overlay</button>
+					</div>
+				</>
+			);
+			const textbox = getTextbox( container );
+
+			await blurWithFocusInPopover(
+				textbox,
+				screen.getByRole( 'button', { name: 'Inside overlay' } )
+			);
+
+			dispatchPrimaryB( textbox );
+			expect( currentOnUse ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'deselects when focus moves to an unrelated popover', async () => {
+			const { container } = render(
+				<>
+					<RichTextControl
+						label="Shortcut unrelated"
+						value=""
+						onChange={ () => {} }
+					/>
+					{ /* A popover this control did not open: it carries the
+					   generic `.components-popover` class but none of the
+					   control's slot markers, so it must not keep the field
+					   selected. */ }
+					<div className="components-popover">
+						<button type="button">Unrelated popover</button>
+					</div>
+				</>
+			);
+			const textbox = getTextbox( container );
+
+			await blurWithFocusInPopover(
+				textbox,
+				screen.getByRole( 'button', { name: 'Unrelated popover' } )
+			);
+
+			// The field deselected, so `FormatEdit` unmounted and the
+			// shortcut no longer fires.
+			dispatchPrimaryB( textbox );
+			expect( currentOnUse ).not.toHaveBeenCalled();
 		} );
 	} );
 
