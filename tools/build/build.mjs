@@ -1,23 +1,11 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT_DIR = path.resolve( __dirname, '..' );
+const ROOT_DIR = path.resolve( __dirname, '../..' );
 
-/**
- * Execute a command and return a promise.
- *
- * @param {string}   command Command to execute.
- * @param {string[]} args    Command arguments.
- * @param {Object}   options Spawn options.
- * @return {Promise<void>} Promise that resolves when command completes.
- */
 function exec( command, args = [], options = {} ) {
 	const silent = options.silent || false;
 	const spawnOptions = { ...options };
@@ -32,7 +20,6 @@ function exec( command, args = [], options = {} ) {
 
 		const child = spawn( command, args, childOptions );
 
-		// If silent, capture output to show only on error
 		let stdout = '';
 		let stderr = '';
 
@@ -53,7 +40,6 @@ function exec( command, args = [], options = {} ) {
 			if ( code === 0 ) {
 				resolve();
 			} else {
-				// On error, show captured output if it was silent
 				if ( silent && ( stdout || stderr ) ) {
 					if ( stdout ) {
 						process.stdout.write( stdout );
@@ -74,9 +60,6 @@ function exec( command, args = [], options = {} ) {
 	} );
 }
 
-/**
- * Main build orchestration function.
- */
 async function build() {
 	const skipTypes = process.argv.includes( '--skip-types' );
 
@@ -85,7 +68,6 @@ async function build() {
 	const startTime = Date.now();
 
 	try {
-		// Step 0: Verify node_modules is in sync with package-lock.json
 		console.log( '🔍 Checking dependencies...' );
 		await exec( 'npm', [
 			'run',
@@ -97,11 +79,9 @@ async function build() {
 			throw new Error( 'Run `npm install` to update.' );
 		} );
 
-		// Step 1: Clean packages
 		console.log( '\n🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
 
-		// Step 2: Build workspaces
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
 			'npm',
@@ -109,15 +89,15 @@ async function build() {
 			{ silent: true }
 		);
 
-		// Step 3: Generate worker placeholders
-		// This must happen before TypeScript compilation because some packages
-		// (like vips) have source files that import from generated worker-code.ts
-		await exec( 'node', [
-			'./bin/packages/generate-worker-placeholders.mjs',
+		await exec( 'npm', [
+			'run',
+			'--silent',
+			'generate-worker-placeholders',
+			'--workspace',
+			'@wordpress/build-tools',
 		] );
 
 		if ( ! skipTypes ) {
-			// Step 4: Build TypeScript types
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
 			await exec( 'tsgo', [ '--build' ] ).catch( () => {
@@ -129,18 +109,25 @@ async function build() {
 			const buildTime = Date.now() - tsStartTime;
 			console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
-			// Step 5: Check build type declaration files
 			console.log( '\n✅ Checking type declaration files...' );
-			await exec( 'node', [
-				'./bin/packages/check-build-type-declaration-files.js',
+			await exec( 'npm', [
+				'run',
+				'--silent',
+				'check-type-declarations',
+				'--workspace',
+				'@wordpress/build-tools',
 			] );
 		}
 
-		// Step 6: Build vendors
 		console.log( '\n📦 Building vendor files...' );
-		await exec( 'node', [ './bin/packages/build-vendors.mjs' ] );
+		await exec( 'npm', [
+			'run',
+			'--silent',
+			'build-vendors',
+			'--workspace',
+			'@wordpress/build-tools',
+		] );
 
-		// Step 7: Build packages
 		console.log( '\n📦 Building packages (production mode)...' );
 		const buildArgs = process.argv
 			.slice( 2 )
@@ -149,7 +136,6 @@ async function build() {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
-		// Step 7.5: Build blocks manifests
 		console.log( '\n📦 Building blocks manifests...' );
 		const blocksDirs = [
 			{
@@ -177,7 +163,6 @@ async function build() {
 			);
 		}
 
-		// Step 8: Build workspace :wp targets
 		console.log( '\n📦 Building workspace :wp targets...' );
 		await exec(
 			'npm',

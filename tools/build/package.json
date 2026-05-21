@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/build-tools",
+	"version": "1.0.0",
+	"description": "Internal build orchestration scripts for the Gutenberg monorepo.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"build"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/build",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/build"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"scripts": {
+		"orchestrate-build": "node ./build.mjs",
+		"orchestrate-dev": "node ./dev.mjs",
+		"build-vendors": "node ./packages/build-vendors.mjs",
+		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
+		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs"
+	},
+	"dependencies": {
+		"chalk": "^4.1.1",
+		"cross-spawn": "^7.0.6",
+		"esbuild": "^0.27.2",
+		"fast-glob": "^3.2.7"
+	}
+}

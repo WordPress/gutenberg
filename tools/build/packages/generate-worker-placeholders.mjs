@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, access, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,11 +8,6 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 
-/**
- * Generate placeholder files for worker code in packages that define wpWorkers.
- * This must run before TypeScript compilation because some packages
- * (like vips) have source files that import from generated worker-code.ts.
- */
 async function generateWorkerPlaceholders() {
 	console.log( '🔧 Generating worker placeholders...\n' );
 
@@ -46,9 +37,7 @@ async function generateWorkerPlaceholders() {
 
 				try {
 					await access( workerCodeFile );
-					// File exists, no need to create placeholder.
 				} catch {
-					// File doesn't exist, create placeholder.
 					const placeholderContent = `/**
  * Worker code for inline Blob URL creation.
  *
@@ -75,7 +64,6 @@ export const workerCode = '/* Placeholder - run npm run build to generate actual
 				}
 			}
 		} catch {
-			// Skip packages with invalid package.json.
 		}
 	}
 
