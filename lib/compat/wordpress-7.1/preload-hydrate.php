@@ -213,6 +213,26 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 				'method' => 'GET',
 			);
 
+		case 'getDefaultTemplateId':
+			// args: [ { slug } ]. The resolver fetches `/wp/v2/templates/lookup`
+			// with the query object as URL params and dispatches both the
+			// template id and the template record.
+			if (
+				empty( $args ) ||
+				! is_array( $args[0] ) ||
+				empty( $args[0]['slug'] )
+			) {
+				return null;
+			}
+			return array(
+				'path'   => add_query_arg(
+					'slug',
+					$args[0]['slug'],
+					'/wp/v2/templates/lookup'
+				),
+				'method' => 'GET',
+			);
+
 		case '__experimentalGetCurrentGlobalStylesId':
 			// The resolver normally derives this from the active theme's
 			// `_links[ 'wp:user-global-styles' ]` URL. PHP has the same
@@ -505,19 +525,35 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 	// getEntitiesConfig entries first so the reducer has a slot for the
 	// record before RECEIVE_ITEMS lands.
 	if ( ! empty( $context->post ) && $context->post instanceof WP_Post ) {
+		$post = $context->post;
+
 		$specs[] = array(
 			'selector' => 'getEntityRecord',
-			'args'     => array( 'root', 'postType', $context->post->post_type ),
+			'args'     => array( 'root', 'postType', $post->post_type ),
 			'context'  => 'edit',
 		);
 		$specs[] = array(
 			'selector' => 'getEntityRecord',
-			'args'     => array( 'postType', $context->post->post_type, $context->post->ID ),
+			'args'     => array( 'postType', $post->post_type, $post->ID ),
 			'context'  => 'edit',
 		);
 		$specs[] = array(
 			'selector' => 'getAutosaves',
-			'args'     => array( $context->post->post_type, $context->post->ID ),
+			'args'     => array( $post->post_type, $post->ID ),
+		);
+
+		// Default-template lookup. Slug formula mirrors the editor's
+		// `getDefaultTemplate` selector — see
+		// packages/core-data/src/private-selectors.ts (`getDefaultTemplate`).
+		$template_lookup_slug = 'page' === $post->post_type
+			? 'page'
+			: 'single-' . $post->post_type;
+		if ( ! empty( $post->post_name ) ) {
+			$template_lookup_slug .= '-' . $post->post_name;
+		}
+		$specs[] = array(
+			'selector' => 'getDefaultTemplateId',
+			'args'     => array( array( 'slug' => $template_lookup_slug ) ),
 		);
 	}
 

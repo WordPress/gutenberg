@@ -15,6 +15,7 @@ import {
 	receiveAutosaves,
 	receiveCurrentTheme,
 	receiveCurrentUser,
+	receiveDefaultTemplateId,
 	receiveEntityRecords,
 	receiveUserPermissions,
 } from './actions';
@@ -123,6 +124,25 @@ function synthesizeActions( entry ) {
 			return data
 				? [ __experimentalReceiveCurrentGlobalStylesId( data ) ]
 				: [];
+		}
+
+		case 'getDefaultTemplateId': {
+			const [ query ] = args;
+			// Match the resolver's id-picking logic: when the active-templates
+			// experiment is on, prefer `wp_id` over the canonical `id`.
+			const id = window?.__experimentalTemplateActivate
+				? data?.wp_id || data?.id
+				: data?.id;
+			const out = [ receiveDefaultTemplateId( query, id || '' ) ];
+			if ( id && data?.type ) {
+				out.push(
+					receiveEntityRecords( 'postType', data.type, {
+						...data,
+						id,
+					} )
+				);
+			}
+			return out;
 		}
 
 		case 'getAutosaves': {
@@ -241,6 +261,22 @@ export function buildHydratedInitialState() {
 				'theme',
 				{ status: 'active' },
 			] );
+		}
+
+		// The getDefaultTemplateId resolver, when a template is found,
+		// also finishes the matching getEntityRecord resolution so the
+		// template record is treated as already loaded.
+		if ( entry.selector === 'getDefaultTemplateId' ) {
+			const id = window?.__experimentalTemplateActivate
+				? entry.data?.wp_id || entry.data?.id
+				: entry.data?.id;
+			if ( id && entry.data?.type ) {
+				markResolved( 'getEntityRecord', [
+					'postType',
+					entry.data.type,
+					id,
+				] );
+			}
 		}
 
 		// A canUser entry primes all four actions for its resource.
