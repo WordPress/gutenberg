@@ -8,7 +8,7 @@ import {
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
-import { dispatch, select } from '@wordpress/data';
+import { dispatch, resolveSelect, select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -18,6 +18,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -150,18 +151,73 @@ export function initializeEditor(
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	root.render(
-		<StrictMode>
-			<Layout
-				settings={ settings }
-				postId={ postId }
-				postType={ postType }
-				initialEdits={ initialEdits }
-			/>
-		</StrictMode>
-	);
+	// Kick off the resolvers whose data the existing path-based
+	// createPreloadingMiddleware already has cached. They run end-to-end
+	// (start/receive/finish dispatches + downstream `resolveSelect` chains
+	// + side-effects like priming canUser via the Allow header) against
+	// the cached responses in a single batch before React mounts. By the
+	// time `root.render(...)` runs, every metadata entry these touch is
+	// already `finished`, so useSelect on the first render finds resolved
+	// data and never triggers another `setTimeout(0)` resolution dance.
+	const preloadedResolutions = preloadResolutions( postType, postId );
+
+	preloadedResolutions.finally( () => {
+		root.render(
+			<StrictMode>
+				<Layout
+					settings={ settings }
+					postId={ postId }
+					postType={ postType }
+					initialEdits={ initialEdits }
+				/>
+			</StrictMode>
+		);
+	} );
 
 	return root;
+}
+
+/**
+ * Drive each resolver to completion using the data already cached by
+ * `createPreloadingMiddleware`. The middleware short-circuits apiFetch,
+ * so no resolver issues a network request; we just need them to run
+ * their dispatch cycles before React mounts.
+ *
+ * @param {string} postType Current post type.
+ * @param {number} postId   Current post id.
+ * @return {Promise<void>}  Resolves when the kickoff resolvers settle.
+ */
+function preloadResolutions( postType, postId ) {
+	const core = resolveSelect( coreDataStore );
+	return Promise.all( [
+		core.getCurrentUser(),
+		core.getEntitiesConfig( 'postType' ),
+		core.getEntitiesConfig( 'taxonomy' ),
+		core.getEntitiesConfig( 'root' ),
+		core.getCurrentTheme(),
+		core.getBlockPatternCategories(),
+		core.__experimentalGetCurrentGlobalStylesId(),
+		core.__experimentalGetCurrentThemeBaseGlobalStyles(),
+		core.__experimentalGetCurrentThemeGlobalStylesVariations(),
+		core.getEntityRecord( 'root', '__unstableBase' ),
+		core.getEntityRecord( 'root', 'site' ),
+		core.canUser( 'read', { kind: 'root', name: 'site' } ),
+		core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
+		core.canUser( 'create', { kind: 'postType', name: 'page' } ),
+		core.canUser( 'create', { kind: 'postType', name: 'wp_block' } ),
+		core.canUser( 'create', { kind: 'postType', name: 'wp_template' } ),
+		// Per-post resolvers — only useful when we actually have a post.
+		...( postType && postId
+			? [
+					core.getEntityRecord( 'root', 'postType', postType ),
+					core.getEntityRecord( 'postType', postType, postId ),
+					core.getAutosaves( postType, postId ),
+			  ]
+			: [] ),
+	] ).catch( () => {
+		// Any individual resolver failing here is harmless — the editor
+		// would have hit the same failure on demand. Don't block render.
+	} );
 }
 
 /**
