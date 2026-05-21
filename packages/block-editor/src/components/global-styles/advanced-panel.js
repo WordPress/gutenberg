@@ -37,7 +37,7 @@ export default function AdvancedPanel( {
 } ) {
 	// Custom CSS
 	const [ cssError, setCSSError ] = useState( null );
-	const customCSS = inheritedValue?.css;
+	const customCSS = inheritedValue?.css ?? '';
 	function handleOnChange( newValue ) {
 		onChange( {
 			...value,
