@@ -523,23 +523,25 @@ export function taxonomyEntitiesFromResponse( taxonomies ) {
  * @return {Promise} Entity promise
  */
 async function loadSiteEntity() {
-	const entity = {
-		label: __( 'Site' ),
-		name: 'site',
-		kind: 'root',
-		key: false,
-		baseURL: '/wp/v2/settings',
-		supportsPagination: false,
-		meta: {},
-	};
-
 	const site = await apiFetch( {
-		path: entity.baseURL,
+		path: '/wp/v2/settings',
 		method: 'OPTIONS',
 	} );
+	return siteEntityFromResponse( site );
+}
 
+/**
+ * Pure transform from a `/wp/v2/settings` OPTIONS response into the
+ * site entity config that `addEntities` accepts. Pulled out of
+ * `loadSiteEntity` so a synchronous hydrator can use the same mapping
+ * without going through `apiFetch`.
+ *
+ * @param {Object} optionsResponse `/wp/v2/settings` OPTIONS body.
+ * @return {Array} Entity configs (single-element array, matching the loader).
+ */
+export function siteEntityFromResponse( optionsResponse ) {
 	const labels = {};
-	Object.entries( site?.schema?.properties ?? {} ).forEach(
+	Object.entries( optionsResponse?.schema?.properties ?? {} ).forEach(
 		( [ key, value ] ) => {
 			// Ignore properties `title` and `type` keys.
 			if ( typeof value === 'object' && value.title ) {
@@ -547,8 +549,17 @@ async function loadSiteEntity() {
 			}
 		}
 	);
-
-	return [ { ...entity, meta: { labels } } ];
+	return [
+		{
+			label: __( 'Site' ),
+			name: 'site',
+			kind: 'root',
+			key: false,
+			baseURL: '/wp/v2/settings',
+			supportsPagination: false,
+			meta: { labels },
+		},
+	];
 }
 
 /**

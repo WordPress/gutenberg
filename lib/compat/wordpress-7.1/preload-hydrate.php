@@ -61,17 +61,39 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 						'path'   => '/wp/v2/taxonomies?context=view',
 						'method' => 'GET',
 					);
+				case 'root':
+					// Site entity: loadSiteEntity reads its config from
+					// the /wp/v2/settings schema via OPTIONS.
+					return array(
+						'path'   => '/wp/v2/settings',
+						'method' => 'OPTIONS',
+					);
 			}
 			return null;
 
 		case 'getEntityRecord':
-			// args: [ kind, name, key ]. Mirrors @wordpress/core-data's
+			// args: [ kind, name, key? ]. Mirrors @wordpress/core-data's
 			// getEntityRecord resolver, which appends `?context=$ctx` to
-			// the entity's baseURL/key.
-			if ( count( $args ) < 3 ) {
+			// the entity's baseURL/key. The site entity has key=false,
+			// so its preload only needs [ kind, name ].
+			if ( count( $args ) < 2 ) {
 				return null;
 			}
-			list( $kind, $entity_name, $key ) = $args;
+			list( $kind, $entity_name ) = $args;
+			$key                        = isset( $args[2] ) ? $args[2] : null;
+
+			if ( 'root' === $kind && 'site' === $entity_name ) {
+				// Site settings: GET on the same endpoint that
+				// `getEntitiesConfig( 'root' )` reads via OPTIONS.
+				return array(
+					'path'   => '/wp/v2/settings',
+					'method' => 'GET',
+				);
+			}
+
+			if ( null === $key ) {
+				return null;
+			}
 
 			if ( 'postType' === $kind ) {
 				$post = get_post( $key );
@@ -302,6 +324,14 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 		array(
 			'selector' => 'getEntitiesConfig',
 			'args'     => array( 'taxonomy' ),
+		),
+		array(
+			'selector' => 'getEntitiesConfig',
+			'args'     => array( 'root' ),
+		),
+		array(
+			'selector' => 'getEntityRecord',
+			'args'     => array( 'root', 'site' ),
 		),
 	);
 

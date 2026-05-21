@@ -15,6 +15,7 @@ import {
 } from './actions';
 import {
 	postTypeEntitiesFromResponse,
+	siteEntityFromResponse,
 	taxonomyEntitiesFromResponse,
 } from './entities';
 import {
@@ -49,6 +50,8 @@ function synthesizeActions( entry ) {
 				configs = postTypeEntitiesFromResponse( data );
 			} else if ( kind === 'taxonomy' ) {
 				configs = taxonomyEntitiesFromResponse( data );
+			} else if ( kind === 'root' ) {
+				configs = siteEntityFromResponse( data );
 			} else {
 				return [];
 			}
