@@ -267,6 +267,7 @@ export default function RevisionHistory() {
 							onClick={ handleRestore }
 							isBusy={ isRestoring }
 							disabled={ isRestoring }
+							accessibleWhenDisabled
 							__next40pxDefaultSize
 						>
 							{ __( 'Restore' ) }
