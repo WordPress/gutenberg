@@ -1270,6 +1270,32 @@ export function generateThumbnails( id: QueueItemId ) {
 					OperationType.Upload,
 				],
 			} );
+
+			// Also sideload a static first-frame poster (vips decodes only the
+			// first GIF frame) so the <video> can paint a lightweight still
+			// image instead of downloading the full GIF as its poster. Stored
+			// under metadata `animated_video_poster` and used at render time.
+			dispatch.addSideloadItem( {
+				file: item.animatedGifFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'animated-video-poster',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeImage,
+						{
+							outputFormat: 'jpeg',
+							outputQuality: DEFAULT_OUTPUT_QUALITY,
+							interlaced: false,
+						} as OperationArgs[ OperationType.TranscodeImage ],
+					],
+					OperationType.Upload,
+				],
+			} );
 		}
 
 		// Check if image needs rotation.
