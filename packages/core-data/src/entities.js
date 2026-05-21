@@ -35,6 +35,31 @@ const blocksTransientEdits = {
 	},
 };
 
+/**
+ * Fields requested for the `/` (root) entity. Mirrored PHP-side so the
+ * hydration helper can emit the exact same URL the resolver would fetch.
+ */
+export const ROOT_BASE_FIELDS = [
+	'description',
+	'gmt_offset',
+	'home',
+	'image_sizes',
+	'image_size_threshold',
+	'image_output_formats',
+	'jpeg_interlaced',
+	'png_interlaced',
+	'gif_interlaced',
+	'name',
+	'site_icon',
+	'site_icon_url',
+	'site_logo',
+	'timezone_string',
+	'url',
+	'page_for_posts',
+	'page_on_front',
+	'show_on_front',
+];
+
 export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
@@ -43,24 +68,10 @@ export const rootEntitiesConfig = [
 		name: '__unstableBase',
 		baseURL: '/',
 		baseURLParams: {
-			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-7.0/preload.php
-			_fields: [
-				'description',
-				'gmt_offset',
-				'home',
-				'image_sizes',
-				'image_size_threshold',
-				'name',
-				'site_icon',
-				'site_icon_url',
-				'site_logo',
-				'timezone_string',
-				'url',
-				'page_for_posts',
-				'page_on_front',
-				'show_on_front',
-			].join( ',' ),
+			// Mirrored PHP-side by gutenberg_resolve_preload_spec
+			// (lib/compat/wordpress-7.1/preload-hydrate.php) so that the
+			// hydration URL matches what the resolver would fetch.
+			_fields: ROOT_BASE_FIELDS.join( ',' ),
 		},
 		// The entity doesn't support selecting multiple records.
 		// The property is maintained for backward compatibility.

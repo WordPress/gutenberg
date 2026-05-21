@@ -91,6 +91,40 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 				);
 			}
 
+			if ( 'root' === $kind && '__unstableBase' === $entity_name ) {
+				// The base "/" entity — a flat slice of site-level
+				// properties the editor needs at boot. Keep this list in
+				// sync with `ROOT_BASE_FIELDS` in
+				// packages/core-data/src/entities.js so the URL matches
+				// what the resolver would fetch.
+				return array(
+					'path'   => '/?_fields=' . implode(
+						',',
+						array(
+							'description',
+							'gmt_offset',
+							'home',
+							'image_sizes',
+							'image_size_threshold',
+							'image_output_formats',
+							'jpeg_interlaced',
+							'png_interlaced',
+							'gif_interlaced',
+							'name',
+							'site_icon',
+							'site_icon_url',
+							'site_logo',
+							'timezone_string',
+							'url',
+							'page_for_posts',
+							'page_on_front',
+							'show_on_front',
+						)
+					),
+					'method' => 'GET',
+				);
+			}
+
 			if ( null === $key ) {
 				return null;
 			}
@@ -487,6 +521,10 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 		);
 	}
 
+	$specs[] = array(
+		'selector' => 'getEntityRecord',
+		'args'     => array( 'root', '__unstableBase' ),
+	);
 	$specs[] = array(
 		'selector' => 'getCurrentTheme',
 		'args'     => array(),
