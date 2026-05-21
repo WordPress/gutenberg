@@ -137,7 +137,13 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 			return null;
 		}
 
-		const isFullBleed = widgetType.presentation === 'full-bleed';
+		// `presentation` encodes two independent axes. `full-bleed` hides
+		// the header; both `full-bleed` and `content-bleed` let the body
+		// break out of the content padding.
+		const { presentation } = widgetType;
+		const isHeaderHidden = presentation === 'full-bleed';
+		const isBodyBleeding =
+			presentation === 'full-bleed' || presentation === 'content-bleed';
 		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
 		const body = (
 			<WidgetErrorBoundary>
@@ -156,13 +162,13 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
-					{ isFullBleed ? (
+					{ isHeaderHidden ? (
 						<VisuallyHidden>{ header }</VisuallyHidden>
 					) : (
 						header
 					) }
 					<Card.Content className={ styles.widgetChromeContent }>
-						{ isFullBleed ? (
+						{ isBodyBleeding ? (
 							<Card.FullBleed
 								className={
 									styles.widgetChromeContentFullBleed
