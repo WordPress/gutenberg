@@ -82,7 +82,7 @@ export function Actions(): React.ReactNode {
 		setResetDialogOpen,
 	} = useDashboardUIContext();
 	const isMobileViewport = useSelect(
-		( select ) => select( viewportStore ).isViewportMatch( '< medium' ),
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
 		[]
 	);
 

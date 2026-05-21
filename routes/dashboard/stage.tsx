@@ -28,7 +28,7 @@ function Dashboard() {
 	const [ editMode, setEditMode ] = useState( false );
 
 	const isMobileViewport = useSelect(
-		( select ) => select( viewportStore ).isViewportMatch( '< medium' ),
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
 		[]
 	);
 
