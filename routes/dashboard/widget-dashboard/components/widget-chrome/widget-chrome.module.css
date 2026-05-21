@@ -70,6 +70,7 @@
 .widgetChromeContent {
 	flex: 1;
 	height: 100%;
+	overflow-y: auto;
 
 	/*
 	 * Probably remove the following padding
@@ -87,6 +88,7 @@
  */
 .widgetChromeContentFullBleed {
 	height: 100%;
+	overflow-y: auto;
 }
 
 .loading {

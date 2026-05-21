@@ -213,6 +213,19 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;
+		const minResizeWidthPx = gridSpanToPixelSize(
+			1,
+			1,
+			columnWidth,
+			gapPx,
+			null
+		).widthPx;
+		const rowHeightPx = typeof rowHeight === 'number' ? rowHeight : null;
+		const minResizeHeightPx =
+			rowHeightPx === null
+				? undefined
+				: gridSpanToPixelSize( 1, 1, columnWidth, gapPx, rowHeightPx )
+						.heightPx ?? undefined;
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardGridLayoutItem >();
@@ -394,7 +407,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
-
 			if ( ! onChangeLayout || ! latest ) {
 				setTemporaryLayout( undefined );
 				return;
@@ -461,8 +473,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				1,
 				baseline.height + relativeDelta.height
 			);
-			const rowHeightPx =
-				typeof rowHeight === 'number' ? rowHeight : null;
 
 			setResizeSnapPreview( {
 				id,
@@ -607,9 +617,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								layoutAnimationStyles[ 'layout-animating' ],
 							className
 						) }
-						data-wp-dashboard-grid-resizing={
-							isResizing || undefined
-						}
+						data-wp-grid-dragging={ activeId || undefined }
+						data-wp-grid-resizing={ isResizing || undefined }
 						style={ {
 							...style,
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
@@ -629,6 +638,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								disabled={ ! editMode }
 								verticalResizable={ rowHeight !== 'auto' }
 								interacting={ activeId !== null || isResizing }
+								dragging={ activeId !== null }
 								onResize={ handleResize }
 								onResizeEnd={ persistTemporaryLayout }
 								resizeSnapPreview={
@@ -636,6 +646,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 										? resizeSnapPreview.snap
 										: null
 								}
+								minResizeWidthPx={ minResizeWidthPx }
+								minResizeHeightPx={ minResizeHeightPx }
 								actionableArea={ actionableAreaMap.get( id ) }
 								renderResizeHandle={ renderResizeHandle }
 							>

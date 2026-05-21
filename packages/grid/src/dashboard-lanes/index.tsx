@@ -189,6 +189,13 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;
+		const minResizeWidthPx = gridSpanToPixelSize(
+			1,
+			1,
+			columnWidth,
+			gapPx,
+			null
+		).widthPx;
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardLanesLayoutItem >();
@@ -367,7 +374,6 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
-
 			if ( ! onChangeLayout || ! latest ) {
 				setTemporaryLayout( undefined );
 				return;
@@ -509,6 +515,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 								layoutAnimationStyles[ 'layout-animating' ],
 							className
 						) }
+						data-wp-grid-dragging={ activeId || undefined }
+						data-wp-grid-resizing={ isResizing || undefined }
 						style={
 							{
 								...style,
@@ -544,6 +552,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 									}
 									disabled={ ! editMode }
 									interacting={ interacting }
+									dragging={ activeId !== null }
 									onResize={ handleResize }
 									onResizeEnd={ persistTemporaryLayout }
 									resizeSnapPreview={
@@ -551,6 +560,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 											? resizeSnapPreview.snap
 											: null
 									}
+									minResizeWidthPx={ minResizeWidthPx }
 									actionableArea={ actionableAreaMap.get(
 										id
 									) }

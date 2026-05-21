@@ -596,6 +596,188 @@ describe( 'actions', () => {
 
 			expect( onError ).not.toHaveBeenCalled();
 		} );
+
+		describe( 'parent cancellation when child sideload fails', () => {
+			// Helpers used by every scenario below. Set up a parent that
+			// has finished its primary upload (so it has an attachment.id),
+			// then add a sideload child that we'll cancel to trigger the
+			// parent-cancel branch.
+			const setUpParentAndChild = ( {
+				parentSubSizes,
+				parentOnError,
+			}: {
+				parentSubSizes?: { name: string; id: number }[];
+				parentOnError?: jest.Mock;
+			} = {} ) => {
+				unlock( registry.dispatch( uploadStore ) ).addItem( {
+					file: jpegFile,
+					onError: parentOnError,
+					operations: [ OperationType.Finalize ],
+				} );
+				const parent = unlock(
+					registry.select( uploadStore )
+				).getAllItems()[ 0 ];
+
+				// Simulate the parent's primary upload having completed:
+				// give it an attachment.id and (optionally) accumulated
+				// sub-sizes from already-successful child sideloads.
+				unlock( registry.dispatch( uploadStore ) ).finishOperation(
+					parent.id,
+					{
+						attachment: { id: 42 },
+						...( parentSubSizes
+							? { subSizes: parentSubSizes }
+							: {} ),
+					}
+				);
+
+				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+					file: jpegFile,
+					parentId: parent.id,
+					additionalData: { post: 42, image_size: 'medium' },
+				} );
+
+				const child = unlock( registry.select( uploadStore ) )
+					.getAllItems()
+					.find( ( i ) => i.parentId === parent.id );
+
+				return { parent, child };
+			};
+
+			it( 'deletes parent attachment and cancels parent for vips processing failures with no successful siblings', async () => {
+				const consoleErrorSpy = jest
+					.spyOn( console, 'error' )
+					.mockImplementation( () => {} );
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+				} );
+
+				// resizeCropItem and rotateItem already wrap vips
+				// failures in an UploadError that carries the
+				// actionable user-facing message at the source.
+				const vipsError = new ( jest.requireActual(
+					'../../upload-error'
+				).UploadError )( {
+					code: 'IMAGE_TRANSCODING_ERROR',
+					message:
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.',
+					file: jpegFile,
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( child!.id, vipsError );
+
+				expect( mediaDelete ).toHaveBeenCalledWith( 42 );
+				expect( parentOnError ).toHaveBeenCalledWith(
+					expect.objectContaining( {
+						code: 'IMAGE_TRANSCODING_ERROR',
+						message: expect.stringContaining(
+							'cannot generate responsive image sizes'
+						),
+					} )
+				);
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toBeUndefined();
+
+				consoleErrorSpy.mockRestore();
+			} );
+
+			it( 'propagates the underlying error message for non-vips sideload failures', async () => {
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				const { child } = setUpParentAndChild( { parentOnError } );
+
+				const networkError = new ( jest.requireActual(
+					'../../upload-error'
+				).UploadError )( {
+					code: 'GENERAL',
+					message: 'Network request failed: 503',
+					file: jpegFile,
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( child!.id, networkError );
+
+				expect( mediaDelete ).toHaveBeenCalledWith( 42 );
+				expect( parentOnError ).toHaveBeenCalledWith(
+					expect.objectContaining( {
+						code: 'GENERAL',
+						message: 'Network request failed: 503',
+					} )
+				);
+			} );
+
+			it( 'preserves the parent attachment when at least one sibling sub-size succeeded', async () => {
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				const { parent, child } = setUpParentAndChild( {
+					parentOnError,
+					parentSubSizes: [ { name: 'medium', id: 99 } ],
+				} );
+
+				const networkError = new ( jest.requireActual(
+					'../../upload-error'
+				).UploadError )( {
+					code: 'GENERAL',
+					message: 'sideload of large size failed',
+					file: jpegFile,
+				} );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( child!.id, networkError );
+
+				// Partial success: do NOT delete the parent attachment,
+				// do NOT cancel the parent. The accumulated sub-sizes
+				// will still be sent to the finalize endpoint.
+				expect( mediaDelete ).not.toHaveBeenCalled();
+				expect( parentOnError ).not.toHaveBeenCalled();
+				expect(
+					unlock( registry.select( uploadStore ) ).getItem(
+						parent.id
+					)
+				).toBeDefined();
+			} );
+
+			it( 'falls back to a generic message when the underlying error has no message', async () => {
+				const mediaDelete = jest.fn().mockResolvedValue( undefined );
+				const parentOnError = jest.fn();
+				unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+					mediaDelete,
+				} );
+
+				const { child } = setUpParentAndChild( { parentOnError } );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( child!.id, new Error( '' ) );
+
+				expect( parentOnError ).toHaveBeenCalledWith(
+					expect.objectContaining( {
+						message: 'The image could not be uploaded.',
+					} )
+				);
+			} );
+		} );
 	} );
 
 	describe( 'resizeCropItem', () => {

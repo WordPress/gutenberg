@@ -152,8 +152,6 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 			return null;
 		}
 
-		const isFullBleed = widgetType.presentation === 'full-bleed';
-
 		// Per-instance settings live in normal mode only: during a layout
 		// edit the card is inert and the toolbar owns the staging buffer,
 		// so the trigger stays hidden to keep the two flows from staging at
@@ -167,16 +165,15 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 			/>
 		) : null;
 
-		const header = (
-			<Header
-				titleId={ titleId }
-				widgetType={ widgetType }
-				// Full-bleed types hide their header for visuals, so the
-				// control floats over the body instead (see below) rather
-				// than getting buried in the visually hidden header row.
-				actions={ isFullBleed ? undefined : settingsControl }
-			/>
-		);
+		// `presentation` encodes two independent axes. `full-bleed` hides
+		// the header; both `full-bleed` and `content-bleed` let the body
+		// break out of the content padding.
+		const { presentation } = widgetType;
+		const isHeaderHidden = presentation === 'full-bleed';
+		const isBodyBleeding =
+			presentation === 'full-bleed' || presentation === 'content-bleed';
+		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
+
 		const body = (
 			<WidgetErrorBoundary>
 				<Suspense fallback={ <LoadingOverlay /> }>
@@ -194,13 +191,13 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					aria-labelledby={ widgetType.title ? titleId : undefined }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
-					{ isFullBleed ? (
+					{ isHeaderHidden ? (
 						<VisuallyHidden>{ header }</VisuallyHidden>
 					) : (
 						header
 					) }
 					<Card.Content className={ styles.widgetChromeContent }>
-						{ isFullBleed ? (
+						{ isBodyBleeding ? (
 							<Card.FullBleed
 								className={
 									styles.widgetChromeContentFullBleed
@@ -213,7 +210,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 						) }
 					</Card.Content>
 
-					{ isFullBleed && settingsControl && (
+					{ isBodyBleeding && settingsControl && (
 						<Stack className={ styles.widgetChromeSettingsOverlay }>
 							{ settingsControl }
 						</Stack>
