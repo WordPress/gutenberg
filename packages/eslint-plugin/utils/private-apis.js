@@ -3,7 +3,7 @@
  */
 
 /**
- * @typedef {{ privateApisSources: Map<string, string>, trackedUnlockImports: Set<string> }} PrivateApisState
+ * @typedef {{ privateApisSources: Map<string, string> }} PrivateApisState
  */
 
 /**
@@ -12,12 +12,11 @@
 function createPrivateApisState() {
 	return {
 		privateApisSources: new Map(),
-		trackedUnlockImports: new Set(),
 	};
 }
 
 /**
- * Records imported `unlock` aliases and, when requested, `privateApis` → package source.
+ * Records imported `privateApis` → package source when requested.
  *
  * @param {PrivateApisState}                 state
  * @param {import('estree').ImportSpecifier} specifier
@@ -31,9 +30,6 @@ function trackPrivateApisSpecifier(
 	trackPrivateApis
 ) {
 	const name = specifier.imported.name;
-	if ( name === 'unlock' ) {
-		state.trackedUnlockImports.add( specifier.local.name );
-	}
 	if ( trackPrivateApis && name === 'privateApis' ) {
 		state.privateApisSources.set( specifier.local.name, source );
 	}
@@ -42,20 +38,16 @@ function trackPrivateApisSpecifier(
 /**
  * @param {import('estree').CallExpression|import('estree').Expression|null} node
  * @param {import('eslint').SourceCode}                                      sourceCode
- * @param {ReadonlySet<string>}                                              trackedUnlockImports
  * @return {node is import('estree').CallExpression} Whether this is an `unlock()` call with one argument.
  */
-function isUnlockCall( node, sourceCode, trackedUnlockImports ) {
+function isUnlockCall( node, sourceCode ) {
 	if (
 		node &&
 		node.type === 'CallExpression' &&
 		node.callee.type === 'Identifier' &&
+		node.callee.name === 'unlock' &&
 		node.arguments.length === 1
 	) {
-		if ( ! trackedUnlockImports.has( node.callee.name ) ) {
-			return false;
-		}
-
 		const { references } = sourceCode.getScope( node.callee );
 		const reference = references.find(
 			( currentReference ) => currentReference.identifier === node.callee
@@ -100,7 +92,7 @@ function getUnlockDestructuring( node, sourceCode, state ) {
 
 	if (
 		node.id.type !== 'ObjectPattern' ||
-		! isUnlockCall( node.init, sourceCode, state.trackedUnlockImports )
+		! isUnlockCall( node.init, sourceCode )
 	) {
 		return null;
 	}

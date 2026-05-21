@@ -91,9 +91,9 @@ ruleTester.run( 'use-import-as', rule, {
 		{
 			code: `
 				import { privateApis } from '@wordpress/components';
-				import { unlock as open } from '../../lock-unlock';
+				import { unlock } from '../../lock-unlock';
 
-				const { Badge: WCBadge = fallbackBadge } = open( privateApis );
+				const { Badge: WCBadge = fallbackBadge } = unlock( privateApis );
 			`,
 			options,
 		},
