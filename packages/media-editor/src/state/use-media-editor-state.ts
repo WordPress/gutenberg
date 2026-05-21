@@ -3,7 +3,7 @@
  */
 import {
 	useCallback,
-	useEffect,
+	useMemo,
 	useReducer,
 	useRef,
 	useState,
@@ -13,12 +13,10 @@ import {
  * Internal dependencies
  */
 import type {
+	CropperAction,
 	CropperState,
-	Flip,
-	NormalizedPoint,
 	NormalizedRect,
 	Size,
-	TransformOperation,
 } from '../image-editor/core/types';
 import {
 	DEFAULT_STATE,
@@ -29,8 +27,8 @@ import {
 	areCropperStatesEqual,
 } from '../image-editor/core/state';
 import { exportCroppedImage } from '../image-editor/core/export/canvas-renderer';
-import { buildFocalPointZoomAction } from '../image-editor/core/setter-helpers';
 import type { CropperController } from '../image-editor';
+import { buildCropperSetters } from '../image-editor/react/hooks/build-cropper-setters';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
@@ -101,8 +99,6 @@ function areCropperImagesEqual(
  * setters, undo/redo, gesture boundaries, and viewport reporting.
  */
 export interface MediaEditorController extends CropperController {
-	/** The full composite state — both slices. */
-	fullState: MediaEditorState;
 	/** The cropOptions slice (preset key + freeform toggle). */
 	cropOptions: CropOptionsSlice;
 	/** Set the aspect-ratio preset. Atomic with the cropRect reshape. */
@@ -196,13 +192,12 @@ export function useMediaEditorState(
 	const [ initialBaseline, setInitialBaseline ] =
 		useState< MediaEditorState >( () => state );
 
-	// Ref for stable-identity callbacks that read fresh state. The
-	// dispatch wrapper updates this synchronously before React commits
-	// so multiple actions in one event still see the latest state.
+	// Latest-state ref used by setters that need to read fresh state
+	// (focal-point zoom, dispatch wrapper). Every mutation path
+	// (`dispatchWithHistory`, `setImage`, `undo`, `redo`) writes this
+	// synchronously, so multiple actions in one event see the latest
+	// reducer output before React commits.
 	const stateRef = useRef( state );
-	useEffect( () => {
-		stateRef.current = state;
-	}, [ state ] );
 	const visualSizeRef = useRef< Size >( { width: 0, height: 0 } );
 
 	// History stacks: full composite snapshots. Refs avoid re-renders
@@ -231,21 +226,10 @@ export function useMediaEditorState(
 		setHasRedo( false );
 	}, [] );
 
-	const commitGestureSnapshot = useCallback( () => {
-		const snapshot = gestureSnapshotRef.current;
-		if (
-			snapshot &&
-			! areMediaEditorStatesEqual( snapshot, stateRef.current )
-		) {
-			pushSnapshot( snapshot );
-		}
-		gestureSnapshotRef.current = null;
-		isGestureOpenRef.current = false;
-	}, [ pushSnapshot ] );
-
-	// Core dispatch wrapper. Synchronously computes the post-state
-	// via the pure reducer so we can skip history pushes for no-op
-	// actions (e.g., setting a freeform toggle to its current value).
+	// Core dispatch wrapper. Synchronously computes the post-state via
+	// the pure reducer so we can skip history pushes for no-op actions
+	// (e.g., setting a freeform toggle to its current value) and keep
+	// `stateRef` in lockstep with React's pending state.
 	const dispatchWithHistory = useCallback(
 		( action: MediaEditorAction, recordHistory = true ) => {
 			const preState = stateRef.current;
@@ -275,20 +259,42 @@ export function useMediaEditorState(
 		gestureSnapshotRef.current = null;
 	}, [] );
 
+	// Close a gesture (or flush a pending one before undo/redo).
+	// Pushes the pre-gesture snapshot only if it differs from current
+	// state. Safe to call when no gesture is open.
 	const endGesture = useCallback( () => {
-		commitGestureSnapshot();
-	}, [ commitGestureSnapshot ] );
-
-	// Flush any pending gesture before undo/redo so the in-flight
-	// change becomes its own undo step rather than being silently
-	// discarded.
-	const flushGesture = useCallback( () => {
-		commitGestureSnapshot();
-	}, [ commitGestureSnapshot ] );
+		const snapshot = gestureSnapshotRef.current;
+		if (
+			snapshot &&
+			! areMediaEditorStatesEqual( snapshot, stateRef.current )
+		) {
+			pushSnapshot( snapshot );
+		}
+		gestureSnapshotRef.current = null;
+		isGestureOpenRef.current = false;
+	}, [ pushSnapshot ] );
 
 	// =====================================================================
-	// Cropper-slice setters (each wraps a CropperAction in a CROPPER envelope)
+	// Cropper-slice setters (built from the shared factory so the pure
+	// hook and this composite stay in lockstep — add a setter in
+	// `buildCropperSetters` once and both hooks get it).
 	// =====================================================================
+
+	const dispatchCropperAction = useCallback(
+		( action: CropperAction ) => {
+			dispatchWithHistory( { type: 'CROPPER', action } );
+		},
+		[ dispatchWithHistory ]
+	);
+
+	const cropperSetters = useMemo(
+		() =>
+			buildCropperSetters(
+				dispatchCropperAction,
+				() => stateRef.current.cropper
+			),
+		[ dispatchCropperAction ]
+	);
 
 	const setImage = useCallback( ( image: CropperState[ 'image' ] ) => {
 		if ( areCropperImagesEqual( stateRef.current.cropper.image, image ) ) {
@@ -311,110 +317,6 @@ export function useMediaEditorState(
 		setHasUndo( false );
 		setHasRedo( false );
 	}, [] );
-
-	const setPan = useCallback(
-		( pan: NormalizedPoint ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: { type: 'SET_PAN', payload: pan },
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
-
-	const setZoom = useCallback(
-		( zoom: number ) => {
-			const action = buildFocalPointZoomAction(
-				stateRef.current.cropper,
-				zoom
-			);
-			if ( action ) {
-				dispatchWithHistory( { type: 'CROPPER', action } );
-			}
-		},
-		[ dispatchWithHistory ]
-	);
-
-	const setZoomAtPoint = useCallback(
-		( zoom: number, pan: NormalizedPoint ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: {
-					type: 'SET_ZOOM_AT_POINT',
-					payload: { zoom, pan },
-				},
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
-
-	const setRotation = useCallback(
-		( rotation: number ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: { type: 'SET_ROTATION', payload: rotation },
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
-
-	const setFlip = useCallback(
-		( flip: Flip ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: { type: 'SET_FLIP', payload: flip },
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
-
-	const toggleFlip = useCallback(
-		( direction: 'horizontal' | 'vertical' ) => {
-			const currentFlip = stateRef.current.cropper.flip;
-			setFlip( {
-				...currentFlip,
-				[ direction ]: ! currentFlip[ direction ],
-			} );
-		},
-		[ setFlip ]
-	);
-
-	const snapRotate90 = useCallback(
-		( direction: 1 | -1 ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: { type: 'SNAP_ROTATE_90', payload: { direction } },
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
-
-	const setCropRect = useCallback(
-		( rect: NormalizedRect ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: { type: 'SET_CROP_RECT', payload: rect },
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
-
-	const settleCrop = useCallback( () => {
-		dispatchWithHistory( {
-			type: 'CROPPER',
-			action: { type: 'SETTLE_CROP' },
-		} );
-	}, [ dispatchWithHistory ] );
-
-	const applyOperation = useCallback(
-		( op: TransformOperation ) => {
-			dispatchWithHistory( {
-				type: 'CROPPER',
-				action: { type: 'APPLY_OPERATION', payload: op },
-			} );
-		},
-		[ dispatchWithHistory ]
-	);
 
 	const reset = useCallback(
 		( resetState?: Partial< CropperState > ) => {
@@ -467,7 +369,7 @@ export function useMediaEditorState(
 	// =====================================================================
 
 	const undo = useCallback( () => {
-		flushGesture();
+		endGesture();
 		const prev = historyRef.current[ historyRef.current.length - 1 ];
 		if ( ! prev ) {
 			return;
@@ -478,10 +380,10 @@ export function useMediaEditorState(
 		setHasRedo( true );
 		stateRef.current = prev;
 		dispatch( { type: 'RESTORE_SNAPSHOT', payload: prev } );
-	}, [ flushGesture ] );
+	}, [ endGesture ] );
 
 	const redo = useCallback( () => {
-		flushGesture();
+		endGesture();
 		const next = redoStackRef.current[ 0 ];
 		if ( ! next ) {
 			return;
@@ -492,7 +394,7 @@ export function useMediaEditorState(
 		setHasRedo( redoStackRef.current.length > 0 );
 		stateRef.current = next;
 		dispatch( { type: 'RESTORE_SNAPSHOT', payload: next } );
-	}, [ flushGesture ] );
+	}, [ endGesture ] );
 
 	// =====================================================================
 	// Viewport
@@ -542,23 +444,13 @@ export function useMediaEditorState(
 	const controller: MediaEditorController = {
 		// CropperController surface (state is the cropper slice so a
 		// <Cropper> takes this controller as-is).
+		...cropperSetters,
 		state: state.cropper,
 		setImage,
-		setPan,
-		setZoom,
-		setZoomAtPoint,
-		setRotation,
-		setFlip,
-		toggleFlip,
-		snapRotate90,
-		setCropRect,
-		settleCrop,
-		applyOperation,
 		reset,
 		isDirty,
 		getCroppedImage,
 		// Composite extensions
-		fullState: state,
 		cropOptions: state.cropOptions,
 		setAspectRatioValue,
 		setFreeformCrop,

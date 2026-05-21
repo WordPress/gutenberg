@@ -4,7 +4,7 @@
 import {
 	useReducer,
 	useCallback,
-	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -15,10 +15,7 @@ import {
 import type {
 	CropperState,
 	CropperAction,
-	TransformOperation,
-	NormalizedPoint,
 	NormalizedRect,
-	Flip,
 	Size,
 } from '../../core/types';
 import { DEFAULT_STATE } from '../../core/constants';
@@ -28,7 +25,10 @@ import {
 	enforceContainment,
 	isStateDirty,
 } from '../../core/state';
-import { buildFocalPointZoomAction } from '../../core/setter-helpers';
+import {
+	buildCropperSetters,
+	type CropperSetters,
+} from './build-cropper-setters';
 
 /**
  * The cropper controller surface — the contract the Cropper component
@@ -39,40 +39,11 @@ import { buildFocalPointZoomAction } from '../../core/setter-helpers';
  * higher-layer concern owned by a composite store
  * (see media-editor/src/state).
  */
-export interface CropperController {
+export interface CropperController extends CropperSetters {
 	/** The current cropper state (read-only). */
 	state: CropperState;
 	/** Set the loaded image (natural size and src). */
 	setImage: ( image: CropperState[ 'image' ] ) => void;
-	/**
-	 * Set the image pan offset in normalized coordinates. Use
-	 * `setCropRect` for the crop rectangle.
-	 */
-	setPan: ( pan: NormalizedPoint ) => void;
-	/**
-	 * Set the zoom level, anchored at the crop center. Clamped to the
-	 * coverage-aware minimum and maximum zoom.
-	 */
-	setZoom: ( zoom: number ) => void;
-	/** Set zoom and pan together so focal-point zoom remains atomic. */
-	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
-	/** Set the rotation in degrees. Normalized to [0, 360). */
-	setRotation: ( rotation: number ) => void;
-	/** Set the flip state. */
-	setFlip: ( flip: Flip ) => void;
-	/** Toggle flip on the given axis. */
-	toggleFlip: ( direction: 'horizontal' | 'vertical' ) => void;
-	/** Snap rotate 90° preserving the image selection. */
-	snapRotate90: ( direction: 1 | -1 ) => void;
-	/** Set the crop rectangle in normalized coordinates. */
-	setCropRect: ( rect: NormalizedRect ) => void;
-	/**
-	 * Settle the crop rect after a resize drag: expand to fill the
-	 * available visual area while preserving the framed image region.
-	 */
-	settleCrop: () => void;
-	/** Apply a transform operation through the pipeline. */
-	applyOperation: ( op: TransformOperation ) => void;
 	/** Reset the state. Optionally merge partial state overrides. */
 	reset: ( resetState?: Partial< CropperState > ) => void;
 	/** Whether the current state differs from the initial state. */
@@ -114,10 +85,10 @@ function areCropperImagesEqual(
  * Pure reducer hook for the image cropper.
  *
  * Wraps the framework-agnostic `cropperReducer` and exposes named
- * setters. Does NOT manage undo/redo history — that responsibility
- * belongs to the surrounding application (see
- * `useMediaEditorState` for the composite store used by the media
- * editor).
+ * setters (built from the shared `buildCropperSetters` factory).
+ * Does NOT manage undo/redo history — that responsibility belongs to
+ * the surrounding application (see `useMediaEditorState` for the
+ * composite store used by the media editor).
  *
  * @param initialState Optional partial state to merge with DEFAULT_STATE.
  * @return The cropper controller — state, setters, and helpers.
@@ -138,15 +109,11 @@ export function useCropperReducer(
 	const [ initialBaseline, setInitialBaseline ] = useState< CropperState >(
 		() => enforceContainment( { ...DEFAULT_STATE, ...initialState } )
 	);
-	// Keep a ref to the latest state so stable-identity callbacks
-	// (reset, setImage, focal-point setZoom) can read fresh state
-	// without re-creating themselves on every render. The dispatch
-	// wrapper updates it synchronously so multiple actions in one event
-	// see the latest reducer output before React commits.
+	// Latest-state ref used by setters that need to read fresh state
+	// (focal-point zoom, toggleFlip, reset, setImage). Updated
+	// synchronously inside `dispatchAndSync` so multiple actions in
+	// one event see each other's output before React commits.
 	const stateRef = useRef( state );
-	useEffect( () => {
-		stateRef.current = state;
-	}, [ state ] );
 
 	const dispatchAndSync = useCallback( ( action: CropperAction ) => {
 		const next = cropperReducer( stateRef.current, action );
@@ -173,85 +140,6 @@ export function useCropperReducer(
 		[ dispatchAndSync ]
 	);
 
-	const setPan = useCallback(
-		( pan: NormalizedPoint ) => {
-			dispatchAndSync( { type: 'SET_PAN', payload: pan } );
-		},
-		[ dispatchAndSync ]
-	);
-
-	const setZoom = useCallback(
-		( zoom: number ) => {
-			const action = buildFocalPointZoomAction( stateRef.current, zoom );
-			if ( action ) {
-				dispatchAndSync( action );
-			}
-		},
-		[ dispatchAndSync ]
-	);
-
-	const setZoomAtPoint = useCallback(
-		( zoom: number, pan: NormalizedPoint ) => {
-			dispatchAndSync( {
-				type: 'SET_ZOOM_AT_POINT',
-				payload: { zoom, pan },
-			} );
-		},
-		[ dispatchAndSync ]
-	);
-
-	const setRotation = useCallback(
-		( rotation: number ) => {
-			dispatchAndSync( { type: 'SET_ROTATION', payload: rotation } );
-		},
-		[ dispatchAndSync ]
-	);
-
-	const setFlip = useCallback(
-		( flip: Flip ) => {
-			dispatchAndSync( { type: 'SET_FLIP', payload: flip } );
-		},
-		[ dispatchAndSync ]
-	);
-
-	const toggleFlip = useCallback(
-		( direction: 'horizontal' | 'vertical' ) => {
-			setFlip( {
-				...stateRef.current.flip,
-				[ direction ]: ! stateRef.current.flip[ direction ],
-			} );
-		},
-		[ setFlip ]
-	);
-
-	const snapRotate90 = useCallback(
-		( direction: 1 | -1 ) => {
-			dispatchAndSync( {
-				type: 'SNAP_ROTATE_90',
-				payload: { direction },
-			} );
-		},
-		[ dispatchAndSync ]
-	);
-
-	const setCropRect = useCallback(
-		( rect: NormalizedRect ) => {
-			dispatchAndSync( { type: 'SET_CROP_RECT', payload: rect } );
-		},
-		[ dispatchAndSync ]
-	);
-
-	const settleCrop = useCallback( () => {
-		dispatchAndSync( { type: 'SETTLE_CROP' } );
-	}, [ dispatchAndSync ] );
-
-	const applyOperation = useCallback(
-		( op: TransformOperation ) => {
-			dispatchAndSync( { type: 'APPLY_OPERATION', payload: op } );
-		},
-		[ dispatchAndSync ]
-	);
-
 	const reset = useCallback(
 		( resetState?: Partial< CropperState > ) => {
 			const nextInitialState = dispatchAndSync( {
@@ -264,6 +152,11 @@ export function useCropperReducer(
 			// isDirty would report true after a reset.
 			setInitialBaseline( nextInitialState );
 		},
+		[ dispatchAndSync ]
+	);
+
+	const setters = useMemo(
+		() => buildCropperSetters( dispatchAndSync, () => stateRef.current ),
 		[ dispatchAndSync ]
 	);
 
@@ -295,21 +188,12 @@ export function useCropperReducer(
 
 	// In the pure hook, history isn't a concern — viewport-driven
 	// reshape is identical to setCropRect.
-	const adjustCropRectForViewport = setCropRect;
+	const adjustCropRectForViewport = setters.setCropRect;
 
 	const controller: CropperController = {
+		...setters,
 		state,
 		setImage,
-		setPan,
-		setZoom,
-		setZoomAtPoint,
-		setRotation,
-		setFlip,
-		toggleFlip,
-		snapRotate90,
-		setCropRect,
-		settleCrop,
-		applyOperation,
 		reset,
 		isDirty,
 		getCroppedImage,
