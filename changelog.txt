@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 23.2.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Guidelines
+- Fix fatal when `rest_api_init` fires before init (cherry-pick #78350). ([78477](https://github.com/WordPress/gutenberg/pull/78477))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@xavier-lc, @paulopmt1
+
+
 = 23.2.0 =
 
 ## Changelog
