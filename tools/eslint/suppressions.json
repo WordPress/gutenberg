@@ -49,11 +49,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-patterns-list/stories/index.story.jsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-patterns-paging/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -1549,11 +1544,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-editor/src/components/rotation-ruler/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/media-editor/src/components/media-editor/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -1561,6 +1551,11 @@
 	},
 	"packages/media-editor/src/components/media-form/index.tsx": {
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"packages/media-editor/src/components/rotation-ruler/stories/index.story.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
 	},
@@ -1871,17 +1866,7 @@
 			"count": 1
 		}
 	},
-	"storybook/stories/playground/fullpage/index.jsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"storybook/stories/playground/with-undo-redo/index.jsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
-	"storybook/stories/playground/zoom-out/index.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
