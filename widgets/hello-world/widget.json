@@ -1,0 +1,7 @@
+{
+	"name": "core/hello-world",
+	"title": "Hello World",
+	"description": "A minimal example widget.",
+	"category": "demo",
+	"presentation": "full-bleed"
+}

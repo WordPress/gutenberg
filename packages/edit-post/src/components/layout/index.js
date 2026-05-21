@@ -38,9 +38,9 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Icon,
+	Icon as WCIcon,
 	SlotFillProvider,
-	Tooltip,
+	Tooltip as WCTooltip,
 	__unstableUseNavigateRegions as useNavigateRegions,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -162,8 +162,8 @@ function MetaBoxesMain( { isLegacy } ) {
 		if ( ! container ) {
 			return;
 		}
-		const noticeLists = container.querySelectorAll(
-			':scope > .components-notice-list'
+		const noticeContainer = container.querySelector(
+			':scope > .notices-inline-notices-wrapper'
 		);
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'
@@ -171,16 +171,16 @@ function MetaBoxesMain( { isLegacy } ) {
 		const deriveConstraints = () => {
 			const fullHeight = container.offsetHeight;
 			let nextMax = fullHeight;
-			for ( const element of noticeLists ) {
-				nextMax -= element.offsetHeight;
+			if ( noticeContainer ) {
+				nextMax -= noticeContainer.offsetHeight;
 			}
-			const nextMin = resizeHandle.offsetHeight;
+			const nextMin = resizeHandle?.offsetHeight ?? 0;
 			setHeightConstraints( { min: nextMin, max: nextMax } );
 		};
 		const observer = new window.ResizeObserver( deriveConstraints );
 		observer.observe( container );
-		for ( const element of noticeLists ) {
-			observer.observe( element );
+		if ( noticeContainer ) {
+			observer.observe( noticeContainer );
 		}
 		return () => observer.disconnect();
 	}, [] );
@@ -194,6 +194,11 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorHelpId = useId();
 
 	const heightRef = useRef();
+
+	const getAriaValueNow = ( height ) =>
+		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
+	const persistIsOpen = ( to = ! isOpen ) =>
+		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
 
 	/**
 	 * @param {number|'auto'} [candidateHeight] Height in pixels or 'auto'.
@@ -294,13 +299,8 @@ function MetaBoxesMain( { isLegacy } ) {
 	const usedOpenHeight = isShort ? 'auto' : openHeight;
 	const usedHeight = isOpen ? usedOpenHeight : min;
 
-	const getAriaValueNow = ( height ) =>
-		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
 	const usedAriaValueNow =
 		max === undefined || isAutoHeight ? 50 : getAriaValueNow( usedHeight );
-
-	const persistIsOpen = ( to = ! isOpen ) =>
-		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
 
 	const paneLabel = __( 'Meta Boxes' );
 
@@ -321,14 +321,14 @@ function MetaBoxesMain( { isLegacy } ) {
 			{ ...( ! isShort && bindDragGesture( persistIsOpen ) ) }
 		>
 			{ paneLabel }
-			<Icon icon={ isOpen ? chevronUp : chevronDown } />
+			<WCIcon icon={ isOpen ? chevronUp : chevronDown } />
 		</button>
 	);
 
 	// The separator button that provides a11y for resizing.
 	const separator = ! isShort && (
 		<>
-			<Tooltip text={ __( 'Drag to resize' ) }>
+			<WCTooltip text={ __( 'Drag to resize' ) }>
 				<button
 					ref={ separatorRef }
 					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
@@ -337,7 +337,7 @@ function MetaBoxesMain( { isLegacy } ) {
 					aria-describedby={ separatorHelpId }
 					{ ...bindDragGesture() }
 				/>
-			</Tooltip>
+			</WCTooltip>
 			<VisuallyHidden id={ separatorHelpId }>
 				{ __(
 					'Use up and down arrow keys to resize the meta box pane.'
@@ -472,7 +472,6 @@ function Layout( {
 			styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode: 'post-only',
 		} ),
 		[
 			settings,
@@ -575,11 +574,7 @@ function Layout( {
 		<SlotFillProvider>
 			<ErrorBoundary canCopyContent>
 				<WelcomeGuide postType={ currentPostType } />
-				<div
-					className={ navigateRegionsProps.className }
-					{ ...navigateRegionsProps }
-					ref={ navigateRegionsProps.ref }
-				>
+				<div { ...navigateRegionsProps }>
 					<Editor
 						settings={ editorSettings }
 						initialEdits={ initialEdits }

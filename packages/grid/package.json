@@ -52,9 +52,11 @@
 		"@dnd-kit/utilities": "^3.2.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
+		"@wordpress/style-runtime": "file:../style-runtime",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
+		"@types/jest": "^29.5.14",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui"
 	},

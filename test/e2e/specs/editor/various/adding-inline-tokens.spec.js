@@ -1,10 +1,10 @@
 /**
  * External dependencies
  */
+import { randomUUID } from 'crypto';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -33,7 +33,7 @@ test.describe( 'adding inline tokens', () => {
 		await page.click( 'role=menuitem[name="Inline image"i]' );
 
 		const testImagePath = './assets/10x10_e2e_test_image_z9T8jK.png';
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( os.tmpdir(), fileName + '.png' );
 		fs.copyFileSync( testImagePath, tmpFileName );
 		await page

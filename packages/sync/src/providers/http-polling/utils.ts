@@ -78,6 +78,13 @@ export function createUpdateQueue(
 		pause(): void {
 			isPaused = true;
 		},
+		peek(): SyncUpdate[] {
+			if ( isPaused ) {
+				return [];
+			}
+
+			return [ ...updates ];
+		},
 		restore( restoredUpdates: SyncUpdate[] ): void {
 			// Restore to front of the queue on failure. Remove compaction updates.
 			const filtered = restoredUpdates.filter(
@@ -90,11 +97,25 @@ export function createUpdateQueue(
 
 			updates.unshift( ...filtered );
 		},
+		restoreExact( restoredUpdates: SyncUpdate[] ): void {
+			if ( 0 === restoredUpdates.length ) {
+				return;
+			}
+
+			updates.unshift( ...restoredUpdates );
+		},
 		resume(): void {
 			isPaused = false;
 		},
 		size(): number {
 			return updates.length;
+		},
+		take( count: number ): SyncUpdate[] {
+			if ( isPaused || count <= 0 ) {
+				return [];
+			}
+
+			return updates.splice( 0, count );
 		},
 	};
 }
