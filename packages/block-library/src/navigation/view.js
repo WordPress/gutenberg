@@ -536,15 +536,6 @@ const { state, actions } = store(
 							ref.style.animation = 'none';
 							ref.style.transform = 'none';
 
-							// Anchor the close button to the hamburger's
-							// exact viewport position so the morph ends
-							// where it started.
-							closeBtn.style.position = 'fixed';
-							closeBtn.style.top = ctx.morphStartRect.top + 'px';
-							closeBtn.style.left =
-								ctx.morphStartRect.left + 'px';
-							closeBtn.style.right = 'auto';
-
 							runOpenMorphAnimation(
 								nav,
 								hamburgerBtn,
