@@ -441,29 +441,52 @@ export function useMediaEditorState(
 		[ state.cropper ]
 	);
 
-	const controller: MediaEditorController = {
-		// CropperController surface (state is the cropper slice so a
-		// <Cropper> takes this controller as-is).
-		...cropperSetters,
-		state: state.cropper,
-		setImage,
-		reset,
-		isDirty,
-		getCroppedImage,
-		// Composite extensions
-		cropOptions: state.cropOptions,
-		setAspectRatioValue,
-		setFreeformCrop,
-		resetCropOptions,
-		isCropperDirty,
-		hasUndo,
-		hasRedo,
-		undo,
-		redo,
-		beginGesture,
-		endGesture,
-		setVisualSize,
-		adjustCropRectForViewport,
-	};
+	const controller = useMemo< MediaEditorController >(
+		() => ( {
+			// CropperController surface (state is the cropper slice so a
+			// <Cropper> takes this controller as-is).
+			...cropperSetters,
+			state: state.cropper,
+			setImage,
+			reset,
+			isDirty,
+			getCroppedImage,
+			// Composite extensions
+			cropOptions: state.cropOptions,
+			setAspectRatioValue,
+			setFreeformCrop,
+			resetCropOptions,
+			isCropperDirty,
+			hasUndo,
+			hasRedo,
+			undo,
+			redo,
+			beginGesture,
+			endGesture,
+			setVisualSize,
+			adjustCropRectForViewport,
+		} ),
+		[
+			cropperSetters,
+			state.cropper,
+			setImage,
+			reset,
+			isDirty,
+			getCroppedImage,
+			state.cropOptions,
+			setAspectRatioValue,
+			setFreeformCrop,
+			resetCropOptions,
+			isCropperDirty,
+			hasUndo,
+			hasRedo,
+			undo,
+			redo,
+			beginGesture,
+			endGesture,
+			setVisualSize,
+			adjustCropRectForViewport,
+		]
+	);
 	return controller;
 }
