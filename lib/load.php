@@ -124,6 +124,7 @@ require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+require __DIR__ . '/compat/wordpress-7.1/preload.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
