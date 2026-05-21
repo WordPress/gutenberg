@@ -107,12 +107,18 @@ function ParagraphBlock( {
 	clientId,
 	isSelected: isSingleSelected,
 	name,
+	insertBlocksAfter,
 } ) {
 	const { content, direction, dropCap, placeholder, style } = attributes;
 	const textAlign = style?.typography?.textAlign;
 	useDeprecatedAlign( attributes.align, style, setAttributes );
 	const blockProps = useBlockProps( {
-		ref: useOnEnter( { clientId, content } ),
+		ref: useOnEnter( {
+			clientId,
+			content,
+			insertBlocksAfter,
+			setAttributes,
+		} ),
 		className: clsx( {
 			'has-drop-cap': hasDropCapDisabled( textAlign ) ? false : dropCap,
 		} ),

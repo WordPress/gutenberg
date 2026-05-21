@@ -24,6 +24,7 @@ export function useOnEnter( props ) {
 		getBlockName,
 		getBlock,
 		canInsertBlockType,
+		getSettings,
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
@@ -37,7 +38,37 @@ export function useOnEnter( props ) {
 				return;
 			}
 
-			const { content, clientId } = propsRef.current;
+			const { content, clientId, insertBlocksAfter, setAttributes } =
+				propsRef.current;
+
+			// When the clean empty paragraphs setting is enabled and the
+			// paragraph is empty, pressing Enter should do nothing.
+			if (
+				getSettings().__experimentalCleanEmptyParagraphs &&
+				! content.length &&
+				! event.shiftKey
+			) {
+				event.preventDefault();
+				return;
+			}
+
+			// When the clean empty paragraphs setting is enabled and Shift+Enter
+			// is pressed on a paragraph already ending with a line break, create
+			// a new paragraph instead of inserting another line break.
+			if (
+				getSettings().__experimentalCleanEmptyParagraphs &&
+				event.shiftKey &&
+				content.endsWith( '<br>' ) &&
+				insertBlocksAfter &&
+				setAttributes
+			) {
+				event.preventDefault();
+				setAttributes( {
+					content: content.slice( 0, -4 ),
+				} );
+				insertBlocksAfter( createBlock( getDefaultBlockName() ) );
+				return;
+			}
 
 			// The paragraph should be empty.
 			if ( content.length ) {

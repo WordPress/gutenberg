@@ -168,6 +168,7 @@ export const SETTINGS_DEFAULTS = {
 
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
+	__experimentalCleanEmptyParagraphs: false,
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
