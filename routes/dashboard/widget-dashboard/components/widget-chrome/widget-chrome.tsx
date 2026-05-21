@@ -7,7 +7,7 @@ import type { MouseEvent, PointerEvent, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Icon as WCIcon, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -154,7 +154,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						className={ styles.widgetChromeHeaderIcon }
 						aria-hidden="true"
 					>
-						<WCIcon icon={ widgetType.icon } />
+						<Icon icon={ widgetType.icon } />
 					</span>
 				) }
 				<Card.Title id={ titleId } render={ <h3 /> }>
