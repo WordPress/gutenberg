@@ -888,15 +888,15 @@ class WP_Navigation_Block_Renderer {
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context    = wp_interactivity_data_wp_context(
 			array(
-				'overlayOpenedBy'           => array(
+				'overlayOpenedBy'          => array(
 					'click' => false,
 					'hover' => false,
 					'focus' => false,
 				),
-				'type'                      => 'overlay',
-				'roleAttribute'             => '',
-				'ariaLabel'                 => __( 'Menu' ),
-				'overlayMenuIconAnimation'  => $overlay_menu_icon_animation,
+				'type'                     => 'overlay',
+				'roleAttribute'            => '',
+				'ariaLabel'                => __( 'Menu' ),
+				'overlayMenuIconAnimation' => $overlay_menu_icon_animation,
 			)
 		);
 		$nav_element_directives = '
