@@ -25,11 +25,11 @@ export function getAllWidgets( rootDir ) {
 
 /**
  * @typedef {Object} WidgetMetadata
- * @property {string}                  name           Widget namespaced identifier.
- * @property {string}                  [title]        Human-readable title.
- * @property {string}                  [description]  Short description.
- * @property {string}                  [category]     Grouping category.
- * @property {'framed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
+ * @property {string}                                    name           Widget namespaced identifier.
+ * @property {string}                                    [title]        Human-readable title.
+ * @property {string}                                    [description]  Short description.
+ * @property {string}                                    [category]     Grouping category.
+ * @property {'framed' | 'content-bleed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
  */
 
 /**
