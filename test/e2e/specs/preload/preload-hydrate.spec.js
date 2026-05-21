@@ -74,6 +74,11 @@ test.describe( 'Preload hydration', () => {
 		expect( hydrationState.entitiesConfigFinished ).toBe( true );
 		expect( hydrationState.record?.id ).toBe( postId );
 
+		const themeFetches = requests.filter( ( r ) =>
+			/\/wp\/v2\/themes(?:\?|$)/.test( r )
+		);
+		expect( themeFetches ).toEqual( [] );
+
 		// The post must not be refetched (either the GET that primes the
 		// record, or the OPTIONS that the canUser resolver would issue
 		// when the record's Allow header isn't already in the store).

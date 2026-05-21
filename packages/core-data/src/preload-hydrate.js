@@ -8,6 +8,7 @@ import { createInitialResolutionState } from '@wordpress/data';
  */
 import reducer from './reducer';
 import {
+	__experimentalReceiveCurrentGlobalStylesId,
 	__experimentalReceiveThemeBaseGlobalStyles,
 	__experimentalReceiveThemeGlobalStyleVariations,
 	addEntities,
@@ -92,15 +93,36 @@ function synthesizeActions( entry ) {
 		}
 
 		case 'getCurrentTheme': {
-			// The resolver fetches the active-themes list and picks [0].
-			const active = Array.isArray( data ) ? data[ 0 ] : data;
-			return active ? [ receiveCurrentTheme( active ) ] : [];
+			// The resolver fetches the active-themes list, then dispatches
+			// the [0] entry as the current theme. But the `getCurrentTheme`
+			// selector only stores the stylesheet name on state.currentTheme
+			// and looks up the theme record from the entities store — so
+			// the inner getEntityRecords flow (which the resolver delegates
+			// to via resolveSelect) is what fills the record. Mirror both
+			// here so the selector finds the data.
+			const themes = Array.isArray( data ) ? data : [ data ];
+			const active = themes[ 0 ];
+			if ( ! active ) {
+				return [];
+			}
+			return [
+				receiveEntityRecords( 'root', 'theme', themes, {
+					status: 'active',
+				} ),
+				receiveCurrentTheme( active ),
+			];
 		}
 
 		case 'getBlockPatternCategories': {
 			return [
 				{ type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories: data },
 			];
+		}
+
+		case '__experimentalGetCurrentGlobalStylesId': {
+			return data
+				? [ __experimentalReceiveCurrentGlobalStylesId( data ) ]
+				: [];
 		}
 
 		case 'getAutosaves': {
@@ -207,6 +229,18 @@ export function buildHydratedInitialState() {
 			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 				markResolved( 'canUser', [ action, { kind, name, id: key } ] );
 			}
+		}
+
+		// The getCurrentTheme resolver delegates to getEntityRecords for
+		// the active themes list; mark that resolution finished too so
+		// any downstream resolver (e.g. __experimentalGetCurrentGlobalStylesId)
+		// or direct caller doesn't fire the network request for it.
+		if ( entry.selector === 'getCurrentTheme' ) {
+			markResolved( 'getEntityRecords', [
+				'root',
+				'theme',
+				{ status: 'active' },
+			] );
 		}
 
 		// A canUser entry primes all four actions for its resource.

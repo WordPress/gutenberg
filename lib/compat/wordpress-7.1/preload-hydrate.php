@@ -179,6 +179,22 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 				'method' => 'GET',
 			);
 
+		case '__experimentalGetCurrentGlobalStylesId':
+			// The resolver normally derives this from the active theme's
+			// `_links[ 'wp:user-global-styles' ]` URL. PHP has the same
+			// value directly, so we can short-circuit the entire REST
+			// dance and just hand the value to the hydrator. Returning a
+			// `data` key bypasses the REST request and emits the value
+			// directly into the payload.
+			if ( ! class_exists( 'WP_Theme_JSON_Resolver' ) ) {
+				return null;
+			}
+			$id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+			if ( ! $id ) {
+				return null;
+			}
+			return array( 'data' => (int) $id );
+
 		case '__experimentalGetCurrentThemeBaseGlobalStyles':
 		case '__experimentalGetCurrentThemeGlobalStylesVariations':
 			// Both resolvers take no args; the resolver itself looks up
@@ -258,12 +274,25 @@ function gutenberg_resolve_preload_spec( array $spec ) {
  *                     ).
  */
 function gutenberg_preload_selectors_for_hydration( array $specs ) {
-	$paths  = array();
-	$by_key = array();
+	$paths   = array();
+	$by_key  = array();
+	$payload = array();
 
 	foreach ( $specs as $spec ) {
 		$req = gutenberg_resolve_preload_spec( $spec );
 		if ( ! $req ) {
+			continue;
+		}
+
+		// Selectors whose value PHP can compute directly bypass REST
+		// entirely — they return `{ data: ... }` and we emit the entry
+		// straight away.
+		if ( array_key_exists( 'data', $req ) ) {
+			$payload[] = array(
+				'selector' => $spec['selector'],
+				'args'     => array_values( $spec['args'] ?? array() ),
+				'data'     => $req['data'],
+			);
 			continue;
 		}
 
@@ -280,7 +309,6 @@ function gutenberg_preload_selectors_for_hydration( array $specs ) {
 
 	$preloaded = array_reduce( $paths, 'rest_preload_api_request', array() );
 
-	$payload = array();
 	// GET responses sit at the top level keyed by path. Non-GET responses
 	// are nested by method.
 	foreach ( $preloaded as $key => $value ) {
@@ -482,6 +510,10 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 	);
 	$specs[] = array(
 		'selector' => 'getBlockPatternCategories',
+		'args'     => array(),
+	);
+	$specs[] = array(
+		'selector' => '__experimentalGetCurrentGlobalStylesId',
 		'args'     => array(),
 	);
 
