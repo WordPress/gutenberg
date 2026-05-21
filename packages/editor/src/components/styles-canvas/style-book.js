@@ -3,7 +3,6 @@
  */
 import { useMemo, forwardRef } from '@wordpress/element';
 import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
-import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -11,64 +10,18 @@ import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import StyleBook from '../style-book';
 import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
 import { useGlobalStyles } from '../global-styles/hooks';
-import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
 
-function isObjectEmpty( object ) {
-	return ! object || Object.keys( object ).length === 0;
-}
-
-/**
- * Style Book content component for global styles.
- * Provides the business logic for StyleBook behavior in the global styles context.
- *
- * @param {Object}             props              Component props.
- * @param {string}             props.path         Current path in global styles.
- * @param {Function}           props.onPathChange Callback when the path changes.
- * @param {React.ForwardedRef} ref                Ref to the Style Book component.
- * @return {React.JSX.Element} The Style Book component.
- */
-function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
-	const isRevisionsPath = path?.startsWith( '/revisions' );
-	const { user: userConfig, base: baseConfig } = useGlobalStyles();
-	const { revisions, isLoading } = useGlobalStylesRevisions();
-
-	const revisionId = useMemo( () => {
-		const match = path?.match( /^\/revisions\/(.+)$/ );
-		return match ? match[ 1 ] : null;
-	}, [ path ] );
-
-	const selectedRevision = useMemo( () => {
-		if ( ! revisionId || ! revisions.length ) {
-			return null;
-		}
-		return revisions.find(
-			( revision ) => String( revision.id ) === String( revisionId )
-		);
-	}, [ revisionId, revisions ] );
-
-	const displayConfig = selectedRevision || userConfig;
-	const mergedConfig = useMemo( () => {
-		if (
-			! isObjectEmpty( displayConfig ) &&
-			! isObjectEmpty( baseConfig )
-		) {
-			return mergeGlobalStyles( baseConfig, displayConfig );
-		}
-		return {};
-	}, [ baseConfig, displayConfig ] );
-
-	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
-
-	if ( isRevisionsPath && isLoading ) {
-		return null;
-	}
-
+function StyleBookWithNavigation( {
+	path,
+	onPathChange,
+	userConfig,
+	forwardedRef,
+} ) {
 	return (
 		<StyleBook
-			ref={ ref }
+			ref={ forwardedRef }
 			path={ path }
-			userConfig={ isRevisionsPath ? displayConfig : undefined }
-			globalStyles={ isRevisionsPath ? globalStyles : undefined }
+			userConfig={ userConfig }
 			isSelected={ ( blockName ) =>
 				// Match '/blocks/core%2Fbutton' and
 				// '/blocks/core%2Fbutton/typography', but not
@@ -100,4 +53,67 @@ function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
 		/>
 	);
 }
+
+function StylesCanvasRevisionStyleBook( { path, onPathChange, forwardedRef } ) {
+	const { user: userConfig } = useGlobalStyles();
+	const { revisions, isLoading } = useGlobalStylesRevisions();
+
+	const revisionId = useMemo( () => {
+		const match = path?.match( /^\/revisions\/(.+)$/ );
+		return match ? match[ 1 ] : null;
+	}, [ path ] );
+
+	const selectedRevision = useMemo( () => {
+		if ( ! revisionId || ! revisions.length ) {
+			return null;
+		}
+		return revisions.find(
+			( revision ) => String( revision.id ) === String( revisionId )
+		);
+	}, [ revisionId, revisions ] );
+
+	if ( isLoading ) {
+		return null;
+	}
+
+	return (
+		<StyleBookWithNavigation
+			forwardedRef={ forwardedRef }
+			path={ path }
+			onPathChange={ onPathChange }
+			userConfig={ selectedRevision || userConfig }
+		/>
+	);
+}
+
+/**
+ * Style Book content component for global styles.
+ * Provides the business logic for StyleBook behavior in the global styles context.
+ *
+ * @param {Object}             props              Component props.
+ * @param {string}             props.path         Current path in global styles.
+ * @param {Function}           props.onPathChange Callback when the path changes.
+ * @param {React.ForwardedRef} ref                Ref to the Style Book component.
+ * @return {React.JSX.Element} The Style Book component.
+ */
+function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
+	if ( path?.startsWith( '/revisions' ) ) {
+		return (
+			<StylesCanvasRevisionStyleBook
+				forwardedRef={ ref }
+				path={ path }
+				onPathChange={ onPathChange }
+			/>
+		);
+	}
+
+	return (
+		<StyleBookWithNavigation
+			forwardedRef={ ref }
+			path={ path }
+			onPathChange={ onPathChange }
+		/>
+	);
+}
+
 export default forwardRef( StylesCanvasStyleBook );
