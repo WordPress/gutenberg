@@ -186,7 +186,8 @@ export interface WidgetChromeProps {
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 	function WidgetChrome( { widget, index, className }, ref ) {
-		const { widgetTypes, editMode } = useDashboardInternalContext();
+		const { widgetTypes, isResolvingWidgetTypes, editMode } =
+			useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();
 
@@ -200,6 +201,26 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 		);
 
 		if ( ! widgetType ) {
+			if ( isResolvingWidgetTypes ) {
+				return (
+					<WidgetContextProvider value={ contextValue }>
+						<Card.Root
+							render={ <section /> }
+							ref={ ref }
+							className={ clsx( styles.widgetChrome, className ) }
+							aria-busy="true"
+							aria-label={ __( 'Loading' ) }
+						>
+							<Card.Content
+								className={ styles.widgetChromeContent }
+							>
+								<LoadingOverlay />
+							</Card.Content>
+						</Card.Root>
+					</WidgetContextProvider>
+				);
+			}
+
 			return (
 				<WidgetContextProvider value={ contextValue }>
 					<Card.Root

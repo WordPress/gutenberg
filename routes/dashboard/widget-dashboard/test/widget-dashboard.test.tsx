@@ -132,6 +132,31 @@ describe( 'WidgetDashboard', () => {
 		} );
 	} );
 
+	it( 'shows a loading placeholder while widget types are resolving', () => {
+		render(
+			<WidgetDashboard
+				layout={ [
+					{
+						uuid: 'w1',
+						type: 'test/greet',
+						placement: { width: 1, height: 1 },
+					},
+				] }
+				onLayoutChange={ () => {} }
+				widgetTypes={ [] }
+				isResolvingWidgetTypes
+				resolveWidgetModule={ resolveWidgetModule }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'region', { name: 'Loading' } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Widget is no longer available.' )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'shows an unavailable placeholder for an unknown widget type (no crash)', () => {
 		render(
 			<WidgetDashboard
