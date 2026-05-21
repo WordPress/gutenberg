@@ -1,3 +1,37 @@
+/*
+ * Fade with opacity only: `visibility` is not interpolatable and pairing
+ * it with delayed transitions breaks fade-in.
+ */
+.resize-handle-slot {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.resize-handle-slot {
+		transition:
+			opacity var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-subtle);
+	}
+}
+
+/*
+ * Grid-level interaction hooks (`data-wp-grid-dragging`,
+ * `data-wp-grid-resizing`, `data-wp-grid-item-resizing`) drive
+ * handle visibility.
+ */
+:global([data-wp-grid-dragging]) .resize-handle-slot,
+:global([data-wp-grid-resizing]) .resize-handle-slot {
+	opacity: 0;
+	pointer-events: none;
+}
+
+:global([data-wp-grid-resizing])
+:global([data-wp-grid-item-resizing])
+.resize-handle-slot {
+	opacity: 1;
+	pointer-events: auto;
+}
+
 .resize-handle {
 	position: absolute;
 	bottom: 0;
