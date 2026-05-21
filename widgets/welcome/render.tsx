@@ -103,7 +103,7 @@ export default function WelcomeBanner( { removeWidget }: WidgetRenderProps ) {
 					icon={ closeSmall }
 					label={ __( 'Dismiss' ) }
 					size="small"
-					variant="minimal"
+					variant="solid"
 					tone="neutral"
 					onClick={ removeWidget }
 				/>
