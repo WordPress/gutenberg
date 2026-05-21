@@ -53,6 +53,8 @@ interface CollectionState {
 interface EntityState {
 	awareness?: Awareness;
 	handlers: RecordHandlers;
+	hydrated: boolean;
+	hydrate: () => void;
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
@@ -256,9 +258,35 @@ export function createSyncManager( debug = false ): SyncManager {
 			restoreUndoMeta,
 		} );
 
+		// Lazy hydration: the persisted CRDT document is only deserialised and
+		// applied when there's a reason to. The two triggers are:
+		//   1. A peer is detected via awareness.
+		//   2. Something explicitly asks for it (e.g. saving the entity needs
+		//      the CRDT to exist; not handled by this trigger).
+		// While unhydrated, CRDT-side updates are skipped — edits flow through
+		// the regular entity store only.
+		async function hydrate() {
+			if ( entityState.hydrated ) {
+				return;
+			}
+			entityState.hydrated = true;
+			log( 'loadEntity', 'hydrating', entityId );
+			// The original record may be stale by now if local edits have
+			// happened. Use the current edited record so the CRDT seeds with
+			// what the user actually sees.
+			const currentRecord = await handlers.getEditedRecord();
+			internal.applyPersistedCrdtDoc(
+				objectType,
+				objectId,
+				currentRecord
+			);
+		}
+
 		const entityState: EntityState = {
 			awareness,
 			handlers,
+			hydrated: false,
+			hydrate,
 			objectId,
 			objectType,
 			syncConfig,
@@ -289,12 +317,20 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
 
-		// Get and apply the persisted CRDT document, if it exists.
-		// Observers are attached after hydration so the applyUpdateV2 inside
-		// _applyPersistedCrdtDoc does not trigger _updateEntityRecord with the
-		// just-loaded state, which would dispatch a redundant editRecord whose
-		// blocks already match the editor's parsed content.
-		internal.applyPersistedCrdtDoc( objectType, objectId, record );
+		// Watch awareness for the appearance of a peer — that's when the
+		// persisted CRDT doc actually matters. For solo sessions, this
+		// listener never fires and the deserialise cost is avoided entirely.
+		if ( awareness ) {
+			const onAwarenessChange = () => {
+				const stateCount = awareness.getStates().size;
+				// `getStates()` includes our own client. Any additional entry
+				// means another peer is present.
+				if ( stateCount > 1 ) {
+					void hydrate();
+				}
+			};
+			awareness.on( 'change', onAwarenessChange );
+		}
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
@@ -572,6 +608,16 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		if ( entityState ) {
 			const { syncConfig, ydoc } = entityState;
+
+			// Skip CRDT mutation while unhydrated. Without hydration the doc
+			// is empty by design — pushing edits into it now would seed the
+			// CRDT without the persisted history, which would then be sent
+			// to any peer who later joins. When hydration is triggered
+			// (peer detection), it seeds the doc from the persisted form +
+			// the current edited record, so the missed edits are captured.
+			if ( ! entityState.hydrated ) {
+				return;
+			}
 
 			// If this is change should create a new undo level, tell the undo
 			// manager to stop capturing and create a new undo group.
