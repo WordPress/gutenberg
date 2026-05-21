@@ -8,7 +8,10 @@ import { createInitialResolutionState } from '@wordpress/data';
  */
 import reducer from './reducer';
 import {
+	__experimentalReceiveThemeBaseGlobalStyles,
+	__experimentalReceiveThemeGlobalStyleVariations,
 	addEntities,
+	receiveAutosaves,
 	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveUserPermissions,
@@ -34,7 +37,7 @@ import {
  * @return {Object[]} Actions to dispatch through the root reducer.
  */
 function synthesizeActions( entry ) {
-	const { selector, args, data, allow } = entry;
+	const { selector, args, data, allow, stylesheet } = entry;
 
 	switch ( selector ) {
 		case 'getCurrentUser':
@@ -85,6 +88,36 @@ function synthesizeActions( entry ) {
 		case 'getEntityRecords': {
 			const [ kind, name, query ] = args;
 			return [ receiveEntityRecords( kind, name, data, query ) ];
+		}
+
+		case 'getAutosaves': {
+			// args: [ postType, postId ]. The resolver dispatches
+			// receiveAutosaves with the postId and the response body.
+			const [ , postId ] = args;
+			return data && data.length
+				? [ receiveAutosaves( postId, data ) ]
+				: [];
+		}
+
+		case '__experimentalGetCurrentThemeBaseGlobalStyles': {
+			if ( ! stylesheet ) {
+				return [];
+			}
+			return [
+				__experimentalReceiveThemeBaseGlobalStyles( stylesheet, data ),
+			];
+		}
+
+		case '__experimentalGetCurrentThemeGlobalStylesVariations': {
+			if ( ! stylesheet ) {
+				return [];
+			}
+			return [
+				__experimentalReceiveThemeGlobalStyleVariations(
+					stylesheet,
+					data
+				),
+			];
 		}
 
 		case 'canUser': {

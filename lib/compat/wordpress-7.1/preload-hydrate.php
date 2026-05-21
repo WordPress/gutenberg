@@ -127,6 +127,47 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 
 			return null;
 
+		case 'getAutosaves':
+			// args: [ postType, postId ]. The resolver builds the path from
+			// the post type's REST base; we re-derive it via the post's
+			// canonical REST route and tack `/autosaves?context=edit` on.
+			if ( count( $args ) < 2 ) {
+				return null;
+			}
+			$post = get_post( $args[1] );
+			if ( ! $post || $post->post_type !== $args[0] ) {
+				return null;
+			}
+			$post_route = rest_get_route_for_post( $post );
+			if ( empty( $post_route ) ) {
+				return null;
+			}
+			return array(
+				'path'   => sprintf( '%s/autosaves?context=edit', $post_route ),
+				'method' => 'GET',
+			);
+
+		case '__experimentalGetCurrentThemeBaseGlobalStyles':
+		case '__experimentalGetCurrentThemeGlobalStylesVariations':
+			// Both resolvers take no args; the resolver itself looks up
+			// the current theme's stylesheet via `getCurrentTheme`. PHP
+			// knows the active stylesheet directly.
+			$stylesheet = get_stylesheet();
+			if ( empty( $stylesheet ) ) {
+				return null;
+			}
+			$suffix = '__experimentalGetCurrentThemeGlobalStylesVariations' === $name
+				? '/variations'
+				: '';
+			return array(
+				'path'   => sprintf(
+					'/wp/v2/global-styles/themes/%s%s?context=view',
+					$stylesheet,
+					$suffix
+				),
+				'method' => 'GET',
+			);
+
 		case 'canUser':
 			// args: [ action, resource, id? ]. The resolver issues an
 			// OPTIONS to the resource's REST URL and parses the Allow
@@ -246,6 +287,16 @@ function gutenberg_build_hydration_entry( $spec, $response ) {
 		if ( null !== $allow ) {
 			$entry['allow'] = $allow;
 		}
+	}
+
+	// The two theme-global-styles selectors take no args, but their
+	// receive-actions need the stylesheet (the resolver normally pulls
+	// it from `getCurrentTheme`). Pass it inline.
+	if (
+		'__experimentalGetCurrentThemeBaseGlobalStyles' === $spec['selector'] ||
+		'__experimentalGetCurrentThemeGlobalStylesVariations' === $spec['selector']
+	) {
+		$entry['stylesheet'] = get_stylesheet();
 	}
 
 	return $entry;
@@ -371,7 +422,22 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 			'args'     => array( 'postType', $context->post->post_type, $context->post->ID ),
 			'context'  => 'edit',
 		);
+		$specs[] = array(
+			'selector' => 'getAutosaves',
+			'args'     => array( $context->post->post_type, $context->post->ID ),
+		);
 	}
+
+	// Theme global styles: both base + variations are tied to the
+	// active stylesheet, which PHP knows directly.
+	$specs[] = array(
+		'selector' => '__experimentalGetCurrentThemeBaseGlobalStyles',
+		'args'     => array(),
+	);
+	$specs[] = array(
+		'selector' => '__experimentalGetCurrentThemeGlobalStylesVariations',
+		'args'     => array(),
+	);
 
 	/**
 	 * Filter the list of selector specs hydrated into the @wordpress/core-data
