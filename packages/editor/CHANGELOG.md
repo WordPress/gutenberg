@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Editor: Add padding around inline notices in the editor content area and distraction-free header.
+-   Editor: Pause the client-side media upload queue while the browser is offline and resume it automatically when connectivity returns ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
 
 ### Bug Fixes
 
