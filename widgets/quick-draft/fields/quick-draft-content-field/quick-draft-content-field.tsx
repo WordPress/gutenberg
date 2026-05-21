@@ -4,6 +4,7 @@
 import { TextareaControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps, FieldValidity } from '@wordpress/dataviews';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -54,7 +55,7 @@ export default function QuickDraftContentField< Item >( {
 	const help = errorMessage ?? field.description;
 
 	return (
-		<div className={ styles.root }>
+		<Stack direction="column" className={ styles.root }>
 			<TextareaControl
 				__nextHasNoMarginBottom
 				label={ field.label }
@@ -66,6 +67,6 @@ export default function QuickDraftContentField< Item >( {
 				disabled={ disabled }
 				rows={ 4 }
 			/>
-		</div>
+		</Stack>
 	);
 }
