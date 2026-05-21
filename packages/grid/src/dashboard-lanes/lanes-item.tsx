@@ -13,6 +13,7 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import ResizeHandle from '../shared/resize-handle';
 import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
@@ -58,9 +59,18 @@ export type LanesItemProps = {
 
 	/**
 	 * Whether any tile in the surface is currently being dragged or
-	 * resized. Used to mute `actionableArea` content with `inert`.
+	 * resized. Drives the drag activator cursor.
 	 */
 	interacting?: boolean;
+
+	/**
+	 * Whether a tile drag is in progress. Mutes each tile's
+	 * `actionableArea` with `inert` so hovers on other tiles' controls
+	 * do not steal the gesture.
+	 *
+	 * @default false
+	 */
+	dragging?: boolean;
 
 	children: React.ReactNode;
 
@@ -95,6 +105,7 @@ export function LanesItem( {
 	resizeSnapPreview = null,
 	minResizeWidthPx,
 	renderResizeHandle,
+	dragging = false,
 }: LanesItemProps ) {
 	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
@@ -178,13 +189,18 @@ export function LanesItem( {
 			className={ itemClassName }
 			style={ style }
 			{ ...{ [ GRID_ITEM_DATA_KEY ]: itemKey } }
+			data-wp-grid-item-resizing={ isResizing || undefined }
 		>
 			{ actionableArea ? (
 				<div
-					style={ { display: 'contents' } }
-					{ ...( interacting ? { inert: '' } : {} ) }
+					className={ actionableAreaStyles[ 'actionable-area-slot' ] }
 				>
-					{ actionableArea }
+					<div
+						style={ { display: 'contents' } }
+						{ ...( dragging ? { inert: '' } : {} ) }
+					>
+						{ actionableArea }
+					</div>
 				</div>
 			) : null }
 

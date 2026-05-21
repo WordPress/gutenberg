@@ -374,7 +374,6 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
-
 			if ( ! onChangeLayout || ! latest ) {
 				setTemporaryLayout( undefined );
 				return;
@@ -516,6 +515,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 								layoutAnimationStyles[ 'layout-animating' ],
 							className
 						) }
+						data-wp-grid-dragging={ activeId || undefined }
+						data-wp-grid-resizing={ isResizing || undefined }
 						style={
 							{
 								...style,
@@ -551,6 +552,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 									}
 									disabled={ ! editMode }
 									interacting={ interacting }
+									dragging={ activeId !== null }
 									onResize={ handleResize }
 									onResizeEnd={ persistTemporaryLayout }
 									resizeSnapPreview={
