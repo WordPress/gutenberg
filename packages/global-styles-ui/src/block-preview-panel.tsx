@@ -16,13 +16,22 @@ import { getVariationClassName } from './utils';
 interface BlockPreviewPanelProps {
 	name: string;
 	variation?: string;
+	selectedViewport?: string;
 	selectedState?: string;
 	stateStyles?: any;
 }
 
+// Keep in sync with responsive breakpoint media queries in the global styles engine.
+const PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
+	default: 783,
+	tablet: 600,
+	mobile: 480,
+};
+
 const BlockPreviewPanel = ( {
 	name,
 	variation = '',
+	selectedViewport = 'default',
 	selectedState = 'default',
 	stateStyles,
 }: BlockPreviewPanelProps ) => {
@@ -55,7 +64,10 @@ const BlockPreviewPanel = ( {
 		return generatePreviewStateStyles( stateStyles, name );
 	}, [ selectedState, stateStyles, name ] );
 
-	const viewportWidth = blockExample?.viewportWidth ?? 500;
+	const viewportWidth =
+		PREVIEW_WIDTH_BY_VIEWPORT[ selectedViewport ] ??
+		blockExample?.viewportWidth ??
+		500;
 	// Same as height of InserterPreviewPanel.
 	const previewHeight = 144;
 	const sidebarWidth = 235;
