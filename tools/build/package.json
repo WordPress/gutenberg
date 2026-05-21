@@ -21,8 +21,8 @@
 	},
 	"type": "module",
 	"scripts": {
-		"orchestrate-build": "node ./build.mjs",
-		"orchestrate-dev": "node ./dev.mjs",
+		"build": "node ./build.mjs",
+		"dev": "node ./dev.mjs",
 		"build-vendors": "node ./packages/build-vendors.mjs",
 		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
 		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs"
