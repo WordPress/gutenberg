@@ -1,17 +1,15 @@
 import { Markdown, useOf } from '@storybook/addon-docs/blocks';
-import { getComponentStatusFromMeta } from '../../component-status';
+import { getComponentStatusFromStory } from '../../component-status';
 import { statuses } from './statuses';
 
 export function ComponentStatusIndicator() {
-	const resolvedOf = useOf( 'meta' );
+	const resolvedOf = useOf( 'story' );
 
-	if ( resolvedOf.type !== 'meta' ) {
+	if ( resolvedOf.type !== 'story' ) {
 		return null;
 	}
 
-	const componentStatus = getComponentStatusFromMeta(
-		resolvedOf.preparedMeta
-	);
+	const componentStatus = getComponentStatusFromStory( resolvedOf.story );
 
 	if ( ! componentStatus ) {
 		return null;

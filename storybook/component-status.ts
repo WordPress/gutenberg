@@ -1,3 +1,5 @@
+import type { PreparedStory } from 'storybook/internal/types';
+
 export type ComponentStatusValue =
 	| 'recommended'
 	| 'use-with-caution'
@@ -642,71 +644,52 @@ export function getComponentStatus< P extends Package >(
 }
 
 /**
- * Map of Storybook story title prefix to the package the stories underneath
- * document. Used by `getComponentStatusFromMeta` to identify which
- * package a meta belongs to without per-story metadata.
+ * Resolve a component's status from a Storybook story object.
  *
- * `@wordpress/ui` titles are nested under `Design System/...`, so its prefix
- * must be checked before the bare `Components/` prefix to avoid mismatching.
- */
-const TITLE_PREFIX_TO_PACKAGE: ReadonlyArray< readonly [ string, Package ] > = [
-	[ 'Design System/Components/', '@wordpress/ui' ],
-	[ 'Components/', '@wordpress/components' ],
-	[ 'Grid/', '@wordpress/grid' ],
-];
-
-/**
- * Minimal shape needed by `getComponentStatusFromMeta`. Matches the
- * relevant slice of Storybook's `PreparedMeta`; typed loosely here so the
- * registry doesn't need to depend on Storybook's internal types.
- */
-type MetaLike = {
-	title: string;
-	component?: unknown;
-};
-
-/**
- * Resolve a component's status entry from a Storybook meta object. Stories
- * do not need to declare their status — this function derives the package
- * from the meta's title prefix and the component name from
- * `meta.component`'s `displayName` / `name`.
+ * The package is derived from the story's `parameters.fileName` by assuming the
+ * `packages/<dir>` convention maps to `@wordpress/<dir>`. This holds for every
+ * package we currently track component status. Packages that don't follow the
+ * convention simply won't match the registry and fall through to `undefined`,
+ * which is the desired behavior.
  *
- * Returns `undefined` for companion docs pages that don't set
- * `meta.component`, so statuses only appear on a component's primary docs
- * page rather than on every sibling page nested under its title.
+ * The component name is derived from the last segment of the story's `title`,
+ * which matches how the component appears in the sidebar and, by convention,
+ * the keys of `COMPONENT_STATUS`.
  *
- * @param meta - The Storybook prepared meta for the docs page being rendered.
- * @return The matching status entry, or `undefined` when the meta cannot be
- *         resolved to a known package + component pair.
+ * Returns `undefined` for companion docs pages that don't reference a component
+ * (i.e. whose story meta doesn't include a component property), so statuses
+ * only appear on a component's primary docs page rather than on every sibling
+ * page nested under its title.
+ *
+ * @param story - The Storybook prepared story for the docs page being rendered.
+ * @return The matching status entry, or `undefined` when the story cannot be
+ *         resolved to a known package component.
  */
-export function getComponentStatusFromMeta(
-	meta: MetaLike
+export function getComponentStatusFromStory(
+	story: PreparedStory
 ): ComponentStatus | undefined {
-	const packageName = packageFromTitle( meta.title );
-	if ( ! packageName ) {
+	if ( ! story.component ) {
 		return undefined;
 	}
 
-	const componentRef = meta.component as
-		| { displayName?: string; name?: string }
-		| undefined;
-	const componentName = componentRef?.displayName ?? componentRef?.name;
+	const packageName = packageFromPath( story.parameters.fileName );
+	if ( ! packageName || ! ( packageName in COMPONENT_STATUS ) ) {
+		return undefined;
+	}
+
+	const componentName = story.title.split( '/' ).pop();
 	if ( ! componentName ) {
 		return undefined;
 	}
 
-	const registry = COMPONENT_STATUS[ packageName ] as Record<
+	const registry = COMPONENT_STATUS[ packageName as Package ] as Record<
 		string,
 		ComponentStatus
 	>;
 	return registry[ componentName ];
 }
 
-function packageFromTitle( title: string ): Package | undefined {
-	for ( const [ prefix, pkg ] of TITLE_PREFIX_TO_PACKAGE ) {
-		if ( title.startsWith( prefix ) ) {
-			return pkg;
-		}
-	}
-	return undefined;
+function packageFromPath( fileName: string | undefined ): string | undefined {
+	const match = fileName?.match( /(?:^|\/)packages\/([^/]+)\// );
+	return match ? `@wordpress/${ match[ 1 ] }` : undefined;
 }
