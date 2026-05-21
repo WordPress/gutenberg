@@ -332,10 +332,12 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				ctx.previousFocus = ref;
+				ctx.morphStartRect = null;
 
 				// Capture hamburger position before the overlay covers it.
 				// Only for the "handle" icon variant (has rect-based SVG lines).
 				if (
+					ctx.overlayMenuIconAnimation !== false &&
 					ref.querySelector( '.wp-block-navigation__hamburger-line' )
 				) {
 					const rect = ref.getBoundingClientRect();
