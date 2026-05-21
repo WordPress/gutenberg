@@ -396,7 +396,6 @@ const WithControlsComponent = () => {
 					<FlexItem>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Aspect ratio"
 							hideLabelFromVision
 							value={ aspectRatioValue }
@@ -411,7 +410,6 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
@@ -420,7 +418,6 @@ const WithControlsComponent = () => {
 					<FlexItem>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Grid"
 							hideLabelFromVision
 							value={ gridMode }
@@ -454,7 +451,6 @@ const WithControlsComponent = () => {
 				<div className="image-editor-story__sliders">
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -464,7 +460,6 @@ const WithControlsComponent = () => {
 					/>
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }
@@ -816,7 +811,6 @@ const DebugComponent = () => {
 					</FlexItem>
 					<FlexItem>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Freeform"
 							checked={ freeformCrop }
 							onChange={ setFreeformCrop }
@@ -838,7 +832,6 @@ const DebugComponent = () => {
 					<FlexItem>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label="Format"
 							hideLabelFromVision
 							value={ exportFormat as 'image/jpeg' }
@@ -874,7 +867,6 @@ const DebugComponent = () => {
 				<div className="image-editor-story__sliders">
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
@@ -884,7 +876,6 @@ const DebugComponent = () => {
 					/>
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label="Zoom"
 						min={ getMinZoom( state ) }
 						max={ MAX_ZOOM }

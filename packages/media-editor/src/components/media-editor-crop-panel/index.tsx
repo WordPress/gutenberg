@@ -68,7 +68,6 @@ export default function MediaEditorCropPanel( {
 			</VisuallyHidden>
 			<SelectControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }
@@ -78,7 +77,6 @@ export default function MediaEditorCropPanel( {
 				} ) ) }
 			/>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Resize crop area' ) }
 				help={ __( 'Show handles to adjust the crop box.' ) }
 				checked={ freeformCrop }
@@ -87,7 +85,6 @@ export default function MediaEditorCropPanel( {
 			<div role="presentation" { ...zoomGestureHandlers }>
 				<RangeControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Zoom' ) }
 					min={ minZoom }
 					max={ MAX_ZOOM }
