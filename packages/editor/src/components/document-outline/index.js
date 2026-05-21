@@ -73,6 +73,37 @@ function EmptyOutlineIllustration() {
 	);
 }
 
+const HEADING_BLOCK_NAMES = [ 'core/heading', 'core/accordion-heading' ];
+
+/**
+ * Builds a map of accordion-heading clientId → resolved heading level
+ * by walking the innerBlocks tree of every core/accordion block in the
+ * flat blocks array. This is needed because accordion heading receives
+ * its level via context from the parent accordion block, so
+ * block.attributes.level may be undefined on initial render before the
+ * attribute has been explicitly persisted.
+ *
+ * @param {Array} blocks Flat array of all blocks (each with innerBlocks).
+ * @return {Object} Map of { [clientId]: level }
+ */
+const buildAccordionHeadingLevelMap = ( blocks ) => {
+	const map = {};
+	blocks.forEach( ( block ) => {
+		if ( block.name !== 'core/accordion' ) {
+			return;
+		}
+		const headingLevel = block.attributes?.headingLevel;
+		( block.innerBlocks ?? [] ).forEach( ( accordionItem ) => {
+			( accordionItem.innerBlocks ?? [] ).forEach( ( child ) => {
+				if ( child.name === 'core/accordion-heading' ) {
+					map[ child.clientId ] = headingLevel;
+				}
+			} );
+		} );
+	} );
+	return map;
+};
+
 /**
  * Returns an array of heading blocks enhanced with the following properties:
  * level   - An integer with the heading level.
@@ -83,18 +114,34 @@ function EmptyOutlineIllustration() {
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
 const computeOutlineHeadings = ( blocks = [] ) => {
+	const accordionHeadingLevelMap = buildAccordionHeadingLevelMap( blocks );
 	return blocks
-		.filter( ( block ) => block.name === 'core/heading' )
-		.map( ( block ) => ( {
-			...block,
-			level: block.attributes.level,
-			isEmpty: isEmptyHeading( block ),
-		} ) );
+		.filter( ( block ) => HEADING_BLOCK_NAMES.includes( block.name ) )
+		.map( ( block ) => {
+			// For accordion heading, attributes.level may be undefined on
+			// initial render (level arrives via context, not persisted attrs).
+			// Fall back to the level resolved from the parent accordion block.
+			const level =
+				block.name === 'core/accordion-heading'
+					? block.attributes.level ??
+					  accordionHeadingLevelMap[ block.clientId ]
+					: block.attributes.level;
+
+			return {
+				...block,
+				level,
+				isEmpty: isEmptyHeading( block ),
+			};
+		} );
 };
 
-const isEmptyHeading = ( heading ) =>
-	! heading.attributes.content ||
-	heading.attributes.content.trim().length === 0;
+const isEmptyHeading = ( heading ) => {
+	const content =
+		heading.name === 'core/accordion-heading'
+			? heading.attributes.title
+			: heading.attributes.content;
+	return ! content || content.trim().length === 0;
+};
 
 /**
  * Renders a document outline component.
@@ -230,7 +277,11 @@ export default function DocumentOutline( {
 								? emptyHeadingContent
 								: getTextContent(
 										create( {
-											html: item.attributes.content,
+											html:
+												item.name ===
+												'core/accordion-heading'
+													? item.attributes.title
+													: item.attributes.content,
 										} )
 								  ) }
 							{ isIncorrectLevel && incorrectLevelContent }
