@@ -27,6 +27,7 @@ const stories = [
 	'./stories/icons/**/*.story.@(ts|tsx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/rich-text-control/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/media-editor/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
