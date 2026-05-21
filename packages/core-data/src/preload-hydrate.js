@@ -12,6 +12,7 @@ import {
 	__experimentalReceiveThemeGlobalStyleVariations,
 	addEntities,
 	receiveAutosaves,
+	receiveCurrentTheme,
 	receiveCurrentUser,
 	receiveEntityRecords,
 	receiveUserPermissions,
@@ -88,6 +89,18 @@ function synthesizeActions( entry ) {
 		case 'getEntityRecords': {
 			const [ kind, name, query ] = args;
 			return [ receiveEntityRecords( kind, name, data, query ) ];
+		}
+
+		case 'getCurrentTheme': {
+			// The resolver fetches the active-themes list and picks [0].
+			const active = Array.isArray( data ) ? data[ 0 ] : data;
+			return active ? [ receiveCurrentTheme( active ) ] : [];
+		}
+
+		case 'getBlockPatternCategories': {
+			return [
+				{ type: 'RECEIVE_BLOCK_PATTERN_CATEGORIES', categories: data },
+			];
 		}
 
 		case 'getAutosaves': {

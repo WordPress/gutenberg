@@ -164,6 +164,21 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 				'method' => 'GET',
 			);
 
+		case 'getCurrentTheme':
+			// Resolver internally fetches the active theme via
+			// `getEntityRecords( 'root', 'theme', { status: 'active' } )`
+			// and dispatches the [0] entry as the current theme.
+			return array(
+				'path'   => '/wp/v2/themes?context=edit&status=active',
+				'method' => 'GET',
+			);
+
+		case 'getBlockPatternCategories':
+			return array(
+				'path'   => '/wp/v2/block-patterns/categories',
+				'method' => 'GET',
+			);
+
 		case '__experimentalGetCurrentThemeBaseGlobalStyles':
 		case '__experimentalGetCurrentThemeGlobalStylesVariations':
 			// Both resolvers take no args; the resolver itself looks up
@@ -460,6 +475,15 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 			'args'     => array( $context->post->post_type, $context->post->ID ),
 		);
 	}
+
+	$specs[] = array(
+		'selector' => 'getCurrentTheme',
+		'args'     => array(),
+	);
+	$specs[] = array(
+		'selector' => 'getBlockPatternCategories',
+		'args'     => array(),
+	);
 
 	// Theme global styles: both base + variations are tied to the
 	// active stylesheet, which PHP knows directly.
