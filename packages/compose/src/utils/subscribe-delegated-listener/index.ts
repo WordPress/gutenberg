@@ -44,10 +44,11 @@ export default function subscribeDelegatedListener(
 	//   Element  → its `ownerDocument`
 	//   Document → itself (own `ownerDocument` is `null`)
 	//   Window   → itself (no `ownerDocument` property)
-	// Works across realms — no `instanceof` checks needed.
-	const root = ( target as Node ).ownerDocument ?? target;
-	// Duck-type detection (cross-realm safe).
-	const isWindow = ( root as Window ).window === root;
+	// `undefined` (Window) → use a fan-out branch on dispatch since
+	// events bubble *to* window but never *from* it via `parentNode`.
+	const ownerDoc = ( target as Node ).ownerDocument;
+	const root = ownerDoc ?? target;
+	const isWindow = ownerDoc === undefined;
 
 	let perRoot = registries.get( root );
 	if ( ! perRoot ) {
