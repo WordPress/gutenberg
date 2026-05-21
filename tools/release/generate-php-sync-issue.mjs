@@ -153,7 +153,11 @@ async function main() {
 	const content = generateIssueContent( result );
 
 	// Write the Markdown content to a file
-	fs.writeFileSync( nodePath.join( __dirname, 'issueContent.md' ), content );
+	const projectRoot = nodePath.resolve( __dirname, '..', '..' );
+	fs.writeFileSync(
+		nodePath.join( projectRoot, 'issueContent.md' ),
+		content
+	);
 }
 
 function validateDate( sinceArg ) {
