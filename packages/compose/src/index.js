@@ -7,6 +7,9 @@ export * from './utils/throttle';
 // The `ObservableMap` data structure
 export * from './utils/observable-map';
 
+// Private APIs.
+export { privateApis } from './private-apis';
+
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
 export { default as pipe } from './higher-order/pipe';

@@ -25,6 +25,7 @@ import {
 import { globalStylesDataKey } from '../store/private-keys';
 import {
 	getStyleForState,
+	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
@@ -193,8 +194,6 @@ export function BackgroundImagePanel( {
 		[ clientId, name ]
 	);
 
-	const isStateSelected = selectedState !== 'default';
-
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
 		'gradient'
@@ -220,6 +219,8 @@ export function BackgroundImagePanel( {
 	) {
 		return null;
 	}
+
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const onChange = isStateSelected
 		? ( newStyle ) => {

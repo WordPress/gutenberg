@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  * WordPress dependencies
  */
 import type { createRegistry } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -24,14 +25,15 @@ import type {
 	RetryItemAction,
 	State,
 } from './types';
-import { Type } from './types';
+import { OperationType, Type } from './types';
 import type {
 	addItem,
 	processItem,
 	removeItem,
 	revokeBlobUrls,
 } from './private-actions';
-import { vipsCancelOperations } from './utils';
+import { maybeRecycleVipsWorker, vipsCancelOperations } from './utils';
+import { UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -166,12 +168,16 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		if ( ! silent ) {
 			const { onError } = item;
 			onError?.( error ?? new Error( 'Upload cancelled' ) );
-			if ( ! onError && error ) {
-				// TODO: Find better way to surface errors with sideloads etc.
+			if ( ! onError && error && ! item.parentId ) {
+				// Log errors for top-level items without an onError handler.
+				// Child sideload errors are suppressed here because the
+				// parent will be notified and surface the error to the user.
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
 		}
+
+		const { currentOperation, parentId, batchId } = item;
 
 		dispatch< CancelAction >( {
 			type: Type.Cancel,
@@ -181,8 +187,102 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		dispatch.removeItem( id );
 		dispatch.revokeBlobUrls( id );
 
+		// A concurrency slot just freed up. Kick any items that were
+		// waiting in the queue, mirroring finishOperation's behavior.
+		if (
+			currentOperation === OperationType.ResizeCrop ||
+			currentOperation === OperationType.Rotate
+		) {
+			for ( const pending of select.getPendingImageProcessing() ) {
+				dispatch.processItem( pending.id );
+			}
+		}
+		if ( currentOperation === OperationType.Upload ) {
+			for ( const pending of select.getPendingUploads() ) {
+				dispatch.processItem( pending.id );
+			}
+		}
+
+		// Failed vips ops also leak WASM memory, so count them toward the
+		// recycle budget. Without this, a long burst of failures (e.g. a
+		// gallery of unsupported AVIFs) could grow memory unbounded.
+		if (
+			currentOperation === OperationType.ResizeCrop ||
+			currentOperation === OperationType.Rotate ||
+			currentOperation === OperationType.TranscodeImage
+		) {
+			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
+		}
+
+		// If this was a child sideload item, handle the parent.
+		if ( parentId ) {
+			const parentItem = select.getItem( parentId );
+			if ( parentItem ) {
+				if ( select.hasPendingItemsByParentId( parentId ) ) {
+					// Other children remain — just notify the parent so
+					// it can re-check the Finalize gate.
+					if (
+						parentItem.operations &&
+						parentItem.operations.length > 0
+					) {
+						dispatch.processItem( parentId );
+					}
+				} else if (
+					parentItem.subSizes &&
+					parentItem.subSizes.length > 0
+				) {
+					// Partial success: at least one child sideload succeeded
+					// (its sub-size is already accumulated on the parent),
+					// but the last in-flight child failed. Keep the parent
+					// attachment and finalize with whichever sub-sizes did
+					// succeed — matching WordPress core's best-effort
+					// behavior when individual sub-size generations fail.
+					if (
+						parentItem.operations &&
+						parentItem.operations.length > 0
+					) {
+						dispatch.processItem( parentId );
+					}
+				} else {
+					// Total failure: no child succeeded. The parent file
+					// already uploaded — delete the orphaned attachment
+					// from the server so it doesn't appear in the media
+					// library.
+					const parentAttachmentId = parentItem.attachment?.id;
+					const { mediaDelete } = select.getSettings();
+					if ( parentAttachmentId && mediaDelete ) {
+						mediaDelete( parentAttachmentId ).catch( () => {
+							// Best-effort cleanup; surface nothing to the
+							// user if the delete itself fails.
+						} );
+					}
+
+					// Cancel the parent too so the block resets rather
+					// than showing a partial upload. Propagate the
+					// underlying error's code and message — vips
+					// processing failures already carry an actionable
+					// hint at their source; network/server failures
+					// surface their real cause.
+					dispatch.cancelItem(
+						parentId,
+						new UploadError( {
+							code:
+								( error instanceof UploadError &&
+									error.code ) ||
+								'UPLOAD_ERROR',
+							message:
+								error?.message ||
+								__( 'The image could not be uploaded.' ),
+							file: parentItem.file,
+							cause: error instanceof Error ? error : undefined,
+						} )
+					);
+				}
+			}
+		}
+
 		// All items of this batch were cancelled or finished.
-		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
+		if ( batchId && select.isBatchUploaded( batchId ) ) {
 			item.onBatchSuccess?.();
 		}
 	};
