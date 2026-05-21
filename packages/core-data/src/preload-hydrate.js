@@ -20,6 +20,7 @@ import {
 	receiveUserPermissions,
 } from './actions';
 import {
+	getMethodName,
 	postTypeEntitiesFromResponse,
 	siteEntityFromResponse,
 	taxonomyEntitiesFromResponse,
@@ -240,6 +241,27 @@ export function buildHydratedInitialState() {
 		}
 
 		markResolved( entry.selector, entry.args );
+
+		// Entity records have shorthand-aliased selectors (`getPostType`
+		// for `getEntityRecord('root', 'postType', ...)`, `getThemes` for
+		// `getEntityRecords('root', 'theme', ...)`, etc.). They share the
+		// resolver implementation but each is registered as its own
+		// selector with its own resolution metadata — so when something
+		// calls `getPostType('post')` instead of `getEntityRecord(...)`,
+		// the alias's resolver will still fire unless we mark it
+		// resolved too.
+		if ( entry.selector === 'getEntityRecord' && entry.args.length >= 2 ) {
+			const [ kind, name, ...rest ] = entry.args;
+			markResolved( getMethodName( kind, name ), rest );
+		}
+		if ( entry.selector === 'getEntityRecords' && entry.args.length >= 2 ) {
+			const [ kind, name, ...rest ] = entry.args;
+			// Plural alias: derived from the entity's `plural` config —
+			// not always equal to `name + 's'`, so we skip the mark when
+			// we can't derive the right shorthand. (No callers in core
+			// today rely on this for the hydrated entities.)
+			markResolved( getMethodName( kind, name ), rest );
+		}
 
 		// When the entry primes a record's permissions via the Allow
 		// header, also mark every canUser resolution as finished so the

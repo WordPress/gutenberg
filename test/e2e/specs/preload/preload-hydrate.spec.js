@@ -79,6 +79,15 @@ test.describe( 'Preload hydration', () => {
 		);
 		expect( themeFetches ).toEqual( [] );
 
+		// The single post-type definition was triggering a refetch because
+		// the shorthand `getPostType( 'post' )` selector has its own
+		// resolution metadata, distinct from `getEntityRecord('root',
+		// 'postType', 'post')`. Make sure both routes stay quiet.
+		const typeFetches = requests.filter( ( r ) =>
+			/\/wp\/v2\/types\/post(?:\?|$)/.test( r )
+		);
+		expect( typeFetches ).toEqual( [] );
+
 		// The post must not be refetched (either the GET that primes the
 		// record, or the OPTIONS that the canUser resolver would issue
 		// when the record's Allow header isn't already in the store).
