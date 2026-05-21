@@ -6,6 +6,7 @@
 			"showSubmenuIcon": true,
 			"submenuVisibility": "hover",
 			"overlayMenu": "mobile",
+			"overlayMenuIconAnimation": true,
 			"icon": "handle",
 			"hasIcon": true,
 			"maxNestingLevel": 5
