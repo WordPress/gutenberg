@@ -21,7 +21,6 @@ jobs:
         env:
             GUTENBERG_REPRO_CI: '1'
             GUTENBERG_REPRO_ISSUE: ${{ github.event.issue.html_url }}
-            GUTENBERG_REPRO_WORKSPACE: ${{ runner.temp }}/gutenberg-repro
             TARGET_REPO: ${{ github.repository }}
         steps:
             - uses: actions/checkout@v4
@@ -48,7 +47,9 @@ jobs:
               run: npx playwright install --with-deps chromium
 
             - name: Prepare workspace
-              run: mkdir -p "$GUTENBERG_REPRO_WORKSPACE"
+              run: |
+                  echo "GUTENBERG_REPRO_WORKSPACE=$RUNNER_TEMP/gutenberg-repro" >> "$GITHUB_ENV"
+                  mkdir -p "$RUNNER_TEMP/gutenberg-repro"
 
             - name: Run Claude repro
               uses: anthropics/claude-code-action@v1
