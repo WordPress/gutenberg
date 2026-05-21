@@ -69,16 +69,6 @@ export const hasArchiveField = createBooleanField(
 	}
 );
 
-export const showInRestField = createBooleanField(
-	'show_in_rest',
-	__( 'Show in REST API' ),
-	{
-		description: __(
-			'Required for the block editor. Disable only if posts of this type should not be available via the REST API.'
-		),
-	}
-);
-
 export const countField: Field< PostTypeFormData > = {
 	id: 'count',
 	label: __( 'Posts' ),
@@ -289,7 +279,6 @@ export const generalForm: Form = {
 		'public',
 		'hierarchical',
 		'has_archive',
-		'show_in_rest',
 		'status',
 	],
 };

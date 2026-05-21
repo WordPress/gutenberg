@@ -29,7 +29,6 @@ export const BLANK_RECORD: TaxonomyFormData = {
 		show_tagcloud: true,
 		show_in_quick_edit: true,
 		show_admin_column: false,
-		show_in_rest: true,
 		sort: false,
 		default_term_enabled: false,
 		default_term: { name: '' },
@@ -161,7 +160,6 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 		show_tagcloud: config.show_tagcloud,
 		show_in_quick_edit: config.show_in_quick_edit,
 		show_admin_column: config.show_admin_column,
-		show_in_rest: config.show_in_rest,
 		sort: !! config.sort,
 		default_term_enabled: defaultTermName !== '',
 		default_term: { name: defaultTermName },
@@ -207,7 +205,6 @@ export function serializeForSave( data: TaxonomyFormData ) {
 			show_tagcloud: config.show_tagcloud,
 			show_in_quick_edit: config.show_in_quick_edit,
 			show_admin_column: config.show_admin_column,
-			show_in_rest: config.show_in_rest,
 			sort: config.sort,
 			...( description !== '' ? { description } : {} ),
 			...( includeDefaultTerm

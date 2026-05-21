@@ -50,7 +50,6 @@ import {
 	showInMenuField,
 	showInNavMenusField,
 	showInQuickEditField,
-	showInRestField,
 	showTagcloudField,
 	showUiField,
 	sortField,
@@ -160,7 +159,6 @@ function TaxonomyPage( {
 				statusField,
 				// Visibility
 				publicField,
-				showInRestField,
 				publiclyQueryableField,
 				showUiField,
 				showInMenuField,

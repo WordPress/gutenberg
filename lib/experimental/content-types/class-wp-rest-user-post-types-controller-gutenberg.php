@@ -115,7 +115,6 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 				'public'       => array( 'type' => 'boolean' ),
 				'hierarchical' => array( 'type' => 'boolean' ),
 				'has_archive'  => array( 'type' => 'boolean' ),
-				'show_in_rest' => array( 'type' => 'boolean' ),
 				// Caps payload size; well above any reasonable description.
 				'description'  => array(
 					'type'      => 'string',

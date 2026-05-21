@@ -43,7 +43,6 @@ export interface StoredConfig {
 	show_tagcloud: boolean;
 	show_in_quick_edit: boolean;
 	show_admin_column: boolean;
-	show_in_rest: boolean;
 	sort?: boolean;
 	default_term?: { name: string };
 }

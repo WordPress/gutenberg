@@ -31,7 +31,6 @@ export const BLANK_RECORD: PostTypeFormData = {
 		public: true,
 		hierarchical: false,
 		has_archive: false,
-		show_in_rest: true,
 	},
 };
 
@@ -203,7 +202,6 @@ export function toFormData( row: PostTypeRecord ): PostTypeFormData {
 			public: config.public ?? true,
 			hierarchical: config.hierarchical ?? false,
 			has_archive: config.has_archive ?? false,
-			show_in_rest: config.show_in_rest ?? true,
 		},
 		count: row.count,
 	};
@@ -232,7 +230,6 @@ export function serializeForSave( data: PostTypeFormData ) {
 			public: config.public,
 			hierarchical: config.hierarchical,
 			has_archive: config.has_archive,
-			show_in_rest: config.show_in_rest,
 			...( description !== '' ? { description } : {} ),
 		},
 	};

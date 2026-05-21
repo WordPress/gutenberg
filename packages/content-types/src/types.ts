@@ -14,7 +14,6 @@ export interface ContentType {
 		description: string;
 		public: boolean;
 		hierarchical: boolean;
-		show_in_rest: boolean;
 	};
 }
 

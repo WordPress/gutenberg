@@ -243,7 +243,7 @@ function gutenberg_build_user_post_type_args( WP_Post $record ) {
 		'public'       => ! empty( $config['public'] ),
 		'hierarchical' => $is_hierarchical,
 		'has_archive'  => ! empty( $config['has_archive'] ),
-		'show_in_rest' => isset( $config['show_in_rest'] ) ? (bool) $config['show_in_rest'] : true,
+		'show_in_rest' => true,
 		'supports'     => $supports,
 	);
 

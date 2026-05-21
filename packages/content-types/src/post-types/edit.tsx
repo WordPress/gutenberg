@@ -48,7 +48,6 @@ import {
 	removeFeaturedImageField,
 	searchItemsField,
 	setFeaturedImageField,
-	showInRestField,
 	supportsField,
 	uploadedToThisItemField,
 	useFeaturedImageField,
@@ -157,7 +156,6 @@ function PostTypePage( {
 				publicField,
 				hierarchicalField,
 				hasArchiveField,
-				showInRestField,
 				statusField,
 				// Labels
 				labelsActionsField,

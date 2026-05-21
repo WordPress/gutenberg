@@ -418,7 +418,7 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 			$args[ $key ] = (bool) $config[ $key ];
 		}
 	}
-	$args['show_in_rest'] = isset( $config['show_in_rest'] ) ? (bool) $config['show_in_rest'] : true;
+	$args['show_in_rest'] = true;
 
 	if ( isset( $config['default_term']['name'] ) ) {
 		$default_term_name = sanitize_text_field( (string) $config['default_term']['name'] );

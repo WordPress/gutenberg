@@ -68,7 +68,6 @@ export interface StoredConfig {
 	public?: boolean;
 	hierarchical?: boolean;
 	has_archive?: boolean;
-	show_in_rest?: boolean;
 }
 
 import type { ContentType } from '../types';

@@ -15,16 +15,6 @@ export const publicField = createBooleanField( 'public', __( 'Public' ), {
 	),
 } );
 
-export const showInRestField = createBooleanField(
-	'show_in_rest',
-	__( 'Show in REST API' ),
-	{
-		description: __(
-			'Required for the block editor. Turn off only for taxonomies that should not be exposed via REST.'
-		),
-	}
-);
-
 export const publiclyQueryableField = createBooleanField(
 	'publicly_queryable',
 	__( 'Publicly queryable' ),
@@ -101,7 +91,6 @@ export const showTagcloudField = createBooleanField(
 
 export const visibilityFormFields: Form[ 'fields' ] = [
 	'public',
-	'show_in_rest',
 	'publicly_queryable',
 	'show_ui',
 	'show_in_menu',
