@@ -173,18 +173,24 @@ export default function StartTemplateOptions() {
 				select( editorStore );
 			const _postType = getCurrentPostType();
 			const _postId = getCurrentPostId();
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+			const { getEditedEntityRecord, getEntityRecordNonTransientEdits } =
 				select( coreStore );
 			const templateRecord = getEditedEntityRecord(
 				'postType',
 				_postType,
 				_postId
 			);
-			const hasEdits = hasEditsForEntityRecord(
-				'postType',
-				_postType,
-				_postId
-			);
+			// Avoid `hasEditsForEntityRecord` — its `isSavingEntityRecord`
+			// branch fires `true` while the CRDT sync manager's phantom
+			// save is in flight at boot, which would suppress the modal.
+			const hasEdits =
+				Object.keys(
+					getEntityRecordNonTransientEdits(
+						'postType',
+						_postType,
+						_postId
+					) ?? {}
+				).length > 0;
 
 			return {
 				shouldOpenModal:

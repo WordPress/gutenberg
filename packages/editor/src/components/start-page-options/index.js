@@ -144,9 +144,10 @@ function StartPageOptionsModal( { onClose } ) {
 
 export default function StartPageOptions() {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const { isEditedPostDirty, isEditedPostEmpty } = useSelect( editorStore );
+	const { isEditedPostEmpty } = useSelect( editorStore );
+	const { getEntityRecordNonTransientEdits } = useSelect( coreStore );
 	const { isModalActive } = useSelect( interfaceStore );
-	const { enabled, postId } = useSelect( ( select ) => {
+	const { enabled, postType, postId } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const choosePatternModalEnabled = select( preferencesStore ).get(
 			'core',
@@ -154,6 +155,7 @@ export default function StartPageOptions() {
 		);
 		const currentPostType = getCurrentPostType();
 		return {
+			postType: currentPostType,
 			postId: getCurrentPostId(),
 			enabled:
 				choosePatternModalEnabled &&
@@ -166,7 +168,20 @@ export default function StartPageOptions() {
 	// Note: The `postId` ensures the effect re-runs when pages are switched without remounting the component.
 	// Examples: changing pages in the List View, creating a new page via Command Palette.
 	useEffect( () => {
-		const isFreshPage = ! isEditedPostDirty() && isEditedPostEmpty();
+		// Use the underlying edits selector rather than `isEditedPostDirty`,
+		// which also returns true while an `isSavingEntityRecord` is in
+		// flight. At boot, the CRDT sync manager kicks off a phantom save
+		// of the just-received post record (no real edits) and we don't
+		// want that side-effect to suppress the modal.
+		const hasEdits =
+			Object.keys(
+				getEntityRecordNonTransientEdits(
+					'postType',
+					postType,
+					postId
+				) ?? {}
+			).length > 0;
+		const isFreshPage = ! hasEdits && isEditedPostEmpty();
 		// Prevents immediately opening when features is enabled via preferences modal.
 		const isPreferencesModalActive = isModalActive( 'editor/preferences' );
 		if ( ! enabled || ! isFreshPage || isPreferencesModalActive ) {
@@ -177,8 +192,9 @@ export default function StartPageOptions() {
 		setIsOpen( true );
 	}, [
 		enabled,
+		postType,
 		postId,
-		isEditedPostDirty,
+		getEntityRecordNonTransientEdits,
 		isEditedPostEmpty,
 		isModalActive,
 	] );
