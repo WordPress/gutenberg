@@ -118,11 +118,6 @@ export { default as MenuItemsChoice } from './menu-items-choice';
 export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
-export { default as __experimentalNavigation } from './navigation';
-export { default as __experimentalNavigationBackButton } from './navigation/back-button';
-export { default as __experimentalNavigationGroup } from './navigation/group';
-export { default as __experimentalNavigationItem } from './navigation/item';
-export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	/** @deprecated Import `Navigator` instead. */
 	NavigatorProvider as __experimentalNavigatorProvider,
