@@ -1902,12 +1902,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/video-conversion",
-		"slug": "packages-video-conversion",
-		"markdown_source": "../packages/video-conversion/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/notices",
 		"slug": "packages-notices",
 		"markdown_source": "../packages/notices/README.md",
@@ -2115,6 +2109,12 @@
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/video-conversion",
+		"slug": "packages-video-conversion",
+		"markdown_source": "../packages/video-conversion/README.md",
 		"parent": "packages"
 	},
 	{

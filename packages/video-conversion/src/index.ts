@@ -34,7 +34,7 @@ const GIF_DEFAULT_FRAME_DURATION_US = 100_000;
  * the original GIF instead of surfacing a hard error.
  *
  * The contract is the message *prefix*, not the Error type: the worker RPC
- * layer (comctx) serializes a thrown error to its `message` string only — the
+ * layer (comctx) serializes a thrown error to its `message` string only - the
  * Error subclass, `name`, and `stack` do not survive the worker boundary.
  */
 export const UNSUPPORTED_ERROR_PREFIX = 'Unsupported';

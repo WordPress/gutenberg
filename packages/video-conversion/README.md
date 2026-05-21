@@ -39,7 +39,7 @@ _Returns_
 
 Converts an animated GIF to a video file (MP4 or WebM).
 
-Decodes GIF frames via the browser ImageDecoder (honoring per-frame delays) and re-encodes them via WebCodecs.
+Decodes GIF frames via the browser ImageDecoder (honoring per-frame delays) and re-encodes them with mediabunny / WebCodecs.
 
 Accepts the GIF as a Blob so the bytes are read once, here in the worker, instead of being materialized on the main thread and transferred. An ArrayBuffer is still accepted for direct callers and tests.
 
