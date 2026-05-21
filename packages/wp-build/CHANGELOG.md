@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use the boot layout background token for `#wpwrap` critical CSS in wp-admin pages to prevent a black flash before hydration.
+
 ## 0.14.0 (2026-05-14)
 
 ### Bug Fixes
