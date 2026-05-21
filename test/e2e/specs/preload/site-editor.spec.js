@@ -33,6 +33,17 @@ test.describe( 'Preload', () => {
 		admin,
 	} ) => {
 		const { requests, stop } = recordRequests( page );
+		const { requests: requestsUntilMount, stop: stopOnMount } =
+			recordRequests( page );
+
+		let preloadStatus;
+		page.on( 'console', ( msg ) => {
+			const text = msg.text();
+			if ( text.startsWith( '[api-fetch][preload] ' ) ) {
+				preloadStatus = text;
+				stopOnMount();
+			}
+		} );
 
 		await admin.visitSiteEditor();
 		await page
@@ -42,6 +53,14 @@ test.describe( 'Preload', () => {
 			.waitFor();
 		await waitForRequestsToSettle( requests );
 		stop();
+
+		// Everything the kickoff touches is served by the preload cache.
+		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
+			[]
+		);
+		expect( preloadStatus ).toBe(
+			'[api-fetch][preload] All preloads consumed.'
+		);
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
 		// fires twice within the captured window; the duplicate count
@@ -62,6 +81,17 @@ test.describe( 'Preload', () => {
 		admin,
 	} ) => {
 		const { requests, stop } = recordRequests( page );
+		const { requests: requestsUntilMount, stop: stopOnMount } =
+			recordRequests( page );
+
+		let preloadStatus;
+		page.on( 'console', ( msg ) => {
+			const text = msg.text();
+			if ( text.startsWith( '[api-fetch][preload] ' ) ) {
+				preloadStatus = text;
+				stopOnMount();
+			}
+		} );
 
 		await admin.visitAdminPage(
 			'site-editor.php',
@@ -74,6 +104,14 @@ test.describe( 'Preload', () => {
 			.waitFor();
 		await waitForRequestsToSettle( requests );
 		stop();
+
+		// Everything the kickoff touches is served by the preload cache.
+		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
+			[]
+		);
+		expect( preloadStatus ).toBe(
+			'[api-fetch][preload] All preloads consumed.'
+		);
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
 		// fires twice within the captured window; the duplicate count
