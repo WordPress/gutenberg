@@ -437,6 +437,8 @@ _Parameters_
 -   _$1_ `Object`: Named arguments.
 -   _$1.value_ `RichTextValue`: Rich text value.
 -   _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
+-   _$1.isEditableTree_ `[boolean]`: Render padding/boundary markers needed for editing (zero-width spaces, active format boundary class).
+-   _$1.placeholder_ `[string]`: Placeholder text to embed when the record is empty (only emitted when `isEditableTree` is true).
 
 _Returns_
 

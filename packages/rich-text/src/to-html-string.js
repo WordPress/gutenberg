@@ -22,13 +22,28 @@ import { toTree } from './to-tree';
  * @param {Object}        $1                      Named arguments.
  * @param {RichTextValue} $1.value                Rich text value.
  * @param {boolean}       [$1.preserveWhiteSpace] Preserves newlines if true.
+ * @param {boolean}       [$1.isEditableTree]     Render padding/boundary
+ *                                                markers needed for editing
+ *                                                (zero-width spaces, active
+ *                                                format boundary class).
+ * @param {string}        [$1.placeholder]        Placeholder text to embed
+ *                                                when the record is empty
+ *                                                (only emitted when
+ *                                                `isEditableTree` is true).
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( { value, preserveWhiteSpace } ) {
+export function toHTMLString( {
+	value,
+	preserveWhiteSpace,
+	isEditableTree,
+	placeholder,
+} ) {
 	const tree = toTree( {
 		value,
 		preserveWhiteSpace,
+		isEditableTree,
+		placeholder,
 		createEmpty,
 		append,
 		getLastChild,

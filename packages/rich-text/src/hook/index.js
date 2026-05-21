@@ -223,8 +223,29 @@ function useRichTextBase( {
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );
 
+	// Initial HTML to render via `dangerouslySetInnerHTML` so the editable
+	// content is present at React commit time, instead of being applied
+	// imperatively by `applyRecord` after the ref attaches. Computed once
+	// from the first record; subsequent updates go through `applyRecord`.
+	const initialHTMLRef = useRef( null );
+	if ( initialHTMLRef.current === null ) {
+		const initialValue = __unstableAddInvisibleFormats
+			? {
+					...recordRef.current,
+					formats: __unstableAddInvisibleFormats( recordRef.current ),
+			  }
+			: recordRef.current;
+		initialHTMLRef.current = toHTMLString( {
+			value: initialValue,
+			preserveWhiteSpace,
+			isEditableTree: true,
+			placeholder,
+		} );
+	}
+
 	return {
 		value: recordRef.current,
+		initialHTML: initialHTMLRef.current,
 		// A function to get the most recent value so event handlers in
 		// useRichText implementations have access to it. For example when
 		// listening to input events, we internally update the state, but this

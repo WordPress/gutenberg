@@ -345,6 +345,7 @@ export function RichTextWrapper(
 		onChange,
 		ref: richTextRef,
 		formatTypes,
+		initialHTML,
 	} = useRichText( {
 		value: adjustedValue,
 		onChange: adjustedOnChange,
@@ -477,6 +478,7 @@ export function RichTextWrapper(
 						: props.tabIndex
 				}
 				data-wp-block-attribute-key={ identifier }
+				dangerouslySetInnerHTML={ { __html: initialHTML } }
 			/>
 		</>
 	);
