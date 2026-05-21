@@ -134,6 +134,13 @@ interface InternalDashboardContextValue {
 	commitGridModelChange: ( targetModel: WidgetGridModel ) => void;
 
 	/**
+	 * Removes a widget from the layout, publishes the result, and exits
+	 * edit mode. Used when a stale instance must be dropped without a
+	 * separate Done step.
+	 */
+	removeWidgetAndCommit: ( uuid: string ) => void;
+
+	/**
 	 * Reverts both staging slices. By default also exits edit mode; pass
 	 * `{ exitEditMode: false }` when dismissing the layout settings drawer.
 	 */
@@ -283,10 +290,24 @@ export function WidgetDashboardProvider( {
 
 	const hasUncommittedChanges = hasLayoutChanges || hasGridSettingsChanges;
 
+	const publishLayout = useCallback(
+		( nextLayout: DashboardWidget[] ) => {
+			const canonical = canonicalize( nextLayout );
+			setStagingLayout( canonical );
+
+			if (
+				! fastDeepEqual( canonicalize( committedLayout ), canonical )
+			) {
+				onLayoutChange( canonical );
+			}
+		},
+		[ committedLayout, onLayoutChange ]
+	);
+
 	const commit = useCallback(
 		( options?: { exitEditMode?: boolean } ) => {
 			if ( hasLayoutChanges ) {
-				onLayoutChange( canonicalize( stagingLayout ) );
+				publishLayout( stagingLayout );
 			}
 
 			if ( hasGridSettingsChanges ) {
@@ -300,8 +321,8 @@ export function WidgetDashboardProvider( {
 		[
 			hasLayoutChanges,
 			hasGridSettingsChanges,
-			onLayoutChange,
 			onGridSettingsChange,
+			publishLayout,
 			stagingLayout,
 			stagingGridSettings,
 			onEditChange,
@@ -346,6 +367,28 @@ export function WidgetDashboardProvider( {
 		]
 	);
 
+	const removeWidgetAndCommit = useCallback(
+		( uuid: string ) => {
+			publishLayout(
+				stagingLayout.filter( ( widget ) => widget.uuid !== uuid )
+			);
+
+			if ( hasGridSettingsChanges ) {
+				onGridSettingsChange?.( stagingGridSettings );
+			}
+
+			onEditChange?.( false );
+		},
+		[
+			hasGridSettingsChanges,
+			onGridSettingsChange,
+			onEditChange,
+			publishLayout,
+			stagingGridSettings,
+			stagingLayout,
+		]
+	);
+
 	const resetGridSettings = useCallback( () => {
 		setStagingGridSettings( DEFAULT_GRID );
 	}, [] );
@@ -375,6 +418,7 @@ export function WidgetDashboardProvider( {
 			resetGridSettings,
 			commit,
 			commitGridModelChange,
+			removeWidgetAndCommit,
 			cancel,
 			hasUncommittedChanges,
 			editMode,
@@ -390,6 +434,7 @@ export function WidgetDashboardProvider( {
 			resetGridSettings,
 			commit,
 			commitGridModelChange,
+			removeWidgetAndCommit,
 			cancel,
 			hasUncommittedChanges,
 			editMode,
