@@ -125,6 +125,23 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 				);
 			}
 
+			if ( 'root' === $kind && 'globalStyles' === $entity_name ) {
+				// The user's global-styles record. `edit` context is only
+				// returnable to users who can edit theme options;
+				// everyone else gets the `view` projection.
+				$global_styles_ctx = current_user_can( 'edit_theme_options' )
+					? 'edit'
+					: 'view';
+				return array(
+					'path'   => add_query_arg(
+						'context',
+						$global_styles_ctx,
+						sprintf( '/wp/v2/global-styles/%d', (int) $key )
+					),
+					'method' => 'GET',
+				);
+			}
+
 			return null;
 
 		case 'getAutosaves':
@@ -171,25 +188,41 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 		case 'canUser':
 			// args: [ action, resource, id? ]. The resolver issues an
 			// OPTIONS to the resource's REST URL and parses the Allow
-			// header. We only wire the object-form `{ kind, name }` for
-			// postType entities here (string-form callers like
-			// `canUser( 'create', 'media' )` would resolve to the same
-			// HTTP request but under a different store-cache key, so
-			// they'd need their own spec to be hydrated).
+			// header. We wire the object-form `{ kind, name, id? }` for
+			// the entity kinds we know the REST base of from PHP.
+			// String-form callers like `canUser( 'create', 'media' )`
+			// would resolve to the same HTTP request but under a different
+			// store-cache key, so they'd need their own spec.
 			if ( count( $args ) < 2 ) {
 				return null;
 			}
-			$resource = $args[1];
+			$resource    = $args[1];
+			$resource_id = isset( $args[2] ) ? $args[2] : null;
 			if (
 				! is_array( $resource ) ||
-				! isset( $resource['kind'], $resource['name'] ) ||
-				'postType' !== $resource['kind'] ||
-				! post_type_exists( $resource['name'] )
+				! isset( $resource['kind'], $resource['name'] )
 			) {
 				return null;
 			}
+
+			if (
+				'postType' === $resource['kind'] &&
+				post_type_exists( $resource['name'] )
+			) {
+				$base = rest_get_route_for_post_type_items( $resource['name'] );
+			} elseif (
+				'root' === $resource['kind'] &&
+				'globalStyles' === $resource['name']
+			) {
+				$base = '/wp/v2/global-styles';
+			} else {
+				return null;
+			}
+
+			$id   = isset( $resource['id'] ) ? $resource['id'] : $resource_id;
+			$path = null !== $id ? $base . '/' . $id : $base;
 			return array(
-				'path'   => rest_get_route_for_post_type_items( $resource['name'] ),
+				'path'   => $path,
 				'method' => 'OPTIONS',
 			);
 	}
@@ -438,6 +471,29 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 		'selector' => '__experimentalGetCurrentThemeGlobalStylesVariations',
 		'args'     => array(),
 	);
+
+	// The user's global-styles record + the canUser OPTIONS for it.
+	if ( class_exists( 'WP_Theme_JSON_Resolver' ) ) {
+		$user_global_styles_id =
+			WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+		if ( $user_global_styles_id ) {
+			$specs[] = array(
+				'selector' => 'getEntityRecord',
+				'args'     => array( 'root', 'globalStyles', $user_global_styles_id ),
+			);
+			$specs[] = array(
+				'selector' => 'canUser',
+				'args'     => array(
+					'read',
+					array(
+						'kind' => 'root',
+						'name' => 'globalStyles',
+						'id'   => $user_global_styles_id,
+					),
+				),
+			);
+		}
+	}
 
 	/**
 	 * Filter the list of selector specs hydrated into the @wordpress/core-data
