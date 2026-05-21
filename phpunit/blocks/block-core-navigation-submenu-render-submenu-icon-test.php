@@ -1,0 +1,40 @@
+<?php
+/**
+ * Tests for the deprecated block_core_navigation_submenu_render_submenu_icon() shim.
+ *
+ * @package WordPress
+ * @subpackage Blocks
+ */
+
+/**
+ * @group blocks
+ */
+class Block_Core_Navigation_Submenu_Render_Submenu_Icon_Test extends WP_UnitTestCase {
+
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		require_once dirname( __DIR__, 2 ) . '/packages/block-library/src/navigation-link/shared/render-submenu-icon.php';
+	}
+
+	/**
+	 * @ticket 65287
+	 */
+	public function test_function_exists() {
+		$this->assertTrue(
+			function_exists( 'block_core_navigation_submenu_render_submenu_icon' ),
+			'The deprecated shim block_core_navigation_submenu_render_submenu_icon() should exist.'
+		);
+	}
+
+	/**
+	 * @ticket 65287
+	 * @expectedDeprecated block_core_navigation_submenu_render_submenu_icon
+	 */
+	public function test_returns_same_markup_as_shared_helper() {
+		$this->assertSame(
+			block_core_shared_navigation_render_submenu_icon(),
+			block_core_navigation_submenu_render_submenu_icon()
+		);
+	}
+}
