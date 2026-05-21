@@ -6,6 +6,8 @@
 
 - Fix `mergeSchemas` in `getBlockContentSchemaFromTransforms` to preserve array values (e.g. `classes`) instead of converting them to objects with numeric string keys when merging schemas ([#70615](https://github.com/WordPress/gutenberg/pull/70615)).
 
+## 15.19.0 (2026-05-14)
+
 ## 15.18.0 (2026-04-29)
 
 - Update `registerBlockType` to accept the attributes type as a generic.

@@ -30,8 +30,9 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
-import { getImageFit } from '../../core/camera';
-import { getImageCropBounds } from '../../core/containment';
+import { getImageFit, getRotatedBBox } from '../../core/camera';
+import { getImageCropBounds, getMinZoom } from '../../core/containment';
+import { MIN_CROP_PIXELS } from '../../core/constants';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -95,7 +96,7 @@ export interface CropperProps {
 	showDimming?: boolean;
 	/** Show the live output dimensions tooltip during a resize. */
 	showDimensions?: boolean;
-	/** Minimum zoom level. */
+	/** Minimum zoom level override. Defaults to the coverage-aware minimum. */
 	minZoom?: number;
 	/** Maximum zoom level. */
 	maxZoom?: number;
@@ -148,7 +149,7 @@ export interface CropperProps {
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
  * @param root0.showDimming       Show dimming overlay outside crop.
  * @param root0.showDimensions    Show live dimensions tooltip during resize.
- * @param root0.minZoom           Minimum zoom level.
+ * @param root0.minZoom           Minimum zoom level override.
  * @param root0.maxZoom           Maximum zoom level.
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
@@ -290,6 +291,32 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
+	// Per-axis minimum crop size in normalized space, expressing a
+	// pixel floor on the captured source region. cropRect is normalized
+	// in the viewport's snap-rotation bbox; the captured source-pixel
+	// width is `cropRect.width * bbox.width / zoom`, so the normalized
+	// floor scales with `zoom` to keep the source-pixel floor constant.
+	// Without this, SETTLE_CROP zooms in proportional to the shrink and
+	// successive drags can crop arbitrarily small.
+	const minCropSize: Size | undefined = useMemo( () => {
+		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		return {
+			width: Math.min( 1, ( MIN_CROP_PIXELS * state.zoom ) / bbox.width ),
+			height: Math.min(
+				1,
+				( MIN_CROP_PIXELS * state.zoom ) / bbox.height
+			),
+		};
+	}, [ naturalWidth, naturalHeight, state.rotation, state.zoom ] );
+
 	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
 	// ratio is selected. With "Free" selected, turning freeform handles off
 	// should preserve the user's current unconstrained crop.
@@ -348,6 +375,8 @@ function CropperInner(
 		}
 		return getImageCropBounds( state, elementSize, visualSize );
 	}, [ state, elementSize, visualSize ] );
+	const effectiveMinZoom =
+		minZoom !== undefined ? minZoom : getMinZoom( state );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
@@ -366,7 +395,7 @@ function CropperInner(
 		isZooming,
 		isPlacementActive: isInteractionPlacementActive,
 	} = useInteraction( state, controller, canvasSize, visualSize, {
-		minZoom,
+		minZoom: effectiveMinZoom,
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,
@@ -740,6 +769,7 @@ function CropperInner(
 						freeformCrop={ freeformCrop }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
+						minCropSize={ minCropSize }
 					/>
 
 					{ /* Rule-of-thirds grid */ }

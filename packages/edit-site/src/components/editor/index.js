@@ -14,14 +14,14 @@ import {
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, arrowUpLeft } from '@wordpress/icons';
+import { Icon, arrowUpLeft, arrowUpRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -208,6 +208,8 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		duration: disableMotion ? 0 : 0.2,
 	};
 
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
+
 	return ! isBlockBasedTheme && isHomeRoute ? (
 		<SitePreview />
 	) : (
@@ -274,24 +276,50 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 												);
 											} }
 										>
-											<motion.div
-												variants={ siteIconVariants }
-											>
-												<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
-											</motion.div>
-										</Button>
-										<motion.div
-											className={ clsx(
-												'edit-site-editor__back-icon',
-												{
-													'has-site-icon':
-														hasSiteIcon,
-												}
+											{ ! hasAdminBarInEditor && (
+												<motion.div
+													variants={
+														! disableMotion &&
+														siteIconVariants
+													}
+												>
+													<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
+												</motion.div>
 											) }
-											variants={ toggleHomeIconVariants }
-										>
-											<Icon icon={ arrowUpLeft } />
-										</motion.div>
+										</Button>
+										{ hasAdminBarInEditor ? (
+											<div className="edit-site-editor__back-icon">
+												<Icon
+													icon={
+														isRTL()
+															? arrowUpRight
+															: arrowUpLeft
+													}
+												/>
+											</div>
+										) : (
+											<motion.div
+												className={ clsx(
+													'edit-site-editor__back-icon',
+													{
+														'has-site-icon':
+															hasSiteIcon,
+													}
+												) }
+												variants={
+													! disableMotion &&
+													toggleHomeIconVariants
+												}
+											>
+												<Icon
+													icon={
+														isRTL()
+															? arrowUpRight
+															: arrowUpLeft
+													}
+												/>
+											</motion.div>
+										) }
 									</motion.div>
 								)
 							}

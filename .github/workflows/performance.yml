@@ -56,7 +56,7 @@ jobs:
 
             - name: Compare performance with base branch
               if: github.event_name == 'pull_request'
-              run: ./bin/plugin/cli.js perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA"
+              run: npm exec --no release-cli -- perf "$GITHUB_SHA" "$GITHUB_BASE_REF" --tests-branch "$GITHUB_SHA"
 
             - name: Compare performance with current WordPress Core and previous Gutenberg versions
               if: github.event_name == 'release'
@@ -71,7 +71,7 @@ jobs:
                   WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
+                  npm exec --no release-cli -- perf "wp/$WP_MAJOR" "$PREVIOUS_RELEASE_BRANCH" "$CURRENT_RELEASE_BRANCH" --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
 
             - name: Compare performance with base branch
               if: github.event_name == 'push'
@@ -83,7 +83,7 @@ jobs:
                   WP_VERSION="$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)"
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf "$GITHUB_SHA" dae102af1458310b05de3c1281b1654951a729ab --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
+                  npm exec --no release-cli -- perf "$GITHUB_SHA" dae102af1458310b05de3c1281b1654951a729ab --tests-branch "$GITHUB_SHA" --wp-version "$WP_MAJOR"
 
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
@@ -91,7 +91,7 @@ jobs:
                   BRANCHES: ${{ github.event.inputs.branches }}
                   WP_VERSION: ${{ github.event.inputs.wpversion }}
               run: |
-                  ./bin/plugin/cli.js perf "$(echo "$BRANCHES" | tr ',' ' ')" --tests-branch "$GITHUB_SHA" --wp-version "$WP_VERSION"
+                  npm exec --no release-cli -- perf "$(echo "$BRANCHES" | tr ',' ' ')" --tests-branch "$GITHUB_SHA" --wp-version "$WP_VERSION"
 
             - name: Add workflow summary
               run: cat "${WP_ARTIFACTS_PATH}/summary.md" >> "$GITHUB_STEP_SUMMARY"

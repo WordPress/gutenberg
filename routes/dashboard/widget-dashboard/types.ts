@@ -1,5 +1,12 @@
 /**
- * Widget type definitions.
+ * Widget type definitions for the dashboard engine.
+ *
+ * The widget identity types (`WidgetName`, `WidgetTypeMetadata`,
+ * `WidgetType`) live in `routes/dashboard/widget-types/types` and are
+ * re-exported here so dashboard internals can pull every type they need
+ * from a single module. The local declarations below cover the
+ * dashboard-specific surface area: `DashboardWidget`, render props,
+ * module resolver, grid settings, and the `WidgetDashboard` prop bag.
  */
 
 /**
@@ -10,155 +17,52 @@ import type { ComponentType, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import type { IconType } from '@wordpress/components';
-import type { Field } from '@wordpress/dataviews';
-import type { DashboardGridLayoutItem } from '@wordpress/grid';
-
-/*
- * MIGRATION: `WidgetName`, `WidgetTypeMetadata`, and `WidgetType` below
- * are also defined in `@wordpress/widget-types` (currently on its own
- * branch). When that package lands in trunk, replace the three
- * declarations with:
- *
- *   export type {
- *       WidgetName,
- *       WidgetTypeMetadata,
- *       WidgetType,
- *   } from '@wordpress/widget-types';
- *
- * The shapes are kept identical on purpose so the swap is mechanical —
- * any change to the fields here must land in lockstep on the
- * `@wordpress/widget-types` package to keep the cutover trivial.
- */
+import type {
+	DashboardGridLayoutItem,
+	DashboardLanesLayoutItem,
+} from '@wordpress/grid';
 
 /**
- * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
- * Both segments are lowercase, kebab-case; the full character pattern is
- * enforced by the `widget.json` schema at authoring time.
+ * Internal dependencies
  */
-export type WidgetName = `${ string }/${ string }`;
+import type {
+	WidgetName,
+	WidgetTypeMetadata,
+	WidgetType,
+} from '../widget-types/types';
 
-/**
- * Literal contents of a widget's `widget.json` metadata file.
- *
- * Captures the *authoring* shape only — module entry points and style
- * assets are discovered by convention from the widget directory
- * (`render.*`, `widget.*`, `render.scss`), not declared here.
- *
- * Consumed by tooling (IDE autocomplete, validation, the build pipeline).
- * The dashboard engine consumes the richer `WidgetType` below, which
- * extends this shape with runtime-only fields produced by the build
- * manifest.
- */
-export interface WidgetTypeMetadata {
-	/**
-	 * Version of the Widget API used by the widget.
-	 */
-	apiVersion: number;
-
-	/**
-	 * Stable type identifier. See `WidgetName` for the shape.
-	 */
-	name: WidgetName;
-
-	/**
-	 * Display title; shown in the inserter.
-	 */
-	title: string;
-
-	/**
-	 * Short description shown in the widget inspector.
-	 */
-	description?: string;
-
-	/**
-	 * Visual identifier shown in the widget header; dashicon string, React node, or SVG component.
-	 */
-	icon?: IconType;
-
-	/**
-	 * Grouping category. Core provides `dashboard`; plugins and themes may
-	 * register custom categories.
-	 */
-	category?: string;
-
-	/**
-	 * Search aliases used to surface the widget from the inserter.
-	 */
-	keywords?: string[];
-
-	/**
-	 * Widget version — used for asset cache invalidation.
-	 */
-	version?: string;
-
-	/**
-	 * Gettext text domain for translations.
-	 */
-	textdomain?: string;
-
-	/**
-	 * Experiment gate — boolean `true`, or a specific experiment name.
-	 */
-	__experimental?: string | boolean;
-
-	/**
-	 * Declarative attribute schema. Surfaces render forms straight from
-	 * this list via `DataForm`, with no per-widget form wiring. `any` is
-	 * used here because the array is heterogeneous — each widget narrows
-	 * `Item` to its own attribute type at the point of registration.
-	 */
-	attributes?: Field< any >[];
-
-	/**
-	 * Structured example data for the Inspector Help Panel preview, and
-	 * the default attributes applied by `createDashboardWidget` when no
-	 * initial attributes are supplied.
-	 */
-	example?: {
-		attributes?: Record< string, unknown >;
-	};
-}
-
-/**
- * Runtime widget type consumed by the dashboard engine.
- *
- * Extends `WidgetTypeMetadata` (the authoring shape of `widget.json`) with
- * runtime-only fields produced by the build pipeline — notably
- * `renderModule`, which maps each widget to its discovered script-module
- * entry point.
- *
- * Surfaces consume `WidgetType[]` via the `widgetTypes` prop; the
- * dashboard never reads the widget-types store directly.
- */
-export interface WidgetType extends WidgetTypeMetadata {
-	/**
-	 * Script-module identifier resolved to a React component at render
-	 * time by `ResolveWidgetModule`. Produced by the build pipeline from
-	 * the conventional `render.*` / `widget.*` entry points; not declared
-	 * in `widget.json`.
-	 */
-	renderModule: string;
-}
+export type { WidgetName, WidgetTypeMetadata, WidgetType };
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
+export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
+
+/**
+ * Storage shape for a widget's placement.
+ *
+ * Structurally a union of every supported per-model shape, but the
+ * intended invariant is stronger than the type suggests: every
+ * placement in a given layout must match the shape of the currently
+ * active `gridSettings.model`. `migrateLayout` is the only correct
+ * way to transition placements across model changes; the render
+ * layer is allowed to trust the active model and treat each
+ * placement as the matching shape.
+ *
+ * The type system cannot enforce that invariant on its own (there is
+ * no discriminator on the placement itself), so consider this union a
+ * declaration of which shapes are *valid*, not which shape any given
+ * placement happens to be at runtime.
+ */
+export type DashboardTilePlacement = GridTilePlacement | MasonryTilePlacement;
 
 /**
  * A widget placed on the dashboard.
  *
- * A `WidgetType` describes the blueprint. A `DashboardWidget` is a concrete
- * placement of that type on a specific dashboard: its unique id, the type it
- * references, user-configured attributes, and its `placement` in the grid.
- *
- * The `Placement` generic defaults to the packed grid's item shape
- * (`DashboardGridLayoutItem` minus `key`, which the engine derives from
- * `uuid`). A different grid model — masonry, stack, absolute — would use a
- * different `Placement` shape; the widget identity stays unchanged.
+ * A `WidgetType` describes the blueprint. A `DashboardWidget` is a
+ * concrete placement of that type on a specific dashboard: its unique
+ * id, the type it references, user-configured attributes, and its
+ * `placement` in the grid.
  */
-export interface DashboardWidget<
-	Item = unknown,
-	Placement = GridTilePlacement,
-> {
+export interface DashboardWidget< Item = unknown > {
 	/**
 	 * Unique instance identifier.
 	 */
@@ -175,9 +79,12 @@ export interface DashboardWidget<
 	attributes?: Item;
 
 	/**
-	 * Grid-model-specific placement (column/row spans, ordering, etc.).
+	 * Grid-model-specific placement (column/row spans, ordering,
+	 * etc.). Must match the shape implied by the dashboard's active
+	 * `gridSettings.model`; see `DashboardTilePlacement` for the
+	 * invariant and `migrateLayout` for the transition mechanism.
 	 */
-	placement?: Placement;
+	placement?: DashboardTilePlacement;
 }
 
 /**
@@ -234,39 +141,83 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
- * Grid-model configuration. Today maps to `@wordpress/grid`'s settings.
- * When alternative grid models (masonry, stack, ...) ship, this type
- * becomes a discriminated union keyed by the chosen model and per-model
- * settings are inferred from the model's own props.
+ * Identifier for the active grid model. Drives which `@wordpress/grid`
+ * surface the dashboard mounts and which per-model settings the
+ * `WidgetGridSettings` union admits.
  *
- * `columns` and `minColumnWidth` are mutually exclusive at runtime — set
- * either one or the other depending on whether you want a fixed or
- * responsive grid. The dashboard does not enforce the xor at the type
- * level so `react-docgen-typescript` (Storybook) can serialize the prop
- * cleanly; the underlying grid component handles the conflict.
+ * Model names describe user-facing concepts. The mapping to the
+ * underlying `@wordpress/grid` component is an implementation detail
+ * resolved in the render layer; `'masonry'` is rendered today through
+ * `DashboardLanes` (skyline placement) but could swap to a future
+ * native `display: grid-lanes` path without affecting the model name.
  */
-export interface WidgetGridSettings {
+export type WidgetGridModel = 'grid' | 'masonry';
+
+/**
+ * Settings common to every grid model. `columns` and `minColumnWidth`
+ * compose as a layered model at runtime: `columns` caps the count and
+ * `minColumnWidth` enforces a per-tile width floor that can reduce the
+ * count on narrow containers. See `@wordpress/grid` for the resolution.
+ *
+ * `spacing` is intentionally absent: the gap between tiles is
+ * presentational and lives with the design-system theme/density, not
+ * with per-dashboard settings. The grid surface keeps the prop for
+ * programmatic overrides, but the dashboard does not propagate it.
+ */
+interface BaseWidgetGridSettings {
 	/**
-	 * Fixed column count. Mutually exclusive with `minColumnWidth`.
+	 * Target column count (cap). When omitted alongside
+	 * `minColumnWidth`, the grid renders six columns.
 	 */
 	columns?: number;
 
 	/**
-	 * Responsive minimum column width in pixels. Mutually exclusive with
-	 * `columns`.
+	 * Per-tile minimum width in pixels. Acts as a floor that can
+	 * reduce the effective column count below `columns` on narrow
+	 * containers.
 	 */
 	minColumnWidth?: number;
+}
+
+/**
+ * 2D packed grid settings. Items declare explicit width and height
+ * spans; rows can be uniform-sized or content-sized via `rowHeight`.
+ */
+export interface WidgetGridLayoutSettings extends BaseWidgetGridSettings {
+	model?: 'grid';
 
 	/**
-	 * Row height in pixels, or `'auto'`.
+	 * Row height in pixels, or `'auto'` to let the tallest item in
+	 * each row size it.
 	 */
 	rowHeight?: number | 'auto';
+}
+
+/**
+ * Masonry settings. Heights are content-driven; resize is
+ * horizontal-only. `flowTolerance` tunes how aggressively the placer
+ * preserves source order vs. minimizing empty regions.
+ */
+export interface WidgetMasonryLayoutSettings extends BaseWidgetGridSettings {
+	model: 'masonry';
 
 	/**
-	 * Grid gap multiplier (multiplied by 4px).
+	 * Pixel tolerance for source-order tiebreaking when two candidate
+	 * columns have similar baselines.
 	 */
-	spacing?: number;
+	flowTolerance?: number;
 }
+
+/**
+ * Discriminated union of supported grid-model configurations.
+ *
+ * When `model` is omitted the dashboard treats the settings as the
+ * 2D packed grid (`'grid'`) for backwards compatibility with the
+ * pre-union shape.
+ */
+export type WidgetGridSettings =
+	| WidgetGridLayoutSettings
+	| WidgetMasonryLayoutSettings;
 
 /**
  * Props for `WidgetDashboard`.
@@ -322,6 +273,15 @@ export interface WidgetDashboardProps {
 	 * Grid model configuration. See `WidgetGridSettings` for the shape.
 	 */
 	gridSettings?: WidgetGridSettings;
+
+	/**
+	 * Called when the user commits in-progress grid-settings edits via
+	 * the Done action. The dashboard maintains a staging copy of
+	 * settings internally; mutations stay local until commit. When
+	 * omitted, the `Layout settings` entry in the more-actions menu is
+	 * hidden, since there is nowhere to persist the change.
+	 */
+	onGridSettingsChange?: ( gridSettings: WidgetGridSettings ) => void;
 
 	children?: ReactNode;
 }

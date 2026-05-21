@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Editor: Add padding around inline notices in the editor content area and distraction-free header.
+
+### Bug Fixes
+
+-   `mediaFinalize` now returns the post-finalize attachment (transformed from the REST response), so the upload-media queue can refresh the in-flight attachment URL. Required for the front-end `srcset` to render on client-side-media uploads that exceeded the big-image threshold.
+
+## 14.46.0 (2026-05-14)
+
 ### Internal
 
 -   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).

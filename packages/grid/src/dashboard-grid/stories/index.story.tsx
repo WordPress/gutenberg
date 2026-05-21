@@ -28,7 +28,6 @@ const meta: Meta< typeof DashboardGrid > = {
 	tags: [ 'status-experimental' ],
 	args: {
 		columns: 6,
-		spacing: 2,
 		rowHeight: 80,
 		editMode: false,
 	},
@@ -42,10 +41,6 @@ const meta: Meta< typeof DashboardGrid > = {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
 				'Enables responsive mode. Per-column lower bound in pixels.',
-		},
-		spacing: {
-			control: { type: 'number', min: 0, max: 16, step: 1 },
-			description: 'Gap multiplier (effective gap = spacing × 4px).',
 		},
 		rowHeight: {
 			control: { type: 'number', min: 24, max: 400, step: 4 },
@@ -157,7 +152,7 @@ function TileActions( {
 				variant="solid"
 				tone={ isFill ? 'brand' : 'neutral' }
 				icon={ justifyStretch }
-				label="Fill width"
+				label="Fill available width"
 				aria-pressed={ isFill }
 				onClick={ onToggleFill }
 			/>
@@ -337,6 +332,50 @@ export const Responsive: Story = {
 };
 
 /**
+ * Layered configuration: `columns` caps the count and
+ * `minColumnWidth` enforces a per-tile width floor. The grid renders
+ * up to `columns` columns on wide containers and reduces the count
+ * on narrow ones whenever fitting all of them would push tiles
+ * below `minColumnWidth`. Resize the preview to see the cap apply
+ * on wide widths and the floor reduce the count on narrow widths.
+ */
+export const Layered: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 1, order: 1 },
+			{ key: 'b', width: 2, order: 2 },
+			{ key: 'c', width: 2, order: 3 },
+			{ key: 'd', width: 1, order: 4 },
+			{ key: 'e', width: 2, order: 5 },
+			{ key: 'f', width: 2, order: 6 },
+		],
+		rowHeight: 96,
+		columns: 6,
+		minColumnWidth: 240,
+		children: [
+			<Tile key="a" tone="brand">
+				width: 1
+			</Tile>,
+			<Tile key="b" tone="info">
+				width: 2
+			</Tile>,
+			<Tile key="c" tone="success">
+				width: 2
+			</Tile>,
+			<Tile key="d" tone="warning">
+				width: 1
+			</Tile>,
+			<Tile key="e" tone="error">
+				width: 2
+			</Tile>,
+			<Tile key="f" tone="neutral">
+				width: 2
+			</Tile>,
+		],
+	},
+};
+
+/**
  * A `width: 'fill'` item expands to cover the remaining columns in
  * its row. Mix it with fixed-width items on either side to build
  * sidebar-like layouts that adapt to the column count.
@@ -441,15 +480,11 @@ export const RowHeight: Story = {
 /**
  * Edit mode with drag, resize, and all width modes. While `editMode`
  * is on, `<DashboardGrid />` paints its default overlay behind the
- * tiles to visualize the underlying template: diagonal stripes, a
- * dashed outline on each column track, a subtle column fill that
- * marks the drop zones against the gaps, and a 1px row divider when
- * `rowHeight` is numeric. The overlay disappears when `editMode`
- * flips back to `false`.
+ * tiles to visualize the underlying template: rounded row-marker
+ * tiles in each column when `rowHeight` is numeric. The overlay
+ * disappears when `editMode` flips back to `false`.
  *
- * Theme the default look in place via CSS custom properties exposed
- * by the package (`--wp-grid-overlay-stripe-color`,
- * `--wp-grid-overlay-track-color`, `--wp-grid-overlay-column-fill`),
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
  * or replace the visual wholesale by passing `renderGridOverlay`.
  * See the `Custom Grid Overlay` story for a full override example.
  *
@@ -461,7 +496,6 @@ export const RowHeight: Story = {
 export const EditMode: Story = {
 	args: {
 		columns: 12,
-		spacing: 4,
 		rowHeight: 80,
 		editMode: true,
 	},
@@ -711,7 +745,6 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
 export const Customization: Story = {
 	args: {
 		columns: 6,
-		spacing: 2,
 		rowHeight: 80,
 		editMode: true,
 		layout: [
@@ -783,14 +816,9 @@ export const Customization: Story = {
  *
  * @param props          Render props supplied by the grid.
  * @param props.columns  Number of column tracks to mirror.
- * @param props.gapPx    Gap between tracks in pixels.
  * @param props.isActive Whether the overlay should be visible.
  */
-function NumberedOverlay( {
-	columns,
-	gapPx,
-	isActive,
-}: GridOverlayRenderProps ) {
+function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 	return (
 		<div
 			aria-hidden
@@ -799,7 +827,7 @@ function NumberedOverlay( {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: gapPx,
+				gap: 'var(--wpds-dimension-gap-xl)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',
@@ -846,9 +874,9 @@ function NumberedOverlay( {
  * Replaces the package's default edit-mode overlay with a custom
  * visual through the `renderGridOverlay` prop. The grid mounts the
  * supplied component as a sibling behind the tiles whenever
- * `editMode` is on, passing the resolved `{ columns, gapPx,
- * rowHeight }` so the override can reproduce the column and row
- * tracks pixel-accurately without re-deriving them.
+ * `editMode` is on, passing the resolved `{ columns, rowHeight }`
+ * so the override can reproduce the column and row tracks
+ * pixel-accurately without re-deriving them.
  *
  * Here the override (see `NumberedOverlay` above) swaps the warning
  * tone for info, drops the row dividers, and labels each column
@@ -860,7 +888,6 @@ export const CustomGridOverlayStory: Story = {
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 12,
-		spacing: 4,
 		rowHeight: 80,
 		editMode: true,
 		layout: [

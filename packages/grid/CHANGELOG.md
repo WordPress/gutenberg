@@ -4,9 +4,28 @@
 
 ### Enhancements
 
+-   Clamp tile resize so width cannot shrink below a single column
+    track (and height below a single row on `DashboardGrid` when
+    vertical resize is enabled).
+-   Rework the default edit-mode `GridOverlay` to paint per-row marker
+    tiles (with `border-radius` md) inside each column instead of
+    column backgrounds, outlines, and repeating row dividers. Theme via
+    `--wp-grid-overlay-tile-bg`.
+    `GridOverlayRenderProps` now includes `rows` for uniform-row grids.
+-   Animate sibling tiles when layout reflows during drag or resize in
+    edit mode (FLIP transform). Respects `prefers-reduced-motion`.
+-   Add `--wp-grid-placeholder-outline-style` and
+    `--wp-grid-resize-preview-outline-style` CSS custom properties for
+    the drag-placeholder outline (default `dashed`) and resize-preview
+    border (default `solid`).
 -   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
     element while any tile resize gesture is active, so consumers can
     adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).
+-   Add `--wp-grid-gap` so consumers can set tile spacing per surface
+    without remapping design-system tokens (defaults to
+    `--wpds-dimension-gap-xl`).
+-   Increase the default tile gap from `--wpds-dimension-gap-md` to
+    `--wpds-dimension-gap-xl`.
 
 ### New Features
 
@@ -32,6 +51,15 @@
     `--wp-grid-placeholder-opacity`,
     `--wp-grid-placeholder-outline-color`,
     `--wp-grid-placeholder-radius`).
+
+### Breaking changes
+
+-   Remove the `spacing` prop from `DashboardGrid` and `DashboardLanes`.
+    The gap between tiles is now owned by the design-system gap token
+    (`--wpds-dimension-gap-md`) applied in CSS; override via theme or
+    density rather than per instance. `GridOverlayRenderProps` no
+    longer exposes `spacing` or `gapPx`; the overlay inherits the same
+    gap token. The `DashboardGridSpacing` type export is removed.
 
 ### Internal
 

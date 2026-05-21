@@ -33,6 +33,7 @@ const meta: Meta< typeof CollapsibleCard.Root > = {
 		'CollapsibleCard.Header': CollapsibleCard.Header,
 		'CollapsibleCard.HeaderDescription': CollapsibleCard.HeaderDescription,
 		'CollapsibleCard.Content': CollapsibleCard.Content,
+		'Card.FullBleed': Card.FullBleed,
 	},
 	parameters: {
 		componentStatus: {
@@ -313,4 +314,69 @@ export const ComparedToCard: Story = {
 			</Card.Root>
 		</div>
 	),
+};
+
+/**
+ * When `Card.FullBleed` is the sole child of `CollapsibleCard.Content` and a
+ * header sits above it, the media bumps against the card&apos;s side and
+ * bottom edges while the header retains its normal padding. (Unlike a plain
+ * `Card`, a header is always required here for the collapse trigger — see
+ * `Card` stories for a body-only `FullBleedCoverOnly` example.)
+ */
+export const FullBleedCoverWithHeader: Story = {
+	argTypes: { open: { control: false } },
+	args: {
+		defaultOpen: true,
+		children: (
+			<>
+				<CollapsibleCard.Header>
+					<Card.Title>Card title</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Card.FullBleed>
+						<div
+							style={ {
+								height: 180,
+								background:
+									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+							} }
+						/>
+					</Card.FullBleed>
+				</CollapsibleCard.Content>
+			</>
+		),
+	},
+};
+
+/**
+ * `Card.FullBleed` breaks out of the content padding to span edge-to-edge.
+ * Useful for images, dividers, or embedded content inside the collapsible
+ * region.
+ */
+export const WithFullBleed: Story = {
+	argTypes: { open: { control: false } },
+	args: {
+		defaultOpen: true,
+		children: (
+			<>
+				<CollapsibleCard.Header>
+					<Card.Title>Featured image</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content
+					render={ <Stack direction="column" gap="lg" /> }
+				>
+					<Card.FullBleed>
+						<div
+							style={ {
+								height: 160,
+								background:
+									'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+							} }
+						/>
+					</Card.FullBleed>
+					<Text>Content below the full-bleed area.</Text>
+				</CollapsibleCard.Content>
+			</>
+		),
+	},
 };
