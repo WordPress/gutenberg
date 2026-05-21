@@ -10,14 +10,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import { DEFAULT_DEVICE_TYPE } from '../block-editor/use-viewport-sync';
 
 export function useAdaptEditorToCanvas( canvas ) {
-	const { clearSelectedBlock, resetZoomLevel } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const {
 		editPost,
 		setDeviceType,
@@ -53,10 +49,6 @@ export function useAdaptEditorToCanvas( canvas ) {
 			} else {
 				setIsListViewOpened( false );
 			}
-
-			if ( isMediumOrBigger && isZoomOut() ) {
-				resetZoomLevel();
-			}
 		} );
 	}, [
 		canvas,
@@ -68,8 +60,6 @@ export function useAdaptEditorToCanvas( canvas ) {
 		setIsInserterOpened,
 		setIsListViewOpened,
 		getPreference,
-		resetZoomLevel,
-		isZoomOut,
 		getCurrentPost,
 	] );
 }
