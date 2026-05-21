@@ -104,6 +104,31 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 			}
 
 			return null;
+
+		case 'canUser':
+			// args: [ action, resource, id? ]. The resolver issues an
+			// OPTIONS to the resource's REST URL and parses the Allow
+			// header. We only wire the object-form `{ kind, name }` for
+			// postType entities here (string-form callers like
+			// `canUser( 'create', 'media' )` would resolve to the same
+			// HTTP request but under a different store-cache key, so
+			// they'd need their own spec to be hydrated).
+			if ( count( $args ) < 2 ) {
+				return null;
+			}
+			$resource = $args[1];
+			if (
+				! is_array( $resource ) ||
+				! isset( $resource['kind'], $resource['name'] ) ||
+				'postType' !== $resource['kind'] ||
+				! post_type_exists( $resource['name'] )
+			) {
+				return null;
+			}
+			return array(
+				'path'   => rest_get_route_for_post_type_items( $resource['name'] ),
+				'method' => 'OPTIONS',
+			);
 	}
 
 	return null;
@@ -187,7 +212,14 @@ function gutenberg_build_hydration_entry( $spec, $response ) {
 		'data'     => $response['body'],
 	);
 
-	if ( 'getEntityRecord' === $spec['selector'] ) {
+	// Both `getEntityRecord` and `canUser` derive their canUser permissions
+	// from the REST response's `Allow` header. Forward it so the JS-side
+	// hydrator can fan it out across the four ALLOWED_RESOURCE_ACTIONS
+	// without issuing a separate OPTIONS request.
+	if (
+		'getEntityRecord' === $spec['selector'] ||
+		'canUser' === $spec['selector']
+	) {
 		$allow = $response['headers']['Allow'] ?? null;
 		if ( null !== $allow ) {
 			$entry['allow'] = $allow;
@@ -272,6 +304,25 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 			'args'     => array( 'taxonomy' ),
 		),
 	);
+
+	// Permissions on the collection endpoints. Each of these would
+	// otherwise issue an OPTIONS request on first `canUser( 'create',
+	// { kind: 'postType', name: $type } )` call to read the Allow header.
+	foreach ( array( 'attachment', 'page', 'wp_block', 'wp_template' ) as $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			continue;
+		}
+		$specs[] = array(
+			'selector' => 'canUser',
+			'args'     => array(
+				'create',
+				array(
+					'kind' => 'postType',
+					'name' => $post_type,
+				),
+			),
+		);
+	}
 
 	// When the editor context exposes a post (the post editor), hydrate
 	// the post-type definition AND the record itself so the resolver

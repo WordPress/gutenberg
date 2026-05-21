@@ -83,6 +83,24 @@ function synthesizeActions( entry ) {
 			const [ kind, name, query ] = args;
 			return [ receiveEntityRecords( kind, name, data, query ) ];
 		}
+
+		case 'canUser': {
+			// args: [ action, resource, id? ]. The resolver issues an
+			// OPTIONS to the resource's URL, reads the Allow header,
+			// and primes every action's permission for that resource
+			// in a single pass. Mirror that here.
+			if ( typeof allow !== 'string' ) {
+				return [];
+			}
+			const [ , resource, id ] = args;
+			const permissions = getUserPermissionsFromAllowHeader( allow );
+			const permissionMap = {};
+			for ( const a of ALLOWED_RESOURCE_ACTIONS ) {
+				permissionMap[ getUserPermissionCacheKey( a, resource, id ) ] =
+					permissions[ a ];
+			}
+			return [ receiveUserPermissions( permissionMap ) ];
+		}
 	}
 	return [];
 }
@@ -139,6 +157,23 @@ export function buildHydratedInitialState() {
 			const [ kind, name, key ] = entry.args;
 			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 				markResolved( 'canUser', [ action, { kind, name, id: key } ] );
+			}
+		}
+
+		// A canUser entry primes all four actions for its resource.
+		// Mark the sibling actions resolved alongside the requested one
+		// so none of them re-fires.
+		if ( entry.selector === 'canUser' && entry.allow ) {
+			const [ requested, resource, id ] = entry.args;
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				if ( action === requested ) {
+					continue;
+				}
+				const siblingArgs =
+					id === undefined
+						? [ action, resource ]
+						: [ action, resource, id ];
+				markResolved( 'canUser', siblingArgs );
 			}
 		}
 	}
