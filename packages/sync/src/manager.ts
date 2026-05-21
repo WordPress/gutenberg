@@ -195,10 +195,15 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Track whether observers have been attached to the maps.
 		let hasObserversAttached = false;
+		// Track whether unload ran (possibly while we were awaiting provider
+		// creation), so the post-await code can destroy any providers that
+		// were created after unload and bail out.
+		let isEntityUnloaded = false;
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadEntity', 'unloading', entityId );
+			isEntityUnloaded = true;
 			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
 			if ( hasObserversAttached ) {
@@ -296,6 +301,15 @@ export function createSyncManager( debug = false ): SyncManager {
 			} )
 		);
 
+		// If unload() or unloadAll() ran while we were awaiting provider
+		// creation, destroy the just-created providers and bail out before
+		// attempting to use the connection
+		if ( isEntityUnloaded ) {
+			log( 'loadEntity', 'unloaded during connect, aborting', entityId );
+			providerResults.forEach( ( result ) => result.destroy() );
+			return;
+		}
+
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
 
@@ -348,12 +362,17 @@ export function createSyncManager( debug = false ): SyncManager {
 		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
-		// Track whether observers have been attached to the maps
+		// Track whether observers have been attached to the maps.
 		let hasObserversAttached = false;
+		// Track whether unload ran (possibly while we were awaiting provider
+		// creation), so the post-await code can destroy any providers that
+		// were created after unload and bail out.
+		let isCollectionUnloaded = false;
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadCollection', 'unloading', entityId );
+			isCollectionUnloaded = true;
 			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
 			if ( hasObserversAttached ) {
@@ -420,6 +439,19 @@ export function createSyncManager( debug = false ): SyncManager {
 			} )
 		);
 
+		// If unload() or unloadAll() ran while we were awaiting provider
+		// creation, destroy the just-created providers and bail out before
+		// attempting to use the connection
+		if ( isCollectionUnloaded ) {
+			log(
+				'loadCollection',
+				'unloaded during connect, aborting',
+				entityId
+			);
+			providerResults.forEach( ( result ) => result.destroy() );
+			return;
+		}
+
 		// Attach observers.
 		stateMap.observe( onStateMapUpdate );
 		hasObserversAttached = true;
@@ -446,12 +478,13 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * Unload all loaded entities, stopping all syncing.
 	 */
 	function unloadAll(): void {
-		log( 'unloadAll', 'unloading all entities', '' );
-		for ( const [ entityId, entityState ] of [ ...entityStates ] ) {
-			log( 'unloadAll', 'unloading', entityId );
+		log( 'unloadAll', 'unloading all entities', 'all' );
+
+		for ( const [ , entityState ] of [ ...entityStates ] ) {
 			entityState.unload();
 		}
 		entityStates.clear();
+
 		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
 			collectionState.unload();
 		}

@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getSyncManager } from './sync';
+import { getSyncManager, hasSyncManager } from './sync';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -174,8 +174,8 @@ export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
-		if ( ! supported ) {
-			getSyncManager()?.unloadAll();
+		if ( ! supported && hasSyncManager() ) {
+			getSyncManager().unloadAll();
 		}
 	};
 
