@@ -43,23 +43,19 @@ function createPreloadingMiddleware(
 		const path = normalizePath( rawPath );
 
 		if ( 'GET' === method && cache[ path ] ) {
-			const cacheData = cache[ path ];
-
-			// Unsetting the cache key ensures that the data is only used a single time.
-			delete cache[ path ];
-
-			return prepareResponse( cacheData, !! parse );
+			// Preloaded entries are now multi-use within the boot window:
+			// callers serve from cache until `__unstableClear` runs (e.g.
+			// just before the editor renders). This lets shared URLs back
+			// multiple selectors that would otherwise each try to fetch
+			// (e.g. `getEntityRecord('root', 'postType', name)` and the
+			// `getPostType( name )` shorthand alias both hit /wp/v2/types/X).
+			return prepareResponse( cache[ path ], !! parse );
 		} else if (
 			'OPTIONS' === method &&
 			cache[ method ] &&
 			cache[ method ][ path ]
 		) {
-			const cacheData = cache[ method ][ path ];
-
-			// Unsetting the cache key ensures that the data is only used a single time.
-			delete cache[ method ][ path ];
-
-			return prepareResponse( cacheData, !! parse );
+			return prepareResponse( cache[ method ][ path ], !! parse );
 		}
 
 		return next( options );

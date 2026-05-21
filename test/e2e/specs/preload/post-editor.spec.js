@@ -58,12 +58,10 @@ test.describe( 'Preload', () => {
 			[
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
 				'GET /wp/v2/taxonomies?context=edit&per_page=100',
-				'GET /wp/v2/taxonomies?context=view',
 				'GET /wp/v2/templates/lookup?slug=front-page',
 				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
 				'OPTIONS /wp/v2/posts',
-				'OPTIONS /wp/v2/settings',
 				`POST /wp/v2/posts/${ postId }`,
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',
