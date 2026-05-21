@@ -244,6 +244,10 @@ await wp.apiFetch( {
 
 This endpoint requires both `edit_post` and `upload_files` capabilities.
 
+### Dimension validation
+
+The endpoint checks that the uploaded file's dimensions are appropriate for the `image_size` you declare. An `original` upload must match the attachment's stored dimensions exactly; a regular registered size (`thumbnail`, `medium`, and so on) must not exceed that size's registered width or height (with a 1px rounding tolerance); and every size must have positive dimensions. The `scaled`, `full`, and `original-heic` sizes are exempt from the maximum-dimension check. If validation fails, the uploaded file is discarded and the request returns a `400` response with one of `rest_upload_dimension_mismatch`, `rest_upload_invalid_dimensions`, or `rest_upload_unknown_size`.
+
 ## Troubleshooting
 
 | Problem | Cause | Solution |
@@ -259,6 +263,17 @@ This endpoint requires both `edit_post` and `upload_files` capabilities.
 | HEIC upload error on a server without HEIC support | Server-side HEIC decoder missing | The client converts HEIC to JPEG before upload — this should not occur in browsers that match `isHeicCanvasSupported()`. Verify the browser provides `createImageBitmap` and `OffscreenCanvas`. |
 | Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF, HEIC). |
 | Save Draft button stays disabled | Lock not released | Ensure all upload items have completed or been cancelled. The lock releases when the upload queue is empty. |
+| Sideload request rejected with a 400 dimension error | Uploaded variant doesn't match the declared `image_size` | The sideload endpoint validates dimensions. Make sure the file matches the size in `image_size`: an exact match for `original`, or within the registered maximum for a named size like `thumbnail`. |
+
+## Debugging the WASM processor
+
+The WASM image processor (wasm-vips) writes internal `stdout`/`stderr` messages (for example, non-actionable AVIF codec warnings) that are suppressed by default to keep the browser console clean. To capture this output while debugging, assign a function to `globalThis.__vipsDebug` before uploading:
+
+```js
+globalThis.__vipsDebug = ( text ) => console.log( '[vips]', text );
+```
+
+Set it back to `undefined` when you're done.
 
 ## Browser compatibility
 
