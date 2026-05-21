@@ -37,7 +37,14 @@ describe( 'IconButton', () => {
 		it( 'does not show tooltip when truly disabled', async () => {
 			const user = userEvent.setup();
 
-			render( <IconButton label="Save" icon={ <svg /> } disabled /> );
+			render(
+				<IconButton
+					label="Save"
+					icon={ <svg /> }
+					disabled
+					focusableWhenDisabled={ false }
+				/>
+			);
 
 			const button = screen.getByRole( 'button', { name: 'Save' } );
 			await user.hover( button );
