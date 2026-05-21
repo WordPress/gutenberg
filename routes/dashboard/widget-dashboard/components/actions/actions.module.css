@@ -10,7 +10,7 @@
 	flex-shrink: 0;
 	align-self: center;
 	width: 1px;
-	height: 16px;
+	height: calc(4 * var(--wpds-dimension-base));
 	background-color: var(--wpds-color-stroke-surface-neutral);
 }
 
