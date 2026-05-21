@@ -11,10 +11,8 @@ import {
 	useMergeRefs,
 	__experimentalUseFixedWindowList as useFixedWindowList,
 } from '@wordpress/compose';
-import {
-	__experimentalTreeGrid as TreeGrid,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {

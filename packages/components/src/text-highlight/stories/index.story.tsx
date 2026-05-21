@@ -19,7 +19,7 @@ const meta: Meta< typeof TextHighlight > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

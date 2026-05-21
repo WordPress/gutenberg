@@ -26,7 +26,7 @@ const meta: Meta< typeof Guide > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'editor',
 		},
 	},

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { isValidElement } from '@wordpress/element';
-import { Dashicon, Icon } from '@wordpress/components';
+import { Dashicon, Icon as WCIcon } from '@wordpress/components';
 import { SVG } from '@wordpress/primitives';
 
 /**
@@ -38,7 +38,7 @@ export function wrapIcon(
 	shouldShowPlaceholder: boolean = true
 ) {
 	if ( isSvg( icon ) ) {
-		return <Icon icon={ icon } />;
+		return <WCIcon icon={ icon } />;
 	}
 
 	if ( typeof icon === 'string' && icon.startsWith( 'dashicons-' ) ) {
