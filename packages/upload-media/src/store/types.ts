@@ -32,6 +32,10 @@ export interface QueueItem {
 	// as the attachment's "original_image" after the converted JPEG is
 	// uploaded. Not set for non-HEIC items.
 	originalHeicFile?: File;
+	// Original JPEG XL file, kept separately so it can be sideloaded as the
+	// attachment's preserved original after the converted JPEG is uploaded.
+	// Not set for non-JXL items.
+	originalJxlFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;

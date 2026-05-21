@@ -270,6 +270,38 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.height ).toBe( 150 );
 	} );
 
+	test( 'converts a JPEG XL (JXL) upload to a web-compatible JPEG', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// JXL is not broadly web-compatible (most browsers can't display it and
+		// the server can't read it), so CSM decodes it to JPEG client-side via
+		// vips and uploads the JPEG. This also regression-guards the original
+		// upload rejection: JXL files used to be refused with "Sorry, you are
+		// not allowed to upload this file type." because image/jxl was not a
+		// registered upload MIME type.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'200x150_e2e_test_image_decode.jxl'
+		);
+
+		// The stored attachment is a JPEG the browser/front end can render,
+		// with real dimensions the server could only read post-conversion.
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
+
+		// The original .jxl is preserved as a companion file, recorded in
+		// metadata['original'] (mirroring how HEIC keeps its original).
+		const fullMedia = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ media.id }?context=edit`,
+		} );
+		expect( fullMedia.media_details.original ).toMatch( /\.jxl$/ );
+	} );
+
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,

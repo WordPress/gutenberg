@@ -666,12 +666,14 @@ export function prepareItem( id: QueueItemId ) {
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
 		let heicJpeg: File | null = null;
+		let jxlJpeg: File | null = null;
 
 		const isImage = file.type.startsWith( 'image/' );
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
 			file.type
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
+		const isJxl = file.type === 'image/jxl';
 
 		// For images that can be processed by vips, upload the original and
 		// let generateThumbnails() handle threshold scaling as a sideload.
@@ -687,16 +689,7 @@ export function prepareItem( id: QueueItemId ) {
 		// image_editor_output_format filter during create_item.
 		// The response carries image_output_format so generateThumbnails
 		// can transcode sub-sizes to the same target format.
-		if ( isImage && isVipsSupported ) {
-			// Lazily load the JXL WASM module when the input is JXL.
-			// The bundler splits this into a separate chunk so the ~3 MB
-			// module is only downloaded on actual JXL use. Output-format
-			// JXL transcoding is handled in transcodeImageItem, which
-			// also ensures JXL support before running vips.
-			if ( file.type === 'image/jxl' ) {
-				await vipsEnsureJxlSupport();
-			}
-
+		if ( isImage && isVipsSupported && ! isJxl ) {
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
@@ -732,6 +725,41 @@ export function prepareItem( id: QueueItemId ) {
 				OperationType.ThumbnailGeneration,
 				OperationType.Finalize
 			);
+		} else if ( isImage && isJxl ) {
+			// JPEG XL is not yet broadly web-compatible: most browsers cannot
+			// display it and the server cannot read it (no GD/Imagick support).
+			// Decode it to JPEG client-side with vips — lazily loading the ~3 MB
+			// JXL WASM chunk on demand — and upload the JPEG so the editor and
+			// front end use a portable format. The original .jxl is preserved as
+			// a companion file (sideloaded in generateThumbnails), mirroring how
+			// HEIC keeps its original.
+			try {
+				await vipsEnsureJxlSupport();
+				jxlJpeg = await vipsConvertImageFormat(
+					item.id,
+					file,
+					'image/jpeg',
+					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+				);
+			} catch ( error ) {
+				dispatch.cancelItem(
+					id,
+					new UploadError( {
+						code: 'JXL_DECODE_ERROR',
+						message:
+							'This JPEG XL image could not be decoded and converted for upload.',
+						file,
+						cause: error instanceof Error ? error : undefined,
+					} )
+				);
+				return;
+			}
+
+			operations.push(
+				OperationType.Upload,
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize
+			);
 		} else {
 			operations.push( OperationType.Upload );
 		}
@@ -745,7 +773,16 @@ export function prepareItem( id: QueueItemId ) {
 		// If the file is not processed by vips, tell the server to
 		// generate sub-sizes since they won't be created client-side.
 		let updates: Partial< QueueItem > = {};
-		if ( isHeic && heicJpeg ) {
+		if ( isJxl && jxlJpeg ) {
+			// Upload the JPEG derivative as the main file and keep the original
+			// .jxl so generateThumbnails() can sideload it as a companion
+			// (stored under $metadata['original'], like the HEIC original).
+			updates = {
+				file: jxlJpeg,
+				sourceFile: jxlJpeg,
+				originalJxlFile: item.file,
+			};
+		} else if ( isHeic && heicJpeg ) {
 			// HEIC was converted to JPEG client-side. Upload the JPEG
 			// and let the server handle it normally (threshold scaling,
 			// sub-sizes, format conversion). Keep the original HEIC in
@@ -1103,6 +1140,24 @@ export function generateThumbnails( id: QueueItemId ) {
 				additionalData: {
 					post: attachment.id,
 					image_size: 'original-heic',
+					convert_format: false,
+				},
+				operations: [ OperationType.Upload ],
+			} );
+		}
+
+		// JXL companion original: preserve the user's uploaded .jxl alongside
+		// the JPEG derivative. Stored under $metadata['original'] (like the HEIC
+		// original) so it never collides with 'original_image'. Cleanup on
+		// attachment delete is handled by a delete_attachment hook.
+		if ( item.originalJxlFile && attachment.id ) {
+			dispatch.addSideloadItem( {
+				file: item.originalJxlFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'original-jxl',
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],

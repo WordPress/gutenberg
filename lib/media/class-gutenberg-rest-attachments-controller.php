@@ -51,6 +51,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
 								$valid_sizes[] = 'original';
 								$valid_sizes[] = 'original-heic';
+								$valid_sizes[] = 'original-jxl';
 								$valid_sizes[] = 'scaled';
 								$valid_sizes[] = 'full';
 
@@ -484,8 +485,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 			if ( 'original' === $image_size ) {
 				$metadata['original_image'] = $sub_size['file'];
-			} elseif ( 'original-heic' === $image_size ) {
-				// HEIC companion original: stored under its own meta key so
+			} elseif ( 'original-heic' === $image_size || 'original-jxl' === $image_size ) {
+				// HEIC/JXL companion original: stored under its own meta key so
 				// the scaled-sideload flow (which writes 'original_image')
 				// cannot clobber it. 'original_image' keeps pointing at the
 				// web-viewable JPEG derivative. Cleanup on attachment delete
@@ -632,8 +633,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return true;
 		}
 
-		// 'original-heic' companion file: no dimension constraint.
-		if ( 'original-heic' === $image_size ) {
+		// 'original-heic' / 'original-jxl' companion file: no dimension constraint.
+		if ( 'original-heic' === $image_size || 'original-jxl' === $image_size ) {
 			return true;
 		}
 
@@ -805,13 +806,18 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$image_size = $request['image_size'];
 
+		// The JXL companion original is preserved byte-for-byte. JPEG XL cannot
+		// be read by getimagesize()/Imagick, so skip the dimension read and
+		// validation for it (it carries no dimension constraint anyway).
+		$is_jxl_companion = 'original-jxl' === $image_size;
+
 		// Read dimensions once up-front. Needed both for early-error handling
 		// (corrupted/unsupported files) and for populating the sub-size payload
 		// below. Scalar 'original' is a byte-only passthrough and does not need
 		// dimensions, but reading them here is harmless.
-		$size = wp_getimagesize( $path );
+		$size = $is_jxl_companion ? false : wp_getimagesize( $path );
 
-		if ( ! $size ) {
+		if ( ! $is_jxl_companion && ! $size ) {
 			// Could not determine dimensions (corrupted file, unsupported format).
 			wp_delete_file( $path );
 			return new WP_Error(
@@ -821,11 +827,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			);
 		}
 
-		$validation = $this->validate_image_dimensions( $size[0], $size[1], $image_size, $attachment_id );
-		if ( is_wp_error( $validation ) ) {
-			// Clean up the uploaded file.
-			wp_delete_file( $path );
-			return $validation;
+		if ( ! $is_jxl_companion ) {
+			$validation = $this->validate_image_dimensions( $size[0], $size[1], $image_size, $attachment_id );
+			if ( is_wp_error( $validation ) ) {
+				// Clean up the uploaded file.
+				wp_delete_file( $path );
+				return $validation;
+			}
 		}
 
 		// Build sub-size data to return to the client.
@@ -846,8 +854,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['filesize']  = wp_filesize( $path );
 		} elseif ( 'original' === $image_size ) {
 			$sub_size_data['file'] = wp_basename( $path );
-		} elseif ( 'original-heic' === $image_size ) {
-			// HEIC companion original. finalize_item() writes the filename to
+		} elseif ( 'original-heic' === $image_size || 'original-jxl' === $image_size ) {
+			// HEIC/JXL companion original. finalize_item() writes the filename to
 			// $metadata['original'] (separate from 'original_image', which the
 			// scaled-sideload flow owns). Cleanup on attachment delete is
 			// handled by a delete_attachment hook that reads this key.
