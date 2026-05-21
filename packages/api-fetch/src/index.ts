@@ -61,6 +61,23 @@ function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
 }
 
+/**
+ * Drops any still-unconsumed entries from every installed
+ * `createPreloadingMiddleware`. Used by the editor bootstrap once
+ * its kickoff resolvers have settled — anything the kickoff missed
+ * then falls through to a real network request (and surfaces in
+ * tests / DevTools) instead of being silently served from the
+ * preload bucket.
+ */
+function clearPreloadedData() {
+	for ( const middleware of middlewares ) {
+		const clear = ( middleware as any ).__unstableClear;
+		if ( typeof clear === 'function' ) {
+			clear();
+		}
+	}
+}
+
 const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -149,6 +166,7 @@ export interface ApiFetch {
 	fetchAllMiddleware: typeof fetchAllMiddleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
+	__unstableClearPreloadedData: () => void;
 }
 
 /**
@@ -196,6 +214,7 @@ const apiFetch: ApiFetch = ( options ) => {
 
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
+apiFetch.__unstableClearPreloadedData = clearPreloadedData;
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;

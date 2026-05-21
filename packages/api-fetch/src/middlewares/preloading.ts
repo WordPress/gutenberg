@@ -22,7 +22,7 @@ function createPreloadingMiddleware(
 		] )
 	);
 
-	return ( options, next ) => {
+	const middleware: APIFetchMiddleware = ( options, next ) => {
 		const { parse = true } = options;
 		let rawPath = options.path;
 		if ( ! rawPath && options.url ) {
@@ -64,6 +64,19 @@ function createPreloadingMiddleware(
 
 		return next( options );
 	};
+
+	// Lets callers drop any still-unconsumed preloaded entries. Used by
+	// the editor bootstrap once kickoff resolvers have settled — anything
+	// the kickoff missed should fall through to a real network request
+	// (and surface in tests / DevTools) instead of being silently served
+	// from the preload bucket.
+	( middleware as any ).__unstableClear = () => {
+		for ( const key of Object.keys( cache ) ) {
+			delete cache[ key ];
+		}
+	};
+
+	return middleware;
 }
 
 /**

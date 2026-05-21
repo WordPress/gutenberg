@@ -19,6 +19,7 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -162,6 +163,11 @@ export function initializeEditor(
 	const preloadedResolutions = preloadResolutions( postType, postId );
 
 	preloadedResolutions.finally( () => {
+		// Drop any preload entries the kickoff didn't consume. After this
+		// point, any resolver firing during render falls through to a
+		// real network request — which makes the misses observable both
+		// in DevTools and in the preload e2e tests.
+		apiFetch.__unstableClearPreloadedData();
 		root.render(
 			<StrictMode>
 				<Layout
@@ -183,41 +189,104 @@ export function initializeEditor(
  * so no resolver issues a network request; we just need them to run
  * their dispatch cycles before React mounts.
  *
+ * Run in two phases:
+ *   1. Selectors whose args we know up-front from PHP (post id + type).
+ *   2. Selectors that need a value derived from phase-1 state — the
+ *      post record yields the default-template slug; the resolved
+ *      current-global-styles id keys the global-styles record + canUser.
+ *
  * @param {string} postType Current post type.
  * @param {number} postId   Current post id.
  * @return {Promise<void>}  Resolves when the kickoff resolvers settle.
  */
-function preloadResolutions( postType, postId ) {
+async function preloadResolutions( postType, postId ) {
 	const core = resolveSelect( coreDataStore );
-	return Promise.all( [
-		core.getCurrentUser(),
-		core.getEntitiesConfig( 'postType' ),
-		core.getEntitiesConfig( 'taxonomy' ),
-		core.getEntitiesConfig( 'root' ),
-		core.getCurrentTheme(),
-		core.getBlockPatternCategories(),
-		core.__experimentalGetCurrentGlobalStylesId(),
-		core.__experimentalGetCurrentThemeBaseGlobalStyles(),
-		core.__experimentalGetCurrentThemeGlobalStylesVariations(),
-		core.getEntityRecord( 'root', '__unstableBase' ),
-		core.getEntityRecord( 'root', 'site' ),
-		core.canUser( 'read', { kind: 'root', name: 'site' } ),
-		core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
-		core.canUser( 'create', { kind: 'postType', name: 'page' } ),
-		core.canUser( 'create', { kind: 'postType', name: 'wp_block' } ),
-		core.canUser( 'create', { kind: 'postType', name: 'wp_template' } ),
-		// Per-post resolvers — only useful when we actually have a post.
-		...( postType && postId
-			? [
-					core.getEntityRecord( 'root', 'postType', postType ),
-					core.getEntityRecord( 'postType', postType, postId ),
-					core.getAutosaves( postType, postId ),
-			  ]
-			: [] ),
-	] ).catch( () => {
+	const coreSelect = select( coreDataStore );
+
+	try {
+		await Promise.all( [
+			core.getCurrentUser(),
+			core.getEntitiesConfig( 'postType' ),
+			core.getEntitiesConfig( 'taxonomy' ),
+			core.getEntitiesConfig( 'root' ),
+			core.getCurrentTheme(),
+			// `getThemeSupports` is a forwardResolver alias of
+			// `getCurrentTheme`; its resolution metadata is tracked
+			// separately, so we need to drive its resolver too.
+			core.getThemeSupports(),
+			core.getBlockPatternCategories(),
+			core.__experimentalGetCurrentGlobalStylesId(),
+			core.__experimentalGetCurrentThemeBaseGlobalStyles(),
+			core.__experimentalGetCurrentThemeGlobalStylesVariations(),
+			core.getEntityRecord( 'root', '__unstableBase' ),
+			core.getEntityRecord( 'root', 'site' ),
+			core.canUser( 'read', { kind: 'root', name: 'site' } ),
+			core.canUser( 'create', { kind: 'postType', name: 'attachment' } ),
+			core.canUser( 'create', { kind: 'postType', name: 'page' } ),
+			core.canUser( 'create', { kind: 'postType', name: 'wp_block' } ),
+			core.canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ),
+			// Per-post resolvers — only useful when we actually have a post.
+			...( postType && postId
+				? [
+						// Editor code calls `getPostType( name )` everywhere,
+						// not `getEntityRecord( 'root', 'postType', name )`.
+						// The shorthand is its own selector with its own
+						// resolution metadata — kick that one off so the
+						// editor's first render finds it resolved.
+						core.getPostType( postType ),
+						core.getEntityRecord( 'postType', postType, postId ),
+						core.getEditedEntityRecord(
+							'postType',
+							postType,
+							postId
+						), // forwardResolver alias of getEntityRecord
+						core.getAutosaves( postType, postId ),
+				  ]
+				: [] ),
+		] );
+
+		// Phase 2: read derived data out of state.
+		const tasks = [];
+		const globalStylesId =
+			coreSelect.__experimentalGetCurrentGlobalStylesId();
+		if ( globalStylesId ) {
+			tasks.push(
+				core.getEntityRecord( 'root', 'globalStyles', globalStylesId ),
+				core.canUser( 'read', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: globalStylesId,
+				} )
+			);
+		}
+
+		if ( postType && postId ) {
+			const post = coreSelect.getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			if ( post ) {
+				// Mirrors core-data's `getDefaultTemplate` slug formula
+				// (see packages/core-data/src/private-selectors.ts).
+				let slug = 'page' === postType ? 'page' : 'single-' + postType;
+				if ( post.slug ) {
+					slug += '-' + post.slug;
+				}
+				tasks.push( core.getDefaultTemplateId( { slug } ) );
+			}
+		}
+
+		if ( tasks.length ) {
+			await Promise.all( tasks );
+		}
+	} catch {
 		// Any individual resolver failing here is harmless — the editor
 		// would have hit the same failure on demand. Don't block render.
-	} );
+	}
 }
 
 /**
