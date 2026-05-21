@@ -21,11 +21,11 @@
 /*
  * While a resize is in progress, the pointer often sits over the tile;
  * keep resting elevation so the hover lift does not flicker or fight the
- * gesture. `data-wp-dashboard-grid-resizing` is set on `@wordpress/grid`
- * `DashboardGrid` root for the duration of the resize.
+ * gesture. `data-wp-grid-resizing` is set on `@wordpress/grid` surface
+ * roots for the duration of the resize.
  */
-:global([data-wp-dashboard-grid-resizing]) .tileEditMode:hover,
-:global([data-wp-dashboard-grid-resizing]) .tileEditMode:focus-visible {
+:global([data-wp-grid-resizing]) .tileEditMode:hover,
+:global([data-wp-grid-resizing]) .tileEditMode:focus-visible {
 	box-shadow: var(--wpds-elevation-xs);
 }
 

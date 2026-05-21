@@ -14,7 +14,6 @@ import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
-import styles from './stage.module.css';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
@@ -50,11 +49,10 @@ function Dashboard() {
 			<Page
 				title={ __( 'Dashboard' ) }
 				actions={ <WidgetDashboard.Actions /> }
+				hasPadding
 			>
-				<div className={ styles[ 'dashboard-widgets-container' ] }>
-					<WidgetDashboard.NoWidgetsState />
-					<WidgetDashboard.Widgets />
-				</div>
+				<WidgetDashboard.NoWidgetsState />
+				<WidgetDashboard.Widgets />
 			</Page>
 		</WidgetDashboard>
 	);

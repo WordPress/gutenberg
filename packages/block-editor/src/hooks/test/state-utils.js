@@ -8,6 +8,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
  */
 import {
 	getRelativeRootSelector,
+	buildScopedBlockSelector,
 	buildRootStyleStateSelector,
 	buildPseudoStyleStateSelector,
 } from '../state-utils';
@@ -33,6 +34,91 @@ describe( 'getRelativeRootSelector', () => {
 
 	it( 'returns null for a single-class selector', () => {
 		expect( getRelativeRootSelector( '.wp-block-foo' ) ).toBeNull();
+	} );
+} );
+
+describe( 'buildScopedBlockSelector', () => {
+	const BASE = '.wp-elements-abc123';
+
+	it( 'scopes a suffix to the descendant element from a block selector', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':hover'
+			)
+		).toBe( `${ BASE } .wp-block-button__link:hover` );
+	} );
+
+	it( 'preserves modifier classes on the first compound selector', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-search.wp-block-search__button-outside .wp-block-search__input',
+				':hover'
+			)
+		).toBe(
+			`${ BASE }.wp-block-search__button-outside .wp-block-search__input:hover`
+		);
+	} );
+
+	it( 'preserves child combinators without surrounding spaces', () => {
+		expect(
+			buildScopedBlockSelector( BASE, '.wp-block-foo>.inner', ':hover' )
+		).toBe( `${ BASE }>.inner:hover` );
+	} );
+
+	it( 'splits selector lists without splitting selector-function arguments', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-example:not(.foo, .bar) .inner, .wp-block-example .fallback',
+				':hover'
+			)
+		).toBe(
+			`${ BASE }:not(.foo, .bar) .inner:hover, ${ BASE } .fallback:hover`
+		);
+	} );
+
+	it( 'works for :focus and :active states', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':focus'
+			)
+		).toBe( `${ BASE } .wp-block-button__link:focus` );
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-button .wp-block-button__link',
+				':active'
+			)
+		).toBe( `${ BASE } .wp-block-button__link:active` );
+	} );
+
+	it( 'falls back to appending the suffix to the base selector when there is no descendant', () => {
+		expect(
+			buildScopedBlockSelector( BASE, '.wp-block-button', ':hover' )
+		).toBe( `${ BASE }:hover` );
+	} );
+
+	it( 'falls back to appending the suffix to the base selector when the block selector is missing', () => {
+		expect( buildScopedBlockSelector( BASE, undefined, ':hover' ) ).toBe(
+			`${ BASE }:hover`
+		);
+	} );
+
+	it( 'does not split selector lists on commas inside pseudo-class arguments', () => {
+		expect(
+			buildScopedBlockSelector(
+				BASE,
+				'.wp-block-navigation :is(.current-menu-item, .current-menu-ancestor)',
+				':hover'
+			)
+		).toBe(
+			`${ BASE } :is(.current-menu-item, .current-menu-ancestor):hover`
+		);
 	} );
 } );
 
