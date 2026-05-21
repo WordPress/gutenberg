@@ -258,6 +258,7 @@ export default function RevisionHistory() {
 						<Button
 							variant="tertiary"
 							onClick={ () => setRevisionToRestore( null ) }
+							__next40pxDefaultSize
 						>
 							{ __( 'Cancel' ) }
 						</Button>
