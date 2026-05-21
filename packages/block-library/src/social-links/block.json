@@ -64,9 +64,10 @@
 			"enableContrastChecker": false,
 			"background": true,
 			"gradients": true,
-			"text": false,
+			"text": true,
 			"__experimentalDefaultControls": {
-				"background": false
+				"background": false,
+				"text": false
 			}
 		},
 		"spacing": {
@@ -103,6 +104,12 @@
 		{ "name": "logos-only", "label": "Logos Only" },
 		{ "name": "pill-shape", "label": "Pill Shape" }
 	],
+	"selectors": {
+		"root": ".wp-block-social-links",
+		"color": {
+			"text": ".wp-block-social-links .wp-social-link"
+		}
+	},
 	"editorStyle": "wp-block-social-links-editor",
 	"style": "wp-block-social-links"
 }

@@ -976,7 +976,7 @@ Display icons linking to your social profiles or sites. ([Source](https://github
 -	**Name:** core/social-links
 -	**Category:** widgets
 -	**Allowed Blocks:** core/social-link
--	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), listView, spacing (blockGap, margin, padding, units), ~~html~~
+-	**Supports:** align (center, left, right), anchor, color (background, gradients, text, ~~enableContrastChecker~~), contentRole, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), listView, spacing (blockGap, margin, padding, units), ~~html~~
 -	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 
 ## Spacer
