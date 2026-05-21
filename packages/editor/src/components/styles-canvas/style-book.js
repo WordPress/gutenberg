@@ -1,13 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
+import { useGlobalStylesRevisions } from '@wordpress/global-styles-ui';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import StyleBook from '../style-book';
 import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
+import { useGlobalStyles } from '../global-styles/hooks';
+import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
+
+function isObjectEmpty( object ) {
+	return ! object || Object.keys( object ).length === 0;
+}
 
 /**
  * Style Book content component for global styles.
@@ -20,9 +28,47 @@ import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
  * @return {React.JSX.Element} The Style Book component.
  */
 function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
+	const isRevisionsPath = path?.startsWith( '/revisions' );
+	const { user: userConfig, base: baseConfig } = useGlobalStyles();
+	const { revisions, isLoading } = useGlobalStylesRevisions();
+
+	const revisionId = useMemo( () => {
+		const match = path?.match( /^\/revisions\/(.+)$/ );
+		return match ? match[ 1 ] : null;
+	}, [ path ] );
+
+	const selectedRevision = useMemo( () => {
+		if ( ! revisionId || ! revisions.length ) {
+			return null;
+		}
+		return revisions.find(
+			( revision ) => String( revision.id ) === String( revisionId )
+		);
+	}, [ revisionId, revisions ] );
+
+	const displayConfig = selectedRevision || userConfig;
+	const mergedConfig = useMemo( () => {
+		if (
+			! isObjectEmpty( displayConfig ) &&
+			! isObjectEmpty( baseConfig )
+		) {
+			return mergeGlobalStyles( baseConfig, displayConfig );
+		}
+		return {};
+	}, [ baseConfig, displayConfig ] );
+
+	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
+
+	if ( isRevisionsPath && isLoading ) {
+		return null;
+	}
+
 	return (
 		<StyleBook
 			ref={ ref }
+			path={ path }
+			userConfig={ isRevisionsPath ? displayConfig : undefined }
+			globalStyles={ isRevisionsPath ? globalStyles : undefined }
 			isSelected={ ( blockName ) =>
 				// Match '/blocks/core%2Fbutton' and
 				// '/blocks/core%2Fbutton/typography', but not

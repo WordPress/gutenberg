@@ -251,6 +251,7 @@ function StyleBook(
 		onSelect,
 		showTabs = true,
 		userConfig = {},
+		globalStyles: globalStylesProp,
 		path = '',
 	},
 	ref
@@ -285,7 +286,9 @@ function StyleBook(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
-	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
+	const [ generatedGlobalStyles ] =
+		useGlobalStylesOutputWithConfig( mergedConfig );
+	const globalStyles = globalStylesProp ?? generatedGlobalStyles;
 
 	const settings = useMemo(
 		() => ( {
