@@ -72,7 +72,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
-	require __DIR__ . '/compat/wordpress-7.0/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
@@ -80,6 +79,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 7.1 compat.
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
