@@ -507,17 +507,22 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 
 /**
  * Hook into the existing path-based preload filter: emit the hydration
- * payload (covering any specs whose corresponding path WP core was about
- * to preload) and strip those paths so the data isn't preloaded twice.
+ * payload and clear the legacy path list entirely.
  *
  * Runs at priority 100 so it sees the final path list (after Gutenberg's
  * own filters at default priority).
+ *
+ * The hydration payload covers everything the editor needs at boot via
+ * the new selector-keyed flow. Anything not in the hydration set falls
+ * through to a regular `apiFetch` round-trip — clearer signal than a
+ * mostly-empty preload, and any remaining startup fetches surface as a
+ * concrete to-do for migration.
  *
  * @param array                   $paths   Paths the legacy helper is about to preload.
  * @param WP_Block_Editor_Context $context Block editor context.
  * @return array
  */
-function gutenberg_hydrate_and_strip_preload_paths( $paths, $context ) {
+function gutenberg_hydrate_and_clear_preload_paths( $paths, $context ) {
 	static $done = false;
 	if ( $done ) {
 		return $paths;
@@ -527,27 +532,11 @@ function gutenberg_hydrate_and_strip_preload_paths( $paths, $context ) {
 	$specs = gutenberg_get_preload_hydration_specs( $context );
 	gutenberg_emit_preload_hydration( $specs );
 
-	if ( empty( $GLOBALS['gutenberg_hydrated_preload_path_keys'] ) ) {
-		return $paths;
-	}
-
-	$covered = $GLOBALS['gutenberg_hydrated_preload_path_keys'];
-
-	return array_values(
-		array_filter(
-			$paths,
-			static function ( $p ) use ( $covered ) {
-				$key = is_array( $p )
-					? gutenberg_preload_path_key( $p[0], $p[1] )
-					: gutenberg_preload_path_key( $p );
-				return ! in_array( $key, $covered, true );
-			}
-		)
-	);
+	return array();
 }
 add_filter(
 	'block_editor_rest_api_preload_paths',
-	'gutenberg_hydrate_and_strip_preload_paths',
+	'gutenberg_hydrate_and_clear_preload_paths',
 	100,
 	2
 );
