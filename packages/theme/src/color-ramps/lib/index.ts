@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
-import {
-	clone,
-	get,
-	OKLCH,
-	set,
-	type ColorTypes,
-	type PlainColorObject,
-} from 'colorjs.io/fn';
+import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
  */
-import './register-color-spaces';
 import { clampToGamut, getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
@@ -23,7 +12,6 @@ import {
 	stepsForStep,
 	solveWithBisect,
 } from './utils';
-
 import type {
 	FollowDirection,
 	Ramp,
@@ -116,7 +104,7 @@ function calculateRamp( {
 		}
 
 		function computeDirection(
-			color: ColorTypes,
+			color: string | PlainColorObject,
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
