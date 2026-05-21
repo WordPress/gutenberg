@@ -51,6 +51,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/global-styles-ui',
 	'@wordpress/ui',
 	'@wordpress/views',
+	'@wordpress/welcome-widget',
 ];
 
 /*
