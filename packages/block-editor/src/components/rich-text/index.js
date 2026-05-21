@@ -13,7 +13,6 @@ import {
 	useCallback,
 	useMemo,
 	forwardRef,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -41,13 +40,14 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
-const { useRichText } = unlock( richTextPrivateApis );
+const { useRichText, keyboardShortcutContext, inputEventContext } =
+	unlock( richTextPrivateApis );
 
-export const keyboardShortcutContext = createContext();
-keyboardShortcutContext.displayName = 'keyboardShortcutContext';
-
-export const inputEventContext = createContext();
-inputEventContext.displayName = 'inputEventContext';
+// These contexts now live in `@wordpress/rich-text` so that lower-level rich
+// text fields (e.g. `RichTextControl` in `@wordpress/rich-text-control`) can
+// share the exact same context objects that format types read via
+// `RichTextShortcut` / `RichTextInputEvent`. Re-exported here for back-compat.
+export { keyboardShortcutContext, inputEventContext };
 
 const instanceIdKey = Symbol( 'instanceId' );
 

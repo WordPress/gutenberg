@@ -31,9 +31,14 @@ import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';
 import shortcutsListener from './event-listeners/shortcuts';
 import inputEventsListener from './event-listeners/input-events';
-import { keyboardShortcutContext, inputEventContext } from './contexts';
 
-const { useRichText } = unlock( richTextPrivateApis );
+// `keyboardShortcutContext` / `inputEventContext` are the same context objects
+// that `@wordpress/block-editor`'s `RichTextShortcut` / `RichTextInputEvent`
+// read. Format types render those components, so providing these contexts here
+// (below) is what wires their keyboard shortcuts and input events to this
+// field even though the control lives outside `@wordpress/block-editor`.
+const { useRichText, keyboardShortcutContext, inputEventContext } =
+	unlock( richTextPrivateApis );
 
 /**
  * A rich text control component that provides a contenteditable field with

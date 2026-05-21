@@ -12,6 +12,7 @@ import { unregisterFormatType, registerFormatType } from '@wordpress/rich-text';
  * Internal dependencies
  */
 import RichTextControl from '../control';
+import { unlock } from '../lock-unlock';
 
 function getTextbox( container ) {
 	return container.querySelector( '.wp-rich-text-control' );
@@ -142,15 +143,18 @@ describe( 'RichTextControl', () => {
 		// `act(...)`), while each test can still assert on a fresh mock.
 		let currentOnUse;
 
-		// Re-implement `RichTextShortcut` locally to avoid pulling the
-		// block-editor package into this unit test. The component just
-		// registers a callback into the `keyboardShortcutContext` set the
-		// control sets up. Mirrors the contract of
+		// Re-implement `RichTextShortcut` locally to keep the assertion on
+		// the registration contract explicit. It registers a callback into
+		// the shared `keyboardShortcutContext` (now owned by
+		// `@wordpress/rich-text`) that the control provides — the same
+		// context the real `RichTextShortcut` reads. Mirrors the contract of
 		// `packages/block-editor/src/components/rich-text/shortcut.js`.
 		function TestShortcut( { onUse } ) {
 			const { useContext, useEffect } = require( '@wordpress/element' );
-
-			const { keyboardShortcutContext } = require( '../contexts' );
+			const {
+				privateApis: richTextPrivateApis,
+			} = require( '@wordpress/rich-text' );
+			const { keyboardShortcutContext } = unlock( richTextPrivateApis );
 			const keyboardShortcuts = useContext( keyboardShortcutContext );
 			useEffect( () => {
 				const shortcuts = keyboardShortcuts.current;
