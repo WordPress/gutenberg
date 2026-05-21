@@ -33,6 +33,7 @@ export { createSelector } from './create-selector';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
 export { keyedReducer } from './redux-store/keyed-reducer';
+export { createInitialResolutionState } from './redux-store/metadata/initial-state';
 export { dispatch } from './dispatch';
 export { select } from './select';
 

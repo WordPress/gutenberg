@@ -340,7 +340,20 @@ async function loadPostTypeEntities() {
 		postTypesPromise,
 		taxonomiesPromise,
 	] );
+	return postTypeEntitiesFromResponse( postTypes, taxonomies );
+}
 
+/**
+ * Pure transform from `/wp/v2/types` (and optionally `/wp/v2/taxonomies`)
+ * response data into the entity-config shape `addEntities` accepts. Pulled
+ * out of `loadPostTypeEntities` so a synchronous hydrator can use the same
+ * mapping without going through `apiFetch`.
+ *
+ * @param {Object} postTypes  Map of post-type slugs → REST type objects.
+ * @param {Object} taxonomies Map of taxonomy slugs → REST taxonomy objects.
+ * @return {Array} Entity configs.
+ */
+export function postTypeEntitiesFromResponse( postTypes, taxonomies = {} ) {
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name

@@ -22,6 +22,7 @@ import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { dynamicActions, dynamicSelectors } from './dynamic-entities';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import { buildHydratedInitialState } from './preload-hydrate';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
@@ -121,6 +122,7 @@ const storeConfig = () => ( {
 		...entitySelectors,
 	},
 	resolvers: { ...resolvers, ...entityResolvers },
+	initialState: buildHydratedInitialState(),
 } );
 
 /**

@@ -378,6 +378,37 @@ _Returns_
 
 Undocumented declaration.
 
+### createInitialResolutionState
+
+Builds the inner `metadata` state for a store, with the given (selector, args\[]) pairs marked as already-resolved. Hand the result to `createReduxStore`'s `initialState.metadata` to start the store with a primed resolution cache — `hasFinishedResolution( selector, args )` returns `true` immediately, and the resolver never fires for those args.
+
+Use this when the data the resolver would have fetched is already in hand (e.g. emitted by the server alongside the page) and you've also pre-populated the matching root state via `initialState.root`.
+
+Constructed inside `@wordpress/data` (rather than at the caller) so the `EquivalentKeyMap` instance is recognised by the metadata reducer's own `new EquivalentKeyMap( state )` copy step. Cross-bundle instances fail an `instanceof` check there and silently drop every entry.
+
+_Usage_
+
+```js
+const store = createReduxStore( 'core', {
+	reducer,
+	initialState: {
+		root: foldedRootState,
+		metadata: createInitialResolutionState( [
+			[ 'getCurrentUser', [ [] ] ],
+			[ 'getEntityRecord', [ [ 'postType', 'post', 123 ] ] ],
+		] ),
+	},
+} );
+```
+
+_Parameters_
+
+-   _entries_ `Iterable< [ string, Iterable< unknown[] > ] >`: Iterable of `[ selectorName, args[] ]` tuples.
+
+_Returns_
+
+-   `Record< string, State >`: The `metadata` inner-state slice ready to hand to createReduxStore.
+
 ### createReduxStore
 
 Creates a data store descriptor for the provided Redux store configuration containing properties describing reducer, actions, selectors, controls and resolvers.

@@ -623,9 +623,21 @@ function instantiateReduxStore(
 		root: reducer,
 	} );
 
+	// initialState may be the root slice (legacy shape) or the full inner
+	// state `{ root, metadata }` when the caller wants to pre-populate the
+	// resolution-metadata sub-store too. The latter is intended to be
+	// constructed via `createInitialResolutionState` so the EquivalentKeyMap
+	// instances inside it are recognised by this package's metadata reducer.
+	const preloadedState =
+		initialState &&
+		typeof initialState === 'object' &&
+		( 'root' in initialState || 'metadata' in initialState )
+			? initialState
+			: { root: initialState };
+
 	return createStore(
 		enhancedReducer,
-		{ root: initialState } as any,
+		preloadedState as any,
 		compose( ...enhancers ) as unknown as StoreEnhancer
 	);
 }
