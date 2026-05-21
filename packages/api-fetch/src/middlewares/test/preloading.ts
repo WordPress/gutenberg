@@ -57,6 +57,46 @@ describe( 'Preloading Middleware', () => {
 					preloadingMiddleware( requestOptions, nextSpy );
 					expect( nextSpy ).toHaveBeenCalled();
 				} );
+
+				it( 'keeps returning the preloaded data when multi-use is enabled', async () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+					const preloadedData = {
+						'wp/v2/posts': { body },
+					};
+					const preloadingMiddleware =
+						createPreloadingMiddleware( preloadedData );
+					(
+						preloadingMiddleware as unknown as {
+							__unstableEnableMultiUse: () => void;
+						}
+					 ).__unstableEnableMultiUse();
+
+					const requestOptions = {
+						method: 'GET',
+						path: 'wp/v2/posts',
+					};
+					const nextSpy = jest.fn();
+
+					await expect(
+						preloadingMiddleware( requestOptions, nextSpy )
+					).resolves.toEqual( body );
+					await expect(
+						preloadingMiddleware( requestOptions, nextSpy )
+					).resolves.toEqual( body );
+					expect( nextSpy ).not.toHaveBeenCalled();
+
+					// `__unstableClear` is the explicit boundary at
+					// which subsequent requests should fall through.
+					(
+						preloadingMiddleware as unknown as {
+							__unstableClear: () => void;
+						}
+					 ).__unstableClear();
+					preloadingMiddleware( requestOptions, nextSpy );
+					expect( nextSpy ).toHaveBeenCalled();
+				} );
 			} );
 
 			describe( 'and the OPTIONS request has a parse flag', () => {

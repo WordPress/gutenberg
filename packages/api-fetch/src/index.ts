@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { lock } from './lock-unlock';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
 import createPreloadingMiddleware from './middlewares/preloading';
@@ -59,6 +60,21 @@ const middlewares: Array< APIFetchMiddleware > = [
  */
 function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
+}
+
+/**
+ * Switches every installed `createPreloadingMiddleware` into multi-use
+ * mode: cached entries are reused for subsequent reads until
+ * {@link clearPreloadedData} runs. Used by the editor bootstrap so a
+ * shared URL can back multiple selectors during the kickoff window.
+ */
+function enablePreloadMultiUse() {
+	for ( const middleware of middlewares ) {
+		const enable = ( middleware as any ).__unstableEnableMultiUse;
+		if ( typeof enable === 'function' ) {
+			enable();
+		}
+	}
 }
 
 /**
@@ -166,7 +182,7 @@ export interface ApiFetch {
 	fetchAllMiddleware: typeof fetchAllMiddleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
-	__unstableClearPreloadedData: () => void;
+	privateApis: object;
 }
 
 /**
@@ -214,7 +230,17 @@ const apiFetch: ApiFetch = ( options ) => {
 
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
-apiFetch.__unstableClearPreloadedData = clearPreloadedData;
+
+// Attached to the function (rather than a named export) because
+// `wpScriptDefaultExport: true` flattens this module to its default
+// export — `wp.apiFetch` is the function itself, so anything that
+// needs to be reachable from a consumer's `wp.apiFetch.X` lookup has
+// to live on the function.
+apiFetch.privateApis = {};
+lock( apiFetch.privateApis, {
+	enablePreloadMultiUse,
+	clearPreloadedData,
+} );
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;

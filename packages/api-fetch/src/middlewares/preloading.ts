@@ -22,6 +22,14 @@ function createPreloadingMiddleware(
 		] )
 	);
 
+	// Entries are single-use by default — the preloading middleware
+	// deletes each one on first read so a subsequent request gets a
+	// fresh response. Callers that know they'll consume the same paths
+	// from multiple selectors (e.g. an editor bootstrap that pre-warms
+	// resolvers before render) can flip this and then call
+	// `__unstableClear` once they're done.
+	let multiUse = false;
+
 	const middleware: APIFetchMiddleware = ( options, next ) => {
 		const { parse = true } = options;
 		let rawPath = options.path;
@@ -43,27 +51,37 @@ function createPreloadingMiddleware(
 		const path = normalizePath( rawPath );
 
 		if ( 'GET' === method && cache[ path ] ) {
-			// Preloaded entries are now multi-use within the boot window:
-			// callers serve from cache until `__unstableClear` runs (e.g.
-			// just before the editor renders). This lets shared URLs back
-			// multiple selectors that would otherwise each try to fetch
-			// (e.g. `getEntityRecord('root', 'postType', name)` and the
-			// `getPostType( name )` shorthand alias both hit /wp/v2/types/X).
-			return prepareResponse( cache[ path ], !! parse );
+			const data = cache[ path ];
+			if ( ! multiUse ) {
+				delete cache[ path ];
+			}
+			return prepareResponse( data, !! parse );
 		} else if (
 			'OPTIONS' === method &&
 			cache[ method ] &&
 			cache[ method ][ path ]
 		) {
-			return prepareResponse( cache[ method ][ path ], !! parse );
+			const data = cache[ method ][ path ];
+			if ( ! multiUse ) {
+				delete cache[ method ][ path ];
+			}
+			return prepareResponse( data, !! parse );
 		}
 
 		return next( options );
 	};
 
-	// Lets callers drop any still-unconsumed preloaded entries. Used by
-	// the editor bootstrap once kickoff resolvers have settled — anything
-	// the kickoff missed should fall through to a real network request
+	// Switches this middleware into multi-use mode: cache entries stay
+	// around after the first read until `__unstableClear` runs. Useful
+	// when multiple selectors share a URL and the consumer guarantees
+	// it will clear at the right boundary.
+	( middleware as any ).__unstableEnableMultiUse = () => {
+		multiUse = true;
+	};
+
+	// Drops any still-unconsumed preloaded entries. Used by the editor
+	// bootstrap once kickoff resolvers have settled — anything the
+	// kickoff missed should fall through to a real network request
 	// (and surface in tests / DevTools) instead of being silently served
 	// from the preload bucket.
 	( middleware as any ).__unstableClear = () => {

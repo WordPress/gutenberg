@@ -32,6 +32,10 @@ const {
 	registerCoreBlockBindingsSources,
 } = unlock( editorPrivateApis );
 
+const { enablePreloadMultiUse, clearPreloadedData } = unlock(
+	apiFetch.privateApis
+);
+
 /**
  * Initializes and returns an instance of Editor.
  *
@@ -160,6 +164,14 @@ export function initializeEditor(
 	// time `root.render(...)` runs, every metadata entry these touch is
 	// already `finished`, so useSelect on the first render finds resolved
 	// data and never triggers another `setTimeout(0)` resolution dance.
+	//
+	// Multi-use lets a single preloaded URL back several selectors
+	// (e.g. `getEntitiesConfig('root')` + `canUser({kind:'root', name:'site'})`
+	// + `getEntityRecord('root', 'site')` all hit /wp/v2/settings via
+	// GET + OPTIONS). The matching `__unstableClearPreloadedData` runs
+	// after the kickoff promise settles, restoring the "fall through to
+	// network" behaviour for anything we missed.
+	enablePreloadMultiUse();
 	const preloadedResolutions = preloadResolutions( postType, postId );
 
 	preloadedResolutions.finally( () => {
@@ -167,7 +179,7 @@ export function initializeEditor(
 		// point, any resolver firing during render falls through to a
 		// real network request — which makes the misses observable both
 		// in DevTools and in the preload e2e tests.
-		apiFetch.__unstableClearPreloadedData();
+		clearPreloadedData();
 		root.render(
 			<StrictMode>
 				<Layout
