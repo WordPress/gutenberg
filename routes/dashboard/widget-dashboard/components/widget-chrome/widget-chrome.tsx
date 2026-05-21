@@ -104,14 +104,12 @@ function UnavailableWidget( {
 	return (
 		<>
 			<Card.Header>
-				<Stack direction="row" align="center" gap="sm">
-					<span
-						className={ styles.widgetChromeHeaderIcon }
-						aria-hidden="true"
-					>
-						<Icon icon={ plugins } />
-					</span>
-				</Stack>
+				<span
+					className={ styles.widgetChromeHeaderIcon }
+					aria-hidden="true"
+				>
+					<Icon icon={ plugins } />
+				</span>
 			</Card.Header>
 			<Card.Content className={ styles.widgetChromeContent }>
 				<Stack
