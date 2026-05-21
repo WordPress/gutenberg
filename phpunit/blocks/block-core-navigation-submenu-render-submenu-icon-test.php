@@ -11,12 +11,6 @@
  */
 class Block_Core_Navigation_Submenu_Render_Submenu_Icon_Test extends WP_UnitTestCase {
 
-	public static function set_up_before_class() {
-		parent::set_up_before_class();
-
-		require_once dirname( __DIR__, 2 ) . '/packages/block-library/src/navigation-link/shared/render-submenu-icon.php';
-	}
-
 	/**
 	 * @ticket 65287
 	 */
