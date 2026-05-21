@@ -470,8 +470,52 @@ let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
 let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
-let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
+// Cancel function for the currently-pending poll, or `null` when no
+// poll is scheduled. Acts as both the cancel callable and the "is a
+// poll pending?" sentinel, regardless of whether the underlying
+// scheduler is `requestIdleCallback` or `setTimeout`.
+let cancelPendingPoll: ( () => void ) | null = null;
 let syncRequestBodySizeLimit = MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES;
+
+/**
+ * Schedule a poll cycle. Prefers `requestIdleCallback` so the poll runs
+ * during a browser idle window, keeping the request off the editor
+ * boot path and off the user's typing-loop frames. Falls back to
+ * `setTimeout` on browsers that don't implement `requestIdleCallback`.
+ *
+ * Two modes:
+ *
+ * - `initial: true` (used for the first poll after a room registers)
+ *   has no fixed delay — it just waits for the next idle window so it
+ *   doesn't compete with editor boot. In the `setTimeout` fallback it
+ *   degrades to a `0`-delay timer, i.e. "as soon as the current task
+ *   yields".
+ *
+ * - `initial: false` (default — used to schedule the next poll inside
+ *   `start()`) caps the wait at `pollInterval` so collaboration
+ *   updates still arrive on roughly the cadence consumers expect.
+ *
+ * @param options         Scheduling options.
+ * @param options.initial Whether this is the first poll for a freshly
+ *                        registered room.
+ */
+function schedulePoll( { initial = false }: { initial?: boolean } = {} ): void {
+	if ( typeof globalThis.requestIdleCallback === 'function' ) {
+		const options = initial ? undefined : { timeout: pollInterval };
+		const handle = globalThis.requestIdleCallback( () => {
+			cancelPendingPoll = null;
+			poll();
+		}, options );
+		cancelPendingPoll = () => globalThis.cancelIdleCallback( handle );
+	} else {
+		const delay = initial ? 0 : pollInterval;
+		const handle = setTimeout( () => {
+			cancelPendingPoll = null;
+			poll();
+		}, delay );
+		cancelPendingPoll = () => clearTimeout( handle );
+	}
+}
 
 // When more rooms are registered than the server allows per request
 // (MAX_ROOMS_PER_REQUEST), the primary room is sent every poll and the
@@ -542,9 +586,9 @@ function handleVisibilityChange() {
 		 * is already in-flight and will pick up the updated isActiveBrowser
 		 * value when it schedules the next cycle.
 		 */
-		if ( pollingTimeoutId ) {
-			clearTimeout( pollingTimeoutId );
-			pollingTimeoutId = null;
+		if ( cancelPendingPoll ) {
+			cancelPendingPoll();
+			cancelPendingPoll = null;
 			poll();
 		}
 	}
@@ -694,7 +738,7 @@ function restoreExactUpdates( payload: SyncPayload ): void {
 
 function poll(): void {
 	isPolling = true;
-	pollingTimeoutId = null;
+	cancelPendingPoll = null;
 
 	async function start(): Promise< void > {
 		if ( 0 === roomStates.size ) {
@@ -970,7 +1014,7 @@ function poll(): void {
 			}
 		}
 
-		pollingTimeoutId = setTimeout( poll, pollInterval );
+		schedulePoll();
 	}
 
 	// Start polling.
@@ -1100,8 +1144,12 @@ function registerRoom( {
 		areListenersRegistered = true;
 	}
 
-	if ( ! isPolling ) {
-		poll();
+	// Defer the first poll until the browser is idle so the initial
+	// wp-sync POST doesn't compete with editor boot. The `initial: true`
+	// schedule has no fixed deadline — we just want to yield long
+	// enough for any synchronous boot work to finish.
+	if ( ! isPolling && ! cancelPendingPoll ) {
+		schedulePoll( { initial: true } );
 	}
 }
 
@@ -1155,9 +1203,9 @@ function unregisterRoom(
 function retryNow(): void {
 	isManualRetry = true;
 
-	if ( pollingTimeoutId ) {
-		clearTimeout( pollingTimeoutId );
-		pollingTimeoutId = null;
+	if ( cancelPendingPoll ) {
+		cancelPendingPoll();
+		cancelPendingPoll = null;
 		poll();
 	}
 }
