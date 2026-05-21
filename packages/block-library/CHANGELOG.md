@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Search: Render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`.
+
 ### Internal
 
 -   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
