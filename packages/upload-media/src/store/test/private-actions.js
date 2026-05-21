@@ -547,6 +547,9 @@ describe( 'private actions', () => {
 		beforeEach( () => {
 			jest.clearAllMocks();
 			setCrossOriginIsolated( true );
+			// Default to opaque so the conversion branch is taken; individual
+			// tests override this to exercise the transparency skip.
+			vipsHasTransparency.mockResolvedValue( false );
 		} );
 
 		afterAll( () => {
@@ -678,6 +681,40 @@ describe( 'private actions', () => {
 
 			// A static GIF takes the normal image path: it is not stashed
 			// for video sideload.
+			expect( gifFinishCall( dispatchFn ) ).toBeUndefined();
+		} );
+
+		it( 'keeps a transparent animated GIF as an image (no video sideload)', async () => {
+			isAnimatedGif.mockReturnValue( true );
+			// A <video> cannot reproduce GIF transparency, so a transparent
+			// GIF must stay a GIF.
+			vipsHasTransparency.mockResolvedValue( true );
+			const item = makeGifItem( 'q-transparent' );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: {},
+				id: 'q-transparent',
+			} );
+
+			expect( vipsHasTransparency ).toHaveBeenCalled();
+			expect( gifFinishCall( dispatchFn ) ).toBeUndefined();
+		} );
+
+		it( 'keeps the GIF when the transparency check throws', async () => {
+			isAnimatedGif.mockReturnValue( true );
+			vipsHasTransparency.mockRejectedValue(
+				new Error( 'vips unavailable' )
+			);
+			const item = makeGifItem( 'q-throws' );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: {},
+				id: 'q-throws',
+			} );
+
+			// Errs on the side of caution: no lossy conversion is attempted.
 			expect( gifFinishCall( dispatchFn ) ).toBeUndefined();
 		} );
 	} );

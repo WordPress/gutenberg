@@ -705,31 +705,51 @@ export function prepareItem( id: QueueItemId ) {
 		) {
 			const buffer = await file.arrayBuffer();
 			if ( isAnimatedGif( buffer ) ) {
-				// The GIF uploads through the normal image pipeline so the
-				// block remains a valid core/image. The converted video is
-				// sideloaded as a companion file of this same attachment
-				// after upload (see generateThumbnails) — like the HEIC
-				// original — not as a separate media library attachment.
-				// It is recorded in attachment metadata and swapped in at
-				// render time (see lib/media/animated-gif-to-video.php).
-				operations.push(
-					OperationType.Upload,
-					OperationType.ThumbnailGeneration,
-					OperationType.Finalize
-				);
+				// Skip the conversion for transparent GIFs: a <video> cannot
+				// reproduce GIF transparency, so converting would visibly
+				// change the image (e.g. small decorative or emoji-like GIFs
+				// placed over a colored background). Such GIFs upload as a
+				// normal image instead. Mirrors the PNG → JPEG transparency
+				// check in getTranscodeImageOperation().
+				let hasTransparency = false;
+				const blobUrl = createBlobURL( file );
+				try {
+					hasTransparency = await vipsHasTransparency( blobUrl );
+				} catch {
+					// If the check fails, err on the side of caution and keep
+					// the GIF rather than risk a lossy conversion.
+					hasTransparency = true;
+				} finally {
+					revokeBlobURL( blobUrl );
+				}
 
-				dispatch< AddOperationsAction >( {
-					type: Type.AddOperations,
-					id,
-					operations,
-				} );
+				if ( ! hasTransparency ) {
+					// The GIF uploads through the normal image pipeline so the
+					// block remains a valid core/image. The converted video is
+					// sideloaded as a companion file of this same attachment
+					// after upload (see generateThumbnails) — like the HEIC
+					// original — not as a separate media library attachment.
+					// It is recorded in attachment metadata and swapped in at
+					// render time (see lib/media/animated-gif-to-video.php).
+					operations.push(
+						OperationType.Upload,
+						OperationType.ThumbnailGeneration,
+						OperationType.Finalize
+					);
 
-				// Keep the original GIF so generateThumbnails can
-				// transcode and sideload it once the attachment exists.
-				dispatch.finishOperation( id, {
-					animatedGifFile: item.file,
-				} );
-				return;
+					dispatch< AddOperationsAction >( {
+						type: Type.AddOperations,
+						id,
+						operations,
+					} );
+
+					// Keep the original GIF so generateThumbnails can
+					// transcode and sideload it once the attachment exists.
+					dispatch.finishOperation( id, {
+						animatedGifFile: item.file,
+					} );
+					return;
+				}
 			}
 		}
 
