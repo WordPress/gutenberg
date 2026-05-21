@@ -62,6 +62,7 @@ describe( 'data', () => {
 					name: 'Button',
 					description: 'A button.',
 					packageName: '@wordpress/components',
+					notes: 'Will be superseded by `Button` in `@wordpress/ui`, but continue using for now.',
 				},
 			] );
 		} );
@@ -102,6 +103,7 @@ describe( 'data', () => {
 				packageName: '@wordpress/components',
 				importStatement:
 					"import { Button } from '@wordpress/components';",
+				notes: 'Will be superseded by `Button` in `@wordpress/ui`, but continue using for now.',
 				props: [
 					{
 						name: 'variant',

@@ -135,13 +135,21 @@ export function parseComponents(
 		const key = `${ packageName }:${ name }`;
 		const existing = byKey.get( key );
 		const description = component.description || '';
+		const notes = component.notes || '';
 
 		if ( ! existing ) {
-			byKey.set( key, { name, description, packageName } );
+			const entry: Component = { name, description, packageName };
+			if ( notes ) {
+				entry.notes = notes;
+			}
+			byKey.set( key, entry );
 		} else {
-			// Prefer a non-empty description from a later entry over an
-			// empty one from the first.
+			// Prefer a non-empty value from a later entry over an empty one
+			// from the first.
 			existing.description ||= description;
+			if ( ! existing.notes && notes ) {
+				existing.notes = notes;
+			}
 		}
 	}
 
@@ -180,6 +188,7 @@ export function parseComponentDetail(
 		}
 
 		const description = component.description || '';
+		const notes = component.notes || '';
 		const props = parseProps( component.reactDocgen?.props || {} );
 		const stories = component.stories || [];
 
@@ -192,8 +201,14 @@ export function parseComponentDetail(
 				props,
 				stories: [ ...stories ],
 			};
+			if ( notes ) {
+				detail.notes = notes;
+			}
 		} else if ( detail.packageName === pkg ) {
 			detail.description ||= description;
+			if ( ! detail.notes && notes ) {
+				detail.notes = notes;
+			}
 			if ( detail.props.length === 0 ) {
 				detail.props = props;
 			}

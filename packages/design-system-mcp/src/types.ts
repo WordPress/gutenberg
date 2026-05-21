@@ -14,12 +14,14 @@ export interface ManifestComponent extends ComponentManifest {
 			}
 		>;
 	};
+	notes?: string;
 }
 
 export interface Component {
 	name: string;
 	description: string;
 	packageName: string;
+	notes?: string;
 }
 
 export interface ComponentProp {
@@ -35,6 +37,7 @@ export interface ComponentDetail {
 	description: string;
 	packageName: string;
 	importStatement: string | null;
+	notes?: string;
 	props: ComponentProp[];
 	stories: Array< {
 		name: string;

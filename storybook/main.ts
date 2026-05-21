@@ -54,6 +54,7 @@ const config: StorybookConfig = {
 		import.meta.resolve( './addons/source-link/preset.ts' ),
 		'storybook-addon-tag-badges',
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
+		import.meta.resolve( './presets/component-status-manifest.ts' ),
 	],
 	framework: '@storybook/react-vite',
 	features: {

@@ -48,6 +48,10 @@ export function formatComponentDetail( detail: ComponentDetail ): string {
 
 	lines.push( '', `**Package:** \`${ detail.packageName }\`` );
 
+	if ( detail.notes ) {
+		lines.push( '', `**Notes:** ${ detail.notes }` );
+	}
+
 	if ( detail.importStatement ) {
 		lines.push(
 			'',

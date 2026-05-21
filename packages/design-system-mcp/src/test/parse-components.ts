@@ -299,6 +299,58 @@ describe( 'parseComponents', () => {
 			},
 		] );
 	} );
+
+	it( 'should propagate notes from the manifest', () => {
+		const components = createComponents( {
+			button: {
+				name: 'Button',
+				description: 'A button.',
+				notes: 'Will be superseded by `Button` in `@wordpress/ui`.',
+				path: '../packages/components/src/button/stories/index.story.tsx',
+			},
+		} );
+
+		expect( parseComponents( components ) ).toEqual( [
+			{
+				name: 'Button',
+				description: 'A button.',
+				packageName: '@wordpress/components',
+				notes: 'Will be superseded by `Button` in `@wordpress/ui`.',
+			},
+		] );
+	} );
+
+	it( 'should omit notes when the manifest entry has none', () => {
+		const components = createComponents( {
+			badge: {
+				name: 'Badge',
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+		} );
+
+		const [ result ] = parseComponents( components );
+		expect( result ).not.toHaveProperty( 'notes' );
+	} );
+
+	it( 'should prefer non-empty notes when merging entries', () => {
+		const components = createComponents( {
+			'badge-index': {
+				name: 'Badge',
+				// First entry has no notes
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+			'badge-intent': {
+				name: 'Badge',
+				notes: 'Use intent="high" for the most important badges.',
+				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+			},
+		} );
+
+		const [ result ] = parseComponents( components );
+		expect( result.notes ).toBe(
+			'Use intent="high" for the most important badges.'
+		);
+	} );
 } );
 
 describe( 'parseComponentDetail', () => {
@@ -522,6 +574,53 @@ describe( 'parseComponentDetail', () => {
 				name: 'AlertDialog',
 				importStatement: "import { AlertDialog } from '@wordpress/ui';",
 			} )
+		);
+	} );
+
+	it( 'should propagate notes from the manifest', () => {
+		const components = createComponents( {
+			button: {
+				name: 'Button',
+				notes: 'Will be superseded by `Button` in `@wordpress/ui`.',
+				path: '../packages/components/src/button/stories/index.story.tsx',
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'Button' );
+		expect( result?.notes ).toBe(
+			'Will be superseded by `Button` in `@wordpress/ui`.'
+		);
+	} );
+
+	it( 'should omit notes when the manifest entry has none', () => {
+		const components = createComponents( {
+			button: {
+				name: 'Button',
+				path: '../packages/ui/src/button/stories/index.story.tsx',
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'Button' );
+		expect( result ).not.toHaveProperty( 'notes' );
+	} );
+
+	it( 'should prefer non-empty notes when merging story files', () => {
+		const components = createComponents( {
+			'badge-index': {
+				name: 'Badge',
+				// First entry has no notes
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+			'badge-intent': {
+				name: 'Badge',
+				notes: 'Use intent="high" for the most important badges.',
+				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'Badge' );
+		expect( result?.notes ).toBe(
+			'Use intent="high" for the most important badges.'
 		);
 	} );
 } );
