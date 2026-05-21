@@ -17,11 +17,12 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, plugins } from '@wordpress/icons';
+import { plugins } from '@wordpress/icons';
 /* eslint-disable @wordpress/use-recommended-components */
 import {
 	Button,
 	Card,
+	Icon,
 	Stack,
 	Notice,
 	Text,
