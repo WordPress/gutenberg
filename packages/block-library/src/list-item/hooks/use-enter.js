@@ -7,7 +7,10 @@ import {
 	cloneBlock,
 } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -16,6 +19,9 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import useOutdentListItem from './use-outdent-list-item';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default function useEnter( props ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
@@ -82,9 +88,13 @@ export default function useEnter( props ) {
 			selectionChange( middle.clientId );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeDelegatedListener(
+			element,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }
