@@ -63,9 +63,26 @@ async function getVips(): Promise< typeof Vips > {
 				cleanup = fn;
 			} );
 		},
+		// Redirect wasm-vips internal stdout/stderr to prevent console errors
+		// (e.g. AVIF codec warnings that are not actionable for users).
+		// Set globalThis.__vipsDebug to a function to capture this output during development.
+		print: ( text: string ) => {
+			( globalThis as any ).__vipsDebug?.( text );
+		},
+		printErr: ( text: string ) => {
+			( globalThis as any ).__vipsDebug?.( text );
+		},
 	} );
 
-	return await vipsPromise;
+	const vipsInstance = await vipsPromise;
+
+	// Disable the operation cache to prevent out-of-memory crashes
+	// during repeated image processing. libvips caches results from
+	// previous operations which accumulates WASM memory over time.
+	// See https://github.com/WordPress/gutenberg/issues/76706
+	vipsInstance.Cache.max( 0 );
+
+	return vipsInstance;
 }
 
 /**

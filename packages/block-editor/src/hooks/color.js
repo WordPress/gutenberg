@@ -36,6 +36,7 @@ import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
+	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
@@ -295,7 +296,7 @@ export function ColorEdit( {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
