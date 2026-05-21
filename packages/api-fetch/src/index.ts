@@ -9,7 +9,10 @@ import { __ } from '@wordpress/i18n';
 import { lock } from './lock-unlock';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
-import createPreloadingMiddleware from './middlewares/preloading';
+import createPreloadingMiddleware, {
+	CLEAR as PRELOADING_CLEAR,
+	ENABLE_MULTI_USE as PRELOADING_ENABLE_MULTI_USE,
+} from './middlewares/preloading';
 import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
@@ -70,10 +73,7 @@ function registerMiddleware( middleware: APIFetchMiddleware ) {
  */
 function enablePreloadMultiUse() {
 	for ( const middleware of middlewares ) {
-		const enable = ( middleware as any ).__unstableEnableMultiUse;
-		if ( typeof enable === 'function' ) {
-			enable();
-		}
+		( middleware as any )[ PRELOADING_ENABLE_MULTI_USE ]?.();
 	}
 }
 
@@ -87,10 +87,7 @@ function enablePreloadMultiUse() {
  */
 function clearPreloadedData() {
 	for ( const middleware of middlewares ) {
-		const clear = ( middleware as any ).__unstableClear;
-		if ( typeof clear === 'function' ) {
-			clear();
-		}
+		( middleware as any )[ PRELOADING_CLEAR ]?.();
 	}
 }
 

@@ -9,6 +9,16 @@ import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
 import type { APIFetchMiddleware } from '../types';
 
 /**
+ * Symbol keys for hooks attached to each `createPreloadingMiddleware`
+ * instance. Using symbols (instead of `__unstable*` string properties)
+ * keeps these out of any `for…in`, `Object.keys`, or accidental
+ * `wp.apiFetch.use( something )` lookup — the only callers that can
+ * reach them are the ones inside this package that import the symbols.
+ */
+export const ENABLE_MULTI_USE = Symbol( 'preloadingEnableMultiUse' );
+export const CLEAR = Symbol( 'preloadingClear' );
+
+/**
  * @param preloadedData
  * @return Preloading middleware.
  */
@@ -72,10 +82,10 @@ function createPreloadingMiddleware(
 	};
 
 	// Switches this middleware into multi-use mode: cache entries stay
-	// around after the first read until `__unstableClear` runs. Useful
-	// when multiple selectors share a URL and the consumer guarantees
-	// it will clear at the right boundary.
-	( middleware as any ).__unstableEnableMultiUse = () => {
+	// around after the first read until `CLEAR` runs. Useful when
+	// multiple selectors share a URL and the consumer guarantees it
+	// will clear at the right boundary.
+	( middleware as any )[ ENABLE_MULTI_USE ] = () => {
 		multiUse = true;
 	};
 
@@ -84,7 +94,7 @@ function createPreloadingMiddleware(
 	// kickoff missed should fall through to a real network request
 	// (and surface in tests / DevTools) instead of being silently served
 	// from the preload bucket.
-	( middleware as any ).__unstableClear = () => {
+	( middleware as any )[ CLEAR ] = () => {
 		for ( const key of Object.keys( cache ) ) {
 			delete cache[ key ];
 		}

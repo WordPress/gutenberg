@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import type { FetchHandler } from '../../types';
-import createPreloadingMiddleware from '../preloading';
+import createPreloadingMiddleware, {
+	CLEAR,
+	ENABLE_MULTI_USE,
+} from '../preloading';
 
 describe( 'Preloading Middleware', () => {
 	describe( 'given preloaded data', () => {
@@ -67,11 +70,7 @@ describe( 'Preloading Middleware', () => {
 					};
 					const preloadingMiddleware =
 						createPreloadingMiddleware( preloadedData );
-					(
-						preloadingMiddleware as unknown as {
-							__unstableEnableMultiUse: () => void;
-						}
-					 ).__unstableEnableMultiUse();
+					( preloadingMiddleware as any )[ ENABLE_MULTI_USE ]();
 
 					const requestOptions = {
 						method: 'GET',
@@ -87,13 +86,9 @@ describe( 'Preloading Middleware', () => {
 					).resolves.toEqual( body );
 					expect( nextSpy ).not.toHaveBeenCalled();
 
-					// `__unstableClear` is the explicit boundary at
-					// which subsequent requests should fall through.
-					(
-						preloadingMiddleware as unknown as {
-							__unstableClear: () => void;
-						}
-					 ).__unstableClear();
+					// `CLEAR` is the explicit boundary at which
+					// subsequent requests should fall through.
+					( preloadingMiddleware as any )[ CLEAR ]();
 					preloadingMiddleware( requestOptions, nextSpy );
 					expect( nextSpy ).toHaveBeenCalled();
 				} );
