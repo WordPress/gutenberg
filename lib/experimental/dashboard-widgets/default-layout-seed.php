@@ -30,18 +30,29 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 
 	$uuids = array_column( $dashboard_layout, 'uuid' );
 
-	if ( in_array( 'default-hello-world-widget-instance', $uuids, true ) ) {
-		return $dashboard_layout;
+	if ( ! in_array( 'default-welcome-widget-instance', $uuids, true ) ) {
+		$dashboard_layout[] = array(
+			'uuid'      => 'default-welcome-widget-instance',
+			'type'      => 'core/welcome',
+			'placement' => array(
+				'width'  => 'full',
+				'height' => 2,
+				'order'  => 0,
+			),
+		);
 	}
 
-	$dashboard_layout[] = array(
-		'uuid'      => 'default-hello-world-widget-instance',
-		'type'      => 'core/hello-world',
-		'placement' => array(
-			'width'  => 2,
-			'height' => 1,
-		),
-	);
+	if ( ! in_array( 'default-hello-world-widget-instance', $uuids, true ) ) {
+		$dashboard_layout[] = array(
+			'uuid'      => 'default-hello-world-widget-instance',
+			'type'      => 'core/hello-world',
+			'placement' => array(
+				'width'  => 2,
+				'height' => 1,
+				'order'  => 1,
+			),
+		);
+	}
 
 	return $dashboard_layout;
 }

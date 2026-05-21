@@ -1513,11 +1513,6 @@
 			"count": 1
 		}
 	},
-	"packages/notices/src/components/inline-notices/index.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/patterns/src/components/allow-overrides-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
