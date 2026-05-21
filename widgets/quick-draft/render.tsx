@@ -17,7 +17,7 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
  * Internal dependencies
  */
 import { ExistingDraftPrompt, SavedPost } from './components';
-import { QuickPostContentField } from './fields';
+import { QuickDraftContentField } from './fields';
 import styles from './styles.module.css';
 
 /*
@@ -51,7 +51,7 @@ function getTodayStartISO() {
 	return `${ year }-${ month }-${ day }T00:00:00`;
 }
 
-type QuickPostData = {
+type QuickDraftData = {
 	title: string;
 	content: string;
 };
@@ -61,19 +61,19 @@ const FORM: Form = {
 	fields: [ 'title', 'content' ],
 };
 
-const INITIAL_DATA: QuickPostData = {
+const INITIAL_DATA: QuickDraftData = {
 	title: '',
 	content: '',
 };
 
 /**
- * Quick Post widget. Lets the user draft a post (title + content) without
+ * Quick Draft widget. Lets the user draft a post (title + content) without
  * leaving the dashboard. Branches between a loading spinner, a prompt when a
  * draft already exists from today, a confirmation after saving, and the form
  * itself.
  */
-export default function QuickPost() {
-	const [ data, setData ] = useState< QuickPostData >( INITIAL_DATA );
+export default function QuickDraft() {
+	const [ data, setData ] = useState< QuickDraftData >( INITIAL_DATA );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ createdPost, setCreatedPost ] = useState< {
 		id: number;
@@ -114,7 +114,7 @@ export default function QuickPost() {
 		};
 	}, [] );
 
-	const fields = useMemo< Field< QuickPostData >[] >(
+	const fields = useMemo< Field< QuickDraftData >[] >(
 		() => [
 			{
 				id: 'title',
@@ -129,7 +129,7 @@ export default function QuickPost() {
 				type: 'text',
 				label: __( 'Content' ),
 				isValid: { required: true, minLength: 10 },
-				Edit: QuickPostContentField,
+				Edit: QuickDraftContentField,
 				help: __( 'Enter the content for your post.' ),
 			},
 		],
@@ -211,7 +211,7 @@ export default function QuickPost() {
 			className={ styles.body }
 		>
 			<Stack className={ styles.formContainer }>
-				<DataForm< QuickPostData >
+				<DataForm< QuickDraftData >
 					data={ data }
 					fields={ fields }
 					form={ FORM }

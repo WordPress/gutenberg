@@ -2,6 +2,6 @@
  * Widget type definition
  */
 export default {
-	name: 'gutenberg/quick-post',
-	title: 'Quick Post',
+	name: 'core/quick-draft',
+	title: 'Quick Draft',
 };

@@ -8,7 +8,7 @@ import type { DataFormControlProps, FieldValidity } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import styles from './quick-post-content-field.module.css';
+import styles from './quick-draft-content-field.module.css';
 
 /*
  * Returns the first failing validity rule's message. Order matches the visual
@@ -34,7 +34,7 @@ function getErrorMessage( validity: FieldValidity | undefined ) {
  * vertically, so the field grows with the widget tile. See the module CSS for
  * the API-gap workarounds that complete the flex chain end-to-end.
  */
-export default function QuickPostContentField< Item >( {
+export default function QuickDraftContentField< Item >( {
 	data,
 	field,
 	onChange,
