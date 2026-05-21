@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "23.2.0-rc.1",
+	"version": "23.2.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -148,11 +148,13 @@
 		"preother:check-local-changes": "npm run docs:build && npm run --workspace @wordpress/theme build",
 		"other:check-local-changes": "npm run --workspace @wordpress/validation-tools check-local-changes --",
 		"other:cherry-pick": "node ./bin/cherry-pick.mjs",
-		"other:generate-php-sync-issue": "node ./bin/generate-php-sync-issue.mjs",
+		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
 		"postinstall": "patch-package && node ./patches/patch-xcode.js",
 		"prepare": "husky install",
 		"prepublishOnly": "npm run build",
+		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
+		"rtc:ws": "node ./test/e2e/bin/rtc-dev.mjs --mode=websockets",
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build -- --skip-types",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
@@ -240,6 +242,7 @@
 		"test/performance",
 		"test/storybook-playwright",
 		"test/unit",
-		"tools/*"
+		"tools/*",
+		"widgets/*"
 	]
 }

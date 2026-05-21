@@ -8,7 +8,18 @@ import { __ } from '@wordpress/i18n';
  */
 import type { NormalizedRect, Flip, CropperState } from './types';
 
+/**
+ * Default/resting zoom. A full, unrotated crop needs at least 1x to cover the
+ * crop area, but smaller/fine-rotated crops can be valid below 1x — the true
+ * floor for those comes from `getMinZoom`.
+ */
 export const MIN_ZOOM = 1;
+/**
+ * Safety floor for coverage-aware zoom. Degenerate crops can have a geometric
+ * coverage minimum of 0, but camera and inverse-matrix math need a stable,
+ * positive scale.
+ */
+export const ABSOLUTE_MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 10;
 
 /**

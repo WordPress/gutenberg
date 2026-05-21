@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -26,6 +27,7 @@ import {
 	vipsHasTransparency,
 	vipsEnsureJxlSupport,
 	terminateVipsWorker,
+	maybeRecycleVipsWorker,
 } from './utils';
 import type {
 	AccumulateSubSizeAction,
@@ -563,6 +565,17 @@ export function finishOperation(
 				dispatch.processItem( pendingItem.id );
 			}
 		}
+
+		// Track vips operations across success and failure paths so a
+		// burst of failures can't bypass the recycle budget; the cancel
+		// path calls the same helper.
+		if (
+			previousOperation === OperationType.ResizeCrop ||
+			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.TranscodeImage
+		) {
+			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
+		}
 	};
 }
 
@@ -770,9 +783,11 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		// If the file is not processed by vips, tell the server to
-		// generate sub-sizes since they won't be created client-side.
-		let updates: Partial< QueueItem > = {};
+		// Tell the server whether to generate sub-sizes.
+		// When vips handles processing client-side, set generate_sub_sizes
+		// to false so the server skips the image-type support check
+		// (allowing formats like AVIF that the server can't process).
+		let updates: Partial< QueueItem >;
 		if ( isJxl && jxlJpeg ) {
 			// Upload the JPEG derivative as the main file and keep the original
 			// .jxl so generateThumbnails() can sideload it as a companion
@@ -806,6 +821,13 @@ export function prepareItem( id: QueueItemId ) {
 					...item.additionalData,
 					generate_sub_sizes: true,
 					convert_format: true,
+				},
+			};
+		} else {
+			updates = {
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: false,
 				},
 			};
 		}
@@ -950,7 +972,9 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				id,
 				new UploadError( {
 					code: 'IMAGE_TRANSCODING_ERROR',
-					message: 'File could not be uploaded',
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
@@ -1012,7 +1036,9 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				id,
 				new UploadError( {
 					code: 'IMAGE_ROTATION_ERROR',
-					message: 'Image could not be rotated',
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )

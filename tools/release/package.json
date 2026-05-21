@@ -37,5 +37,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs"
 	}
 }

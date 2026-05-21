@@ -1,8 +1,17 @@
 .editActionsEnter,
 .editActionsExit {
 	display: inline-flex;
+	align-items: center;
 	gap: var(--wp--preset--spacing--20);
 	transform-origin: right center;
+}
+
+.editActionsDivider {
+	flex-shrink: 0;
+	align-self: center;
+	width: 1px;
+	height: 16px;
+	background-color: var(--wpds-color-stroke-surface-neutral);
 }
 
 @media not ( prefers-reduced-motion ) {

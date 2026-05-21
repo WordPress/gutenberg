@@ -42,6 +42,17 @@ const DEFAULT_GRID: WidgetGridSettings = {
 	rowHeight: 200,
 };
 
+type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
+
+function resolveGridSettings(
+	settings: WidgetGridSettings
+): GridSettingsWithColumns {
+	return {
+		...settings,
+		columns: settings.columns ?? DEFAULT_GRID.columns!,
+	};
+}
+
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 	import( /* webpackIgnore: true */ moduleId );
 
@@ -93,7 +104,7 @@ interface InternalDashboardContextValue {
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
-	gridSettings: WidgetGridSettings;
+	gridSettings: GridSettingsWithColumns;
 	onGridSettingsChange: ( gridSettings: WidgetGridSettings ) => void;
 	canEditGridSettings: boolean;
 
@@ -106,13 +117,17 @@ interface InternalDashboardContextValue {
 
 	/**
 	 * Publishes staged slices that differ from their committed
-	 * counterparts, then exits edit mode. Best-effort atomic: no
-	 * rollback if a callback throws.
+	 * counterparts. By default also exits edit mode; pass
+	 * `{ exitEditMode: false }` when committing from the layout
+	 * settings drawer so customize mode stays active.
 	 */
-	commit: () => void;
+	commit: ( options?: { exitEditMode?: boolean } ) => void;
 
-	/** Reverts both staging slices and exits edit mode. */
-	cancel: () => void;
+	/**
+	 * Reverts both staging slices. By default also exits edit mode; pass
+	 * `{ exitEditMode: false }` when dismissing the layout settings drawer.
+	 */
+	cancel: ( options?: { exitEditMode?: boolean } ) => void;
 
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
@@ -258,31 +273,41 @@ export function WidgetDashboardProvider( {
 
 	const hasUncommittedChanges = hasLayoutChanges || hasGridSettingsChanges;
 
-	const commit = useCallback( () => {
-		if ( hasLayoutChanges ) {
-			onLayoutChange( canonicalize( stagingLayout ) );
-		}
+	const commit = useCallback(
+		( options?: { exitEditMode?: boolean } ) => {
+			if ( hasLayoutChanges ) {
+				onLayoutChange( canonicalize( stagingLayout ) );
+			}
 
-		if ( hasGridSettingsChanges ) {
-			onGridSettingsChange?.( stagingGridSettings );
-		}
+			if ( hasGridSettingsChanges ) {
+				onGridSettingsChange?.( stagingGridSettings );
+			}
 
-		onEditChange?.( false );
-	}, [
-		hasLayoutChanges,
-		hasGridSettingsChanges,
-		onLayoutChange,
-		onGridSettingsChange,
-		stagingLayout,
-		stagingGridSettings,
-		onEditChange,
-	] );
+			if ( options?.exitEditMode !== false ) {
+				onEditChange?.( false );
+			}
+		},
+		[
+			hasLayoutChanges,
+			hasGridSettingsChanges,
+			onLayoutChange,
+			onGridSettingsChange,
+			stagingLayout,
+			stagingGridSettings,
+			onEditChange,
+		]
+	);
 
-	const cancel = useCallback( () => {
-		setStagingLayout( committedLayout );
-		setStagingGridSettings( committedGridSettings );
-		onEditChange?.( false );
-	}, [ committedLayout, committedGridSettings, onEditChange ] );
+	const cancel = useCallback(
+		( options?: { exitEditMode?: boolean } ) => {
+			setStagingLayout( committedLayout );
+			setStagingGridSettings( committedGridSettings );
+			if ( options?.exitEditMode !== false ) {
+				onEditChange?.( false );
+			}
+		},
+		[ committedLayout, committedGridSettings, onEditChange ]
+	);
 
 	const resetGridSettings = useCallback( () => {
 		setStagingGridSettings( DEFAULT_GRID );
@@ -307,7 +332,7 @@ export function WidgetDashboardProvider( {
 			layout: stagingLayout,
 			onLayoutChange: setStagingLayout,
 			onLayoutReset,
-			gridSettings: stagingGridSettings,
+			gridSettings: resolveGridSettings( stagingGridSettings ),
 			onGridSettingsChange: setStagingGridSettings,
 			canEditGridSettings,
 			resetGridSettings,

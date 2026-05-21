@@ -60,24 +60,15 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * CSS is now registered with the style engine store rather than injected inline.
 	 *
 	 * @param array $state_styles Map of state to style array (e.g. `[':hover' => ['color' => [...]]]`).
+	 * @param string $block_name  Block name.
 	 * @return array { unique_class: string }
 	 */
-	private function build_expected_state_output( $state_styles ) {
-		$css_rules = array();
-		foreach ( $state_styles as $state => $style ) {
-			$compiled = wp_style_engine_get_styles(
-				gutenberg_normalize_state_style_for_css_output( $style )
-			);
-			if ( ! empty( $compiled['declarations'] ) ) {
-				$css_rules[] = array(
-					'state'        => $state,
-					'declarations' => $compiled['declarations'],
-				);
-			}
-		}
+	private function build_expected_state_output( $state_styles, $block_name = 'core/navigation-link' ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+		$css_rules  = gutenberg_get_block_state_style_rules( $state_styles, $block_type );
 
 		return array(
-			'unique_class' => 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 ),
+			'unique_class' => gutenberg_get_block_state_unique_class( $block_name, $css_rules ),
 		);
 	}
 
@@ -125,6 +116,62 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'border-style'      => 'dashed !important',
 				'border-left-width' => '2px',
 			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that modifier classes on the first compound selector are preserved
+	 * when state selectors are scoped to the block wrapper.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 */
+	public function test_build_state_selector_preserves_first_compound_modifier_classes() {
+		$actual = gutenberg_build_state_selector(
+			'.wp-states-test',
+			'.wp-block-search.wp-block-search__button-outside .wp-block-search__input',
+			':hover'
+		);
+
+		$this->assertSame(
+			'.wp-states-test.wp-block-search__button-outside .wp-block-search__input:hover',
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that child combinators without surrounding spaces are preserved when
+	 * state selectors are scoped to the block wrapper.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 */
+	public function test_build_state_selector_preserves_child_combinator_without_spaces() {
+		$actual = gutenberg_build_state_selector(
+			'.wp-states-test',
+			'.wp-block-foo>.inner',
+			':hover'
+		);
+
+		$this->assertSame(
+			'.wp-states-test>.inner:hover',
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that selector lists are split without splitting selector-function arguments.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 */
+	public function test_build_state_selector_splits_selector_lists_without_splitting_selector_function_arguments() {
+		$actual = gutenberg_build_state_selector(
+			'.wp-states-test',
+			'.wp-block-example:not(.foo, .bar) .inner, .wp-block-example .fallback',
+			':hover'
+		);
+
+		$this->assertSame(
+			'.wp-states-test:not(.foo, .bar) .inner:hover, .wp-states-test .fallback:hover',
 			$actual
 		);
 	}
@@ -653,6 +700,142 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a responsive root state generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_root_state_generates_media_query_scoped_css() {
+		$this->ensure_block_registered( 'core/paragraph' );
+
+		$block_content = '<p class="wp-block-paragraph">Hello</p>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'mobile' => array(
+						'color' => array(
+							'text' => '#ff0000',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<p class="wp-block-paragraph (wp-states-[a-f0-9]{8})">Hello<\/p>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a responsive pseudo-state generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_pseudo_state_generates_media_query_scoped_css() {
+		$this->ensure_block_registered(
+			'core/button',
+			array( 'root' => '.wp-block-button .wp-block-button__link' )
+		);
+
+		$block_content = '<div class="wp-block-button"><a class="wp-block-button__link">Click me</a></div>';
+		$block         = array(
+			'blockName' => 'core/button',
+			'attrs'     => array(
+				'style' => array(
+					'mobile' => array(
+						':hover' => array(
+							'color' => array(
+								'background' => '#ff00d0',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<div class="wp-block-button (wp-states-[a-f0-9]{8})"><a class="wp-block-button__link">Click me<\/a><\/div>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that responsive styles are routed through block feature selectors.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_state_routes_feature_selectors() {
+		$this->ensure_block_registered(
+			'core/button',
+			array(
+				'root'       => '.wp-block-button .wp-block-button__link',
+				'dimensions' => array(
+					'root'  => '.wp-block-button',
+					'width' => '.wp-block-button',
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Click</a></div>';
+		$block         = array(
+			'blockName' => 'core/button',
+			'attrs'     => array(
+				'style' => array(
+					'mobile' => array(
+						'color'      => array(
+							'background' => '#ff00d0',
+						),
+						'dimensions' => array(
+							'width' => '50%',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<div class="wp-block-button (wp-states-[a-f0-9]{8})"><a class="wp-block-button__link wp-element-button">Click<\/a><\/div>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'.' . $matches[0] . ' .wp-block-button__link{background-color:#ff00d0 !important;}',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '{width:50% !important;}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
 	 * Tests that the unique scoped class is added to the wrapper element for a
 	 * block with no descendant root selector.
 	 *
@@ -676,13 +859,12 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that the unique scoped class is added to the descendant element (not
-	 * the wrapper) for a block whose `selectors.root` targets a descendant, so
-	 * that `.wp-states-XXXX:hover` matches correctly.
+	 * Tests that the unique scoped class is added to the wrapper for a block
+	 * whose `selectors.root` targets a descendant.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
-	public function test_unique_class_is_added_to_descendant_not_wrapper_when_root_selector_has_descendant() {
+	public function test_unique_class_is_added_to_wrapper_when_root_selector_has_descendant() {
 		$this->ensure_block_registered(
 			'core/button',
 			array( 'root' => '.wp-block-button .wp-block-button__link' )
@@ -695,8 +877,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
-		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = '<div class="wp-block-button"><a class="wp-block-button__link ' . $parts['unique_class'] . '">Click me</a></div>';
+		$parts    = $this->build_expected_state_output( $state_styles, 'core/button' );
+		$expected = '<div class="wp-block-button ' . $parts['unique_class'] . '"><a class="wp-block-button__link">Click me</a></div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -706,7 +888,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * Integration test using the exact block markup and style attribute captured
 	 * from a core/button block in the editor with Twenty Twenty-Four theme.
 	 * Covers color, typography (preset font family reference), and class injection
-	 * onto the descendant element.
+	 * onto the wrapper element.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
@@ -734,8 +916,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
-		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = '<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-accent-4-background-color has-text-color has-background has-link-color wp-element-button ' . $parts['unique_class'] . '" style="color:#bdfffb">Button 2 outline</a></div>';
+		$parts    = $this->build_expected_state_output( $state_styles, 'core/button' );
+		$expected = '<div class="wp-block-button is-style-outline ' . $parts['unique_class'] . '"><a class="wp-block-button__link has-accent-4-background-color has-text-color has-background has-link-color wp-element-button" style="color:#bdfffb">Button 2 outline</a></div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -768,10 +950,57 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'attrs'     => array( 'style' => $state_styles ),
 		);
 
-		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button ' . $parts['unique_class'] . '">Click</a></div>';
+		$parts    = $this->build_expected_state_output( $state_styles, 'core/button' );
+		$expected = '<div class="wp-block-button ' . $parts['unique_class'] . '"><a class="wp-block-button__link wp-element-button">Click</a></div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Tests that button hover width is scoped to the outer wrapper while visual
+	 * styles remain scoped to the inner element.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_button_like_block_with_hover_width_targets_wrapper() {
+		$this->ensure_block_registered(
+			'core/button',
+			array(
+				'root'       => '.wp-block-button .wp-block-button__link',
+				'dimensions' => array(
+					'root'  => '.wp-block-button',
+					'width' => '.wp-block-button',
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Click</a></div>';
+		$state_styles  = array(
+			':hover' => array(
+				'color'      => array( 'background' => '#ff00d0' ),
+				'dimensions' => array( 'width' => '50%' ),
+			),
+		);
+		$block         = array(
+			'blockName' => 'core/button',
+			'attrs'     => array( 'style' => $state_styles ),
+		);
+
+		$parts    = $this->build_expected_state_output( $state_styles, 'core/button' );
+		$expected = '<div class="wp-block-button ' . $parts['unique_class'] . '"><a class="wp-block-button__link wp-element-button">Click</a></div>';
+		$actual   = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertSame( $expected, $actual );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$this->assertStringContainsString(
+			'.' . $parts['unique_class'] . ':hover{width:50% !important;}',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'.' . $parts['unique_class'] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;}',
+			$actual_stylesheet
+		);
 	}
 }
