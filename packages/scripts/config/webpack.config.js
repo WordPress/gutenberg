@@ -1,4 +1,11 @@
 /**
+ * Node dependencies
+ */
+const { exec } = require( 'child_process' );
+const { realpathSync } = require( 'fs' );
+const { basename, dirname, relative, resolve, sep } = require( 'path' );
+
+/**
  * External dependencies
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
@@ -6,12 +13,9 @@ const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
-const { exec } = require( 'child_process' );
 
 /**
  * WordPress dependencies
@@ -302,7 +306,7 @@ const scriptConfig = {
 				devMiddleware: {
 					writeToDisk: true,
 				},
-				allowedHosts: 'auto',
+				allowedHosts: 'all',
 				host: 'localhost',
 				port: 8887,
 				proxy: {
@@ -424,7 +428,24 @@ const scriptConfig = {
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.
 		! process.env.WP_NO_EXTERNALS &&
-			new DependencyExtractionWebpackPlugin(),
+			new DependencyExtractionWebpackPlugin(
+				hasReactFastRefresh
+					? {
+							// In HMR mode, react-refresh/runtime is injected and
+							// managed by ReactRefreshWebpackPlugin. It must not be
+							// externalized, otherwise WordPress would try to load a
+							// handle ('wp-react-refresh-runtime') that is never
+							// registered, causing the block script to fail.
+							requestToExternal( request ) {
+								if (
+									request.includes( 'react-refresh/runtime' )
+								) {
+									return null;
+								}
+							},
+					  }
+					: {}
+			),
 	].filter( Boolean ),
 };
 
