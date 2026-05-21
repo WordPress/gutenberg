@@ -2,6 +2,16 @@
 name: gutenberg-repro
 description: This skill should be used when the user explicitly invokes the `/gutenberg-repro` slash command OR when invoked by the `ai-reproduce` label workflow (CI mode, signalled by `GUTENBERG_REPRO_CI=1`). Reproduces a WordPress/Gutenberg GitHub issue end-to-end against a fresh `trunk` build: reads issue body, comments, linked refs and images; synthesizes a structured repro plan; spins up wp-env with the Playground runtime; drives the editor via Playwright MCP for up to three attempts; and writes a markdown report with a five-state verdict and evidence. Do not auto-fire on conversational mentions of issues or bugs in interactive mode.
 version: 0.2.0
+argument-hint: <github-issue-url-or-number>
+arguments:
+  - name: issue
+    required: true
+    description: |
+      The target GitHub issue. Accepts:
+      - A full GitHub URL: `https://github.com/WordPress/gutenberg/issues/12345`
+      - A bare issue number (assumed to be `WordPress/gutenberg`): `12345`
+      - A short form: `WordPress/gutenberg#12345`
+      If omitted, the skill scans recent conversation for an issue reference; if none is found, it stops and asks the user.
 ---
 
 # Gutenberg Repro
@@ -42,9 +52,13 @@ Follow each step in order. Track progress with TodoWrite. Do not skip steps.
 
 ### Step 1 — Identify the target issue
 
-- Look first at the slash-command argument. Accept either a full GitHub URL (`https://github.com/WordPress/gutenberg/issues/12345`) or a bare number (`12345`, assumed to be `WordPress/gutenberg`).
-- If no argument, scan the recent conversation for a GitHub issue reference and use the most recent.
-- If nothing is found, stop and ask the user for the issue.
+Resolve the target from the `issue` argument (see frontmatter). Normalise to `<repo>#<number>`:
+
+- Full URL `https://github.com/<owner>/<repo>/issues/<n>` → `<owner>/<repo>#<n>`.
+- Bare number `12345` → `WordPress/gutenberg#12345`.
+- Short form `WordPress/gutenberg#12345` → use as-is.
+
+If `issue` is missing, scan the recent conversation for a GitHub issue reference and use the most recent. If still nothing is found, stop and ask the user.
 
 **In CI mode:** read `GUTENBERG_REPRO_ISSUE` and use it as the target. Skip the argument and conversation scans. If the env var is unset or empty, write a `Could not execute` report explaining the missing input and exit non-zero (Step 8.5 will skip posting per its gating).
 
