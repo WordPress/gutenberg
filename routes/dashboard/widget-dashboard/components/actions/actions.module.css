@@ -10,7 +10,7 @@
 	flex-shrink: 0;
 	align-self: center;
 	width: 1px;
-	height: 20px;
+	height: 16px;
 	background-color: var(--wpds-color-stroke-surface-neutral);
 }
 
