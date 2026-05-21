@@ -38,15 +38,29 @@ import {
 import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
+import { gridSpanToPixelSize } from '../shared/resize-snap';
+import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import {
+	getLayoutFingerprint,
+	getPlacementFingerprint,
+	useLayoutShiftAnimation,
+} from '../shared/use-layout-shift-animation';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
+import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import styles from './lanes.module.css';
 
 // Fallback gap in pixels for math that runs before the computed gap
-// can be read from the DOM. Matches the `'md'` step the surface
-// resolves to in CSS (`--wpds-dimension-gap-md`); the next layout
+// can be read from the DOM. Matches the `'xl'` step the surface
+// resolves to in CSS (`--wpds-dimension-gap-xl`); the next layout
 // effect overwrites this with the actual computed value.
-const FALLBACK_GAP_PX = 12;
+const FALLBACK_GAP_PX = 24;
+
+// Default lane cap when no explicit `columns` or `minColumnWidth` is
+// supplied. Layered semantics: `columns` acts as a cap and
+// `minColumnWidth` as a per-tile floor; if neither is set we still
+// need a finite count to render against.
+const DEFAULT_COLUMNS = 6;
 
 const NO_SORT_STRATEGY = () => null;
 
@@ -91,7 +105,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 	function DashboardLanes( props, ref ) {
 		const {
 			layout,
-			columns = 6,
+			columns,
 			children,
 			className,
 			style,
@@ -112,6 +126,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		>();
 		const [ activeId, setActiveId ] = useState< string | null >( null );
 		const [ isResizing, setIsResizing ] = useState( false );
+		const [ resizeSnapPreview, setResizeSnapPreview ] = useState< {
+			id: string;
+			snap: ResizeSnapSize;
+		} | null >( null );
 		const latestLayoutRef = useRef<
 			DashboardLanesLayoutItem[] | undefined
 		>();
@@ -120,6 +138,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			y: number;
 		} | null >( null );
 		const resizeBaselineRef = useRef< number | null >( null );
+		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
 		const activeLayout = temporaryLayout ?? layout;
 
 		const [ container, setContainer ] = useState< HTMLDivElement | null >(
@@ -158,17 +177,25 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		}, [ container ] );
 		const effectiveColumns = useMemo( () => {
 			if ( ! minColumnWidth ) {
-				return columns;
+				return columns ?? DEFAULT_COLUMNS;
 			}
 			const totalWidthPerColumn = minColumnWidth + gapPx;
-			const maxColumns = Math.floor(
-				( containerWidth + gapPx ) / totalWidthPerColumn
+			const maxFit = Math.max(
+				1,
+				Math.floor( ( containerWidth + gapPx ) / totalWidthPerColumn )
 			);
-			return Math.max( 1, maxColumns );
+			return columns !== undefined ? Math.min( columns, maxFit ) : maxFit;
 		}, [ minColumnWidth, gapPx, containerWidth, columns ] );
 		const columnWidth =
 			( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
 			effectiveColumns;
+		const minResizeWidthPx = gridSpanToPixelSize(
+			1,
+			1,
+			columnWidth,
+			gapPx,
+			null
+		).widthPx;
 
 		const layoutMap = useMemo( () => {
 			const map = new Map< string, DashboardLanesLayoutItem >();
@@ -177,21 +204,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		}, [ activeLayout ] );
 
 		// Stable-identity key set for the children walk (see grid.tsx).
-		const layoutKeysSig = useMemo(
-			() => layout.map( ( item ) => item.key ).join( '\0' ),
+		const layoutKeys = useMemo(
+			() => new Set( layout.map( ( item ) => item.key ) ),
 			[ layout ]
 		);
-		const layoutKeysRef = useRef< {
-			sig: string;
-			set: Set< string >;
-		} | null >( null );
-		if ( layoutKeysRef.current?.sig !== layoutKeysSig ) {
-			layoutKeysRef.current = {
-				sig: layoutKeysSig,
-				set: new Set( layout.map( ( item ) => item.key ) ),
-			};
-		}
-		const layoutKeys = layoutKeysRef.current.set;
 
 		// Sorted item keys, identity-stable when the resulting sequence
 		// is unchanged (avoids invalidating SortableContext).
@@ -207,18 +223,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					.map( ( { item } ) => item.key ),
 			[ activeLayout ]
 		);
-		const itemsSig = useMemo(
-			() => sortedItems.join( '\0' ),
-			[ sortedItems ]
-		);
-		const itemsRef = useRef< {
-			sig: string;
-			arr: string[];
-		} | null >( null );
-		if ( itemsRef.current?.sig !== itemsSig ) {
-			itemsRef.current = { sig: itemsSig, arr: sortedItems };
-		}
-		const items = itemsRef.current.arr;
+		const items = sortedItems;
 
 		// Placement input for the hook: each item with its clamped span
 		// in source (sorted) order. `lane` forwards the optional explicit
@@ -299,6 +304,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			lastReorderCursorRef.current = null;
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
+			setResizeSnapPreview( null );
 			setTemporaryLayout( undefined );
 		} );
 
@@ -357,6 +363,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				y: activeCenterY,
 			};
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
@@ -366,7 +373,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			latestLayoutRef.current = undefined;
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
-
+			setResizeSnapPreview( null );
 			if ( ! onChangeLayout || ! latest ) {
 				setTemporaryLayout( undefined );
 				return;
@@ -400,7 +407,21 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				Math.min( baseline + relativeDelta, effectiveColumns )
 			);
 
-			const currentItem = layoutMap.get( id );
+			setResizeSnapPreview( {
+				id,
+				snap: gridSpanToPixelSize(
+					newWidth,
+					1,
+					columnWidth,
+					gapPx,
+					null
+				),
+			} );
+
+			const pendingItem = latestLayoutRef.current?.find(
+				( item ) => item.key === id
+			);
+			const currentItem = pendingItem ?? layoutMap.get( id );
 			if ( currentItem && currentItem.width === newWidth ) {
 				return;
 			}
@@ -410,6 +431,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			);
 
 			latestLayoutRef.current = updatedLayout;
+			captureLayoutSnapshotRef.current();
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		} );
@@ -452,6 +474,25 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			[ Overlay, editMode, effectiveColumns ]
 		);
 
+		const layoutAnimating =
+			editMode && ( isResizing || temporaryLayout !== undefined );
+		const layoutFingerprint = useMemo( () => {
+			const layoutSig = getLayoutFingerprint( activeLayout );
+			const placementSig = getPlacementFingerprint( itemStyles );
+			return `${ layoutSig }\0${ placementSig }`;
+		}, [ activeLayout, itemStyles ] );
+		const excludeLayoutAnimationKey =
+			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
+		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+			container,
+			enabled: layoutAnimating,
+			layoutFingerprint,
+			excludeItemKey: excludeLayoutAnimationKey,
+		} );
+		useLayoutEffect( () => {
+			captureLayoutSnapshotRef.current = captureLayoutSnapshot;
+		}, [ captureLayoutSnapshot ] );
+
 		return (
 			<DndContext
 				sensors={ sensors }
@@ -468,7 +509,14 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					<div
 						{ ...divProps }
 						ref={ mergedRootRef }
-						className={ clsx( styles.lanes, className ) }
+						className={ clsx(
+							styles.lanes,
+							layoutAnimating &&
+								layoutAnimationStyles[ 'layout-animating' ],
+							className
+						) }
+						data-wp-grid-dragging={ activeId || undefined }
+						data-wp-grid-resizing={ isResizing || undefined }
 						style={
 							{
 								...style,
@@ -504,8 +552,15 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 									}
 									disabled={ ! editMode }
 									interacting={ interacting }
+									dragging={ activeId !== null }
 									onResize={ handleResize }
 									onResizeEnd={ persistTemporaryLayout }
+									resizeSnapPreview={
+										resizeSnapPreview?.id === id
+											? resizeSnapPreview.snap
+											: null
+									}
+									minResizeWidthPx={ minResizeWidthPx }
 									actionableArea={ actionableAreaMap.get(
 										id
 									) }

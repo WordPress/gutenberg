@@ -9,6 +9,10 @@
 	isolation: isolate;
 }
 
+.editor-editor-interface .editor-notices {
+	padding: var(--wpds-dimension-padding-md);
+}
+
 .editor-visual-editor {
 	flex: 1 0 auto;
 }

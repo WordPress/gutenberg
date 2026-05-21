@@ -4,11 +4,13 @@
 
 ### Enhancements
 
+- DataViews: Lower the sticky footer z-index and isolate grid card stacking contexts. [#78315](https://github.com/WordPress/gutenberg/pull/78315)
 - DataViews: Refresh filter chip styling to align with `Button`. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataForms: Increase the minimum width of the panel layout popover from 256px to 320px so option labels have more room. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 
 ### Bug Fixes
 
+- DataViewsPicker: Fix first-click row selection in the table layout being swallowed by Ariakit's focus shift, which also scrolled the active row under the sticky header. [#78423](https://github.com/WordPress/gutenberg/pull/78423)
 - DataViews: Restore the `padding` rule on grid item titles that was lost when the wrapping element's class was renamed. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataViews: Restore the original 16px padding on the first/last table header cells (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataViews: Restore the original 4px gap inside table header buttons (had drifted to 8px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)

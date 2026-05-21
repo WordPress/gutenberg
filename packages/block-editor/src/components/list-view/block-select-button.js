@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	Tooltip,
+	Tooltip as WCTooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
@@ -164,14 +164,14 @@ function ListViewBlockSelectButton(
 					</span>
 				) : null }
 				{ !! visibilityLabel && (
-					<Tooltip text={ visibilityLabel }>
+					<WCTooltip text={ visibilityLabel }>
 						<span
 							className="block-editor-list-view-block-select-button__block-visibility"
 							aria-hidden="true"
 						>
 							<Icon icon={ unseen } />
 						</span>
-					</Tooltip>
+					</WCTooltip>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">

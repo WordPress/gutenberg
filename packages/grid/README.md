@@ -131,9 +131,9 @@ interface DashboardGridLayoutItem {
 `style`, etc.) flow through. The grid's own layout styles
 (`gridTemplateColumns`, `gridAutoRows`) override any user-supplied
 `style` for those properties. The gap between tiles is owned by the
-design-system gap token (`--wpds-dimension-gap-md` by default) and
-is not configurable per instance; theme it through a `ThemeProvider`
-density change or token override.
+design-system gap token (`--wpds-dimension-gap-xl` by default). Set
+`--wp-grid-gap` on the grid root or an ancestor to use another gap
+step.
 
 #### Child-level props
 
@@ -178,7 +178,7 @@ When `editMode` is true:
   stays in place as a dashed placeholder while a clone follows the
   cursor through `<DragOverlay>`.
 - A resize handle appears on the bottom-right of each item. A
-  dashed outline previews the target size as the cursor moves.
+  solid outline previews the target size as the cursor moves.
 - While any tile is dragging or resizing, `actionableArea` content
   on every tile is set `inert` so hovers on other tiles can't steal
   the gesture.
@@ -186,6 +186,8 @@ When `editMode` is true:
 - `onPreviewLayout` fires continuously during the interaction for
   live feedback; the committed layout is still emitted via
   `onChangeLayout`.
+- Sibling tiles animate into their new positions when the layout
+  reflows.
 
 ---
 
@@ -308,6 +310,9 @@ Drag-to-reorder works the same as in `DashboardGrid`. Resize is
 **horizontal-only**: tile heights are content-driven, so there is
 no vertical resize gesture. The default handle is a vertical bar
 centered on the trailing edge; the cursor is `ew-resize`.
+
+Sibling tiles animate into their new positions when the layout
+reflows.
 
 ---
 
@@ -472,10 +477,13 @@ root itself via `style`). All values fall back to sensible defaults.
 
 | Variable | Default | Applies to |
 |----------|---------|------------|
+| `--wp-grid-gap` | `var(--wpds-dimension-gap-xl)` | Gap between tiles on `DashboardGrid`, `DashboardLanes`, and the edit overlay. |
 | `--wp-grid-drag-preview-scale` | `1.05` | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift. |
 | `--wp-grid-placeholder-opacity` | `0.4` | Opacity of the placeholder tile (the original item while a drag is in flight). |
-| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Dashed outline color of the placeholder and of the resize-preview overlay. |
-| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the dashed outline traces the right silhouette. |
+| `--wp-grid-placeholder-outline-style` | `dashed` | Outline style of the drag placeholder (for example `solid` or `dotted`). |
+| `--wp-grid-resize-preview-outline-style` | `solid` | Border style of the resize-preview overlay (for example `dashed` or `dotted`). |
+| `--wp-grid-placeholder-outline-color` | `var(--wpds-color-stroke-interactive-brand)` | Outline color of the placeholder and of the resize-preview overlay. |
+| `--wp-grid-placeholder-radius` | `0` | Border radius of the placeholder, used to match the consumer's tile shape so the outline traces the right silhouette. |
 
 ---
 

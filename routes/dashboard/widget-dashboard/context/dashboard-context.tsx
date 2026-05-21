@@ -31,11 +31,27 @@ import type {
  * `gridSettings` entirely; if `gridSettings` is provided, the consumer's
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
+ *
+ * `widgets.tsx` also applies a hard-coded floor when `minColumnWidth`
+ * resolves to `undefined`, to keep legibility intact for stored settings
+ * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
+	columns: 6,
 	minColumnWidth: 350,
 	rowHeight: 200,
 };
+
+type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
+
+function resolveGridSettings(
+	settings: WidgetGridSettings
+): GridSettingsWithColumns {
+	return {
+		...settings,
+		columns: settings.columns ?? DEFAULT_GRID.columns!,
+	};
+}
 
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 	import( /* webpackIgnore: true */ moduleId );
@@ -88,7 +104,7 @@ interface InternalDashboardContextValue {
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
-	gridSettings: WidgetGridSettings;
+	gridSettings: GridSettingsWithColumns;
 	onGridSettingsChange: ( gridSettings: WidgetGridSettings ) => void;
 	canEditGridSettings: boolean;
 
@@ -302,7 +318,7 @@ export function WidgetDashboardProvider( {
 			layout: stagingLayout,
 			onLayoutChange: setStagingLayout,
 			onLayoutReset,
-			gridSettings: stagingGridSettings,
+			gridSettings: resolveGridSettings( stagingGridSettings ),
 			onGridSettingsChange: setStagingGridSettings,
 			canEditGridSettings,
 			resetGridSettings,

@@ -23,7 +23,7 @@ import {
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
 import {
-	Icon,
+	Icon as WCIcon,
 	Image,
 	ImageEditingButton,
 	IMAGE_DEFAULT_FOCAL_POINT,
@@ -354,7 +354,9 @@ const Cover = ( {
 		styles.iconDark
 	);
 
-	const placeholderIcon = <Icon icon={ icon } { ...placeholderIconStyle } />;
+	const placeholderIcon = (
+		<WCIcon icon={ icon } { ...placeholderIconStyle } />
+	);
 
 	const toolbarControls = ( open ) => (
 		<BlockControls group="other">
@@ -380,7 +382,7 @@ const Cover = ( {
 		>
 			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>
-					<Icon
+					<WCIcon
 						size={ 16 }
 						icon={ image }
 						{ ...styles.selectImageIcon }
@@ -665,7 +667,7 @@ const Cover = ( {
 					style={ styles.uploadFailedContainer }
 				>
 					<View style={ styles.uploadFailed }>
-						<Icon
+						<WCIcon
 							icon={ cautionFilled }
 							{ ...styles.uploadFailedIcon }
 						/>
