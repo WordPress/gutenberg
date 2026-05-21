@@ -10,7 +10,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import PostFeaturedImage from './index';
+import UnifiedFeaturedMedia from './unified-featured-media';
 import PostFeaturedImageCheck from './check';
 
 const PANEL_NAME = 'featured-image';
@@ -49,7 +49,7 @@ export default function PostFeaturedImagePanel( { withPanelBody = true } ) {
 	if ( ! withPanelBody ) {
 		return (
 			<PostFeaturedImageCheck>
-				<PostFeaturedImage />
+				<UnifiedFeaturedMedia />
 			</PostFeaturedImageCheck>
 		);
 	}
@@ -58,12 +58,12 @@ export default function PostFeaturedImagePanel( { withPanelBody = true } ) {
 		<PostFeaturedImageCheck>
 			<PanelBody
 				title={
-					postType?.labels?.featured_image ?? __( 'Featured image' )
+					postType?.labels?.featured_image ?? __( 'Featured media' )
 				}
 				opened={ isOpened }
 				onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
 			>
-				<PostFeaturedImage />
+				<UnifiedFeaturedMedia />
 			</PanelBody>
 		</PostFeaturedImageCheck>
 	);

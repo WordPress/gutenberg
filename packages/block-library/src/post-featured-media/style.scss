@@ -1,0 +1,33 @@
+%wp-block-post-featured-media-shared {
+	margin-left: 0;
+	margin-right: 0;
+	a {
+		display: block;
+		height: 100%;
+	}
+	:where(img) {
+		max-width: 100%;
+		width: 100%;
+		height: auto;
+		vertical-align: bottom;
+		box-sizing: border-box;
+	}
+
+	&.alignwide img,
+	&.alignfull img {
+		width: 100%;
+	}
+
+	&:where(.alignleft, .alignright) {
+		width: 100%;
+	}
+}
+
+.wp-block-post-featured-media {
+	@extend %wp-block-post-featured-media-shared;
+}
+
+// Styles for backwards compatibility with the legacy `post-featured-image` block.
+.wp-block-post-featured-image {
+	@extend %wp-block-post-featured-media-shared;
+}

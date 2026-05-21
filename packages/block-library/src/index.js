@@ -106,7 +106,7 @@ import * as postCommentsLink from './post-comments-link';
 import * as postContent from './post-content';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
-import * as postFeaturedImage from './post-featured-image';
+import * as postFeaturedMedia from './post-featured-media';
 import * as postNavigationLink from './post-navigation-link';
 import * as postTemplate from './post-template';
 import * as postTerms from './post-terms';
@@ -232,7 +232,7 @@ const getAllBlocks = () => {
 		avatar,
 		postTitle,
 		postExcerpt,
-		postFeaturedImage,
+		postFeaturedMedia,
 		postContent,
 		postAuthor,
 		postAuthorName,

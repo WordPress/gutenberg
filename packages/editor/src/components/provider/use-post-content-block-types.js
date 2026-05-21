@@ -6,7 +6,7 @@ import { applyFilters } from '@wordpress/hooks';
 
 const POST_CONTENT_BLOCK_TYPES = [
 	'core/post-title',
-	'core/post-featured-image',
+	'core/post-featured-media',
 	'core/post-content',
 ];
 

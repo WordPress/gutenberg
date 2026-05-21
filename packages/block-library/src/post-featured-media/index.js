@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { postFeaturedImage as icon } from '@wordpress/icons';
+import { media as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies

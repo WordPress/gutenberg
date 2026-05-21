@@ -1,0 +1,77 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+%wp-block-post-featured-media-editor-shared {
+	.components-placeholder {
+		justify-content: center;
+		align-items: center;
+		padding: 0;
+		display: flex;
+		min-height: 200px;
+
+		// Hide the upload button, as it's also available in the media library.
+		.components-form-file-upload {
+			display: none;
+		}
+
+		.components-button {
+			margin: auto;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: $grid-unit-60;
+			height: $grid-unit-60;
+			border-radius: 50%;
+			position: relative;
+			background: var(--wp-admin-theme-color);
+			border-color: var(--wp-admin-theme-color);
+			border-style: solid;
+			color: $white;
+
+			> svg {
+				color: inherit;
+			}
+		}
+	}
+
+	&[style*="height"] .components-placeholder {
+		min-height: $grid-unit-60;
+		min-width: $grid-unit-60;
+		height: 100%;
+		width: 100%;
+	}
+
+	// When the block is linked it's wrapped with a disabled <a /> tag in the
+	// editor. Ensure the link is not clickable so the inner controls stay live.
+	> a {
+		pointer-events: none;
+	}
+
+	&.is-selected .components-placeholder.has-illustration {
+		.components-button,
+		.components-placeholder__instructions,
+		.components-placeholder__label {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+}
+
+.wp-block-post-featured-media {
+	@extend %wp-block-post-featured-media-editor-shared;
+}
+
+// Styles for backwards compatibility with the legacy `post-featured-image` block.
+.wp-block-post-featured-image {
+	@extend %wp-block-post-featured-media-editor-shared;
+}
+
+div[data-type="core/post-featured-media"] {
+	img,
+	video {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
+}

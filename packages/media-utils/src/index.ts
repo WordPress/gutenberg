@@ -5,6 +5,7 @@ export { transformAttachment } from './utils/transform-attachment';
 export { validateFileSize } from './utils/validate-file-size';
 export { validateMimeType } from './utils/validate-mime-type';
 export { validateMimeTypeForUser } from './utils/validate-mime-type-for-user';
+export { getMediaType } from './utils/get-media-type';
 
 export type { Attachment, RestAttachment, SubSizeData } from './utils/types';
 

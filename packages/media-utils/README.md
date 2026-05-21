@@ -21,6 +21,20 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Undocumented declaration.
 
+### getMediaType
+
+Derives a simple media type ('image' | 'video' | 'audio') from an attachment.
+
+The REST API returns `media_type: 'image'` for images and `media_type: 'file'` for both video and audio, so the helper also inspects `mime_type` to tell those apart. The media library picker uses `type` and `mime` instead — both shapes are accepted.
+
+_Parameters_
+
+-   _media_ `MediaLike | null | undefined`: Attachment object from REST or the media library.
+
+_Returns_
+
+-   `'image' | 'video' | 'audio' | null`: Resolved media type, or null for nullish input.
+
 ### MediaUpload
 
 Undocumented declaration.

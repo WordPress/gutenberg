@@ -82,7 +82,7 @@ const variations = [
 				'core/post-template',
 				{},
 				[
-					[ 'core/post-featured-image' ],
+					[ 'core/post-featured-media' ],
 					postDate,
 					[ 'core/post-title' ],
 				],
