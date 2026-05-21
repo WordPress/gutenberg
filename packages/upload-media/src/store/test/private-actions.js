@@ -498,6 +498,9 @@ describe( 'private actions', () => {
 		beforeEach( () => {
 			global.ImageDecoder = function () {};
 			global.VideoEncoder = function () {};
+			// Default to opaque so the conversion branch is taken; individual
+			// tests override this to exercise the transparency skip.
+			vipsHasTransparency.mockResolvedValue( false );
 		} );
 
 		afterEach( () => {
@@ -535,6 +538,38 @@ describe( 'private actions', () => {
 			expect( flattenOperations( operations || [] ) ).not.toContain(
 				OperationType.TranscodeGif
 			);
+			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
+				'gif-id',
+				expect.objectContaining( {
+					animatedGifFile: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'does not stash animatedGifFile for a transparent GIF', async () => {
+			// A <video> cannot reproduce GIF transparency, so a transparent
+			// GIF must stay a GIF.
+			vipsHasTransparency.mockResolvedValue( true );
+
+			const { dispatch } = await runPrepareItem();
+
+			expect( vipsHasTransparency ).toHaveBeenCalled();
+			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
+				'gif-id',
+				expect.objectContaining( {
+					animatedGifFile: expect.anything(),
+				} )
+			);
+		} );
+
+		it( 'keeps the GIF when the transparency check throws', async () => {
+			vipsHasTransparency.mockRejectedValue(
+				new Error( 'vips unavailable' )
+			);
+
+			const { dispatch } = await runPrepareItem();
+
+			// Errs on the side of caution: no lossy conversion is attempted.
 			expect( dispatch.finishOperation ).not.toHaveBeenCalledWith(
 				'gif-id',
 				expect.objectContaining( {
@@ -792,7 +827,8 @@ describe( 'private actions', () => {
 				settings: { videoOutputFormat: 'video/mp4' },
 			} );
 
-			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 1 );
+			// Two companions are sideloaded: the video and its static poster.
+			expect( dispatchFn.addSideloadItem ).toHaveBeenCalledTimes( 2 );
 			const sideload = dispatchFn.addSideloadItem.mock.calls[ 0 ][ 0 ];
 			expect( sideload.file ).toBe( gif );
 			expect( sideload.parentId ).toBe( 'g' );
@@ -807,6 +843,41 @@ describe( 'private actions', () => {
 				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
 				OperationType.Upload,
 			] );
+		} );
+
+		it( 'sideloads a static first-frame poster alongside the video', async () => {
+			const gif = makeGif();
+			const item = {
+				id: 'g',
+				sourceFile: gif,
+				file: gif,
+				animatedGifFile: gif,
+				attachment: { id: 42 },
+			};
+
+			const dispatchFn = await runGenerate( {
+				item,
+				settings: { videoOutputFormat: 'video/mp4' },
+			} );
+
+			const poster = dispatchFn.addSideloadItem.mock.calls[ 1 ][ 0 ];
+			expect( poster.file ).toBe( gif );
+			expect( poster.parentId ).toBe( 'g' );
+			expect( poster.additionalData ).toEqual(
+				expect.objectContaining( {
+					post: 42,
+					image_size: 'animated-video-poster',
+					convert_format: false,
+				} )
+			);
+			// A vips image transcode (first GIF frame → static JPEG), then upload.
+			expect( poster.operations[ 0 ][ 0 ] ).toBe(
+				OperationType.TranscodeImage
+			);
+			expect( poster.operations[ 0 ][ 1 ] ).toEqual(
+				expect.objectContaining( { outputFormat: 'jpeg' } )
+			);
+			expect( poster.operations[ 1 ] ).toBe( OperationType.Upload );
 		} );
 
 		it( 'uses webm when videoOutputFormat is video/webm', async () => {

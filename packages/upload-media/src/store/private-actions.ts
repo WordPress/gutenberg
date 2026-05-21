@@ -735,24 +735,44 @@ export function prepareItem( id: QueueItemId ) {
 				isAnimated = false;
 			}
 			if ( isAnimated ) {
-				operations.push(
-					OperationType.Upload,
-					OperationType.ThumbnailGeneration,
-					OperationType.Finalize
-				);
+				// Skip the conversion for transparent GIFs: a <video> cannot
+				// reproduce GIF transparency, so converting would visibly
+				// change the image (e.g. small decorative or emoji-like GIFs
+				// over a colored background). Such GIFs upload as a normal
+				// image instead. Mirrors the PNG → JPEG transparency check in
+				// getTranscodeImageOperation().
+				let hasTransparency = false;
+				const blobUrl = createBlobURL( file );
+				try {
+					hasTransparency = await vipsHasTransparency( blobUrl );
+				} catch {
+					// If the check fails, err on the side of caution and keep
+					// the GIF rather than risk a lossy conversion.
+					hasTransparency = true;
+				} finally {
+					revokeBlobURL( blobUrl );
+				}
 
-				dispatch< AddOperationsAction >( {
-					type: Type.AddOperations,
-					id,
-					operations,
-				} );
+				if ( ! hasTransparency ) {
+					operations.push(
+						OperationType.Upload,
+						OperationType.ThumbnailGeneration,
+						OperationType.Finalize
+					);
 
-				// Keep the original GIF so generateThumbnails can
-				// transcode and sideload it once the attachment exists.
-				dispatch.finishOperation( id, {
-					animatedGifFile: item.file,
-				} );
-				return;
+					dispatch< AddOperationsAction >( {
+						type: Type.AddOperations,
+						id,
+						operations,
+					} );
+
+					// Keep the original GIF so generateThumbnails can
+					// transcode and sideload it once the attachment exists.
+					dispatch.finishOperation( id, {
+						animatedGifFile: item.file,
+					} );
+					return;
+				}
 			}
 		}
 
@@ -1298,6 +1318,32 @@ export function generateThumbnails( id: QueueItemId ) {
 						{
 							outputFormat,
 						} as OperationArgs[ OperationType.TranscodeGif ],
+					],
+					OperationType.Upload,
+				],
+			} );
+
+			// Also sideload a static first-frame poster (vips decodes only the
+			// first GIF frame) so the <video> can paint a lightweight still
+			// image instead of downloading the full GIF as its poster. Stored
+			// under metadata `animated_video_poster` and used at render time.
+			dispatch.addSideloadItem( {
+				file: item.animatedGifFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'animated-video-poster',
+					convert_format: false,
+				},
+				operations: [
+					[
+						OperationType.TranscodeImage,
+						{
+							outputFormat: 'jpeg',
+							outputQuality: DEFAULT_OUTPUT_QUALITY,
+							interlaced: false,
+						} as OperationArgs[ OperationType.TranscodeImage ],
 					],
 					OperationType.Upload,
 				],
