@@ -155,7 +155,7 @@ async function main() {
 	// Write the Markdown content to a file
 	const projectRoot = nodePath.resolve( __dirname, '..', '..' );
 	fs.writeFileSync(
-		nodePath.join( projectRoot, 'bin', 'issueContent.md' ),
+		nodePath.join( projectRoot, 'issueContent.md' ),
 		content
 	);
 }
