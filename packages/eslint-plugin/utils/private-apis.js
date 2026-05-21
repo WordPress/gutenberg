@@ -86,10 +86,6 @@ function getPropertyName( key ) {
  * @return {{ source: string, properties: import('estree').Property[] }|null} Unlock destructuring context.
  */
 function getUnlockDestructuring( node, sourceCode, state ) {
-	if ( node.parent.type !== 'VariableDeclaration' ) {
-		return null;
-	}
-
 	if (
 		node.id.type !== 'ObjectPattern' ||
 		! isUnlockCall( node.init, sourceCode )
