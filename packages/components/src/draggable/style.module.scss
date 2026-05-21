@@ -1,0 +1,29 @@
+@use "@wordpress/base-styles/z-index" as *;
+
+.invisible-drag-image {
+	position: fixed;
+	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Offscreen drag-image stand-in; flipping with writing direction has no benefit. */
+	left: -1000px;
+	height: 50px;
+	width: 50px;
+}
+
+.clone {
+	position: fixed;
+	padding: 0; // Matches the `clonePadding` JS constant.
+	background: transparent;
+	pointer-events: none;
+}
+
+// Fallback for clones placed outside the compat overlay slot — the
+// slot's stacking context handles ordering inside it.
+.clone:not(.is-in-compat-slot) {
+	z-index: z-index(".components-draggable__clone");
+}
+
+// Global selector — external code (e.g. block-editor keyboard drag)
+// toggles the same body class.
+:global(body.is-dragging-components-draggable) {
+	cursor: move; /* Fallback for IE/Edge < 14 */
+	cursor: grabbing !important;
+}

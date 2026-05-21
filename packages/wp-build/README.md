@@ -52,6 +52,13 @@ or via npm script:
 }
 ```
 
+### Testing Generated Styles
+
+Generated CSS module output skips automatic style injection when `NODE_ENV` is
+`test`. Node-based DOM implementations such as jsdom do not reliably support
+modern CSS features, so tests that need actual styles in the DOM should
+run in a browser environment.
+
 ## Package Configuration
 
 Configure your `package.json` with the following optional fields:
@@ -580,6 +587,7 @@ Rule of thumb: anything expressible as plain JSON goes in `widget.json`. Anythin
 Exports a default object that describes the widget's runtime contract: typed attributes, translated labels, example data. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
 
 ```ts
+import { wordpress } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 type HelloWorldAttributes = {
@@ -590,6 +598,7 @@ type HelloWorldAttributes = {
 const widget = {
 	name: 'my-plugin/hello-world',
 	title: __( 'Hello World', 'my-plugin' ),
+	icon: wordpress,
 	attributes: [
 		{
 			id: 'greeting',

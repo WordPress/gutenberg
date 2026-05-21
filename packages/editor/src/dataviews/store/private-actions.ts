@@ -65,7 +65,6 @@ import { unlock } from '../../lock-unlock';
 declare global {
 	interface Window {
 		__experimentalTemplateActivate?: boolean;
-		__experimentalMediaEditor?: boolean;
 	}
 }
 

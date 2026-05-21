@@ -8,8 +8,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,49 +18,22 @@ import useTabListSync from './use-tab-list-sync';
 
 const EMPTY_ARRAY = [];
 
-const TABS_TEMPLATE = [
-	[
-		'core/tab-list',
-		{},
-		[
-			[ 'core/tab', {} ],
-			[ 'core/tab', {} ],
-		],
-	],
-	[
-		'core/tab-panels',
-		{},
-		[
-			[
-				'core/tab-panel',
-				{
-					label: __( 'Tab' ),
-				},
-				[ [ 'core/paragraph' ] ],
-			],
-			[
-				'core/tab-panel',
-				{
-					label: __( 'Tab' ),
-				},
-				[ [ 'core/paragraph' ] ],
-			],
-		],
-	],
-];
+/**
+ * Only the two structural child blocks are specified here — without inner
+ * block entries for core/tab-list or core/tab-panels.
+ *
+ * If inner blocks were included in this template, `synchronizeBlocksWithTemplate`
+ * (called whenever templateLock === 'all') would recurse into the containers and
+ * truncate them to the template count, causing data loss when a saved block with
+ * more than two tabs is re-opened in the editor.
+ *
+ * Initial tab/panel creation is delegated to the tab-panels template in
+ * tab-panels/edit.js (templateLock: false, applied only when empty).
+ */
+const TABS_TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
 
 function Edit( { clientId, attributes, setAttributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
-
-	/**
-	 * Initialize editorActiveTabIndex to activeTabIndex on mount.
-	 * This ensures the ephemeral editor state starts at the persisted default.
-	 */
-	useEffect( () => {
-		if ( editorActiveTabIndex === undefined ) {
-			setAttributes( { editorActiveTabIndex: activeTabIndex } );
-		}
-	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	const { tabPanels, tabPanelsClientId, tabs, tabListClientId } = useSelect(
 		( select ) => {

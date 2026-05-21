@@ -529,3 +529,35 @@ export function clearRequestedInspectorTab() {
 		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
 	};
 }
+
+/**
+ * Sets the selected style state for a block's style controls.
+ *
+ * @param {string} clientId The block client ID.
+ * @param {Object} value    The selected state value.
+ *
+ * @return {Object} Action object.
+ */
+export function setSelectedBlockStyleState( clientId, value ) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+		clientId,
+		value,
+	};
+}
+
+/**
+ * Sets whether the selected style state is shown on the canvas.
+ *
+ * @param {string}  clientId The block client ID.
+ * @param {boolean} value    Whether to show the selected state on the canvas.
+ *
+ * @return {Object} Action object.
+ */
+export function setSelectedBlockStyleStateCanvasPreview( clientId, value ) {
+	return {
+		type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+		clientId,
+		value,
+	};
+}

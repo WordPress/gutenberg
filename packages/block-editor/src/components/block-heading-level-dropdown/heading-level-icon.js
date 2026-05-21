@@ -10,7 +10,7 @@ import {
 	headingLevel6,
 	paragraph,
 } from '@wordpress/icons';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 
 /** @typedef {React.ComponentType} ComponentType */
 
@@ -41,7 +41,7 @@ const LEVEL_TO_PATH = {
  */
 export default function HeadingLevelIcon( { level } ) {
 	if ( LEVEL_TO_PATH[ level ] ) {
-		return <Icon icon={ LEVEL_TO_PATH[ level ] } />;
+		return <WCIcon icon={ LEVEL_TO_PATH[ level ] } />;
 	}
 
 	return null;
