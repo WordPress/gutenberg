@@ -17,7 +17,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { plugins } from '@wordpress/icons';
+import { Icon, plugins } from '@wordpress/icons';
 /* eslint-disable @wordpress/use-recommended-components */
 import {
 	Button,
@@ -109,7 +109,7 @@ function UnavailableWidget( {
 						className={ styles.widgetChromeHeaderIcon }
 						aria-hidden="true"
 					>
-						<WCIcon icon={ plugins } />
+						<Icon icon={ plugins } />
 					</span>
 				</Stack>
 			</Card.Header>
