@@ -13,7 +13,10 @@ import {
 	receiveEntityRecords,
 	receiveUserPermissions,
 } from './actions';
-import { postTypeEntitiesFromResponse } from './entities';
+import {
+	postTypeEntitiesFromResponse,
+	taxonomyEntitiesFromResponse,
+} from './entities';
 import {
 	ALLOWED_RESOURCE_ACTIONS,
 	getUserPermissionCacheKey,
@@ -38,13 +41,17 @@ function synthesizeActions( entry ) {
 
 		case 'getEntitiesConfig': {
 			const [ kind ] = args;
-			if ( kind !== 'postType' ) {
+			// Mirror the getEntitiesConfig resolver: take the raw response
+			// and map it through the same transform that the matching
+			// `loadXEntities` would have used after apiFetch.
+			let configs;
+			if ( kind === 'postType' ) {
+				configs = postTypeEntitiesFromResponse( data );
+			} else if ( kind === 'taxonomy' ) {
+				configs = taxonomyEntitiesFromResponse( data );
+			} else {
 				return [];
 			}
-			// Mirror the getEntitiesConfig resolver: take the raw types
-			// response and map it through the same transform that
-			// `loadPostTypeEntities` would have used after apiFetch.
-			const configs = postTypeEntitiesFromResponse( data );
 			return configs.length ? [ addEntities( configs ) ] : [];
 		}
 

@@ -43,38 +43,67 @@ function gutenberg_resolve_preload_spec( array $spec ) {
 			);
 
 		case 'getEntitiesConfig':
-			// args: [ kind ]. Only `postType` is wired so far — its raw
-			// REST response is what the JS-side hydrator runs through
-			// postTypeEntitiesFromResponse to produce addEntities configs.
-			if ( empty( $args ) || 'postType' !== $args[0] ) {
+			// args: [ kind ]. Each kind has its own loader hitting a fixed
+			// REST list endpoint at `context=view`. The JS-side hydrator
+			// runs the response through the matching `XEntitiesFromResponse`
+			// transform to produce addEntities configs.
+			if ( empty( $args ) ) {
 				return null;
 			}
-			return array(
-				'path'   => '/wp/v2/types?context=view',
-				'method' => 'GET',
-			);
+			switch ( $args[0] ) {
+				case 'postType':
+					return array(
+						'path'   => '/wp/v2/types?context=view',
+						'method' => 'GET',
+					);
+				case 'taxonomy':
+					return array(
+						'path'   => '/wp/v2/taxonomies?context=view',
+						'method' => 'GET',
+					);
+			}
+			return null;
 
 		case 'getEntityRecord':
-			// args: [ kind, name, key ]. For now only the postType kind is
-			// wired up — that's by far the hottest case (the post being
-			// edited). Mirrors @wordpress/core-data's getEntityRecord
-			// resolver, which appends `?context=$ctx` to the entity's
-			// baseURL/key.
+			// args: [ kind, name, key ]. Mirrors @wordpress/core-data's
+			// getEntityRecord resolver, which appends `?context=$ctx` to
+			// the entity's baseURL/key.
 			if ( count( $args ) < 3 ) {
 				return null;
 			}
-			list( $kind, , $key ) = $args;
-			if ( 'postType' !== $kind ) {
-				return null;
+			list( $kind, $entity_name, $key ) = $args;
+
+			if ( 'postType' === $kind ) {
+				$post = get_post( $key );
+				if ( ! $post ) {
+					return null;
+				}
+				return array(
+					'path'   => add_query_arg(
+						'context',
+						$ctx,
+						rest_get_route_for_post( $post )
+					),
+					'method' => 'GET',
+				);
 			}
-			$post = get_post( $key );
-			if ( ! $post ) {
-				return null;
+
+			if ( 'root' === $kind && 'postType' === $entity_name ) {
+				// A single post-type definition, keyed by its slug.
+				if ( ! post_type_exists( $key ) ) {
+					return null;
+				}
+				return array(
+					'path'   => add_query_arg(
+						'context',
+						$ctx,
+						sprintf( '/wp/v2/types/%s', $key )
+					),
+					'method' => 'GET',
+				);
 			}
-			return array(
-				'path'   => add_query_arg( 'context', $ctx, rest_get_route_for_post( $post ) ),
-				'method' => 'GET',
-			);
+
+			return null;
 	}
 
 	return null;
@@ -234,18 +263,27 @@ function gutenberg_get_preload_hydration_specs( $context ) {
 			'selector' => 'getCurrentUser',
 			'args'     => array(),
 		),
+		array(
+			'selector' => 'getEntitiesConfig',
+			'args'     => array( 'postType' ),
+		),
+		array(
+			'selector' => 'getEntitiesConfig',
+			'args'     => array( 'taxonomy' ),
+		),
 	);
 
 	// When the editor context exposes a post (the post editor), hydrate
-	// the postType entity configs AND the record itself so the resolver
+	// the post-type definition AND the record itself so the resolver
 	// graph for `getEntityRecord( 'postType', $type, $id )` never fires.
 	// Order matters in the payload: the JS-side hydrator processes
 	// getEntitiesConfig entries first so the reducer has a slot for the
 	// record before RECEIVE_ITEMS lands.
 	if ( ! empty( $context->post ) && $context->post instanceof WP_Post ) {
 		$specs[] = array(
-			'selector' => 'getEntitiesConfig',
-			'args'     => array( 'postType' ),
+			'selector' => 'getEntityRecord',
+			'args'     => array( 'root', 'postType', $context->post->post_type ),
+			'context'  => 'edit',
 		);
 		$specs[] = array(
 			'selector' => 'getEntityRecord',

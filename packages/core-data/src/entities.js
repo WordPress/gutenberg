@@ -486,6 +486,19 @@ async function loadTaxonomyEntities() {
 	const taxonomies = await apiFetch( {
 		path: '/wp/v2/taxonomies?context=view',
 	} );
+	return taxonomyEntitiesFromResponse( taxonomies );
+}
+
+/**
+ * Pure transform from `/wp/v2/taxonomies` response data into the
+ * entity-config shape `addEntities` accepts. Pulled out of
+ * `loadTaxonomyEntities` so a synchronous hydrator can use the same
+ * mapping without going through `apiFetch`.
+ *
+ * @param {Object} taxonomies Map of taxonomy slugs → REST taxonomy objects.
+ * @return {Array} Entity configs.
+ */
+export function taxonomyEntitiesFromResponse( taxonomies ) {
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
 		const entity = {
