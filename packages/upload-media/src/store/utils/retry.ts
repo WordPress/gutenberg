@@ -85,13 +85,17 @@ const RETRYABLE_MESSAGE_PATTERNS = [
  * Returns `false` once the retry budget is exhausted, otherwise returns
  * `true` if the error message looks transient (see `RETRYABLE_MESSAGE_PATTERNS`).
  *
- * @param error      The error that occurred.
+ * Accepts both `Error` instances and plain strings: the editor's media-upload
+ * wrapper forwards only the error *message* (a string) to the queue, so the
+ * upload path frequently rejects with a string rather than an `Error`.
+ *
+ * @param error      The error that occurred, or its message.
  * @param retryCount The number of retries already attempted.
  * @param maxRetries The maximum number of retries allowed.
  * @return Whether the error should be retried.
  */
 export function shouldRetryError(
-	error: Error,
+	error: Error | string,
 	retryCount: number,
 	maxRetries: number
 ): boolean {
@@ -99,7 +103,7 @@ export function shouldRetryError(
 		return false;
 	}
 
-	const message = error.message || '';
+	const message = typeof error === 'string' ? error : error?.message || '';
 	return RETRYABLE_MESSAGE_PATTERNS.some( ( pattern ) =>
 		pattern.test( message )
 	);

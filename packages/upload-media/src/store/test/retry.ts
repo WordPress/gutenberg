@@ -193,6 +193,34 @@ describe( 'shouldRetryError', () => {
 			).toBe( true );
 		} );
 
+		it( 'should match retryable messages passed as a plain string', () => {
+			// The editor's media-upload wrapper forwards only the error
+			// message (a string) to the queue, so cancelItem frequently
+			// receives a string rather than an Error instance.
+			expect(
+				shouldRetryError(
+					'Could not get a valid response from the server.',
+					0,
+					3
+				)
+			).toBe( true );
+			expect( shouldRetryError( 'Failed to fetch', 0, 3 ) ).toBe( true );
+		} );
+
+		it( 'should return false for non-retryable string messages', () => {
+			expect( shouldRetryError( 'File too large', 0, 3 ) ).toBe( false );
+		} );
+
+		it( 'should respect the retry budget for string messages', () => {
+			expect(
+				shouldRetryError(
+					'Could not get a valid response from the server.',
+					3,
+					3
+				)
+			).toBe( false );
+		} );
+
 		it( 'should return true for Safari raw fetch TypeError', () => {
 			expect( shouldRetryError( new Error( 'Load failed' ), 0, 3 ) ).toBe(
 				true

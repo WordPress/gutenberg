@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+- Automatically retry failed uploads with exponential backoff for transient (network/server) errors. Retry behavior is configurable via the `retry` store setting; non-transient failures and child sideloads are not retried ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+
 ### Bug Fix
 
 - Fix `-scaled` suffix propagating to every sub-size filename when an image exceeds `big_image_size_threshold`. Threshold scaling now runs as a sideload after the original is uploaded, so sub-sizes inherit the un-suffixed basename — matching WordPress core's `wp_create_image_subsizes()` naming.
