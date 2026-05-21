@@ -168,11 +168,10 @@ export default function StartPageOptions() {
 	// Note: The `postId` ensures the effect re-runs when pages are switched without remounting the component.
 	// Examples: changing pages in the List View, creating a new page via Command Palette.
 	useEffect( () => {
-		// Use the underlying edits selector rather than `isEditedPostDirty`,
-		// which also returns true while an `isSavingEntityRecord` is in
-		// flight. At boot, the CRDT sync manager kicks off a phantom save
-		// of the just-received post record (no real edits) and we don't
-		// want that side-effect to suppress the modal.
+		// Read non-transient edits directly. `isEditedPostDirty` /
+		// `hasEditsForEntityRecord` also return true while the CRDT
+		// sync manager's phantom save (fired off `receiveEntityRecords`
+		// at boot) is in flight, which would suppress the modal.
 		const hasEdits =
 			Object.keys(
 				getEntityRecordNonTransientEdits(

@@ -180,9 +180,10 @@ export default function StartTemplateOptions() {
 				_postType,
 				_postId
 			);
-			// Avoid `hasEditsForEntityRecord` — its `isSavingEntityRecord`
-			// branch fires `true` while the CRDT sync manager's phantom
-			// save is in flight at boot, which would suppress the modal.
+			// Read non-transient edits directly. `isEditedPostDirty` /
+			// `hasEditsForEntityRecord` also return true while the CRDT
+			// sync manager's phantom save (fired off `receiveEntityRecords`
+			// at boot) is in flight, which would suppress the modal.
 			const hasEdits =
 				Object.keys(
 					getEntityRecordNonTransientEdits(
