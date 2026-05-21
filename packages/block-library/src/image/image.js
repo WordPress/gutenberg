@@ -9,6 +9,7 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
+	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -295,6 +296,7 @@ export default function Image( {
 		sizeSlug,
 		lightbox,
 		metadata,
+		preserveAnimatedGif,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -965,6 +967,33 @@ export default function Image( {
 								}
 							/>
 						</ToolsPanelItem>
+						{ !! image?.media_details?.animated_video && (
+							<ToolsPanelItem
+								label={ __( 'Animation' ) }
+								isShownByDefault
+								hasValue={ () => !! preserveAnimatedGif }
+								onDeselect={ () =>
+									setAttributes( {
+										preserveAnimatedGif: undefined,
+									} )
+								}
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Display as original GIF' ) }
+									checked={ !! preserveAnimatedGif }
+									onChange={ ( value ) =>
+										setAttributes( {
+											preserveAnimatedGif:
+												value || undefined,
+										} )
+									}
+									help={ __(
+										'This GIF is shown as an optimized, faster-loading video on your site. Enable to display the original GIF instead.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
