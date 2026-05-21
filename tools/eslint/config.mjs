@@ -372,7 +372,11 @@ export default dedupePlugins( [
 	// Override: Package source files — non-module stylesheets should be
 	// bundled through package stylesheet entry points, not runtime injected.
 	{
-		files: [ 'packages/*/src/**/*.[tj]s?(x)', 'routes/**/*.[tj]s?(x)' ],
+		files: [
+			'packages/*/src/**/*.[tj]s?(x)',
+			'routes/**/*.[tj]s?(x)',
+			'widgets/**/*.[tj]s?(x)',
+		],
 		ignores: [
 			...developmentFiles,
 			'**/*.@(android|ios|native).[tj]s?(x)',

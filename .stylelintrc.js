@@ -65,8 +65,9 @@ module.exports = {
 		{
 			files: [
 				'**/*.module.{css,scss}',
-				// Can be removed when all `routes/` stylesheets are converted to CSS modules.
+				// Can be removed when all `routes/` and `widgets/` stylesheets are converted to CSS modules.
 				'routes/**/*.{css,scss}',
+				'widgets/**/*.{css,scss}',
 			],
 			rules: {
 				'function-no-unknown': [
@@ -131,7 +132,11 @@ module.exports = {
 		},
 		{
 			// SCSS-only: use the Sass-aware `function-no-unknown` variant.
-			files: [ '**/*.module.scss', 'routes/**/*.scss' ],
+			files: [
+				'**/*.module.scss',
+				'routes/**/*.scss',
+				'widgets/**/*.scss',
+			],
 			rules: {
 				'function-no-unknown': null,
 				'scss/function-no-unknown': [
