@@ -64,10 +64,17 @@ const BlockPreviewPanel = ( {
 		return generatePreviewStateStyles( stateStyles, name );
 	}, [ selectedState, stateStyles, name ] );
 
+	if ( ! blockExample ) {
+		return null;
+	}
+
 	const viewportWidth =
 		PREVIEW_WIDTH_BY_VIEWPORT[ selectedViewport ] ??
-		blockExample?.viewportWidth ??
+		blockExample.viewportWidth ??
 		500;
+	const normalizedViewportWidth = blockExample.viewportWidth ?? 500;
+	const previewScale = Math.max( viewportWidth / normalizedViewportWidth, 1 );
+	const previewPadding = 24 * previewScale;
 	// Same as height of InserterPreviewPanel.
 	const previewHeight = 144;
 	const sidebarWidth = 235;
@@ -76,10 +83,6 @@ const BlockPreviewPanel = ( {
 		scale !== 0 && scale < 1 && previewHeight
 			? previewHeight / scale
 			: previewHeight;
-
-	if ( ! blockExample ) {
-		return null;
-	}
 
 	return (
 		<Spacer marginX={ 4 } marginBottom={ 4 }>
@@ -97,12 +100,16 @@ const BlockPreviewPanel = ( {
 							{
 								css: `
 								body{
-									padding: 24px;
+									padding: ${ previewPadding }px;
 									min-height:${ Math.round( minHeight ) }px;
 									display:flex;
 									align-items:center;
 								}
-								.is-root-container { width: 100%; }
+								.is-root-container {
+									width: ${ 100 / previewScale }%;
+									transform: scale(${ previewScale });
+									transform-origin: center left;
+								}
 								${ stateCSS }
 							`,
 							},
