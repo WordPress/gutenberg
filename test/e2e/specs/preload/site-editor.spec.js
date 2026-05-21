@@ -32,6 +32,17 @@ test.describe( 'Preload', () => {
 		admin,
 	} ) => {
 		const { requests, stop } = recordRequests( page );
+		const { requests: requestsUntilMount, stop: stopOnMount } =
+			recordRequests( page );
+
+		let preloadStatus;
+		page.on( 'console', ( msg ) => {
+			const text = msg.text();
+			if ( text.startsWith( '[api-fetch][preload] ' ) ) {
+				preloadStatus = text;
+				stopOnMount();
+			}
+		} );
 
 		await admin.visitSiteEditor();
 		await page
@@ -43,6 +54,14 @@ test.describe( 'Preload', () => {
 		await page.waitForLoadState( 'networkidle' );
 		stop();
 
+		// Everything the kickoff touches is served by the preload cache.
+		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
+			[]
+		);
+		expect( preloadStatus ).toBe(
+			'[api-fetch][preload] All preloads consumed.'
+		);
+
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
 		// fires twice within the captured window; the duplicate count
 		// isn't stable across runs, so this assertion deduplicates.
@@ -50,10 +69,7 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				'GET /wp/v2/posts?context=edit&offset=0&order=desc&orderby=date&per_page=10&ignore_sticky=false',
-				'GET /wp/v2/taxonomies?context=view',
-				'GET /wp/v2/template-parts/emptytheme//header?context=edit',
 				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
-				'OPTIONS /wp/v2/settings',
 				'POST /wp/v2/users/me',
 			].sort()
 		);
@@ -64,6 +80,17 @@ test.describe( 'Preload', () => {
 		admin,
 	} ) => {
 		const { requests, stop } = recordRequests( page );
+		const { requests: requestsUntilMount, stop: stopOnMount } =
+			recordRequests( page );
+
+		let preloadStatus;
+		page.on( 'console', ( msg ) => {
+			const text = msg.text();
+			if ( text.startsWith( '[api-fetch][preload] ' ) ) {
+				preloadStatus = text;
+				stopOnMount();
+			}
+		} );
 
 		await admin.visitAdminPage(
 			'site-editor.php',
@@ -78,6 +105,14 @@ test.describe( 'Preload', () => {
 		await page.waitForLoadState( 'networkidle' );
 		stop();
 
+		// Everything the kickoff touches is served by the preload cache.
+		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
+			[]
+		);
+		expect( preloadStatus ).toBe(
+			'[api-fetch][preload] All preloads consumed.'
+		);
+
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
 		// fires twice within the captured window; the duplicate count
 		// isn't stable across runs, so this assertion deduplicates.
@@ -87,14 +122,12 @@ test.describe( 'Preload', () => {
 				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
 				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
 				'GET /wp/v2/taxonomies?context=edit&per_page=100',
-				'GET /wp/v2/taxonomies?context=view',
 				'GET /wp/v2/templates/lookup?slug=front-page',
 				'GET /wp/v2/types/page?context=edit',
 				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/users/me',
 				'GET /wp/v2/view-config?kind=postType&name=page',
 				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
-				'OPTIONS /wp/v2/settings',
 				'OPTIONS /wp/v2/templates',
 				'POST /wp/v2/users/me',
 			].sort()

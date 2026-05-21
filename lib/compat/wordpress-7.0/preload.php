@@ -21,6 +21,12 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 				}
 			);
 		}
+
+		// `getEntitiesConfig('postType')` chains into a taxonomies fetch
+		// when collaboration is enabled. Post-editor preloads this; site
+		// editor doesn't. Adding it here lets the site-editor boot
+		// kickoff fully consume from cache.
+		$paths[] = '/wp/v2/taxonomies?context=view';
 	}
 
 	return $paths;
