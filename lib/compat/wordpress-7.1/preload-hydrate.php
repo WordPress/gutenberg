@@ -399,23 +399,6 @@ function gutenberg_emit_preload_hydration( array $specs ) {
 		),
 		'before'
 	);
-
-	// Remember the paths we covered so the legacy preload filter can skip
-	// them. Stored on a global because the filter runs in a separate hook
-	// call (block editor settings filtering).
-	if ( ! isset( $GLOBALS['gutenberg_hydrated_preload_path_keys'] ) ) {
-		$GLOBALS['gutenberg_hydrated_preload_path_keys'] = array();
-	}
-	foreach ( $specs as $spec ) {
-		$req = gutenberg_resolve_preload_spec( $spec );
-		if ( ! $req ) {
-			continue;
-		}
-		$GLOBALS['gutenberg_hydrated_preload_path_keys'][] = gutenberg_preload_path_key(
-			$req['path'],
-			$req['method']
-		);
-	}
 }
 
 /**
