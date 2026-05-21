@@ -87,8 +87,10 @@ describe( 'Preloading Middleware', () => {
 					expect( nextSpy ).not.toHaveBeenCalled();
 
 					// `CLEAR` is the explicit boundary at which
-					// subsequent requests should fall through.
+					// subsequent requests should fall through. It also
+					// logs whether anything went unconsumed.
 					( preloadingMiddleware as any )[ CLEAR ]();
+					expect( console ).toHaveLogged();
 					preloadingMiddleware( requestOptions, nextSpy );
 					expect( nextSpy ).toHaveBeenCalled();
 				} );

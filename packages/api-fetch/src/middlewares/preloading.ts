@@ -8,13 +8,6 @@ import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
  */
 import type { APIFetchMiddleware } from '../types';
 
-/**
- * Symbol keys for hooks attached to each `createPreloadingMiddleware`
- * instance. Using symbols (instead of `__unstable*` string properties)
- * keeps these out of any `for…in`, `Object.keys`, or accidental
- * `wp.apiFetch.use( something )` lookup — the only callers that can
- * reach them are the ones inside this package that import the symbols.
- */
 export const ENABLE_MULTI_USE = Symbol( 'preloadingEnableMultiUse' );
 export const CLEAR = Symbol( 'preloadingClear' );
 
@@ -25,19 +18,17 @@ export const CLEAR = Symbol( 'preloadingClear' );
 function createPreloadingMiddleware(
 	preloadedData: Record< string, any >
 ): APIFetchMiddleware {
-	const cache = Object.fromEntries(
+	const { OPTIONS = {}, ...GET } = Object.fromEntries(
 		Object.entries( preloadedData ).map( ( [ path, data ] ) => [
 			normalizePath( path ),
 			data,
 		] )
-	);
+	) as Record< string, any > & { OPTIONS?: Record< string, any > };
 
-	// Entries are single-use by default — the preloading middleware
-	// deletes each one on first read so a subsequent request gets a
-	// fresh response. Callers that know they'll consume the same paths
-	// from multiple selectors (e.g. an editor bootstrap that pre-warms
-	// resolvers before render) can flip this and then call
-	// `__unstableClear` once they're done.
+	// Preload entries that haven't been served yet.
+	const unusedGet = new Set< string >( Object.keys( GET ) );
+	const unusedOptions = new Set< string >( Object.keys( OPTIONS ) );
+
 	let multiUse = false;
 
 	const middleware: APIFetchMiddleware = ( options, next ) => {
@@ -60,43 +51,51 @@ function createPreloadingMiddleware(
 		const method = options.method || 'GET';
 		const path = normalizePath( rawPath );
 
-		if ( 'GET' === method && cache[ path ] ) {
-			const data = cache[ path ];
+		if ( 'GET' === method && GET[ path ] ) {
+			const data = GET[ path ];
 			if ( ! multiUse ) {
-				delete cache[ path ];
+				delete GET[ path ];
 			}
+			unusedGet.delete( path );
 			return prepareResponse( data, !! parse );
-		} else if (
-			'OPTIONS' === method &&
-			cache[ method ] &&
-			cache[ method ][ path ]
-		) {
-			const data = cache[ method ][ path ];
+		} else if ( 'OPTIONS' === method && OPTIONS[ path ] ) {
+			const data = OPTIONS[ path ];
 			if ( ! multiUse ) {
-				delete cache[ method ][ path ];
+				delete OPTIONS[ path ];
 			}
+			unusedOptions.delete( path );
 			return prepareResponse( data, !! parse );
 		}
 
 		return next( options );
 	};
 
-	// Switches this middleware into multi-use mode: cache entries stay
-	// around after the first read until `CLEAR` runs. Useful when
-	// multiple selectors share a URL and the consumer guarantees it
-	// will clear at the right boundary.
 	( middleware as any )[ ENABLE_MULTI_USE ] = () => {
 		multiUse = true;
 	};
 
-	// Drops any still-unconsumed preloaded entries. Used by the editor
-	// bootstrap once kickoff resolvers have settled — anything the
-	// kickoff missed should fall through to a real network request
-	// (and surface in tests / DevTools) instead of being silently served
-	// from the preload bucket.
-	( middleware as any )[ CLEAR ] = () => {
-		for ( const key of Object.keys( cache ) ) {
-			delete cache[ key ];
+	( middleware as any )[ CLEAR ] = (): void => {
+		const tags = [
+			...Array.from( unusedGet, ( p ) => `GET ${ p }` ),
+			...Array.from( unusedOptions, ( p ) => `OPTIONS ${ p }` ),
+		];
+		if ( tags.length ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'[api-fetch][preload] Some preloads were never consumed:',
+				tags
+			);
+		} else {
+			// eslint-disable-next-line no-console
+			console.log( '[api-fetch][preload] All preloads consumed.' );
+		}
+		unusedGet.clear();
+		unusedOptions.clear();
+		for ( const key of Object.keys( GET ) ) {
+			delete GET[ key ];
+		}
+		for ( const key of Object.keys( OPTIONS ) ) {
+			delete OPTIONS[ key ];
 		}
 	};
 

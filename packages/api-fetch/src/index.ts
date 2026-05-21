@@ -65,26 +65,12 @@ function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
 }
 
-/**
- * Switches every installed `createPreloadingMiddleware` into multi-use
- * mode: cached entries are reused for subsequent reads until
- * {@link clearPreloadedData} runs. Used by the editor bootstrap so a
- * shared URL can back multiple selectors during the kickoff window.
- */
 function enablePreloadMultiUse() {
 	for ( const middleware of middlewares ) {
 		( middleware as any )[ PRELOADING_ENABLE_MULTI_USE ]?.();
 	}
 }
 
-/**
- * Drops any still-unconsumed entries from every installed
- * `createPreloadingMiddleware`. Used by the editor bootstrap once
- * its kickoff resolvers have settled — anything the kickoff missed
- * then falls through to a real network request (and surfaces in
- * tests / DevTools) instead of being silently served from the
- * preload bucket.
- */
 function clearPreloadedData() {
 	for ( const middleware of middlewares ) {
 		( middleware as any )[ PRELOADING_CLEAR ]?.();

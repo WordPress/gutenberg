@@ -156,29 +156,19 @@ export function initializeEditor(
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	// Kick off the resolvers whose data the existing path-based
-	// createPreloadingMiddleware already has cached. They run end-to-end
-	// (start/receive/finish dispatches + downstream `resolveSelect` chains
-	// + side-effects like priming canUser via the Allow header) against
-	// the cached responses in a single batch before React mounts. By the
-	// time `root.render(...)` runs, every metadata entry these touch is
-	// already `finished`, so useSelect on the first render finds resolved
-	// data and never triggers another `setTimeout(0)` resolution dance.
-	//
-	// Multi-use lets a single preloaded URL back several selectors
-	// (e.g. `getEntitiesConfig('root')` + `canUser({kind:'root', name:'site'})`
-	// + `getEntityRecord('root', 'site')` all hit /wp/v2/settings via
-	// GET + OPTIONS). The matching `__unstableClearPreloadedData` runs
-	// after the kickoff promise settles, restoring the "fall through to
-	// network" behaviour for anything we missed.
+	// Drive the resolvers whose data `createPreloadingMiddleware`
+	// already has cached so every metadata entry they touch is
+	// `finished` by the time React mounts — no `setTimeout(0)`
+	// resolution dance on first render. Multi-use lets a single
+	// preloaded URL back several selectors (e.g. /wp/v2/settings GET +
+	// OPTIONS serves `getEntitiesConfig`, `canUser`, `getEntityRecord`).
 	enablePreloadMultiUse();
 	const preloadedResolutions = preloadResolutions( postType, postId );
 
 	preloadedResolutions.finally( () => {
-		// Drop any preload entries the kickoff didn't consume. After this
-		// point, any resolver firing during render falls through to a
-		// real network request — which makes the misses observable both
-		// in DevTools and in the preload e2e tests.
+		// Anything not consumed by the kickoff falls through to a real
+		// network request from here on. `clearPreloadedData` logs which
+		// preload entries (if any) were never served.
 		clearPreloadedData();
 		root.render(
 			<StrictMode>
@@ -196,16 +186,10 @@ export function initializeEditor(
 }
 
 /**
- * Drive each resolver to completion using the data already cached by
- * `createPreloadingMiddleware`. The middleware short-circuits apiFetch,
- * so no resolver issues a network request; we just need them to run
- * their dispatch cycles before React mounts.
- *
- * Run in two phases:
- *   1. Selectors whose args we know up-front from PHP (post id + type).
- *   2. Selectors that need a value derived from phase-1 state — the
- *      post record yields the default-template slug; the resolved
- *      current-global-styles id keys the global-styles record + canUser.
+ * Drive resolvers to completion against the preload cache before React
+ * mounts. Two phases: known-up-front args (post id + type), then args
+ * derived from phase-1 state (post slug → template, current global
+ * styles id → record + canUser).
  *
  * @param {string} postType Current post type.
  * @param {number} postId   Current post id.
@@ -222,9 +206,8 @@ async function preloadResolutions( postType, postId ) {
 			core.getEntitiesConfig( 'taxonomy' ),
 			core.getEntitiesConfig( 'root' ),
 			core.getCurrentTheme(),
-			// `getThemeSupports` is a forwardResolver alias of
-			// `getCurrentTheme`; its resolution metadata is tracked
-			// separately, so we need to drive its resolver too.
+			// Forward-resolver alias of `getCurrentTheme` with its own
+			// resolution metadata, so it needs a separate kick.
 			core.getThemeSupports(),
 			core.getBlockPatternCategories(),
 			core.__experimentalGetCurrentGlobalStylesId(),
@@ -240,21 +223,18 @@ async function preloadResolutions( postType, postId ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
-			// Per-post resolvers — only useful when we actually have a post.
+			// Per-post resolvers. `getPostType` and `getEditedEntityRecord`
+			// are shorthand/forward-resolver aliases with their own
+			// resolution metadata, so they need separate kicks.
 			...( postType && postId
 				? [
-						// Editor code calls `getPostType( name )` everywhere,
-						// not `getEntityRecord( 'root', 'postType', name )`.
-						// The shorthand is its own selector with its own
-						// resolution metadata — kick that one off so the
-						// editor's first render finds it resolved.
 						core.getPostType( postType ),
 						core.getEntityRecord( 'postType', postType, postId ),
 						core.getEditedEntityRecord(
 							'postType',
 							postType,
 							postId
-						), // forwardResolver alias of getEntityRecord
+						),
 						core.getAutosaves( postType, postId ),
 				  ]
 				: [] ),
@@ -282,8 +262,7 @@ async function preloadResolutions( postType, postId ) {
 				postId
 			);
 			if ( post ) {
-				// Mirrors core-data's `getDefaultTemplate` slug formula
-				// (see packages/core-data/src/private-selectors.ts).
+				// Mirrors core-data's `getDefaultTemplate` slug formula.
 				let slug = 'page' === postType ? 'page' : 'single-' + postType;
 				if ( post.slug ) {
 					slug += '-' + post.slug;
@@ -296,8 +275,7 @@ async function preloadResolutions( postType, postId ) {
 			await Promise.all( tasks );
 		}
 	} catch {
-		// Any individual resolver failing here is harmless — the editor
-		// would have hit the same failure on demand. Don't block render.
+		// Resolver failures here would also surface on demand; don't block render.
 	}
 }
 
