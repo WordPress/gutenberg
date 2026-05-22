@@ -61,13 +61,18 @@ const config: StorybookConfig = {
 	framework: '@storybook/react-vite',
 	features: {
 		componentsManifest: NODE_ENV !== 'development',
+		// Use the TypeScript LanguageService backed prop extractor for the
+		// components manifest. Resolves monorepo project references that the
+		// legacy manifest extractor cannot follow, which was the source of
+		// "No component file found" errors. The in-stories docs UI continues
+		// to use `react-docgen-typescript` via the React Vite framework.
+		experimentalReactComponentMeta: true,
 	},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',
 		// Should match defaults in Storybook except for the propFilter.
 		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
 		reactDocgenTypescriptOptions: {
-			EXPERIMENTAL_useProjectService: true,
 			shouldExtractLiteralValuesFromEnum: true,
 			shouldRemoveUndefinedFromOptional: true,
 			propFilter: ( prop ) => {
