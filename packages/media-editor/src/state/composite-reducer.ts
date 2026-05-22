@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import type { CropperState } from '../image-editor/core/types';
 import {
 	cropperReducer,
 	areCropperStatesEqual,
-} from '../image-editor/core/state';
-import { computeInscribedRect } from '../image-editor/core/crop-rect';
+	computeInscribedRect,
+	type CropperState,
+} from '../image-editor';
 import {
 	DEFAULT_CROP_OPTIONS,
 	type CropOptionsSlice,

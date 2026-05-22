@@ -6,7 +6,7 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { CropperState } from '../image-editor/core/types';
+import type { CropperState } from '../image-editor';
 import {
 	useMediaEditorState,
 	type MediaEditorController,

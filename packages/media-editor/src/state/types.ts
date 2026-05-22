@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 import type {
+	CropperAction,
 	CropperState,
 	NormalizedRect,
 	Size,
-} from '../image-editor/core/types';
+} from '../image-editor';
 
 /**
  * Sidebar control state for the cropper — preset selection and
@@ -60,7 +61,7 @@ export type MediaEditorAction =
 	 */
 	| {
 			type: 'CROPPER';
-			action: import('../image-editor/core/types').CropperAction;
+			action: CropperAction;
 	  }
 	/**
 	 * Set the aspect-ratio preset. Atomically updates the preset key

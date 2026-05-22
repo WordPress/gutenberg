@@ -12,23 +12,19 @@ import {
 /**
  * Internal dependencies
  */
-import type {
-	CropperAction,
-	CropperState,
-	NormalizedRect,
-	Size,
-} from '../image-editor/core/types';
 import {
 	DEFAULT_STATE,
 	ORIGINAL_ASPECT_RATIO,
-} from '../image-editor/core/constants';
-import {
-	enforceContainment,
 	areCropperStatesEqual,
-} from '../image-editor/core/state';
-import { exportCroppedImage } from '../image-editor/core/export/canvas-renderer';
-import type { CropperController } from '../image-editor';
-import { buildCropperSetters } from '../image-editor/react/hooks/build-cropper-setters';
+	buildCropperSetters,
+	enforceContainment,
+	exportCroppedImage,
+	type CropperAction,
+	type CropperController,
+	type CropperState,
+	type NormalizedRect,
+	type Size,
+} from '../image-editor';
 import {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
