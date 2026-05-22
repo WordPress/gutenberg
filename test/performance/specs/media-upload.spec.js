@@ -69,6 +69,8 @@ async function runUploadIterations( {
 } ) {
 	const iterations = samples + throwaway;
 
+	await editor.canvas.locator( 'body' ).waitFor();
+
 	for ( let i = 1; i <= iterations; i++ ) {
 		const { tmpFileName, tmpDirectory } = await createTempImage(
 			sourceFile,
@@ -201,6 +203,7 @@ test.describe( 'Media Upload Performance', () => {
 			requestUtils,
 		} ) => {
 			await admin.createNewPost();
+			await editor.canvas.locator( 'body' ).waitFor();
 
 			for ( let i = 1; i <= iterations; i++ ) {
 				await editor.insertBlock( { name: 'core/gallery' } );
