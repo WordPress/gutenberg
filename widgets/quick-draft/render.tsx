@@ -256,12 +256,12 @@ export default function QuickDraft() {
 
 	/*
 	 * Whether there is room to show the drafts list inline, and how to place it.
-	 * The list needs vertical room ( `isTall` ) to be worth showing in any
-	 * arrangement; given that, a wide tile sets it beside the form, otherwise it
-	 * stacks below. A wide-but-short tile stays compact, since `isTall` gates
-	 * both arrangements.
+	 * A wide tile sets the list beside the form (each column scrolls, so width
+	 * is what it needs, not height); a tall but narrow tile stacks it below.
+	 * Only a tile that is neither wide nor tall stays compact, with the list
+	 * still reachable through the reveal link.
 	 */
-	const showDraftsList = isTall;
+	const showDraftsList = isWide || isTall;
 	const listBeside = isWide;
 
 	// No room for the list inline, but it was revealed in place from compact.
