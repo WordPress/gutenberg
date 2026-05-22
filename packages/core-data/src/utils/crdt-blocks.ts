@@ -603,13 +603,13 @@ export function mergeCrdtBlocks(
 						// Never overwrite the local block's clientId with the
 						// incoming one. Some callers (e.g. the Code Editor flow
 						// that parses raw HTML into blocks on every keystroke)
-						// produce freshly-generated clientIds for blocks whose
-						// content has changed. Without this case the default
+						// produce randomized clientIds for blocks whose content
+						// has changed on every sync. Without this case the default
 						// branch would replace the stable Y.Doc clientId with
 						// a new one, causing remote peers to remount the block
-						// and possibly flash a block on remount.
-						// This mirrors the clientId exclusion in `areBlocksEqual`.
+						// and flash the block's content on reload.
 						//
+						// This mirrors the clientId exclusion in `areBlocksEqual`.
 						// Convergence is preserved. Because we're not writing
 						// to the clientId, Yjs doesn't send an update to peers
 						// telling them to change the clientId, so everyone
