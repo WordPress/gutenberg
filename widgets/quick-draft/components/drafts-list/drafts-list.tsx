@@ -216,6 +216,14 @@ export function DraftsList() {
 
 	return (
 		<Stack direction="column" className={ styles.root }>
+			<Text
+				variant="heading-lg"
+				className={ styles.titleHeader }
+				render={ <h2 /> }
+			>
+				{ __( 'Drafts' ) }
+			</Text>
+
 			<DataViews
 				data={ drafts }
 				fields={ fields }
