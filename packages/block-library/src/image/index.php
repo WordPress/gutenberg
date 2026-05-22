@@ -344,20 +344,20 @@ function block_core_image_print_lightbox_overlay() {
 		}
 	}
 
-    // Check for a lightbox specific overlay background color.
-    // Themes can set this in theme.json under:
-    //    settings.blocks.core/image.lightbox.overlayBackgroundColor  (block-level)
-    //    settings.lightbox.overlayBackgroundColor                     (global fallback)
+	// Check for a lightbox specific overlay background color.
+	// Themes can set this in theme.json under:
+	// settings.blocks.core/image.lightbox.overlayBackgroundColor (block-level)
+	// settings.lightbox.overlayBackgroundColor (global fallback).
 	$lightbox_overlay_background_color = null;
-    $lightbox_block_settings = wp_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
-    if ( isset( $lightbox_block_settings['overlayBackgroundColor'] ) ) {
-        $lightbox_overlay_background_color = esc_attr( $lightbox_block_settings['overlayBackgroundColor'] );
-    } else {
-        $lightbox_global_settings = wp_get_global_settings( array( 'lightbox' ) );
-        if ( isset( $lightbox_global_settings['overlayBackgroundColor'] ) ) {
-            $lightbox_overlay_background_color = esc_attr( $lightbox_global_settings['overlayBackgroundColor'] );
-        }
-    }
+	$lightbox_block_settings           = wp_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
+	if ( isset( $lightbox_block_settings['overlayBackgroundColor'] ) ) {
+		$lightbox_overlay_background_color = esc_attr( $lightbox_block_settings['overlayBackgroundColor'] );
+	} else {
+		$lightbox_global_settings = wp_get_global_settings( array( 'lightbox' ) );
+		if ( isset( $lightbox_global_settings['overlayBackgroundColor'] ) ) {
+			$lightbox_overlay_background_color = esc_attr( $lightbox_global_settings['overlayBackgroundColor'] );
+		}
+	}
 
 	// Prefer the lightbox specific color when set, otherwise fall back to
 	// the global background color.
