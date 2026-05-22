@@ -1366,7 +1366,7 @@ export const getDeviceType = createRegistrySelector(
  * @return {boolean} Whether the list view is opened.
  */
 export function isListViewOpened( state ) {
-	return state.listViewPanel;
+	return state.listViewPanel === true;
 }
 
 /**

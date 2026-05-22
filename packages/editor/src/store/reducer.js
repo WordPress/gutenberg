@@ -9,6 +9,8 @@ import { combineReducers } from '@wordpress/data';
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import dataviewsReducer from '../dataviews/store/reducer';
 
+const LIST_VIEW_PANEL_HIDDEN_BY_INSERTER = 'hidden-by-inserter';
+
 /**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
@@ -343,7 +345,10 @@ export function blockInserterPanel( state = false, action ) {
 export function listViewPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_INSERTER_OPENED':
-			return action.value ? false : state;
+			if ( action.value ) {
+				return state ? LIST_VIEW_PANEL_HIDDEN_BY_INSERTER : false;
+			}
+			return state === LIST_VIEW_PANEL_HIDDEN_BY_INSERTER ? true : state;
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen;
 	}
