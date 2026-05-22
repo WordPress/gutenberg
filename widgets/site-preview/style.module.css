@@ -22,20 +22,32 @@
 	position: absolute;
 	inset: 0;
 	opacity: 0;
+	background: color-mix(in srgb, var(--wpds-color-fg-content-neutral-weak) 20%, transparent);
+	backdrop-filter: blur(1px);
 }
 
 .overlayButton {
 	box-shadow: var(--wpds-elevation-xs);
 }
 
-.previewWrap:hover .overlay {
+.previewWrap:hover .overlay,
+.previewWrap:focus-within .overlay {
 	opacity: 1;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	.overlay {
-		transition:
-			opacity var(--wpds-motion-duration-sm)
-			var(--wpds-motion-easing-subtle);
+	.previewWrap:hover .overlay,
+	.previewWrap:focus-within .overlay {
+		animation: fadeIn var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle) both;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
 	}
 }
