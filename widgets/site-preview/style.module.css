@@ -31,7 +31,8 @@
 
 @media (prefers-reduced-motion: no-preference) {
 	.iframe {
-		transition: transform 0.2s ease-in;
+		transition: transform var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-subtle);
 	}
 
 	.previewWrap:hover .iframe {
@@ -39,6 +40,7 @@
 	}
 
 	.overlay {
-		transition: opacity 0.1s ease-in;
+		transition: opacity var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-subtle);
 	}
 }
