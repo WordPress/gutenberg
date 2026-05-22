@@ -329,6 +329,7 @@ export default function QuickDraft() {
 			<Stack direction="column" className={ styles.primaryPane }>
 				{ primary }
 			</Stack>
+
 			<Stack direction="column" className={ styles.listPane }>
 				<DraftsList />
 			</Stack>

@@ -1,6 +1,5 @@
 .body {
 	height: 100%;
-	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 /* Stretches loading/empty states and the form to fill their pane. */
@@ -12,9 +11,8 @@
 	flex: 1;
 	min-width: 0;
 	min-height: 0;
-	max-width: calc(var(--wpds-dimension-base) * 100);
-	margin: 0 auto;
 	padding: var(--wpds-dimension-padding-lg);
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .listPane {
@@ -26,6 +24,8 @@
 /* Wide tile: drafts list sits beside the form, split by a vertical rule. */
 .row .primaryPane {
 	border-inline-end: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	max-width: calc(var(--wpds-dimension-base) * 100);
+	margin: 0 auto;
 }
 
 /* Compact tile: footer link that reveals the drafts list in place. */
