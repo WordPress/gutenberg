@@ -27,9 +27,6 @@ const outputPath = join(
 );
 
 const content = `
-/**
- * Internal dependencies
- */
 import type { RampResult } from './types';
 import type { DEFAULT_SEED_COLORS } from './constants';
 
