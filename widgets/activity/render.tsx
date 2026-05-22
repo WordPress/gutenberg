@@ -33,6 +33,11 @@ type ActivityEvent = {
 	kind: ActivityKind;
 };
 
+type ActivityAttributes = {
+	// How many items of each activity type to fetch.
+	perPage?: number;
+};
+
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
 /**
@@ -135,11 +140,18 @@ const FIELDS: Field< ActivityEvent >[] = [
 
 // ─── Default view ─────────────────────────────────────────────────────────────
 
+// Default number of items fetched per activity type.
+const DEFAULT_PER_PAGE = 5;
+
+// Activity sources merged into the stream: scheduled posts, published posts,
+// and comments. Used to size the page so every fetched item is shown.
+const SOURCE_COUNT = 3;
+
 const DEFAULT_VIEW: View = {
 	type: 'activity',
 	search: '',
 	page: 1,
-	perPage: 20,
+	perPage: DEFAULT_PER_PAGE,
 	filters: [],
 	fields: [ 'datetime' ],
 	titleField: 'title',
@@ -157,28 +169,38 @@ const DEFAULT_VIEW: View = {
 	},
 };
 
-const FUTURE_POSTS_QUERY = {
-	status: 'future',
-	orderby: 'date',
-	order: 'asc',
-	per_page: 5,
-};
-
-const RECENT_POSTS_QUERY = {
-	status: 'publish',
-	orderby: 'date',
-	order: 'desc',
-	per_page: 5,
-};
-
-const COMMENTS_QUERY = {
-	per_page: 5,
-};
-
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function Activity() {
+export default function Activity( {
+	attributes,
+}: {
+	attributes?: ActivityAttributes;
+} ) {
+	const perPage = Math.max( 1, attributes?.perPage ?? DEFAULT_PER_PAGE );
+
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+
+	// Fetch up to `perPage` items from each source so all three activity types
+	// are represented; the merged result is sorted into one stream.
+	const queries = useMemo(
+		() => ( {
+			future: {
+				status: 'future',
+				orderby: 'date',
+				order: 'asc',
+				per_page: perPage,
+			},
+			recent: {
+				status: 'publish',
+				orderby: 'date',
+				order: 'desc',
+				per_page: perPage,
+			},
+			comments: { per_page: perPage },
+		} ),
+		[ perPage ]
+	);
+
 	const { futurePosts, recentPosts, comments, isResolved } = useSelect(
 		( select ) => {
 			const coreData = select( coreStore );
@@ -187,37 +209,37 @@ export default function Activity() {
 				futurePosts: coreData.getEntityRecords< Post >(
 					'postType',
 					'post',
-					FUTURE_POSTS_QUERY
+					queries.future
 				),
 				recentPosts: coreData.getEntityRecords< Post >(
 					'postType',
 					'post',
-					RECENT_POSTS_QUERY
+					queries.recent
 				),
 				comments: coreData.getEntityRecords< Comment >(
 					'root',
 					'comment',
-					COMMENTS_QUERY
+					queries.comments
 				),
 				isResolved:
 					coreData.hasFinishedResolution( 'getEntityRecords', [
 						'postType',
 						'post',
-						FUTURE_POSTS_QUERY,
+						queries.future,
 					] ) &&
 					coreData.hasFinishedResolution( 'getEntityRecords', [
 						'postType',
 						'post',
-						RECENT_POSTS_QUERY,
+						queries.recent,
 					] ) &&
 					coreData.hasFinishedResolution( 'getEntityRecords', [
 						'root',
 						'comment',
-						COMMENTS_QUERY,
+						queries.comments,
 					] ),
 			};
 		},
-		[]
+		[ queries ]
 	);
 
 	const allEvents = useMemo< ActivityEvent[] >( () => {
@@ -265,9 +287,16 @@ export default function Activity() {
 		return events;
 	}, [ futurePosts, recentPosts, comments ] );
 
+	// Size the page to the full merged set (up to `perPage` per source) so every
+	// fetched item is shown; the widget has no pagination UI yet.
+	const resolvedView = useMemo(
+		() => ( { ...view, perPage: perPage * SOURCE_COUNT } ),
+		[ view, perPage ]
+	);
+
 	const { data: shownData, paginationInfo } = useMemo(
-		() => filterSortAndPaginate( allEvents, view, FIELDS ),
-		[ allEvents, view ]
+		() => filterSortAndPaginate( allEvents, resolvedView, FIELDS ),
+		[ allEvents, resolvedView ]
 	);
 
 	if ( ! isResolved ) {
@@ -310,7 +339,7 @@ export default function Activity() {
 		<DataViews
 			data={ shownData }
 			fields={ FIELDS }
-			view={ view }
+			view={ resolvedView }
 			onChangeView={ setView }
 			paginationInfo={ paginationInfo }
 			getItemId={ ( item ) => item.id }
