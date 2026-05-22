@@ -799,7 +799,11 @@ export default dedupePlugins( [
 	// Override: Packages which have eliminated dependency grouping comments
 	// and explicitly prevent new additions.
 	{
-		files: [ 'packages/ui/**', 'packages/design-system-mcp/**' ],
+		files: [
+			'packages/design-system-mcp/**',
+			'packages/ui/**',
+			'packages/theme/**',
+		],
 		rules: {
 			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},

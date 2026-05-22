@@ -2,6 +2,17 @@
 	height: 100%;
 }
 
+/*
+ * When keyboard focus lands on the widget's own content (a link or control
+ * the render module draws), outline the whole tile so Tab users can tell
+ * which widget holds focus, since an inner ring alone is easy to miss. Scoped
+ * to content focus, and to `:focus-visible` so a mouse click doesn't draw it.
+ */
+.widgetChrome:has(.widgetChromeContent :focus-visible) {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline-offset: 2px;
+}
+
 .widgetChromeHeaderIcon {
 	display: inline-flex;
 	color: var(--wpds-color-fg-content-neutral);
