@@ -101,7 +101,7 @@ const FIELDS: Field< ActivityEvent >[] = [
 		enableGlobalSearch: true,
 	},
 	{
-		id: 'time',
+		id: 'datetime',
 		label: __( 'Time' ),
 		getValue: ( { item } ) => item.datetime,
 		render: ( { item } ) => (
@@ -110,7 +110,7 @@ const FIELDS: Field< ActivityEvent >[] = [
 				{ dateI18n( __( 'g:i a' ), item.datetime ) }
 			</span>
 		),
-		enableSorting: false,
+		enableSorting: true,
 	},
 	{
 		id: 'date',
@@ -119,7 +119,7 @@ const FIELDS: Field< ActivityEvent >[] = [
 		render: ( { item } ) => (
 			<span>{ formatGroupDate( item.datetime.split( 'T' )[ 0 ] ) }</span>
 		),
-		enableSorting: false,
+		enableSorting: true,
 		enableHiding: false,
 	},
 ];
@@ -132,7 +132,7 @@ const DEFAULT_VIEW: View = {
 	page: 1,
 	perPage: 20,
 	filters: [],
-	fields: [ 'time' ],
+	fields: [ 'datetime' ],
 	titleField: 'content',
 	mediaField: 'icon',
 	showMedia: true,
