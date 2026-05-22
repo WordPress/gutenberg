@@ -36,6 +36,33 @@ import {
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useNoteThreads( postId ) {
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { clientIds } = useSelect( ( select ) => {
+		const { getClientIdsWithDescendants } = select( blockEditorStore );
+		return {
+			clientIds: getClientIdsWithDescendants(),
+		};
+	}, [] );
+
+	// Skip the comments fetch entirely when no block in the post
+	// references a note id — the canvas/sidebar surface notes by joining
+	// the fetched threads against block metadata, so threads with no
+	// referencing block are never rendered. This keeps the (often empty)
+	// `GET /wp/v2/comments?type=note&per_page=-1` call off the boot path
+	// for the common case of posts with no notes.
+	const hasAnyNoteIds = useMemo( () => {
+		for ( const clientId of clientIds ) {
+			if (
+				getNoteIdsFromMetadata(
+					getBlockAttributes( clientId )?.metadata
+				).length > 0
+			) {
+				return true;
+			}
+		}
+		return false;
+	}, [ clientIds, getBlockAttributes ] );
+
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -47,16 +74,10 @@ export function useNoteThreads( postId ) {
 		'root',
 		'comment',
 		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
+		{
+			enabled: hasAnyNoteIds && !! postId && typeof postId === 'number',
+		}
 	);
-
-	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { clientIds } = useSelect( ( select ) => {
-		const { getClientIdsWithDescendants } = select( blockEditorStore );
-		return {
-			clientIds: getClientIdsWithDescendants(),
-		};
-	}, [] );
 
 	// Process notes to build the tree structure.
 	const { notes, unresolvedNotes } = useMemo( () => {
