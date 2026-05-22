@@ -36,7 +36,8 @@
 	}
 
 	.previewWrap:hover .iframe {
-		transform: translate(-50%, -13px) scale(0.42);
+		/* -14px instead of -13px to prevent the iframe top-edge visual issues. */
+		transform: translate(-50%, -14px) scale(0.42);
 	}
 
 	.overlay {
