@@ -65,6 +65,7 @@ import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
+import AnimatedGifConverter from './animated-gif-converter';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -1027,7 +1028,7 @@ export default function Image( {
 										} )
 									}
 									help={ __(
-										'This GIF is shown as an optimized, faster-loading video on your site. Enable to display the original GIF instead.'
+										'Enabled keeps the original animated GIF. Disable to play it as an optimized, looping video instead.'
 									) }
 								/>
 							</ToolsPanelItem>
@@ -1406,6 +1407,14 @@ export default function Image( {
 
 	return (
 		<>
+			<AnimatedGifConverter
+				id={ id }
+				clientId={ clientId }
+				url={ url }
+				caption={ attributes.caption }
+				galleryId={ context.galleryId }
+				preserveAnimatedGif={ preserveAnimatedGif }
+			/>
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }
