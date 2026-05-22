@@ -84,7 +84,7 @@ describe( 'WidgetDashboard widget settings', () => {
 
 		expect( await screen.findByTestId( 'greeting' ) ).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Greet settings' } )
+			screen.getByRole( 'button', { name: 'Widget settings' } )
 		).toBeInTheDocument();
 	} );
 
@@ -96,7 +96,7 @@ describe( 'WidgetDashboard widget settings', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Customize' } ) );
 
 		expect(
-			screen.queryByRole( 'button', { name: 'Greet settings' } )
+			screen.queryByRole( 'button', { name: 'Widget settings' } )
 		).not.toBeInTheDocument();
 	} );
 
@@ -107,7 +107,7 @@ describe( 'WidgetDashboard widget settings', () => {
 		await screen.findByTestId( 'greeting' );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Greet settings' } )
+			screen.getByRole( 'button', { name: 'Widget settings' } )
 		);
 
 		const dialog = await screen.findByRole( 'dialog', {
@@ -151,7 +151,7 @@ describe( 'WidgetDashboard widget settings', () => {
 		await screen.findByTestId( 'greeting' );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Greet settings' } )
+			screen.getByRole( 'button', { name: 'Widget settings' } )
 		);
 		const dialog = await screen.findByRole( 'dialog', {
 			name: 'Greet settings',
