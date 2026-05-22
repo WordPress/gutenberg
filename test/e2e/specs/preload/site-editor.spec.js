@@ -50,7 +50,6 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				'GET /wp/v2/posts?context=edit&offset=0&order=desc&orderby=date&per_page=10&ignore_sticky=false',
-				'GET /wp/v2/taxonomies?context=view',
 				'GET /wp/v2/template-parts/emptytheme//header?context=edit',
 				'OPTIONS /wp/v2/settings',
 				'POST /wp/v2/users/me',
@@ -86,7 +85,6 @@ test.describe( 'Preload', () => {
 				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
 				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
 				'GET /wp/v2/taxonomies?context=edit',
-				'GET /wp/v2/taxonomies?context=view',
 				'GET /wp/v2/templates/lookup?slug=front-page',
 				'GET /wp/v2/types/page?context=edit',
 				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
