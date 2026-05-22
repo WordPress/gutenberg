@@ -89,7 +89,12 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 				 * future, we should do so in a separate meta key.
 				 */
 				'revisions_enabled' => false,
-				'show_in_rest'      => true,
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type'    => 'string',
+						'context' => array( 'edit' ),
+					),
+				),
 				'single'            => true,
 				'type'              => 'string',
 			)
