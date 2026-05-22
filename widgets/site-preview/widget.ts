@@ -9,6 +9,4 @@ export default {
 	title: __( 'Site preview' ),
 	description: __( 'Shows preview of the site homepage.' ),
 	icon: siteLogo,
-	category: 'site',
-	presentation: 'full-bleed',
 };
