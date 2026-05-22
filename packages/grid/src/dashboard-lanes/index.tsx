@@ -502,7 +502,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		}, [ activeLayout, itemStyles ] );
 		const excludeLayoutAnimationKey =
 			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
-		const { captureLayoutSnapshot, getLastPositions } =
+		const { captureLayoutSnapshot, getPositionsBeforeLastChange } =
 			useLayoutShiftAnimation( {
 				container,
 				enabled: editMode,
@@ -513,7 +513,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			container,
 			enabled: editMode,
 			layoutKeys,
-			getLastPositions,
+			getPositionsBeforeLastChange,
 			childrenCacheRef,
 		} );
 		const layoutAnimating = editMode;

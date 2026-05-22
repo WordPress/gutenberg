@@ -46,10 +46,19 @@ type UseLayoutShiftAnimationResult = {
 	captureLayoutSnapshot: () => void;
 
 	/**
-	 * Viewport rects from the last committed paint. Used by item-exit
-	 * animation to place overlays when keys drop out of `layout`.
+	 * Viewport rects from the last committed paint (settled, no FLIP
+	 * invert transforms).
 	 */
 	getLastPositions: () => ReadonlyMap< string, RectSnapshot > | null;
+
+	/**
+	 * Tile positions immediately before the latest layout commit. Used
+	 * by item-exit animation when keys drop out of `layout`.
+	 */
+	getPositionsBeforeLastChange: () => ReadonlyMap<
+		string,
+		RectSnapshot
+	> | null;
 };
 
 function queryGridItems( container: HTMLElement ): HTMLElement[] {
@@ -140,6 +149,10 @@ export function useLayoutShiftAnimation( {
 		string,
 		RectSnapshot
 	> | null >( null );
+	const positionsBeforeLastChangeRef = useRef< Map<
+		string,
+		RectSnapshot
+	> | null >( null );
 
 	const captureLayoutSnapshot = useCallback( () => {
 		if ( container ) {
@@ -151,6 +164,7 @@ export function useLayoutShiftAnimation( {
 		if ( ! container || ! enabled ) {
 			snapshotBeforeChangeRef.current = null;
 			lastRenderedPositionsRef.current = null;
+			positionsBeforeLastChangeRef.current = null;
 			if ( container ) {
 				for ( const element of queryGridItems( container ) ) {
 					clearLayoutShiftStyles( element );
@@ -159,9 +173,22 @@ export function useLayoutShiftAnimation( {
 			return;
 		}
 
+		for ( const element of queryGridItems( container ) ) {
+			clearLayoutShiftStyles( element );
+		}
+
 		const previous =
 			snapshotBeforeChangeRef.current ?? lastRenderedPositionsRef.current;
 		snapshotBeforeChangeRef.current = null;
+
+		positionsBeforeLastChangeRef.current = previous
+			? new Map( previous )
+			: null;
+
+		// Record settled grid positions for the next FLIP. Must run before
+		// invert transforms — measuring after `playLayoutShift` would bake
+		// translate offsets into the baseline and skew the next animation.
+		lastRenderedPositionsRef.current = snapshotPositions( container );
 
 		if ( previous ) {
 			for ( const element of queryGridItems( container ) ) {
@@ -176,19 +203,24 @@ export function useLayoutShiftAnimation( {
 				const { left, top } = element.getBoundingClientRect();
 				const deltaX = old.left - left;
 				const deltaY = old.top - top;
-				clearLayoutShiftStyles( element );
 				playLayoutShift( element, deltaX, deltaY );
 			}
 		}
-
-		lastRenderedPositionsRef.current = snapshotPositions( container );
 	}, [ container, enabled, layoutFingerprint, excludeItemKey ] );
 
 	const getLastPositions = useCallback( () => {
 		return lastRenderedPositionsRef.current;
 	}, [] );
 
-	return { captureLayoutSnapshot, getLastPositions };
+	const getPositionsBeforeLastChange = useCallback( () => {
+		return positionsBeforeLastChangeRef.current;
+	}, [] );
+
+	return {
+		captureLayoutSnapshot,
+		getLastPositions,
+		getPositionsBeforeLastChange,
+	};
 }
 
 /**

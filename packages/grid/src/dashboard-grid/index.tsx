@@ -597,7 +597,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		);
 		const excludeLayoutAnimationKey =
 			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
-		const { captureLayoutSnapshot, getLastPositions } =
+		const { captureLayoutSnapshot, getPositionsBeforeLastChange } =
 			useLayoutShiftAnimation( {
 				container: gridRoot,
 				enabled: editMode,
@@ -608,7 +608,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			container: gridRoot,
 			enabled: editMode,
 			layoutKeys,
-			getLastPositions,
+			getPositionsBeforeLastChange,
 			childrenCacheRef,
 		} );
 		// Transform transitions on tiles for FLIP (drag, resize, removal).

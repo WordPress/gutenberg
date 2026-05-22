@@ -27,7 +27,10 @@ type UseItemExitAnimationOptions = {
 	container: HTMLElement | null;
 	enabled: boolean;
 	layoutKeys: ReadonlySet< string >;
-	getLastPositions: () => ReadonlyMap< string, RectSnapshot > | null;
+	getPositionsBeforeLastChange: () => ReadonlyMap<
+		string,
+		RectSnapshot
+	> | null;
 	childrenCacheRef: React.MutableRefObject<
 		Map< string, React.ReactElement >
 	>;
@@ -63,19 +66,19 @@ function toContainerRect(
  * When `layout` loses keys in edit mode, keeps a short-lived overlay at
  * the removed tile's last position (scale + fade) while siblings FLIP.
  *
- * @param root0                  Hook options.
- * @param root0.container        Surface root that contains grid tiles.
- * @param root0.enabled          When false, exiting state is cleared.
- * @param root0.layoutKeys       Keys in the committed `layout` prop.
- * @param root0.getLastPositions Viewport rects from the previous paint.
- * @param root0.childrenCacheRef Last rendered children keyed by tile id.
+ * @param root0                              Hook options.
+ * @param root0.container                    Surface root that contains grid tiles.
+ * @param root0.enabled                      When false, exiting state is cleared.
+ * @param root0.layoutKeys                   Keys in the committed `layout` prop.
+ * @param root0.getPositionsBeforeLastChange Viewport rects before the latest layout commit.
+ * @param root0.childrenCacheRef             Last rendered children keyed by tile id.
  * @return Exiting overlays and a callback to dismiss one by key.
  */
 export function useItemExitAnimation( {
 	container,
 	enabled,
 	layoutKeys,
-	getLastPositions,
+	getPositionsBeforeLastChange,
 	childrenCacheRef,
 }: UseItemExitAnimationOptions ): UseItemExitAnimationResult {
 	const [ exitingItems, setExitingItems ] = useState< ExitingGridItem[] >(
@@ -139,7 +142,7 @@ export function useItemExitAnimation( {
 			return;
 		}
 
-		const lastPositions = getLastPositions();
+		const lastPositions = getPositionsBeforeLastChange();
 		if ( ! lastPositions ) {
 			return;
 		}
@@ -180,7 +183,7 @@ export function useItemExitAnimation( {
 		clearExitingItem,
 		container,
 		enabled,
-		getLastPositions,
+		getPositionsBeforeLastChange,
 		layoutKeys,
 		childrenCacheRef,
 		scheduleExitComplete,
