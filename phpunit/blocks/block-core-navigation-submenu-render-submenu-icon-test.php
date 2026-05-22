@@ -15,6 +15,10 @@ class Block_Core_Navigation_Submenu_Render_Submenu_Icon_Test extends WP_UnitTest
 	 * @ticket 65287
 	 */
 	public function test_returns_same_markup_as_shared_helper() {
+		if ( ! function_exists( 'block_core_shared_navigation_render_submenu_icon' ) ) {
+			$this->markTestSkipped( 'The shared navigation submenu icon helper is not available in this WordPress version.' );
+		}
+
 		$this->setExpectedDeprecated( 'gutenberg_block_core_navigation_submenu_render_submenu_icon' );
 
 		$this->assertSame(
