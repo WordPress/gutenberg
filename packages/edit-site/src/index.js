@@ -18,6 +18,7 @@ import {
 } from '@wordpress/widgets';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -25,8 +26,10 @@ import apiFetch from '@wordpress/api-fetch';
 import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
+import { pageItemRoute } from './components/site-editor-routes/page-item';
 
 const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
+const { recognizePath } = unlock( routerPrivateApis );
 
 const { enablePreloadMultiUse, clearPreloadedData } = unlock(
 	apiFetch.privateApis
@@ -139,11 +142,18 @@ async function preloadResolutions() {
 	const params = new URLSearchParams( window.location.search );
 	const routeParam = params.get( 'p' );
 	const isRootScreen = routeParam === null || routeParam === '/';
-	// When editing a specific page (`p=/page&postId=…`), the server
-	// preloads the page record and its template lookup. Pick those up
-	// in a second phase once the postType entity config has resolved.
-	const pageId =
-		routeParam === '/page' ? Number( params.get( 'postId' ) ) : null;
+	// When editing a specific page (`p=/page/N`), the server preloads
+	// the page record and its template lookup. Pick those up in a
+	// second phase once the postType entity config has resolved. The
+	// match runs the same `:postId` parsing the post-mount router
+	// uses, but pre-mount so the kickoff can drive the resolver.
+	const pageMatch =
+		routeParam !== null
+			? recognizePath( [ pageItemRoute ], routeParam )
+			: undefined;
+	const pageId = pageMatch?.params?.postId
+		? Number( pageMatch.params.postId )
+		: null;
 
 	try {
 		await Promise.all( [
