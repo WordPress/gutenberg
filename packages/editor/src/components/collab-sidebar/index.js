@@ -67,15 +67,16 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes } = useNoteThreads( postId );
+	const { notes, unresolvedNotes, hasNotes, hasUnresolvedNotes } =
+		useNoteThreads( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
+	const showAllNotesSidebar = hasNotes || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedNotes.length > 0 || selectedNote !== undefined )
+			( hasUnresolvedNotes || selectedNote !== undefined )
 	);
 
 	async function focusNote( {

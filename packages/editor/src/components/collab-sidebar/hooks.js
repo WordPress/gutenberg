@@ -36,6 +36,39 @@ import {
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useNoteThreads( postId ) {
+	const enabled = !! postId && typeof postId === 'number';
+
+	// Cheap presence probes: 1-record list calls whose response body is
+	// effectively empty but whose `X-WP-Total` header gives the exact
+	// count. The kickoff's PHP preload covers these (see
+	// `lib/compat/wordpress-7.0/preload.php`), so the boot path resolves
+	// them from cache. The counts then gate the heavier full fetch
+	// below.
+	const { totalItems: notesCount } = useEntityRecords(
+		'root',
+		'comment',
+		{
+			post: postId,
+			type: 'note',
+			status: 'all',
+			per_page: 1,
+			_fields: 'id',
+		},
+		{ enabled }
+	);
+	const { totalItems: unresolvedCount } = useEntityRecords(
+		'root',
+		'comment',
+		{
+			post: postId,
+			type: 'note',
+			status: 'hold',
+			per_page: 1,
+			_fields: 'id',
+		},
+		{ enabled }
+	);
+
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -43,11 +76,14 @@ export function useNoteThreads( postId ) {
 		per_page: -1,
 	};
 
+	// Full fetch only when there's at least one note. Posts with no
+	// notes pay just the cached count probes; posts with notes pay the
+	// same fetch they pay today.
 	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
+		{ enabled: enabled && ( notesCount ?? 0 ) > 0 }
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
@@ -142,6 +178,8 @@ export function useNoteThreads( postId ) {
 	return {
 		notes,
 		unresolvedNotes,
+		hasNotes: ( notesCount ?? 0 ) > 0,
+		hasUnresolvedNotes: ( unresolvedCount ?? 0 ) > 0,
 	};
 }
 
