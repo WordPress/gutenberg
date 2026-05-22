@@ -109,6 +109,7 @@ require __DIR__ . '/compat/plugin/fonts.php';
 require __DIR__ . '/compat/wordpress-6.9/customizer-preview-custom-css.php';
 require __DIR__ . '/compat/wordpress-6.9/command-palette.php';
 require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
+require __DIR__ . '/compat/wordpress-6.9/preload.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/preload.php';
