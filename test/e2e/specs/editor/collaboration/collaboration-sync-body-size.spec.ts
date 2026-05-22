@@ -11,7 +11,7 @@ const MAX_SYNC_BODY_SIZE = 16 * 1024 * 1024;
 // One room per extra post record, plus the baseline rooms the editor always
 // registers when opening a post (the primary post plus its collection rooms,
 // e.g. root/comment).
-const EXPECTED_ROOMS = EXTRA_POST_COUNT + 4;
+const EXPECTED_ROOMS = EXTRA_POST_COUNT + 3;
 
 function isSyncUpdateRequest( url: string ): boolean {
 	const decodedUrl = decodeURIComponent( url );
