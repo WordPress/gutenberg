@@ -158,6 +158,10 @@ const restrictedSyntax = [
 		message: 'Do not use string literals for IDs; use useId hook instead.',
 	},
 	{
+		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
+		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
+	},
+	{
 		selector:
 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
 		message:
