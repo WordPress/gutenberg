@@ -182,11 +182,8 @@ export default function useBlockSync( {
 	// Also restores selection from context after blocks are set.
 	useEffect( () => {
 		const { getBlockName, getBlocks } = registry.select( blockEditorStore );
-		const isOutgoing =
-			pendingChangesRef.current.outgoing.includes( controlledBlocks );
-		const storeMatch = getBlocks( clientId ) === controlledBlocks;
 
-		if ( isOutgoing ) {
+		if ( pendingChangesRef.current.outgoing.includes( controlledBlocks ) ) {
 			// Skip block reset if the value matches expected outbound sync
 			// triggered by this component by a preceding change detection.
 			// Only skip if the value matches expectation, since a reset should
@@ -202,7 +199,7 @@ export default function useBlockSync( {
 			}
 		}
 
-		if ( storeMatch ) {
+		if ( getBlocks( clientId ) === controlledBlocks ) {
 			return;
 		}
 
@@ -271,7 +268,7 @@ export default function useBlockSync( {
 			const selection = getSelection();
 			if (
 				selection?.selectionStart?.clientId &&
-				! selection === appliedSelectionRef.current
+				selection !== appliedSelectionRef.current
 			) {
 				const startClientId = selection.selectionStart.clientId;
 
