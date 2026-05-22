@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate } from '@wordpress/date';
+import { decodeEntities } from '@wordpress/html-entities';
 import { Spinner } from '@wordpress/components';
 import { Icon, comment, postList } from '@wordpress/icons';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
@@ -217,7 +218,9 @@ export default function Activity() {
 			events.push( {
 				id: `post-future-${ post.id }`,
 				datetime: post.date ?? '',
-				title: ( post.title as { rendered: string } )?.rendered ?? '',
+				title: decodeEntities(
+					( post.title as { rendered: string } )?.rendered ?? ''
+				),
 				description: '',
 				link: post.link ?? '',
 				kind: 'post-future',
@@ -228,7 +231,9 @@ export default function Activity() {
 			events.push( {
 				id: `post-published-${ post.id }`,
 				datetime: post.date ?? '',
-				title: ( post.title as { rendered: string } )?.rendered ?? '',
+				title: decodeEntities(
+					( post.title as { rendered: string } )?.rendered ?? ''
+				),
 				description: '',
 				link: post.link ?? '',
 				kind: 'post-published',
@@ -239,7 +244,7 @@ export default function Activity() {
 			events.push( {
 				id: `comment-${ c.id }`,
 				datetime: ( c.date as string ) ?? '',
-				title: ( c.author_name as string ) ?? '',
+				title: decodeEntities( ( c.author_name as string ) ?? '' ),
 				description:
 					( c.content as { rendered: string } )?.rendered ?? '',
 				link: ( c.link as string ) ?? '',
