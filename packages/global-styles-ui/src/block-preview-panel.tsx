@@ -103,12 +103,11 @@ const BlockPreviewPanel = ( {
 									padding: ${ previewPadding }px;
 									min-height:${ Math.round( minHeight ) }px;
 									display:flex;
-									align-items:center;
 								}
 								.is-root-container {
 									width: ${ 100 / previewScale }%;
 									transform: scale(${ previewScale });
-									transform-origin: center left;
+									transform-origin: top left;
 								}
 								${ stateCSS }
 							`,
