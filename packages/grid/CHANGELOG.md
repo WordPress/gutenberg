@@ -26,9 +26,10 @@
 -   Animate drag preview `box-shadow` from resting `xs` to `sm` (same
     motion tokens as scale) and apply static `sm` when reduced motion
     is requested, on the `.drag-preview-frame` wrapper (both surfaces).
-    On drop, compose `@dnd-kit/core`'s default `DragOverlay` animation
-    with a frame exit transition (scale + shadow back to resting) so
-    release does not snap.
+    On drop, compose `@dnd-kit/core`'s default `DragOverlay` translation
+    with preview exit keyframes (via drop side effects). Split scale into
+    an inner `__lift` wrapper so drop translation does not fight the lift
+    transform.
 -   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
     element while any tile resize gesture is active, so consumers can
     adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).

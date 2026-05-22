@@ -25,13 +25,10 @@
 /*
  * Functional frame for the drag-preview clone inside `<DragOverlay>`.
  * Always applied, including when the consumer passes a
- * `renderDragPreview` wrapper. Owns the lift cue (`scale` with motion
- * tokens), drag elevation (`box-shadow` animating from resting `xs` to
- * `sm`), optional corner radius via `--wp-grid-drag-preview-radius`, the
- * pointer feedback (`cursor`), and the pointer pass-through during the
- * gesture. Further visual chrome (padding, inner surfaces) belongs
- * to the consumer, either on the children passed to <DashboardLanes />
- * or via `renderDragPreview`.
+ * `renderDragPreview` wrapper. The outer frame has no `transform` so
+ * @dnd-kit’s drop translation matches the placeholder; scale lives on
+ * `__lift` (see dnd-kit #398). Owns elevation, radius, cursor, and
+ * pointer pass-through. Further chrome belongs to the consumer.
  */
 .drag-preview-frame {
 	height: 100%;
@@ -39,28 +36,43 @@
 	cursor: grabbing;
 	pointer-events: none;
 	box-shadow: var(--wpds-elevation-sm);
-	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+}
 
-	@media not (prefers-reduced-motion: reduce) {
-		/*
-		 * Keyframes (not @starting-style) so each DragOverlay mount
-		 * reliably runs xs → sm; var() box-shadow pairs can fail to
-		 * interpolate in entry transitions.
-		 */
-		animation: wp-grid-drag-preview-enter var(--wpds-motion-duration-sm)
-			var(--wpds-motion-easing-balanced) both;
+.drag-preview-frame__lift {
+	height: 100%;
+	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+	transform-origin: center;
+}
+
+@media not (prefers-reduced-motion: reduce) {
+	.drag-preview-frame {
+		animation: wp-grid-drag-preview-shadow-enter
+			var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced) both;
+	}
+
+	.drag-preview-frame__lift {
+		animation: wp-grid-drag-preview-scale-enter
+			var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced) both;
 	}
 }
 
 @media not (prefers-reduced-motion: reduce) {
-	@keyframes wp-grid-drag-preview-enter {
+	@keyframes wp-grid-drag-preview-shadow-enter {
 		from {
 			box-shadow: var(--wpds-elevation-xs);
-			transform: scale(1);
 		}
 
 		to {
 			box-shadow: var(--wpds-elevation-sm);
+		}
+	}
+
+	@keyframes wp-grid-drag-preview-scale-enter {
+		from {
+			transform: scale(1);
+		}
+
+		to {
 			transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
 		}
 	}
@@ -69,26 +81,67 @@
 /*
  * Applied by @dnd-kit `DragOverlay` drop side-effects while the
  * default overlay transform runs; duration matches
- * `createDashboardDragDropAnimation` (200ms / md token).
+ * `createDashboardDragDropAnimation` (200ms / md token). Use keyframed
+ * exit (not transition) so scale does not snap when the enter animation
+ * is replaced.
  */
+@media not (prefers-reduced-motion: reduce) {
+	.drag-preview-frame.dragPreviewFrameExiting {
+		animation: wp-grid-drag-preview-shadow-exit
+			var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced)
+			forwards;
+	}
+
+	.drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
+		animation: wp-grid-drag-preview-scale-exit
+			var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced)
+			forwards;
+	}
+
+	@keyframes wp-grid-drag-preview-shadow-exit {
+		from {
+			box-shadow: var(--wpds-elevation-sm);
+		}
+
+		to {
+			box-shadow: var(--wpds-elevation-xs);
+		}
+	}
+
+	@keyframes wp-grid-drag-preview-scale-exit {
+		from {
+			transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+		}
+
+		to {
+			transform: scale(1);
+		}
+	}
+}
+
 .drag-preview-frame.dragPreviewFrameExiting {
-	animation: none;
-	transform: scale(1);
 	box-shadow: var(--wpds-elevation-xs);
-	transition:
-		transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced),
-		box-shadow var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
+}
+
+.drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
+	transform: scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.drag-preview-frame {
 		box-shadow: var(--wpds-elevation-sm);
+	}
+
+	.drag-preview-frame__lift {
 		transform: none;
-		transition: none;
 	}
 
 	.drag-preview-frame.dragPreviewFrameExiting {
 		box-shadow: var(--wpds-elevation-xs);
+		transition: none;
+	}
+
+	.drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
 		transition: none;
 	}
 }

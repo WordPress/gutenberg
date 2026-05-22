@@ -556,13 +556,15 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const dragOverlayContent =
 			activeId && activeClone ? (
 				<div className={ styles[ 'drag-preview-frame' ] }>
-					{ DragPreview ? (
-						<DragPreview itemId={ activeId }>
-							{ activeClone }
-						</DragPreview>
-					) : (
-						activeClone
-					) }
+					<div className={ styles[ 'drag-preview-frame__lift' ] }>
+						{ DragPreview ? (
+							<DragPreview itemId={ activeId }>
+								{ activeClone }
+							</DragPreview>
+						) : (
+							activeClone
+						) }
+					</div>
 				</div>
 			) : null;
 
@@ -640,8 +642,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				onDragMove={ handleDragMove }
 				onDragEnd={ () => {
 					persistTemporaryLayout();
-					setActiveId( null );
 					lastReorderCursorRef.current = null;
+					setActiveId( null );
 				} }
 			>
 				{ /* No-op strategy: reorder comes from `temporaryLayout`

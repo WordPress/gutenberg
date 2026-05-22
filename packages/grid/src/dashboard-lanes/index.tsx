@@ -480,13 +480,15 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const dragOverlayContent =
 			activeId && activeClone ? (
 				<div className={ styles[ 'drag-preview-frame' ] }>
-					{ DragPreview ? (
-						<DragPreview itemId={ activeId }>
-							{ activeClone }
-						</DragPreview>
-					) : (
-						activeClone
-					) }
+					<div className={ styles[ 'drag-preview-frame__lift' ] }>
+						{ DragPreview ? (
+							<DragPreview itemId={ activeId }>
+								{ activeClone }
+							</DragPreview>
+						) : (
+							activeClone
+						) }
+					</div>
 				</div>
 			) : null;
 
@@ -539,8 +541,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 				onDragMove={ handleDragMove }
 				onDragEnd={ () => {
 					persistTemporaryLayout();
-					setActiveId( null );
 					lastReorderCursorRef.current = null;
+					setActiveId( null );
 				} }
 			>
 				<SortableContext items={ items } strategy={ NO_SORT_STRATEGY }>

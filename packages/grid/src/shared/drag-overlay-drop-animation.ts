@@ -7,22 +7,19 @@ import {
 } from '@dnd-kit/core';
 import type { DropAnimation } from '@dnd-kit/core';
 
-/**
- * Matches `--wpds-motion-duration-md` (200ms) and
- * `--wpds-motion-easing-balanced` on the drag preview frame exit.
- */
-const DROP_ANIMATION_DURATION_MS = 200;
+/** Matches `--wpds-motion-duration-md` on the drag preview frame exit. */
+export const DROP_ANIMATION_DURATION_MS = 200;
+
+/** Matches `--wpds-motion-easing-balanced` on the drag preview frame exit. */
 const DROP_ANIMATION_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
 /**
- * Composes @dnd-kit/core’s default overlay drop animation with a CSS
- * transition on the inner drag preview frame (scale + shadow) so
- * release does not snap before the overlay unmounts.
+ * Composes @dnd-kit/core’s default overlay drop translation with preview
+ * exit keyframes (via side effects). When the pointer never moves, @dnd-kit
+ * skips the drop animation and these side effects do not run.
  *
- * @param dragPreviewFrameClassName Hashed class for `.drag-preview-frame`
- *                                  (e.g. `styles[ 'drag-preview-frame' ]`).
- * @param exitingFrameClassName     Hashed class for the exit state (e.g.
- *                                  `styles.dragPreviewFrameExiting`).
+ * @param dragPreviewFrameClassName Hashed class for `.drag-preview-frame`.
+ * @param exitingFrameClassName     Hashed class for the exit state.
  */
 export function createDashboardDragDropAnimation(
 	dragPreviewFrameClassName: string,
@@ -46,6 +43,15 @@ export function createDashboardDragDropAnimation(
 			)[ 0 ] as HTMLElement | undefined;
 
 			if ( frame ) {
+				frame
+					.getAnimations()
+					.forEach( ( animation ) => animation.cancel() );
+				const lift = frame.firstElementChild;
+				if ( lift instanceof HTMLElement ) {
+					lift.getAnimations().forEach( ( animation ) =>
+						animation.cancel()
+					);
+				}
 				frame.classList.add( exitingFrameClassName );
 			}
 
