@@ -88,9 +88,9 @@ const BlockPreviewPanel = ( {
 									padding: 24px;
 									min-height:${ Math.round( minHeight ) }px;
 									display:flex;
-									align-items:center;
+									align-items: flex-start;
 								}
-								.is-root-container { width: 100%; }
+								.is-root-container { width: 100%; transform-origin: top center; }
 								${ stateCSS }
 							`,
 							},
