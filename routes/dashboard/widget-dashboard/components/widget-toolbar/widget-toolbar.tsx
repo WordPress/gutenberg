@@ -40,7 +40,7 @@ export function WidgetToolbar( {
 		<Stack
 			direction="row"
 			align="center"
-			gap="sm"
+			gap="xs"
 			className={ clsx( styles.widgetToolbar, className ) }
 		>
 			{ children }
