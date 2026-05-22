@@ -496,13 +496,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			} elseif ( 'animated-video' === $image_size ) {
 				// Converted video companion of an animated GIF. Stored
 				// under its own key; the GIF stays the attachment. The
-				// render-time swap and secure cleanup live in
-				// lib/media/animated-gif-to-video.php.
+				// editor reads this key to switch the block to a video;
+				// companion cleanup lives in lib/media/animated-gif-to-video.php.
 				$metadata['animated_video'] = $sub_size['file'];
 			} elseif ( 'animated-video-poster' === $image_size ) {
 				// Static first-frame poster for the converted video. Used as
-				// the <video poster> at render time and deleted alongside the
-				// video. See lib/media/animated-gif-to-video.php.
+				// the video block's poster and deleted alongside the video.
+				// See lib/media/animated-gif-to-video.php.
 				$metadata['animated_video_poster'] = $sub_size['file'];
 			} elseif ( 'scaled' === $image_size ) {
 				if ( ! empty( $sub_size['original_image'] ) ) {
@@ -886,14 +886,14 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'animated-video' === $image_size ) {
 			// Converted animated-GIF video companion. finalize_item()
-			// writes the filename to $metadata['animated_video']; it is
-			// swapped in for the GIF at render time and deleted by a
-			// delete_attachment hook. See lib/media/animated-gif-to-video.php.
+			// writes the filename to $metadata['animated_video']; the editor
+			// reads it to switch the block to a video, and a delete_attachment
+			// hook removes it. See lib/media/animated-gif-to-video.php.
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'animated-video-poster' === $image_size ) {
 			// Static poster for the converted video. finalize_item() writes
 			// the filename to $metadata['animated_video_poster']; used as the
-			// <video poster> at render time and deleted with the video.
+			// video block's poster and deleted with the video.
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// Record the current attached file as the original.

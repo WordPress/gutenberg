@@ -715,11 +715,13 @@ export function prepareItem( id: QueueItemId ) {
 		// capability check, not a browser-support fallback path.
 		//
 		// The GIF uploads through the normal image pipeline so the block
-		// remains a valid core/image. The converted video is sideloaded as
+		// starts as a valid core/image. The converted video is sideloaded as
 		// a companion file of this same attachment after upload (see
 		// generateThumbnails) — like the HEIC original — not as a separate
-		// media library attachment. It is recorded in attachment metadata
-		// and swapped in at render time (see lib/media/animated-gif-to-video.php).
+		// media library attachment. It is recorded in attachment metadata; the
+		// editor then switches the block to the Video block's GIF variation
+		// playing that companion (see
+		// packages/block-library/src/image/animated-gif-converter.js).
 		if (
 			file.type === 'image/gif' &&
 			settings.gifConvert !== false &&
@@ -1326,7 +1328,8 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Also sideload a static first-frame poster (vips decodes only the
 			// first GIF frame) so the <video> can paint a lightweight still
 			// image instead of downloading the full GIF as its poster. Stored
-			// under metadata `animated_video_poster` and used at render time.
+			// under metadata `animated_video_poster` and used as the converted
+			// video block's poster.
 			dispatch.addSideloadItem( {
 				file: item.animatedGifFile,
 				batchId: uuidv4(),
