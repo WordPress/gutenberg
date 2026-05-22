@@ -29,17 +29,6 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	.iframe {
-		transition:
-			transform var(--wpds-motion-duration-md)
-			var(--wpds-motion-easing-subtle);
-	}
-
-	.previewWrap:hover .iframe {
-		/* -14px instead of -13px to prevent the iframe top-edge visual issues. */
-		transform: translate(-50%, -14px) scale(0.42);
-	}
-
 	.overlay {
 		transition:
 			opacity var(--wpds-motion-duration-sm)
