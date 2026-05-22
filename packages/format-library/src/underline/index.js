@@ -5,8 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
 import {
 	RichTextShortcut,
+	RichTextToolbarButton,
 	__unstableRichTextInputEvent,
 } from '@wordpress/block-editor';
+import { formatUnderline } from '@wordpress/icons';
 
 const name = 'core/underline';
 const title = __( 'Underline' );
@@ -19,7 +21,7 @@ export const underline = {
 	attributes: {
 		style: 'style',
 	},
-	edit( { value, onChange } ) {
+	edit( { isActive, value, onChange, onFocus } ) {
 		const onToggle = () => {
 			onChange(
 				toggleFormat( value, {
@@ -30,6 +32,7 @@ export const underline = {
 					title,
 				} )
 			);
+			onFocus();
 		};
 
 		return (
@@ -42,6 +45,13 @@ export const underline = {
 				<__unstableRichTextInputEvent
 					inputType="formatUnderline"
 					onInput={ onToggle }
+				/>
+				<RichTextToolbarButton
+					icon={ formatUnderline }
+					title={ title }
+					onClick={ onToggle }
+					isActive={ isActive }
+					role="menuitemcheckbox"
 				/>
 			</>
 		);
