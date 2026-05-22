@@ -21,6 +21,8 @@
     `--wp-grid-resize-preview-outline-style` CSS custom properties for
     the drag-placeholder outline (default `dashed`) and resize-preview
     border (default `solid`).
+-   Add `--wp-grid-drag-preview-radius` so consumers can round the
+    drag-preview functional frame without targeting package internals.
 -   Animate drag preview `box-shadow` from resting `sm` to `lg` (same
     motion tokens as scale) and apply static `lg` when reduced motion
     is requested, on the `.drag-preview-frame` wrapper (both surfaces).
@@ -61,6 +63,7 @@
 -   Expose CSS custom properties for theming the lift scale,
     placeholder opacity, placeholder outline color, and placeholder
     radius (`--wp-grid-drag-preview-scale`,
+    `--wp-grid-drag-preview-radius`,
     `--wp-grid-placeholder-opacity`,
     `--wp-grid-placeholder-outline-color`,
     `--wp-grid-placeholder-radius`).

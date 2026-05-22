@@ -14,18 +14,18 @@ import type { DropAnimation } from '@dnd-kit/core';
 const DROP_ANIMATION_DURATION_MS = 200;
 const DROP_ANIMATION_EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
-export const DASHBOARD_DRAG_PREVIEW_FRAME_SELECTOR =
-	'[data-wp-dashboard-drag-preview-frame]';
-
 /**
  * Composes @dnd-kit/core’s default overlay drop animation with a CSS
  * transition on the inner drag preview frame (scale + shadow) so
  * release does not snap before the overlay unmounts.
  *
- * @param exitingFrameClassName Hashed class from `*.module.css` (e.g.
- *                              `styles.dragPreviewFrameExiting`).
+ * @param dragPreviewFrameClassName Hashed class for `.drag-preview-frame`
+ *                                  (e.g. `styles[ 'drag-preview-frame' ]`).
+ * @param exitingFrameClassName     Hashed class for the exit state (e.g.
+ *                                  `styles.dragPreviewFrameExiting`).
  */
 export function createDashboardDragDropAnimation(
+	dragPreviewFrameClassName: string,
 	exitingFrameClassName: string
 ): DropAnimation {
 	return {
@@ -41,9 +41,9 @@ export function createDashboardDragDropAnimation(
 				},
 			} )( args );
 
-			const frame = args.dragOverlay.node.querySelector(
-				DASHBOARD_DRAG_PREVIEW_FRAME_SELECTOR
-			);
+			const frame = args.dragOverlay.node.getElementsByClassName(
+				dragPreviewFrameClassName
+			)[ 0 ] as HTMLElement | undefined;
 
 			if ( frame ) {
 				frame.classList.add( exitingFrameClassName );

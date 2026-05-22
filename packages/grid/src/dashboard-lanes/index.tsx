@@ -54,6 +54,7 @@ import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-an
 import styles from './lanes.module.css';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
+	styles[ 'drag-preview-frame' ],
 	styles.dragPreviewFrameExiting
 );
 
@@ -478,10 +479,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const DragPreview = renderDragPreview;
 		const dragOverlayContent =
 			activeId && activeClone ? (
-				<div
-					className={ styles[ 'drag-preview-frame' ] }
-					data-wp-dashboard-drag-preview-frame
-				>
+				<div className={ styles[ 'drag-preview-frame' ] }>
 					{ DragPreview ? (
 						<DragPreview itemId={ activeId }>
 							{ activeClone }

@@ -1,16 +1,8 @@
 .grid {
 	width: 100%;
-	/* Drag placeholder outline radius: matches `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
+	/* Placeholder and drag-preview radii: match `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
 	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);
-}
-
-/*
- * Rounded drag shadow: `@wordpress/grid` keeps the overlay frame
- * radius-agnostic; match tile / Card radius here (frame exposes
- * `data-wp-dashboard-drag-preview-frame`).
- */
-.grid :global([data-wp-dashboard-drag-preview-frame]) {
-	border-radius: var(--wpds-border-radius-lg);
+	--wp-grid-drag-preview-radius: var(--wpds-border-radius-lg);
 }
 
 .tile {

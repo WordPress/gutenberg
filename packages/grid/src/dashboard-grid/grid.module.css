@@ -9,13 +9,15 @@
  * Always applied, including when the consumer passes a
  * `renderDragPreview` wrapper. Owns the lift cue (`scale` with motion
  * tokens), drag elevation (`box-shadow` animating from resting `sm` to
- * `lg`), the pointer feedback (`cursor`), and the pointer pass-through during
- * the gesture. Further visual chrome (padding, inner surfaces) belongs
+ * `lg`), optional corner radius via `--wp-grid-drag-preview-radius`, the
+ * pointer feedback (`cursor`), and the pointer pass-through during the
+ * gesture. Further visual chrome (padding, inner surfaces) belongs
  * to the consumer, either on the children passed to <DashboardGrid />
  * or via `renderDragPreview`.
  */
 .drag-preview-frame {
 	height: 100%;
+	border-radius: var(--wp-grid-drag-preview-radius, 0);
 	cursor: grabbing;
 	pointer-events: none;
 	box-shadow: var(--wpds-elevation-lg);

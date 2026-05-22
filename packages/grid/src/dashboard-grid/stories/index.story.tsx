@@ -711,8 +711,9 @@ function CustomResizeHandle( {
 /**
  * Example `renderDragPreview` wrapper: keeps the clone height chain
  * intact. Lift, shadow, and motion live on the grid
- * `.drag-preview-frame`; add radius or extra chrome here only when a
- * surface needs it (see widget dashboard).
+ * `.drag-preview-frame`; set `--wp-grid-drag-preview-radius` on the
+ * surface when the lift shadow should match rounded tiles (see widget
+ * dashboard).
  */
 function CustomDragPreview( { children }: DragPreviewRenderProps ) {
 	return <div style={ { height: '100%' } }>{ children }</div>;
