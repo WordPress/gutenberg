@@ -18,7 +18,6 @@ import {
 	Spinner,
 	MenuItem,
 	ToolbarButton,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -138,24 +137,20 @@ function ReusableBlockControl( {
 		<>
 			{ canUserEdit && (
 				<BlockControls group="other">
-					<ToolbarGroup>
-						<ToolbarButton onClick={ onToggleEdit }>
-							{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
+					<ToolbarButton onClick={ onToggleEdit }>
+						{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
+					</ToolbarButton>
 				</BlockControls>
 			) }
 
 			{ canOverrideBlocks && (
 				<BlockControls group="other">
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ resetContent }
-							disabled={ ! hasContent }
-						>
-							{ __( 'Reset' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
+					<ToolbarButton
+						onClick={ resetContent }
+						disabled={ ! hasContent }
+					>
+						{ __( 'Reset' ) }
+					</ToolbarButton>
 				</BlockControls>
 			) }
 		</>

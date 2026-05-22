@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - heading "Log In" [level=1] [ref=e2]
+  - generic [ref=e3]:
+    - link "Powered by WordPress" [ref=e4] [cursor=pointer]:
+      - /url: https://wordpress.org/
+    - generic [ref=e5]:
+      - paragraph [ref=e6]:
+        - generic [ref=e7]: Username or Email Address
+        - textbox "Username or Email Address" [ref=e8]
+      - generic [ref=e9]:
+        - generic [ref=e10]: Password
+        - generic [ref=e11]:
+          - textbox "Password" [ref=e12]
+          - button "Show password" [ref=e13] [cursor=pointer]:
+            - generic [ref=e14]: 
+      - paragraph [ref=e15]:
+        - checkbox "Remember Me" [ref=e16] [cursor=pointer]
+        - generic [ref=e17]: Remember Me
+      - paragraph:
+        - button "Log In" [ref=e18] [cursor=pointer]
+    - paragraph [ref=e19]:
+      - link "Lost your password?" [ref=e20] [cursor=pointer]:
+        - /url: http://localhost:8888/wp-login.php?action=lostpassword
+    - paragraph [ref=e21]:
+      - link "← Go to gutenberg" [ref=e22] [cursor=pointer]:
+        - /url: http://localhost:8888/

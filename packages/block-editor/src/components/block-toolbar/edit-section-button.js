@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
@@ -10,8 +10,8 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import BlockControls from '../block-controls';
 import { unlock } from '../../lock-unlock';
-import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 
 // Shows an Edit/Done button for any content-only locked block — including
 // patterns, which carry `templateLock: 'contentOnly'` after insertion.
@@ -73,20 +73,18 @@ export default function EditSectionButton() {
 	}
 
 	return (
-		<__unstableBlockToolbarLastItem>
-			<ToolbarGroup>
-				<ToolbarButton
-					onClick={ () => {
-						if ( isEditingThis ) {
-							stopEditingContentOnlySection();
-						} else {
-							editContentOnlySection( clientId );
-						}
-					} }
-				>
-					{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
-				</ToolbarButton>
-			</ToolbarGroup>
-		</__unstableBlockToolbarLastItem>
+		<BlockControls group="other">
+			<ToolbarButton
+				onClick={ () => {
+					if ( isEditingThis ) {
+						stopEditingContentOnlySection();
+					} else {
+						editContentOnlySection( clientId );
+					}
+				} }
+			>
+				{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
+			</ToolbarButton>
+		</BlockControls>
 	);
 }

@@ -82,13 +82,9 @@ export default function PatternConvertButton( {
 					blocks[ 0 ].attributes.ref
 				);
 
-			const isUnsyncedPattern =
-				blocks.length === 1 &&
-				blocks?.[ 0 ]?.attributes?.metadata?.patternName;
-
 			const _canConvert =
-				// Hide when this is already a pattern.
-				! isUnsyncedPattern &&
+				// Hide when this is already a synced pattern. Unsynced pattern
+				// instances can still be used to create a new synced pattern.
 				! isSyncedPattern &&
 				// Hide when patterns are disabled.
 				canInsertBlockType( 'core/block', rootId ) &&
