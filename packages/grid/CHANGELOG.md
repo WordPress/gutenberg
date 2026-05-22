@@ -30,6 +30,8 @@
     with preview exit keyframes (via drop side effects). Split scale into
     an inner `__lift` wrapper so drop translation does not fight the lift
     transform.
+-   Defer placeholder fade and dashed outline until `data-wp-grid-dragging`
+    is set and the drag-preview enter animation completes (both surfaces).
 -   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
     element while any tile resize gesture is active, so consumers can
     adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).
