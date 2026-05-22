@@ -150,17 +150,6 @@ export default function useBlockSync( {
 } ) {
 	const registry = useRegistry();
 	const { getSelection, onChangeSelection } = useContext( SelectionContext );
-
-	const {
-		resetBlocks,
-		resetSelection,
-		replaceInnerBlocks,
-		setHasControlledInnerBlocks,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
-		registry.select( blockEditorStore );
-
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
 
@@ -178,116 +167,6 @@ export default function useBlockSync( {
 	// change that was just restored from context (which would loop).
 	const isRestoringSelectionRef = useRef( false );
 
-	// Restores selection from the SelectionContext using the current
-	// idMapping.  Called after blocks are (re-)cloned so that the
-	// mapping is guaranteed to be fresh.
-	const restoreSelection = () => {
-		const selection = getSelection();
-		if (
-			! selection?.selectionStart?.clientId ||
-			selection === appliedSelectionRef.current
-		) {
-			return;
-		}
-
-		const startClientId = selection.selectionStart.clientId;
-
-		// Check if this selection belongs to this controller.
-		// Inner block controllers (clientId is set) own the block if
-		// the external ID appears in their clone mapping.
-		// The root controller (no clientId) owns it if the block
-		// exists directly in the store.
-		const isOurs = clientId
-			? idMappingRef.current.externalToInternal.has( startClientId )
-			: !! getBlockName( startClientId );
-
-		if ( isOurs ) {
-			appliedSelectionRef.current = selection;
-			// Inner block controllers need to convert external→internal
-			// IDs via the clone mapping; the root controller uses
-			// external IDs directly (no mapping needed).
-			const convert = ( sel ) => {
-				if ( ! sel?.clientId || ! clientId ) {
-					return sel;
-				}
-				return {
-					...sel,
-					clientId:
-						idMappingRef.current.externalToInternal.get(
-							sel.clientId
-						) ?? sel.clientId,
-				};
-			};
-			// Flag prevents the subscription from re-reporting this
-			// selection change back to the entity (which would cause
-			// an infinite update loop).
-			isRestoringSelectionRef.current = true;
-			resetSelection(
-				convert( selection.selectionStart ),
-				convert( selection.selectionEnd ),
-				selection.initialPosition
-			);
-			isRestoringSelectionRef.current = false;
-		}
-	};
-
-	const setControlledBlocks = () => {
-		if ( ! controlledBlocks ) {
-			return;
-		}
-
-		// We don't need to persist this change because we only replace
-		// controlled inner blocks when the change was caused by an entity,
-		// and so it would already be persisted.
-		if ( clientId ) {
-			// Batch so that the controlled flag and block replacement
-			// are applied atomically — subscribers see a consistent state.
-			registry.batch( () => {
-				// Clear previous mappings and build new ones during cloning.
-				// This ensures the mapping stays in sync with the current blocks.
-				idMappingRef.current.externalToInternal.clear();
-				idMappingRef.current.internalToExternal.clear();
-
-				const storeBlocks = controlledBlocks.map( ( block ) =>
-					cloneBlockWithMapping( block, idMappingRef.current )
-				);
-
-				setHasControlledInnerBlocks( clientId, true );
-
-				if ( subscribedRef.current ) {
-					pendingChangesRef.current.incoming = storeBlocks;
-				}
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceInnerBlocks( clientId, storeBlocks );
-
-				// Invalidate the applied-selection ref so that
-				// restoreSelection() at the end of the
-				// controlledBlocks effect re-applies with the
-				// freshly-built mapping (new internal IDs).
-				appliedSelectionRef.current = null;
-			} );
-		} else {
-			if ( subscribedRef.current ) {
-				pendingChangesRef.current.incoming = controlledBlocks;
-			}
-			__unstableMarkNextChangeAsNotPersistent();
-			resetBlocks( controlledBlocks );
-		}
-	};
-
-	// Clean up the changes made by setControlledBlocks() when the component
-	// containing useBlockSync() unmounts.
-	const unsetControlledBlocks = () => {
-		__unstableMarkNextChangeAsNotPersistent();
-		if ( clientId ) {
-			setHasControlledInnerBlocks( clientId, false );
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, [] );
-		} else {
-			resetBlocks( [] );
-		}
-	};
-
 	// Add a subscription to the block-editor registry to detect when changes
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
@@ -302,6 +181,7 @@ export default function useBlockSync( {
 	// Determine if blocks need to be reset when they change.
 	// Also restores selection from context after blocks are set.
 	useEffect( () => {
+		const { getBlockName, getBlocks } = registry.select( blockEditorStore );
 		const isOutgoing =
 			pendingChangesRef.current.outgoing.includes( controlledBlocks );
 		const storeMatch = getBlocks( clientId ) === controlledBlocks;
@@ -320,22 +200,122 @@ export default function useBlockSync( {
 			) {
 				pendingChangesRef.current.outgoing = [];
 			}
-		} else if ( ! storeMatch ) {
-			// Reset changing value in all other cases than the sync described
-			// above. Since this can be reached in an update following an out-
-			// bound sync, unset the outbound value to avoid considering it in
-			// subsequent renders.
-			pendingChangesRef.current.outgoing = [];
-			setControlledBlocks();
-
-			// Restore selection from context if it targets our scope.
-			// Only done when blocks were reset from an external source
-			// (undo/redo, entity navigation) — NOT for outgoing changes,
-			// because dispatching resetSelection between keystrokes breaks
-			// the isUpdatingSameBlockAttribute chain and creates per-
-			// character undo levels.
-			restoreSelection();
 		}
+
+		if ( storeMatch ) {
+			return;
+		}
+
+		const {
+			resetBlocks,
+			resetSelection,
+			replaceInnerBlocks,
+			setHasControlledInnerBlocks,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
+
+		// Reset changing value in all other cases than the sync described
+		// above. Since this can be reached in an update following an out- bound
+		// sync, unset the outbound value to avoid considering it in subsequent
+		// renders.
+		pendingChangesRef.current.outgoing = [];
+		// Batch so that the controlled flag and block replacement are applied
+		// atomically — subscribers see a consistent state.
+		registry.batch( () => {
+			if ( controlledBlocks ) {
+				// We don't need to persist this change because we only replace
+				// controlled inner blocks when the change was caused by an
+				// entity, and so it would already be persisted.
+				if ( clientId ) {
+					// Clear previous mappings and build new ones during
+					// cloning. This ensures the mapping stays in sync with the
+					// current blocks.
+					idMappingRef.current.externalToInternal.clear();
+					idMappingRef.current.internalToExternal.clear();
+
+					const storeBlocks = controlledBlocks.map( ( block ) =>
+						cloneBlockWithMapping( block, idMappingRef.current )
+					);
+
+					setHasControlledInnerBlocks( clientId, true );
+
+					if ( subscribedRef.current ) {
+						pendingChangesRef.current.incoming = storeBlocks;
+					}
+					__unstableMarkNextChangeAsNotPersistent();
+					replaceInnerBlocks( clientId, storeBlocks );
+
+					// Invalidate the applied-selection ref so that
+					// restoreSelection() at the end of the controlledBlocks
+					// effect re-applies with the freshly-built mapping (new
+					// internal IDs).
+					appliedSelectionRef.current = null;
+				} else {
+					if ( subscribedRef.current ) {
+						pendingChangesRef.current.incoming = controlledBlocks;
+					}
+					__unstableMarkNextChangeAsNotPersistent();
+					resetBlocks( controlledBlocks );
+				}
+			}
+
+			// Restore selection from context if it targets our scope. Only done
+			// when blocks were reset from an external source (undo/redo, entity
+			// navigation) — NOT for outgoing changes, because dispatching
+			// resetSelection between keystrokes breaks the
+			// isUpdatingSameBlockAttribute chain and creates per- character
+			// undo levels.
+			// Restores selection from the SelectionContext using the current
+			// idMapping.  Called after blocks are (re-)cloned so that the
+			// mapping is guaranteed to be fresh.
+			const selection = getSelection();
+			if (
+				selection?.selectionStart?.clientId &&
+				! selection === appliedSelectionRef.current
+			) {
+				const startClientId = selection.selectionStart.clientId;
+
+				// Check if this selection belongs to this controller. Inner
+				// block controllers (clientId is set) own the block if the
+				// external ID appears in their clone mapping. The root
+				// controller (no clientId) owns it if the block exists directly
+				// in the store.
+				const isOurs = clientId
+					? idMappingRef.current.externalToInternal.has(
+							startClientId
+					  )
+					: !! getBlockName( startClientId );
+
+				if ( isOurs ) {
+					appliedSelectionRef.current = selection;
+					// Inner block controllers need to convert external→internal
+					// IDs via the clone mapping; the root controller uses
+					// external IDs directly (no mapping needed).
+					const convert = ( sel ) => {
+						if ( ! sel?.clientId || ! clientId ) {
+							return sel;
+						}
+						return {
+							...sel,
+							clientId:
+								idMappingRef.current.externalToInternal.get(
+									sel.clientId
+								) ?? sel.clientId,
+						};
+					};
+					// Flag prevents the subscription from re-reporting this
+					// selection change back to the entity (which would cause an
+					// infinite update loop).
+					isRestoringSelectionRef.current = true;
+					resetSelection(
+						convert( selection.selectionStart ),
+						convert( selection.selectionEnd ),
+						selection.initialPosition
+					);
+					isRestoringSelectionRef.current = false;
+				}
+			}
+		} );
 	}, [ controlledBlocks, clientId ] );
 
 	useEffect( () => {
@@ -345,6 +325,10 @@ export default function useBlockSync( {
 			__unstableIsLastBlockChangeIgnored,
 			areInnerBlocksControlled,
 			getBlockParents,
+			getBlocks,
+			getBlockName,
+			getSelectionStart,
+			getSelectionEnd,
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
@@ -494,9 +478,25 @@ export default function useBlockSync( {
 		};
 	}, [ registry, clientId ] );
 
+	// Clean up the changes made by setControlledBlocks() when the component
+	// containing useBlockSync() unmounts.
 	useEffect( () => {
 		return () => {
-			unsetControlledBlocks();
+			const {
+				__unstableMarkNextChangeAsNotPersistent,
+				setHasControlledInnerBlocks,
+				replaceInnerBlocks,
+				resetBlocks,
+			} = registry.dispatch( blockEditorStore );
+			registry.batch( () => {
+				__unstableMarkNextChangeAsNotPersistent();
+				if ( clientId ) {
+					setHasControlledInnerBlocks( clientId, false );
+					replaceInnerBlocks( clientId, [] );
+				} else {
+					resetBlocks( [] );
+				}
+			} );
 		};
 	}, [] );
 }

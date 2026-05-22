@@ -91,20 +91,22 @@ export default function useInnerBlockTemplateSync(
 			);
 
 			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceInnerBlocks(
-					clientId,
-					nextBlocks,
-					currentInnerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
-						nextBlocks.length !== 0 &&
-						isBlockSelected( clientId ),
-					// This ensures the "initialPosition" doesn't change when applying the template
-					// If we're supposed to focus the block, we'll focus the first inner block
-					// otherwise, we won't apply any auto-focus.
-					// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
-					getSelectedBlocksInitialCaretPosition()
-				);
+				registry.batch( () => {
+					__unstableMarkNextChangeAsNotPersistent();
+					replaceInnerBlocks(
+						clientId,
+						nextBlocks,
+						currentInnerBlocks.length === 0 &&
+							templateInsertUpdatesSelection &&
+							nextBlocks.length !== 0 &&
+							isBlockSelected( clientId ),
+						// This ensures the "initialPosition" doesn't change when applying the template
+						// If we're supposed to focus the block, we'll focus the first inner block
+						// otherwise, we won't apply any auto-focus.
+						// This ensures for instance that the focus stays in the inserter when inserting the "buttons" block.
+						getSelectedBlocksInitialCaretPosition()
+					);
+				} );
 			}
 		} );
 
