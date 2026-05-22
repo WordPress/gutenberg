@@ -68,6 +68,18 @@ function formatGroupDate( dateStr: string ): string {
 	return dateI18n( __( 'M jS Y' ), dateStr );
 }
 
+/*
+ * Converts a comment's rendered HTML into a plain-text excerpt, matching the
+ * classic dashboard which shows comment content without markup.
+ */
+function htmlToPlainText( html: string ): string {
+	const { body } = new window.DOMParser().parseFromString(
+		html,
+		'text/html'
+	);
+	return ( body.textContent ?? '' ).trim();
+}
+
 // ─── Fields ───────────────────────────────────────────────────────────────────
 
 const FIELDS: Field< ActivityEvent >[] = [
@@ -82,24 +94,18 @@ const FIELDS: Field< ActivityEvent >[] = [
 		enableHiding: false,
 	},
 	{
-		id: 'content',
-		label: __( 'Content' ),
+		id: 'title',
+		label: __( 'Title' ),
+		type: 'text',
 		getValue: ( { item } ) => item.title,
-		render: ( { item } ) => (
-			<>
-				<strong>{ item.title }</strong>
-				{ item.description && (
-					<>
-						{ ': ' }
-						<span
-							dangerouslySetInnerHTML={ {
-								__html: item.description,
-							} }
-						/>
-					</>
-				) }
-			</>
-		),
+		enableSorting: false,
+		enableGlobalSearch: true,
+	},
+	{
+		id: 'description',
+		label: __( 'Description' ),
+		type: 'text',
+		getValue: ( { item } ) => item.description,
 		enableSorting: false,
 		enableGlobalSearch: true,
 	},
@@ -136,7 +142,8 @@ const DEFAULT_VIEW: View = {
 	perPage: 20,
 	filters: [],
 	fields: [ 'datetime' ],
-	titleField: 'content',
+	titleField: 'title',
+	descriptionField: 'description',
 	mediaField: 'icon',
 	showMedia: true,
 	sort: {
@@ -247,8 +254,9 @@ export default function Activity() {
 				id: `comment-${ c.id }`,
 				datetime: ( c.date as string ) ?? '',
 				title: decodeEntities( ( c.author_name as string ) ?? '' ),
-				description:
-					( c.content as { rendered: string } )?.rendered ?? '',
+				description: htmlToPlainText(
+					( c.content as { rendered: string } )?.rendered ?? ''
+				),
 				link: ( c.link as string ) ?? '',
 				kind: 'comment',
 			} );
