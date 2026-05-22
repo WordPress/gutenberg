@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
@@ -11,7 +12,7 @@ import { IconButton } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useDashboardUIContext } from '../../context/ui-context';
-import { getAdminMenuInset, getWidgetSettingsTitle } from './utils';
+import { getAdminMenuInset } from './utils';
 import type { DashboardWidget, WidgetType } from '../../types';
 
 export interface WidgetSettingsTriggerProps {
@@ -89,7 +90,7 @@ export function WidgetSettingsTrigger( {
 	return (
 		<IconButton
 			icon={ cog }
-			label={ getWidgetSettingsTitle( widgetType ) }
+			label={ __( 'Widget settings' ) }
 			variant="minimal"
 			tone="neutral"
 			size="compact"
