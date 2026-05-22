@@ -14,6 +14,7 @@ import styles from './style.module.css';
 
 export default function SitePreview() {
 	const [ isIframeLoading, setIsIframeLoading ] = useState( true );
+	const [ isEditLoading, setIsEditLoading ] = useState( false );
 	const siteUrl = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecord< { url: string } >(
@@ -71,7 +72,9 @@ export default function SitePreview() {
 					<Button
 						variant="solid"
 						tone="neutral"
+						loading={ isEditLoading }
 						onClick={ () => {
+							setIsEditLoading( true );
 							window.location.href = editUrl;
 						} }
 					>
