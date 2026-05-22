@@ -20,5 +20,7 @@ updates:
           - dependency-name: 'ruby/setup-ruby'
       groups:
           github-actions:
-              patterns:
-                  - '*'
+              applies-to: version-updates
+              update-types:
+                  - minor
+                  - patch
