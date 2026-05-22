@@ -1,0 +1,44 @@
+.root {
+	height: 100%;
+	min-height: 0;
+}
+
+/*
+ * API gap workaround.
+ *
+ * `TextareaControl` from `@wordpress/components` renders its `<textarea>`
+ * inside a `BaseControl` wrapper sized to fit `rows`. To let the textarea
+ * grow vertically with its container, every node in the chain
+ * (BaseControl > field-wrapper > textarea) must become a stretching flex
+ * column. The public API does not expose a `grow` prop or a className on
+ * the inner field wrapper, so we override the internal class names here.
+ * Drop once the upstream component surfaces a hook for this.
+ */
+.root :global(.components-base-control),
+.root :global(.components-base-control__field) {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+}
+
+.root :global(.components-textarea-control__input) {
+	flex: 1;
+	min-height: 0;
+	resize: none;
+}
+
+/*
+ * API gap workaround.
+ *
+ * `DataForm`'s regular layout wraps every field in
+ * `.dataforms-layouts-regular__field` with `display: block` and no public
+ * way to declare per-field vertical growth. To stretch this field with its
+ * container, we reach into the internal class via `:has()` and scope it to
+ * rows that actually contain this field. Drop once `@wordpress/dataviews`
+ * exposes a `grow` option on the regular layout.
+ */
+:global(.dataforms-layouts-regular__field):has(.root) {
+	flex: 1;
+	min-height: 0;
+}

@@ -18,7 +18,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 			// Prevent accidental forwarding of `children`
 			children: _children,
 			disabled,
-			focusableWhenDisabled,
+			focusableWhenDisabled = true,
 			icon,
 			size,
 			shortcut,
