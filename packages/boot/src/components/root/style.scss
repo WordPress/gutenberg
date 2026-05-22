@@ -86,6 +86,7 @@
 .boot-layout__inspector {
 	flex: 1;
 	overflow-y: auto;
+	overscroll-behavior-y: none;
 	background: var(--wpds-color-bg-surface-neutral);
 	color: var(--wpds-color-fg-content-neutral);
 	position: relative;
