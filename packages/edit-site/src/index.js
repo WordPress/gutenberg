@@ -232,16 +232,12 @@ async function preloadResolutions() {
 				} )
 			);
 		}
-		if ( tasks.length ) {
-			await Promise.all( tasks );
-		}
-
-		// Phase 3: the page's per-slug template lookup needs the page
-		// record from phase 2. Mirrors the slug formula in
-		// `post-template/hooks.js`: `page-{slug}` for named pages,
-		// `page` for unnamed (drafts). Core's `site-editor.php`
-		// preloads the matching variant.
 		if ( pageId ) {
+			// The page's per-slug template lookup needs the resolved
+			// page record. Mirrors the slug formula in
+			// `post-template/hooks.js`: `page-{slug}` for named pages,
+			// `page` for unnamed (drafts). Core's `site-editor.php`
+			// preloads the matching variant.
 			const page = coreSelect.getEntityRecord(
 				'postType',
 				'page',
@@ -249,8 +245,11 @@ async function preloadResolutions() {
 			);
 			if ( page ) {
 				const slug = page.slug ? `page-${ page.slug }` : 'page';
-				await core.getDefaultTemplateId( { slug } );
+				tasks.push( core.getDefaultTemplateId( { slug } ) );
 			}
+		}
+		if ( tasks.length ) {
+			await Promise.all( tasks );
 		}
 	} catch {
 		// Resolver failures here would also surface on demand; don't block render.
