@@ -17,6 +17,15 @@ figure.wp-block-image:not(.wp-block) {
 .wp-block-image {
 	position: relative;
 
+	// While uploading or processing client-side, hug the preview so the
+	// centered spinner lands on the image. A preview narrower than the content
+	// width (e.g. a small animated GIF being transcoded to a video) otherwise
+	// leaves the spinner off to one side. Wide and full alignments keep their
+	// own width.
+	&.is-transient:not(.alignwide):not(.alignfull) {
+		width: fit-content;
+	}
+
 	.is-applying img,
 	&.is-transient img {
 		opacity: 0.3;
