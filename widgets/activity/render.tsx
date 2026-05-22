@@ -10,12 +10,14 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { Spinner } from '@wordpress/components';
 import { Icon, comment, postList } from '@wordpress/icons';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-
-// Dashboard is still experimental.
-
 import { EmptyState, Link, Stack } from '@wordpress/ui';
 import type { View, Field } from '@wordpress/dataviews';
 import type { Post, Comment } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import styles from './style.module.css';
 
 // ─── Item type ────────────────────────────────────────────────────────────────
 
@@ -262,7 +264,12 @@ export default function Activity() {
 
 	if ( ! isResolved ) {
 		return (
-			<Stack align="center" justify="center" style={ { minHeight: 220 } }>
+			<Stack
+				direction="column"
+				align="center"
+				justify="center"
+				className={ styles.center }
+			>
 				<Spinner />
 			</Stack>
 		);
@@ -270,7 +277,12 @@ export default function Activity() {
 
 	if ( allEvents.length === 0 ) {
 		return (
-			<Stack align="center" justify="center" style={ { minHeight: 220 } }>
+			<Stack
+				direction="column"
+				align="center"
+				justify="center"
+				className={ styles.center }
+			>
 				<EmptyState.Root>
 					<EmptyState.Icon icon={ postList } />
 					<EmptyState.Title>
