@@ -181,10 +181,16 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
+	const blockDefaultControls = getBlockSupport( name, [
 		TYPOGRAPHY_SUPPORT_KEY,
 		'__experimentalDefaultControls',
 	] );
+
+	// Ensure fontFamily is shown by default for blocks that support it,
+	// unless the block explicitly opts out by setting fontFamily: false.
+	const defaultControls = blockDefaultControls
+		? { fontFamily: true, ...blockDefaultControls }
+		: undefined;
 
 	return (
 		<StylesTypographyPanel
