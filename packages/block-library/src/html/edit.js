@@ -49,12 +49,14 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 						{ __( 'Edit HTML' ) }
 					</Button>
 				</Placeholder>
-				<HTMLEditModal
-					isOpen={ isModalOpen }
-					onRequestClose={ () => setIsModalOpen( false ) }
-					content={ attributes.content }
-					setAttributes={ setAttributes }
-				/>
+				{ isModalOpen && (
+					<HTMLEditModal
+						isOpen={ isModalOpen }
+						onRequestClose={ () => setIsModalOpen( false ) }
+						content={ attributes.content }
+						setAttributes={ setAttributes }
+					/>
+				) }
 			</div>
 		);
 	}
@@ -84,12 +86,14 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				</VStack>
 			</InspectorControls>
 			<Preview content={ attributes.content } isSelected={ isSelected } />
-			<HTMLEditModal
-				isOpen={ isModalOpen }
-				onRequestClose={ () => setIsModalOpen( false ) }
-				content={ attributes.content }
-				setAttributes={ setAttributes }
-			/>
+			{ isModalOpen && (
+				<HTMLEditModal
+					isOpen={ isModalOpen }
+					onRequestClose={ () => setIsModalOpen( false ) }
+					content={ attributes.content }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</div>
 	);
 }
