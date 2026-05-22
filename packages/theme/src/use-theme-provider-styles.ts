@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import {
 	ColorSpace,
@@ -12,15 +9,7 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ThemeContext } from './context';
 import colorTokens from './prebuilt/ts/color-tokens';
 import {

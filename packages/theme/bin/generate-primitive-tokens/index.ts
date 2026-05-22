@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ColorSpace, to, sRGB, getAll } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,

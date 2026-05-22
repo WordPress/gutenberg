@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
