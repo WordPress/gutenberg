@@ -15,6 +15,7 @@ import { Button, Drawer } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
+import styles from './widget-settings.module.css';
 
 type WidgetAttributes = Record< string, unknown >;
 
@@ -137,24 +138,27 @@ export function WidgetSettings(): React.ReactNode {
 		[ cancelStaging, close ]
 	);
 
-	// Clear the admin bar at the top, and (for a left drawer) the fixed
-	// admin menu on the inline-start edge so the drawer lands beside it
-	// rather than over it.
+	// For a left drawer, clear the fixed admin menu on the inline-start
+	// edge so the drawer lands beside it. The admin bar at the top is
+	// cleared in the CSS module.
 	const popupStyle = useMemo< React.CSSProperties >(
-		() => ( {
-			marginTop: '32px',
-			...( settingsDrawerSide === 'left' && settingsDrawerInset > 0
+		() =>
+			settingsDrawerSide === 'left' && settingsDrawerInset > 0
 				? { marginLeft: settingsDrawerInset }
-				: {} ),
-		} ),
+				: {},
 		[ settingsDrawerSide, settingsDrawerInset ]
 	);
+
+	const hasForm = !! widget && !! widgetType && fields.length > 0;
+
+	if ( ! hasForm ) {
+		return null;
+	}
 
 	const title = getWidgetSettingsTitle( widgetType );
 	const data = ( widget?.attributes ??
 		widgetType?.example?.attributes ??
 		{} ) as WidgetAttributes;
-	const hasForm = !! widget && !! widgetType && fields.length > 0;
 
 	return (
 		<Drawer.Root
@@ -164,21 +168,23 @@ export function WidgetSettings(): React.ReactNode {
 			modal={ false }
 			disablePointerDismissal
 		>
-			<Drawer.Popup size="medium" style={ popupStyle }>
+			<Drawer.Popup
+				size="medium"
+				className={ styles.popup }
+				style={ popupStyle }
+			>
 				<Drawer.Header>
 					<Drawer.Title>{ title }</Drawer.Title>
 					<Drawer.CloseIcon />
 				</Drawer.Header>
 
 				<Drawer.Content>
-					{ hasForm && (
-						<DataForm< WidgetAttributes >
-							data={ data }
-							fields={ fields }
-							form={ form }
-							onChange={ handleChange }
-						/>
-					) }
+					<DataForm< WidgetAttributes >
+						data={ data }
+						fields={ fields }
+						form={ form }
+						onChange={ handleChange }
+					/>
 				</Drawer.Content>
 
 				<Drawer.Footer>
