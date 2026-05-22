@@ -127,16 +127,16 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'keeps the GIF as core/image and sideloads a companion video', async ( {
+	test( 'switches an uploaded GIF to the video GIF variation', async ( {
 		editor,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
-		// The companion-file design uploads the GIF as a normal image
-		// attachment (block stays a valid core/image) and sideloads the
-		// transcoded video as that attachment's `animated_video` meta.
-		// The render-time PHP filter swaps the GIF <img> for a
-		// GIF-behaving <video> on the front end.
+		// The GIF uploads as a normal image attachment and the transcoded
+		// video is sideloaded as that attachment's `animated_video` meta.
+		// Once the companion is available, the editor switches the Image
+		// block to the Video block's "GIF" variation playing that video,
+		// so it renders as a native <video> with no render-time PHP.
 		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = editor.canvas.locator(
@@ -149,36 +149,40 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 			ANIMATED_GIF_FIXTURE
 		);
 
-		// Editor still shows the GIF in an <img>: the block was not
-		// transformed, and the <img>'s final src is the server URL.
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible( { timeout: 30_000 } );
-		await expect( image ).toHaveAttribute(
-			'src',
-			/^https?:\/\/.*\.gif(\?.*)?$/i,
+		// Drain the full queue (parent GIF upload + companion video
+		// sideload + TranscodeGif). On success the attachment record is
+		// invalidated, the block refetches it and the converter runs.
+		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+		// The block becomes a core/video block.
+		await gifToVideoUtils.page.waitForFunction(
+			() =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks()
+					.some( ( block ) => block.name === 'core/video' ),
 			{ timeout: 30_000 }
 		);
 
-		// Drain the full queue (parent GIF upload + companion video
-		// sideload + TranscodeGif) before inspecting REST.
-		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
-
-		// Block must remain core/image.
-		const selectedBlockName = await gifToVideoUtils.page.evaluate(
-			() =>
-				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
-					?.name
+		const videoBlock = await gifToVideoUtils.page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.find( ( block ) => block.name === 'core/video' )
 		);
-		expect( selectedBlockName ).toBe( 'core/image' );
 
-		// Attachment must be an image (GIF), not a video.
-		const attachmentId = await gifToVideoUtils.page.evaluate(
-			() =>
-				window.wp.data.select( 'core/block-editor' ).getSelectedBlock()
-					?.attributes?.id
-		);
+		// It is the GIF variation: a muted, looping, autoplaying, inline
+		// video with no controls, sourced from the converted companion.
+		expect( videoBlock.attributes.controls ).toBe( false );
+		expect( videoBlock.attributes.loop ).toBe( true );
+		expect( videoBlock.attributes.autoplay ).toBe( true );
+		expect( videoBlock.attributes.muted ).toBe( true );
+		expect( videoBlock.attributes.playsInline ).toBe( true );
+		expect( videoBlock.attributes.src ).toMatch( /\.(mp4|webm)(\?.*)?$/i );
+
+		// The underlying media is still the GIF image with a recorded
+		// companion video (basename only) in its metadata.
+		const attachmentId = videoBlock.attributes.id;
 		expect( attachmentId ).toBeDefined();
 
 		const media = await requestUtils.rest( {
@@ -187,9 +191,6 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		} );
 
 		expect( media.mime_type ).toBe( 'image/gif' );
-
-		// Companion video filename should be recorded in attachment
-		// metadata under the animated_video key (basename only).
 		expect( media.media_details ).toBeDefined();
 		expect( typeof media.media_details.animated_video ).toBe( 'string' );
 		expect( media.media_details.animated_video ).toMatch(
