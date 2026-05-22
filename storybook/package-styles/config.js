@@ -74,6 +74,15 @@ const CONFIG = [
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],
 	},
 	{
+		// `RichTextControl` renders format UI from `@wordpress/format-library`
+		// and the inline link popover (`LinkControl`) from
+		// `@wordpress/block-editor`, so it needs those package styles in
+		// addition to `@wordpress/components`.
+		componentIdMatcher: /^richtextcontrol/,
+		ltr: [ componentsLtr, blockEditorLtr, formatLibraryLtr ],
+		rtl: [ componentsRtl, blockEditorRtl, formatLibraryRtl ],
+	},
+	{
 		componentIdMatcher: /^admin-ui-/,
 		ltr: [ designTokens, componentsLtr ],
 		rtl: [ designTokens, componentsRtl ],
