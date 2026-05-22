@@ -10,14 +10,15 @@
  * `renderDragPreview` wrapper. The outer frame has no `transform` so
  * @dnd-kit’s drop translation matches the placeholder; scale lives on
  * `__lift` (see dnd-kit #398). Owns elevation, radius, cursor, and
- * pointer pass-through. Further chrome belongs to the consumer.
+ * pointer pass-through. Further chrome belongs to the consumer. Drag
+ * elevation animates `xs` → `md` so it reads above edit tiles at `xs`.
  */
 .drag-preview-frame {
 	height: 100%;
 	border-radius: var(--wp-grid-drag-preview-radius, 0);
 	cursor: grabbing;
 	pointer-events: none;
-	box-shadow: var(--wpds-elevation-sm);
+	box-shadow: var(--wpds-elevation-md);
 }
 
 .drag-preview-frame__lift {
@@ -45,7 +46,7 @@
 		}
 
 		to {
-			box-shadow: var(--wpds-elevation-sm);
+			box-shadow: var(--wpds-elevation-md);
 		}
 	}
 
@@ -82,7 +83,7 @@
 
 	@keyframes wp-grid-drag-preview-shadow-exit {
 		from {
-			box-shadow: var(--wpds-elevation-sm);
+			box-shadow: var(--wpds-elevation-md);
 		}
 
 		to {
@@ -111,7 +112,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.drag-preview-frame {
-		box-shadow: var(--wpds-elevation-sm);
+		box-shadow: var(--wpds-elevation-md);
 	}
 
 	.drag-preview-frame__lift {
