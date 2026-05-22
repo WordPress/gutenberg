@@ -407,7 +407,6 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			resizeBaselineRef.current = null;
 			setIsResizing( false );
 			setResizeSnapPreview( null );
-
 			if ( ! onChangeLayout || ! latest ) {
 				setTemporaryLayout( undefined );
 				return;
@@ -618,9 +617,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								layoutAnimationStyles[ 'layout-animating' ],
 							className
 						) }
-						data-wp-dashboard-grid-resizing={
-							isResizing || undefined
-						}
+						data-wp-grid-dragging={ activeId || undefined }
+						data-wp-grid-resizing={ isResizing || undefined }
 						style={ {
 							...style,
 							gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
@@ -640,6 +638,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 								disabled={ ! editMode }
 								verticalResizable={ rowHeight !== 'auto' }
 								interacting={ activeId !== null || isResizing }
+								dragging={ activeId !== null }
 								onResize={ handleResize }
 								onResizeEnd={ persistTemporaryLayout }
 								resizeSnapPreview={
