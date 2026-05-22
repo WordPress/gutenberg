@@ -55,10 +55,6 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -67,12 +63,11 @@ jobs:
 
             - name: Running the tests
               env:
-                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
                   SHARD: ${{ matrix.shard }}
               run: |
                   npm run test:unit -- \
                     --ci \
-                    --maxWorkers="$MAXWORKERS" \
+                    --maxWorkers="$(nproc)" \
                     --shard="$SHARD" \
                     --cacheDirectory="$HOME/.jest-cache"
 
@@ -106,10 +101,6 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
-              id: cpu-cores
-
             - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -117,9 +108,7 @@ jobs:
               run: npx lerna run build
 
             - name: Run the date tests
-              env:
-                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
-              run: npm run test:unit:date -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --ci --maxWorkers="$(nproc)" --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
