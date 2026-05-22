@@ -60,7 +60,7 @@ const config: StorybookConfig = {
 	],
 	framework: '@storybook/react-vite',
 	features: {
-		experimentalComponentsManifest: NODE_ENV !== 'development',
+		componentsManifest: NODE_ENV !== 'development',
 	},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',
