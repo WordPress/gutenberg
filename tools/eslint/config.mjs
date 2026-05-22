@@ -369,23 +369,6 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Package source files — non-module stylesheets should be
-	// bundled through package stylesheet entry points, not runtime injected.
-	{
-		files: [
-			'packages/*/src/**/*.[tj]s?(x)',
-			'routes/**/*.[tj]s?(x)',
-			'widgets/**/*.[tj]s?(x)',
-		],
-		ignores: [
-			...developmentFiles,
-			'**/*.@(android|ios|native).[tj]s?(x)',
-		],
-		rules: {
-			'@wordpress/no-non-module-stylesheet-imports': 'error',
-		},
-	},
-
 	// Override: Package source files — forbid raw SVG elements.
 	{
 		files: [ 'packages/**/*.js' ],
@@ -415,28 +398,17 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Package src + storybook — restricted syntax + unsafe button disabled.
+	// Override: React src + storybook — stylesheet and component rules.
 	{
 		files: [
 			'packages/*/src/**/*.[tj]s?(x)',
+			'routes/**/*.[tj]s?(x)',
+			'widgets/**/*.[tj]s?(x)',
 			'storybook/stories/**/*.[tj]s?(x)',
 		],
 		ignores: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
 		rules: {
-			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-			'@wordpress/components-no-unsafe-button-disabled': 'error',
-		},
-	},
-
-	// Override: Package src (non-test, non-stories, non-native) — add 40px size prop rule.
-	{
-		files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
-		ignores: [
-			'packages/*/src/**/@(test|stories)/**',
-			'**/*.@(android|ios|native).[tj]s?(x)',
-		],
-		rules: {
-			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
 		},

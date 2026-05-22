@@ -662,11 +662,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/navigation/index.tsx": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
@@ -808,6 +803,11 @@
 	"packages/dataviews/src/dataviews/stories/free-composition.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
+		}
+	},
+	"packages/dataviews/src/dataviews/stories/index.story.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
 		}
 	},
 	"packages/dataviews/src/dataviews/stories/layout-activity.tsx": {
@@ -1517,6 +1517,9 @@
 		}
 	},
 	"packages/image-cropper/src/stories/index.story.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		},
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
@@ -1541,6 +1544,11 @@
 			"count": 1
 		}
 	},
+	"packages/media-editor/src/components/rotation-ruler/stories/index.story.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
 	"packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -1554,6 +1562,11 @@
 	"packages/media-editor/src/image-editor/react/hooks/use-interaction.ts": {
 		"react-hooks/refs": {
 			"count": 5
+		}
+	},
+	"packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
 		}
 	},
 	"packages/media-fields/src/author/view.tsx": {
@@ -1835,6 +1848,16 @@
 			"count": 1
 		},
 		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/box/index.jsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
+			"count": 1
+		}
+	},
+	"storybook/stories/playground/with-undo-redo/index.jsx": {
+		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
 	}

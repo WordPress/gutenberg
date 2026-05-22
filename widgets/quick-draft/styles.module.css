@@ -1,0 +1,22 @@
+.body {
+	height: 100%;
+}
+
+.formContainer {
+	flex: 1;
+	min-height: 0;
+}
+
+/*
+ * API gap workaround.
+ *
+ * `<DataForm>` does not accept a className and does not expose a `grow`
+ * prop on its form-level wrapper. We reach into the internal class so the
+ * form Stack stretches to fill our container, which in turn lets a
+ * `grow`-style field row absorb the remaining vertical space. Drop once
+ * `@wordpress/dataviews` exposes a public hook for this.
+ */
+.formContainer > :global(.dataforms-layouts__wrapper) {
+	flex: 1;
+	min-height: 0;
+}
