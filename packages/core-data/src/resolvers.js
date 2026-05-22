@@ -1032,10 +1032,15 @@ export const getDefaultTemplateId =
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on an actual site-settings update — `persistedEdits`
+	// is set on save responses, not on initial fetches, so distinguishing
+	// the two keeps the kickoff from invalidating its own just-resolved
+	// template id when the site record is received for the first time.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 

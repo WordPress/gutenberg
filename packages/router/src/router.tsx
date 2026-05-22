@@ -87,6 +87,31 @@ function getLocationWithQuery() {
 	return locationWithQuery;
 }
 
+/**
+ * Recognize a path against a set of route definitions. Mirrors the
+ * matching the `RouterProvider` does at render time, but is callable
+ * outside the React tree (e.g. from a pre-mount kickoff) so the same
+ * `:param` patterns can drive route-aware logic before mount.
+ *
+ * @param routes Route definitions to recognize against.
+ * @param path   Path to match (no query string).
+ * @return The first matching route's params, or `undefined` if no match.
+ */
+export function recognizePath(
+	routes: { name: string; path: string }[],
+	path: string
+): { params?: Record< string, string > } | undefined {
+	const matcher = new RouteRecognizer();
+	for ( const route of routes ) {
+		matcher.add( [ { path: route.path, handler: {} } ], {
+			as: route.name,
+		} );
+	}
+	return matcher.recognize( path )?.[ 0 ] as
+		| { params?: Record< string, string > }
+		| undefined;
+}
+
 export function useLocation() {
 	const context = useContext( RoutesContext );
 	if ( ! context ) {

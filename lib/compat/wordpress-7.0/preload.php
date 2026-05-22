@@ -21,6 +21,33 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 				}
 			);
 		}
+
+		// `getEntitiesConfig('postType')` chains into a taxonomies fetch
+		// when collaboration is enabled. Post-editor preloads this; site
+		// editor doesn't. Adding it here lets the site-editor boot
+		// kickoff fully consume from cache.
+		$paths[] = '/wp/v2/taxonomies?context=view';
+
+		// Site editor's page-edit context (`?p=/page/{id}`). Mount-time
+		// consumers of these URLs:
+		//
+		// - `post-actions/actions.js` calls
+		//   `getDefaultTemplateId({ slug: 'front-page' })` to gate
+		//   homepage-specific actions for any page.
+		// - `getPostType('page')` fires from publish panel / preview
+		//   button / others; core preloads `/wp/v2/types?context=view`
+		//   but not the per-type record.
+		//
+		// Note: core's `site-editor.php` already preloads the per-slug
+		// template lookup (`slug=page` for unnamed, `slug=page-{name}`
+		// for named) — handled in the kickoff's phase 3.
+		if (
+			isset( $context->post ) &&
+			'page' === $context->post->post_type
+		) {
+			$paths[] = '/wp/v2/templates/lookup?slug=front-page';
+			$paths[] = '/wp/v2/types/page?context=edit';
+		}
 	}
 
 	return $paths;
