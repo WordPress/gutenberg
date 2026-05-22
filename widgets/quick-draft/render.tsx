@@ -284,7 +284,7 @@ export default function QuickDraft() {
 						{ __( 'Back' ) }
 					</Button>
 				</Stack>
-				<Stack direction="column" className={ styles.listPane }>
+				<Stack direction="column">
 					<DraftsList />
 				</Stack>
 			</Stack>
