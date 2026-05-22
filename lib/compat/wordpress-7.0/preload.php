@@ -34,19 +34,18 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 		// - `post-actions/actions.js` calls
 		//   `getDefaultTemplateId({ slug: 'front-page' })` to gate
 		//   homepage-specific actions for any page.
-		// - `post-template/hooks.js` calls
-		//   `getDefaultTemplateId({ slug: 'page' })` when the page has no
-		//   slug. (For named pages it fires `page-{slug}`, already added
-		//   by core's `site-editor.php`.)
 		// - `getPostType('page')` fires from publish panel / preview
 		//   button / others; core preloads `/wp/v2/types?context=view`
 		//   but not the per-type record.
+		//
+		// Note: core's `site-editor.php` already preloads the per-slug
+		// template lookup (`slug=page` for unnamed, `slug=page-{name}`
+		// for named) — handled in the kickoff's phase 3.
 		if (
 			isset( $context->post ) &&
 			'page' === $context->post->post_type
 		) {
 			$paths[] = '/wp/v2/templates/lookup?slug=front-page';
-			$paths[] = '/wp/v2/templates/lookup?slug=page';
 			$paths[] = '/wp/v2/types/page?context=edit';
 		}
 	}

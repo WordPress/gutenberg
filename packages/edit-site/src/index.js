@@ -230,12 +230,7 @@ async function preloadResolutions() {
 				// every page being edited, to decide whether to surface
 				// homepage-specific actions. Always preloaded for the
 				// page-edit context.
-				core.getDefaultTemplateId( { slug: 'front-page' } ),
-				// `post-template/hooks.js` calls
-				// `getDefaultTemplateId({ slug: 'page' })` when the page
-				// has no slug (drafts / unnamed). For named pages it
-				// instead fires `page-{slug}` — handled in phase 3 below.
-				core.getDefaultTemplateId( { slug: 'page' } )
+				core.getDefaultTemplateId( { slug: 'front-page' } )
 			);
 		}
 		if ( tasks.length ) {
@@ -243,17 +238,19 @@ async function preloadResolutions() {
 		}
 
 		// Phase 3: the page's per-slug template lookup needs the page
-		// record from phase 2.
+		// record from phase 2. Mirrors the slug formula in
+		// `post-template/hooks.js`: `page-{slug}` for named pages,
+		// `page` for unnamed (drafts). Core's `site-editor.php`
+		// preloads the matching variant.
 		if ( pageId ) {
 			const page = coreSelect.getEntityRecord(
 				'postType',
 				'page',
 				pageId
 			);
-			if ( page?.slug ) {
-				await core.getDefaultTemplateId( {
-					slug: `page-${ page.slug }`,
-				} );
+			if ( page ) {
+				const slug = page.slug ? `page-${ page.slug }` : 'page';
+				await core.getDefaultTemplateId( { slug } );
 			}
 		}
 	} catch {
