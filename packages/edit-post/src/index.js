@@ -236,6 +236,26 @@ async function preloadResolutions( postType, postId ) {
 							postId
 						),
 						core.getAutosaves( postType, postId ),
+						// Collab notes presence probes — paired with the
+						// preload entries in `wordpress-7.0/preload.php`.
+						// The hook in `useNoteThreads` reads `totalItems`
+						// from these to drive the sidebar/floating gates
+						// without doing the full per-page comments fetch
+						// on every boot.
+						core.getEntityRecords( 'root', 'comment', {
+							post: postId,
+							type: 'note',
+							status: 'all',
+							per_page: 1,
+							_fields: 'id',
+						} ),
+						core.getEntityRecords( 'root', 'comment', {
+							post: postId,
+							type: 'note',
+							status: 'hold',
+							per_page: 1,
+							_fields: 'id',
+						} ),
 				  ]
 				: [] ),
 		] );

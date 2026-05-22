@@ -57,3 +57,37 @@ function gutenberg_block_editor_preload_paths_root_fields( $paths ) {
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_root_fields' );
+
+/**
+ * Preload the notes-presence probes for the post editor.
+ *
+ * The collab notes feature drives sidebar visibility and the
+ * floating-sidebar auto-open from two count probes:
+ *   - total note count   (`status=all`)
+ *   - unresolved count   (`status=hold`)
+ * Each is a tiny list call (`per_page=1&_fields=id`) whose
+ * `X-WP-Total` header carries the count. Preloading them keeps the
+ * boot path cache-only — the full per-page comments fetch only fires
+ * when the total count is > 0.
+ *
+ * @param array                   $paths   REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Current block editor context.
+ * @return array Filtered preload paths.
+ */
+function gutenberg_block_editor_preload_paths_notes_counts( $paths, $context ) {
+	if ( 'core/edit-post' !== $context->name || ! isset( $context->post ) ) {
+		return $paths;
+	}
+	$post_id = (int) $context->post->ID;
+	if ( ! $post_id ) {
+		return $paths;
+	}
+	$base = sprintf(
+		'/wp/v2/comments?context=edit&post=%d&type=note&per_page=1&_fields=id',
+		$post_id
+	);
+	$paths[] = $base . '&status=all';
+	$paths[] = $base . '&status=hold';
+	return $paths;
+}
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_notes_counts', 10, 2 );
