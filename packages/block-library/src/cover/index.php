@@ -156,10 +156,10 @@ function render_block_core_cover( $attributes, $content ) {
 					$aspect_ratio = $image_src[1] / $image_src[2];
 
 					if ( 'px' === $min_height_unit ) {
-						$required_width = (int) round( $min_height * $aspect_ratio );
+						$required_width = (int) round( (float) $min_height * $aspect_ratio );
 						$custom_sizes   = sprintf( '(max-width: %1$dpx) %1$dpx, 100vw', $required_width );
 					} else {
-						$required_width = round( $min_height * $aspect_ratio, 2 );
+						$required_width = round( (float) $min_height * $aspect_ratio, 2 );
 						$custom_sizes   = sprintf( 'max(100vw, %s%s)', $required_width, $min_height_unit );
 					}
 				}
