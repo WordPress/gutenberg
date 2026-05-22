@@ -14,6 +14,7 @@ import styles from './style.module.css';
 
 export default function SitePreview() {
 	const [ isIframeLoading, setIsIframeLoading ] = useState( true );
+	const [ isVisitLoading, setIsVisitLoading ] = useState( false );
 	const [ isEditLoading, setIsEditLoading ] = useState( false );
 	const siteUrl = useSelect(
 		( select ) =>
@@ -65,14 +66,28 @@ export default function SitePreview() {
 					inert="true"
 				></iframe>
 				<Stack
+					direction="row"
 					align="center"
 					justify="center"
+					gap="sm"
 					className={ styles.overlay }
 				>
 					<Button
-						className={ styles.editButton }
+						className={ styles.overlayButton }
 						variant="solid"
 						tone="neutral"
+						loading={ isVisitLoading }
+						onClick={ () => {
+							setIsVisitLoading( true );
+							window.location.href = siteUrl;
+						} }
+					>
+						{ __( 'Visit' ) }
+					</Button>
+					<Button
+						className={ styles.overlayButton }
+						variant="solid"
+						tone="brand"
 						loading={ isEditLoading }
 						onClick={ () => {
 							setIsEditLoading( true );

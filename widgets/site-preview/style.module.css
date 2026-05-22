@@ -24,7 +24,7 @@
 	opacity: 0;
 }
 
-.editButton {
+.overlayButton {
 	box-shadow: var(--wpds-elevation-xs);
 }
 
