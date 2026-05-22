@@ -167,18 +167,16 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					) : (
 						header
 					) }
+
 					<Card.Content
 						className={ clsx(
 							styles.widgetChromeContent,
-							isBodyBleeding &&
-								styles.widgetChromeContentFullBleed
+							isBodyBleeding && styles.widgetChromeContentBleed
 						) }
 					>
 						{ isBodyBleeding ? (
 							<Card.FullBleed
-								className={
-									styles.widgetChromeContentFullBleed
-								}
+								className={ styles.widgetChromeBleedScroll }
 							>
 								{ body }
 							</Card.FullBleed>
