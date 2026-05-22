@@ -17,7 +17,7 @@
 	 * once #77856 lands.
 	 * @see https://github.com/WordPress/gutenberg/pull/77856
 	 */
-	 &.widgetChromeContentFullBleed {
+	&.widgetChromeContentFullBleed {
 		padding-top: 0;
 		padding-bottom: 0;
 	}
