@@ -34,7 +34,12 @@ const SAMPLE_LAYOUT: DashboardWidget[] = [
 ];
 
 const DEFAULT_LAYOUT: DashboardWidget[] = [
-	{ uuid: 'default-hello-world-widget-instance', type: 'core/hello-world' },
+	{
+		uuid: 'default-on-this-day-widget-instance',
+		type: 'core/on-this-day',
+		attributes: { windowDays: 1 },
+		placement: { width: 2, height: 2 },
+	},
 ];
 
 describe( 'useDashboardLayout', () => {

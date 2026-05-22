@@ -30,7 +30,7 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		const PRESENTATION_VALUES = array( 'framed', 'content-bleed', 'full-bleed' );
 
 		/**
-		 * Widget type key. Namespaced identifier, e.g. `core/hello-world`.
+		 * Widget type key. Namespaced identifier, e.g. `core/on-this-day`.
 		 *
 		 * @var string
 		 */

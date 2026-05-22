@@ -1,0 +1,74 @@
+.scroll {
+	max-height: 360px;
+	overflow: auto;
+}
+
+.windowRow {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	gap: 8px;
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.range {
+	width: 100%;
+	margin: 0;
+	accent-color: var(--wp-admin-theme-color, #3858e9);
+}
+
+.yearHeading {
+	margin: 12px 0 4px;
+}
+
+.postBlock {
+	padding: 8px 0 12px;
+}
+
+.postMeta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	margin-top: 4px;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.thumbnail {
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+	background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.thumbnail img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.metaSep {
+	color: color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.categories {
+	min-width: 0;
+	color: color-mix(in srgb, currentColor 55%, transparent);
+	font-size: 12px;
+	line-height: 1.5;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
