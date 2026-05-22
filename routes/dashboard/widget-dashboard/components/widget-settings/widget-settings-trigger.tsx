@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { settings as settingsIcon } from '@wordpress/icons';
+import { cog } from '@wordpress/icons';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { IconButton } from '@wordpress/ui';
@@ -52,17 +52,17 @@ export function WidgetSettingsTrigger( {
 
 	const open = useCallback(
 		( event: React.MouseEvent< HTMLElement > ) => {
-			// Open the drawer on the side away from the widget so it stays
-			// visible. Measure the widget's own box (the gear sits at its
-			// corner, so using the gear would bias the result toward the
-			// left), and weigh its center against the midpoint of the usable
-			// content area — which starts after the admin menu, not at the
-			// raw viewport edge. A widget past that midpoint opens a left
-			// drawer, and vice versa.
+			// Open the drawer on the side away from the widget: compare the
+			// tile's center against the midpoint of the usable content area
+			// (which starts after the admin menu). Past it opens left.
 			const adminMenuInset = getAdminMenuInset();
-			const widgetBox = event.currentTarget.closest( 'section' );
+			// The gear sits in the grid slot, outside the card, so reach the
+			// tile via the grid item's data hook.
+			const tile = event.currentTarget.closest(
+				'[data-wp-grid-item-key]'
+			);
 			const rect = (
-				widgetBox ?? event.currentTarget
+				tile ?? event.currentTarget
 			).getBoundingClientRect();
 			const widgetCenter = rect.left + rect.width / 2;
 			const contentCenter = ( adminMenuInset + window.innerWidth ) / 2;
@@ -88,7 +88,7 @@ export function WidgetSettingsTrigger( {
 
 	return (
 		<IconButton
-			icon={ settingsIcon }
+			icon={ cog }
 			label={ getWidgetSettingsTitle( widgetType ) }
 			variant="minimal"
 			tone="neutral"

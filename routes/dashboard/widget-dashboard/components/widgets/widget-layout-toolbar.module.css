@@ -1,0 +1,4 @@
+/* Solid surface: shown for the whole customize session, not on hover. */
+.widgetLayoutToolbar {
+	background: var(--wpds-color-bg-surface-neutral-strong);
+}

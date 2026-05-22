@@ -26,7 +26,6 @@ import { Card, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
-import { WidgetSettingsTrigger } from '../widget-settings';
 import styles from './widget-chrome.module.css';
 import type { DashboardWidget, WidgetType } from '../../types';
 
@@ -73,42 +72,27 @@ function LoadingOverlay() {
 interface HeaderProps {
 	titleId: string;
 	widgetType: WidgetType;
-	actions?: ReactNode;
 }
 
-function Header( { titleId, widgetType, actions }: HeaderProps ) {
-	if ( ! widgetType.title && ! actions ) {
+function Header( { titleId, widgetType }: HeaderProps ) {
+	if ( ! widgetType.title ) {
 		return null;
 	}
 
 	return (
 		<Card.Header>
-			<Stack
-				direction="row"
-				align="center"
-				justify="space-between"
-				gap="sm"
-			>
-				<Stack direction="row" align="center" gap="sm">
-					{ widgetType.icon && (
-						<span
-							className={ styles.widgetChromeHeaderIcon }
-							aria-hidden="true"
-						>
-							<WCIcon icon={ widgetType.icon } />
-						</span>
-					) }
-					{ widgetType.title && (
-						<Card.Title id={ titleId } render={ <h3 /> }>
-							{ widgetType.title }
-						</Card.Title>
-					) }
-				</Stack>
-				{ actions && (
-					<Stack className={ styles.widgetChromeHeaderActions }>
-						{ actions }
-					</Stack>
+			<Stack direction="row" align="center" gap="sm">
+				{ widgetType.icon && (
+					<span
+						className={ styles.widgetChromeHeaderIcon }
+						aria-hidden="true"
+					>
+						<WCIcon icon={ widgetType.icon } />
+					</span>
 				) }
+				<Card.Title id={ titleId } render={ <h3 /> }>
+					{ widgetType.title }
+				</Card.Title>
 			</Stack>
 		</Card.Header>
 	);
@@ -151,19 +135,6 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 		if ( ! widgetType ) {
 			return null;
 		}
-
-		// Per-instance settings live in normal mode only: during a layout
-		// edit the card is inert and the toolbar owns the staging buffer,
-		// so the trigger stays hidden to keep the two flows from staging at
-		// once.
-		const hasSettings = ! editMode && !! widgetType.attributes?.length;
-
-		const settingsControl = hasSettings ? (
-			<WidgetSettingsTrigger
-				widget={ widget }
-				widgetType={ widgetType }
-			/>
-		) : null;
 
 		// `presentation` encodes two independent axes. `full-bleed` hides
 		// the header; both `full-bleed` and `content-bleed` let the body
@@ -213,12 +184,6 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 							body
 						) }
 					</Card.Content>
-
-					{ isBodyBleeding && settingsControl && (
-						<Stack className={ styles.widgetChromeSettingsOverlay }>
-							{ settingsControl }
-						</Stack>
-					) }
 				</Card.Root>
 			</WidgetContextProvider>
 		);
