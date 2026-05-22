@@ -42,6 +42,8 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
+import { isGifVariation } from './variations';
+import GifRestoreControl from './gif-restore-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -52,9 +54,11 @@ function VideoEdit( {
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
+	clientId,
 } ) {
 	const videoPlayer = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
+	const isGif = isGifVariation( attributes );
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockEditingMode = useBlockEditingMode();
@@ -73,6 +77,17 @@ function VideoEdit( {
 			videoPlayer.current.load();
 		}
 	}, [ poster ] );
+
+	// The GIF variation plays like an animated GIF in the editor (the playback
+	// attributes are applied to the preview <video> below). Regular videos do
+	// not autoplay in the editor, so only nudge GIFs into playing after a
+	// source change in case the muted autoplay did not start on its own.
+	useEffect( () => {
+		if ( isGif ) {
+			// Browsers allow muted videos to be played programmatically.
+			videoPlayer.current?.play().catch( () => {} );
+		}
+	}, [ isGif, src, poster ] );
 
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
@@ -202,6 +217,12 @@ function VideoEdit( {
 							variant="toolbar"
 						/>
 					</BlockControls>
+					{ isGif && (
+						<GifRestoreControl
+							attributes={ attributes }
+							clientId={ clientId }
+						/>
+					) }
 				</>
 			) }
 			<InspectorControls>
@@ -246,6 +267,10 @@ function VideoEdit( {
 						poster={ poster }
 						src={ src || temporaryURL }
 						ref={ videoPlayer }
+						autoPlay={ isGif }
+						loop={ isGif }
+						muted={ isGif }
+						playsInline={ isGif }
 					>
 						<Tracks tracks={ tracks } />
 					</video>
