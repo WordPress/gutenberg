@@ -201,9 +201,24 @@ async function preloadResolutions() {
 						core.getDefaultTemplateId( { slug: 'home' } ),
 				  ]
 				: [] ),
+			...( pageId
+				? [
+						core.getEntityRecord( 'postType', 'page', pageId ),
+						// `getPostType( getEditedPostAttribute( 'type' ) )`
+						// fires across many post-editor components
+						// (publish panel, preview button, ...).
+						core.getPostType( 'page' ),
+						// `shouldShowHomepageActions` in
+						// `post-actions/actions.js` calls
+						// `getDefaultTemplateId({ slug: 'front-page' })`
+						// for every page being edited, to decide whether
+						// to surface homepage-specific actions.
+						core.getDefaultTemplateId( { slug: 'front-page' } ),
+				  ]
+				: [] ),
 		] );
 
-		// Phase 2: theme-derived resolvers that need phase-1 state.
+		// Phase 2: derived resolvers that need phase-1 state.
 		const tasks = [];
 		const globalStylesId =
 			coreSelect.__experimentalGetCurrentGlobalStylesId();
@@ -215,22 +230,6 @@ async function preloadResolutions() {
 					name: 'globalStyles',
 					id: globalStylesId,
 				} )
-			);
-		}
-		if ( pageId ) {
-			tasks.push(
-				core.getEntityRecord( 'postType', 'page', pageId ),
-				// `getPostType( getEditedPostAttribute( 'type' ) )` fires
-				// across many post-editor components (publish panel,
-				// preview button, ...). Kicked off here so it's served
-				// from the preload cache on first mount.
-				core.getPostType( 'page' ),
-				// `shouldShowHomepageActions` in `post-actions/actions.js`
-				// calls `getDefaultTemplateId({ slug: 'front-page' })` for
-				// every page being edited, to decide whether to surface
-				// homepage-specific actions. Always preloaded for the
-				// page-edit context.
-				core.getDefaultTemplateId( { slug: 'front-page' } )
 			);
 		}
 		if ( tasks.length ) {

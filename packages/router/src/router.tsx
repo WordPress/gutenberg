@@ -107,7 +107,9 @@ export function recognizePath(
 			as: route.name,
 		} );
 	}
-	return matcher.recognize( path )?.[ 0 ];
+	return matcher.recognize( path )?.[ 0 ] as
+		| { params?: Record< string, string > }
+		| undefined;
 }
 
 export function useLocation() {
