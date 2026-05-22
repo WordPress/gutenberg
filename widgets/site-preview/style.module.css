@@ -10,12 +10,12 @@
 
 .iframe {
 	position: absolute;
-	inset-block-start: 50%;
+	inset-block-start: 0;
 	inset-inline-start: 50%;
 	width: 250%;
 	min-height: 375%;
-	transform: translate(-50%, -50%) scale(0.4);
-	transform-origin: center center;
+	transform: translate(-50%, -13px) scale(0.4);
+	transform-origin: center top;
 }
 
 .overlay {
@@ -36,7 +36,7 @@
 	}
 
 	.previewWrap:hover .iframe {
-		transform: translate(-50%, -50%) scale(0.42);
+		transform: translate(-50%, -13px) scale(0.42);
 	}
 
 	.overlay {
