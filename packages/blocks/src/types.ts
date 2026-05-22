@@ -135,7 +135,7 @@ export interface BlockVariation<
  * Block attribute definition.
  */
 export interface BlockAttribute {
-	type?: string;
+	type?: string | string[];
 	source?: string;
 	selector?: string;
 	attribute?: string;

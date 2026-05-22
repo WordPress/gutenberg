@@ -254,6 +254,7 @@ export const WithModal = ( {
 			<Stack direction="row" justify="left" gap="sm">
 				<Button
 					variant="primary"
+					__next40pxDefaultSize
 					onClick={ () => setIsModalOpen( true ) }
 				>
 					Open Picker Modal
@@ -262,6 +263,7 @@ export const WithModal = ( {
 					onClick={ () => setSelectedItems( [] ) }
 					disabled={ ! selectedItems.length }
 					accessibleWhenDisabled
+					__next40pxDefaultSize
 				>
 					Clear Selection
 				</Button>

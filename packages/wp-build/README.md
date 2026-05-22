@@ -549,6 +549,7 @@ widgets/
     widget.ts       # Runtime schema entry point (optional)
     render.tsx      # UI component entry point (optional)
     render.scss     # Optional styles (bundled inline when imported from render.tsx)
+    package.json    # Optional npm dependencies manifest
 ```
 
 ### Why two entries?
