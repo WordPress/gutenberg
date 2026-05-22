@@ -23,8 +23,8 @@
     border (default `solid`).
 -   Add `--wp-grid-drag-preview-radius` so consumers can round the
     drag-preview functional frame without targeting package internals.
--   Animate drag preview `box-shadow` from resting `sm` to `lg` (same
-    motion tokens as scale) and apply static `lg` when reduced motion
+-   Animate drag preview `box-shadow` from resting `xs` to `sm` (same
+    motion tokens as scale) and apply static `sm` when reduced motion
     is requested, on the `.drag-preview-frame` wrapper (both surfaces).
     On drop, compose `@dnd-kit/core`'s default `DragOverlay` animation
     with a frame exit transition (scale + shadow back to resting) so

@@ -26,8 +26,8 @@
  * Functional frame for the drag-preview clone inside `<DragOverlay>`.
  * Always applied, including when the consumer passes a
  * `renderDragPreview` wrapper. Owns the lift cue (`scale` with motion
- * tokens), drag elevation (`box-shadow` animating from resting `sm` to
- * `lg`), optional corner radius via `--wp-grid-drag-preview-radius`, the
+ * tokens), drag elevation (`box-shadow` animating from resting `xs` to
+ * `sm`), optional corner radius via `--wp-grid-drag-preview-radius`, the
  * pointer feedback (`cursor`), and the pointer pass-through during the
  * gesture. Further visual chrome (padding, inner surfaces) belongs
  * to the consumer, either on the children passed to <DashboardLanes />
@@ -38,18 +38,31 @@
 	border-radius: var(--wp-grid-drag-preview-radius, 0);
 	cursor: grabbing;
 	pointer-events: none;
-	box-shadow: var(--wpds-elevation-lg);
+	box-shadow: var(--wpds-elevation-sm);
 	transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
 
 	@media not (prefers-reduced-motion: reduce) {
-		@starting-style {
-			box-shadow: var(--wpds-elevation-sm);
+		/*
+		 * Keyframes (not @starting-style) so each DragOverlay mount
+		 * reliably runs xs → sm; var() box-shadow pairs can fail to
+		 * interpolate in entry transitions.
+		 */
+		animation: wp-grid-drag-preview-enter var(--wpds-motion-duration-sm)
+			var(--wpds-motion-easing-balanced) both;
+	}
+}
+
+@media not (prefers-reduced-motion: reduce) {
+	@keyframes wp-grid-drag-preview-enter {
+		from {
+			box-shadow: var(--wpds-elevation-xs);
 			transform: scale(1);
 		}
 
-		transition:
-			transform var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced),
-			box-shadow var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced);
+		to {
+			box-shadow: var(--wpds-elevation-sm);
+			transform: scale(var(--wp-grid-drag-preview-scale, 1.05));
+		}
 	}
 }
 
@@ -59,8 +72,9 @@
  * `createDashboardDragDropAnimation` (200ms / md token).
  */
 .drag-preview-frame.dragPreviewFrameExiting {
+	animation: none;
 	transform: scale(1);
-	box-shadow: var(--wpds-elevation-sm);
+	box-shadow: var(--wpds-elevation-xs);
 	transition:
 		transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced),
 		box-shadow var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
@@ -68,13 +82,13 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.drag-preview-frame {
-		box-shadow: var(--wpds-elevation-lg);
+		box-shadow: var(--wpds-elevation-sm);
 		transform: none;
 		transition: none;
 	}
 
 	.drag-preview-frame.dragPreviewFrameExiting {
-		box-shadow: var(--wpds-elevation-sm);
+		box-shadow: var(--wpds-elevation-xs);
 		transition: none;
 	}
 }

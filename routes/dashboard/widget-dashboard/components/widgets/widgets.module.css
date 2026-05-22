@@ -11,12 +11,12 @@
 }
 
 .tileEditMode {
-	box-shadow: var(--wpds-elevation-sm);
+	box-shadow: var(--wpds-elevation-xs);
 }
 
 .tileEditMode:hover,
 .tileEditMode:focus-visible {
-	box-shadow: var(--wpds-elevation-md);
+	box-shadow: var(--wpds-elevation-sm);
 }
 
 /*
@@ -27,7 +27,7 @@
  */
 :global([data-wp-grid-resizing]) .tileEditMode:hover,
 :global([data-wp-grid-resizing]) .tileEditMode:focus-visible {
-	box-shadow: var(--wpds-elevation-sm);
+	box-shadow: var(--wpds-elevation-xs);
 }
 
 .tileEditMode:focus-visible {
@@ -40,7 +40,7 @@
  * `height: 100%` keeps the inner `.tile` height: 100% chain alive
  * (without it, the wrapper auto-sizes and the cloned tile collapses
  * to content height). Drag elevation is owned by the grid
- * `.drag-preview-frame` (`lg` while dragging); strip the cloned tile shadow so it
+ * `.drag-preview-frame` (`sm` while dragging); strip the cloned tile shadow so it
  * does not stack on the frame.
  */
 .dragPreview {
