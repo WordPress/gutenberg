@@ -70,6 +70,7 @@ export default function SitePreview() {
 					className={ styles.overlay }
 				>
 					<Button
+						className={ styles.editButton }
 						variant="solid"
 						tone="neutral"
 						loading={ isEditLoading }

@@ -24,6 +24,10 @@
 	opacity: 0;
 }
 
+.editButton {
+	box-shadow: var(--wpds-elevation-xs);
+}
+
 .previewWrap:hover .overlay {
 	opacity: 1;
 }
