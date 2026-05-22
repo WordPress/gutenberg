@@ -1,12 +1,13 @@
 <?php
 
 /**
- * Tests for the animated GIF → video render-time swap.
+ * Tests for animated GIF → video companion-file cleanup.
  *
  * An uploaded animated GIF stays a normal image attachment; a converted video
  * and a static poster are sideloaded as companion files (recorded in attachment
- * metadata) and the GIF `<img>` is swapped for a `<video>` at render time, but
- * only for top-level Image blocks. See lib/media/animated-gif-to-video.php.
+ * metadata). The swap to a video happens in the editor (the Video block's "GIF"
+ * variation), so the only PHP responsibility is removing those companions when
+ * the attachment is deleted. See lib/media/animated-gif-to-video.php.
  */
 class Animated_Gif_To_Video_Test extends WP_UnitTestCase {
 	/**
@@ -66,140 +67,57 @@ class Animated_Gif_To_Video_Test extends WP_UnitTestCase {
 		return $attachment_id;
 	}
 
-	private function image_block_html( int $attachment_id ): string {
-		return sprintf(
-			'<figure class="wp-block-image size-large"><img class="wp-image-%1$d" src="%2$s" alt="A cat"/></figure>',
-			$attachment_id,
-			esc_url( wp_get_attachment_url( $attachment_id ) )
-		);
-	}
-
 	/**
-	 * @covers ::gutenberg_mark_animated_gif_for_video_swap
-	 */
-	public function test_marks_top_level_image_with_companion_video() {
-		$attachment_id = $this->create_gif_attachment();
-		$block         = array(
-			'blockName' => 'core/image',
-			'attrs'     => array( 'id' => $attachment_id ),
-		);
-		$instance      = new WP_Block( $block );
-
-		$output = gutenberg_mark_animated_gif_for_video_swap(
-			$this->image_block_html( $attachment_id ),
-			$block,
-			$instance
-		);
-
-		$this->assertStringContainsString( 'data-gutenberg-gif-swap', $output );
-	}
-
-	/**
-	 * @covers ::gutenberg_mark_animated_gif_for_video_swap
-	 */
-	public function test_does_not_mark_when_author_opted_out() {
-		$attachment_id = $this->create_gif_attachment();
-		$block         = array(
-			'blockName' => 'core/image',
-			'attrs'     => array(
-				'id'                  => $attachment_id,
-				'preserveAnimatedGif' => true,
-			),
-		);
-		$instance      = new WP_Block( $block );
-
-		$output = gutenberg_mark_animated_gif_for_video_swap(
-			$this->image_block_html( $attachment_id ),
-			$block,
-			$instance
-		);
-
-		$this->assertStringNotContainsString( 'data-gutenberg-gif-swap', $output );
-	}
-
-	/**
-	 * Images nested in a Gallery carry the galleryId context and must be left
-	 * as GIFs so gallery layout, lightbox and captions are unaffected.
+	 * The companion path is rebuilt from the attachment's own directory plus
+	 * the recorded basename.
 	 *
-	 * @covers ::gutenberg_mark_animated_gif_for_video_swap
+	 * @covers ::gutenberg_get_animated_gif_companion_path
 	 */
-	public function test_does_not_mark_gallery_inner_image() {
+	public function test_companion_path_resolves_inside_attachment_directory() {
 		$attachment_id = $this->create_gif_attachment();
-		$block         = array(
-			'blockName' => 'core/image',
-			'attrs'     => array( 'id' => $attachment_id ),
-		);
-		$instance      = new WP_Block( $block, array( 'galleryId' => 123 ) );
+		$dir           = dirname( get_attached_file( $attachment_id, true ) );
 
-		$output = gutenberg_mark_animated_gif_for_video_swap(
-			$this->image_block_html( $attachment_id ),
-			$block,
-			$instance
+		$this->assertSame(
+			$dir . '/animated-test-video.mp4',
+			gutenberg_get_animated_gif_companion_path( $attachment_id, 'animated_video' )
 		);
-
-		$this->assertStringNotContainsString( 'data-gutenberg-gif-swap', $output );
+		$this->assertSame(
+			$dir . '/animated-test-poster.jpg',
+			gutenberg_get_animated_gif_companion_path( $attachment_id, 'animated_video_poster' )
+		);
 	}
 
 	/**
-	 * @covers ::gutenberg_mark_animated_gif_for_video_swap
+	 * Only the basename of the recorded value is trusted, so a path traversal
+	 * in the metadata cannot escape the attachment's directory.
+	 *
+	 * @covers ::gutenberg_get_animated_gif_companion_path
 	 */
-	public function test_does_not_mark_image_without_companion_video() {
+	public function test_companion_path_ignores_directory_traversal() {
+		$attachment_id = $this->create_gif_attachment( false );
+		$dir           = dirname( get_attached_file( $attachment_id, true ) );
+
+		$metadata                   = wp_get_attachment_metadata( $attachment_id, true );
+		$metadata['animated_video'] = '../../evil.mp4';
+		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		$this->assertSame(
+			$dir . '/evil.mp4',
+			gutenberg_get_animated_gif_companion_path( $attachment_id, 'animated_video' )
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_get_animated_gif_companion_path
+	 */
+	public function test_companion_path_is_null_without_companion() {
 		$attachment_id = self::factory()->attachment->create_upload_object(
 			DIR_TESTDATA . '/images/canola.jpg'
 		);
-		$block         = array(
-			'blockName' => 'core/image',
-			'attrs'     => array( 'id' => $attachment_id ),
+
+		$this->assertNull(
+			gutenberg_get_animated_gif_companion_path( $attachment_id, 'animated_video' )
 		);
-		$instance      = new WP_Block( $block );
-
-		$output = gutenberg_mark_animated_gif_for_video_swap(
-			$this->image_block_html( $attachment_id ),
-			$block,
-			$instance
-		);
-
-		$this->assertStringNotContainsString( 'data-gutenberg-gif-swap', $output );
-	}
-
-	/**
-	 * @covers ::gutenberg_swap_animated_gif_for_video
-	 */
-	public function test_swaps_marked_image_for_video_with_poster() {
-		$attachment_id = $this->create_gif_attachment();
-		$img           = sprintf(
-			'<img class="wp-image-%1$d" src="%2$s" alt="A cat" data-gutenberg-gif-swap="1" />',
-			$attachment_id,
-			esc_url( wp_get_attachment_url( $attachment_id ) )
-		);
-
-		$output = gutenberg_swap_animated_gif_for_video( $img, 'the_content', $attachment_id );
-
-		$this->assertStringContainsString( '<video', $output );
-		$this->assertStringContainsString( 'autoplay loop muted playsinline', $output );
-		$this->assertStringContainsString( 'animated-test-video.mp4', $output );
-		$this->assertStringContainsString( 'type="video/mp4"', $output );
-		// The accessible name carries over and the lightweight poster is used.
-		$this->assertStringContainsString( 'aria-label="A cat"', $output );
-		$this->assertStringContainsString( 'animated-test-poster.jpg', $output );
-		// The internal marker never leaks into the output.
-		$this->assertStringNotContainsString( 'data-gutenberg-gif-swap', $output );
-	}
-
-	/**
-	 * @covers ::gutenberg_swap_animated_gif_for_video
-	 */
-	public function test_does_not_swap_unmarked_image() {
-		$attachment_id = $this->create_gif_attachment();
-		$img           = sprintf(
-			'<img class="wp-image-%1$d" src="%2$s" alt="A cat" />',
-			$attachment_id,
-			esc_url( wp_get_attachment_url( $attachment_id ) )
-		);
-
-		$output = gutenberg_swap_animated_gif_for_video( $img, 'the_content', $attachment_id );
-
-		$this->assertSame( $img, $output );
 	}
 
 	/**
