@@ -662,16 +662,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/navigation/index.tsx": {
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
-	"packages/components/src/navigation/stories/index.story.tsx": {
-		"@wordpress/no-non-module-stylesheet-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2

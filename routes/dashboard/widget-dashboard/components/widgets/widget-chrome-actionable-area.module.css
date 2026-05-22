@@ -6,4 +6,6 @@
 	padding: var(--wpds-dimension-padding-xs);
 	background: var(--wpds-color-bg-surface-neutral-strong);
 	border-radius: var(--wpds-border-radius-md);
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	box-shadow: var(--wpds-elevation-xs);
 }

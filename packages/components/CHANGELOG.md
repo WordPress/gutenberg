@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Navigation`: Completely remove deprecated component ([#78529](https://github.com/WordPress/gutenberg/pull/78529)).
 -   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
     -   Removed the `is-dismissible` class name on the root wrapper.
     -   Moved the `.components-notice__actions` wrapper as a sibling of `.components-notice__content` (it was previously nested inside it).
