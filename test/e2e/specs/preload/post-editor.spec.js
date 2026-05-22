@@ -30,6 +30,19 @@ test.describe( 'Preload', () => {
 		editor,
 	} ) => {
 		const { requests, stop } = recordRequests( page );
+		const { requests: requestsUntilMount, stop: stopOnMount } =
+			recordRequests( page );
+
+		// Mount boundary. `clearPreloadedData` warns if any preload
+		// entry went unused, logs the success line otherwise.
+		let preloadStatus;
+		page.on( 'console', ( msg ) => {
+			const text = msg.text();
+			if ( text.startsWith( '[api-fetch][preload] ' ) ) {
+				preloadStatus = text;
+				stopOnMount();
+			}
+		} );
 
 		await admin.editPost( postId );
 		// Ensure the document sidebar is open — its default state isn't
@@ -50,6 +63,19 @@ test.describe( 'Preload', () => {
 		await page.waitForLoadState( 'networkidle' );
 		stop();
 
+		// Only collab side effects (CRDT save + first wp-sync poll)
+		// should escape before mount — they're detached promise chains
+		// off `receiveEntityRecords`.
+		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
+			[
+				`POST /wp/v2/posts/${ postId }`,
+				'POST /wp-sync/v1/updates',
+			].sort()
+		);
+		// Every preloaded path should be consumed by the kickoff.
+		expect( preloadStatus ).toBe(
+			'[api-fetch][preload] All preloads consumed.'
+		);
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
 		// fires twice within the captured window; the duplicate count
 		// isn't stable across runs, so this assertion deduplicates.
@@ -58,12 +84,10 @@ test.describe( 'Preload', () => {
 			[
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
 				'GET /wp/v2/taxonomies?context=edit&per_page=100',
-				'GET /wp/v2/taxonomies?context=view',
 				'GET /wp/v2/templates/lookup?slug=front-page',
 				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
 				'OPTIONS /wp/v2/posts',
-				'OPTIONS /wp/v2/settings',
 				`POST /wp/v2/posts/${ postId }`,
 				'POST /wp-sync/v1/updates',
 				'POST /wp/v2/users/me',

@@ -1,7 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { useCallback, useEffect, useRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import { useCropper } from '../image-editor';
+import { useMediaEditor } from '../state';
 
 /**
  * Data attribute applied to crop control wrappers. The modal's keyboard
@@ -11,27 +16,26 @@ import { useCropper } from '../image-editor';
  */
 export const CROP_CONTROL_ATTR = 'data-crop-control';
 
+/** Idle window used to group repeated keyboard input into one gesture. */
+const KEYBOARD_GESTURE_IDLE_MS = 300;
+
 export interface UseCropGestureHandlersOptions {
 	/**
-	 * When `true` (default), key-up triggers an immediate history commit so
-	 * each discrete keypress becomes its own undo step. Set to `false` for
+	 * When `true` (default), key-up closes the gesture so each
+	 * discrete keypress becomes its own undo step. Set to `false` for
 	 * continuous-input controls (e.g. the rotation ruler) where rapid
-	 * keypresses should coalesce into a single history entry via the
-	 * state-change debounce.
+	 * keypresses should coalesce into a single history entry across
+	 * the whole gesture.
 	 */
 	commitOnKeyUp?: boolean;
 }
 
 /**
- * Returns event handler props to spread onto a wrapper element around a
- * crop control. Marks the wrapper as a crop control (via `data-crop-control`)
- * so the modal's Cmd+Z handler can identify it, and wires up immediate-flush
- * signals on pointer-up and (optionally) key-up so history is committed as
- * soon as the user releases rather than waiting for the debounce window to
- * expire.
- *
- * The history entry itself is recorded by the state-change debounce in
- * `useCropperState` — no explicit gesture-start signal is needed.
+ * Event handler props to spread onto a wrapper element around a crop
+ * control. Marks the wrapper as a crop control (via `data-crop-control`)
+ * so the modal's Cmd+Z handler can identify it, and wires gesture
+ * boundaries on the composite store so a slider drag becomes a single
+ * undo entry rather than one per tick.
  *
  * Usage:
  *   const gestureHandlers = useCropGestureHandlers();
@@ -45,10 +49,53 @@ export function useCropGestureHandlers(
 	options: UseCropGestureHandlersOptions = {}
 ) {
 	const { commitOnKeyUp = true } = options;
-	const { commitHistory } = useCropper();
+	const { beginGesture, endGesture } = useMediaEditor();
+	const keyboardTimerRef = useRef< ReturnType< typeof setTimeout > >();
+
+	const clearKeyboardTimer = useCallback( () => {
+		clearTimeout( keyboardTimerRef.current );
+	}, [] );
+
+	const scheduleKeyboardEnd = useCallback( () => {
+		clearKeyboardTimer();
+		keyboardTimerRef.current = setTimeout( () => {
+			endGesture();
+		}, KEYBOARD_GESTURE_IDLE_MS );
+	}, [ clearKeyboardTimer, endGesture ] );
+
+	useEffect( () => clearKeyboardTimer, [ clearKeyboardTimer ] );
+
+	const handlePointerDownCapture = useCallback( () => {
+		clearKeyboardTimer();
+		beginGesture();
+	}, [ beginGesture, clearKeyboardTimer ] );
+
+	const handlePointerEnd = useCallback( () => {
+		clearKeyboardTimer();
+		endGesture();
+	}, [ clearKeyboardTimer, endGesture ] );
+
+	const handleKeyDownCapture = useCallback( () => {
+		beginGesture();
+		if ( ! commitOnKeyUp ) {
+			scheduleKeyboardEnd();
+		}
+	}, [ beginGesture, commitOnKeyUp, scheduleKeyboardEnd ] );
+
+	const handleKeyUp = useCallback( () => {
+		if ( commitOnKeyUp ) {
+			endGesture();
+			return;
+		}
+		scheduleKeyboardEnd();
+	}, [ commitOnKeyUp, endGesture, scheduleKeyboardEnd ] );
+
 	return {
 		[ CROP_CONTROL_ATTR ]: true,
-		onPointerUp: commitHistory,
-		...( commitOnKeyUp ? { onKeyUp: commitHistory } : {} ),
+		onPointerDownCapture: handlePointerDownCapture,
+		onPointerUp: handlePointerEnd,
+		onPointerCancel: handlePointerEnd,
+		onKeyDownCapture: handleKeyDownCapture,
+		onKeyUp: handleKeyUp,
 	};
 }

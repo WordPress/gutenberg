@@ -48,7 +48,7 @@ const Context = createContext< DashboardUIContextValue | null >( null );
 
 /**
  * UI-state hook used by the inserter modal and any compound that needs to
- * open or close it (today: the "Add widgets" trigger in `Actions`).
+ * open or close it (today: the "Add widget" trigger in `Actions`).
  *
  * Throws when called outside `WidgetDashboard` so misuse fails loudly during
  * development.

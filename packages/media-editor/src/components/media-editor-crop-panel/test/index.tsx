@@ -8,7 +8,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
-import { CropperProvider } from '../../../image-editor';
+import { MediaEditorStateProvider } from '../../../state';
 
 function setupCropPanel(
 	overrides: Partial< MediaEditorCropPanelProps > = {}
@@ -27,9 +27,9 @@ function setupCropPanel(
 	};
 
 	render(
-		<CropperProvider>
+		<MediaEditorStateProvider>
 			<MediaEditorCropPanel { ...props } />
-		</CropperProvider>
+		</MediaEditorStateProvider>
 	);
 
 	return props;

@@ -40,7 +40,11 @@ export const InsideComponentsModal = {
 		const [ isOpen, setIsOpen ] = useState( false );
 		return (
 			<>
-				<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+				<Button
+					variant="primary"
+					onClick={ () => setIsOpen( true ) }
+					__next40pxDefaultSize
+				>
 					Open `@wordpress/components` Modal
 				</Button>
 				{ isOpen && (
@@ -131,6 +135,7 @@ export const InsideComponentsPopover = {
 					ref={ setAnchor }
 					variant="primary"
 					onClick={ () => setIsOpen( ( v ) => ! v ) }
+					__next40pxDefaultSize
 				>
 					Toggle `@wordpress/components` Popover
 				</Button>
