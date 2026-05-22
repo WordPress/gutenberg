@@ -29,7 +29,7 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
  */
 import { DraftsList, ExistingDraftPrompt, SavedPost } from './components';
 import { QuickDraftContentField } from './fields';
-import { useDisplayMode } from './hooks';
+import { useWidgetSize } from './hooks';
 import styles from './styles.module.css';
 
 /*
@@ -96,7 +96,7 @@ export default function QuickDraft() {
 	const [ hasDismissedPrompt, setHasDismissedPrompt ] = useState( false );
 	const [ isListOpenInCompact, setIsListOpenInCompact ] = useState( false );
 
-	const { ref, mode } = useDisplayMode();
+	const { ref, isWide, isTall } = useWidgetSize();
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 
@@ -190,7 +190,7 @@ export default function QuickDraft() {
 	/*
 	 * The single most relevant state for the tile: loading, the
 	 * already-saved-today prompt, the post-save confirmation, or the form.
-	 * Composed with the drafts list below according to the display mode.
+	 * Composed with the drafts list according to the room the tile has.
 	 */
 	let primary: ReactNode;
 	if ( isLoadingDrafts ) {
@@ -254,8 +254,18 @@ export default function QuickDraft() {
 		);
 	}
 
-	// Compact tile with the list opened in place: swap the primary pane out.
-	if ( mode === 'compact' && isListOpenInCompact ) {
+	/*
+	 * Whether there is room to show the drafts list inline, and how to place it.
+	 * The list needs vertical room ( `isTall` ) to be worth showing in any
+	 * arrangement; given that, a wide tile sets it beside the form, otherwise it
+	 * stacks below. A wide-but-short tile stays compact, since `isTall` gates
+	 * both arrangements.
+	 */
+	const showDraftsList = isTall;
+	const listBeside = isWide;
+
+	// No room for the list inline, but it was revealed in place from compact.
+	if ( ! showDraftsList && isListOpenInCompact ) {
 		return (
 			<Stack
 				ref={ ref }
@@ -282,7 +292,7 @@ export default function QuickDraft() {
 	}
 
 	// Compact tile: primary pane plus a link that reveals the drafts list.
-	if ( mode === 'compact' ) {
+	if ( ! showDraftsList ) {
 		return (
 			<Stack ref={ ref } direction="column" className={ styles.body }>
 				<Stack direction="column" className={ styles.primaryPane }>
@@ -306,12 +316,15 @@ export default function QuickDraft() {
 		);
 	}
 
-	// Wide (row) or tall (column) tile: show the drafts list alongside.
+	// Room for the list: beside the form when wide, otherwise stacked below.
 	return (
 		<Stack
 			ref={ ref }
-			direction={ mode === 'row' ? 'row' : 'column' }
-			className={ clsx( styles.body, styles[ mode ] ) }
+			direction={ listBeside ? 'row' : 'column' }
+			className={ clsx(
+				styles.body,
+				listBeside ? styles.row : styles.column
+			) }
 		>
 			<Stack direction="column" className={ styles.primaryPane }>
 				{ primary }
