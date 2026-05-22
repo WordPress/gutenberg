@@ -27,6 +27,16 @@
 	flex: 1;
 	height: 100%;
 	overflow-y: auto;
+
+	/*
+	 * As a flex item, the content area defaults to `min-height: auto`, which
+	 * lets tall widget content expand it past the height the card allots
+	 * instead of staying bounded. Pinning the min sizes to 0 keeps the area
+	 * within its slot so a widget's own `overflow` scrolls internally rather
+	 * than pushing past the card.
+	 */
+	min-width: 0;
+	min-height: 0;
 }
 
 /*
