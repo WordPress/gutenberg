@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { Icon as WCIcon } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
@@ -10,7 +9,7 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { postFeaturedImage, trash } from '@wordpress/icons';
-import { IconButton, Link, Stack, Text } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { IconButton, Link, Stack, Text, Icon } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -100,7 +99,7 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 			className={ styles.thumbPlaceholder }
 			aria-hidden="true"
 		>
-			<WCIcon icon={ postFeaturedImage } />
+			<Icon icon={ postFeaturedImage } />
 		</Stack>
 	);
 }
@@ -130,12 +129,12 @@ function DraftTitle( {
 			>
 				{ title }
 			</Link>
+
 			<IconButton
 				icon={ trash }
 				label={ __( 'Delete draft' ) }
 				variant="minimal"
 				size="small"
-				className={ styles.trashButton }
 				onClick={ () => onDelete( post.id ) }
 			/>
 		</Stack>
