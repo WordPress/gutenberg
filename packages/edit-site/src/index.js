@@ -218,7 +218,25 @@ async function preloadResolutions() {
 			);
 		}
 		if ( pageId ) {
-			tasks.push( core.getEntityRecord( 'postType', 'page', pageId ) );
+			tasks.push(
+				core.getEntityRecord( 'postType', 'page', pageId ),
+				// `getPostType( getEditedPostAttribute( 'type' ) )` fires
+				// across many post-editor components (publish panel,
+				// preview button, ...). Kicked off here so it's served
+				// from the preload cache on first mount.
+				core.getPostType( 'page' ),
+				// `shouldShowHomepageActions` in `post-actions/actions.js`
+				// calls `getDefaultTemplateId({ slug: 'front-page' })` for
+				// every page being edited, to decide whether to surface
+				// homepage-specific actions. Always preloaded for the
+				// page-edit context.
+				core.getDefaultTemplateId( { slug: 'front-page' } ),
+				// `post-template/hooks.js` calls
+				// `getDefaultTemplateId({ slug: 'page' })` when the page
+				// has no slug (drafts / unnamed). For named pages it
+				// instead fires `page-{slug}` — handled in phase 3 below.
+				core.getDefaultTemplateId( { slug: 'page' } )
+			);
 		}
 		if ( tasks.length ) {
 			await Promise.all( tasks );

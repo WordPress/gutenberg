@@ -27,6 +27,28 @@ function gutenberg_block_editor_preload_paths_6_9( $paths, $context ) {
 		// editor doesn't. Adding it here lets the site-editor boot
 		// kickoff fully consume from cache.
 		$paths[] = '/wp/v2/taxonomies?context=view';
+
+		// Site editor's page-edit context (`?p=/page/{id}`). Mount-time
+		// consumers of these URLs:
+		//
+		// - `post-actions/actions.js` calls
+		//   `getDefaultTemplateId({ slug: 'front-page' })` to gate
+		//   homepage-specific actions for any page.
+		// - `post-template/hooks.js` calls
+		//   `getDefaultTemplateId({ slug: 'page' })` when the page has no
+		//   slug. (For named pages it fires `page-{slug}`, already added
+		//   by core's `site-editor.php`.)
+		// - `getPostType('page')` fires from publish panel / preview
+		//   button / others; core preloads `/wp/v2/types?context=view`
+		//   but not the per-type record.
+		if (
+			isset( $context->post ) &&
+			'page' === $context->post->post_type
+		) {
+			$paths[] = '/wp/v2/templates/lookup?slug=front-page';
+			$paths[] = '/wp/v2/templates/lookup?slug=page';
+			$paths[] = '/wp/v2/types/page?context=edit';
+		}
 	}
 
 	return $paths;
