@@ -1,0 +1,6 @@
+{
+	"name": "core/site-health",
+	"title": "Site health",
+	"description": "Shows an overview of your site health and any issues that need attention.",
+	"category": "site"
+}
