@@ -140,7 +140,7 @@ function render_block_core_cover( $attributes, $content ) {
 		$min_height      = $attributes['minHeight'] ?? 430;
 		$min_height_unit = $attributes['minHeightUnit'] ?? 'px';
 
-		if ( in_array( $min_height_unit, array( 'px', 'vh' ), true ) ) {
+		if ( in_array( $min_height_unit, array( 'px', 'vh', 'vw', 'em', 'rem' ), true ) ) {
 			$attachment_id = null;
 
 			if ( ! empty( $attributes['useFeaturedImage'] ) ) {
@@ -153,15 +153,14 @@ function render_block_core_cover( $attributes, $content ) {
 				$image_src = wp_get_attachment_image_src( $attachment_id, 'full' );
 
 				if ( $image_src && $image_src[2] > 0 ) {
-					$width          = $image_src[1];
-					$height         = $image_src[2];
-					$aspect_ratio   = $width / $height;
-					$required_width = round( $min_height * $aspect_ratio );
+					$aspect_ratio = $image_src[1] / $image_src[2];
 
 					if ( 'px' === $min_height_unit ) {
-						$custom_sizes = sprintf( '(max-width: %1$dpx) %1$dpx, 100vw', $required_width );
-					} elseif ( 'vh' === $min_height_unit ) {
-						$custom_sizes = sprintf( 'max(100vw, %dvh)', $required_width );
+						$required_width = (int) round( $min_height * $aspect_ratio );
+						$custom_sizes   = sprintf( '(max-width: %1$dpx) %1$dpx, 100vw', $required_width );
+					} else {
+						$required_width = round( $min_height * $aspect_ratio, 2 );
+						$custom_sizes   = sprintf( 'max(100vw, %s%s)', $required_width, $min_height_unit );
 					}
 				}
 			}
