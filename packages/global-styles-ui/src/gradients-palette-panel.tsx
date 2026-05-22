@@ -55,6 +55,10 @@ export default function GradientPalettePanel( {
 		'color.defaultGradients',
 		name
 	);
+	const [ customGradientEnabled ] = useSetting< boolean >(
+		'color.customGradient',
+		name
+	);
 
 	const [ customDuotone ] = useSetting( 'color.duotone.custom' ) || [];
 	const [ defaultDuotone ] = useSetting( 'color.duotone.default' ) || [];
@@ -99,14 +103,16 @@ export default function GradientPalettePanel( {
 						popoverProps={ popoverProps }
 					/>
 				) }
-			<PaletteEdit
-				gradients={ customGradients }
-				onChange={ setCustomGradients }
-				paletteLabel={ __( 'Custom' ) }
-				paletteLabelHeadingLevel={ 3 }
-				slugPrefix="custom-"
-				popoverProps={ popoverProps }
-			/>
+			{ customGradientEnabled !== false && (
+				<PaletteEdit
+					gradients={ customGradients }
+					onChange={ setCustomGradients }
+					paletteLabel={ __( 'Custom' ) }
+					paletteLabelHeadingLevel={ 3 }
+					slugPrefix="custom-"
+					popoverProps={ popoverProps }
+				/>
+			) }
 			{ !! duotonePalette && !! duotonePalette.length && (
 				<div>
 					<Subtitle level={ 3 }>{ __( 'Duotone' ) }</Subtitle>
