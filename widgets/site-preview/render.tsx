@@ -48,9 +48,10 @@ export default function SitePreview() {
 			<div className={ styles.previewWrap }>
 				{ isIframeLoading && (
 					<Stack
+						direction="column"
 						align="center"
 						justify="center"
-						style={ { minHeight: 220 } }
+						className={ styles.loading }
 					>
 						<Spinner />
 					</Stack>
