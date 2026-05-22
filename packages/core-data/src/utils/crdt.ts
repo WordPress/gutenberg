@@ -8,6 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 import {
 	__unstableSerializeAndClean,
+	parse,
 	type Block as WPBlock,
 } from '@wordpress/blocks';
 import {
@@ -157,8 +158,29 @@ export function applyPostChangesToCRDTDoc(
 
 		switch ( key ) {
 			case 'blocks': {
+				// Block changes from typing are bundled with a 'selection' update.
+				// Use the resulting cursor position for block merging.
+				const newCursorPosition = parseCursorSelection(
+					changes.selection
+				);
+
 				// Blocks are undefined when they need to be re-parsed from content.
-				if ( ! newValue ) {
+				// When new content is also part of this change (e.g. the Code
+				// Editor dispatching `{ content, blocks: undefined }` on every
+				// keystroke), derive blocks from content so the merge keeps
+				// stable YBlock identities for unchanged blocks.
+
+				const rawContent = getRawValue( changes.content );
+				if ( ! newValue && typeof rawContent === 'string' ) {
+					// We have no blocks but an updated content string.
+					mergeContentWithoutBlocks(
+						ymap,
+						rawContent,
+						newCursorPosition
+					);
+					break;
+				} else if ( ! newValue ) {
+					// We have an update containing empty blocks and content.
 					// Set to undefined instead of deleting the key. This is important
 					// since we iterate over the Y.Map keys in getPostChangesFromCRDTDoc.
 					ymap.set( key, undefined );
@@ -172,12 +194,6 @@ export function applyPostChangesToCRDTDoc(
 					currentBlocks = new Y.Array< YBlock >();
 					ymap.set( key, currentBlocks );
 				}
-
-				// Block changes from typing are bundled with a 'selection' update.
-				// Pass the resulting cursor position to the mergeCrdtBlocks function.
-				const newCursorPosition = parseCursorSelection(
-					changes.selection
-				);
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
@@ -273,6 +289,36 @@ export function applyPostChangesToCRDTDoc(
 			updateSelectionHistory( ydoc, selection );
 		}, 0 );
 	}
+}
+
+/**
+ * Derive blocks from a raw content string and merge them into the post's
+ * blocks Y.Array. Used when a caller dispatches a change with `blocks:
+ * undefined` alongside new content,  most notably the Code Editor's
+ * per-keystroke dispatch.
+ *
+ * @param ymap           The post's root Y.Map.
+ * @param rawContent     The raw HTML content to parse.
+ * @param cursorPosition Cursor position derived from the change's selection,
+ *                       used by mergeCrdtBlocks for rich-text cursor hints.
+ */
+function mergeContentWithoutBlocks(
+	ymap: YMapWrap< YPostRecord >,
+	rawContent: string,
+	cursorPosition: MergeCursorPosition
+): void {
+	let currentBlocks = ymap.get( 'blocks' );
+
+	if ( ! ( currentBlocks instanceof Y.Array ) ) {
+		currentBlocks = new Y.Array< YBlock >();
+		ymap.set( 'blocks', currentBlocks );
+	}
+
+	mergeCrdtBlocks(
+		currentBlocks,
+		parse( rawContent ) as Block[],
+		cursorPosition
+	);
 }
 
 /**

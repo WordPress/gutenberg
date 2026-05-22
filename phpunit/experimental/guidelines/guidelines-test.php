@@ -8,6 +8,8 @@
  * direct unit and end-to-end through wp_set_object_terms()).
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Guidelines_Test extends WP_UnitTestCase {
 
@@ -20,6 +22,7 @@ class Guidelines_Test extends WP_UnitTestCase {
 			array(
 				'artifact' => array( 'title' => 'Artifact' ),
 				'content'  => array( 'title' => 'Content' ),
+				'memory'   => array( 'title' => 'Memory' ),
 			),
 			wp_guideline_types()
 		);
@@ -28,7 +31,7 @@ class Guidelines_Test extends WP_UnitTestCase {
 	/**
 	 * The wp_guideline_types filter should be able to add new entries.
 	 */
-	public function test_filter_can_register_additional_types() {
+	public function test_types_filter_can_register_additional_types() {
 		add_filter(
 			'wp_guideline_types',
 			static function ( $types ) {
@@ -46,7 +49,7 @@ class Guidelines_Test extends WP_UnitTestCase {
 	/**
 	 * The wp_guideline_types filter should be able to remove built-in entries.
 	 */
-	public function test_filter_can_remove_default_types() {
+	public function test_types_filter_can_remove_default_types() {
 		add_filter(
 			'wp_guideline_types',
 			static function ( $types ) {

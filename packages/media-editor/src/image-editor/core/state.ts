@@ -18,6 +18,40 @@ function nearlyEqual( a: number, b: number ): boolean {
 	return Math.abs( a - b ) < STATE_EPSILON;
 }
 
+/**
+ * Value-equality check for two cropper states.
+ *
+ * Used by history machinery to dedup snapshots and detect no-op
+ * transitions. Compares every field that participates in the rendered
+ * output; ignores reference identity.
+ *
+ * @param a First cropper state.
+ * @param b Second cropper state.
+ * @return Whether the two states are value-equal across all tracked fields.
+ */
+export function areCropperStatesEqual(
+	a: CropperState,
+	b: CropperState
+): boolean {
+	const aImage = a.image;
+	const bImage = b.image;
+	return (
+		aImage?.src === bImage?.src &&
+		aImage?.naturalWidth === bImage?.naturalWidth &&
+		aImage?.naturalHeight === bImage?.naturalHeight &&
+		nearlyEqual( a.pan.x, b.pan.x ) &&
+		nearlyEqual( a.pan.y, b.pan.y ) &&
+		nearlyEqual( a.zoom, b.zoom ) &&
+		nearlyEqual( a.rotation, b.rotation ) &&
+		a.flip.horizontal === b.flip.horizontal &&
+		a.flip.vertical === b.flip.vertical &&
+		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&
+		nearlyEqual( a.cropRect.y, b.cropRect.y ) &&
+		nearlyEqual( a.cropRect.width, b.cropRect.width ) &&
+		nearlyEqual( a.cropRect.height, b.cropRect.height )
+	);
+}
+
 function clampRequestedZoom( state: CropperState, zoom: number ): number {
 	// With an image, enforceContainment raises zoom to the coverage-aware
 	// floor below. Without an image, no enforcement runs, so MIN_ZOOM stays
