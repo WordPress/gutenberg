@@ -56,7 +56,7 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              uses: SimenB/github-actions-cpu-cores@97330871fe1b7d3529392ea000e3d2c4b357e403 # v3.0.0
               id: cpu-cores
 
             - name: Run build scripts
@@ -107,7 +107,7 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Determine the number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              uses: SimenB/github-actions-cpu-cores@97330871fe1b7d3529392ea000e3d2c4b357e403 # v3.0.0
               id: cpu-cores
 
             - name: Run build scripts
