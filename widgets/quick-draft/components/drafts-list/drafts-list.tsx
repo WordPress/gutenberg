@@ -4,7 +4,7 @@
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
-import { humanTimeDiff } from '@wordpress/date';
+import { dateI18n, getSettings, humanTimeDiff } from '@wordpress/date';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
@@ -137,8 +137,14 @@ function DraftTitle( {
 }
 
 function DraftDate( { post }: { post: DraftPost } ) {
+	const fullDate = dateI18n( getSettings().formats.datetime, post.date );
+
 	return (
-		<Text variant="body-sm" className={ styles.date }>
+		<Text
+			variant="body-sm"
+			className={ styles.date }
+			render={ <span title={ fullDate } /> }
+		>
 			{ humanTimeDiff( post.date ) }
 		</Text>
 	);
