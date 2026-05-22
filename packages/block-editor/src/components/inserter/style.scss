@@ -93,17 +93,6 @@ $block-inserter-tabs-height: 44px;
 		transition: color 0.2s ease;
 	}
 
-	svg {
-		@media not (prefers-reduced-motion) {
-			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
-		}
-	}
-
-	&.is-pressed {
-		svg {
-			transform: rotate(45deg);
-		}
-	}
 }
 
 .block-editor-inserter__menu {

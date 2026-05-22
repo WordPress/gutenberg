@@ -682,6 +682,18 @@
 		color: colors.$white;
 		background: var(--wp-admin-theme-color);
 	}
+
+	svg {
+		@media not (prefers-reduced-motion) {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		}
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
 }
 
 @mixin selected-block-outline($widthRatio: 1) {
