@@ -113,6 +113,8 @@ async function build() {
 			'run',
 			'--silent',
 			'generate-worker-placeholders',
+			'--workspace',
+			'@wordpress/build-tools',
 		] );
 
 		if ( ! skipTypes ) {
@@ -128,13 +130,7 @@ async function build() {
 			console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
 			console.log( '\n✅ Checking type declaration files...' );
-			await exec( 'npm', [
-				'run',
-				'--silent',
-				'check-type-declarations',
-				'--workspace',
-				'@wordpress/build-tools',
-			] );
+			await exec( 'npm', [ 'run', '--silent', 'check-type-declarations', '--workspace', '@wordpress/build-tools' ] );
 		}
 
 		console.log( '\n📦 Building vendor files...' );
@@ -142,6 +138,8 @@ async function build() {
 			'run',
 			'--silent',
 			'build-vendors',
+			'--workspace',
+			'@wordpress/build-tools',
 		] );
 
 		console.log( '\n📦 Building packages (production mode)...' );

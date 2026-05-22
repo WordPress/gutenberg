@@ -271,7 +271,7 @@ export class Metrics {
 			return;
 		}
 
-		// Traces are saved minified. Run bin/resolve-trace-source-maps.js
+		// Traces are saved minified. Run tools/build/packages/resolve-trace-source-maps.cjs
 		// against a downloaded trace + matching `build/` directory to rewrite
 		// minified `functionName`s back to their source identifiers.
 		const tracesDir = join( artifactsPath, 'traces' );
