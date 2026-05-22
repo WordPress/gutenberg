@@ -8,9 +8,11 @@ import { useCallback, useLayoutEffect, useRef } from '@wordpress/element';
  */
 import { GRID_ITEM_DATA_KEY } from './grid-item-key';
 
-type RectSnapshot = {
+export type RectSnapshot = {
 	left: number;
 	top: number;
+	width: number;
+	height: number;
 };
 
 type UseLayoutShiftAnimationOptions = {
@@ -42,11 +44,19 @@ type UseLayoutShiftAnimationResult = {
 	 * (call immediately before `setTemporaryLayout` / similar).
 	 */
 	captureLayoutSnapshot: () => void;
+
+	/**
+	 * Viewport rects from the last committed paint. Used by item-exit
+	 * animation to place overlays when keys drop out of `layout`.
+	 */
+	getLastPositions: () => ReadonlyMap< string, RectSnapshot > | null;
 };
 
 function queryGridItems( container: HTMLElement ): HTMLElement[] {
 	return Array.from(
-		container.querySelectorAll< HTMLElement >( `[${ GRID_ITEM_DATA_KEY }]` )
+		container.querySelectorAll< HTMLElement >(
+			`[${ GRID_ITEM_DATA_KEY }]:not([data-wp-grid-item-exiting])`
+		)
 	);
 }
 
@@ -63,8 +73,8 @@ function snapshotPositions(
 		if ( ! key ) {
 			continue;
 		}
-		const { left, top } = element.getBoundingClientRect();
-		positions.set( key, { left, top } );
+		const { left, top, width, height } = element.getBoundingClientRect();
+		positions.set( key, { left, top, width, height } );
 	}
 	return positions;
 }
@@ -174,7 +184,11 @@ export function useLayoutShiftAnimation( {
 		lastRenderedPositionsRef.current = snapshotPositions( container );
 	}, [ container, enabled, layoutFingerprint, excludeItemKey ] );
 
-	return { captureLayoutSnapshot };
+	const getLastPositions = useCallback( () => {
+		return lastRenderedPositionsRef.current;
+	}, [] );
+
+	return { captureLayoutSnapshot, getLastPositions };
 }
 
 /**

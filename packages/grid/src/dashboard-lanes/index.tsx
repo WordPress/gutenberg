@@ -40,11 +40,13 @@ import { useLanePlacement } from './use-lane-placement';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
 	getLayoutFingerprint,
 	getPlacementFingerprint,
 	useLayoutShiftAnimation,
 } from '../shared/use-layout-shift-animation';
+import { useItemExitAnimation } from '../shared/use-item-exit-animation';
 import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
@@ -139,6 +141,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		} | null >( null );
 		const resizeBaselineRef = useRef< number | null >( null );
 		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
+		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
+			new Map()
+		);
 		const activeLayout = temporaryLayout ?? layout;
 
 		const [ container, setContainer ] = useState< HTMLDivElement | null >(
@@ -260,6 +265,22 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 					return;
 				}
 				const key = child.key?.toString();
+				if ( key ) {
+					const { actionableArea } = child.props as {
+						actionableArea?: React.ReactNode;
+					};
+					childrenCacheRef.current.set(
+						key,
+						actionableArea !== undefined
+							? cloneElement(
+									child as React.ReactElement< {
+										actionableArea?: React.ReactNode;
+									} >,
+									{ actionableArea: undefined }
+							  )
+							: ( child as React.ReactElement )
+					);
+				}
 				if ( key && layoutKeys.has( key ) ) {
 					const { actionableArea } = child.props as {
 						actionableArea?: React.ReactNode;
@@ -474,8 +495,6 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			[ Overlay, editMode, effectiveColumns ]
 		);
 
-		const layoutAnimating =
-			editMode && ( isResizing || temporaryLayout !== undefined );
 		const layoutFingerprint = useMemo( () => {
 			const layoutSig = getLayoutFingerprint( activeLayout );
 			const placementSig = getPlacementFingerprint( itemStyles );
@@ -483,12 +502,21 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		}, [ activeLayout, itemStyles ] );
 		const excludeLayoutAnimationKey =
 			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
-		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+		const { captureLayoutSnapshot, getLastPositions } =
+			useLayoutShiftAnimation( {
+				container,
+				enabled: editMode,
+				layoutFingerprint,
+				excludeItemKey: excludeLayoutAnimationKey,
+			} );
+		const { exitingItems, clearExitingItem } = useItemExitAnimation( {
 			container,
-			enabled: layoutAnimating,
-			layoutFingerprint,
-			excludeItemKey: excludeLayoutAnimationKey,
+			enabled: editMode,
+			layoutKeys,
+			getLastPositions,
+			childrenCacheRef,
 		} );
+		const layoutAnimating = editMode;
 		useLayoutEffect( () => {
 			captureLayoutSnapshotRef.current = captureLayoutSnapshot;
 		}, [ captureLayoutSnapshot ] );
@@ -571,6 +599,16 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 							);
 						} ) }
 						{ remaining }
+						{ exitingItems.map( ( { key, rect, child } ) => (
+							<ItemExitOverlay
+								key={ `exiting-${ key }` }
+								itemKey={ key }
+								rect={ rect }
+								onAnimationEnd={ () => clearExitingItem( key ) }
+							>
+								{ child }
+							</ItemExitOverlay>
+						) ) }
 					</div>
 				</SortableContext>
 				<DragOverlay>{ dragOverlayContent }</DragOverlay>

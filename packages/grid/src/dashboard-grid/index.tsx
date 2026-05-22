@@ -39,10 +39,12 @@ import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
 	getLayoutFingerprint,
 	useLayoutShiftAnimation,
 } from '../shared/use-layout-shift-animation';
+import { useItemExitAnimation } from '../shared/use-item-exit-animation';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
@@ -156,6 +158,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			height: number;
 		} | null >( null );
 		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
+		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
+			new Map()
+		);
 		const activeLayout = temporaryLayout ?? layout;
 
 		const [ gridRoot, setGridRoot ] = useState< HTMLDivElement | null >(
@@ -295,6 +300,17 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				}
 
 				const key = child.key?.toString();
+				if ( key ) {
+					const { actionableArea } = child.props;
+					childrenCacheRef.current.set(
+						key,
+						actionableArea !== undefined
+							? cloneElement( child, {
+									actionableArea: undefined,
+							  } )
+							: child
+					);
+				}
 				if ( key && layoutKeys.has( key ) ) {
 					// Lift `actionableArea` to a grid slot; strip it
 					// from the child so it does not leak to the DOM.
@@ -575,20 +591,28 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			]
 		);
 
-		const layoutAnimating =
-			editMode && ( isResizing || temporaryLayout !== undefined );
 		const layoutFingerprint = useMemo(
 			() => getLayoutFingerprint( [ ...resolvedItemMap.values() ] ),
 			[ resolvedItemMap ]
 		);
 		const excludeLayoutAnimationKey =
 			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
-		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+		const { captureLayoutSnapshot, getLastPositions } =
+			useLayoutShiftAnimation( {
+				container: gridRoot,
+				enabled: editMode,
+				layoutFingerprint,
+				excludeItemKey: excludeLayoutAnimationKey,
+			} );
+		const { exitingItems, clearExitingItem } = useItemExitAnimation( {
 			container: gridRoot,
-			enabled: layoutAnimating,
-			layoutFingerprint,
-			excludeItemKey: excludeLayoutAnimationKey,
+			enabled: editMode,
+			layoutKeys,
+			getLastPositions,
+			childrenCacheRef,
 		} );
+		// Transform transitions on tiles for FLIP (drag, resize, removal).
+		const layoutAnimating = editMode;
 		useLayoutEffect( () => {
 			captureLayoutSnapshotRef.current = captureLayoutSnapshot;
 		}, [ captureLayoutSnapshot ] );
@@ -655,6 +679,16 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 							</GridItem>
 						) ) }
 						{ remaining }
+						{ exitingItems.map( ( { key, rect, child } ) => (
+							<ItemExitOverlay
+								key={ `exiting-${ key }` }
+								itemKey={ key }
+								rect={ rect }
+								onAnimationEnd={ () => clearExitingItem( key ) }
+							>
+								{ child }
+							</ItemExitOverlay>
+						) ) }
 					</div>
 				</SortableContext>
 				<DragOverlay>{ dragOverlayContent }</DragOverlay>
