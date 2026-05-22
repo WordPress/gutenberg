@@ -17,6 +17,8 @@ import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
+import richTextControlLtr from '../package-styles/rich-text-control-ltr.lazy.scss?inline';
+import richTextControlRtl from '../package-styles/rich-text-control-rtl.lazy.scss?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
 
 /**
@@ -79,8 +81,18 @@ const CONFIG = [
 		// `@wordpress/block-editor`, so it needs those package styles in
 		// addition to `@wordpress/components`.
 		componentIdMatcher: /^richtextcontrol/,
-		ltr: [ componentsLtr, blockEditorLtr, formatLibraryLtr ],
-		rtl: [ componentsRtl, blockEditorRtl, formatLibraryRtl ],
+		ltr: [
+			componentsLtr,
+			blockEditorLtr,
+			formatLibraryLtr,
+			richTextControlLtr,
+		],
+		rtl: [
+			componentsRtl,
+			blockEditorRtl,
+			formatLibraryRtl,
+			richTextControlRtl,
+		],
 	},
 	{
 		componentIdMatcher: /^admin-ui-/,

@@ -17,7 +17,10 @@ import '@wordpress/format-library';
  * Internal dependencies
  */
 import RichTextControl from '../control';
-import '../style.scss';
+
+// The control's own styles (and the format/link UI styles) are lazy-loaded in
+// Storybook via `storybook/package-styles/config.js`, keyed off this story's
+// component id, rather than imported here.
 
 const meta: Meta< typeof RichTextControl > = {
 	title: 'RichTextControl',
