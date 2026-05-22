@@ -25,6 +25,9 @@
 }
 
 .thumbPlaceholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 100%;
 	height: 100%;
 	border-radius: var(--wpds-border-radius-md);
@@ -47,9 +50,4 @@
 
 .date {
 	color: var(--wpds-color-fg-content-neutral-weak);
-}
-
-/* @wordpress/ui has no destructive tone; tint the icon via the error token. */
-.trashButton {
-	color: var(--wpds-color-fg-interactive-error);
 }

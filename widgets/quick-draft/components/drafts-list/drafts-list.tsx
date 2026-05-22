@@ -93,14 +93,9 @@ function DraftThumbnail( { post }: { post: DraftPost } ) {
 	}
 
 	return (
-		<Stack
-			align="center"
-			justify="center"
-			className={ styles.thumbPlaceholder }
-			aria-hidden="true"
-		>
+		<div className={ styles.thumbPlaceholder } aria-hidden="true">
 			<Icon icon={ postFeaturedImage } />
-		</Stack>
+		</div>
 	);
 }
 
