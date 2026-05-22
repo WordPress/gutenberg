@@ -6,6 +6,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	TextControl,
+	Button,
 	CheckboxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -22,6 +23,7 @@ import { useDisabled } from '@wordpress/compose';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
+import { CustomInserterModal } from '../icon/components';
 
 const separatorDefaultValue = '/';
 
@@ -33,21 +35,35 @@ export default function BreadcrumbEdit( {
 } ) {
 	const {
 		separator,
+		separatorType,
+		separatorIcon,
 		showHomeItem,
 		showCurrentItem,
 		prefersTaxonomy,
 		showOnHomePage,
 	} = attributes;
+
+	const [ isIconInserterOpen, setIconInserterOpen ] = useState( false );
 	const {
 		post,
 		isPostTypeHierarchical,
 		postTypeHasTaxonomies,
 		hasTermsAssigned,
 		isLoading,
+		selectedIconContent,
+		allIcons,
 	} = useSelect(
 		( select ) => {
+			const { getEntityRecord, getEntityRecords } = select( coreStore );
 			if ( ! postType ) {
-				return {};
+				return {
+					selectedIconContent: separatorIcon
+						? getEntityRecord( 'root', 'icon', separatorIcon )
+						: null,
+					allIcons: isIconInserterOpen
+						? getEntityRecords( 'root', 'icon' )
+						: undefined,
+				};
 			}
 			const _post = select( coreStore ).getEntityRecord(
 				'postType',
@@ -81,9 +97,15 @@ export default function BreadcrumbEdit( {
 					( postId && ! _post ) ||
 					! postTypeObject ||
 					( _postTypeHasTaxonomies && ! taxonomies ),
+				selectedIconContent: separatorIcon
+					? getEntityRecord( 'root', 'icon', separatorIcon )
+					: null,
+				allIcons: isIconInserterOpen
+					? getEntityRecords( 'root', 'icon' )
+					: undefined,
 			};
 		},
-		[ postType, postId ]
+		[ postType, postId, separatorIcon, isIconInserterOpen ]
 	);
 
 	/**
@@ -164,6 +186,28 @@ export default function BreadcrumbEdit( {
 		( templateSlug && ! postType ) ||
 		( ! _showTerms && ! isPostTypeHierarchical ) ||
 		( _showTerms && ! hasTermsAssigned );
+	const iconSeparatorElement = selectedIconContent?.content ? (
+		<span className="wp-block-breadcrumbs__separator" aria-hidden="true">
+			<HtmlRenderer html={ selectedIconContent.content } />
+		</span>
+	) : (
+		<span className="wp-block-breadcrumbs__separator" aria-hidden="true">
+			/
+		</span>
+	);
+	const separatorElement =
+		separatorType === 'icon' ? iconSeparatorElement : null;
+
+	const navStyle =
+		separatorType === 'icon'
+			? { '--separator': 'none', ...blockProps.style }
+			: {
+					'--separator': `"${ separator
+						.replace( /\\/g, '\\\\' )
+						.replace( /"/g, '\\"' ) }"`,
+					...blockProps.style,
+			  };
+
 	if ( showPlaceholder ) {
 		const placeholderItems = [];
 		if ( showHomeItem ) {
@@ -177,21 +221,14 @@ export default function BreadcrumbEdit( {
 			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
 		}
 		placeholder = (
-			<nav
-				{ ...blockProps }
-				style={ {
-					'--separator': `"${ separator
-						.replace( /\\/g, '\\\\' )
-						.replace( /"/g, '\\"' ) }"`,
-					...blockProps.style,
-				} }
-			>
+			<nav { ...blockProps } style={ navStyle }>
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
 							<a href={ `#breadcrumbs-pseudo-link-${ index }` }>
 								{ text }
 							</a>
+							{ separatorElement }
 						</li>
 					) ) }
 					{ showCurrentItem && (
@@ -211,6 +248,8 @@ export default function BreadcrumbEdit( {
 					resetAll={ () => {
 						setAttributes( {
 							separator: separatorDefaultValue,
+							separatorType: 'text',
+							separatorIcon: undefined,
 							showHomeItem: true,
 							showCurrentItem: true,
 						} );
@@ -256,29 +295,90 @@ export default function BreadcrumbEdit( {
 					<ToolsPanelItem
 						label={ __( 'Separator' ) }
 						isShownByDefault
-						hasValue={ () => separator !== separatorDefaultValue }
+						hasValue={ () =>
+							separator !== separatorDefaultValue ||
+							separatorType !== 'text' ||
+							!! separatorIcon
+						}
 						onDeselect={ () =>
 							setAttributes( {
 								separator: separatorDefaultValue,
+								separatorType: 'text',
+								separatorIcon: undefined,
 							} )
 						}
 					>
-						<TextControl
-							__next40pxDefaultSize
-							autoComplete="off"
-							label={ __( 'Separator' ) }
-							value={ separator }
+						<ToggleControl
+							label={ __( 'Use icon as separator' ) }
+							checked={ separatorType === 'icon' }
 							onChange={ ( value ) =>
-								setAttributes( { separator: value } )
+								setAttributes( {
+									separatorType: value ? 'icon' : 'text',
+								} )
 							}
-							onBlur={ () => {
-								if ( ! separator ) {
-									setAttributes( {
-										separator: separatorDefaultValue,
-									} );
-								}
-							} }
 						/>
+						{ separatorType !== 'icon' ? (
+							<div className="wp-block-breadcrumbs__separator-control">
+								<TextControl
+									__next40pxDefaultSize
+									autoComplete="off"
+									label={ __( 'Separator character' ) }
+									value={ separator }
+									onChange={ ( value ) =>
+										setAttributes( { separator: value } )
+									}
+									onBlur={ () => {
+										if ( ! separator ) {
+											setAttributes( {
+												separator:
+													separatorDefaultValue,
+											} );
+										}
+									} }
+								/>
+							</div>
+						) : (
+							<>
+								<div className="wp-block-breadcrumbs__separator-icon-control">
+									{ separatorIcon &&
+										selectedIconContent?.content && (
+											<HtmlRenderer
+												html={
+													selectedIconContent.content
+												}
+												wrapperProps={ {
+													className:
+														'wp-block-breadcrumbs__separator-icon-preview',
+													style: { width: '24px' },
+												} }
+											/>
+										) }
+									<Button
+										__next40pxDefaultSize
+										variant="secondary"
+										onClick={ () =>
+											setIconInserterOpen( true )
+										}
+									>
+										{ separatorIcon
+											? __( 'Replace icon' )
+											: __( 'Choose icon' ) }
+									</Button>
+								</div>
+								{ isIconInserterOpen && (
+									<CustomInserterModal
+										icons={ allIcons ?? [] }
+										setInserterOpen={ setIconInserterOpen }
+										attributes={ { icon: separatorIcon } }
+										setAttributes={ ( { icon } ) =>
+											setAttributes( {
+												separatorIcon: icon,
+											} )
+										}
+									/>
+								) }
+							</>
+						) }
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>

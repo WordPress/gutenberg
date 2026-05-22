@@ -10,6 +10,11 @@ import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 
+/**
+ * Internal styles
+ */
+import './editor.scss';
+
 const { name } = metadata;
 
 export { metadata, name };
