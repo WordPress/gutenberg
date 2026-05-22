@@ -10,13 +10,12 @@
 
 .iframe {
 	position: absolute;
-	inset-block-start: 0;
+	inset-block-start: 50%;
 	inset-inline-start: 50%;
 	width: 250%;
 	min-height: 375%;
-	transform: scale(0.4);
-	transform-origin: center top;
-	translate: -50% -13px;
+	transform: translate(-50%, -50%) scale(0.4);
+	transform-origin: center center;
 }
 
 .overlay {
@@ -31,16 +30,18 @@
 
 @media (prefers-reduced-motion: no-preference) {
 	.iframe {
-		transition: transform var(--wpds-motion-duration-md)
+		transition:
+			transform var(--wpds-motion-duration-md)
 			var(--wpds-motion-easing-subtle);
 	}
 
 	.previewWrap:hover .iframe {
-		transform: scale(0.42);
+		transform: translate(-50%, -50%) scale(0.42);
 	}
 
 	.overlay {
-		transition: opacity var(--wpds-motion-duration-sm)
+		transition:
+			opacity var(--wpds-motion-duration-sm)
 			var(--wpds-motion-easing-subtle);
 	}
 }
