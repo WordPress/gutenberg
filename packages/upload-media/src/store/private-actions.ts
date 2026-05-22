@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -25,6 +26,7 @@ import {
 	vipsConvertImageFormat,
 	vipsHasTransparency,
 	terminateVipsWorker,
+	maybeRecycleVipsWorker,
 } from './utils';
 import type {
 	AccumulateSubSizeAction,
@@ -562,6 +564,17 @@ export function finishOperation(
 				dispatch.processItem( pendingItem.id );
 			}
 		}
+
+		// Track vips operations across success and failure paths so a
+		// burst of failures can't bypass the recycle budget; the cancel
+		// path calls the same helper.
+		if (
+			previousOperation === OperationType.ResizeCrop ||
+			previousOperation === OperationType.Rotate ||
+			previousOperation === OperationType.TranscodeImage
+		) {
+			maybeRecycleVipsWorker( select.getActiveImageProcessingCount() );
+		}
 	};
 }
 
@@ -665,30 +678,21 @@ export function prepareItem( id: QueueItemId ) {
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
 
-		// For images that can be processed by vips, check if we need to scale down based on threshold.
+		// For images that can be processed by vips, upload the original and
+		// let generateThumbnails() handle threshold scaling as a sideload.
+		//
+		// Uploading the original (rather than a pre-scaled copy) preserves
+		// the un-suffixed basename in attachment.filename, so sub-size
+		// names are derived from the original — matching WordPress core's
+		// wp_create_image_subsizes() naming convention where only the
+		// scaled-down full-size copy carries the `-scaled` suffix and the
+		// original is kept alongside it as `original_image`.
+		//
+		// Main-file format conversion is handled server-side via the
+		// image_editor_output_format filter during create_item.
+		// The response carries image_output_format so generateThumbnails
+		// can transcode sub-sizes to the same target format.
 		if ( isImage && isVipsSupported ) {
-			const { bigImageSizeThreshold } = settings;
-
-			// If a threshold is set, add a resize operation to scale down large images.
-			// This matches WordPress core's behavior in wp_create_image_subsizes().
-			if ( bigImageSizeThreshold ) {
-				operations.push( [
-					OperationType.ResizeCrop,
-					{
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						isThresholdResize: true,
-					},
-				] );
-			}
-
-			// Main-file format conversion is handled server-side via the
-			// image_editor_output_format filter during create_item.
-			// The response carries image_output_format so generateThumbnails
-			// can transcode sub-sizes to the same target format.
-
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration,
@@ -734,9 +738,11 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		// If the file is not processed by vips, tell the server to
-		// generate sub-sizes since they won't be created client-side.
-		let updates: Partial< QueueItem > = {};
+		// Tell the server whether to generate sub-sizes.
+		// When vips handles processing client-side, set generate_sub_sizes
+		// to false so the server skips the image-type support check
+		// (allowing formats like AVIF that the server can't process).
+		let updates: Partial< QueueItem >;
 		if ( isHeic && heicJpeg ) {
 			// HEIC was converted to JPEG client-side. Upload the JPEG
 			// and let the server handle it normally (threshold scaling,
@@ -761,6 +767,13 @@ export function prepareItem( id: QueueItemId ) {
 					...item.additionalData,
 					generate_sub_sizes: true,
 					convert_format: true,
+				},
+			};
+		} else {
+			updates = {
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: false,
 				},
 			};
 		}
@@ -905,7 +918,9 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				id,
 				new UploadError( {
 					code: 'IMAGE_TRANSCODING_ERROR',
-					message: 'File could not be uploaded',
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
@@ -967,7 +982,9 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				id,
 				new UploadError( {
 					code: 'IMAGE_ROTATION_ERROR',
-					message: 'Image could not be rotated',
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
@@ -1313,11 +1330,24 @@ export function finalizeItem( id: QueueItemId ) {
 
 		const attachment = item.attachment;
 		const { mediaFinalize } = select.getSettings();
+		const updates: Partial< QueueItem > = {};
 
 		// Only finalize if we have an attachment ID and a mediaFinalize callback.
 		if ( attachment?.id && mediaFinalize ) {
 			try {
-				await mediaFinalize( attachment.id, item.subSizes || [] );
+				// Pass the post-finalize attachment through so the reducer
+				// merges the updated URL (now pointing at the `-scaled` file)
+				// into item.attachment. The next processItem pass fires
+				// onChange with that URL, which is what the block stores —
+				// and what `wp_calculate_image_srcset()` needs in order to
+				// match a known size and emit srcset on the front end.
+				const updatedAttachment = await mediaFinalize(
+					attachment.id,
+					item.subSizes || []
+				);
+				if ( updatedAttachment ) {
+					updates.attachment = updatedAttachment;
+				}
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console
@@ -1325,7 +1355,7 @@ export function finalizeItem( id: QueueItemId ) {
 			}
 		}
 
-		dispatch.finishOperation( id, {} );
+		dispatch.finishOperation( id, updates );
 	};
 }
 

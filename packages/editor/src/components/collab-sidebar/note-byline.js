@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Tooltip } from '@wordpress/components';
+import { Tooltip as WCTooltip } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import {
@@ -95,14 +95,14 @@ export function NoteByline( { avatar, name, date, userId } ) {
 					{ name ?? currentUserName }
 				</span>
 				{ date && (
-					<Tooltip text={ tooltipText }>
+					<WCTooltip text={ tooltipText }>
 						<time
 							dateTime={ commentDateTime }
 							className="editor-collab-sidebar-panel__user-time"
 						>
 							{ commentDateText }
 						</time>
-					</Tooltip>
+					</WCTooltip>
 				) }
 			</Stack>
 		</>

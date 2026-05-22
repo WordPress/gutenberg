@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -11,16 +17,63 @@ import type { CropperState } from '../../core/types';
 /** Debounce delay for ARIA live announcements (ms). */
 const ARIA_DEBOUNCE_MS = 300;
 
+function buildFlipAnnouncement( state: CropperState ): string {
+	const { horizontal, vertical } = state.flip;
+	if ( horizontal && vertical ) {
+		return __( 'Flipped horizontally and vertically' );
+	}
+	if ( horizontal ) {
+		return __( 'Flipped horizontally' );
+	}
+	if ( vertical ) {
+		return __( 'Flipped vertically' );
+	}
+	return __( 'Flip removed' );
+}
+
 // Build a human-readable announcement string from cropper state.
-function buildAnnouncement( state: CropperState ): string {
+function buildAnnouncement(
+	state: CropperState,
+	previousState: CropperState | null
+): string {
+	if (
+		previousState &&
+		( previousState.flip.horizontal !== state.flip.horizontal ||
+			previousState.flip.vertical !== state.flip.vertical )
+	) {
+		return buildFlipAnnouncement( state );
+	}
+
 	const parts: string[] = [];
-	parts.push( `Zoom ${ Math.round( state.zoom * 100 ) }%` );
+	parts.push(
+		sprintf(
+			/* translators: %d: zoom level as a percentage. */
+			__( 'Zoom %d%%' ),
+			Math.round( state.zoom * 100 )
+		)
+	);
 	if ( state.rotation !== 0 ) {
-		parts.push( `Rotation ${ Math.round( state.rotation ) } degrees` );
+		parts.push(
+			sprintf(
+				/* translators: %d: rotation angle in degrees. */
+				__( 'Rotation %d degrees' ),
+				Math.round( state.rotation )
+			)
+		);
 	}
 	const cropW = Math.round( state.cropRect.width * 100 );
 	const cropH = Math.round( state.cropRect.height * 100 );
-	parts.push( `Crop ${ cropW }% by ${ cropH }%` );
+	parts.push(
+		sprintf(
+			/* translators: 1: crop width as a percentage, 2: crop height as a percentage. */
+			__( 'Crop %1$d%% by %2$d%%' ),
+			cropW,
+			cropH
+		)
+	);
+	if ( state.flip.horizontal || state.flip.vertical ) {
+		parts.push( buildFlipAnnouncement( state ) );
+	}
 	return parts.join( ', ' );
 }
 
@@ -38,11 +91,18 @@ export function useAriaAnnouncer( state: CropperState ): string {
 	const [ ariaMessage, setAriaMessage ] = useState( '' );
 	const timerRef = useRef< ReturnType< typeof setTimeout > >();
 	const prevMessageRef = useRef( '' );
+	const prevStateRef = useRef< CropperState | null >( null );
+	const latestStateRef = useRef( state );
+	useLayoutEffect( () => {
+		latestStateRef.current = state;
+	}, [ state ] );
 
 	useEffect( () => {
 		clearTimeout( timerRef.current );
 		timerRef.current = setTimeout( () => {
-			const msg = buildAnnouncement( state );
+			const current = latestStateRef.current;
+			const msg = buildAnnouncement( current, prevStateRef.current );
+			prevStateRef.current = current;
 			if ( msg !== prevMessageRef.current ) {
 				prevMessageRef.current = msg;
 				setAriaMessage( msg );
@@ -57,7 +117,8 @@ export function useAriaAnnouncer( state: CropperState ): string {
 		state.rotation,
 		state.cropRect.width,
 		state.cropRect.height,
-		state,
+		state.flip.horizontal,
+		state.flip.vertical,
 	] );
 
 	return ariaMessage;

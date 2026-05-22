@@ -193,6 +193,7 @@ export default dedupePlugins( [
 			'**/build-wp/**',
 			'**/node_modules/**',
 			'packages/block-serialization-spec-parser/parser.js',
+			'packages/global-styles-ui/src/font-library/lib/**',
 			'packages/icons/src/library/*.tsx',
 			'packages/react-native-editor/bundle/**',
 			'packages/vips/src/worker-code.ts',
@@ -264,6 +265,8 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Icon: 'WCIcon',
+						Tooltip: 'WCTooltip',
 					},
 				},
 			],
@@ -395,28 +398,17 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Package src + storybook — restricted syntax + unsafe button disabled.
+	// Override: React src + storybook — stylesheet and component rules.
 	{
 		files: [
 			'packages/*/src/**/*.[tj]s?(x)',
+			'routes/**/*.[tj]s?(x)',
+			'widgets/**/*.[tj]s?(x)',
 			'storybook/stories/**/*.[tj]s?(x)',
 		],
 		ignores: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
 		rules: {
-			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-			'@wordpress/components-no-unsafe-button-disabled': 'error',
-		},
-	},
-
-	// Override: Package src (non-test, non-stories, non-native) — add 40px size prop rule.
-	{
-		files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
-		ignores: [
-			'packages/*/src/**/@(test|stories)/**',
-			'**/*.@(android|ios|native).[tj]s?(x)',
-		],
-		rules: {
-			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
 		},
@@ -551,12 +543,7 @@ export default dedupePlugins( [
 
 	// Override: CLI/bin/env files — allow console.
 	{
-		files: [
-			'bin/**/*.js',
-			'bin/**/*.mjs',
-			'packages/env/**',
-			'packages/theme/bin/**/*.[tj]s?(x)',
-		],
+		files: [ '**/{bin,scripts,tools}/**', 'packages/env/**' ],
 		rules: {
 			'no-console': 'off',
 		},
@@ -812,7 +799,11 @@ export default dedupePlugins( [
 	// Override: Packages which have eliminated dependency grouping comments
 	// and explicitly prevent new additions.
 	{
-		files: [ 'packages/ui/**', 'packages/design-system-mcp/**' ],
+		files: [
+			'packages/design-system-mcp/**',
+			'packages/ui/**',
+			'packages/theme/**',
+		],
 		rules: {
 			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},

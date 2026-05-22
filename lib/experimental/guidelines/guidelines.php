@@ -50,6 +50,9 @@ if ( ! function_exists( 'wp_guideline_types' ) ) {
 				'content'  => array(
 					'title' => __( 'Content', 'gutenberg' ),
 				),
+				'memory'   => array(
+					'title' => __( 'Memory', 'gutenberg' ),
+				),
 			)
 		);
 	}
@@ -76,10 +79,9 @@ if ( ! function_exists( '_wp_guidelines_ensure_default_type_term' ) ) {
 			return;
 		}
 
-		// wp_set_object_terms() expects term IDs for hierarchical taxonomies —
-		// strings are interpreted as term names, not slugs. Resolve 'artifact'
-		// to an ID up front (creating the term on first use) so we assign the
-		// exact term we mean instead of relying on name-based lookup.
+		// Resolve to an ID up front (creating the term on first use):
+		// wp_set_object_terms() interprets strings as names for hierarchical
+		// taxonomies, not slugs.
 		$term = term_exists( 'artifact', 'wp_guideline_type' );
 		if ( ! $term ) {
 			$term = wp_insert_term( 'artifact', 'wp_guideline_type' );
@@ -89,6 +91,78 @@ if ( ! function_exists( '_wp_guidelines_ensure_default_type_term' ) ) {
 		}
 
 		wp_set_object_terms( $post_id, (int) $term['term_id'], 'wp_guideline_type' );
+	}
+}
+
+if ( ! function_exists( '_wp_guidelines_synthesize_caps' ) ) {
+	/**
+	 * Hook callback for the `user_has_cap` filter that grants guideline
+	 * capabilities based on the user's role, post ownership, and post status.
+	 *
+	 * Administrators get every guideline capability. Contributors, Authors,
+	 * and Editors can list and create guidelines, and fully manage their own
+	 * private rows. Publishing guidelines and acting on other users' rows is
+	 * reserved for Administrators.
+	 *
+	 * @access private
+	 *
+	 * @param array   $allcaps All capabilities of the user.
+	 * @param array   $caps    Required primitive capabilities for the requested capability.
+	 * @param array   $args    Arguments that accompany the requested capability check.
+	 * @param WP_User $user    The user object.
+	 * @return array Possibly augmented capabilities.
+	 */
+	function _wp_guidelines_synthesize_caps( array $allcaps, array $caps, array $args, WP_User $user ): array {
+		if ( ! empty( $allcaps['manage_options'] ) ) {
+			$allcaps['read_guidelines']             = true;
+			$allcaps['edit_guidelines']             = true;
+			$allcaps['edit_others_guidelines']      = true;
+			$allcaps['edit_published_guidelines']   = true;
+			$allcaps['edit_private_guidelines']     = true;
+			$allcaps['publish_guidelines']          = true;
+			$allcaps['delete_guidelines']           = true;
+			$allcaps['delete_others_guidelines']    = true;
+			$allcaps['delete_published_guidelines'] = true;
+			$allcaps['delete_private_guidelines']   = true;
+			$allcaps['read_private_guidelines']     = true;
+			return $allcaps;
+		}
+
+		if ( empty( $allcaps['edit_posts'] ) ) {
+			return $allcaps;
+		}
+
+		// Ambient floor for Contributor+: `read_guidelines` clears the
+		// post-type read check; `edit_guidelines` clears the create and
+		// ownership checks that don't pass a post ID. Per-post primitives
+		// are granted only in the per-post branch below.
+		$allcaps['read_guidelines'] = true;
+		$allcaps['edit_guidelines'] = true;
+
+		if ( ! isset( $args[0], $args[2] ) ) {
+			return $allcaps;
+		}
+
+		if ( ! in_array( $args[0], array( 'edit_post', 'delete_post', 'read_post' ), true ) ) {
+			return $allcaps;
+		}
+
+		$post = get_post( $args[2] );
+		if (
+			! $post instanceof WP_Post ||
+			'wp_guideline' !== $post->post_type ||
+			(int) $post->post_author !== (int) $user->ID ||
+			'private' !== $post->post_status
+		) {
+			return $allcaps;
+		}
+
+		$allcaps['edit_private_guidelines']   = true;
+		$allcaps['delete_guidelines']         = true;
+		$allcaps['delete_private_guidelines'] = true;
+		$allcaps['read_private_guidelines']   = true;
+
+		return $allcaps;
 	}
 }
 

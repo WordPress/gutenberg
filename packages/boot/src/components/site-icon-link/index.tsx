@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Link, privateApis as routePrivateApis } from '@wordpress/route';
-import { Tooltip } from '@wordpress/components';
+import { Tooltip as WCTooltip } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -26,7 +26,7 @@ function SiteIconLink( {
 	const canGoBack = useCanGoBack();
 
 	return (
-		<Tooltip text={ props[ 'aria-label' ] } placement="right">
+		<WCTooltip text={ props[ 'aria-label' ] } placement="right">
 			<Link
 				to={ to }
 				aria-label={ props[ 'aria-label' ] }
@@ -42,7 +42,7 @@ function SiteIconLink( {
 			>
 				<SiteIcon />
 			</Link>
-		</Tooltip>
+		</WCTooltip>
 	);
 }
 

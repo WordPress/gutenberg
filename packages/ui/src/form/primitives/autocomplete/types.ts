@@ -1,12 +1,12 @@
 import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 
 export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
 
-export type PortalProps = ComponentPropsWithoutRef<
-	typeof _Autocomplete.Portal
->;
+export type PortalProps = ComponentProps< typeof _Autocomplete.Portal >;
+
+export type PositionerProps = ComponentProps< typeof _Autocomplete.Positioner >;
 
 export type AutocompleteClearProps = ComponentProps<
 	typeof _Autocomplete.Clear
@@ -58,17 +58,17 @@ export type AutocompletePopupProps = ComponentProps<
 	 * portal element; they would be ignored.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
-};
-
-export type AutocompleteRootProps = ComponentProps<
-	typeof _Autocomplete.Root
-> & {
-	children?: React.ReactNode;
-};
-
-export type AutocompleteValueProps = {
 	/**
-	 * Can be used to override the current value of the autocomplete.
+	 * Optional positioner element, typically `<Autocomplete.Positioner />`
+	 * with custom positioning props (`side`, `align`, `sideOffset`, collision
+	 * settings, etc.). When omitted, `Autocomplete.Popup` uses
+	 * `Autocomplete.Positioner` with default props. Do not pass `children` on
+	 * the positioner element; they would be ignored.
 	 */
-	children?: _Autocomplete.Value.Props[ 'children' ];
+	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
 };
+
+export type AutocompleteRootProps< Value = unknown > =
+	_Autocomplete.Root.Props< Value >;
+
+export type AutocompleteValueProps = _Autocomplete.Value.Props;

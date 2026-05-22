@@ -207,6 +207,15 @@ function ReusableBlockEdit( {
 				EMPTY_OBJECT,
 		};
 	}, [] );
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: ref,
+			} ),
+		[ ref ]
+	);
 
 	const canOverrideBlocks = useMemo( () => {
 		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
@@ -300,6 +309,7 @@ function ReusableBlockEdit( {
 			{ isSelected &&
 				hasResolved &&
 				! isMissing &&
+				canUserEdit &&
 				onNavigateToEntityRecord && (
 					<BlockSettingsMenuControls>
 						{ ( { onClose } ) => (

@@ -12,14 +12,13 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useCropper } from '../../image-editor';
-import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
+import { useMediaEditor } from '../../state';
 import {
-	DEFAULT_ASPECT_RATIOS,
-	MAX_ZOOM,
-	MIN_ZOOM,
-	ORIGINAL_ASPECT_RATIO,
-} from '../../image-editor/core/constants';
+	useCropGestureHandlers,
+	CROP_CONTROL_ATTR,
+} from '../../hooks/use-crop-gesture-handlers';
+import { MAX_ZOOM } from '../../image-editor/core/constants';
+import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
@@ -37,36 +36,8 @@ export interface MediaEditorCropPanelProps {
 	onFreeformChange: ( value: boolean ) => void;
 	/** Signal that a placement-oriented control is being adjusted. */
 	onPlacementControlInteraction?: () => void;
-	/**
-	 * Fixed aspect-ratio presets to display after Free and Original. When
-	 * omitted, the media editor's default fixed-ratio presets are used.
-	 */
-	aspectRatioPresets?: AspectRatioPreset[];
-}
-
-/**
- * Resolve an aspect-ratio preset value into a number suitable for
- * `<Cropper aspectRatio=...>`. Returns `undefined` for Free (no lock).
- *
- * @param value            Preset value as a string.
- * @param imageAspectRatio Image's natural width / height — used for
- *                         the Original preset.
- */
-export function resolveAspectRatio(
-	value: string,
-	imageAspectRatio: number | null
-): number | undefined {
-	const num = parseFloat( value );
-	if ( num === 0 ) {
-		return undefined;
-	}
-	if ( num === ORIGINAL_ASPECT_RATIO && imageAspectRatio ) {
-		return imageAspectRatio;
-	}
-	if ( num > 0 ) {
-		return num;
-	}
-	return undefined;
+	/** Aspect-ratio presets to display in the selector. */
+	aspectRatioOptions: AspectRatioPreset[];
 }
 
 /**
@@ -79,7 +50,7 @@ export function resolveAspectRatio(
  * @param props.freeformCrop
  * @param props.onFreeformChange
  * @param props.onPlacementControlInteraction
- * @param props.aspectRatioPresets
+ * @param props.aspectRatioOptions
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
@@ -87,48 +58,26 @@ export default function MediaEditorCropPanel( {
 	freeformCrop,
 	onFreeformChange,
 	onPlacementControlInteraction,
-	aspectRatioPresets,
+	aspectRatioOptions,
 }: MediaEditorCropPanelProps ) {
-	const { state, setZoom } = useCropper();
+	const { state, setZoom } = useMediaEditor();
 	const zoomGestureHandlers = useCropGestureHandlers();
-	const aspectRatioOptions = [
-		...DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value <= 0 ),
-		...( aspectRatioPresets ??
-			DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value > 0 ) ),
-	];
+	const minZoom = getMinZoom( state );
 
 	return (
-		<Stack direction="column" gap="md">
+		// Tag the whole panel as a crop-control region so the modal's
+		// Cmd+Z handler doesn't mistake the SelectControl / ToggleControl
+		// inputs for metadata fields (which would suppress undo).
+		<Stack
+			direction="column"
+			gap="md"
+			{ ...{ [ CROP_CONTROL_ATTR ]: true } }
+		>
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
-			<div role="presentation" { ...zoomGestureHandlers }>
-				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ __( 'Zoom' ) }
-					min={ MIN_ZOOM }
-					max={ MAX_ZOOM }
-					step={ 0.1 }
-					value={ state.zoom }
-					onChange={ ( value ) => {
-						onPlacementControlInteraction?.();
-						setZoom( typeof value === 'number' ? value : MIN_ZOOM );
-					} }
-					renderTooltipContent={ ( value ) => {
-						const zoom =
-							typeof value === 'number' ? value : MIN_ZOOM;
-						return sprintf(
-							/* translators: %d: zoom level as a percentage. */
-							__( '%d%%' ),
-							Math.round( zoom * 100 )
-						);
-					} }
-				/>
-			</div>
 			<SelectControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }
@@ -138,14 +87,34 @@ export default function MediaEditorCropPanel( {
 				} ) ) }
 			/>
 			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Freeform crop' ) }
-				help={ __(
-					'Drag the crop edges to resize freely. When off, the crop is fixed to the selected ratio.'
-				) }
+				label={ __( 'Resize crop area' ) }
+				help={ __( 'Show handles to adjust the crop box.' ) }
 				checked={ freeformCrop }
 				onChange={ onFreeformChange }
 			/>
+			<div role="presentation" { ...zoomGestureHandlers }>
+				<RangeControl
+					__next40pxDefaultSize
+					label={ __( 'Zoom' ) }
+					min={ minZoom }
+					max={ MAX_ZOOM }
+					step={ 0.1 }
+					value={ state.zoom }
+					onChange={ ( value ) => {
+						onPlacementControlInteraction?.();
+						setZoom( typeof value === 'number' ? value : minZoom );
+					} }
+					renderTooltipContent={ ( value ) => {
+						const zoom =
+							typeof value === 'number' ? value : minZoom;
+						return sprintf(
+							/* translators: %d: zoom level as a percentage. */
+							__( '%d%%' ),
+							Math.round( zoom * 100 )
+						);
+					} }
+				/>
+			</div>
 		</Stack>
 	);
 }
