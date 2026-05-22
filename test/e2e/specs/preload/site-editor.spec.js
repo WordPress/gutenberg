@@ -52,7 +52,6 @@ test.describe( 'Preload', () => {
 				'GET /wp/v2/posts?context=edit&offset=0&order=desc&orderby=date&per_page=10&ignore_sticky=false',
 				'GET /wp/v2/taxonomies?context=view',
 				'GET /wp/v2/template-parts/emptytheme//header?context=edit',
-				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
 				'OPTIONS /wp/v2/settings',
 				'POST /wp/v2/users/me',
 			].sort()
@@ -93,7 +92,6 @@ test.describe( 'Preload', () => {
 				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/users/me',
 				'GET /wp/v2/view-config?kind=postType&name=page',
-				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
 				'OPTIONS /wp/v2/settings',
 				'OPTIONS /wp/v2/templates',
 				'POST /wp/v2/users/me',
