@@ -37,10 +37,31 @@ import { cleanEmptyObject, useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
+	setStyleForState,
+} from './block-style-state';
 
 const VARIATION_PREFIX = 'is-style-';
 
 const layoutBlockSupportKey = 'layout';
+// Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
+// packages/global-styles-engine/src/core/render.tsx.
+const RESPONSIVE_BREAKPOINTS = {
+	mobile: '@media (width <= 480px)',
+	tablet: '@media (480px < width <= 782px)',
+};
+const CHILD_LAYOUT_KEYS = [
+	'selfStretch',
+	'flexSize',
+	'columnStart',
+	'columnSpan',
+	'rowStart',
+	'rowSpan',
+];
 const { kebabCase } = unlock( componentsPrivateApis );
 
 function getDefaultLayout( layoutBlockSupport = {}, blockVariation ) {
@@ -61,6 +82,92 @@ export function getResetLayout( layoutBlockSupport = {}, blockVariation ) {
 	return cleanEmptyObject( {
 		...getDefaultLayout( layoutBlockSupport, blockVariation ),
 	} );
+}
+
+function getLayoutStateOverrides(
+	layout = {},
+	baseLayout = {},
+	existingLayout = {}
+) {
+	const overrides = {};
+	const childLayoutValues = Object.fromEntries(
+		CHILD_LAYOUT_KEYS.filter( ( key ) =>
+			Object.hasOwn( existingLayout || {}, key )
+		).map( ( key ) => [ key, existingLayout[ key ] ] )
+	);
+
+	Object.entries( layout || {} ).forEach( ( [ key, value ] ) => {
+		if (
+			! CHILD_LAYOUT_KEYS.includes( key ) &&
+			value !== baseLayout?.[ key ]
+		) {
+			overrides[ key ] = value;
+		}
+	} );
+
+	return cleanEmptyObject( {
+		...childLayoutValues,
+		...overrides,
+	} );
+}
+
+function getCSSRulesBySelector( css = '' ) {
+	const rules = new Map();
+	const rulePattern = /([^{}]+)\{([^{}]*)\}/g;
+	let match;
+
+	while ( ( match = rulePattern.exec( css ) ) ) {
+		const selector = match[ 1 ].trim();
+		const declarations = rules.get( selector ) ?? new Map();
+		match[ 2 ]
+			.split( ';' )
+			.map( ( declaration ) => declaration.trim() )
+			.filter( Boolean )
+			.forEach( ( declaration ) => {
+				const separatorIndex = declaration.indexOf( ':' );
+				if ( separatorIndex === -1 ) {
+					return;
+				}
+				const property = declaration.slice( 0, separatorIndex ).trim();
+				const value = declaration.slice( separatorIndex + 1 ).trim();
+				declarations.set( property, value );
+			} );
+
+		rules.set( selector, declarations );
+	}
+
+	return rules;
+}
+
+function getLayoutStyleDelta( baseCSS = '', nextCSS = '' ) {
+	const baseRules = getCSSRulesBySelector( baseCSS );
+	const nextRules = getCSSRulesBySelector( nextCSS );
+	const excludedProperties = new Set( [ 'container-type' ] );
+	const deltaRules = [];
+
+	nextRules.forEach( ( nextDeclarations, selector ) => {
+		const baseDeclarations = baseRules.get( selector );
+		const changedDeclarations = [];
+
+		nextDeclarations.forEach( ( value, property ) => {
+			if (
+				excludedProperties.has( property ) ||
+				baseDeclarations?.get( property ) === value
+			) {
+				return;
+			}
+
+			changedDeclarations.push( `${ property }: ${ value }` );
+		} );
+
+		if ( changedDeclarations.length ) {
+			deltaRules.push(
+				`${ selector } { ${ changedDeclarations.join( '; ' ) }; }`
+			);
+		}
+	} );
+
+	return deltaRules.join( '' );
 }
 
 function hasLayoutBlockSupport( blockName ) {
@@ -169,8 +276,84 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	} );
 }
 
+/**
+ * Generates responsive layout CSS for viewport state styles.
+ *
+ * Viewport state blockGap values need to go through the layout definitions
+ * because flow/constrained layouts use child margins while flex/grid use gap.
+ *
+ * @param { Object }  options                     Options.
+ * @param { Object }  options.attributes          Block attributes.
+ * @param { string }  options.blockName           Block name.
+ * @param { string }  options.selector            CSS selector.
+ * @param { Object }  options.layout              Active block layout.
+ * @param { boolean } options.hasBlockGapSupport  Whether block gap is supported.
+ * @param { * }       options.globalBlockGapValue Global block gap fallback.
+ *
+ * @return { string } CSS rule.
+ */
+export function getResponsiveLayoutStyles( {
+	attributes = {},
+	blockName,
+	selector,
+	layout = {},
+	hasBlockGapSupport,
+	globalBlockGapValue,
+} ) {
+	return Object.entries( RESPONSIVE_BREAKPOINTS )
+		.map( ( [ viewport, mediaQuery ] ) => {
+			const viewportStyle = attributes?.style?.[ viewport ];
+			const hasViewportLayout =
+				viewportStyle?.layout &&
+				Object.keys( viewportStyle.layout ).length > 0;
+			const hasViewportBlockGap =
+				viewportStyle?.spacing &&
+				Object.hasOwn( viewportStyle.spacing, 'blockGap' );
+			const hasViewportPadding =
+				viewportStyle?.spacing &&
+				Object.hasOwn( viewportStyle.spacing, 'padding' );
+			if (
+				! hasViewportLayout &&
+				! hasViewportBlockGap &&
+				! hasViewportPadding
+			) {
+				return '';
+			}
+
+			const viewportLayout = hasViewportLayout
+				? { ...layout, ...viewportStyle.layout }
+				: layout;
+			const layoutType = getLayoutType(
+				viewportLayout?.type || 'default'
+			);
+			const viewportCSS = layoutType?.getLayoutStyle?.( {
+				blockName,
+				selector,
+				layout: viewportLayout,
+				style: viewportStyle,
+				hasBlockGapSupport,
+				globalBlockGapValue,
+			} );
+			const baseLayoutType = getLayoutType( layout?.type || 'default' );
+			const baseCSS = baseLayoutType?.getLayoutStyle?.( {
+				blockName,
+				selector,
+				layout,
+				style: attributes?.style,
+				hasBlockGapSupport,
+				globalBlockGapValue,
+			} );
+			const css = getLayoutStyleDelta( baseCSS, viewportCSS );
+
+			return css ? `${ mediaQuery }{${ css }}` : '';
+		} )
+		.filter( Boolean )
+		.join( '' );
+}
+
 function LayoutPanelPure( {
 	layout,
+	style,
 	setAttributes,
 	name: blockName,
 	clientId,
@@ -178,28 +361,59 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	const { themeSupportsLayout, activeBlockVariation } = useSelect(
-		( select ) => {
-			const { getBlockAttributes, getSettings } =
-				select( blockEditorStore );
-			return {
-				activeBlockVariation: select(
-					blocksStore
-				).getActiveBlockVariation(
-					blockName,
-					getBlockAttributes( clientId ) || {},
-					'block'
-				),
-				themeSupportsLayout: getSettings().supportsLayout,
-			};
-		},
-		[ blockName, clientId ]
-	);
+	const { themeSupportsLayout, activeBlockVariation, selectedState } =
+		useSelect(
+			( select ) => {
+				const blockEditorSelect = select( blockEditorStore );
+				const { getBlockAttributes, getSettings } = blockEditorSelect;
+				const { getSelectedBlockStyleState } =
+					unlock( blockEditorSelect );
+				return {
+					activeBlockVariation: select(
+						blocksStore
+					).getActiveBlockVariation(
+						blockName,
+						getBlockAttributes( clientId ) || {},
+						'block'
+					),
+					themeSupportsLayout: getSettings().supportsLayout,
+					selectedState:
+						getSelectedBlockStyleState?.( clientId ) ??
+						DEFAULT_BLOCK_STYLE_STATE,
+				};
+			},
+			[ blockName, clientId ]
+		);
 
 	const blockEditingMode = useBlockEditingMode();
+	const isViewportLayoutState =
+		hasViewportBlockStyleState( selectedState ) &&
+		! hasPseudoBlockStyleState( selectedState );
 	const resetLayoutFilter = useCallback(
 		( ...resetArgs ) => {
+			const attributes = resetArgs[ 0 ] || {};
 			const context = resetArgs[ 1 ] || {};
+
+			if ( isViewportLayoutState ) {
+				const existingStateStyle =
+					getStyleForState(
+						attributes.style ?? style,
+						selectedState
+					) || {};
+				const nextStateStyle = cleanEmptyObject( {
+					...existingStateStyle,
+					layout: undefined,
+				} );
+
+				return {
+					style: setStyleForState(
+						attributes.style ?? style,
+						selectedState,
+						nextStateStyle
+					),
+				};
+			}
+
 			const resetBlockName = context.name || blockName;
 			const resetLayoutBlockSupport = getBlockSupport(
 				resetBlockName,
@@ -214,7 +428,13 @@ function LayoutPanelPure( {
 				),
 			};
 		},
-		[ blockName, activeBlockVariation ]
+		[
+			blockName,
+			activeBlockVariation,
+			isViewportLayoutState,
+			selectedState,
+			style,
+		]
 	);
 
 	if ( blockEditingMode !== 'default' ) {
@@ -246,9 +466,23 @@ function LayoutPanelPure( {
 	 * Try to find the layout type from either the
 	 * block's layout settings or any saved layout config.
 	 */
+	const baseLayout = layout || defaultBlockLayout || {};
+	const stateStyle = isViewportLayoutState
+		? getStyleForState( style, selectedState )
+		: undefined;
+	const stateLayout = stateStyle?.layout;
+	const usedLayout = isViewportLayoutState
+		? cleanEmptyObject( {
+				...baseLayout,
+				...stateLayout,
+		  } ) || {}
+		: baseLayout;
+	const resetLayoutDefaults = isViewportLayoutState
+		? baseLayout
+		: getResetLayout( layoutBlockSupport, activeBlockVariation );
 	const blockSupportAndLayout = {
 		...layoutBlockSupport,
-		...layout,
+		...usedLayout,
 	};
 	const { type, default: { type: defaultType = 'default' } = {} } =
 		blockSupportAndLayout;
@@ -264,7 +498,6 @@ function LayoutPanelPure( {
 			blockSupportAndLayout.inherit )
 	);
 
-	const usedLayout = layout || defaultBlockLayout || {};
 	const { inherit = false, contentSize = null } = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
@@ -278,32 +511,43 @@ function LayoutPanelPure( {
 	) {
 		return null;
 	}
-	const defaultLayout = cleanEmptyObject( {
-		...getDefaultLayout( layoutBlockSupport, activeBlockVariation ),
-	} );
-	const resetLayoutDefaults = getResetLayout(
-		layoutBlockSupport,
-		activeBlockVariation
-	);
 	const layoutType = getLayoutType( blockLayoutType );
 	const constrainedType = getLayoutType( 'constrained' );
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
 	const hasContentSizeOrLegacySettings = !! inherit || !! contentSize;
 
-	const onChangeType = ( newType ) =>
-		setAttributes( { layout: { type: newType } } );
-	const onChangeLayout = ( newLayout ) =>
+	const onChangeLayout = ( newLayout ) => {
+		if ( isViewportLayoutState ) {
+			const nextStateStyle = cleanEmptyObject( {
+				...stateStyle,
+				layout: getLayoutStateOverrides(
+					cleanEmptyObject( newLayout ),
+					baseLayout,
+					stateStyle?.layout
+				),
+			} );
+			setAttributes( {
+				style: setStyleForState( style, selectedState, nextStateStyle ),
+			} );
+			return;
+		}
+
 		setAttributes( { layout: cleanEmptyObject( newLayout ) } );
-	const resetLayout = () => setAttributes( { layout: defaultLayout } );
-	const resetInheritToggle = () =>
-		setAttributes( { layout: { type: 'default' } } );
+	};
+	const onChangeType = ( newType ) => onChangeLayout( { type: newType } );
+	const resetLayout = () => onChangeLayout( resetLayoutDefaults );
+	const resetInheritToggle = () => onChangeLayout( { type: 'default' } );
 	const isUsingContentWidth = () =>
 		layoutType?.name === 'constrained' || hasContentSizeOrLegacySettings;
-	const hasInheritToggleValue = () => layout?.type === 'constrained';
+	const hasInheritToggleValue = () =>
+		isViewportLayoutState
+			? ( usedLayout?.type ?? 'default' ) !==
+			  ( resetLayoutDefaults?.type ?? 'default' )
+			: layout?.type === 'constrained';
 	const hasLayoutTypeValue = () =>
 		( usedLayout?.type ?? 'default' ) !==
-		( defaultLayout?.type ?? 'default' );
+		( resetLayoutDefaults?.type ?? 'default' );
 
 	return (
 		<>
@@ -323,12 +567,10 @@ function LayoutPanelPure( {
 							label={ __( 'Inner blocks use content width' ) }
 							checked={ isUsingContentWidth() }
 							onChange={ () =>
-								setAttributes( {
-									layout: {
-										type: isUsingContentWidth()
-											? 'default'
-											: 'constrained',
-									},
+								onChangeLayout( {
+									type: isUsingContentWidth()
+										? 'default'
+										: 'constrained',
 								} )
 							}
 							help={
@@ -398,7 +640,7 @@ function LayoutPanelPure( {
 export default {
 	shareWithChildBlocks: true,
 	edit: LayoutPanelPure,
-	attributeKeys: [ 'layout' ],
+	attributeKeys: [ 'layout', 'style' ],
 	hasSupport( name ) {
 		return hasLayoutBlockSupport( name );
 	},
@@ -476,7 +718,7 @@ function BlockWithLayoutStyles( {
 	// Get CSS string for the current layout type.
 	// The CSS and `style` element is only output if it is not empty.
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
-	const css = fullLayoutType?.getLayoutStyle?.( {
+	const baseLayoutCSS = fullLayoutType?.getLayoutStyle?.( {
 		blockName: name,
 		selector,
 		layout: usedLayout,
@@ -484,6 +726,17 @@ function BlockWithLayoutStyles( {
 		hasBlockGapSupport,
 		globalBlockGapValue,
 	} );
+	const responsiveLayoutCSS = getResponsiveLayoutStyles( {
+		attributes,
+		blockName: name,
+		selector,
+		layout: usedLayout,
+		hasBlockGapSupport,
+		globalBlockGapValue,
+	} );
+	const css = [ baseLayoutCSS, responsiveLayoutCSS ]
+		.filter( Boolean )
+		.join( '' );
 
 	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
 	const layoutClassNames = clsx(

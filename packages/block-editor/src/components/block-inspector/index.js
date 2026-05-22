@@ -41,7 +41,11 @@ import { BlockStateBadges, BlockStatesControl } from '../../hooks/states';
 import ContentTab from '../inspector-controls-tabs/content-tab';
 import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
-import { isDefaultBlockStyleState } from '../../hooks/block-style-state';
+import {
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
+	isDefaultBlockStyleState,
+} from '../../hooks/block-style-state';
 import { onViewportStateChangeKey } from '../../store/private-keys';
 
 function StyleInspectorSlots( {
@@ -88,8 +92,11 @@ function StyleInspectorSlots( {
 	);
 }
 
-function StyleStateInspectorSlots( { blockName } ) {
+function StyleStateInspectorSlots( { blockName, selectedBlockStyleState } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const showLayoutControls =
+		hasViewportBlockStyleState( selectedBlockStyleState ) &&
+		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	return (
 		<>
 			<InspectorControls.Slot
@@ -106,6 +113,12 @@ function StyleStateInspectorSlots( { blockName } ) {
 				group="typography"
 				label={ __( 'Typography' ) }
 			/>
+			{ showLayoutControls && (
+				<InspectorControls.Slot
+					group="layout"
+					label={ __( 'Layout' ) }
+				/>
+			) }
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
@@ -473,7 +486,10 @@ const BlockInspectorSingleBlock = ( {
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
 			<BlockInspectorPreTabsSlot />
 			{ isBlockStyleStateSelected && ! isSectionBlock && (
-				<StyleStateInspectorSlots blockName={ blockName } />
+				<StyleStateInspectorSlots
+					blockName={ blockName }
+					selectedBlockStyleState={ selectedBlockStyleState }
+				/>
 			) }
 			{ ! isBlockStyleStateSelected && hasMultipleTabs && (
 				<>

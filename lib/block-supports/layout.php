@@ -238,6 +238,271 @@ function gutenberg_register_layout_support( $block_type ) {
 }
 
 /**
+ * Returns the child-layout-only subset of a layout object.
+ *
+ * Child layout keys are the ones controlling how the block lays itself out
+ * inside its parent's grid or flex container.
+ *
+ * @param mixed $layout Layout object.
+ * @return array Child layout values, or an empty array.
+ */
+function gutenberg_get_layout_child_values( $layout ) {
+	if ( ! is_array( $layout ) ) {
+		return array();
+	}
+
+	return array_intersect_key(
+		$layout,
+		array_flip(
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+		)
+	);
+}
+
+/**
+ * Returns the container-layout subset of a layout object (everything except child layout keys).
+ *
+ * @param mixed $layout Layout object.
+ * @return array Container layout values, or an empty array.
+ */
+function gutenberg_get_layout_container_values( $layout ) {
+	if ( ! is_array( $layout ) ) {
+		return array();
+	}
+
+	return array_diff_key(
+		$layout,
+		array_flip(
+			array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
+		)
+	);
+}
+
+/**
+ * Sanitizes a block gap value before layout style generation.
+ *
+ * Regex for CSS value borrowed from `safecss_filter_attr`, used here to only match
+ * against the value, not the CSS attribute.
+ *
+ * @param string|array|null $gap_value Block gap value.
+ * @return string|array|null Sanitized block gap value.
+ */
+function gutenberg_sanitize_block_gap_value( $gap_value ) {
+	if ( is_array( $gap_value ) ) {
+		foreach ( $gap_value as $key => $value ) {
+			$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
+		}
+		return $gap_value;
+	}
+
+	return $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
+}
+
+/**
+ * Removes declarations for excluded properties from layout style rules.
+ *
+ * @param array $layout_styles       Layout style rules.
+ * @param array $excluded_properties CSS properties to omit.
+ * @return array Layout style rules with excluded declarations removed.
+ */
+function gutenberg_filter_layout_style_properties( $layout_styles, $excluded_properties = array() ) {
+	if ( empty( $excluded_properties ) ) {
+		return $layout_styles;
+	}
+
+	$excluded_properties = array_flip( $excluded_properties );
+	$filtered_styles     = array();
+
+	foreach ( $layout_styles as $layout_style ) {
+		if ( empty( $layout_style['declarations'] ) || ! is_array( $layout_style['declarations'] ) ) {
+			continue;
+		}
+
+		foreach ( array_keys( $layout_style['declarations'] ) as $property ) {
+			if ( isset( $excluded_properties[ $property ] ) ) {
+				unset( $layout_style['declarations'][ $property ] );
+			}
+		}
+
+		if ( ! empty( $layout_style['declarations'] ) ) {
+			$filtered_styles[] = $layout_style;
+		}
+	}
+
+	return $filtered_styles;
+}
+
+/**
+ * Filters layout style rules down to declarations that differ from base rules.
+ *
+ * @param array $layout_styles       Layout style rules.
+ * @param array $base_layout_styles  Base layout style rules.
+ * @param array $excluded_properties CSS properties to always omit.
+ * @return array Layout style rules containing changed declarations only.
+ */
+function gutenberg_get_layout_style_delta( $layout_styles, $base_layout_styles, $excluded_properties = array() ) {
+	$base_declarations   = array();
+	$excluded_properties = array_flip( $excluded_properties );
+
+	foreach ( $base_layout_styles as $base_layout_style ) {
+		if ( empty( $base_layout_style['selector'] ) || empty( $base_layout_style['declarations'] ) || ! is_array( $base_layout_style['declarations'] ) ) {
+			continue;
+		}
+
+		$rule_key = ( $base_layout_style['rules_group'] ?? '' ) . '|' . $base_layout_style['selector'];
+		if ( ! isset( $base_declarations[ $rule_key ] ) ) {
+			$base_declarations[ $rule_key ] = array();
+		}
+		foreach ( $base_layout_style['declarations'] as $property => $value ) {
+			$base_declarations[ $rule_key ][ $property ] = $value;
+		}
+	}
+
+	$delta_styles = array();
+	foreach ( $layout_styles as $layout_style ) {
+		if ( empty( $layout_style['selector'] ) || empty( $layout_style['declarations'] ) || ! is_array( $layout_style['declarations'] ) ) {
+			continue;
+		}
+
+		$changed_declarations  = array();
+		$rule_key              = ( $layout_style['rules_group'] ?? '' ) . '|' . $layout_style['selector'];
+		$selector_declarations = $base_declarations[ $rule_key ] ?? array();
+		foreach ( $layout_style['declarations'] as $property => $value ) {
+			if ( isset( $excluded_properties[ $property ] ) ) {
+				continue;
+			}
+
+			if ( array_key_exists( $property, $selector_declarations ) && (string) $selector_declarations[ $property ] === (string) $value ) {
+				continue;
+			}
+
+			$changed_declarations[ $property ] = $value;
+		}
+
+		if ( ! empty( $changed_declarations ) ) {
+			$layout_style['declarations'] = $changed_declarations;
+			$delta_styles[]               = $layout_style;
+		}
+	}
+
+	return $delta_styles;
+}
+
+/**
+ * Returns child layout styles for a block affected by its parent's layout.
+ *
+ * @param string $selector      CSS selector.
+ * @param array  $child_layout  Child layout values.
+ * @param array  $parent_layout Parent layout values.
+ * @return array Child layout style rules.
+ */
+function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $parent_layout = array() ) {
+	$child_layout_declarations = array();
+	$child_layout_styles       = array();
+
+	$self_stretch = $child_layout['selfStretch'] ?? null;
+
+	if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
+		$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
+		$child_layout_declarations['box-sizing'] = 'border-box';
+	} elseif ( 'fill' === $self_stretch ) {
+		$child_layout_declarations['flex-grow'] = '1';
+	}
+
+	$column_start = $child_layout['columnStart'] ?? null;
+	$column_span  = $child_layout['columnSpan'] ?? null;
+	if ( $column_start && $column_span ) {
+		$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
+	} elseif ( $column_start ) {
+		$child_layout_declarations['grid-column'] = "$column_start";
+	} elseif ( $column_span ) {
+		$child_layout_declarations['grid-column'] = "span $column_span";
+	}
+
+	$row_start = $child_layout['rowStart'] ?? null;
+	$row_span  = $child_layout['rowSpan'] ?? null;
+	if ( $row_start && $row_span ) {
+		$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
+	} elseif ( $row_start ) {
+		$child_layout_declarations['grid-row'] = "$row_start";
+	} elseif ( $row_span ) {
+		$child_layout_declarations['grid-row'] = "span $row_span";
+	}
+
+	if ( ! empty( $child_layout_declarations ) ) {
+		$child_layout_styles[] = array(
+			'selector'     => $selector,
+			'declarations' => $child_layout_declarations,
+		);
+	}
+
+	$minimum_column_width = $parent_layout['minimumColumnWidth'] ?? null;
+	$column_count         = $parent_layout['columnCount'] ?? null;
+
+	/*
+	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
+	 * the columnSpan should be removed once the grid is smaller than the span, and columnStart should be removed
+	 * once the grid has less columns than the start.
+	 * If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
+	 * In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
+	 */
+	if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
+		$column_span_number  = floatval( $column_span );
+		$column_start_number = floatval( $column_start );
+		$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
+		$parent_column_value = floatval( $parent_column_width );
+		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+
+		$num_cols_to_break_at = 2;
+		if ( $column_span_number && $column_start_number ) {
+			$num_cols_to_break_at = $column_start_number + $column_span_number - 1;
+		} elseif ( $column_span_number ) {
+			$num_cols_to_break_at = $column_span_number;
+		} else {
+			$num_cols_to_break_at = $column_start_number;
+		}
+
+		/*
+		 * If there is no unit, the width has somehow been mangled so we reset both unit and value
+		 * to defaults.
+		 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
+		 */
+		if ( count( $parent_column_unit ) <= 1 ) {
+			$parent_column_unit  = 'rem';
+			$parent_column_value = 12;
+		} else {
+			$parent_column_unit = $parent_column_unit[1];
+
+			if ( ! in_array( $parent_column_unit, array( 'px', 'rem', 'em' ), true ) ) {
+				$parent_column_unit = 'rem';
+			}
+		}
+
+		/*
+		 * A default gap value is used for this computation because custom gap values may not be
+		 * viable to use in the computation of the container query value.
+		 */
+		$default_gap_value             = 'px' === $parent_column_unit ? 24 : 1.5;
+		$container_query_value         = $num_cols_to_break_at * $parent_column_value + ( $num_cols_to_break_at - 1 ) * $default_gap_value;
+		$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
+		$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
+		// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
+		$grid_column_value = $column_span && $column_span > 1 ? '1/-1' : 'auto';
+
+		$child_layout_styles[] = array(
+			'rules_group'  => "@container (max-width: $container_query_value )",
+			'selector'     => $selector,
+			'declarations' => array(
+				'grid-column' => $grid_column_value,
+				'grid-row'    => 'auto',
+			),
+		);
+	}
+
+	return $child_layout_styles;
+}
+
+/**
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string               $selector                      CSS selector.
@@ -248,9 +513,11 @@ function gutenberg_register_layout_support( $block_type ) {
  * @param bool                 $should_skip_gap_serialization Optional. Whether to skip applying the user-defined value set in the editor. Default false.
  * @param string|array         $fallback_gap_value            Optional. The block gap value to apply. If it's an array expected properties are "top" and/or "left". Default '0.5em'.
  * @param array|null           $block_spacing                 Optional. Custom spacing set on the block. Default null.
- * @return string CSS styles on success. Else, empty string.
+ * @param string|null          $rules_group                   Optional. CSS grouping rule, e.g. a media query. Default null.
+ * @param array                $options                       Optional. Extra options for internal callers. Default empty array.
+ * @return string|array CSS styles, layout rules when requested, or empty string.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null ) {
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null, $rules_group = null, $options = array() ) {
 	$layout_type   = $layout['type'] ?? 'default';
 	$layout_styles = array();
 
@@ -595,7 +862,40 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 	}
 
+	if ( ! empty( $options['return_rules'] ) ) {
+		return $layout_styles;
+	}
+
+	$excluded_properties = $options['excluded_properties'] ?? array();
+
+	if ( ! empty( $layout_styles ) && array_key_exists( 'base_layout', $options ) && is_array( $options['base_layout'] ) ) {
+		$base_layout_styles = gutenberg_get_layout_style(
+			$selector,
+			$options['base_layout'],
+			$has_block_gap_support,
+			$options['base_gap_value'] ?? null,
+			$should_skip_gap_serialization,
+			$fallback_gap_value,
+			$options['base_block_spacing'] ?? null,
+			null,
+			array( 'return_rules' => true )
+		);
+		$layout_styles      = gutenberg_get_layout_style_delta(
+			$layout_styles,
+			$base_layout_styles,
+			$excluded_properties
+		);
+	} else {
+		$layout_styles = gutenberg_filter_layout_style_properties( $layout_styles, $excluded_properties );
+	}
+
 	if ( ! empty( $layout_styles ) ) {
+		if ( ! empty( $rules_group ) ) {
+			foreach ( $layout_styles as $index => $layout_style ) {
+				$layout_styles[ $index ]['rules_group'] = $rules_group;
+			}
+		}
+
 		/*
 		 * Add to the style engine store to enqueue and render layout styles.
 		 * Return compiled layout styles to retain backwards compatibility.
@@ -664,142 +964,100 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
+	$style_attr            = $block['attrs']['style'] ?? array();
 	// If there is any value in style -> layout, the block has a child layout.
-	$child_layout = $block['attrs']['style']['layout'] ?? null;
+	$child_layout = $style_attr['layout'] ?? null;
 
-	if ( ! $block_supports_layout && ! $child_layout ) {
+	// Collect responsive viewport child layout overrides so that a block with
+	// only responsive child layout (no base child layout) is still processed.
+	$viewport_child_layouts = array();
+	foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+		$viewport_child = gutenberg_get_layout_child_values( $style_attr[ $breakpoint ]['layout'] ?? null );
+		if ( ! empty( $viewport_child ) ) {
+			$viewport_child_layouts[ $breakpoint ] = array(
+				'media_query'  => $media_query,
+				'child_layout' => $viewport_child,
+			);
+		}
+	}
+
+	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) ) {
 		return $block_content;
 	}
 
 	$outer_class_names = array();
 
 	// Child layout specific logic.
-	if ( $child_layout ) {
+	if ( $child_layout || ! empty( $viewport_child_layouts ) ) {
+		$base_child_layout = gutenberg_get_layout_child_values( $child_layout );
+		$parent_layout     = $block['parentLayout'] ?? array();
+
 		/*
 		 * Generates a unique class for child block layout styles.
 		 *
 		 * To ensure consistent class generation across different page renders,
 		 * only properties that affect layout styling are used. These properties
-		 * come from `$block['attrs']['style']['layout']` and `$block['parentLayout']`.
+		 * come from `$block['attrs']['style']['layout']`, viewport overrides in
+		 * `$block['attrs']['style'][$breakpoint]['layout']`, and
+		 * `$block['parentLayout']`.
 		 *
 		 * As long as these properties coincide, the generated class will be the same.
 		 */
-		$container_content_class = gutenberg_unique_id_from_values(
-			array(
-				'layout'       => array_intersect_key(
-					$block['attrs']['style']['layout'] ?? array(),
-					array_flip(
-						array( 'selfStretch', 'flexSize', 'columnStart', 'columnSpan', 'rowStart', 'rowSpan' )
-					)
-				),
-				'parentLayout' => array_intersect_key(
-					$block['parentLayout'] ?? array(),
-					array_flip(
-						array( 'minimumColumnWidth', 'columnCount' )
-					)
-				),
+		$container_content_hash_input = array(
+			'layout'       => $base_child_layout,
+			'parentLayout' => array_intersect_key(
+				$parent_layout,
+				array_flip( array( 'minimumColumnWidth', 'columnCount' ) )
 			),
+		);
+		foreach ( $viewport_child_layouts as $breakpoint => $viewport_data ) {
+			$container_content_hash_input[ $breakpoint ] = $viewport_data['child_layout'];
+		}
+		$container_content_class = gutenberg_unique_id_from_values(
+			$container_content_hash_input,
 			'wp-container-content-'
 		);
 
-		$child_layout_declarations = array();
-		$child_layout_styles       = array();
-
-		$self_stretch = $block['attrs']['style']['layout']['selfStretch'] ?? null;
-
-		if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
-			$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
-			$child_layout_declarations['box-sizing'] = 'border-box';
-		} elseif ( 'fill' === $self_stretch ) {
-			$child_layout_declarations['flex-grow'] = '1';
-		}
-
-		$column_start = $block['attrs']['style']['layout']['columnStart'] ?? null;
-		$column_span  = $block['attrs']['style']['layout']['columnSpan'] ?? null;
-		if ( $column_start && $column_span ) {
-			$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
-		} elseif ( $column_start ) {
-			$child_layout_declarations['grid-column'] = "$column_start";
-		} elseif ( $column_span ) {
-			$child_layout_declarations['grid-column'] = "span $column_span";
-		}
-
-		$row_start = $block['attrs']['style']['layout']['rowStart'] ?? null;
-		$row_span  = $block['attrs']['style']['layout']['rowSpan'] ?? null;
-		if ( $row_start && $row_span ) {
-			$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
-		} elseif ( $row_start ) {
-			$child_layout_declarations['grid-row'] = "$row_start";
-		} elseif ( $row_span ) {
-			$child_layout_declarations['grid-row'] = "span $row_span";
-		}
-
-		$child_layout_styles[] = array(
-			'selector'     => ".$container_content_class",
-			'declarations' => $child_layout_declarations,
+		$child_layout_styles = gutenberg_get_child_layout_style_rules(
+			".$container_content_class",
+			$base_child_layout,
+			$parent_layout
 		);
 
-		$minimum_column_width = $block['parentLayout']['minimumColumnWidth'] ?? null;
-		$column_count         = $block['parentLayout']['columnCount'] ?? null;
-
-		/*
-		 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
-		 * the columnSpan should be removed once the grid is smaller than the span, and columnStart should be removed
-		 * once the grid has less columns than the start.
-		 * If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
-		 * In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
-		 */
-		if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
-			$column_span_number  = floatval( $column_span );
-			$column_start_number = floatval( $column_start );
-			$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
-			$parent_column_value = floatval( $parent_column_width );
-			$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
-
-			$num_cols_to_break_at = 2;
-			if ( $column_span_number && $column_start_number ) {
-				$num_cols_to_break_at = $column_start_number + $column_span_number - 1;
-			} elseif ( $column_span_number ) {
-				$num_cols_to_break_at = $column_span_number;
-			} else {
-				$num_cols_to_break_at = $column_start_number;
-			}
-
-			/*
-			 * If there is no unit, the width has somehow been mangled so we reset both unit and value
-			 * to defaults.
-			 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
-			 */
-			if ( count( $parent_column_unit ) <= 1 ) {
-				$parent_column_unit  = 'rem';
-				$parent_column_value = 12;
-			} else {
-				$parent_column_unit = $parent_column_unit[1];
-
-				if ( ! in_array( $parent_column_unit, array( 'px', 'rem', 'em' ), true ) ) {
-					$parent_column_unit = 'rem';
-				}
-			}
-
-			/*
-			 * A default gap value is used for this computation because custom gap values may not be
-			 * viable to use in the computation of the container query value.
-			 */
-			$default_gap_value             = 'px' === $parent_column_unit ? 24 : 1.5;
-			$container_query_value         = $num_cols_to_break_at * $parent_column_value + ( $num_cols_to_break_at - 1 ) * $default_gap_value;
-			$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
-			$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
-			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			$grid_column_value = $column_span && $column_span > 1 ? '1/-1' : 'auto';
-
-			$child_layout_styles[] = array(
-				'rules_group'  => "@container (max-width: $container_query_value )",
-				'selector'     => ".$container_content_class",
-				'declarations' => array(
-					'grid-column' => $grid_column_value,
-					'grid-row'    => 'auto',
-				),
+		// Emit responsive child layout CSS using the same container-content class
+		// so that base and responsive child layout share the exact same selector.
+		foreach ( $viewport_child_layouts as $viewport_data ) {
+			$viewport_child_full   = array_replace( $base_child_layout, $viewport_data['child_layout'] );
+			$viewport_child_styles = gutenberg_get_child_layout_style_rules(
+				".$container_content_class",
+				$viewport_child_full,
+				$parent_layout
 			);
+			$base_viewport_styles  = gutenberg_get_child_layout_style_rules(
+				".$container_content_class",
+				$base_child_layout,
+				$parent_layout
+			);
+			$viewport_child_styles = gutenberg_get_layout_style_delta(
+				$viewport_child_styles,
+				$base_viewport_styles
+			);
+
+			// Container queries don't compose with responsive media queries;
+			// drop any container-query rules and wrap the rest in the media query.
+			$viewport_child_styles = array_values(
+				array_filter(
+					$viewport_child_styles,
+					static function ( $rule ) {
+						return empty( $rule['rules_group'] );
+					}
+				)
+			);
+			foreach ( $viewport_child_styles as $index => $rule ) {
+				$viewport_child_styles[ $index ]['rules_group'] = $viewport_data['media_query'];
+			}
+
+			$child_layout_styles = array_merge( $child_layout_styles, $viewport_child_styles );
 		}
 
 		/*
@@ -899,20 +1157,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 */
 	if ( ! current_theme_supports( 'disable-layout-styles' ) ) {
 
-		$gap_value = $block['attrs']['style']['spacing']['blockGap'] ?? null;
-
-		/*
-		 * Skip if gap value contains unsupported characters.
-		 * Regex for CSS value borrowed from `safecss_filter_attr`, and used here
-		 * to only match against the value, not the CSS attribute.
-		 */
-		if ( is_array( $gap_value ) ) {
-			foreach ( $gap_value as $key => $value ) {
-				$gap_value[ $key ] = $value && preg_match( '%[\\\(&=}]|/\*%', $value ) ? null : $value;
-			}
-		} else {
-			$gap_value = $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
-		}
+		$gap_value = gutenberg_sanitize_block_gap_value( $block['attrs']['style']['spacing']['blockGap'] ?? null );
 
 		$fallback_gap_value = $block_type->supports['spacing']['blockGap']['__experimentalDefault'] ?? '0.5em';
 		$block_spacing      = $block['attrs']['style']['spacing'] ?? null;
@@ -984,6 +1229,58 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Only add container class and enqueue block support styles if unique styles were generated.
 		if ( ! empty( $style ) ) {
 			$class_names[] = $container_class;
+		}
+
+		/*
+		 * Emit responsive container layout styles using the same $container_class
+		 * selector as the base layout so they target the inner block wrapper. Only
+		 * the declarations that differ from base are emitted (per viewport).
+		 */
+		foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
+			$viewport_style = $style_attr[ $breakpoint ] ?? null;
+			if ( ! is_array( $viewport_style ) ) {
+				continue;
+			}
+
+			$viewport_container_layout = gutenberg_get_layout_container_values( $viewport_style['layout'] ?? null );
+			$has_viewport_layout       = ! empty( $viewport_container_layout );
+			$has_viewport_block_gap    = isset( $viewport_style['spacing']['blockGap'] );
+			$has_viewport_padding      = isset( $viewport_style['spacing']['padding'] );
+
+			if ( ! $has_viewport_layout && ! $has_viewport_block_gap && ! $has_viewport_padding ) {
+				continue;
+			}
+
+			$viewport_layout        = $has_viewport_layout
+				? array_replace( $used_layout, $viewport_container_layout )
+				: $used_layout;
+			$viewport_gap_value     = $has_viewport_block_gap
+				? gutenberg_sanitize_block_gap_value( $viewport_style['spacing']['blockGap'] )
+				: $gap_value;
+			$viewport_block_spacing = is_array( $viewport_style['spacing'] ?? null )
+				? array_replace( is_array( $block_spacing ) ? $block_spacing : array(), $viewport_style['spacing'] )
+				: $block_spacing;
+
+			$viewport_styles = gutenberg_get_layout_style(
+				".$container_class",
+				$viewport_layout,
+				$has_block_gap_support,
+				$viewport_gap_value,
+				$should_skip_gap_serialization,
+				$fallback_gap_value,
+				$viewport_block_spacing,
+				$media_query,
+				array(
+					'base_layout'         => $used_layout,
+					'base_gap_value'      => $gap_value,
+					'base_block_spacing'  => $block_spacing,
+					'excluded_properties' => array( 'container-type' ),
+				)
+			);
+
+			if ( ! empty( $viewport_styles ) && ! in_array( $container_class, $class_names, true ) ) {
+				$class_names[] = $container_class;
+			}
 		}
 	}
 

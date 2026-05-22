@@ -31,7 +31,7 @@ import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
-	isDefaultBlockStyleState,
+	hasPseudoBlockStyleState,
 } from '../../hooks/block-style-state';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
@@ -97,7 +97,7 @@ function hasAspectRatio( settings ) {
 }
 
 function hasChildLayout( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
-	if ( ! isDefaultBlockStyleState( styleState ) ) {
+	if ( hasPseudoBlockStyleState( styleState ) ) {
 		return false;
 	}
 
@@ -509,6 +509,7 @@ export default function DimensionsPanel( {
 		onChange( {
 			...value,
 			layout: {
+				...value?.layout,
 				...newChildLayout,
 			},
 		} );
