@@ -6,6 +6,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
@@ -37,7 +38,26 @@ const observeAndResizeJS = function () {
 		);
 	}
 
-	const observer = new MutationObserver( sendResize );
+	function scheduleResize() {
+		sendResize();
+		requestAnimationFrame( sendResize );
+		setTimeout( sendResize, 0 );
+		setTimeout( sendResize, 100 );
+	}
+
+	function attachIframeLoadListeners() {
+		Array.prototype.forEach.call(
+			document.querySelectorAll( 'iframe' ),
+			function ( nestedIframe ) {
+				nestedIframe.addEventListener( 'load', sendResize, true );
+			}
+		);
+	}
+
+	const observer = new MutationObserver( function () {
+		sendResize();
+		attachIframeLoadListeners();
+	} );
 	observer.observe( document.body, {
 		attributes: true,
 		attributeOldValue: false,
@@ -47,7 +67,7 @@ const observeAndResizeJS = function () {
 		subtree: true,
 	} );
 
-	window.addEventListener( 'load', sendResize, true );
+	window.addEventListener( 'load', scheduleResize, true );
 
 	// Hack: Remove viewport unit styles, as these are relative
 	// the iframe root and interfere with our mechanism for
@@ -86,7 +106,8 @@ const observeAndResizeJS = function () {
 	document.body.style.width = '100%';
 	document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
-	sendResize();
+	attachIframeLoadListeners();
+	scheduleResize();
 
 	// Resize events can change the width of elements with 100% width, but we don't
 	// get an DOM mutations for that, so do the resize when the window is resized, too.
@@ -174,9 +195,9 @@ function buildSandBoxDocument( {
  *
  * Because `srcdoc` is a declarative attribute, the browser automatically
  * re-renders the content when the iframe is moved in the DOM (e.g.,
- * block reordering), so no `load` event listener is needed.
- * The `message` listener is re-synced on every `load` so
- * it follows the iframe if it's reparented into a different document.
+ * block reordering). The `message` listener is re-synced on every `load`
+ * and whenever `srcDoc` changes so it follows the iframe if it is
+ * reparented into a different document.
  */
 function IsolatedSandBox( {
 	html = '',
@@ -196,7 +217,7 @@ function IsolatedSandBox( {
 		[ html, title, type, styles, scripts ]
 	);
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const iframe = ref.current;
 		if ( ! iframe ) {
 			return;
@@ -256,7 +277,7 @@ function IsolatedSandBox( {
 				checkMessageForResize
 			);
 		};
-	}, [] );
+	}, [ srcDoc ] );
 
 	return (
 		<iframe

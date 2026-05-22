@@ -109,4 +109,14 @@ describe( 'SandBox', () => {
 			expect.stringContaining( 'https://another.super.embed' )
 		);
 	} );
+
+	it( 'should schedule delayed resize messages in srcdoc', () => {
+		render( <SandBox html="<p>Hello</p>" title="Resize Test" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Resize Test' );
+		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
+
+		expect( srcDoc ).toContain( 'scheduleResize' );
+		expect( srcDoc ).toContain( 'attachIframeLoadListeners' );
+	} );
 } );

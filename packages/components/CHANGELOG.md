@@ -18,6 +18,7 @@
 
 ### Bug Fixes
 
+-   `SandBox`: Fix isolated preview iframe sizing race where initial resize messages could be missed, causing empty Custom HTML block previews ([#78576](https://github.com/WordPress/gutenberg/issues/78576)).
 -   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, or is restored to the popover from any portaled descendant. This unblocks nested overlays such as `@wordpress/ui` `Select`, which previously dismissed the host `Popover` on hover and on overlay dismissal ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
 
 ### Internal
