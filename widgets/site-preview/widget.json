@@ -1,6 +1,7 @@
 {
 	"name": "core/site-preview",
-	"title": "Site Preview",
-	"description": "Shows a scaled preview of the site homepage.",
-	"category": "site"
+	"title": "Site preview",
+	"description": "Shows preview of the site homepage.",
+	"category": "site",
+	"presentation": "full-bleed"
 }
