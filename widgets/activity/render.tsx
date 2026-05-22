@@ -276,7 +276,7 @@ export default function Activity() {
 				direction="column"
 				align="center"
 				justify="center"
-				className={ styles.center }
+				className={ styles.loading }
 			>
 				<Spinner />
 			</Stack>
@@ -289,7 +289,7 @@ export default function Activity() {
 				direction="column"
 				align="center"
 				justify="center"
-				className={ styles.center }
+				className={ styles.loading }
 			>
 				<EmptyState.Root>
 					<EmptyState.Icon icon={ postList } />
