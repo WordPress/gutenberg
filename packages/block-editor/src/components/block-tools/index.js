@@ -300,7 +300,7 @@ export default function BlockTools( {
 			} ) }
 		>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && ! isZoomOutMode && (
+				{ ! isTyping && ( ! isZoomOutMode || isDragging ) && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>

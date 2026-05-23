@@ -36,7 +36,6 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
-import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
@@ -191,7 +190,7 @@ function Items( {
 		isZoomOut,
 		selectedBlocks,
 		visibleBlocks,
-		shouldRenderAppender,
+		shouldRenderAppender: shouldRenderAppenderInCurrentMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -238,9 +237,9 @@ function Items( {
 
 			return {
 				order: _order,
+				isZoomOut: _isZoomOut(),
 				selectedBlocks: selectedBlockClientIds,
 				visibleBlocks: __unstableGetVisibleBlocks(),
-				isZoomOut: _isZoomOut(),
 				shouldRenderAppender:
 					( ! isSectionBlock( rootClientId ) ||
 						isContainerInsertableToInContentOnlyMode(
@@ -250,7 +249,6 @@ function Items( {
 					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					( ! templateLock || templateLock === 'contentOnly' ) &&
 					hasAppender &&
-					! _isZoomOut() &&
 					( hasCustomAppender ||
 						hasSelectedRoot ||
 						showRootAppender ),
@@ -258,6 +256,8 @@ function Items( {
 		},
 		[ rootClientId, hasAppender, hasCustomAppender ]
 	);
+	const shouldRenderAppender =
+		shouldRenderAppenderInCurrentMode && ! isZoomOut;
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -271,24 +271,10 @@ function Items( {
 						! selectedBlocks.includes( clientId )
 					}
 				>
-					{ isZoomOut && (
-						<ZoomOutSeparator
-							clientId={ clientId }
-							rootClientId={ rootClientId }
-							position="top"
-						/>
-					) }
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 					/>
-					{ isZoomOut && (
-						<ZoomOutSeparator
-							clientId={ clientId }
-							rootClientId={ rootClientId }
-							position="bottom"
-						/>
-					) }
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
