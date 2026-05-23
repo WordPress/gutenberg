@@ -485,7 +485,6 @@ export default function SearchEdit( {
 						} }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							checked={ !! useSearchElement }
 							label={ __( 'Use the search element' ) }
 							help={ __(
