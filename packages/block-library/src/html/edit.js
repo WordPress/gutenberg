@@ -51,7 +51,6 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				</Placeholder>
 				{ isModalOpen && (
 					<HTMLEditModal
-						isOpen={ isModalOpen }
 						onRequestClose={ () => setIsModalOpen( false ) }
 						content={ attributes.content }
 						setAttributes={ setAttributes }
@@ -88,7 +87,6 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 			<Preview content={ attributes.content } isSelected={ isSelected } />
 			{ isModalOpen && (
 				<HTMLEditModal
-					isOpen={ isModalOpen }
 					onRequestClose={ () => setIsModalOpen( false ) }
 					content={ attributes.content }
 					setAttributes={ setAttributes }
