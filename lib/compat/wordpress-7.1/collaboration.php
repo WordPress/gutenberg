@@ -400,24 +400,25 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 	$title = _draft_or_post_title( $post->ID );
 
 	/*
-	 * Both "Edit" and "Join" links are rendered as sibling <a>s pointing to
-	 * the same URL. CSS in gutenberg_post_list_collaboration_styles() toggles
-	 * which one is visible based on the row's `wp-locked` class, which core's
-	 * inline-edit-post.js maintains in response to heartbeat ticks.
-	 *
-	 * Sibling <a>s (rather than nested spans inside a single <a>) are used so
-	 * the visible label is a direct text child of <a>, matching the row-action
-	 * shape WP core uses for View/Trash/etc. This shape is required by core's
-	 * responsive list-table rule at <=782px:
+	 * Each state is rendered as `<span class="…-action-text"><a>…</a></span>`.
+	 * The toggle classes sit on the outer <span> rather than the <a> so they
+	 * fall outside core's responsive selector `.row-actions span a` at
+	 * <=782px, which otherwise outranks our class selectors and (a) leaves
+	 * both labels visible on unlocked rows and (b) forces `display: inline`
+	 * on the visible Join link to misalign with sibling row actions. The
+	 * visible label is still a direct text child of <a>, so core's mobile
+	 * font-size rule
 	 *     .row-actions span   { font-size: 0;  }
 	 *     .row-actions span a { font-size: 13px; }
-	 * which only restores font-size on the <a> itself, not on descendant
-	 * spans. The previous nested-span markup caused the visible label to
-	 * render at 0px on mobile.
+	 * still reaches it — that's the fix for the original "Edit invisible
+	 * at 0px on mobile" regression. CSS in
+	 * gutenberg_post_list_collaboration_styles() flips visibility on the
+	 * outer spans based on the row's `wp-locked` class, which core's
+	 * inline-edit-post.js maintains in response to heartbeat ticks.
 	 */
 	$actions['edit'] = sprintf(
-		'<a class="edit-action-text" href="%1$s" aria-label="%2$s">%3$s</a>'
-		. '<a class="join-action-text" href="%1$s" aria-label="%4$s">%5$s</a>',
+		'<span class="edit-action-text"><a href="%1$s" aria-label="%2$s">%3$s</a></span>'
+		. '<span class="join-action-text"><a href="%1$s" aria-label="%4$s">%5$s</a></span>',
 		esc_url( get_edit_post_link( $post->ID ) ),
 		/* translators: %s: Post title. */
 		esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) ),
