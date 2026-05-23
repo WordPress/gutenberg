@@ -98,38 +98,70 @@ export default function QuickDraft() {
 
 	const { ref, isWide, isTall } = useWidgetSize();
 
+	/*
+	 * Whether there is room to show the drafts list inline, and how to place it.
+	 * A wide tile sets the list beside the form (each column scrolls, so width
+	 * is what it needs, not height); a tall but narrow tile stacks it below. A
+	 * tile that is neither wide nor tall stays compact, reaching the list from a
+	 * button in the form's action row that only shows when drafts exist.
+	 */
+	const showDraftsList = isWide || isTall;
+	const listBeside = isWide;
+
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 
-	const { existingDraft, isLoadingDrafts } = useSelect( ( select ) => {
-		const { getCurrentUser, getEntityRecords, hasFinishedResolution } =
-			select( coreDataStore );
-		const currentUser = getCurrentUser();
+	const { existingDraft, isLoadingDrafts, hasDrafts } = useSelect(
+		( select ) => {
+			const { getCurrentUser, getEntityRecords, hasFinishedResolution } =
+				select( coreDataStore );
 
-		if ( ! currentUser?.id ) {
-			return { existingDraft: null, isLoadingDrafts: true };
-		}
+			/*
+			 * The "Draft posts" reveal only shows in compact mode, so the
+			 * site-wide draft existence (as DraftsList lists them) is checked
+			 * only there. One record is enough to know the list is non-empty.
+			 */
+			let draftsExist = false;
+			if ( ! showDraftsList ) {
+				const anyDrafts = getEntityRecords( 'postType', 'post', {
+					status: 'draft',
+					per_page: 1,
+				} ) as Array< { id: number } > | undefined;
+				draftsExist = ( anyDrafts?.length ?? 0 ) > 0;
+			}
 
-		const query = {
-			status: 'draft',
-			author: currentUser.id,
-			after: getTodayStartISO(),
-			orderby: 'date',
-			order: 'desc',
-			per_page: 1,
-		};
-		const records = getEntityRecords( 'postType', 'post', query ) as
-			| Array< { id: number; title: { rendered: string } } >
-			| undefined;
+			const currentUser = getCurrentUser();
+			if ( ! currentUser?.id ) {
+				return {
+					existingDraft: null,
+					isLoadingDrafts: true,
+					hasDrafts: draftsExist,
+				};
+			}
 
-		return {
-			existingDraft: records?.[ 0 ] ?? null,
-			isLoadingDrafts: ! hasFinishedResolution( 'getEntityRecords', [
-				'postType',
-				'post',
-				query,
-			] ),
-		};
-	}, [] );
+			const query = {
+				status: 'draft',
+				author: currentUser.id,
+				after: getTodayStartISO(),
+				orderby: 'date',
+				order: 'desc',
+				per_page: 1,
+			};
+			const records = getEntityRecords( 'postType', 'post', query ) as
+				| Array< { id: number; title: { rendered: string } } >
+				| undefined;
+
+			return {
+				existingDraft: records?.[ 0 ] ?? null,
+				isLoadingDrafts: ! hasFinishedResolution( 'getEntityRecords', [
+					'postType',
+					'post',
+					query,
+				] ),
+				hasDrafts: draftsExist,
+			};
+		},
+		[ showDraftsList ]
+	);
 
 	const fields = useMemo< Field< QuickDraftData >[] >(
 		() => [
@@ -186,16 +218,6 @@ export default function QuickDraft() {
 	const writeAnother = () => {
 		setCreatedPost( null );
 	};
-
-	/*
-	 * Whether there is room to show the drafts list inline, and how to place it.
-	 * A wide tile sets the list beside the form (each column scrolls, so width
-	 * is what it needs, not height); a tall but narrow tile stacks it below. A
-	 * tile that is neither wide nor tall stays compact, with the list reached
-	 * from a button in the form's action row.
-	 */
-	const showDraftsList = isWide || isTall;
-	const listBeside = isWide;
 
 	/*
 	 * The single most relevant state for the tile: loading, the
@@ -259,7 +281,7 @@ export default function QuickDraft() {
 					>
 						{ __( 'Save as draft' ) }
 					</Button>
-					{ ! showDraftsList && (
+					{ ! showDraftsList && hasDrafts && (
 						<Button
 							variant="minimal"
 							onClick={ () => setIsListOpenInCompact( true ) }
