@@ -28,6 +28,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
+import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
 import { useBlockVisibility } from '../../block-visibility/';
 
@@ -96,8 +97,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isDragging,
 		hasChildSelected,
 		isEditingDisabled,
+		hasEditableOutline,
 		isEditingContentOnlySection,
 		defaultClassName,
+		isSectionBlock,
 		isWithinSectionBlock,
 		canMove,
 		blockVisibility,
@@ -116,8 +119,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
-	const isHoverEnabled =
-		! isWithinSectionBlock || blockEditingMode === 'contentOnly';
+	const isHoverEnabled = ! isWithinSectionBlock;
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		defaultViewRef,
@@ -129,6 +131,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
+		useFlashEditableBlocks( {
+			clientId,
+			isEnabled: isSectionBlock,
+		} ),
 		useScrollIntoView( { isSelected } ),
 		canMove ? ffDragRef : undefined,
 	] );
@@ -194,6 +200,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
 				'is-editing-disabled': isEditingDisabled,
+				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
 				'is-block-hidden': isBlockCurrentlyHidden,

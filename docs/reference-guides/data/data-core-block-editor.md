@@ -1121,7 +1121,7 @@ _Returns_
 
 ### isGroupable
 
-Indicates if the provided blocks(by client ids) are groupable. We need to have at least one block, have a grouping block name set and be able to move these blocks (grouping reparents into a new container).
+Indicates if the provided blocks(by client ids) are groupable. We need to have at least one block, have a grouping block name set and be able to remove these blocks.
 
 _Parameters_
 

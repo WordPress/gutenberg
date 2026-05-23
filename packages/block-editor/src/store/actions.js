@@ -1167,31 +1167,7 @@ export const mergeBlocks =
 	( { registry, select, dispatch } ) => {
 		const clientIdA = firstBlockClientId;
 		const clientIdB = secondBlockClientId;
-
-		// If either side of the merge is an unmodified default block (e.g.
-		// an empty paragraph), just remove it. This runs before the editing
-		// mode / merge-function checks below because removing an empty
-		// placeholder doesn't actually merge anything into the other block
-		// — it's a pure deletion that only requires the empty block itself
-		// to be removable (already enforced via `canRemove` upstream).
-		const blockB = select.getBlock( clientIdB );
-		if ( blockB && isUnmodifiedDefaultBlock( blockB ) ) {
-			dispatch.removeBlock(
-				clientIdB,
-				select.isBlockSelected( clientIdB )
-			);
-			return;
-		}
-
 		const blockA = select.getBlock( clientIdA );
-		if ( blockA && isUnmodifiedDefaultBlock( blockA ) ) {
-			dispatch.removeBlock(
-				clientIdA,
-				select.isBlockSelected( clientIdA )
-			);
-			return;
-		}
-
 		const blockAType = getBlockType( blockA.name );
 
 		if (
@@ -1201,6 +1177,8 @@ export const mergeBlocks =
 		) {
 			return;
 		}
+
+		const blockB = select.getBlock( clientIdB );
 
 		if (
 			! blockAType.merge &&
@@ -1269,6 +1247,22 @@ export const mergeBlocks =
 					}
 				}
 			} );
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockA ) ) {
+			dispatch.removeBlock(
+				clientIdA,
+				select.isBlockSelected( clientIdA )
+			);
+			return;
+		}
+
+		if ( isUnmodifiedDefaultBlock( blockB ) ) {
+			dispatch.removeBlock(
+				clientIdB,
+				select.isBlockSelected( clientIdB )
+			);
 			return;
 		}
 

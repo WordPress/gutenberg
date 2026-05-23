@@ -354,14 +354,9 @@ export function setInsertionPoint( value ) {
 }
 
 /**
- * Enter inline edit mode for a content-only section block (template part,
- * synced/unsynced pattern, or any block with `templateLock: 'contentOnly'`).
- * The reducer flips the section's descendants from `disabled` to `default`
- * editing mode while this state is set.
+ * Mark a contentOnly section as being edited.
  *
- * @param {string} clientId Section block's client ID.
- *
- * @return {Object} Action object.
+ * @param {string} clientId The client id of the block.
  */
 export function editContentOnlySection( clientId ) {
 	return {
@@ -371,13 +366,11 @@ export function editContentOnlySection( clientId ) {
 }
 
 /**
- * Stop editing the currently-edited contentOnly section.
- *
- * @return {Object} Action object.
+ * Action that stops editing a contentOnly section.
  */
 export function stopEditingContentOnlySection() {
 	return {
-		type: 'STOP_EDITING_CONTENT_ONLY_SECTION',
+		type: 'EDIT_CONTENT_ONLY_SECTION',
 	};
 }
 

@@ -7,7 +7,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	EntityProvider,
@@ -310,6 +310,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
+		const registry = useRegistry();
 
 		const onChangeSelection = useCallback(
 			( newSelection ) => {
@@ -334,7 +335,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			}
 
 			updatePostLock( settings.postLock );
-			setupEditor( post, initialEdits, settings.template );
+			// `setupEditor` may already have been dispatched by the
+			// editor's pre-mount kickoff (see edit-post's
+			// `initializeEditor`). Skip the redundant dispatch — it
+			// would otherwise re-parse + reset blocks for new posts.
+			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
+				setupEditor( post, initialEdits, settings.template );
+			}
 			if ( settings.autosave ) {
 				createWarningNotice(
 					__(

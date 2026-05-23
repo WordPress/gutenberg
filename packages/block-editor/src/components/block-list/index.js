@@ -36,8 +36,8 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
+import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
-import { isIsolatedEditorKey } from '../../store/private-keys';
 
 export const IntersectionObserver = createContext();
 IntersectionObserver.displayName = 'IntersectionObserverContext';
@@ -52,7 +52,6 @@ function Root( { className, ...settings } ) {
 		isOutlineMode,
 		isFocusMode,
 		isPreviewMode,
-		isSyncedIsolatedEditor,
 		editedContentOnlySection,
 	} = useSelect( ( select ) => {
 		const {
@@ -61,21 +60,15 @@ function Root( { className, ...settings } ) {
 			hasBlockSpotlight,
 			getEditedContentOnlySection,
 		} = unlock( select( blockEditorStore ) );
-		const editorSettings = getSettings();
 		const {
 			outlineMode,
 			focusMode,
 			isPreviewMode: _isPreviewMode,
-		} = editorSettings;
+		} = getSettings();
 		return {
 			isOutlineMode: outlineMode && ! isTyping(),
 			isFocusMode: focusMode || hasBlockSpotlight(),
 			isPreviewMode: _isPreviewMode,
-			// outlineMode is on for wp_template/wp_template_part/wp_block;
-			// isolatedEditor is on for wp_template_part/wp_block/wp_navigation.
-			// Their intersection is exactly the synced entities.
-			isSyncedIsolatedEditor:
-				!! outlineMode && !! editorSettings?.[ isIsolatedEditorKey ],
 			editedContentOnlySection: getEditedContentOnlySection(),
 		};
 	}, [] );
@@ -126,7 +119,6 @@ function Root( { className, ...settings } ) {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode,
 				'is-preview-mode': isPreviewMode,
-				'is-synced-isolated-editor': isSyncedIsolatedEditor,
 			} ),
 		},
 		settings
@@ -194,72 +186,78 @@ function Items( {
 	// function on every render.
 	const hasAppender = CustomAppender !== false;
 	const hasCustomAppender = !! CustomAppender;
-	const { order, selectedBlocks, visibleBlocks, shouldRenderAppender } =
-		useSelect(
-			( select ) => {
-				const {
-					getSettings,
-					getBlockOrder,
-					getSelectedBlockClientIds,
-					__unstableGetVisibleBlocks,
-					getTemplateLock,
-					getBlockEditingMode,
-					isSectionBlock,
-					isContainerInsertableToInContentOnlyMode,
-					getBlockName,
-					isZoomOut: _isZoomOut,
-					canInsertBlockType,
-				} = unlock( select( blockEditorStore ) );
+	const {
+		order,
+		isZoomOut,
+		selectedBlocks,
+		visibleBlocks,
+		shouldRenderAppender,
+	} = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				getBlockOrder,
+				getSelectedBlockClientIds,
+				__unstableGetVisibleBlocks,
+				getTemplateLock,
+				getBlockEditingMode,
+				isSectionBlock,
+				isContainerInsertableToInContentOnlyMode,
+				getBlockName,
+				isZoomOut: _isZoomOut,
+				canInsertBlockType,
+			} = unlock( select( blockEditorStore ) );
 
-				const _order = getBlockOrder( rootClientId );
+			const _order = getBlockOrder( rootClientId );
 
-				if ( getSettings().isPreviewMode ) {
-					return {
-						order: _order,
-						selectedBlocks: EMPTY_ARRAY,
-						visibleBlocks: EMPTY_SET,
-					};
-				}
-
-				const selectedBlockClientIds = getSelectedBlockClientIds();
-				const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-				const showRootAppender =
-					! rootClientId &&
-					! selectedBlockClientId &&
-					( ! _order.length ||
-						! canInsertBlockType(
-							getDefaultBlockName(),
-							rootClientId
-						) );
-				const hasSelectedRoot = !! (
-					rootClientId &&
-					selectedBlockClientId &&
-					rootClientId === selectedBlockClientId
-				);
-
-				const templateLock = getTemplateLock( rootClientId );
-
+			if ( getSettings().isPreviewMode ) {
 				return {
 					order: _order,
-					selectedBlocks: selectedBlockClientIds,
-					visibleBlocks: __unstableGetVisibleBlocks(),
-					shouldRenderAppender:
-						( ! isSectionBlock( rootClientId ) ||
-							isContainerInsertableToInContentOnlyMode(
-								getBlockName( selectedBlockClientId ),
-								rootClientId
-							) ) &&
-						getBlockEditingMode( rootClientId ) !== 'disabled' &&
-						( ! templateLock || templateLock === 'contentOnly' ) &&
-						hasAppender &&
-						! _isZoomOut() &&
-						( hasCustomAppender ||
-							hasSelectedRoot ||
-							showRootAppender ),
+					selectedBlocks: EMPTY_ARRAY,
+					visibleBlocks: EMPTY_SET,
 				};
-			},
-			[ rootClientId, hasAppender, hasCustomAppender ]
-		);
+			}
+
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+			const showRootAppender =
+				! rootClientId &&
+				! selectedBlockClientId &&
+				( ! _order.length ||
+					! canInsertBlockType(
+						getDefaultBlockName(),
+						rootClientId
+					) );
+			const hasSelectedRoot = !! (
+				rootClientId &&
+				selectedBlockClientId &&
+				rootClientId === selectedBlockClientId
+			);
+
+			const templateLock = getTemplateLock( rootClientId );
+
+			return {
+				order: _order,
+				selectedBlocks: selectedBlockClientIds,
+				visibleBlocks: __unstableGetVisibleBlocks(),
+				isZoomOut: _isZoomOut(),
+				shouldRenderAppender:
+					( ! isSectionBlock( rootClientId ) ||
+						isContainerInsertableToInContentOnlyMode(
+							getBlockName( selectedBlockClientId ),
+							rootClientId
+						) ) &&
+					getBlockEditingMode( rootClientId ) !== 'disabled' &&
+					( ! templateLock || templateLock === 'contentOnly' ) &&
+					hasAppender &&
+					! _isZoomOut() &&
+					( hasCustomAppender ||
+						hasSelectedRoot ||
+						showRootAppender ),
+			};
+		},
+		[ rootClientId, hasAppender, hasCustomAppender ]
+	);
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -273,10 +271,24 @@ function Items( {
 						! selectedBlocks.includes( clientId )
 					}
 				>
+					{ isZoomOut && (
+						<ZoomOutSeparator
+							clientId={ clientId }
+							rootClientId={ rootClientId }
+							position="top"
+						/>
+					) }
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 					/>
+					{ isZoomOut && (
+						<ZoomOutSeparator
+							clientId={ clientId }
+							rootClientId={ rootClientId }
+							position="bottom"
+						/>
+					) }
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }

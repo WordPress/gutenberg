@@ -18,6 +18,7 @@ import {
 	Spinner,
 	MenuItem,
 	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -43,17 +44,7 @@ import { unlock } from '../lock-unlock';
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { isOverridableBlock } = unlock( patternsPrivateApis );
 
-function useIsEditingThis( clientId ) {
-	return useSelect(
-		( select ) => {
-			const { getEditedContentOnlySection } = unlock(
-				select( blockEditorStore )
-			);
-			return getEditedContentOnlySection() === clientId;
-		},
-		[ clientId ]
-	);
-}
+const NOOP = () => {};
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -145,12 +136,14 @@ function ReusableBlockControl( {
 
 			{ canOverrideBlocks && (
 				<BlockControls group="other">
-					<ToolbarButton
-						onClick={ resetContent }
-						disabled={ ! hasContent }
-					>
-						{ __( 'Reset' ) }
-					</ToolbarButton>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetContent }
+							disabled={ ! hasContent }
+						>
+							{ __( 'Reset' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
 				</BlockControls>
 			) }
 		</>
@@ -177,7 +170,6 @@ function ReusableBlockEdit( {
 		'wp_block',
 		{ id: ref }
 	);
-	const isEditingThis = useIsEditingThis( clientId );
 	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -190,18 +182,27 @@ function ReusableBlockEdit( {
 		onNavigateToEntityRecord,
 		hasPatternOverridesSource,
 		supportedBlockTypesRaw,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return {
-			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
-			hasPatternOverridesSource: !! getBlockBindingsSource(
-				'core/pattern-overrides'
-			),
-			supportedBlockTypesRaw:
-				getSettings().__experimentalBlockBindingsSupportedAttributes ||
-				EMPTY_OBJECT,
-		};
-	}, [] );
+		isEditingThis,
+	} = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			const { getSettings } = blockEditorSelect;
+			const { getEditedContentOnlySection } = unlock( blockEditorSelect );
+			return {
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+				hasPatternOverridesSource: !! getBlockBindingsSource(
+					'core/pattern-overrides'
+				),
+				supportedBlockTypesRaw:
+					getSettings()
+						.__experimentalBlockBindingsSupportedAttributes ||
+					EMPTY_OBJECT,
+				isEditingThis: getEditedContentOnlySection() === clientId,
+			};
+		},
+		[ clientId ]
+	);
 	const canUserEdit = useSelect(
 		( select ) =>
 			!! select( coreStore ).canUser( 'update', {
@@ -241,8 +242,8 @@ function ReusableBlockEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		layout,
 		value: blocks,
-		onInput,
-		onChange,
+		onInput: isEditingThis ? onInput : NOOP,
+		onChange: isEditingThis ? onChange : NOOP,
 		renderAppender: blocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,

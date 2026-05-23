@@ -25,6 +25,7 @@ import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import PatternsActions from './actions';
+import { useEditPostAction } from '../dataviews-actions';
 import {
 	patternStatusField,
 	previewField,
@@ -158,13 +159,14 @@ export default function DataviewsPatterns() {
 		postType: PATTERN_TYPES.user,
 		context: 'list',
 	} );
+	const editAction = useEditPostAction();
 
 	const actions = useMemo( () => {
 		if ( postType === TEMPLATE_PART_POST_TYPE ) {
-			return templatePartActions;
+			return [ editAction, ...templatePartActions ].filter( Boolean );
 		}
-		return patternActions;
-	}, [ postType, templatePartActions, patternActions ] );
+		return [ editAction, ...patternActions ].filter( Boolean );
+	}, [ editAction, postType, templatePartActions, patternActions ] );
 	const settings = usePatternSettings();
 	const { title, description } = usePagePatternsHeader(
 		postType,

@@ -445,25 +445,24 @@ export const __experimentalGetBlockAttributesNamesByRole = (
 };
 
 /**
- * Checks whether a block declares `supports.contentRole`. Blocks with this
- * support act as transparent containers — `isContentBlock` treats them as
- * content blocks regardless of their attribute roles, but only when they
- * actually contain children.
+ * Checks if a block is a content block by examining its attributes.
+ * A block is considered a content block if it has at least one attribute
+ * with a role of 'content'.
  *
- * @param name Block name.
- * @return Whether the block type sets `supports.contentRole`.
+ * @param name The name of the block to check.
+ * @return Whether the block is a content block.
  */
-export function hasContentRoleSupport( name: string ): boolean {
-	const blockType = getBlockType( name );
-	return !! ( blockType?.supports as Record< string, unknown > )?.contentRole;
-}
-
 export function isContentBlock( name: string ): boolean {
-	if ( hasContentRoleSupport( name ) ) {
-		return true;
-	}
 	const blockType = getBlockType( name );
 	const attributes = blockType?.attributes;
+	// Not all blocks have attributes but they may support contentRole instead.
+	const supportsContentRole = (
+		blockType?.supports as Record< string, unknown >
+	 )?.contentRole;
+
+	if ( supportsContentRole ) {
+		return true;
+	}
 	if ( ! attributes ) {
 		return false;
 	}

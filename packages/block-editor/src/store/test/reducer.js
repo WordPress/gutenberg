@@ -4199,6 +4199,12 @@ describe( 'state', () => {
 				initialState = dispatchActions(
 					[
 						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
 							type: 'RESET_BLOCKS',
 							blocks: [
 								{
@@ -4234,7 +4240,7 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'returns no block editing modes when no section root is configured', () => {
+			it( 'returns no block editing modes when zoomed out is not active and there are no synced patterns', () => {
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map()
 				);
@@ -4389,11 +4395,8 @@ describe( 'state', () => {
 			} );
 
 			it( 'returns the expected block editing modes for synced patterns', () => {
-				// Only the parent pattern and its own children that have
-				// bindings are in contentOnly mode. All other descendants
-				// are disabled. The plain `group-1` at the root has no
-				// derived mode — section-locked behavior is opt-in via an
-				// explicit marker, not inferred from position.
+				// Only the parent pattern and its own children that have bindings
+				// are in contentOnly mode. All other blocks are disabled.
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
@@ -4421,19 +4424,11 @@ describe( 'state', () => {
 					initialState
 				);
 
-				// `group-1` is a plain Group at the root with no explicit
-				// lock, so once the synced pattern is gone the derived map
-				// is empty.
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
-			it( 'synced pattern inner blocks become default when the synced pattern is the editedContentOnlySection', () => {
-				// When the synced pattern itself is being edited inline (via
-				// the "Edit" button on a core/block), its inner blocks should
-				// become fully editable ('default') so changes propagate to
-				// the shared wp_block entity. Nested synced patterns stay
-				// locked.
-				const editingState = dispatchActions(
+			it( 'sets synced pattern inner blocks to default when the synced pattern is edited', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
 					[
 						{
 							type: 'EDIT_CONTENT_ONLY_SECTION',
@@ -4444,23 +4439,17 @@ describe( 'state', () => {
 					initialState
 				);
 
-				expect( editingState.derivedBlockEditingModes ).toEqual(
+				expect( derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							// Root is outside the edited section.
 							'': 'disabled',
 							'group-1': 'disabled',
 							'paragraph-1': 'disabled',
 							'group-2': 'disabled',
 							'paragraph-2': 'disabled',
-							// Direct inner blocks of the edited synced pattern
-							// are freely editable.
 							'pattern-paragraph': 'default',
 							'pattern-group': 'default',
 							'pattern-paragraph-with-overrides': 'default',
-							// Nested synced pattern and its contents remain
-							// locked — editing doesn't cascade through another
-							// synced boundary.
 							'nested-pattern': 'disabled',
 							'nested-paragraph': 'disabled',
 							'nested-group': 'disabled',
@@ -5304,44 +5293,37 @@ describe( 'state', () => {
 			} );
 		} );
 
-		describe( 'zoom out mode with template parts', () => {
+		describe( 'unsynced patterns', () => {
 			let initialState;
-
 			beforeAll( () => {
 				initialState = dispatchActions(
 					[
 						{
-							type: 'UPDATE_SETTINGS',
-							settings: {
-								[ sectionRootClientIdKey ]: 'main-group',
-							},
-						},
-						{
-							type: 'SET_ZOOM_LEVEL',
-							zoom: 'auto-scaled',
-						},
-						{
 							type: 'RESET_BLOCKS',
 							blocks: [
 								{
-									name: 'core/template-part',
-									clientId: 'header-tp',
-									attributes: {},
-									innerBlocks: [],
-								},
-								{
 									name: 'core/group',
-									clientId: 'main-group',
-									attributes: {},
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
 									innerBlocks: [
 										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
 											name: 'core/group',
-											clientId: 'section-1',
+											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
 												{
 													name: 'core/paragraph',
-													clientId: 'paragraph-1',
+													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
 												},
@@ -5349,151 +5331,7 @@ describe( 'state', () => {
 										},
 									],
 								},
-								{
-									name: 'core/template-part',
-									clientId: 'footer-tp',
-									attributes: {},
-									innerBlocks: [],
-								},
 							],
-						},
-						{
-							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
-							clientId: 'header-tp',
-							hasControlledInnerBlocks: true,
-						},
-						{
-							type: 'REPLACE_INNER_BLOCKS',
-							rootClientId: 'header-tp',
-							blocks: [
-								{
-									name: 'core/paragraph',
-									clientId: 'header-paragraph',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
-						},
-						{
-							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
-							clientId: 'footer-tp',
-							hasControlledInnerBlocks: true,
-						},
-						{
-							type: 'REPLACE_INNER_BLOCKS',
-							rootClientId: 'footer-tp',
-							blocks: [
-								{
-									name: 'core/paragraph',
-									clientId: 'footer-paragraph',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
-						},
-					],
-					testReducer
-				);
-			} );
-
-			it( 'gives template parts default mode so they stay selectable in List View', () => {
-				expect( initialState.derivedBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							'': 'disabled',
-							'header-tp': 'default', // Template part stays selectable.
-							'header-paragraph': 'disabled',
-							'main-group': 'contentOnly', // Section root.
-							'section-1': 'contentOnly', // Section.
-							'paragraph-1': 'disabled',
-							'footer-tp': 'default', // Template part stays selectable.
-							'footer-paragraph': 'disabled',
-						} )
-					)
-				);
-			} );
-		} );
-
-		describe( 'top-level sections', () => {
-			// Section-locked behavior is opt-in via an explicit marker
-			// (`templateLock: 'contentOnly'`, `metadata.patternName`,
-			// `core/template-part`, `core/block`). A plain `core/group` at
-			// the section root has no derived modes — it behaves like any
-			// other Group. The fixture mirrors that: a plain Group at the
-			// root contributes nothing, while a sibling Group with explicit
-			// `templateLock: 'contentOnly'` does.
-			let initialState;
-			beforeAll( () => {
-				initialState = dispatchActions(
-					[
-						{
-							type: 'UPDATE_SETTINGS',
-							settings: {
-								[ sectionRootClientIdKey ]: 'section-root',
-							},
-						},
-						{
-							type: 'RESET_BLOCKS',
-							blocks: [
-								{
-									name: 'core/group',
-									clientId: 'section-root',
-									attributes: { tagName: 'main' },
-									innerBlocks: [
-										{
-											name: 'core/group',
-											clientId: 'plain-group',
-											attributes: {},
-											innerBlocks: [
-												{
-													name: 'core/paragraph',
-													clientId: 'plain-paragraph',
-													attributes: {},
-													innerBlocks: [],
-												},
-											],
-										},
-										{
-											name: 'core/group',
-											clientId: 'locked-group',
-											attributes: {
-												templateLock: 'contentOnly',
-											},
-											innerBlocks: [
-												{
-													name: 'core/paragraph',
-													clientId:
-														'locked-paragraph',
-													attributes: {},
-													innerBlocks: [],
-												},
-												{
-													name: 'core/group',
-													clientId:
-														'locked-inner-group',
-													attributes: {},
-													innerBlocks: [
-														{
-															name: 'core/paragraph',
-															clientId:
-																'locked-inner-paragraph',
-															attributes: {},
-															innerBlocks: [],
-														},
-													],
-												},
-											],
-										},
-									],
-								},
-							],
-						},
-						{
-							type: 'UPDATE_BLOCK_LIST_SETTINGS',
-							clientId: 'locked-group',
-							settings: {
-								templateLock: 'contentOnly',
-							},
 						},
 					],
 					testReducer,
@@ -5501,24 +5339,24 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'derives modes only for explicitly-locked sections, not plain groups at the root', () => {
+			it( 'returns the expected block editing modes for an unsynced pattern', () => {
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'locked-paragraph': 'contentOnly',
-							'locked-inner-group': 'disabled',
-							'locked-inner-paragraph': 'contentOnly',
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
 						} )
 					)
 				);
 			} );
 
-			it( 'removes block editing modes when an explicitly-locked section is removed', () => {
+			it( 'removes block editing modes when an unsynced pattern is removed', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
 						{
 							type: 'REMOVE_BLOCKS',
-							clientIds: [ 'locked-group' ],
+							clientIds: [ 'group-1' ],
 						},
 					],
 					testReducer,
@@ -5528,12 +5366,32 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
-			it( 'allows explicitly set blockEditingModes to override the section editing modes', () => {
+			it( 'removes block editing modes when the `patternName` attribute is removed from the unsynced pattern', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'group-1' ],
+							attributes: {
+								metadata: {
+									patternName: undefined,
+								},
+							},
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+
+			it( 'allows explicitly set blockEditingModes to override the unsynced pattern editing modes', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
 						{
 							type: 'SET_BLOCK_EDITING_MODE',
-							clientId: 'locked-paragraph',
+							clientId: 'paragraph-2',
 							mode: 'disabled',
 						},
 					],
@@ -5544,31 +5402,34 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'locked-inner-group': 'disabled',
-							'locked-inner-paragraph': 'contentOnly',
-							// `locked-paragraph` has an explicit mode, so it
-							// isn't set as a derived mode.
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							// Paragraph 2 already has an explicit mode, so isn't set as a derived mode.
 						} )
 					)
 				);
 			} );
 
-			it( 'a newly inserted plain group at the section root contributes no derived modes', () => {
+			it( 'sets the correct block editing modes when a new unsynced pattern is inserted', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
 						{
 							type: 'INSERT_BLOCKS',
-							rootClientId: 'section-root',
-							index: 2,
+							rootClientId: '',
+							index: 1,
 							blocks: [
 								{
 									name: 'core/group',
-									clientId: 'inserted-group',
-									attributes: {},
+									clientId: 'group-3',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern-2',
+										},
+									},
 									innerBlocks: [
 										{
 											name: 'core/paragraph',
-											clientId: 'inserted-paragraph',
+											clientId: 'paragraph-3',
 											attributes: {},
 											innerBlocks: [],
 										},
@@ -5581,33 +5442,28 @@ describe( 'state', () => {
 					initialState
 				);
 
-				// The newly inserted plain Group at the root has no
-				// templateLock — it shouldn't add derived modes for its
-				// inner blocks. Only the previously-locked section
-				// contributes.
 				expect( derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'locked-paragraph': 'contentOnly',
-							'locked-inner-group': 'disabled',
-							'locked-inner-paragraph': 'contentOnly',
+							'paragraph-1': 'contentOnly',
+							'group-2': 'disabled',
+							'paragraph-2': 'contentOnly',
+							'paragraph-3': 'contentOnly',
 						} )
 					)
 				);
 			} );
 		} );
 
-		describe( 'isIsolatedEditor setting', () => {
-			let stateWithSectionAndTemplatePart;
+		describe( 'unsynced patterns with disableContentOnlyForUnsyncedPatterns enabled', () => {
+			let initialState;
 			beforeAll( () => {
-				// Set up a state with a top-level section block and a template part,
-				// both nested inside a section root.
-				stateWithSectionAndTemplatePart = dispatchActions(
+				initialState = dispatchActions(
 					[
 						{
 							type: 'UPDATE_SETTINGS',
 							settings: {
-								[ sectionRootClientIdKey ]: 'section-root',
+								disableContentOnlyForUnsyncedPatterns: true,
 							},
 						},
 						{
@@ -5615,30 +5471,129 @@ describe( 'state', () => {
 							blocks: [
 								{
 									name: 'core/group',
-									clientId: 'section-root',
-									attributes: { tagName: 'main' },
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
 									innerBlocks: [
 										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
 											name: 'core/group',
-											clientId: 'section-block',
+											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
 												{
 													name: 'core/paragraph',
-													clientId:
-														'section-paragraph',
+													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
 												},
 											],
 										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for unsynced patterns when disableContentOnlyForUnsyncedPatterns is true', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+
+			it( 'does not add editing modes when a patternName attribute is set via UPDATE_BLOCK_ATTRIBUTES', () => {
+				const stateWithoutPatternName = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForUnsyncedPatterns: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
 										{
-											name: 'core/template-part',
-											clientId: 'template-part',
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
 										},
 									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'group-1' ],
+							attributes: {
+								metadata: {
+									patternName: 'test-pattern',
+								},
+							},
+						},
+					],
+					testReducer,
+					stateWithoutPatternName
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+		} );
+
+		describe( 'isIsolatedEditor setting', () => {
+			let stateWithUnsyncedPatternAndTemplatePart;
+			beforeAll( () => {
+				// Set up a state with both an unsynced pattern and a template part.
+				stateWithUnsyncedPatternAndTemplatePart = dispatchActions(
+					[
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'unsynced-pattern',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'pattern-paragraph',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+								{
+									name: 'core/template-part',
+									clientId: 'template-part',
+									attributes: {},
+									innerBlocks: [],
 								},
 							],
 						},
@@ -5664,17 +5619,13 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'applies disabled to template part descendants when isIsolatedEditor is false', () => {
+			it( 'applies contentOnly modes to unsynced patterns and template parts when isIsolatedEditor is false', () => {
 				expect(
-					stateWithSectionAndTemplatePart.derivedBlockEditingModes
+					stateWithUnsyncedPatternAndTemplatePart.derivedBlockEditingModes
 				).toEqual(
 					new Map(
 						Object.entries( {
-							// The plain Group (`section-block`) at the root
-							// has no explicit lock, so its inner blocks have
-							// no derived modes. Template parts behave like
-							// synced patterns: their descendants are fully
-							// locked until the user opts in via "Edit".
+							'pattern-paragraph': 'contentOnly',
 							'template-part-paragraph': 'disabled',
 						} )
 					)
@@ -5692,13 +5643,13 @@ describe( 'state', () => {
 						},
 					],
 					testReducer,
-					stateWithSectionAndTemplatePart
+					stateWithUnsyncedPatternAndTemplatePart
 				);
 
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
-			it( 'recomputes derived modes when isIsolatedEditor changes from true to false', () => {
+			it( 'recomputes contentOnly modes when isIsolatedEditor changes from true to false', () => {
 				const stateWithIsolatedEditor = dispatchActions(
 					[
 						{
@@ -5709,7 +5660,7 @@ describe( 'state', () => {
 						},
 					],
 					testReducer,
-					stateWithSectionAndTemplatePart
+					stateWithUnsyncedPatternAndTemplatePart
 				);
 
 				// Verify that no derived modes exist with isIsolatedEditor enabled.
@@ -5734,19 +5685,19 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
+							'pattern-paragraph': 'contentOnly',
 							'template-part-paragraph': 'disabled',
 						} )
 					)
 				);
 			} );
 
-			it( 'returns no derived editing modes for top-level sections when isIsolatedEditor is initially true', () => {
+			it( 'returns no derived editing modes for unsynced patterns when isIsolatedEditor is initially true', () => {
 				const stateWithIsolatedEditorFromStart = dispatchActions(
 					[
 						{
 							type: 'UPDATE_SETTINGS',
 							settings: {
-								[ sectionRootClientIdKey ]: 'section-root',
 								[ isIsolatedEditorKey ]: true,
 							},
 						},
@@ -5755,21 +5706,18 @@ describe( 'state', () => {
 							blocks: [
 								{
 									name: 'core/group',
-									clientId: 'section-root',
-									attributes: { tagName: 'main' },
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
 									innerBlocks: [
 										{
-											name: 'core/group',
-											clientId: 'group-1',
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
 											attributes: {},
-											innerBlocks: [
-												{
-													name: 'core/paragraph',
-													clientId: 'paragraph-1',
-													attributes: {},
-													innerBlocks: [],
-												},
-											],
+											innerBlocks: [],
 										},
 									],
 								},
@@ -5842,10 +5790,7 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'returns the expected block editing modes for template parts', () => {
-				// Template parts behave like synced patterns: every
-				// descendant is fully locked until the user clicks "Edit",
-				// regardless of whether the descendant is a content block.
+			it( 'returns the expected block editing modes for synced patterns', () => {
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
@@ -5883,7 +5828,7 @@ describe( 'state', () => {
 						{
 							type: 'SET_BLOCK_EDITING_MODE',
 							clientId: 'template-part-grouped-paragraph',
-							mode: 'contentOnly',
+							mode: 'disabled',
 						},
 					],
 					testReducer,
@@ -5901,13 +5846,32 @@ describe( 'state', () => {
 				);
 			} );
 
-			// Mirrors the page-context setup in `DisableNonPageContentBlocks`:
-			// the root is disabled and the template part gets an explicit
-			// `default` so it punches through the cascade. The descendants
-			// should be derived `disabled` (locked, like synced patterns)
-			// until the user clicks "Edit", which opens the section inline
-			// even though those explicit modes are present.
-			it( 'page-context: template-part descendants stay disabled until the section is edited', () => {
+			it( 'sets template part descendants to default when the template part is edited', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'template-part',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							'template-part': 'default',
+							'template-part-paragraph': 'default',
+							'template-part-group': 'default',
+							'template-part-grouped-paragraph': 'default',
+						} )
+					)
+				);
+			} );
+
+			it( 'sets template part descendants to default when page-context modes are set', () => {
 				const pageContextState = dispatchActions(
 					[
 						{
@@ -5918,25 +5882,24 @@ describe( 'state', () => {
 						{
 							type: 'SET_BLOCK_EDITING_MODE',
 							clientId: 'template-part',
-							mode: 'default',
+							mode: 'contentOnly',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-part-paragraph',
+							mode: 'disabled',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-part-group',
+							mode: 'disabled',
 						},
 					],
 					testReducer,
 					initialState
 				);
 
-				expect( pageContextState.derivedBlockEditingModes ).toEqual(
-					new Map(
-						Object.entries( {
-							// Descendants of the template part are fully locked.
-							'template-part-paragraph': 'disabled',
-							'template-part-group': 'disabled',
-							'template-part-grouped-paragraph': 'disabled',
-						} )
-					)
-				);
-
-				const editingState = dispatchActions(
+				const { derivedBlockEditingModes } = dispatchActions(
 					[
 						{
 							type: 'EDIT_CONTENT_ONLY_SECTION',
@@ -5947,13 +5910,10 @@ describe( 'state', () => {
 					pageContextState
 				);
 
-				expect( editingState.derivedBlockEditingModes ).toEqual(
+				expect( derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							// Root stays disabled (outside the section).
 							'': 'disabled',
-							// The edited section and its descendants flip to
-							// `default` so the user can edit.
 							'template-part': 'default',
 							'template-part-paragraph': 'default',
 							'template-part-group': 'default',

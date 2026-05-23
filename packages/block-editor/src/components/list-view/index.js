@@ -37,7 +37,6 @@ import useListViewClientIds from './use-list-view-client-ids';
 import useListViewCollapseItems from './use-list-view-collapse-items';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
-import useListViewEditedSectionSync from './use-list-view-edited-section-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 import { focusListItem } from './utils';
@@ -137,11 +136,6 @@ function ListViewComponent(
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	// Tracks rows we auto-expanded so a subsequent exclusive expand can
-	// collapse them, keeping at most one auto-expanded subtree visible without
-	// disturbing rows the user expanded manually.
-	const autoExpandedRef = useRef( new Set() );
-
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
@@ -220,36 +214,6 @@ function ListViewComponent(
 	const collapseAll = useCallback( () => {
 		setExpandedState( { type: 'clear' } );
 	}, [ setExpandedState ] );
-
-	// Replace the auto-expanded subtree, collapsing any rows previously
-	// auto-expanded that aren't in the new set. Pass `[]` to collapse all of
-	// them. Rows the user expanded manually are untouched.
-	const expandExclusively = useCallback(
-		( clientIds = [] ) => {
-			const ids = Array.isArray( clientIds ) ? clientIds : [ clientIds ];
-			const idSet = new Set( ids );
-			const toCollapse = [];
-			autoExpandedRef.current.forEach( ( trackedId ) => {
-				if ( ! idSet.has( trackedId ) ) {
-					toCollapse.push( trackedId );
-				}
-			} );
-			if ( toCollapse.length ) {
-				setExpandedState( {
-					type: 'collapse',
-					clientIds: toCollapse,
-				} );
-			}
-			if ( ids.length ) {
-				setExpandedState( { type: 'expand', clientIds: ids } );
-			}
-			autoExpandedRef.current = idSet;
-		},
-		[ setExpandedState ]
-	);
-
-	useListViewEditedSectionSync( { expandExclusively } );
-
 	const expandRow = useCallback(
 		( row ) => {
 			expand( row?.dataset?.block );
@@ -331,7 +295,6 @@ function ListViewComponent(
 			firstDraggedBlockIndex,
 			collapse,
 			collapseAll,
-			expandExclusively,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
@@ -350,7 +313,6 @@ function ListViewComponent(
 			firstDraggedBlockIndex,
 			collapse,
 			collapseAll,
-			expandExclusively,
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,

@@ -3192,8 +3192,8 @@ describe( 'selectors', () => {
 					attributes: new Map(
 						Object.entries( {
 							section: {
-								// templateLock: 'contentOnly' makes this block a section.
-								templateLock: 'contentOnly',
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
 							},
 							container: {},
 						} )
@@ -3212,7 +3212,7 @@ describe( 'selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				blockListSettings: new Map( [
-					[ 'section', { templateLock: 'contentOnly' } ],
+					[ 'section', {} ],
 					[ 'container', {} ],
 				] ),
 				settings: {
@@ -3250,8 +3250,8 @@ describe( 'selectors', () => {
 					attributes: new Map(
 						Object.entries( {
 							section: {
-								// templateLock: 'contentOnly' makes this block a section.
-								templateLock: 'contentOnly',
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
 							},
 							container: {},
 						} )
@@ -3270,7 +3270,7 @@ describe( 'selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				blockListSettings: new Map( [
-					[ 'section', { templateLock: 'contentOnly' } ],
+					[ 'section', {} ],
 					[ 'container', {} ],
 				] ),
 				settings: {
@@ -3630,7 +3630,6 @@ describe( 'selectors', () => {
 				blocks: [
 					expect.objectContaining( {
 						attributes: {
-							templateLock: 'contentOnly',
 							metadata: expect.objectContaining( {
 								name: 'Reusable Block 1',
 								patternName: 'core/block/1',
@@ -4575,8 +4574,8 @@ describe( 'selectors', () => {
 					attributes: new Map(
 						Object.entries( {
 							section: {
-								// templateLock: 'contentOnly' makes this block a section.
-								templateLock: 'contentOnly',
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
 							},
 							container: {},
 							child: {},
@@ -4597,7 +4596,7 @@ describe( 'selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				blockListSettings: new Map( [
-					[ 'section', { templateLock: 'contentOnly' } ],
+					[ 'section', {} ],
 					[ 'container', {} ],
 				] ),
 				settings: {
@@ -4628,8 +4627,8 @@ describe( 'selectors', () => {
 					attributes: new Map(
 						Object.entries( {
 							section: {
-								// templateLock: 'contentOnly' makes this block a section.
-								templateLock: 'contentOnly',
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
 							},
 							container: {},
 							child: {},
@@ -4650,7 +4649,7 @@ describe( 'selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				blockListSettings: new Map( [
-					[ 'section', { templateLock: 'contentOnly' } ],
+					[ 'section', {} ],
 					[ 'container', {} ],
 				] ),
 				settings: {
@@ -4688,8 +4687,8 @@ describe( 'selectors', () => {
 					attributes: new Map(
 						Object.entries( {
 							section: {
-								// templateLock: 'contentOnly' makes this block a section.
-								templateLock: 'contentOnly',
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
 							},
 							container: {},
 							child1: {},
@@ -4712,7 +4711,7 @@ describe( 'selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				blockListSettings: new Map( [
-					[ 'section', { templateLock: 'contentOnly' } ],
+					[ 'section', {} ],
 					[ 'container', {} ],
 				] ),
 				settings: {
@@ -4785,8 +4784,8 @@ describe( 'selectors', () => {
 					attributes: new Map(
 						Object.entries( {
 							section: {
-								// templateLock: 'contentOnly' makes this block a section.
-								templateLock: 'contentOnly',
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
 							},
 							container: {},
 							child: {},
@@ -4807,7 +4806,7 @@ describe( 'selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				blockListSettings: new Map( [
-					[ 'section', { templateLock: 'contentOnly' } ],
+					[ 'section', {} ],
 					[ 'container', {} ],
 				] ),
 				settings: {
@@ -4838,8 +4837,8 @@ describe( 'selectors', () => {
 					attributes: new Map(
 						Object.entries( {
 							section: {
-								// templateLock: 'contentOnly' makes this block a section.
-								templateLock: 'contentOnly',
+								// patternName makes this block a section.
+								metadata: { patternName: 'test-pattern' },
 							},
 							container: {},
 							child: {},
@@ -4860,7 +4859,7 @@ describe( 'selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				blockListSettings: new Map( [
-					[ 'section', { templateLock: 'contentOnly' } ],
+					[ 'section', {} ],
 					[ 'container', {} ],
 				] ),
 				settings: {

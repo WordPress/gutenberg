@@ -7,7 +7,10 @@ import { parse as grammarParse } from '@wordpress/block-serialization-default-pa
 /**
  * Internal dependencies
  */
-import { selectBlockPatternsKey } from './private-keys';
+import {
+	selectBlockPatternsKey,
+	userPatternCategoriesSelectKey,
+} from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 import {
@@ -47,27 +50,13 @@ function parsePattern( pattern ) {
 		__unstableSkipMigrationLogs: true,
 	} );
 	if ( blocks.length === 1 ) {
-		// Replace blocks[ 0 ] with a fresh object so we don't mutate the
-		// reference returned by `parse()` — `getParsedPattern` caches by
-		// pattern identity, but the parsed blocks themselves may be shared
-		// or referenced by other consumers.
-		blocks[ 0 ] = {
-			...blocks[ 0 ],
-			attributes: {
-				...blocks[ 0 ].attributes,
-				// Make inserted patterns self-describing as content-locked so
-				// the "Lock layout" UI reflects the actual lock state without
-				// relying on section-root inference. Preserves any explicit
-				// templateLock the pattern author set (including `false`).
-				templateLock:
-					blocks[ 0 ].attributes.templateLock ?? 'contentOnly',
-				metadata: {
-					...( blocks[ 0 ].attributes.metadata || {} ),
-					categories: pattern.categories,
-					patternName: pattern.name,
-					name:
-						blocks[ 0 ].attributes.metadata?.name || pattern.title,
-				},
+		blocks[ 0 ].attributes = {
+			...blocks[ 0 ].attributes,
+			metadata: {
+				...( blocks[ 0 ].attributes.metadata || {} ),
+				categories: pattern.categories,
+				patternName: pattern.name,
+				name: blocks[ 0 ].attributes.metadata?.name || pattern.title,
 			},
 		};
 	}
@@ -142,7 +131,8 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 export const getAllPatternsDependants = ( select ) => ( state ) => {
 	return [
 		state.settings.__experimentalBlockPatterns,
-		state.settings.__experimentalUserPatternCategories,
+		state.settings[ userPatternCategoriesSelectKey ]?.( select ) ??
+			state.settings.__experimentalUserPatternCategories,
 		state.settings.__experimentalReusableBlocks,
 		state.settings[ selectBlockPatternsKey ]?.( select ),
 		state.blockPatterns,
