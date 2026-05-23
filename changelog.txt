@@ -1,7 +1,45 @@
 == Changelog ==
 
-= 23.2.0-rc.1 =
+= 23.2.2 =
 
+
+## Changelog
+
+### Bug Fixes
+
+- Fix registered post meta scope. ([78531](https://github.com/WordPress/gutenberg/pull/78531))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@alecgeatches
+
+
+= 23.2.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Guidelines
+- Fix fatal when `rest_api_init` fires before init (cherry-pick #78350). ([78477](https://github.com/WordPress/gutenberg/pull/78477))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@xavier-lc, @paulopmt1
+
+
+= 23.2.0 =
 
 ## Changelog
 
@@ -26,6 +64,7 @@
 - Use theme gray for muted Text. ([77999](https://github.com/WordPress/gutenberg/pull/77999))
 - docgen: Automatic documentation handle for TypeScript overloads. ([77558](https://github.com/WordPress/gutenberg/pull/77558))
 - ui/Tooltip, ui/IconButton: Add positioner slot API. ([78089](https://github.com/WordPress/gutenberg/pull/78089))
+- Support object values in Select primitive. ([77861](https://github.com/WordPress/gutenberg/pull/77861))
 
 #### Block Library
 - Added Translator Context for Reply. ([77891](https://github.com/WordPress/gutenberg/pull/77891))
@@ -81,6 +120,7 @@
 - Embed: Tighten raw URL transform isMatch. ([78021](https://github.com/WordPress/gutenberg/pull/78021))
 - Fix: Buttons block shows inserter picker when multiple allowed blocks are registered. ([77858](https://github.com/WordPress/gutenberg/pull/77858))
 - Fix: Shortcode block does not render in Navigation Overlay. ([77511](https://github.com/WordPress/gutenberg/pull/77511))
+- Correct capitalization in help text for Breadcrumbs block. ([78175](https://github.com/WordPress/gutenberg/pull/78175))
 
 #### Post Editor
 - Editor: Paginate revisions slider by 100 per page. ([77200](https://github.com/WordPress/gutenberg/pull/77200))
@@ -174,6 +214,8 @@
 - Migrate native tests to workspace. ([77425](https://github.com/WordPress/gutenberg/pull/77425))
 - Script Modules: Guard setAccessible() calls behind PHP < 8.1 check. ([78137](https://github.com/WordPress/gutenberg/pull/78137))
 - Inline z-index values across Block Manager, meta boxes, pattern chooser, sticky search, layout, and Popover, and remove local z-index helper entries. ([77753](https://github.com/WordPress/gutenberg/pull/77753), [77759](https://github.com/WordPress/gutenberg/pull/77759), [77772](https://github.com/WordPress/gutenberg/pull/77772), [77806](https://github.com/WordPress/gutenberg/pull/77806), [77807](https://github.com/WordPress/gutenberg/pull/77807), [77808](https://github.com/WordPress/gutenberg/pull/77808), [78180](https://github.com/WordPress/gutenberg/pull/78180), [78181](https://github.com/WordPress/gutenberg/pull/78181))
+- Update uuid dependency. ([77848](https://github.com/WordPress/gutenberg/pull/77848))
+- Update date-fns to v4.1.0 in components and editor packages. ([78057](https://github.com/WordPress/gutenberg/pull/78057))
 
 #### Post Editor
 - Editor: Refactor 'PostPublishPanel' into function component. ([78083](https://github.com/WordPress/gutenberg/pull/78083))
@@ -220,6 +262,7 @@
 - Revision: Fix failing end-to-end test. ([78079](https://github.com/WordPress/gutenberg/pull/78079))
 - Site Editor end-to-end tests: Reimplement the wait for load. ([77981](https://github.com/WordPress/gutenberg/pull/77981))
 - end-to-end tests: Use editPost and createNewPost helpers everywhere. ([78170](https://github.com/WordPress/gutenberg/pull/78170))
+- Fill in end-to-end tests for client-side media processing. ([75949](https://github.com/WordPress/gutenberg/pull/75949))
 
 #### Build Tooling
 - Build: Update lint-staged from v10 to v16. ([77963](https://github.com/WordPress/gutenberg/pull/77963))
@@ -230,17 +273,6 @@
 - bin/dev.mjs: Warn on stale webpack watching this checkout. ([78098](https://github.com/WordPress/gutenberg/pull/78098))
 - Upgrade and unify @types/node version. ([77900](https://github.com/WordPress/gutenberg/pull/77900))
 
-
-### Various
-- Update uuid dependency. ([77848](https://github.com/WordPress/gutenberg/pull/77848))
-- Fill in end-to-end tests for client-side media processing. ([75949](https://github.com/WordPress/gutenberg/pull/75949))
-
-#### Components
-- Support object values in Select primitive. ([77861](https://github.com/WordPress/gutenberg/pull/77861))
-- Update date-fns to v4.1.0 in components and editor packages. ([78057](https://github.com/WordPress/gutenberg/pull/78057))
-
-#### Block Library
-- Correct capitalization in help text for Breadcrumbs block. ([78175](https://github.com/WordPress/gutenberg/pull/78175))
 
 ## First-time contributors
 
@@ -257,6 +289,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @369work @adamsilverstein @adithya-naik @aduth @afercia @alecgeatches @andrea-sdl @andreawetzel @andrewserong @anomiex @artpi @cbravobernal @ciampo @coderGtm @crisbusquets @danluu @desrosj @dmsnell @dpmehta @ellatrix @hbhalodia @himanshupathak95 @Infinite-Null @jameskoster @jorgefilipecosta @jsnajdr @lancewillett @Mamaduka @manzoorwanijk @mikachan @mirka @Mustafabharmal @ntsekouras @R1shabh-Gupta @ramonjd @retrofox @sarthaknagoshe2002 @scruffian @shail-mehta @simison @t-hamano @talldan @tellthemachines @timse201 @tyxla @USERSATOSHI @vishnucmsminds @vishnupprajapat @youknowriad @yuliyan
+
+
 
 
 = 23.1.1 =

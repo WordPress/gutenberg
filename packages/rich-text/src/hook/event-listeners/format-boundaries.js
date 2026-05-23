@@ -2,11 +2,15 @@
  * WordPress dependencies
  */
 import { LEFT, RIGHT } from '@wordpress/keycodes';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { isCollapsed } from '../../is-collapsed';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -34,8 +38,7 @@ export default ( props ) => ( element ) => {
 			activeFormats: currentActiveFormats = [],
 		} = record.current;
 		const collapsed = isCollapsed( record.current );
-		const { ownerDocument } = element;
-		const { defaultView } = ownerDocument;
+		const { defaultView } = element.ownerDocument;
 		// To do: ideally, we should look at visual position instead.
 		const { direction } = defaultView.getComputedStyle( element );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
@@ -96,8 +99,5 @@ export default ( props ) => ( element ) => {
 		forceRender();
 	}
 
-	element.addEventListener( 'keydown', onKeyDown );
-	return () => {
-		element.removeEventListener( 'keydown', onKeyDown );
-	};
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
 };

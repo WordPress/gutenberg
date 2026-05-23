@@ -1134,12 +1134,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "Navigation",
-		"slug": "navigation",
-		"markdown_source": "../packages/components/src/navigation/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Navigator",
 		"slug": "navigator",
 		"markdown_source": "../packages/components/src/navigator/README.md",
