@@ -42,6 +42,33 @@ import {
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
+const getPatternNameFromMeta = ( meta ) =>
+	typeof meta === 'string' ? meta : meta?.patternName;
+
+function withPatternMetadata( blocks, patternName ) {
+	if (
+		! patternName ||
+		blocks.length !== 1 ||
+		blocks[ 0 ].name === 'core/block'
+	) {
+		return blocks;
+	}
+
+	const [ block ] = blocks;
+	return [
+		{
+			...block,
+			attributes: {
+				...block.attributes,
+				metadata: {
+					...( block.attributes?.metadata || {} ),
+					patternName,
+				},
+			},
+		},
+	];
+}
+
 /**
  * Action that resets blocks state to the specified array of blocks, taking precedence
  * over any other content reflected as an edit in state.
@@ -381,6 +408,7 @@ export const replaceBlocks =
 	( { select, dispatch, registry } ) => {
 		clientIds = castArray( clientIds );
 		blocks = castArray( blocks );
+		blocks = withPatternMetadata( blocks, getPatternNameFromMeta( meta ) );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
 		for ( let index = 0; index < blocks.length; index++ ) {
@@ -588,6 +616,7 @@ export const insertBlocks =
 		}
 
 		blocks = castArray( blocks );
+		blocks = withPatternMetadata( blocks, getPatternNameFromMeta( meta ) );
 		const allowedBlocks = [];
 		for ( const block of blocks ) {
 			const isValid = select.canInsertBlockType(
