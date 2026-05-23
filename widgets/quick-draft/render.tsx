@@ -276,13 +276,15 @@ export default function QuickDraft() {
 	// No room for the list inline, but it was revealed in place from compact.
 	if ( ! showDraftsList && isListOpenInCompact ) {
 		return (
-			<Stack
-				ref={ ref }
-				direction="column"
-				gap="sm"
-				className={ styles.body }
-			>
-				<Stack direction="row" justify="flex-start">
+			<Stack ref={ ref } direction="column" className={ styles.body }>
+				<Stack direction="column" className={ styles.listPane }>
+					<DraftsList />
+				</Stack>
+				<Stack
+					direction="row"
+					justify="flex-start"
+					className={ styles.backRow }
+				>
 					<Button
 						variant="minimal"
 						tone="neutral"
@@ -292,9 +294,6 @@ export default function QuickDraft() {
 						<Button.Icon icon={ chevronLeft } />
 						{ __( 'Back' ) }
 					</Button>
-				</Stack>
-				<Stack direction="column">
-					<DraftsList />
 				</Stack>
 			</Stack>
 		);

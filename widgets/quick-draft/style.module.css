@@ -21,6 +21,12 @@
 	min-height: 0;
 }
 
+/* Compact reveal: Back control pinned below the scrolling drafts list. */
+.backRow {
+	padding: var(--wpds-dimension-padding-sm);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
 /* Wide tile: drafts list sits beside the form, split by a vertical rule. */
 .row .primaryPane {
 	border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
