@@ -5,7 +5,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { Card, Link, Stack, Text } from '@wordpress/ui';
+import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -182,7 +182,12 @@ export default function SiteHealth() {
 
 	if ( isLoading ) {
 		return (
-			<Stack align="center" justify="center" style={ { minHeight: 220 } }>
+			<Stack
+				className={ styles.loading }
+				direction="column"
+				align="center"
+				justify="center"
+			>
 				<Spinner />
 			</Stack>
 		);
@@ -199,33 +204,23 @@ export default function SiteHealth() {
 	const tone = toneForPercentage( percentage );
 
 	return (
-		<Card.Content>
-			<Stack
-				align="center"
-				direction="column"
-				gap="lg"
-				style={ {
-					margin: '0 auto',
-					maxWidth: 320,
-					textAlign: 'center',
-				} }
-			>
-				<CircleProgress percentage={ percentage } tone={ tone } />
-				<Text variant="body-lg">{ statusMessage( counts ) }</Text>
-				{ issuesTotal > 0 && (
-					<Link href="site-health.php">
-						{ sprintf(
-							/* translators: %d: Number of issues to address. */
-							_n(
-								'Review %d item',
-								'Review %d items',
-								issuesTotal
-							),
-							issuesTotal
-						) }
-					</Link>
-				) }
-			</Stack>
-		</Card.Content>
+		<Stack
+			className={ styles.root }
+			align="center"
+			direction="column"
+			gap="lg"
+		>
+			<CircleProgress percentage={ percentage } tone={ tone } />
+			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
+			{ issuesTotal > 0 && (
+				<Link href="site-health.php">
+					{ sprintf(
+						/* translators: %d: Number of issues to address. */
+						_n( 'Review %d item', 'Review %d items', issuesTotal ),
+						issuesTotal
+					) }
+				</Link>
+			) }
+		</Stack>
 	);
 }

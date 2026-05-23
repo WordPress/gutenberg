@@ -1,4 +1,14 @@
 
+.root {
+	margin: 0 auto;
+	max-width: 320px;
+	text-align: center;
+}
+
+.loading {
+	min-height: 220px;
+}
+
 .circle.is-success {
 	--site-health-stroke: var(--wpds-color-stroke-surface-success);
 	--site-health-fg: var(--wpds-color-fg-content-success);
