@@ -9,17 +9,17 @@
 	min-height: 220px;
 }
 
-.circle.is-success {
+.circle.success {
 	--site-health-stroke: var(--wpds-color-stroke-surface-success);
 	--site-health-fg: var(--wpds-color-fg-content-success);
 }
 
-.circle.is-warning {
+.circle.warning {
 	--site-health-stroke: var(--wpds-color-stroke-surface-warning);
 	--site-health-fg: var(--wpds-color-fg-content-warning);
 }
 
-.circle.is-error {
+.circle.error {
 	--site-health-stroke: var(--wpds-color-stroke-surface-error);
 	--site-health-fg: var(--wpds-color-fg-content-error);
 }
@@ -30,12 +30,12 @@
 	height: 68px;
 }
 
-.circle svg circle:first-child {
+.circle circle:first-child {
 	stroke: var(--wpds-color-bg-track-neutral);
 	stroke-width: 12;
 }
 
-.circle svg circle:last-of-type {
+.circle circle:last-of-type {
 	stroke: var(--site-health-stroke);
 	stroke-width: 12;
 	stroke-linecap: round;

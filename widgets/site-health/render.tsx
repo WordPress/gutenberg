@@ -5,6 +5,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
+import { SVG, Circle } from '@wordpress/primitives';
 import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
@@ -99,9 +100,7 @@ function statusMessage( counts: IssueCounts ): string {
 
 // ─── Circle progress ──────────────────────────────────────────────────────────
 
-/**
- * @param {{ percentage: number, tone: HealthTone }} props
- */
+/* Progress ring; the health tone selects its stroke/fill via a CSS-module class. */
 function CircleProgress( {
 	percentage,
 	tone,
@@ -112,42 +111,36 @@ function CircleProgress( {
 	const offset = CIRCUMFERENCE * ( 1 - percentage / 100 );
 
 	return (
-		<div className={ `${ styles.circle } ${ styles[ `is-${ tone }` ] }` }>
-			<svg
-				focusable="false"
-				viewBox="0 0 200 200"
-				width="100%"
-				height="100%"
-				role="img"
-				aria-label={ `${ percentage }%` }
+		<SVG
+			className={ `${ styles.circle } ${ styles[ tone ] }` }
+			viewBox="0 0 200 200"
+		>
+			<Circle
+				r={ RADIUS }
+				cx="100"
+				cy="100"
+				fill="transparent"
+				strokeDasharray={ CIRCUMFERENCE }
+				strokeDashoffset={ 0 }
+			/>
+			<Circle
+				r={ RADIUS }
+				cx="100"
+				cy="100"
+				fill="transparent"
+				strokeDasharray={ CIRCUMFERENCE }
+				strokeDashoffset={ offset }
+			/>
+			<text
+				x="100"
+				y="100"
+				textAnchor="middle"
+				dominantBaseline="middle"
+				className={ styles.percentage }
 			>
-				<circle
-					r={ RADIUS }
-					cx="100"
-					cy="100"
-					fill="transparent"
-					strokeDasharray={ CIRCUMFERENCE }
-					strokeDashoffset={ 0 }
-				/>
-				<circle
-					r={ RADIUS }
-					cx="100"
-					cy="100"
-					fill="transparent"
-					strokeDasharray={ CIRCUMFERENCE }
-					strokeDashoffset={ offset }
-				/>
-				<text
-					x="100"
-					y="100"
-					textAnchor="middle"
-					dominantBaseline="middle"
-					className={ styles.percentage }
-				>
-					{ percentage }%
-				</text>
-			</svg>
-		</div>
+				{ percentage }%
+			</text>
+		</SVG>
 	);
 }
 
