@@ -61,7 +61,6 @@ const COMMAND_NAMES = [
 	'core/dashboard/add-widgets',
 	'core/dashboard/switch-to-masonry-layout',
 	'core/dashboard/switch-to-grid-layout',
-	'core/dashboard/layout-settings',
 	'core/dashboard/reset-to-default',
 ];
 
@@ -148,7 +147,6 @@ describe( 'WidgetDashboard.DashboardCommands', () => {
 		expect( registered[ 'core/dashboard/switch-to-grid-layout' ] ).toBe(
 			false
 		);
-		expect( registered[ 'core/dashboard/layout-settings' ] ).toBe( false );
 	} );
 
 	it( 'only registers the active layout-model switch command', () => {
@@ -174,6 +172,5 @@ describe( 'WidgetDashboard.DashboardCommands', () => {
 		expect( registered[ 'core/dashboard/switch-to-masonry-layout' ] ).toBe(
 			false
 		);
-		expect( registered[ 'core/dashboard/layout-settings' ] ).toBe( false );
 	} );
 } );

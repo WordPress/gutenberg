@@ -12,7 +12,6 @@ import {
 	grid,
 	layout as layoutIcon,
 	plus,
-	settings,
 	trash,
 } from '@wordpress/icons';
 
@@ -45,8 +44,7 @@ export function DashboardCommands() {
 		commitGridModelChange,
 	} = useDashboardInternalContext();
 
-	const { setInserterOpen, setLayoutSettingsOpen, setResetDialogOpen } =
-		useDashboardUIContext();
+	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
 
 	useCommandContext( DASHBOARD_COMMAND_CONTEXT );
 
@@ -75,14 +73,6 @@ export function DashboardCommands() {
 		[ commitGridModelChange ]
 	);
 
-	const openLayoutSettings = useCallback< CommandCallback >(
-		( { close } ) => {
-			close();
-			setLayoutSettingsOpen( true );
-		},
-		[ setLayoutSettingsOpen ]
-	);
-
 	const resetToDefault = useCallback< CommandCallback >(
 		( { close } ) => {
 			close();
@@ -103,8 +93,8 @@ export function DashboardCommands() {
 
 	const customize = useCallback< CommandCallback >(
 		( { close } ) => {
-			onEditChange?.( true );
 			close();
+			onEditChange?.( true );
 		},
 		[ onEditChange ]
 	);
@@ -161,20 +151,6 @@ export function DashboardCommands() {
 				callback: switchToGrid,
 			},
 			{
-				name: 'core/dashboard/layout-settings',
-				label: __( 'Configure dashboard layout settings' ),
-				icon: settings,
-				category: 'command',
-				context: DASHBOARD_COMMAND_CONTEXT,
-				keywords: [
-					__( 'layout' ),
-					__( 'columns' ),
-					__( 'row height' ),
-				],
-				disabled: ! canEditGridSettings || editMode,
-				callback: openLayoutSettings,
-			},
-			{
 				name: 'core/dashboard/reset-to-default',
 				label: __( 'Reset dashboard widgets to default' ),
 				icon: trash,
@@ -195,7 +171,6 @@ export function DashboardCommands() {
 			isGridLayout,
 			switchToMasonry,
 			switchToGrid,
-			openLayoutSettings,
 			onLayoutReset,
 			resetToDefault,
 		]
