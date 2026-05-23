@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockIcon,
@@ -16,7 +16,7 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { code } from '@wordpress/icons';
+import { code, seen, unseen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,11 +24,28 @@ import { code } from '@wordpress/icons';
 import Preview from './preview';
 import HTMLEditModal from './modal';
 
+function hasVisibleContent( html ) {
+	if ( ! html?.trim() ) {
+		return false;
+	}
+	const doc = new window.DOMParser().parseFromString( html, 'text/html' );
+	[ 'script', 'style', 'meta', 'link', 'noscript', 'template' ].forEach(
+		( tag ) => doc.querySelectorAll( tag ).forEach( ( el ) => el.remove() )
+	);
+	return doc.body.innerHTML.trim().length > 0;
+}
+
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ isPreviewDisabled, setIsPreviewDisabled ] = useState( false );
+
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
 	} );
+
+	const containsVisibleContent = useMemo( () => {
+		return hasVisibleContent( attributes.content );
+	}, [ attributes.content ] );
 
 	// Show placeholder when content is empty
 	if ( ! attributes.content?.trim() ) {
@@ -66,6 +83,16 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
 						{ __( 'Edit code' ) }
 					</ToolbarButton>
+					<ToolbarButton
+						icon={ isPreviewDisabled ? unseen : seen }
+						label={
+							isPreviewDisabled
+								? __( 'Enable preview' )
+								: __( 'Disable preview' )
+						}
+						isPressed={ isPreviewDisabled }
+						onClick={ () => setIsPreviewDisabled( ( v ) => ! v ) }
+					/>
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
@@ -83,7 +110,22 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</Button>
 				</VStack>
 			</InspectorControls>
-			<Preview content={ attributes.content } isSelected={ isSelected } />
+			{ isPreviewDisabled || ! containsVisibleContent ? (
+				<Placeholder
+					icon={ <BlockIcon icon={ code } /> }
+					label={ __( 'Custom HTML' ) }
+					instructions={
+						isPreviewDisabled
+							? __( 'Preview is disabled.' )
+							: __( 'This code has no visual preview.' )
+					}
+				/>
+			) : (
+				<Preview
+					content={ attributes.content }
+					isSelected={ isSelected }
+				/>
+			) }
 			<HTMLEditModal
 				isOpen={ isModalOpen }
 				onRequestClose={ () => setIsModalOpen( false ) }
