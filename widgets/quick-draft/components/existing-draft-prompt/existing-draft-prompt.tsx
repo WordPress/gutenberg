@@ -63,9 +63,7 @@ export function ExistingDraftPrompt( {
 							<Link
 								href={ editUrl }
 								openInNewTab
-								style={ {
-									color: 'var(--wpds-color-fg-interactive-brand-strong)',
-								} }
+								className={ styles.continueLink }
 							/>
 						}
 					>
