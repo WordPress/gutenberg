@@ -36,6 +36,7 @@ export function CircleProgress( { percentage, tone }: CircleProgressProps ) {
 				strokeDasharray={ CIRCUMFERENCE }
 				strokeDashoffset={ 0 }
 			/>
+
 			<Circle
 				r={ RADIUS }
 				cx="100"
@@ -44,6 +45,7 @@ export function CircleProgress( { percentage, tone }: CircleProgressProps ) {
 				strokeDasharray={ CIRCUMFERENCE }
 				strokeDashoffset={ offset }
 			/>
+
 			<text
 				x="100"
 				y="100"
