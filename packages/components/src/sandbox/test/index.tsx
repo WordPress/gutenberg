@@ -110,13 +110,14 @@ describe( 'SandBox', () => {
 		);
 	} );
 
-	it( 'should schedule delayed resize messages in srcdoc', () => {
+	it( 'should listen for ready messages in srcdoc', () => {
 		render( <SandBox html="<p>Hello</p>" title="Resize Test" /> );
 
 		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Resize Test' );
 		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
 
-		expect( srcDoc ).toContain( 'scheduleResize' );
+		expect( srcDoc ).toContain( 'checkMessageForReady' );
+		expect( srcDoc ).toContain( "'ready'" );
 		expect( srcDoc ).toContain( 'attachIframeLoadListeners' );
 	} );
 } );
