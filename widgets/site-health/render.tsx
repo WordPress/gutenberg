@@ -201,6 +201,7 @@ export default function SiteHealth() {
 			className={ styles.root }
 			align="center"
 			direction="column"
+			justify="center"
 			gap="lg"
 		>
 			<CircleProgress percentage={ percentage } tone={ tone } />

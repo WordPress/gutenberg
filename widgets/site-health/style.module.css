@@ -3,10 +3,12 @@
 	margin: 0 auto;
 	max-width: 320px;
 	text-align: center;
+	height: 100%;
 }
 
 .loading {
 	min-height: 220px;
+	height: 100%;
 }
 
 .circle.success {
