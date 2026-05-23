@@ -5,12 +5,12 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { SVG, Circle } from '@wordpress/primitives';
 import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -38,13 +38,7 @@ const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/authorization-header',
 ] as const;
 
-// SVG circle geometry (matches WP core's site-health progress ring).
-const RADIUS = 90;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS; // ≈ 565.48
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-type HealthTone = 'success' | 'warning' | 'error';
 
 /**
  * Maps a percentage to a semantic tone used for CSS class selection.
@@ -95,52 +89,6 @@ function statusMessage( counts: IssueCounts ): string {
 
 	return __(
 		'Your site\u2019s health is looking good, but there are still some things you can do to improve its performance and security.'
-	);
-}
-
-// ─── Circle progress ──────────────────────────────────────────────────────────
-
-/* Progress ring; the health tone selects its stroke/fill via a CSS-module class. */
-function CircleProgress( {
-	percentage,
-	tone,
-}: {
-	percentage: number;
-	tone: HealthTone;
-} ) {
-	const offset = CIRCUMFERENCE * ( 1 - percentage / 100 );
-
-	return (
-		<SVG
-			className={ `${ styles.circle } ${ styles[ tone ] }` }
-			viewBox="0 0 200 200"
-		>
-			<Circle
-				r={ RADIUS }
-				cx="100"
-				cy="100"
-				fill="transparent"
-				strokeDasharray={ CIRCUMFERENCE }
-				strokeDashoffset={ 0 }
-			/>
-			<Circle
-				r={ RADIUS }
-				cx="100"
-				cy="100"
-				fill="transparent"
-				strokeDasharray={ CIRCUMFERENCE }
-				strokeDashoffset={ offset }
-			/>
-			<text
-				x="100"
-				y="100"
-				textAnchor="middle"
-				dominantBaseline="middle"
-				className={ styles.percentage }
-			>
-				{ percentage }%
-			</text>
-		</SVG>
 	);
 }
 
