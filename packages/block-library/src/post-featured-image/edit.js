@@ -278,6 +278,7 @@ export default function PostFeaturedImageEdit( {
 							}
 						>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ __( 'Make image a link' ) }
 								onChange={ () =>
 									setAttributes( { isLink: ! isLink } )

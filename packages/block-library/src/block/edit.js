@@ -44,8 +44,6 @@ import { unlock } from '../lock-unlock';
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { isOverridableBlock } = unlock( patternsPrivateApis );
 
-const NOOP = () => {};
-
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
 const useInferredLayout = ( blocks, parentLayout ) => {
@@ -88,6 +86,8 @@ function RecursionWarning() {
 	);
 }
 
+const NOOP = () => {};
+
 // Wrap the main Edit function for the pattern block with a recursion wrapper
 // that allows short-circuiting rendering as early as possible, before any
 // of the other effects in the block edit have run.
@@ -107,23 +107,13 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 }
 
 function ReusableBlockControl( {
-	recordId,
+	canUserEdit,
 	canOverrideBlocks,
 	hasContent,
 	isEditingThis,
 	onToggleEdit,
 	resetContent,
 } ) {
-	const canUserEdit = useSelect(
-		( select ) =>
-			!! select( coreStore ).canUser( 'update', {
-				kind: 'postType',
-				name: 'wp_block',
-				id: recordId,
-			} ),
-		[ recordId ]
-	);
-
 	return (
 		<>
 			{ canUserEdit && (
@@ -294,7 +284,7 @@ function ReusableBlockEdit( {
 		<>
 			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
-					recordId={ ref }
+					canUserEdit={ canUserEdit }
 					canOverrideBlocks={ canOverrideBlocks }
 					hasContent={ !! content }
 					isEditingThis={ isEditingThis }

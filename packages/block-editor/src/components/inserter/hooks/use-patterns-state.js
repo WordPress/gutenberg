@@ -12,10 +12,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-import {
-	isNavigationOverlayContextKey,
-	userPatternCategoriesSelectKey,
-} from '../../../store/private-keys';
+import { isNavigationOverlayContextKey } from '../../../store/private-keys';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
 
@@ -54,19 +51,17 @@ const usePatternsState = (
 			const { getSettings, __experimentalGetAllowedPatterns } = unlock(
 				select( blockEditorStore )
 			);
-			const settings = getSettings();
-			const userPatternCategoriesSelect =
-				settings[ userPatternCategoriesSelectKey ];
+			const {
+				__experimentalUserPatternCategories,
+				__experimentalBlockPatternCategories,
+			} = getSettings();
 			return {
 				patterns: __experimentalGetAllowedPatterns(
 					rootClientId,
 					options
 				),
-				userPatternCategories: userPatternCategoriesSelect
-					? userPatternCategoriesSelect( select )
-					: settings.__experimentalUserPatternCategories,
-				patternCategories:
-					settings.__experimentalBlockPatternCategories,
+				userPatternCategories: __experimentalUserPatternCategories,
+				patternCategories: __experimentalBlockPatternCategories,
 			};
 		},
 		[ rootClientId, options ]

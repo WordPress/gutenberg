@@ -993,6 +993,7 @@ export default function Image( {
 								}
 							>
 								<CheckboxControl
+									__nextHasNoMarginBottom
 									label={ __( 'Mark as decorative' ) }
 									checked={ !! isDecorative }
 									onChange={ updateIsDecorative }
