@@ -12,7 +12,12 @@ import PatternExplorerSidebar from './pattern-explorer-sidebar';
 import PatternList from './pattern-list';
 import { usePatternCategories } from '../block-patterns-tab/use-pattern-categories';
 
-function PatternsExplorer( { initialCategory, rootClientId, onModalClose } ) {
+function PatternsExplorer( {
+	initialCategory,
+	rootClientId,
+	onModalClose,
+	onPatternSelect,
+} ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ selectedCategory, setSelectedCategory ] = useState(
 		initialCategory?.name
@@ -35,6 +40,7 @@ function PatternsExplorer( { initialCategory, rootClientId, onModalClose } ) {
 				patternCategories={ patternCategories }
 				rootClientId={ rootClientId }
 				onModalClose={ onModalClose }
+				onPatternSelect={ onPatternSelect }
 			/>
 		</div>
 	);
