@@ -13,7 +13,7 @@
 	padding-block-start: var(--wpds-dimension-padding-md);
 	padding-block-end: var(--wpds-dimension-padding-md);
 	padding-inline-start: var(--wpds-dimension-padding-md);
-	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 /* Featured-image cell; fills the list layout's media slot. */

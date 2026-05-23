@@ -12,7 +12,7 @@
 	min-width: 0;
 	min-height: 0;
 	padding: var(--wpds-dimension-padding-lg);
-	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .listPane {
@@ -23,7 +23,7 @@
 
 /* Wide tile: drafts list sits beside the form, split by a vertical rule. */
 .row .primaryPane {
-	border-inline-end: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	max-width: calc(var(--wpds-dimension-base) * 100);
 	margin: 0 auto;
 }
