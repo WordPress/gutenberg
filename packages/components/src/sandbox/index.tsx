@@ -71,7 +71,7 @@ const observeAndResizeJS = function () {
 		);
 	}
 
-	function checkMessageForReady( event ) {
+	function checkMessageForReady( event: MessageEvent ) {
 		if ( event.source !== window.parent ) {
 			return;
 		}
