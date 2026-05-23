@@ -18,6 +18,7 @@ import { unlock } from '../lock-unlock';
 export default function useContentOnlySectionEdit( clientId ) {
 	const {
 		isSectionBlock,
+		parentSectionBlock,
 		isWithinSection,
 		isWithinEditedSection,
 		isEditingContentOnlySection,
@@ -32,12 +33,13 @@ export default function useContentOnlySectionEdit( clientId ) {
 			} = unlock( select( blockEditorStore ) );
 
 			const editedSection = getEditedContentOnlySection();
+			const isSection = _isSectionBlock( clientId );
+			const parentSection = getParentSectionBlock( clientId );
 
 			return {
-				isSectionBlock: _isSectionBlock( clientId ),
-				isWithinSection:
-					_isSectionBlock( clientId ) ||
-					!! getParentSectionBlock( clientId ),
+				isSectionBlock: isSection,
+				parentSectionBlock: parentSection,
+				isWithinSection: isSection || !! parentSection,
 				isWithinEditedSection:
 					isWithinEditedContentOnlySection( clientId ),
 				isEditingContentOnlySection: editedSection === clientId,
@@ -53,6 +55,7 @@ export default function useContentOnlySectionEdit( clientId ) {
 
 	return {
 		isSectionBlock,
+		parentSectionBlock,
 		isWithinSection,
 		isWithinEditedSection,
 		isEditingContentOnlySection,

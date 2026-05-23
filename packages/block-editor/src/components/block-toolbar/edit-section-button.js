@@ -16,26 +16,37 @@ import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit
 export default function EditSectionButton( { clientId } ) {
 	const {
 		isSectionBlock,
+		parentSectionBlock,
+		isWithinSection,
+		isWithinEditedSection,
 		isEditingContentOnlySection,
+		editedContentOnlySection,
 		editContentOnlySection,
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
+	const sectionClientId =
+		( isSectionBlock && clientId ) ||
+		parentSectionBlock ||
+		( isWithinEditedSection && editedContentOnlySection );
+
 	const blockType = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
+			if ( ! sectionClientId ) {
 				return null;
 			}
 			const { getBlockName } = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
+			const blockName = getBlockName( sectionClientId );
 			return blockName ? { name: blockName } : null;
 		},
-		[ clientId ]
+		[ sectionClientId ]
 	);
 
+	const isEditing = isEditingContentOnlySection || isWithinEditedSection;
+
 	if (
-		! clientId ||
-		( ! isSectionBlock && ! isEditingContentOnlySection ) ||
+		! sectionClientId ||
+		( ! isWithinSection && ! isEditing ) ||
 		isReusableBlock( blockType ) ||
 		isTemplatePart( blockType )
 	) {
@@ -43,17 +54,17 @@ export default function EditSectionButton( { clientId } ) {
 	}
 
 	const handleClick = () => {
-		if ( isEditingContentOnlySection ) {
+		if ( isEditing ) {
 			stopEditingContentOnlySection();
 		} else {
-			editContentOnlySection( clientId );
+			editContentOnlySection( sectionClientId );
 		}
 	};
 
 	return (
 		<BlockControls group="other">
 			<ToolbarButton onClick={ handleClick }>
-				{ isEditingContentOnlySection ? __( 'Done' ) : __( 'Edit' ) }
+				{ isEditing ? __( 'Done' ) : __( 'Edit' ) }
 			</ToolbarButton>
 		</BlockControls>
 	);
