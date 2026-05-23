@@ -191,8 +191,30 @@ function render_block_core_search( $attributes ) {
 		';
 	}
 
+	/*
+	 * The semantic <search> landmark wrapper is opt-in. When disabled (the
+	 * default) the block renders the original <form role="search"> markup, so
+	 * existing themes and CSS selectors are unaffected. It can be enabled per
+	 * block via the "Use the search element" toggle, or for every search block
+	 * via add_theme_support( 'search-element' ), mirroring the opt-in added to
+	 * get_search_form() in core.
+	 */
+	$use_search_element = ! empty( $attributes['useSearchElement'] ) || current_theme_supports( 'search-element' );
+
+	if ( $use_search_element ) {
+		// Positional specifiers are required here because the wrapper attributes
+		// and directives precede the action URL in the markup.
+		return sprintf(
+			'<search %2$s %3$s><form method="get" action="%1$s">%4$s</form></search>',
+			esc_url( home_url( '/' ) ),
+			$wrapper_attributes,
+			$form_directives,
+			$label . $field_markup
+		);
+	}
+
 	return sprintf(
-		'<search %2s %3s><form method="get" action="%1s">%4s</form></search>',
+		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,

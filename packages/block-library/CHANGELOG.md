@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Search: Render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`.
+-   Search: Add an opt-in "Use the search element" setting to render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`. Also enabled for every search block via `add_theme_support( 'search-element' )`.
 
 ### Internal
 

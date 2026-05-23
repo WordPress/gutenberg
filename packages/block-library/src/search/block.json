@@ -42,6 +42,10 @@
 		"query": {
 			"type": "object",
 			"default": {}
+		},
+		"useSearchElement": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

@@ -70,6 +70,7 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
+		useSearchElement,
 		style,
 	} = attributes;
 
@@ -324,6 +325,7 @@ export default function SearchEdit( {
 							showLabel: true,
 							buttonUseIcon: false,
 							buttonPosition: 'button-outside',
+							useSearchElement: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -474,6 +476,25 @@ export default function SearchEdit( {
 								} ) }
 							</ToggleGroupControl>
 						</VStack>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! useSearchElement }
+						label={ __( 'Use the search element' ) }
+						onDeselect={ () => {
+							setAttributes( { useSearchElement: false } );
+						} }
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							checked={ !! useSearchElement }
+							label={ __( 'Use the search element' ) }
+							help={ __(
+								'Render the block in the semantic HTML <search> landmark element instead of a form with the search role. Affects the published output only.'
+							) }
+							onChange={ ( value ) =>
+								setAttributes( { useSearchElement: value } )
+							}
+						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
 			</InspectorControls>
