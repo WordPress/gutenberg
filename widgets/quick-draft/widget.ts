@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { drafts } from '@wordpress/icons';
 
 /*
  * Widget type definition
@@ -9,4 +10,5 @@ import { __ } from '@wordpress/i18n';
 export default {
 	name: 'core/quick-draft',
 	title: __( 'Quick Draft' ),
+	icon: drafts,
 };
