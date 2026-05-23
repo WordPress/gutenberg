@@ -8,7 +8,6 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { autop } from '@wordpress/autop';
-import { Spinner } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -19,7 +18,6 @@ import {
 } from '@wordpress/dataviews';
 import { useMemo, useState } from '@wordpress/element';
 import { escapeHTML } from '@wordpress/escape-html';
-import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
@@ -27,7 +25,7 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
 /**
  * Internal dependencies
  */
-import { DraftsList, ExistingDraftPrompt, SavedPost } from './components';
+import { DraftsList, SavedPost } from './components';
 import { QuickDraftContentField } from './fields';
 import { useWidgetSize } from './hooks';
 import styles from './style.module.css';
@@ -51,18 +49,6 @@ function textToParagraphBlocks( text: string ): string {
 	);
 }
 
-/*
- * Start of today in the user's local time, formatted without a timezone offset
- * so the WP REST `after` filter compares against site-local `post_date`.
- */
-function getTodayStartISO() {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = String( now.getMonth() + 1 ).padStart( 2, '0' );
-	const day = String( now.getDate() ).padStart( 2, '0' );
-	return `${ year }-${ month }-${ day }T00:00:00`;
-}
-
 type QuickDraftData = {
 	title: string;
 	content: string;
@@ -81,10 +67,11 @@ const INITIAL_DATA: QuickDraftData = {
 /**
  * Quick Draft widget. Lets the user draft a post (title + content) without
  * leaving the dashboard, and adapts to its own tile size: at compact sizes it
- * shows just the form/message plus a link that reveals the recent drafts in
- * place; when the tile is wide it places the drafts list beside the form, and
- * when it is tall it stacks the list underneath. The drafts request only runs
- * when the list is actually shown, since `DraftsList` mounts only then.
+ * shows the form plus a link (when drafts exist) that reveals the recent
+ * drafts in place; when the tile is wide it places the drafts list beside the
+ * form, and when it is tall it stacks the list underneath. The drafts request
+ * only runs when the list is actually shown, since `DraftsList` mounts only
+ * then.
  */
 export default function QuickDraft() {
 	const [ data, setData ] = useState< QuickDraftData >( INITIAL_DATA );
@@ -93,7 +80,6 @@ export default function QuickDraft() {
 		id: number;
 		title: string;
 	} | null >( null );
-	const [ hasDismissedPrompt, setHasDismissedPrompt ] = useState( false );
 	const [ isListOpenInCompact, setIsListOpenInCompact ] = useState( false );
 
 	const { ref, isWide, isTall } = useWidgetSize();
@@ -110,55 +96,22 @@ export default function QuickDraft() {
 
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 
-	const { existingDraft, isLoadingDrafts, hasDrafts } = useSelect(
+	/*
+	 * The "Draft posts" reveal only shows in compact mode, so check whether any
+	 * drafts exist (site-wide, as DraftsList lists them) only there. One record
+	 * is enough to know the list is non-empty.
+	 */
+	const { hasDrafts } = useSelect(
 		( select ) => {
-			const { getCurrentUser, getEntityRecords, hasFinishedResolution } =
-				select( coreDataStore );
-
-			/*
-			 * The "Draft posts" reveal only shows in compact mode, so the
-			 * site-wide draft existence (as DraftsList lists them) is checked
-			 * only there. One record is enough to know the list is non-empty.
-			 */
-			let draftsExist = false;
-			if ( ! showDraftsList ) {
-				const anyDrafts = getEntityRecords( 'postType', 'post', {
-					status: 'draft',
-					per_page: 1,
-				} ) as Array< { id: number } > | undefined;
-				draftsExist = ( anyDrafts?.length ?? 0 ) > 0;
+			if ( showDraftsList ) {
+				return { hasDrafts: false };
 			}
-
-			const currentUser = getCurrentUser();
-			if ( ! currentUser?.id ) {
-				return {
-					existingDraft: null,
-					isLoadingDrafts: true,
-					hasDrafts: draftsExist,
-				};
-			}
-
-			const query = {
+			const { getEntityRecords } = select( coreDataStore );
+			const anyDrafts = getEntityRecords( 'postType', 'post', {
 				status: 'draft',
-				author: currentUser.id,
-				after: getTodayStartISO(),
-				orderby: 'date',
-				order: 'desc',
 				per_page: 1,
-			};
-			const records = getEntityRecords( 'postType', 'post', query ) as
-				| Array< { id: number; title: { rendered: string } } >
-				| undefined;
-
-			return {
-				existingDraft: records?.[ 0 ] ?? null,
-				isLoadingDrafts: ! hasFinishedResolution( 'getEntityRecords', [
-					'postType',
-					'post',
-					query,
-				] ),
-				hasDrafts: draftsExist,
-			};
+			} ) as Array< { id: number } > | undefined;
+			return { hasDrafts: ( anyDrafts?.length ?? 0 ) > 0 };
 		},
 		[ showDraftsList ]
 	);
@@ -207,9 +160,6 @@ export default function QuickDraft() {
 				setCreatedPost( { id: newId, title: data.title } );
 			}
 			setData( INITIAL_DATA );
-			// The newly saved draft would re-trigger the prompt on the next
-			// render; skip it for the rest of this session.
-			setHasDismissedPrompt( true );
 		} finally {
 			setIsSaving( false );
 		}
@@ -220,31 +170,11 @@ export default function QuickDraft() {
 	};
 
 	/*
-	 * The single most relevant state for the tile: loading, the
-	 * already-saved-today prompt, the post-save confirmation, or the form.
-	 * Composed with the drafts list according to the room the tile has.
+	 * The most relevant state for the tile: the post-save confirmation or the
+	 * form. Composed with the drafts list according to the room the tile has.
 	 */
 	let primary: ReactNode;
-	if ( isLoadingDrafts ) {
-		primary = (
-			<Stack
-				direction="column"
-				align="center"
-				justify="center"
-				className={ styles.fill }
-			>
-				<Spinner />
-			</Stack>
-		);
-	} else if ( existingDraft && ! hasDismissedPrompt ) {
-		primary = (
-			<ExistingDraftPrompt
-				postId={ existingDraft.id }
-				postTitle={ decodeEntities( existingDraft.title.rendered ) }
-				onWriteAnother={ () => setHasDismissedPrompt( true ) }
-			/>
-		);
-	} else if ( createdPost !== null ) {
+	if ( createdPost !== null ) {
 		primary = (
 			<SavedPost
 				postId={ createdPost.id }
