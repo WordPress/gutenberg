@@ -45,6 +45,10 @@ function __experimentalReusableBlocksSelect( select ) {
 	} );
 }
 
+function __experimentalUserPatternCategoriesSelect( select ) {
+	return select( coreStore ).getUserPatternCategories();
+}
+
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockBindingsSupportedAttributes',
 	'__experimentalBlockDirectory',
@@ -103,6 +107,7 @@ const {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
@@ -142,7 +147,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userCanCreatePages,
 		pageOnFront,
 		pageForPosts,
-		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
@@ -154,7 +158,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				canUser,
 				getRawEntityRecord,
 				getEntityRecord,
-				getUserPatternCategories,
 				getBlockPatternCategories,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
@@ -217,7 +220,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
-				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
@@ -370,8 +372,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ userPatternCategoriesSelectKey ]:
+				__experimentalUserPatternCategoriesSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -435,7 +438,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		keepCaretInsideBlock,
 		settings,
 		hasUploadPermissions,
-		userPatternCategories,
 		blockPatterns,
 		blockPatternCategories,
 		canUseUnfilteredHTML,

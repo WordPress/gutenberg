@@ -15,8 +15,6 @@
  */
 import type { ComponentProps } from 'react';
 import type { Field } from '@wordpress/dataviews';
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import type { Icon } from '@wordpress/ui';
 
 type IconProps = ComponentProps< typeof Icon >;
