@@ -28,13 +28,6 @@
 	margin: 0 auto;
 }
 
-/* Compact tile: footer link that reveals the drafts list in place. */
-.footer {
-	margin-block-start: var(--wpds-dimension-padding-sm);
-	padding-block-start: var(--wpds-dimension-padding-sm);
-	border-block-start: var(--wpds-border-width-sm) solid var(--wpds-color-stroke-surface-neutral-weak);
-}
-
 .formContainer {
 	flex: 1;
 	min-height: 0;

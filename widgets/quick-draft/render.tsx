@@ -188,6 +188,16 @@ export default function QuickDraft() {
 	};
 
 	/*
+	 * Whether there is room to show the drafts list inline, and how to place it.
+	 * A wide tile sets the list beside the form (each column scrolls, so width
+	 * is what it needs, not height); a tall but narrow tile stacks it below. A
+	 * tile that is neither wide nor tall stays compact, with the list reached
+	 * from a button in the form's action row.
+	 */
+	const showDraftsList = isWide || isTall;
+	const listBeside = isWide;
+
+	/*
 	 * The single most relevant state for the tile: loading, the
 	 * already-saved-today prompt, the post-save confirmation, or the form.
 	 * Composed with the drafts list according to the room the tile has.
@@ -249,20 +259,19 @@ export default function QuickDraft() {
 					>
 						{ __( 'Save as draft' ) }
 					</Button>
+					{ ! showDraftsList && (
+						<Button
+							variant="minimal"
+							onClick={ () => setIsListOpenInCompact( true ) }
+						>
+							{ __( 'Draft posts' ) }
+							<Button.Icon icon={ chevronRight } />
+						</Button>
+					) }
 				</Stack>
 			</Stack>
 		);
 	}
-
-	/*
-	 * Whether there is room to show the drafts list inline, and how to place it.
-	 * A wide tile sets the list beside the form (each column scrolls, so width
-	 * is what it needs, not height); a tall but narrow tile stacks it below.
-	 * Only a tile that is neither wide nor tall stays compact, with the list
-	 * still reachable through the reveal link.
-	 */
-	const showDraftsList = isWide || isTall;
-	const listBeside = isWide;
 
 	// No room for the list inline, but it was revealed in place from compact.
 	if ( ! showDraftsList && isListOpenInCompact ) {
@@ -291,26 +300,12 @@ export default function QuickDraft() {
 		);
 	}
 
-	// Compact tile: primary pane plus a link that reveals the drafts list.
+	// Compact tile: just the primary pane; drafts are reached from the action row.
 	if ( ! showDraftsList ) {
 		return (
 			<Stack ref={ ref } direction="column" className={ styles.body }>
 				<Stack direction="column" className={ styles.primaryPane }>
 					{ primary }
-				</Stack>
-				<Stack
-					direction="row"
-					justify="flex-start"
-					className={ styles.footer }
-				>
-					<Button
-						variant="minimal"
-						size="compact"
-						onClick={ () => setIsListOpenInCompact( true ) }
-					>
-						{ __( 'Draft posts' ) }
-						<Button.Icon icon={ chevronRight } />
-					</Button>
 				</Stack>
 			</Stack>
 		);
