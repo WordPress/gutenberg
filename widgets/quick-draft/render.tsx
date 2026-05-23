@@ -30,7 +30,7 @@ import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress
 import { DraftsList, ExistingDraftPrompt, SavedPost } from './components';
 import { QuickDraftContentField } from './fields';
 import { useWidgetSize } from './hooks';
-import styles from './styles.module.css';
+import styles from './style.module.css';
 
 /*
  * Serializes plain text into one or more `core/paragraph` blocks so the saved
