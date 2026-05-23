@@ -42,17 +42,17 @@ export default function EditSectionButton( { clientId } ) {
 		return null;
 	}
 
+	const handleClick = () => {
+		if ( isEditingContentOnlySection ) {
+			stopEditingContentOnlySection();
+		} else {
+			editContentOnlySection( clientId );
+		}
+	};
+
 	return (
 		<BlockControls group="other">
-			<ToolbarButton
-				onClick={ () => {
-					if ( isEditingContentOnlySection ) {
-						stopEditingContentOnlySection();
-					} else {
-						editContentOnlySection( clientId );
-					}
-				} }
-			>
+			<ToolbarButton onClick={ handleClick }>
 				{ isEditingContentOnlySection ? __( 'Done' ) : __( 'Edit' ) }
 			</ToolbarButton>
 		</BlockControls>
