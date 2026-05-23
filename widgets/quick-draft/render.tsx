@@ -228,7 +228,7 @@ export default function QuickDraft() {
 				justify="space-between"
 				className={ styles.fill }
 			>
-				<Stack className={ styles.formContainer }>
+				<Stack direction="column" className={ styles.formContainer }>
 					<DataForm< QuickDraftData >
 						data={ data }
 						fields={ fields }
