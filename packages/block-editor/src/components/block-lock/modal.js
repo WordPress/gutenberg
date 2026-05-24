@@ -101,11 +101,12 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		hasLayoutLock,
 	] );
 
+	const isLayoutChecked = lock.layout ?? isLayoutLocked;
 	const lockValues = [
 		lock.move,
 		lock.remove,
 		...( allowsEditLocking ? [ !! lock.edit ] : [] ),
-		...( hasLayoutLock ? [ !! lock.layout ] : [] ),
+		...( hasLayoutLock ? [ isLayoutChecked ] : [] ),
 	];
 	const isAllChecked = lockValues.every( Boolean );
 	const isMixed = lockValues.some( Boolean ) && ! isAllChecked;
@@ -114,11 +115,11 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		lock.move !== isMoveLocked ||
 		lock.remove !== isRemoveLocked ||
 		( allowsEditLocking && lock.edit !== isEditLocked ) ||
-		( hasLayoutLock && lock.layout !== isLayoutLocked ) ||
+		( hasLayoutLock && isLayoutChecked !== isLayoutLocked ) ||
 		( hasTemplateLock &&
-			! lock.layout &&
+			! isLayoutChecked &&
 			applyTemplateLock !== hasAppliedTemplateLock );
-	const isTemplateLockToggleChecked = ! lock.layout && applyTemplateLock;
+	const isTemplateLockToggleChecked = ! isLayoutChecked && applyTemplateLock;
 
 	return (
 		<Modal
@@ -137,17 +138,18 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					if ( ! isDirty ) {
 						return;
 					}
-					const { layout, ...blockLock } = lock;
+					const blockLock = { ...lock };
+					delete blockLock.layout;
 					const blockAttributes = {
 						lock: blockLock,
 					};
 					let templateLockValue;
-					if ( layout ) {
+					if ( isLayoutChecked ) {
 						templateLockValue = 'contentOnly';
 					} else if ( applyTemplateLock ) {
 						templateLockValue = getTemplateLockValue( blockLock );
 					}
-					if ( isPatternSection && ! layout ) {
+					if ( isPatternSection && ! isLayoutChecked ) {
 						blockAttributes.metadata = {
 							...metadata,
 							patternName: undefined,
@@ -258,7 +260,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 									<li className="block-editor-block-lock-modal__checklist-item">
 										<CheckboxControl
 											label={ __( 'Lock layout' ) }
-											checked={ !! lock.layout }
+											checked={ isLayoutChecked }
 											onChange={ ( layout ) => {
 												setLock( ( prevLock ) => ( {
 													...prevLock,
@@ -269,7 +271,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 										<WCIcon
 											className="block-editor-block-lock-modal__lock-icon"
 											icon={
-												lock.layout
+												isLayoutChecked
 													? lockIcon
 													: unlockIcon
 											}
@@ -286,7 +288,8 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ isTemplateLockToggleChecked }
 							disabled={
-								lock.layout || ( lock.move && ! lock.remove )
+								isLayoutChecked ||
+								( lock.move && ! lock.remove )
 							}
 							onChange={ () =>
 								setApplyTemplateLock( ! applyTemplateLock )
