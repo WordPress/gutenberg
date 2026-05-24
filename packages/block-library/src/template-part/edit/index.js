@@ -258,7 +258,7 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
-				{ isEntityAvailable && canUserEdit && (
+				{ isEntityAvailable && canUserEdit && canUserEditBlock && (
 					<BlockControls group="other">
 						<ToolbarButton onClick={ onToggleEdit }>
 							{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }

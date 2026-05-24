@@ -15,37 +15,28 @@ import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit
 export default function EditSectionButton( { clientId } ) {
 	const {
 		isSectionBlock,
-		parentSectionBlock,
-		isWithinSection,
-		isWithinEditedSection,
 		isEditingContentOnlySection,
-		editedContentOnlySection,
 		editContentOnlySection,
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const sectionClientId =
-		( isSectionBlock && clientId ) ||
-		parentSectionBlock ||
-		( isWithinEditedSection && editedContentOnlySection );
-
 	const blockType = useSelect(
 		( select ) => {
-			if ( ! sectionClientId ) {
+			if ( ! clientId ) {
 				return null;
 			}
 			const { getBlockName } = select( blockEditorStore );
-			const blockName = getBlockName( sectionClientId );
+			const blockName = getBlockName( clientId );
 			return blockName ? { name: blockName } : null;
 		},
-		[ sectionClientId ]
+		[ clientId ]
 	);
 
-	const isEditing = isEditingContentOnlySection || isWithinEditedSection;
+	const isEditing = isEditingContentOnlySection;
 
 	if (
-		! sectionClientId ||
-		( ! isWithinSection && ! isEditing ) ||
+		! clientId ||
+		( ! isSectionBlock && ! isEditing ) ||
 		isReusableBlock( blockType ) ||
 		isTemplatePart( blockType )
 	) {
@@ -56,7 +47,7 @@ export default function EditSectionButton( { clientId } ) {
 		if ( isEditing ) {
 			stopEditingContentOnlySection();
 		} else {
-			editContentOnlySection( sectionClientId );
+			editContentOnlySection( clientId );
 		}
 	};
 

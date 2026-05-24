@@ -86,8 +86,6 @@ function RecursionWarning() {
 	);
 }
 
-const NOOP = () => {};
-
 // Wrap the main Edit function for the pattern block with a recursion wrapper
 // that allows short-circuiting rendering as early as possible, before any
 // of the other effects in the block edit have run.
@@ -108,6 +106,7 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 
 function ReusableBlockControl( {
 	canUserEdit,
+	canUserEditBlock,
 	canOverrideBlocks,
 	hasContent,
 	isEditingThis,
@@ -116,7 +115,7 @@ function ReusableBlockControl( {
 } ) {
 	return (
 		<>
-			{ canUserEdit && (
+			{ canUserEdit && canUserEditBlock && (
 				<BlockControls group="other">
 					<ToolbarButton onClick={ onToggleEdit }>
 						{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
@@ -173,10 +172,11 @@ function ReusableBlockEdit( {
 		hasPatternOverridesSource,
 		supportedBlockTypesRaw,
 		isEditingThis,
+		canUserEditBlock,
 	} = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
-			const { getSettings } = blockEditorSelect;
+			const { canEditBlock, getSettings } = blockEditorSelect;
 			const { getEditedContentOnlySection } = unlock( blockEditorSelect );
 			return {
 				onNavigateToEntityRecord:
@@ -189,6 +189,7 @@ function ReusableBlockEdit( {
 						.__experimentalBlockBindingsSupportedAttributes ||
 					EMPTY_OBJECT,
 				isEditingThis: getEditedContentOnlySection() === clientId,
+				canUserEditBlock: canEditBlock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -232,8 +233,8 @@ function ReusableBlockEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		layout,
 		value: blocks,
-		onInput: isEditingThis ? onInput : NOOP,
-		onChange: isEditingThis ? onChange : NOOP,
+		onInput,
+		onChange,
 		renderAppender: blocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
@@ -285,6 +286,7 @@ function ReusableBlockEdit( {
 			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
 					canUserEdit={ canUserEdit }
+					canUserEditBlock={ canUserEditBlock }
 					canOverrideBlocks={ canOverrideBlocks }
 					hasContent={ !! content }
 					isEditingThis={ isEditingThis }
