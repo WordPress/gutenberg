@@ -12,13 +12,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	unseen,
-	symbol,
-} from '@wordpress/icons';
+import { Icon, pinSmall, unseen, symbol } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 
@@ -32,7 +26,6 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
-import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -63,7 +56,6 @@ function ListViewBlockSelectButton(
 		clientId,
 		context: 'list-view',
 	} );
-	const { isLocked } = useBlockLock( clientId );
 	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
@@ -76,7 +68,6 @@ function ListViewBlockSelectButton(
 		[ clientId ]
 	);
 
-	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -182,11 +173,6 @@ function ListViewBlockSelectButton(
 						/>
 						<Tooltip.Popup>{ visibilityLabel }</Tooltip.Popup>
 					</Tooltip.Root>
-				) }
-				{ shouldShowLockIcon && (
-					<span className="block-editor-list-view-block-select-button__lock">
-						<Icon icon={ lock } />
-					</span>
 				) }
 			</HStack>
 		</a>

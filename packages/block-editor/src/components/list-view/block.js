@@ -12,11 +12,13 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import {
+	Button,
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useInstanceId, useDebounce } from '@wordpress/compose';
-import { moreVertical } from '@wordpress/icons';
+import { lockSmall, moreVertical, unlockSmall } from '@wordpress/icons';
 import {
 	useCallback,
 	useMemo,
@@ -50,11 +52,15 @@ import {
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import useUnlockBlock from '../block-lock/use-unlock-block';
+import LockMenuContent from './lock-menu-content';
 import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
+
+const { Menu } = unlock( componentsPrivateApis );
 
 function ListViewBlock( {
 	block: { clientId },
@@ -80,8 +86,10 @@ function ListViewBlock( {
 	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
+	const [ isLockMenuOpen, setIsLockMenuOpen ] = useState( false );
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
-	const { isLocked } = useBlockLock( clientId );
+	const { canLock, isLocked } = useBlockLock( clientId );
+	const unlockBlock = useUnlockBlock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -609,39 +617,125 @@ function ListViewBlock( {
 				colSpan={ colSpan }
 				ref={ cellRef }
 				aria-selected={ !! isSelected }
+				withoutGridItem
 			>
-				{ ( { ref, tabIndex, onFocus } ) => (
-					<div className="block-editor-list-view-block__contents-container">
-						<ListViewBlockContents
-							block={ block }
-							onClick={ selectEditorBlock }
-							onContextMenu={ onContextMenu }
-							onMouseDown={ onMouseDown }
-							onToggleExpanded={ toggleExpanded }
-							isSelected={ isSelected }
-							position={ position }
-							siblingBlockCount={ siblingBlockCount }
-							level={ level }
-							ref={ ref }
-							tabIndex={
-								currentlyEditingBlockInCanvas ? 0 : tabIndex
-							}
-							onFocus={ onFocus }
-							isExpanded={ canEditBlock ? isExpanded : undefined }
-							selectedClientIds={ selectedClientIds }
-							ariaDescribedBy={ descriptionId }
-						/>
-						<AriaReferencedText id={ descriptionId }>
-							{ [
-								blockPositionDescription,
-								blockPropertiesDescription,
-								blockVisibilityDescription,
-							]
-								.filter( Boolean )
-								.join( ' ' ) }
-						</AriaReferencedText>
-					</div>
-				) }
+				<div className="block-editor-list-view-block__contents-container">
+					<TreeGridItem>
+						{ ( { ref, tabIndex, onFocus } ) => (
+							<ListViewBlockContents
+								block={ block }
+								onClick={ selectEditorBlock }
+								onContextMenu={ onContextMenu }
+								onMouseDown={ onMouseDown }
+								onToggleExpanded={ toggleExpanded }
+								isSelected={ isSelected }
+								position={ position }
+								siblingBlockCount={ siblingBlockCount }
+								level={ level }
+								ref={ ref }
+								tabIndex={
+									currentlyEditingBlockInCanvas ? 0 : tabIndex
+								}
+								onFocus={ onFocus }
+								isExpanded={
+									canEditBlock ? isExpanded : undefined
+								}
+								selectedClientIds={ selectedClientIds }
+								ariaDescribedBy={ descriptionId }
+							/>
+						) }
+					</TreeGridItem>
+					{ ( isLocked || canLock ) &&
+						getBlockEditingMode( clientId ) === 'default' && (
+							<TreeGridItem>
+								{ ( { ref, tabIndex, onFocus } ) => {
+									const lockButtonClassName = clsx(
+										'block-editor-list-view-block__lock-toggle',
+										{
+											'is-visible':
+												isLocked ||
+												isHovered ||
+												isFirstSelectedBlock,
+										}
+									);
+
+									if ( isLocked && ! isLockMenuOpen ) {
+										return (
+											<Button
+												ref={ ref }
+												className={
+													lockButtonClassName
+												}
+												size="small"
+												icon={ lockSmall }
+												disabled={ ! canLock }
+												accessibleWhenDisabled
+												label={
+													canLock
+														? __( 'Unlock' )
+														: __( 'Locked' )
+												}
+												tabIndex={ tabIndex }
+												onFocus={ onFocus }
+												onClick={
+													canLock
+														? unlockBlock
+														: undefined
+												}
+											/>
+										);
+									}
+
+									const lockButtonIcon = isLocked
+										? lockSmall
+										: unlockSmall;
+									const lockButtonLabel = isLocked
+										? __( 'Lock options' )
+										: __( 'Lock' );
+
+									return (
+										<Menu
+											placement="bottom-start"
+											open={ isLockMenuOpen }
+											onOpenChange={ setIsLockMenuOpen }
+										>
+											<Menu.TriggerButton
+												render={
+													<Button
+														ref={ ref }
+														className={
+															lockButtonClassName
+														}
+														size="small"
+														icon={ lockButtonIcon }
+														label={
+															lockButtonLabel
+														}
+														tabIndex={ tabIndex }
+														onFocus={ onFocus }
+													/>
+												}
+											/>
+											<Menu.Popover>
+												<LockMenuContent
+													clientId={ clientId }
+												/>
+											</Menu.Popover>
+										</Menu>
+									);
+								} }
+							</TreeGridItem>
+						) }
+					<AriaReferencedText id={ descriptionId }>
+						{ [
+							blockPositionDescription,
+							blockPropertiesDescription,
+							blockVisibilityDescription,
+						]
+							.filter( Boolean )
+							.join( ' ' ) }
+					</AriaReferencedText>
+				</div>
 			</TreeGridCell>
 			{ hasRenderedMovers && (
 				<>
