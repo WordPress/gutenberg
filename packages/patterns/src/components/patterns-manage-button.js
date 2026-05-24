@@ -29,9 +29,6 @@ function PatternsManageButton( { clientId, onClose } ) {
 			const { canUser } = select( coreStore );
 			const block = getBlock( clientId );
 
-			const _isUnsyncedPattern =
-				!! block?.attributes?.metadata?.patternName;
-
 			const _isSyncedPattern =
 				!! block &&
 				isReusableBlock( block ) &&
@@ -44,7 +41,7 @@ function PatternsManageButton( { clientId, onClose } ) {
 			return {
 				canEdit: canEditBlock( clientId ),
 				canDetach: _isSyncedPattern && canRemoveBlock( clientId ),
-				isVisible: _isUnsyncedPattern || _isSyncedPattern,
+				isVisible: _isSyncedPattern,
 				// The site editor and templates both check whether the user
 				// has edit_theme_options capabilities. We can leverage that here
 				// and omit the manage patterns link if the user can't access it.
