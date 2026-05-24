@@ -348,7 +348,7 @@ test.describe( 'Unsynced pattern', () => {
 		).toHaveCount( 2 );
 	} );
 
-	test( 'supports editing pattern via Edit pattern button', async ( {
+	test( 'supports editing pattern via Edit button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -397,13 +397,9 @@ test.describe( 'Unsynced pattern', () => {
 		// Click on the pattern in List View to select it.
 		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
 
-		// Open settings sidebar and click "Edit pattern" button.
+		// Click "Edit" in the block toolbar.
 		await editor.openDocumentSettingsSidebar();
-
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit pattern' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Edit' );
 
 		// Expand the inner Group to see all blocks including separator.
 		await listView
@@ -426,11 +422,8 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 
-		// Exit pattern editing by clicking the "Exit pattern" button.
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Exit pattern' } )
-			.click();
+		// Exit pattern editing by clicking the "Done" button.
+		await editor.clickBlockToolbarButton( 'Done' );
 
 		// Verify pattern is back to content-only mode (separator hidden again).
 		await expect(
@@ -497,7 +490,7 @@ test.describe( 'Unsynced pattern', () => {
 		);
 	} );
 
-	test( 'supports editing pattern via Edit pattern toolbar button', async ( {
+	test( 'supports editing pattern via Edit toolbar button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -546,8 +539,8 @@ test.describe( 'Unsynced pattern', () => {
 		// Click on the pattern in List View to select it.
 		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
 
-		// Click "Edit pattern" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Edit pattern' );
+		// Click "Edit" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit' );
 
 		// Expand the inner Group to see all blocks including separator.
 		await listView
@@ -570,8 +563,8 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 
-		// Exit pattern editing by clicking "Exit pattern" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Exit pattern' );
+		// Exit pattern editing by clicking "Done" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Done' );
 
 		// Verify pattern is back to content-only mode (separator hidden again).
 		await expect(
@@ -746,13 +739,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.showBlockToolbar();
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', {
-				name: 'Edit original',
-			} )
-			.click();
+		await editor.clickBlockOptionsMenuItem( 'Edit original' );
 
 		const editorTopBar = page.getByRole( 'region', {
 			name: 'Editor top bar',
@@ -808,12 +795,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', {
-				name: 'Edit original',
-			} )
-			.click();
+		await editor.clickBlockOptionsMenuItem( 'Edit original' );
 
 		const editorTopBar = page.getByRole( 'region', {
 			name: 'Editor top bar',
@@ -1088,11 +1070,7 @@ test.describe( 'Synced pattern', () => {
 				.getByRole( 'document', { name: 'Block: Pattern' } )
 				.first()
 		);
-		await editor.showBlockToolbar();
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Edit original' } )
-			.click();
+		await editor.clickBlockOptionsMenuItem( 'Edit original' );
 
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -1214,12 +1192,8 @@ test.describe( 'Synced pattern - entity navigation', () => {
 		} );
 		await editor.selectBlocks( patternBlock );
 
-		// Click "Edit original" in the block toolbar.
-		await editor.showBlockToolbar();
-		await page
-			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Edit original' } )
-			.click();
+		// Click "Edit original" in the block options menu.
+		await editor.clickBlockOptionsMenuItem( 'Edit original' );
 
 		// Verify we navigated to the pattern editing view.
 		const editorTopBar = page.getByRole( 'region', {

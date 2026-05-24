@@ -627,11 +627,7 @@ test.describe( 'Pattern Overrides', () => {
 					.getByRole( 'document', { name: 'Block: Pattern' } )
 					.first()
 			);
-			await editor.showBlockToolbar();
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Edit original' } )
-				.click();
+			await editor.clickBlockOptionsMenuItem( 'Edit original' );
 
 			// The inner paragraph should be editable in the pattern focus mode.
 			await editor.selectBlocks(

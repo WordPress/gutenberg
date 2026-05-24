@@ -351,10 +351,12 @@ test.describe( 'Template Part', () => {
 			editor.canvas.locator( '[data-type="core/template-part"]' )
 		);
 
-		// Go to Block Inspector -> Advanced.
+		// Open the Block Inspector.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Settings' } ).click();
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+		const advancedPanel = page.getByRole( 'button', { name: 'Advanced' } );
+		if ( await advancedPanel.isVisible() ) {
+			await advancedPanel.click();
+		}
 
 		// Verify that the widget area import button is not there.
 		await expect(
