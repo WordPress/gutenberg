@@ -32,7 +32,11 @@ import {
 	// No type declarations available for @wordpress/interface.
 	// @ts-expect-error
 } from '@wordpress/interface';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type {
+	JSX,
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactNode,
+} from 'react';
 
 /**
  * Internal dependencies
