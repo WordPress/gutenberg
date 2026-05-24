@@ -95,7 +95,7 @@ test.describe( 'Block Locking', () => {
 		await paragraphRow.getByRole( 'button', { name: 'Unlock' } ).click();
 
 		await expect(
-			paragraphRow.getByRole( 'button', { name: 'Lock' } )
+			paragraphRow.getByRole( 'button', { name: 'Lock settings' } )
 		).toBeFocused();
 
 		expect( await editor.getEditedPostContent() )

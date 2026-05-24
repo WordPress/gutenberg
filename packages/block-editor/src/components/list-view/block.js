@@ -723,9 +723,8 @@ function ListViewBlock( {
 									const lockButtonIcon = isLocked
 										? lockSmall
 										: unlockSmall;
-									const lockButtonLabel = isLocked
-										? __( 'Lock options' )
-										: __( 'Lock' );
+									const lockButtonLabel =
+										__( 'Lock settings' );
 
 									return (
 										<Menu

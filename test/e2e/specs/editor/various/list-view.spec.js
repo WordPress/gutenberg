@@ -299,13 +299,24 @@ test.describe( 'List View', () => {
 			} )
 		).toBeFocused();
 
-		// Navigate the right column to image block options button via Home key.
+		// Navigate the right column to the image block lock options button via Home key.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Home' );
 
 		const imageItem = listView.getByRole( 'gridcell', {
 			name: 'Image',
 		} );
+
+		await expect(
+			imageItem
+				.locator( '..' ) // parent selector.
+				.getByRole( 'button', {
+					name: 'Lock settings',
+				} )
+		).toBeFocused();
+
+		// Navigate the right column to image block options button.
+		await page.keyboard.press( 'ArrowRight' );
 
 		await expect(
 			imageItem
@@ -1303,19 +1314,26 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', selected: true, focused: true },
 			] );
 
+		const fileRow = listView.getByRole( 'row' ).filter( {
+			has: page.getByRole( 'gridcell', { name: 'File' } ),
+		} );
+
 		await page.keyboard.press( 'ArrowRight' );
-		const optionsForFileToggle = listView
-			.getByRole( 'row' )
-			.filter( {
-				has: page.getByRole( 'gridcell', { name: 'File' } ),
-			} )
-			.getByRole( 'button', { name: 'Options' } );
+		await expect(
+			fileRow.getByRole( 'button', { name: 'Lock settings' } ),
+			'Pressing arrow right should move focus to the lock settings button'
+		).toBeFocused();
+
+		await page.keyboard.press( 'ArrowRight' );
+		const optionsForFileToggle = fileRow.getByRole( 'button', {
+			name: 'Options',
+		} );
 		const optionsForFileMenu = page.getByRole( 'menu', {
 			name: 'Options',
 		} );
 		await expect(
 			optionsForFileToggle,
-			'Pressing arrow right should move focus to the menu dropdown toggle button'
+			'Pressing arrow right again should move focus to the menu dropdown toggle button'
 		).toBeFocused();
 
 		await page.keyboard.press( 'Enter' );

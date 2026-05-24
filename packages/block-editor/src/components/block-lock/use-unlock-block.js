@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,7 +39,7 @@ export default function useUnlockBlock( clientId ) {
 		[ clientId ]
 	);
 
-	return () => {
+	return useCallback( () => {
 		const previousAttributes = registry
 			.select( blockEditorStore )
 			.getBlockAttributes( clientId );
@@ -87,5 +88,12 @@ export default function useUnlockBlock( clientId ) {
 				],
 			}
 		);
-	};
+	}, [
+		clientId,
+		createSuccessNotice,
+		isEditLocked,
+		isPatternSection,
+		registry,
+		updateBlockAttributes,
+	] );
 }
