@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	flushSync,
 	useCallback,
 	useLayoutEffect,
 	useRef,
@@ -170,22 +169,23 @@ export function useItemExitAnimation( {
 			return;
 		}
 
-		flushSync( () => {
-			setExitingItems( ( current ) => [ ...current, ...nextExiting ] );
-		} );
-
 		if ( prefersReducedMotion() ) {
+			// Siblings snap into place via the layout-shift hook; skip the
+			// exit ghost (and its synchronous mount) entirely.
 			for ( const { key } of nextExiting ) {
-				clearExitingItem( key );
+				childrenCacheRef.current.delete( key );
 			}
 			return;
 		}
+
+		// A state update inside a layout effect is flushed before paint,
+		// so the ghost mounts in the same frame the tile is removed.
+		setExitingItems( ( current ) => [ ...current, ...nextExiting ] );
 
 		for ( const { key } of nextExiting ) {
 			scheduleExitComplete( key );
 		}
 	}, [
-		clearExitingItem,
 		container,
 		enabled,
 		getPositionsBeforeLastChange,
