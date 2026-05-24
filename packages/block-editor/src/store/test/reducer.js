@@ -4427,6 +4427,38 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
+			it( 'sets synced pattern inner blocks to default when the synced pattern is edited', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'root-pattern',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							'group-1': 'disabled',
+							'paragraph-1': 'disabled',
+							'group-2': 'disabled',
+							'paragraph-2': 'disabled',
+							'pattern-paragraph': 'default',
+							'pattern-group': 'default',
+							'pattern-paragraph-with-overrides': 'default',
+							'nested-pattern': 'disabled',
+							'nested-paragraph': 'disabled',
+							'nested-group': 'disabled',
+							'nested-paragraph-with-overrides': 'disabled',
+						} )
+					)
+				);
+			} );
+
 			it( 'synced pattern inner blocks keep their editing modes when inside an editedContentOnlySection', () => {
 				// Set up an unsynced pattern containing a synced pattern.
 				// When the unsynced pattern is the editedContentOnlySection,
@@ -5594,7 +5626,7 @@ describe( 'state', () => {
 					new Map(
 						Object.entries( {
 							'pattern-paragraph': 'contentOnly',
-							'template-part-paragraph': 'contentOnly',
+							'template-part-paragraph': 'disabled',
 						} )
 					)
 				);
@@ -5654,7 +5686,7 @@ describe( 'state', () => {
 					new Map(
 						Object.entries( {
 							'pattern-paragraph': 'contentOnly',
-							'template-part-paragraph': 'contentOnly',
+							'template-part-paragraph': 'disabled',
 						} )
 					)
 				);
@@ -5762,9 +5794,9 @@ describe( 'state', () => {
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'template-part-paragraph': 'contentOnly',
+							'template-part-paragraph': 'disabled',
 							'template-part-group': 'disabled',
-							'template-part-grouped-paragraph': 'contentOnly',
+							'template-part-grouped-paragraph': 'disabled',
 						} )
 					)
 				);
@@ -5806,9 +5838,86 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
-							'template-part-paragraph': 'contentOnly',
+							'template-part-paragraph': 'disabled',
 							'template-part-group': 'disabled',
 							// template-part-grouped-paragraph already has an explicit mode, so isn't set as a derived mode.
+						} )
+					)
+				);
+			} );
+
+			it( 'sets template part descendants to default when the template part is edited', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'template-part',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							'template-part': 'default',
+							'template-part-paragraph': 'default',
+							'template-part-group': 'default',
+							'template-part-grouped-paragraph': 'default',
+						} )
+					)
+				);
+			} );
+
+			it( 'sets template part descendants to default when page-context modes are set', () => {
+				const pageContextState = dispatchActions(
+					[
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: '',
+							mode: 'disabled',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-part',
+							mode: 'contentOnly',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-part-paragraph',
+							mode: 'disabled',
+						},
+						{
+							type: 'SET_BLOCK_EDITING_MODE',
+							clientId: 'template-part-group',
+							mode: 'disabled',
+						},
+					],
+					testReducer,
+					initialState
+				);
+
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'template-part',
+						},
+					],
+					testReducer,
+					pageContextState
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'': 'disabled',
+							'template-part': 'default',
+							'template-part-paragraph': 'default',
+							'template-part-group': 'default',
+							'template-part-grouped-paragraph': 'default',
 						} )
 					)
 				);

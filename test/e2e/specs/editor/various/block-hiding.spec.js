@@ -111,14 +111,11 @@ test.describe( 'Block Hiding', () => {
 			page.getByRole( 'dialog', { name: 'Hide block' } )
 		).toBeHidden();
 
-		// Now enter edit mode via "Edit pattern".
+		// Now enter edit mode via "Edit".
 		await editor.canvas
 			.locator( 'role=document[name="Block: Group"i]' )
 			.click();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit pattern' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Edit' );
 
 		// Select a nested paragraph again.
 		await editor.canvas
@@ -167,14 +164,11 @@ test.describe( 'Block Hiding', () => {
 			page.getByRole( 'dialog', { name: 'Hide block' } )
 		).toBeHidden();
 
-		// Select the pattern block and enter edit mode via "Edit pattern".
+		// Select the pattern block and enter edit mode via "Edit".
 		await editor.canvas
 			.locator( 'role=document[name="Block: Group"i]' )
 			.click();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit pattern' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Edit' );
 
 		// Select the nested paragraph again.
 		await editor.canvas

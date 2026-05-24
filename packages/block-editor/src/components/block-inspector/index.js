@@ -19,7 +19,6 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import EditContents from './edit-contents';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
@@ -469,7 +468,6 @@ const BlockInspectorSingleBlock = ( {
 				</Spacer>
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
-			<EditContents clientId={ renderedBlockClientId } />
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
 			<BlockInspectorPreTabsSlot />
 			{ isBlockStyleStateSelected && ! isSectionBlock && (

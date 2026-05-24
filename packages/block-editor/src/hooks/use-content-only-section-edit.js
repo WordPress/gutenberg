@@ -16,32 +16,19 @@ import { unlock } from '../lock-unlock';
  * @return {Object} Object containing section block state and actions.
  */
 export default function useContentOnlySectionEdit( clientId ) {
-	const {
-		isSectionBlock,
-		isWithinSection,
-		isWithinEditedSection,
-		isEditingContentOnlySection,
-		editedContentOnlySection,
-	} = useSelect(
+	const { isSectionBlock, isEditingContentOnlySection } = useSelect(
 		( select ) => {
 			const {
 				isSectionBlock: _isSectionBlock,
-				getParentSectionBlock,
 				getEditedContentOnlySection,
-				isWithinEditedContentOnlySection,
 			} = unlock( select( blockEditorStore ) );
 
 			const editedSection = getEditedContentOnlySection();
+			const isSection = _isSectionBlock( clientId );
 
 			return {
-				isSectionBlock: _isSectionBlock( clientId ),
-				isWithinSection:
-					_isSectionBlock( clientId ) ||
-					!! getParentSectionBlock( clientId ),
-				isWithinEditedSection:
-					isWithinEditedContentOnlySection( clientId ),
+				isSectionBlock: isSection,
 				isEditingContentOnlySection: editedSection === clientId,
-				editedContentOnlySection: editedSection,
 			};
 		},
 		[ clientId ]
@@ -53,10 +40,7 @@ export default function useContentOnlySectionEdit( clientId ) {
 
 	return {
 		isSectionBlock,
-		isWithinSection,
-		isWithinEditedSection,
 		isEditingContentOnlySection,
-		editedContentOnlySection,
 		editContentOnlySection,
 		stopEditingContentOnlySection,
 	};

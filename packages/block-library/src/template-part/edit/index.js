@@ -34,6 +34,7 @@ import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
+import { unlock } from '../../lock-unlock';
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
@@ -107,9 +108,13 @@ export default function TemplatePartEdit( {
 	attributes,
 	setAttributes,
 	clientId,
+	isSelected,
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
@@ -129,12 +134,16 @@ export default function TemplatePartEdit( {
 		title,
 		canUserEdit,
 		canUserEditBlock,
+		isEditingThis,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			const { getBlockCount, getSettings, canEditBlock } =
 				select( blockEditorStore );
+			const { getEditedContentOnlySection } = unlock(
+				select( blockEditorStore )
+			);
 
 			const getEntityArgs = [
 				'postType',
@@ -173,6 +182,7 @@ export default function TemplatePartEdit( {
 				title: entityRecord?.title,
 				canUserEdit: !! _canUserEdit,
 				canUserEditBlock: canEditBlock( clientId ),
+				isEditingThis: getEditedContentOnlySection() === clientId,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -237,24 +247,43 @@ export default function TemplatePartEdit( {
 		);
 	}
 
+	const onToggleEdit = () => {
+		if ( isEditingThis ) {
+			stopEditingContentOnlySection();
+		} else {
+			editContentOnlySection( clientId );
+		}
+	};
+
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
-				{ isEntityAvailable &&
-					onNavigateToEntityRecord &&
-					canUserEdit && (
-						<BlockControls group="other">
-							<ToolbarButton
-								onClick={ () => {
-									onNavigateToEntityRecord( {
-										postId: templatePartId,
-										postType: 'wp_template_part',
-									} );
-								} }
-							>
-								{ __( 'Edit original' ) }
-							</ToolbarButton>
-						</BlockControls>
+				{ isEntityAvailable && canUserEdit && canUserEditBlock && (
+					<BlockControls group="other">
+						<ToolbarButton onClick={ onToggleEdit }>
+							{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
+						</ToolbarButton>
+					</BlockControls>
+				) }
+				{ isSelected &&
+					isEntityAvailable &&
+					canUserEdit &&
+					onNavigateToEntityRecord && (
+						<BlockSettingsMenuControls>
+							{ ( { onClose } ) => (
+								<MenuItem
+									onClick={ () => {
+										onNavigateToEntityRecord( {
+											postId: templatePartId,
+											postType: 'wp_template_part',
+										} );
+										onClose?.();
+									} }
+								>
+									{ __( 'Edit original' ) }
+								</MenuItem>
+							) }
+						</BlockSettingsMenuControls>
 					) }
 				{ canUserEdit && (
 					<InspectorControls group="advanced">

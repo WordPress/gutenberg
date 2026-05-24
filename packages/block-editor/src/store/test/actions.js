@@ -357,6 +357,57 @@ describe( 'actions', () => {
 				meta: { patternName: 'core/chicken-ribs-pattern' },
 			} );
 		} );
+
+		it( 'should add patternName metadata to a single pattern replacement block', () => {
+			const block = {
+				clientId: 'ribs',
+				name: 'core/test-ribs',
+				attributes: {
+					metadata: {
+						name: 'Ribs',
+					},
+				},
+			};
+			const meta = { patternName: 'core/ribs-pattern' };
+
+			const select = {
+				getSettings: () => null,
+				getBlockRootClientId: () => null,
+				canInsertBlockType: () => true,
+				getBlockCount: () => 1,
+			};
+			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
+
+			replaceBlocks(
+				[ 'chicken' ],
+				block,
+				null,
+				null,
+				meta
+			)( { select, dispatch, registry } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [
+					{
+						...block,
+						attributes: {
+							metadata: {
+								name: 'Ribs',
+								patternName: 'core/ribs-pattern',
+							},
+						},
+					},
+				],
+				time: expect.any( Number ),
+				indexToSelect: null,
+				initialPosition: null,
+				meta,
+			} );
+		} );
 	} );
 
 	describe( 'insertBlock', () => {
@@ -521,6 +572,49 @@ describe( 'actions', () => {
 				updateSelection: false,
 				initialPosition: null,
 				meta: { patternName: 'core/chicken-ribs-pattern' },
+			} );
+		} );
+
+		it( 'should add patternName metadata from the insertion point to a single inserted pattern block', () => {
+			const block = {
+				clientId: 'ribs',
+				name: 'core/test-ribs',
+			};
+			const meta = 'core/ribs-pattern';
+
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
+				block,
+				5,
+				'testrootid',
+				false,
+				0,
+				meta
+			)( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'INSERT_BLOCKS',
+				blocks: [
+					{
+						...block,
+						attributes: {
+							metadata: {
+								patternName: 'core/ribs-pattern',
+							},
+						},
+					},
+				],
+				index: 5,
+				rootClientId: 'testrootid',
+				time: expect.any( Number ),
+				updateSelection: false,
+				initialPosition: null,
+				meta,
 			} );
 		} );
 	} );

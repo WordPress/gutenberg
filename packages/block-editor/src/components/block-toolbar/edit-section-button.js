@@ -32,20 +32,16 @@ export default function EditSectionButton( { clientId } ) {
 		[ clientId ]
 	);
 
-	// Don't show for synced patterns or template parts — they already have
-	// their own toolbar buttons ("Edit original").
-	// Note: isSectionBlock returns false while the section is being edited,
-	// so we also check isEditingContentOnlySection to show "Exit pattern".
+	const isEditing = isEditingContentOnlySection;
+
 	if (
 		! clientId ||
-		( ! isSectionBlock && ! isEditingContentOnlySection ) ||
+		( ! isSectionBlock && ! isEditing ) ||
 		isReusableBlock( blockType ) ||
 		isTemplatePart( blockType )
 	) {
 		return null;
 	}
-
-	const isEditing = isEditingContentOnlySection;
 
 	const handleClick = () => {
 		if ( isEditing ) {
@@ -58,11 +54,7 @@ export default function EditSectionButton( { clientId } ) {
 	return (
 		<ToolbarGroup>
 			<ToolbarButton onClick={ handleClick }>
-				{ isEditing
-					? /* translators: Button label to leave pattern editing mode. */
-					  __( 'Exit pattern' )
-					: /* translators: Button label to enter pattern editing mode. */
-					  __( 'Edit pattern' ) }
+				{ isEditing ? __( 'Done' ) : __( 'Edit' ) }
 			</ToolbarButton>
 		</ToolbarGroup>
 	);

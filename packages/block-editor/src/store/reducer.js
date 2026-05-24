@@ -2580,10 +2580,12 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( isIsolatedEditor || disableContentOnlyForTemplateParts
-			? []
-			: templatePartClientIds ),
 	];
+
+	const lockedSectionParents =
+		isIsolatedEditor || disableContentOnlyForTemplateParts
+			? []
+			: templatePartClientIds;
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
@@ -2608,14 +2610,20 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		}
 
 		// If the block already has an explicit block editing mode set,
-		// don't override it.
+		// don't override it, except inside the edited section.
 		if ( state.blocks.blockEditingModes.has( clientId ) ) {
+			if (
+				hasEditedContentOnlySection &&
+				isWithinEditedContentOnlySection
+			) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+			}
 			return;
 		}
 
 		// Disabled explicit block editing modes are inherited by children.
 		// It's an expensive calculation, so only do it if there are disabled blocks.
-		if ( hasDisabledBlocks ) {
+		if ( hasDisabledBlocks && ! isWithinEditedContentOnlySection ) {
 			// Look through parents to find one with an explicit block editing mode.
 			let ancestorBlockEditingMode;
 			let parent = state.blocks.parents.get( clientId );
@@ -2641,6 +2649,11 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		}
 
 		if ( isZoomedOut ) {
+			if ( templatePartClientIds.includes( clientId ) ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+
 			// If the root block is the section root set its editing mode to contentOnly.
 			if ( clientId === sectionRootClientId ) {
 				derivedBlockEditingModes.set( clientId, 'contentOnly' );
@@ -2691,29 +2704,36 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				syncedPatternClientIds
 			);
 			if ( parentSyncedPatternClientId ) {
-				// This is an inner block of a synced pattern that's nested in another synced pattern,
-				// disable its contents.
-				if (
-					findParentInClientIdsList(
-						state,
-						parentSyncedPatternClientId,
-						syncedPatternClientIds
-					)
-				) {
+				const isParentSyncedPatternEdited =
+					hasEditedContentOnlySection &&
+					parentSyncedPatternClientId ===
+						state.editedContentOnlySection;
+
+				if ( ! isParentSyncedPatternEdited ) {
+					// This is an inner block of a synced pattern that's nested in another synced pattern,
+					// disable its contents.
+					if (
+						findParentInClientIdsList(
+							state,
+							parentSyncedPatternClientId,
+							syncedPatternClientIds
+						)
+					) {
+						derivedBlockEditingModes.set( clientId, 'disabled' );
+						return;
+					}
+
+					if ( hasBindings( block ) ) {
+						derivedBlockEditingModes.set( clientId, 'contentOnly' );
+						return;
+					}
+
+					// Synced pattern content without a binding isn't editable
+					// from the instance, the user has to edit the pattern source,
+					// so return 'disabled'.
 					derivedBlockEditingModes.set( clientId, 'disabled' );
 					return;
 				}
-
-				if ( hasBindings( block ) ) {
-					derivedBlockEditingModes.set( clientId, 'contentOnly' );
-					return;
-				}
-
-				// Synced pattern content without a binding isn't editable
-				// from the instance, the user has to edit the pattern source,
-				// so return 'disabled'.
-				derivedBlockEditingModes.set( clientId, 'disabled' );
-				return;
 			}
 		}
 
@@ -2722,6 +2742,18 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			derivedBlockEditingModes.set( clientId, 'default' );
 			// When there's an editedContentOnlySection, it overrides any modes that are usually
 			// set for `contentOnlyParents`, return early to prevent continuing to code below.
+			return;
+		}
+
+		if (
+			lockedSectionParents.length &&
+			!! findParentInClientIdsList(
+				state,
+				clientId,
+				lockedSectionParents
+			)
+		) {
+			derivedBlockEditingModes.set( clientId, 'disabled' );
 			return;
 		}
 

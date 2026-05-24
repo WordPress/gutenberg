@@ -16,6 +16,7 @@ import {
 import {
 	Placeholder,
 	Spinner,
+	MenuItem,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -29,6 +30,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	BlockSettingsMenuControls,
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
@@ -84,8 +86,6 @@ function RecursionWarning() {
 	);
 }
 
-const NOOP = () => {};
-
 // Wrap the main Edit function for the pattern block with a recursion wrapper
 // that allows short-circuiting rendering as early as possible, before any
 // of the other effects in the block edit have run.
@@ -105,31 +105,21 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 }
 
 function ReusableBlockControl( {
-	recordId,
+	canUserEdit,
+	canUserEditBlock,
 	canOverrideBlocks,
 	hasContent,
-	handleEditOriginal,
+	isEditingThis,
+	onToggleEdit,
 	resetContent,
 } ) {
-	const canUserEdit = useSelect(
-		( select ) =>
-			!! select( coreStore ).canUser( 'update', {
-				kind: 'postType',
-				name: 'wp_block',
-				id: recordId,
-			} ),
-		[ recordId ]
-	);
-
 	return (
 		<>
-			{ canUserEdit && !! handleEditOriginal && (
+			{ canUserEdit && canUserEditBlock && (
 				<BlockControls group="other">
-					<ToolbarGroup>
-						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
+					<ToolbarButton onClick={ onToggleEdit }>
+						{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
+					</ToolbarButton>
 				</BlockControls>
 			) }
 
@@ -156,15 +146,22 @@ function ReusableBlockEdit( {
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	setAttributes,
+	clientId,
+	isSelected,
 } ) {
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
 	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
-	} );
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_block',
+		{ id: ref }
+	);
+	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isMissing = hasResolved && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
@@ -174,19 +171,38 @@ function ReusableBlockEdit( {
 		onNavigateToEntityRecord,
 		hasPatternOverridesSource,
 		supportedBlockTypesRaw,
-	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		// For editing link to the site editor if the theme and user permissions support it.
-		return {
-			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
-			hasPatternOverridesSource: !! getBlockBindingsSource(
-				'core/pattern-overrides'
-			),
-			supportedBlockTypesRaw:
-				getSettings().__experimentalBlockBindingsSupportedAttributes ||
-				EMPTY_OBJECT,
-		};
-	}, [] );
+		isEditingThis,
+		canUserEditBlock,
+	} = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			const { canEditBlock, getSettings } = blockEditorSelect;
+			const { getEditedContentOnlySection } = unlock( blockEditorSelect );
+			return {
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+				hasPatternOverridesSource: !! getBlockBindingsSource(
+					'core/pattern-overrides'
+				),
+				supportedBlockTypesRaw:
+					getSettings()
+						.__experimentalBlockBindingsSupportedAttributes ||
+					EMPTY_OBJECT,
+				isEditingThis: getEditedContentOnlySection() === clientId,
+				canUserEditBlock: canEditBlock( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: ref,
+			} ),
+		[ ref ]
+	);
 
 	const canOverrideBlocks = useMemo( () => {
 		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
@@ -217,12 +233,20 @@ function ReusableBlockEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		layout,
 		value: blocks,
-		onInput: NOOP,
-		onChange: NOOP,
+		onInput,
+		onChange,
 		renderAppender: blocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
+
+	const onToggleEdit = () => {
+		if ( isEditingThis ) {
+			stopEditingContentOnlySection();
+		} else {
+			editContentOnlySection( clientId );
+		}
+	};
 
 	const handleEditOriginal = () => {
 		onNavigateToEntityRecord( {
@@ -261,17 +285,33 @@ function ReusableBlockEdit( {
 		<>
 			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
-					recordId={ ref }
+					canUserEdit={ canUserEdit }
+					canUserEditBlock={ canUserEditBlock }
 					canOverrideBlocks={ canOverrideBlocks }
 					hasContent={ !! content }
-					handleEditOriginal={
-						onNavigateToEntityRecord
-							? handleEditOriginal
-							: undefined
-					}
+					isEditingThis={ isEditingThis }
+					onToggleEdit={ onToggleEdit }
 					resetContent={ resetContent }
 				/>
 			) }
+			{ isSelected &&
+				hasResolved &&
+				! isMissing &&
+				canUserEdit &&
+				onNavigateToEntityRecord && (
+					<BlockSettingsMenuControls>
+						{ ( { onClose } ) => (
+							<MenuItem
+								onClick={ () => {
+									handleEditOriginal();
+									onClose?.();
+								} }
+							>
+								{ __( 'Edit original' ) }
+							</MenuItem>
+						) }
+					</BlockSettingsMenuControls>
+				) }
 
 			{ children === null ? (
 				<div { ...innerBlocksProps } />
