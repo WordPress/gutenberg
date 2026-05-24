@@ -993,7 +993,9 @@ export function isLockedBlock( state, clientId ) {
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
 		isRemoveLockedBlock( state, clientId ) ||
-		attributes?.templateLock === 'contentOnly'
+		attributes?.templateLock === 'contentOnly' ||
+		( !! attributes?.metadata?.patternName &&
+			isSectionBlock( state, clientId ) )
 	);
 }
 

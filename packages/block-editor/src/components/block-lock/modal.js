@@ -22,6 +22,7 @@ import { getBlockType } from '@wordpress/blocks';
 import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 // Entity based blocks which allow edit locking
 const ALLOWS_EDIT_LOCKING = [ 'core/navigation' ];
@@ -44,24 +45,40 @@ export default function BlockLockModal( { clientId, onClose } ) {
 	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { isEditLocked, isMoveLocked, isRemoveLocked } =
 		useBlockLock( clientId );
-	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
+	const {
+		allowsEditLocking,
+		hasLayoutLock,
+		isPatternSection,
+		metadata,
+		templateLock,
+		hasTemplateLock,
+	} = useSelect(
 		( select ) => {
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+			const blockEditorSelect = select( blockEditorStore );
+			const { getBlockName, getBlockAttributes } = blockEditorSelect;
+			const { isSectionBlock } = unlock( blockEditorSelect );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
+			const attributes = getBlockAttributes( clientId );
+			const _isPatternSection =
+				!! attributes?.metadata?.patternName &&
+				isSectionBlock( clientId );
+			const _hasTemplateLock = !! blockType?.attributes?.templateLock;
 
 			return {
 				allowsEditLocking: ALLOWS_EDIT_LOCKING.includes( blockName ),
-				templateLock: getBlockAttributes( clientId )?.templateLock,
-				hasTemplateLock: !! blockType?.attributes?.templateLock,
+				hasLayoutLock: _hasTemplateLock || _isPatternSection,
+				isPatternSection: _isPatternSection,
+				metadata: attributes?.metadata,
+				templateLock: attributes?.templateLock,
+				hasTemplateLock: _hasTemplateLock,
 			};
 		},
 		[ clientId ]
 	);
 	const hasAppliedTemplateLock =
 		!! templateLock && templateLock !== 'contentOnly';
-	const isLayoutLocked = templateLock === 'contentOnly';
+	const isLayoutLocked = templateLock === 'contentOnly' || isPatternSection;
 	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
 		hasAppliedTemplateLock
 	);
@@ -73,7 +90,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			move: isMoveLocked,
 			remove: isRemoveLocked,
 			...( allowsEditLocking ? { edit: isEditLocked } : {} ),
-			...( hasTemplateLock ? { layout: isLayoutLocked } : {} ),
+			...( hasLayoutLock ? { layout: isLayoutLocked } : {} ),
 		} );
 	}, [
 		isEditLocked,
@@ -81,14 +98,14 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		isMoveLocked,
 		isRemoveLocked,
 		allowsEditLocking,
-		hasTemplateLock,
+		hasLayoutLock,
 	] );
 
 	const lockValues = [
 		lock.move,
 		lock.remove,
 		...( allowsEditLocking ? [ !! lock.edit ] : [] ),
-		...( hasTemplateLock ? [ !! lock.layout ] : [] ),
+		...( hasLayoutLock ? [ !! lock.layout ] : [] ),
 	];
 	const isAllChecked = lockValues.every( Boolean );
 	const isMixed = lockValues.some( Boolean ) && ! isAllChecked;
@@ -97,7 +114,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		lock.move !== isMoveLocked ||
 		lock.remove !== isRemoveLocked ||
 		( allowsEditLocking && lock.edit !== isEditLocked ) ||
-		( hasTemplateLock && lock.layout !== isLayoutLocked ) ||
+		( hasLayoutLock && lock.layout !== isLayoutLocked ) ||
 		( hasTemplateLock &&
 			! lock.layout &&
 			applyTemplateLock !== hasAppliedTemplateLock );
@@ -121,14 +138,23 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						return;
 					}
 					const { layout, ...blockLock } = lock;
+					const blockAttributes = {
+						lock: blockLock,
+					};
 					let templateLockValue;
 					if ( layout ) {
 						templateLockValue = 'contentOnly';
 					} else if ( applyTemplateLock ) {
 						templateLockValue = getTemplateLockValue( blockLock );
 					}
+					if ( isPatternSection && ! layout ) {
+						blockAttributes.metadata = {
+							...metadata,
+							patternName: undefined,
+						};
+					}
 					updateBlockAttributes( [ clientId ], {
-						lock: blockLock,
+						...blockAttributes,
 						templateLock: templateLockValue,
 					} );
 					onClose();
@@ -160,7 +186,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 										...( allowsEditLocking
 											? { edit: newValue }
 											: {} ),
-										...( hasTemplateLock
+										...( hasLayoutLock
 											? { layout: newValue }
 											: {} ),
 									} );
@@ -228,7 +254,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 										}
 									/>
 								</li>
-								{ hasTemplateLock && (
+								{ hasLayoutLock && (
 									<li className="block-editor-block-lock-modal__checklist-item">
 										<CheckboxControl
 											label={ __( 'Lock layout' ) }
