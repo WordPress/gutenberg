@@ -1,7 +1,7 @@
 .root {
 	flex-shrink: 0;
-	width: 68px;
-	height: 68px;
+	width: calc(var(--wpds-dimension-base) * 17);
+	height: calc(var(--wpds-dimension-base) * 17);
 }
 
 .root.success {
@@ -36,5 +36,5 @@
 .percentage {
 	fill: var(--site-health-fg);
 	font-size: 36px;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-medium);
 }
