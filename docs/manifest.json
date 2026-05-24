@@ -2418,6 +2418,12 @@
 		"parent": "code"
 	},
 	{
+		"title": "Workspace Development",
+		"slug": "workspace-development",
+		"markdown_source": "../docs/contributors/code/workspace-development.md",
+		"parent": "code"
+	},
+	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release/README.md",
