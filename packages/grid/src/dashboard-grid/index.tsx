@@ -139,9 +139,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		} | null >( null );
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
-		const latestLayoutRef = useRef<
-			DashboardGridLayoutItem[] | undefined
-		>();
+		const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >(
+			undefined
+		);
 		// Cursor center at the last applied reorder. Used to skip the
 		// cascade of re-measured `onDragMove` events after a layout
 		// change, when the cursor has not actually moved.
