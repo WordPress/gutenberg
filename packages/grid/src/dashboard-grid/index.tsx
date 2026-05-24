@@ -309,10 +309,13 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 					// Strip `actionableArea` so it does not leak to the DOM;
 					// the grid lifts it to a slot separately.
-					const { actionableArea } = child.props;
+					const typedChild = child as React.ReactElement< {
+						actionableArea?: React.ReactNode;
+					} >;
+					const { actionableArea } = typedChild.props;
 					const stripped =
 						actionableArea !== undefined
-							? cloneElement( child, {
+							? cloneElement( typedChild, {
 									actionableArea: undefined,
 							  } )
 							: child;
