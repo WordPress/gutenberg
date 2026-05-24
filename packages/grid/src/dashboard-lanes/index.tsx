@@ -254,23 +254,30 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			rowUnit,
 		} );
 
-		const [ childrenMap, actionableAreaMap, remaining ] = useMemo( () => {
-			const childMap = new Map< string, React.ReactElement >();
-			const actionableMap = new Map< string, React.ReactNode >();
-			const rest: React.ReactNode[] = [];
+		const [ childrenMap, actionableAreaMap, remaining, renderedByKey ] =
+			useMemo( () => {
+				const childMap = new Map< string, React.ReactElement >();
+				const actionableMap = new Map< string, React.ReactNode >();
+				const rest: React.ReactNode[] = [];
+				const byKey = new Map< string, React.ReactElement >();
 
-			Children.forEach( children, ( child ) => {
-				if ( ! isValidElement( child ) ) {
-					rest.push( child );
-					return;
-				}
-				const key = child.key?.toString();
-				if ( key ) {
+				Children.forEach( children, ( child ) => {
+					if ( ! isValidElement( child ) ) {
+						rest.push( child );
+						return;
+					}
+					const key = child.key?.toString();
+					if ( ! key ) {
+						rest.push( child );
+						return;
+					}
+
+					// Strip `actionableArea` so it does not leak to the DOM;
+					// the grid lifts it to a slot separately.
 					const { actionableArea } = child.props as {
 						actionableArea?: React.ReactNode;
 					};
-					childrenCacheRef.current.set(
-						key,
+					const stripped =
 						actionableArea !== undefined
 							? cloneElement(
 									child as React.ReactElement< {
@@ -278,34 +285,31 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 									} >,
 									{ actionableArea: undefined }
 							  )
-							: ( child as React.ReactElement )
-					);
-				}
-				if ( key && layoutKeys.has( key ) ) {
-					const { actionableArea } = child.props as {
-						actionableArea?: React.ReactNode;
-					};
-					if ( actionableArea !== undefined ) {
-						actionableMap.set( key, actionableArea );
-						childMap.set(
-							key,
-							cloneElement(
-								child as React.ReactElement< {
-									actionableArea?: React.ReactNode;
-								} >,
-								{ actionableArea: undefined }
-							)
-						);
-					} else {
-						childMap.set( key, child as React.ReactElement );
-					}
-				} else {
-					rest.push( child );
-				}
-			} );
+							: ( child as React.ReactElement );
 
-			return [ childMap, actionableMap, rest ];
-		}, [ children, layoutKeys ] );
+					byKey.set( key, stripped );
+
+					if ( layoutKeys.has( key ) ) {
+						if ( actionableArea !== undefined ) {
+							actionableMap.set( key, actionableArea );
+						}
+						childMap.set( key, stripped );
+					} else {
+						rest.push( child );
+					}
+				} );
+
+				return [ childMap, actionableMap, rest, byKey ];
+			}, [ children, layoutKeys ] );
+
+		// Persist the latest rendered children so a removed tile's content
+		// is still available for its exit overlay. Filled from an effect so a
+		// discarded render never writes to the cache.
+		useLayoutEffect( () => {
+			for ( const [ key, child ] of renderedByKey ) {
+				childrenCacheRef.current.set( key, child );
+			}
+		}, [ renderedByKey ] );
 
 		const sensors = useSensors(
 			useSensor( PointerSensor ),
