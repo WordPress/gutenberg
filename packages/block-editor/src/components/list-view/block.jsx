@@ -12,6 +12,7 @@ import {
 	useMemo,
 	useState,
 	useRef,
+	useEffect,
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -29,6 +30,7 @@ import {
 	BlockMoverDownButton,
 } from '../block-mover/button';
 import ListViewBlockContents from './block-contents';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useListViewContext } from './context';
 import {
 	getBlockPositionDescription,
@@ -68,6 +70,8 @@ function ListViewBlock( {
 	const cellRef = useRef( null );
 	const rowRef = useRef( null );
 	const settingsRef = useRef( null );
+	const lockToggleRef = useRef( null );
+	const shouldFocusLockToggleRef = useRef( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const [ isLockMenuOpen, setIsLockMenuOpen ] = useState( false );
@@ -160,6 +164,18 @@ function ListViewBlock( {
 		},
 		[ clientId ]
 	);
+
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+
+	useEffect( () => {
+		if ( shouldFocusLockToggleRef.current && ! isLocked ) {
+			lockToggleRef.current?.focus();
+			shouldFocusLockToggleRef.current = false;
+		}
+	}, [ isLocked ] );
 
 	const isDisabled = blockEditingMode === 'disabled';
 	const canRename =
@@ -626,6 +642,16 @@ function ListViewBlock( {
 		return rovingTabIndex;
 	};
 
+	function setLockToggleRef( ref, node ) {
+		lockToggleRef.current = node;
+
+		if ( typeof ref === 'function' ) {
+			ref( node );
+		} else if ( ref ) {
+			ref.current = node;
+		}
+	}
+
 	return (
 		<ListViewLeaf
 			className={ classes }
@@ -649,6 +675,7 @@ function ListViewBlock( {
 				colSpan={ colSpan }
 				ref={ cellRef }
 				aria-selected={ !! isSelected }
+				aria-label={ blockTitle || undefined }
 				withoutGridItem
 			>
 				<div className="block-editor-list-view-block__contents-container">
@@ -697,7 +724,12 @@ function ListViewBlock( {
 									if ( isLocked && ! isLockMenuOpen ) {
 										return (
 											<Button
-												ref={ ref }
+												ref={ ( node ) =>
+													setLockToggleRef(
+														ref,
+														node
+													)
+												}
 												className={
 													lockButtonClassName
 												}
@@ -714,7 +746,10 @@ function ListViewBlock( {
 												onFocus={ onFocus }
 												onClick={
 													canLock
-														? unlockBlock
+														? () => {
+																shouldFocusLockToggleRef.current = true;
+																unlockBlock();
+															}
 														: undefined
 												}
 											/>
@@ -737,7 +772,12 @@ function ListViewBlock( {
 											}
 										>
 											<Menu.Trigger
-												ref={ ref }
+												ref={ ( node ) =>
+													setLockToggleRef(
+														ref,
+														node
+													)
+												}
 												tabIndex={ tabIndex }
 												onFocus={ onFocus }
 												render={
