@@ -142,6 +142,10 @@
 		--wp-ui-button-height: 24px;
 	}
 
+	.icon {
+		margin: calc(-1 * var(--wpds-dimension-base));
+	}
+
 	/* Variants (`tone` + `variant`) overrides compared to default styles */
 
 	/* All outline buttons have a border */
