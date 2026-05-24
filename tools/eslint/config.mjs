@@ -158,6 +158,10 @@ const restrictedSyntax = [
 		message: 'Do not use string literals for IDs; use useId hook instead.',
 	},
 	{
+		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
+		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
+	},
+	{
 		selector:
 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
 		message:
@@ -207,13 +211,9 @@ export default dedupePlugins( [
 	...wpPlugin.configs.recommended,
 
 	// eslint-comments recommended (manually converted to flat config).
-	// Register under both names so that existing `eslint-comments/*` rule
-	// references (used below) continue to work alongside the canonical
-	// `@eslint-community/eslint-comments/*` names from the recommended config.
 	{
 		plugins: {
 			'@eslint-community/eslint-comments': eslintCommentsPlugin,
-			'eslint-comments': eslintCommentsPlugin,
 		},
 		rules: eslintCommentsPlugin.configs.recommended.rules,
 	},
@@ -226,6 +226,9 @@ export default dedupePlugins( [
 
 	// Global settings applicable to all files.
 	{
+		linterOptions: {
+			reportUnusedDisableDirectives: 'error',
+		},
 		languageOptions: {
 			globals: {
 				wp: 'off',
@@ -270,7 +273,6 @@ export default dedupePlugins( [
 					},
 				},
 			],
-			'eslint-comments/no-unused-disable': 'error',
 			'import/default': 'error',
 			'import/named': 'error',
 			'no-restricted-imports': [
@@ -799,7 +801,11 @@ export default dedupePlugins( [
 	// Override: Packages which have eliminated dependency grouping comments
 	// and explicitly prevent new additions.
 	{
-		files: [ 'packages/ui/**', 'packages/design-system-mcp/**' ],
+		files: [
+			'packages/design-system-mcp/**',
+			'packages/ui/**',
+			'packages/theme/**',
+		],
 		rules: {
 			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},

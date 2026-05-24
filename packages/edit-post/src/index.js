@@ -170,6 +170,20 @@ export function initializeEditor(
 		// network request from here on. `clearPreloadedData` logs which
 		// preload entries (if any) were never served.
 		clearPreloadedData();
+		if ( postType && postId ) {
+			const post = select( coreDataStore ).getEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			if ( post ) {
+				dispatch( editorStore ).setupEditor(
+					post,
+					initialEdits,
+					settings.template
+				);
+			}
+		}
 		root.render(
 			<StrictMode>
 				<Layout
@@ -205,6 +219,7 @@ async function preloadResolutions( postType, postId ) {
 			core.getEntitiesConfig( 'postType' ),
 			core.getEntitiesConfig( 'taxonomy' ),
 			core.getEntitiesConfig( 'root' ),
+			core.getEntityRecords( 'root', 'taxonomy' ),
 			core.getCurrentTheme(),
 			// Forward-resolver alias of `getCurrentTheme` with its own
 			// resolution metadata, so it needs a separate kick.
@@ -236,6 +251,11 @@ async function preloadResolutions( postType, postId ) {
 							postId
 						),
 						core.getAutosaves( postType, postId ),
+						core.getDefaultTemplateId( { slug: 'front-page' } ),
+						core.canUser( 'create', {
+							kind: 'postType',
+							name: postType,
+						} ),
 				  ]
 				: [] ),
 		] );
@@ -268,6 +288,15 @@ async function preloadResolutions( postType, postId ) {
 					slug += '-' + post.slug;
 				}
 				tasks.push( core.getDefaultTemplateId( { slug } ) );
+
+				if ( post.author ) {
+					tasks.push(
+						core.getUser( post.author, {
+							context: 'view',
+							_fields: 'id,name',
+						} )
+					);
+				}
 			}
 		}
 

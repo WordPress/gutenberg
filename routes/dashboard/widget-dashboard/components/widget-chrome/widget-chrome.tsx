@@ -90,7 +90,6 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						<WCIcon icon={ widgetType.icon } />
 					</span>
 				) }
-
 				<Card.Title id={ titleId } render={ <h3 /> }>
 					{ widgetType.title }
 				</Card.Title>
@@ -145,6 +144,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 		const isBodyBleeding =
 			presentation === 'full-bleed' || presentation === 'content-bleed';
 		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
+
 		const body = (
 			<WidgetErrorBoundary>
 				<Suspense fallback={ <LoadingOverlay /> }>

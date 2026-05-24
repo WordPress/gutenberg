@@ -2,5 +2,6 @@
 	"name": "core/quick-draft",
 	"title": "Quick Draft",
 	"description": "Quickly draft a new post.",
-	"category": "dashboard"
+	"category": "dashboard",
+	"presentation": "content-bleed"
 }
