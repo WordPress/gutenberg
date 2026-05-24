@@ -34,7 +34,7 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import Replace from './change-design';
+import ReplacePattern from './replace-pattern';
 import SwitchSectionStyle from './switch-section-style';
 import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
@@ -254,7 +254,7 @@ export function PrivateBlockToolbar( {
 					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
 				) }
 				{ ! areSelectedBlocksHiddenOnViewport && showReplaceButton && (
-					<Replace clientId={ blockClientIds[ 0 ] } />
+					<ReplacePattern clientId={ blockClientIds[ 0 ] } />
 				) }
 				{ ! areSelectedBlocksHiddenOnViewport &&
 					showSwitchSectionStyleButton && (

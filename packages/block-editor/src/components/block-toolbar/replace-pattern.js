@@ -16,7 +16,7 @@ import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const EMPTY_ARRAY = [];
 
-export default function Replace( { clientId } ) {
+export default function ReplacePattern( { clientId } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { categories, rootClientId } = useSelect(
 		( select ) => {
