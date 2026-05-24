@@ -1030,6 +1030,23 @@ describe( 'private selectors', () => {
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
+		it( 'returns true when block has templateLock set to "contentOnly"', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', { templateLock: 'contentOnly' } ],
+					] ),
+					parents: new Map( [ [ 'block-1', '' ] ] ),
+				},
+				settings: {},
+				blockListSettings: new Map(),
+			};
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
 		it( 'returns true when block has multiple locks', () => {
 			const state = createState( null, {
 				edit: true,

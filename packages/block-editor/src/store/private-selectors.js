@@ -988,10 +988,12 @@ export function isRemoveLockedBlock( state, clientId ) {
  * @return {boolean} Whether the block is currently locked.
  */
 export function isLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
 	return (
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
-		isRemoveLockedBlock( state, clientId )
+		isRemoveLockedBlock( state, clientId ) ||
+		attributes?.templateLock === 'contentOnly'
 	);
 }
 
