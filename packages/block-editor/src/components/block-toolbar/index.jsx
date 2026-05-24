@@ -15,7 +15,6 @@ import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
-import { BlockLockToolbar } from '../block-lock';
 import { ViewportVisibilityToolbar } from '../block-visibility';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
@@ -51,7 +50,6 @@ export function PrivateBlockToolbar( {
 	variant = 'unstyled',
 } ) {
 	const {
-		blockClientId,
 		blockClientIds,
 		isDefaultEditingMode,
 		blockType,
@@ -64,7 +62,6 @@ export function PrivateBlockToolbar( {
 		showShuffleButton,
 		showSlots,
 		showGroupButtons,
-		showLockButtons,
 		showBlockVisibilityButton,
 		showSwitchSectionStyleButton,
 		areSelectedBlocksHiddenOnViewport,
@@ -139,7 +136,6 @@ export function PrivateBlockToolbar( {
 			);
 
 		return {
-			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
@@ -163,7 +159,6 @@ export function PrivateBlockToolbar( {
 			showSlots: ! _isZoomOut && ! _isEditingResponsiveStyleState,
 			showStyleStateSlot: ! _isZoomOut && _isEditingResponsiveStyleState,
 			showGroupButtons: ! _isZoomOut,
-			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
 			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 			areSelectedBlocksHiddenOnViewport:
@@ -232,13 +227,6 @@ export function PrivateBlockToolbar( {
 								showBlockVisibilityButton && (
 									<ViewportVisibilityToolbar
 										clientIds={ blockClientIds }
-									/>
-								) }
-							{ ! isMultiToolbar &&
-								isDefaultEditingMode &&
-								showLockButtons && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
 									/>
 								) }
 							<BlockMover
