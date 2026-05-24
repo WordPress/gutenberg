@@ -99,11 +99,17 @@ export default function SiteHealth() {
 	const [ isLoading, setIsLoading ] = useState( true );
 
 	useEffect( () => {
+		let ignore = false;
+
 		const requests = ASYNC_TEST_PATHS.map( ( path ) =>
 			apiFetch< TestResult >( { path } ).catch( () => null )
 		);
 
 		Promise.all( requests ).then( ( results ) => {
+			if ( ignore ) {
+				return;
+			}
+
 			const totals: IssueCounts = {
 				good: 0,
 				recommended: 0,
@@ -119,6 +125,10 @@ export default function SiteHealth() {
 			setCounts( totals );
 			setIsLoading( false );
 		} );
+
+		return () => {
+			ignore = true;
+		};
 	}, [] );
 
 	if ( isLoading ) {
