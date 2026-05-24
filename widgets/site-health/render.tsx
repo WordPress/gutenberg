@@ -13,8 +13,6 @@ import { Link, Stack, Text } from '@wordpress/ui';
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type TestStatus = 'good' | 'recommended' | 'critical';
 
 type TestResult = {
@@ -27,8 +25,6 @@ type IssueCounts = {
 	critical: number;
 };
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 // Async site health tests exposed via the REST API.
 const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/background-updates',
@@ -38,12 +34,10 @@ const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/authorization-header',
 ] as const;
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 /**
  * Maps a percentage to a semantic tone used for CSS class selection.
  *
- * @param {number} pct Percentage of passing tests (0–100).
+ * @param {number} pct Percentage of passing tests (0-100).
  */
 function toneForPercentage( pct: number ): HealthTone {
 	if ( pct === 100 ) {
@@ -91,8 +85,6 @@ function statusMessage( counts: IssueCounts ): string {
 		'Your site\u2019s health is looking good, but there are still some things you can do to improve its performance and security.'
 	);
 }
-
-// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function SiteHealth() {
 	const [ counts, setCounts ] = useState< IssueCounts | null >( null );
