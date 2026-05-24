@@ -9,7 +9,7 @@ import {
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { chevronDown, chevronUp, moreVertical } from '@wordpress/icons';
-import { Children, cloneElement } from '@wordpress/element';
+import { Children, cloneElement, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
@@ -26,6 +26,8 @@ import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import PatternsExplorerModal from '../inserter/block-patterns-explorer';
+import { allPatternsCategory } from '../inserter/block-patterns-tab/utils';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -80,6 +82,9 @@ export function BlockSettingsDropdown( {
 	// Get the client id of the current block for this menu, if one is set.
 	const count = clientIds.length;
 	const firstBlockClientId = clientIds[ 0 ];
+	const lastBlockClientId = clientIds[ count - 1 ];
+	const [ patternsExplorerIndex, setPatternsExplorerIndex ] =
+		useState( null );
 
 	const {
 		firstParentClientId,
@@ -92,6 +97,8 @@ export function BlockSettingsDropdown( {
 		canMove,
 		isFirst,
 		isLast,
+		firstBlockIndex,
+		lastBlockIndex,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -136,9 +143,11 @@ export function BlockSettingsDropdown( {
 				isLast:
 					getBlockIndex( firstBlockClientId ) ===
 					getBlockCount( _firstParentClientId ) - 1,
+				firstBlockIndex: getBlockIndex( firstBlockClientId ),
+				lastBlockIndex: getBlockIndex( lastBlockClientId ),
 			};
 		},
-		[ firstBlockClientId, clientIds ]
+		[ firstBlockClientId, lastBlockClientId, clientIds ]
 	);
 
 	const { getBlockOrder, getSelectedBlockClientIds } =
@@ -234,8 +243,9 @@ export function BlockSettingsDropdown( {
 					return null;
 				}
 
-				return (
+				return [
 					<DropdownMenu
+						key="dropdown"
 						icon={ moreVertical }
 						label={ __( 'Options' ) }
 						className="block-editor-block-settings-menu"
@@ -322,6 +332,28 @@ export function BlockSettingsDropdown( {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
+									{ canInsertBlock && isZoomOut && (
+										<>
+											<MenuItem
+												onClick={ pipe( onClose, () =>
+													setPatternsExplorerIndex(
+														firstBlockIndex
+													)
+												) }
+											>
+												{ __( 'Add before' ) }
+											</MenuItem>
+											<MenuItem
+												onClick={ pipe( onClose, () =>
+													setPatternsExplorerIndex(
+														lastBlockIndex + 1
+													)
+												) }
+											>
+												{ __( 'Add after' ) }
+											</MenuItem>
+										</>
+									) }
 									{ canInsertBlock && ! isZoomOut && (
 										<>
 											<MenuItem
@@ -403,8 +435,19 @@ export function BlockSettingsDropdown( {
 								) }
 							</>
 						) }
-					</DropdownMenu>
-				);
+					</DropdownMenu>,
+					patternsExplorerIndex !== null && (
+						<PatternsExplorerModal
+							key="patterns-explorer"
+							initialCategory={ allPatternsCategory }
+							rootClientId={ firstParentClientId }
+							insertionIndex={ patternsExplorerIndex }
+							onModalClose={ () =>
+								setPatternsExplorerIndex( null )
+							}
+						/>
+					),
+				];
 			} }
 		</BlockActions>
 	);
