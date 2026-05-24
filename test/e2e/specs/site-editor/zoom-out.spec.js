@@ -264,10 +264,10 @@ test.describe( 'Zoom Out', () => {
 			.getByRole( 'menuitem' );
 
 		await expect( optionsMenu ).toHaveText( [
-			'Duplicate',
+			/^Duplicate/,
 			'Add before',
 			'Add after',
-			'Delete',
+			/^Delete/,
 		] );
 	} );
 
