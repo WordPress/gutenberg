@@ -15,7 +15,12 @@ import {
 import type { ItemExitOverlayRect } from './item-exit-overlay';
 import type { RectSnapshot } from './use-layout-shift-animation';
 
-const EXIT_ANIMATION_MS = 150;
+/*
+ * Last-resort cleanup if `animationend` never fires (the overlay's
+ * `onAnimationEnd` is the primary path). Kept well above the motion
+ * token durations so the timeout can never clip the exit animation.
+ */
+const EXIT_SAFETY_TIMEOUT_MS = 1000;
 
 export type ExitingGridItem = {
 	key: string;
@@ -112,7 +117,7 @@ export function useItemExitAnimation( {
 			const timeout = setTimeout( () => {
 				exitTimeoutsRef.current.delete( key );
 				clearExitingItem( key );
-			}, EXIT_ANIMATION_MS );
+			}, EXIT_SAFETY_TIMEOUT_MS );
 			exitTimeoutsRef.current.set( key, timeout );
 		},
 		[ clearExitingItem ]
