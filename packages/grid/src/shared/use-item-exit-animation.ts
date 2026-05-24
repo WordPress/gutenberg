@@ -53,19 +53,6 @@ function prefersReducedMotion(): boolean {
 	);
 }
 
-function toContainerRect(
-	viewportRect: RectSnapshot,
-	container: HTMLElement
-): ItemExitOverlayRect {
-	const containerRect = container.getBoundingClientRect();
-	return {
-		left: viewportRect.left - containerRect.left,
-		top: viewportRect.top - containerRect.top,
-		width: viewportRect.width,
-		height: viewportRect.height,
-	};
-}
-
 /**
  * When `layout` loses keys in edit mode, keeps a short-lived overlay at
  * the removed tile's last position (scale + fade) while siblings FLIP.
@@ -74,7 +61,7 @@ function toContainerRect(
  * @param root0.container                    Surface root that contains grid tiles.
  * @param root0.enabled                      When false, exiting state is cleared.
  * @param root0.layoutKeys                   Keys in the committed `layout` prop.
- * @param root0.getPositionsBeforeLastChange Viewport rects before the latest layout commit.
+ * @param root0.getPositionsBeforeLastChange Container-relative rects before the latest layout commit.
  * @param root0.childrenCacheRef             Last rendered children keyed by tile id.
  * @return Exiting overlays and a callback to dismiss one by key.
  */
@@ -160,7 +147,7 @@ export function useItemExitAnimation( {
 			}
 			nextExiting.push( {
 				key,
-				rect: toContainerRect( position, container ),
+				rect: position,
 				child,
 			} );
 		}

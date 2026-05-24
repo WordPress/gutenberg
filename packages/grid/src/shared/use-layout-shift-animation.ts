@@ -8,6 +8,7 @@ import { useCallback, useLayoutEffect, useRef } from '@wordpress/element';
  */
 import { GRID_ITEM_DATA_KEY } from './grid-item-key';
 
+/* `left`/`top` are relative to the grid container, not the viewport. */
 export type RectSnapshot = {
 	left: number;
 	top: number;
@@ -46,8 +47,8 @@ type UseLayoutShiftAnimationResult = {
 	captureLayoutSnapshot: () => void;
 
 	/**
-	 * Viewport rects from the last committed paint (settled, no FLIP
-	 * invert transforms).
+	 * Container-relative rects from the last committed paint (settled, no
+	 * FLIP invert transforms).
 	 */
 	getLastPositions: () => ReadonlyMap< string, RectSnapshot > | null;
 
@@ -76,6 +77,10 @@ function readItemKey( element: HTMLElement ): string | null {
 function snapshotPositions(
 	container: HTMLElement
 ): Map< string, RectSnapshot > {
+	// Measure relative to the container so positions stay valid even if the
+	// page scroll shifts between capture and use (e.g. the document reflowing
+	// shorter after a tile is removed).
+	const base = container.getBoundingClientRect();
 	const positions = new Map< string, RectSnapshot >();
 	for ( const element of queryGridItems( container ) ) {
 		const key = readItemKey( element );
@@ -83,7 +88,12 @@ function snapshotPositions(
 			continue;
 		}
 		const { left, top, width, height } = element.getBoundingClientRect();
-		positions.set( key, { left, top, width, height } );
+		positions.set( key, {
+			left: left - base.left,
+			top: top - base.top,
+			width,
+			height,
+		} );
 	}
 	return positions;
 }
@@ -191,6 +201,7 @@ export function useLayoutShiftAnimation( {
 		lastRenderedPositionsRef.current = snapshotPositions( container );
 
 		if ( previous ) {
+			const base = container.getBoundingClientRect();
 			for ( const element of queryGridItems( container ) ) {
 				const key = readItemKey( element );
 				if ( ! key || key === excludeItemKey ) {
@@ -201,8 +212,8 @@ export function useLayoutShiftAnimation( {
 					continue;
 				}
 				const { left, top } = element.getBoundingClientRect();
-				const deltaX = old.left - left;
-				const deltaY = old.top - top;
+				const deltaX = old.left - ( left - base.left );
+				const deltaY = old.top - ( top - base.top );
 				playLayoutShift( element, deltaX, deltaY );
 			}
 		}
