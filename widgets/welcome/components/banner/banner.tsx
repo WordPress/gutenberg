@@ -31,7 +31,7 @@ export function Banner( { isWide = false, isTiny = false }: BannerProps ) {
 
 	return (
 		<Stack className={ className } direction="column" justify="center">
-			<HeaderBackground />
+			<HeaderBackground version={ DISPLAY_VERSION } />
 
 			<Stack
 				className={ styles.bannerContent }
