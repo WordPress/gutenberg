@@ -81,6 +81,8 @@ export function Actions(): React.ReactNode {
 		resetDialogOpen,
 		setResetDialogOpen,
 	} = useDashboardUIContext();
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
 	const isMobileViewport = useSelect(
 		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
 		[]
