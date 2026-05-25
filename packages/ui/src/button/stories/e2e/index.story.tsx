@@ -1,4 +1,4 @@
-import type { Meta, StoryFn } from '@storybook/react-vite';
+import type { Meta, StoryFn, StoryObj } from '@storybook/react-vite';
 import { Button } from '../..';
 import type { ButtonProps } from '../../types';
 
@@ -7,6 +7,8 @@ const meta: Meta< typeof Button > = {
 	component: Button,
 };
 export default meta;
+
+type Story = StoryObj< typeof Button >;
 
 const variants: NonNullable< ButtonProps[ 'variant' ] >[] = [
 	'solid',
@@ -117,13 +119,12 @@ VariantStates.args = {
 	children: 'Code is poetry',
 };
 
-export const TextOverflow: StoryFn< typeof Button > = ( props ) => {
-	return <Button { ...props } />;
-};
-TextOverflow.args = {
-	children:
-		'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
-};
-TextOverflow.parameters = {
-	textOverflowContainers: true,
+export const TextOverflow: Story = {
+	args: {
+		children:
+			'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
+	},
+	parameters: {
+		textOverflowContainers: true,
+	},
 };
