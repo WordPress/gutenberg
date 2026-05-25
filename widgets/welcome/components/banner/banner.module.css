@@ -1,19 +1,19 @@
 .banner {
 	--banner-bg: var(--wpds-color-bg-interactive-neutral-strong);
 	--banner-fg: var(--wpds-color-fg-interactive-neutral-strong);
-	--banner-line-brand: var(--wpds-color-bg-interactive-brand-strong);
-	--banner-line-caution: var(--wpds-color-bg-surface-caution-weak);
-	--banner-line-success: var(--wpds-color-bg-surface-success);
-	--banner-line-error: color-mix(in srgb, var(--wpds-color-fg-interactive-error) 30%, var(--banner-bg));
-	--banner-line-info: color-mix(in srgb, var(--wpds-color-bg-interactive-brand-strong) 60%, var(--banner-bg));
+	--banner-accent-brand: var(--wpds-color-bg-interactive-brand-strong);
+	--banner-accent-warm: color-mix(in srgb, var(--wpds-color-stroke-surface-warning) 60%, var(--wpds-color-bg-surface-neutral-strong));
+	--banner-accent-dark: var(--wpds-color-fg-content-neutral);
 
 	position: relative;
 	padding: var(--wpds-dimension-padding-3xl);
 	background-color: var(--banner-bg);
+	background-image: linear-gradient(108deg, var(--banner-bg) 0%, var(--banner-bg) 26%, var(--banner-accent-brand) 66%, var(--banner-accent-warm) 100%);
 	color: var(--banner-fg);
 	flex-grow: 1;
 	min-height: 120px;
 	max-height: 300px;
+	overflow: hidden;
 }
 
 .bannerContent {

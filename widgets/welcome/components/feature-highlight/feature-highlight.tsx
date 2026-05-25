@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Icon, Link, Stack, Text } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { Icon, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies

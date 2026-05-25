@@ -72,10 +72,13 @@ export function Actions(): React.ReactNode {
 		return () => clearTimeout( exitTimeout );
 	}, [ editMode, isEditActionsMounted ] );
 
-	const { setInserterOpen } = useDashboardUIContext();
-
-	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
-	const [ isLayoutSettingsOpen, setIsLayoutSettingsOpen ] = useState( false );
+	const {
+		setInserterOpen,
+		layoutSettingsOpen,
+		setLayoutSettingsOpen,
+		resetDialogOpen,
+		setResetDialogOpen,
+	} = useDashboardUIContext();
 
 	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
@@ -94,13 +97,13 @@ export function Actions(): React.ReactNode {
 	}, [ commit ] );
 
 	const openLayoutSettings = useCallback( () => {
-		setIsLayoutSettingsOpen( true );
-	}, [] );
+		setLayoutSettingsOpen( true );
+	}, [ setLayoutSettingsOpen ] );
 
 	const moreActionsItems: MoreActionsDropdownItem[] = [
 		{
 			label: __( 'Reset to default' ),
-			onClick: () => setIsResetDialogOpen( true ),
+			onClick: () => setResetDialogOpen( true ),
 			disabled: ! onLayoutReset,
 		},
 	];
@@ -178,12 +181,12 @@ export function Actions(): React.ReactNode {
 			<MoreActionsDropdown items={ moreActionsItems } />
 
 			<AlertDialog.Root
-				open={ isResetDialogOpen }
-				onOpenChange={ setIsResetDialogOpen }
+				open={ resetDialogOpen }
+				onOpenChange={ setResetDialogOpen }
 				onConfirm={ async () => {
 					await onLayoutReset?.();
 					onEditChange?.( false );
-					setIsResetDialogOpen( false );
+					setResetDialogOpen( false );
 				} }
 			>
 				<AlertDialog.Popup
@@ -198,8 +201,8 @@ export function Actions(): React.ReactNode {
 
 			{ canEditGridSettings && (
 				<LayoutSettings
-					open={ isLayoutSettingsOpen }
-					onOpenChange={ setIsLayoutSettingsOpen }
+					open={ layoutSettingsOpen }
+					onOpenChange={ setLayoutSettingsOpen }
 				/>
 			) }
 		</Stack>
