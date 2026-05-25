@@ -20,6 +20,16 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"type": "module",
+	"dependencies": {
+		"chalk": "^4.1.1",
+		"cross-spawn": "^7.0.6",
+		"esbuild": "^0.27.2",
+		"fast-glob": "^3.2.7",
+		"source-map": "^0.6.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"orchestrate-build": "node ./build.mjs",
 		"orchestrate-dev": "node ./dev.mjs",
@@ -27,12 +37,5 @@
 		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
 		"resolve-trace-source-maps": "node ./packages/resolve-trace-source-maps.cjs",
 		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs"
-	},
-	"dependencies": {
-		"chalk": "^4.1.1",
-		"cross-spawn": "^7.0.6",
-		"esbuild": "^0.27.2",
-		"fast-glob": "^3.2.7",
-		"source-map": "^0.6.1"
 	}
 }
