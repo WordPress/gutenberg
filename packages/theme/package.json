@@ -78,11 +78,7 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": [
-		"src/color-ramps/lib/register-color-spaces.ts",
-		"build/color-ramps/lib/register-color-spaces.js",
-		"build-module/color-ramps/lib/register-color-spaces.mjs"
-	],
+	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",

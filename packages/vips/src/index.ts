@@ -425,113 +425,6 @@ export async function resizeImage(
 }
 
 /**
- * Configuration for a single resize operation within a batch.
- */
-interface BatchResizeConfig {
-	resize: ImageSizeCrop;
-	quality: number;
-}
-
-/**
- * Result from a single resize operation within a batch.
- */
-interface BatchResizeResult {
-	buffer: ArrayBuffer | ArrayBufferLike;
-	width: number;
-	height: number;
-	originalWidth: number;
-	originalHeight: number;
-}
-
-/**
- * Resizes an image into multiple sizes in a single pass using copyMemory().
- *
- * Decodes the source image once, materializes it in WASM memory via
- * copyMemory(), then uses thumbnailImage() for each sub-size. This avoids
- * re-decoding the source for every thumbnail.
- *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param inputType  Input mime type.
- * @param outputType Output mime type for all results.
- * @param resizes    Array of resize configurations.
- * @param smartCrop  Whether to use smart cropping (i.e. saliency-aware).
- * @return Array of processed results, one per resize config.
- */
-export async function batchResizeImage(
-	id: ItemId,
-	buffer: ArrayBuffer,
-	inputType: string,
-	outputType: string,
-	resizes: BatchResizeConfig[],
-	smartCrop = false
-): Promise< BatchResizeResult[] > {
-	const ext = outputType.split( '/' )[ 1 ];
-
-	inProgressOperations.add( id );
-
-	try {
-		const vips = await getVips();
-
-		// Do not load animation frames for batch resize — copyMemory()
-		// would materialize all frames and use excessive memory.
-		const loadOptions: LoadOptions< typeof inputType > = {};
-
-		const sourceImage = vips.Image.newFromBuffer( buffer, '', loadOptions );
-
-		sourceImage.onProgress = () => {
-			if ( ! inProgressOperations.has( id ) ) {
-				sourceImage.kill = true;
-			}
-		};
-
-		const { width: originalWidth, pageHeight: originalHeight } =
-			sourceImage;
-
-		// Materialize the decoded image in WASM memory.
-		// This renders the full pipeline once so thumbnailImage() calls
-		// do not re-decode the source.
-		const memImage = sourceImage.copyMemory();
-
-		const results: BatchResizeResult[] = [];
-
-		for ( const config of resizes ) {
-			// Check cancellation between thumbnails.
-			if ( ! inProgressOperations.has( id ) ) {
-				break;
-			}
-
-			const image = applyResizeAndCrop(
-				config.resize,
-				originalWidth,
-				originalHeight,
-				smartCrop,
-				( resizeWidth, thumbnailOptions ) =>
-					memImage.thumbnailImage( resizeWidth, thumbnailOptions )
-			);
-
-			const saveOptions = buildSaveOptions( outputType, config.quality );
-			const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
-
-			results.push( {
-				buffer: outBuffer.buffer,
-				width: image.width,
-				height: image.pageHeight,
-				originalWidth,
-				originalHeight,
-			} );
-		}
-
-		// Only call after all images are no longer being used.
-		cleanup?.();
-
-		return results;
-	} finally {
-		inProgressOperations.delete( id );
-	}
-}
-
-/**
  * Rotates an image based on EXIF orientation value.
  *
  * EXIF orientation values:
@@ -660,7 +553,6 @@ export {
 	convertImageFormat as vipsConvertImageFormat,
 	compressImage as vipsCompressImage,
 	resizeImage as vipsResizeImage,
-	batchResizeImage as vipsBatchResizeImage,
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
 	cancelOperations as vipsCancelOperations,

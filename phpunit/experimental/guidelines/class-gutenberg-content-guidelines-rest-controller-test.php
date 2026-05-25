@@ -3,6 +3,8 @@
  * Tests for the Content Guidelines REST API Controller (singleton).
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
 
@@ -43,24 +45,6 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
-	}
-
-	/**
-	 * Clean up after each test.
-	 */
-	public function tear_down() {
-		$posts = get_posts(
-			array(
-				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
-				'post_status'    => array( 'publish', 'draft' ),
-				'posts_per_page' => -1,
-			)
-		);
-		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
-		}
-
-		parent::tear_down();
 	}
 
 	/**
@@ -443,12 +427,15 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	 * @return int Post ID.
 	 */
 	private function create_artifact_post() {
-		$artifact_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
-			'artifact',
-			'Artifact'
+		$artifact_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Artifact',
+				'slug'     => 'artifact',
+			)
 		);
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',

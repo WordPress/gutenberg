@@ -2,31 +2,61 @@
 	height: 100%;
 }
 
+/*
+ * When keyboard focus lands on the widget's own content (a link or control
+ * the render module draws), outline the whole tile so Tab users can tell
+ * which widget holds focus, since an inner ring alone is easy to miss. Scoped
+ * to content focus, and to `:focus-visible` so a mouse click doesn't draw it.
+ */
+.widgetChrome:has(.widgetChromeContent :focus-visible) {
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline-offset: 2px;
+}
+
 .widgetChromeHeaderIcon {
 	display: inline-flex;
 	color: var(--wpds-color-fg-content-neutral);
 }
 
+/*
+ * Scroll container for the widget body. The card root clips its own overflow
+ * and the header is a fixed-size flex sibling, so confining the scroll to this
+ * element is what keeps the header pinned while the body scrolls.
+ */
 .widgetChromeContent {
 	flex: 1;
 	height: 100%;
 	overflow-y: auto;
 
 	/*
-	 * Probably remove the following padding
-	 * once #77856 lands.
-	 * @see https://github.com/WordPress/gutenberg/pull/77856
+	 * As a flex item, the content area defaults to `min-height: auto`, which
+	 * lets tall widget content expand it past the height the card allots
+	 * instead of staying bounded. Pinning the min sizes to 0 keeps the area
+	 * within its slot so a widget's own `overflow` scrolls internally rather
+	 * than pushing past the card.
 	 */
-	padding-top: 0;
-	padding-bottom: 0;
+	min-width: 0;
+	min-height: 0;
 }
 
-/**
- * Full-bleed widgets are rendered in a full-bleed container.
- * Probably remove the following CSS once #77586 lands.
- * @see https://github.com/WordPress/gutenberg/pull/77586
+/*
+ * Bleed: zero the content's block padding so the body reaches the card edges.
+ * The top edge is strictly ours, because a full-bleed widget hides its header
+ * in a position:absolute VisuallyHidden node that stays the card's :first-child
+ * and blocks Card.FullBleed's top-flush rule. The bottom edge is already
+ * flushed by Card.FullBleed, so zeroing it here is redundant but harmless.
  */
-.widgetChromeContentFullBleed {
+.widgetChromeContentBleed {
+	padding-block: 0;
+}
+
+/*
+ * Scroll container for a bleeding body. Card.FullBleed only does the edge
+ * breakout (negative margins) and declares no height or overflow, so the scroll
+ * container must be re-established here, on the wrapper that spans the card
+ * edges, so the scrollbar tracks the edge and the header stays pinned.
+ */
+.widgetChromeBleedScroll {
 	height: 100%;
 	overflow-y: auto;
 }

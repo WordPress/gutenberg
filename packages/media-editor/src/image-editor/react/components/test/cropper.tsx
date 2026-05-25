@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import { Cropper } from '../cropper';
-import type { UseCropperStateReturn } from '../../hooks/use-cropper-state';
+import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
 
 const GRID_TEST_ID = 'cropper-grid';
@@ -21,7 +21,7 @@ const GRID_INTERACTIVE_CLASS =
 	'wp-media-editor-image-editor__canvas--grid-interactive';
 const SHOW_GRID_CLASS = 'wp-media-editor-image-editor__canvas--show-grid';
 
-function createController(): UseCropperStateReturn {
+function createController(): CropperController {
 	return {
 		state: {
 			...DEFAULT_STATE,
@@ -37,18 +37,16 @@ function createController(): UseCropperStateReturn {
 		setZoomAtPoint: jest.fn(),
 		setRotation: jest.fn(),
 		setFlip: jest.fn(),
+		toggleFlip: jest.fn(),
 		snapRotate90: jest.fn(),
 		setCropRect: jest.fn(),
 		settleCrop: jest.fn(),
 		applyOperation: jest.fn(),
 		reset: jest.fn(),
 		isDirty: false,
-		hasUndo: false,
-		hasRedo: false,
-		undo: jest.fn(),
-		redo: jest.fn(),
-		commitHistory: jest.fn(),
 		getCroppedImage: jest.fn(),
+		setVisualSize: jest.fn(),
+		adjustCropRectForViewport: jest.fn(),
 	};
 }
 
@@ -294,6 +292,7 @@ describe( 'Cropper', () => {
 			name: 'Resize top-left corner',
 		} );
 		( controller.setCropRect as jest.Mock ).mockClear();
+		( controller.adjustCropRectForViewport as jest.Mock ).mockClear();
 
 		rerender(
 			<Cropper
@@ -310,6 +309,7 @@ describe( 'Cropper', () => {
 			} )
 		).not.toBeInTheDocument();
 		expect( controller.setCropRect ).not.toHaveBeenCalled();
+		expect( controller.adjustCropRectForViewport ).not.toHaveBeenCalled();
 	} );
 
 	it( 'centers a fixed-ratio crop when freeform handles are off', async () => {
@@ -329,12 +329,14 @@ describe( 'Cropper', () => {
 		);
 
 		await waitFor( () =>
-			expect( controller.setCropRect ).toHaveBeenCalledWith( {
-				x: expect.closeTo( 1 / 6, 5 ),
-				y: 0,
-				width: expect.closeTo( 2 / 3, 5 ),
-				height: 1,
-			} )
+			expect( controller.adjustCropRectForViewport ).toHaveBeenCalledWith(
+				{
+					x: expect.closeTo( 1 / 6, 5 ),
+					y: 0,
+					width: expect.closeTo( 2 / 3, 5 ),
+					height: 1,
+				}
+			)
 		);
 	} );
 
