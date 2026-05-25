@@ -200,9 +200,10 @@ function toEventListItem( event: WPEvent ): EventListItem {
 	};
 }
 
-function EventIcon( { item }: { item: EventListItem } ) {
+/* Event type icon in the list layout media slot (no image URL). */
+function EventThumbnail( { item }: { item: EventListItem } ) {
 	return (
-		<div className={ styles.eventIcon }>
+		<div className={ styles.thumbPlaceholder } aria-hidden="true">
 			<Icon icon={ item.iconType === 'wordcamp' ? wordpress : people } />
 		</div>
 	);
@@ -256,7 +257,7 @@ export function EventsList( {
 				label: __( 'Type' ),
 				enableSorting: false,
 				enableHiding: false,
-				render: ( { item } ) => <EventIcon item={ item } />,
+				render: ( { item } ) => <EventThumbnail item={ item } />,
 			},
 		],
 		[]
