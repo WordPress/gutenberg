@@ -168,9 +168,10 @@ Provides control over whether the label will only be visible to screen readers.
 
 ### `icon`: `string`
 
-Deprecated. This prop has no effect — use `beforeIcon` or `afterIcon` instead.
+An icon to be shown above the slider next to its container title.
 
 -   Required: No
+-   Platform: Mobile
 
 ### `initialPosition`: `number`
 
