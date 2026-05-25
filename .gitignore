@@ -13,8 +13,6 @@ coverage
 .reassure
 .dev-ready
 
-!tools/build
-
 
 # Directories/files that may appear in your environment
 *.log
