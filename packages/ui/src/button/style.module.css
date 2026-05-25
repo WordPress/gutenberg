@@ -177,19 +177,11 @@
 		&.is-solid,
 		&.is-minimal[aria-pressed="true"] {
 			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
-			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
-		}
-
-		&.is-solid {
 			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong-active);
+			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
+			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
 			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong-active);
-		}
-
-		&.is-minimal[aria-pressed="true"] {
-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong);
-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong);
+			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
 		}
 
 		/* Outline and unpressed minimal buttons use the same foreground color */
