@@ -1197,6 +1197,37 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$fallback_gap_value = $global_block_gap_value;
 		}
 
+		$responsive_style_hash_input = array();
+		foreach ( array_keys( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+			$viewport_style = $style_attr[ $breakpoint ] ?? null;
+			if ( ! is_array( $viewport_style ) ) {
+				continue;
+			}
+
+			$viewport_container_layout = gutenberg_get_layout_container_values( $viewport_style['layout'] ?? null );
+			$has_viewport_layout       = ! empty( $viewport_container_layout );
+			$has_viewport_block_gap    = isset( $viewport_style['spacing']['blockGap'] );
+			$has_viewport_padding      = isset( $viewport_style['spacing']['padding'] );
+
+			if ( ! $has_viewport_layout && ! $has_viewport_block_gap && ! $has_viewport_padding ) {
+				continue;
+			}
+
+			$responsive_style_hash_input[ $breakpoint ] = array();
+
+			if ( $has_viewport_layout ) {
+				$responsive_style_hash_input[ $breakpoint ]['layout'] = $viewport_container_layout;
+			}
+
+			if ( $has_viewport_block_gap ) {
+				$responsive_style_hash_input[ $breakpoint ]['blockGap'] = gutenberg_sanitize_block_gap_value( $viewport_style['spacing']['blockGap'] );
+			}
+
+			if ( $has_viewport_padding ) {
+				$responsive_style_hash_input[ $breakpoint ]['padding'] = $viewport_style['spacing']['padding'];
+			}
+		}
+
 		/*
 		 * We generate a unique ID based on all the data required to obtain the
 		 * corresponding layout style. This way, the CSS class names keep the same
@@ -1204,15 +1235,20 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * make the CSS class names stable across paginations for features like the
 		 * enhanced pagination of the Query block.
 		 */
+		$container_class_hash_input = array(
+			$used_layout,
+			$has_block_gap_support,
+			$gap_value,
+			$should_skip_gap_serialization,
+			$fallback_gap_value,
+			$block_spacing,
+		);
+		if ( ! empty( $responsive_style_hash_input ) ) {
+			$container_class_hash_input[] = $responsive_style_hash_input;
+		}
+
 		$container_class = gutenberg_unique_id_from_values(
-			array(
-				$used_layout,
-				$has_block_gap_support,
-				$gap_value,
-				$should_skip_gap_serialization,
-				$fallback_gap_value,
-				$block_spacing,
-			),
+			$container_class_hash_input,
 			'wp-container-' . sanitize_title( $block['blockName'] ) . '-is-layout-'
 		);
 

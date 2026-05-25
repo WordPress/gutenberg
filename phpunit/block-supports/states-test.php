@@ -1062,6 +1062,90 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that different responsive layout states generate different container
+	 * classes, even when the base layout configuration is identical.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_layout_state_generates_distinct_container_classes_for_distinct_viewport_styles() {
+		$this->ensure_block_registered(
+			'test/responsive-grid-distinct-layout-state',
+			array(),
+			array(
+				'layout' => array(
+					'default' => array(
+						'type' => 'grid',
+					),
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+		$base_block    = array(
+			'blockName'    => 'test/responsive-grid-distinct-layout-state',
+			'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+			'attrs'        => array(
+				'layout' => array(
+					'type' => 'grid',
+				),
+			),
+		);
+		$first_block   = array_replace_recursive(
+			$base_block,
+			array(
+				'attrs' => array(
+					'style' => array(
+						'mobile' => array(
+							'layout' => array(
+								'columnCount' => 3,
+							),
+						),
+					),
+				),
+			)
+		);
+		$second_block  = array_replace_recursive(
+			$base_block,
+			array(
+				'attrs' => array(
+					'style' => array(
+						'mobile' => array(
+							'layout' => array(
+								'columnCount' => 4,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$first_actual  = gutenberg_render_layout_support_flag( $block_content, $first_block );
+		$second_actual = gutenberg_render_layout_support_flag( $block_content, $second_block );
+
+		preg_match( '/wp-container-test-responsive-grid-distinct-layout-state-is-layout-[a-f0-9]{8}/', $first_actual, $first_matches );
+		preg_match( '/wp-container-test-responsive-grid-distinct-layout-state-is-layout-[a-f0-9]{8}/', $second_actual, $second_matches );
+
+		$this->assertNotEmpty( $first_matches, "wp-container class missing in: $first_actual" );
+		$this->assertNotEmpty( $second_matches, "wp-container class missing in: $second_actual" );
+
+		$first_container_class  = $first_matches[0];
+		$second_container_class = $second_matches[0];
+
+		$this->assertNotSame( $first_container_class, $second_container_class );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $first_container_class . '{grid-template-columns:repeat(3, minmax(0, 1fr));}}',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $second_container_class . '{grid-template-columns:repeat(4, minmax(0, 1fr));}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
 	 * Tests that responsive grid layout and block gap state CSS are both generated.
 	 *
 	 * @covers ::gutenberg_render_layout_support_flag
