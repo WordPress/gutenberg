@@ -15,7 +15,8 @@
  * (polymorphic `render`). `@wordpress/ui` Button exposes no color/tone prop
  * that reaches the rendered anchor, so the brand-strong link color is set
  * here; the unlayered module class wins over `@layer wp-ui-components`. Drop
- * once Button exposes a color API for the rendered element.
+ * once Button exposes a color API for the rendered element, or once a
+ * dedicated link component lands (https://github.com/WordPress/gutenberg/issues/77098).
  */
 .continueLink {
 	color: var(--wpds-color-fg-interactive-brand-strong);
