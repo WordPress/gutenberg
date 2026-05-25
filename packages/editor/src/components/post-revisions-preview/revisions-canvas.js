@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
 import { sprintf, __ } from '@wordpress/i18n';
@@ -26,9 +26,7 @@ import {
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 
-const { usePrivateStyleOverride, useBlockElementRef } = unlock(
-	blockEditorPrivateApis
-);
+const { usePrivateStyleOverride } = unlock( blockEditorPrivateApis );
 
 // SVG filter for removed blocks: grayscale + red tint
 const REVISION_REMOVED_FILTER_SVG = `
@@ -126,31 +124,14 @@ function getDiffStatusLabel( status, blockTitle ) {
  */
 function withRevisionDiffClasses( BlockListBlock ) {
 	return ( props ) => {
-		const { block, className } = props;
+		const { block, className, wrapperProps } = props;
 		const diffStatus = block?.__revisionDiffStatus?.status;
 
-		const blockRef = useRef();
-		useBlockElementRef( block.clientId, blockRef );
-
-		useEffect( () => {
-			const el = blockRef.current;
-			if ( ! el || ! diffStatus ) {
-				el?.removeAttribute( 'aria-label' );
-				return;
-			}
-
-			const blockTitle = getBlockType( block.name )?.title;
-			if ( ! blockTitle ) {
-				return;
-			}
-
-			const diffLabel = getDiffStatusLabel( diffStatus, blockTitle );
-			if ( ! diffLabel ) {
-				return;
-			}
-
-			el.setAttribute( 'aria-label', diffLabel );
-		}, [ block.clientId, diffStatus, block.name ] );
+		const blockTitle = getBlockType( block.name )?.title;
+		const diffLabel =
+			diffStatus && blockTitle
+				? getDiffStatusLabel( diffStatus, blockTitle )
+				: undefined;
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
@@ -158,7 +139,16 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			'is-revision-modified': diffStatus === 'modified',
 		} );
 
-		return <BlockListBlock { ...props } className={ enhancedClassName } />;
+		return (
+			<BlockListBlock
+				{ ...props }
+				className={ enhancedClassName }
+				wrapperProps={ {
+					...wrapperProps,
+					...( diffLabel && { 'aria-label': diffLabel } ),
+				} }
+			/>
+		);
 	};
 }
 
