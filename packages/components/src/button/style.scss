@@ -14,9 +14,7 @@
 .components-button {
 	@include mixins.outset-ring__rest();
 
-	// Focus.
-	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
-	&:not(.is-link):focus:not(:active) {
+	&:focus:not(:active) {
 		@include mixins.outset-ring__focus();
 	}
 
@@ -250,9 +248,7 @@
 
 		height: auto;
 
-		&:focus {
-			@include mixins.outset-ring__focus();
-
+		&:focus:not(:active) {
 			border-radius: $radius-small;
 			text-decoration: none;
 		}
