@@ -39,9 +39,9 @@ import type {
  * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
-	columns: 6,
-	minColumnWidth: 350,
-	rowHeight: 200,
+	columns: 12,
+	minColumnWidth: 140,
+	rowHeight: 140,
 };
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
