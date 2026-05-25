@@ -31,7 +31,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.module.css';
-import List, { type ListItem } from './list';
+import { List, type ListItem } from './components';
 
 interface WPEvent {
 	type: 'wordcamp' | 'meetup' | 'online' | string;

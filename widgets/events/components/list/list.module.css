@@ -1,0 +1,25 @@
+.statusText {
+	color: var(--wpds-color-fg-content-neutral-weak);
+	margin: 0;
+}
+
+.listItem {
+	inline-size: 100%;
+}
+
+.listItemIcon {
+	inline-size: calc(var(--wpds-dimension-base) * 9);
+	block-size: calc(var(--wpds-dimension-base) * 9);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--wpds-border-radius-lg);
+	background: var(--wpds-color-bg-track-neutral-weak);
+	color: var(--wpds-color-fg-content-neutral-weak);
+	flex-shrink: 0;
+}
+
+.listItemContent {
+	flex: 1;
+	min-inline-size: 0;
+}

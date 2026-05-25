@@ -7,7 +7,7 @@ import { Link, Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import styles from './style.module.css';
+import styles from './list.module.css';
 
 export type ListItem = {
 	id: string;
@@ -17,7 +17,7 @@ export type ListItem = {
 	icon?: ReactNode;
 };
 
-export default function List( {
+export function List( {
 	items,
 	empty,
 }: {
