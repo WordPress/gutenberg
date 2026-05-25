@@ -279,7 +279,7 @@ export class Metrics {
 		//
 		// Or via the workspace script:
 		//
-		//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace> <build-dir>
+		//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace.json> [--build-dir <dir>]
 		const tracesDir = join( artifactsPath, 'traces' );
 		const filePath = join( tracesDir, `${ name }.trace.json` );
 		await mkdir( tracesDir, { recursive: true } );
