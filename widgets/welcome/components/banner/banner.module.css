@@ -4,6 +4,7 @@
 	--banner-accent-brand: var(--wpds-color-bg-interactive-brand-strong);
 	--banner-accent-warm: color-mix(in srgb, var(--wpds-color-stroke-surface-warning) 60%, var(--wpds-color-bg-surface-neutral-strong));
 	--banner-accent-dark: var(--wpds-color-fg-content-neutral);
+	--banner-glint: color-mix(in srgb, var(--banner-fg) 80%, var(--banner-accent-warm));
 
 	position: relative;
 	padding: var(--wpds-dimension-padding-3xl);

@@ -7,6 +7,7 @@ import {
 	G,
 	Path,
 	Circle,
+	Rect,
 	Defs,
 	LinearGradient,
 	Stop,
@@ -127,6 +128,8 @@ interface HeaderBackgroundProps {
 
 export function HeaderBackground( { version }: HeaderBackgroundProps ) {
 	const idBase = useId();
+	const maskId = `${ idBase }-glint-mask`;
+	const glintId = `${ idBase }-glint`;
 
 	// Place glyphs right-to-left so the version stays anchored to the right.
 	const placed: { key: string; x: number; char: string; glyph: Glyph }[] = [];
@@ -149,6 +152,43 @@ export function HeaderBackground( { version }: HeaderBackgroundProps ) {
 	const strokeId = ( glyphIndex: number, strokeIndex: number ) =>
 		`${ idBase }-${ glyphIndex }-${ strokeIndex }`;
 
+	/* Paint the placed glyphs. `forMask` swaps the gradients/fills for opaque
+	   white so the same shapes can drive the glint mask. */
+	const renderGlyphs = ( forMask: boolean ) =>
+		placed.map( ( { key, x, char, glyph }, glyphIndex ) => (
+			<G
+				key={ key }
+				data-glyph={ char }
+				transform={ `translate(${ x } ${ GLYPH_TOP })` }
+			>
+				{ glyph.strokes?.map( ( stroke, strokeIndex ) => (
+					<Path
+						key={ strokeIndex }
+						d={ stroke.d }
+						stroke={
+							forMask
+								? 'white'
+								: `url(#${ strokeId(
+										glyphIndex,
+										strokeIndex
+								  ) })`
+						}
+					/>
+				) ) }
+				{ glyph.circles?.map( ( circle, circleIndex ) => (
+					<Circle
+						key={ circleIndex }
+						cx={ circle.cx }
+						cy={ circle.cy }
+						r={ circle.r }
+						fill={
+							forMask ? 'white' : 'var(--banner-accent-brand)'
+						}
+					/>
+				) ) }
+			</G>
+		) );
+
 	return (
 		<SVG
 			className={ styles.root }
@@ -163,33 +203,20 @@ export function HeaderBackground( { version }: HeaderBackgroundProps ) {
 				strokeLinejoin="round"
 				strokeWidth="44"
 			>
-				{ placed.map( ( { key, x, char, glyph }, glyphIndex ) => (
-					<G
-						key={ key }
-						data-glyph={ char }
-						transform={ `translate(${ x } ${ GLYPH_TOP })` }
-					>
-						{ glyph.strokes?.map( ( stroke, strokeIndex ) => (
-							<Path
-								key={ strokeIndex }
-								d={ stroke.d }
-								stroke={ `url(#${ strokeId(
-									glyphIndex,
-									strokeIndex
-								) })` }
-							/>
-						) ) }
-						{ glyph.circles?.map( ( circle, circleIndex ) => (
-							<Circle
-								key={ circleIndex }
-								cx={ circle.cx }
-								cy={ circle.cy }
-								r={ circle.r }
-								fill="var(--banner-accent-brand)"
-							/>
-						) ) }
-					</G>
-				) ) }
+				{ renderGlyphs( false ) }
+			</G>
+
+			{ /* Slow specular sweep, clipped to the digits, so light grazes
+			     the bevel as it travels. It rests off-screen (see CSS). */ }
+			<G mask={ `url(#${ maskId })` }>
+				<Rect
+					className={ styles.glint }
+					x="0"
+					y="0"
+					width="300"
+					height={ VIEW_HEIGHT }
+					fill={ `url(#${ glintId })` }
+				/>
 			</G>
 
 			<Defs>
@@ -224,6 +251,54 @@ export function HeaderBackground( { version }: HeaderBackgroundProps ) {
 						);
 					} )
 				) }
+
+				{ /* Narrow diagonal highlight band; rides the glint rect's box
+				     so it tilts along with the bevel. */ }
+				<LinearGradient id={ glintId } x1="0" y1="0" x2="1" y2="0.55">
+					<Stop
+						offset="0"
+						stopColor="var(--banner-glint)"
+						stopOpacity="0"
+					/>
+					<Stop
+						offset="0.4"
+						stopColor="var(--banner-glint)"
+						stopOpacity="0"
+					/>
+					<Stop
+						offset="0.5"
+						stopColor="var(--banner-glint)"
+						stopOpacity="0.65"
+					/>
+					<Stop
+						offset="0.6"
+						stopColor="var(--banner-glint)"
+						stopOpacity="0"
+					/>
+					<Stop
+						offset="1"
+						stopColor="var(--banner-glint)"
+						stopOpacity="0"
+					/>
+				</LinearGradient>
+
+				<mask
+					id={ maskId }
+					maskUnits="userSpaceOnUse"
+					x="0"
+					y="0"
+					width={ VIEW_WIDTH }
+					height={ VIEW_HEIGHT }
+				>
+					<G
+						fill="none"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						strokeWidth="44"
+					>
+						{ renderGlyphs( true ) }
+					</G>
+				</mask>
 			</Defs>
 		</SVG>
 	);

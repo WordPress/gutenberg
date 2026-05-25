@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -26,6 +27,16 @@ function Dashboard() {
 
 	const [ editMode, setEditMode ] = useState( false );
 
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
+	const isMobileViewport = useSelect(
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
+		[]
+	);
+
+	const customizeDashboardLabel = __( 'Customize Dashboard' );
+	const dashboardLabel = __( 'Dashboard' );
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleLayoutChange = ( next: DashboardWidget[] ) => {
@@ -34,6 +45,8 @@ function Dashboard() {
 			type: 'snackbar',
 		} );
 	};
+
+	const pageTitle = editMode ? customizeDashboardLabel : dashboardLabel;
 
 	return (
 		<WidgetDashboard
@@ -47,9 +60,8 @@ function Dashboard() {
 			onEditChange={ setEditMode }
 		>
 			<Page
-				title={
-					editMode ? __( 'Customize Dashboard' ) : __( 'Dashboard' )
-				}
+				title={ editMode && isMobileViewport ? undefined : pageTitle }
+				ariaLabel={ pageTitle }
 				actions={ <WidgetDashboard.Actions /> }
 				hasPadding
 			>
