@@ -11,9 +11,7 @@ import { Spinner } from '@wordpress/components';
 import { Component, Suspense, forwardRef, useId, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
-/* eslint-disable @wordpress/use-recommended-components */
 import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
 
 /**
  * Internal dependencies
