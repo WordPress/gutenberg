@@ -13,16 +13,8 @@ jest.spyOn( global, 'clearTimeout' );
 jest.spyOn( global, 'setTimeout' );
 
 describe( 'AutosaveMonitor', () => {
-	let setAutosaveTimerSpy;
 	beforeEach( () => {
-		setAutosaveTimerSpy = jest.spyOn(
-			AutosaveMonitor.prototype,
-			'setAutosaveTimer'
-		);
-	} );
-
-	afterEach( () => {
-		setAutosaveTimerSpy.mockClear();
+		jest.clearAllMocks();
 	} );
 
 	it( 'should render nothing', () => {
@@ -34,7 +26,7 @@ describe( 'AutosaveMonitor', () => {
 	it( 'should start autosave timer after being mounted', () => {
 		render( <AutosaveMonitor isDirty /> );
 
-		expect( setAutosaveTimerSpy ).toHaveBeenCalled();
+		expect( setTimeout ).toHaveBeenCalled();
 	} );
 
 	it( 'should clear the autosave timer after being unmounted', () => {
@@ -51,7 +43,7 @@ describe( 'AutosaveMonitor', () => {
 		rerender( <AutosaveMonitor isDirty interval={ 999 } /> );
 
 		expect( clearTimeout ).toHaveBeenCalled();
-		expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+		expect( setTimeout ).toHaveBeenCalledTimes( 2 );
 	} );
 
 	it( 'should autosave when `editReference` changes', () => {
