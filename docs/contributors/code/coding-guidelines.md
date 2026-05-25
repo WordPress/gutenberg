@@ -804,6 +804,7 @@ GitHub Actions workflows operate in a privileged software supply chain environme
 
 All YAML workflow files within the `.github/workflows` directory are statically scanned when modified using [Actionlint](https://github.com/rhysd/actionlint) and [Zizmor](https://github.com/zizmorcore/zizmor). It's recommended that you install both of these tools locally using a package manager to run prior to submitting changes to workflow files.
 
+- [GitHub Actions Workflow Standards for WordPress](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
 - [Actionlint installations instructions](https://github.com/rhysd/actionlint/blob/main/docs/install.md)
 - [Zizmor installation instructions](https://docs.zizmor.sh/installation/)
 
