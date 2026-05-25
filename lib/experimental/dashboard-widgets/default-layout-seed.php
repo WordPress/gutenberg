@@ -48,7 +48,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'type'      => 'core/activity',
 			'placement' => array(
 				'width'  => 3,
-				'height' => 4,
+				'height' => 3,
 				'order'  => 1,
 			),
 		);
@@ -59,8 +59,8 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'uuid'      => 'default-quick-draft-widget-instance',
 			'type'      => 'core/quick-draft',
 			'placement' => array(
-				'width'  => 5,
-				'height' => 4,
+				'width'  => 4,
+				'height' => 3,
 				'order'  => 2,
 			),
 		);
@@ -71,7 +71,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'uuid'      => 'default-site-health-widget-instance',
 			'type'      => 'core/site-health',
 			'placement' => array(
-				'width'  => 'fill',
+				'width'  => 2,
 				'height' => 2,
 				'order'  => 3,
 			),
@@ -83,8 +83,8 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'uuid'      => 'default-preview-widget-instance',
 			'type'      => 'core/site-preview',
 			'placement' => array(
-				'width'  => 'fill',
-				'height' => 2,
+				'width'  => 2,
+				'height' => 3,
 				'order'  => 4,
 			),
 		);
