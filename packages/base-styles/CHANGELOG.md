@@ -10,6 +10,10 @@
     -   `.dataviews-view-grid__card .dataviews-selection-checkbox`
     -   `.dataviews-view-table thead`
 
+### Enhancements
+
+-   Add `outset-ring__rest` and `outset-ring__focus` mixins for outline-based focus rings using `--wpds-*` design tokens ([#78646](https://github.com/WordPress/gutenberg/pull/78646)).
+
 ## 8.0.0 (2026-05-14)
 
 ### Breaking Changes
