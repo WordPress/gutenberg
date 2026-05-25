@@ -11,7 +11,8 @@
 .footer {
 	padding-block-start: var(--wpds-dimension-padding-md);
 	margin-block-start: var(--wpds-dimension-padding-md);
-	border-block-start: var(--wpds-border-width-xs) solid
+	border-block-start:
+		var(--wpds-border-width-xs) solid
 		var(--wpds-color-stroke-surface-neutral-weak);
 }
 
