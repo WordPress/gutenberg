@@ -27,7 +27,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Run actionlint
-              uses: docker://rhysd/actionlint@sha256:6f03470d0152251d7f07f7c4dc019dbe7024c72cd952f839544c7798843efa8f # v1.7.11
+              uses: docker://rhysd/actionlint@sha256:5457037ba91acd225478edac3d4b32e45cf6c10291e0dabbfd2491c63129afe1 # v1.7.11
               with:
                   args: '-color -verbose'
 
