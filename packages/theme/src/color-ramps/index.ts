@@ -6,7 +6,6 @@ import { get, OKLCH } from 'colorjs.io/fn';
 /**
  * Internal dependencies
  */
-import './lib/register-color-spaces';
 import { buildRamp } from './lib/index';
 import { clampAccentScaleReferenceLightness } from './lib/utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';

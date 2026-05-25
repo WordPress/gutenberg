@@ -7,28 +7,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
  * Internal dependencies
  */
 import { useCropOptions } from '../use-crop-options';
-import type { Media } from '../../media-editor-provider';
 import { ORIGINAL_ASPECT_RATIO } from '../../../image-editor/core/constants';
+import { MediaEditorStateProvider } from '../../../state';
 
-const media = {
-	id: 1,
-	media_details: {
-		width: 1200,
-		height: 600,
-	},
-} as Media;
-
-function CropOptionsHarness( {
-	id = 1,
-	isImage = true,
-}: {
-	id?: number;
-	isImage?: boolean;
-} ) {
+function CropOptionsHarness() {
 	const cropOptions = useCropOptions( {
-		id,
-		isImage,
-		media,
 		aspectRatioPresets: [
 			{ label: 'Square', value: 1 },
 			{ label: 'Landscape', value: 4 / 3 },
@@ -74,31 +57,87 @@ function CropOptionsHarness( {
 	);
 }
 
+function renderHarness() {
+	render(
+		<MediaEditorStateProvider
+			initialCropperState={ {
+				image: {
+					src: 'test.jpg',
+					naturalWidth: 1200,
+					naturalHeight: 600,
+				},
+			} }
+		>
+			<CropOptionsHarness />
+		</MediaEditorStateProvider>
+	);
+}
+
 describe( 'useCropOptions', () => {
 	it( 'builds explicit aspect-ratio options', () => {
-		render( <CropOptionsHarness /> );
+		renderHarness();
 
 		expect(
 			screen.getByTestId( 'aspect-ratio-options' )
 		).toHaveTextContent( '0,-1,1,1.3333333333333333' );
 	} );
 
-	it( 'resolves the Original aspect ratio from image dimensions', () => {
-		render( <CropOptionsHarness /> );
+	it( 'resolves the Original aspect ratio from the cropper image dimensions', () => {
+		renderHarness();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Original' } ) );
 
+		// 1200 / 600 = 2.
 		expect(
 			screen.getByTestId( 'resolved-aspect-ratio' )
 		).toHaveTextContent( '2' );
 	} );
 
-	it( 'enables freeform crop when Free is selected', () => {
-		render( <CropOptionsHarness /> );
+	it( 'reports Free as undefined resolved aspect ratio', () => {
+		renderHarness();
 
+		fireEvent.click( screen.getByRole( 'button', { name: 'Free' } ) );
+
+		expect(
+			screen.getByTestId( 'resolved-aspect-ratio' )
+		).toHaveTextContent( 'undefined' );
+	} );
+
+	it( 'picking Free auto-enables freeform when it was off', () => {
+		renderHarness();
+
+		// Pick a non-Free preset and turn freeform off.
+		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
 		fireEvent.click(
 			screen.getByRole( 'button', { name: 'Disable handles' } )
 		);
+
+		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
+			'false'
+		);
+		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
+			'1'
+		);
+
+		// Picking Free re-enables freeform — picking Free implies the
+		// user wants to freeform-edit and there'd otherwise be no
+		// visible affordance.
+		fireEvent.click( screen.getByRole( 'button', { name: 'Free' } ) );
+
+		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
+			'0'
+		);
+		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
+			'true'
+		);
+	} );
+
+	it( 'picking Free leaves freeform alone if it was already on', () => {
+		renderHarness();
+
+		// Start clean: freeform is true by default.
+		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
+		// Don't turn freeform off — pick Free directly.
 		fireEvent.click( screen.getByRole( 'button', { name: 'Free' } ) );
 
 		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
@@ -106,15 +145,14 @@ describe( 'useCropOptions', () => {
 		);
 	} );
 
-	it( 'resets crop options when the media id changes', () => {
-		const { rerender } = render( <CropOptionsHarness id={ 1 } /> );
+	it( 'reset returns cropOptions to defaults (Free + freeform on)', () => {
+		renderHarness();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
 		fireEvent.click(
 			screen.getByRole( 'button', { name: 'Disable handles' } )
 		);
-
-		rerender( <CropOptionsHarness id={ 2 } /> );
+		fireEvent.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
 			'0'

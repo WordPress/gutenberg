@@ -3,6 +3,7 @@
  */
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { AlertDialog, Button, Stack } from '@wordpress/ui';
 
@@ -135,8 +136,14 @@ export function Actions(): React.ReactNode {
 						size="compact"
 						onClick={ insert }
 					>
-						{ __( 'Add widgets' ) }
+						<Button.Icon icon={ plus } />
+						{ __( 'Add widget' ) }
 					</Button>
+
+					<div
+						className={ styles.editActionsDivider }
+						aria-hidden="true"
+					/>
 
 					<Button
 						variant="minimal"
@@ -159,7 +166,7 @@ export function Actions(): React.ReactNode {
 				</Stack>
 			) : (
 				<Button
-					variant="outline"
+					variant="minimal"
 					tone="brand"
 					size="compact"
 					onClick={ handleEditMode }
