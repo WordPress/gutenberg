@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { useState, useRef } from '@wordpress/element';
 import {
 	ResizableBox,
-	Tooltip as WCTooltip,
 	__unstableMotion as motion,
 } from '@wordpress/components';
 import { useInstanceId, useReducedMotion } from '@wordpress/compose';
@@ -18,6 +17,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { addQueryArgs } from '@wordpress/url';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -294,32 +295,43 @@ function ResizableFrame( {
 			handleComponent={ {
 				[ isRTL() ? 'right' : 'left' ]: canvas === 'view' && (
 					<>
-						<WCTooltip text={ __( 'Drag to resize' ) }>
-							<motion.button
-								key="handle"
-								role="separator"
-								aria-orientation="vertical"
-								className={ clsx(
-									'edit-site-resizable-frame__handle',
-									{ 'is-resizing': isResizing }
-								) }
-								variants={ resizeHandleVariants }
-								animate={ currentResizeHandleVariant }
-								aria-label={ __( 'Drag to resize' ) }
-								aria-describedby={ resizableHandleHelpId }
-								aria-valuenow={
-									frameRef.current?.resizable?.offsetWidth ||
-									undefined
+						<Tooltip.Root>
+							<Tooltip.Trigger
+								render={
+									<motion.button
+										key="handle"
+										role="separator"
+										aria-orientation="vertical"
+										className={ clsx(
+											'edit-site-resizable-frame__handle',
+											{ 'is-resizing': isResizing }
+										) }
+										variants={ resizeHandleVariants }
+										animate={ currentResizeHandleVariant }
+										aria-label={ __( 'Drag to resize' ) }
+										aria-describedby={
+											resizableHandleHelpId
+										}
+										aria-valuenow={
+											frameRef.current?.resizable
+												?.offsetWidth || undefined
+										}
+										aria-valuemin={ FRAME_MIN_WIDTH }
+										aria-valuemax={ defaultSize.width }
+										onKeyDown={
+											handleResizableHandleKeyDown
+										}
+										initial="hidden"
+										exit="hidden"
+										whileFocus="active"
+										whileHover="active"
+									/>
 								}
-								aria-valuemin={ FRAME_MIN_WIDTH }
-								aria-valuemax={ defaultSize.width }
-								onKeyDown={ handleResizableHandleKeyDown }
-								initial="hidden"
-								exit="hidden"
-								whileFocus="active"
-								whileHover="active"
 							/>
-						</WCTooltip>
+							<Tooltip.Popup>
+								{ __( 'Drag to resize' ) }
+							</Tooltip.Popup>
+						</Tooltip.Root>
 						<div hidden id={ resizableHandleHelpId }>
 							{ __(
 								'Use left and right arrow keys to resize the canvas. Hold shift to resize in larger increments.'

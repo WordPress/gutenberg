@@ -17,6 +17,7 @@
 - DataViews: Restore the original 24px gap on the default-density grid (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataForms: Restore the original 24px minimum height on panel-layout fields (trigger, label, control) (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataViews: Restore the original 28px end-padding on resettable filter chips (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Fix wrapper height not resolving in flex layouts, enabling proper internal scrolling. [#76945](https://github.com/WordPress/gutenberg/pull/76945)
 
 ### Code Quality
 

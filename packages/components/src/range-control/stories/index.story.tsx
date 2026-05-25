@@ -35,7 +35,6 @@ const meta: Meta< typeof RangeControl > = {
 		},
 		color: { control: { type: 'color' } },
 		help: { control: { type: 'text' } },
-		icon: { control: false },
 		marks: { control: { type: 'object' } },
 		onBlur: { control: false },
 		onChange: { control: false },

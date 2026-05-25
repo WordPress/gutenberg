@@ -115,10 +115,6 @@ export type RangeControlProps = Pick<
 		 */
 		currentInput?: number;
 		/**
-		 * An icon to be shown above the slider next to its container title.
-		 */
-		icon?: string;
-		/**
 		 * The slider starting position, used when no `value` is passed.
 		 * The `initialPosition` will be clamped between the provided `min`
 		 * and `max` prop values.
