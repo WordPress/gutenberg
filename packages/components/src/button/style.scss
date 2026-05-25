@@ -50,7 +50,6 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		border: $border-width solid transparent; // for forced-colors mode
 		background: $components-color-accent;
 		color: $components-color-accent-inverted;
 		text-decoration: none;
@@ -95,6 +94,10 @@
 			);
 			/* stylelint-enable */
 		}
+
+		@media (forced-colors: active) {
+			outline: 1px solid ButtonText;
+		}
 	}
 
 	/**
@@ -103,12 +106,20 @@
 
 	&.is-secondary,
 	&.is-tertiary {
+		&:active:not(:disabled) {
+			box-shadow: none;
+		}
+
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
 			color: $gray-600;
 			background: transparent;
 			transform: none;
+		}
+
+		@media (forced-colors: active) {
+			outline: 1px solid ButtonText;
 		}
 	}
 
@@ -119,30 +130,33 @@
 	&.is-secondary {
 		@media not ( prefers-reduced-motion ) {
 			transition:
-				border-color 0.1s linear,
+				box-shadow 0.1s linear,
 				background 0.1s linear,
 				color 0.1s linear;
 		}
 
-		border: $border-width solid var(--wpds-color-stroke-interactive-brand);
+		box-shadow:
+			inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-brand),
+			0 0 0 currentColor;
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
 
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			border-color: var(--wpds-color-stroke-interactive-brand-active);
+			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-brand-active);
 			color: $components-color-accent-darker-20;
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
-		}
-
-		&:active:not(:disabled, [aria-disabled="true"]) {
-			border-color: var(--wpds-color-stroke-interactive-brand-active);
 		}
 
 		&:disabled:not(:focus),
 		&[aria-disabled="true"]:not(:focus),
 		&[aria-disabled="true"]:hover:not(:focus) {
-			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-neutral-disabled);
+		}
+
+		@media (forced-colors: active) {
+			// Inset box-shadow borders are not reliable in forced-colors mode.
+			box-shadow: none;
 		}
 	}
 
@@ -151,7 +165,6 @@
 	 */
 
 	&.is-tertiary {
-		border: $border-width solid transparent;
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
@@ -198,14 +211,12 @@
 		}
 
 		&.is-secondary {
-			border-color: $components-color-accent;
+			box-shadow:
+				inset 0 0 0 $border-width $components-color-accent,
+				0 0 0 currentColor;
 
 			&:hover:not(:disabled, [aria-disabled="true"]) {
-				border-color: $components-color-accent-darker-20;
-			}
-
-			&:active:not(:disabled, [aria-disabled="true"]) {
-				border-color: $components-color-accent-darker-20;
+				box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
 			}
 		}
 
