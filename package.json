@@ -101,13 +101,13 @@
 		"jsdom": "26.1.0"
 	},
 	"scripts": {
-		"build": "npm run --workspace @wordpress/build-tools orchestrate-build --",
-		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && npm run check-installed-deps --workspace @wordpress/validation-tools --silent && ( tsgo --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && npm run --workspace @wordpress/build-tools --silent check-type-declarations && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
+		"build": "npm run --workspace @wordpress/build-scripts orchestrate-build --",
+		"build:profile-types": "rimraf ./ts-traces && npm run clean:package-types && npm run check-installed-deps --workspace @wordpress/validation-tools --silent && ( tsgo --build --extendedDiagnostics --generateTrace ./ts-traces || ( echo 'tsc failed.'; exit 1 ) ) && npm run --workspace @wordpress/build-scripts --silent check-type-declarations && npx --yes @typescript/analyze-trace ts-traces > ts-traces/analysis.txt && node -p \"'\\n\\nDone! Build traces saved to ts-traces/ directory.\\nTrace analysis saved to ts-traces/analysis.txt.'\"",
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "tsgo --build --clean && rimraf --glob \"./packages/*/build-types\"",
 		"clean:packages": "rimraf --glob \"./packages/*/{build,build-module,build-wp,build-style}\" \"./build\"",
 		"component-usage-stats": "node ./node_modules/react-scanner/bin/react-scanner -c ./react-scanner.config.js",
-		"dev": "npm run --workspace @wordpress/build-tools orchestrate-dev --",
+		"dev": "npm run --workspace @wordpress/build-scripts orchestrate-dev --",
 		"distclean": "git clean --force -d -X",
 		"docs:api-ref": "npm run --workspace @wordpress/api-docs-generator docs:api-ref",
 		"docs:blocks": "npm run --workspace @wordpress/api-docs-generator docs:blocks",
