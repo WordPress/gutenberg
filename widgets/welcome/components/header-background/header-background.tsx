@@ -196,8 +196,6 @@ export function HeaderBackground( { version }: HeaderBackgroundProps ) {
 			fill="none"
 			viewBox={ `0 0 ${ VIEW_WIDTH } ${ VIEW_HEIGHT }` }
 			xmlns="http://www.w3.org/2000/svg"
-			aria-hidden="true"
-			focusable="false"
 		>
 			<G
 				fill="none"
