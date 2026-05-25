@@ -299,134 +299,57 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 }
 
 /**
- * Removes declarations for excluded properties from layout style rules.
- *
- * @param array $layout_styles       Layout style rules.
- * @param array $excluded_properties CSS properties to omit.
- * @return array Layout style rules with excluded declarations removed.
- */
-function gutenberg_filter_layout_style_properties( $layout_styles, $excluded_properties = array() ) {
-	if ( empty( $excluded_properties ) ) {
-		return $layout_styles;
-	}
-
-	$excluded_properties = array_flip( $excluded_properties );
-	$filtered_styles     = array();
-
-	foreach ( $layout_styles as $layout_style ) {
-		if ( empty( $layout_style['declarations'] ) || ! is_array( $layout_style['declarations'] ) ) {
-			continue;
-		}
-
-		foreach ( array_keys( $layout_style['declarations'] ) as $property ) {
-			if ( isset( $excluded_properties[ $property ] ) ) {
-				unset( $layout_style['declarations'][ $property ] );
-			}
-		}
-
-		if ( ! empty( $layout_style['declarations'] ) ) {
-			$filtered_styles[] = $layout_style;
-		}
-	}
-
-	return $filtered_styles;
-}
-
-/**
- * Filters layout style rules down to declarations that differ from base rules.
- *
- * @param array $layout_styles       Layout style rules.
- * @param array $base_layout_styles  Base layout style rules.
- * @param array $excluded_properties CSS properties to always omit.
- * @return array Layout style rules containing changed declarations only.
- */
-function gutenberg_get_layout_style_delta( $layout_styles, $base_layout_styles, $excluded_properties = array() ) {
-	$base_declarations   = array();
-	$excluded_properties = array_flip( $excluded_properties );
-
-	foreach ( $base_layout_styles as $base_layout_style ) {
-		if ( empty( $base_layout_style['selector'] ) || empty( $base_layout_style['declarations'] ) || ! is_array( $base_layout_style['declarations'] ) ) {
-			continue;
-		}
-
-		$rule_key = ( $base_layout_style['rules_group'] ?? '' ) . '|' . $base_layout_style['selector'];
-		if ( ! isset( $base_declarations[ $rule_key ] ) ) {
-			$base_declarations[ $rule_key ] = array();
-		}
-		foreach ( $base_layout_style['declarations'] as $property => $value ) {
-			$base_declarations[ $rule_key ][ $property ] = $value;
-		}
-	}
-
-	$delta_styles = array();
-	foreach ( $layout_styles as $layout_style ) {
-		if ( empty( $layout_style['selector'] ) || empty( $layout_style['declarations'] ) || ! is_array( $layout_style['declarations'] ) ) {
-			continue;
-		}
-
-		$changed_declarations  = array();
-		$rule_key              = ( $layout_style['rules_group'] ?? '' ) . '|' . $layout_style['selector'];
-		$selector_declarations = $base_declarations[ $rule_key ] ?? array();
-		foreach ( $layout_style['declarations'] as $property => $value ) {
-			if ( isset( $excluded_properties[ $property ] ) ) {
-				continue;
-			}
-
-			if ( array_key_exists( $property, $selector_declarations ) && (string) $selector_declarations[ $property ] === (string) $value ) {
-				continue;
-			}
-
-			$changed_declarations[ $property ] = $value;
-		}
-
-		if ( ! empty( $changed_declarations ) ) {
-			$layout_style['declarations'] = $changed_declarations;
-			$delta_styles[]               = $layout_style;
-		}
-	}
-
-	return $delta_styles;
-}
-
-/**
  * Returns child layout styles for a block affected by its parent's layout.
  *
- * @param string $selector      CSS selector.
- * @param array  $child_layout  Child layout values.
- * @param array  $parent_layout Parent layout values.
+ * @param string     $selector         CSS selector.
+ * @param array      $child_layout     Child layout values.
+ * @param array      $parent_layout    Parent layout values.
+ * @param array|null $viewport_overrides Optional. Child viewport layout overrides to emit.
  * @return array Child layout style rules.
  */
-function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $parent_layout = array() ) {
-	$child_layout_declarations = array();
-	$child_layout_styles       = array();
+function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $parent_layout = array(), $viewport_overrides = null ) {
+	$base_child_layout              = is_array( $child_layout ) ? $child_layout : array();
+	$viewport_overrides             = is_array( $viewport_overrides ) ? $viewport_overrides : null;
+	$child_layout                   = null === $viewport_overrides ? $base_child_layout : array_replace( $base_child_layout, $viewport_overrides );
+	$child_layout_declarations      = array();
+	$child_layout_styles            = array();
+	$has_viewport_property_override = static function ( $property ) use ( $viewport_overrides ) {
+		return array_key_exists( $property, $viewport_overrides );
+	};
 
 	$self_stretch = $child_layout['selfStretch'] ?? null;
 
-	if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
-		$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
-		$child_layout_declarations['box-sizing'] = 'border-box';
-	} elseif ( 'fill' === $self_stretch ) {
-		$child_layout_declarations['flex-grow'] = '1';
+	if ( null === $viewport_overrides || $has_viewport_property_override( 'selfStretch' ) || $has_viewport_property_override( 'flexSize' ) ) {
+		if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
+			$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
+			$child_layout_declarations['box-sizing'] = 'border-box';
+		} elseif ( 'fill' === $self_stretch ) {
+			$child_layout_declarations['flex-grow'] = '1';
+		}
 	}
 
 	$column_start = $child_layout['columnStart'] ?? null;
 	$column_span  = $child_layout['columnSpan'] ?? null;
-	if ( $column_start && $column_span ) {
-		$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
-	} elseif ( $column_start ) {
-		$child_layout_declarations['grid-column'] = "$column_start";
-	} elseif ( $column_span ) {
-		$child_layout_declarations['grid-column'] = "span $column_span";
+	if ( null === $viewport_overrides || $has_viewport_property_override( 'columnStart' ) || $has_viewport_property_override( 'columnSpan' ) ) {
+		if ( $column_start && $column_span ) {
+			$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
+		} elseif ( $column_start ) {
+			$child_layout_declarations['grid-column'] = "$column_start";
+		} elseif ( $column_span ) {
+			$child_layout_declarations['grid-column'] = "span $column_span";
+		}
 	}
 
 	$row_start = $child_layout['rowStart'] ?? null;
 	$row_span  = $child_layout['rowSpan'] ?? null;
-	if ( $row_start && $row_span ) {
-		$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
-	} elseif ( $row_start ) {
-		$child_layout_declarations['grid-row'] = "$row_start";
-	} elseif ( $row_span ) {
-		$child_layout_declarations['grid-row'] = "span $row_span";
+	if ( null === $viewport_overrides || $has_viewport_property_override( 'rowStart' ) || $has_viewport_property_override( 'rowSpan' ) ) {
+		if ( $row_start && $row_span ) {
+			$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
+		} elseif ( $row_start ) {
+			$child_layout_declarations['grid-row'] = "$row_start";
+		} elseif ( $row_span ) {
+			$child_layout_declarations['grid-row'] = "span $row_span";
+		}
 	}
 
 	if ( ! empty( $child_layout_declarations ) ) {
@@ -446,7 +369,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	 * If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
 	 * In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
 	 */
-	if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
+	if ( null === $viewport_overrides && ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
 		$column_span_number  = floatval( $column_span );
 		$column_start_number = floatval( $column_start );
 		$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
@@ -513,16 +436,25 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
  * @param bool                 $should_skip_gap_serialization Optional. Whether to skip applying the user-defined value set in the editor. Default false.
  * @param string|array         $fallback_gap_value            Optional. The block gap value to apply. If it's an array expected properties are "top" and/or "left". Default '0.5em'.
  * @param array|null           $block_spacing                 Optional. Custom spacing set on the block. Default null.
- * @param string|null          $rules_group                   Optional. CSS grouping rule, e.g. a media query. Default null.
  * @param array                $options                       Optional. Extra options for internal callers. Default empty array.
- * @return string|array CSS styles, layout rules when requested, or empty string.
+ * @return string CSS styles, or empty string.
  */
-function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null, $rules_group = null, $options = array() ) {
-	$layout_type   = $layout['type'] ?? 'default';
-	$layout_styles = array();
+function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support = false, $gap_value = null, $should_skip_gap_serialization = false, $fallback_gap_value = '0.5em', $block_spacing = null, $options = array() ) {
+	$base_layout                    = is_array( $layout ) ? $layout : array();
+	$viewport_overrides             = $options['viewport_overrides'] ?? null;
+	$layout_for_styles              = null === $viewport_overrides ? $base_layout : array_replace( $base_layout, $viewport_overrides );
+	$layout_type                    = $base_layout['type'] ?? 'default';
+	$rules_group                    = $options['rules_group'] ?? null;
+	$has_block_gap_override         = ! empty( $options['has_block_gap_override'] );
+	$has_block_spacing_override     = ! empty( $options['has_block_spacing_override'] );
+	$should_output_block_gap        = null === $viewport_overrides || $has_block_gap_override;
+	$has_viewport_property_override = static function ( $property ) use ( $viewport_overrides ) {
+		return array_key_exists( $property, $viewport_overrides );
+	};
+	$layout_styles                  = array();
 
 	if ( 'default' === $layout_type ) {
-		if ( $has_block_gap_support ) {
+		if ( $has_block_gap_support && $should_output_block_gap ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_value = $gap_value['top'] ?? null;
 			}
@@ -554,9 +486,9 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'constrained' === $layout_type ) {
-		$content_size    = $layout['contentSize'] ?? '';
-		$wide_size       = $layout['wideSize'] ?? '';
-		$justify_content = $layout['justifyContent'] ?? 'center';
+		$content_size    = $layout_for_styles['contentSize'] ?? '';
+		$wide_size       = $layout_for_styles['wideSize'] ?? '';
+		$justify_content = $layout_for_styles['justifyContent'] ?? 'center';
 
 		$all_max_width_value  = $content_size ? $content_size : $wide_size;
 		$wide_max_width_value = $wide_size ? $wide_size : $content_size;
@@ -568,16 +500,23 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$margin_left  = 'left' === $justify_content ? '0 !important' : 'auto !important';
 		$margin_right = 'right' === $justify_content ? '0 !important' : 'auto !important';
 
-		if ( $content_size || $wide_size ) {
+		$has_justify_content_override    = null !== $viewport_overrides && $has_viewport_property_override( 'justifyContent' );
+		$should_output_constrained_sizes = null === $viewport_overrides || $has_viewport_property_override( 'contentSize' ) || $has_viewport_property_override( 'wideSize' );
+		if ( $should_output_constrained_sizes && ( $content_size || $wide_size ) ) {
+			$content_size_declarations = array(
+				'max-width' => $all_max_width_value,
+			);
+
+			if ( null === $viewport_overrides || $has_justify_content_override ) {
+				$content_size_declarations['margin-left']  = $margin_left;
+				$content_size_declarations['margin-right'] = $margin_right;
+			}
+
 			array_push(
 				$layout_styles,
 				array(
 					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-					'declarations' => array(
-						'max-width'    => $all_max_width_value,
-						'margin-left'  => $margin_left,
-						'margin-right' => $margin_right,
-					),
+					'declarations' => $content_size_declarations,
 				),
 				array(
 					'selector'     => "$selector > .alignwide",
@@ -590,7 +529,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( isset( $block_spacing ) ) {
+		if ( ( null === $viewport_overrides || $has_block_spacing_override ) && isset( $block_spacing ) ) {
 			$block_spacing_values = gutenberg_style_engine_get_styles(
 				array(
 					'spacing' => $block_spacing,
@@ -625,21 +564,31 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 
-		if ( 'left' === $justify_content ) {
+		if ( $has_justify_content_override && ! $should_output_constrained_sizes ) {
 			$layout_styles[] = array(
 				'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-				'declarations' => array( 'margin-left' => '0 !important' ),
+				'declarations' => array(
+					'margin-left'  => $margin_left,
+					'margin-right' => $margin_right,
+				),
 			);
+		} elseif ( null === $viewport_overrides ) {
+			if ( 'left' === $justify_content ) {
+				$layout_styles[] = array(
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'declarations' => array( 'margin-left' => '0 !important' ),
+				);
+			}
+
+			if ( 'right' === $justify_content ) {
+				$layout_styles[] = array(
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'declarations' => array( 'margin-right' => '0 !important' ),
+				);
+			}
 		}
 
-		if ( 'right' === $justify_content ) {
-			$layout_styles[] = array(
-				'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-				'declarations' => array( 'margin-right' => '0 !important' ),
-			);
-		}
-
-		if ( $has_block_gap_support ) {
+		if ( $has_block_gap_support && $should_output_block_gap ) {
 			if ( is_array( $gap_value ) ) {
 				$gap_value = $gap_value['top'] ?? null;
 			}
@@ -671,7 +620,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'flex' === $layout_type ) {
-		$layout_orientation = $layout['orientation'] ?? 'horizontal';
+		$layout_orientation = $layout_for_styles['orientation'] ?? 'horizontal';
 
 		$justify_content_options = array(
 			'left'   => 'flex-start',
@@ -693,14 +642,19 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$vertical_alignment_options += array( 'space-between' => 'space-between' );
 		}
 
-		if ( ! empty( $layout['flexWrap'] ) && 'nowrap' === $layout['flexWrap'] ) {
+		$should_output_flex_wrap          = null === $viewport_overrides || $has_viewport_property_override( 'flexWrap' );
+		$should_output_flex_orientation   = null === $viewport_overrides || $has_viewport_property_override( 'orientation' );
+		$should_output_flex_justification = null === $viewport_overrides || $has_viewport_property_override( 'justifyContent' ) || $has_viewport_property_override( 'orientation' );
+		$should_output_flex_alignment     = null === $viewport_overrides || $has_viewport_property_override( 'verticalAlignment' ) || $has_viewport_property_override( 'orientation' );
+
+		if ( $should_output_flex_wrap && ! empty( $layout_for_styles['flexWrap'] ) && 'nowrap' === $layout_for_styles['flexWrap'] ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array( 'flex-wrap' => 'nowrap' ),
 			);
 		}
 
-		if ( $has_block_gap_support && isset( $gap_value ) ) {
+		if ( $has_block_gap_support && $should_output_block_gap && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
 
@@ -738,39 +692,41 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * since we intend to convert blocks that had flex layout implemented
 			 * by custom css.
 			 */
-			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'justify-content' => $justify_content_options[ $layout['justifyContent'] ] ),
+					'declarations' => array( 'justify-content' => $justify_content_options[ $layout_for_styles['justifyContent'] ] ),
 				);
 			}
 
-			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
+					'declarations' => array( 'align-items' => $vertical_alignment_options[ $layout_for_styles['verticalAlignment'] ] ),
 				);
 			}
 		} else {
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'flex-direction' => 'column' ),
-			);
-			if ( ! empty( $layout['justifyContent'] ) && array_key_exists( $layout['justifyContent'], $justify_content_options ) ) {
+			if ( $should_output_flex_orientation ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'align-items' => $justify_content_options[ $layout['justifyContent'] ] ),
+					'declarations' => array( 'flex-direction' => 'column' ),
 				);
-			} else {
+			}
+			if ( $should_output_flex_justification && ! empty( $layout_for_styles['justifyContent'] ) && array_key_exists( $layout_for_styles['justifyContent'], $justify_content_options ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'align-items' => $justify_content_options[ $layout_for_styles['justifyContent'] ] ),
+				);
+			} elseif ( $should_output_flex_justification ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
 					'declarations' => array( 'align-items' => 'flex-start' ),
 				);
 			}
-			if ( ! empty( $layout['verticalAlignment'] ) && array_key_exists( $layout['verticalAlignment'], $vertical_alignment_options ) ) {
+			if ( $should_output_flex_alignment && ! empty( $layout_for_styles['verticalAlignment'] ) && array_key_exists( $layout_for_styles['verticalAlignment'], $vertical_alignment_options ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $layout['verticalAlignment'] ] ),
+					'declarations' => array( 'justify-content' => $vertical_alignment_options[ $layout_for_styles['verticalAlignment'] ] ),
 				);
 			}
 		}
@@ -816,77 +772,51 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$responsive_gap_value = '0px';
 		}
 
-		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
-			$max_value       = 'max(min(' . $layout['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))',
-					'container-type'        => 'inline-size',
-				),
-			);
-			if ( ! empty( $layout['rowCount'] ) ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
-				);
-			}
-		} elseif ( ! empty( $layout['columnCount'] ) ) {
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
-			);
-			if ( ! empty( $layout['rowCount'] ) ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
-				);
-			}
-		} else {
-			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+		$should_output_grid_columns = null === $viewport_overrides || $has_viewport_property_override( 'minimumColumnWidth' ) || $has_viewport_property_override( 'columnCount' );
+		$uses_gap_in_grid_columns   = ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] );
+		if ( $has_block_gap_override && $uses_gap_in_grid_columns ) {
+			$should_output_grid_columns = true;
+		}
 
+		$should_output_grid_rows = ( null === $viewport_overrides || $has_viewport_property_override( 'rowCount' ) ) && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['rowCount'] );
+		$grid_declarations       = array();
+
+		if ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) && ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
+			$max_value                                  = 'max(min(' . $layout_for_styles['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout_for_styles['columnCount'] . ' - 1))) /' . $layout_for_styles['columnCount'] . ')';
+			$grid_declarations['grid-template-columns'] = 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))';
+		} elseif ( $should_output_grid_columns && ! empty( $layout_for_styles['columnCount'] ) ) {
+			$grid_declarations['grid-template-columns'] = 'repeat(' . $layout_for_styles['columnCount'] . ', minmax(0, 1fr))';
+		} elseif ( $should_output_grid_columns ) {
+			$minimum_column_width                       = ! empty( $layout_for_styles['minimumColumnWidth'] ) ? $layout_for_styles['minimumColumnWidth'] : '12rem';
+			$grid_declarations['grid-template-columns'] = 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))';
+		}
+
+		if ( ! empty( $grid_declarations ) ) {
+			$base_has_container_type = empty( $base_layout['columnCount'] ) || ( ! empty( $base_layout['columnCount'] ) && ! empty( $base_layout['minimumColumnWidth'] ) );
+			if ( empty( $layout_for_styles['columnCount'] ) || ! empty( $layout_for_styles['minimumColumnWidth'] ) ) {
+				if ( null === $viewport_overrides || ! $base_has_container_type ) {
+					$grid_declarations['container-type'] = 'inline-size';
+				}
+			}
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
-					'container-type'        => 'inline-size',
-				),
+				'declarations' => $grid_declarations,
 			);
 		}
 
-		if ( $has_block_gap_support && null !== $gap_value && ! $should_skip_gap_serialization ) {
+		if ( $should_output_grid_rows ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout_for_styles['rowCount'] . ', minmax(1rem, auto))' ),
+			);
+		}
+
+		if ( $has_block_gap_support && $should_output_block_gap && null !== $gap_value && ! $should_skip_gap_serialization ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array( 'gap' => $gap_value ),
 			);
 		}
-	}
-
-	if ( ! empty( $options['return_rules'] ) ) {
-		return $layout_styles;
-	}
-
-	$excluded_properties = $options['excluded_properties'] ?? array();
-
-	if ( ! empty( $layout_styles ) && array_key_exists( 'base_layout', $options ) && is_array( $options['base_layout'] ) ) {
-		$base_layout_styles = gutenberg_get_layout_style(
-			$selector,
-			$options['base_layout'],
-			$has_block_gap_support,
-			$options['base_gap_value'] ?? null,
-			$should_skip_gap_serialization,
-			$fallback_gap_value,
-			$options['base_block_spacing'] ?? null,
-			null,
-			array( 'return_rules' => true )
-		);
-		$layout_styles      = gutenberg_get_layout_style_delta(
-			$layout_styles,
-			$base_layout_styles,
-			$excluded_properties
-		);
-	} else {
-		$layout_styles = gutenberg_filter_layout_style_properties( $layout_styles, $excluded_properties );
 	}
 
 	if ( ! empty( $layout_styles ) ) {
@@ -1027,31 +957,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Emit responsive child layout CSS using the same container-content class
 		// so that base and responsive child layout share the exact same selector.
 		foreach ( $viewport_child_layouts as $viewport_data ) {
-			$viewport_child_full   = array_replace( $base_child_layout, $viewport_data['child_layout'] );
 			$viewport_child_styles = gutenberg_get_child_layout_style_rules(
 				".$container_content_class",
-				$viewport_child_full,
-				$parent_layout
-			);
-			$base_viewport_styles  = gutenberg_get_child_layout_style_rules(
-				".$container_content_class",
 				$base_child_layout,
-				$parent_layout
-			);
-			$viewport_child_styles = gutenberg_get_layout_style_delta(
-				$viewport_child_styles,
-				$base_viewport_styles
-			);
-
-			// Container queries don't compose with responsive media queries;
-			// drop any container-query rules and wrap the rest in the media query.
-			$viewport_child_styles = array_values(
-				array_filter(
-					$viewport_child_styles,
-					static function ( $rule ) {
-						return empty( $rule['rules_group'] );
-					}
-				)
+				$parent_layout,
+				$viewport_data['child_layout']
 			);
 			foreach ( $viewport_child_styles as $index => $rule ) {
 				$viewport_child_styles[ $index ]['rules_group'] = $viewport_data['media_query'];
@@ -1269,8 +1179,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		/*
 		 * Emit responsive container layout styles using the same $container_class
-		 * selector as the base layout so they target the inner block wrapper. Only
-		 * the declarations that differ from base are emitted (per viewport).
+		 * selector as the base layout so they target the inner block wrapper.
 		 */
 		foreach ( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS as $breakpoint => $media_query ) {
 			$viewport_style = $style_attr[ $breakpoint ] ?? null;
@@ -1287,9 +1196,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 				continue;
 			}
 
-			$viewport_layout        = $has_viewport_layout
-				? array_replace( $used_layout, $viewport_container_layout )
-				: $used_layout;
 			$viewport_gap_value     = $has_viewport_block_gap
 				? gutenberg_sanitize_block_gap_value( $viewport_style['spacing']['blockGap'] )
 				: $gap_value;
@@ -1299,18 +1205,17 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 			$viewport_styles = gutenberg_get_layout_style(
 				".$container_class",
-				$viewport_layout,
+				$used_layout,
 				$has_block_gap_support,
 				$viewport_gap_value,
 				$should_skip_gap_serialization,
 				$fallback_gap_value,
 				$viewport_block_spacing,
-				$media_query,
 				array(
-					'base_layout'         => $used_layout,
-					'base_gap_value'      => $gap_value,
-					'base_block_spacing'  => $block_spacing,
-					'excluded_properties' => array( 'container-type' ),
+					'rules_group'                => $media_query,
+					'viewport_overrides'         => $viewport_container_layout,
+					'has_block_gap_override'     => $has_viewport_block_gap,
+					'has_block_spacing_override' => $has_viewport_padding,
 				)
 			);
 

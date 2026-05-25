@@ -36,38 +36,22 @@ function serializeRule( { selector, declarations } ) {
 	}`;
 }
 
-function getRuleKey( rule ) {
-	return `${ rule.rulesGroup || '' }|${ rule.selector }`;
-}
-
-function getChildLayoutStyleRuleDelta( baseRules, nextRules ) {
-	const baseDeclarationsByRule = new Map(
-		baseRules.map( ( rule ) => [ getRuleKey( rule ), rule.declarations ] )
-	);
-
-	return nextRules.flatMap( ( rule ) => {
-		const baseDeclarations = baseDeclarationsByRule.get(
-			getRuleKey( rule )
-		);
-		const changedDeclarations = Object.fromEntries(
-			Object.entries( rule.declarations ).filter(
-				( [ property, value ] ) =>
-					baseDeclarations?.[ property ] !== value
-			)
-		);
-
-		return Object.keys( changedDeclarations ).length
-			? [ { ...rule, declarations: changedDeclarations } ]
-			: [];
-	} );
-}
-
 export function getChildLayoutStyleRules( {
 	selector,
 	layout = {},
+	viewportOverrides,
 	parentLayout = {},
 	includeContainerQuery = true,
 } ) {
+	const hasViewportOverrides = viewportOverrides !== undefined;
+	const effectiveLayout = hasViewportOverrides
+		? {
+				...layout,
+				...viewportOverrides,
+		  }
+		: layout;
+	const hasViewportOverride = ( key ) =>
+		Object.hasOwn( viewportOverrides || {}, key );
 	const {
 		selfStretch,
 		flexSize,
@@ -75,41 +59,59 @@ export function getChildLayoutStyleRules( {
 		rowStart,
 		columnSpan,
 		rowSpan,
-	} = layout;
+	} = effectiveLayout;
 	const { columnCount, minimumColumnWidth } = parentLayout;
 	const rules = [];
 
 	const declarations = {};
-	if ( selfStretch === 'fixed' && flexSize ) {
-		declarations[ 'flex-basis' ] = flexSize;
-		declarations[ 'box-sizing' ] = 'border-box';
-	} else if ( selfStretch === 'fill' ) {
-		declarations[ 'flex-grow' ] = '1';
+	if (
+		! hasViewportOverrides ||
+		hasViewportOverride( 'selfStretch' ) ||
+		hasViewportOverride( 'flexSize' )
+	) {
+		if ( selfStretch === 'fixed' && flexSize ) {
+			declarations[ 'flex-basis' ] = flexSize;
+			declarations[ 'box-sizing' ] = 'border-box';
+		} else if ( selfStretch === 'fill' ) {
+			declarations[ 'flex-grow' ] = '1';
+		}
 	}
 
-	if ( columnStart && columnSpan ) {
-		declarations[
-			'grid-column'
-		] = `${ columnStart } / span ${ columnSpan }`;
-	} else if ( columnStart ) {
-		declarations[ 'grid-column' ] = `${ columnStart }`;
-	} else if ( columnSpan ) {
-		declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+	if (
+		! hasViewportOverrides ||
+		hasViewportOverride( 'columnStart' ) ||
+		hasViewportOverride( 'columnSpan' )
+	) {
+		if ( columnStart && columnSpan ) {
+			declarations[
+				'grid-column'
+			] = `${ columnStart } / span ${ columnSpan }`;
+		} else if ( columnStart ) {
+			declarations[ 'grid-column' ] = `${ columnStart }`;
+		} else if ( columnSpan ) {
+			declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+		}
 	}
 
-	if ( rowStart && rowSpan ) {
-		declarations[ 'grid-row' ] = `${ rowStart } / span ${ rowSpan }`;
-	} else if ( rowStart ) {
-		declarations[ 'grid-row' ] = `${ rowStart }`;
-	} else if ( rowSpan ) {
-		declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+	if (
+		! hasViewportOverrides ||
+		hasViewportOverride( 'rowStart' ) ||
+		hasViewportOverride( 'rowSpan' )
+	) {
+		if ( rowStart && rowSpan ) {
+			declarations[ 'grid-row' ] = `${ rowStart } / span ${ rowSpan }`;
+		} else if ( rowStart ) {
+			declarations[ 'grid-row' ] = `${ rowStart }`;
+		} else if ( rowSpan ) {
+			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+		}
 	}
 
 	if ( Object.keys( declarations ).length ) {
 		rules.push( { selector, declarations } );
 	}
 
-	if ( includeContainerQuery ) {
+	if ( includeContainerQuery && ! hasViewportOverrides ) {
 		/**
 		 * If minimumColumnWidth is set on the parent, or if no
 		 * columnCount is set, the grid is responsive so a
@@ -208,12 +210,6 @@ export function getResponsiveChildLayoutStyles( {
 	parentLayout = {},
 } ) {
 	const baseLayout = style?.layout ?? {};
-	const baseRules = getChildLayoutStyleRules( {
-		selector,
-		layout: baseLayout,
-		parentLayout,
-		includeContainerQuery: false,
-	} );
 
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
 		.map( ( [ viewport, mediaQuery ] ) => {
@@ -222,18 +218,13 @@ export function getResponsiveChildLayoutStyles( {
 				return '';
 			}
 
-			const viewportRules = getChildLayoutStyleRuleDelta(
-				baseRules,
-				getChildLayoutStyleRules( {
-					selector,
-					layout: {
-						...baseLayout,
-						...viewportLayout,
-					},
-					parentLayout,
-					includeContainerQuery: false,
-				} )
-			);
+			const viewportRules = getChildLayoutStyleRules( {
+				selector,
+				layout: baseLayout,
+				viewportOverrides: viewportLayout,
+				parentLayout,
+				includeContainerQuery: false,
+			} );
 			const css = viewportRules.map( serializeRule ).join( '' );
 
 			return css ? `${ mediaQuery }{${ css }}` : '';

@@ -111,63 +111,12 @@ function getLayoutStateOverrides(
 	} );
 }
 
-function getCSSRulesBySelector( css = '' ) {
-	const rules = new Map();
-	const rulePattern = /([^{}]+)\{([^{}]*)\}/g;
-	let match;
-
-	while ( ( match = rulePattern.exec( css ) ) ) {
-		const selector = match[ 1 ].trim();
-		const declarations = rules.get( selector ) ?? new Map();
-		match[ 2 ]
-			.split( ';' )
-			.map( ( declaration ) => declaration.trim() )
-			.filter( Boolean )
-			.forEach( ( declaration ) => {
-				const separatorIndex = declaration.indexOf( ':' );
-				if ( separatorIndex === -1 ) {
-					return;
-				}
-				const property = declaration.slice( 0, separatorIndex ).trim();
-				const value = declaration.slice( separatorIndex + 1 ).trim();
-				declarations.set( property, value );
-			} );
-
-		rules.set( selector, declarations );
-	}
-
-	return rules;
-}
-
-function getLayoutStyleDelta( baseCSS = '', nextCSS = '' ) {
-	const baseRules = getCSSRulesBySelector( baseCSS );
-	const nextRules = getCSSRulesBySelector( nextCSS );
-	const excludedProperties = new Set( [ 'container-type' ] );
-	const deltaRules = [];
-
-	nextRules.forEach( ( nextDeclarations, selector ) => {
-		const baseDeclarations = baseRules.get( selector );
-		const changedDeclarations = [];
-
-		nextDeclarations.forEach( ( value, property ) => {
-			if (
-				excludedProperties.has( property ) ||
-				baseDeclarations?.get( property ) === value
-			) {
-				return;
-			}
-
-			changedDeclarations.push( `${ property }: ${ value }` );
-		} );
-
-		if ( changedDeclarations.length ) {
-			deltaRules.push(
-				`${ selector } { ${ changedDeclarations.join( '; ' ) }; }`
-			);
-		}
-	} );
-
-	return deltaRules.join( '' );
+function getLayoutContainerValues( layout = {} ) {
+	return Object.fromEntries(
+		Object.entries( layout || {} ).filter(
+			( [ key ] ) => ! CHILD_LAYOUT_KEYS.includes( key )
+		)
+	);
 }
 
 function hasLayoutBlockSupport( blockName ) {
@@ -303,9 +252,10 @@ export function getResponsiveLayoutStyles( {
 	return Object.entries( RESPONSIVE_BREAKPOINTS )
 		.map( ( [ viewport, mediaQuery ] ) => {
 			const viewportStyle = attributes?.style?.[ viewport ];
-			const hasViewportLayout =
-				viewportStyle?.layout &&
-				Object.keys( viewportStyle.layout ).length > 0;
+			const viewportLayout = getLayoutContainerValues(
+				viewportStyle?.layout
+			);
+			const hasViewportLayout = Object.keys( viewportLayout ).length > 0;
 			const hasViewportBlockGap =
 				viewportStyle?.spacing &&
 				Object.hasOwn( viewportStyle.spacing, 'blockGap' );
@@ -320,32 +270,18 @@ export function getResponsiveLayoutStyles( {
 				return '';
 			}
 
-			const viewportLayout = hasViewportLayout
-				? { ...layout, ...viewportStyle.layout }
-				: layout;
-			const layoutType = getLayoutType(
-				viewportLayout?.type || 'default'
-			);
+			const layoutType = getLayoutType( layout?.type || 'default' );
 			const viewportCSS = layoutType?.getLayoutStyle?.( {
 				blockName,
 				selector,
-				layout: viewportLayout,
+				layout,
+				viewportOverrides: viewportLayout,
 				style: viewportStyle,
 				hasBlockGapSupport,
 				globalBlockGapValue,
 			} );
-			const baseLayoutType = getLayoutType( layout?.type || 'default' );
-			const baseCSS = baseLayoutType?.getLayoutStyle?.( {
-				blockName,
-				selector,
-				layout,
-				style: attributes?.style,
-				hasBlockGapSupport,
-				globalBlockGapValue,
-			} );
-			const css = getLayoutStyleDelta( baseCSS, viewportCSS );
 
-			return css ? `${ mediaQuery }{${ css }}` : '';
+			return viewportCSS ? `${ mediaQuery }{${ viewportCSS }}` : '';
 		} )
 		.filter( Boolean )
 		.join( '' );

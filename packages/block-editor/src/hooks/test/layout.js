@@ -156,7 +156,7 @@ describe( 'layout', () => {
 					hasBlockGapSupport: true,
 				} )
 			).toBe(
-				'@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}'
+				'@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(3, minmax(0, 1fr)); }.wp-container-test { gap: 12px; }}'
 			);
 		} );
 
