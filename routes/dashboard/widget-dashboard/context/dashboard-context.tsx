@@ -355,14 +355,14 @@ export function WidgetDashboardProvider( {
 			setStagingLayout( next.layout );
 			setStagingGridSettings( next.gridSettings );
 			onLayoutChange( canonicalize( next.layout ) );
-			onGridSettingsChange?.( next.gridSettings );
+			publishCommittedGridSettings?.( next.gridSettings );
 			onEditChange?.( false );
 		},
 		[
 			stagingLayout,
 			stagingGridSettings,
 			onLayoutChange,
-			onGridSettingsChange,
+			publishCommittedGridSettings,
 			onEditChange,
 		]
 	);
