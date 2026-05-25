@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -12,6 +15,13 @@ import {
 	cloneBlock,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export function useOnEnter( props ) {
 	const { batch } = useRegistry();
@@ -119,9 +129,13 @@ export function useOnEnter( props ) {
 			} );
 		}
 
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
+		// Capture phase so we run before writing-flow's ancestor-bubble
+		// keydown handlers that gate on `event.defaultPrevented`.
+		return subscribeDelegatedListener(
+			element,
+			'keydown',
+			onKeyDown,
+			true
+		);
 	}, [] );
 }

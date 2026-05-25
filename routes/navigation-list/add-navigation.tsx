@@ -106,6 +106,7 @@ export const AddNavigationModal = ( {
 						label={ __( 'Name' ) }
 						placeholder={ __( 'Enter menu name' ) }
 						disabled={ isBusy }
+						__next40pxDefaultSize
 					/>
 					<HStack justify="right" spacing={ 2 }>
 						<Button
@@ -113,6 +114,7 @@ export const AddNavigationModal = ( {
 							onClick={ closeModal }
 							disabled={ isBusy }
 							accessibleWhenDisabled
+							__next40pxDefaultSize
 						>
 							{ __( 'Cancel' ) }
 						</Button>
@@ -122,6 +124,7 @@ export const AddNavigationModal = ( {
 							aria-busy={ isBusy }
 							disabled={ isBusy || ! menuTitle?.trim() }
 							accessibleWhenDisabled
+							__next40pxDefaultSize
 						>
 							{ __( 'Create Menu' ) }
 						</Button>

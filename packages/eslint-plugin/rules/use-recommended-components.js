@@ -1,3 +1,10 @@
+const {
+	createPrivateApisState,
+	trackPrivateApisSpecifier,
+	getPropertyName,
+	getUnlockDestructuring,
+} = require( '../utils/private-apis' );
+
 /**
  * Allowlist: only the listed components are permitted from these packages.
  * Any other named import will be flagged with the package's message.
@@ -17,6 +24,7 @@ const ALLOWLIST = {
 			'Icon',
 			'Link',
 			'Stack',
+			'Tabs',
 			'Text',
 			'VisuallyHidden',
 		],
@@ -50,6 +58,8 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
+		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
 };
@@ -66,6 +76,8 @@ const rule = {
 		schema: [],
 	},
 	create( context ) {
+		const privateApisState = createPrivateApisState();
+
 		return {
 			/** @param {import('estree').ImportDeclaration} node */
 			ImportDeclaration( node ) {
@@ -78,16 +90,22 @@ const rule = {
 				const allowlistEntry = ALLOWLIST[ source ];
 				const denylistEntry = DENYLIST[ source ];
 
-				if ( ! allowlistEntry && ! denylistEntry ) {
-					return;
-				}
-
 				node.specifiers.forEach( ( specifier ) => {
 					if ( specifier.type !== 'ImportSpecifier' ) {
 						return;
 					}
 
 					const name = specifier.imported.name;
+					trackPrivateApisSpecifier(
+						privateApisState,
+						specifier,
+						source,
+						!! denylistEntry
+					);
+
+					if ( ! allowlistEntry && ! denylistEntry ) {
+						return;
+					}
 
 					if (
 						allowlistEntry &&
@@ -113,6 +131,39 @@ const rule = {
 							),
 						} );
 					}
+				} );
+			},
+			/** @param {import('estree').VariableDeclarator} node */
+			VariableDeclarator( node ) {
+				const unlockDestructuring = getUnlockDestructuring(
+					node,
+					context.sourceCode,
+					privateApisState
+				);
+				if ( ! unlockDestructuring ) {
+					return;
+				}
+
+				const { source, properties } = unlockDestructuring;
+				const denylistEntry = DENYLIST[ source ];
+				if ( ! denylistEntry ) {
+					return;
+				}
+
+				properties.forEach( ( property ) => {
+					const name = getPropertyName( property.key );
+					if ( ! name || ! denylistEntry.hasOwnProperty( name ) ) {
+						return;
+					}
+
+					context.report( {
+						node: property.key,
+						message: resolveMessage(
+							denylistEntry[ name ],
+							name,
+							source
+						),
+					} );
 				} );
 			},
 		};

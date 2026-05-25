@@ -462,4 +462,6 @@ function gutenberg_register_user_defined_taxonomies() {
 		register_taxonomy( $slug, $object_type, $args );
 	}
 }
-add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
+// Priority 25 — after gutenberg_register_user_defined_post_types() (priority 20)
+// so user CPT slugs exist when register_taxonomy() records the object_type association.
+add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 25 );

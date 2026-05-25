@@ -10,6 +10,9 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
  * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
+ * Also stub __unstableSerializeAndClean so we can assert how it's invoked
+ * (the real implementation returns "" without registered block types, which
+ * isn't useful for asserting closure-capture behavior).
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
@@ -43,12 +46,19 @@ jest.mock( '@wordpress/blocks', () => {
 				},
 			},
 		],
+		// Mocked so tests can control what the Code Editor sync path "parses"
+		// from raw content without needing real block-type registration.
+		parse: jest.fn( () => [] ),
+		__unstableSerializeAndClean: jest.fn(
+			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
+		),
 	};
 } );
 
 /**
  * WordPress dependencies
  */
+import { parse } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
@@ -63,7 +73,7 @@ import {
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
-import type { YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
+import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
 import { updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
@@ -126,9 +136,12 @@ describe( 'crdt', () => {
 	beforeEach( () => {
 		doc = new Y.Doc();
 		jest.clearAllMocks();
+		jest.useFakeTimers();
 	} );
 
 	afterEach( () => {
+		jest.runAllTimers();
+		jest.useRealTimers();
 		doc.destroy();
 	} );
 
@@ -286,7 +299,7 @@ describe( 'crdt', () => {
 			expect( blocks ).toBeInstanceOf( Y.Array );
 		} );
 
-		it( 'sets blocks to undefined when blocks value is undefined', () => {
+		it( 'sets blocks to undefined when blocks value is undefined and no content is provided', () => {
 			// First, set some blocks.
 			map.set( 'blocks', new Y.Array< YBlock >() );
 
@@ -299,6 +312,86 @@ describe( 'crdt', () => {
 			// The key should still exist, but the value should be undefined.
 			expect( map.has( 'blocks' ) ).toBe( true );
 			expect( map.get( 'blocks' ) ).toBeUndefined();
+		} );
+
+		it( 'parses content into blocks when blocks=undefined is paired with new content', () => {
+			// Pre-populate the Y.Doc with two stable blocks. Simulates the
+			// state after the initial sync: peers share the same blocks Y.Array
+			// with stable clientIds on every YBlock.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Hello' },
+							innerBlocks: [],
+							clientId: 'stable-first',
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'World' },
+							innerBlocks: [],
+							clientId: 'stable-second',
+						},
+					],
+				} as PostChanges,
+				defaultSyncedProperties
+			);
+
+			// The Code Editor flow: dispatch `{ content, blocks: undefined }`
+			// when the user types. The new HTML edits the second paragraph
+			// only. `parse()` is mocked to return blocks with freshly minted
+			// clientIds — the sync layer must not let those overwrite the
+			// stable clientIds already in the Y.Array.
+			( parse as jest.Mock ).mockReturnValueOnce( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hello' },
+					innerBlocks: [],
+					clientId: 'fresh-first',
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'World!' },
+					innerBlocks: [],
+					clientId: 'fresh-second',
+				},
+			] );
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					content:
+						'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->' +
+						'<!-- wp:paragraph --><p>World!</p><!-- /wp:paragraph -->',
+					blocks: undefined,
+				} as PostChanges,
+				defaultSyncedProperties
+			);
+
+			const yblocks = map.get( 'blocks' );
+			expect( yblocks ).toBeInstanceOf( Y.Array );
+			const blocksArray = yblocks as YBlocks;
+			expect( blocksArray.length ).toBe( 2 );
+
+			// Both clientIds must be preserved: the unchanged first block via
+			// the left-right diff sweep, the edited second block via the
+			// explicit clientId-skip in the update loop.
+			expect( blocksArray.get( 0 ).get( 'clientId' ) ).toBe(
+				'stable-first'
+			);
+			expect( blocksArray.get( 1 ).get( 'clientId' ) ).toBe(
+				'stable-second'
+			);
+
+			// The second block's content reflects the edit.
+			const updatedContent = (
+				blocksArray
+					.get( 1 )
+					.get( 'attributes' ) as unknown as YMapWrap< YBlockRecord >
+			 ).get( 'content' ) as Y.Text;
+			expect( updatedContent.toString() ).toBe( 'World!' );
 		} );
 
 		it( 'syncs content as Y.Text', () => {
@@ -437,6 +530,23 @@ describe( 'crdt', () => {
 			const metaMap = map.get( 'meta' );
 			expect( metaMap ).toBeInstanceOf( Y.Map );
 			expect( metaMap?.get( 'custom_field' ) ).toBe( 'value' );
+		} );
+
+		it( 'skips function-valued content in changes', () => {
+			const changes = {
+				content: ( {
+					blocks: blocksForSerialization = [],
+				}: {
+					blocks: Block[];
+				} ) =>
+					blocksForSerialization
+						.map( ( b ) => b.attributes.content )
+						.join( '' ),
+			} as unknown as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, defaultSyncedProperties );
+
+			expect( map.has( 'content' ) ).toBe( false );
 		} );
 
 		it( 'syncs taxonomy rest_base values included in syncedProperties', () => {
@@ -957,6 +1067,102 @@ describe( 'crdt', () => {
 
 				expect( changes.selection ).toBeUndefined();
 			} );
+		} );
+
+		it( 'injects a closure-based content function when blocks changed but content did not', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Same content', rendered: 'Same content' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			// Blocks changed, content didn't, so a lazy content function is injected.
+			expect( changes.blocks ).toBeDefined();
+			expect( typeof changes.content ).toBe( 'function' );
+		} );
+
+		it( 'injected content function captures the synced blocks and ignores its caller-supplied argument', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Same content', rendered: 'Same content' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			// The injected function takes no parameters and serializes the
+			// captured (synced) blocks. This is what makes getEditedPostContent
+			// keep working after the Code Editor clears `record.blocks` to force
+			// a re-parse: the closure already has the right blocks on hand.
+			//
+			// The mocked __unstableSerializeAndClean returns "serialized:<n>"
+			// where n is the length of the blocks it was called with. The
+			// captured blocks have one entry, so both calls below should yield
+			// "serialized:1" (proving the closure ignores its argument and
+			// uses the captured blocks instead).
+			const contentFn = changes.content as ( args?: {
+				blocks: Block[];
+			} ) => string;
+			expect( contentFn() ).toBe( 'serialized:1' );
+			expect( contentFn( { blocks: [] } ) ).toBe( 'serialized:1' );
+		} );
+
+		it( 'does not inject a content function when content also changed in the doc', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+			map.set( 'content', new Y.Text( 'New content' ) );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Old content', rendered: 'Old content' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			// Content changed directly, so it should be a string, not a function.
+			expect( changes.blocks ).toBeDefined();
+			expect( typeof changes.content ).toBe( 'string' );
+			expect( changes.content ).toBe( 'New content' );
+		} );
+
+		it( 'does not inject a content function when blocks did not change', () => {
+			map.set( 'content', new Y.Text( 'Same content' ) );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'Same content', rendered: 'Same content' },
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			expect( changes.blocks ).toBeUndefined();
+			expect( changes.content ).toBeUndefined();
 		} );
 	} );
 } );
