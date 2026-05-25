@@ -118,3 +118,30 @@ export function isPointContainedByRect( point, rect ) {
 export function isPointWithinTopAndBottomBoundariesOfRect( point, rect ) {
 	return rect.top <= point.y && rect.bottom >= point.y;
 }
+
+/**
+ * Returns the area of a DOMRect.
+ *
+ * @param {DOMRect} rect The rectangle.
+ *
+ * @return {number} The area of the rectangle.
+ */
+export function getRectArea( rect ) {
+	const w = rect.right - rect.left;
+	const h = rect.bottom - rect.top;
+	return w * h;
+}
+
+/**
+ * Returns the smaller of two rectangle areas.
+ *
+ * @param {DOMRect} a First rectangle.
+ * @param {DOMRect} b Second rectangle.
+ *
+ * @return {number} The smaller area.
+ */
+export function getSmallerRectArea( a, b ) {
+	const areaA = a.right - a.left * a.bottom - a.top;
+	const areaB = getRectArea( b );
+	return areaA < areaB ? areaA : areaB;
+}
