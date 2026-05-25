@@ -13,7 +13,6 @@ import { dateI18n, format } from '@wordpress/date';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { calendar, mapMarker, wordpress, people } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
-/* eslint-disable @wordpress/use-recommended-components */
 import {
 	Autocomplete,
 	Button,
@@ -27,7 +26,6 @@ import {
 	Stack,
 	Text,
 } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
 
 /**
  * Internal dependencies
