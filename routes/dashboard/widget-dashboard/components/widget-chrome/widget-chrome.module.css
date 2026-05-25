@@ -1,5 +1,17 @@
 .widgetChrome {
 	height: 100%;
+
+	/*
+	 * Isolate the widget body from the surrounding layout. In a fixed-row
+	 * grid the tile height comes from its row span, but a body taller than
+	 * the tile lets its intrinsic size feed the grid item's `min-height: auto`
+	 * and overflow the cell, adding scroll space below the grid. Layout
+	 * containment severs that propagation so the body stays within the tile
+	 * and scrolls internally. It contains layout only, not size or paint, so
+	 * the masonry surface still measures the tile from its content and the
+	 * tile elevation is not clipped.
+	 */
+	contain: layout;
 }
 
 /*
