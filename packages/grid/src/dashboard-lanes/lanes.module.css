@@ -47,12 +47,14 @@
 
 @media not (prefers-reduced-motion: reduce) {
 	.drag-preview-frame {
-		animation: wp-grid-drag-preview-shadow-enter
+		animation:
+			wp-grid-drag-preview-shadow-enter
 			var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced) both;
 	}
 
 	.drag-preview-frame__lift {
-		animation: wp-grid-drag-preview-scale-enter
+		animation:
+			wp-grid-drag-preview-scale-enter
 			var(--wpds-motion-duration-sm) var(--wpds-motion-easing-balanced) both;
 	}
 }
@@ -88,13 +90,15 @@
  */
 @media not (prefers-reduced-motion: reduce) {
 	.drag-preview-frame.dragPreviewFrameExiting {
-		animation: wp-grid-drag-preview-shadow-exit
+		animation:
+			wp-grid-drag-preview-shadow-exit
 			var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced)
 			forwards;
 	}
 
 	.drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
-		animation: wp-grid-drag-preview-scale-exit
+		animation:
+			wp-grid-drag-preview-scale-exit
 			var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced)
 			forwards;
 	}
