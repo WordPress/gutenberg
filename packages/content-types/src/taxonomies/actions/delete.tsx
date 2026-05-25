@@ -155,7 +155,6 @@ function DeleteTaxonomyModal( {
 					  ) }
 			</Text>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label={
 					items.length > 1
 						? __( 'Also delete all terms in these taxonomies' )
