@@ -1,5 +1,6 @@
 @use "sass:color";
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
@@ -22,9 +23,7 @@
 	appearance: none;
 	background: none;
 
-	@media not ( prefers-reduced-motion ) {
-		transition: box-shadow 0.1s linear;
-	}
+	@include mixins.outset-ring__rest();
 
 	height: $button-size;
 	align-items: center;
@@ -44,8 +43,8 @@
 
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
-	&:focus:not(:active) {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+	&:not(.is-link):focus:not(:active) {
+		@include mixins.outset-ring__focus();
 	}
 
 	/**
@@ -54,13 +53,11 @@
 
 	&.is-primary {
 		white-space: nowrap;
+		border: $border-width solid transparent; // for forced-colors mode
 		background: $components-color-accent;
 		color: $components-color-accent-inverted;
 		text-decoration: none;
 		text-shadow: none;
-
-		// Show the boundary of the button, in High Contrast Mode.
-		outline: 1px solid transparent;
 
 		&:hover:not(:disabled) {
 			background: $components-color-accent-darker-10;
@@ -69,12 +66,7 @@
 
 		&:active:not(:disabled) {
 			background: $components-color-accent-darker-20;
-			border-color: $components-color-accent-darker-20;
 			color: $components-color-accent-inverted;
-		}
-
-		&:focus:not(:active) {
-			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 
 		&:disabled,
@@ -85,11 +77,9 @@
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			color: rgba($white, 0.4);
 			background: $components-color-accent;
-			border-color: $components-color-accent;
-			outline: none;
 
 			&:focus:enabled {
-				box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+				@include mixins.outset-ring__focus();
 			}
 		}
 
@@ -107,7 +97,6 @@
 				$components-color-accent 70%
 			);
 			/* stylelint-enable */
-			border-color: $components-color-accent;
 		}
 	}
 
@@ -117,13 +106,6 @@
 
 	&.is-secondary,
 	&.is-tertiary {
-		// Show the boundary of the button, in High Contrast Mode.
-		outline: 1px solid transparent;
-
-		&:active:not(:disabled) {
-			box-shadow: none;
-		}
-
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
@@ -138,26 +120,32 @@
 	 */
 
 	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
-		outline: 1px solid transparent; // Shown in high contrast mode.
+		@media not ( prefers-reduced-motion ) {
+			transition:
+				border-color 0.1s linear,
+				background 0.1s linear,
+				color 0.1s linear;
+		}
+
+		border: $border-width solid var(--wpds-color-stroke-interactive-brand);
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
 
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
 			color: $components-color-accent-darker-20;
 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+		}
+
+		&:active:not(:disabled, [aria-disabled="true"]) {
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
 		}
 
 		&:disabled:not(:focus),
 		&[aria-disabled="true"]:not(:focus),
 		&[aria-disabled="true"]:hover:not(:focus) {
-			box-shadow: inset 0 0 0 $border-width $gray-300;
-		}
-
-		&:focus:not(:active) {
-			box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		}
 	}
 
@@ -166,6 +154,7 @@
 	 */
 
 	&.is-tertiary {
+		border: $border-width solid transparent;
 		white-space: nowrap;
 		color: $components-color-accent;
 		background: transparent;
@@ -182,15 +171,6 @@
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
 		p + & {
 			margin-left: -($grid-unit-15 * 0.5);
-		}
-
-		&:disabled,
-		&[aria-disabled="true"],
-		&[aria-disabled="true"]:hover {
-			&:not(:focus) {
-				box-shadow: none;
-				outline: none;
-			}
 		}
 	}
 
@@ -210,10 +190,6 @@
 				color: color.adjust($alert-red, $lightness: -20%);
 			}
 
-			&:focus:not(:active) {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
-			}
-
 			&:active:not(:disabled, [aria-disabled="true"]) {
 				background: $gray-400;
 			}
@@ -221,6 +197,18 @@
 			&:disabled,
 			&[aria-disabled="true"] {
 				color: $gray-600;
+			}
+		}
+
+		&.is-secondary {
+			border-color: $components-color-accent;
+
+			&:hover:not(:disabled, [aria-disabled="true"]) {
+				border-color: $components-color-accent-darker-20;
+			}
+
+			&:active:not(:disabled, [aria-disabled="true"]) {
+				border-color: $components-color-accent-darker-20;
 			}
 		}
 
@@ -271,14 +259,6 @@
 		&[aria-disabled="true"] {
 			color: $gray-600;
 		}
-	}
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	// This rule is placed after variant outline declarations (e.g. is-primary,
-	// is-secondary, is-tertiary) to ensure it wins by source order at the same
-	// specificity, while not using `:not(:active)` to avoid outline flicker.
-	&:focus {
-		outline: 3px solid transparent;
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):active {
@@ -383,22 +363,6 @@
 			}
 		}
 
-		&:focus:not(:active) {
-			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-		}
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		&:focus {
-			outline: 2px solid transparent;
-		}
-	}
-
-	// Hide focus outline on :active to provide click feedback in forced-colors
-	// mode, where box-shadow is not visible. Higher specificity (0,3,0)
-	// ensures this wins over variant outline declarations. Placed after
-	// .is-pressed to also win by source order at equal specificity (0,3,0).
-	&:focus:active {
-		outline: none;
 	}
 
 	svg {
