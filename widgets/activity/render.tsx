@@ -336,7 +336,7 @@ export default function Activity( {
 	}
 
 	return (
-		<Stack direction="column" className={ styles.scroll }>
+		<Stack direction="column" className={ styles.list }>
 			<DataViews
 				data={ shownData }
 				fields={ FIELDS }

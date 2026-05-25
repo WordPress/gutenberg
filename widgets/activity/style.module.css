@@ -3,10 +3,12 @@
 }
 
 /*
- * Cap the event list on a content-driven (masonry) surface so a long stream
- * scrolls inside the tile instead of stretching it. Tune the value to taste.
+ * Bound the event list height. No `overflow` here on purpose: the dashboard
+ * chrome already owns a scroll container, so a second one would nest a double
+ * scrollbar when the tile is shorter than the cap. On a content-driven (masonry)
+ * tile this caps the measured height; on a fixed grid tile the chrome scrolls to
+ * the tile edge. Tune the value to taste.
  */
-.scroll {
+.list {
 	max-height: 420px;
-	overflow-y: auto;
 }
