@@ -13,11 +13,11 @@
 	transform: translateX(-360px);
 }
 
-@media (prefers-reduced-motion: no-preference) {
+@media not ( prefers-reduced-motion ) {
 	.glint {
 		animation:
-			welcomeVersionGlint 10s var(--wpds-motion-easing-balanced)
-			infinite;
+			welcomeVersionGlint 10s
+			var(--wpds-motion-easing-expressive) 3s 3;
 	}
 }
 
