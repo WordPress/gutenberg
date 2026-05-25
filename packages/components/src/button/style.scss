@@ -252,7 +252,10 @@
 		height: auto;
 
 		&:focus {
+			@include mixins.outset-ring__focus();
+
 			border-radius: $radius-small;
+			text-decoration: none;
 		}
 
 		&:disabled,
