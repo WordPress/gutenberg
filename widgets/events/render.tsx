@@ -9,16 +9,13 @@ import {
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { dateI18n, format } from '@wordpress/date';
-import { __, _x, sprintf } from '@wordpress/i18n';
-import { calendar, mapMarker, wordpress, people } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { mapMarker } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
 import {
 	Autocomplete,
 	Button,
 	Card,
-	EmptyState,
-	Icon,
 	IconButton,
 	InputControl,
 	InputLayout,
@@ -31,23 +28,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.module.css';
-import { List, type ListItem } from './components';
-
-interface WPEvent {
-	type: 'wordcamp' | 'meetup' | 'online' | string;
-	title: string;
-	url: string;
-	date: string;
-	start_unix_timestamp?: number;
-	end_unix_timestamp?: number;
-	location: {
-		description: string;
-		country: string;
-	};
-	user_formatted_date: string;
-	user_formatted_time?: string;
-	timeZoneAbbreviation?: string;
-}
+import { EventsList, type WPEvent } from './components';
 
 interface WPEventsResponse {
 	events: WPEvent[];
@@ -62,120 +43,7 @@ type LocationOption = {
 	value: string;
 };
 
-function formatEventType( type: string ): string {
-	if ( type === 'wordcamp' ) {
-		return 'WordCamp';
-	}
-	if ( type === 'meetup' ) {
-		return __( 'Meetup' );
-	}
-	return type.charAt( 0 ).toUpperCase() + type.slice( 1 );
-}
-
-function getFlippedTimeZoneOffset( startTimestamp: number ): number {
-	return new Date( startTimestamp ).getTimezoneOffset() * -1;
-}
-
-function getTimeZone( startTimestamp: number ): string | number {
-	const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-	if ( typeof timeZone === 'undefined' ) {
-		return getFlippedTimeZoneOffset( startTimestamp );
-	}
-
-	return timeZone;
-}
-
-function getFormattedDate(
-	startDate: number,
-	endDate?: number,
-	timeZone?: string | number
-): string {
-	let formattedDate: string;
-
-	/* translators: Date format for upcoming events on the dashboard. Include the day of the week. See https://www.php.net/manual/datetime.format.php */
-	const singleDayEvent = __( 'l, M j, Y' );
-	/* translators: Date string for upcoming events. 1: Month, 2: Starting day, 3: Ending day, 4: Year. */
-	const multipleDayEvent = __( '%1$s %2$d–%3$d, %4$d' );
-	/* translators: Date string for upcoming events. 1: Starting month, 2: Starting day, 3: Ending month, 4: Ending day, 5: Ending year. */
-	const multipleMonthEvent = __( '%1$s %2$d – %3$s %4$d, %5$d' );
-
-	if (
-		! endDate ||
-		format( 'Y-m-d', startDate ) === format( 'Y-m-d', endDate )
-	) {
-		formattedDate = dateI18n( singleDayEvent, startDate, timeZone );
-	} else if ( format( 'Y-m', startDate ) === format( 'Y-m', endDate ) ) {
-		formattedDate = sprintf(
-			multipleDayEvent,
-			dateI18n(
-				_x( 'F', 'upcoming events month format' ),
-				startDate,
-				timeZone
-			),
-			Number(
-				dateI18n(
-					_x( 'j', 'upcoming events day format' ),
-					startDate,
-					timeZone
-				)
-			),
-			Number(
-				dateI18n(
-					_x( 'j', 'upcoming events day format' ),
-					endDate,
-					timeZone
-				)
-			),
-			Number(
-				dateI18n(
-					_x( 'Y', 'upcoming events year format' ),
-					endDate,
-					timeZone
-				)
-			)
-		);
-	} else {
-		formattedDate = sprintf(
-			multipleMonthEvent,
-			dateI18n(
-				_x( 'F', 'upcoming events month format' ),
-				startDate,
-				timeZone
-			),
-			Number(
-				dateI18n(
-					_x( 'j', 'upcoming events day format' ),
-					startDate,
-					timeZone
-				)
-			),
-			dateI18n(
-				_x( 'F', 'upcoming events month format' ),
-				endDate,
-				timeZone
-			),
-			Number(
-				dateI18n(
-					_x( 'j', 'upcoming events day format' ),
-					endDate,
-					timeZone
-				)
-			),
-			Number(
-				dateI18n(
-					_x( 'Y', 'upcoming events year format' ),
-					endDate,
-					timeZone
-				)
-			)
-		);
-	}
-
-	return formattedDate;
-}
-
-function EventsList( {
+function EventsListSection( {
 	events,
 	loading,
 	error,
@@ -206,62 +74,9 @@ function EventsList( {
 		'https://make.wordpress.org/community/organize-event-landing-page/'
 	);
 
-	const emptyState = (
-		<Stack align="center" justify="center" style={ { margin: '24px 0' } }>
-			<EmptyState.Root>
-				<EmptyState.Icon icon={ calendar } />
-				<EmptyState.Title>
-					{ __( 'No events near you' ) }
-				</EmptyState.Title>
-				<EmptyState.Description>
-					{ createInterpolateElement(
-						__( '<a>Help organize the next one!</a>' ),
-						{
-							a: <Link href={ organizeUrl } openInNewTab />,
-						}
-					) }
-				</EmptyState.Description>
-			</EmptyState.Root>
-		</Stack>
-	);
-
-	const items: ListItem[] = events.map( ( event ) => {
-		const startDate = event.start_unix_timestamp
-			? event.start_unix_timestamp * 1000
-			: Date.parse( event.date );
-		const endDate = event.end_unix_timestamp
-			? event.end_unix_timestamp * 1000
-			: undefined;
-		const timeZone = getTimeZone( startDate );
-		const formattedDate = Number.isNaN( startDate )
-			? event.user_formatted_date || dateI18n( 'M j, Y', event.date )
-			: getFormattedDate( startDate, endDate, timeZone );
-
-		return {
-			id: event.url,
-			title: event.title,
-			url: event.url,
-			icon:
-				event.type === 'wordcamp' ? (
-					<Icon icon={ wordpress } />
-				) : (
-					<Icon icon={ people } />
-				),
-			meta: [
-				event.type !== 'online' ? formatEventType( event.type ) : null,
-				event.location.description,
-				formattedDate,
-				event.user_formatted_time,
-			].filter( Boolean ) as string[],
-		};
-	} );
-
 	return (
 		<>
-			<List
-				items={ items }
-				empty={ showEmptyState ? emptyState : undefined }
-			/>
+			<EventsList events={ events } showEmptyState={ showEmptyState } />
 			{ events.length > 0 && events.length <= 2 && (
 				<Text variant="body-sm" className={ styles.eventNone }>
 					{ createInterpolateElement(
@@ -553,7 +368,7 @@ export default function WordPressEvents() {
 					</form>
 				</div>
 			) : null }
-			<EventsList
+			<EventsListSection
 				events={ events }
 				loading={ eventsLoading }
 				error={ eventsError }

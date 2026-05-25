@@ -6,6 +6,7 @@
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/date": "file:../../packages/date",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
