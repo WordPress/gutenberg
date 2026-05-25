@@ -11,7 +11,7 @@ import { useMemo, useState } from '@wordpress/element';
  * about two grid cells in that axis. Revisit if the grid metrics change.
  */
 const WIDE_MIN_WIDTH = 560;
-const TALL_MIN_HEIGHT = 360;
+const TALL_MIN_HEIGHT = 420;
 
 type Size = { width: number; height: number };
 
