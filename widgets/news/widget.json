@@ -2,5 +2,6 @@
 	"name": "core/news",
 	"title": "WordPress news",
 	"description": "Displays the latest news from WordPress.org and Planet WordPress.",
-	"category": "dashboard"
+	"category": "dashboard",
+	"presentation": "full-content"
 }
