@@ -14,12 +14,13 @@ describe( 'Button.Icon', () => {
 	it( 'preserves the icon viewBox', () => {
 		render(
 			<ButtonIcon
-				data-testid="button-icon"
+				aria-label="Button icon"
+				role="img"
 				icon={ <svg viewBox="-2 -2 24 24" /> }
 			/>
 		);
 
-		expect( screen.getByTestId( 'button-icon' ) ).toHaveAttribute(
+		expect( screen.getByRole( 'img', { hidden: true } ) ).toHaveAttribute(
 			'viewBox',
 			'-2 -2 24 24'
 		);
