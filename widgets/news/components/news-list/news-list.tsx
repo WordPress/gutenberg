@@ -187,7 +187,7 @@ export function NewsList() {
 	);
 
 	return (
-		<Stack direction="column" className={ styles.root }>
+		<div className={ styles.root }>
 			<DataViews
 				data={ items }
 				fields={ fields }
@@ -204,6 +204,6 @@ export function NewsList() {
 			>
 				<DataViews.Layout />
 			</DataViews>
-		</Stack>
+		</div>
 	);
 }

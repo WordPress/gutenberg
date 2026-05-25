@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Link, Stack } from '@wordpress/ui';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ import styles from './render.module.css';
 
 export default function WordPressNews() {
 	return (
-		<Stack direction="column" justify="start" gap="md">
+		<>
 			<NewsList />
 			<div className={ styles.footer }>
 				<Link
@@ -25,6 +25,6 @@ export default function WordPressNews() {
 					{ __( 'See all' ) }
 				</Link>
 			</div>
-		</Stack>
+		</>
 	);
 }
