@@ -400,30 +400,33 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 	$title = _draft_or_post_title( $post->ID );
 
 	/*
-	 * Both "Edit" and "Join" labels are rendered. The visible label is
-	 * toggled by CSS based on the row's `wp-collaborative-editing` class,
-	 * which is added or removed by inline-edit-post.js in response to
-	 * heartbeat ticks.
+	 * Each state is rendered as `<span class="…-action-text"><a>…</a></span>`.
+	 * The toggle classes sit on the outer <span> rather than the <a> so they
+	 * fall outside core's responsive selector `.row-actions span a` at
+	 * <=782px, which otherwise outranks our class selectors and (a) leaves
+	 * both labels visible on unlocked rows and (b) forces `display: inline`
+	 * on the visible Join link to misalign with sibling row actions. The
+	 * visible label is still a direct text child of <a>, so core's mobile
+	 * font-size rule
+	 *     .row-actions span   { font-size: 0;  }
+	 *     .row-actions span a { font-size: 13px; }
+	 * still reaches it — that's the fix for the original "Edit invisible
+	 * at 0px on mobile" regression. CSS in
+	 * gutenberg_post_list_collaboration_styles() flips visibility on the
+	 * outer spans based on the row's `wp-locked` class, which core's
+	 * inline-edit-post.js maintains in response to heartbeat ticks.
 	 */
 	$actions['edit'] = sprintf(
-		'<a href="%1$s">'
-		. '<span class="edit-action-text">'
-		. '<span aria-hidden="true">%2$s</span>'
-		. '<span class="screen-reader-text">%3$s</span>'
-		. '</span>'
-		. '<span class="join-action-text">'
-		. '<span aria-hidden="true">%4$s</span>'
-		. '<span class="screen-reader-text">%5$s</span>'
-		. '</span>'
-		. '</a>',
-		get_edit_post_link( $post->ID ),
+		'<span class="edit-action-text"><a href="%1$s" aria-label="%2$s">%3$s</a></span>'
+		. '<span class="join-action-text"><a href="%1$s" aria-label="%4$s">%5$s</a></span>',
+		esc_url( get_edit_post_link( $post->ID ) ),
+		/* translators: %s: Post title. */
+		esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ) ),
 		__( 'Edit' ),
 		/* translators: %s: Post title. */
-		sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ),
+		esc_attr( sprintf( __( 'Join editing &#8220;%s&#8221;', 'gutenberg' ), $title ) ),
 		/* translators: Action link text for a singular post in the post list. Can be any type of post. */
-		_x( 'Join', 'post list', 'gutenberg' ),
-		/* translators: %s: Post title. */
-		sprintf( __( 'Join editing &#8220;%s&#8221;', 'gutenberg' ), $title )
+		_x( 'Join', 'post list', 'gutenberg' )
 	);
 
 	return $actions;
