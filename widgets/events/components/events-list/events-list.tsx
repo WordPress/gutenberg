@@ -201,9 +201,9 @@ function toEventListItem( event: WPEvent ): EventListItem {
 }
 
 /* Event type icon in the list layout media slot (no image URL). */
-function EventThumbnail( { item }: { item: EventListItem } ) {
+function EventIcon( { item }: { item: EventListItem } ) {
 	return (
-		<div className={ styles.thumbPlaceholder } aria-hidden="true">
+		<div className={ styles.eventIcon } aria-hidden="true">
 			<Icon icon={ item.iconType === 'wordcamp' ? wordpress : people } />
 		</div>
 	);
@@ -217,9 +217,9 @@ function EventTitle( { item }: { item: EventListItem } ) {
 	);
 }
 
-function EventDescription( { item }: { item: EventListItem } ) {
+function EventMeta( { item }: { item: EventListItem } ) {
 	return (
-		<Text variant="body-sm" className={ styles.description }>
+		<Text variant="body-sm" className={ styles.meta }>
 			{ item.description }
 		</Text>
 	);
@@ -228,9 +228,11 @@ function EventDescription( { item }: { item: EventListItem } ) {
 export function EventsList( {
 	events,
 	showEmptyState,
+	isLoading = false,
 }: {
 	events: WPEvent[];
 	showEmptyState: boolean;
+	isLoading?: boolean;
 } ) {
 	const [ view, setView ] = useState< View >( INITIAL_VIEW );
 
@@ -250,14 +252,14 @@ export function EventsList( {
 				label: __( 'Details' ),
 				enableSorting: false,
 				enableHiding: false,
-				render: ( { item } ) => <EventDescription item={ item } />,
+				render: ( { item } ) => <EventMeta item={ item } />,
 			},
 			{
 				id: 'icon',
 				label: __( 'Type' ),
 				enableSorting: false,
 				enableHiding: false,
-				render: ( { item } ) => <EventThumbnail item={ item } />,
+				render: ( { item } ) => <EventIcon item={ item } />,
 			},
 		],
 		[]
@@ -287,18 +289,20 @@ export function EventsList( {
 	) : undefined;
 
 	return (
-		<DataViews
-			data={ items }
-			fields={ fields }
-			view={ view }
-			onChangeView={ setView }
-			getItemId={ ( item ) => item.id }
-			isLoading={ false }
-			paginationInfo={ { totalItems: items.length, totalPages: 1 } }
-			defaultLayouts={ DEFAULT_LAYOUTS }
-			empty={ empty }
-		>
-			<DataViews.Layout className={ styles.root } />
-		</DataViews>
+		<div className={ styles.root }>
+			<DataViews
+				data={ items }
+				fields={ fields }
+				view={ view }
+				onChangeView={ setView }
+				getItemId={ ( item ) => item.id }
+				isLoading={ isLoading }
+				paginationInfo={ { totalItems: items.length, totalPages: 1 } }
+				defaultLayouts={ DEFAULT_LAYOUTS }
+				empty={ empty }
+			>
+				<DataViews.Layout />
+			</DataViews>
+		</div>
 	);
 }

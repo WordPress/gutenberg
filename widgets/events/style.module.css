@@ -1,21 +1,11 @@
 .eventNone {
 	padding-block: var(--wpds-dimension-padding-sm);
+	padding-inline: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-fg-content-neutral-weak);
 }
 
 .statusText {
+	padding-inline: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-fg-content-neutral-weak);
 	margin: 0;
-}
-
-.footer {
-	padding-block-start: var(--wpds-dimension-padding-md);
-	margin-block-start: var(--wpds-dimension-padding-md);
-	border-block-start:
-		var(--wpds-border-width-xs) solid
-		var(--wpds-color-stroke-surface-neutral-weak);
-}
-
-.footerLinks {
-	margin-inline-start: auto;
 }

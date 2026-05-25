@@ -1,0 +1,16 @@
+.locationSummary {
+	padding-block-end: var(--wpds-dimension-padding-md);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+}
+
+.footer {
+	border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	padding-block: var(--wpds-dimension-padding-lg);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+}
+
+.footerLinks {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-sm);
+}

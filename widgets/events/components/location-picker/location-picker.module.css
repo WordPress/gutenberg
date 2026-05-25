@@ -1,5 +1,6 @@
 .locationPicker {
 	margin-block-end: var(--wpds-dimension-padding-md);
+	padding-inline: var(--wpds-dimension-padding-2xl);
 	max-width: calc(var(--wpds-dimension-base) * 100);
 }
 

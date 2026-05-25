@@ -9,14 +9,14 @@ import {
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { Spinner } from '@wordpress/components';
-import { Card, Link, Stack, Text } from '@wordpress/ui';
+import { Link, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import styles from './style.module.css';
 import { EventsList, LocationPicker, type WPEvent } from './components';
+import renderStyles from './render.module.css';
+import styles from './style.module.css';
 
 interface WPEventsResponse {
 	events: WPEvent[];
@@ -38,14 +38,6 @@ function EventsListSection( {
 	error: boolean;
 	showEmptyState: boolean;
 } ) {
-	if ( loading ) {
-		return (
-			<Stack justify="center" align="center">
-				<Spinner />
-			</Stack>
-		);
-	}
-
 	if ( error ) {
 		return (
 			<p className={ styles.statusText }>
@@ -60,7 +52,11 @@ function EventsListSection( {
 
 	return (
 		<>
-			<EventsList events={ events } showEmptyState={ showEmptyState } />
+			<EventsList
+				events={ events }
+				showEmptyState={ showEmptyState }
+				isLoading={ loading }
+			/>
 			{ events.length > 0 && events.length <= 2 && (
 				<Text variant="body-sm" className={ styles.eventNone }>
 					{ createInterpolateElement(
@@ -129,7 +125,7 @@ export default function WordPressEvents() {
 	}, [ activeLocation, hasSelectedLocation, userLocale ] );
 
 	return (
-		<Card.Content>
+		<>
 			<LocationPicker
 				hidden={ Boolean( locationLabel ) && ! isEditingLocation }
 				onSubmit={ ( location ) => {
@@ -140,6 +136,23 @@ export default function WordPressEvents() {
 				onCancel={ () => setIsEditingLocation( false ) }
 				seedInput={ activeLocation }
 			/>
+			{ locationLabel && ! isEditingLocation && (
+				<div className={ renderStyles.locationSummary }>
+					{ createInterpolateElement(
+						sprintf(
+							/* translators: %s: city name */
+							__( 'Upcoming events near <strong>%s</strong>.' ),
+							locationLabel
+						),
+						{
+							strong: <strong />,
+						}
+					) }{ ' ' }
+					<Link onClick={ () => setIsEditingLocation( true ) }>
+						{ __( 'Change' ) }
+					</Link>
+				</div>
+			) }
 			{ hasSelectedLocation && (
 				<EventsListSection
 					events={ events }
@@ -148,39 +161,8 @@ export default function WordPressEvents() {
 					showEmptyState
 				/>
 			) }
-			<Stack
-				align="center"
-				className={ styles.footer }
-				direction="row"
-				gap="md"
-				justify="space-between"
-				wrap="wrap"
-			>
-				{ locationLabel && ! isEditingLocation && (
-					<div>
-						{ createInterpolateElement(
-							sprintf(
-								/* translators: %s: city name */
-								__(
-									'Upcoming events near <strong>%s</strong>.'
-								),
-								locationLabel
-							),
-							{
-								strong: <strong />,
-							}
-						) }{ ' ' }
-						<Link onClick={ () => setIsEditingLocation( true ) }>
-							{ __( 'Change' ) }
-						</Link>
-					</div>
-				) }
-				<Stack
-					direction="row"
-					align="center"
-					gap="sm"
-					className={ styles.footerLinks }
-				>
+			<div className={ renderStyles.footer }>
+				<div className={ renderStyles.footerLinks }>
 					<Link
 						href="https://make.wordpress.org/community/meetups-landing-page"
 						openInNewTab
@@ -193,8 +175,8 @@ export default function WordPressEvents() {
 					>
 						{ __( 'WordCamps' ) }
 					</Link>
-				</Stack>
-			</Stack>
-		</Card.Content>
+				</div>
+			</div>
+		</>
 	);
 }
