@@ -1,0 +1,14 @@
+{
+	"name": "@wordpress/news-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/date": "file:../../packages/date",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/ui": "file:../../packages/ui",
+		"react": "18.3.1"
+	}
+}
