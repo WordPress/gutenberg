@@ -20,13 +20,18 @@ The root element is considered to be the highest ancestor element returned by th
 Consider the following component located at `packages/components/src/notice/index.js`:
 
 ```jsx
-export default function Notice( { children, onRemove } ) {
+export default function Notice( { children, onRemove, actions = [] } ) {
 	return (
 		<div className="components-notice">
 			<div className="components-notice__content">{ children }</div>
+			{ actions.length > 0 && (
+				<div className="components-notice__actions">
+					{ /* action buttons */ }
+				</div>
+			) }
 			<Button
 				className="components-notice__dismiss"
-				icon={ check }
+				icon={ closeSmall }
 				label={ __( 'Dismiss this notice' ) }
 				onClick={ onRemove }
 			/>
@@ -35,18 +40,20 @@ export default function Notice( { children, onRemove } ) {
 }
 ```
 
+Optional regions exposed via props should use additional `__descriptor` classes on direct descendants of the root, following the same pattern as the other child elements in the example above.
+
 Components may be assigned with class names that indicate states (for example, an "active" tab or an "opened" panel). These modifiers should be applied as a separate class name, prefixed as an adjective expression by `is-` (`is-active` or `is-opened`). In rare cases, you may encounter variations of the modifier prefix, usually to improve readability (`has-warning`). Because a modifier class name is not contextualized to a specific component, it should always be written in stylesheets as accompanying the component being modified (`.components-panel.is-opened`).
 
 **Example:**
 
-Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
+Consider a panel that can be expanded. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
 
 ```jsx
 import clsx from 'clsx';
 
-export default function Notice( { children, onRemove, isDismissible } ) {
-	const classes = clsx( 'components-notice', {
-		'is-dismissible': isDismissible,
+export default function Panel( { children, isExpanded } ) {
+	const classes = clsx( 'components-panel', {
+		'is-expanded': isExpanded,
 	} );
 
 	return <div className={ classes }>{ /* ... */ }</div>;

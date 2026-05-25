@@ -29,6 +29,7 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		await page
 			.getByRole( 'button', { name: 'Meta Boxes' } )
 			.click( { position: { x: 0, y: 0 } } );
+		await page.locator( 'role=button[name="Visual"i]' ).click();
 		// Switch tinymce to Text mode, first waiting for it to initialize
 		// because otherwise it will flip back to Visual mode once initialized.
 		await page.locator( '#test_tinymce_id_ifr' ).waitFor();

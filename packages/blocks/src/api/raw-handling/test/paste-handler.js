@@ -263,6 +263,35 @@ describe( 'pasteHandler', () => {
 		} );
 	} );
 
+	it( 'preserves <img> wrapped in <a> when source is plain text only', () => {
+		const result = pasteHandler( {
+			HTML: '',
+			plainText:
+				'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"/></a>',
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe(
+			'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"></a>'
+		);
+	} );
+
+	it( 'preserves <img> wrapped in <a> when source is HTML', () => {
+		const result = pasteHandler( {
+			HTML: '<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"/></a>',
+			plainText: '',
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe(
+			'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"></a>'
+		);
+	} );
+
 	it( 'can handle a video', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<video controls src="https://example.com/media.mp4" autoplay loop muted controls playsinline preload="auto" poster="https://example.com/media.jpg"></video>',

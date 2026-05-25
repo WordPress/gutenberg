@@ -348,21 +348,19 @@ export default class CollaborationUtils {
 	}
 
 	/**
-	 * Read the _crdt_document meta value from the currently loaded entity record.
+	 * Read the _crdt_document meta value for the current post.
 	 *
 	 * @param page The Playwright page to evaluate on.
 	 */
 	async getCrdtDocument( page: Page ): Promise< string | null > {
-		return page.evaluate( () => {
+		return page.evaluate( async () => {
 			const postId = ( window as any ).wp.data
 				.select( 'core/editor' )
 				.getCurrentPostId();
-			return (
-				( window as any ).wp.data
-					.select( 'core' )
-					.getEntityRecord( 'postType', 'post', postId )?.meta
-					?._crdt_document ?? null
-			);
+			const post = await ( window as any ).wp.apiFetch( {
+				path: `/wp/v2/posts/${ postId }?context=edit`,
+			} );
+			return post?.meta?._crdt_document ?? null;
 		} );
 	}
 
