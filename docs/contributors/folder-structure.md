@@ -59,7 +59,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .github/*
     │   Config of the different GitHub features (issues and PR templates, CI, owners).
     │
-    ├── bin/api-docs
+    ├── tools/api-docs
     │   Tool/script used to generate the API Docs.
     │
     ├── tools/build-scripts
