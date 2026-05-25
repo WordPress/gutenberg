@@ -8,20 +8,23 @@ import { Link, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { NewsList } from './components';
+import styles from './render.module.css';
 
 export default function WordPressNews() {
 	return (
 		<Stack direction="column" justify="start" gap="md">
 			<NewsList />
-			<Link
-				href={ _x(
-					'https://wordpress.org/news/all-posts/',
-					'News dashboard widget'
-				) }
-				openInNewTab
-			>
-				{ __( 'See all' ) }
-			</Link>
+			<div className={ styles.footer }>
+				<Link
+					href={ _x(
+						'https://wordpress.org/news/all-posts/',
+						'News dashboard widget'
+					) }
+					openInNewTab
+				>
+					{ __( 'See all' ) }
+				</Link>
+			</div>
 		</Stack>
 	);
 }

@@ -41,19 +41,13 @@ const NEWS_FEEDS = [
 	{
 		key: 'news',
 		label: __( 'WordPress Blog' ),
-		siteUrl: _x(
-			'https://wordpress.org/news/',
-			'Events and News dashboard widget'
-		),
+		siteUrl: _x( 'https://wordpress.org/news/', 'News dashboard widget' ),
 		apiUrl: 'https://wordpress.org/news/wp-json/wp/v2/posts?per_page=3&_fields=id,title,link,date',
 	},
 	{
 		key: 'planet',
 		label: __( 'Other WordPress News' ),
-		siteUrl: _x(
-			'https://planet.wordpress.org/',
-			'Events and News dashboard widget'
-		),
+		siteUrl: _x( 'https://planet.wordpress.org/', 'News dashboard widget' ),
 		apiUrl: 'https://planet.wordpress.org/wp-json/wp/v2/posts?per_page=3&_fields=id,title,link,date',
 	},
 ];
