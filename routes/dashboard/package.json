@@ -13,6 +13,7 @@
 		"@wordpress/api-fetch": "file:../../packages/api-fetch",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/commands": "file:../../packages/commands",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/data": "file:../../packages/data",

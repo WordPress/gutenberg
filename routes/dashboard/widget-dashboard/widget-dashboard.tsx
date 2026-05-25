@@ -4,6 +4,7 @@
 import { WidgetDashboardProvider } from './context/dashboard-context';
 import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
+import { DashboardCommands } from './components/dashboard-commands';
 import { Inserter } from './components/inserter';
 import { WidgetChrome } from './components/widget-chrome';
 import { WidgetSettings } from './components/widget-settings';
@@ -23,20 +24,27 @@ import { NoWidgetsState } from './components/no-widgets-state';
  *
  * function MyDashboard() {
  * 	const [ layout, setLayout ] = useState( defaultLayout );
+ * 	const [ editMode, setEditMode ] = useState( false );
  * 	return (
  * 		<WidgetDashboard
  * 			layout={ layout }
  * 			onLayoutChange={ setLayout }
  * 			widgetTypes={ widgetTypes }
+ * 			editMode={ editMode }
+ * 			onEditChange={ setEditMode }
  * 		>
  * 			<WidgetDashboard.NoWidgetsState>
  * 				<p>No widgets yet.</p>
  * 			</WidgetDashboard.NoWidgetsState>
+ * 			<WidgetDashboard.Actions />
  * 			<WidgetDashboard.Widgets />
  * 		</WidgetDashboard>
  * 	);
  * }
  * ```
+ *
+ * `Actions` hosts the reset dialog, so include it (or rely on the default
+ * children) for the command-palette "Reset to default" action to work.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -72,6 +80,7 @@ export const WidgetDashboard = Object.assign(
 						</>
 					) }
 
+					<DashboardCommands />
 					<Inserter />
 					<WidgetSettings />
 				</WidgetDashboardUIProvider>

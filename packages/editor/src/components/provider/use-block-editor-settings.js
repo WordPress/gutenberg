@@ -30,7 +30,7 @@ import { default as mediaFinalize } from '../../utils/media-finalize';
 import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useGlobalStylesContext } from '../global-styles-provider';
+import { useGlobalStyles } from '../global-styles';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
@@ -237,7 +237,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	const { merged: mergedGlobalStyles } = useGlobalStylesContext();
+	const { merged: mergedGlobalStyles } = useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 

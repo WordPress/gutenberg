@@ -14,6 +14,9 @@
     `GridOverlayRenderProps` now includes `rows` for uniform-row grids.
 -   Animate sibling tiles when layout reflows during drag or resize in
     edit mode (FLIP transform). Respects `prefers-reduced-motion`.
+-   Animate tile removal in edit mode: the removed tile scales down and
+    fades out while siblings reflow into place (FLIP). Respects
+    `prefers-reduced-motion`.
 -   Add `--wp-grid-placeholder-outline-style` and
     `--wp-grid-resize-preview-outline-style` CSS custom properties for
     the drag-placeholder outline (default `dashed`) and resize-preview

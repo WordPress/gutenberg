@@ -16,6 +16,10 @@ import {
 interface DashboardUIContextValue {
 	inserterOpen: boolean;
 	setInserterOpen: ( next: boolean ) => void;
+	layoutSettingsOpen: boolean;
+	setLayoutSettingsOpen: ( next: boolean ) => void;
+	resetDialogOpen: boolean;
+	setResetDialogOpen: ( next: boolean ) => void;
 
 	/**
 	 * `uuid` of the instance whose settings drawer is open, or `null`
@@ -76,6 +80,8 @@ interface ProviderProps {
  */
 export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 	const [ inserterOpen, setInserterOpen ] = useState( false );
+	const [ layoutSettingsOpen, setLayoutSettingsOpen ] = useState( false );
+	const [ resetDialogOpen, setResetDialogOpen ] = useState( false );
 	const [ settingsWidgetUuid, setSettingsWidgetUuid ] = useState<
 		string | null
 	>( null );
@@ -88,6 +94,10 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 		() => ( {
 			inserterOpen,
 			setInserterOpen,
+			layoutSettingsOpen,
+			setLayoutSettingsOpen,
+			resetDialogOpen,
+			setResetDialogOpen,
 			settingsWidgetUuid,
 			setSettingsWidgetUuid,
 			settingsDrawerSide,
@@ -97,6 +107,8 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 		} ),
 		[
 			inserterOpen,
+			layoutSettingsOpen,
+			resetDialogOpen,
 			settingsWidgetUuid,
 			settingsDrawerSide,
 			settingsDrawerInset,
