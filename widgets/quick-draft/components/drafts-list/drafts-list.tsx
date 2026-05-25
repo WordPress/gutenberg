@@ -8,8 +8,12 @@ import { dateI18n, getSettings, humanTimeDiff } from '@wordpress/date';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { page, postFeaturedImage, trash } from '@wordpress/icons';
-import { EmptyState, IconButton, Link, Stack, Text, Icon } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import {
+	drafts as draftsIcon,
+	postFeaturedImage,
+	trash,
+} from '@wordpress/icons';
+import { EmptyState, IconButton, Link, Stack, Text, Icon } from '@wordpress/ui';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -231,7 +235,7 @@ export function DraftsList() {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				empty={
 					<EmptyState.Root>
-						<EmptyState.Icon icon={ page } />
+						<EmptyState.Icon icon={ draftsIcon } />
 						<EmptyState.Description>
 							{ __( 'No drafts yet.' ) }
 						</EmptyState.Description>

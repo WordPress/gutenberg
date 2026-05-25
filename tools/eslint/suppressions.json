@@ -1860,5 +1860,20 @@
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		}
+	},
+	"widgets/quick-draft/components/drafts-list/drafts-list.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"widgets/quick-draft/components/saved-post/saved-post.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
+	"widgets/quick-draft/render.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
 	}
 }

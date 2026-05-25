@@ -20,7 +20,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { escapeHTML } from '@wordpress/escape-html';
 import { __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import { Button, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { Button, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
