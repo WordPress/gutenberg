@@ -12,7 +12,7 @@
 	min-width: 0;
 	min-height: 0;
 	padding: var(--wpds-dimension-padding-lg);
-	border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
 .listPane {
@@ -21,18 +21,17 @@
 	min-height: 0;
 }
 
-/* Wide tile: drafts list sits beside the form, split by a vertical rule. */
-.row .primaryPane {
-	border-inline-end: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
-	max-width: calc(var(--wpds-dimension-base) * 100);
-	margin: 0 auto;
+/* Compact reveal: Back control pinned below the scrolling drafts list. */
+.backRow {
+	padding: var(--wpds-dimension-padding-sm);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
-/* Compact tile: footer link that reveals the drafts list in place. */
-.footer {
-	margin-block-start: var(--wpds-dimension-padding-sm);
-	padding-block-start: var(--wpds-dimension-padding-sm);
-	border-block-start: var(--wpds-border-width-sm) solid var(--wpds-color-stroke-surface-neutral-weak);
+/* Wide tile: drafts list sits beside the form, split by a vertical rule. */
+.row .primaryPane {
+	border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	max-width: calc(var(--wpds-dimension-base) * 100);
+	margin: 0 auto;
 }
 
 .formContainer {
