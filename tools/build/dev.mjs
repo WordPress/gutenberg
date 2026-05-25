@@ -146,7 +146,7 @@ async function dev() {
 
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
-		await exec( 'npm', [ 'run', '--silent', 'generate-worker-placeholders', '--workspace', '@wordpress/build-tools' ] );
+		await exec( 'node', [ './tools/build/packages/generate-worker-placeholders.mjs' ] );
 
 		console.log( '\n📘 Building TypeScript types...\n' );
 		const tsStartTime = Date.now();
@@ -160,10 +160,10 @@ async function dev() {
 		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
 		console.log( '\n✅ Checking type declaration files...' );
-		await exec( 'npm', [ 'run', '--silent', 'check-type-declarations', '--workspace', '@wordpress/build-tools' ] );
+		await exec( 'node', [ './tools/build/packages/check-build-type-declaration-files.cjs' ] );
 
 		console.log( '\n📦 Building vendor files...' );
-		await exec( 'npm', [ 'run', '--silent', 'build-vendors', '--workspace', '@wordpress/build-tools' ] );
+		await exec( 'node', [ './tools/build/packages/build-vendors.mjs' ] );
 
 		const setupTime = Date.now() - startTime;
 		console.log(

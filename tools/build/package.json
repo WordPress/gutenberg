@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build-tools",
-	"version": "1.0.0",
+	"version": "0.0.0",
 	"description": "Internal build orchestration scripts for the Gutenberg monorepo.",
 	"private": true,
 	"author": "The WordPress Contributors",
@@ -33,6 +33,6 @@
 		"cross-spawn": "^7.0.6",
 		"esbuild": "^0.27.2",
 		"fast-glob": "^3.2.7",
-		"source-map": "0.6.1"
+		"source-map": "^0.6.1"
 	}
 }
