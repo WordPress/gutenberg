@@ -89,10 +89,16 @@ export default function WordPressEvents() {
 	const [ locationLabel, setLocationLabel ] = useState( '' );
 	const [ isEditingLocation, setIsEditingLocation ] = useState( false );
 	const [ events, setEvents ] = useState< WPEvent[] >( [] );
-	const [ eventsLoading, setEventsLoading ] = useState( true );
+	const [ eventsLoading, setEventsLoading ] = useState( false );
 	const [ eventsError, setEventsError ] = useState( false );
 
+	const hasSelectedLocation = Boolean( activeLocation.trim() );
+
 	useEffect( () => {
+		if ( ! hasSelectedLocation ) {
+			return;
+		}
+
 		const controller = new AbortController();
 		setEventsLoading( true );
 		setEventsError( false );
@@ -100,10 +106,8 @@ export default function WordPressEvents() {
 		const params = new URLSearchParams( {
 			number: '5',
 			locale: userLocale,
+			location: activeLocation,
 		} );
-		if ( activeLocation ) {
-			params.set( 'location', activeLocation );
-		}
 
 		fetch( `${ EVENTS_API }?${ params }`, { signal: controller.signal } )
 			.then( ( r ) => r.json() as Promise< WPEventsResponse > )
@@ -122,7 +126,7 @@ export default function WordPressEvents() {
 			} );
 
 		return () => controller.abort();
-	}, [ activeLocation, userLocale ] );
+	}, [ activeLocation, hasSelectedLocation, userLocale ] );
 
 	return (
 		<Card.Content>
@@ -136,12 +140,14 @@ export default function WordPressEvents() {
 				onCancel={ () => setIsEditingLocation( false ) }
 				seedInput={ activeLocation }
 			/>
-			<EventsListSection
-				events={ events }
-				loading={ eventsLoading }
-				error={ eventsError }
-				showEmptyState={ Boolean( activeLocation.trim() ) }
-			/>
+			{ hasSelectedLocation && (
+				<EventsListSection
+					events={ events }
+					loading={ eventsLoading }
+					error={ eventsError }
+					showEmptyState
+				/>
+			) }
 			<Stack
 				align="center"
 				className={ styles.footer }
