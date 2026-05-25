@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-	Button,
-	TextControl,
-	ExternalLink,
-} from '@wordpress/components';
+import { PanelBody, Button, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -15,7 +10,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
+import { Link, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -125,9 +120,9 @@ export default function PostPublishPanelPostpublish( {
 	return (
 		<div className="post-publish-panel__postpublish">
 			<PanelBody className="post-publish-panel__postpublish-header">
-				<ExternalLink ref={ postLinkRef } href={ link }>
+				<Link ref={ postLinkRef } href={ link } openInNewTab>
 					{ decodeEntities( post.title ) || __( '(no title)' ) }
-				</ExternalLink>{ ' ' }
+				</Link>{ ' ' }
 				{ postPublishNonLinkHeader }
 			</PanelBody>
 			<PanelBody>

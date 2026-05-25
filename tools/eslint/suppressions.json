@@ -1068,11 +1068,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/post-publish-panel/postpublish.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/post-revisions-panel/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
