@@ -1,0 +1,59 @@
+.container {
+	height: 100%;
+	overflow: hidden;
+}
+
+.previewWrap {
+	position: relative;
+	height: 100%;
+}
+
+.loading {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+}
+
+.iframe {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 50%;
+	width: 250%;
+	min-height: 375%;
+	transform: translate(-50%, -13px) scale(0.4);
+	transform-origin: center top;
+}
+
+.overlay {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	background: color-mix(in srgb, var(--wpds-color-fg-content-neutral-weak) 20%, transparent);
+	backdrop-filter: blur(1px);
+}
+
+.overlayButton {
+	box-shadow: var(--wpds-elevation-xs);
+}
+
+.previewWrap:hover .overlay,
+.previewWrap:focus-within .overlay {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.previewWrap:hover .overlay,
+	.previewWrap:focus-within .overlay {
+		animation: fadeIn var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle) both;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}

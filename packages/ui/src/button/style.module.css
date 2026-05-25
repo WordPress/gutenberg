@@ -59,7 +59,10 @@
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
 		overflow-wrap: anywhere;
-		cursor: var(--wpds-cursor-control);
+
+		&:not([data-disabled]) {
+			cursor: var(--wpds-cursor-control);
+		}
 
 		@media not ( prefers-reduced-motion ) {
 			transition: color 0.1s ease-out;

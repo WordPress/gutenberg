@@ -5,6 +5,7 @@ import { pasteHandler } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
 
@@ -263,6 +264,35 @@ describe( 'pasteHandler', () => {
 		} );
 	} );
 
+	it( 'preserves <img> wrapped in <a> when source is plain text only', () => {
+		const result = pasteHandler( {
+			HTML: '',
+			plainText:
+				'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"/></a>',
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe(
+			'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"></a>'
+		);
+	} );
+
+	it( 'preserves <img> wrapped in <a> when source is HTML', () => {
+		const result = pasteHandler( {
+			HTML: '<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"/></a>',
+			plainText: '',
+			mode: 'INLINE',
+			tagName: 'p',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result ).toBe(
+			'<a href="https://example.com/"><img src="https://example.com/img.png" alt="x"></a>'
+		);
+	} );
+
 	it( 'can handle a video', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<video controls src="https://example.com/media.mp4" autoplay loop muted controls playsinline preload="auto" poster="https://example.com/media.jpg"></video>',
@@ -286,5 +316,64 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
+	} );
+} );
+
+describe( 'pasteHandler — core/image', () => {
+	beforeAll( () => {
+		initAndRegisterImageBlock();
+	} );
+
+	it( 'preserves explicit pixel width and height from a bare <img>', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="77" height="77" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.url ).toBe( 'https://example.com/i.jpg' );
+		expect( result.attributes.width ).toBe( '77px' );
+		expect( result.attributes.height ).toBe( '77px' );
+	} );
+
+	it( 'preserves explicit pixel width and height from an <img> inside a <figure>', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<figure><img src="https://example.com/i.jpg" width="120" height="80" /></figure>',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBe( '120px' );
+		expect( result.attributes.height ).toBe( '80px' );
+	} );
+
+	it( 'drops non-pixel width/height (e.g. percentages)', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="50%" height="auto" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBeUndefined();
+		expect( result.attributes.height ).toBeUndefined();
+	} );
+
+	it( 'leaves width/height unset when not present on the source', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBeUndefined();
+		expect( result.attributes.height ).toBeUndefined();
 	} );
 } );

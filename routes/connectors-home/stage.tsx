@@ -139,7 +139,11 @@ function ConnectorsPage() {
 								) }
 							</WCText>
 						</VStack>
-						<Button variant="secondary" href="plugin-install.php">
+						<Button
+							variant="secondary"
+							href="plugin-install.php"
+							__next40pxDefaultSize
+						>
 							{ __( 'Learn more' ) }
 						</Button>
 					</VStack>

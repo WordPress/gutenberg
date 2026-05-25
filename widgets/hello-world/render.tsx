@@ -1,18 +1,36 @@
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
+ * WordPress dependencies
+ */
 import { Stack, Text } from '@wordpress/ui';
 
-export default function HelloWorld() {
+/**
+ * Internal dependencies
+ */
+import styles from './style.module.css';
+
+interface HelloWorldAttributes {
+	message?: string;
+}
+
+type HelloWorldRenderProps = {
+	attributes?: HelloWorldAttributes;
+};
+
+export default function HelloWorld( { attributes }: HelloWorldRenderProps ) {
 	return (
 		<Stack
 			align="center"
 			justify="center"
-			style={ {
-				height: '100%',
-				padding: 'var(--wpds-dimension-padding-2xl)',
-				backgroundColor: 'var(--wpds-color-bg-surface-brand)',
-				color: 'var(--wpds-color-fg-interactive-brand)',
-			} }
+			className={ clsx( styles.root ) }
 		>
-			<Text variant="heading-2xl">Hello World</Text>
+			<Text variant="heading-2xl">
+				{ attributes?.message || 'Hello World' }
+			</Text>
 		</Stack>
 	);
 }

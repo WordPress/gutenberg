@@ -3,13 +3,17 @@
  * Tests for the standard Guidelines REST API collection.
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase {
 
 	/**
-	 * @var int Administrator user ID.
+	 * Map of role => user ID. Populated once per test class.
+	 *
+	 * @var array<string,int>
 	 */
-	protected static $admin_id;
+	protected static $users = array();
 
 	/**
 	 * REST API route base.
@@ -19,80 +23,60 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	const REST_BASE = '/wp/v2/guidelines';
 
 	/**
-	 * Set up class fixtures.
+	 * Set up class fixtures: one user per default role.
 	 *
 	 * @param WP_UnitTest_Factory $factory Factory instance.
 	 */
-	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ): void {
+		foreach ( array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' ) as $role ) {
+			self::$users[ $role ] = $factory->user->create( array( 'role' => $role ) );
+		}
 	}
 
 	/**
 	 * Clean up class fixtures.
 	 */
-	public static function wpTearDownAfterClass() {
-		self::delete_user( self::$admin_id );
+	public static function wpTearDownAfterClass(): void {
+		foreach ( self::$users as $user_id ) {
+			self::delete_user( $user_id );
+		}
+		self::$users = array();
 	}
 
 	/**
-	 * Clean up guidelines posts and taxonomy terms after each test.
-	 */
-	public function tear_down() {
-		$posts = get_posts(
-			array(
-				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
-				'post_status'    => 'any',
-				'posts_per_page' => -1,
-			)
-		);
-		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
-		}
-
-		$terms = get_terms(
-			array(
-				'taxonomy'   => Gutenberg_Guidelines_Post_Type::TAXONOMY,
-				'hide_empty' => false,
-			)
-		);
-		if ( ! is_wp_error( $terms ) ) {
-			foreach ( $terms as $term ) {
-				wp_delete_term( $term->term_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
-			}
-		}
-
-		parent::tear_down();
-	}
-
-	/**
-	 * Creates an artifact guideline through the standard REST collection.
+	 * Creates a guideline fixture owned by the named role and saved with the
+	 * given post status.
 	 *
-	 * @param array $args Optional request params to merge.
-	 * @return WP_REST_Response
+	 * @param string $owner_role Role key from the self::$users fixture map.
+	 * @param string $status     Post status for the guideline fixture.
+	 * @return int Inserted guideline post ID.
 	 */
-	private function create_artifact_guideline( array $args = array() ): WP_REST_Response {
-		wp_set_current_user( self::$admin_id );
-
-		$defaults = array(
-			'status'  => 'draft',
-			'title'   => 'Artifact guideline',
-			'content' => 'Artifact guideline content.',
-			'excerpt' => 'Artifact guideline excerpt.',
+	private function create_guideline( string $owner_role, string $status ): int {
+		return self::factory()->post->create(
+			array(
+				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
+				'post_status'  => $status,
+				'post_title'   => "{$status} guideline owned by {$owner_role}",
+				'post_content' => "Guideline fixture content for {$owner_role} with {$status} status.",
+				'post_author'  => self::$users[ $owner_role ],
+			)
 		);
-
-		$request = new WP_REST_Request( 'POST', self::REST_BASE );
-		foreach ( array_merge( $defaults, $args ) as $key => $value ) {
-			$request->set_param( $key, $value );
-		}
-
-		return rest_get_server()->dispatch( $request );
 	}
 
 	/**
-	 * The standard collection route is registered independently from the
-	 * content-guidelines singleton route.
+	 * Switches the current user to a fixture user with the named role.
+	 *
+	 * @param string $role Role key from the self::$users fixture map.
+	 * @return void
 	 */
-	public function test_register_routes() {
+	private function switch_to_user_role( string $role ): void {
+		wp_set_current_user( self::$users[ $role ] );
+	}
+
+	/**
+	 * The standard collection and single-item routes are registered.
+	 */
+	public function test_register_routes(): void {
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( self::REST_BASE, $routes, 'Collection route not registered.' );
@@ -100,11 +84,18 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Artifact guidelines can be created through the standard collection and
-	 * receive the requested publish status and fallback artifact type term.
+	 * A POST to the collection creates the guideline and the save_post
+	 * hook assigns the `artifact` fallback type term.
 	 */
-	public function test_create_artifact_guideline() {
-		$response = $this->create_artifact_guideline( array( 'status' => 'publish' ) );
+	public function test_create_guideline(): void {
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'status', 'publish' );
+		$request->set_param( 'title', 'Guideline' );
+		$request->set_param( 'content', 'Guideline content.' );
+		$request->set_param( 'excerpt', 'Guideline excerpt.' );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 201, $response->get_status() );
 
@@ -122,11 +113,45 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Artifact guidelines are listed by the standard collection route.
+	 * A POST that explicitly supplies a `wp_guideline_type` term keeps that
+	 * term; the `artifact` fallback only applies when no term is given.
 	 */
-	public function test_get_items_lists_artifact_guidelines() {
-		$first_response  = $this->create_artifact_guideline( array( 'title' => 'First artifact' ) );
-		$second_response = $this->create_artifact_guideline( array( 'title' => 'Second artifact' ) );
+	public function test_create_guideline_preserves_explicit_type(): void {
+		$memory_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Memory',
+				'slug'     => 'memory',
+			)
+		);
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'status', 'private' );
+		$request->set_param( 'title', 'Typed guideline' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( $memory_term_id ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		$terms = wp_get_object_terms(
+			$response->get_data()['id'],
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'fields' => 'slugs' )
+		);
+
+		$this->assertSame( array( 'memory' ), $terms );
+	}
+
+	/**
+	 * The collection route returns matching guidelines and totals.
+	 */
+	public function test_get_items_lists_guidelines(): void {
+		$first_post_id  = $this->create_guideline( 'administrator', 'draft' );
+		$second_post_id = $this->create_guideline( 'administrator', 'draft' );
+
+		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'GET', self::REST_BASE );
 		$request->set_param( 'status', 'draft' );
@@ -134,17 +159,42 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 
 		$this->assertSame( 200, $response->get_status() );
 
-		$ids = wp_list_pluck( $response->get_data(), 'id' );
+		$ids     = wp_list_pluck( $response->get_data(), 'id' );
+		$headers = $response->get_headers();
 
-		$this->assertContains( $first_response->get_data()['id'], $ids );
-		$this->assertContains( $second_response->get_data()['id'], $ids );
+		$this->assertContains( $first_post_id, $ids );
+		$this->assertContains( $second_post_id, $ids );
+		$this->assertSame( 2, (int) $headers['X-WP-Total'] );
 	}
 
 	/**
-	 * Unauthenticated users cannot list published artifact guidelines.
+	 * Collection totals are scoped to the private rows readable by the caller.
 	 */
-	public function test_get_items_unauthenticated_cannot_read_published_artifacts() {
-		$this->create_artifact_guideline( array( 'status' => 'publish' ) );
+	public function test_get_items_private_totals_are_scoped_to_current_user(): void {
+		$own_private_post_id   = $this->create_guideline( 'contributor', 'private' );
+		$other_private_post_id = $this->create_guideline( 'author', 'private' );
+
+		$this->switch_to_user_role( 'contributor' );
+
+		$request = new WP_REST_Request( 'GET', self::REST_BASE );
+		$request->set_param( 'status', 'private' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$ids     = wp_list_pluck( $response->get_data(), 'id' );
+		$headers = $response->get_headers();
+
+		$this->assertContains( $own_private_post_id, $ids );
+		$this->assertNotContains( $other_private_post_id, $ids );
+		$this->assertSame( 1, (int) $headers['X-WP-Total'] );
+	}
+
+	/**
+	 * Anonymous reads of the collection are rejected with `rest_forbidden`.
+	 */
+	public function test_get_items_blocks_anonymous(): void {
+		$this->create_guideline( 'administrator', 'publish' );
 
 		wp_set_current_user( 0 );
 
@@ -156,11 +206,11 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Unauthenticated users cannot read a published artifact guideline by ID.
+	 * Anonymous reads of a single item are rejected with `rest_forbidden`,
+	 * even when the row is `publish`.
 	 */
-	public function test_get_item_unauthenticated_cannot_read_published_artifact() {
-		$create_response = $this->create_artifact_guideline( array( 'status' => 'publish' ) );
-		$post_id         = $create_response->get_data()['id'];
+	public function test_get_item_blocks_anonymous(): void {
+		$post_id = $this->create_guideline( 'administrator', 'publish' );
 
 		wp_set_current_user( 0 );
 
@@ -172,45 +222,39 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Authors can pass the post type read capability but must still satisfy
-	 * the per-post check for non-public statuses.
+	 * An authenticated reader cannot fetch another user's private row.
 	 */
-	public function test_get_item_author_cannot_read_other_users_private_guideline() {
-		$create_response = $this->create_artifact_guideline( array( 'status' => 'private' ) );
-		$post_id         = $create_response->get_data()['id'];
+	public function test_get_item_blocks_others_private(): void {
+		$post_id = $this->create_guideline( 'administrator', 'private' );
 
-		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
-		wp_set_current_user( $author_id );
+		$this->switch_to_user_role( 'author' );
 
 		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $post_id );
 		$response = rest_get_server()->dispatch( $request );
 
-		$status = $response->get_status();
-		$code   = $response->get_data()['code'] ?? null;
-
-		self::delete_user( $author_id );
-
-		$this->assertSame( 403, $status );
-		$this->assertSame( 'rest_forbidden', $code );
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_forbidden', $response->get_data()['code'] );
 	}
 
 	/**
-	 * Artifact guidelines can be updated through the standard item route.
+	 * A PATCH to the item route updates title and content without
+	 * changing the row's taxonomy assignment.
 	 */
-	public function test_update_artifact_guideline() {
-		$create_response = $this->create_artifact_guideline();
-		$post_id         = $create_response->get_data()['id'];
+	public function test_update_guideline(): void {
+		$post_id = $this->create_guideline( 'administrator', 'draft' );
+
+		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
-		$request->set_param( 'title', 'Updated artifact guideline' );
-		$request->set_param( 'content', 'Updated artifact content.' );
+		$request->set_param( 'title', 'Updated guideline' );
+		$request->set_param( 'content', 'Updated guideline content.' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertSame( 'Updated artifact guideline', $data['title']['raw'] );
-		$this->assertSame( 'Updated artifact content.', $data['content']['raw'] );
+		$this->assertSame( 'Updated guideline', $data['title']['raw'] );
+		$this->assertSame( 'Updated guideline content.', $data['content']['raw'] );
 		$this->assertSame( 'draft', $data['status'] );
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
@@ -219,11 +263,12 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
-	 * Artifact guidelines can be deleted through the standard item route.
+	 * A DELETE with `force=true` removes the row entirely.
 	 */
-	public function test_delete_artifact_guideline() {
-		$create_response = $this->create_artifact_guideline();
-		$post_id         = $create_response->get_data()['id'];
+	public function test_delete_guideline(): void {
+		$post_id = $this->create_guideline( 'administrator', 'draft' );
+
+		$this->switch_to_user_role( 'administrator' );
 
 		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );
 		$request->set_param( 'force', true );
@@ -231,5 +276,142 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertNull( get_post( $post_id ) );
+	}
+
+	/**
+	 * Non-publishers may only create rows with `status: private` (or
+	 * omit the param, in which case the controller defaults to
+	 * `private`); Administrators may use any status the parent accepts.
+	 *
+	 * @dataProvider data_create_enforces_status_policy
+	 */
+	public function test_create_enforces_status_policy(
+		string $role,
+		?string $requested_status,
+		?string $expected_status,
+		?string $expected_error
+	): void {
+		$this->switch_to_user_role( $role );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		if ( null !== $requested_status ) {
+			$request->set_param( 'status', $requested_status );
+		}
+		$request->set_param( 'title', "{$role} requesting " . ( null === $requested_status ? '(omitted)' : $requested_status ) );
+		$request->set_param( 'content', 'body' );
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( null === $expected_error ) {
+			$this->assertSame( 201, $response->get_status() );
+			$this->assertSame( $expected_status, $response->get_data()['status'] );
+			return;
+		}
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( $expected_error, $response->get_data()['code'] );
+	}
+
+	/**
+	 * @return array Rows: [role, requested_status, expected_status, expected_error].
+	 */
+	public function data_create_enforces_status_policy(): array {
+		return array(
+			// Status omitted: controller defaults to `private`.
+			'contributor + omitted'   => array( 'contributor', null, 'private', null ),
+			'administrator + omitted' => array( 'administrator', null, 'private', null ),
+
+			// Explicit `private` honored for any role above Subscriber.
+			'contributor + private'   => array( 'contributor', 'private', 'private', null ),
+
+			// Administrator may use any status the parent accepts.
+			'administrator + publish' => array( 'administrator', 'publish', 'publish', null ),
+			'administrator + draft'   => array( 'administrator', 'draft', 'draft', null ),
+
+			// Non-publishers limited to `private` — any other status is rejected.
+			'contributor + publish'   => array( 'contributor', 'publish', null, 'rest_cannot_publish' ),
+			'contributor + draft'     => array( 'contributor', 'draft', null, 'rest_cannot_publish' ),
+
+			// Subscriber fails the parent's `create_posts` floor.
+			'subscriber + private'    => array( 'subscriber', 'private', null, 'rest_cannot_create' ),
+		);
+	}
+
+	/**
+	 * Owners may update their own private rows; updates to other users'
+	 * rows are denied with `rest_cannot_edit`.
+	 *
+	 * @dataProvider data_update_enforces_per_post_permission
+	 */
+	public function test_update_enforces_per_post_permission(
+		string $role,
+		string $owner_role,
+		string $status,
+		?string $expected_error
+	): void {
+		$post_id = $this->create_guideline( $owner_role, $status );
+		$this->switch_to_user_role( $role );
+
+		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
+		$request->set_param( 'title', "{$role} updating {$owner_role}'s {$status}" );
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( null === $expected_error ) {
+			$this->assertSame( 200, $response->get_status() );
+			return;
+		}
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( $expected_error, $response->get_data()['code'] );
+	}
+
+	/**
+	 * @return array Rows: [role, owner_role, status, expected_error].
+	 */
+	public function data_update_enforces_per_post_permission(): array {
+		return array(
+			'contributor + own private'    => array( 'contributor', 'contributor', 'private', null ),
+			'contributor + others private' => array( 'contributor', 'administrator', 'private', 'rest_cannot_edit' ),
+		);
+	}
+
+	/**
+	 * Owners may delete their own private rows; deletes of other users'
+	 * rows are denied with `rest_cannot_delete` and the row remains in
+	 * place.
+	 *
+	 * @dataProvider data_delete_enforces_per_post_permission
+	 */
+	public function test_delete_enforces_per_post_permission(
+		string $role,
+		string $owner_role,
+		string $status,
+		?string $expected_error
+	): void {
+		$post_id = $this->create_guideline( $owner_role, $status );
+		$this->switch_to_user_role( $role );
+
+		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $post_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( null === $expected_error ) {
+			$this->assertSame( 200, $response->get_status() );
+			$this->assertNull( get_post( $post_id ) );
+			return;
+		}
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( $expected_error, $response->get_data()['code'] );
+		$this->assertInstanceOf( WP_Post::class, get_post( $post_id ) );
+	}
+
+	/**
+	 * @return array Rows: [role, owner_role, status, expected_error].
+	 */
+	public function data_delete_enforces_per_post_permission(): array {
+		return array(
+			'contributor + own private'    => array( 'contributor', 'contributor', 'private', null ),
+			'contributor + others private' => array( 'contributor', 'administrator', 'private', 'rest_cannot_delete' ),
+		);
 	}
 }
