@@ -4,6 +4,9 @@ on:
     pull_request:
         paths:
             - 'package.json'
+            - 'tools/validation/check-root-dependencies.mjs'
+            - 'tools/validation/package.json'
+            - '.github/workflows/check-root-dependencies.yml'
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:

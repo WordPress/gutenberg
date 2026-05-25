@@ -10,7 +10,11 @@
  * Usage:
  *   node tools/validation/check-root-dependencies.mjs --base <ref>
  *
- * The base ref defaults to `origin/trunk` when not provided.
+ * The base ref defaults to `origin/trunk`. The diff is computed against the
+ * merge-base of HEAD and the base ref (matching how PR diffs work), so changes
+ * that landed on the base branch after this branch diverged don't produce
+ * false positives. Moves between dependency fields (e.g. devDependencies →
+ * dependencies) are not flagged.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -38,44 +42,52 @@ try {
 	process.exit( 2 );
 }
 
-function readDeps( source, json ) {
-	const result = {};
-	for ( const field of FIELDS ) {
-		result[ field ] = json[ field ] || {};
-	}
-	return { source, ...result };
-}
-
-function readHeadDeps() {
-	const json = JSON.parse( fs.readFileSync( ROOT_PACKAGE_JSON, 'utf8' ) );
-	return readDeps( 'HEAD', json );
-}
-
-function readBaseDeps() {
-	let text;
+function git( args, errorContext ) {
 	try {
-		text = execFileSync( 'git', [ 'show', `${ baseRef }:package.json` ], {
+		return execFileSync( 'git', args, {
 			encoding: 'utf8',
 			stdio: [ 'ignore', 'pipe', 'pipe' ],
-		} );
+		} ).trim();
 	} catch ( error ) {
-		console.error(
-			`error: unable to read package.json at base ref "${ baseRef }": ${ error.message.trim() }`
-		);
+		console.error( `error: ${ errorContext }: ${ error.message.trim() }` );
 		process.exit( 2 );
 	}
-	return readDeps( baseRef, JSON.parse( text ) );
 }
 
-const head = readHeadDeps();
-const base = readBaseDeps();
+// Build a map of dependency name → first field it appears in. Membership is
+// what matters, so a name listed in multiple fields collapses to one entry.
+function depNames( pkg ) {
+	const result = new Map();
+	for ( const field of FIELDS ) {
+		for ( const name of Object.keys( pkg[ field ] || {} ) ) {
+			if ( ! result.has( name ) ) {
+				result.set( name, field );
+			}
+		}
+	}
+	return result;
+}
+
+const mergeBase = git(
+	[ 'merge-base', 'HEAD', baseRef ],
+	`unable to compute merge-base between HEAD and "${ baseRef }"`
+);
+
+const baseJson = JSON.parse(
+	git(
+		[ 'show', `${ mergeBase }:package.json` ],
+		`unable to read package.json at merge-base ${ mergeBase }`
+	)
+);
+const headJson = JSON.parse( fs.readFileSync( ROOT_PACKAGE_JSON, 'utf8' ) );
+
+const baseNames = depNames( baseJson );
+const headNames = depNames( headJson );
 
 const added = [];
-for ( const field of FIELDS ) {
-	for ( const name of Object.keys( head[ field ] ) ) {
-		if ( ! ( name in base[ field ] ) ) {
-			added.push( { field, name } );
-		}
+for ( const [ name, field ] of headNames ) {
+	if ( ! baseNames.has( name ) ) {
+		added.push( { name, field } );
 	}
 }
 
@@ -85,7 +97,7 @@ if ( added.length === 0 ) {
 }
 
 const list = added
-	.map( ( { field, name } ) => `  - ${ name } (${ field })` )
+	.map( ( { name, field } ) => `  - ${ name } (${ field })` )
 	.join( '\n' );
 
 console.error( `
@@ -93,8 +105,7 @@ console.error( `
 
 ${ list }
 
-It is recommended to declare dependencies in the workspace that uses them, not at the repo root.
-Add the dependency to an existing workspace under tools/ or test/, or create a new workspace if no existing one fits.
+Please declare dependencies in the workspace that uses them, not at the repo root — add the dependency to an existing workspace under tools/ or test/, or create a new workspace if no existing one fits.
 
 See: ${ GUIDE_URL }
 ` );
