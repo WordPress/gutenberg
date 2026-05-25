@@ -62,8 +62,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── bin/api-docs
     │   Tool/script used to generate the API Docs.
     │
-    ├── tools/build
-    │   Build orchestration scripts for the Gutenberg monorepo (@wordpress/build-tools).
+    ├── tools/build-scripts
+    │   Build orchestration scripts for the Gutenberg monorepo (@wordpress/build-scripts).
     │
     ├── tools/release
     │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.

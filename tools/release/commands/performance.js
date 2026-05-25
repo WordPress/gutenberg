@@ -517,7 +517,7 @@ async function runPerformanceTests( branches, options ) {
 
 	// Copy the head branch's script source maps next to the traces so the
 	// artifact is self-contained: downloaders can run
-	// `tools/build/packages/resolve-trace-source-maps.cjs` directly without checking out the
+	// `tools/build-scripts/packages/resolve-trace-source-maps.cjs` directly without checking out the
 	// repo or running `npm run build`.
 	const headBranch = branches[ 0 ];
 	// @ts-ignore
