@@ -169,7 +169,7 @@ describe( 'useResourcePermissions', () => {
 
 		await waitFor( () =>
 			expect( data ).toEqual( {
-				status: 'SUCCESS',
+				status: 'finished',
 				isResolving: false,
 				hasResolved: true,
 				canCreate: true,
