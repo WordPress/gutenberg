@@ -4,7 +4,6 @@
 import '@testing-library/jest-dom';
 import type { ComponentType } from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -181,40 +180,8 @@ describe( 'WidgetDashboard', () => {
 		).toBeInTheDocument();
 		expect( screen.getByText( 'does/not-exist' ) ).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Remove widget' } )
-		).toBeInTheDocument();
-		expect(
 			screen.queryByRole( 'heading', { level: 3 } )
 		).not.toBeInTheDocument();
-	} );
-
-	it( 'removes an unavailable widget and commits the layout on Remove widget', async () => {
-		const onLayoutChange = jest.fn();
-		const user = userEvent.setup();
-
-		render(
-			<WidgetDashboard
-				layout={ [
-					{
-						uuid: 'w1',
-						type: 'does/not-exist',
-						placement: { width: 1, height: 1 },
-					},
-				] }
-				onLayoutChange={ onLayoutChange }
-				onEditChange={ () => {} }
-				editMode
-				widgetTypes={ widgetTypes }
-				resolveWidgetModule={ resolveWidgetModule }
-			/>
-		);
-
-		await user.click(
-			screen.getByRole( 'button', { name: 'Remove widget' } )
-		);
-
-		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
-		expect( onLayoutChange ).toHaveBeenCalledWith( [] );
 	} );
 
 	it( 'renders the NoWidgetsState compound when layout is empty', () => {

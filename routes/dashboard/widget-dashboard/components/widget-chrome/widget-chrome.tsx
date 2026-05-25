@@ -2,32 +2,17 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { MouseEvent, PointerEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
-import {
-	Component,
-	Suspense,
-	forwardRef,
-	useCallback,
-	useId,
-	useMemo,
-} from '@wordpress/element';
+import { Component, Suspense, forwardRef, useId, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
 /* eslint-disable @wordpress/use-recommended-components */
-import {
-	Button,
-	Card,
-	Icon,
-	Stack,
-	Notice,
-	Text,
-	VisuallyHidden,
-} from '@wordpress/ui';
+import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
 
 /**
@@ -80,28 +65,10 @@ function LoadingOverlay() {
 }
 
 interface UnavailableWidgetProps {
-	widget: DashboardWidget< unknown >;
 	widgetTypeName: string;
 }
 
-function UnavailableWidget( {
-	widget,
-	widgetTypeName,
-}: UnavailableWidgetProps ) {
-	const { removeWidgetAndCommit } = useDashboardInternalContext();
-
-	const stopDragActivation = useCallback( ( event: PointerEvent ) => {
-		event.stopPropagation();
-	}, [] );
-
-	const onRemoveClick = useCallback(
-		( event: MouseEvent ) => {
-			event.stopPropagation();
-			removeWidgetAndCommit( widget.uuid );
-		},
-		[ removeWidgetAndCommit, widget.uuid ]
-	);
-
+function UnavailableWidget( { widgetTypeName }: UnavailableWidgetProps ) {
 	return (
 		<>
 			<Card.Header>
@@ -122,14 +89,6 @@ function UnavailableWidget( {
 				>
 					<Text>{ __( 'Widget is no longer available.' ) }</Text>
 					<Text render={ <code /> }>{ widgetTypeName }</Text>
-					<Button
-						variant="outline"
-						tone="neutral"
-						onClick={ onRemoveClick }
-						onPointerDown={ stopDragActivation }
-					>
-						{ __( 'Remove widget' ) }
-					</Button>
 				</Stack>
 			</Card.Content>
 		</>
@@ -229,10 +188,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 						className={ clsx( styles.widgetChrome, className ) }
 						aria-label={ __( 'Missing widget' ) }
 					>
-						<UnavailableWidget
-							widget={ widget }
-							widgetTypeName={ widget.type }
-						/>
+						<UnavailableWidget widgetTypeName={ widget.type } />
 					</Card.Root>
 				</WidgetContextProvider>
 			);

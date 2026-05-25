@@ -31,7 +31,6 @@ interface ProbeApi {
 	mutate: ( next: DashboardWidget[] ) => void;
 	mutateGridSettings: ( next: WidgetGridSettings ) => void;
 	commit: ( options?: { exitEditMode?: boolean } ) => void;
-	removeWidgetAndCommit: ( uuid: string ) => void;
 	cancel: ( options?: { exitEditMode?: boolean } ) => void;
 }
 
@@ -48,7 +47,6 @@ function Probe() {
 			mutate: ctx.onLayoutChange,
 			mutateGridSettings: ctx.onGridSettingsChange,
 			commit: ctx.commit,
-			removeWidgetAndCommit: ctx.removeWidgetAndCommit,
 			cancel: ctx.cancel,
 		};
 	} );
@@ -153,27 +151,6 @@ describe( 'WidgetDashboard staging layer', () => {
 				( w: DashboardWidget ) => w.uuid
 			)
 		).toEqual( [ 'a', 'b', 'c' ] );
-	} );
-
-	it( 'publishes layout when removeWidgetAndCommit drops a widget', () => {
-		const onLayoutChange = jest.fn();
-		render(
-			<Harness
-				layout={ initialLayout }
-				onLayoutChange={ onLayoutChange }
-			/>
-		);
-
-		act( () => {
-			readProbe().removeWidgetAndCommit( 'a' );
-		} );
-
-		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
-		expect(
-			onLayoutChange.mock.calls[ 0 ][ 0 ].map(
-				( w: DashboardWidget ) => w.uuid
-			)
-		).toEqual( [ 'b' ] );
 	} );
 
 	it( 'restores staging to the committed layout on cancel', () => {
