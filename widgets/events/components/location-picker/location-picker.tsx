@@ -184,7 +184,7 @@ export function LocationPicker( {
 					onSubmit( locationInput );
 				} }
 			>
-				<Stack direction="row" align="top" wrap="wrap" gap="sm">
+				<Stack direction="row" align="start" wrap="wrap" gap="sm">
 					<Autocomplete.Root
 						items={ locationOptions }
 						value={ locationInput }
