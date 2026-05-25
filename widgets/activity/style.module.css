@@ -1,3 +1,12 @@
 .loading {
 	height: 100%;
 }
+
+/*
+ * Cap the event list on a content-driven (masonry) surface so a long stream
+ * scrolls inside the tile instead of stretching it. Tune the value to taste.
+ */
+.scroll {
+	max-height: 420px;
+	overflow-y: auto;
+}
