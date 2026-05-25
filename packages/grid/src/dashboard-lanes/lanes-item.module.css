@@ -51,8 +51,7 @@
 		to {
 			opacity: var(--wp-grid-placeholder-opacity, 0.4);
 			outline-width: var(--wpds-border-width-sm);
-			outline-color:
- var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+			outline-color: var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
 		}
 	}
 }
