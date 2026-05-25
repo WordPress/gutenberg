@@ -688,6 +688,38 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $image_styles, $theme_json->get_styles_for_block( $image_node ) );
 	}
 
+	public function test_get_styles_for_block_color_text_subfeature_selector() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/social-links' => array(
+							'color' => array(
+								'text' => '#ff0000',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$social_links_node = array(
+			'name'      => 'core/social-links',
+			'path'      => array( 'styles', 'blocks', 'core/social-links' ),
+			'selector'  => '.wp-block-social-links',
+			'selectors' => array(
+				'root'  => '.wp-block-social-links',
+				'color' => array(
+					'text' => '.wp-block-social-links .wp-social-link',
+				),
+			),
+		);
+
+		$expected = ':root :where(.wp-block-social-links .wp-social-link){color: #ff0000;}';
+		$this->assertSameCSS( $expected, $theme_json->get_styles_for_block( $social_links_node ) );
+	}
+
 	public function test_get_stylesheet_skips_disabled_protected_properties() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
