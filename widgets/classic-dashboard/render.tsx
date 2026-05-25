@@ -67,8 +67,15 @@ export default function ClassicDashboardWidgetRender( {
 				return;
 			}
 
-			const container = iframe.parentElement;
-			if ( ! container ) {
+			const parentElement = iframe.parentElement;
+			if ( ! parentElement ) {
+				return;
+			}
+
+			const container: HTMLElement = parentElement;
+
+			const ownerView = iframe.ownerDocument.defaultView;
+			if ( ! ownerView?.IntersectionObserver ) {
 				return;
 			}
 
@@ -87,11 +94,10 @@ export default function ClassicDashboardWidgetRender( {
 			} );
 			resizeObserver.observe( container );
 
-			const { IntersectionObserver } = iframe.ownerDocument.defaultView;
-
-			const intersectionObserver = new IntersectionObserver(
-				( [ entry ] ) => {
-					if ( entry.isIntersecting ) {
+			const intersectionObserver = new ownerView.IntersectionObserver(
+				( entries: IntersectionObserverEntry[] ) => {
+					const entry = entries[ 0 ];
+					if ( entry?.isIntersecting ) {
 						syncIframeHeight();
 					}
 				},
