@@ -10,7 +10,6 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/ui": "file:../../packages/ui",
-		"react": "18.3.1"
+		"@wordpress/ui": "file:../../packages/ui"
 	}
 }
