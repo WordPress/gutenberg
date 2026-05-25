@@ -12,6 +12,14 @@
  */
 
 .components-button {
+	@include mixins.outset-ring__rest();
+
+	// Focus.
+	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
+	&:not(.is-link):focus:not(:active) {
+		@include mixins.outset-ring__focus();
+	}
+
 	display: inline-flex;
 	text-decoration: none;
 	font-family: inherit;
@@ -22,9 +30,6 @@
 	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
-
-	@include mixins.outset-ring__rest();
-
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
@@ -39,12 +44,6 @@
 	&[aria-expanded="true"],
 	&:hover:not(:disabled, [aria-disabled="true"]) {
 		color: $components-color-accent;
-	}
-
-	// Focus.
-	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
-	&:not(.is-link):focus:not(:active) {
-		@include mixins.outset-ring__focus();
 	}
 
 	/**
@@ -74,13 +73,13 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: rgba($white, 0.4);
-			background: $components-color-accent;
-
 			&:focus:enabled {
 				@include mixins.outset-ring__focus();
 			}
+
+			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+			color: rgba($white, 0.4);
+			background: $components-color-accent;
 		}
 
 		&.is-busy,
