@@ -52,14 +52,19 @@
 }
 
 /*
- * Bleed: zero the content's block padding so the body reaches the card edges.
- * The top edge is strictly ours, because a full-bleed widget hides its header
- * in a position:absolute VisuallyHidden node that stays the card's :first-child
- * and blocks Card.FullBleed's top-flush rule. The bottom edge is already
- * flushed by Card.FullBleed, so zeroing it here is redundant but harmless.
+ * Bleed top edge: zero only the content's block-start padding so the body
+ * reaches the card's top edge. A full-bleed widget hides its header in a
+ * position:absolute VisuallyHidden node that stays the card's :first-child and
+ * blocks Card.FullBleed's top-flush rule, so we flush the top ourselves.
+ *
+ * Keep the block-end padding. Card.FullBleed's `margin-block-end: calc(var(
+ * --wp-ui-card-padding) * -1)` is sized to cancel exactly that padding; zeroing
+ * it left the negative margin nothing to cancel, so it shrank the content box
+ * below the full-height bleed wrapper and surfaced a phantom scrollbar the size
+ * of the card padding.
  */
 .widgetChromeContentBleed {
-	padding-block: 0;
+	padding-block-start: 0;
 }
 
 /*
