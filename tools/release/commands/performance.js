@@ -523,7 +523,7 @@ async function runPerformanceTests( branches, options ) {
 	//
 	// Or via the workspace script:
 	//
-	//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace> <build-dir>
+	//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace> --build-dir <build-dir>
 	const headBranch = branches[ 0 ];
 	// @ts-ignore
 	const headBuildScriptsDir = path.join(
