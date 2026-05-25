@@ -19,7 +19,7 @@ import {
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { __, _x, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import type {
 	FontFamilyPreset,
@@ -349,6 +349,8 @@ function InstalledFonts() {
 							{ libraryFontSelected && (
 								<ConfirmDeleteDialog
 									font={ libraryFontSelected }
+									selectedVariantCount={ activeFontsCount }
+									totalVariantCount={ selectedFontsCount }
 									isOpen={ isConfirmDeleteOpen }
 									setIsOpen={ setIsConfirmDeleteOpen }
 									setNotice={ setNotice }
@@ -469,6 +471,8 @@ function InstalledFonts() {
 
 function ConfirmDeleteDialog( {
 	font,
+	selectedVariantCount,
+	totalVariantCount,
 	isOpen,
 	setIsOpen,
 	setNotice,
@@ -476,6 +480,8 @@ function ConfirmDeleteDialog( {
 	handleSetLibraryFontSelected,
 }: {
 	font: FontFamily;
+	selectedVariantCount: number;
+	totalVariantCount: number;
 	isOpen: boolean;
 	setIsOpen: ( isOpen: boolean ) => void;
 	setNotice: (
@@ -486,7 +492,7 @@ function ConfirmDeleteDialog( {
 	) => void;
 	uninstallFontFamily: (
 		fontFamily: FontFamily
-	) => Promise< { deleted: boolean } >;
+	) => Promise< { deleted: boolean; deletedFontFamily: boolean } >;
 	handleSetLibraryFontSelected: ( font?: FontFamily ) => void;
 } ) {
 	const navigator = useNavigator();
@@ -495,12 +501,14 @@ function ConfirmDeleteDialog( {
 		setNotice( null );
 		setIsOpen( false );
 		try {
-			await uninstallFontFamily( font );
+			const result = await uninstallFontFamily( font );
 			navigator.goBack();
 			handleSetLibraryFontSelected( undefined );
 			setNotice( {
 				type: 'success',
-				message: __( 'Font family uninstalled successfully.' ),
+				message: result.deletedFontFamily
+					? __( 'Font family uninstalled successfully.' )
+					: __( 'Selected font variants deleted successfully.' ),
 			} );
 		} catch ( error ) {
 			setNotice( {
@@ -525,14 +533,24 @@ function ConfirmDeleteDialog( {
 			onConfirm={ handleConfirmUninstall }
 			size="medium"
 		>
-			{ font &&
-				sprintf(
-					/* translators: %s: Name of the font. */
-					__(
-						'Are you sure you want to delete "%s" font and all its variants and assets?'
-					),
-					font.name
-				) }
+			{ font && totalVariantCount > selectedVariantCount
+				? sprintf(
+						/* translators: 1: Number of selected variants, 2: Name of the font. */
+						_n(
+							'Are you sure you want to delete %1$d selected variant from "%2$s"?',
+							'Are you sure you want to delete %1$d selected variants from "%2$s"?',
+							selectedVariantCount
+						),
+						selectedVariantCount,
+						font.name
+				  )
+				: sprintf(
+						/* translators: %s: Name of the font. */
+						__(
+							'Are you sure you want to delete "%s" font and all its variants and assets?'
+						),
+						font.name
+				  ) }
 		</ConfirmDialog>
 	);
 }

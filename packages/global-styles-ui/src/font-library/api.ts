@@ -19,7 +19,7 @@ const FONT_FAMILIES_URL = '/wp/v2/font-families';
  *
  * @param registry The data registry to use for dispatching actions.
  */
-function invalidateFontFamilyCache( registry: DataRegistry ) {
+export function invalidateFontFamilyCache( registry: DataRegistry ) {
 	const { receiveEntityRecords } = registry.dispatch( coreDataStore );
 
 	// Invalidate all font family queries
@@ -69,4 +69,30 @@ export async function fetchInstallFontFace(
 		id: response.id,
 		...response.font_face_settings,
 	};
+}
+
+export async function fetchDeleteFontFace(
+	fontFamilyId: string,
+	fontFaceId: string
+) {
+	const attempts = [
+		`${ FONT_FAMILIES_URL }/${ fontFamilyId }/font-faces/${ fontFaceId }?force=true`,
+		`/wp/v2/font-faces/${ fontFaceId }?force=true`,
+	];
+
+	let lastError: unknown;
+
+	for ( const path of attempts ) {
+		try {
+			const response = await apiFetch( {
+				path,
+				method: 'DELETE',
+			} );
+			return response;
+		} catch ( error ) {
+			lastError = error;
+		}
+	}
+
+	throw lastError;
 }
