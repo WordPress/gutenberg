@@ -1,6 +1,6 @@
 # RotationRuler
 
-Private controlled ruler input for fine rotation. Pointer and keyboard changes are clamped to `min` / `max` and quantized to `step`.
+Private controlled ruler input for fine rotation. Pointer drag values are clamped to `min` / `max` and quantized to `step`. Keyboard arrow changes are clamped to `min` / `max` and increment or decrement by `step` (or `step / 2` with Shift).
 
 ## Usage
 
