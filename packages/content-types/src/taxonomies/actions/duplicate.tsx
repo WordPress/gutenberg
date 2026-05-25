@@ -3,6 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Taxonomy } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	DataForm,
@@ -11,7 +12,7 @@ import {
 	type Field,
 	type Form,
 } from '@wordpress/dataviews';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { copy } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -61,16 +62,22 @@ function DuplicateTaxonomyModal( {
 } ) {
 	const source = items[ 0 ];
 	const takenSlugs = useSelect( ( select ) => {
-		const taxonomies = select( coreStore ).getTaxonomies() ?? [];
-		const drafts =
-			select( coreStore ).getEntityRecords( 'postType', TAXONOMY_ENTITY, {
+		const taxonomies: Taxonomy[] =
+			select( coreStore ).getTaxonomies() ?? [];
+
+		const drafts = ( select( coreStore ).getEntityRecords(
+			'postType',
+			TAXONOMY_ENTITY,
+			{
 				status: 'draft',
 				per_page: -1,
 				_fields: 'id,slug',
-			} ) ?? [];
+			}
+		) ?? [] ) as Array< { slug: string } >;
+
 		return new Set< string >( [
-			...taxonomies.map( ( t: any ) => t.slug ),
-			...drafts.map( ( d: any ) => d.slug ),
+			...taxonomies.map( ( t ) => t.slug ),
+			...drafts.map( ( d ) => d.slug ),
 		] );
 	}, [] );
 	const [ data, setData ] = useState< TaxonomyFormData >( () => ( {
@@ -86,6 +93,18 @@ function DuplicateTaxonomyModal( {
 		},
 		slug: buildCopySlug( source.slug, takenSlugs ),
 	} ) );
+	// Track whether the user has manually edited the slug so we don't
+	// overwrite their input when takenSlugs resolves asynchronously.
+	const isSlugEditedRef = useRef( false );
+
+	useEffect( () => {
+		if ( ! isSlugEditedRef.current ) {
+			setData( ( prev ) => ( {
+				...prev,
+				slug: buildCopySlug( source.slug, takenSlugs ),
+			} ) );
+		}
+	}, [ source.slug, takenSlugs ] );
 	const [ isDuplicating, setIsDuplicating ] = useState( false );
 	const slugField = useSlugField( undefined, data.slug );
 
@@ -150,12 +169,15 @@ function DuplicateTaxonomyModal( {
 				fields={ fields }
 				form={ duplicateForm }
 				validity={ validity }
-				onChange={ ( edits ) =>
+				onChange={ ( edits ) => {
+					if ( 'slug' in edits ) {
+						isSlugEditedRef.current = true;
+					}
 					setData(
 						( prev ) =>
 							( { ...prev, ...edits } ) as TaxonomyFormData
-					)
-				}
+					);
+				} }
 			/>
 			<Stack direction="row" justify="flex-end" gap="sm">
 				<Button
