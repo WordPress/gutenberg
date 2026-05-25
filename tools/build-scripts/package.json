@@ -31,8 +31,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"orchestrate-build": "node ./build.mjs",
-		"orchestrate-dev": "node ./dev.mjs",
+		"build:all": "node ./build.mjs",
+		"dev": "node ./dev.mjs",
 		"build-vendors": "node ./packages/build-vendors.mjs",
 		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
 		"resolve-trace-source-maps": "node ./packages/resolve-trace-source-maps.cjs",
