@@ -86,8 +86,7 @@ Then add a project reference for the new workspace in the root `tsconfig.json`.
 
 ### 3. Register the workspace (if needed)
 
-If the new workspace lives under a path already covered by a glob in the root `package.json` (for example, `tools/*`), it is registered automatically. Otherwise, add an entry in `workspaces` in the root `package.json`:
-
+If the new workspace lives under a path already covered by a glob in the root `package.json` (for example, `tools/*`), it is registered automatically. Otherwise, add an entry in `workspaces` in the root `package.json`.
 
 ### 4. Expose scripts from the repo root
 
