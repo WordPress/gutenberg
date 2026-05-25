@@ -9,6 +9,6 @@ import { drafts } from '@wordpress/icons';
  */
 export default {
 	name: 'core/quick-draft',
-	title: __( 'Quick Draft' ),
+	title: __( 'Quick draft' ),
 	icon: drafts,
 };
