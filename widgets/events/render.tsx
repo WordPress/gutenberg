@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	useId,
 	useState,
 	useEffect,
 	createInterpolateElement,
@@ -10,25 +9,14 @@ import {
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { mapMarker } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
-import {
-	Autocomplete,
-	Button,
-	Card,
-	IconButton,
-	InputControl,
-	InputLayout,
-	Link,
-	Stack,
-	Text,
-} from '@wordpress/ui';
+import { Card, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import styles from './style.module.css';
-import { EventsList, type WPEvent } from './components';
+import { EventsList, LocationPicker, type WPEvent } from './components';
 
 interface WPEventsResponse {
 	events: WPEvent[];
@@ -38,10 +26,6 @@ interface WPEventsResponse {
 }
 
 const EVENTS_API = 'https://api.wordpress.org/events/1.0/';
-type LocationOption = {
-	id: string;
-	value: string;
-};
 
 function EventsListSection( {
 	events,
@@ -94,7 +78,6 @@ function EventsListSection( {
 }
 
 export default function WordPressEvents() {
-	const locationInputId = useId();
 	const userLocale = useSelect(
 		( select ) =>
 			( ( select( coreStore ) as any ).getCurrentUser()
@@ -102,140 +85,12 @@ export default function WordPressEvents() {
 		[]
 	);
 
-	const [ locationInput, setLocationInput ] = useState( '' );
-	const [ locationOptions, setLocationOptions ] = useState<
-		LocationOption[]
-	>( [] );
 	const [ activeLocation, setActiveLocation ] = useState( '' );
 	const [ locationLabel, setLocationLabel ] = useState( '' );
 	const [ isEditingLocation, setIsEditingLocation ] = useState( false );
-	const [ isLocatingCity, setIsLocatingCity ] = useState( false );
 	const [ events, setEvents ] = useState< WPEvent[] >( [] );
 	const [ eventsLoading, setEventsLoading ] = useState( true );
 	const [ eventsError, setEventsError ] = useState( false );
-
-	const fillCityFromGeolocation = async () => {
-		if ( ! navigator.geolocation || isLocatingCity ) {
-			return;
-		}
-
-		setIsLocatingCity( true );
-
-		try {
-			const position = await new Promise< GeolocationPosition >(
-				( resolve, reject ) => {
-					navigator.geolocation.getCurrentPosition( resolve, reject, {
-						enableHighAccuracy: false,
-						timeout: 10000,
-					} );
-				}
-			);
-
-			const { latitude, longitude } = position.coords;
-			const response = await fetch(
-				`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${ latitude }&lon=${ longitude }`
-			);
-			const data = ( await response.json() ) as {
-				address?: {
-					city?: string;
-					town?: string;
-					village?: string;
-					municipality?: string;
-				};
-			};
-
-			const city =
-				data.address?.city ??
-				data.address?.town ??
-				data.address?.village ??
-				data.address?.municipality;
-
-			if ( city ) {
-				setLocationInput( city );
-			}
-		} catch {
-			// No-op: keep manual location entry as fallback.
-		} finally {
-			setIsLocatingCity( false );
-		}
-	};
-
-	useEffect( () => {
-		const query = locationInput.trim();
-
-		if ( query.length < 2 ) {
-			setLocationOptions( [] );
-			return;
-		}
-
-		const controller = new AbortController();
-		const timeoutId = setTimeout( async () => {
-			try {
-				const params = new URLSearchParams( {
-					q: query,
-					featureType: 'city',
-					format: 'jsonv2',
-					addressdetails: '1',
-					limit: '8',
-				} );
-				const response = await fetch(
-					`https://nominatim.openstreetmap.org/search?${ params }`,
-					{ signal: controller.signal }
-				);
-				const data = ( await response.json() ) as Array< {
-					place_id: number;
-					address?: {
-						city?: string;
-						town?: string;
-						village?: string;
-						municipality?: string;
-						country?: string;
-					};
-				} >;
-
-				const seen = new Set< string >();
-				const nextOptions = data
-					.map( ( place ) => {
-						const city =
-							place.address?.city ??
-							place.address?.town ??
-							place.address?.village ??
-							place.address?.municipality;
-						const country = place.address?.country;
-
-						if ( ! city ) {
-							return null;
-						}
-
-						const label = country
-							? `${ city }, ${ country }`
-							: city;
-						if ( seen.has( label.toLowerCase() ) ) {
-							return null;
-						}
-
-						seen.add( label.toLowerCase() );
-						return {
-							id: String( place.place_id ),
-							value: label,
-						};
-					} )
-					.filter( Boolean ) as LocationOption[];
-
-				setLocationOptions( nextOptions );
-			} catch ( error: unknown ) {
-				if ( error instanceof Error && error.name === 'AbortError' ) {
-					return;
-				}
-				setLocationOptions( [] );
-			}
-		}, 200 );
-
-		return () => {
-			clearTimeout( timeoutId );
-			controller.abort();
-		};
-	}, [ locationInput ] );
 
 	useEffect( () => {
 		const controller = new AbortController();
@@ -271,103 +126,16 @@ export default function WordPressEvents() {
 
 	return (
 		<Card.Content>
-			{ ! locationLabel || isEditingLocation ? (
-				<div className={ styles.locationPicker }>
-					<form
-						onSubmit={ ( e ) => {
-							e.preventDefault();
-							setActiveLocation( locationInput );
-							setIsEditingLocation( false );
-						} }
-					>
-						<Stack direction="row" align="top" wrap="wrap" gap="sm">
-							<Autocomplete.Root
-								items={ locationOptions }
-								value={ locationInput }
-								onValueChange={ setLocationInput }
-							>
-								<Autocomplete.Input
-									id={ locationInputId }
-									className={ styles.locationInput }
-									render={
-										<InputControl
-											autoComplete="off"
-											label={ __( 'City' ) }
-											hideLabelFromVision
-											size="compact"
-											description={ __(
-												'Select a city to view upcoming events.'
-											) }
-											onValueChange={ () => {} }
-											suffix={
-												<InputLayout.Slot padding="minimal">
-													<Autocomplete.Clear />
-													<IconButton
-														icon={ mapMarker }
-														label={ __(
-															'Use current location'
-														) }
-														onClick={
-															fillCityFromGeolocation
-														}
-														disabled={
-															isLocatingCity
-														}
-														size="small"
-														variant="minimal"
-													/>
-												</InputLayout.Slot>
-											}
-										/>
-									}
-									placeholder={ __( 'City, like Tokyo…' ) }
-								/>
-								{ locationOptions.length > 0 && (
-									<Autocomplete.Popup>
-										<Autocomplete.List>
-											<Autocomplete.ListBody>
-												<Autocomplete.Collection>
-													{ ( item: {
-														id: string;
-														value: string;
-													} ) => (
-														<Autocomplete.Item
-															key={ item.id }
-															value={ item }
-														>
-															{ item.value }
-														</Autocomplete.Item>
-													) }
-												</Autocomplete.Collection>
-											</Autocomplete.ListBody>
-										</Autocomplete.List>
-									</Autocomplete.Popup>
-								) }
-							</Autocomplete.Root>
-							<Button
-								variant="outline"
-								size="compact"
-								type="submit"
-								disabled={ ! locationInput.trim() }
-							>
-								{ __( 'Select' ) }
-							</Button>
-							{ isEditingLocation && (
-								<Button
-									size="compact"
-									tone="neutral"
-									variant="minimal"
-									onClick={ () =>
-										setIsEditingLocation( false )
-									}
-								>
-									{ __( 'Cancel' ) }
-								</Button>
-							) }
-						</Stack>
-					</form>
-				</div>
-			) : null }
+			<LocationPicker
+				hidden={ Boolean( locationLabel ) && ! isEditingLocation }
+				onSubmit={ ( location ) => {
+					setActiveLocation( location );
+					setIsEditingLocation( false );
+				} }
+				showCancel={ isEditingLocation }
+				onCancel={ () => setIsEditingLocation( false ) }
+				seedInput={ activeLocation }
+			/>
 			<EventsListSection
 				events={ events }
 				loading={ eventsLoading }
@@ -396,12 +164,7 @@ export default function WordPressEvents() {
 								strong: <strong />,
 							}
 						) }{ ' ' }
-						<Link
-							onClick={ () => {
-								setLocationInput( activeLocation );
-								setIsEditingLocation( true );
-							} }
-						>
+						<Link onClick={ () => setIsEditingLocation( true ) }>
 							{ __( 'Change' ) }
 						</Link>
 					</div>

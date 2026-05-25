@@ -1,0 +1,9 @@
+.locationPicker {
+	margin-block-end: var(--wpds-dimension-padding-md);
+	max-width: calc(var(--wpds-dimension-base) * 100);
+}
+
+.locationInput {
+	flex: 1;
+	min-inline-size: calc(var(--wpds-dimension-base) * 30);
+}

@@ -1856,7 +1856,7 @@
 			"count": 1
 		}
 	},
-	"widgets/events/render.tsx": {
+	"widgets/events/components/location-picker/location-picker.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
 		}
