@@ -483,7 +483,11 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
-			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
+			{ ! isBlockStyleStateSelected && (
+				<BlockVariationTransforms
+					blockClientId={ renderedBlockClientId }
+				/>
+			) }
 			<BlockInspectorPreTabsSlot />
 			{ isBlockStyleStateSelected && ! isSectionBlock && (
 				<StyleStateInspectorSlots

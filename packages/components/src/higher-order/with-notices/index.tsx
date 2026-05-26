@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -45,10 +45,7 @@ import type { WithNoticeProps } from './types';
  * @return Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
-	function Component(
-		props: { [ key: string ]: any },
-		ref: React.ForwardedRef< any >
-	) {
+	return function Component( props: { [ key: string ]: any } ) {
 		const [ noticeList, setNoticeList ] = useState<
 			WithNoticeProps[ 'noticeList' ]
 		>( [] );
@@ -97,20 +94,6 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 			),
 		};
 
-		return isForwardRef ? (
-			<OriginalComponent { ...propsOut } ref={ ref } />
-		) : (
-			<OriginalComponent { ...propsOut } />
-		);
-	}
-
-	let isForwardRef: boolean;
-	// @ts-expect-error - `render` will only be present when OriginalComponent was wrapped with forwardRef().
-	const { render } = OriginalComponent;
-	// Returns a forwardRef if OriginalComponent appears to be a forwardRef.
-	if ( typeof render === 'function' ) {
-		isForwardRef = true;
-		return forwardRef( Component );
-	}
-	return Component;
+		return <OriginalComponent { ...propsOut } />;
+	};
 }, 'withNotices' );
