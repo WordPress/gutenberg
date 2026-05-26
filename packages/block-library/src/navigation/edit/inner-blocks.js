@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { __unstableUseEntityBlockEditorProps as useEntityBlockEditorProps } from '@wordpress/core-data';
 import {
 	useInnerBlocksProps,
 	InnerBlocks,
@@ -52,10 +52,11 @@ export default function NavigationInnerBlocks( {
 		[ clientId ]
 	);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const blockEditorProps = useEntityBlockEditorProps(
 		'postType',
 		'wp_navigation'
 	);
+	const { blocks } = blockEditorProps;
 
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
@@ -80,9 +81,7 @@ export default function NavigationInnerBlocks( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			value: blocks,
-			onInput,
-			onChange,
+			...blockEditorProps,
 			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,

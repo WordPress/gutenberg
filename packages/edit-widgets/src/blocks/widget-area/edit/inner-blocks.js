@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { __unstableUseEntityBlockEditorProps as useEntityBlockEditorProps } from '@wordpress/core-data';
 import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 
@@ -16,10 +16,7 @@ import { useRef } from '@wordpress/element';
 import useIsDraggingWithin from './use-is-dragging-within';
 
 export default function WidgetAreaInnerBlocks( { id } ) {
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'root',
-		'postType'
-	);
+	const blockEditorProps = useEntityBlockEditorProps( 'root', 'postType' );
 	const innerBlocksRef = useRef();
 	const isDraggingWithinInnerBlocks = useIsDraggingWithin( innerBlocksRef );
 	const shouldHighlightDropZone = isDraggingWithinInnerBlocks;
@@ -27,9 +24,7 @@ export default function WidgetAreaInnerBlocks( { id } ) {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ ref: innerBlocksRef },
 		{
-			value: blocks,
-			onInput,
-			onChange,
+			...blockEditorProps,
 			templateLock: false,
 			renderAppender: InnerBlocks.ButtonBlockAppender,
 		}

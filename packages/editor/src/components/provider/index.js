@@ -11,7 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	EntityProvider,
-	useEntityBlockEditor,
+	__unstableUseEntityBlockEditorProps as useEntityBlockEditorProps,
 	store as coreStore,
 } from '@wordpress/core-data';
 import {
@@ -50,6 +50,13 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
+const DEFAULT_BLOCK_EDITOR_PROPS = {
+	blocks: undefined,
+	value: undefined,
+	onInput: noop,
+	onChange: noop,
+	__unstableIsRemoteSynced: false,
+};
 
 /**
  * These are global entities that are only there to split blocks into logical units
@@ -73,23 +80,30 @@ const NON_CONTEXTUAL_POST_TYPES = [
  *
  * @example
  * ```jsx
- * const [ blocks, onInput, onChange ] = useBlockEditorProps( post, template, mode );
+ * const blockEditorProps = useBlockEditorProps( post, template, mode );
  * ```
  *
- * @return {Array} Block editor props.
+ * @return {Object} Block editor props.
  */
 function useBlockEditorProps( post, template, mode ) {
 	const revisionBlocks = useRevisionBlocks();
 	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
-	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
+	const postBlockEditorProps = useEntityBlockEditorProps(
 		'postType',
 		post.type,
-		{ id: post.id }
+		{
+			id: post.id,
+		}
 	);
-	const [ templateBlocks, onInputTemplate, onChangeTemplate ] =
-		useEntityBlockEditor( 'postType', template?.type, {
+	const templateBlockEditorProps = useEntityBlockEditorProps(
+		'postType',
+		template?.type,
+		{
 			id: template?.id,
-		} );
+		}
+	);
+	const postBlocks = postBlockEditorProps.blocks;
+	const templateBlocks = templateBlockEditorProps.blocks;
 	const maybeNavigationBlocks = useMemo( () => {
 		if ( post.type === 'wp_navigation' ) {
 			return [
@@ -120,8 +134,17 @@ function useBlockEditorProps( post, template, mode ) {
 
 	// In revisions mode, use the revision blocks and disable editing.
 	if ( revisionBlocks !== null ) {
-		return [ revisionBlocks, noop, noop ];
+		return {
+			...DEFAULT_BLOCK_EDITOR_PROPS,
+			blocks: revisionBlocks,
+			value: revisionBlocks,
+		};
 	}
+
+	const blockEditorProps =
+		rootLevelPost === 'post'
+			? postBlockEditorProps
+			: templateBlockEditorProps;
 
 	// Handle fallback to postBlocks outside of the above useMemo, to ensure
 	// that constructed block templates that call `createBlock` are not generated
@@ -130,14 +153,24 @@ function useBlockEditorProps( post, template, mode ) {
 		( !! template && mode === 'template-locked' ) ||
 		post.type === 'wp_navigation';
 	if ( disableRootLevelChanges ) {
-		return [ blocks, noop, noop ];
+		const disabledBlockEditorProps =
+			post.type === 'wp_navigation'
+				? DEFAULT_BLOCK_EDITOR_PROPS
+				: blockEditorProps;
+		return {
+			...disabledBlockEditorProps,
+			blocks,
+			value: blocks,
+			onInput: noop,
+			onChange: noop,
+		};
 	}
 
-	return [
+	return {
+		...blockEditorProps,
 		blocks,
-		rootLevelPost === 'post' ? onInput : onInputTemplate,
-		rootLevelPost === 'post' ? onChange : onChangeTemplate,
-	];
+		value: blocks,
+	};
 }
 
 /**
@@ -295,11 +328,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			id,
 			mode
 		);
-		const [ blocks, onInput, onChange ] = useBlockEditorProps(
-			post,
-			template,
-			mode
-		);
+		const blockEditorProps = useBlockEditorProps( post, template, mode );
 
 		const {
 			updatePostLock,
@@ -410,9 +439,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
-							value={ blocks }
-							onChange={ onChange }
-							onInput={ onInput }
+							{ ...blockEditorProps }
 							selection={
 								isInRevisionsMode ? undefined : selection
 							}

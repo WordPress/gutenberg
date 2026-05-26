@@ -283,6 +283,59 @@ function entity( entityConfig ) {
 				return state;
 			},
 
+			editSources: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'RECEIVE_ITEMS': {
+						const nextState = { ...state };
+						const itemsList = Array.isArray( action.items )
+							? action.items
+							: [ action.items ];
+						let hasChange = false;
+
+						for ( const record of itemsList ) {
+							const recordId = record?.[ action.key ];
+							if ( nextState[ recordId ] ) {
+								delete nextState[ recordId ];
+								hasChange = true;
+							}
+						}
+
+						return hasChange ? nextState : state;
+					}
+
+					case 'EDIT_ENTITY_RECORD': {
+						if (
+							! Object.prototype.hasOwnProperty.call(
+								action.edits,
+								'blocks'
+							)
+						) {
+							return state;
+						}
+
+						if ( action.options?.__unstableIsRemoteSync ) {
+							return {
+								...state,
+								[ action.recordId ]: {
+									...state[ action.recordId ],
+									blocks: 'remote-sync',
+								},
+							};
+						}
+
+						if ( ! state[ action.recordId ] ) {
+							return state;
+						}
+
+						const nextState = { ...state };
+						delete nextState[ action.recordId ];
+						return nextState;
+					}
+				}
+
+				return state;
+			},
+
 			saving: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'SAVE_ENTITY_RECORD_START':

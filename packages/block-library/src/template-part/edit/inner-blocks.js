@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
+import {
+	__unstableUseEntityBlockEditorProps as useEntityBlockEditorProps,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	InnerBlocks,
 	useInnerBlocksProps,
@@ -106,16 +109,14 @@ function EditableTemplatePartInnerBlocks( {
 		[]
 	);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const blockEditorProps = useEntityBlockEditorProps(
 		'postType',
 		'wp_template_part',
 		{ id }
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		value: blocks,
-		onInput,
-		onChange,
+		...blockEditorProps,
 		renderAppender: useRenderAppender( hasInnerBlocks ),
 		layout: useLayout( layout ),
 	} );

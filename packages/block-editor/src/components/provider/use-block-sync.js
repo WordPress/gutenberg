@@ -92,6 +92,13 @@ function restoreSelectionIds( selectionState, mapping ) {
 	};
 }
 
+function getClientIdsFromBlocks( blocks = [] ) {
+	return blocks.flatMap( ( block ) => [
+		block.clientId,
+		...getClientIdsFromBlocks( block.innerBlocks ),
+	] );
+}
+
 /**
  * A function to call when the block value has been updated in the block-editor
  * store.
@@ -123,30 +130,33 @@ function restoreSelectionIds( selectionState, mapping ) {
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object}        props          Props for the block sync hook
- * @param {string}        props.clientId The client ID of the inner block controller.
- *                                       If none is passed, then it is assumed to be a
- *                                       root controller rather than an inner block
- *                                       controller.
- * @param {Object[]}      props.value    The control value for the blocks. This value
- *                                       is used to initialize the block-editor store
- *                                       and for resetting the blocks to incoming
- *                                       changes like undo.
- * @param {onBlockUpdate} props.onChange Function to call when a persistent
- *                                       change has been made in the block-editor blocks
- *                                       for the given clientId. For example, after
- *                                       this function is called, an entity is marked
- *                                       dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput  Function to call when a non-persistent
- *                                       change has been made in the block-editor blocks
- *                                       for the given clientId. When this is called,
- *                                       controlling sources do not become dirty.
+ * @param {Object}        props                          Props for the block sync hook
+ * @param {string}        props.clientId                 The client ID of the inner block controller.
+ *                                                       If none is passed, then it is assumed to be a
+ *                                                       root controller rather than an inner block
+ *                                                       controller.
+ * @param {Object[]}      props.value                    The control value for the blocks. This value
+ *                                                       is used to initialize the block-editor store
+ *                                                       and for resetting the blocks to incoming
+ *                                                       changes like undo.
+ * @param {onBlockUpdate} props.onChange                 Function to call when a persistent
+ *                                                       change has been made in the block-editor blocks
+ *                                                       for the given clientId. For example, after
+ *                                                       this function is called, an entity is marked
+ *                                                       dirty because it has changes to save.
+ * @param {onBlockUpdate} props.onInput                  Function to call when a non-persistent
+ *                                                       change has been made in the block-editor blocks
+ *                                                       for the given clientId. When this is called,
+ *                                                       controlling sources do not become dirty.
+ * @param {boolean}       props.__unstableIsRemoteSynced Whether the current control
+ *                                                       value was received from remote sync.
  */
 export default function useBlockSync( {
 	clientId = null,
 	value: controlledBlocks,
 	onChange = noop,
 	onInput = noop,
+	__unstableIsRemoteSynced = false,
 } ) {
 	const registry = useRegistry();
 	const { getSelection, onChangeSelection } = useContext( SelectionContext );
@@ -156,6 +166,7 @@ export default function useBlockSync( {
 		resetSelection,
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
+		__unstableMarkRemoteSyncedBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
@@ -259,6 +270,11 @@ export default function useBlockSync( {
 				}
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks( clientId, storeBlocks );
+				if ( __unstableIsRemoteSynced ) {
+					__unstableMarkRemoteSyncedBlocks(
+						getClientIdsFromBlocks( storeBlocks )
+					);
+				}
 
 				// Invalidate the applied-selection ref so that
 				// restoreSelection() at the end of the
@@ -267,11 +283,18 @@ export default function useBlockSync( {
 				appliedSelectionRef.current = null;
 			} );
 		} else {
-			if ( subscribedRef.current ) {
-				pendingChangesRef.current.incoming = controlledBlocks;
-			}
-			__unstableMarkNextChangeAsNotPersistent();
-			resetBlocks( controlledBlocks );
+			registry.batch( () => {
+				if ( subscribedRef.current ) {
+					pendingChangesRef.current.incoming = controlledBlocks;
+				}
+				__unstableMarkNextChangeAsNotPersistent();
+				resetBlocks( controlledBlocks );
+				if ( __unstableIsRemoteSynced ) {
+					__unstableMarkRemoteSyncedBlocks(
+						getClientIdsFromBlocks( controlledBlocks )
+					);
+				}
+			} );
 		}
 	};
 
@@ -336,7 +359,7 @@ export default function useBlockSync( {
 			// character undo levels.
 			restoreSelection();
 		}
-	}, [ controlledBlocks, clientId ] );
+	}, [ controlledBlocks, clientId, __unstableIsRemoteSynced ] );
 
 	useEffect( () => {
 		const {

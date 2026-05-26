@@ -53,10 +53,14 @@ export default function useInnerBlockTemplateSync(
 		const {
 			getBlocks,
 			getSelectedBlocksInitialCaretPosition,
+			__unstableIsRemoteSyncedBlock,
 			isBlockSelected,
 		} = registry.select( blockEditorStore );
-		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-			registry.dispatch( blockEditorStore );
+		const {
+			replaceInnerBlocks,
+			__unstableClearRemoteSyncedBlock,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = registry.dispatch( blockEditorStore );
 
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
@@ -70,6 +74,14 @@ export default function useInnerBlockTemplateSync(
 			// Only synchronize innerBlocks with template if innerBlocks are empty
 			// or a locking "all" or "contentOnly" exists directly on the block.
 			const currentInnerBlocks = getBlocks( clientId );
+			const wasRemoteSynced = __unstableIsRemoteSyncedBlock( clientId );
+			if ( wasRemoteSynced ) {
+				// Remote sync marks are single-use. Clear them as soon as this
+				// effect observes them so stale marks do not suppress later
+				// intentional template sync work.
+				__unstableClearRemoteSyncedBlock( clientId );
+			}
+
 			const shouldApplyTemplate =
 				currentInnerBlocks.length === 0 ||
 				templateLock === 'all' ||
@@ -85,6 +97,14 @@ export default function useInnerBlockTemplateSync(
 			}
 
 			existingTemplateRef.current = template;
+
+			// Remote peers should wait for the originator's template fill
+			// instead of broadcasting their own. Record this template as seen so
+			// a rerun does not fill the same empty remote-synced block later.
+			if ( wasRemoteSynced && currentInnerBlocks.length === 0 ) {
+				return;
+			}
+
 			const nextBlocks = synchronizeBlocksWithTemplate(
 				currentInnerBlocks,
 				template

@@ -19,31 +19,42 @@ const EMPTY_ARRAY = [];
  * Hook that returns block content getters and setters for
  * the nearest provided entity of the specified type.
  *
- * The return value has the shape `[ blocks, onInput, onChange ]`.
+ * The return value has the shape `[ blocks, onInput, onChange, options ]`.
  * `onInput` is for block changes that don't create undo levels
  * or dirty the post, non-persistent changes, and `onChange` is for
- * persistent changes. They map directly to the props of a
- * `BlockEditorProvider` and are intended to be used with it,
- * or similar components or hooks.
+ * persistent changes.
+ *
+ * Prefer `__unstableUseEntityBlockEditorProps` when passing entity blocks to a
+ * controlled block editor surface like `BlockEditorProvider`, `InnerBlocks`, or
+ * `useInnerBlocksProps`. Use this lower-level tuple hook when a component only
+ * needs to inspect blocks or call one of the returned callbacks.
  *
  * @param {string} kind         The entity kind.
  * @param {string} name         The entity name.
  * @param {Object} options
  * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
- * @return {[unknown[], Function, Function]} The block array and setters.
+ * @return {[unknown[], Function, Function, Object]} The block array, setters, and block editor options.
  */
 export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { content, editedBlocks, meta } = useSelect(
+	const { blockEditSource, content, editedBlocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
 				return {};
 			}
-			const { getEditedEntityRecord } = select( STORE_NAME );
+			const {
+				__unstableGetEntityRecordBlockEditSource,
+				getEditedEntityRecord,
+			} = select( STORE_NAME );
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return {
+				blockEditSource: __unstableGetEntityRecordBlockEditSource(
+					kind,
+					name,
+					id
+				),
 				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
 				meta: editedRecord.meta,
@@ -133,5 +144,47 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		[ kind, name, id, meta, editEntityRecord ]
 	);
 
-	return [ blocks, onInput, onChange ];
+	const options = useMemo(
+		() => ( {
+			__unstableIsRemoteSynced:
+				blockEditSource === 'remote-sync' && blocks === editedBlocks,
+		} ),
+		[ blockEditSource, blocks, editedBlocks ]
+	);
+
+	return [ blocks, onInput, onChange, options ];
 }
+
+/**
+ * Hook that returns the spreadable block editor props for an entity record.
+ *
+ * This is a convenience wrapper around `useEntityBlockEditor` for controlled
+ * block editor surfaces. Prefer this helper when passing entity-backed blocks
+ * to `BlockEditorProvider`, `InnerBlocks`, or `useInnerBlocksProps`, so callers
+ * receive the full prop bundle including private editor sync metadata. The
+ * returned object includes both `blocks` for local reads and `value` for
+ * spreading into controlled block editor APIs.
+ *
+ * @param {string} kind    The entity kind.
+ * @param {string} name    The entity name.
+ * @param {Object} options Hook options.
+ *
+ * @return {Object} Block editor props.
+ */
+function useEntityBlockEditorProps( kind, name, options ) {
+	const [ blocks, onInput, onChange, { __unstableIsRemoteSynced } = {} ] =
+		useEntityBlockEditor( kind, name, options );
+
+	return useMemo(
+		() => ( {
+			blocks,
+			value: blocks,
+			onInput,
+			onChange,
+			__unstableIsRemoteSynced,
+		} ),
+		[ blocks, onInput, onChange, __unstableIsRemoteSynced ]
+	);
+}
+
+export { useEntityBlockEditorProps as __unstableUseEntityBlockEditorProps };

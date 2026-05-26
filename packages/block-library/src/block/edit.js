@@ -11,7 +11,7 @@ import { useRef, useMemo } from '@wordpress/element';
 import {
 	useEntityRecord,
 	store as coreStore,
-	useEntityBlockEditor,
+	__unstableUseEntityBlockEditorProps as useEntityBlockEditorProps,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
@@ -162,9 +162,14 @@ function ReusableBlockEdit( {
 		'wp_block',
 		ref
 	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
-	} );
+	const blockEditorProps = useEntityBlockEditorProps(
+		'postType',
+		'wp_block',
+		{
+			id: ref,
+		}
+	);
+	const { blocks } = blockEditorProps;
 	const isMissing = hasResolved && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
@@ -216,7 +221,7 @@ function ReusableBlockEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		layout,
-		value: blocks,
+		...blockEditorProps,
 		onInput: NOOP,
 		onChange: NOOP,
 		renderAppender: blocks?.length

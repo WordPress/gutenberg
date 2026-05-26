@@ -14,7 +14,7 @@ import {
  */
 import { useState, useCallback } from '@wordpress/element';
 import {
-	useEntityBlockEditor,
+	__unstableUseEntityBlockEditorProps as useEntityBlockEditorProps,
 	useEntityProp,
 	store as coreStore,
 } from '@wordpress/core-data';
@@ -115,10 +115,12 @@ export default function ReusableBlockEdit( {
 		useDispatch( reusableBlocksStore );
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const blockEditorProps = useEntityBlockEditorProps(
 		'postType',
 		'wp_block',
-		{ id: ref }
+		{
+			id: ref,
+		}
 	);
 
 	const [ title ] = useEntityProp( 'postType', 'wp_block', 'title', ref );
@@ -215,13 +217,7 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
-	let element = (
-		<InnerBlocks
-			value={ blocks }
-			onChange={ onChange }
-			onInput={ onInput }
-		/>
-	);
+	let element = <InnerBlocks { ...blockEditorProps } />;
 
 	if ( ! isEditing ) {
 		element = <Disabled>{ element }</Disabled>;

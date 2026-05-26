@@ -5,7 +5,10 @@ import { SlotFillProvider } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
+import {
+	__unstableUseEntityBlockEditorProps as useEntityBlockEditorProps,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -110,20 +113,16 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	const widgetAreaId = useLastSelectedWidgetArea();
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		KIND,
-		POST_TYPE,
-		{ id: buildWidgetAreasPostId() }
-	);
+	const blockEditorProps = useEntityBlockEditorProps( KIND, POST_TYPE, {
+		id: buildWidgetAreasPostId(),
+	} );
 
 	return (
 		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
 			<BlockKeyboardShortcuts />
 			<ExperimentalBlockEditorProvider
-				value={ blocks }
-				onInput={ onInput }
-				onChange={ onChange }
+				{ ...blockEditorProps }
 				settings={ settings }
 				useSubRegistry={ false }
 				{ ...props }

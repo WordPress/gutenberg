@@ -223,6 +223,8 @@ export function createSyncManager( debug = false ): SyncManager {
 			_events: Y.YEvent< any >[],
 			transaction: Y.Transaction
 		): void => {
+			const isRemoteSync = ! transaction.local;
+
 			if (
 				transaction.local &&
 				! ( transaction.origin instanceof Y.UndoManager )
@@ -230,7 +232,9 @@ export function createSyncManager( debug = false ): SyncManager {
 				return;
 			}
 
-			void internal.updateEntityRecord( objectType, objectId );
+			void internal.updateEntityRecord( objectType, objectId, {
+				isRemoteSync,
+			} );
 		};
 
 		const onStateMapUpdate = (
@@ -675,12 +679,16 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * Update the entity record in the local store with changes from the CRDT
 	 * document.
 	 *
-	 * @param {ObjectType} objectType Object type of record to update.
-	 * @param {ObjectID}   objectId   Object ID of record to update.
+	 * @param {ObjectType} objectType           Object type of record to update.
+	 * @param {ObjectID}   objectId             Object ID of record to update.
+	 * @param {Object}     options              Update options.
+	 * @param {boolean}    options.isRemoteSync Whether the update originated from
+	 *                                          remote sync.
 	 */
 	async function _updateEntityRecord(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		options: { isRemoteSync?: boolean } = {}
 	): Promise< void > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -708,7 +716,9 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'updateEntityRecord', 'changes', entityId, {
 			changedKeys,
 		} );
-		handlers.editRecord( changes );
+		handlers.editRecord( changes, {
+			__unstableIsRemoteSync: !! options.isRemoteSync,
+		} );
 	}
 
 	/**

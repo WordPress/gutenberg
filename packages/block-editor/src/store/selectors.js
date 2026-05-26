@@ -2977,6 +2977,18 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
 }
 
 /**
+ * Returns true if a block was just received from remote sync.
+ *
+ * @param {Object} state    Block editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether the block was just received from remote sync.
+ */
+export function __unstableIsRemoteSyncedBlock( state, clientId ) {
+	return state.blocks.remoteSyncedBlocks.has( clientId );
+}
+
+/**
  * Returns the block attributes changed as a result of the last dispatched
  * action.
  *

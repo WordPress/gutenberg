@@ -1655,6 +1655,26 @@ export function __unstableMarkNextChangeAsNotPersistent() {
 }
 
 /**
+ * Action that marks blocks as having just been received from remote sync.
+ *
+ * @param {string[]} clientIds Client IDs for blocks received from remote sync.
+ * @return {Object} Action object.
+ */
+export function __unstableMarkRemoteSyncedBlocks( clientIds ) {
+	return { type: 'MARK_REMOTE_SYNCED_BLOCKS', clientIds };
+}
+
+/**
+ * Action that clears a remote sync mark for a block.
+ *
+ * @param {string} clientId Block client ID.
+ * @return {Object} Action object.
+ */
+export function __unstableClearRemoteSyncedBlock( clientId ) {
+	return { type: 'CLEAR_REMOTE_SYNCED_BLOCK', clientId };
+}
+
+/**
  * Action that marks the last block change as an automatic change, meaning it was not
  * performed by the user, and can be undone using the `Escape` and `Backspace` keys.
  * This action must be called after the change was made, and any actions that are a

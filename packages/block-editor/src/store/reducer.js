@@ -1186,6 +1186,41 @@ export const blocks = pipe(
 		return state;
 	},
 
+	remoteSyncedBlocks( state = new Set(), action ) {
+		switch ( action.type ) {
+			case 'RESET_BLOCKS':
+				return new Set();
+
+			case 'MARK_REMOTE_SYNCED_BLOCKS':
+				if ( ! action.clientIds?.length ) {
+					return state;
+				}
+				return new Set( [ ...state, ...action.clientIds ] );
+
+			case 'CLEAR_REMOTE_SYNCED_BLOCK': {
+				if ( ! state.has( action.clientId ) ) {
+					return state;
+				}
+				const nextState = new Set( state );
+				nextState.delete( action.clientId );
+				return nextState;
+			}
+
+			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN': {
+				const nextState = new Set( state );
+				let hasChange = false;
+				action.removedClientIds.forEach( ( clientId ) => {
+					if ( nextState.delete( clientId ) ) {
+						hasChange = true;
+					}
+				} );
+				return hasChange ? nextState : state;
+			}
+		}
+
+		return state;
+	},
+
 	controlledInnerBlocks(
 		state = new Set(),
 		{ type, clientId, hasControlledInnerBlocks }

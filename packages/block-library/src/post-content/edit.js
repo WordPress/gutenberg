@@ -15,7 +15,7 @@ import {
 import { parse } from '@wordpress/blocks';
 import {
 	useEntityProp,
-	useEntityBlockEditor,
+	__unstableUseEntityBlockEditorProps as useEntityBlockEditorProps,
 	store as coreStore,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -80,11 +80,10 @@ function ReadOnlyContent( {
 function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const { postType, postId } = context;
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		postType,
-		{ id: postId }
-	);
+	const blockEditorProps = useEntityBlockEditorProps( 'postType', postType, {
+		id: postId,
+	} );
+	const { blocks } = blockEditorProps;
 
 	const entityRecord = useSelect(
 		( select ) => {
@@ -104,9 +103,7 @@ function EditableContent( { context = {}, tagName: TagName = 'div' } ) {
 	const props = useInnerBlocksProps(
 		useBlockProps( { className: 'entry-content' } ),
 		{
-			value: blocks,
-			onInput,
-			onChange,
+			...blockEditorProps,
 			template: ! hasInnerBlocks ? initialInnerBlocks : undefined,
 		}
 	);

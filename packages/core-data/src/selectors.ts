@@ -82,6 +82,7 @@ interface RevisionsQueriedData {
 
 interface EntityState< EntityRecord extends ET.EntityRecord > {
 	edits: Record< string, Partial< EntityRecord > >;
+	editSources: Record< string, { blocks?: 'remote-sync' } >;
 	saving: Record<
 		string,
 		Partial< { pending: boolean; isAutosave: boolean; error: Error } >
@@ -869,6 +870,27 @@ export function getEntityRecordEdits(
 	return state.entities.records?.[ kind ]?.[ name ]?.edits?.[
 		recordId as string | number
 	];
+}
+
+/**
+ * Returns source metadata for the latest block edit to an entity record.
+ *
+ * @param state    State tree.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record ID.
+ *
+ * @return The source of the latest block edit, if known.
+ */
+export function __unstableGetEntityRecordBlockEditSource(
+	state: State,
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey
+): Optional< 'remote-sync' > {
+	return state.entities.records?.[ kind ]?.[ name ]?.editSources?.[
+		recordId as string | number
+	]?.blocks;
 }
 
 /**

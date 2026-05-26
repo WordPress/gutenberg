@@ -127,7 +127,7 @@ export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: (
 		data: Partial< ObjectData >,
-		options?: { undoIgnore?: boolean }
+		options?: { __unstableIsRemoteSync?: boolean; undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	onStatusChange: OnStatusChangeCallback;

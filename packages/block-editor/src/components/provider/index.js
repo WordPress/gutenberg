@@ -380,6 +380,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 					value={ props.value }
 					onChange={ props.onChange }
 					onInput={ props.onInput }
+					__unstableIsRemoteSynced={ props.__unstableIsRemoteSynced }
 				/>
 				{ children }
 			</SelectionContext.Provider>
