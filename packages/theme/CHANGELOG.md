@@ -17,6 +17,7 @@
 ### Internal
 
 -   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
+-   Deduplicate the internal `addFallbackToVar` helper by extracting a single generic implementation shared between the PostCSS, esbuild, and Vite plugins.
 
 ## 0.13.0 (2026-05-14)
 
