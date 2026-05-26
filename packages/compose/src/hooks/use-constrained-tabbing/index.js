@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
-import useRefEffect from '../use-ref-effect';
+import { useCallback } from '@wordpress/element';
 
 /**
  * In Dialogs/modals, the tabbing must be constrained to the content of
@@ -30,7 +26,11 @@ import useRefEffect from '../use-ref-effect';
  * ```
  */
 function useConstrainedTabbing() {
-	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
+	return useCallback( ( /** @type {HTMLElement | null} */ node ) => {
+		if ( ! node ) {
+			return;
+		}
+		const element = node;
 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
 			const { key, shiftKey, target } = event;
 
@@ -61,7 +61,7 @@ function useConstrainedTabbing() {
 			// If the element that is about to receive focus is inside the
 			// area, rely on native browsers behavior and let tabbing follow
 			// the native tab sequence.
-			if ( node.contains( nextElement ) ) {
+			if ( element.contains( nextElement ) ) {
 				return;
 			}
 
@@ -70,21 +70,21 @@ function useConstrainedTabbing() {
 			// the area, depending on the direction. Without preventing default
 			// behaviour, the browser will then move focus to the next element.
 			const domAction = shiftKey ? 'append' : 'prepend';
-			const { ownerDocument } = node;
+			const { ownerDocument } = element;
 			const trap = ownerDocument.createElement( 'div' );
 
 			trap.tabIndex = -1;
-			node[ domAction ]( trap );
+			element[ domAction ]( trap );
 
 			// Remove itself when the trap loses focus.
-			trap.addEventListener( 'blur', () => node.removeChild( trap ) );
+			trap.addEventListener( 'blur', () => element.removeChild( trap ) );
 
 			trap.focus();
 		}
 
-		node.addEventListener( 'keydown', onKeyDown );
+		element.addEventListener( 'keydown', onKeyDown );
 		return () => {
-			node.removeEventListener( 'keydown', onKeyDown );
+			element.removeEventListener( 'keydown', onKeyDown );
 		};
 	}, [] );
 }
