@@ -11,14 +11,14 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 		await requestUtils.deleteAllMenus();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.deleteAllPages();
 		await requestUtils.deleteAllMenus();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.describe( 'Overlay menu', () => {
@@ -599,6 +599,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 					.getByRole( 'button', { name: 'Save', exact: true } );
 
 				await saveButton.click();
+				await page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'updated' } )
+					.waitFor();
 
 				// Fetch the post from the database to see what was actually saved
 				const savedPost = await requestUtils.rest( {

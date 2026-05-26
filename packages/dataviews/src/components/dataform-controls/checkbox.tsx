@@ -22,6 +22,7 @@ export default function Checkbox< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue, label, description, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback( () => {
 		onChange(
@@ -39,6 +40,7 @@ export default function Checkbox< Item >( {
 			help={ description }
 			checked={ getValue( { item: data } ) }
 			onChange={ onChangeControl }
+			disabled={ disabled }
 		/>
 	);
 }

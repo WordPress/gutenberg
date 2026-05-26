@@ -8,7 +8,10 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
-import { DialogValidationProvider } from './context';
+import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
+import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+import { DialogValidationProvider, useDialogModal } from './context';
+import { Portal } from './portal';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -20,27 +23,41 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
 /**
  * Renders the dialog popup element that contains the dialog content.
  * Uses a portal to render outside the DOM hierarchy.
+ *
+ * When `portal` is omitted, defaults to `Dialog.Portal`.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{
 		className,
+		portal,
+		children,
 		size = 'medium',
 		initialFocus,
 		finalFocus,
-		children,
 		...props
 	},
 	ref
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
-		deprioritizedAttribute: CLOSE_ICON_ATTR,
+		deprioritizedAttributes: [ CLOSE_ICON_ATTR, SCROLL_CONTAINER_ATTR ],
 	} );
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+	const modal = useDialogModal();
 
-	return (
-		<_Dialog.Portal>
-			<_Dialog.Backdrop className={ styles.backdrop } />
+	const portalChildren = (
+		<>
+			{ /*
+			 * Only render a backdrop for fully modal dialogs. Non-modal dialogs
+			 * should not dim the page, and `trap-focus` keeps outside pointer
+			 * interactions enabled, so a backdrop would misrepresent that mode.
+			 */ }
+			{ modal === true && (
+				<_Dialog.Backdrop
+					className={ styles.backdrop }
+					data-testid="dialog-backdrop"
+				/>
+			) }
 			<ThemeProvider>
 				<_Dialog.Popup
 					ref={ mergedRef }
@@ -52,14 +69,17 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
 					{ ...props }
+					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
 				>
 					<DialogValidationProvider>
 						{ children }
 					</DialogValidationProvider>
 				</_Dialog.Popup>
 			</ThemeProvider>
-		</_Dialog.Portal>
+		</>
 	);
+
+	return renderSlotWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

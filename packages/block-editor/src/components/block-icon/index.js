@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { memo } from '@wordpress/element';
 
@@ -18,7 +18,10 @@ function BlockIcon( { icon, showColors = false, className, context } ) {
 	}
 
 	const renderedIcon = (
-		<Icon icon={ icon && icon.src ? icon.src : icon } context={ context } />
+		<WCIcon
+			icon={ icon && icon.src ? icon.src : icon }
+			context={ context }
+		/>
 	);
 	const style = showColors
 		? {

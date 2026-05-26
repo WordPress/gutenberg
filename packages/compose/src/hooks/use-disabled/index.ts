@@ -45,14 +45,14 @@ export default function useDisabled( {
 			}
 
 			/** A variable keeping track of the previous updates in order to restore them. */
-			const updates: Function[] = [];
+			const updates: ( () => void )[] = [];
 			const disable = () => {
 				node.childNodes.forEach( ( child ) => {
 					if ( ! ( child instanceof defaultView.HTMLElement ) ) {
 						return;
 					}
-					if ( ! child.getAttribute( 'inert' ) ) {
-						child.setAttribute( 'inert', 'true' );
+					if ( ! child.hasAttribute( 'inert' ) ) {
+						child.setAttribute( 'inert', '' );
 						updates.push( () => {
 							child.removeAttribute( 'inert' );
 						} );

@@ -86,7 +86,9 @@ export function ItemClickWrapper< Item >( {
 			className: `${ className } ${ className }--clickable`,
 			...extraProps,
 			children,
-		} );
+		} ) as ReactElement<
+			Pick< React.DOMAttributes< Element >, 'onClick' | 'onKeyDown' >
+		>;
 
 		// Clone the element and enhance onClick to stop propagation
 		return cloneElement( renderedElement, {

@@ -28,6 +28,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
+import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -180,6 +181,18 @@ export const getEntityRecord =
 							transientConfig.read( recordWithTransients );
 					} );
 
+				// Share the parsed blocks with `useEntityBlockEditor` so the
+				// editor doesn't re-parse the same `content` string.
+				if (
+					recordWithTransients.blocks &&
+					typeof recordWithTransients.content?.raw === 'string'
+				) {
+					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
+						content: recordWithTransients.content.raw,
+						blocks: recordWithTransients.blocks,
+					} );
+				}
+
 				// Load the entity record for syncing. Do not await promise.
 				void getSyncManager()?.load(
 					entityConfig.syncConfig,
@@ -247,13 +260,19 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
+									// Trigger a minimal save to persist the CRDT document. The
+									// entity's pre-persist hooks will create the persisted CRDT
+									// document and apply it to the record's meta.
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
 									dispatch.saveEntityRecord(
 										kind,
 										name,
-										editedRecord
+										{
+											[ entityIdKey ]:
+												editedRecord[ entityIdKey ],
+										},
+										{ __unstableSkipSyncUpdate: true }
 									);
 								} );
 						},
@@ -578,7 +597,7 @@ export const getEntityRecords =
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
-		} catch ( e ) {
+		} catch {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
@@ -635,7 +654,7 @@ export const getEmbedPreview =
 				path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
 			} );
 			dispatch.receiveEmbedPreview( url, embedProxyResponse );
-		} catch ( error ) {
+		} catch {
 			// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
 			dispatch.receiveEmbedPreview( url, false );
 		}
@@ -706,7 +725,7 @@ export const canUser =
 				method: 'OPTIONS',
 				parse: false,
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if our OPTIONS request comes back with an API error (4xx or
 			// 5xx). The previously determined isAllowed value will remain in the store.
 			return;
@@ -1013,10 +1032,14 @@ export const getDefaultTemplateId =
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 
@@ -1077,7 +1100,7 @@ export const getRevisions =
 				entityConfig.supportsPagination && query.per_page !== -1;
 			try {
 				response = await apiFetch( { path, parse: ! isPaginated } );
-			} catch ( error ) {
+			} catch {
 				// Do nothing if our request comes back with an API error.
 				return;
 			}
@@ -1220,7 +1243,7 @@ export const getRevision =
 			let record;
 			try {
 				record = await apiFetch( { path } );
-			} catch ( error ) {
+			} catch {
 				// Do nothing if our request comes back with an API error.
 				return;
 			}
@@ -1257,7 +1280,7 @@ export const getRegisteredPostMeta =
 				path: `${ restNamespace }/${ restBase }/?context=edit`,
 				method: 'OPTIONS',
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if the request comes back with an API error.
 			return;
 		}

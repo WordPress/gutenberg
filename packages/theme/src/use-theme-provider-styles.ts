@@ -1,8 +1,6 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import {
+	ColorSpace,
 	clone,
 	set,
 	to,
@@ -11,16 +9,7 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
 import colorTokens from './prebuilt/ts/color-tokens';
 import {
@@ -101,6 +90,7 @@ function customRgbFormat( color: PlainColorObject ): string {
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+	ColorSpace.register( sRGB );
 	const parsedAccent = to( accent, HSL );
 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
@@ -228,7 +218,7 @@ export function useThemeProviderStyles( {
 		} );
 	}, [ primary, bg ] );
 
-	const themeProviderStyles = useMemo(
+	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {
 			...colorStyles,
 			...( cursorControl && {

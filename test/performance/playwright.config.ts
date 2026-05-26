@@ -14,6 +14,10 @@ process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 
 const config = defineConfig( {
 	...baseConfig,
+	webServer: {
+		...baseConfig.webServer,
+		command: 'npm run --prefix ../.. wp-env -- start',
+	},
 	reporter: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
 	forbidOnly: !! process.env.CI,
 	fullyParallel: false,
@@ -27,6 +31,12 @@ const config = defineConfig( {
 		...baseConfig.use,
 		actionTimeout: 120_000, // 2 minutes.
 		video: 'off',
+		// Playwright's own tracing injects a DOM snapshot recorder into
+		// every page (captureSnapshot/visitNode/_getSheetText), which runs
+		// on the main thread on each action and shows up as ~750ms of
+		// extra work in our captured Chromium traces. We don't need
+		// Playwright's trace artifacts for perf measurements.
+		trace: 'off',
 	},
 } );
 

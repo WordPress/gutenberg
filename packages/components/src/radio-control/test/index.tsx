@@ -82,6 +82,16 @@ describe.each( [
 			).toBeVisible();
 		} );
 
+		it( 'should disable the radio group when `disabled` is true', () => {
+			render(
+				<Component { ...defaultProps } disabled onChange={ () => {} } />
+			);
+
+			expect(
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+			).toBeDisabled();
+		} );
+
 		it( 'should describe the radio group with the help text', () => {
 			const onChangeSpy = jest.fn();
 			render(

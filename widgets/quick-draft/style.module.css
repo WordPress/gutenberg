@@ -1,0 +1,54 @@
+.body {
+	height: 100%;
+}
+
+/* Stretches loading/empty states and the form to fill their pane. */
+.fill {
+	height: 100%;
+}
+
+.primaryPane {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	padding: var(--wpds-dimension-padding-lg);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.listPane {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+}
+
+/* Compact reveal: Back control pinned below the scrolling drafts list. */
+.backRow {
+	padding: var(--wpds-dimension-padding-sm);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+/* Wide tile: drafts list sits beside the form, split by a vertical rule. */
+.row .primaryPane {
+	border-inline-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	max-width: calc(var(--wpds-dimension-base) * 100);
+	margin: 0 auto;
+}
+
+.formContainer {
+	flex: 1;
+	min-height: 0;
+}
+
+/*
+ * API gap workaround.
+ *
+ * `<DataForm>` does not accept a className and does not expose a `grow`
+ * prop on its form-level wrapper. We reach into the internal class so the
+ * form Stack stretches to fill our container, which in turn lets a
+ * `grow`-style field row absorb the remaining vertical space. Drop once
+ * `@wordpress/dataviews` exposes a public hook for this.
+ */
+.formContainer > :global(.dataforms-layouts__wrapper) {
+	flex: 1;
+	min-height: 0;
+}

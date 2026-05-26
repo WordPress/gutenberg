@@ -10,6 +10,7 @@ export { UploadError } from './upload-error';
 export {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
+	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
 } from './feature-detection';
 

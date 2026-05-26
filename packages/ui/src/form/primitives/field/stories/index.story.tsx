@@ -1,17 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
-import { Field } from '../../../..';
+import * as Field from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
 	component: Field.Root,
 	subcomponents: {
-		Item: Field.Item,
-		Label: Field.Label,
-		Control: Field.Control,
-		Description: Field.Description,
-		Details: Field.Details,
+		'Field.Item': Field.Item,
+		'Field.Label': Field.Label,
+		'Field.Control': Field.Control,
+		'Field.Description': Field.Description,
+		'Field.Details': Field.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;

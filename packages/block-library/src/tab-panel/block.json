@@ -4,62 +4,52 @@
 	"apiVersion": 3,
 	"name": "core/tab-panel",
 	"title": "Tab Panel",
-	"description": "Container for tab panel content in a tabbed interface.",
-	"version": "1.0.0",
+	"description": "Content for a tab in a tabbed interface.",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [ "core/tabs" ],
-	"allowedBlocks": [ "core/tab" ],
-	"attributes": {},
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"parent": [ "core/tab-panels" ],
+	"usesContext": [
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex",
+		"core/tabs-id"
+	],
 	"supports": {
-		"anchor": false,
+		"anchor": true,
 		"html": false,
 		"reusable": false,
-		"lock": false,
-		"dimensions": {
-			"aspectRatio": false,
-			"height": false,
-			"minHeight": false,
-			"width": false
-		},
 		"color": {
 			"background": true,
 			"text": true,
-			"heading": true,
-			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
 		},
+		"layout": true,
 		"spacing": {
-			"blockGap": false,
+			"blockGap": true,
 			"padding": true,
-			"margin": true
+			"margin": false
 		},
 		"typography": {
 			"fontSize": true,
-			"__experimentalFontFamily": true
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"__experimentalFontFamily": true
+			}
 		},
-		"layout": {
-			"default": {
-				"type": "flex",
-				"flexWrap": "nowrap",
-				"justifyContent": "stretch",
-				"orientation": "vertical"
-			},
-			"allowSwitching": false,
-			"allowVerticalAlignment": false,
-			"allowOrientation": false,
-			"allowJustification": true,
-			"allowSizingOnChildren": false
-		},
-		"__experimentalBorder": {
-			"radius": true,
-			"color": true,
-			"width": true,
-			"style": true
-		}
+		"renaming": true,
+		"visibility": false
+	},
+	"providesContext": {
+		"core/tab-label": "label"
 	},
 	"editorScript": "file:./index.js",
 	"style": "file:./style-index.css"
