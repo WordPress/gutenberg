@@ -51,7 +51,7 @@ jobs:
               with:
                   # Need full history on the annotation run so the root-deps
                   # check can compute the merge-base against the PR base.
-                  fetch-depth: ${{ case(github.event_name == 'pull_request' && matrix.annotations, '0', '1') }}
+                  fetch-depth: ${{ case(github.event_name == 'pull_request' && matrix.annotations == true, '0', '1') }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
