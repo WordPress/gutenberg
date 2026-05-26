@@ -23,10 +23,7 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 export function useIsHovered( { isEnabled = true } = {} ) {
 	return useCallback(
 		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( ! isEnabled ) {
+			if ( ! node || ! isEnabled ) {
 				return;
 			}
 

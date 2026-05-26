@@ -40,10 +40,7 @@ export function useInBetweenInserter() {
 
 	return useCallback(
 		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( isInBetweenInserterDisabled ) {
+			if ( ! node || isInBetweenInserterDisabled ) {
 				return;
 			}
 

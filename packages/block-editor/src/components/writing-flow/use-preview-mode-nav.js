@@ -24,10 +24,7 @@ export function usePreviewModeNav() {
 
 	return useCallback(
 		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( ! isPreviewMode ) {
+			if ( ! node || ! isPreviewMode ) {
 				return;
 			}
 

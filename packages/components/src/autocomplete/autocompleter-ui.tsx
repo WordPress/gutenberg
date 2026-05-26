@@ -108,10 +108,7 @@ export function AutocompleterUI( {
 		popoverRef,
 		useCallback(
 			( node: HTMLElement | null ) => {
-				if ( ! node ) {
-					return;
-				}
-				if ( ! contentRef.current ) {
+				if ( ! node || ! contentRef.current ) {
 					return;
 				}
 

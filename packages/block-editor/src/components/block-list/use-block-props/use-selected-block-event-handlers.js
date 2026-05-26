@@ -45,10 +45,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 	return useCallback(
 		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( ! isSelected ) {
+			if ( ! node || ! isSelected ) {
 				return;
 			}
 

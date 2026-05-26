@@ -62,10 +62,7 @@ export function useMouseMoveTypingReset() {
 
 	return useCallback(
 		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( ! isTyping ) {
+			if ( ! node || ! isTyping ) {
 				return;
 			}
 

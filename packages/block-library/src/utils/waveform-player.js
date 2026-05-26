@@ -33,10 +33,7 @@ export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
 
 	const ref = useCallback(
 		( element ) => {
-			if ( ! element ) {
-				return;
-			}
-			if ( ! src ) {
+			if ( ! element || ! src ) {
 				return;
 			}
 

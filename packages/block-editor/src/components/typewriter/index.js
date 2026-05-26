@@ -23,10 +23,7 @@ export function useTypewriter() {
 
 	return useCallback(
 		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( ! hasSelectedBlock ) {
+			if ( ! node || ! hasSelectedBlock ) {
 				return;
 			}
 

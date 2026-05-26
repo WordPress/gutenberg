@@ -49,10 +49,7 @@ export function useEventListeners( props ) {
 
 	return useCallback(
 		( element ) => {
-			if ( ! element ) {
-				return;
-			}
-			if ( ! props.isSelected ) {
+			if ( ! element || ! props.isSelected ) {
 				return;
 			}
 			const cleanups = refEffects.map( ( effect ) => effect( element ) );

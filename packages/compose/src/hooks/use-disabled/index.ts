@@ -39,10 +39,7 @@ export default function useDisabled( {
 } = {} ) {
 	return useCallback(
 		( node: HTMLElement | null ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( isDisabledProp ) {
+			if ( ! node || isDisabledProp ) {
 				return;
 			}
 

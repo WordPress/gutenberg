@@ -32,10 +32,7 @@ export default function useSelectNearestEditableBlock( {
 
 	return useCallback(
 		( element ) => {
-			if ( ! element ) {
-				return;
-			}
-			if ( ! isEnabled ) {
+			if ( ! element || ! isEnabled ) {
 				return;
 			}
 

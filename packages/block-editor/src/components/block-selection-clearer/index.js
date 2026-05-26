@@ -24,10 +24,7 @@ export function useBlockSelectionClearer() {
 
 	return useCallback(
 		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			if ( ! isEnabled ) {
+			if ( ! node || ! isEnabled ) {
 				return;
 			}
 

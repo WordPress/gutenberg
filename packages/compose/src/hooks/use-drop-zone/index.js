@@ -42,10 +42,7 @@ export default function useDropZone( {
 
 	return useCallback(
 		( elem ) => {
-			if ( ! elem ) {
-				return;
-			}
-			if ( isDisabled ) {
+			if ( ! elem || isDisabled ) {
 				return;
 			}
 

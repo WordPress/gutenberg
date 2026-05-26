@@ -49,10 +49,7 @@ export function useFocusOnMount(
 	}, [ focusOnMount ] );
 
 	return useCallback( ( node: HTMLElement | null ) => {
-		if ( ! node ) {
-			return;
-		}
-		if ( focusOnMountRef.current === false ) {
+		if ( ! node || focusOnMountRef.current === false ) {
 			return;
 		}
 
