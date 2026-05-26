@@ -10,14 +10,19 @@ import {
 import { dateI18n } from '@wordpress/date';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { globe, postList, wordpress } from '@wordpress/icons';
 import { EmptyState, Icon, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { DEFAULT_PER_PAGE } from './widget';
+import {
+	DEFAULT_PER_PAGE,
+	NEWS_FEED_LIST,
+	NEWS_FEEDS,
+	type NewsFeedSource,
+} from './widget';
 import styles from './render.module.css';
 
 interface NewsPost {
@@ -49,21 +54,6 @@ type NewsAttributes = {
 	showNews?: boolean;
 	showCommunity?: boolean;
 };
-
-const NEWS_FEEDS = [
-	{
-		key: 'news',
-		label: __( 'WordPress Blog' ),
-		siteUrl: _x( 'https://wordpress.org/news/', 'News dashboard widget' ),
-		apiUrl: 'https://wordpress.org/news/wp-json/wp/v2/posts?_fields=id,title,link,date',
-	},
-	{
-		key: 'planet',
-		label: __( 'Other WordPress News' ),
-		siteUrl: _x( 'https://planet.wordpress.org/', 'News dashboard widget' ),
-		apiUrl: 'https://planet.wordpress.org/wp-json/wp/v2/posts?_fields=id,title,link,date',
-	},
-];
 
 const DEFAULT_LAYOUTS = { list: {} };
 
@@ -168,7 +158,7 @@ function extendPaginationInfo(
 }
 
 async function fetchNewsFeed(
-	feed: ( typeof NEWS_FEEDS )[ number ],
+	feed: NewsFeedSource,
 	fetchCount: number
 ): Promise< NewsFeed > {
 	const apiUrl = `${ feed.apiUrl }&per_page=${ fetchCount }`;
@@ -202,7 +192,7 @@ function getEnabledFeeds( attributes?: NewsAttributes ) {
 	const showNews = attributes?.showNews ?? true;
 	const showCommunity = attributes?.showCommunity ?? true;
 
-	return NEWS_FEEDS.filter( ( feed ) => {
+	return NEWS_FEED_LIST.filter( ( feed ) => {
 		if ( feed.key === 'news' ) {
 			return showNews;
 		}
@@ -354,7 +344,11 @@ export default function WordPressNews( {
 	const isLoading =
 		isInitialLoading || ( isFetchingMore && ! hasDataForCurrentPage );
 	const showEmpty = ! isLoading && ! isFetchingMore && allItems.length === 0;
-	const showSeeAllLink = attributes?.showNews ?? true;
+	const showNewsLink = attributes?.showNews ?? true;
+	const showCommunityLink = attributes?.showCommunity ?? true;
+	const hasFooterLinks = showNewsLink || showCommunityLink;
+	const newsFeed = NEWS_FEEDS.news;
+	const communityFeed = NEWS_FEEDS.planet;
 
 	return (
 		<div className={ styles.root }>
@@ -373,22 +367,39 @@ export default function WordPressNews( {
 				<footer className={ styles.footer }>
 					<Stack
 						direction="row"
-						justify={ showSeeAllLink ? 'space-between' : 'end' }
+						justify={ hasFooterLinks ? 'space-between' : 'end' }
 						align="center"
 						gap="md"
+						wrap="wrap"
 					>
-						{ showSeeAllLink && (
-							<Link
-								href={ _x(
-									'https://wordpress.org/news/all-posts/',
-									'News dashboard widget'
-								) }
-								openInNewTab
+						{ hasFooterLinks && (
+							<Stack
+								direction="row"
+								gap="md"
+								wrap="wrap"
+								className={ styles.footerLinks }
 							>
-								{ __( 'See all' ) }
-							</Link>
+								{ showNewsLink && newsFeed && (
+									<Link
+										href={ newsFeed.siteUrl }
+										openInNewTab
+									>
+										{ newsFeed.label }
+									</Link>
+								) }
+								{ showCommunityLink && communityFeed && (
+									<Link
+										href={ communityFeed.siteUrl }
+										openInNewTab
+									>
+										{ communityFeed.label }
+									</Link>
+								) }
+							</Stack>
 						) }
-						<DataViews.Pagination />
+						<div className={ styles.footerPagination }>
+							<DataViews.Pagination />
+						</div>
 					</Stack>
 				</footer>
 			</DataViews>
