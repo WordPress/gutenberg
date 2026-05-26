@@ -22,6 +22,8 @@ import {
 	keyboardShortcutContext,
 	inputEventContext,
 } from '../../../components/rich-text';
+import { useBlockEditContext } from '../../../components/block-edit';
+import { GatedConnectedButton } from '../connected-button';
 import { unlock } from '../../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );
@@ -34,6 +36,7 @@ export default function RichTextControl( {
 	config = {},
 } ) {
 	const registry = useRegistry();
+	const { name: blockName } = useBlockEditContext();
 	const isBound = field.id in ( data?.metadata?.bindings || {} );
 	const attrValue = field.getValue( { item: data } );
 	const fieldConfig = field.config || {};
@@ -135,6 +138,11 @@ export default function RichTextControl( {
 					onBlur={ () => setIsSelected( false ) }
 					contentEditable
 					{ ...controlProps }
+				/>
+				<GatedConnectedButton
+					attribute={ field.id }
+					blockName={ blockName }
+					isConnected={ isBound }
 				/>
 			</BaseControl>
 		</>
