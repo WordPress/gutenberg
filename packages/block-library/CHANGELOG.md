@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Image and Site Logo blocks: the Crop toolbar button now opens the Media Editor modal instead of an inline cropper. The previous inline experience is removed.
+
 ### Internal
 
 -   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).

@@ -312,7 +312,7 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {
-		if ( ! id || ! openMediaEditorModal ) {
+		if ( ! id ) {
 			return;
 		}
 
@@ -351,5 +351,5 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 		resolveAttachmentRecord,
 	] );
 
-	return id && openMediaEditorModal ? openImageMediaEditorModal : undefined;
+	return id ? openImageMediaEditorModal : undefined;
 }
