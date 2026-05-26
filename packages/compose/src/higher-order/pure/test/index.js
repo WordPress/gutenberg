@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -15,6 +16,12 @@ import { Component } from '@wordpress/element';
 import pure from '../';
 
 describe( 'pure', () => {
+	afterEach( () => {
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
+	} );
+
 	it( 'functional component should rerender only when props change', () => {
 		let i = 0;
 		const MyComp = pure( () => {
@@ -24,6 +31,9 @@ describe( 'pure', () => {
 
 		// Updating with same props doesn't rerender.
 		rerender( <MyComp /> );
+		expect( console ).toHaveWarnedWith(
+			'wp.compose.pure is deprecated since version 7.1. Please use Use `memo` or `PureComponent` instead instead.'
+		);
 		expect( screen.getByTestId( 'counter' ) ).toHaveTextContent( '1' );
 
 		// New prop should trigger a rerender.
@@ -74,6 +84,9 @@ describe( 'pure', () => {
 		);
 
 		const { rerender } = render( <MyComp /> );
+		expect( console ).toHaveWarnedWith(
+			'wp.compose.pure is deprecated since version 7.1. Please use Use `memo` or `PureComponent` instead instead.'
+		);
 
 		// Updating with same props doesn't rerender.
 		rerender( <MyComp /> );

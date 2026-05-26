@@ -11,6 +11,10 @@
 -   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
 -   `useDialog`: Handle Escape via React `onKeyDown` so portaled descendants can stop propagation to prevent the dialog from closing ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
 
+### Deprecations
+
+-   The `pure` HoC now logs a runtime deprecation warning. Use `memo` or `PureComponent` from `@wordpress/element` instead.
+
 ## 7.46.0 (2026-05-14)
 
 ## 7.45.0 (2026-04-29)

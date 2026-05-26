@@ -6,10 +6,9 @@ import type { ComponentType } from 'react';
 /**
  * WordPress dependencies
  */
-import { createElement } from '@wordpress/element';
+import { createElement, memo } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
-	pure,
 	useViewportMatch,
 } from '@wordpress/compose';
 
@@ -78,7 +77,7 @@ const withViewportMatch = ( queries: ViewportQueries ) => {
 				} );
 			};
 
-			return pure( WrappedWithViewport );
+			return memo( WrappedWithViewport );
 		},
 		'withViewportMatch'
 	);
