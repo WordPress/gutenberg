@@ -11,6 +11,7 @@
 - DataViews: Lower the sticky footer z-index and isolate grid card stacking contexts. [#78315](https://github.com/WordPress/gutenberg/pull/78315)
 - DataViews: Refresh filter chip styling to align with `Button`. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataForms: Increase the minimum width of the panel layout popover from 256px to 320px so option labels have more room. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForm: Surface a "connected" visual indicator on `text` controls whose `data.metadata.bindings[field.id]` is set; the `ValidatedText` control gains the `.is-connected` class (purple `--wp-block-synced-color` border) and consumer-supplied `prefix`/`suffix` components receive an `isConnected` boolean prop. [#75022](https://github.com/WordPress/gutenberg/issues/75022)
 
 ### Bug Fixes
 
