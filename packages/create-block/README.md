@@ -69,7 +69,7 @@ The rest of the configuration is set to all default values unless overridden wit
 
 ```bash
 -V, --version                output the version number
--t, --template <name>        project template type name; allowed values: "static" (default), "es5", the name of an external npm package, or the path to a local directory
+-t, --template <name>        project template type name; allowed values: "standard" (default), "es5", the name of an external npm package, or the path to a local directory
 --variant                    choose a block variant as defined by the template
 --no-plugin                  scaffold block files only
 --target-dir <directory>     the directory where the files will be scaffolded, defaults to the slug
