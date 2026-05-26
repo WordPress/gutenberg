@@ -42,6 +42,7 @@ import {
 	getStyleForState,
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
+	isDefaultBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
 
@@ -452,6 +453,10 @@ function LayoutPanelPure( {
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
 	const hasContentSizeOrLegacySettings = !! inherit || !! contentSize;
+	const showLayoutTypeSwitcher =
+		isDefaultBlockStyleState( selectedState ) &&
+		! inherit &&
+		allowSwitching;
 
 	const onChangeLayout = ( newLayout ) => {
 		if ( isViewportLayoutState ) {
@@ -522,7 +527,7 @@ function LayoutPanelPure( {
 					</ToolsPanelItem>
 				) }
 
-				{ ! inherit && allowSwitching && (
+				{ showLayoutTypeSwitcher && (
 					<ToolsPanelItem
 						label={ __( 'Layout type' ) }
 						hasValue={ hasLayoutTypeValue }
