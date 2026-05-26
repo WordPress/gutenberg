@@ -43,8 +43,9 @@ function gutenberg_normalize_state_preset_vars( $value ) {
  * @return array Normalized state style object.
  */
 function gutenberg_normalize_state_style_for_css_output( $style ) {
-	$style = gutenberg_normalize_state_preset_vars( $style );
+	// Layout is processed separately by gutenberg_render_layout_support_flag(), so we remove it before declaration generation.
 	unset( $style['layout'] );
+	$style = gutenberg_normalize_state_preset_vars( $style );
 	return $style;
 }
 
