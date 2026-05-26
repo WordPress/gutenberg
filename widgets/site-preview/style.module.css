@@ -13,9 +13,48 @@
 	overflow: hidden;
 }
 
+.urlBar {
+	flex-shrink: 0;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+	background: var(--wpds-color-bg-surface-neutral-weak);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.urlField {
+	min-width: 0;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-radius: var(--wpds-border-radius-lg);
+	background: var(--wpds-color-bg-surface-neutral);
+}
+
+.urlFavicon {
+	flex-shrink: 0;
+	width: var(--wpds-typography-font-size-xs);
+	height: var(--wpds-typography-font-size-xs);
+	object-fit: contain;
+}
+
+.urlIcon {
+	flex-shrink: 0;
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.urlText {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	font-size: var(--wpds-typography-font-size-xs);
+	line-height: var(--wpds-typography-line-height-xs);
+	color: var(--wpds-color-fg-content-neutral);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .previewWrap {
 	position: relative;
-	height: 100%;
+	flex: 1;
+	min-height: 0;
 }
 
 .loading {
@@ -30,7 +69,7 @@
 	inset-inline-start: 50%;
 	width: 250%;
 	min-height: 375%;
-	transform: translate(-50%, -13px) scale(0.4);
+	transform: translate(-50%, 0) scale(0.4);
 	transform-origin: center top;
 }
 
@@ -42,28 +81,13 @@
 	backdrop-filter: blur(1px);
 }
 
-.overlayButton {
-	box-shadow: var(--wpds-elevation-xs);
-}
-
 .previewWrap:hover .overlay,
 .previewWrap:focus-within .overlay {
 	opacity: 1;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-	.previewWrap:hover .overlay,
-	.previewWrap:focus-within .overlay {
-		animation: fadeIn var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle) both;
-	}
-}
-
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-
-	to {
-		opacity: 1;
+@media not (prefers-reduced-motion) {
+	.overlay {
+		transition: opacity var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive);
 	}
 }
