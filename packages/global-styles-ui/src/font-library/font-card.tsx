@@ -47,6 +47,7 @@ function FontCard( {
 			} }
 			style={ style }
 			className="font-library__font-card"
+			data-font-slug={ font.slug }
 		>
 			<Flex justify="space-between" wrap={ false }>
 				<FontDemo font={ font } />

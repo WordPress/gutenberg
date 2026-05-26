@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useState } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import type {
@@ -57,6 +57,8 @@ function InstalledFonts() {
 	const [ fontFamilies, setFontFamilies ] = useSetting<
 		Record< string, FontFamilyPreset[] > | undefined
 	>( 'typography.fontFamilies' );
+	const lastSelectedFontSlugRef = useRef< string | undefined >( undefined );
+
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] =
 		useState< boolean >( false );
 	const [ notice, setNotice ] = useState< {
@@ -176,6 +178,18 @@ function InstalledFonts() {
 	useEffect( () => {
 		handleSetLibraryFontSelected( libraryFontSelected );
 	}, [] );
+
+	useEffect( () => {
+		if ( ! libraryFontSelected && lastSelectedFontSlugRef.current ) {
+			const button = document.querySelector< HTMLElement >(
+				`[data-font-slug="${ lastSelectedFontSlugRef.current }"]`
+			);
+			if ( button ) {
+				button.focus();
+			}
+			lastSelectedFontSlugRef.current = undefined;
+		}
+	}, [ libraryFontSelected ] );
 
 	// Get activated fonts count.
 	const activeFontsCount = libraryFontSelected
@@ -366,6 +380,8 @@ function InstalledFonts() {
 									}
 									size="small"
 									onClick={ () => {
+										lastSelectedFontSlugRef.current =
+											libraryFontSelected?.slug;
 										handleSetLibraryFontSelected(
 											undefined
 										);
