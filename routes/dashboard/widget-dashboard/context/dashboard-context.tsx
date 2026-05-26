@@ -39,6 +39,7 @@ import type {
  * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
+	model: 'grid',
 	columns: 12,
 	minColumnWidth: 140,
 	rowHeight: 140,

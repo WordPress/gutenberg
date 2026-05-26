@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal/es6';
+
+/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -54,11 +59,20 @@ export function useDashboardGridSettings(): [
 	const { set } = useDispatch( preferencesStore );
 
 	function setSettings( next: WidgetGridSettings ) {
+		// Persist "back to default" as a cleared preference rather than a stored
+		// copy of the defaults: the dashboard then tracks the current code
+		// default and the value can never drift. Reset routes through here (the
+		// drawer commit fires the setter with the default), so this is what makes
+		// Reset + Save truly clear the stored preference.
+		if ( fastDeepEqual( next, DEFAULT_GRID_SETTINGS ) ) {
+			void set( SCOPE, KEY, null );
+			return;
+		}
 		void set( SCOPE, KEY, next );
 	}
 
 	function resetSettings() {
-		void set( SCOPE, KEY, DEFAULT_GRID_SETTINGS );
+		void set( SCOPE, KEY, null );
 	}
 
 	return [ settings, setSettings, resetSettings ];

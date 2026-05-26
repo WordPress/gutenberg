@@ -52,11 +52,11 @@
 }
 
 /*
- * Bleed: zero the content's block padding so the body reaches the card edges.
- * The top edge is strictly ours, because a full-bleed widget hides its header
- * in a position:absolute VisuallyHidden node that stays the card's :first-child
- * and blocks Card.FullBleed's top-flush rule. The bottom edge is already
- * flushed by Card.FullBleed, so zeroing it here is redundant but harmless.
+ * Bleed block edges: zero the content's block padding so the body fills the
+ * card top to bottom. The top is ours to flush (a full-bleed widget hides its
+ * header in a position:absolute VisuallyHidden node that stays the card's
+ * :first-child and blocks Card.FullBleed's top-flush rule). The bottom pairs
+ * with the `margin-block-end: 0` on the bleed scroll wrapper below.
  */
 .widgetChromeContentBleed {
 	padding-block: 0;
@@ -67,10 +67,17 @@
  * breakout (negative margins) and declares no height or overflow, so the scroll
  * container must be re-established here, on the wrapper that spans the card
  * edges, so the scrollbar tracks the edge and the header stays pinned.
+ *
+ * Card.FullBleed also adds `margin-block-end: calc(var(--wp-ui-card-padding) *
+ * -1)` to cancel the content's bottom padding; that padding is zeroed above, so
+ * neutralize the margin. Left in, it pulls the wrapper's box short of the body,
+ * surfacing as a phantom scrollbar on a content-driven tile or a bottom inset
+ * on a fixed-height one.
  */
 .widgetChromeBleedScroll {
 	height: 100%;
 	overflow-y: auto;
+	margin-block-end: 0;
 }
 
 .loading {

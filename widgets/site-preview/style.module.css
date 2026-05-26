@@ -1,5 +1,15 @@
 .container {
+	/*
+	 * The preview is built from absolutely-positioned layers (iframe, overlay),
+	 * so it has no intrinsic block size. `height: 100%` fills a fixed-height grid
+	 * tile exactly; on a content-driven (masonry) surface it resolves to auto, so
+	 * `aspect-ratio` derives the height from the width. `width: 100%` pins the
+	 * inline size so the aspect ratio only ever drives the block axis — without
+	 * it, a tall narrow tile would size the width from the height and overflow.
+	 */
+	width: 100%;
 	height: 100%;
+	aspect-ratio: 3 / 4;
 	overflow: hidden;
 }
 
