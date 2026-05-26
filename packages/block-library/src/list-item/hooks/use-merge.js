@@ -19,6 +19,7 @@ export default function useMerge( clientId, onMerge ) {
 		getBlockRootClientId,
 		getBlockName,
 		getBlock,
+		getBlockAttributes,
 	} = useSelect( blockEditorStore );
 	const { mergeBlocks, moveBlocksToPosition, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -122,6 +123,64 @@ export default function useMerge( clientId, onMerge ) {
 			const nextBlockClientId = getNextId( clientId );
 
 			if ( ! nextBlockClientId ) {
+				// No further list items exist in this list tree. Look past
+				// the outermost containing list for a block to merge into
+				// the innermost list. Without this, deleting forward at the
+				// end of a deeply-nested item would silently do nothing
+				// because the block-editor's fallback `onMerge` only walks
+				// one parent level up.
+				let topmostListItemId = clientId;
+				for (
+					let parentLi = getParentListItemId( topmostListItemId );
+					parentLi;
+					parentLi = getParentListItemId( topmostListItemId )
+				) {
+					topmostListItemId = parentLi;
+				}
+				const outermostListId =
+					getBlockRootClientId( topmostListItemId );
+				const followingBlockId =
+					getNextBlockClientId( outermostListId );
+
+				if ( followingBlockId ) {
+					// If the following block is a sibling list with the
+					// same attributes, mirror the generic block-editor
+					// behavior: move its items into the outermost list as
+					// new siblings (rather than concatenating into the
+					// current item). This keeps Delete-at-end and
+					// Backspace-at-start of the following list symmetric.
+					const sameName =
+						getBlockName( followingBlockId ) ===
+						getBlockName( outermostListId );
+					const outerAttrs = getBlockAttributes( outermostListId );
+					const followingAttrs =
+						getBlockAttributes( followingBlockId );
+					const sameAttrs =
+						sameName &&
+						Object.keys( outerAttrs ).every(
+							( k ) => outerAttrs[ k ] === followingAttrs[ k ]
+						);
+
+					if ( sameAttrs ) {
+						registry.batch( () => {
+							moveBlocksToPosition(
+								getBlockOrder( followingBlockId ),
+								followingBlockId,
+								outermostListId
+							);
+							removeBlock( followingBlockId, false );
+						} );
+						return;
+					}
+
+					// Otherwise concatenate via mergeBlocks. Its
+					// container-drilling walks from the outermost list
+					// down to the innermost (current) list item and
+					// concatenates the absorbed content there.
+					mergeBlocks( outermostListId, followingBlockId );
+					return;
+				}
+
 				onMerge( forward );
 				return;
 			}

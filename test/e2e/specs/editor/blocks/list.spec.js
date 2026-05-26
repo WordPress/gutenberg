@@ -1541,6 +1541,298 @@ test.describe( 'List (@firefox)', () => {
 		} );
 	} );
 
+	test( 'should merge following paragraph into a nested list item with Delete (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'text' },
+			},
+		];
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		// Place the cursor at the end of "inner" by stepping back from the
+		// start of the paragraph; ArrowLeft at block start moves to the
+		// end of the previous block, regardless of nesting.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await page.keyboard.press( 'Delete' );
+
+		// Mark caret position so we can assert it landed between "inner" and "text".
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner‸text' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should merge a following separate list into a nested list item with Delete (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'x' },
+					},
+				],
+			},
+		];
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		// Place the cursor at the end of "inner".
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await page.keyboard.press( 'Delete' );
+
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner‸' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'x' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'Backspace mirror: at start of paragraph after nested list should concatenate (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		for ( const block of [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'text' },
+			},
+		] ) {
+			await editor.insertBlock( block );
+		}
+
+		// Place the cursor at the start of "text".
+		await page.keyboard.press( 'Home' );
+
+		await page.keyboard.press( 'Backspace' );
+
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner‸text' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'Backspace mirror: at start of first item in second list should concatenate (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		// Build the structure via keyboard so the cursor lands naturally
+		// at the end of "x" (last typed character) with same-block context.
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '* outer' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'inner' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '* x' );
+
+		// Verify the starting structure so the test fails clearly if the
+		// keyboard build-up didn't produce what we expect.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'x' },
+					},
+				],
+			},
+		] );
+
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: '‸x' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should leave nested list intact when deleting the parent item', async ( {
 		editor,
 		page,

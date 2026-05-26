@@ -1157,6 +1157,66 @@ export const __unstableExpandSelection =
 	};
 
 /**
+ * Find the deepest descendant (in the given direction) of a block that has
+ * a `merge` function and can therefore absorb the other side of a merge.
+ *
+ * @param {Object} select    Block-editor selectors.
+ * @param {string} clientId  Block to drill into.
+ * @param {string} direction "leading" or "trailing".
+ * @return {?string} Client ID of a mergeable descendant, or null.
+ */
+function findDeepestMergeableLeaf( select, clientId, direction ) {
+	const order = select.getBlockOrder( clientId );
+	if ( order.length ) {
+		const childId =
+			direction === 'trailing' ? order[ order.length - 1 ] : order[ 0 ];
+		const deeper = findDeepestMergeableLeaf( select, childId, direction );
+		if ( deeper ) {
+			return deeper;
+		}
+	}
+	const blockType = getBlockType( select.getBlockName( clientId ) );
+	return blockType?.merge ? clientId : null;
+}
+
+/**
+ * If the given block is an `__experimentalOnMerge` container (list, quote,
+ * group), drill into it to find a deeper mergeable leaf. Returns null for
+ * any block that already has its own merge fn — callers in that case
+ * already targeted the right level (e.g. list-item to list-item).
+ *
+ * @param {Object} select    Block-editor selectors.
+ * @param {string} clientId  Block to drill into.
+ * @param {string} direction "leading" or "trailing".
+ * @return {?string} Client ID of a mergeable descendant, or null.
+ */
+function drillToMergeableLeaf( select, clientId, direction ) {
+	const blockName = select.getBlockName( clientId );
+	if ( ! getBlockSupport( blockName, '__experimentalOnMerge' ) ) {
+		return null;
+	}
+	const order = select.getBlockOrder( clientId );
+	if ( ! order.length ) {
+		return null;
+	}
+	const immediateChild =
+		direction === 'trailing' ? order[ order.length - 1 ] : order[ 0 ];
+	const deepest = findDeepestMergeableLeaf(
+		select,
+		immediateChild,
+		direction
+	);
+	// Only drill when there is real nesting past the immediate child.
+	// Flat containers keep the historical "absorb as new inner block"
+	// semantics so that, e.g. `list[a] + paragraph` still produces
+	// `list[a, paragraph-as-li]` rather than concatenating.
+	if ( deepest === immediateChild ) {
+		return null;
+	}
+	return deepest;
+}
+
+/**
  * Action that merges two blocks.
  *
  * @param {string} firstBlockClientId  Client ID of the first block to merge.
@@ -1165,8 +1225,19 @@ export const __unstableExpandSelection =
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
 	( { registry, select, dispatch } ) => {
-		const clientIdA = firstBlockClientId;
-		const clientIdB = secondBlockClientId;
+		// If either side is a container whose deepest leaf can absorb the
+		// other side via its merge function, retarget the merge at that
+		// leaf. This makes Backspace/Delete across nested blocks behave
+		// like a normal text editor (content concatenates into the trailing
+		// leaf instead of producing a new sibling).
+		const drilledA =
+			drillToMergeableLeaf( select, firstBlockClientId, 'trailing' ) ||
+			firstBlockClientId;
+		const drilledB =
+			drillToMergeableLeaf( select, secondBlockClientId, 'leading' ) ||
+			secondBlockClientId;
+		const clientIdA = drilledA;
+		const clientIdB = drilledB;
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
@@ -1364,20 +1435,31 @@ export const mergeBlocks =
 			);
 		}
 
-		dispatch.replaceBlocks(
-			[ blockA.clientId, blockB.clientId ],
-			[
-				{
-					...blockA,
-					attributes: {
-						...blockA.attributes,
-						...updatedAttributes,
+		registry.batch( () => {
+			dispatch.replaceBlocks(
+				[ blockA.clientId, blockB.clientId ],
+				[
+					{
+						...blockA,
+						attributes: {
+							...blockA.attributes,
+							...updatedAttributes,
+						},
 					},
-				},
-				...blocksWithTheSameType.slice( 1 ),
-			],
-			0 // If we don't pass the `indexToSelect` it will default to the last block.
-		);
+					...blocksWithTheSameType.slice( 1 ),
+				],
+				0 // If we don't pass the `indexToSelect` it will default to the last block.
+			);
+			// If we drilled into a container to find a mergeable leaf, the
+			// container may now be empty. Remove it so we don't leave an
+			// empty list/quote/etc. hanging around.
+			if (
+				drilledB !== secondBlockClientId &&
+				! select.getBlockOrder( secondBlockClientId ).length
+			) {
+				dispatch.removeBlock( secondBlockClientId, false );
+			}
+		} );
 	};
 
 /**
