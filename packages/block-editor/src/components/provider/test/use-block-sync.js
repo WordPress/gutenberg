@@ -241,6 +241,49 @@ describe( 'useBlockSync hook', () => {
 		expect( setAsController ).toHaveBeenCalledWith( 'test', true );
 	} );
 
+	it( 'marks incoming remotely synced blocks', async () => {
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+		const value = [
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [
+					{
+						name: 'test/test-block',
+						clientId: 'b',
+						innerBlocks: [],
+						attributes: { foo: 2 },
+					},
+				],
+				attributes: { foo: 1 },
+			},
+		];
+
+		render(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				value={ value }
+				onChange={ jest.fn() }
+				onInput={ jest.fn() }
+				__unstableIsRemoteSynced
+			/>
+		);
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableIsRemoteSyncedBlock( 'a' )
+		).toBe( true );
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableIsRemoteSyncedBlock( 'b' )
+		).toBe( true );
+	} );
+
 	it( 'calls onInput when a non-persistent block change occurs', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();

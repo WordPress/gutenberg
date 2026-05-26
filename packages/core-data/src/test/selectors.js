@@ -14,6 +14,7 @@ import {
 	getRawEntityRecord,
 	__experimentalGetDirtyEntityRecords,
 	__experimentalGetEntitiesBeingSaved,
+	__unstableGetEntityRecordBlockEditSource,
 	getEntityRecordNonTransientEdits,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
@@ -898,6 +899,41 @@ describe( 'getEntityRecordNonTransientEdits', () => {
 				'someId'
 			)
 		).toEqual( {} );
+	} );
+} );
+
+describe( '__unstableGetEntityRecordBlockEditSource', () => {
+	it( 'returns the latest block edit source for an entity record', () => {
+		const state = deepFreeze( {
+			entities: {
+				records: {
+					postType: {
+						post: {
+							editSources: {
+								1: { blocks: 'remote-sync' },
+							},
+						},
+					},
+				},
+			},
+		} );
+
+		expect(
+			__unstableGetEntityRecordBlockEditSource(
+				state,
+				'postType',
+				'post',
+				1
+			)
+		).toBe( 'remote-sync' );
+		expect(
+			__unstableGetEntityRecordBlockEditSource(
+				state,
+				'postType',
+				'post',
+				2
+			)
+		).toBeUndefined();
 	} );
 } );
 

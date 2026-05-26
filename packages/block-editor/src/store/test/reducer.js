@@ -287,6 +287,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -346,6 +347,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -389,6 +391,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -448,6 +451,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
@@ -520,6 +524,7 @@ describe( 'state', () => {
 					),
 					tree: new Map(),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -615,6 +620,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -691,6 +697,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -744,6 +751,7 @@ describe( 'state', () => {
 						} )
 					),
 					controlledInnerBlocks: new Set(),
+					remoteSyncedBlocks: new Set(),
 					blockEditingModes: new Map(),
 				} );
 
@@ -766,6 +774,7 @@ describe( 'state', () => {
 				isIgnoredChange: false,
 				tree: new Map(),
 				controlledInnerBlocks: new Set(),
+				remoteSyncedBlocks: new Set(),
 				blockEditingModes: new Map(),
 			} );
 		} );
@@ -2269,6 +2278,35 @@ describe( 'state', () => {
 					} );
 
 					expect( state.isIgnoredChange ).toBe( true );
+				} );
+			} );
+
+			describe( 'remoteSyncedBlocks', () => {
+				it( 'should track and clear blocks received from remote sync', () => {
+					let state = blocks( undefined, {
+						type: 'MARK_REMOTE_SYNCED_BLOCKS',
+						clientIds: [ 'kumquat', 'persimmon' ],
+					} );
+
+					expect( state.remoteSyncedBlocks ).toEqual(
+						new Set( [ 'kumquat', 'persimmon' ] )
+					);
+
+					state = blocks( state, {
+						type: 'CLEAR_REMOTE_SYNCED_BLOCK',
+						clientId: 'kumquat',
+					} );
+
+					expect( state.remoteSyncedBlocks ).toEqual(
+						new Set( [ 'persimmon' ] )
+					);
+
+					state = blocks( state, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} );
+
+					expect( state.remoteSyncedBlocks ).toEqual( new Set() );
 				} );
 			} );
 

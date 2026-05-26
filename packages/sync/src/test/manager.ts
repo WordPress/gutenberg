@@ -888,9 +888,12 @@ describe( 'SyncManager', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-				title: 'Title from remote peer',
-			} );
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith(
+				{
+					title: 'Title from remote peer',
+				},
+				{ __unstableIsRemoteSync: true }
+			);
 		} );
 
 		it( 'does not edit the local record for local transactions', async () => {

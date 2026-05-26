@@ -29,6 +29,60 @@ describe( 'entities', () => {
 		} );
 	} );
 
+	it( 'tracks and clears remote block edit sources', () => {
+		let state = entities( undefined, {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'root',
+			name: 'postType',
+			recordId: 'post',
+			edits: { blocks: [] },
+			options: { __unstableIsRemoteSync: true },
+		} );
+
+		expect( state.records.root.postType.editSources ).toEqual( {
+			post: { blocks: 'remote-sync' },
+		} );
+
+		state = entities( state, {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'root',
+			name: 'postType',
+			recordId: 'post',
+			edits: { title: 'A local title edit' },
+		} );
+
+		expect( state.records.root.postType.editSources ).toEqual( {
+			post: { blocks: 'remote-sync' },
+		} );
+
+		state = entities( state, {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'root',
+			name: 'postType',
+			recordId: 'post',
+			edits: { blocks: [] },
+		} );
+
+		expect( state.records.root.postType.editSources ).toEqual( {} );
+
+		state = entities( state, {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'root',
+			name: 'postType',
+			recordId: 'post',
+			edits: { blocks: [] },
+			options: { __unstableIsRemoteSync: true },
+		} );
+		state = entities( state, {
+			type: 'RECEIVE_ITEMS',
+			kind: 'root',
+			name: 'postType',
+			items: { slug: 'post' },
+		} );
+
+		expect( state.records.root.postType.editSources ).toEqual( {} );
+	} );
+
 	it( 'returns with received post types by slug', () => {
 		const originalState = deepFreeze( {} );
 		const state = entities( originalState, {
