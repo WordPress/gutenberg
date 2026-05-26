@@ -10,6 +10,7 @@ import { Y } from '@wordpress/sync';
 import {
 	asHtmlStringIndex,
 	asRichTextOffset,
+	getAttributeKeyForYText,
 	getYTextByAttributeKey,
 	htmlIndexToRichTextOffset as typedHtmlIndexToRichTextOffset,
 	richTextOffsetToHtmlIndex as typedRichTextOffsetToHtmlIndex,
@@ -76,6 +77,53 @@ describe( 'getYTextByAttributeKey', () => {
 		expect(
 			getYTextByAttributeKey( attributes, 'body.-1.cells.0.content' )
 		).toBeNull();
+	} );
+} );
+
+describe( 'getAttributeKeyForYText', () => {
+	it( 'returns a top-level rich-text attribute key', () => {
+		const attributes = createAttachedAttributes();
+		const text = new Y.Text( 'Top level' );
+		attributes.set( 'content', text );
+
+		expect( getAttributeKeyForYText( attributes, text ) ).toBe( 'content' );
+	} );
+
+	it( 'returns the current nested path after an array insertion', () => {
+		const attributes = createAttachedAttributes();
+		const body = new Y.Array< Y.Map< unknown > >();
+		const firstRow = new Y.Map< unknown >();
+		const insertedRow = new Y.Map< unknown >();
+		const cells = new Y.Array< Y.Map< unknown > >();
+		const cell = new Y.Map< unknown >();
+		const text = new Y.Text( 'Cell text' );
+
+		cell.set( 'content', text );
+		cells.push( [ cell ] );
+		firstRow.set( 'cells', cells );
+		body.push( [ firstRow ] );
+		attributes.set( 'body', body );
+
+		expect( getAttributeKeyForYText( attributes, text ) ).toBe(
+			'body.0.cells.0.content'
+		);
+
+		insertedRow.set( 'cells', new Y.Array() );
+		body.insert( 0, [ insertedRow ] );
+
+		expect( getAttributeKeyForYText( attributes, text ) ).toBe(
+			'body.1.cells.0.content'
+		);
+	} );
+
+	it( 'prefers direct top-level keys that contain dots', () => {
+		const attributes = createAttachedAttributes();
+		const text = new Y.Text( 'Direct dotted key' );
+		attributes.set( 'body.0.content', text );
+
+		expect( getAttributeKeyForYText( attributes, text ) ).toBe(
+			'body.0.content'
+		);
 	} );
 } );
 

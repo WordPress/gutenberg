@@ -394,6 +394,10 @@ function areCursorPositionsEqual(
 	// This is necessary because Y.Text relative positions can remain the same after text changes.
 	const isAbsoluteOffsetEqual =
 		cursorPosition1.absoluteOffset === cursorPosition2.absoluteOffset;
+	const isAttributeKeyEqual =
+		cursorPosition1.attributeKey === cursorPosition2.attributeKey;
 
-	return isRelativePositionEqual && isAbsoluteOffsetEqual;
+	return (
+		isRelativePositionEqual && isAbsoluteOffsetEqual && isAttributeKeyEqual
+	);
 }

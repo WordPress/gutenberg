@@ -20,6 +20,8 @@ import {
 import {
 	asHtmlStringIndex,
 	findBlockByClientIdInDoc,
+	getAttributeKeyForYText,
+	getYTextByAttributeKey,
 	htmlIndexToRichTextOffset,
 } from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
@@ -67,16 +69,33 @@ function convertYSelectionToBlockSelection(
 ): WPBlockSelection | null {
 	if ( ySelection.type === YSelectionType.RelativeSelection ) {
 		const { relativePosition, attributeKey, clientId } = ySelection;
+		const block = findBlockByClientIdInDoc( clientId, ydoc );
+		const attributes = block?.get( 'attributes' );
 
 		const absolutePosition = Y.createAbsolutePositionFromRelativePosition(
 			relativePosition,
 			ydoc
 		);
 
-		if ( absolutePosition ) {
+		if (
+			absolutePosition &&
+			attributes instanceof Y.Map &&
+			absolutePosition.type instanceof Y.Text
+		) {
+			const currentAttributeKey =
+				getAttributeKeyForYText( attributes, absolutePosition.type ) ??
+				( getYTextByAttributeKey( attributes, attributeKey ) ===
+				absolutePosition.type
+					? attributeKey
+					: null );
+
+			if ( ! currentAttributeKey ) {
+				return null;
+			}
+
 			return {
 				clientId,
-				attributeKey,
+				attributeKey: currentAttributeKey,
 				offset: htmlIndexToRichTextOffset(
 					absolutePosition.type.toString(),
 					asHtmlStringIndex( absolutePosition.index )
