@@ -22,6 +22,7 @@
 
 -   `IconButton`: Default `focusableWhenDisabled` to `true`, matching `Button` ([#78526](https://github.com/WordPress/gutenberg/pull/78526)).
 -   `Button`: Do not show the interactive cursor when disabled ([#78479](https://github.com/WordPress/gutenberg/pull/78479)).
+-   `Button`: Fix disabled and hover styles for neutral minimal buttons with `aria-pressed="true"` ([#78635](https://github.com/WordPress/gutenberg/pull/78635)).
 -   `Autocomplete`: Fix the TypeScript prop types for the `Root` and `Value` primitives ([#78450](https://github.com/WordPress/gutenberg/pull/78450)).
 -   `Autocomplete`: Disable the clear button when the autocomplete is disabled, and hide it from assistive technologies ([#78520](https://github.com/WordPress/gutenberg/pull/78520)).
 -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).

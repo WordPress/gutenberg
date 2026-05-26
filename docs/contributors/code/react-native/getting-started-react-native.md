@@ -2,6 +2,8 @@
 
 Welcome! This is the Getting Started guide for the native mobile port of the block editor, targeting Android and iOS devices. Overall, it's a React Native library to be used in parent greenfield or brownfield apps. Continue reading for information on how to build, test, and run it.
 
+> **Heads up:** The React Native mobile editor is currently unmaintained on `trunk` and is known to be broken following the upgrade to React 19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)). To build a working demo app or patch the existing Gutenberg Mobile build, check out the most recent React Native release — tag [`rnmobile/1.121.0`](https://github.com/WordPress/gutenberg/releases/tag/rnmobile%2F1.121.0) at commit [`e63b8b8`](https://github.com/WordPress/gutenberg/commit/e63b8b8be7bdc5e9dd2781c597e918a7be212fe5) (see [#63744](https://github.com/WordPress/gutenberg/pull/63744)) — and work from there. See the [project status notice](/docs/contributors/code/react-native/README.md#project-status) for details.
+
 ## Prerequisites
 
 For a developer experience closer to the one the project maintainers current have, make sure you have the following tools installed:
