@@ -31,16 +31,18 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const [ latexToMathML, setLatexToMathML ] = useState();
 	// Tracks the latest `latex` so the one-shot effect below can read it
 	// when the dynamic import resolves rather than the value captured at
-	// mount. Must remain unconditional and run on every render.
-	const latestLatex = useRef( latex );
-	latestLatex.current = latex;
+	// mount.
+	const latestLatexRef = useRef( latex );
+	useEffect( () => {
+		latestLatexRef.current = latex;
+	} );
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
-			const currentLatex = latestLatex.current;
+			const currentLatex = latestLatexRef.current;
 			if ( currentLatex ) {
 				// `wp_kses` runs on block attributes for users without
 				// `unfiltered_html`, encoding `&` to `&amp;`. LaTeX uses
