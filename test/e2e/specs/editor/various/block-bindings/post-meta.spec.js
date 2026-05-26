@@ -376,7 +376,12 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT post', () => {
-		test.beforeAll( async ( { requestUtils } ) => {
+		test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				! isGutenbergPluginActive,
+				'Block Fields experiment requires Gutenberg plugin'
+			);
 			await requestUtils.setGutenbergExperiments( [
 				'gutenberg-content-only-inspector-fields',
 			] );

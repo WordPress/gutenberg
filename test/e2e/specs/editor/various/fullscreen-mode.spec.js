@@ -63,7 +63,13 @@ test.describe( 'Fullscreen Mode', () => {
 		page,
 		admin,
 		requestUtils,
+		isGutenbergPluginActive,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-admin-bar-in-editor',
 		] );
@@ -83,7 +89,13 @@ test.describe( 'Fullscreen Mode', () => {
 		admin,
 		requestUtils,
 		pageUtils,
+		isGutenbergPluginActive,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-admin-bar-in-editor',
 		] );
@@ -102,7 +114,13 @@ test.describe( 'Fullscreen Mode', () => {
 		admin,
 		requestUtils,
 		pageUtils,
+		isGutenbergPluginActive,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
+		);
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-admin-bar-in-editor',
 		] );
@@ -129,7 +147,13 @@ test.describe( 'Fullscreen Mode', () => {
 			page,
 			admin,
 			requestUtils,
+			isGutenbergPluginActive,
 		} ) => {
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				! isGutenbergPluginActive,
+				'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
+			);
 			await requestUtils.setGutenbergExperiments( [
 				'gutenberg-admin-bar-in-editor',
 			] );

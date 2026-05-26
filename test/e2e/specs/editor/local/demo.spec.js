@@ -8,7 +8,14 @@ test.describe( 'New editor state', () => {
 		page,
 		admin,
 		editor,
+		isGutenbergPluginActive,
 	} ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'This test requires Gutenberg plugin to be active'
+		);
+
 		await admin.visitAdminPage( 'post-new.php', 'gutenberg-demo' );
 		await editor.setPreferences( 'core/edit-site', {
 			welcomeGuide: false,

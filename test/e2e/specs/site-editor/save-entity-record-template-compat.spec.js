@@ -4,7 +4,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'calling saveEntityRecord with a theme template ID', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 		await requestUtils.activateTheme( 'emptytheme' );
 		// Enable the template activation feature.
 		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );

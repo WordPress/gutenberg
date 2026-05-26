@@ -10,7 +10,12 @@ test.use( {
 } );
 
 test.describe( 'Block template registration', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.activatePlugin(
 			'gutenberg-test-block-template-registration'
