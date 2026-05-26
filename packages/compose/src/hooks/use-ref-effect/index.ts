@@ -7,6 +7,7 @@ import type { DependencyList, RefCallback } from 'react';
  * WordPress dependencies
  */
 import { useCallback, useRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Effect-like ref callback. Just like with `useEffect`, this allows you to
@@ -22,15 +23,25 @@ import { useCallback, useRef } from '@wordpress/element';
  * to be removed. It *is* necessary if you add dependencies because the ref
  * callback will be called multiple times for the same node.
  *
- * @param callback     Callback with ref as argument.
- * @param dependencies Dependencies of the callback.
+ * @deprecated since WordPress 7.1.0. Use `useCallback` with a returned cleanup
+ *             function (React 19's ref callback cleanup pattern) instead.
+ * @see        https://react.dev/reference/react/useCallback#ref-callback-cleanup
  *
- * @return Ref callback.
+ * @param      callback     Callback with ref as argument.
+ * @param      dependencies Dependencies of the callback.
+ *
+ * @return     Ref callback.
  */
 export default function useRefEffect< TElement = Node >(
 	callback: ( node: TElement ) => ( () => void ) | void,
 	dependencies: DependencyList
 ): RefCallback< TElement | null > {
+	deprecated( 'wp.compose.useRefEffect', {
+		since: '7.1',
+		alternative: 'useCallback',
+		link: 'https://react.dev/reference/react/useCallback#ref-callback-cleanup',
+	} );
+
 	const cleanupRef = useRef< ( () => void ) | void >( undefined );
 	return useCallback( ( node: TElement | null ) => {
 		if ( node ) {

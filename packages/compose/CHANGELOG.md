@@ -16,6 +16,10 @@
 
 -   `useMergeRefs`: Support cleanup functions returned by inner ref callbacks (React 19 ref callback cleanup pattern). Inner refs that return a cleanup have it invoked at teardown instead of being called with `null`.
 
+### Deprecations
+
+-   `useRefEffect`: Deprecated in favor of `useCallback` with a returned cleanup function (React 19's native ref callback cleanup pattern).
+
 ### Bug Fixes
 
 -   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).

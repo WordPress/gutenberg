@@ -82,17 +82,20 @@ export default function Edit() {
 }
 ```
 
-### Using useRefEffect (recommended)
+### Using a ref callback with cleanup (recommended)
 
-If you attach event handlers, remember that the `useEffect` callback will not be called if the ref changes, so it is good practice to use the new `useRefEffect` API, which *will* call the given callback if the ref changes in addition to any dependencies passed.
+If you attach event handlers, remember that the `useEffect` callback will not be called if the ref changes, so it is good practice to use a ref callback that returns a cleanup function. With React 19's native ref callback cleanup pattern, you can pass a `useCallback`-wrapped ref callback directly: the callback is invoked when the element is attached, and the returned cleanup function runs when the element changes, dependencies change, or the component unmounts.
 
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 export default function Edit() {
-	const ref = useRefEffect( ( element ) => {
+	const ref = useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
+		}
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 		defaultView.addEventListener( ... );
@@ -118,11 +121,14 @@ For the editor, scripts such as jQuery are loaded in the parent window (admin pa
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import jQuery from 'jquery';
 
 export default function Edit() {
-	const ref = useRefEffect( ( element ) => {
+	const ref = useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
+		}
 		jQuery( element ).masonry( … );
 		return () => {
 			jQuery( element ).masonry( 'destroy' );
@@ -148,11 +154,14 @@ In the meantime, you can use the script that is loaded inside the iframe. We've 
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import jQuery from 'jquery';
 
 export default function Edit() {
-	const ref = useRefEffect( ( element ) => {
+	const ref = useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
+		}
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 
@@ -167,7 +176,7 @@ export default function Edit() {
 		return () => {
 			defaultView.jQuery( element ).masonry( 'destroy' );
 		}
-	} );
+	}, [] );
 
 	const blockProps = useBlockProps( { ref } );
 
