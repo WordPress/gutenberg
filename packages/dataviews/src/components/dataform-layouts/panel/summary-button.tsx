@@ -6,14 +6,12 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	Icon as WCIcon,
-	Tooltip as WCTooltip,
-} from '@wordpress/components';
+import { Button, Icon as WCIcon } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 
 /**
@@ -115,11 +113,20 @@ export default function SummaryButton< Item >( {
 				<span className={ labelClassName }>{ labelContent }</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<WCTooltip text={ errorMessage } placement="top">
-					<span className="dataforms-layouts-panel__field-label-error-content">
-						<WCIcon icon={ errorIcon } size={ 16 } />
-					</span>
-				</WCTooltip>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						render={
+							<span
+								className="dataforms-layouts-panel__field-label-error-content"
+								role="img"
+								aria-label={ errorMessage }
+							>
+								<WCIcon icon={ errorIcon } size={ 16 } />
+							</span>
+						}
+					/>
+					<Tooltip.Popup>{ errorMessage }</Tooltip.Popup>
+				</Tooltip.Root>
 			) }
 			<span
 				id={ `${ controlId }` }
