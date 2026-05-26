@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -39,60 +40,86 @@ export default function useBlockBindingsCompatibleFields(
 	blockName,
 	blockContext
 ) {
-	return useSelect(
+	const registry = useRegistry();
+
+	// Subscribe to a small set of stable primitives so `useSelect`'s dev
+	// reference-stability check stays happy. The actual compatible-fields
+	// computation runs inside `useMemo` below (it would otherwise build a
+	// fresh object on every render, tripping `useSelect`'s warning).
+	const {
+		blockTypeAttribute,
+		sources,
+		supportedAttributes,
+		canUpdateBlockBindings,
+	} = useSelect(
 		( select ) => {
-			const {
-				__experimentalBlockBindingsSupportedAttributes,
-				canUpdateBlockBindings,
-			} = select( blockEditorStore ).getSettings();
+			const settings = select( blockEditorStore ).getSettings();
 			const { getBlockType } = select( blocksStore );
-			const {
-				getAllBlockBindingsSources,
-				getBlockBindingsSourceFieldsList,
-			} = unlock( select( blocksStore ) );
-
-			const _attribute =
-				getBlockType( blockName )?.attributes?.[ attribute ];
-
-			// Enum-typed attributes have a closed set of values and are
-			// therefore not bindable to external sources.
-			if ( _attribute?.enum ) {
-				return { isBindable: false, compatibleFields: {} };
-			}
-
-			const attributeType =
-				_attribute?.type === 'rich-text' ? 'string' : _attribute?.type;
-
-			const compatibleFields = {};
-			Object.entries( getAllBlockBindingsSources() ).forEach(
-				( [ sourceName, source ] ) => {
-					const fieldsList = getBlockBindingsSourceFieldsList(
-						source,
-						blockContext
-					);
-					if ( ! fieldsList?.length ) {
-						return;
-					}
-					const compatibleFieldsList = fieldsList.filter(
-						( field ) => field.type === attributeType
-					);
-					if ( compatibleFieldsList.length ) {
-						compatibleFields[ sourceName ] = compatibleFieldsList;
-					}
-				}
+			const { getAllBlockBindingsSources } = unlock(
+				select( blocksStore )
 			);
-
-			const supportedAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
-
-			const isBindable =
-				!! canUpdateBlockBindings &&
-				!! supportedAttributes?.includes( attribute ) &&
-				! BLOCK_BINDINGS_PANEL_EXCLUDED_BLOCKS.includes( blockName ) &&
-				Object.keys( compatibleFields ).length > 0;
-
-			return { isBindable, compatibleFields };
+			return {
+				blockTypeAttribute:
+					getBlockType( blockName )?.attributes?.[ attribute ],
+				sources: getAllBlockBindingsSources(),
+				supportedAttributes:
+					settings.__experimentalBlockBindingsSupportedAttributes?.[
+						blockName
+					],
+				canUpdateBlockBindings: settings.canUpdateBlockBindings,
+			};
 		},
-		[ attribute, blockName, blockContext ]
+		[ attribute, blockName ]
 	);
+
+	return useMemo( () => {
+		// Enum-typed attributes have a closed set of values and are therefore
+		// not bindable to external sources.
+		if ( blockTypeAttribute?.enum ) {
+			return { isBindable: false, compatibleFields: {} };
+		}
+
+		const attributeType =
+			blockTypeAttribute?.type === 'rich-text'
+				? 'string'
+				: blockTypeAttribute?.type;
+
+		const { getBlockBindingsSourceFieldsList } = unlock(
+			registry.select( blocksStore )
+		);
+
+		const compatibleFields = {};
+		Object.entries( sources ).forEach( ( [ sourceName, source ] ) => {
+			const fieldsList = getBlockBindingsSourceFieldsList(
+				source,
+				blockContext
+			);
+			if ( ! fieldsList?.length ) {
+				return;
+			}
+			const compatibleFieldsList = fieldsList.filter(
+				( field ) => field.type === attributeType
+			);
+			if ( compatibleFieldsList.length ) {
+				compatibleFields[ sourceName ] = compatibleFieldsList;
+			}
+		} );
+
+		const isBindable =
+			!! canUpdateBlockBindings &&
+			!! supportedAttributes?.includes( attribute ) &&
+			! BLOCK_BINDINGS_PANEL_EXCLUDED_BLOCKS.includes( blockName ) &&
+			Object.keys( compatibleFields ).length > 0;
+
+		return { isBindable, compatibleFields };
+	}, [
+		attribute,
+		blockName,
+		blockTypeAttribute,
+		sources,
+		blockContext,
+		supportedAttributes,
+		canUpdateBlockBindings,
+		registry,
+	] );
 }
