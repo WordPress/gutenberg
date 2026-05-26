@@ -81,9 +81,7 @@ export default function AdvancedPanel( {
 		setCSSError( getMarkupValidationError( newValue ) );
 	}
 	function handleOnBlur( event ) {
-		const cssValue = event?.target?.value;
-
-		setCSSError( getCSSValidationError( cssValue ) );
+		setCSSError( getCSSValidationError( event?.target?.value ) );
 	}
 
 	return (
