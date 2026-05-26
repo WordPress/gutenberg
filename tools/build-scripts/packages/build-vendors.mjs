@@ -6,7 +6,7 @@ import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT_DIR = path.resolve( __dirname, '../..' );
+const ROOT_DIR = path.resolve( __dirname, '../../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 

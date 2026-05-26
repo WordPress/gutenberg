@@ -31,9 +31,10 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $block_name Block name.
 	 * @param array  $selectors  Optional block selectors (e.g. `['root' => '.foo .bar']`).
+	 * @param array  $supports   Optional block supports.
 	 * @return WP_Block_Type
 	 */
-	private function ensure_block_registered( $block_name, $selectors = array() ) {
+	private function ensure_block_registered( $block_name, $selectors = array(), $supports = array() ) {
 		$registered_block = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 		if ( $registered_block ) {
 			return $registered_block;
@@ -48,6 +49,9 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 		if ( ! empty( $selectors ) ) {
 			$args['selectors'] = $selectors;
+		}
+		if ( ! empty( $supports ) ) {
+			$args['supports'] = $supports;
 		}
 		register_block_type( $block_name, $args );
 
@@ -831,6 +835,547 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 		$this->assertStringContainsString(
 			'.' . $matches[0] . '{width:50% !important;}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a responsive block gap state generates layout spacing CSS.
+	 *
+	 * Responsive layout CSS is owned by gutenberg_render_layout_support_flag()
+	 * so it shares a selector with the base layout (the inner block wrapper for
+	 * wrapper blocks) instead of being scoped to a separate `wp-states-…` class.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_block_gap_state_generates_layout_spacing_css() {
+		$this->ensure_block_registered(
+			'test/responsive-flow-layout-state',
+			array(),
+			array(
+				'layout'  => array(
+					'default' => array(
+						'type' => 'default',
+					),
+				),
+				'spacing' => array(
+					'blockGap' => true,
+				),
+			)
+		);
+
+		add_theme_support( 'appearance-tools' );
+		WP_Theme_JSON_Resolver::clean_cached_data();
+
+		try {
+			$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+			$block         = array(
+				'blockName'    => 'test/responsive-flow-layout-state',
+				'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+				'attrs'        => array(
+					'layout' => array(
+						'type' => 'default',
+					),
+					'style'  => array(
+						'mobile' => array(
+							'spacing' => array(
+								'blockGap' => '12px',
+							),
+						),
+					),
+				),
+			);
+
+			$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+			preg_match( '/wp-container-test-responsive-flow-layout-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
+			$this->assertNotEmpty( $matches, "wp-container class missing in: $actual" );
+			$container_class   = $matches[0];
+			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+			$this->assertStringContainsString(
+				'@media (width <= 480px){.' . $container_class . ' > *{margin-block-start:0;margin-block-end:0;}}',
+				$actual_stylesheet
+			);
+			$this->assertStringContainsString(
+				'@media (width <= 480px){.' . $container_class . ' > * + *{margin-block-start:12px;margin-block-end:0;}}',
+				$actual_stylesheet
+			);
+		} finally {
+			remove_theme_support( 'appearance-tools' );
+			WP_Theme_JSON_Resolver::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that responsive block gap state CSS uses the block's active layout type.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_block_gap_state_uses_active_layout_type() {
+		$this->ensure_block_registered(
+			'test/responsive-flex-layout-state',
+			array(),
+			array(
+				'layout'  => array(
+					'default' => array(
+						'type' => 'flex',
+					),
+				),
+				'spacing' => array(
+					'blockGap' => true,
+				),
+			)
+		);
+
+		add_theme_support( 'appearance-tools' );
+		WP_Theme_JSON_Resolver::clean_cached_data();
+
+		try {
+			$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+			$block         = array(
+				'blockName'    => 'test/responsive-flex-layout-state',
+				'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+				'attrs'        => array(
+					'layout' => array(
+						'type' => 'flex',
+					),
+					'style'  => array(
+						'mobile' => array(
+							'spacing' => array(
+								'blockGap' => '12px',
+							),
+						),
+					),
+				),
+			);
+
+			$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+			preg_match( '/wp-container-test-responsive-flex-layout-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
+			$this->assertNotEmpty( $matches, "wp-container class missing in: $actual" );
+			$container_class   = $matches[0];
+			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+			$this->assertStringContainsString(
+				'@media (width <= 480px){.' . $container_class . '{gap:12px;}}',
+				$actual_stylesheet
+			);
+		} finally {
+			remove_theme_support( 'appearance-tools' );
+			WP_Theme_JSON_Resolver::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that responsive layout state CSS can override grid layout values.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_layout_state_generates_grid_layout_css() {
+		$this->ensure_block_registered(
+			'test/responsive-grid-layout-state',
+			array(),
+			array(
+				'layout' => array(
+					'default' => array(
+						'type' => 'grid',
+					),
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+		$block         = array(
+			'blockName'    => 'test/responsive-grid-layout-state',
+			'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+			'attrs'        => array(
+				'layout' => array(
+					'type' => 'grid',
+				),
+				'style'  => array(
+					'mobile' => array(
+						'layout' => array(
+							'minimumColumnWidth' => '8rem',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+		preg_match( '/wp-container-test-responsive-grid-layout-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertNotEmpty( $matches, "wp-container class missing in: $actual" );
+		$container_class   = $matches[0];
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $container_class . '{grid-template-columns:repeat(auto-fill, minmax(min(8rem, 100%), 1fr));}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that responsive layout state CSS can override grid columns.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_layout_state_generates_grid_column_count_css() {
+		$this->ensure_block_registered(
+			'test/responsive-grid-column-layout-state',
+			array(),
+			array(
+				'layout' => array(
+					'default' => array(
+						'type' => 'grid',
+					),
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+		$block         = array(
+			'blockName'    => 'test/responsive-grid-column-layout-state',
+			'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+			'attrs'        => array(
+				'layout' => array(
+					'type' => 'grid',
+				),
+				'style'  => array(
+					'mobile' => array(
+						'layout' => array(
+							'columnCount' => 3,
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+		preg_match( '/wp-container-test-responsive-grid-column-layout-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertNotEmpty( $matches, "wp-container class missing in: $actual" );
+		$container_class   = $matches[0];
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $container_class . '{grid-template-columns:repeat(3, minmax(0, 1fr));}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that different responsive layout states generate different container
+	 * classes, even when the base layout configuration is identical.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_layout_state_generates_distinct_container_classes_for_distinct_viewport_styles() {
+		$this->ensure_block_registered(
+			'test/responsive-grid-distinct-layout-state',
+			array(),
+			array(
+				'layout' => array(
+					'default' => array(
+						'type' => 'grid',
+					),
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+		$base_block    = array(
+			'blockName'    => 'test/responsive-grid-distinct-layout-state',
+			'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+			'attrs'        => array(
+				'layout' => array(
+					'type' => 'grid',
+				),
+			),
+		);
+		$first_block   = array_replace_recursive(
+			$base_block,
+			array(
+				'attrs' => array(
+					'style' => array(
+						'mobile' => array(
+							'layout' => array(
+								'columnCount' => 3,
+							),
+						),
+					),
+				),
+			)
+		);
+		$second_block  = array_replace_recursive(
+			$base_block,
+			array(
+				'attrs' => array(
+					'style' => array(
+						'mobile' => array(
+							'layout' => array(
+								'columnCount' => 4,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$first_actual  = gutenberg_render_layout_support_flag( $block_content, $first_block );
+		$second_actual = gutenberg_render_layout_support_flag( $block_content, $second_block );
+
+		preg_match( '/wp-container-test-responsive-grid-distinct-layout-state-is-layout-[a-f0-9]{8}/', $first_actual, $first_matches );
+		preg_match( '/wp-container-test-responsive-grid-distinct-layout-state-is-layout-[a-f0-9]{8}/', $second_actual, $second_matches );
+
+		$this->assertNotEmpty( $first_matches, "wp-container class missing in: $first_actual" );
+		$this->assertNotEmpty( $second_matches, "wp-container class missing in: $second_actual" );
+
+		$first_container_class  = $first_matches[0];
+		$second_container_class = $second_matches[0];
+
+		$this->assertNotSame( $first_container_class, $second_container_class );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $first_container_class . '{grid-template-columns:repeat(3, minmax(0, 1fr));}}',
+			$actual_stylesheet
+		);
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $second_container_class . '{grid-template-columns:repeat(4, minmax(0, 1fr));}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that responsive grid layout and block gap state CSS are both generated.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_layout_state_generates_grid_columns_and_gap_css() {
+		$this->ensure_block_registered(
+			'test/responsive-grid-columns-gap-layout-state',
+			array(),
+			array(
+				'layout'  => array(
+					'default' => array(
+						'type' => 'grid',
+					),
+				),
+				'spacing' => array(
+					'blockGap' => true,
+				),
+			)
+		);
+
+		add_theme_support( 'appearance-tools' );
+		WP_Theme_JSON_Resolver::clean_cached_data();
+
+		try {
+			$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+			$block         = array(
+				'blockName'    => 'test/responsive-grid-columns-gap-layout-state',
+				'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+				'attrs'        => array(
+					'layout' => array(
+						'type' => 'grid',
+					),
+					'style'  => array(
+						'mobile' => array(
+							'layout'  => array(
+								'columnCount' => 3,
+							),
+							'spacing' => array(
+								'blockGap' => '12px',
+							),
+						),
+					),
+				),
+			);
+
+			$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+			preg_match( '/wp-container-test-responsive-grid-columns-gap-layout-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
+			$this->assertNotEmpty( $matches, "wp-container class missing in: $actual" );
+			$container_class   = $matches[0];
+			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+			$this->assertStringContainsString(
+				'@media (width <= 480px){.' . $container_class . '{grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px;}}',
+				$actual_stylesheet
+			);
+		} finally {
+			remove_theme_support( 'appearance-tools' );
+			WP_Theme_JSON_Resolver::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that responsive grid block gap CSS does not repeat unchanged layout declarations.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_grid_block_gap_state_only_outputs_changed_layout_css() {
+		$this->ensure_block_registered(
+			'test/responsive-grid-gap-state',
+			array(),
+			array(
+				'layout'  => array(
+					'default' => array(
+						'type'               => 'grid',
+						'minimumColumnWidth' => '12rem',
+					),
+				),
+				'spacing' => array(
+					'blockGap' => true,
+				),
+			)
+		);
+
+		add_theme_support( 'appearance-tools' );
+		WP_Theme_JSON_Resolver::clean_cached_data();
+
+		try {
+			$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
+			$block         = array(
+				'blockName'    => 'test/responsive-grid-gap-state',
+				'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
+				'attrs'        => array(
+					'layout' => array(
+						'type'               => 'grid',
+						'minimumColumnWidth' => '12rem',
+					),
+					'style'  => array(
+						'tablet' => array(
+							'spacing' => array(
+								'blockGap' => '12px',
+							),
+						),
+					),
+				),
+			);
+
+			$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+			preg_match( '/wp-container-test-responsive-grid-gap-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
+			$this->assertNotEmpty( $matches, "wp-container class missing in: $actual" );
+			$container_class   = $matches[0];
+			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+			$this->assertStringContainsString(
+				'@media (480px < width <= 782px){.' . $container_class . '{gap:12px;}}',
+				$actual_stylesheet
+			);
+			$this->assertStringNotContainsString(
+				'@media (480px < width <= 782px){.' . $container_class . '{grid-template-columns:',
+				$actual_stylesheet
+			);
+			$this->assertStringNotContainsString(
+				'@media (480px < width <= 782px){.' . $container_class . '{container-type:',
+				$actual_stylesheet
+			);
+		} finally {
+			remove_theme_support( 'appearance-tools' );
+			WP_Theme_JSON_Resolver::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Tests that responsive child layout state CSS is generated.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_child_layout_state_generates_grid_span_css() {
+		$this->ensure_block_registered( 'test/responsive-child-layout-state' );
+
+		$block_content = '<p>Some text.</p>';
+		$block         = array(
+			'blockName'    => 'test/responsive-child-layout-state',
+			'innerContent' => array( '<p>Some text.</p>' ),
+			'attrs'        => array(
+				'style' => array(
+					'mobile' => array(
+						'layout' => array(
+							'columnSpan' => '2',
+						),
+					),
+				),
+			),
+			'parentLayout' => array(
+				'type'        => 'grid',
+				'columnCount' => 3,
+			),
+		);
+
+		$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+		preg_match( '/wp-container-content-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertNotEmpty( $matches, "wp-container-content class missing in: $actual" );
+		$container_content_class = $matches[0];
+		$actual_stylesheet       = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $container_content_class . '{grid-column:span 2;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a wrapper block (markup with an inner content wrapper) receives
+	 * responsive grid layout CSS scoped to the inner wrapper, not the outermost tag.
+	 *
+	 * Regression test for the bug where wp-states-… was added to the outer tag
+	 * while the wp-container-… layout class lives on the inner wrapper, causing
+	 * the responsive @media rule to apply to the wrong element.
+	 *
+	 * @covers ::gutenberg_render_layout_support_flag
+	 */
+	public function test_responsive_layout_state_targets_inner_wrapper_for_wrapper_blocks() {
+		$this->ensure_block_registered(
+			'test/responsive-wrapper-grid-state',
+			array(),
+			array(
+				'layout' => array(
+					'default' => array(
+						'type' => 'grid',
+					),
+				),
+			)
+		);
+
+		$block_content = '<div class="wp-block-wrapper"><div class="wp-block-wrapper__inner-container"><p>One</p></div></div>';
+		$block         = array(
+			'blockName'    => 'test/responsive-wrapper-grid-state',
+			'innerContent' => array(
+				'<div class="wp-block-wrapper"><div class="wp-block-wrapper__inner-container">',
+				null,
+				'</div></div>',
+			),
+			'attrs'        => array(
+				'layout' => array(
+					'type' => 'grid',
+				),
+				'style'  => array(
+					'mobile' => array(
+						'layout' => array(
+							'columnCount' => 3,
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_layout_support_flag( $block_content, $block );
+
+		// The wp-container-…-is-layout-… class should land on the inner wrapper.
+		$this->assertMatchesRegularExpression(
+			'/<div class="wp-block-wrapper__inner-container [^"]*wp-container-test-responsive-wrapper-grid-state-is-layout-[a-f0-9]{8}/',
+			$actual
+		);
+
+		preg_match( '/wp-container-test-responsive-wrapper-grid-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
+		$container_class   = $matches[0];
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		// The responsive @media rule must target the same selector that lives on
+		// the inner wrapper element.
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $container_class . '{grid-template-columns:repeat(3, minmax(0, 1fr));}}',
 			$actual_stylesheet
 		);
 	}

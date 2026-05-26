@@ -43,7 +43,10 @@ function gutenberg_normalize_state_preset_vars( $value ) {
  * @return array Normalized state style object.
  */
 function gutenberg_normalize_state_style_for_css_output( $style ) {
-	return gutenberg_normalize_state_preset_vars( $style );
+	// Layout is processed separately by gutenberg_render_layout_support_flag(), so we remove it before declaration generation.
+	unset( $style['layout'] );
+	$style = gutenberg_normalize_state_preset_vars( $style );
+	return $style;
 }
 
 /**
@@ -421,6 +424,10 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 *
 	 * State declarations need !important to apply reliably over inline styles and
 	 * preset utility classes such as .has-accent-3-background-color.
+	 *
+	 * Layout-driven state styles (responsive layout, blockGap, child layout) are
+	 * handled by gutenberg_render_layout_support_flag() so they share a selector
+	 * with the base layout and target the correct (inner) wrapper element.
 	 */
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
