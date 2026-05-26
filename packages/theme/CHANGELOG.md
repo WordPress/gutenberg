@@ -6,6 +6,10 @@
 
 -   The `color.primary` and `color.bg` props on `ThemeProvider` now require an sRGB-parseable string (hex, `rgb(...)`, or CSS named color). Other CSS color formats like `hsl(...)`, `oklch(...)`, and `lab(...)` are no longer supported ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
 
+### Bug Fixes
+
+-   `ThemeProvider`: Propagate `density` through React context so nested providers inherit it via React (not only via the DOM/CSS cascade).
+
 ### Documentation
 
 -   Add ["Design System/Tokens/Introduction" page](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs) to Storybook ([#78449](https://github.com/WordPress/gutenberg/pull/78449)).
