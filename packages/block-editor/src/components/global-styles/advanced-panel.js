@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	TextareaControl,
-	Notice,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { TextareaControl, Notice } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -90,7 +87,7 @@ export default function AdvancedPanel( {
 	}
 
 	return (
-		<VStack spacing={ 3 }>
+		<Stack direction="column" spacing={ 3 }>
 			{ cssError && (
 				<Notice status="error" onRemove={ () => setCSSError( null ) }>
 					{ cssError }
@@ -105,6 +102,6 @@ export default function AdvancedPanel( {
 				spellCheck={ false }
 				help={ help }
 			/>
-		</VStack>
+		</Stack>
 	);
 }
