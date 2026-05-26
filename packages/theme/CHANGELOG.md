@@ -14,6 +14,7 @@
 ### Internal
 
 -   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
+-   Remove unused `@wordpress/style-runtime` dependency.
 
 ## 0.13.0 (2026-05-14)
 
