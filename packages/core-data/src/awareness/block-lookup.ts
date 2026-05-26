@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -16,11 +16,11 @@ import type { AbsoluteBlockIndexPath } from '../types';
  *
  * This is a minimal interface covering only the fields used by RTC awareness.
  */
-interface EditorStoreBlock {
+export type EditorStoreBlock = {
 	clientId: string;
 	name: string;
 	innerBlocks: EditorStoreBlock[];
-}
+};
 
 /**
  * Find the block Y.Map that contains a nested Yjs type.
@@ -112,25 +112,17 @@ export function getBlockPathInYdoc(
  * Navigate the block-editor store's block tree by an index path
  * and return the local block's clientId.
  *
- * In template mode, getBlocks() returns the full template tree, but Yjs
- * paths are relative to the post content. This method finds the
- * core/post-content block (if present) and uses its inner blocks as the
- * navigation root, so paths align with the Yjs document structure.
- *
- * @param path - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param path   - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param blocks - The tree of block-editor store post contentblocks.
  * @return The local block clientId, or null if the path is invalid.
  */
 export function resolveBlockClientIdByPath(
-	path: AbsoluteBlockIndexPath
+	path: AbsoluteBlockIndexPath,
+	blocks: EditorStoreBlock[]
 ): string | null {
 	if ( path.length === 0 ) {
 		return null;
 	}
-
-	const { getBlocks } = select( blockEditorStore );
-	const postContentBlocks = getPostContentBlocks( getBlocks(), getBlocks );
-
-	let blocks = postContentBlocks;
 
 	for ( let i = 0; i < path.length; i++ ) {
 		const block = blocks[ path[ i ] ];
@@ -159,22 +151,24 @@ export function resolveBlockClientIdByPath(
  * but are not populated in the .innerBlocks property of the tree
  * returned by getBlocks().
  *
- * @param rootBlocks - The root-level blocks from getBlocks().
- * @param getBlocks  - The getBlocks selector.
  * @return The blocks that correspond to the Yjs document root.
  */
-function getPostContentBlocks(
-	rootBlocks: EditorStoreBlock[],
-	getBlocks: ( rootClientId?: string ) => EditorStoreBlock[]
-): EditorStoreBlock[] {
-	const postContentBlock = findBlockByName( rootBlocks, 'core/post-content' );
-	if ( postContentBlock ) {
-		// Use getBlocks(clientId) to read controlled inner blocks from
-		// the store, since postContentBlock.innerBlocks is empty.
-		return getBlocks( postContentBlock.clientId );
-	}
+export function usePostContentBlocks(): EditorStoreBlock[] {
+	return useSelect( ( select ) => {
+		const { getBlocks } = select( blockEditorStore );
+		const rootBlocks = getBlocks();
+		const postContentBlock = findBlockByName(
+			rootBlocks,
+			'core/post-content'
+		);
+		if ( postContentBlock ) {
+			// Use getBlocks(clientId) to read controlled inner blocks from
+			// the store, since postContentBlock.innerBlocks is empty.
+			return getBlocks( postContentBlock.clientId );
+		}
 
-	return rootBlocks;
+		return rootBlocks;
+	}, [] );
 }
 
 /**

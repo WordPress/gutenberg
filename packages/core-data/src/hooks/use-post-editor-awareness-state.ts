@@ -9,6 +9,8 @@ import type { Y } from '@wordpress/sync';
  * Internal dependencies
  */
 import { getSyncManager } from '../sync';
+import { usePostContentBlocks } from '../awareness/block-lookup';
+import type { EditorStoreBlock } from '../awareness/block-lookup';
 import type {
 	PostEditorAwarenessState as ActiveCollaborator,
 	PostSaveEvent,
@@ -19,7 +21,10 @@ import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
 
 interface AwarenessState {
 	activeCollaborators: ActiveCollaborator[];
-	resolveSelection: ( selection: SelectionState ) => ResolvedSelection;
+	resolveSelection: (
+		selection: SelectionState,
+		blocks: EditorStoreBlock[]
+	) => ResolvedSelection;
 	getDebugData: () => YDocDebugData;
 	isCurrentCollaboratorDisconnected: boolean;
 }
@@ -49,8 +54,10 @@ function getAwarenessState(
 
 	return {
 		activeCollaborators,
-		resolveSelection: ( selection: SelectionState ) =>
-			awareness.convertSelectionStateToAbsolute( selection ),
+		resolveSelection: (
+			selection: SelectionState,
+			blocks: EditorStoreBlock[]
+		) => awareness.convertSelectionStateToAbsolute( selection, blocks ),
 		getDebugData: () => awareness.getDebugData(),
 		isCurrentCollaboratorDisconnected:
 			activeCollaborators.find( ( collaborator ) => collaborator.isMe )
@@ -124,7 +131,10 @@ export function useResolvedSelection(
 	postId: number | null,
 	postType: string | null
 ): ( selection: SelectionState ) => ResolvedSelection {
-	return usePostEditorAwarenessState( postId, postType ).resolveSelection;
+	const blocks = usePostContentBlocks();
+	const awarenessState = usePostEditorAwarenessState( postId, postType );
+	return ( selection: SelectionState ) =>
+		awarenessState.resolveSelection( selection, blocks );
 }
 
 /**
