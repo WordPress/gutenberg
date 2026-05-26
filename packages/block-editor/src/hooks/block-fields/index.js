@@ -22,7 +22,7 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
 import InspectorControls from '../../components/inspector-controls/fill';
-import ConnectedButton from './connected-button';
+import { GatedConnectedButton } from './connected-button';
 
 // controls
 import RichText from './rich-text';
@@ -160,13 +160,28 @@ function BlockFields( {
 			} else if ( ! fieldDef.Edit ) {
 				field.Edit = {
 					control: fieldDef.type,
-					suffix: ConnectedButton,
+					// Closure captures attribute (fieldDef.id) + blockName
+					// at field-construction time. `blockContext` is read
+					// from React context inside the picker (spec req 10:
+					// no DataForm restructuring, no field.connectionMeta).
+					// When `isBindable` is false the picker returns null;
+					// the wrapped `ConnectedButtonSuffix` variant is used
+					// to retain the InputControl suffix slot for the
+					// `asSuffix` branch (preserving cherry-pick layout).
+					suffix: ( { isConnected } ) => (
+						<GatedConnectedButton
+							attribute={ fieldDef.id }
+							blockName={ blockType.name }
+							isConnected={ isConnected }
+							asSuffix
+						/>
+					),
 				};
 			}
 
 			return field;
 		} );
-	}, [ blockTypeFields, clientId ] );
+	}, [ blockTypeFields, blockType?.name, clientId ] );
 
 	if ( ! blockTypeFields?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.
