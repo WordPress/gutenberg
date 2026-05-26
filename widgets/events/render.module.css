@@ -8,9 +8,3 @@
 	padding-block: var(--wpds-dimension-padding-lg);
 	padding-inline: var(--wpds-dimension-padding-2xl);
 }
-
-.footerLinks {
-	display: flex;
-	align-items: center;
-	gap: var(--wpds-dimension-gap-sm);
-}

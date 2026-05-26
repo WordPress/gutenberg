@@ -9,7 +9,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { Link, Text } from '@wordpress/ui';
+import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -162,7 +162,7 @@ export default function WordPressEvents() {
 				/>
 			) }
 			<div className={ renderStyles.footer }>
-				<div className={ renderStyles.footerLinks }>
+				<Stack direction="row" align="center" gap="sm">
 					<Link
 						href="https://make.wordpress.org/community/meetups-landing-page"
 						openInNewTab
@@ -175,7 +175,7 @@ export default function WordPressEvents() {
 					>
 						{ __( 'WordCamps' ) }
 					</Link>
-				</div>
+				</Stack>
 			</div>
 		</>
 	);

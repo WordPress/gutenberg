@@ -6,9 +6,6 @@
 }
 
 .eventIcon {
-	display: flex;
-	align-items: center;
-	justify-content: center;
 	width: 100%;
 	height: 100%;
 	border-radius: var(--wpds-border-radius-md);
@@ -25,4 +22,8 @@
 
 .meta {
 	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.emptyState {
+	margin-block: var(--wpds-dimension-padding-2xl);
 }

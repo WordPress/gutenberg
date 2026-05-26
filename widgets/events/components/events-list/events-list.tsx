@@ -203,9 +203,14 @@ function toEventListItem( event: WPEvent ): EventListItem {
 /* Event type icon in the list layout media slot (no image URL). */
 function EventIcon( { item }: { item: EventListItem } ) {
 	return (
-		<div className={ styles.eventIcon } aria-hidden="true">
+		<Stack
+			className={ styles.eventIcon }
+			direction="column"
+			align="center"
+			justify="center"
+		>
 			<Icon icon={ item.iconType === 'wordcamp' ? wordpress : people } />
-		</div>
+		</Stack>
 	);
 }
 
@@ -270,7 +275,7 @@ export function EventsList( {
 	);
 
 	const empty = showEmptyState ? (
-		<Stack align="center" justify="center" style={ { margin: '24px 0' } }>
+		<Stack align="center" justify="center" className={ styles.emptyState }>
 			<EmptyState.Root>
 				<EmptyState.Icon icon={ calendar } />
 				<EmptyState.Title>
