@@ -6,15 +6,14 @@ import { useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockIcon,
-	InspectorControls,
 	useBlockProps,
+	PlainText,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
 	ToolbarGroup,
 	Placeholder,
 	Button,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { code } from '@wordpress/icons';
 
@@ -23,6 +22,22 @@ import { code } from '@wordpress/icons';
  */
 import Preview from './preview';
 import HTMLEditModal from './modal';
+import { parseContent, serializeContent } from './utils';
+
+/**
+ * Strips the CSS and JS wrapper tags (<style> and <script>) and any trailing
+ * double-newlines from the serialized block content to retrieve the raw HTML.
+ * Using a regex avoids browser-side HTML normalization that breaks typing flow.
+ *
+ * @param {string} raw The full serialized block content.
+ * @return {string} The HTML-only portion.
+ */
+function getRawHtml( raw = '' ) {
+	return raw.replace(
+		/<(style|script)\s+data-wp-block-html="(?:css|js)">[\s\S]*?<\/\1>(\n\n)?/g,
+		''
+	);
+}
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -30,10 +45,32 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 		className: 'block-library-html__edit',
 	} );
 
-	// Show placeholder when content is empty
-	if ( ! attributes.content?.trim() ) {
+	const isPreview = ( attributes.viewMode || 'html' ) === 'preview';
+
+	// Show placeholder when content is empty and we are in preview mode
+	if ( isPreview && ! attributes.content?.trim() ) {
 		return (
 			<div { ...blockProps }>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							isPressed={ false }
+							onClick={ () =>
+								setAttributes( { viewMode: 'html' } )
+							}
+						>
+							HTML
+						</ToolbarButton>
+						<ToolbarButton
+							isPressed
+							onClick={ () =>
+								setAttributes( { viewMode: 'preview' } )
+							}
+						>
+							{ __( 'Preview' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
 				<Placeholder
 					icon={ <BlockIcon icon={ code } /> }
 					label={ __( 'Custom HTML' ) }
@@ -51,6 +88,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				</Placeholder>
 				{ isModalOpen && (
 					<HTMLEditModal
+						isOpen={ isModalOpen }
 						onRequestClose={ () => setIsModalOpen( false ) }
 						content={ attributes.content }
 						setAttributes={ setAttributes }
@@ -64,29 +102,52 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 		<div { ...blockProps }>
 			<BlockControls>
 				<ToolbarGroup>
+					<ToolbarButton
+						isPressed={ ! isPreview }
+						onClick={ () => setAttributes( { viewMode: 'html' } ) }
+					>
+						HTML
+					</ToolbarButton>
+					<ToolbarButton
+						isPressed={ isPreview }
+						onClick={ () =>
+							setAttributes( { viewMode: 'preview' } )
+						}
+					>
+						{ __( 'Preview' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+				<ToolbarGroup>
 					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
 						{ __( 'Edit code' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
-				<VStack
-					className="block-editor-block-inspector-edit-contents"
-					expanded
-				>
-					<Button
-						className="block-editor-block-inspector-edit-contents__button"
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={ () => setIsModalOpen( true ) }
-					>
-						{ __( 'Edit code' ) }
-					</Button>
-				</VStack>
-			</InspectorControls>
-			<Preview content={ attributes.content } isSelected={ isSelected } />
+			{ isPreview ? (
+				<Preview
+					content={ attributes.content }
+					isSelected={ isSelected }
+				/>
+			) : (
+				<PlainText
+					value={ getRawHtml( attributes.content ) }
+					onChange={ ( newHtml ) => {
+						const { css, js } = parseContent( attributes.content );
+						setAttributes( {
+							content: serializeContent( {
+								html: newHtml,
+								css,
+								js,
+							} ),
+						} );
+					} }
+					placeholder={ __( 'Write HTML…' ) }
+					aria-label={ __( 'HTML' ) }
+				/>
+			) }
 			{ isModalOpen && (
 				<HTMLEditModal
+					isOpen={ isModalOpen }
 					onRequestClose={ () => setIsModalOpen( false ) }
 					content={ attributes.content }
 					setAttributes={ setAttributes }
