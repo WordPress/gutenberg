@@ -1281,7 +1281,7 @@ describe( 'polling-manager', () => {
 	} );
 
 	describe( 'visibility change', () => {
-		it( 'does not spawn a duplicate poll when a request is in-flight', () => {
+		it( 'does not spawn a duplicate poll when a request is in-flight', async () => {
 			// Keep the first postSyncUpdate pending so we can simulate
 			// a visibility change while the request is in-flight.
 			const deferred = createDeferred< SyncResponse >();
@@ -1296,7 +1296,9 @@ describe( 'polling-manager', () => {
 				onSync: jest.fn(),
 			} );
 
-			// registerRoom → poll() → start() → postSyncUpdate (pending).
+			// registerRoom defers the first poll to the next idle tick,
+			// so flush it before checking in-flight behavior.
+			await jest.advanceTimersByTimeAsync( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
 			// Simulate tab hidden → visible while the request is in-flight.
@@ -1686,17 +1688,13 @@ describe( 'polling-manager', () => {
 			// Primary + 9 overflow = 10 rooms, exactly at the cap.
 			const overflow = registerPrimaryAndOverflow( pollingManager, 9 );
 
+			// First poll is deferred to the next idle window, so by the
+			// time it fires every room has been registered. Fast path: all
+			// rooms in one request since total rooms === cap.
 			await jest.advanceTimersByTimeAsync( 0 );
-			await jest.advanceTimersByTimeAsync( 4000 );
 
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
-
-			// First poll fires synchronously with only the primary room.
-			expect( getRoomNames( 0 ) ).toEqual( [ 'primary' ] );
-
-			// Second poll includes every registered room in a single
-			// request (fast path since total rooms === cap).
-			expect( getRoomNames( 1 ) ).toEqual( [ 'primary', ...overflow ] );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+			expect( getRoomNames( 0 ) ).toEqual( [ 'primary', ...overflow ] );
 		} );
 
 		it( 'caps each request at MAX_ROOMS_PER_REQUEST and always includes the primary room', async () => {
@@ -1711,11 +1709,10 @@ describe( 'polling-manager', () => {
 
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
-			// First poll: only the primary room was registered yet.
-			expect( getRoomNames( 0 ) ).toEqual( [ 'primary' ] );
-
-			// Subsequent polls cap at MAX_ROOMS_PER_REQUEST and pin primary.
-			for ( let i = 1; i < 3; i++ ) {
+			// Every poll caps at MAX_ROOMS_PER_REQUEST and pins primary,
+			// including the deferred first poll that now sees every
+			// already-registered room.
+			for ( let i = 0; i < 3; i++ ) {
 				const names = getRoomNames( i );
 				expect( names ).toHaveLength( 10 );
 				expect( names[ 0 ] ).toBe( 'primary' );
@@ -1771,29 +1768,23 @@ describe( 'polling-manager', () => {
 			// Primary + 11 overflow rooms, 9 slots per request.
 			registerPrimaryAndOverflow( pollingManager, 11 );
 
-			// Poll 1: primary only (fires synchronously at registration).
-			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
-			await jest.advanceTimersByTimeAsync( 0 );
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
-			expect( getRoomNames( 0 ) ).toEqual( [ 'primary' ] );
-
-			// Poll 2 fails while sending primary + 9 overflow. The
+			// Poll 1 fails while sending primary + 9 overflow. The
 			// rotation offset should still advance past this window.
 			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'network' ) );
-			await jest.advanceTimersByTimeAsync( 4000 );
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
-			const failedSent = getRoomNames( 1 );
+			const failedSent = getRoomNames( 0 );
 			expect( failedSent ).toHaveLength( 10 );
 			expect( failedSent[ 0 ] ).toBe( 'primary' );
 
-			// Poll 3 retries after the failure and should send a different
+			// Poll 2 retries after the failure and should send a different
 			// overflow slice, proving the offset advanced despite the error.
 			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
 			await jest.advanceTimersByTimeAsync( 2000 );
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
-			const retrySent = getRoomNames( 2 );
+			const retrySent = getRoomNames( 1 );
 			expect( retrySent ).toHaveLength( 10 );
 			expect( retrySent[ 0 ] ).toBe( 'primary' );
 			expect( retrySent ).not.toEqual( failedSent );

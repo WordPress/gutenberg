@@ -13,17 +13,25 @@ global.window.setImmediate = function ( callback ) {
 	return setTimeout( callback, 0 );
 };
 
-// Ignoring `options` argument since we unconditionally schedule this ASAP.
-global.window.requestIdleCallback = function requestIdleCallback( callback ) {
+// Approximate `requestIdleCallback` with `setTimeout`. The browser
+// would normally schedule against the next idle frame; we don't have
+// one, so we honor the caller's `options.timeout` deadline directly —
+// that's the wait callers are willing to accept anyway. Without an
+// explicit timeout, fall back to "as soon as the current task yields".
+global.window.requestIdleCallback = function requestIdleCallback(
+	callback,
+	options
+) {
 	const start = Date.now();
+	const delay = options?.timeout ?? 0;
 
 	return setTimeout(
 		() =>
 			callback( {
-				didTimeout: false,
+				didTimeout: delay > 0,
 				timeRemaining: () => Math.max( 0, 50 - ( Date.now() - start ) ),
 			} ),
-		0
+		delay
 	);
 };
 
