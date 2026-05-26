@@ -25,6 +25,7 @@ import {
 	isSectionBlock,
 	getParentSectionBlock,
 	getSelectedBlockStyleState,
+	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
@@ -123,6 +124,58 @@ describe( 'private selectors', () => {
 				viewport: 'default',
 				pseudo: 'default',
 			} );
+		} );
+	} );
+
+	describe( 'hasSelectedStyleState', () => {
+		it( 'returns false when the block has no selected state', () => {
+			const state = {};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when a viewport state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: 'default' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when a pseudo state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when viewport and pseudo states are selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
 		} );
 	} );
 
