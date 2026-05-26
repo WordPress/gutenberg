@@ -47,7 +47,7 @@ function getMarkupValidationError( css ) {
  * @param {string} css The CSS string to validate.
  * @return {string|null} An error message, or null if the CSS is valid.
  */
-export function getCSSValidationError( css ) {
+function getCSSValidationError( css ) {
 	if ( ! css ) {
 		return null;
 	}
