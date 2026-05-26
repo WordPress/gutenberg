@@ -26,62 +26,6 @@ type Entry = [ string, string ];
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
-const legacyWpComponentsOverridesCSS: Entry[] = [
-	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
-	[
-		'--wp-components-color-accent-darker-10',
-		'var(--wp-admin-theme-color-darker-10)',
-	],
-	[
-		'--wp-components-color-accent-darker-20',
-		'var(--wp-admin-theme-color-darker-20)',
-	],
-	[
-		'--wp-components-color-accent-inverted',
-		'var(--wpds-color-fg-interactive-brand-strong)',
-	],
-	[
-		'--wp-components-color-background',
-		'var(--wpds-color-bg-surface-neutral-strong)',
-	],
-	[
-		'--wp-components-color-foreground',
-		'var(--wpds-color-fg-content-neutral)',
-	],
-	[
-		'--wp-components-color-foreground-inverted',
-		'var(--wpds-color-bg-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-100',
-		'var(--wpds-color-bg-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-200',
-		'var(--wpds-color-stroke-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-300',
-		'var(--wpds-color-stroke-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-400',
-		'var(--wpds-color-stroke-interactive-neutral)',
-	],
-	[
-		'--wp-components-color-gray-600',
-		'var(--wpds-color-stroke-interactive-neutral)',
-	],
-	[
-		'--wp-components-color-gray-700',
-		'var(--wpds-color-fg-content-neutral-weak)',
-	],
-	[
-		'--wp-components-color-gray-800',
-		'var(--wpds-color-fg-content-neutral)',
-	],
-];
-
 function customRgbFormat( color: PlainColorObject ): string {
 	const rgb = to( color, sRGB );
 	return rgb.coords
@@ -142,18 +86,25 @@ function colorTokensCSS(
 
 function generateStyles( {
 	primary,
+	hasUserProvidedPrimary,
 	computedColorRamps,
 }: {
 	primary: string;
+	hasUserProvidedPrimary: boolean;
 	computedColorRamps: Map< string, RampResult >;
 } ): CSSProperties {
 	return Object.fromEntries(
 		[
 			// Semantic color tokens
 			colorTokensCSS( computedColorRamps ),
-			// Legacy overrides
-			legacyWpAdminThemeOverridesCSS( primary ),
-			legacyWpComponentsOverridesCSS,
+			// Legacy `--wp-admin-theme-color*` overrides only need to be
+			// emitted when `color.primary` is explicitly provided by the
+			// consumer. WP Core already defines these custom properties at
+			// `:root`, so we'd otherwise be duplicating its defaults on
+			// every provider instance.
+			hasUserProvidedPrimary
+				? legacyWpAdminThemeOverridesCSS( primary )
+				: [],
 		].flat()
 	);
 }
@@ -190,6 +141,8 @@ export function useThemeProviderStyles( {
 		[ primary, bg, cursorControl ]
 	);
 
+	const hasUserProvidedPrimary = color.primary !== undefined;
+
 	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
@@ -214,9 +167,10 @@ export function useThemeProviderStyles( {
 
 		return generateStyles( {
 			primary: seeds.primary,
+			hasUserProvidedPrimary,
 			computedColorRamps,
 		} );
-	}, [ primary, bg ] );
+	}, [ primary, bg, hasUserProvidedPrimary ] );
 
 	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {

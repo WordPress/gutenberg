@@ -11,6 +11,10 @@
 -   Add ["Design System/Tokens/Introduction" page](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs) to Storybook ([#78449](https://github.com/WordPress/gutenberg/pull/78449)).
 -   Add "How to pick a token" and "Naming pattern" guidance to [the design system tokens reference documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) ([#78438](https://github.com/WordPress/gutenberg/pull/78438)).
 
+### Enhancements
+
+-   `ThemeProvider`: Move the static `--wp-components-*` legacy overrides into a standalone `@wordpress/theme/legacy-overrides.css` stylesheet so they're emitted once at `:root` instead of being injected into every provider instance. The runtime `--wp-admin-theme-color*` overrides are now only emitted when `color.primary` is explicitly provided.
+
 ### Internal
 
 -   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
