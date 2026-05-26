@@ -102,17 +102,16 @@ const REVISION_DIFF_STYLES = `
  * @return {string|undefined} The aria-label string, or undefined if not applicable.
  */
 function getDiffStatusLabel( status, blockTitle ) {
-	if ( status === 'added' ) {
-		// translators: %s: block type name e.g. "Paragraph"
-		return sprintf( __( 'Added Block: %s' ), blockTitle );
-	}
-	if ( status === 'removed' ) {
-		// translators: %s: block type name e.g. "Paragraph"
-		return sprintf( __( 'Removed Block: %s' ), blockTitle );
-	}
-	if ( status === 'modified' ) {
-		// translators: %s: block type name e.g. "Paragraph"
-		return sprintf( __( 'Modified Block: %s' ), blockTitle );
+	switch ( status ) {
+		case 'added':
+			// translators: %s: block type name e.g. "Paragraph"
+			return sprintf( __( 'Added Block: %s' ), blockTitle );
+		case 'removed':
+			// translators: %s: block type name e.g. "Paragraph"
+			return sprintf( __( 'Removed Block: %s' ), blockTitle );
+		case 'modified':
+			// translators: %s: block type name e.g. "Paragraph"
+			return sprintf( __( 'Modified Block: %s' ), blockTitle );
 	}
 }
 
