@@ -40,38 +40,55 @@ function getRawHtml( raw = '' ) {
 	);
 }
 
+/**
+ * Renders the HTML/Preview toolbar toggle.
+ *
+ * @param {Object}   props             Component props.
+ * @param {string}   props.viewMode    Current editor mode.
+ * @param {Function} props.setViewMode State setter for the current mode.
+ * @return {Object} The toggle toolbar group.
+ */
+function ViewModeToggle( { viewMode, setViewMode } ) {
+	const isPreview = viewMode === 'preview';
+
+	return (
+		<ToolbarGroup>
+			<ToolbarButton
+				isPressed={ ! isPreview }
+				onClick={ () => setViewMode( 'html' ) }
+			>
+				HTML
+			</ToolbarButton>
+			<ToolbarButton
+				isPressed={ isPreview }
+				onClick={ () => setViewMode( 'preview' ) }
+			>
+				{ __( 'Preview' ) }
+			</ToolbarButton>
+		</ToolbarGroup>
+	);
+}
+
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const [ viewMode, setViewMode ] = useState( 'preview' );
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
 	} );
 
-	const viewMode = attributes.viewMode === 'preview' ? 'preview' : 'html';
 	const isPreview = viewMode === 'preview';
+	const hasContent = !! attributes.content?.trim();
+	const showPlaceholder = isPreview && ! hasContent;
 
 	// Show placeholder when content is empty and we are in preview mode.
-	if ( isPreview && ! attributes.content?.trim() ) {
+	if ( showPlaceholder ) {
 		return (
 			<div { ...blockProps }>
 				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							isPressed={ false }
-							onClick={ () =>
-								setAttributes( { viewMode: 'html' } )
-							}
-						>
-							HTML
-						</ToolbarButton>
-						<ToolbarButton
-							isPressed
-							onClick={ () =>
-								setAttributes( { viewMode: 'preview' } )
-							}
-						>
-							{ __( 'Preview' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
+					<ViewModeToggle
+						viewMode={ viewMode }
+						setViewMode={ setViewMode }
+					/>
 				</BlockControls>
 				<Placeholder
 					icon={ <BlockIcon icon={ code } /> }
@@ -103,22 +120,10 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	return (
 		<div { ...blockProps }>
 			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						isPressed={ viewMode === 'html' }
-						onClick={ () => setAttributes( { viewMode: 'html' } ) }
-					>
-						HTML
-					</ToolbarButton>
-					<ToolbarButton
-						isPressed={ isPreview }
-						onClick={ () =>
-							setAttributes( { viewMode: 'preview' } )
-						}
-					>
-						{ __( 'Preview' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
+				<ViewModeToggle
+					viewMode={ viewMode }
+					setViewMode={ setViewMode }
+				/>
 				<ToolbarGroup>
 					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
 						{ __( 'Edit code' ) }
@@ -140,12 +145,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</Button>
 				</Stack>
 			</InspectorControls>
-			{ isPreview ? (
-				<Preview
-					content={ attributes.content }
-					isSelected={ isSelected }
-				/>
-			) : (
+			<div hidden={ isPreview } aria-hidden={ isPreview }>
 				<PlainText
 					value={ getRawHtml( attributes.content ) }
 					onChange={ ( newHtml ) => {
@@ -161,6 +161,14 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					placeholder={ __( 'Write HTML…' ) }
 					aria-label={ __( 'HTML' ) }
 				/>
+			</div>
+			{ hasContent && (
+				<div hidden={ ! isPreview } aria-hidden={ ! isPreview }>
+					<Preview
+						content={ attributes.content }
+						isSelected={ isSelected }
+					/>
+				</div>
 			) }
 			{ isModalOpen && (
 				<HTMLEditModal

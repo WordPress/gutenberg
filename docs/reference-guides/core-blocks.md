@@ -427,7 +427,7 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 -	**Name:** core/html
 -	**Category:** widgets
 -	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
--	**Attributes:** content, viewMode
+-	**Attributes:** content
 
 ## Icon
 

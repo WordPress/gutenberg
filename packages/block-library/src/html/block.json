@@ -12,10 +12,6 @@
 			"type": "string",
 			"source": "raw",
 			"role": "content"
-		},
-		"viewMode": {
-			"type": "string",
-			"default": "html"
 		}
 	},
 	"supports": {
