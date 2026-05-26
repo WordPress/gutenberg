@@ -17,11 +17,11 @@
  * dependencies) are not flagged.
  */
 
-import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import SimpleGit from 'simple-git';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT = path.resolve( __dirname, '../..' );
@@ -42,12 +42,11 @@ try {
 	process.exit( 2 );
 }
 
-function git( args, errorContext ) {
+const git = SimpleGit( ROOT );
+
+async function tryGit( fn, errorContext ) {
 	try {
-		return execFileSync( 'git', args, {
-			encoding: 'utf8',
-			stdio: [ 'ignore', 'pipe', 'pipe' ],
-		} ).trim();
+		return await fn();
 	} catch ( error ) {
 		console.error( `error: ${ errorContext }: ${ error.message.trim() }` );
 		process.exit( 2 );
@@ -68,14 +67,16 @@ function depNames( pkg ) {
 	return result;
 }
 
-const mergeBase = git(
-	[ 'merge-base', 'HEAD', baseRef ],
-	`unable to compute merge-base between HEAD and "${ baseRef }"`
-);
+const mergeBase = (
+	await tryGit(
+		() => git.raw( [ 'merge-base', 'HEAD', baseRef ] ),
+		`unable to compute merge-base between HEAD and "${ baseRef }"`
+	)
+).trim();
 
 const baseJson = JSON.parse(
-	git(
-		[ 'show', `${ mergeBase }:package.json` ],
+	await tryGit(
+		() => git.show( [ `${ mergeBase }:package.json` ] ),
 		`unable to read package.json at merge-base ${ mergeBase }`
 	)
 );
