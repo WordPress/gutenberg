@@ -447,9 +447,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
-									{ window?.__experimentalMediaEditorModal && (
-										<MediaEditorModalMount />
-									) }
+									<MediaEditorModalMount />
 								</>
 							) }
 						</BlockEditorProviderComponent>
