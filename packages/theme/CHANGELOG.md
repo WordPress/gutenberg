@@ -16,6 +16,10 @@
 
 -   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
 
+### Enhancements
+
+-   Export `@wordpress/theme/design-token-fallbacks.scss` with a generated `wpds-var()` Sass function for compile-time design token fallback injection.
+
 ## 0.13.0 (2026-05-14)
 
 ### New Features

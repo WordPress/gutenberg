@@ -1,4 +1,4 @@
-import { computeBrandFallback } from '../index';
+import { computeBrandFallback, formatDesignTokenFallbacksScss } from '../index';
 
 jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
 
@@ -12,6 +12,28 @@ describe( 'computeBrandFallback', () => {
 	it( 'throws on colors with alpha (4-digit hex)', () => {
 		expect( () => computeBrandFallback( '#f008' ) ).toThrow(
 			/does not support colors with alpha/
+		);
+	} );
+} );
+
+describe( 'formatDesignTokenFallbacksScss', () => {
+	it( 'generates a Sass map and wpds-var function', () => {
+		const scss = formatDesignTokenFallbacksScss( {
+			'--wpds-border-radius-sm': '2px',
+			'--wpds-border-width-focus':
+				'var(--wp-admin-border-width-focus, 2px)',
+			'--wpds-typography-font-family-mono':
+				'"Menlo", "Consolas", monaco, monospace',
+		} );
+
+		expect( scss ).toContain( '@use "sass:map";' );
+		expect( scss ).toContain( '@function wpds-var($token)' );
+		expect( scss ).toContain( "'--wpds-border-radius-sm': '2px'" );
+		expect( scss ).toContain(
+			"'--wpds-border-width-focus': 'var(--wp-admin-border-width-focus, 2px)'"
+		);
+		expect( scss ).toContain(
+			'\'--wpds-typography-font-family-mono\': \'"Menlo", "Consolas", monaco, monospace\''
 		);
 	} );
 } );
