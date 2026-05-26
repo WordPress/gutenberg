@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import glob from 'fast-glob';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT_DIR = path.resolve( __dirname, '../..' );
+const ROOT_DIR = path.resolve( __dirname, '../../..' );
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 
 /**

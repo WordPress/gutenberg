@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import type { ReactNode } from 'react';
 
 /**
@@ -39,6 +39,7 @@ import type {
  * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
+	model: 'grid',
 	columns: 12,
 	minColumnWidth: 140,
 	rowHeight: 140,

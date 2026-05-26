@@ -32,7 +32,11 @@ import {
 	// No type declarations available for @wordpress/interface.
 	// @ts-expect-error
 } from '@wordpress/interface';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type {
+	JSX,
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactNode,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -269,8 +273,9 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef =
-		useRef< ReturnType< typeof setTimeout > >();
+	const placementControlTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );

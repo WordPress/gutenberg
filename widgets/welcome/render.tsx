@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useResizeObserver } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { layout, pencil, styles as stylesIcon } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
@@ -15,30 +13,12 @@ import { Stack } from '@wordpress/ui';
 import { Banner, FeatureHighlight } from './components';
 import styles from './style.module.css';
 
-const ROW_LAYOUT_MIN_WIDTH = 800;
-const ROW_LAYOUT_MAX_HEIGHT = 390;
-const TINY_LAYOUT_MAX_SIZE = 120;
-
 export default function WelcomeBanner() {
-	const [ isWide, setIsWide ] = useState( false );
-	const [ isTiny, setIsTiny ] = useState( false );
-
 	const isClassicTheme = useSelect(
 		( select ) =>
 			select( coreStore ).getCurrentTheme()?.is_block_theme === false,
 		[]
 	);
-
-	const setRef = useResizeObserver< HTMLDivElement >( ( [ entry ] ) => {
-		const { width, height } = entry.contentRect;
-
-		setIsWide(
-			width >= ROW_LAYOUT_MIN_WIDTH && height <= ROW_LAYOUT_MAX_HEIGHT
-		);
-		setIsTiny(
-			width < TINY_LAYOUT_MAX_SIZE && height < TINY_LAYOUT_MAX_SIZE
-		);
-	} );
 
 	const customizeFeature = isClassicTheme
 		? {
@@ -81,35 +61,26 @@ export default function WelcomeBanner() {
 		  };
 
 	return (
-		<Stack
-			ref={ setRef }
-			className={ `${ styles.root }${
-				isWide ? ` ${ styles.wide }` : ''
-			}` }
-			direction={ isWide ? 'row' : 'column' }
-			gap="lg"
-		>
-			<Banner isWide={ isWide } isTiny={ isTiny } />
+		<Stack className={ styles.root } direction="column" gap="lg">
+			<Banner />
 
-			{ ! isTiny && (
-				<Stack className={ styles.columns }>
-					<FeatureHighlight
-						icon={ pencil }
-						title={ __(
-							'Author rich content with blocks and patterns'
-						) }
-						description={ __(
-							'Block patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.'
-						) }
-						ctaUrl="/wp-admin/post-new.php?post_type=page"
-						ctaLabel={ __( 'Add a new page' ) }
-					/>
+			<Stack className={ styles.columns }>
+				<FeatureHighlight
+					icon={ pencil }
+					title={ __(
+						'Author rich content with blocks and patterns'
+					) }
+					description={ __(
+						'Block patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.'
+					) }
+					ctaUrl="/wp-admin/post-new.php?post_type=page"
+					ctaLabel={ __( 'Add a new page' ) }
+				/>
 
-					<FeatureHighlight { ...customizeFeature } />
+				<FeatureHighlight { ...customizeFeature } />
 
-					<FeatureHighlight { ...stylesFeature } />
-				</Stack>
-			) }
+				<FeatureHighlight { ...stylesFeature } />
+			</Stack>
 		</Stack>
 	);
 }

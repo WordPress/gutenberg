@@ -7,7 +7,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const { SourceMapConsumer } = require( 'source-map' );
 
-const USAGE = `Usage: bin/resolve-trace-source-maps.js <trace.json> [--build-dir <dir>] [--out <path>]
+const USAGE = `Usage: node tools/build/packages/resolve-trace-source-maps.cjs <trace.json> [--build-dir <dir>] [--out <path>]
 
 Rewrites minified \`functionName\`s in a saved Chromium trace's CPU profile
 nodes back to their original identifiers using source maps from a

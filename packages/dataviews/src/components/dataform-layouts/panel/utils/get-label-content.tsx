@@ -1,8 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Icon as WCIcon, Tooltip as WCTooltip } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { error as errorIcon } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 function getLabelContent(
 	showError?: boolean,
@@ -10,12 +12,18 @@ function getLabelContent(
 	fieldLabel?: string
 ) {
 	return showError ? (
-		<WCTooltip text={ errorMessage } placement="top">
-			<span className="dataforms-layouts-panel__field-label-error-content">
-				<WCIcon icon={ errorIcon } size={ 16 } />
-				{ fieldLabel }
-			</span>
-		</WCTooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<span className="dataforms-layouts-panel__field-label-error-content">
+						<WCIcon icon={ errorIcon } size={ 16 } />
+						<VisuallyHidden>{ errorMessage }: </VisuallyHidden>
+						{ fieldLabel }
+					</span>
+				}
+			/>
+			<Tooltip.Popup>{ errorMessage }</Tooltip.Popup>
+		</Tooltip.Root>
 	) : (
 		fieldLabel
 	);

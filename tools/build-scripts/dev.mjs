@@ -9,7 +9,7 @@ import path from 'path';
 import fs from 'fs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT_DIR = path.resolve( __dirname, '..' );
+const ROOT_DIR = path.resolve( __dirname, '../..' );
 
 /**
  * Execute a command and return a promise.
@@ -134,11 +134,9 @@ async function dev() {
 			throw new Error( 'Run `npm install` to update.' );
 		} );
 
-		// Step 1: Clean packages
 		console.log( '\n🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );
 
-		// Step 2: Build workspaces
 		console.log( '\n📦 Building workspaces...' );
 		await exec(
 			'npm',
@@ -146,14 +144,12 @@ async function dev() {
 			{ silent: true }
 		);
 
-		// Step 3: Generate worker placeholders
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
 		await exec( 'node', [
-			'./bin/packages/generate-worker-placeholders.mjs',
+			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
 		] );
 
-		// Step 4: Build TypeScript types
 		console.log( '\n📘 Building TypeScript types...\n' );
 		const tsStartTime = Date.now();
 		await exec( 'tsgo', [ '--build' ] ).catch( () => {
@@ -165,15 +161,18 @@ async function dev() {
 		const buildTime = Date.now() - tsStartTime;
 		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
-		// Step 5: Check build type declaration files
 		console.log( '\n✅ Checking type declaration files...' );
 		await exec( 'node', [
-			'./bin/packages/check-build-type-declaration-files.js',
+			path.join(
+				__dirname,
+				'packages/check-build-type-declaration-files.cjs'
+			),
 		] );
 
-		// Step 6: Build vendors
 		console.log( '\n📦 Building vendor files...' );
-		await exec( 'node', [ './bin/packages/build-vendors.mjs' ] );
+		await exec( 'node', [
+			path.join( __dirname, 'packages/build-vendors.mjs' ),
+		] );
 
 		const setupTime = Date.now() - startTime;
 		console.log(
@@ -182,7 +181,6 @@ async function dev() {
 			) }s)\n`
 		);
 
-		// Step 7: Start watch mode with both TypeScript and package builds
 		console.log( '👀 Starting watch mode...\n' );
 		console.log( '   - TypeScript compiler watching for type changes' );
 		console.log( '   - Package builder watching for source changes\n' );
