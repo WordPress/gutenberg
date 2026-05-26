@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   `ThemeProvider`: Propagate `density` through React context so nested providers inherit it via React (not only via the DOM/CSS cascade).
+-   `ThemeProvider`: Propagate `density` through React context so nested providers inherit it via React (not only via the DOM/CSS cascade) ([#78662](https://github.com/WordPress/gutenberg/pull/78662)).
 
 ### Documentation
 
