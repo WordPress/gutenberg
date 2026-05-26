@@ -65,16 +65,3 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 		return $processor->get_updated_html();
 	}
 }
-
-if ( ! function_exists( 'wp_icon' ) ) {
-	/**
-	 * Echoes the SVG markup for an icon.
-	 *
-	 * @param string $name The namespaced icon name (e.g. 'core/plus',
-	 *                     'core/arrow-down', 'my-plugin/custom-icon').
-	 * @param array  $args Optional. Arguments for the icon. See wp_get_icon() for details.
-	 */
-	function wp_icon( $name, $args = array() ) {
-		echo wp_get_icon( $name, $args );
-	}
-}

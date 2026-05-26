@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the wp_get_icon() and wp_icon() helper functions.
+ * Tests for the wp_get_icon() helper function.
  *
  * @package gutenberg
  */
@@ -63,10 +63,4 @@ class WP_Icon_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( '<script>', $output );
 	}
 
-	public function test_wp_icon_echoes_output() {
-		ob_start();
-		wp_icon( 'core/plus' );
-		$output = ob_get_clean();
-		$this->assertSame( wp_get_icon( 'core/plus' ), $output );
-	}
 }
