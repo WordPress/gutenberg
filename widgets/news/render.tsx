@@ -17,6 +17,7 @@ import { EmptyState, Icon, Link, Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
+import { DEFAULT_PER_PAGE } from './widget';
 import styles from './render.module.css';
 
 interface NewsPost {
@@ -45,9 +46,9 @@ type NewsItem = {
 
 type NewsAttributes = {
 	perPage?: number;
+	showNews?: boolean;
+	showCommunity?: boolean;
 };
-
-const DEFAULT_PER_PAGE = 5;
 
 const NEWS_FEEDS = [
 	{
@@ -197,12 +198,37 @@ async function fetchNewsFeed(
 	}
 }
 
+function getEnabledFeeds( attributes?: NewsAttributes ) {
+	const showNews = attributes?.showNews ?? true;
+	const showCommunity = attributes?.showCommunity ?? true;
+
+	return NEWS_FEEDS.filter( ( feed ) => {
+		if ( feed.key === 'news' ) {
+			return showNews;
+		}
+
+		if ( feed.key === 'planet' ) {
+			return showCommunity;
+		}
+
+		return true;
+	} );
+}
+
 export default function WordPressNews( {
 	attributes,
 }: {
 	attributes?: NewsAttributes;
 } ) {
 	const limit = Math.max( 1, attributes?.perPage ?? DEFAULT_PER_PAGE );
+	const enabledFeeds = useMemo(
+		() => getEnabledFeeds( attributes ),
+		[ attributes?.showNews, attributes?.showCommunity ]
+	);
+	const enabledFeedKeys = useMemo(
+		() => enabledFeeds.map( ( feed ) => feed.key ).join( ',' ),
+		[ enabledFeeds ]
+	);
 
 	const [ view, setView ] = useState< View >( INITIAL_VIEW );
 	const [ newsFeeds, setNewsFeeds ] = useState< NewsFeed[] >( [] );
@@ -229,9 +255,16 @@ export default function WordPressNews( {
 		setNewsFeeds( [] );
 		setFetchedPages( 0 );
 		setIsInitialLoading( true );
-	}, [ limit ] );
+	}, [ limit, enabledFeedKeys ] );
 
 	useEffect( () => {
+		if ( enabledFeeds.length === 0 ) {
+			setNewsFeeds( [] );
+			setFetchedPages( 0 );
+			setIsInitialLoading( false );
+			return;
+		}
+
 		if ( targetPages <= fetchedPages ) {
 			return;
 		}
@@ -246,7 +279,7 @@ export default function WordPressNews( {
 		const fetchCount = limit * targetPages;
 
 		Promise.all(
-			NEWS_FEEDS.map( ( feed ) => fetchNewsFeed( feed, fetchCount ) )
+			enabledFeeds.map( ( feed ) => fetchNewsFeed( feed, fetchCount ) )
 		)
 			.then( ( feeds ) => {
 				if ( fetchId !== fetchIdRef.current ) {
@@ -261,7 +294,7 @@ export default function WordPressNews( {
 					setIsInitialLoading( false );
 				}
 			} );
-	}, [ limit, targetPages, fetchedPages ] );
+	}, [ limit, targetPages, fetchedPages, enabledFeedKeys, enabledFeeds ] );
 
 	const allItems = useMemo(
 		() => combineFeedPosts( newsFeeds ),
@@ -321,6 +354,7 @@ export default function WordPressNews( {
 	const isLoading =
 		isInitialLoading || ( isFetchingMore && ! hasDataForCurrentPage );
 	const showEmpty = ! isLoading && ! isFetchingMore && allItems.length === 0;
+	const showSeeAllLink = attributes?.showNews ?? true;
 
 	return (
 		<div className={ styles.root }>
@@ -339,19 +373,21 @@ export default function WordPressNews( {
 				<footer className={ styles.footer }>
 					<Stack
 						direction="row"
-						justify="space-between"
+						justify={ showSeeAllLink ? 'space-between' : 'end' }
 						align="center"
 						gap="md"
 					>
-						<Link
-							href={ _x(
-								'https://wordpress.org/news/all-posts/',
-								'News dashboard widget'
-							) }
-							openInNewTab
-						>
-							{ __( 'See all' ) }
-						</Link>
+						{ showSeeAllLink && (
+							<Link
+								href={ _x(
+									'https://wordpress.org/news/all-posts/',
+									'News dashboard widget'
+								) }
+								openInNewTab
+							>
+								{ __( 'See all' ) }
+							</Link>
+						) }
 						<DataViews.Pagination />
 					</Stack>
 				</footer>
