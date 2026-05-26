@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   Add `outset-ring__rest` and `outset-ring__focus` mixins for outline-based focus rings using `--wpds-*` design tokens.
+-   Add `outset-ring__rest` and `outset-ring__focus` mixins for outline-based focus rings using `--wpds-*` design tokens ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
 
 ## 8.0.0 (2026-05-14)
 
