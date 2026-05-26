@@ -48,7 +48,8 @@ async function tryGit( fn, errorContext ) {
 	try {
 		return await fn();
 	} catch ( error ) {
-		console.error( `error: ${ errorContext }: ${ error.message.trim() }` );
+		const message = String( error?.message ?? error ).trim();
+		console.error( `error: ${ errorContext }: ${ message }` );
 		process.exit( 2 );
 	}
 }
