@@ -19,6 +19,7 @@ export default function Text< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { prefix, suffix } = config || {};
+	const isConnected = field.id in ( data?.metadata?.bindings || {} );
 
 	return (
 		<ValidatedText
@@ -29,8 +30,12 @@ export default function Text< Item >( {
 				hideLabelFromVision,
 				markWhenOptional,
 				validity,
-				prefix: prefix ? createElement( prefix ) : undefined,
-				suffix: suffix ? createElement( suffix ) : undefined,
+				prefix: prefix
+					? createElement( prefix, { isConnected } )
+					: undefined,
+				suffix: suffix
+					? createElement( suffix, { isConnected } )
+					: undefined,
 			} }
 		/>
 	);

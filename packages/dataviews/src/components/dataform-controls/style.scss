@@ -32,3 +32,8 @@
 		background-color: var(--wpds-color-bg-interactive-neutral-strong-active);
 	}
 }
+
+// TODO: Make selector/classes consistent with this file/directory!
+.components-validated-control .components-input-control.is-connected .components-input-control__backdrop {
+	border-color: var(--wp-block-synced-color);
+}

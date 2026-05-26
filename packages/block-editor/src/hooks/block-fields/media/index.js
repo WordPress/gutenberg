@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -113,6 +118,8 @@ export default function Media( { data, field, onChange, config = {} } ) {
 	const id = value?.id;
 	const url = value?.url;
 
+	const isBound = 'id' in ( data?.metadata?.bindings || {} );
+
 	const attachment = useSelect(
 		( select ) => {
 			if ( ! id ) {
@@ -206,7 +213,10 @@ export default function Media( { data, field, onChange, config = {} } ) {
 					renderToggle={ ( buttonProps ) => (
 						<Button
 							__next40pxDefaultSize
-							className="block-editor-content-only-controls__media"
+							className={ clsx(
+								'block-editor-content-only-controls__media',
+								{ 'is-connected': isBound }
+							) }
 							{ ...buttonProps }
 						>
 							<Grid

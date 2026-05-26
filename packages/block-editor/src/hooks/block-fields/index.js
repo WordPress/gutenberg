@@ -22,6 +22,7 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
 import InspectorControls from '../../components/inspector-controls/fill';
+import ConnectedButton from './connected-button';
 
 // controls
 import RichText from './rich-text';
@@ -156,6 +157,11 @@ function BlockFields( {
 				field.Edit = createConfiguredControl( Media, {
 					...fieldDef.Edit,
 				} );
+			} else if ( ! fieldDef.Edit ) {
+				field.Edit = {
+					control: fieldDef.type,
+					suffix: ConnectedButton,
+				};
 			}
 
 			return field;
