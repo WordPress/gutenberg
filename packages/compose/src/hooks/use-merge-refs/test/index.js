@@ -580,4 +580,56 @@ describe( 'useMergeRefs with cleanup-returning ref callbacks', () => {
 			],
 		] );
 	} );
+
+	it( 'should support mixing an object ref with a cleanup-returning ref', () => {
+		const objectRef = { current: null };
+
+		function MergedRefsMixed( { tagName: TagName = 'ul' } ) {
+			function refCleanup( value ) {
+				refCleanup.history.push( value );
+				return () => {
+					refCleanup.history.push( 'cleanup' );
+				};
+			}
+
+			refCleanup.history = [];
+
+			renderCallback( [ refCleanup.history ] );
+
+			const r = useCallback( refCleanup, [] );
+			const merged = useMergeRefs( [ objectRef, r ] );
+
+			return <TagName ref={ merged } />;
+		}
+
+		const { rerender, unmount } = render( <MergedRefsMixed /> );
+
+		const originalElement = screen.getByRole( 'list' );
+
+		// Object ref's .current is set; cleanup ref is called with the node.
+		expect( objectRef.current ).toBe( originalElement );
+		expect( renderCallback.history ).toEqual( [ [ [ originalElement ] ] ] );
+
+		rerender( <MergedRefsMixed tagName="button" /> );
+
+		const newElement = screen.getByRole( 'button' );
+
+		// Node change: object ref retargets, callback ref's cleanup fires
+		// and the callback is re-invoked with the new node.
+		expect( objectRef.current ).toBe( newElement );
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement, 'cleanup', newElement ] ],
+			[ [] ],
+		] );
+
+		unmount();
+
+		// Object ref nulled via the fallback assignRef path; callback ref
+		// sees its cleanup, never null.
+		expect( objectRef.current ).toBe( null );
+		expect( renderCallback.history ).toEqual( [
+			[ [ originalElement, 'cleanup', newElement, 'cleanup' ] ],
+			[ [] ],
+		] );
+	} );
 } );
