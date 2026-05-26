@@ -125,12 +125,12 @@ export default function BlockBindingsAttributeControl( {
 			hasValue={ () => !! binding }
 			label={ attribute }
 			onDeselect={
-				!! hasCompatibleFields &&
-				( () => {
-					updateBlockBindings( {
-						[ attribute ]: undefined,
-					} );
-				} )
+				hasCompatibleFields
+					? () =>
+							updateBlockBindings( {
+								[ attribute ]: undefined,
+							} )
+					: undefined
 			}
 		>
 			<Menu placement={ isMobile ? 'bottom-start' : 'left-start' }>
