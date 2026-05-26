@@ -13,14 +13,19 @@ const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 export default function StateControlBadges( {
 	viewportStates = [],
+	customStates = [],
 	pseudoStates = [],
 	viewportValue = 'default',
+	customStateValue = 'default',
 	pseudoStateValue = 'default',
 	className = 'block-editor-global-styles-state-control__badges',
 } ) {
 	const activeStates = [];
 	const selectedViewport = viewportStates.find(
 		( state ) => state.value === viewportValue
+	);
+	const selectedCustomState = customStates.find(
+		( state ) => state.value === customStateValue
 	);
 	const selectedPseudoState = pseudoStates.find(
 		( state ) => state.value === pseudoStateValue
@@ -30,6 +35,13 @@ export default function StateControlBadges( {
 		activeStates.push( {
 			key: `viewport-${ selectedViewport.value }`,
 			label: selectedViewport.label,
+		} );
+	}
+
+	if ( selectedCustomState ) {
+		activeStates.push( {
+			key: `custom-${ selectedCustomState.value }`,
+			label: selectedCustomState.label,
 		} );
 	}
 

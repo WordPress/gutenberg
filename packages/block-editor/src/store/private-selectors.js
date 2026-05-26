@@ -1060,6 +1060,7 @@ export function getRequestedInspectorTab( state ) {
 
 const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: 'default',
+	custom: 'default',
 	pseudo: 'default',
 };
 

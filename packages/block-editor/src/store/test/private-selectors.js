@@ -80,6 +80,7 @@ describe( 'private selectors', () => {
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: 'default',
+				custom: 'default',
 				pseudo: 'default',
 			} );
 		} );
@@ -107,6 +108,7 @@ describe( 'private selectors', () => {
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: 'default',
+				custom: 'default',
 				pseudo: 'default',
 			} );
 		} );
@@ -121,6 +123,7 @@ describe( 'private selectors', () => {
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: 'default',
+				custom: 'default',
 				pseudo: 'default',
 			} );
 		} );

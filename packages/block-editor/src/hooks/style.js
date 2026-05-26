@@ -42,9 +42,10 @@ import {
 	getStyleForState,
 	hasViewportBlockStyleState,
 	hasPseudoBlockStyleState,
+	hasCustomBlockStyleState,
 } from './block-style-state';
-import { VALID_BLOCK_PSEUDO_STATES } from './states';
-import { buildScopedBlockSelector } from './state-utils';
+import { VALID_BLOCK_PSEUDO_STATES, VALID_BLOCK_CUSTOM_STATES } from './states';
+import { buildScopedBlockSelector, getCustomStateSuffix } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
@@ -323,11 +324,75 @@ function getPseudoStateCSSRules( style, name, baseSelector ) {
 }
 
 /**
+ * Generates CSS rules for custom (class-based) state styles such as `@current`.
+ *
+ * Each custom state can contain root styles plus nested pseudo-state styles
+ * (e.g. `@current` + `:hover` stored at `style['@current'][':hover']`).
+ *
+ * @param {Object} style        Block style object containing custom states.
+ * @param {string} name         Block name.
+ * @param {string} baseSelector Base selector used to scope generated CSS.
+ * @return {string[]} Generated CSS rule strings.
+ */
+function getCustomStateCSSRules( style, name, baseSelector ) {
+	const validCustomStates = VALID_BLOCK_CUSTOM_STATES[ name ];
+	if ( ! validCustomStates ) {
+		return [];
+	}
+
+	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
+	const cssRules = [];
+
+	validCustomStates.forEach( ( customState ) => {
+		const customStyles = style?.[ customState ];
+		if ( ! customStyles ) {
+			return;
+		}
+		const customSuffix = getCustomStateSuffix( name, customState );
+		if ( ! customSuffix ) {
+			return;
+		}
+
+		const rootStyles = getRootStateStyles(
+			customStyles,
+			validPseudoStates
+		);
+		if ( rootStyles && Object.keys( rootStyles ).length ) {
+			const css = getBlockStateStylesCSS( rootStyles, {
+				name,
+				baseSelector,
+				state: customSuffix,
+			} );
+			if ( css ) {
+				cssRules.push( css );
+			}
+		}
+
+		validPseudoStates.forEach( ( pseudoState ) => {
+			const compoundStyles = customStyles[ pseudoState ];
+			if ( ! compoundStyles ) {
+				return;
+			}
+			const css = getBlockStateStylesCSS( compoundStyles, {
+				name,
+				baseSelector,
+				state: `${ customSuffix }${ pseudoState }`,
+			} );
+			if ( css ) {
+				cssRules.push( css );
+			}
+		} );
+	} );
+
+	return cssRules;
+}
+
+/**
  * Generates CSS rules for responsive block instance style states.
  *
  * Each responsive state can contain root styles, element styles, and nested
- * pseudo-state styles. Generated rules are wrapped in the matching breakpoint
- * media query.
+ * pseudo-state and custom-state styles. Generated rules are wrapped in the
+ * matching breakpoint media query.
  *
  * @param {Object} style        Block style object containing responsive states.
  * @param {string} name         Block name.
@@ -337,7 +402,12 @@ function getPseudoStateCSSRules( style, name, baseSelector ) {
 export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 	const cssRules = [];
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
-	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
+	const validCustomStates = VALID_BLOCK_CUSTOM_STATES[ name ] ?? [];
+	const nestedStateKeys = [
+		'elements',
+		...validPseudoStates,
+		...validCustomStates,
+	];
 
 	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
 		( [ viewport, mediaQuery ] ) => {
@@ -369,6 +439,10 @@ export function getResponsiveStateCSSRules( style, name, baseSelector ) {
 
 			viewportCSSRules.push(
 				...getPseudoStateCSSRules( viewportStyles, name, baseSelector )
+			);
+
+			viewportCSSRules.push(
+				...getCustomStateCSSRules( viewportStyles, name, baseSelector )
 			);
 
 			if ( viewportCSSRules.length ) {
@@ -699,13 +773,17 @@ function BlockStyleControls( {
 		[ clientId, name ]
 	);
 	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
+	const isCustomSelectorState = hasCustomBlockStyleState( selectedState );
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
 	// other blocks of the same type are not affected. Must be called before
 	// any early returns because it is a hook.
 	const canvasStateCSS = useMemo( () => {
-		if ( ! showStateOnCanvas || ! isPseudoSelectorState ) {
+		if (
+			! showStateOnCanvas ||
+			( ! isPseudoSelectorState && ! isCustomSelectorState )
+		) {
 			return undefined;
 		}
 
@@ -739,6 +817,7 @@ function BlockStyleControls( {
 	}, [
 		showStateOnCanvas,
 		isPseudoSelectorState,
+		isCustomSelectorState,
 		globalBlockStyles,
 		style,
 		selectedState,
@@ -903,6 +982,10 @@ function useBlockProps( { name, style } ) {
 
 		cssRules.push(
 			...getPseudoStateCSSRules( style, name, baseElementSelector )
+		);
+
+		cssRules.push(
+			...getCustomStateCSSRules( style, name, baseElementSelector )
 		);
 
 		cssRules.push(

@@ -137,6 +137,33 @@ export function buildStateSelector( baseSelector, name, state ) {
 }
 
 /**
+ * Returns the CSS selector suffix for a custom (class-based) state declared
+ * on a block via `selectors.states`, extracting the trailing class/pseudo
+ * segment so it can be appended to the block-instance selector.
+ *
+ * Example: for `@current` on `core/navigation-link`, where
+ * `selectors.states['@current'] = ".wp-block-navigation .current-menu-item"`,
+ * this returns `.current-menu-item`.
+ *
+ * Keep in sync with gutenberg_get_custom_state_suffix() in
+ * lib/block-supports/states.php.
+ *
+ * @param {string} name  Block name.
+ * @param {string} state Custom state key, e.g. `'@current'`.
+ * @return {string|null} CSS suffix, or null if not declared.
+ */
+export function getCustomStateSuffix( name, state ) {
+	const stateSelector = getBlockType( name )?.selectors?.states?.[ state ];
+	if ( typeof stateSelector !== 'string' || ! stateSelector.trim() ) {
+		return null;
+	}
+	const match = stateSelector.match(
+		/(\.[a-zA-Z0-9_-]+(?::[a-zA-Z0-9_-]+)?)\s*$/
+	);
+	return match ? match[ 1 ] : null;
+}
+
+/**
  * Builds the CSS selector used to preview a state on the editor canvas,
  * scoped to a specific block instance via its `data-block` attribute.
  *
