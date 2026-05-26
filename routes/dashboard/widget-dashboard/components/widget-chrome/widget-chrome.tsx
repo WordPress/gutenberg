@@ -8,7 +8,13 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
-import { Component, Suspense, forwardRef, useId, useMemo } from '@wordpress/element';
+import {
+	Component,
+	Suspense,
+	forwardRef,
+	useId,
+	useMemo,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
 import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
