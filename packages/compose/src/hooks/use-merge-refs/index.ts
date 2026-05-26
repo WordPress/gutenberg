@@ -4,12 +4,17 @@
 import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 import type { Ref, RefCallback } from 'react';
 
-function assignRef< T >( ref: Ref< T >, value: T ) {
+// Returns a cleanup function if the ref callback returned one (React 19 ref
+// callback cleanup pattern), otherwise `undefined`. Object refs never have a
+// cleanup and only set `.current`.
+function assignRef< T >( ref: Ref< T >, value: T ): ( () => void ) | undefined {
 	if ( typeof ref === 'function' ) {
-		ref( value );
+		const returned = ref( value );
+		return typeof returned === 'function' ? returned : undefined;
 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
 		ref.current = value;
 	}
+	return undefined;
 }
 
 /**
@@ -28,22 +33,24 @@ function assignRef< T >( ref: Ref< T >, value: T ) {
  * old ref callback will be called with `null` and the new ref callback will be
  * called with the same value.
  *
- * To make ref callbacks easier to use, you can also pass the result of
- * `useRefEffect`, which makes cleanup easier by allowing you to return a
- * cleanup function instead of handling `null`.
+ * Inner ref callbacks may return a cleanup function (React 19's ref callback
+ * cleanup pattern). When a ref callback returns a function, that function is
+ * invoked at teardown (node change, dependency change, or unmount) **instead
+ * of** the callback being called with `null`. Callbacks that do not return a
+ * cleanup continue to receive `null` on teardown as before.
  *
  * It's also possible to _disable_ a ref (and its behaviour) by simply not
  * passing the ref.
  *
  * ```jsx
- * const ref = useRefEffect( ( node ) => {
+ * const ref = useCallback( ( node ) => {
  *   node.addEventListener( ... );
  *   return () => {
  *     node.removeEventListener( ... );
  *   };
  * }, [ ...dependencies ] );
  * const otherRef = useRef();
- * const mergedRefs useMergeRefs( [
+ * const mergedRefs = useMergeRefs( [
  *   enabled && ref,
  *   otherRef,
  * ] );
@@ -56,11 +63,15 @@ function assignRef< T >( ref: Ref< T >, value: T ) {
 export default function useMergeRefs< T >(
 	refs: Ref< T >[]
 ): RefCallback< T > {
-	const element = useRef( null );
+	const elementRef = useRef< T | null >( null );
 	const isAttachedRef = useRef( false );
 	const didElementChangeRef = useRef( false );
 	const previousRefsRef = useRef< Ref< T >[] >( [] );
 	const currentRefsRef = useRef( refs );
+	// Position-indexed cleanups returned by inner ref callbacks. A slot is
+	// `undefined` when the ref at that position did not return a cleanup (or
+	// is an object ref / disabled).
+	const cleanupsRef = useRef< Array< ( () => void ) | undefined > >( [] );
 
 	// Update on render before the ref callback is called, so the ref callback
 	// always has access to the current refs.
@@ -77,8 +88,19 @@ export default function useMergeRefs< T >(
 			refs.forEach( ( ref, index ) => {
 				const previousRef = previousRefsRef.current[ index ];
 				if ( ref !== previousRef ) {
-					assignRef( previousRef, null );
-					assignRef( ref, element.current );
+					// Tear down: prefer the stored cleanup; otherwise fall
+					// back to calling the previous ref with `null`.
+					const cleanup = cleanupsRef.current[ index ];
+					if ( cleanup ) {
+						cleanupsRef.current[ index ] = undefined;
+						cleanup();
+					} else {
+						assignRef( previousRef, null );
+					}
+					cleanupsRef.current[ index ] = assignRef(
+						ref,
+						elementRef.current as T
+					);
 				}
 			} );
 		}
@@ -97,20 +119,29 @@ export default function useMergeRefs< T >(
 	return useCallback( ( value: T | null ) => {
 		// Update the element so it can be used when calling ref callbacks on a
 		// dependency change.
-		assignRef( element, value );
+		elementRef.current = value;
 
 		didElementChangeRef.current = true;
 		isAttachedRef.current = value !== null;
 
 		// When an element changes, the current ref callback should be called
 		// with the new element and the previous one with `null`.
-		const refsToAssign = value
-			? currentRefsRef.current
-			: previousRefsRef.current;
-
-		// Update the latest refs.
-		for ( const ref of refsToAssign ) {
-			assignRef( ref, value );
+		if ( value === null ) {
+			previousRefsRef.current.forEach( ( ref, index ) => {
+				// Tear down: prefer the stored cleanup; otherwise fall back
+				// to calling the ref with `null`.
+				const cleanup = cleanupsRef.current[ index ];
+				if ( cleanup ) {
+					cleanupsRef.current[ index ] = undefined;
+					cleanup();
+				} else {
+					assignRef( ref, null );
+				}
+			} );
+		} else {
+			currentRefsRef.current.forEach( ( ref, index ) => {
+				cleanupsRef.current[ index ] = assignRef( ref, value );
+			} );
 		}
 	}, [] );
 }
