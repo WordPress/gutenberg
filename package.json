@@ -155,7 +155,7 @@
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"test": "npm-run-all lint test:unit",
-		"test:create-block": "bash ./bin/test-create-block.sh",
+		"test:create-block": "npm run --workspace @wordpress/validation-tools test-create-block --",
 		"test:e2e": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.config.ts",
 		"test:e2e:debug": "npm exec --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-playwright --config playwright.config.ts --ui",
 		"test:e2e:playwright": "npm run test:e2e",
