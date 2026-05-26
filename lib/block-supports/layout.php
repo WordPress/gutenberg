@@ -446,7 +446,6 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 	$layout_type                    = $base_layout['type'] ?? 'default';
 	$rules_group                    = $options['rules_group'] ?? null;
 	$has_block_gap_override         = ! empty( $options['has_block_gap_override'] );
-	$has_block_spacing_override     = ! empty( $options['has_block_spacing_override'] );
 	$should_output_block_gap        = null === $viewport_overrides || $has_block_gap_override;
 	$has_viewport_property_override = static function ( $property ) use ( $viewport_overrides ) {
 		return array_key_exists( $property, $viewport_overrides );
@@ -529,7 +528,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( ( null === $viewport_overrides || $has_block_spacing_override ) && isset( $block_spacing ) ) {
+		if ( null === $viewport_overrides && isset( $block_spacing ) ) {
 			$block_spacing_values = gutenberg_style_engine_get_styles(
 				array(
 					'spacing' => $block_spacing,
@@ -1107,37 +1106,6 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$fallback_gap_value = $global_block_gap_value;
 		}
 
-		$responsive_style_hash_input = array();
-		foreach ( array_keys( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
-			$viewport_style = $style_attr[ $breakpoint ] ?? null;
-			if ( ! is_array( $viewport_style ) ) {
-				continue;
-			}
-
-			$viewport_container_layout = gutenberg_get_layout_container_values( $viewport_style['layout'] ?? null );
-			$has_viewport_layout       = ! empty( $viewport_container_layout );
-			$has_viewport_block_gap    = isset( $viewport_style['spacing']['blockGap'] );
-			$has_viewport_padding      = isset( $viewport_style['spacing']['padding'] );
-
-			if ( ! $has_viewport_layout && ! $has_viewport_block_gap && ! $has_viewport_padding ) {
-				continue;
-			}
-
-			$responsive_style_hash_input[ $breakpoint ] = array();
-
-			if ( $has_viewport_layout ) {
-				$responsive_style_hash_input[ $breakpoint ]['layout'] = $viewport_container_layout;
-			}
-
-			if ( $has_viewport_block_gap ) {
-				$responsive_style_hash_input[ $breakpoint ]['blockGap'] = gutenberg_sanitize_block_gap_value( $viewport_style['spacing']['blockGap'] );
-			}
-
-			if ( $has_viewport_padding ) {
-				$responsive_style_hash_input[ $breakpoint ]['padding'] = $viewport_style['spacing']['padding'];
-			}
-		}
-
 		/*
 		 * We generate a unique ID based on all the data required to obtain the
 		 * corresponding layout style. This way, the CSS class names keep the same
@@ -1153,8 +1121,27 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$fallback_gap_value,
 			$block_spacing,
 		);
-		if ( ! empty( $responsive_style_hash_input ) ) {
-			$container_class_hash_input[] = $responsive_style_hash_input;
+
+		foreach ( array_keys( WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+			$viewport_style = $style_attr[ $breakpoint ] ?? null;
+			if ( ! is_array( $viewport_style ) ) {
+				continue;
+			}
+
+			$viewport_container_layout = gutenberg_get_layout_container_values( $viewport_style['layout'] ?? null );
+			if ( ! empty( $viewport_container_layout ) ) {
+				$container_class_hash_input[] = array(
+					'breakpoint' => $breakpoint,
+					'layout'     => $viewport_container_layout,
+				);
+			}
+
+			if ( isset( $viewport_style['spacing']['blockGap'] ) ) {
+				$container_class_hash_input[] = array(
+					'breakpoint' => $breakpoint,
+					'blockGap'   => gutenberg_sanitize_block_gap_value( $viewport_style['spacing']['blockGap'] ),
+				);
+			}
 		}
 
 		$container_class = gutenberg_unique_id_from_values(
@@ -1190,9 +1177,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$viewport_container_layout = gutenberg_get_layout_container_values( $viewport_style['layout'] ?? null );
 			$has_viewport_layout       = ! empty( $viewport_container_layout );
 			$has_viewport_block_gap    = isset( $viewport_style['spacing']['blockGap'] );
-			$has_viewport_padding      = isset( $viewport_style['spacing']['padding'] );
 
-			if ( ! $has_viewport_layout && ! $has_viewport_block_gap && ! $has_viewport_padding ) {
+			if ( ! $has_viewport_layout && ! $has_viewport_block_gap ) {
 				continue;
 			}
 
@@ -1212,10 +1198,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 				$fallback_gap_value,
 				$viewport_block_spacing,
 				array(
-					'rules_group'                => $media_query,
-					'viewport_overrides'         => $viewport_container_layout,
-					'has_block_gap_override'     => $has_viewport_block_gap,
-					'has_block_spacing_override' => $has_viewport_padding,
+					'rules_group'            => $media_query,
+					'viewport_overrides'     => $viewport_container_layout,
+					'has_block_gap_override' => $has_viewport_block_gap,
 				)
 			);
 
