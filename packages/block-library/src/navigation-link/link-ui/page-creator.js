@@ -26,15 +26,19 @@ import DialogWrapper from './dialog-wrapper';
  *
  * @param {Object}   props                Component props.
  * @param {string}   props.postType       The post type to create.
- * @param {Function} props.onBack         Callback when user wants to go back.
+ * @param {Function} [props.onBack]       Callback when user wants to go back. Shows a back button when provided.
+ * @param {Function} props.onClose        Callback to close the creator without going back.
  * @param {Function} props.onPageCreated  Callback when page is successfully created.
  * @param {string}   [props.initialTitle] Initial title to pre-fill the form.
+ * @param {number}   [props.menuOrder]    Menu order for the new page.
  */
 export function LinkUIPageCreator( {
 	postType,
 	onBack,
+	onClose,
 	onPageCreated,
 	initialTitle = '',
+	menuOrder,
 } ) {
 	const [ title, setTitle ] = useState( initialTitle );
 	const [ shouldPublish, setShouldPublish ] = useState( true );
@@ -74,6 +78,9 @@ export function LinkUIPageCreator( {
 				{
 					title,
 					status: shouldPublish ? 'publish' : 'draft',
+					...( menuOrder !== undefined && {
+						menu_order: menuOrder,
+					} ),
 				},
 				{ throwOnError: true }
 			);
@@ -117,6 +124,8 @@ export function LinkUIPageCreator( {
 
 	const isSubmitDisabled = isSaving || ! isTitleValid;
 
+	const handleDismiss = onBack || onClose;
+
 	return (
 		<DialogWrapper
 			className="link-ui-page-creator"
@@ -154,7 +163,7 @@ export function LinkUIPageCreator( {
 							<Button
 								__next40pxDefaultSize
 								variant="tertiary"
-								onClick={ onBack }
+								onClick={ handleDismiss }
 								disabled={ isSaving }
 								accessibleWhenDisabled
 							>

@@ -39,11 +39,15 @@ import {
 	ConvertToLinksModal,
 } from './convert-to-links-modal';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import PageCreatorAppender, {
+	PageCreatorContext,
+} from './page-creator-appender';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
+
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -51,6 +55,7 @@ function BlockContent( {
 	blockList,
 	pages,
 	parentPageID,
+	showAppender,
 } ) {
 	if ( ! hasResolvedPages ) {
 		return (
@@ -111,7 +116,18 @@ function BlockContent( {
 	}
 
 	if ( pages.length > 0 ) {
-		return <ul { ...innerBlocksProps }></ul>;
+		return (
+			<div { ...blockProps }>
+				<ul { ...innerBlocksProps }>
+					{ innerBlocksProps.children }
+				</ul>
+				{ showAppender && (
+					<div className="wp-block-page-list__appender-container">
+						<PageCreatorAppender />
+					</div>
+				) }
+			</div>
+		);
 	}
 }
 
@@ -259,12 +275,14 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
+		isSelected,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
+				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
@@ -282,6 +300,7 @@ export default function PageListEdit( {
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
+				isSelected: getSelectedBlockClientId() === clientId,
 			};
 		},
 		[ clientId ]
@@ -294,23 +313,49 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: isChildOfNavigation ? false : 'all',
-		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
-	} );
+	const showAppender =
+		! isChildOfNavigation && ( isSelected || hasSelectedChild );
+
+	const nextMenuOrder = useMemo( () => {
+		if ( ! pages?.length ) {
+			return 0;
+		}
+		return (
+			pages.reduce(
+				( max, page ) => Math.max( max, page.menu_order ),
+				0
+			) + 1
+		);
+	}, [ pages ] );
+
+	const pageCreatorContextValue = useMemo(
+		() => ( {
+			menuOrder: nextMenuOrder,
+		} ),
+		[ nextMenuOrder ]
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			renderAppender: false,
+			__unstableDisableDropZone: true,
+			templateLock: isChildOfNavigation ? false : 'all',
+			onInput: NOOP,
+			onChange: NOOP,
+			value: blockList,
+		}
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
-		if ( hasSelectedChild || hasDraggedChild ) {
+		if ( isChildOfNavigation && ( hasSelectedChild || hasDraggedChild ) ) {
 			openModal();
 			selectBlock( parentClientId );
 		}
 	}, [
+		isChildOfNavigation,
 		hasSelectedChild,
 		hasDraggedChild,
 		parentClientId,
@@ -396,14 +441,17 @@ export default function PageListEdit( {
 					) }
 				</>
 			) }
-			<BlockContent
-				blockProps={ blockProps }
-				innerBlocksProps={ innerBlocksProps }
-				hasResolvedPages={ hasResolvedPages }
-				blockList={ blockList }
-				pages={ pages }
-				parentPageID={ parentPageID }
-			/>
+			<PageCreatorContext.Provider value={ pageCreatorContextValue }>
+				<BlockContent
+					blockProps={ blockProps }
+					innerBlocksProps={ innerBlocksProps }
+					hasResolvedPages={ hasResolvedPages }
+					blockList={ blockList }
+					pages={ pages }
+					parentPageID={ parentPageID }
+					showAppender={ showAppender }
+				/>
+			</PageCreatorContext.Provider>
 		</>
 	);
 }
