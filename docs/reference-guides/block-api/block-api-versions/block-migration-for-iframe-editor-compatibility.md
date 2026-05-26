@@ -24,8 +24,8 @@ The iframed post editor will make life easier for block and theme authors by red
 
 While most editors, including the template editor, already work as iframes, for backward compatibility, the current post editor only works as an iframe when the following conditions are met (determined by [the useShouldIframe hook](https://github.com/WordPress/gutenberg/blob/cd4fae71551e0ebf27472da1d7bbdfce91a131ec/packages/edit-post/src/components/layout/use-should-iframe.js#L16)):
 
-- **If the Gutenberg plugin is enabled:** The active theme is a block-based theme OR all registered blocks have `apiVersion` 3 or higher
-- **If the Gutenberg plugin is not enabled:** All blocks present in the post content have `apiVersion` 3 or higher
+- **If the Gutenberg plugin is enabled:** The editor always works as an iframe.
+- **If the Gutenberg plugin is not enabled:** The editor always works as an iframe when any of the following is true: the device type is not `Desktop` (e.g., tablet or mobile previews), the current post type is `wp_template` or `wp_block`, zoom-out mode is active, or all blocks present in the post content have `apiVersion` 3 or higher.
 
 In summary, if you haven't been able to fully test your blocks in the iframe editor yet, by maintaining `apiVersion` 2, you can prevent the post editor from working as an iframe in most cases. Once you've confirmed that your blocks work in the iframe editor, you can then migrate to `apiVersion` 3.
 
@@ -89,7 +89,7 @@ If you attach event handlers, remember that the `useEffect` callback will not be
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-import { useRefEffect } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 
 export default function Edit() {
 	const ref = useRefEffect( ( element ) => {
@@ -118,7 +118,7 @@ For the editor, scripts such as jQuery are loaded in the parent window (admin pa
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-import { useRefEffect } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import jQuery from 'jquery';
 
 export default function Edit() {
@@ -148,7 +148,7 @@ In the meantime, you can use the script that is loaded inside the iframe. We've 
 ```javascript
 import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
-import { useRefEffect } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import jQuery from 'jquery';
 
 export default function Edit() {
