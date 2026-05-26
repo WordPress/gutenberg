@@ -46,11 +46,7 @@
 	"devDependencies": {
 		"@babel/core": "7.25.7",
 		"@emotion/babel-plugin": "11.13.5",
-		"@emotion/is-prop-valid": "1.4.0",
 		"@emotion/jest": "^11.14.2",
-		"@emotion/native": "11.11.0",
-		"@emotion/react": "11.14.0",
-		"@emotion/styled": "11.14.1",
 		"@eslint/eslintrc": "^3.0.0",
 		"@testing-library/jest-dom": "6.9.1",
 		"@types/node": "^20.19.39",
