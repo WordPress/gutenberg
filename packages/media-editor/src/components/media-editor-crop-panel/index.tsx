@@ -13,9 +13,11 @@ import {
 	useCropGestureHandlers,
 	CROP_CONTROL_ATTR,
 } from '../../hooks/use-crop-gesture-handlers';
+import { getSourceRegion } from '../../image-editor';
 import { MAX_ZOOM } from '../../image-editor/core/constants';
 import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { formatAspectRatio } from '../../utils';
 
 const ZOOM_PERCENTAGE_SCALE = 100;
 const MAX_ZOOM_PERCENTAGE = MAX_ZOOM * ZOOM_PERCENTAGE_SCALE;
@@ -43,6 +45,51 @@ export interface MediaEditorCropPanelProps {
 	aspectRatioOptions: AspectRatioPreset[];
 }
 
+interface Measurement {
+	width: number;
+	height: number;
+	aspectRatio: string;
+}
+
+/**
+ * Builds display-ready dimensions and aspect ratio from raw pixel dimensions.
+ *
+ * @param rawWidth  Width in pixels.
+ * @param rawHeight Height in pixels.
+ * @return Rounded dimensions and aspect ratio, or null for invalid dimensions.
+ */
+function buildMeasurement(
+	rawWidth: number,
+	rawHeight: number
+): Measurement | null {
+	// Compute the ratio from raw floats so per-axis rounding doesn't
+	// drift the displayed ratio past the snap tolerance at high zoom
+	// (e.g. 265×176 rounded would read 1.51:1 instead of 3:2).
+	const aspectRatio = formatAspectRatio( rawWidth, rawHeight );
+	if ( ! aspectRatio ) {
+		return null;
+	}
+	const width = Math.max( 0, Math.round( rawWidth ) );
+	const height = Math.max( 0, Math.round( rawHeight ) );
+	return { width, height, aspectRatio };
+}
+
+/**
+ * Formats a measurement for compact display in the Crop panel.
+ *
+ * @param m Display-ready dimensions and aspect ratio.
+ * @return A compact measurement string.
+ */
+function formatMeasurement( m: Measurement ): string {
+	return sprintf(
+		/* translators: 1: Width in pixels. 2: Height in pixels. 3: Aspect ratio, e.g. 4:3. */
+		__( '%1$d x %2$d px - %3$s' ),
+		m.width,
+		m.height,
+		m.aspectRatio
+	);
+}
+
 /**
  * Sidebar panel for crop-shape controls. The tactile verbs (rotate, flip)
  * live in the bottom toolbar instead.
@@ -64,6 +111,19 @@ export default function MediaEditorCropPanel( {
 	const zoomPercentage = getZoomPercentageForDisplay( state.zoom );
 	const minZoomPercentage = getMinZoomPercentageForDisplay( minZoom );
 
+	const image = state.image;
+	const imageMeasurement = image
+		? buildMeasurement( image.naturalWidth, image.naturalHeight )
+		: null;
+	let cropMeasurement: Measurement | null = null;
+	if ( image ) {
+		const region = getSourceRegion( state, {
+			width: image.naturalWidth,
+			height: image.naturalHeight,
+		} );
+		cropMeasurement = buildMeasurement( region.width, region.height );
+	}
+
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -76,6 +136,21 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
+			{ imageMeasurement && cropMeasurement && (
+				<dl
+					className="media-editor__crop-measurements"
+					aria-label={ __( 'Image and crop measurements' ) }
+				>
+					<div className="media-editor__crop-measurement">
+						<dt>{ __( 'Image' ) }</dt>
+						<dd>{ formatMeasurement( imageMeasurement ) }</dd>
+					</div>
+					<div className="media-editor__crop-measurement">
+						<dt>{ __( 'Crop' ) }</dt>
+						<dd>{ formatMeasurement( cropMeasurement ) }</dd>
+					</div>
+				</dl>
+			) }
 			<SelectControl
 				__next40pxDefaultSize
 				label={ __( 'Aspect ratio' ) }

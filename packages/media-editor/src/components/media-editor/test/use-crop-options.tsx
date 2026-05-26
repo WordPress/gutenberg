@@ -31,6 +31,11 @@ function CropOptionsHarness() {
 					.map( ( option ) => option.value )
 					.join( ',' ) }
 			</div>
+			<div data-testid="aspect-ratio-labels">
+				{ cropOptions.aspectRatioOptions
+					.map( ( option ) => option.label )
+					.join( ',' ) }
+			</div>
 			<button
 				onClick={ () =>
 					cropOptions.setAspectRatioValue(
@@ -74,6 +79,14 @@ describe( 'useCropOptions', () => {
 		expect(
 			screen.getByTestId( 'aspect-ratio-options' )
 		).toHaveTextContent( '0,-1,1,1.3333333333333333' );
+	} );
+
+	it( 'includes the image ratio in the Original option label', () => {
+		renderHarness();
+
+		expect( screen.getByTestId( 'aspect-ratio-labels' ) ).toHaveTextContent(
+			'Free,Original - 2:1,Square,Landscape'
+		);
 	} );
 
 	it( 'resolves the Original aspect ratio from the cropper image dimensions', () => {

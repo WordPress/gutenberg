@@ -54,6 +54,30 @@ describe( 'MediaEditorCropPanel', () => {
 		);
 	} );
 
+	it( 'renders compact image and crop measurements when an image is loaded', () => {
+		setupCropPanel(
+			{},
+			{
+				image: {
+					src: 'test.jpg',
+					naturalWidth: 1200,
+					naturalHeight: 600,
+				},
+				cropRect: {
+					x: 0,
+					y: 0,
+					width: 0.5,
+					height: 0.5,
+				},
+			}
+		);
+
+		expect( screen.getByText( 'Image' ) ).toBeInTheDocument();
+		expect( screen.getByText( '1200 x 600 px - 2:1' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Crop' ) ).toBeInTheDocument();
+		expect( screen.getByText( '600 x 300 px - 2:1' ) ).toBeInTheDocument();
+	} );
+
 	it( 'passes selected aspect ratio changes to the caller', () => {
 		const controls = setupCropPanel( {
 			aspectRatioValue: '1',

@@ -2,13 +2,18 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { DEFAULT_ASPECT_RATIOS } from '../../image-editor/core/constants';
+import {
+	DEFAULT_ASPECT_RATIOS,
+	ORIGINAL_ASPECT_RATIO,
+} from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { useMediaEditor, resolveAspectRatio } from '../../state';
+import { formatAspectRatio } from '../../utils';
 
 interface UseCropOptionsArgs {
 	aspectRatioPresets?: AspectRatioPreset[];
@@ -59,10 +64,35 @@ export function useCropOptions( {
 	const { aspectRatioValue } = controller.cropOptions;
 	const cropperImage = controller.state.image;
 
-	const aspectRatioOptions = useMemo(
-		() => getAspectRatioOptions( aspectRatioPresets ),
-		[ aspectRatioPresets ]
-	);
+	const originalAspectRatioLabel = useMemo( () => {
+		if ( ! cropperImage ) {
+			return undefined;
+		}
+		return formatAspectRatio(
+			cropperImage.naturalWidth,
+			cropperImage.naturalHeight
+		);
+	}, [ cropperImage ] );
+
+	const aspectRatioOptions = useMemo( () => {
+		const options = getAspectRatioOptions( aspectRatioPresets );
+		if ( ! originalAspectRatioLabel ) {
+			return options;
+		}
+		return options.map( ( preset ) => {
+			if ( preset.value !== ORIGINAL_ASPECT_RATIO ) {
+				return preset;
+			}
+			return {
+				...preset,
+				label: sprintf(
+					/* translators: %s: Aspect ratio, e.g. 4:3. */
+					__( 'Original - %s' ),
+					originalAspectRatioLabel
+				),
+			};
+		} );
+	}, [ aspectRatioPresets, originalAspectRatioLabel ] );
 
 	const resolvedAspectRatio = useMemo(
 		() => resolveAspectRatio( aspectRatioValue, cropperImage ),

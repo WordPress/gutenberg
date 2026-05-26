@@ -81,7 +81,7 @@ export const DEFAULT_STATE: CropperState = {
  * An aspect ratio preset with a human-readable label.
  */
 export interface AspectRatioPreset {
-	/** Display label (e.g., "Square (1:1)"). */
+	/** Display label (e.g., "Square - 1:1"). */
 	label: string;
 	/** The aspect ratio value (width / height). 0 = free / original. */
 	value: number;
@@ -114,11 +114,11 @@ export const ORIGINAL_ASPECT_RATIO = -1;
 export const DEFAULT_ASPECT_RATIOS: AspectRatioPreset[] = [
 	{ label: __( 'Free' ), value: 0 },
 	{ label: __( 'Original' ), value: ORIGINAL_ASPECT_RATIO },
-	{ label: __( 'Square (1:1)' ), value: 1 },
-	{ label: __( 'Landscape (16:9)' ), value: 16 / 9 },
-	{ label: __( 'Portrait (9:16)' ), value: 9 / 16 },
-	{ label: __( 'Classic (4:3)' ), value: 4 / 3 },
-	{ label: __( 'Classic portrait (3:4)' ), value: 3 / 4 },
-	{ label: __( 'Photo (3:2)' ), value: 3 / 2 },
-	{ label: __( 'Photo portrait (2:3)' ), value: 2 / 3 },
+	{ label: __( 'Square - 1:1' ), value: 1 },
+	{ label: __( 'Standard - 4:3' ), value: 4 / 3 },
+	{ label: __( 'Portrait - 3:4' ), value: 3 / 4 },
+	{ label: __( 'Classic - 3:2' ), value: 3 / 2 },
+	{ label: __( 'Classic Portrait - 2:3' ), value: 2 / 3 },
+	{ label: __( 'Wide - 16:9' ), value: 16 / 9 },
+	{ label: __( 'Tall - 9:16' ), value: 9 / 16 },
 ];

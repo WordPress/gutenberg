@@ -61,6 +61,33 @@
 		padding: $grid-unit-20;
 	}
 
+	.media-editor__crop-measurements {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		column-gap: $grid-unit-15;
+		row-gap: $grid-unit-05;
+		margin: 0;
+		padding: 0 0 $grid-unit-15;
+		border-bottom: 1px solid $gray-300;
+		font-size: 12px;
+		line-height: 1.4;
+	}
+
+	.media-editor__crop-measurement {
+		display: contents;
+		color: $gray-900;
+
+		dt {
+			margin: 0;
+			color: $gray-700;
+		}
+
+		dd {
+			margin: 0;
+			text-align: right;
+		}
+	}
+
 	.components-panel__header.media-editor__sidebar-header {
 		padding-left: 0;
 		padding-right: $grid-unit-10;
