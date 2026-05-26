@@ -35,8 +35,12 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `typography.fontWeight`       | 5.9 | 5.9 |
 | `typography.letterSpacing`    | 5.9 | 5.9 |
 | `typography.lineHeight`       | 5.8 | 5.9 |
+| `typography.textAlign`        | 6.6 | 6.6 |
+| `typography.textColumns`      | 6.1 | N/A |
 | `typography.textDecoration`   | 5.9 | 6.2 |
+| `typography.textIndent`       | 7.0 | N/A |
 | `typography.textTransform`    | 5.9 | 6.0 |
+| `typography.writingMode`      | 6.3 | 6.3 |
 | `spacing.padding`             | 5.9 | 5.9 |
 | `spacing.padding.top`         | 5.8 | 5.9 |
 | `spacing.padding.right`       | 5.8 | 5.9 |
@@ -48,6 +52,12 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `spacing.margin.left`         | 5.8 | 5.9 |
 | `spacing.margin.bottom`       | 5.8 | 5.9 |
 | `spacing.blockGap`            | 5.9 | 5.9 |
+| `background.backgroundAttachment` | 6.6 | 6.6 |
+| `background.backgroundImage`      | 6.6 | 6.5 |
+| `background.backgroundPosition`   | 6.6 | 6.6 |
+| `background.backgroundRepeat`     | 6.6 | 6.6 |
+| `background.backgroundSize`       | 6.6 | 6.6 |
+| `dimensions.aspectRatio`      | 6.6 | 6.6 |
 | `dimensions.height`           | 7.0 | N/A |
 | `dimensions.minHeight`        | 6.2 | N/A |
 | `dimensions.minWidth`         | 7.1 | 7.1 |
