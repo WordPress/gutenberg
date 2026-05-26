@@ -24,6 +24,18 @@ import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { store as blockEditorStore } from '../store';
 
+/**
+ * Block names for which the legacy "Attributes" Block Bindings panel is not
+ * rendered. The new inline picker also uses this list (via
+ * `useBlockBindingsCompatibleFields`) so the gating logic is a single source
+ * of truth — see spec req 17.
+ */
+export const BLOCK_BINDINGS_PANEL_EXCLUDED_BLOCKS = [
+	'core/post-date',
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -119,10 +131,6 @@ export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
 	hasSupport( name ) {
-		return ! [
-			'core/post-date',
-			'core/navigation-link',
-			'core/navigation-submenu',
-		].includes( name );
+		return ! BLOCK_BINDINGS_PANEL_EXCLUDED_BLOCKS.includes( name );
 	},
 };
