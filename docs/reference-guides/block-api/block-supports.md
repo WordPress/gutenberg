@@ -644,6 +644,7 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `aspectRatio`: type `boolean`, default value `false`
     -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
     -   `minWidth`: type `boolean`, default value `false`
@@ -654,11 +655,11 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	dimensions: {
-		aspectRatio: true // Enable aspect ratio control.
-		height: true // Enable height control.
-		minHeight: true // Enable min height control.
-		minWidth: true // Enable min width control.
-		width: true // Enable width control.
+		aspectRatio: true, // Enable aspect ratio control.
+		height: true, // Enable height control.
+		minHeight: true, // Enable min height control.
+		minWidth: true, // Enable min width control.
+		width: true, // Enable width control.
 	}
 }
 ```
