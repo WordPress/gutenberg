@@ -821,6 +821,24 @@ describe( 'actions', () => {
 			} );
 		} );
 
+		// Build the minimal selectors/state `mergeBlocks` needs at runtime.
+		// `mergeBlocks` reads `getBlockName` / `getBlockOrder` to decide
+		// whether to drill into an `__experimentalOnMerge` container; the
+		// tests below only operate on flat block pairs, so an empty order
+		// is enough to make the drill bail out.
+		function makeSelect( blocks, extra = {} ) {
+			return {
+				getBlock: ( clientId ) =>
+					blocks.find( ( b ) => b.clientId === clientId ),
+				getBlockName: ( clientId ) =>
+					blocks.find( ( b ) => b.clientId === clientId )?.name,
+				getBlockOrder: () => [],
+				getBlockEditingMode: () => 'default',
+				isBlockSelected: () => false,
+				...extra,
+			};
+		}
+
 		it( 'should only focus the blockA if the blockA has no merge function and the content of blockB is modified', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -843,21 +861,17 @@ describe( 'actions', () => {
 				},
 			} );
 
-			const select = {
-				getBlock: ( clientId ) =>
-					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
-				getBlockEditingMode: () => 'default',
-				isBlockSelected: () => false,
-			};
+			const select = makeSelect( [ blockA, blockB ] );
 			const dispatch = Object.assign( jest.fn(), {
 				selectBlock: jest.fn(),
 				removeBlock: jest.fn(),
 			} );
+			const registry = createRegistry();
 
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
 		} );
@@ -893,25 +907,23 @@ describe( 'actions', () => {
 				innerBlocks: [],
 			} );
 
-			const select = {
-				getBlock: ( clientId ) =>
-					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+			const select = makeSelect( [ blockA, blockB ], {
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
 					attributeKey: 'content',
 					offset: 0,
 				} ),
-				getBlockEditingMode: () => 'default',
-			};
+			} );
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
 				selectionChange: jest.fn(),
 			} );
+			const registry = createRegistry();
 
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -965,24 +977,22 @@ describe( 'actions', () => {
 				innerBlocks: [],
 			} );
 
-			const select = {
-				getBlock: ( clientId ) =>
-					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+			const select = makeSelect( [ blockA, blockB ], {
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
 					attributeKey: 'content',
 					offset: 0,
 				} ),
-				getBlockEditingMode: () => 'default',
-			};
+			} );
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
 			} );
+			const registry = createRegistry();
 
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
 		} );
@@ -1044,25 +1054,23 @@ describe( 'actions', () => {
 				innerBlocks: [],
 			} );
 
-			const select = {
-				getBlock: ( clientId ) =>
-					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+			const select = makeSelect( [ blockA, blockB ], {
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
 					attributeKey: 'content2',
 					offset: 0,
 				} ),
-				getBlockEditingMode: () => 'default',
-			};
+			} );
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
 				selectionChange: jest.fn(),
 			} );
+			const registry = createRegistry();
 
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -1120,25 +1128,24 @@ describe( 'actions', () => {
 				ribs: 'disabled',
 			};
 
-			const select = {
-				getBlock: ( clientId ) =>
-					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+			const select = makeSelect( [ blockA, blockB ], {
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
 					attributeKey: 'content',
 					offset: 0,
 				} ),
 				getBlockEditingMode: ( clientId ) => modes[ clientId ],
-			};
+			} );
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
 				selectionChange: jest.fn(),
 			} );
+			const registry = createRegistry();
 
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
@@ -1180,25 +1187,24 @@ describe( 'actions', () => {
 				ribs: 'default',
 			};
 
-			const select = {
-				getBlock: ( clientId ) =>
-					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+			const select = makeSelect( [ blockA, blockB ], {
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
 					attributeKey: 'content',
 					offset: 0,
 				} ),
 				getBlockEditingMode: ( clientId ) => modes[ clientId ],
-			};
+			} );
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
 				selectionChange: jest.fn(),
 			} );
+			const registry = createRegistry();
 
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();

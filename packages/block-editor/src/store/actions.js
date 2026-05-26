@@ -1166,7 +1166,7 @@ export const __unstableExpandSelection =
  * @return {?string} Client ID of a mergeable descendant, or null.
  */
 function findDeepestMergeableLeaf( select, clientId, direction ) {
-	const order = select.getBlockOrder?.( clientId ) ?? [];
+	const order = select.getBlockOrder( clientId );
 	if ( order.length ) {
 		const childId =
 			direction === 'trailing' ? order[ order.length - 1 ] : order[ 0 ];
@@ -1175,7 +1175,7 @@ function findDeepestMergeableLeaf( select, clientId, direction ) {
 			return deeper;
 		}
 	}
-	const blockType = getBlockType( select.getBlockName?.( clientId ) );
+	const blockType = getBlockType( select.getBlockName( clientId ) );
 	return blockType?.merge ? clientId : null;
 }
 
@@ -1191,9 +1191,6 @@ function findDeepestMergeableLeaf( select, clientId, direction ) {
  * @return {?string} Client ID of a mergeable descendant, or null.
  */
 function drillToMergeableLeaf( select, clientId, direction ) {
-	if ( ! select.getBlockName || ! select.getBlockOrder ) {
-		return null;
-	}
 	const blockName = select.getBlockName( clientId );
 	if ( ! getBlockSupport( blockName, '__experimentalOnMerge' ) ) {
 		return null;
@@ -1438,8 +1435,7 @@ export const mergeBlocks =
 			);
 		}
 
-		const batch = registry?.batch ?? ( ( fn ) => fn() );
-		batch( () => {
+		registry.batch( () => {
 			dispatch.replaceBlocks(
 				[ blockA.clientId, blockB.clientId ],
 				[
@@ -1459,7 +1455,7 @@ export const mergeBlocks =
 			// empty list/quote/etc. hanging around.
 			if (
 				drilledB !== secondBlockClientId &&
-				! ( select.getBlockOrder?.( secondBlockClientId ) ?? [] ).length
+				! select.getBlockOrder( secondBlockClientId ).length
 			) {
 				dispatch.removeBlock( secondBlockClientId, false );
 			}
