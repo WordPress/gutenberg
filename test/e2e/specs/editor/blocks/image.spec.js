@@ -241,6 +241,60 @@ test.describe( 'Image', () => {
 		} );
 	} );
 
+	test( 'allows rotating an image using the media editor modal', async ( {
+		editor,
+		page,
+		imageBlockUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+
+		await imageBlockUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' )
+		);
+
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		const [
+			{
+				attributes: { id: initialId, url: initialUrl },
+			},
+		] = await editor.getBlocks();
+
+		// Open the media editor modal from the block toolbar.
+		await editor.clickBlockToolbarButton( 'Crop' );
+		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
+		await expect( modal ).toBeVisible();
+
+		// Rotate and save.
+		await modal
+			.locator( 'role=button[name="Rotate 90° clockwise"i]' )
+			.click();
+		await modal.locator( 'role=button[name="Save"i]' ).click();
+
+		// Modal closes and the block now points at a child attachment whose
+		// URL matches the rendered <img>. The `/edit` endpoint creates a new
+		// attachment rather than mutating the original, so id must change.
+		await expect( modal ).toBeHidden();
+		await expect( image ).not.toHaveAttribute( 'src', initialUrl );
+		const [
+			{
+				attributes: { id, url },
+			},
+		] = await editor.getBlocks();
+		expect( id ).not.toBe( initialId );
+		expect( url ).not.toBe( initialUrl );
+		await expect( image ).toHaveAttribute( 'src', url );
+	} );
+
 	test( 'should undo without broken temporary state', async ( {
 		editor,
 		pageUtils,
