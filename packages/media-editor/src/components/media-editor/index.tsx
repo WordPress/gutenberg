@@ -176,15 +176,6 @@ function HeaderActions( {
 			<PinnedItems.Slot scope="media-editor" />
 			<Button
 				size="compact"
-				variant="tertiary"
-				onClick={ onCancel }
-				disabled={ isSaving }
-				accessibleWhenDisabled
-			>
-				{ __( 'Cancel' ) }
-			</Button>
-			<Button
-				size="compact"
 				variant="primary"
 				onClick={ onSave }
 				isBusy={ isSaving }
