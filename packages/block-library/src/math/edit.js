@@ -29,36 +29,36 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const [ blockRef, setBlockRef ] = useState();
 	const [ error, setError ] = useState( null );
 	const [ latexToMathML, setLatexToMathML ] = useState();
-	const initialLatex = useRef( latex );
+	// Tracks the latest `latex` so the one-shot effect below can read it
+	// when the dynamic import resolves rather than the value captured at
+	// mount. Must remain unconditional and run on every render.
+	const latestLatex = useRef( latex );
+	latestLatex.current = latex;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
-			if ( initialLatex.current ) {
+			const currentLatex = latestLatex.current;
+			if ( currentLatex ) {
 				// `wp_kses` runs on block attributes for users without
-				// `unfiltered_html`, encoding `&` to `&amp;` and similar.
-				// LaTeX uses `&` (e.g. as a column separator in `pmatrix`),
-				// so decode entities before rendering.
-				const decodedLatex = decodeEntities( initialLatex.current );
-				const updates = {
+				// `unfiltered_html`, encoding `&` to `&amp;`. LaTeX uses
+				// `&` (e.g. as a column separator in `pmatrix`), so decode
+				// entities before rendering.
+				const decodedLatex = decodeEntities( currentLatex );
+				__unstableMarkNextChangeAsNotPersistent();
+				setAttributes( {
 					mathML: module.default( decodedLatex, {
 						displayMode: true,
 					} ),
-				};
-				if ( decodedLatex !== initialLatex.current ) {
-					updates.latex = decodedLatex;
-				}
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( updates );
+					...( decodedLatex !== currentLatex && {
+						latex: decodedLatex,
+					} ),
+				} );
 			}
 		} );
-	}, [
-		initialLatex,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
+	}, [ setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const blockProps = useBlockProps( {
 		ref: setBlockRef,
