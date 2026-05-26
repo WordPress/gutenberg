@@ -8,7 +8,7 @@ import {
 	type View,
 } from '@wordpress/dataviews';
 import { dateI18n } from '@wordpress/date';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, _x } from '@wordpress/i18n';
 import { globe, postList, wordpress } from '@wordpress/icons';
@@ -133,18 +133,30 @@ function combineFeedPosts( newsFeeds: NewsFeed[] ): NewsItem[] {
 		);
 }
 
+function hasMoreFeeds(
+	feeds: NewsFeed[],
+	limit: number,
+	pagesDepth: number
+): boolean {
+	if ( ! feeds.length ) {
+		return true;
+	}
+
+	const fetchCount = limit * pagesDepth;
+
+	return feeds.some(
+		( feed ) =>
+			feed.posts.length >= fetchCount && feed.totalPages > pagesDepth
+	);
+}
+
 function extendPaginationInfo(
 	paginationInfo: { totalItems: number; totalPages: number },
 	limit: number,
 	page: number,
 	feeds: NewsFeed[]
 ): { totalItems: number; totalPages: number } {
-	const fetchCount = limit * page;
-	const hasMoreFromFeeds = feeds.some(
-		( feed ) => feed.posts.length >= fetchCount && feed.totalPages > page
-	);
-
-	if ( ! hasMoreFromFeeds ) {
+	if ( ! hasMoreFeeds( feeds, limit, page ) ) {
 		return paginationInfo;
 	}
 
@@ -194,29 +206,62 @@ export default function WordPressNews( {
 
 	const [ view, setView ] = useState< View >( INITIAL_VIEW );
 	const [ newsFeeds, setNewsFeeds ] = useState< NewsFeed[] >( [] );
-	const [ isLoading, setIsLoading ] = useState( true );
+	const [ fetchedPages, setFetchedPages ] = useState( 0 );
+	const [ isInitialLoading, setIsInitialLoading ] = useState( true );
+	const fetchIdRef = useRef( 0 );
 
 	const currentPage = Math.max( 1, view.page ?? 1 );
 
+	const targetPages = useMemo( () => {
+		const pagesDepth = Math.max( fetchedPages, currentPage );
+		const prefetch = hasMoreFeeds( newsFeeds, limit, pagesDepth ) ? 1 : 0;
+
+		return currentPage + prefetch;
+	}, [ currentPage, fetchedPages, newsFeeds, limit ] );
+
 	useEffect( () => {
+		fetchIdRef.current += 1;
 		setView( ( previousView ) => ( {
 			...previousView,
 			page: 1,
 			perPage: limit,
 		} ) );
+		setNewsFeeds( [] );
+		setFetchedPages( 0 );
+		setIsInitialLoading( true );
 	}, [ limit ] );
 
 	useEffect( () => {
-		setIsLoading( true );
+		if ( targetPages <= fetchedPages ) {
+			return;
+		}
 
-		const fetchCount = limit * currentPage;
+		const fetchId = ++fetchIdRef.current;
+		const isInitialFetch = fetchedPages === 0;
+
+		if ( isInitialFetch ) {
+			setIsInitialLoading( true );
+		}
+
+		const fetchCount = limit * targetPages;
 
 		Promise.all(
 			NEWS_FEEDS.map( ( feed ) => fetchNewsFeed( feed, fetchCount ) )
 		)
-			.then( setNewsFeeds )
-			.finally( () => setIsLoading( false ) );
-	}, [ limit, currentPage ] );
+			.then( ( feeds ) => {
+				if ( fetchId !== fetchIdRef.current ) {
+					return;
+				}
+
+				setNewsFeeds( feeds );
+				setFetchedPages( targetPages );
+			} )
+			.finally( () => {
+				if ( fetchId === fetchIdRef.current && isInitialFetch ) {
+					setIsInitialLoading( false );
+				}
+			} );
+	}, [ limit, targetPages, fetchedPages ] );
 
 	const allItems = useMemo(
 		() => combineFeedPosts( newsFeeds ),
@@ -271,6 +316,12 @@ export default function WordPressNews( {
 		[ clientPaginationInfo, limit, currentPage, newsFeeds ]
 	);
 
+	const hasDataForCurrentPage = allItems.length > ( currentPage - 1 ) * limit;
+	const isFetchingMore = targetPages > fetchedPages;
+	const isLoading =
+		isInitialLoading || ( isFetchingMore && ! hasDataForCurrentPage );
+	const showEmpty = ! isLoading && ! isFetchingMore && allItems.length === 0;
+
 	return (
 		<div className={ styles.root }>
 			<DataViews
@@ -282,7 +333,7 @@ export default function WordPressNews( {
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ DEFAULT_LAYOUTS }
-				empty={ emptyState }
+				empty={ showEmpty ? emptyState : undefined }
 			>
 				<DataViews.Layout />
 				<footer className={ styles.footer }>
