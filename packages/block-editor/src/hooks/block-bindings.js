@@ -92,7 +92,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	}
 
 	return (
-		<InspectorControls group="bindings">
+		<InspectorControls
+			group={
+				window?.__experimentalContentOnlyInspectorFields
+					? 'content'
+					: 'bindings'
+			}
+		>
 			<ToolsPanel
 				label={ __( 'Attributes' ) }
 				resetAll={ () => {
