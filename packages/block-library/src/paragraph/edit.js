@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, _x, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL, sprintf } from '@wordpress/i18n';
 import {
 	ToolbarButton,
 	ToggleControl,
@@ -120,10 +120,11 @@ function ParagraphBlock( {
 	} );
 	const blockEditingMode = useBlockEditingMode();
 	const { 'aria-label': injectedAriaLabel, ...restBlockProps } = blockProps;
-	const defaultParagraphLabel = __( 'Block: Paragraph' );
+	// translators: %s: block type title e.g. "Paragraph"
+	const blockLabel = sprintf( __( 'Block: %s' ), blockProps[ 'data-title' ] );
 
-	let ariaLabel = defaultParagraphLabel;
-	if ( injectedAriaLabel !== defaultParagraphLabel ) {
+	let ariaLabel = __( 'Block: Paragraph' );
+	if ( injectedAriaLabel !== blockLabel ) {
 		ariaLabel = injectedAriaLabel;
 	} else if ( RichText.isEmpty( content ) ) {
 		ariaLabel = __(
