@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import {
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { useCallback, useRef } from '@wordpress/element';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -37,7 +34,10 @@ export function useOnEnter( props ) {
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	return useRefEffect( ( element ) => {
+	return useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
+		}
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
 				return;

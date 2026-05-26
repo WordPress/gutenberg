@@ -13,7 +13,7 @@ import {
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -172,7 +172,10 @@ export default function useArrowNav() {
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
 	const { selectBlock } = useDispatch( blockEditorStore );
-	return useRefEffect( ( node ) => {
+	return useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
 		// recreate browser behaviour across blocks.

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,8 +22,11 @@ export function useBlockSelectionClearer() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clearBlockSelection: isEnabled } = getSettings();
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			if ( ! isEnabled ) {
 				return;
 			}

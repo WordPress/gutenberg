@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import { useCallback, useContext } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
 /**
@@ -39,8 +38,11 @@ export function useInBetweenInserter() {
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			if ( isInBetweenInserterDisabled ) {
 				return;
 			}

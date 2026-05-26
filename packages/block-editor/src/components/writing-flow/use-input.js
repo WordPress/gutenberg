@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import {
 	createBlock,
@@ -43,7 +43,10 @@ export default function useInput() {
 		__unstableMarkAutomaticChange,
 	} = useDispatch( blockEditorStore );
 
-	return useRefEffect( ( node ) => {
+	return useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		function onBeforeInput( event ) {
 			// If writing flow is editable, NEVER allow the browser to alter the
 			// DOM. This will cause React errors (and the DOM should only be

@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,16 +23,19 @@ import { initWaveformPlayer } from './waveform-utils';
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
-	// Store onEnded in a ref so it doesn't need to be a useRefEffect dependency.
+	// Store onEnded in a ref so it doesn't need to be a useCallback dependency.
 	// The callback changes reference on every render (its dependency chain
-	// includes an unstable array), which would cause useRefEffect to destroy
+	// includes an unstable array), which would cause useCallback to destroy
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
 	const onEndedRef = useRef( onEnded );
 	onEndedRef.current = onEnded;
 
-	const ref = useRefEffect(
+	const ref = useCallback(
 		( element ) => {
+			if ( ! element ) {
+				return;
+			}
 			if ( ! src ) {
 				return;
 			}

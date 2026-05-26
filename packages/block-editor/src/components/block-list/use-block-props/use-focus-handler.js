@@ -2,10 +2,8 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,8 +23,11 @@ export function useFocusHandler( clientId ) {
 	const { isBlockSelected } = useSelect( blockEditorStore );
 	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			/**
 			 * Marks the block as selected when focused and not already
 			 * selected. This specifically handles the case where block does not

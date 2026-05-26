@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,8 +21,11 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  * @return {Function} Ref callback.
  */
 export function useIsHovered( { isEnabled = true } = {} ) {
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			if ( ! isEnabled ) {
 				return;
 			}

@@ -3,6 +3,7 @@
  */
 import {
 	renderToString,
+	useCallback,
 	useEffect,
 	useMemo,
 	useReducer,
@@ -11,7 +12,6 @@ import {
 import {
 	useInstanceId,
 	useMergeRefs,
-	useRefEffect,
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import {
@@ -397,7 +397,10 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element: HTMLElement ) => {
+		useCallback( ( element: HTMLElement | null ) => {
+			if ( ! element ) {
+				return;
+			}
 			function _onKeyDown( event: Event ) {
 				onKeyDownRef.current?.( event as KeyboardEvent );
 			}

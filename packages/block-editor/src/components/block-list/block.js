@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
+import {
+	memo,
+	RawHTML,
+	useCallback,
+	useContext,
+	useMemo,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -23,7 +29,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { compose, useRefEffect } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -741,12 +747,13 @@ function BlockListBlockProvider( props ) {
 		[ clientId, rootClientId ]
 	);
 
-	const defaultViewRef = useRefEffect( ( element ) => {
-		if ( element ) {
-			const { ownerDocument } = element;
-			const { defaultView } = ownerDocument;
-			defaultViewRef.current = defaultView;
+	const defaultViewRef = useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
 		}
+		const { ownerDocument } = element;
+		const { defaultView } = ownerDocument;
+		defaultViewRef.current = defaultView;
 	}, [] );
 
 	// Use block visibility hook with data from existing useSelect to avoid extra subscription

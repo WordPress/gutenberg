@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
-import {
-	createHigherOrderComponent,
-	useRefEffect,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useCallback, useState, useRef } from '@wordpress/element';
+import { createHigherOrderComponent, useMergeRefs } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 import type { WPKeycodeModifier } from '@wordpress/keycodes';
 
@@ -75,8 +71,11 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 		setIsFocusingRegions( true );
 	}
 
-	const clickRef = useRefEffect(
-		( element ) => {
+	const clickRef = useCallback(
+		( element: HTMLElement | null ) => {
+			if ( ! element ) {
+				return;
+			}
 			function onClick() {
 				setIsFocusingRegions( false );
 			}

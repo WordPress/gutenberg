@@ -8,13 +8,14 @@ import { createPortal } from 'react-dom';
  * WordPress dependencies
  */
 import {
+	useCallback,
 	useLayoutEffect,
 	useRef,
 	useEffect,
 	useState,
 } from '@wordpress/element';
 import { useAnchor } from '@wordpress/rich-text';
-import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useDebounce, useMergeRefs } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -105,8 +106,11 @@ export function AutocompleterUI( {
 	const popoverRef = useRef< HTMLElement >( null );
 	const popoverRefs = useMergeRefs( [
 		popoverRef,
-		useRefEffect(
-			( node ) => {
+		useCallback(
+			( node: HTMLElement | null ) => {
+				if ( ! node ) {
+					return;
+				}
 				if ( ! contentRef.current ) {
 					return;
 				}

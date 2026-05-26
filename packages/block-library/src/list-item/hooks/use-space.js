@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { SPACE, TAB } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -24,8 +22,11 @@ export default function useSpace( clientId ) {
 	const indentListItem = useIndentListItem( clientId );
 	const outdentListItem = useOutdentListItem();
 
-	return useRefEffect(
+	return useCallback(
 		( element ) => {
+			if ( ! element ) {
+				return;
+			}
 			function onKeyDown( event ) {
 				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 

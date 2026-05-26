@@ -6,8 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { Disabled, Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
@@ -48,8 +47,11 @@ export default function Preview( { idBase, instance, isVisible } ) {
 	}, [ idBase, instance ] );
 
 	// Resize the iframe on either the load event, or when the iframe becomes visible.
-	const ref = useRefEffect(
+	const ref = useCallback(
 		( iframe ) => {
+			if ( ! iframe ) {
+				return;
+			}
 			// Only set height if the iframe is loaded,
 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
 			if ( ! isLoaded ) {

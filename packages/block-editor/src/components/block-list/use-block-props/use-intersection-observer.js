@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
-import { useContext } from '@wordpress/element';
+import { useCallback, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,8 +10,11 @@ import { IntersectionObserver } from '../';
 
 export function useIntersectionObserver() {
 	const observer = useContext( IntersectionObserver );
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			if ( observer ) {
 				observer.observe( node );
 				return () => {

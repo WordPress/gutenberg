@@ -1,8 +1,7 @@
-( ( { wp: { element, blocks, blockEditor, compose } } ) => {
-	const { createElement: el } = element;
+( ( { wp: { element, blocks, blockEditor } } ) => {
+	const { createElement: el, useCallback } = element;
 	const { registerBlockType } = blocks;
 	const { useBlockProps } = blockEditor;
-	const { useRefEffect } = compose;
 
 	const content = [
 		el( 'div', { className: 'grid-item' } ),
@@ -39,7 +38,10 @@
 	registerBlockType( 'test/iframed-masonry-block', {
 		apiVersion: 3,
 		edit: function Edit() {
-			const ref = useRefEffect( ( node ) => {
+			const ref = useCallback( ( node ) => {
+				if ( ! node ) {
+					return;
+				}
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
 
@@ -54,7 +56,7 @@
 				return () => {
 					masonry.destroy();
 				};
-			} );
+			}, [] );
 			return el( 'div', useBlockProps( { ref } ), ...content );
 		},
 		save: function Save() {

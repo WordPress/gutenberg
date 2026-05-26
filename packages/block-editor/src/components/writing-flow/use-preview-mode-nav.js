@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { TAB, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
@@ -22,8 +22,11 @@ export function usePreviewModeNav() {
 		[]
 	);
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			if ( ! isPreviewMode ) {
 				return;
 			}

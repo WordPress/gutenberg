@@ -6,11 +6,8 @@ import {
 	getDefaultBlockName,
 	cloneBlock,
 } from '@wordpress/blocks';
-import { useRef } from '@wordpress/element';
-import {
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { useCallback, useRef } from '@wordpress/element';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -30,7 +27,10 @@ export default function useEnter( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	const outdentListItem = useOutdentListItem();
-	return useRefEffect( ( element ) => {
+	return useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
+		}
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
 				return;

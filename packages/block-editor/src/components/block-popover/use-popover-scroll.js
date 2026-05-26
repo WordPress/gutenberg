@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 
 const scrollContainerCache = new WeakMap();
@@ -14,8 +14,11 @@ const scrollContainerCache = new WeakMap();
  * @param {Object} contentRef
  */
 function usePopoverScroll( contentRef ) {
-	const effect = useRefEffect(
+	const effect = useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			function onWheel( event ) {
 				const { deltaX, deltaY, target } = event;
 				const contentEl = contentRef.current;

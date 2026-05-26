@@ -13,7 +13,7 @@ import {
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -48,7 +48,10 @@ export default function useClipboardHandler() {
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
-	return useRefEffect( ( node ) => {
+	return useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		function handler( event ) {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.

@@ -6,10 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useCallback, useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -107,12 +107,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		deviceType,
 	} = useContext( PrivateBlockContext );
 
-	const defaultViewRef = useRefEffect( ( element ) => {
-		if ( element ) {
-			const { ownerDocument } = element;
-			const { defaultView } = ownerDocument;
-			defaultViewRef.current = defaultView;
+	const defaultViewRef = useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
 		}
+		const { ownerDocument } = element;
+		const { defaultView } = ownerDocument;
+		defaultViewRef.current = defaultView;
 	}, [] );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)

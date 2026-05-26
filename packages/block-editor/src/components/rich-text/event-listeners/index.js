@@ -1,8 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useCallback,
+	useMemo,
+	useRef,
+	useInsertionEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,8 +47,11 @@ export function useEventListeners( props ) {
 		[ propsRef ]
 	);
 
-	return useRefEffect(
+	return useCallback(
 		( element ) => {
+			if ( ! element ) {
+				return;
+			}
 			if ( ! props.isSelected ) {
 				return;
 			}
