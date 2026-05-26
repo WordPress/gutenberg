@@ -17,6 +17,7 @@ import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
 import MinimalUIComponent from './minimal-ui';
 import EmptyComponent from './empty';
+import RequiredFilterComponent from './required-filter';
 
 import './style.css';
 
@@ -274,6 +275,22 @@ export const InfiniteScroll = {
 			table: {
 				disable: true,
 			},
+		},
+	},
+};
+
+export const RequiredFilter = {
+	name: 'Filter Behavior Comparison',
+	render: RequiredFilterComponent,
+	args: {
+		filterMode: 'all',
+	},
+	argTypes: {
+		filterMode: {
+			control: 'select',
+			options: [ 'isPrimary', 'isRequired', 'isLocked', 'all' ],
+			description:
+				'Which filter type to demonstrate. "all" shows isPrimary, isRequired, and isLocked side by side for comparison.',
 		},
 	},
 };

@@ -29,6 +29,10 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 				view.filters?.some(
 					( f ) => f.field === field.id && !! f.isLocked
 				) ?? false;
+			const isRequired =
+				view.filters?.some(
+					( f ) => f.field === field.id && !! f.isRequired
+				) ?? false;
 			filters.push( {
 				field: field.id,
 				name: field.label,
@@ -41,6 +45,7 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 				operators,
 				isVisible:
 					isLocked ||
+					isRequired ||
 					isPrimary ||
 					!! view.filters?.some(
 						( f ) =>
@@ -49,11 +54,13 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 					),
 				isPrimary,
 				isLocked,
+				isRequired,
 			} );
 		} );
 
 		// Sort filters by:
 		// - locked filters go first
+		// - required filters go next
 		// - primary filters go next
 		// - then, sort by name
 		filters.sort( ( a, b ) => {
@@ -61,6 +68,12 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 				return -1;
 			}
 			if ( ! a.isLocked && b.isLocked ) {
+				return 1;
+			}
+			if ( a.isRequired && ! b.isRequired ) {
+				return -1;
+			}
+			if ( ! a.isRequired && b.isRequired ) {
 				return 1;
 			}
 			if ( a.isPrimary && ! b.isPrimary ) {

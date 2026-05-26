@@ -42,6 +42,11 @@ export interface Filter {
 	 * Whether the filter can be edited by the user.
 	 */
 	isLocked?: boolean;
+
+	/**
+	 * Whether the filter is required (cannot be removed or reset, but can be edited).
+	 */
+	isRequired?: boolean;
 }
 
 export interface NormalizedFilter {
@@ -94,6 +99,11 @@ export interface NormalizedFilter {
 	 * Whether the filter can be edited by the user.
 	 */
 	isLocked: boolean;
+
+	/**
+	 * Whether the filter is required (cannot be removed or reset, but can be edited).
+	 */
+	isRequired: boolean;
 }
 
 interface ViewBase {
