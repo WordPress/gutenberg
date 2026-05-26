@@ -46,10 +46,8 @@ type DataViewsContextType< Item > = {
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
 	containerWidth: number;
-	containerRef: React.MutableRefObject< HTMLDivElement | null >;
-	resizeObserverRef:
-		| ( ( element?: HTMLDivElement | null ) => void )
-		| React.RefObject< HTMLDivElement >;
+	containerRef: React.RefObject< HTMLDivElement | null >;
+	resizeObserverRef: React.Ref< HTMLDivElement | null >;
 	defaultLayouts: NormalizedSupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;

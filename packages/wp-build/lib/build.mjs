@@ -2143,6 +2143,12 @@ async function buildAll( baseUrlExpression, { noScriptDebug = false } = {} ) {
 	// Collect widget data for PHP generation
 	const widgets = collectWidgets();
 
+	// Build widgets
+	await buildAllWidgets();
+
+	// Collect widget data for PHP generation
+	const widgets = collectWidgets();
+
 	// Collect route and page data for PHP generation
 	// Use flatMap to expand routes with multiple pages into separate entries
 	const routes = getAllRoutes( ROOT_DIR ).flatMap( ( routeName ) => {

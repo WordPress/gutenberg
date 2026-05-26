@@ -1,5 +1,7 @@
 # react-native-gutenberg-bridge
 
+> **Status:** This package is unmaintained on `trunk` and is known to be broken following the upgrade to React 19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)). For patches to the existing Gutenberg Mobile build, branch from the most recent React Native release — tag [`rnmobile/1.121.0`](https://github.com/WordPress/gutenberg/releases/tag/rnmobile%2F1.121.0) at commit [`e63b8b8`](https://github.com/WordPress/gutenberg/commit/e63b8b8be7bdc5e9dd2781c597e918a7be212fe5) (see [#63744](https://github.com/WordPress/gutenberg/pull/63744)). See the [React Native mobile editor project status](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/react-native/README.md#project-status) for background.
+
 ## Getting started
 
 This package is not yet published to npm. You can use it locally:

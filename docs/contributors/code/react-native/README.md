@@ -2,6 +2,12 @@
 
 The Gutenberg repository includes the source for the [React Native](https://reactnative.dev/) based editor for mobile.
 
+## Project status
+
+The React Native mobile editor is currently unmaintained on `trunk` and is known to be broken following the upgrade to React 19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)). React 19 is not compatible with the current Gutenberg Mobile setup, and there is little to no active work on Gutenberg Mobile while the WP Mobile project explores paths forward for the block editor in the mobile apps. See the [tracking issue (#71336)](https://github.com/WordPress/gutenberg/issues/71336) for background.
+
+If a fix is required for the existing Gutenberg Mobile build, branch from the most recent React Native release — tag [`rnmobile/1.121.0`](https://github.com/WordPress/gutenberg/releases/tag/rnmobile%2F1.121.0) at commit [`e63b8b8`](https://github.com/WordPress/gutenberg/commit/e63b8b8be7bdc5e9dd2781c597e918a7be212fe5) (see [#63744](https://github.com/WordPress/gutenberg/pull/63744)) — and cut a minor release from there. New work targeting `trunk` to restore React Native compatibility should be coordinated with the WP Mobile team beforehand.
+
 ## Mind the mobile
 
 Contributors need to ensure that they update any affected native mobile files during code refactorings because we cannot yet rely on automated tooling to do this for us. For example, renaming a function or a prop should also be performed in the native modules too, otherwise, the mobile client will break. We have added some mobile specific CI tests as safeguards in place in PRs, but we're still far from done. Please bear with us and thank you in advance. ❤️🙇‍

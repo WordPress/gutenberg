@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	Tooltip as WCTooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
@@ -22,6 +21,9 @@ import {
 } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
+
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -164,14 +166,22 @@ function ListViewBlockSelectButton(
 					</span>
 				) : null }
 				{ !! visibilityLabel && (
-					<WCTooltip text={ visibilityLabel }>
-						<span
-							className="block-editor-list-view-block-select-button__block-visibility"
-							aria-hidden="true"
-						>
-							<Icon icon={ unseen } />
-						</span>
-					</WCTooltip>
+					// TODO: `visibilityLabel` is not exposed to
+					// assistive technology — the trigger is
+					// `aria-hidden`, so the label is sighted-hover-only.
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<span
+									className="block-editor-list-view-block-select-button__block-visibility"
+									aria-hidden="true"
+								>
+									<Icon icon={ unseen } />
+								</span>
+							}
+						/>
+						<Tooltip.Popup>{ visibilityLabel }</Tooltip.Popup>
+					</Tooltip.Root>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">

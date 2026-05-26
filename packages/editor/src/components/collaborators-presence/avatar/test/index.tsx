@@ -2,11 +2,28 @@
  * External dependencies
  */
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import Avatar from '..';
+
+/**
+ * Wraps the avatar in a `Tooltip.Provider` with `delay={ 0 }` so hover-based
+ * tooltip-presence assertions don't have to wait for the real-world delay.
+ *
+ * @param ui The avatar element (or anything else) to render.
+ */
+function renderAvatar( ui: React.ReactElement ): ReturnType< typeof render > {
+	return render( <Tooltip.Provider delay={ 0 }>{ ui }</Tooltip.Provider> );
+}
 
 /**
  * In JSDOM, `<img>` elements never fire `load` or `error` events on their
@@ -190,12 +207,13 @@ describe( 'Avatar', () => {
 			expect( avatar ).toBeInTheDocument();
 		} );
 
-		it( 'should wrap in tooltip when label differs from name', () => {
-			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
-			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
-			// The Tooltip's Ariakit.TooltipAnchor makes the element
-			// focusable so the tooltip can be triggered via keyboard.
-			expect( avatar ).toHaveAttribute( 'tabindex', '0' );
+		it( 'should wrap in tooltip when label differs from name', async () => {
+			const user = userEvent.setup();
+			renderAvatar(
+				<Avatar name="Jane Doe" label="You" variant="badge" />
+			);
+			await user.hover( screen.getByRole( 'img', { name: 'Jane Doe' } ) );
+			expect( await screen.findByText( 'Jane Doe' ) ).toBeVisible();
 		} );
 	} );
 
@@ -367,23 +385,37 @@ describe( 'Avatar', () => {
 	} );
 
 	describe( 'tooltip', () => {
-		it( 'should wrap in tooltip when name is provided without badge', () => {
-			render( <Avatar name="Jane Doe" /> );
-			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
-			expect( avatar ).toHaveAttribute( 'tabindex', '0' );
+		it( 'should wrap in tooltip when name is provided without badge', async () => {
+			const user = userEvent.setup();
+			renderAvatar( <Avatar name="Jane Doe" /> );
+			await user.hover( screen.getByRole( 'img', { name: 'Jane Doe' } ) );
+			expect( await screen.findByText( 'Jane Doe' ) ).toBeVisible();
 		} );
 
-		it( 'should not wrap in tooltip for badge without label', () => {
-			render( <Avatar name="Jane Doe" variant="badge" /> );
-			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
-			// Badge shows the name visibly, so no tooltip needed.
-			expect( avatar ).not.toHaveAttribute( 'tabindex' );
+		it( 'should not wrap in tooltip for badge without label', async () => {
+			const user = userEvent.setup();
+			renderAvatar( <Avatar name="Jane Doe" variant="badge" /> );
+			// Before hovering: the single "Jane Doe" occurrence is the
+			// badge text — that's what the next assertion is allowed to
+			// match. Hovering should not add a second occurrence.
+			expect( screen.getAllByText( 'Jane Doe' ) ).toHaveLength( 1 );
+			await user.hover( screen.getByRole( 'img', { name: 'Jane Doe' } ) );
+			expect( screen.getAllByText( 'Jane Doe' ) ).toHaveLength( 1 );
 		} );
 
-		it( 'should not wrap in tooltip when name is not provided', () => {
-			render( <Avatar data-testid="avatar" /> );
+		it( 'should not wrap in tooltip when name is not provided', async () => {
+			const user = userEvent.setup();
+			renderAvatar( <Avatar data-testid="avatar" /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).not.toHaveAttribute( 'tabindex' );
+			const bodyTextBefore = document.body.textContent;
+			await user.hover( avatar );
+			// No name → no `Tooltip.Root` wrapper at all, so hovering
+			// cannot reveal any additional text content anywhere in the
+			// document (no popup mounts). Strict equality is what we
+			// want here — a substring `toHaveTextContent` would still
+			// pass if the popup added text.
+			// eslint-disable-next-line jest-dom/prefer-to-have-text-content -- intentional, see comment above.
+			expect( document.body.textContent ).toBe( bodyTextBefore );
 		} );
 	} );
 } );

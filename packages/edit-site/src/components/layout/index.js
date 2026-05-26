@@ -31,6 +31,8 @@ import { PluginArea } from '@wordpress/plugins';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -54,6 +56,9 @@ function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
+	const showDesktopSiteHub = ! hasAdminBarInEditor;
+	const showMobileSiteHub = ! hasAdminBarInEditor || routeKey !== 'home';
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
@@ -129,12 +134,14 @@ function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<SiteHub
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
+										{ showDesktopSiteHub && (
+											<SiteHub
+												ref={ toggleRef }
+												isTransparent={
+													isResizableFrameOversized
+												}
+											/>
+										) }
 										<SidebarNavigationProvider>
 											<SidebarContent
 												shouldAnimate={
@@ -163,12 +170,14 @@ function Layout() {
 							<SidebarNavigationProvider>
 								{ canvas !== 'edit' ? (
 									<>
-										<SiteHubMobile
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
+										{ showMobileSiteHub && (
+											<SiteHubMobile
+												ref={ toggleRef }
+												isTransparent={
+													isResizableFrameOversized
+												}
+											/>
+										) }
 										<SidebarContent routeKey={ routeKey }>
 											<ErrorBoundary>
 												{ areas.mobile }
@@ -275,9 +284,11 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 
 	return (
 		<SlotFillProvider>
-			{ /** This needs to be within the SlotFillProvider */ }
-			<PluginArea onError={ onPluginAreaError } />
-			<Layout { ...props } />
+			<Tooltip.Provider>
+				{ /** This needs to be within the SlotFillProvider */ }
+				<PluginArea onError={ onPluginAreaError } />
+				<Layout { ...props } />
+			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
 }
