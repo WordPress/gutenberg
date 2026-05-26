@@ -37,18 +37,20 @@ type NewsItem = {
 	date: string;
 };
 
+const DEFAULT_PER_PAGE = 5;
+
 const NEWS_FEEDS = [
 	{
 		key: 'news',
 		label: __( 'WordPress Blog' ),
 		siteUrl: _x( 'https://wordpress.org/news/', 'News dashboard widget' ),
-		apiUrl: 'https://wordpress.org/news/wp-json/wp/v2/posts?per_page=4&_fields=id,title,link,date',
+		apiUrl: 'https://wordpress.org/news/wp-json/wp/v2/posts?_fields=id,title,link,date',
 	},
 	{
 		key: 'planet',
 		label: __( 'Other WordPress News' ),
 		siteUrl: _x( 'https://planet.wordpress.org/', 'News dashboard widget' ),
-		apiUrl: 'https://planet.wordpress.org/wp-json/wp/v2/posts?per_page=4&_fields=id,title,link,date',
+		apiUrl: 'https://planet.wordpress.org/wp-json/wp/v2/posts?_fields=id,title,link,date',
 	},
 ];
 
@@ -57,7 +59,7 @@ const DEFAULT_LAYOUTS = { list: {} };
 const INITIAL_VIEW: View = {
 	type: 'list',
 	page: 1,
-	perPage: 4,
+	perPage: DEFAULT_PER_PAGE,
 	search: '',
 	filters: [],
 	fields: [],
@@ -103,7 +105,7 @@ const emptyState = (
 	</Stack>
 );
 
-function combineFeedPosts( newsFeeds: NewsFeed[] ): NewsItem[] {
+function combineFeedPosts( newsFeeds: NewsFeed[], limit: number ): NewsItem[] {
 	return newsFeeds
 		.flatMap( ( feed ) =>
 			feed.posts.map( ( post ) => ( {
@@ -118,23 +120,34 @@ function combineFeedPosts( newsFeeds: NewsFeed[] ): NewsItem[] {
 		.sort(
 			( a, b ) =>
 				new Date( b.date ).getTime() - new Date( a.date ).getTime()
-		);
+		)
+		.slice( 0, limit );
 }
 
 /*
  * Renders WordPress.org and Planet WordPress posts through the DataViews list
  * layout. Mounting this component triggers the feed requests.
  */
-export function NewsList() {
+export function NewsList( {
+	perPage = DEFAULT_PER_PAGE,
+}: {
+	perPage?: number;
+} ) {
+	const limit = Math.max( 1, perPage );
+
 	const [ view, setView ] = useState< View >( INITIAL_VIEW );
 	const [ newsFeeds, setNewsFeeds ] = useState< NewsFeed[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 
 	useEffect( () => {
+		setIsLoading( true );
+
 		Promise.all(
 			NEWS_FEEDS.map( async ( feed ) => {
+				const apiUrl = `${ feed.apiUrl }&per_page=${ limit }`;
+
 				try {
-					const posts: NewsPost[] = await fetch( feed.apiUrl ).then(
+					const posts: NewsPost[] = await fetch( apiUrl ).then(
 						( r ) => r.json()
 					);
 					return {
@@ -155,9 +168,17 @@ export function NewsList() {
 		)
 			.then( setNewsFeeds )
 			.finally( () => setIsLoading( false ) );
-	}, [] );
+	}, [ limit ] );
 
-	const items = useMemo( () => combineFeedPosts( newsFeeds ), [ newsFeeds ] );
+	const items = useMemo(
+		() => combineFeedPosts( newsFeeds, limit ),
+		[ newsFeeds, limit ]
+	);
+
+	const resolvedView = useMemo(
+		() => ( { ...view, perPage: limit } ),
+		[ view, limit ]
+	);
 
 	const fields = useMemo< Field< NewsItem >[] >(
 		() => [
@@ -191,7 +212,7 @@ export function NewsList() {
 			<DataViews
 				data={ items }
 				fields={ fields }
-				view={ view }
+				view={ resolvedView }
 				onChangeView={ setView }
 				getItemId={ ( item ) => item.id }
 				isLoading={ isLoading }
