@@ -63,6 +63,13 @@ const config: StorybookConfig = {
 		componentsManifest: NODE_ENV !== 'development',
 		// Use experimental TypeScript LanguageService prop extractor for the
 		// components manifest to improve performance and accuracy.
+		//
+		// This only applies to the components manifest and not the Storybook
+		// UI. Storybook describe this extractor as the "successor" of both
+		// `react-docgen` and `react-docgen-typescript`, but it currently only
+		// applies to the manifest.
+		//
+		// See: https://github.com/Storybookjs/storybook/issues/34824
 		experimentalReactComponentMeta: true,
 	},
 	typescript: {
