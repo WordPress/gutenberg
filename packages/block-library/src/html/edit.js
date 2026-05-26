@@ -6,6 +6,7 @@ import { useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockIcon,
+	InspectorControls,
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
@@ -15,6 +16,7 @@ import {
 	Placeholder,
 	Button,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { code } from '@wordpress/icons';
 
 /**
@@ -47,7 +49,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const viewMode = attributes.viewMode === 'preview' ? 'preview' : 'html';
 	const isPreview = viewMode === 'preview';
 
-	// Show placeholder when content is empty and we are in preview mode
+	// Show placeholder when content is empty and we are in preview mode.
 	if ( isPreview && ! attributes.content?.trim() ) {
 		return (
 			<div { ...blockProps }>
@@ -123,6 +125,21 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
+			<InspectorControls>
+				<Stack
+					className="block-editor-block-inspector-edit-contents"
+					direction="column"
+				>
+					<Button
+						className="block-editor-block-inspector-edit-contents__button"
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit code' ) }
+					</Button>
+				</Stack>
+			</InspectorControls>
 			{ isPreview ? (
 				<Preview
 					content={ attributes.content }
