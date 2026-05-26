@@ -87,7 +87,7 @@ export default function AdvancedPanel( {
 	}
 
 	return (
-		<Stack direction="column" spacing={ 3 }>
+		<Stack direction="column" gap="md">
 			{ cssError && (
 				<Notice status="error" onRemove={ () => setCSSError( null ) }>
 					{ cssError }
