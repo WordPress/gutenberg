@@ -33,7 +33,6 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	store as blockEditorStore,
-	__experimentalImageEditor as ImageEditor,
 	useBlockEditingMode,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -72,7 +71,6 @@ const SiteLogo = ( {
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
-	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -109,12 +107,6 @@ const SiteLogo = ( {
 			setAttributes( { shouldSyncIcon: false } );
 		}
 	}, [] );
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsEditingImage( false );
-		}
-	}, [ isSelected ] );
 
 	// Always apply modal updates as snackbar Undo may restore the original id.
 	const handleMediaUpdate = ( { id: newId } ) => {
@@ -229,57 +221,6 @@ const SiteLogo = ( {
 	// Hide crop and dimensions editing in write mode
 	const shouldShowCropAndDimensions = ! isContentOnlyMode;
 
-	let imgEdit;
-	if ( canEditImage && isEditingImage ) {
-		imgEdit = (
-			<ImageEditor
-				id={ logoId }
-				url={ logoUrl }
-				width={ currentWidth }
-				height={ currentHeight }
-				naturalHeight={ naturalHeight }
-				naturalWidth={ naturalWidth }
-				onSaveImage={ ( imageAttributes ) => {
-					setLogo( imageAttributes.id );
-				} }
-				onFinishEditing={ () => {
-					setIsEditingImage( false );
-				} }
-			/>
-		);
-	} else {
-		// Always render ResizableBox but disable resize functionality in contentOnly mode
-		imgEdit = (
-			<ResizableBox
-				size={ {
-					width: currentWidth,
-					height: currentHeight,
-				} }
-				showHandle={ isSelected && shouldShowCropAndDimensions }
-				minWidth={ minWidth }
-				maxWidth={ maxWidthBuffer }
-				minHeight={ minHeight }
-				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: showRightHandle,
-					bottom: true,
-					left: showLeftHandle,
-				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					onResizeStop();
-					setAttributes( {
-						width: parseInt( currentWidth + delta.width, 10 ),
-						height: parseInt( currentHeight + delta.height, 10 ),
-					} );
-				} }
-			>
-				{ imgWrapper }
-			</ResizableBox>
-		);
-	}
 
 	// Support the previous location for the Site Icon settings. To be removed
 	// when the required WP core version for Gutenberg is >= 6.5.0.
@@ -396,31 +337,50 @@ const SiteLogo = ( {
 					) }
 				</ToolsPanel>
 			</InspectorControls>
-			{ canEditImage &&
-				! isEditingImage &&
-				shouldShowCropAndDimensions && (
-					<BlockControls group="block">
-						<ToolbarButton
-							onClick={
-								openMediaEditorModal && logoId
-									? () =>
-											openMediaEditorModal( {
-												id: logoId,
-												onUpdate: handleMediaUpdate,
-											} )
-									: () => setIsEditingImage( true )
-							}
-							aria-haspopup={
-								openMediaEditorModal && logoId
-									? 'dialog'
-									: undefined
-							}
-							icon={ crop }
-							label={ __( 'Crop' ) }
-						/>
-					</BlockControls>
-				) }
-			{ imgEdit }
+			{ canEditImage && shouldShowCropAndDimensions && (
+				<BlockControls group="block">
+					<ToolbarButton
+						onClick={ () =>
+							openMediaEditorModal( {
+								id: logoId,
+								onUpdate: handleMediaUpdate,
+							} )
+						}
+						aria-haspopup="dialog"
+						icon={ crop }
+						label={ __( 'Crop' ) }
+					/>
+				</BlockControls>
+			) }
+			{ /* Always render ResizableBox but disable resize functionality in contentOnly mode */ }
+			<ResizableBox
+				size={ {
+					width: currentWidth,
+					height: currentHeight,
+				} }
+				showHandle={ isSelected && shouldShowCropAndDimensions }
+				minWidth={ minWidth }
+				maxWidth={ maxWidthBuffer }
+				minHeight={ minHeight }
+				maxHeight={ maxWidthBuffer / ratio }
+				lockAspectRatio
+				enable={ {
+					top: false,
+					right: showRightHandle,
+					bottom: true,
+					left: showLeftHandle,
+				} }
+				onResizeStart={ onResizeStart }
+				onResizeStop={ ( event, direction, elt, delta ) => {
+					onResizeStop();
+					setAttributes( {
+						width: parseInt( currentWidth + delta.width, 10 ),
+						height: parseInt( currentHeight + delta.height, 10 ),
+					} );
+				} }
+			>
+				{ imgWrapper }
+			</ResizableBox>
 		</>
 	);
 };
