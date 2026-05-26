@@ -19,7 +19,10 @@ export default function Text< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { prefix, suffix } = config || {};
-	const isConnected = field.id in ( data?.metadata?.bindings || {} );
+	const isConnected =
+		field.id in
+		( ( data as { metadata?: { bindings?: object } } )?.metadata
+			?.bindings || {} );
 
 	return (
 		<ValidatedText

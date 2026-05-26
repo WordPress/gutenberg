@@ -149,11 +149,11 @@ export type EditConfigText = {
 	/**
 	 * Prefix component to display before the input.
 	 */
-	prefix?: React.ComponentType;
+	prefix?: React.ComponentType< { isConnected?: boolean } >;
 	/**
 	 * Suffix component to display after the input.
 	 */
-	suffix?: React.ComponentType;
+	suffix?: React.ComponentType< { isConnected?: boolean } >;
 };
 
 /**
@@ -476,8 +476,8 @@ export type DataFormControlProps< Item > = {
 	 * Configuration object for the control.
 	 */
 	config?: {
-		prefix?: React.ComponentType;
-		suffix?: React.ComponentType;
+		prefix?: React.ComponentType< { isConnected?: boolean } >;
+		suffix?: React.ComponentType< { isConnected?: boolean } >;
 		rows?: number;
 		compact?: boolean;
 	};
