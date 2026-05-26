@@ -7,10 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	getBlockBindingsSource,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import {
 	__experimentalItem as Item,
 	__experimentalText as WCText,
@@ -28,6 +25,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockContext from '../block-context';
 import BlockBindingsSourceFieldsList from './source-fields-list';
 import useBlockBindingsUtils from './use-block-bindings-utils';
+import useBlockBindingsCompatibleFields from './use-block-bindings-compatible-fields';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 
@@ -42,45 +40,17 @@ export default function BlockBindingsAttributeControl( {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const blockContext = useContext( BlockContext );
-	const compatibleFields = useSelect(
-		( select ) => {
-			const {
-				getAllBlockBindingsSources,
-				getBlockBindingsSourceFieldsList,
-				getBlockType,
-			} = unlock( select( blocksStore ) );
-
-			const _attribute =
-				getBlockType( blockName ).attributes?.[ attribute ];
-
-			if ( _attribute?.enum ) {
-				return {};
-			}
-
-			const attributeType =
-				_attribute?.type === 'rich-text' ? 'string' : _attribute?.type;
-
-			const sourceFields = {};
-			Object.entries( getAllBlockBindingsSources() ).forEach(
-				( [ sourceName, source ] ) => {
-					const fieldsList = getBlockBindingsSourceFieldsList(
-						source,
-						blockContext
-					);
-					if ( ! fieldsList?.length ) {
-						return;
-					}
-					const compatibleFieldsList = fieldsList.filter(
-						( field ) => field.type === attributeType
-					);
-					if ( compatibleFieldsList.length ) {
-						sourceFields[ sourceName ] = compatibleFieldsList;
-					}
-				}
-			);
-			return sourceFields;
-		},
-		[ attribute, blockName, blockContext ]
+	// Reuse the shared hook (spec req 10). The legacy panel only needs the
+	// `compatibleFields` map here; the broader `isBindable` gate is enforced
+	// elsewhere (`bindableAttributes` in `block-bindings.js`). The duplicate
+	// `canUpdateBlockBindings` read below is intentional accepted tech debt —
+	// collapsing into the hook would entangle the hook's return shape with
+	// legacy-panel-specific gate granularity (the panel renders the item but
+	// disables the menu rather than hiding it).
+	const { compatibleFields } = useBlockBindingsCompatibleFields(
+		attribute,
+		blockName,
+		blockContext
 	);
 
 	const { canUpdateBlockBindings } = useSelect( ( select ) => ( {
