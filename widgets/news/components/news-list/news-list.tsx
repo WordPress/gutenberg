@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { DataViews, type Field, type View } from '@wordpress/dataviews';
+import {
+	DataViews,
+	filterSortAndPaginate,
+	type Field,
+	type View,
+} from '@wordpress/dataviews';
 import { dateI18n } from '@wordpress/date';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -26,6 +31,7 @@ interface NewsFeed {
 	label: string;
 	siteUrl: string;
 	posts: NewsPost[];
+	totalPages: number;
 }
 
 type NewsItem = {
@@ -105,7 +111,7 @@ const emptyState = (
 	</Stack>
 );
 
-function combineFeedPosts( newsFeeds: NewsFeed[], limit: number ): NewsItem[] {
+function combineFeedPosts( newsFeeds: NewsFeed[] ): NewsItem[] {
 	return newsFeeds
 		.flatMap( ( feed ) =>
 			feed.posts.map( ( post ) => ( {
@@ -120,8 +126,59 @@ function combineFeedPosts( newsFeeds: NewsFeed[], limit: number ): NewsItem[] {
 		.sort(
 			( a, b ) =>
 				new Date( b.date ).getTime() - new Date( a.date ).getTime()
-		)
-		.slice( 0, limit );
+		);
+}
+
+function extendPaginationInfo(
+	paginationInfo: { totalItems: number; totalPages: number },
+	limit: number,
+	page: number,
+	feeds: NewsFeed[]
+): { totalItems: number; totalPages: number } {
+	const fetchCount = limit * page;
+	const hasMoreFromFeeds = feeds.some(
+		( feed ) => feed.posts.length >= fetchCount && feed.totalPages > page
+	);
+
+	if ( ! hasMoreFromFeeds ) {
+		return paginationInfo;
+	}
+
+	return {
+		totalItems: Math.max( paginationInfo.totalItems, page * limit + 1 ),
+		totalPages: Math.max( paginationInfo.totalPages, page + 1 ),
+	};
+}
+
+async function fetchNewsFeed(
+	feed: ( typeof NEWS_FEEDS )[ number ],
+	fetchCount: number
+): Promise< NewsFeed > {
+	const apiUrl = `${ feed.apiUrl }&per_page=${ fetchCount }`;
+
+	try {
+		const response = await fetch( apiUrl );
+		const posts: NewsPost[] = await response.json();
+
+		return {
+			key: feed.key,
+			label: feed.label,
+			siteUrl: feed.siteUrl,
+			posts: Array.isArray( posts ) ? posts : [],
+			totalPages: parseInt(
+				response.headers.get( 'X-WP-TotalPages' ) ?? '1',
+				10
+			),
+		};
+	} catch {
+		return {
+			key: feed.key,
+			label: feed.label,
+			siteUrl: feed.siteUrl,
+			posts: [],
+			totalPages: 1,
+		};
+	}
 }
 
 /*
@@ -139,45 +196,36 @@ export function NewsList( {
 	const [ newsFeeds, setNewsFeeds ] = useState< NewsFeed[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 
+	const currentPage = Math.max( 1, view.page ?? 1 );
+
+	useEffect( () => {
+		setView( ( previousView ) => ( {
+			...previousView,
+			page: 1,
+			perPage: limit,
+		} ) );
+	}, [ limit ] );
+
 	useEffect( () => {
 		setIsLoading( true );
 
-		Promise.all(
-			NEWS_FEEDS.map( async ( feed ) => {
-				const apiUrl = `${ feed.apiUrl }&per_page=${ limit }`;
+		const fetchCount = limit * currentPage;
 
-				try {
-					const posts: NewsPost[] = await fetch( apiUrl ).then(
-						( r ) => r.json()
-					);
-					return {
-						key: feed.key,
-						label: feed.label,
-						siteUrl: feed.siteUrl,
-						posts,
-					};
-				} catch {
-					return {
-						key: feed.key,
-						label: feed.label,
-						siteUrl: feed.siteUrl,
-						posts: [],
-					};
-				}
-			} )
+		Promise.all(
+			NEWS_FEEDS.map( ( feed ) => fetchNewsFeed( feed, fetchCount ) )
 		)
 			.then( setNewsFeeds )
 			.finally( () => setIsLoading( false ) );
-	}, [ limit ] );
+	}, [ limit, currentPage ] );
 
-	const items = useMemo(
-		() => combineFeedPosts( newsFeeds, limit ),
-		[ newsFeeds, limit ]
+	const allItems = useMemo(
+		() => combineFeedPosts( newsFeeds ),
+		[ newsFeeds ]
 	);
 
 	const resolvedView = useMemo(
-		() => ( { ...view, perPage: limit } ),
-		[ view, limit ]
+		() => ( { ...view, perPage: limit, page: currentPage } ),
+		[ view, limit, currentPage ]
 	);
 
 	const fields = useMemo< Field< NewsItem >[] >(
@@ -207,23 +255,55 @@ export function NewsList( {
 		[]
 	);
 
+	const { data: shownData, paginationInfo: clientPaginationInfo } = useMemo(
+		() => filterSortAndPaginate( allItems, resolvedView, fields ),
+		[ allItems, resolvedView, fields ]
+	);
+
+	const paginationInfo = useMemo(
+		() =>
+			extendPaginationInfo(
+				clientPaginationInfo,
+				limit,
+				currentPage,
+				newsFeeds
+			),
+		[ clientPaginationInfo, limit, currentPage, newsFeeds ]
+	);
+
 	return (
 		<div className={ styles.root }>
 			<DataViews
-				data={ items }
+				data={ shownData }
 				fields={ fields }
 				view={ resolvedView }
 				onChangeView={ setView }
 				getItemId={ ( item ) => item.id }
 				isLoading={ isLoading }
-				paginationInfo={ {
-					totalItems: items.length,
-					totalPages: 1,
-				} }
+				paginationInfo={ paginationInfo }
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				empty={ emptyState }
 			>
 				<DataViews.Layout />
+				<footer className={ styles.footer }>
+					<Stack
+						direction="row"
+						justify="space-between"
+						align="center"
+						gap="md"
+					>
+						<Link
+							href={ _x(
+								'https://wordpress.org/news/all-posts/',
+								'News dashboard widget'
+							) }
+							openInNewTab
+						>
+							{ __( 'See all' ) }
+						</Link>
+						<DataViews.Pagination />
+					</Stack>
+				</footer>
 			</DataViews>
 		</div>
 	);
