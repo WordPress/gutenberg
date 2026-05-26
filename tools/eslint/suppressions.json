@@ -1875,5 +1875,10 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
+	},
+	"widgets/site-preview/render.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
 	}
 }

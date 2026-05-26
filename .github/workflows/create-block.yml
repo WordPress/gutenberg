@@ -52,5 +52,4 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Create block
-              shell: bash
-              run: bash ./bin/test-create-block.sh
+              run: npm run test:create-block

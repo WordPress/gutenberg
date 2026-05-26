@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
 ### Enhancements
 
 - DataViews: Lower the sticky footer z-index and isolate grid card stacking contexts. [#78315](https://github.com/WordPress/gutenberg/pull/78315)

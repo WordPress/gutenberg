@@ -54,7 +54,7 @@ function CalendarDateTimeControl< Item >( {
 	const inputControlRef = useRef< HTMLInputElement >( null );
 	const validationTimeoutRef =
 		useRef< ReturnType< typeof setTimeout > >( undefined );
-	const previousFocusRef = useRef< Element | null >( null );
+	const previousFocusRef = useRef< Element >( null );
 
 	const { minConstraint, maxConstraint, disabledMatchers } =
 		useDisabledDateMatchers( isValid, parseDateTime );
