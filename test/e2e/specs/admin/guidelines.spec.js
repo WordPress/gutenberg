@@ -64,15 +64,15 @@ async function saveCategoryGuidelines( page, title, text ) {
 }
 
 test.describe( 'Guidelines', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
-			[ 'gutenberg-guidelines' ]
-		);
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
 		// eslint-disable-next-line playwright/no-skipped-test
 		test.skip(
-			! experimentsAvailable,
+			! isGutenbergPluginActive,
 			'gutenberg-guidelines experiment requires Gutenberg plugin'
 		);
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-guidelines',
+		] );
 		await deleteAllGuidelines( requestUtils );
 	} );
 

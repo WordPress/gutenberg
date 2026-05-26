@@ -63,15 +63,10 @@ async function saveEntities( { page } ) {
 test.describe( 'Template ID Format', () => {
 	let pageId;
 
-	test.beforeAll( async ( { requestUtils } ) => {
-		// Probe whether the active_templates experiment is available;
-		// the rest of this suite assumes it can be toggled.
-		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
-			[]
-		);
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
 		// eslint-disable-next-line playwright/no-skipped-test
 		test.skip(
-			! experimentsAvailable,
+			! isGutenbergPluginActive,
 			'Template activation experiment requires Gutenberg plugin'
 		);
 		await requestUtils.activateTheme( 'twentytwentyfive' );

@@ -4,19 +4,17 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Activate', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
+	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
+		// eslint-disable-next-line playwright/no-skipped-test
+		test.skip(
+			! isGutenbergPluginActive,
+			'Template activation experiment requires Gutenberg plugin'
+		);
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		// Enable the template activation feature.
-		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
-			[ 'active_templates' ]
-		);
-		// eslint-disable-next-line playwright/no-skipped-test
-		test.skip(
-			! experimentsAvailable,
-			'Template activation experiment requires Gutenberg plugin'
-		);
+		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
 
 	test.beforeEach( async ( { admin, requestUtils } ) => {

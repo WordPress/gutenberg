@@ -63,15 +63,16 @@ test.describe( 'Fullscreen Mode', () => {
 		page,
 		admin,
 		requestUtils,
+		isGutenbergPluginActive,
 	} ) => {
-		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
-			[ 'gutenberg-admin-bar-in-editor' ]
-		);
 		// eslint-disable-next-line playwright/no-skipped-test
 		test.skip(
-			! experimentsAvailable,
+			! isGutenbergPluginActive,
 			'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
 		);
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-admin-bar-in-editor',
+		] );
 		await admin.createNewPost();
 		await enableFullscreenMode( page );
 
@@ -88,15 +89,16 @@ test.describe( 'Fullscreen Mode', () => {
 		admin,
 		requestUtils,
 		pageUtils,
+		isGutenbergPluginActive,
 	} ) => {
-		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
-			[ 'gutenberg-admin-bar-in-editor' ]
-		);
 		// eslint-disable-next-line playwright/no-skipped-test
 		test.skip(
-			! experimentsAvailable,
+			! isGutenbergPluginActive,
 			'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
 		);
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-admin-bar-in-editor',
+		] );
 		await admin.createNewPost();
 		await enableFullscreenMode( page );
 		await enableDistractionFreeMode( pageUtils );
@@ -112,15 +114,16 @@ test.describe( 'Fullscreen Mode', () => {
 		admin,
 		requestUtils,
 		pageUtils,
+		isGutenbergPluginActive,
 	} ) => {
-		const experimentsAvailable = await requestUtils.setGutenbergExperiments(
-			[ 'gutenberg-admin-bar-in-editor' ]
-		);
 		// eslint-disable-next-line playwright/no-skipped-test
 		test.skip(
-			! experimentsAvailable,
+			! isGutenbergPluginActive,
 			'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
 		);
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-admin-bar-in-editor',
+		] );
 		await pageUtils.setBrowserViewport( 'small' );
 		await admin.createNewPost();
 		await enableDistractionFreeMode( pageUtils );
@@ -144,16 +147,16 @@ test.describe( 'Fullscreen Mode', () => {
 			page,
 			admin,
 			requestUtils,
+			isGutenbergPluginActive,
 		} ) => {
-			const experimentsAvailable =
-				await requestUtils.setGutenbergExperiments( [
-					'gutenberg-admin-bar-in-editor',
-				] );
 			// eslint-disable-next-line playwright/no-skipped-test
 			test.skip(
-				! experimentsAvailable,
+				! isGutenbergPluginActive,
 				'gutenberg-admin-bar-in-editor experiment requires Gutenberg plugin'
 			);
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-admin-bar-in-editor',
+			] );
 			await admin.visitSiteEditor( { canvas: 'edit' } );
 
 			await expect( page.locator( '#wpadminbar' ) ).toBeVisible();
