@@ -83,7 +83,7 @@ export const DEFAULT_STATE: CropperState = {
 export interface AspectRatioPreset {
 	/** Display label (e.g., "Square - 1:1"). */
 	label: string;
-	/** The aspect ratio value (width / height). 0 = free / original. */
+	/** The aspect ratio value (width / height). 0 = free, -1 = original. */
 	value: number;
 }
 
