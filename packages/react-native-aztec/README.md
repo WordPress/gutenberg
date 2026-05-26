@@ -3,6 +3,8 @@
 This package provides a component, AztecView, that wraps around the Aztec Android and Aztec iOS libraries in a React Native component.
 This component provides rich text editing capabilities that emulate a subset of the HTML functionality.
 
+> **Status:** This package is unmaintained on `trunk` and is known to be broken following the upgrade to React 19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)). For patches to the existing Gutenberg Mobile build, branch from the most recent React Native release — tag [`rnmobile/1.121.0`](https://github.com/WordPress/gutenberg/releases/tag/rnmobile%2F1.121.0) at commit [`e63b8b8`](https://github.com/WordPress/gutenberg/commit/e63b8b8be7bdc5e9dd2781c597e918a7be212fe5) (see [#63744](https://github.com/WordPress/gutenberg/pull/63744)). See the [React Native mobile editor project status](https://github.com/WordPress/gutenberg/tree/HEAD/docs/contributors/code/react-native/README.md#project-status) for background.
+
 # `RCTAztecView`
 
 Render a rich text area that displays the HTML content provided.

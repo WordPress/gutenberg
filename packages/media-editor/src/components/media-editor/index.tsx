@@ -32,7 +32,11 @@ import {
 	// No type declarations available for @wordpress/interface.
 	// @ts-expect-error
 } from '@wordpress/interface';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type {
+	JSX,
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactNode,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -46,7 +50,7 @@ import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { CropperProvider, useCropper } from '../../image-editor';
+import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
@@ -224,7 +228,7 @@ function MediaEditorContent( {
 	showCloseButton = false,
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
-	const cropper = useCropper();
+	const cropper = useMediaEditor();
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -259,7 +263,7 @@ function MediaEditorContent( {
 		[ id ]
 	);
 
-	const hasChanges = cropper.isDirty || hasEdits;
+	const hasChanges = cropper.isCropperDirty || hasEdits;
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
@@ -269,8 +273,9 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef =
-		useRef< ReturnType< typeof setTimeout > >();
+	const placementControlTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -318,12 +323,8 @@ function MediaEditorContent( {
 		aspectRatioOptions,
 		freeformCrop,
 		setFreeformCrop,
-		resolvedAspectRatio,
 		resetCropOptions,
 	} = useCropOptions( {
-		id,
-		isImage,
-		media,
 		aspectRatioPresets,
 	} );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
@@ -483,8 +484,6 @@ function MediaEditorContent( {
 								<div className="media-editor__canvas">
 									{ isImage ? (
 										<MediaEditorCanvas
-											aspectRatio={ resolvedAspectRatio }
-											freeformCrop={ freeformCrop }
 											focusOnMount
 											isPlacementActive={
 												isPlacementActive
@@ -565,9 +564,9 @@ function MediaEditorContent( {
 
 export function MediaEditor( props: MediaEditorProps ) {
 	return (
-		<CropperProvider key={ props.id }>
+		<MediaEditorStateProvider key={ props.id }>
 			<MediaEditorContent { ...props } />
-		</CropperProvider>
+		</MediaEditorStateProvider>
 	);
 }
 

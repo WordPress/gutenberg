@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useCropper } from '../../image-editor';
+import { useMediaEditor } from '../../state';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 import RotationRuler from '../rotation-ruler';
@@ -61,17 +61,21 @@ export default function MediaEditorToolbar( {
 		hasRedo,
 		undo: undoCrop,
 		redo: redoCrop,
-	} = useCropper();
-	// `commitOnKeyUp: false` keeps rapid arrow-key adjustments coalesced
-	// into a single undo entry by the state-change debounce. Pointer-up
-	// still commits immediately so each drag is its own undo step.
+		beginGesture,
+		endGesture,
+	} = useMediaEditor();
+	// `commitOnKeyUp: false` lets rapid arrow-key adjustments coalesce
+	// into one undo entry via the gesture idle window. Pointer-up still
+	// closes pointer drags immediately.
 	const rotationGestureHandlers = useCropGestureHandlers( {
 		commitOnKeyUp: false,
 	} );
 
 	const handleReset = () => {
+		beginGesture();
 		reset();
 		onReset?.();
+		endGesture();
 	};
 	const handleUndo = () => {
 		if ( isUndoRedoDisabled ) {

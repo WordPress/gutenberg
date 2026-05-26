@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import {
+	Activity,
 	Children,
 	cloneElement,
 	Component,
@@ -15,16 +16,20 @@ import {
 	memo,
 	PureComponent,
 	StrictMode,
+	use,
+	useActionState,
 	useCallback,
 	useContext,
 	useDebugValue,
 	useDeferredValue,
 	useEffect,
+	useEffectEvent,
 	useId,
 	useMemo,
 	useImperativeHandle,
 	useInsertionEffect,
 	useLayoutEffect,
+	useOptimistic,
 	useReducer,
 	useRef,
 	useState,
@@ -65,6 +70,14 @@ export type RefCallback< T > = React.RefCallback< T >;
  * Object containing a React ref.
  */
 export type Ref< T > = React.Ref< T >;
+
+/**
+ * Hide and show parts of the UI while preserving state.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react/Activity
+ */
+export { Activity };
 
 /**
  * Object that provides utilities for dealing with React children.
@@ -156,6 +169,22 @@ export { memo };
 export { StrictMode };
 
 /**
+ * Read the value of a resource like a Promise or context.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react/use
+ */
+export { use };
+
+/**
+ * Manage state based on the result of a form action.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react/useActionState
+ */
+export { useActionState };
+
+/**
  * @see https://react.dev/reference/react/useCallback
  */
 export { useCallback };
@@ -181,6 +210,14 @@ export { useDeferredValue };
 export { useEffect };
 
 /**
+ * Extract non-reactive logic from an Effect into an Effect Event.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react/useEffectEvent
+ */
+export { useEffectEvent };
+
+/**
  * @see https://react.dev/reference/react/useId
  */
 export { useId };
@@ -204,6 +241,14 @@ export { useLayoutEffect };
  * @see https://react.dev/reference/react/useMemo
  */
 export { useMemo };
+
+/**
+ * Show a different state while an async action is underway.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react/useOptimistic
+ */
+export { useOptimistic };
 
 /**
  * @see https://react.dev/reference/react/useReducer
@@ -299,7 +344,9 @@ export function switchChildrenNodeName(
 				return elt;
 			}
 
-			const { children: childrenProp, ...props } = elt.props;
+			const { children: childrenProp, ...props } = (
+				elt as React.ReactElement< React.PropsWithChildren< unknown > >
+			 ).props;
 			return createElement(
 				nodeName,
 				{ key: index, ...props },

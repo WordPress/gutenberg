@@ -3,11 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import {
-	Tooltip as WCTooltip,
-	__unstableMotion as motion,
-} from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+import { __unstableMotion as motion } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
 
@@ -44,21 +42,26 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 
 	return (
 		<>
-			<WCTooltip text={ __( 'Drag to resize' ) }>
-				<motion.button
-					className={ `editor-resizable-editor__resize-handle is-${ direction }` }
-					aria-label={ __( 'Drag to resize' ) }
-					aria-describedby={ resizableHandleHelpId }
-					onKeyDown={ handleKeyDown }
-					variants={ resizeHandleVariants }
-					whileFocus="active"
-					whileHover="active"
-					whileTap="active"
-					key="handle"
-					role="separator"
-					aria-orientation="vertical"
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={
+						<motion.button
+							className={ `editor-resizable-editor__resize-handle is-${ direction }` }
+							aria-label={ __( 'Drag to resize' ) }
+							aria-describedby={ resizableHandleHelpId }
+							onKeyDown={ handleKeyDown }
+							variants={ resizeHandleVariants }
+							whileFocus="active"
+							whileHover="active"
+							whileTap="active"
+							key="handle"
+							role="separator"
+							aria-orientation="vertical"
+						/>
+					}
 				/>
-			</WCTooltip>
+				<Tooltip.Popup>{ __( 'Drag to resize' ) }</Tooltip.Popup>
+			</Tooltip.Root>
 			<VisuallyHidden id={ resizableHandleHelpId }>
 				{ __( 'Use left and right arrow keys to resize the canvas.' ) }
 			</VisuallyHidden>

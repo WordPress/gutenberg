@@ -41,7 +41,7 @@ function getFirstAnchorAttributeFormHTML( html, attributeName ) {
 
 const imageSchema = {
 	img: {
-		attributes: [ 'src', 'alt', 'title' ],
+		attributes: [ 'src', 'alt', 'title', 'width', 'height' ],
 		classes: [
 			'alignleft',
 			'aligncenter',
@@ -51,6 +51,14 @@ const imageSchema = {
 		],
 	},
 };
+
+// Read a pixel dimension from an `<img>` HTML attribute and normalise it to
+// the `<value>px` form the Image block stores in its `width` / `height`
+// attributes. Non-integer values (e.g. `50%`) are dropped because the block
+// attribute round-trips through inline styles that expect pixel units.
+function parsePixelDimension( value ) {
+	return value && /^\d+$/.test( value ) ? `${ value }px` : undefined;
+}
 
 const schema = ( { phrasingContentSchema } ) => ( {
 	figure: {
@@ -77,12 +85,10 @@ const transforms = {
 				node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 			schema,
 			transform: ( node ) => {
+				const img = node.querySelector( 'img' );
 				// Search both figure and image classes. Alignment could be
 				// set on either. ID is set on the image.
-				const className =
-					node.className +
-					' ' +
-					node.querySelector( 'img' ).className;
+				const className = node.className + ' ' + img.className;
 				const alignMatches =
 					/(?:^|\s)align(left|center|right)(?:$|\s)/.exec(
 						className
@@ -108,6 +114,14 @@ const transforms = {
 					anchorElement && anchorElement.className
 						? anchorElement.className
 						: undefined;
+				// Preserve explicit pixel dimensions set on the source `<img>`
+				// (e.g. legacy "Add Media" output: `<img width="77" height="77">`).
+				const width = parsePixelDimension(
+					img.getAttribute( 'width' )
+				);
+				const height = parsePixelDimension(
+					img.getAttribute( 'height' )
+				);
 				const attributes = getBlockAttributes(
 					'core/image',
 					node.outerHTML,
@@ -119,6 +133,8 @@ const transforms = {
 						rel,
 						linkClass,
 						anchor,
+						width,
+						height,
 					}
 				);
 

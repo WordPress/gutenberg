@@ -32,7 +32,7 @@ function WidgetPreview( { item }: { item: WidgetType } ) {
 	);
 
 	return (
-		<div className={ styles.preview } { ...{ inert: '' } }>
+		<div className={ styles.preview } inert>
 			<Suspense fallback={ null }>
 				<WidgetRender widget={ exampleWidget } widgetType={ item } />
 			</Suspense>

@@ -15,8 +15,6 @@
  */
 import type { ComponentProps } from 'react';
 import type { Field } from '@wordpress/dataviews';
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import type { Icon } from '@wordpress/ui';
 
 type IconProps = ComponentProps< typeof Icon >;
@@ -79,10 +77,12 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 *
 	 * - `'framed'` (default when absent): the widget renders its
 	 *   content only.
+	 * - `'content-bleed'`: the header stays visible while the content
+	 *   fills the content area edge-to-edge, with no padding.
 	 * - `'full-bleed'`: the widget renders edge-to-edge with no
 	 *   surrounding chrome.
 	 */
-	presentation?: 'framed' | 'full-bleed';
+	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
 	 * Search aliases used to surface the widget from the inserter.

@@ -46,6 +46,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url"
 	},
 	"publishConfig": {
