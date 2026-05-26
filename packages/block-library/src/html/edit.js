@@ -27,7 +27,6 @@ import { parseContent, serializeContent } from './utils';
 /**
  * Strips the CSS and JS wrapper tags (<style> and <script>) and any trailing
  * double-newlines from the serialized block content to retrieve the raw HTML.
- * Using a regex avoids browser-side HTML normalization that breaks typing flow.
  *
  * @param {string} raw The full serialized block content.
  * @return {string} The HTML-only portion.
@@ -45,7 +44,8 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 		className: 'block-library-html__edit',
 	} );
 
-	const isPreview = ( attributes.viewMode || 'html' ) === 'preview';
+	const viewMode = attributes.viewMode === 'preview' ? 'preview' : 'html';
+	const isPreview = viewMode === 'preview';
 
 	// Show placeholder when content is empty and we are in preview mode
 	if ( isPreview && ! attributes.content?.trim() ) {
@@ -103,7 +103,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						isPressed={ ! isPreview }
+						isPressed={ viewMode === 'html' }
 						onClick={ () => setAttributes( { viewMode: 'html' } ) }
 					>
 						HTML

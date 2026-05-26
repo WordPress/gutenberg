@@ -14,7 +14,8 @@
 			"role": "content"
 		},
 		"viewMode": {
-			"type": "string"
+			"type": "string",
+			"default": "html"
 		}
 	},
 	"supports": {
