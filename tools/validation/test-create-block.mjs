@@ -89,7 +89,7 @@ function wpScripts( ...args ) {
  */
 function countFiles( dir, maxDepth ) {
 	let count = 0;
-	( function walk( current, depth ) {
+	const walk = ( current, depth ) => {
 		for ( const entry of fs.readdirSync( current, {
 			withFileTypes: true,
 		} ) ) {
@@ -99,7 +99,8 @@ function countFiles( dir, maxDepth ) {
 				walk( path.join( current, entry.name ), depth + 1 );
 			}
 		}
-	} )( dir, 1 );
+	};
+	walk( dir, 1 );
 	return count;
 }
 
