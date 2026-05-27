@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Stop the build from crashing when a namespaced import resolves to a package that is not an installed dependency. `getPackageInfo` now returns `null` (honoring its documented contract) instead of throwing, letting the externals plugin fall through to esbuild's own resolution ([#78714](https://github.com/WordPress/gutenberg/issues/78714)).
+-   Stop the build from crashing when a namespaced import resolves to a package that is not an installed dependency. `getPackageInfo` now returns `null` (honoring its documented contract) instead of throwing, letting the externals plugin fall through to esbuild's own resolution ([#78715](https://github.com/WordPress/gutenberg/pull/78715)).
 
 ## 0.14.0 (2026-05-14)
 

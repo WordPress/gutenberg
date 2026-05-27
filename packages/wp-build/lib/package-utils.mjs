@@ -88,9 +88,7 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	const contextPath = path.join( packageRoot, 'package.json' );
 	const require = createRequire( contextPath );
 
-	// `require.resolve` throws when the package isn't installed. Treat that as a
-	// cache-able miss and return `null`, honoring the documented contract so callers
-	// (e.g. the externals plugin) can fall through to esbuild's own resolution.
+	// `require.resolve` throws when the package isn't installed; treat that as a miss.
 	let resolved;
 	try {
 		resolved = require.resolve( `${ fullPackageName }/package.json` );
