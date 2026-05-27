@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.20.0 (2026-05-27)
+
 ### Bug Fixes
 
 -   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).

@@ -253,6 +253,12 @@ export interface WidgetDashboardProps {
 	widgetTypes: WidgetType[];
 
 	/**
+	 * When true, widget types are still loading. Instances whose type is
+	 * not yet in `widgetTypes` show a loading state instead of missing.
+	 */
+	isResolvingWidgetTypes?: boolean;
+
+	/**
 	 * Whether the dashboard is in edit mode (enables drag/resize).
 	 */
 	editMode?: boolean;

@@ -6,6 +6,8 @@
 
 -   Preserve the non-enumerable `__esModule` marker on `window.wp.*` IIFE globals so that external webpack consumers (e.g. WooCommerce) can still default-import `@wordpress/*` packages exposed as webpack externals.
 
+## 0.15.0 (2026-05-27)
+
 ## 0.14.0 (2026-05-14)
 
 ### Bug Fixes
