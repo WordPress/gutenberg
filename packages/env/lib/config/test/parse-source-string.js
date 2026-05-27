@@ -83,6 +83,34 @@ describe( 'parseSourceString', () => {
 			} );
 		} );
 
+		it( 'should parse versioned WordPress.org sources', () => {
+			expect(
+				parseSourceString(
+					'http://downloads.wordpress.org/plugin/gutenberg.1.2.3.zip',
+					options
+				)
+			).toEqual( {
+				basename: 'gutenberg',
+				path: '/test/cache/gutenberg',
+				type: 'zip',
+				url: 'http://downloads.wordpress.org/plugin/gutenberg.1.2.3.zip',
+			} );
+		} );
+
+		it( 'should parse latest-stable WordPress.org sources', () => {
+			expect(
+				parseSourceString(
+					'http://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip',
+					options
+				)
+			).toEqual( {
+				basename: 'gutenberg',
+				path: '/test/cache/gutenberg',
+				type: 'zip',
+				url: 'http://downloads.wordpress.org/plugin/gutenberg.latest-stable.zip',
+			} );
+		} );
+
 		it( 'should parse other sources', () => {
 			expect(
 				parseSourceString( 'http://example.com/testing.zip', options )
@@ -91,6 +119,20 @@ describe( 'parseSourceString', () => {
 				path: '/test/cache/testing',
 				type: 'zip',
 				url: 'http://example.com/testing.zip',
+			} );
+		} );
+
+		it( 'should parse other versioned sources', () => {
+			expect(
+				parseSourceString(
+					'http://example.com/testing.1.2.3.zip',
+					options
+				)
+			).toEqual( {
+				basename: 'testing',
+				path: '/test/cache/testing',
+				type: 'zip',
+				url: 'http://example.com/testing.1.2.3.zip',
 			} );
 		} );
 	} );
