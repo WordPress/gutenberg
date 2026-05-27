@@ -7,7 +7,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { getLazyWidgetComponent } from '../../utils/get-lazy-widget-component';
+import { getLazyWidgetComponent } from '../../../widget-kit';
 import type { DashboardWidget, WidgetType } from '../../types';
 
 interface WidgetRenderInternalProps {

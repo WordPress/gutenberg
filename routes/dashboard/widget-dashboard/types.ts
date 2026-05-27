@@ -5,14 +5,14 @@
  * `WidgetType`) live in `routes/dashboard/widget-kit/types` and are
  * re-exported here so dashboard internals can pull every type they need
  * from a single module. The local declarations below cover the
- * dashboard-specific surface area: `DashboardWidget`, render props,
- * module resolver, grid settings, and the `WidgetDashboard` prop bag.
+ * dashboard-specific surface area: `DashboardWidget`, grid settings,
+ * and the `WidgetDashboard` prop bag.
  */
 
 /**
  * External dependencies
  */
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,7 @@ import type {
 	WidgetName,
 	WidgetTypeMetadata,
 	WidgetType,
+	ResolveWidgetModule,
 } from '../widget-kit/types';
 
 export type { WidgetName, WidgetTypeMetadata, WidgetType };
@@ -88,22 +89,6 @@ export interface DashboardWidget< Item = unknown > {
 }
 
 /**
- * Props passed to every widget render component.
- */
-export interface WidgetRenderProps< Item = unknown > {
-	/**
-	 * Widget attributes configured by the user.
-	 */
-	attributes: Item;
-
-	/**
-	 * Update the attributes of this instance. Fires `onLayoutChange` on the
-	 * dashboard with the updated layout.
-	 */
-	setAttributes?: ( next: Partial< Item > ) => void;
-}
-
-/**
  * Identity of a widget within the rendering tree. Returned by
  * `useWidgetContext()`; `null` when called outside a widget render subtree.
  */
@@ -123,22 +108,6 @@ export interface WidgetContextValue {
 	 */
 	index: number;
 }
-
-/**
- * Widget render module shape returned by the module resolver.
- */
-export interface WidgetModule {
-	default: ComponentType< WidgetRenderProps< unknown > >;
-}
-
-/**
- * Resolver hook: maps a `WidgetType.renderModule` id to a React component.
- * Defaults to a dynamic `import()`; override for tests, Storybook, or to load
- * from a non-URL source.
- */
-export type ResolveWidgetModule = (
-	moduleId: string
-) => Promise< WidgetModule >;
 
 /**
  * Identifier for the active grid model. Drives which `@wordpress/grid`
