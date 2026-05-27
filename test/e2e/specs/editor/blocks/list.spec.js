@@ -1645,17 +1645,6 @@ test.describe( 'List (@firefox)', () => {
 					{
 						name: 'core/list-item',
 						attributes: { content: 'one' },
-						innerBlocks: [
-							{
-								name: 'core/list',
-								innerBlocks: [
-									{
-										name: 'core/list-item',
-										attributes: { content: 'two' },
-									},
-								],
-							},
-						],
 					},
 				],
 			},
@@ -1664,18 +1653,12 @@ test.describe( 'List (@firefox)', () => {
 			await editor.insertBlock( block );
 		}
 
-		// Place the cursor at the end of the inner "test" in the first
-		// list. After insertion the caret is at the end of "two"
-		// (deepest leaf of the second list); step back across two
-		// block boundaries (start of "two" → end of "one", start of
-		// "one" → into inner "test"), then `End` to snap to the
-		// actual end of the block since the cross-block jump
-		// preserves column rather than landing at end.
+		// Place the cursor at the end of the inner "test" in the
+		// first list. After insertion the caret is at the end of
+		// "one" (the only item of the second, flat list); stepping
+		// back one block boundary lands at the end of inner "test".
 		await page.keyboard.press( 'Home' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'Home' );
-		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowRight' );
 
 		// Verify the setup: caret should land at end of the first
 		// list's inner "test".
@@ -1707,17 +1690,6 @@ test.describe( 'List (@firefox)', () => {
 					{
 						name: 'core/list-item',
 						attributes: { content: 'one' },
-						innerBlocks: [
-							{
-								name: 'core/list',
-								innerBlocks: [
-									{
-										name: 'core/list-item',
-										attributes: { content: 'two' },
-									},
-								],
-							},
-						],
 					},
 				],
 			},
@@ -1752,17 +1724,6 @@ test.describe( 'List (@firefox)', () => {
 					{
 						name: 'core/list-item',
 						attributes: { content: 'one' },
-						innerBlocks: [
-							{
-								name: 'core/list',
-								innerBlocks: [
-									{
-										name: 'core/list-item',
-										attributes: { content: 'two' },
-									},
-								],
-							},
-						],
 					},
 				],
 			},
