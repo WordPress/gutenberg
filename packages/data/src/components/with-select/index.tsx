@@ -59,7 +59,7 @@ const withSelect = (
 ) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) =>
-			memo( ( ownProps: Record< string, unknown > ) => {
+			memo( function WithSelect( ownProps: Record< string, unknown > ) {
 				const mapSelect = (
 					select: SelectFunction,
 					registry: DataRegistry

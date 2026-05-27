@@ -6,7 +6,7 @@ import type { ComponentType } from 'react';
 /**
  * WordPress dependencies
  */
-import { createElement, memo } from '@wordpress/element';
+import { createElement } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
 	useViewportMatch,
@@ -69,15 +69,13 @@ const withViewportMatch = ( queries: ViewportQueries ) => {
 		< T extends Record< string, unknown > >(
 			WrappedComponent: ComponentType< T >
 		) => {
-			const WrappedWithViewport = ( props: T ) => {
+			return function WithViewportMatch( props: T ) {
 				const queriesResult = useViewPortQueriesResult();
 				return createElement( WrappedComponent, {
 					...props,
 					...queriesResult,
 				} );
 			};
-
-			return memo( WrappedWithViewport );
 		},
 		'withViewportMatch'
 	);
