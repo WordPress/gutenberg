@@ -91,12 +91,27 @@ const migrateCustomColorsAndFontSizes = ( attributes ) => {
 };
 
 const migrateTextAlign = ( attributes ) => {
-	const { align, ...restAttributes } = attributes;
+	const { align, className, ...restAttributes } = attributes;
 	if ( ! align ) {
 		return attributes;
 	}
+	const cleanedClassName = className
+		? className
+				.split( ' ' )
+				.filter(
+					( cls ) =>
+						! cls.startsWith( 'has-text-align-' ) &&
+						! cls.endsWith( '-color' ) &&
+						! cls.endsWith( '-background-color' ) &&
+						cls !== 'has-text-color' &&
+						cls !== 'has-background' &&
+						! cls.startsWith( 'has-drop-cap' )
+				)
+				.join( ' ' ) || undefined
+		: undefined;
 	return {
 		...restAttributes,
+		className: cleanedClassName,
 		style: {
 			...attributes.style,
 			typography: {
