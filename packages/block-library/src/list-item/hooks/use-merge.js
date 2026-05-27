@@ -122,6 +122,32 @@ export default function useMerge( clientId, onMerge ) {
 			const nextBlockClientId = getNextId( clientId );
 
 			if ( ! nextBlockClientId ) {
+				// No further list items exist in this list tree. Look past
+				// the outermost containing list for a block to merge into
+				// it. Without this, deleting forward at the end of a
+				// deeply-nested item would silently do nothing — the
+				// block-editor's fallback `onMerge` operates on the
+				// currently selected block and only walks one parent
+				// level up, so it can't reach the next block after the
+				// outer list.
+				let topmostListItemId = clientId;
+				for (
+					let parentLi = getParentListItemId( topmostListItemId );
+					parentLi;
+					parentLi = getParentListItemId( topmostListItemId )
+				) {
+					topmostListItemId = parentLi;
+				}
+				const outermostListId =
+					getBlockRootClientId( topmostListItemId );
+				const followingBlockId =
+					getNextBlockClientId( outermostListId );
+
+				if ( followingBlockId ) {
+					mergeBlocks( outermostListId, followingBlockId );
+					return;
+				}
+
 				onMerge( forward );
 				return;
 			}

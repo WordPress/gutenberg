@@ -1201,16 +1201,31 @@ export const mergeBlocks =
 				return;
 			}
 
+			// If the caret was inside the block being removed, it has
+			// nowhere to go after the merge — move it to the newly
+			// inserted block. Otherwise keep the caller's selection
+			// (e.g. Delete from a deeper block inside `clientIdA`).
+			const selectionClientId = select.getSelectionStart()?.clientId;
+			const selectionInsideB =
+				!! selectionClientId &&
+				( selectionClientId === clientIdB ||
+					select
+						.getBlockParents( selectionClientId )
+						.includes( clientIdB ) );
+
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
 					undefined,
-					clientIdA
+					clientIdA,
+					selectionInsideB
 				);
-				dispatch.removeBlock( clientIdB );
-				dispatch.selectBlock(
-					blockWithSameType.innerBlocks[ 0 ].clientId
-				);
+				dispatch.removeBlock( clientIdB, selectionInsideB );
+				if ( selectionInsideB ) {
+					dispatch.selectBlock(
+						blockWithSameType.innerBlocks[ 0 ].clientId
+					);
+				}
 
 				// Attempt to merge the next block if it's the same type and
 				// same attributes. This is useful when merging a paragraph into

@@ -1541,6 +1541,79 @@ test.describe( 'List (@firefox)', () => {
 		} );
 	} );
 
+	test( 'should merge a following paragraph into the outermost list with Delete from a nested item (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'text' },
+			},
+		];
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		// Place the cursor at the end of "inner" by stepping back from
+		// the start of the paragraph.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await page.keyboard.press( 'Delete' );
+
+		// The caret stays at the end of "inner" — Delete shouldn't
+		// move the cursor away from the block the user pressed it in.
+		await page.keyboard.type( '‸' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner‸' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'text' },
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should leave nested list intact when deleting the parent item', async ( {
 		editor,
 		page,
