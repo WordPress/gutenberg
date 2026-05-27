@@ -84,7 +84,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   PHP Source code of the Gutenberg plugin.
     │
     ├── lib/compat/wordpress-x.x
-    │   PHP code that was include in WordPress ont the WordPress X.X version.
+    │   PHP code that was included in WordPress on the WordPress X.X version.
     │   It is kept to ensure plugin compatibility with older WordPress versions.
     │
     ├── packages
