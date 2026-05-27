@@ -7,7 +7,7 @@ export type PortalProps = ComponentProps< typeof _Tooltip.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Tooltip.Positioner >;
 
-export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
+export type RootProps = _Tooltip.Root.Props;
 
 export type ProviderProps = _Tooltip.Provider.Props;
 

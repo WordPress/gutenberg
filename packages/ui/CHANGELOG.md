@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
+-   `Tooltip.Root`, `Popover.Root`, `Popover.Trigger`, `Popover.Popup`, `Dialog.Root`, `Dialog.Popup`, `Drawer.Root`, `Drawer.Popup`, `AlertDialog.Popup`: Widen the types to forward all upstream props from the equivalent `@base-ui/react` subcomponents instead of `Pick`-ing a subset (types-only change).
 
 ## 0.14.0 (2026-05-27)
 
