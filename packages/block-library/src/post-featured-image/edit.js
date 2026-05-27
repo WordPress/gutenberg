@@ -11,7 +11,6 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	ToggleControl,
-	Placeholder,
 	Button,
 	Spinner,
 	TextControl,
@@ -47,6 +46,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import DimensionControls from './dimension-controls';
 import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
+import BlockMediaPlaceholder from '../utils/media-placeholder';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 
@@ -174,11 +174,8 @@ export default function PostFeaturedImageEdit( {
 
 	const placeholder = ( content ) => {
 		return (
-			<Placeholder
-				className={ clsx(
-					'block-editor-media-placeholder',
-					borderProps.className
-				) }
+			<BlockMediaPlaceholder
+				className={ clsx( borderProps.className ) }
 				withIllustration
 				style={ {
 					height: !! aspectRatio && '100%',
@@ -188,7 +185,7 @@ export default function PostFeaturedImageEdit( {
 				} }
 			>
 				{ content }
-			</Placeholder>
+			</BlockMediaPlaceholder>
 		);
 	};
 

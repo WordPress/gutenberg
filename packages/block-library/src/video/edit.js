@@ -10,7 +10,6 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	Disabled,
 	Spinner,
-	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import {
@@ -41,6 +40,7 @@ import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
+import BlockMediaPlaceholder from '../utils/media-placeholder';
 import PosterImage from '../utils/poster-image';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
@@ -138,8 +138,7 @@ function VideoEdit( {
 	// Much of this description is duplicated from MediaPlaceholder.
 	const placeholder = ( content ) => {
 		return (
-			<Placeholder
-				className="block-editor-media-placeholder"
+			<BlockMediaPlaceholder
 				withIllustration={ ! isSingleSelected }
 				icon={ icon }
 				label={ __( 'Video' ) }
@@ -148,7 +147,7 @@ function VideoEdit( {
 				) }
 			>
 				{ content }
-			</Placeholder>
+			</BlockMediaPlaceholder>
 		);
 	};
 

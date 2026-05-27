@@ -13,7 +13,7 @@ import {
 	useMemo,
 	useRef,
 } from '@wordpress/element';
-import { Placeholder, SandBox, Spinner } from '@wordpress/components';
+import { SandBox, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
@@ -43,6 +43,7 @@ import {
 	getPositionClassName,
 	mediaPosition,
 } from '../shared';
+import BlockMediaPlaceholder from '../../utils/media-placeholder';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
@@ -663,7 +664,7 @@ function CoverEdit( {
 				{ resizeListener }
 
 				{ ! url && useFeaturedImage && (
-					<Placeholder
+					<BlockMediaPlaceholder
 						className="wp-block-cover__image--placeholder-image"
 						withIllustration
 					/>
