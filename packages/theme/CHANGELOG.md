@@ -18,7 +18,7 @@
 
 ### Enhancements
 
--   Export `@wordpress/theme/design-token-fallbacks.scss` with a generated `wpds-var()` Sass function for compile-time design token fallback injection ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
+-   Export `@wordpress/theme/design-token-fallbacks` with a generated `wpds-var()` Sass function for compile-time design token fallback injection ([#78698](https://github.com/WordPress/gutenberg/pull/78698)).
 
 ## 0.13.0 (2026-05-14)
 
