@@ -34,7 +34,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 			src={ media.previewUrl || mediaSrc }
 			alt={ alt }
 			controls={ mediaType === 'audio' ? true : undefined }
-			inert="true"
+			inert
 			onError={ ( { currentTarget } ) => {
 				// Fall back to the media source if the preview cannot be loaded.
 				if ( currentTarget.src === media.previewUrl ) {

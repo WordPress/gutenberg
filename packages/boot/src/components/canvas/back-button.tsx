@@ -6,15 +6,21 @@ import {
 	Icon as WCIcon,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { arrowUpLeft } from '@wordpress/icons';
+import { arrowUpLeft, arrowUpRight } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import SiteIcon from '../site-icon';
 import './back-button.scss';
+
+declare global {
+	interface Window {
+		__experimentalAdminBarInEditor?: boolean;
+	}
+}
 
 /**
  * Overlay arrow animation that appears on hover.
@@ -42,6 +48,7 @@ const toggleHomeIconVariants = {
  */
 export default function BootBackButton( { length }: { length: number } ) {
 	const disableMotion = useReducedMotion();
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 
 	const handleBack = () => {
 		window.history.back();
@@ -55,6 +62,8 @@ export default function BootBackButton( { length }: { length: number } ) {
 	const transition = {
 		duration: disableMotion ? 0 : 0.3,
 	};
+
+	const arrowIcon = isRTL() ? arrowUpRight : arrowUpLeft;
 
 	return (
 		<motion.div
@@ -71,16 +80,22 @@ export default function BootBackButton( { length }: { length: number } ) {
 				aria-label={ __( 'Go back' ) }
 				__next40pxDefaultSize
 			>
-				<SiteIcon />
+				{ ! hasAdminBarInEditor && <SiteIcon /> }
 			</Button>
 
-			{ /* Overlay arrow that appears on hover */ }
-			<motion.div
-				className="boot-canvas-back-button__icon"
-				variants={ toggleHomeIconVariants }
-			>
-				<WCIcon icon={ arrowUpLeft } />
-			</motion.div>
+			{ hasAdminBarInEditor ? (
+				<div className="boot-canvas-back-button__icon">
+					<WCIcon icon={ arrowIcon } />
+				</div>
+			) : (
+				/* Overlay arrow that appears on hover */
+				<motion.div
+					className="boot-canvas-back-button__icon"
+					variants={ toggleHomeIconVariants }
+				>
+					<WCIcon icon={ arrowIcon } />
+				</motion.div>
+			) }
 		</motion.div>
 	);
 }

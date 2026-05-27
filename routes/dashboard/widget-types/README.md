@@ -4,7 +4,7 @@ Public surface for widget type discovery in the dashboard route.
 
 ## What this module exposes
 
-`useWidgetTypes()` returns the `WidgetType[]` available on the current page.
+`useWidgetTypes()` returns `[ widgetTypes, isResolvingWidgetTypes ]`: the `WidgetType[]` available on the current page, plus a flag that is true while those types are still resolving.
 
 `WidgetType`, `WidgetTypeMetadata`, `WidgetName` TypeScript types.
 

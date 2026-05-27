@@ -168,7 +168,7 @@ function gutenberg_get_all_image_sizes(): array {
  * @param WP_REST_Response $response Response data.
  */
 function gutenberg_media_processing_filter_rest_index( WP_REST_Response $response ) {
-	/** This filter is documented in wp-admin/includes/images.php */
+	/** This filter is documented in wp-admin/includes/image.php */
 	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 	if ( current_user_can( 'upload_files' ) ) {

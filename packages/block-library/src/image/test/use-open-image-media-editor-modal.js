@@ -317,6 +317,66 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		} );
 	} );
 
+	it( 'updates back to the previous attachment from the original modal callback', async () => {
+		const originalAttachment = {
+			id: 1,
+			alt_text: '',
+			caption: { raw: '' },
+		};
+		const croppedAttachment = {
+			id: 2,
+			alt_text: '',
+			caption: { raw: '' },
+		};
+		const deferredAttachment = createDeferred();
+		const registry = createRegistry( {
+			getEntityRecord: ( kind, name, attachmentId ) =>
+				attachmentId === 1 ? originalAttachment : undefined,
+			resolveGetEntityRecord: ( kind, name, attachmentId ) =>
+				attachmentId === 2 ? deferredAttachment.promise : undefined,
+		} );
+		useRegistry.mockReturnValue( registry );
+		const setAttributes = jest.fn();
+		const openMediaEditorModal = jest.fn();
+		mockMediaEditorModalSetting( openMediaEditorModal );
+		const { result } = renderHook(
+			( { attributes } ) =>
+				useOpenImageMediaEditorModal( { attributes, setAttributes } ),
+			{
+				initialProps: {
+					attributes: {
+						id: 1,
+						url: 'original.jpg',
+						alt: '',
+						caption: '',
+					},
+				},
+			}
+		);
+
+		await act( async () => {
+			await result.current();
+		} );
+		const onUpdate = openMediaEditorModal.mock.calls[ 0 ][ 0 ].onUpdate;
+		let updatePromise;
+		await act( async () => {
+			updatePromise = onUpdate( { id: 2, url: 'cropped.jpg' } );
+		} );
+		await act( async () => {
+			await onUpdate( { id: 1, url: 'original.jpg' } );
+		} );
+		await act( async () => {
+			deferredAttachment.resolve( croppedAttachment );
+			await updatePromise;
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledTimes( 1 );
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			id: 1,
+			url: 'original.jpg',
+		} );
+	} );
+
 	it( 'resolves fresh metadata when the new attachment id has an incomplete cached record', async () => {
 		const originalAttachment = {
 			id: 1,

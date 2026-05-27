@@ -350,6 +350,7 @@ async function publishPackagesToNpm( {
 	gitWorkingDirectoryPath,
 	interactive,
 	minimumVersionBump,
+	npmReleaseBranch,
 	releaseType,
 } ) {
 	log( '>> Installing npm packages.' );
@@ -423,8 +424,12 @@ async function publishPackagesToNpm( {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
 		);
+		// --no-push keeps the version commit and package tags local until
+		// `lerna publish` succeeds, so a failed retry can re-version
+		// without hitting "tag '@wordpress/<pkg>@<version>' already exists"
+		// on origin.
 		await command(
-			`npx lerna version ${ minimumVersionBump } --no-private ${ yesFlag }`,
+			`npx lerna version ${ minimumVersionBump } --no-private --no-push ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -452,6 +457,35 @@ async function publishPackagesToNpm( {
 					stdio: 'inherit',
 				}
 			);
+		}
+
+		// Retry the push so a transient network/auth blip between a successful
+		// publish and a failed push doesn't leave npm-published versions
+		// without their tags on origin. The push is idempotent: tags already
+		// present on origin (same SHA) are a no-op.
+		log( '>> Pushing version commit and tags to remote.' );
+		const maxPushAttempts = 3;
+		for ( let attempt = 1; ; attempt++ ) {
+			try {
+				await SimpleGit( gitWorkingDirectoryPath ).push(
+					'origin',
+					npmReleaseBranch,
+					[ '--follow-tags' ]
+				);
+				break;
+			} catch ( err ) {
+				if ( attempt >= maxPushAttempts ) {
+					throw err;
+				}
+				log(
+					`>> Push failed (attempt ${ attempt }/${ maxPushAttempts }): ${
+						err.message
+					}, retrying in ${ attempt * 5 }s…`
+				);
+				await new Promise( ( resolve ) =>
+					setTimeout( resolve, attempt * 5000 )
+				);
+			}
 		}
 	}
 
