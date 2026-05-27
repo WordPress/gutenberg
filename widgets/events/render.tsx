@@ -14,7 +14,12 @@ import { Link, Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { EventsList, LocationPicker, type WPEvent } from './components';
+import {
+	EventsList,
+	LocationPicker,
+	type EventsWidgetAttributes,
+	type WPEvent,
+} from './components';
 import renderStyles from './render.module.css';
 import styles from './style.module.css';
 
@@ -73,7 +78,13 @@ function EventsListSection( {
 	);
 }
 
-export default function WordPressEvents() {
+export default function WordPressEvents( {
+	attributes = {},
+	setAttributes,
+}: {
+	attributes?: EventsWidgetAttributes;
+	setAttributes?: ( next: Partial< EventsWidgetAttributes > ) => void;
+} ) {
 	const userLocale = useSelect(
 		( select ) =>
 			( ( select( coreStore ) as any ).getCurrentUser()
@@ -81,9 +92,18 @@ export default function WordPressEvents() {
 		[]
 	);
 
-	const [ activeLocation, setActiveLocation ] = useState( '' );
+	const persistedLocation =
+		typeof attributes.location === 'string'
+			? attributes.location.trim()
+			: '';
+
+	const [ activeLocation, setActiveLocation ] = useState( persistedLocation );
 	const [ locationLabel, setLocationLabel ] = useState( '' );
 	const [ isEditingLocation, setIsEditingLocation ] = useState( false );
+
+	useEffect( () => {
+		setActiveLocation( persistedLocation );
+	}, [ persistedLocation ] );
 	const [ events, setEvents ] = useState< WPEvent[] >( [] );
 	const [ eventsLoading, setEventsLoading ] = useState( false );
 	const [ eventsError, setEventsError ] = useState( false );
@@ -126,16 +146,21 @@ export default function WordPressEvents() {
 
 	return (
 		<>
-			<LocationPicker
-				hidden={ Boolean( locationLabel ) && ! isEditingLocation }
-				onSubmit={ ( location ) => {
-					setActiveLocation( location );
-					setIsEditingLocation( false );
-				} }
-				showCancel={ isEditingLocation }
-				onCancel={ () => setIsEditingLocation( false ) }
-				seedInput={ activeLocation }
-			/>
+			<div className={ renderStyles.locationPickerInWidget }>
+				<LocationPicker
+					hidden={ Boolean( locationLabel ) && ! isEditingLocation }
+					onSubmit={ ( location ) => {
+						const next = location.trim();
+						setActiveLocation( next );
+						setIsEditingLocation( false );
+						setAttributes?.( { location: next } );
+					} }
+					showCancel={ isEditingLocation }
+					onCancel={ () => setIsEditingLocation( false ) }
+					seedInput={ activeLocation }
+					hideLabelFromVision
+				/>
+			</div>
 			{ locationLabel && ! isEditingLocation && (
 				<div className={ renderStyles.locationSummary }>
 					{ createInterpolateElement(

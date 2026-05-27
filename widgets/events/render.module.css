@@ -1,3 +1,12 @@
+/*
+ * Constrains the inline tile picker; settings sidebar uses full-width picker.
+ */
+.locationPickerInWidget {
+	margin-block-end: var(--wpds-dimension-padding-md);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	max-width: calc(var(--wpds-dimension-base) * 100);
+}
+
 .locationSummary {
 	padding-block-end: var(--wpds-dimension-padding-md);
 	padding-inline: var(--wpds-dimension-padding-2xl);
