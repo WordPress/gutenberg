@@ -8,8 +8,9 @@
 	},
 	"references": [
 		{ "path": "../api-fetch" },
-		{ "path": "../compose" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
+		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../deprecated" },
 		{ "path": "../element" },

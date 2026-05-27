@@ -2,20 +2,23 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { __ } from '@wordpress/i18n';
-import { Badge } from '@wordpress/ui';
+import { select } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { Badge, Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { useConnectorPlugin } from './use-connector-plugin';
 import {
 	OpenAILogo,
@@ -25,33 +28,47 @@ import {
 	DefaultConnectorLogo,
 } from './logos';
 
+const { store: connectorsStore } = unlock( connectorsPrivateApis );
+
 interface ConnectorData {
 	name: string;
 	description: string;
 	logoUrl?: string;
 	type: string;
 	plugin?: {
-		slug: string;
-		pluginFile?: string | null;
+		file: string;
+		isInstalled: boolean;
 		isActivated: boolean;
 	};
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
+}
+
+interface ConnectorScriptModuleData {
+	connectors?: Record< string, ConnectorData >;
+	isFileModDisabled?: boolean;
+}
+
+function getConnectorScriptModuleData(): ConnectorScriptModuleData {
+	try {
+		return JSON.parse(
+			document.getElementById(
+				'wp-script-module-data-options-connectors-wp-admin'
+			)?.textContent ?? '{}'
+		);
+	} catch {
+		return {};
+	}
 }
 
 /**
  * Reads connector data passed from PHP via the script module data mechanism.
  */
 export function getConnectorData(): Record< string, ConnectorData > {
-	try {
-		const parsed = JSON.parse(
-			document.getElementById(
-				'wp-script-module-data-options-connectors-wp-admin'
-			)?.textContent ?? ''
-		);
-		return parsed?.connectors ?? {};
-	} catch {
-		return {};
-	}
+	return getConnectorScriptModuleData().connectors ?? {};
+}
+
+export function getIsFileModDisabled(): boolean {
+	return !! getConnectorScriptModuleData().isFileModDisabled;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
@@ -91,6 +108,19 @@ const ConnectedBadge = () => (
 	</span>
 );
 
+const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
+	<Link
+		href={ sprintf(
+			/* translators: %s: plugin slug. */
+			__( 'https://wordpress.org/plugins/%s/' ),
+			slug
+		) }
+		openInNewTab
+	>
+		{ __( 'Learn more' ) }
+	</Link>
+);
+
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
 function ApiKeyConnector( {
@@ -104,7 +134,10 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginSlug = plugin?.slug;
+	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
+	const pluginSlug = pluginFile?.includes( '/' )
+		? pluginFile.split( '/' )[ 0 ]
+		: pluginFile;
 
 	let helpLabel: string | undefined;
 	try {
@@ -130,10 +163,10 @@ function ApiKeyConnector( {
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
-		pluginSlug,
-		pluginFile: plugin?.pluginFile,
+		file: plugin?.file,
 		settingName,
 		connectorName: name,
+		isInstalled: plugin?.isInstalled,
 		isActivated: plugin?.isActivated,
 		keySource: auth?.keySource,
 		initialIsConnected: auth?.isConnected,
@@ -146,22 +179,6 @@ function ApiKeyConnector( {
 	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
-	const pendingFocusRef = useRef( false );
-
-	// Restore focus to the action button after async actions complete.
-	useEffect( () => {
-		if ( pendingFocusRef.current && ! isBusy ) {
-			pendingFocusRef.current = false;
-			actionButtonRef.current?.focus();
-		}
-	}, [ isBusy, isExpanded, isConnected ] );
-
-	const handleActionClick = () => {
-		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
-			pendingFocusRef.current = true;
-		}
-		handleButtonClick();
-	};
 
 	return (
 		<ConnectorItem
@@ -174,7 +191,12 @@ function ApiKeyConnector( {
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
 					{ isConnected && <ConnectedBadge /> }
-					{ showUnavailableBadge && <UnavailableActionBadge /> }
+					{ showUnavailableBadge &&
+						( pluginSlug ? (
+							<PluginDirectoryLink slug={ pluginSlug } />
+						) : (
+							<UnavailableActionBadge />
+						) ) }
 					{ showActionButton && (
 						<Button
 							ref={ actionButtonRef }
@@ -184,9 +206,10 @@ function ApiKeyConnector( {
 									: 'secondary'
 							}
 							size="compact"
-							onClick={ handleActionClick }
+							onClick={ handleButtonClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
+							accessibleWhenDisabled
 						>
 							{ getButtonLabel() }
 						</Button>
@@ -210,18 +233,14 @@ function ApiKeyConnector( {
 						isExternallyConfigured
 							? undefined
 							: async () => {
-									pendingFocusRef.current = true;
-									try {
-										await removeApiKey();
-									} catch {
-										pendingFocusRef.current = false;
-									}
+									await removeApiKey();
+									actionButtonRef.current?.focus();
 							  }
 					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
-						pendingFocusRef.current = true;
 						setIsExpanded( false );
+						actionButtonRef.current?.focus();
 					} }
 				/>
 			) }
@@ -236,6 +255,12 @@ export function registerDefaultConnectors() {
 	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
+		// Special case: Hide Akismet unless it is already installed.
+		// See https://core.trac.wordpress.org/ticket/65012
+		if ( connectorId === 'akismet' && ! data.plugin?.isInstalled ) {
+			continue;
+		}
+
 		const { authentication } = data;
 
 		const connectorName = sanitize( connectorId );
@@ -247,7 +272,14 @@ export function registerDefaultConnectors() {
 			authentication,
 			plugin: data.plugin,
 		};
-		if ( authentication.method === 'api_key' ) {
+
+		// Preserve a render that was already registered for this slug by
+		// another caller. Omitting `render` from `args` leaves the existing
+		// render in place while the server-side metadata still merges on top.
+		const existing = unlock( select( connectorsStore ) ).getConnector(
+			connectorName
+		);
+		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
 		}
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import {
 	useEffect,
 	useState,
@@ -13,10 +6,6 @@ import {
 	useId,
 	createPortal,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ThemeProvider } from '../theme-provider';
 
 const meta: Meta< typeof ThemeProvider > = {

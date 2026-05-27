@@ -10,15 +10,20 @@ export const FieldsetLegend = forwardRef< HTMLDivElement, FieldsetLegendProps >(
 		{ className, hideFromVision, ...restProps },
 		ref
 	) {
-		return (
+		const legend = (
 			<_Fieldset.Legend
 				ref={ ref }
 				className={ clsx( fieldStyles.label, className ) }
-				{ ...( hideFromVision && {
-					render: <VisuallyHidden />,
-				} ) }
 				{ ...restProps }
 			/>
 		);
+
+		// VisuallyHidden is the host so that _Fieldset.Legend's semantic
+		// element is preserved. See VisuallyHidden docs for details.
+		if ( hideFromVision ) {
+			return <VisuallyHidden render={ legend } />;
+		}
+
+		return legend;
 	}
 );

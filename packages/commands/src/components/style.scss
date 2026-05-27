@@ -80,7 +80,7 @@ $palette-header-height: 48px;
 	}
 
 	[cmdk-item] {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		display: flex;
 		align-items: center;
 		padding: $grid-unit-05 0;

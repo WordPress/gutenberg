@@ -9,8 +9,6 @@ import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
 
-import './styles/collaborators-list.scss';
-
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];
 	popoverAnchor?: HTMLElement | null;

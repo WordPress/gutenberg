@@ -146,7 +146,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 									'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
 							} }
 						>
-							{ /* eslint-disable jsx-a11y/heading-has-content */ }
 							<Text
 								variant="heading-sm"
 								render={ <h2 /> }
@@ -157,7 +156,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							>
 								My App
 							</Text>
-							{ /* eslint-enable jsx-a11y/heading-has-content */ }
 							<nav>
 								<Stack
 									direction="column"
@@ -221,7 +219,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 											gap: 'var(--wpds-dimension-gap-md)',
 										} }
 									>
-										{ /* eslint-disable jsx-a11y/heading-has-content */ }
 										<Text
 											variant="heading-lg"
 											render={ <h1 /> }
@@ -231,7 +228,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 										>
 											Settings
 										</Text>
-										{ /* eslint-enable jsx-a11y/heading-has-content */ }
 										<Badge intent="informational">
 											Beta
 										</Badge>

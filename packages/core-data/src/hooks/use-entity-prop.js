@@ -64,7 +64,7 @@ export default function useEntityProp( kind, name, prop, _id ) {
 				);
 				return revision
 					? {
-							value: revision[ prop ],
+							value: revision[ prop ]?.raw ?? revision[ prop ],
 							fullValue: revision[ prop ],
 					  }
 					: {};

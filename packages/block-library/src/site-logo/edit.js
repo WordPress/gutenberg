@@ -51,7 +51,9 @@ import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { mediaEditKey } = unlock( blockEditorPrivateApis );
+const { mediaEditKey, openMediaEditorModalKey } = unlock(
+	blockEditorPrivateApis
+);
 
 const SiteLogo = ( {
 	alt,
@@ -78,22 +80,26 @@ const SiteLogo = ( {
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
-	const { imageEditing, maxWidth, title, editMediaEntity } = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			const siteEntities = select( coreStore ).getEntityRecord(
-				'root',
-				'__unstableBase'
-			);
-			return {
-				title: siteEntities?.name,
-				imageEditing: settings.imageEditing,
-				maxWidth: settings.maxWidth,
-				editMediaEntity: settings?.[ mediaEditKey ],
-			};
-		},
-		[]
-	);
+	const {
+		imageEditing,
+		maxWidth,
+		title,
+		editMediaEntity,
+		openMediaEditorModal,
+	} = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		const siteEntities = select( coreStore ).getEntityRecord(
+			'root',
+			'__unstableBase'
+		);
+		return {
+			title: siteEntities?.name,
+			imageEditing: settings.imageEditing,
+			maxWidth: settings.maxWidth,
+			editMediaEntity: settings?.[ mediaEditKey ],
+			openMediaEditorModal: settings?.[ openMediaEditorModalKey ],
+		};
+	}, [] );
 
 	useEffect( () => {
 		// Turn the `Use as site icon` toggle off if it is on but the logo and icon have
@@ -109,6 +115,13 @@ const SiteLogo = ( {
 			setIsEditingImage( false );
 		}
 	}, [ isSelected ] );
+
+	// Always apply modal updates as snackbar Undo may restore the original id.
+	const handleMediaUpdate = ( { id: newId } ) => {
+		if ( typeof newId === 'number' ) {
+			setLogo( newId );
+		}
+	};
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -282,11 +295,11 @@ const SiteLogo = ( {
 		),
 		{
 			a: (
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
 				<a
 					href={ siteIconSettingsUrl }
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener"
 				/>
 			),
 		}
@@ -388,7 +401,20 @@ const SiteLogo = ( {
 				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							onClick={
+								openMediaEditorModal && logoId
+									? () =>
+											openMediaEditorModal( {
+												id: logoId,
+												onUpdate: handleMediaUpdate,
+											} )
+									: () => setIsEditingImage( true )
+							}
+							aria-haspopup={
+								openMediaEditorModal && logoId
+									? 'dialog'
+									: undefined
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>

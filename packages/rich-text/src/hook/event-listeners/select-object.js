@@ -1,3 +1,15 @@
+/**
+ * WordPress dependencies
+ */
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
+
 export default () => ( element ) => {
 	function onClick( event ) {
 		const { target } = event;
@@ -45,10 +57,18 @@ export default () => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'click', onClick );
-	element.addEventListener( 'focusin', onFocusIn );
+	const unsubscribeClick = subscribeDelegatedListener(
+		element,
+		'click',
+		onClick
+	);
+	const unsubscribeFocusIn = subscribeDelegatedListener(
+		element,
+		'focusin',
+		onFocusIn
+	);
 	return () => {
-		element.removeEventListener( 'click', onClick );
-		element.removeEventListener( 'focusin', onFocusIn );
+		unsubscribeClick();
+		unsubscribeFocusIn();
 	};
 };

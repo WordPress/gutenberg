@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalVStack as VStack,
-	ExternalLink,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -40,18 +35,6 @@ import PostTrash from '../post-trash';
  * Module Constants
  */
 const PANEL_NAME = 'post-status';
-
-export function OpenRevisionsClassicScreen( { revisionId } ) {
-	return (
-		<ExternalLink
-			href={ addQueryArgs( 'revision.php', {
-				revision: revisionId,
-			} ) }
-		>
-			{ __( 'Open classic revisions screen' ) }
-		</ExternalLink>
-	);
-}
 
 export default function PostSummary( { onActionPerformed } ) {
 	const postType = useSelect(

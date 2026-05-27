@@ -1,9 +1,17 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * All inserting input types that would insert HTML into the DOM.
@@ -213,7 +221,23 @@ export default ( props ) => ( element ) => {
 		);
 	}
 
-	function onFocus() {
+	function onFocus( event ) {
+		// `focusin` bubbles from focusable descendants too — only act
+		// when focus lands on the editable itself.
+		if ( event.target !== element ) {
+			return;
+		}
+
+		// `contentEditable` can be false even on a tabindex'd element
+		// (e.g. a paragraph with a locked block binding). When that's the
+		// case the rich text isn't actually being edited and shouldn't
+		// claim selection — block-editor's `use-focus-handler.js` will
+		// dispatch `selectionChange(clientId)` to keep `attributeKey`
+		// unset for the wrapper-level focus.
+		if ( element.contentEditable !== 'true' ) {
+			return;
+		}
+
 		const { record, isSelected, onSelectionChange, applyRecord } =
 			props.current;
 
@@ -252,15 +276,37 @@ export default ( props ) => ( element ) => {
 		);
 	}
 
-	element.addEventListener( 'input', onInput );
-	element.addEventListener( 'compositionstart', onCompositionStart );
-	element.addEventListener( 'compositionend', onCompositionEnd );
-	element.addEventListener( 'focus', onFocus );
+	// `input` and `compositionend` must run before block-editor's
+	// `input-rules.js` element-level listeners, which call `getValue()`
+	// reading `record.current` updated by our `onInput`. Use capture phase
+	// so we fire before any ancestor bubble handlers.
+	const unsubscribeInput = subscribeDelegatedListener(
+		element,
+		'input',
+		onInput,
+		true
+	);
+	const unsubscribeCompositionStart = subscribeDelegatedListener(
+		element,
+		'compositionstart',
+		onCompositionStart
+	);
+	const unsubscribeCompositionEnd = subscribeDelegatedListener(
+		element,
+		'compositionend',
+		onCompositionEnd,
+		true
+	);
+	const unsubscribeFocus = subscribeDelegatedListener(
+		element,
+		'focusin',
+		onFocus
+	);
 
 	return () => {
-		element.removeEventListener( 'input', onInput );
-		element.removeEventListener( 'compositionstart', onCompositionStart );
-		element.removeEventListener( 'compositionend', onCompositionEnd );
-		element.removeEventListener( 'focus', onFocus );
+		unsubscribeInput();
+		unsubscribeCompositionStart();
+		unsubscribeCompositionEnd();
+		unsubscribeFocus();
 	};
 };

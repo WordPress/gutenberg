@@ -136,6 +136,7 @@ export default function PageTemplates() {
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
+			headingLevel={ 2 }
 			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
@@ -153,7 +154,7 @@ export default function PageTemplates() {
 					history.navigate( `/wp_template/${ id }?canvas=edit` );
 				} }
 				selection={ selection }
-				defaultLayouts={ defaultLayouts ?? {} }
+				defaultLayouts={ defaultLayouts }
 				onReset={
 					isModified
 						? () => {

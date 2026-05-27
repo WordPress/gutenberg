@@ -54,6 +54,16 @@ async function createAndSelectBlock() {
 	await selectBlock( 'Block: Cover' );
 }
 
+async function openStylesTabIfAvailable() {
+	const stylesTab = screen.queryByRole( 'tab', {
+		name: 'Styles',
+	} );
+
+	if ( stylesTab ) {
+		await userEvent.click( stylesTab );
+	}
+}
+
 describe( 'Cover block', () => {
 	describe( 'Editor canvas', () => {
 		test( 'shows placeholder if background image and color not set', async () => {
@@ -189,6 +199,21 @@ describe( 'Cover block', () => {
 					} )
 				).not.toBeInTheDocument();
 			} );
+			test( 'does not display settings tab when media settings are empty', async () => {
+				await setup();
+				await createAndSelectBlock();
+
+				expect(
+					screen.queryByRole( 'tab', {
+						name: 'Settings',
+					} )
+				).not.toBeInTheDocument();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Advanced',
+					} )
+				).toBeInTheDocument();
+			} );
 			test( 'displays media settings panel if url is set', async () => {
 				await setup( {
 					url: 'http://localhost/my-image.jpg',
@@ -275,11 +300,7 @@ describe( 'Cover block', () => {
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
 
-				await userEvent.click(
-					screen.getByRole( 'tab', {
-						name: 'Styles',
-					} )
-				);
+				await openStylesTabIfAvailable();
 				// Need act here as the isDark method is async.
 				// eslint-disable-next-line testing-library/no-unnecessary-act
 				await act( async () => {
@@ -308,11 +329,7 @@ describe( 'Cover block', () => {
 
 				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
 
-				await userEvent.click(
-					screen.getByRole( 'tab', {
-						name: 'Styles',
-					} )
-				);
+				await openStylesTabIfAvailable();
 
 				// Need act here as the isDark method is async.
 				// eslint-disable-next-line testing-library/no-unnecessary-act
@@ -332,9 +349,7 @@ describe( 'Cover block', () => {
 				test( 'does not render overlay control', async () => {
 					await setup( undefined, true, disabledColorSettings );
 					await selectBlock( 'Block: Cover' );
-					await userEvent.click(
-						screen.getByRole( 'tab', { name: 'Styles' } )
-					);
+					await openStylesTabIfAvailable();
 
 					const overlayControl = screen.queryByRole( 'button', {
 						name: 'Overlay',
@@ -345,9 +360,7 @@ describe( 'Cover block', () => {
 				test( 'does not render opacity control', async () => {
 					await setup( undefined, true, disabledColorSettings );
 					await selectBlock( 'Block: Cover' );
-					await userEvent.click(
-						screen.getByRole( 'tab', { name: 'Styles' } )
-					);
+					await openStylesTabIfAvailable();
 
 					const opacityControl = screen.queryByRole( 'slider', {
 						name: 'Overlay opacity',
@@ -362,11 +375,7 @@ describe( 'Cover block', () => {
 			test( 'sets minHeight attribute when number control value changed', async () => {
 				await setup();
 				await createAndSelectBlock();
-				await userEvent.click(
-					screen.getByRole( 'tab', {
-						name: 'Styles',
-					} )
-				);
+				await openStylesTabIfAvailable();
 				await userEvent.clear(
 					screen.getByLabelText( 'Minimum height' )
 				);
@@ -395,11 +404,7 @@ describe( 'Cover block', () => {
 			expect( coverBlock ).toHaveClass( 'is-light' );
 
 			await selectBlock( 'Block: Cover' );
-			await userEvent.click(
-				screen.getByRole( 'tab', {
-					name: 'Styles',
-				} )
-			);
+			await openStylesTabIfAvailable();
 			await userEvent.click( screen.getByText( 'Overlay' ) );
 			const popupColorPicker = screen.getByRole( 'option', {
 				name: 'Black',
@@ -416,11 +421,7 @@ describe( 'Cover block', () => {
 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
 			expect( coverBlock ).toHaveClass( 'is-light' );
 			await selectBlock( 'Block: Cover' );
-			await userEvent.click(
-				screen.getByRole( 'tab', {
-					name: 'Styles',
-				} )
-			);
+			await openStylesTabIfAvailable();
 			await userEvent.click( screen.getByText( 'Overlay' ) );
 			// The default color is black, so clicking the black color button will remove the background color,
 			// which should remove the isDark setting and assign the is-light class.

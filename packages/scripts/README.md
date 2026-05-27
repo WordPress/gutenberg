@@ -244,7 +244,13 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [ESLint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. It detects flat config files (`eslint.config.*`) first, falling back to legacy `.eslintrc.*` files if present. You can override default rules with your own as described in the [ESLint configuration docs](https://eslint.org/docs/latest/use/configure/). Learn more in the [Advanced Usage](#advanced-usage) section.
+
+**Breaking changes in ESLint v10:**
+
+-   The default config path has changed from `config/.eslintrc.js` to `config/eslint.config.cjs`. If you were extending the default config, update your import path.
+-   The `--ignore-path` CLI flag was removed along with the eslintrc system. Use `ignores` arrays in your flat config instead.
+-   Legacy `.eslintrc.*` fallback detection is deprecated and will be removed in a future version. Migrate to `eslint.config.*` files.
 
 ### `lint-pkg-json`
 

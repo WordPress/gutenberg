@@ -1,6 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
-
 .dataforms-layouts-card__field {
 	width: 100%;
 }
@@ -14,15 +11,15 @@
 }
 
 .dataforms-layouts-card__field-description {
-	color: $gray-700;
+	color: var(--wpds-color-fg-content-neutral-weak);
 	display: block;
-	font-size: $font-size-medium;
-	margin-bottom: $grid-unit-20;
+	font-size: var(--wpds-typography-font-size-md);
+	margin-bottom: var(--wpds-dimension-gap-lg);
 }
 
 .dataforms-layouts-card__field-summary {
 	display: flex;
 	flex-direction: row;
-	gap: $grid-unit-20;
+	gap: var(--wpds-dimension-gap-lg);
 	align-items: center;
 }

@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import type { View, SupportedLayouts } from '@wordpress/dataviews';
+import type { View, SupportedLayouts, Form } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -29,6 +29,7 @@ export function useViewConfig( {
 	default_view: View;
 	default_layouts: SupportedLayouts;
 	view_list: Array< any >;
+	form: Form | undefined;
 } {
 	return useSelect(
 		( select ) => {

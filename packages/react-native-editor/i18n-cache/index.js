@@ -76,7 +76,7 @@ const fetchTranslation = ( locale ) => {
 				locale,
 				inCache: true,
 			} );
-		} catch ( error ) {
+		} catch {
 			// translation not found, let's fetch it
 		}
 	}

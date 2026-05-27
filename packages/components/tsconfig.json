@@ -5,8 +5,8 @@
 		"types": [
 			"gutenberg-env",
 			"gutenberg-test-env",
-			"css-modules",
-			"jest"
+			"jest",
+			"style-imports"
 		]
 	},
 	"references": [
@@ -27,6 +27,8 @@
 		{ "path": "../private-apis" },
 		{ "path": "../react-i18n" },
 		{ "path": "../rich-text" },
+		{ "path": "../style-runtime" },
+		{ "path": "../ui" },
 		{ "path": "../warning" }
 	],
 	"files": [ "global.d.ts", "storybook.d.ts" ],

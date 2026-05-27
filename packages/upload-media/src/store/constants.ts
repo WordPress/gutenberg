@@ -28,3 +28,15 @@ export const CLIENT_SIDE_SUPPORTED_MIME_TYPES: readonly string[] = [
 	'image/webp',
 	'image/avif',
 ] as const;
+
+/**
+ * HEIC/HEIF MIME types.
+ *
+ * These formats use the HEVC codec which has patent/licensing restrictions.
+ * Instead of shipping our own decoder, the client falls back to the browser's
+ * native createImageBitmap() which leverages OS/browser-licensed HEVC codecs.
+ */
+export const HEIC_MIME_TYPES: readonly string[] = [
+	'image/heic',
+	'image/heif',
+] as const;

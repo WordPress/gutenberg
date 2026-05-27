@@ -67,7 +67,7 @@ const getOffsetPositionInBlock = (
 
 	try {
 		cursorRange.setStart( node, offset );
-	} catch ( error ) {
+	} catch {
 		return null;
 	}
 

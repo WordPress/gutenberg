@@ -30,7 +30,11 @@ export function addFallbackToVar( cssValue, { escapeQuotes = false } = {} ) {
 		( match, tokenName ) => {
 			let fallback = tokenFallbacks[ tokenName ];
 			if ( fallback === undefined ) {
-				return match;
+				throw new Error(
+					`Unknown design token: ${ tokenName }. ` +
+						'This token is not in the design system. ' +
+						'If this token was recently renamed, update all references to use the new name.'
+				);
 			}
 			if ( escapeQuotes ) {
 				fallback = fallback
