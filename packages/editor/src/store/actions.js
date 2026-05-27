@@ -965,20 +965,8 @@ export const toggleDistractionFree =
 								{
 									label: __( 'Undo' ),
 									onClick: () => {
-										registry.batch( () => {
-											registry
-												.dispatch( preferencesStore )
-												.set(
-													'core',
-													'fixedToolbar',
-													isDistractionFree
-												);
-											registry
-												.dispatch( preferencesStore )
-												.toggle(
-													'core',
-													'distractionFree'
-												);
+										dispatch.toggleDistractionFree( {
+											createNotice: false,
 										} );
 									},
 								},
