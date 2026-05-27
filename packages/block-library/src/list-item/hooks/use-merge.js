@@ -101,21 +101,14 @@ export default function useMerge( clientId, onMerge ) {
 			}
 
 			if ( ! nextBlockClientId ) {
-				// Walk past the outermost list. The fallback `onMerge` only walks one level up.
 				const outermostListId = getBlockRootClientId( listItemId );
 				const followingBlockId =
 					getNextBlockClientId( outermostListId );
 
 				if ( followingBlockId ) {
 					mergeBlocks( outermostListId, followingBlockId );
-					return;
 				}
-
-				onMerge( forward );
-				return;
-			}
-
-			if ( getParentListItemId( nextBlockClientId ) ) {
+			} else if ( getParentListItemId( nextBlockClientId ) ) {
 				outdentListItem( nextBlockClientId );
 			} else {
 				mergeWithNested( clientId, nextBlockClientId );
