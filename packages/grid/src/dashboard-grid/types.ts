@@ -75,13 +75,20 @@ export type GridItemProps = {
 
 	/**
 	 * Whether any tile in the grid is currently being dragged or
-	 * resized. When true, the item mutes its `actionableArea` with
-	 * `inert` so pointer hovers over buttons in other tiles do not
-	 * steal the in-progress gesture.
+	 * resized. Drives the drag activator cursor.
 	 *
 	 * @default false
 	 */
 	interacting?: boolean;
+
+	/**
+	 * Whether a tile drag is in progress. Mutes each tile's
+	 * `actionableArea` with `inert` so hovers on other tiles' controls
+	 * do not steal the gesture.
+	 *
+	 * @default false
+	 */
+	dragging?: boolean;
 
 	/**
 	 * The content to be displayed within the grid item.
@@ -91,8 +98,9 @@ export type GridItemProps = {
 	/**
 	 * Content rendered above the draggable area that stays interactive
 	 * in edit mode, typically action buttons, menus, or links. While
-	 * any tile in the grid is being dragged or resized, this content
-	 * is set `inert` so hovers on other tiles can't steal the gesture.
+	 * a tile drag is in progress, this content is set `inert` so hovers
+	 * on other tiles can't steal the gesture. During resize, visibility
+	 * is controlled by grid-level CSS hooks.
 	 */
 	actionableArea?: React.ReactNode;
 

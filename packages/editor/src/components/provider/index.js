@@ -7,7 +7,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	EntityProvider,
@@ -28,7 +28,6 @@ import { createBlock } from '@wordpress/blocks';
  */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -312,6 +311,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
+		const registry = useRegistry();
 
 		const onChangeSelection = useCallback(
 			( newSelection ) => {
@@ -336,7 +336,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			}
 
 			updatePostLock( settings.postLock );
-			setupEditor( post, initialEdits, settings.template );
+			// `setupEditor` may already have been dispatched by the
+			// editor's pre-mount kickoff (see edit-post's
+			// `initializeEditor`). Skip the redundant dispatch — it
+			// would otherwise re-parse + reset blocks for new posts.
+			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
+				setupEditor( post, initialEdits, settings.template );
+			}
 			if ( settings.autosave ) {
 				createWarningNotice(
 					__(
@@ -405,31 +411,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return null;
 		}
 
-		const isAttachment =
-			post.type === ATTACHMENT_POST_TYPE &&
-			window?.__experimentalMediaEditor;
-
-		// Early return for attachments - no block editor needed
-		if ( isAttachment ) {
-			return (
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						{ children }
-						{ ! settings.isPreviewMode && (
-							<>
-								<EditorKeyboardShortcuts />
-								<KeyboardShortcutHelpModal />
-							</>
-						) }
-					</EntityProvider>
-				</EntityProvider>
-			);
-		}
-
 		return (
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -470,9 +451,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
-									{ window?.__experimentalMediaEditorModal && (
-										<MediaEditorModalMount />
-									) }
+									<MediaEditorModalMount />
 								</>
 							) }
 						</BlockEditorProviderComponent>

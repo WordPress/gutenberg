@@ -90,7 +90,6 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						<WCIcon icon={ widgetType.icon } />
 					</span>
 				) }
-
 				<Card.Title id={ titleId } render={ <h3 /> }>
 					{ widgetType.title }
 				</Card.Title>
@@ -137,8 +136,15 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 			return null;
 		}
 
-		const isFullBleed = widgetType.presentation === 'full-bleed';
+		// `presentation` encodes two independent axes. `full-bleed` hides
+		// the header; both `full-bleed` and `content-bleed` let the body
+		// break out of the content padding.
+		const { presentation } = widgetType;
+		const isHeaderHidden = presentation === 'full-bleed';
+		const isBodyBleeding =
+			presentation === 'full-bleed' || presentation === 'content-bleed';
 		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
+
 		const body = (
 			<WidgetErrorBoundary>
 				<Suspense fallback={ <LoadingOverlay /> }>
@@ -154,19 +160,23 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					ref={ ref }
 					className={ clsx( styles.widgetChrome, className ) }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
-					{ ...( editMode ? { inert: '' } : {} ) }
+					inert={ editMode || undefined }
 				>
-					{ isFullBleed ? (
+					{ isHeaderHidden ? (
 						<VisuallyHidden>{ header }</VisuallyHidden>
 					) : (
 						header
 					) }
-					<Card.Content className={ styles.widgetChromeContent }>
-						{ isFullBleed ? (
+
+					<Card.Content
+						className={ clsx(
+							styles.widgetChromeContent,
+							isBodyBleeding && styles.widgetChromeContentBleed
+						) }
+					>
+						{ isBodyBleeding ? (
 							<Card.FullBleed
-								className={
-									styles.widgetChromeContentFullBleed
-								}
+								className={ styles.widgetChromeBleedScroll }
 							>
 								{ body }
 							</Card.FullBleed>

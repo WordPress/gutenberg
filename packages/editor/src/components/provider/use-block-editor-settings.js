@@ -30,7 +30,7 @@ import { default as mediaFinalize } from '../../utils/media-finalize';
 import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useGlobalStylesContext } from '../global-styles-provider';
+import { useGlobalStyles } from '../global-styles';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
@@ -43,6 +43,10 @@ function __experimentalReusableBlocksSelect( select ) {
 		per_page: -1,
 		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 	} );
+}
+
+function __experimentalUserPatternCategoriesSelect( select ) {
+	return select( coreStore ).getUserPatternCategories();
 }
 
 const BLOCK_EDITOR_SETTINGS = [
@@ -103,11 +107,13 @@ const {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
+	onViewportStateChangeKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
@@ -141,7 +147,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userCanCreatePages,
 		pageOnFront,
 		pageForPosts,
-		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
@@ -153,7 +158,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				canUser,
 				getRawEntityRecord,
 				getEntityRecord,
-				getUserPatternCategories,
 				getBlockPatternCategories,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
@@ -216,7 +220,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
-				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
@@ -234,7 +237,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	const { merged: mergedGlobalStyles } = useGlobalStylesContext();
+	const { merged: mergedGlobalStyles } = useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 
@@ -272,6 +275,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	);
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
+	const { updateDeviceTypeForViewportState } = unlock(
+		useDispatch( editorStore )
+	);
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
@@ -345,10 +351,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: window?.__experimentalMediaEditorModal
-				? ( { id, onUpdate } ) =>
-						openMediaEditorModal( { id, onUpdate } )
-				: undefined,
+			[ openMediaEditorModalKey ]: ( { id, onUpdate } ) =>
+				openMediaEditorModal( { id, onUpdate } ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess
@@ -366,8 +370,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ userPatternCategoriesSelectKey ]:
+				__experimentalUserPatternCategoriesSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
-			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
@@ -411,6 +416,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			disableContentOnlyForTemplateParts:
 				renderingMode === 'template-locked',
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
+			[ onViewportStateChangeKey ]: updateDeviceTypeForViewportState,
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
@@ -430,7 +436,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		keepCaretInsideBlock,
 		settings,
 		hasUploadPermissions,
-		userPatternCategories,
 		blockPatterns,
 		blockPatternCategories,
 		canUseUnfilteredHTML,
@@ -447,7 +452,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		renderingMode,
 		editMediaEntity,
 		openMediaEditorModal,
-		settings.onNavigateToEntityRecord,
+		updateDeviceTypeForViewportState,
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,
