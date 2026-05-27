@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useCallback } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -20,43 +20,50 @@ export function AutosaveMonitor( {
 	autosave,
 	disableIntervalChecks,
 } ) {
-	const needsAutosave = useRef( !! ( isDirty && isAutosaveable ) );
-	const timerId = useRef( null );
+	const needsAutosaveRef = useRef( !! ( isDirty && isAutosaveable ) );
+	const timerIdRef = useRef( null );
 
-	const latestIsAutosaveable = useRef( isAutosaveable );
-	const latestInterval = useRef( interval );
-	const latestAutosave = useRef( autosave );
+	const latestIsAutosaveableRef = useRef( isAutosaveable );
+	const latestIntervalRef = useRef( interval );
+	const latestAutosaveRef = useRef( autosave );
 
-	// Update refs inside useEffect — not during render.
+	// Update latest value refs inside useEffect — not during render.
 	useEffect( () => {
-		latestIsAutosaveable.current = isAutosaveable;
-		latestInterval.current = interval;
-		latestAutosave.current = autosave;
+		latestIsAutosaveableRef.current = isAutosaveable;
+		latestIntervalRef.current = interval;
+		latestAutosaveRef.current = autosave;
 	}, [ isAutosaveable, interval, autosave ] );
 
-	const setAutosaveTimer = useCallback( ( timeout ) => {
-		const ms =
-			timeout !== undefined ? timeout : latestInterval.current * 1000;
-		timerId.current = setTimeout( () => {
-			if ( ! latestIsAutosaveable.current ) {
-				setAutosaveTimer( 1000 );
-				return;
-			}
-			if ( needsAutosave.current ) {
-				needsAutosave.current = false;
-				latestAutosave.current();
-			}
-			setAutosaveTimer();
-		}, ms );
-	}, [] );
+	// Hold setAutosaveTimer in a ref so the recursive call inside
+	// setTimeout doesn't trigger a "used before defined" lint error.
+	const setAutosaveTimerRef = useRef( null );
+	useEffect( () => {
+		setAutosaveTimerRef.current = ( timeout ) => {
+			const ms =
+				timeout !== undefined
+					? timeout
+					: latestIntervalRef.current * 1000;
+			timerIdRef.current = setTimeout( () => {
+				if ( ! latestIsAutosaveableRef.current ) {
+					setAutosaveTimerRef.current( 1000 );
+					return;
+				}
+				if ( needsAutosaveRef.current ) {
+					needsAutosaveRef.current = false;
+					latestAutosaveRef.current();
+				}
+				setAutosaveTimerRef.current();
+			}, ms );
+		};
+	} );
 
 	// componentDidMount: start timer.
 	// componentWillUnmount: clear timer.
 	useEffect( () => {
 		if ( ! disableIntervalChecks ) {
-			setAutosaveTimer();
+			setAutosaveTimerRef.current();
 		}
-		return () => clearTimeout( timerId.current );
+		return () => clearTimeout( timerIdRef.current );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
@@ -67,9 +74,9 @@ export function AutosaveMonitor( {
 			return;
 		}
 		prevIntervalRef.current = interval;
-		clearTimeout( timerId.current );
-		setAutosaveTimer();
-	}, [ interval, setAutosaveTimer ] );
+		clearTimeout( timerIdRef.current );
+		setAutosaveTimerRef.current();
+	}, [ interval ] );
 
 	// Track dirty state, autosaving, and edit changes.
 	const prevIsAutosavingRef = useRef( isAutosaving );
@@ -88,17 +95,17 @@ export function AutosaveMonitor( {
 		}
 
 		if ( ! isDirty ) {
-			needsAutosave.current = false;
+			needsAutosaveRef.current = false;
 			return;
 		}
 
 		if ( isAutosaving && ! prevIsAutosaving ) {
-			needsAutosave.current = false;
+			needsAutosaveRef.current = false;
 			return;
 		}
 
 		if ( editsReference !== prevEditsReference ) {
-			needsAutosave.current = true;
+			needsAutosaveRef.current = true;
 		}
 	}, [
 		isDirty,
