@@ -1,0 +1,16 @@
+[
+	{
+		"name": "core/paragraph",
+		"isValid": true,
+		"attributes": {
+			"content": "test",
+			"dropCap": false,
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

@@ -124,7 +124,67 @@ const migrateTextAlign = ( attributes ) => {
 
 const { style, ...restBlockAttributes } = blockAttributes;
 
+// Supports matching the current block type for use in the healing
+// deprecation entry below. textAlign support is included so that
+// getSaveContent produces the has-text-align-* class, allowing
+// validation to pass against blocks that have it in their HTML.
+const currentSupports = {
+	className: false,
+	typography: {
+		textAlign: true,
+	},
+};
+
 const deprecated = [
+	// Version with leaked color/background classes in className.
+	// Heals already-corrupted blocks produced by earlier migrations.
+	{
+		supports: currentSupports,
+		attributes: {
+			...restBlockAttributes,
+			className: {
+				type: 'string',
+			},
+		},
+		isEligible( attributes ) {
+			return !! attributes.className?.match(
+				/\b(?:has-text-color|has-background|has-[a-z0-9-]+-color|has-[a-z0-9-]+-background-color)\b/
+			);
+		},
+		save( { attributes } ) {
+			const { content, dropCap, direction } = attributes;
+			const textAlign = attributes.style?.typography?.textAlign;
+			const className = clsx( {
+				'has-drop-cap':
+					textAlign === ( isRTL() ? 'left' : 'right' ) ||
+					textAlign === 'center'
+						? false
+						: dropCap,
+			} );
+			return (
+				<p { ...useBlockProps.save( { className, dir: direction } ) }>
+					<RichText.Content value={ content } />
+				</p>
+			);
+		},
+		migrate( attributes ) {
+			const { className, ...restAttributes } = attributes;
+			const cleanedClassName =
+				className
+					?.split( ' ' )
+					.filter(
+						( cls ) =>
+							! cls.startsWith( 'has-text-align-' ) &&
+							! cls.endsWith( '-color' ) &&
+							! cls.endsWith( '-background-color' ) &&
+							cls !== 'has-text-color' &&
+							cls !== 'has-background' &&
+							! cls.startsWith( 'has-drop-cap' )
+					)
+					.join( ' ' ) || undefined;
+			return { ...restAttributes, className: cleanedClassName };
+		},
+	},
 	// Version with `align` attribute.
 	{
 		supports: {
