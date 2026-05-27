@@ -138,7 +138,7 @@ const fields: Field< WidgetGridSettings >[] = [
 		type: 'text',
 		Edit: 'toggleGroup',
 		label: __( 'Row height' ),
-		description: __( 'Height of each row in the standard grid.' ),
+		description: __( 'Height of each grid row.' ),
 		elements: [
 			{ value: 'small', label: __( 'Small' ) },
 			{ value: 'medium', label: __( 'Medium' ) },
