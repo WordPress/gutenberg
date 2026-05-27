@@ -8,10 +8,12 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
 import {
 	Button,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalInputControl as InputControl,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
+import { unlock } from '../lock-unlock';
+
+const { ValidatedNumberControl } = unlock( componentsPrivateApis );
 
 /**
  * Internal dependencies
@@ -86,31 +88,30 @@ function ReorderModal( {
 
 	return (
 		<form onSubmit={ onOrder }>
-			<VStack spacing="5">
+			<Stack direction="column" gap="xl">
 				<div>
 					{ __(
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
-				<InputControl
-					__next40pxDefaultSize
+				<ValidatedNumberControl
 					label={ __( 'Order' ) }
-					type="number"
+					step={ 1 }
 					value={
 						typeof item.menu_order === 'number' &&
 						Number.isInteger( item.menu_order )
-							? String( item.menu_order )
+							? item.menu_order
 							: ''
 					}
-					onChange={ ( value ) => {
-						const parsed = parseInt( value as string, 10 ); // absorbs '' and undefined
+					onChange={ ( value: string | undefined ) => {
+						const parsed = parseInt( value ?? '', 10 );
 						setItem( {
 							...item,
 							menu_order: isNaN( parsed ) ? undefined : parsed,
 						} );
 					} }
 				/>
-				<HStack justify="right">
+				<Stack justify="right" gap="md">
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -129,8 +130,8 @@ function ReorderModal( {
 					>
 						{ __( 'Save' ) }
 					</Button>
-				</HStack>
-			</VStack>
+				</Stack>
+			</Stack>
 		</form>
 	);
 }

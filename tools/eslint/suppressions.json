@@ -1183,11 +1183,6 @@
 			"count": 2
 		}
 	},
-	"packages/fields/src/actions/reorder-page.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/fields/src/actions/reset-post.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
