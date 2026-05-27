@@ -12,9 +12,15 @@ import {
 	Icon as WCIcon,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-import { wordpress, arrowUpLeft } from '@wordpress/icons';
+import {
+	wordpress,
+	arrowUpLeft,
+	arrowUpRight,
+	chevronLeft,
+	chevronRight,
+} from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
@@ -119,6 +125,8 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 
 	const buttonLabel = postType?.labels?.view_items ?? __( 'Back' );
 
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
+
 	return (
 		<motion.div
 			className="edit-post-fullscreen-mode-close__view-mode-toggle"
@@ -136,23 +144,33 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 				showTooltip={ showTooltip }
 				tooltipPosition="bottom"
 			>
-				<motion.div variants={ ! disableMotion && siteIconVariants }>
-					<div className="edit-post-fullscreen-mode-close__view-mode-toggle-icon">
-						{ buttonIcon }
-					</div>
-				</motion.div>
-			</Button>
-			<motion.div
-				className={ clsx(
-					'edit-post-fullscreen-mode-close__back-icon',
-					{
-						'has-site-icon': siteIconUrl,
-					}
+				{ ! hasAdminBarInEditor && (
+					<motion.div
+						variants={ ! disableMotion && siteIconVariants }
+					>
+						<div className="edit-post-fullscreen-mode-close__view-mode-toggle-icon">
+							{ buttonIcon }
+						</div>
+					</motion.div>
 				) }
-				variants={ ! disableMotion && toggleHomeIconVariants }
-			>
-				<WCIcon icon={ arrowUpLeft } />
-			</motion.div>
+			</Button>
+			{ hasAdminBarInEditor ? (
+				<div className="edit-post-fullscreen-mode-close__back-icon">
+					<WCIcon icon={ isRTL() ? chevronRight : chevronLeft } />
+				</div>
+			) : (
+				<motion.div
+					className={ clsx(
+						'edit-post-fullscreen-mode-close__back-icon',
+						{
+							'has-site-icon': siteIconUrl,
+						}
+					) }
+					variants={ ! disableMotion && toggleHomeIconVariants }
+				>
+					<WCIcon icon={ isRTL() ? arrowUpRight : arrowUpLeft } />
+				</motion.div>
+			) }
 		</motion.div>
 	);
 }

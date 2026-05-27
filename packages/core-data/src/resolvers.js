@@ -260,13 +260,18 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
+									// Trigger a minimal save to persist the CRDT document. The
+									// entity's pre-persist hooks will create the persisted CRDT
+									// document and apply it to the record's meta.
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
 									dispatch.saveEntityRecord(
 										kind,
 										name,
-										editedRecord,
+										{
+											[ entityIdKey ]:
+												editedRecord[ entityIdKey ],
+										},
 										{ __unstableSkipSyncUpdate: true }
 									);
 								} );
@@ -1027,10 +1032,14 @@ export const getDefaultTemplateId =
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 

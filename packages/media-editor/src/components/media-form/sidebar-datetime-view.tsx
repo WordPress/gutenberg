@@ -27,9 +27,21 @@ export default function SidebarDatetimeView( {
 		settings.formats.datetimeAbbreviated,
 		getDate( value )
 	);
+	// `aria-label` makes assistive tech announce the full date (the visible
+	// text is a shortened summary; `<time dateTime>` is for machines, not
+	// announced by screen readers). `tabIndex={-1}` keeps the Tooltip anchor
+	// out of the keyboard tab order — Ariakit's `useFocusable` preserves an
+	// explicit `tabIndex` on non-natively-focusable elements rather than
+	// defaulting it to `0`. The Tooltip remains available on mouse hover.
 	return (
 		<WCTooltip text={ fullDatetime } placement="top">
-			<time dateTime={ value }>{ dateOnly }</time>
+			<time
+				dateTime={ value }
+				aria-label={ fullDatetime }
+				tabIndex={ -1 }
+			>
+				{ dateOnly }
+			</time>
 		</WCTooltip>
 	);
 }

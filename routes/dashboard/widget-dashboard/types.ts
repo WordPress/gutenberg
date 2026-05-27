@@ -1,5 +1,12 @@
 /**
- * Widget type definitions.
+ * Widget type definitions for the dashboard engine.
+ *
+ * The widget identity types (`WidgetName`, `WidgetTypeMetadata`,
+ * `WidgetType`) live in `routes/dashboard/widget-types/types` and are
+ * re-exported here so dashboard internals can pull every type they need
+ * from a single module. The local declarations below cover the
+ * dashboard-specific surface area: `DashboardWidget`, render props,
+ * module resolver, grid settings, and the `WidgetDashboard` prop bag.
  */
 
 /**
@@ -10,139 +17,21 @@ import type { ComponentType, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import type { IconType } from '@wordpress/components';
-import type { Field } from '@wordpress/dataviews';
 import type {
 	DashboardGridLayoutItem,
 	DashboardLanesLayoutItem,
 } from '@wordpress/grid';
 
-/*
- * MIGRATION: `WidgetName`, `WidgetTypeMetadata`, and `WidgetType` below
- * are also defined in `@wordpress/widget-types` (currently on its own
- * branch). When that package lands in trunk, replace the three
- * declarations with:
- *
- *   export type {
- *       WidgetName,
- *       WidgetTypeMetadata,
- *       WidgetType,
- *   } from '@wordpress/widget-types';
- *
- * The shapes are kept identical on purpose so the swap is mechanical —
- * any change to the fields here must land in lockstep on the
- * `@wordpress/widget-types` package to keep the cutover trivial.
- */
-
 /**
- * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
- * Both segments are lowercase, kebab-case; the full character pattern is
- * enforced by the `widget.json` schema at authoring time.
+ * Internal dependencies
  */
-export type WidgetName = `${ string }/${ string }`;
+import type {
+	WidgetName,
+	WidgetTypeMetadata,
+	WidgetType,
+} from '../widget-types/types';
 
-/**
- * Literal contents of a widget's `widget.json` metadata file.
- *
- * Captures the *authoring* shape only — module entry points and style
- * assets are discovered by convention from the widget directory
- * (`render.*`, `widget.*`, `render.scss`), not declared here.
- *
- * Consumed by tooling (IDE autocomplete, validation, the build pipeline).
- * The dashboard engine consumes the richer `WidgetType` below, which
- * extends this shape with runtime-only fields produced by the build
- * manifest.
- */
-export interface WidgetTypeMetadata {
-	/**
-	 * Version of the Widget API used by the widget.
-	 */
-	apiVersion: number;
-
-	/**
-	 * Stable type identifier. See `WidgetName` for the shape.
-	 */
-	name: WidgetName;
-
-	/**
-	 * Display title; shown in the inserter.
-	 */
-	title: string;
-
-	/**
-	 * Short description shown in the widget inspector.
-	 */
-	description?: string;
-
-	/**
-	 * Visual identifier shown in the widget header; dashicon string, React node, or SVG component.
-	 */
-	icon?: IconType;
-
-	/**
-	 * Grouping category. Core provides `dashboard`; plugins and themes may
-	 * register custom categories.
-	 */
-	category?: string;
-
-	/**
-	 * Search aliases used to surface the widget from the inserter.
-	 */
-	keywords?: string[];
-
-	/**
-	 * Widget version — used for asset cache invalidation.
-	 */
-	version?: string;
-
-	/**
-	 * Gettext text domain for translations.
-	 */
-	textdomain?: string;
-
-	/**
-	 * Experiment gate — boolean `true`, or a specific experiment name.
-	 */
-	__experimental?: string | boolean;
-
-	/**
-	 * Declarative attribute schema. Surfaces render forms straight from
-	 * this list via `DataForm`, with no per-widget form wiring. `any` is
-	 * used here because the array is heterogeneous — each widget narrows
-	 * `Item` to its own attribute type at the point of registration.
-	 */
-	attributes?: Field< any >[];
-
-	/**
-	 * Structured example data for the Inspector Help Panel preview, and
-	 * the default attributes applied by `createDashboardWidget` when no
-	 * initial attributes are supplied.
-	 */
-	example?: {
-		attributes?: Record< string, unknown >;
-	};
-}
-
-/**
- * Runtime widget type consumed by the dashboard engine.
- *
- * Extends `WidgetTypeMetadata` (the authoring shape of `widget.json`) with
- * runtime-only fields produced by the build pipeline — notably
- * `renderModule`, which maps each widget to its discovered script-module
- * entry point.
- *
- * Surfaces consume `WidgetType[]` via the `widgetTypes` prop; the
- * dashboard never reads the widget-types store directly.
- */
-export interface WidgetType extends WidgetTypeMetadata {
-	/**
-	 * Script-module identifier resolved to a React component at render
-	 * time by `ResolveWidgetModule`. Produced by the build pipeline from
-	 * the conventional `render.*` / `widget.*` entry points; not declared
-	 * in `widget.json`.
-	 */
-	renderModule: string;
-}
+export type { WidgetName, WidgetTypeMetadata, WidgetType };
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
 export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;

@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -14,7 +15,6 @@ import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
 import { useWidgetTypes } from './widget-types';
-import styles from './stage.module.css';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
@@ -27,6 +27,16 @@ function Dashboard() {
 
 	const [ editMode, setEditMode ] = useState( false );
 
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
+	const isMobileViewport = useSelect(
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
+		[]
+	);
+
+	const customizeDashboardLabel = __( 'Customize Dashboard' );
+	const dashboardLabel = __( 'Dashboard' );
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleLayoutChange = ( next: DashboardWidget[] ) => {
@@ -35,6 +45,8 @@ function Dashboard() {
 			type: 'snackbar',
 		} );
 	};
+
+	const pageTitle = editMode ? customizeDashboardLabel : dashboardLabel;
 
 	return (
 		<WidgetDashboard
@@ -48,13 +60,13 @@ function Dashboard() {
 			onEditChange={ setEditMode }
 		>
 			<Page
-				title={ __( 'Dashboard' ) }
+				title={ editMode && isMobileViewport ? undefined : pageTitle }
+				ariaLabel={ pageTitle }
 				actions={ <WidgetDashboard.Actions /> }
+				hasPadding
 			>
-				<div className={ styles[ 'dashboard-widgets-container' ] }>
-					<WidgetDashboard.NoWidgetsState />
-					<WidgetDashboard.Widgets />
-				</div>
+				<WidgetDashboard.NoWidgetsState />
+				<WidgetDashboard.Widgets />
 			</Page>
 		</WidgetDashboard>
 	);

@@ -3,9 +3,11 @@
  */
 import {
 	RangeControl,
-	Tooltip as WCTooltip,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
+
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * CustomValueControls component for handling custom value input.
@@ -93,11 +95,16 @@ export default function CustomValueControls( {
 	);
 
 	const wrappedUnitControl = showTooltip ? (
-		<WCTooltip text={ ariaLabel } placement="top">
-			<div className="preset-input-control__tooltip-wrapper">
-				{ unitControl }
-			</div>
-		</WCTooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<div className="preset-input-control__tooltip-wrapper">
+						{ unitControl }
+					</div>
+				}
+			/>
+			<Tooltip.Popup>{ ariaLabel }</Tooltip.Popup>
+		</Tooltip.Root>
 	) : (
 		unitControl
 	);
