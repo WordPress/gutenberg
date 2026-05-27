@@ -104,6 +104,13 @@ Title text. It shows even when the component is closed.
 
 -   Required: No
 
+###### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6`
+
+The heading level of the title. Use this to reflect the surrounding document structure so the title is rendered with the appropriate heading tag (`h1`–`h6`).
+
+-   Required: No
+-   Default: `2`
+
 ###### `opened`: `boolean`
 
 When set to `true`, the component will remain open regardless of the `initialOpen` prop and the

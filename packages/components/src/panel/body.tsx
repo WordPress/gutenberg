@@ -29,6 +29,7 @@ export function UnforwardedPanelBody(
 		buttonProps = {},
 		children,
 		className,
+		headingLevel = 2,
 		icon,
 		initialOpen,
 		onToggle = noop,
@@ -90,6 +91,7 @@ export function UnforwardedPanelBody(
 				isOpened={ Boolean( isOpened ) }
 				onClick={ handleOnToggle }
 				title={ title }
+				headingLevel={ headingLevel }
 				{ ...buttonProps }
 			/>
 			{ typeof children === 'function'
@@ -102,6 +104,7 @@ export function UnforwardedPanelBody(
 const PanelBodyTitle = forwardRef(
 	(
 		{
+			headingLevel = 2,
 			isOpened,
 			icon,
 			title,
@@ -113,8 +116,11 @@ const PanelBodyTitle = forwardRef(
 			return null;
 		}
 
+		const TitleTag =
+			`h${ headingLevel }` as keyof React.JSX.IntrinsicElements;
+
 		return (
-			<h2 className="components-panel__body-title">
+			<TitleTag className="components-panel__body-title">
 				<Button
 					__next40pxDefaultSize
 					className="components-panel__body-toggle"
@@ -141,7 +147,7 @@ const PanelBodyTitle = forwardRef(
 						/>
 					) }
 				</Button>
-			</h2>
+			</TitleTag>
 		);
 	}
 );

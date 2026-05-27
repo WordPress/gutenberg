@@ -151,4 +151,25 @@ describe( 'PanelBody', () => {
 			expect( mock ).toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'title heading level', () => {
+		it( 'should render the title as a level 2 heading by default', () => {
+			render( <PanelBody title="Panel" /> );
+
+			expect(
+				screen.getByRole( 'heading', { level: 2, name: 'Panel' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should render the title at the specified heading level', () => {
+			render( <PanelBody title="Panel" headingLevel={ 3 } /> );
+
+			expect(
+				screen.getByRole( 'heading', { level: 3, name: 'Panel' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'heading', { level: 2 } )
+			).not.toBeInTheDocument();
+		} );
+	} );
 } );

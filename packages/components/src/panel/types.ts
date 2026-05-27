@@ -3,6 +3,7 @@
  */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { WordPressComponentProps } from '../context';
+import type { HeadingSize } from '../heading/types';
 
 export type PanelProps = {
 	/**
@@ -68,6 +69,14 @@ export type PanelBodyProps = {
 	 */
 	className?: string;
 	/**
+	 * The heading level of the title. Use this to reflect the surrounding
+	 * document structure so the title is rendered with the appropriate
+	 * heading tag (`h1`–`h6`).
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
+	/**
 	 * An icon to be shown next to the title.
 	 */
 	icon?: React.JSX.Element;
@@ -101,6 +110,12 @@ export type PanelBodyProps = {
 };
 
 export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
+	/**
+	 * The heading level of the title.
+	 *
+	 * @default 2
+	 */
+	headingLevel?: HeadingSize;
 	/**
 	 * An icon to be shown next to the title.
 	 */

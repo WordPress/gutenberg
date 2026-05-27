@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `PanelBody`: Add a `headingLevel` prop to configure the title's heading level (`h1`–`h6`), defaulting to `2` ([#78752](https://github.com/WordPress/gutenberg/pull/78752)).
+
 ## 34.0.0 (2026-05-27)
 
 ### Breaking Changes
