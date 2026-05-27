@@ -18,14 +18,14 @@ import {
 	rowHeightToPreset,
 	type RowHeightPreset,
 } from '../../utils/row-height-presets';
-import type {
-	WidgetGridLayoutSettings,
-	WidgetGridModel,
-	WidgetGridSettings,
+import {
+	WIDGET_DASHBOARD_COLUMN_COUNT,
+	type WidgetGridLayoutSettings,
+	type WidgetGridModel,
+	type WidgetGridSettings,
 } from '../../types';
 import { LayoutModelEditField } from './layout-model-edit-field';
 
-const DEFAULT_FIXED_COLUMNS = 6;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
 
 function getModel( item: WidgetGridSettings ): WidgetGridModel {
@@ -91,16 +91,6 @@ const fields: Field< WidgetGridSettings >[] = [
 		getValue: ( { item } ) => getModel( item ),
 	},
 	{
-		id: 'columns',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Columns' ),
-		description: __(
-			'How many columns to show when the dashboard has enough space.'
-		),
-		isValid: { min: 1, max: 12 },
-	},
-	{
 		id: 'adaptiveColumns',
 		type: 'boolean',
 		Edit: 'toggle',
@@ -162,7 +152,6 @@ const form: Form = {
 	layout: { type: 'regular', labelPosition: 'top' },
 	fields: [
 		'model',
-		'columns',
 		'adaptiveColumns',
 		'minColumnWidth',
 		'rowHeight',
@@ -230,7 +219,7 @@ export function LayoutSettings( {
 					layout,
 					currentModel,
 					nextModel,
-					{ columns: gridSettings.columns ?? DEFAULT_FIXED_COLUMNS }
+					{ columns: WIDGET_DASHBOARD_COLUMN_COUNT }
 				);
 				onLayoutChange( migrated );
 			}

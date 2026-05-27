@@ -118,6 +118,13 @@ export interface WidgetContextValue {
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
+ * Fixed column count for the widget dashboard. Not exposed in layout
+ * settings; `minColumnWidth` can still reduce the effective count on
+ * narrow viewports.
+ */
+export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
+
+/**
  * Settings common to every grid model. `columns` and `minColumnWidth`
  * compose as a layered model at runtime: `columns` caps the count and
  * `minColumnWidth` enforces a per-tile width floor that can reduce the
@@ -130,8 +137,8 @@ export type WidgetGridModel = 'grid' | 'masonry';
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Target column count (cap). When omitted alongside
-	 * `minColumnWidth`, the grid renders six columns.
+	 * Target column count (cap). The dashboard always uses
+	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}; persisted values are ignored.
 	 */
 	columns?: number;
 
