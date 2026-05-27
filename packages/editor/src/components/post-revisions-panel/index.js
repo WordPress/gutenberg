@@ -22,10 +22,10 @@ import PostLastRevisionCheck from '../post-last-revision/check';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 const DAY_IN_MILLISECONDS = 86400000;
 const EMPTY_ARRAY = [];
-const defaultLayouts = { activity: {} };
+const defaultLayouts = { activity: true };
 const noop = () => {};
 const paginationInfo = {};
 const view = {
@@ -107,9 +107,9 @@ function PostRevisionsPanelContent() {
 			title={
 				<HStack justify="space-between" align="center" as="span">
 					<span>{ __( 'Revisions' ) }</span>
-					<Badge className="editor-post-revisions-panel__revisions-count">
+					<WCBadge className="editor-post-revisions-panel__revisions-count">
 						{ revisionsCount }
-					</Badge>
+					</WCBadge>
 				</HStack>
 			}
 			initialOpen={ false }
@@ -145,6 +145,14 @@ function PostRevisionsPanelContent() {
 }
 
 export default function PostRevisionsPanel() {
+	const disableVisualRevisions = useSelect(
+		( select ) =>
+			!! select( editorStore ).getEditorSettings().disableVisualRevisions,
+		[]
+	);
+	if ( disableVisualRevisions ) {
+		return null;
+	}
 	return (
 		<PostLastRevisionCheck>
 			<PostRevisionsPanelContent />

@@ -4,6 +4,7 @@
 import {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
+	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
 } from '../feature-detection';
 
@@ -286,6 +287,67 @@ describe( 'feature-detection', () => {
 			global.WebAssembly = undefined;
 
 			expect( isClientSideMediaSupported() ).toBe( false );
+		} );
+	} );
+
+	describe( 'isHeicCanvasSupported', () => {
+		const originalCreateImageBitmap =
+			global.createImageBitmap as typeof createImageBitmap;
+		const originalOffscreenCanvas =
+			global.OffscreenCanvas as typeof OffscreenCanvas;
+
+		afterEach( () => {
+			// Restore globals after each test.
+			if ( originalCreateImageBitmap !== undefined ) {
+				global.createImageBitmap =
+					originalCreateImageBitmap as typeof createImageBitmap;
+			} else {
+				// @ts-ignore
+				delete global.createImageBitmap;
+			}
+			if ( originalOffscreenCanvas !== undefined ) {
+				global.OffscreenCanvas =
+					originalOffscreenCanvas as typeof OffscreenCanvas;
+			} else {
+				// @ts-ignore
+				delete global.OffscreenCanvas;
+			}
+		} );
+
+		it( 'returns true when both createImageBitmap and OffscreenCanvas are available', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( true );
+		} );
+
+		it( 'returns false when createImageBitmap is unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when OffscreenCanvas is unavailable', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when both are unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
 		} );
 	} );
 

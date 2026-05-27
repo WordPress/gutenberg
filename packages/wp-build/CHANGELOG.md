@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 0.15.0 (2026-05-27)
+
+## 0.14.0 (2026-05-14)
+
+### Bug Fixes
+
+-   Register generated CSS module styles with `@wordpress/style-runtime` so they can be injected into registered documents, such as editor iframes ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
+
+## 0.13.0 (2026-04-29)
+
+### Bug Fixes
+
+-   Update the optional `@wordpress/boot`, `@wordpress/route`, and `@wordpress/theme` peer dependency ranges to avoid blocking newer compatible package versions ([#77568](https://github.com/WordPress/gutenberg/pull/77568)).
+
+## 0.12.0 (2026-04-15)
+
 ## 0.11.0 (2026-04-01)
 
 ### Bug Fixes

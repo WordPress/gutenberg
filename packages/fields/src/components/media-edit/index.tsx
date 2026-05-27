@@ -9,15 +9,14 @@ import clsx from 'clsx';
 import {
 	Button,
 	DropZone,
-	Icon,
+	Icon as WCIcon,
 	Spinner,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
-	Tooltip,
-	VisuallyHidden,
+	Tooltip as WCTooltip,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -42,6 +41,7 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -193,9 +193,9 @@ function MediaPickerButton( {
 		return mediaPickerButton;
 	}
 	return (
-		<Tooltip text={ label } placement="top">
+		<WCTooltip text={ label } placement="top">
 			{ mediaPickerButton }
-		</Tooltip>
+		</WCTooltip>
 	);
 }
 
@@ -291,13 +291,13 @@ function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 			/>
 		);
 	} else if ( mimeType.startsWith( 'audio' ) ) {
-		return <Icon icon={ audio } />;
+		return <WCIcon icon={ audio } />;
 	} else if ( mimeType.startsWith( 'video' ) ) {
-		return <Icon icon={ video } />;
+		return <WCIcon icon={ video } />;
 	} else if ( archiveMimeTypes.includes( mimeType ) ) {
-		return <Icon icon={ archive } />;
+		return <WCIcon icon={ archive } />;
 	}
-	return <Icon icon={ file } />;
+	return <WCIcon icon={ file } />;
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
@@ -640,9 +640,7 @@ export default function MediaEdit< Item >( {
 	// reorders (same IDs), we fall back to the cached list to avoid a visual
 	// flash in compact mode. For replacements/uploads (new IDs not in cache),
 	// we let attachments be null as normal.
-	const stableAttachmentsRef = useRef< Attachment< 'view' >[] | null >(
-		null
-	);
+	const stableAttachmentsRef = useRef< Attachment< 'view' >[] >( null );
 	if ( attachments !== null ) {
 		stableAttachmentsRef.current = attachments;
 	}
@@ -914,7 +912,7 @@ export default function MediaEdit< Item >( {
 							<VStack spacing={ 2 }>
 								{ field.label &&
 									( hideLabelFromVision ? (
-										<VisuallyHidden as="legend">
+										<VisuallyHidden render={ <legend /> }>
 											{ field.label }
 										</VisuallyHidden>
 									) : (
@@ -937,12 +935,12 @@ export default function MediaEdit< Item >( {
 									setTargetItemId={ setTargetItemId }
 								/>
 								{ field.description && (
-									<Text
+									<WCText
 										variant="muted"
 										className="fields__media-edit-description"
 									>
 										{ field.description }
-									</Text>
+									</WCText>
 								) }
 							</VStack>
 						);
@@ -971,7 +969,7 @@ export default function MediaEdit< Item >( {
 							}
 						) }
 					>
-						<Icon
+						<WCIcon
 							className="components-validated-control__indicator-icon"
 							icon={ errorIcon }
 							size={ 16 }

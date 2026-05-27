@@ -10,13 +10,13 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -239,7 +239,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		// FIXME: I think we should show the indicator when hovering on patterns as well?
@@ -333,7 +333,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			PATTERN_NAME
 		);
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
@@ -409,7 +409,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
@@ -761,12 +761,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 test.describe( 'insert media from inserter', () => {
 	let uploadedMedia;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(
 			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllMedia(),

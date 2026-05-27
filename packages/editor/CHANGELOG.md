@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+## 14.47.0 (2026-05-27)
+
+### Enhancements
+
+-   Editor: Add padding around inline notices in the editor content area and distraction-free header.
+-   The Media Editor modal is now mounted unconditionally and the `openMediaEditorModal` setting is always provided to the block editor. Previously both were gated behind the `gutenberg-media-editor-modal` experiment, which has been removed.
+
+### Bug Fixes
+
+-   `mediaFinalize` now returns the post-finalize attachment (transformed from the REST response), so the upload-media queue can refresh the in-flight attachment URL. Required for the front-end `srcset` to render on client-side-media uploads that exceeded the big-image threshold.
+
+## 14.46.0 (2026-05-14)
+
+### Internal
+
+-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+
+## 14.45.0 (2026-04-29)
+
+## 14.44.0 (2026-04-15)
+
 ## 14.43.0 (2026-04-01)
 
 ## 14.42.0 (2026-03-18)

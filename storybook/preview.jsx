@@ -251,4 +251,4 @@ export const parameters = {
 	},
 };
 
-export const tags = [ 'autodocs' ];
+export const tags = [ 'autodocs', '!manifest' ];

@@ -142,6 +142,21 @@ function TableRow< Item >( {
 			aria-setsize={ paginationInfo.totalItems || undefined }
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
+			onMouseDown={ ( event ) => {
+				if ( event.button !== 0 ) {
+					return;
+				}
+				// Pre-focus the Composite container (parent `tbody`) so that
+				// when the row is focused on click, Ariakit sees the focus
+				// coming from within the Composite and uses `focusSilently`
+				// (which passes `preventScroll: true`). Without this, the
+				// first focus into the Composite scrolls the active row
+				// under the sticky table header, which also causes the click
+				// to land on a different element than the original target.
+				event.currentTarget.parentElement?.focus( {
+					preventScroll: true,
+				} );
+			} }
 			onClick={ () => {
 				// Toggle in/out of selection array
 				if ( isSelected ) {

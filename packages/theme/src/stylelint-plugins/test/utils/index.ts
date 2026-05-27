@@ -8,7 +8,7 @@ const generateStylelintCommand = (
 	filename: string,
 	configFile: string
 ): string =>
-	'npx stylelint ' +
+	'node_modules/.bin/stylelint ' +
 	path.resolve( __dirname, '../', filename ) +
 	' -c ' +
 	path.resolve( __dirname, '../', configFile ) +

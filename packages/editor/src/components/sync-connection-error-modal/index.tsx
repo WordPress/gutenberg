@@ -25,7 +25,10 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getSyncErrorMessages } from '../../utils/sync-error-messages';
+import {
+	getSyncErrorMessages,
+	PROTOCOL_MISMATCH,
+} from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useRetryCountdown } from './use-retry-countdown';
@@ -45,20 +48,22 @@ const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
 export function SyncConnectionErrorModal() {
 	const [ hasInitialized, setHasInitialized ] = useState( false );
 	const [ showModal, setShowModal ] = useState( false );
+	const [ isManualRetryAvailable, setIsManualRetryAvailable ] =
+		useState( false );
 
 	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
 		( selectFn ) => {
-			const currentPostType =
-				selectFn( editorStore ).getCurrentPostType();
+			const { getSyncConnectionStatus, getPostType } = unlock(
+				selectFn( coreDataStore )
+			);
+			const { getCurrentPostType, isCollaborationEnabledForCurrentPost } =
+				unlock( selectFn( editorStore ) );
+			const currentPostType = getCurrentPostType();
 			return {
-				connectionStatus:
-					selectFn( coreDataStore ).getSyncConnectionStatus() || null,
-				isCollaborationEnabled:
-					selectFn(
-						editorStore
-					).isCollaborationEnabledForCurrentPost(),
+				connectionStatus: getSyncConnectionStatus() || null,
+				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 				postType: currentPostType
-					? selectFn( coreDataStore ).getPostType( currentPostType )
+					? getPostType( currentPostType )
 					: null,
 			};
 		},
@@ -81,6 +86,22 @@ export function SyncConnectionErrorModal() {
 
 		return () => clearTimeout( timeout );
 	}, [] );
+
+	// Track retry availability separately from the raw connection status.
+	// The polling manager briefly emits `{ status: 'connecting' }` without
+	// `canManuallyRetry` when a retry is kicked off, which would otherwise
+	//  unmount the Retry button briefly.
+	useEffect( () => {
+		if ( 'connecting' === connectionStatus?.status ) {
+			return;
+		}
+
+		setIsManualRetryAvailable(
+			connectionStatus !== null &&
+				'canManuallyRetry' in connectionStatus &&
+				connectionStatus.canManuallyRetry === true
+		);
+	}, [ connectionStatus ] );
 
 	// Show the modal when disconnected and either retries are exhausted or
 	// no retry is available (unrecoverable error). Hide on reconnect.
@@ -107,7 +128,18 @@ export function SyncConnectionErrorModal() {
 		}
 	}, [ connectionStatus, canRetry ] );
 
-	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
+	// Protocol mismatch is unrecoverable and has no in-flight connection
+	// attempt to wait on, so delaying the modal serves no purpose.
+	const isProtocolMismatch =
+		connectionStatus?.status === 'disconnected' &&
+		'error' in connectionStatus &&
+		connectionStatus.error?.code === PROTOCOL_MISMATCH;
+
+	if (
+		! isCollaborationEnabled ||
+		( ! hasInitialized && ! isProtocolMismatch ) ||
+		! showModal
+	) {
 		return null;
 	}
 
@@ -145,15 +177,12 @@ export function SyncConnectionErrorModal() {
 		return null;
 	}
 
-	const manualRetry =
-		connectionStatus &&
-		'canManuallyRetry' in connectionStatus &&
-		connectionStatus.canManuallyRetry
-			? () => {
-					onManualRetry();
-					retrySyncConnection();
-			  }
-			: undefined;
+	const manualRetry = isManualRetryAvailable
+		? () => {
+				onManualRetry();
+				retrySyncConnection();
+		  }
+		: undefined;
 
 	const messages = getSyncErrorMessages( error );
 

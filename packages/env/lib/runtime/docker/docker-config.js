@@ -111,7 +111,8 @@ RUN groupadd -o -g $HOST_GID $HOST_USERNAME || true
 RUN useradd -mlo -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Install any dependencies we need in the container.
-${ installDependencies( 'wordpress', env, config ) }`;
+${ installDependencies( 'wordpress', env, config ) }
+${ getLoopbackPortConfig( config.env[ env ].port ) }`;
 }
 
 /**
@@ -331,7 +332,39 @@ RUN echo 'spx.data_dir="/tmp/spx"' >> /usr/local/etc/php/php.ini
 RUN mkdir -p /tmp/spx && chmod 777 /tmp/spx`;
 }
 
+/**
+ * Generates Dockerfile RUN steps that make Apache also listen on the
+ * host-mapped wp-env port, so PHP loopback requests inside the container
+ * (WP-Cron, REST API loopback, Site Health) can reach WordPress at
+ * WP_HOME = http://localhost:<port>.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/20569
+ * @see https://github.com/docker-library/wordpress/issues/611#issuecomment-1378316911
+ *
+ * @param {number} port The host-side port wp-env exposes WordPress on.
+ * @return {string} The Dockerfile fragment, or '' when no change is needed.
+ */
+function getLoopbackPortConfig( port ) {
+	// Apache already listens on 80 by default and wp-env never
+	// configures SSL, so 80 and 443 are no-ops. Mirrors the same
+	// short-circuit in lib/config/add-or-replace-port.js.
+	if ( port === 80 || port === 443 ) {
+		return '';
+	}
+
+	return `
+# Make Apache listen on the wp-env-mapped port in addition to 80 so
+# PHP loopback requests (WP-Cron, REST API, Site Health) inside the
+# container reach WordPress at WP_HOME = http://localhost:${ port }.
+# See https://github.com/WordPress/gutenberg/issues/20569
+RUN echo 'Listen ${ port }' >> /etc/apache2/ports.conf
+RUN sed -i 's|<VirtualHost \\*:80>|<VirtualHost *:80 *:${ port }>|' /etc/apache2/sites-enabled/000-default.conf`;
+}
+
 module.exports = {
 	writeDockerFiles,
 	ensureDockerInitialized,
+	// Exported for testing.
+	wordpressDockerFileContents,
+	getLoopbackPortConfig,
 };

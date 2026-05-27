@@ -95,7 +95,7 @@
 
 .wp-block-legacy-widget__edit-preview,
 .wp-block-legacy-widget__edit-no-preview {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	&:hover::after {
 		border-radius: $radius-small;

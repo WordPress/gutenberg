@@ -5,8 +5,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	FlexItem,
 	__experimentalHStack as HStack,
-	// TODO: Replace this ZStack with ad hoc CSS.
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
 	ColorIndicator,

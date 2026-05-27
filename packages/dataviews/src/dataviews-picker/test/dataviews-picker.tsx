@@ -14,7 +14,12 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViewsPicker from '../index';
 import { LAYOUT_PICKER_GRID } from '../../constants';
-import type { ActionButton, View, ViewPickerGrid } from '../../types';
+import type {
+	ActionButton,
+	SupportedLayouts,
+	View,
+	ViewPickerGrid,
+} from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
@@ -107,7 +112,7 @@ function Picker( {
 		paginationInfo,
 		data: shownData,
 		view,
-		defaultLayouts: { [ LAYOUT_PICKER_GRID ]: {} },
+		defaultLayouts: { [ LAYOUT_PICKER_GRID ]: true } as SupportedLayouts,
 		fields: [],
 		onChangeView: setView,
 		multiselect,
@@ -473,6 +478,78 @@ describe( 'DataViews Picker', () => {
 					'true'
 				);
 			} );
+		} );
+	} );
+
+	describe( 'Default layouts', () => {
+		/**
+		 * A minimal Picker that intentionally omits the `defaultLayouts` prop so
+		 * that DataViewsPicker falls back to its internal DEFAULT_PICKER_LAYOUTS
+		 * constant ({ pickerGrid: true, pickerTable: true }).
+		 */
+		function PickerWithoutDefaultLayouts() {
+			const [ view, setView ] = useState< View >( {
+				type: LAYOUT_PICKER_GRID,
+				fields: [],
+				titleField: 'title',
+				mediaField: 'image',
+				search: '',
+				page: 1,
+				perPage: 10,
+				filters: [],
+			} satisfies ViewPickerGrid );
+
+			const [ selection, setSelection ] = useState< string[] >( [] );
+
+			const { data: shownData, paginationInfo } = useMemo( () => {
+				return filterSortAndPaginate( data, view, [] );
+			}, [ view ] );
+
+			return (
+				<DataViewsPicker
+					getItemId={ ( item: Data ) => item.id.toString() }
+					paginationInfo={ paginationInfo }
+					data={ shownData }
+					view={ view }
+					fields={ [] }
+					onChangeView={ setView }
+					selection={ selection }
+					onChangeSelection={ setSelection }
+					// No `defaultLayouts` prop falls back to DEFAULT_PICKER_LAYOUTS
+				/>
+			);
+		}
+
+		it( 'renders both picker layout options when defaultLayouts is not provided', async () => {
+			render( <PickerWithoutDefaultLayouts /> );
+
+			const user = userEvent.setup();
+
+			// Both picker layouts are available, so the Layout switcher button
+			// (rendered by ViewTypeMenu) must be present.
+			const layoutButton = screen.getByRole( 'button', {
+				name: 'Layout',
+			} );
+			expect( layoutButton ).toBeInTheDocument();
+
+			// Open the layout menu.
+			await user.click( layoutButton );
+
+			// Both "Grid" and "Table" picker layout options must appear in the menu.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeInTheDocument();
+
+			// The grid layout is active by default.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).not.toBeChecked();
 		} );
 	} );
 } );

@@ -34,7 +34,7 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'editor',
 		},
 	},

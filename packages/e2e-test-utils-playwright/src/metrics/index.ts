@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import type { Page, Browser } from '@playwright/test';
+import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+import type { Page, Browser } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
 // See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
 // @ts-expect-error
@@ -209,24 +210,80 @@ export class Metrics {
 	/**
 	 * Starts Chromium tracing with predefined options for performance testing.
 	 *
+	 * The category set mirrors what Chrome DevTools enables when recording in
+	 * the Performance panel: `devtools.timeline` provides the top-level event
+	 * tree, and the `disabled-by-default-v8.cpu_profiler` + companion
+	 * `devtools.timeline.stack` categories enable the V8 sampler that
+	 * populates JavaScript call stacks. Without the latter, the saved trace
+	 * shows only opaque "Function call" blocks with no JS frames inside.
+	 *
 	 * @param options Options to pass to `browser.startTracing()`.
 	 */
 	async startTracing( options = {} ) {
 		return await this.browser.startTracing( this.page, {
 			screenshots: false,
-			categories: [ 'devtools.timeline' ],
+			categories: [
+				'devtools.timeline',
+				'disabled-by-default-devtools.timeline',
+				'disabled-by-default-devtools.timeline.stack',
+				'disabled-by-default-v8.cpu_profiler',
+				'v8.execute',
+			],
 			...options,
 		} );
 	}
 
 	/**
-	 * Stops Chromium tracing and saves the trace.
+	 * Stops Chromium tracing.
+	 *
+	 * When `name` is a non-empty string and the `WP_ARTIFACTS_PATH` environment
+	 * variable is set, the raw trace is written to
+	 * `${WP_ARTIFACTS_PATH}/traces/<name>.trace.json`. The resulting file can
+	 * be opened in Chrome DevTools (Performance panel → "Load profile…") to
+	 * inspect the flame graph. Pass a falsy value (or omit the argument) to
+	 * just parse the trace into `this.trace` without writing — this is the
+	 * default for iteration loops, where you typically want to save only one
+	 * representative sample. Callers pick which iteration that is, e.g.
+	 * `i === Math.floor( iterations / 2 ) && 'post-editor-first-block'`.
+	 *
+	 * @param name File name (without extension) identifying the scenario, or
+	 *             `false`/`undefined` to skip writing.
 	 */
-	async stopTracing() {
+	async stopTracing( name?: string | false ) {
 		const traceBuffer = await this.browser.stopTracing();
 		const traceJSON = JSON.parse( traceBuffer.toString() );
 
 		this.trace = traceJSON;
+
+		if ( ! name ) {
+			return;
+		}
+
+		const artifactsPath = process.env.WP_ARTIFACTS_PATH;
+		if ( ! artifactsPath ) {
+			return;
+		}
+
+		// The perf comparison flow runs the same suite against multiple
+		// branches into a single artifacts directory; the comparison branches
+		// set WP_PERF_NO_TRACE so the head branch's traces aren't overwritten.
+		if ( process.env.WP_PERF_NO_TRACE ) {
+			return;
+		}
+
+		// Traces are saved minified. Run the following against a downloaded trace
+		// + matching `build/` directory to rewrite minified `functionName`s back
+		// to their source identifiers:
+		//
+		//   node tools/build-scripts/packages/resolve-trace-source-maps.cjs
+		//
+		// Or via the workspace script:
+		//
+		//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace.json> [--build-dir <dir>]
+		const tracesDir = join( artifactsPath, 'traces' );
+		const filePath = join( tracesDir, `${ name }.trace.json` );
+		await mkdir( tracesDir, { recursive: true } );
+		await writeFile( filePath, JSON.stringify( traceJSON ) );
 	}
 
 	/**

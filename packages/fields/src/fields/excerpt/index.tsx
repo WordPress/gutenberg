@@ -6,7 +6,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import {
 	ExternalLink,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 
 /**
@@ -38,9 +38,9 @@ const excerptField: Field< BasePost > = {
 			excerpt = decodeEntities( item.excerpt?.raw || '' );
 		}
 		return (
-			<Text align="left" numberOfLines={ 3 } truncate>
+			<WCText align="left" numberOfLines={ 3 } truncate>
 				{ excerpt }
-			</Text>
+			</WCText>
 		);
 	},
 	Edit: {

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.43.0",
+	"version": "9.47.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -127,6 +127,8 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/shortcode": "file:../shortcode",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
@@ -139,14 +141,14 @@
 		"html-react-parser": "5.2.11",
 		"memize": "^2.1.0",
 		"remove-accents": "^0.5.0",
-		"uuid": "^9.0.1"
+		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

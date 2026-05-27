@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 // @wordpress/blocks imports are not typed.
-// @ts-expect-error
 import { getCategories } from '@wordpress/blocks';
 
 /**

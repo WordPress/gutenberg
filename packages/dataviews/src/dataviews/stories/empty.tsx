@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { __experimentalText as Text } from '@wordpress/components';
+import { __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -41,7 +41,7 @@ const PlanetIllustration = () => (
 const CustomEmptyComponent = () => (
 	<Stack direction="column" align="center" justify="center" gap="md">
 		<PlanetIllustration />
-		<Text>No celestial bodies found</Text>
+		<WCText>No celestial bodies found</WCText>
 	</Stack>
 );
 
@@ -79,10 +79,10 @@ const EmptyComponent = ( {
 				onChangeView={ setView }
 				actions={ actions }
 				defaultLayouts={ {
-					[ LAYOUT_TABLE ]: {},
-					[ LAYOUT_GRID ]: {},
-					[ LAYOUT_LIST ]: {},
-					[ LAYOUT_ACTIVITY ]: {},
+					[ LAYOUT_TABLE ]: true,
+					[ LAYOUT_GRID ]: true,
+					[ LAYOUT_LIST ]: true,
+					[ LAYOUT_ACTIVITY ]: true,
 				} }
 				isLoading={ isLoading }
 				empty={ customEmpty ? <CustomEmptyComponent /> : undefined }

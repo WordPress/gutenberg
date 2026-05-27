@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 export default function AccessibleDescription( { id, children } ) {
 	return (

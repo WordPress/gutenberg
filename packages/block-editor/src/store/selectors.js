@@ -51,6 +51,12 @@ const { isContentBlock } = unlock( blocksPrivateApis );
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
