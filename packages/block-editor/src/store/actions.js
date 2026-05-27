@@ -1184,6 +1184,22 @@ export const mergeBlocks =
 			! blockAType.merge &&
 			getBlockSupport( blockA.name, '__experimentalOnMerge' )
 		) {
+			// Short-circuit if the blocks are the same type.
+			if ( blockA.name === blockB.name ) {
+				registry.batch( () => {
+					dispatch.moveBlocksToPosition(
+						select.getBlockOrder( clientIdB ),
+						clientIdB,
+						clientIdA
+					);
+					if ( select.getSelectionStart()?.clientId === clientIdB ) {
+						dispatch.selectBlock( clientIdA );
+					}
+					dispatch.removeBlock( clientIdB, false );
+				} );
+				return;
+			}
+
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1201,27 +1217,18 @@ export const mergeBlocks =
 				return;
 			}
 
-			// If the caret was inside the block being removed, it has
-			// nowhere to go after the merge — move it to the newly
-			// inserted block. Otherwise keep the caller's selection
-			// (e.g. Delete from a deeper block inside `clientIdA`).
-			const selectionClientId = select.getSelectionStart()?.clientId;
-			const selectionInsideB =
-				!! selectionClientId &&
-				( selectionClientId === clientIdB ||
-					select
-						.getBlockParents( selectionClientId )
-						.includes( clientIdB ) );
+			const selectionOnB =
+				select.getSelectionStart()?.clientId === clientIdB;
 
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
 					undefined,
 					clientIdA,
-					selectionInsideB
+					selectionOnB
 				);
-				dispatch.removeBlock( clientIdB, selectionInsideB );
-				if ( selectionInsideB ) {
+				dispatch.removeBlock( clientIdB, selectionOnB );
+				if ( selectionOnB ) {
 					dispatch.selectBlock(
 						blockWithSameType.innerBlocks[ 0 ].clientId
 					);

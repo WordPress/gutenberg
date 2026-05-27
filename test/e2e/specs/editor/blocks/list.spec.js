@@ -1614,6 +1614,161 @@ test.describe( 'List (@firefox)', () => {
 		] );
 	} );
 
+	test( 'should merge a following sibling list into the outermost list with Delete from a nested item (#77245)', async ( {
+		editor,
+		page,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'test' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'test' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'two' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		];
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		// Place the cursor at the end of the inner "test" in the first
+		// list. After insertion the caret is at the end of "two"
+		// (deepest leaf of the second list); step back across two
+		// block boundaries (start of "two" → end of "one", start of
+		// "one" → into inner "test"), then `End` to snap to the
+		// actual end of the block since the cross-block jump
+		// preserves column rather than landing at end.
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Verify the setup: caret should land at end of the first
+		// list's inner "test".
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'test' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'test‸' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'two' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+		await page.keyboard.press( 'Backspace' );
+
+		// Action under test.
+		await page.keyboard.press( 'Delete' );
+
+		// Caret should stay at the end of the inner "test"; the
+		// second list's items are absorbed as outer-level siblings.
+		await page.keyboard.type( '‸' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'test' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'test‸' },
+									},
+								],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'one' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'two' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should leave nested list intact when deleting the parent item', async ( {
 		editor,
 		page,
