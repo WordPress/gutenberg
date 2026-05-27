@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.0.0 (2026-05-27)
+
 ### Breaking Changes
 
 -   `useDialog`: The returned `props` object now exposes an `onKeyDown` handler. Consumers that spread it onto a wrapper which also receives an `onKeyDown` from elsewhere should pass that handler via the new `onKeyDown` option (which merges it with close-on-Escape) or merge the two themselves ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
