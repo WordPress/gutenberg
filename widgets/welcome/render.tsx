@@ -71,7 +71,7 @@ export default function WelcomeBanner() {
 						'Author rich content with blocks and patterns'
 					) }
 					description={ __(
-						'Block patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.'
+						'Patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.'
 					) }
 					ctaUrl="/wp-admin/post-new.php?post_type=page"
 					ctaLabel={ __( 'Add a new page' ) }

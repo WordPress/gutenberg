@@ -46,12 +46,9 @@ describe( 'MediaEditorCropPanel', () => {
 		setupCropPanel();
 
 		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
-		const resizeCropArea = screen.getByLabelText( 'Resize crop area' );
+		const resizeCropArea = screen.getByLabelText( 'Show resize handles' );
 		const zoom = screen.getByRole( 'slider', { name: 'Zoom' } );
 
-		expect(
-			screen.getByText( 'Show handles to adjust the crop box.' )
-		).toBeInTheDocument();
 		expectElementBefore( aspectRatio, resizeCropArea );
 		expectElementBefore( resizeCropArea, zoom );
 	} );
@@ -79,7 +76,7 @@ describe( 'MediaEditorCropPanel', () => {
 			freeformCrop: true,
 		} );
 
-		fireEvent.click( screen.getByLabelText( 'Resize crop area' ) );
+		fireEvent.click( screen.getByLabelText( 'Show resize handles' ) );
 
 		expect( controls.onFreeformChange ).toHaveBeenCalledWith( false );
 	} );
