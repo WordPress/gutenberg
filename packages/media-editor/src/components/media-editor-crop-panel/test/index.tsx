@@ -8,10 +8,12 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
-import { MediaEditorStateProvider } from '../../../state';
+import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
+import type { CropperState } from '../../../image-editor';
 
 function setupCropPanel(
-	overrides: Partial< MediaEditorCropPanelProps > = {}
+	overrides: Partial< MediaEditorCropPanelProps > = {},
+	initialCropperState?: Partial< CropperState >
 ) {
 	const props: MediaEditorCropPanelProps = {
 		aspectRatioValue: '1',
@@ -27,18 +29,19 @@ function setupCropPanel(
 	};
 
 	render(
-		<MediaEditorStateProvider>
+		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
 			<MediaEditorCropPanel { ...props } />
+			<CurrentZoomValue />
 		</MediaEditorStateProvider>
 	);
 
 	return props;
 }
 
-function expectElementBefore( first: HTMLElement, second: HTMLElement ) {
-	expect( first.compareDocumentPosition( second ) ).toBe(
-		Node.DOCUMENT_POSITION_FOLLOWING
-	);
+function CurrentZoomValue() {
+	const { state } = useMediaEditor();
+
+	return <output data-testid="current-zoom">{ state.zoom }</output>;
 }
 
 describe( 'MediaEditorCropPanel', () => {
@@ -49,8 +52,12 @@ describe( 'MediaEditorCropPanel', () => {
 		const resizeCropArea = screen.getByLabelText( 'Show resize handles' );
 		const zoom = screen.getByRole( 'slider', { name: 'Zoom' } );
 
-		expectElementBefore( aspectRatio, resizeCropArea );
-		expectElementBefore( resizeCropArea, zoom );
+		expect( aspectRatio.compareDocumentPosition( resizeCropArea ) ).toBe(
+			Node.DOCUMENT_POSITION_FOLLOWING
+		);
+		expect( resizeCropArea.compareDocumentPosition( zoom ) ).toBe(
+			Node.DOCUMENT_POSITION_FOLLOWING
+		);
 	} );
 
 	it( 'passes selected aspect ratio changes to the caller', () => {
@@ -80,4 +87,23 @@ describe( 'MediaEditorCropPanel', () => {
 
 		expect( controls.onFreeformChange ).toHaveBeenCalledWith( false );
 	} );
+
+	it.each( [
+		[ 3.749999999999999, 3.7 ],
+		[ 3.799999999999999, 3.8 ],
+	] )(
+		'formats displayed zoom value %s as %s without changing cropper state',
+		( zoom, displayZoom ) => {
+			setupCropPanel( {}, { zoom } );
+
+			const zoomInput = screen.getByRole( 'spinbutton', {
+				name: 'Zoom',
+			} );
+
+			expect( zoomInput ).toHaveValue( displayZoom );
+			expect( screen.getByTestId( 'current-zoom' ) ).toHaveTextContent(
+				String( zoom )
+			);
+		}
+	);
 } );

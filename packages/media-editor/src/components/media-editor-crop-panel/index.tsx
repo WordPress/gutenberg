@@ -21,6 +21,19 @@ import { MAX_ZOOM } from '../../image-editor/core/constants';
 import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
+const ZOOM_DISPLAY_PRECISION = 10;
+const ZOOM_DISPLAY_TOLERANCE = 1e-8;
+
+function roundDownZoomForDisplay( value: number ): number {
+	// Keep exact tenths represented slightly below their decimal value
+	// from dropping by another tenth in the visible control.
+	return (
+		Math.floor(
+			( value + ZOOM_DISPLAY_TOLERANCE ) * ZOOM_DISPLAY_PRECISION
+		) / ZOOM_DISPLAY_PRECISION
+	);
+}
+
 export interface MediaEditorCropPanelProps {
 	/**
 	 * Selected aspect-ratio preset value as a string (so it round-trips
@@ -63,6 +76,8 @@ export default function MediaEditorCropPanel( {
 	const { state, setZoom } = useMediaEditor();
 	const zoomGestureHandlers = useCropGestureHandlers();
 	const minZoom = getMinZoom( state );
+	const displayZoom = roundDownZoomForDisplay( state.zoom );
+	const displayMinZoom = roundDownZoomForDisplay( minZoom );
 
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
@@ -95,10 +110,10 @@ export default function MediaEditorCropPanel( {
 				<RangeControl
 					__next40pxDefaultSize
 					label={ __( 'Zoom' ) }
-					min={ minZoom }
+					min={ displayMinZoom }
 					max={ MAX_ZOOM }
 					step={ 0.1 }
-					value={ state.zoom }
+					value={ displayZoom }
 					onChange={ ( value ) => {
 						onPlacementControlInteraction?.();
 						setZoom( typeof value === 'number' ? value : minZoom );
