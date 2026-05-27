@@ -79,7 +79,7 @@
 		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

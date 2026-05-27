@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Editor: Add padding around inline notices in the editor content area and distraction-free header.
+-   The Media Editor modal is now mounted unconditionally and the `openMediaEditorModal` setting is always provided to the block editor. Previously both were gated behind the `gutenberg-media-editor-modal` experiment, which has been removed.
 
 ### Bug Fixes
 

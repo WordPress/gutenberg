@@ -1,5 +1,24 @@
 == Changelog ==
 
+= 23.2.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Fix registered post meta scope. ([78531](https://github.com/WordPress/gutenberg/pull/78531))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@alecgeatches
+
+
 = 23.2.1 =
 
 

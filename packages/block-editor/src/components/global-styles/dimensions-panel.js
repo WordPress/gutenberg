@@ -31,6 +31,7 @@ import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
+	hasPseudoBlockStyleState,
 	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
 
@@ -51,7 +52,7 @@ export function useHasDimensionsPanel(
 			hasMinHeight( settings ) ||
 			hasMinWidth( settings ) ||
 			hasWidth( settings ) ||
-			hasAspectRatio( settings ) ||
+			hasAspectRatio( settings, styleState ) ||
 			hasChildLayout( settings, styleState ) )
 	);
 }
@@ -92,12 +93,15 @@ function hasWidth( settings ) {
 	return settings?.dimensions?.width;
 }
 
-function hasAspectRatio( settings ) {
-	return settings?.dimensions?.aspectRatio;
+function hasAspectRatio( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
+	return (
+		isDefaultBlockStyleState( styleState ) &&
+		settings?.dimensions?.aspectRatio
+	);
 }
 
 function hasChildLayout( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
-	if ( ! isDefaultBlockStyleState( styleState ) ) {
+	if ( hasPseudoBlockStyleState( styleState ) ) {
 		return false;
 	}
 
@@ -484,7 +488,7 @@ export default function DimensionsPanel( {
 	const hasWidthValue = () => !! value?.dimensions?.width;
 
 	// Aspect Ratio
-	const showAspectRatioControl = hasAspectRatio( settings );
+	const showAspectRatioControl = hasAspectRatio( settings, styleState );
 	const aspectRatioValue = decodeValue(
 		inheritedValue?.dimensions?.aspectRatio
 	);
@@ -509,6 +513,7 @@ export default function DimensionsPanel( {
 		onChange( {
 			...value,
 			layout: {
+				...value?.layout,
 				...newChildLayout,
 			},
 		} );

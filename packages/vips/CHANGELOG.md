@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove unused `batchResizeImage` and `vipsBatchResizeImage` exports. The concurrent sideload pipeline (introduced in [#75888](https://github.com/WordPress/gutenberg/pull/75888)) generates each sub-size through its own queued resize/upload operation, so the single-pass batch path no longer has any callers ([#77247](https://github.com/WordPress/gutenberg/issues/77247)).
+
 ## 1.6.0 (2026-05-14)
 
 ## 1.5.0 (2026-04-29)

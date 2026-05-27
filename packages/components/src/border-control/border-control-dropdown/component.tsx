@@ -160,6 +160,7 @@ const BorderControlDropdown = (
 		resetButtonWrapperClassName,
 		size,
 		__unstablePopoverProps,
+		onToggle: onToggleProp, // Remove from `otherProps` to avoid type errors (native HTML `onToggle` vs `Dropdown` `onToggle`).
 		...otherProps
 	} = useBorderControlDropdown( props );
 
@@ -199,44 +200,42 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	const renderContent: DropdownComponentProps[ 'renderContent' ] = () => (
-		<>
-			<DropdownContentWrapper paddingSize="medium">
-				<VStack className={ popoverControlsClassName } spacing={ 6 }>
-					<ColorPalette
-						className={ popoverContentClassName }
-						value={ color }
-						onChange={ onColorChange }
-						{ ...{ colors, disableCustomColors } }
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						clearable={ false }
-						enableAlpha={ enableAlpha }
+	const renderContent = () => (
+		<DropdownContentWrapper paddingSize="medium">
+			<VStack className={ popoverControlsClassName } spacing={ 6 }>
+				<ColorPalette
+					className={ popoverContentClassName }
+					value={ color }
+					onChange={ onColorChange }
+					{ ...{ colors, disableCustomColors } }
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					clearable={ false }
+					enableAlpha={ enableAlpha }
+				/>
+				{ enableStyle && isStyleSettable && (
+					<BorderControlStylePicker
+						label={ __( 'Style' ) }
+						value={ style }
+						onChange={ onStyleChange }
 					/>
-					{ enableStyle && isStyleSettable && (
-						<BorderControlStylePicker
-							label={ __( 'Style' ) }
-							value={ style }
-							onChange={ onStyleChange }
-						/>
-					) }
-				</VStack>
-				<div className={ resetButtonWrapperClassName }>
-					<Button
-						variant="tertiary"
-						onClick={ () => {
-							onReset();
-						} }
-						disabled={ ! enableResetButton }
-						accessibleWhenDisabled
-						__next40pxDefaultSize
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</div>
-			</DropdownContentWrapper>
-		</>
+				) }
+			</VStack>
+			<div className={ resetButtonWrapperClassName }>
+				<Button
+					variant="tertiary"
+					onClick={ () => {
+						onReset();
+					} }
+					disabled={ ! enableResetButton }
+					accessibleWhenDisabled
+					__next40pxDefaultSize
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			</div>
+		</DropdownContentWrapper>
 	);
 
 	return (

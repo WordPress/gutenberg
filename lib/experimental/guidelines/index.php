@@ -59,32 +59,3 @@ add_action(
 		$content_revisions_controller->register_routes();
 	}
 );
-
-add_action(
-	'current_screen',
-	function ( $screen ) {
-		if ( Gutenberg_Guidelines_Post_Type::POST_TYPE !== $screen->post_type ) {
-			return;
-		}
-
-		// Disable the block editor for this post type.
-		add_filter( 'use_block_editor_for_post_type', '__return_false' );
-
-		// Remove the media button.
-		remove_action( 'media_buttons', 'media_buttons' );
-
-		// Use a plain textarea by disabling TinyMCE and Quicktags.
-		add_filter(
-			'wp_editor_settings',
-			static function ( $settings, $editor_id ) {
-				if ( 'content' === $editor_id ) {
-					$settings['tinymce']   = false;
-					$settings['quicktags'] = false;
-				}
-				return $settings;
-			},
-			10,
-			2
-		);
-	}
-);
