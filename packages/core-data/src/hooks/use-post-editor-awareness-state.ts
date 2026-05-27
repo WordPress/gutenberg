@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import type { Y } from '@wordpress/sync';
 
 /**
@@ -133,8 +133,11 @@ export function useResolvedSelection(
 ): ( selection: SelectionState ) => ResolvedSelection {
 	const blocks = usePostContentBlocks();
 	const awarenessState = usePostEditorAwarenessState( postId, postType );
-	return ( selection: SelectionState ) =>
-		awarenessState.resolveSelection( selection, blocks );
+	return useCallback(
+		( selection: SelectionState ) =>
+			awarenessState.resolveSelection( selection, blocks ),
+		[ blocks, awarenessState ]
+	);
 }
 
 /**
