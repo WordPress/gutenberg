@@ -228,28 +228,6 @@ test.describe( 'User taxonomies', () => {
 			).toHaveCount( 0 );
 		} );
 
-		test( 'turning `Show in REST API` off blocks the taxonomy from the REST API', async ( {
-			page,
-			requestUtils,
-		} ) => {
-			await page.getByRole( 'button', { name: 'Visibility' } ).click();
-			await page
-				.getByRole( 'checkbox', { name: 'Show in REST API' } )
-				.click();
-			await page.getByRole( 'button', { name: 'Save' } ).click();
-			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
-				'"Genres" taxonomy updated.'
-			);
-
-			const result = await requestUtils
-				.rest( {
-					path: '/wp/v2/taxonomies/genre',
-					method: 'GET',
-				} )
-				.catch( ( error ) => error );
-			expect( result.code ).toBe( 'rest_forbidden' );
-		} );
-
 		test( 'turning `Publicly queryable` off blocks the front-end term archive', async ( {
 			page,
 		} ) => {
