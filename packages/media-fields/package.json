@@ -42,7 +42,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",

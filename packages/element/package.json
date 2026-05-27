@@ -41,7 +41,6 @@
 		"./react-polyfill": "./src/react-polyfill-base.ts",
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,

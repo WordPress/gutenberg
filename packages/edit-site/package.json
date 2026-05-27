@@ -41,7 +41,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptExtraDependencies": [
 		"wp-dom-ready"

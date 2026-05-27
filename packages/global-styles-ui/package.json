@@ -42,7 +42,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"dependencies": {
 		"@types/react": "^18.3.27",
 		"@wordpress/a11y": "file:../a11y",

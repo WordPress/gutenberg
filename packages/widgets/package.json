@@ -37,7 +37,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpCopyFiles": {
 		"files": [

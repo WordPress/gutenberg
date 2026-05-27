@@ -48,7 +48,6 @@
 		},
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {

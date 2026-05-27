@@ -33,7 +33,6 @@
 		"./animations": "./_animations.scss",
 		"./breakpoints": "./_breakpoints.scss",
 		"./colors": "./_colors.scss",
-		"./colors.native": "./_colors.native.scss",
 		"./default-custom-properties": "./_default-custom-properties.scss",
 		"./functions": "./_functions.scss",
 		"./long-content-fade": "./_long-content-fade.scss",
