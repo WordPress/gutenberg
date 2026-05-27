@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
 ## 15.20.0 (2026-05-27)
 
 ### Bug Fixes
