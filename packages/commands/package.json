@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "1.46.0",
+	"version": "1.47.0",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,8 +58,8 @@
 		"cmdk": "^1.0.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

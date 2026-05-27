@@ -39,6 +39,7 @@ async function globalSetup( config: FullConfig ) {
 			'gutenberg-test-plugin-disables-the-css-animations'
 		),
 		requestUtils.deleteAllPosts(),
+		requestUtils.deleteAllPages(),
 		requestUtils.deleteAllBlocks(),
 		requestUtils.resetPreferences(),
 		setupRtcWebSocketProvider( requestUtils ),

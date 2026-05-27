@@ -1,3 +1,5 @@
+// @ts-expect-error No exported types
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import type {
 	CoreDataPrivateApis,
@@ -65,6 +67,11 @@ export function useRenderCursors(
 	const showOwnCursor = useSelect(
 		( select ) =>
 			select( preferencesStore ).get( 'core', 'showCollaborationCursor' ),
+		[]
+	);
+
+	const blockClientIds = useSelect(
+		( select ) => select( blockEditorStore ).getClientIdsWithDescendants(),
 		[]
 	);
 
@@ -179,6 +186,7 @@ export function useRenderCursors(
 		sortedUsers,
 		showOwnCursor,
 		recomputeToken,
+		blockClientIds,
 	] );
 
 	return { cursors: cursorPositions, rerenderCursorsAfterDelay };

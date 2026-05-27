@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/default-custom-properties";
 @use "@wordpress/dataviews/build-style/style.css" as dataviews;
 @use "@wordpress/fields/build-style/style.css" as fields;
@@ -31,6 +32,7 @@
 @use "./components/resizable-frame/style.scss" as *;
 @use "./components/pagination/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
+@use "./experimental-admin-bar-in-editor.scss" as *;
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {
