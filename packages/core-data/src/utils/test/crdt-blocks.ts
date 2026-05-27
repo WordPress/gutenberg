@@ -2867,6 +2867,26 @@ describe( 'crdt-blocks', () => {
 		} );
 	} );
 
+	describe( 'mergeRichTextUpdate - rapid typing', () => {
+		it( 'appends repeated text one character at a time with cursor hints', () => {
+			const text =
+				'987654321098765432109876543210987654321098765432109876543210';
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'p1' );
+
+			for ( let i = 1; i <= text.length; i++ ) {
+				const value = `p1${ text.slice( 0, i ) }`;
+				mergeRichTextUpdate(
+					yText,
+					value,
+					asHtmlStringIndex( value.length )
+				);
+			}
+
+			expect( yText.toString() ).toBe( `p1${ text }` );
+		} );
+	} );
+
 	describe( 'supplementary plane characters (non-emoji)', () => {
 		// Characters above U+FFFF are stored as surrogate pairs in UTF-16,
 		// so .length === 2 per character. The diff library v8 counts them
