@@ -88,13 +88,22 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	const contextPath = path.join( packageRoot, 'package.json' );
 	const require = createRequire( contextPath );
 
-	// `require.resolve` throws when the package isn't installed; treat that as a miss.
 	let resolved;
 	try {
 		resolved = require.resolve( `${ fullPackageName }/package.json` );
-	} catch {
-		packageJsonCache.set( cacheKey, null );
-		return null;
+	} catch ( error ) {
+		// Treat a genuine resolution miss (package not installed, or it doesn't
+		// expose its package.json) as `null` so callers can fall through to
+		// esbuild's own resolution. Rethrow anything unexpected so real errors
+		// (invalid specifiers, resolver bugs) aren't silently swallowed.
+		if (
+			error?.code === 'MODULE_NOT_FOUND' ||
+			error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+		) {
+			packageJsonCache.set( cacheKey, null );
+			return null;
+		}
+		throw error;
 	}
 
 	const result = getPackageInfoFromFile( resolved );
