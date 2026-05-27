@@ -12,9 +12,7 @@ When reviewing pull requests:
 ## What not to flag
 
 - **Do not speculate about external code.** Verify WordPress, PHP, and Node APIs, function signatures, and version constraints against the diff or repo files (`composer.json`, `package.json`, etc.) before flagging compatibility or contract issues. Do not invent strings, error messages, or behaviour in linked codebases such as WordPress core. If a claim cannot be verified from the diff or repository, do not include it.
-- **Do not request refactor of inherited duplication.** If a pattern already exists in the codebase before this PR, do not ask the author to extract a helper or deduplicate. Flag it at most once for awareness.
 - **Calibrate edge-case warnings.** Do not flag theoretical edge cases (`Number.MAX_VALUE`, subnormals, inputs that cannot occur given current callers). Flag edge cases only when they correspond to inputs that can plausibly reach the code.
-- **Do not request tests** when the surrounding test files are out of scope for the PR. Flag missing tests only when the new behaviour is risky and adding a test fits the diff naturally.
 
 ## Gutenberg-specific context
 
