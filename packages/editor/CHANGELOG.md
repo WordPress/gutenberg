@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.47.0 (2026-05-27)
+
 ### Enhancements
 
 -   Editor: Add padding around inline notices in the editor content area and distraction-free header.
