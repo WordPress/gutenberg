@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 7.0.0 (2026-05-27)
-
 ### Breaking Changes
 
 -   Updated dependencies to React 19.2.4 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
