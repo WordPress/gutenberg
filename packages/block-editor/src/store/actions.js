@@ -1184,22 +1184,6 @@ export const mergeBlocks =
 			! blockAType.merge &&
 			getBlockSupport( blockA.name, '__experimentalOnMerge' )
 		) {
-			// Short-circuit if the blocks are the same type.
-			if ( blockA.name === blockB.name ) {
-				registry.batch( () => {
-					dispatch.moveBlocksToPosition(
-						select.getBlockOrder( clientIdB ),
-						clientIdB,
-						clientIdA
-					);
-					if ( select.getSelectionStart()?.clientId === clientIdB ) {
-						dispatch.selectBlock( clientIdA );
-					}
-					dispatch.removeBlock( clientIdB, false );
-				} );
-				return;
-			}
-
 			// If there's no merge function defined, attempt merging inner
 			// blocks.
 			const blocksWithTheSameType = switchToBlockType(
@@ -1217,22 +1201,16 @@ export const mergeBlocks =
 				return;
 			}
 
-			const selectionOnB =
-				select.getSelectionStart()?.clientId === clientIdB;
-
 			registry.batch( () => {
 				dispatch.insertBlocks(
 					blockWithSameType.innerBlocks,
 					undefined,
-					clientIdA,
-					selectionOnB
+					clientIdA
 				);
-				dispatch.removeBlock( clientIdB, selectionOnB );
-				if ( selectionOnB ) {
-					dispatch.selectBlock(
-						blockWithSameType.innerBlocks[ 0 ].clientId
-					);
-				}
+				dispatch.removeBlock( clientIdB );
+				dispatch.selectBlock(
+					blockWithSameType.innerBlocks[ 0 ].clientId
+				);
 
 				// Attempt to merge the next block if it's the same type and
 				// same attributes. This is useful when merging a paragraph into

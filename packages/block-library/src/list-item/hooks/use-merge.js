@@ -3,7 +3,7 @@
  */
 import { useRegistry, useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { isUnmodifiedBlock } from '@wordpress/blocks';
+import { isUnmodifiedBlock, switchToBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ export default function useMerge( clientId, onMerge ) {
 		getBlockName,
 		getBlock,
 	} = useSelect( blockEditorStore );
-	const { mergeBlocks, moveBlocksToPosition, removeBlock } =
+	const { mergeBlocks, moveBlocksToPosition, removeBlock, insertBlocks } =
 		useDispatch( blockEditorStore );
 	const outdentListItem = useOutdentListItem();
 
@@ -101,12 +101,37 @@ export default function useMerge( clientId, onMerge ) {
 			}
 
 			if ( ! nextBlockClientId ) {
-				const outermostListId = getBlockRootClientId( listItemId );
-				const followingBlockId =
-					getNextBlockClientId( outermostListId );
+				const outerListId = getBlockRootClientId( listItemId );
+				const followingBlockId = getNextBlockClientId( outerListId );
 
 				if ( followingBlockId ) {
-					mergeBlocks( outermostListId, followingBlockId );
+					if ( getBlockName( followingBlockId ) === 'core/list' ) {
+						registry.batch( () => {
+							moveBlocksToPosition(
+								getBlockOrder( followingBlockId ),
+								followingBlockId,
+								outerListId
+							);
+							removeBlock( followingBlockId, false );
+						} );
+					} else {
+						const transformed = switchToBlockType(
+							getBlock( followingBlockId ),
+							'core/list'
+						);
+						const newInnerBlocks = transformed?.[ 0 ]?.innerBlocks;
+						if ( newInnerBlocks?.length ) {
+							registry.batch( () => {
+								insertBlocks(
+									newInnerBlocks,
+									undefined,
+									outerListId,
+									false
+								);
+								removeBlock( followingBlockId, false );
+							} );
+						}
+					}
 				}
 			} else if ( getParentListItemId( nextBlockClientId ) ) {
 				outdentListItem( nextBlockClientId );
