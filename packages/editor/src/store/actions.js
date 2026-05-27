@@ -956,8 +956,8 @@ export const toggleDistractionFree =
 					.dispatch( noticesStore )
 					.createInfoNotice(
 						isDistractionFree
-							? __( 'Distraction free mode deactivated sdfsd.' )
-							: __( 'Distraction free mode activated dsfsd.' ),
+							? __( 'Distraction free mode deactivated.' )
+							: __( 'Distraction free mode activated.' ),
 						{
 							id: 'core/editor/distraction-free-mode/notice',
 							type: 'snackbar',
