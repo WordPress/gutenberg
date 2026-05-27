@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
+import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
 
@@ -37,6 +38,11 @@ function Dashboard() {
 	const customizeDashboardLabel = __( 'Customize Dashboard' );
 	const dashboardLabel = __( 'Dashboard' );
 
+	const displayName = useSelect(
+		( select ) => select( coreStore ).getCurrentUser()?.name,
+		[]
+	);
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const handleLayoutChange = ( next: DashboardWidget[] ) => {
@@ -46,7 +52,16 @@ function Dashboard() {
 		} );
 	};
 
-	const pageTitle = editMode ? customizeDashboardLabel : dashboardLabel;
+	let pageTitle = dashboardLabel;
+	if ( editMode ) {
+		pageTitle = customizeDashboardLabel;
+	} else if ( displayName ) {
+		pageTitle = sprintf(
+			/* translators: %s: current user's display name. */
+			__( 'Howdy, %s' ),
+			displayName
+		);
+	}
 
 	return (
 		<WidgetDashboard
