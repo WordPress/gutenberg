@@ -25,7 +25,7 @@
 		 * positioner (via the shared `.box-sizing` reset utility), so
 		 * the 1px is absorbed and non-FC layout is unchanged.
 		 */
-		@media (forced-colors: active) {
+		@media ( forced-colors: active ) {
 			border: 1px solid CanvasText;
 		}
 	}

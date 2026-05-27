@@ -5,8 +5,13 @@ import type { HandlePosition, NormalizedRect, Size } from './types';
 
 export type { HandlePosition };
 
-/** Minimum crop rect dimension in normalized space (5% of visual area). */
-export const MIN_CROP_SIZE = 0.05;
+/**
+ * Default minimum crop rect dimension in normalized space, used when no
+ * explicit per-axis minimum is supplied (e.g. before the source image
+ * has loaded). Real usage derives a pixel-based min from the source
+ * image dimensions and `MIN_CROP_PIXELS` in `constants.ts`.
+ */
+export const DEFAULT_MIN_CROP_SIZE: Size = { width: 0.05, height: 0.05 };
 
 /**
  * Bounds within which the crop rect must stay.
@@ -37,11 +42,12 @@ export interface ResizeDragState {
  * Each edge moves independently based on the handle being dragged.
  * Edges are clamped to the provided bounds and maintain a minimum size.
  *
- * @param drag      The current drag state.
- * @param clientX   Current mouse/touch X position in pixels.
- * @param clientY   Current mouse/touch Y position in pixels.
- * @param imageSize The rendered image dimensions in pixels.
- * @param bounds    The allowed crop area bounds.
+ * @param drag        The current drag state.
+ * @param clientX     Current mouse/touch X position in pixels.
+ * @param clientY     Current mouse/touch Y position in pixels.
+ * @param imageSize   The rendered image dimensions in pixels.
+ * @param bounds      The allowed crop area bounds.
+ * @param minCropSize Minimum crop rect dimension in normalized space, per axis.
  * @return The new crop rect in normalized coordinates.
  */
 export function computeFreeResizeRect(
@@ -49,7 +55,8 @@ export function computeFreeResizeRect(
 	clientX: number,
 	clientY: number,
 	imageSize: Size,
-	bounds: CropBounds
+	bounds: CropBounds,
+	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
 ): NormalizedRect {
 	const dx =
 		imageSize.width > 0 ? ( clientX - drag.startX ) / imageSize.width : 0;
@@ -67,24 +74,24 @@ export function computeFreeResizeRect(
 	if ( handle === 'n' || handle === 'nw' || handle === 'ne' ) {
 		edgeTop = Math.max(
 			bounds.minY,
-			Math.min( s.y + dy, edgeBottom - MIN_CROP_SIZE )
+			Math.min( s.y + dy, edgeBottom - minCropSize.height )
 		);
 	}
 	if ( handle === 's' || handle === 'sw' || handle === 'se' ) {
 		edgeBottom = Math.max(
-			edgeTop + MIN_CROP_SIZE,
+			edgeTop + minCropSize.height,
 			Math.min( s.y + s.height + dy, bounds.maxY )
 		);
 	}
 	if ( handle === 'w' || handle === 'nw' || handle === 'sw' ) {
 		edgeLeft = Math.max(
 			bounds.minX,
-			Math.min( s.x + dx, edgeRight - MIN_CROP_SIZE )
+			Math.min( s.x + dx, edgeRight - minCropSize.width )
 		);
 	}
 	if ( handle === 'e' || handle === 'ne' || handle === 'se' ) {
 		edgeRight = Math.max(
-			edgeLeft + MIN_CROP_SIZE,
+			edgeLeft + minCropSize.width,
 			Math.min( s.x + s.width + dx, bounds.maxX )
 		);
 	}
@@ -110,6 +117,7 @@ export function computeFreeResizeRect(
  * @param imageSize       The rendered image dimensions in pixels.
  * @param bounds          The allowed crop area bounds.
  * @param normalizedRatio The locked aspect ratio (width / height in normalized space).
+ * @param minCropSize     Minimum crop rect dimension in normalized space, per axis.
  * @return The new crop rect in normalized coordinates.
  */
 export function computeLockedResizeRect(
@@ -118,7 +126,8 @@ export function computeLockedResizeRect(
 	clientY: number,
 	imageSize: Size,
 	bounds: CropBounds,
-	normalizedRatio: number
+	normalizedRatio: number,
+	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
 ): NormalizedRect {
 	// The math below divides by `normalizedRatio` and `imageSize`, so
 	// bail out with the start rect when any of them is zero. This can
@@ -156,9 +165,15 @@ export function computeLockedResizeRect(
 	let distW = ( draggedX - anchorX ) * dirX;
 	let distH = ( draggedY - anchorY ) * dirY;
 
-	// Enforce minimum size.
-	distW = Math.max( distW, MIN_CROP_SIZE );
-	distH = Math.max( distH, MIN_CROP_SIZE );
+	// Enforce minimum size on both axes, projecting through the ratio so
+	// neither axis falls below its per-axis floor.
+	const minDistW = Math.max(
+		minCropSize.width,
+		minCropSize.height * normalizedRatio
+	);
+	const minDistH = minDistW / normalizedRatio;
+	distW = Math.max( distW, minDistW );
+	distH = Math.max( distH, minDistH );
 
 	// Determine which axis "drives" — whichever the user moved more
 	// (in pixel space) determines the size, the other follows. The
@@ -192,8 +207,8 @@ export function computeLockedResizeRect(
 	}
 
 	// Enforce minimum after clamping.
-	distW = Math.max( distW, MIN_CROP_SIZE );
-	distH = Math.max( distH, MIN_CROP_SIZE );
+	distW = Math.max( distW, minDistW );
+	distH = Math.max( distH, minDistH );
 
 	// Compute the final rect position from the anchor.
 	const newX = dirX > 0 ? anchorX : anchorX - distW;
@@ -211,11 +226,12 @@ export function computeLockedResizeRect(
  * axis symmetrically around the rect's center to preserve the ratio,
  * clamping symmetrically so the rect stays within bounds.
  *
- * @param drag      The current drag state.
- * @param clientX   Current mouse/touch X position in pixels.
- * @param clientY   Current mouse/touch Y position in pixels.
- * @param imageSize The rendered image dimensions in pixels.
- * @param bounds    The allowed crop area bounds.
+ * @param drag        The current drag state.
+ * @param clientX     Current mouse/touch X position in pixels.
+ * @param clientY     Current mouse/touch Y position in pixels.
+ * @param imageSize   The rendered image dimensions in pixels.
+ * @param bounds      The allowed crop area bounds.
+ * @param minCropSize Minimum crop rect dimension in normalized space, per axis.
  * @return The new crop rect in normalized coordinates.
  */
 export function computeShiftLockedResizeRect(
@@ -223,7 +239,8 @@ export function computeShiftLockedResizeRect(
 	clientX: number,
 	clientY: number,
 	imageSize: Size,
-	bounds: CropBounds
+	bounds: CropBounds,
+	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
 ): NormalizedRect {
 	const s = drag.startRect;
 	const pixelW = s.width * imageSize.width;
@@ -234,7 +251,8 @@ export function computeShiftLockedResizeRect(
 			clientX,
 			clientY,
 			imageSize,
-			bounds
+			bounds,
+			minCropSize
 		);
 	}
 	const normalizedRatio = s.width / s.height;
@@ -252,7 +270,8 @@ export function computeShiftLockedResizeRect(
 			clientY,
 			imageSize,
 			bounds,
-			normalizedRatio
+			normalizedRatio,
+			minCropSize
 		);
 	}
 
@@ -263,7 +282,8 @@ export function computeShiftLockedResizeRect(
 		clientX,
 		clientY,
 		imageSize,
-		bounds
+		bounds,
+		minCropSize
 	);
 
 	if ( handle === 'n' || handle === 's' ) {
@@ -281,11 +301,11 @@ export function computeShiftLockedResizeRect(
 		}
 		// Enforce the minimum on the driving axis, then derive the
 		// other axis from the ratio so it stays consistent. The
-		// effective minimum height has to satisfy MIN_CROP_SIZE on
-		// both axes simultaneously.
+		// effective minimum height has to satisfy the per-axis floor
+		// on both axes simultaneously.
 		const minHeight = Math.max(
-			MIN_CROP_SIZE,
-			MIN_CROP_SIZE / normalizedRatio
+			minCropSize.height,
+			minCropSize.width / normalizedRatio
 		);
 		if ( newHeight < minHeight ) {
 			newHeight = minHeight;
@@ -312,7 +332,10 @@ export function computeShiftLockedResizeRect(
 		newHeight = maxHeight;
 		newWidth = newHeight * normalizedRatio;
 	}
-	const minWidth = Math.max( MIN_CROP_SIZE, MIN_CROP_SIZE * normalizedRatio );
+	const minWidth = Math.max(
+		minCropSize.width,
+		minCropSize.height * normalizedRatio
+	);
 	if ( newWidth < minWidth ) {
 		newWidth = minWidth;
 		newHeight = newWidth / normalizedRatio;

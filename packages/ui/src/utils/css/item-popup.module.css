@@ -16,10 +16,6 @@
 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-md);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
-		font-family: var(--wpds-typography-font-family-body);
-		font-size: var(--wpds-typography-font-size-md);
-		line-height: 1.4;
-		color: var(--wpds-color-fg-interactive-neutral);
 	}
 
 	.list {
@@ -27,6 +23,10 @@
 		grid-area: main;
 		grid-template-rows: minmax(0, 1fr) auto;
 		grid-template-areas: "scrollable" "footer";
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+		color: var(--wpds-color-fg-interactive-neutral);
 	}
 
 	.list-scrollable-container {
@@ -124,6 +124,9 @@
 		align-items: center;
 		min-height: var(--wp-ui-popup-empty-min-height);
 		padding-inline: var(--wp-ui-popup-empty-padding-inline);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 

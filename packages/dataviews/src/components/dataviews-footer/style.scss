@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/z-index" as *;
 @use "../../dataviews/style" as *;
 
 .dataviews-footer {
@@ -14,7 +13,8 @@
 		transition: padding ease-out 0.1s;
 	}
 
-	z-index: z-index(".dataviews-footer");
+	// Ensure the footer stays above the scrolling content, independent of DOM order.
+	z-index: 1;
 
 	.is-refreshing {
 		@include dataviews-refreshing();

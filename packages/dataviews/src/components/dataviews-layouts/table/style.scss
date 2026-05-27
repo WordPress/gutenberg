@@ -1,5 +1,4 @@
 @use "@wordpress/base-styles/mixins" as *;
-@use "@wordpress/base-styles/z-index" as *;
 @use "../../../dataviews/style" as *;
 
 .dataviews-view-table {
@@ -129,7 +128,8 @@
 	thead {
 		position: sticky;
 		inset-block-start: 0;
-		z-index: z-index(".dataviews-view-table thead");
+		// Ensure the header stays above the scrolling content.
+		z-index: 1;
 		background-color: inherit;
 
 		&.dataviews-view-table__thead--stuck {

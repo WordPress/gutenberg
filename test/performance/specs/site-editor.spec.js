@@ -70,6 +70,15 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			draftId = page.id;
+
+			// Set preferences via REST so that welcomeGuide is reliably
+			// persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-site', {
+				welcomeGuide: false,
+				welcomeGuideStyles: false,
+				welcomeGuidePage: false,
+				welcomeGuideTemplate: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -85,11 +94,11 @@ test.describe( 'Site Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Go to the test draft.
-				await admin.visitSiteEditor( {
-					postId: draftId,
-					postType: 'page',
-					canvas: 'edit',
-				} );
+				await admin.page.goto(
+					'wp-admin/site-editor.php?postId=' +
+						draftId +
+						'&postType=page&canvas=edit'
+				);
 
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();

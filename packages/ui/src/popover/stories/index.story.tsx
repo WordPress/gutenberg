@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useRef, useState } from '@wordpress/element';
-import { SlotFillProvider, Slot } from '@wordpress/components';
 import { close, info } from '@wordpress/icons';
 import * as Popover from '../';
 import { VisuallyHidden } from '../../visually-hidden';
@@ -693,102 +692,6 @@ export const CrossIframe: Story = {
 					</div>
 				</GenericIframe>
 			</div>
-		);
-	},
-};
-
-/**
- * Same cross-iframe scenario, but using `SlotFillProvider` and `Slot` from
- * `@wordpress/components` as the render target.
- *
- * The `Slot` renders a `div` in the parent document, and its forwarded ref
- * is passed to `Popover.Portal`'s `container` prop (via `Popover.Popup`'s
- * `portal` prop) so the popup portals into the slot element. This mirrors the
- * legacy Popover's `WithSlotOutsideIframe` pattern.
- */
-export const CrossIframeWithSlotFill: Story = {
-	name: 'Cross-Iframe (SlotFill)',
-	args: { defaultOpen: true },
-	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { children: _children, ...args } ) {
-		const slotRef = useRef< HTMLDivElement >( null );
-		const [ iframeBoundary, setIframeBoundary ] =
-			useState< HTMLIFrameElement | null >( null );
-
-		return (
-			<SlotFillProvider>
-				<Slot
-					name="popover-container"
-					bubblesVirtually
-					ref={ slotRef }
-				/>
-				<GenericIframe
-					ref={ setIframeBoundary }
-					style={ {
-						width: '100%',
-						height: 400,
-						border: 0,
-						outline: '1px solid purple',
-					} }
-				>
-					<div
-						style={ {
-							height: '200vh',
-							paddingTop: '10vh',
-						} }
-					>
-						<div
-							style={ {
-								maxWidth: 200,
-								marginTop: 100,
-								marginInline: 'auto',
-							} }
-						>
-							<Popover.Root { ...args }>
-								<Popover.Trigger
-									style={ {
-										padding: 8,
-										background: 'salmon',
-									} }
-								>
-									Popover&apos;s anchor (inside iframe)
-								</Popover.Trigger>
-								<Popover.Popup
-									portal={
-										<Popover.Portal
-											container={
-												slotRef as React.RefObject< HTMLElement >
-											}
-										/>
-									}
-									positioner={
-										<Popover.Positioner
-											collisionBoundary={
-												iframeBoundary ?? undefined
-											}
-										/>
-									}
-								>
-									<Popover.Arrow />
-									<Popover.Title
-										style={ {
-											marginBottom:
-												'var(--wpds-dimension-gap-xs)',
-										} }
-									>
-										Cross-Iframe (SlotFill)
-									</Popover.Title>
-									<Popover.Description>
-										This popup renders in the parent
-										document via a `Slot` from
-										`@wordpress/components`.
-									</Popover.Description>
-								</Popover.Popup>
-							</Popover.Root>
-						</div>
-					</div>
-				</GenericIframe>
-			</SlotFillProvider>
 		);
 	},
 };
