@@ -47,6 +47,14 @@
 		"html": false,
 		"reusable": false,
 		"inserter": false,
+		"color": {
+			"text": true,
+			"background": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"style": true,
