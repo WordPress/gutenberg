@@ -2191,6 +2191,28 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 	};
 };
 
+const getBlockTransformItemFromVariation = ( state, item, variationName ) => {
+	if ( ! variationName ) {
+		return item;
+	}
+	const variation = getBlockVariations( item.name, 'transform' )?.find(
+		( { name } ) => name === variationName
+	);
+	if ( ! variation ) {
+		return item;
+	}
+	const variationId = `${ item.id }/${ variation.name }`;
+	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
+	return {
+		...item,
+		id: variationId,
+		icon: variation.icon || item.icon,
+		title: variation.title || item.title,
+		frecency: calculateFrecency( time, count ),
+		variationName: variation.name,
+	};
+};
+
 /**
  * Returns the calculated frecency.
  *
@@ -2474,20 +2496,21 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
  *
  * Items are returned ordered descendingly by their 'frecency'.
  *
- * @param    {Object}          state        Editor state.
- * @param    {Object|Object[]} blocks       Block object or array objects.
- * @param    {?string}         rootClientId Optional root client ID of block list.
+ * @param    {Object}          state         Editor state.
+ * @param    {Object|Object[]} blocks        Block object or array objects.
+ * @param    {?string}         rootClientId  Optional root client ID of block list.
  *
  * @return {WPEditorTransformItem[]} Items that appear in inserter.
  *
  * @typedef {Object} WPEditorTransformItem
- * @property {string}          id           Unique identifier for the item.
- * @property {string}          name         The type of block to create.
- * @property {string}          title        Title of the item, as it appears in the inserter.
- * @property {string}          icon         Dashicon for the item, as it appears in the inserter.
- * @property {boolean}         isDisabled   Whether or not the user should be prevented from inserting
- *                                          this item.
- * @property {number}          frecency     Heuristic that combines frequency and recency.
+ * @property {string}          id            Unique identifier for the item.
+ * @property {string}          name          The type of block to create.
+ * @property {?string}         variationName The target block variation name.
+ * @property {string}          title         Title of the item, as it appears in the inserter.
+ * @property {string}          icon          Dashicon for the item, as it appears in the inserter.
+ * @property {boolean}         isDisabled    Whether or not the user should be prevented from inserting
+ *                                           this item.
+ * @property {number}          frecency      Heuristic that combines frequency and recency.
  */
 export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 	createSelector(
@@ -2518,13 +2541,19 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 				normalizedBlocks
 			).reduce( ( accumulator, block ) => {
 				if ( itemsByName[ block?.name ] ) {
-					accumulator.push( itemsByName[ block.name ] );
+					accumulator.push(
+						getBlockTransformItemFromVariation(
+							state,
+							itemsByName[ block.name ],
+							block.variationName
+						)
+					);
 				}
 				return accumulator;
 			}, [] );
 			return orderBy(
 				possibleTransforms,
-				( block ) => itemsByName[ block.name ].frecency,
+				( block ) => block.frecency,
 				'desc'
 			);
 		},

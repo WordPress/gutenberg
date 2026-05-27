@@ -8,6 +8,21 @@ import {
 
 const MAXIMUM_SELECTED_BLOCKS = 6;
 
+const getGridInnerBlocks = ( innerBlocks ) =>
+	innerBlocks.flatMap( ( column ) => {
+		const columnInnerBlocks = column.innerBlocks || [];
+		if ( columnInnerBlocks.length > 1 ) {
+			return [
+				createBlock(
+					'core/group',
+					{ layout: { type: 'constrained' } },
+					columnInnerBlocks
+				),
+			];
+		}
+		return columnInnerBlocks;
+	} );
+
 const transforms = {
 	from: [
 		{
@@ -101,6 +116,25 @@ const transforms = {
 						verticalAlignment,
 					},
 					createBlocksFromInnerBlocksTemplate( innerBlocksTemplate )
+				);
+			},
+		},
+	],
+	to: [
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			variationName: 'group-grid',
+			transform: ( attributes, innerBlocks ) => {
+				return createBlock(
+					'core/group',
+					{
+						...attributes,
+						isStackedOnMobile: undefined,
+						verticalAlignment: undefined,
+						layout: { type: 'grid' },
+					},
+					getGridInnerBlocks( innerBlocks )
 				);
 			},
 		},
