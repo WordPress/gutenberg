@@ -21,6 +21,7 @@
 	},
 	"type": "module",
 	"devDependencies": {
+		"@wordpress/create-block": "file:../../packages/create-block",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"chalk": "^4.1.1",
 		"glob": "^7.1.2",
@@ -34,6 +35,7 @@
 		"check-installed-deps": "node ./check-installed-deps.mjs",
 		"check-licenses": "node ./check-licenses.mjs",
 		"check-local-changes": "node ./check-local-changes.cjs",
+		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
 		"validate-tsconfig": "node ./validate-tsconfig.mjs"
 	}

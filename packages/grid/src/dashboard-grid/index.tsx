@@ -39,15 +39,23 @@ import { GridItem } from './grid-item';
 import { GridOverlay } from '../shared/grid-overlay';
 import { gridSpanToPixelSize } from '../shared/resize-snap';
 import layoutAnimationStyles from '../shared/layout-shift-animation.module.css';
+import { ItemExitOverlay } from '../shared/item-exit-overlay';
 import {
 	getLayoutFingerprint,
 	useLayoutShiftAnimation,
 } from '../shared/use-layout-shift-animation';
+import { useItemExitAnimation } from '../shared/use-item-exit-animation';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
+import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
 import styles from './grid.module.css';
+
+const dashboardDragDropAnimation = createDashboardDragDropAnimation(
+	styles[ 'drag-preview-frame' ],
+	styles.dragPreviewFrameExiting
+);
 
 // Fallback gap in pixels for math that runs before the computed gap
 // can be read from the DOM. Matches the `'xl'` step the surface
@@ -137,9 +145,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		} | null >( null );
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
-		const latestLayoutRef = useRef<
-			DashboardGridLayoutItem[] | undefined
-		>();
+		const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >(
+			undefined
+		);
 		// Cursor center at the last applied reorder. Used to skip the
 		// cascade of re-measured `onDragMove` events after a layout
 		// change, when the cursor has not actually moved.
@@ -156,6 +164,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			height: number;
 		} | null >( null );
 		const captureLayoutSnapshotRef = useRef< () => void >( () => {} );
+		const childrenCacheRef = useRef< Map< string, React.ReactElement > >(
+			new Map()
+		);
 		const activeLayout = temporaryLayout ?? layout;
 
 		const [ gridRoot, setGridRoot ] = useState< HTMLDivElement | null >(
@@ -283,38 +294,61 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			return map;
 		}, [ items, layoutMap, effectiveColumns ] );
 
-		const [ childrenMap, actionableAreaMap, remaining ] = useMemo( () => {
-			const childMap = new Map< string, React.ReactElement >();
-			const actionableMap = new Map< string, React.ReactNode >();
-			const rest: React.ReactNode[] = [];
+		const [ childrenMap, actionableAreaMap, remaining, renderedByKey ] =
+			useMemo( () => {
+				const childMap = new Map< string, React.ReactElement >();
+				const actionableMap = new Map< string, React.ReactNode >();
+				const rest: React.ReactNode[] = [];
+				const byKey = new Map< string, React.ReactElement >();
 
-			Children.forEach( children, ( child ) => {
-				if ( ! isValidElement( child ) ) {
-					rest.push( child );
-					return;
-				}
-
-				const key = child.key?.toString();
-				if ( key && layoutKeys.has( key ) ) {
-					// Lift `actionableArea` to a grid slot; strip it
-					// from the child so it does not leak to the DOM.
-					const { actionableArea } = child.props;
-					if ( actionableArea !== undefined ) {
-						actionableMap.set( key, actionableArea );
-						childMap.set(
-							key,
-							cloneElement( child, { actionableArea: undefined } )
-						);
-					} else {
-						childMap.set( key, child );
+				Children.forEach( children, ( child ) => {
+					if ( ! isValidElement( child ) ) {
+						rest.push( child );
+						return;
 					}
-				} else {
-					rest.push( child );
-				}
-			} );
 
-			return [ childMap, actionableMap, rest ];
-		}, [ children, layoutKeys ] );
+					const key = child.key?.toString();
+					if ( ! key ) {
+						rest.push( child );
+						return;
+					}
+
+					// Strip `actionableArea` so it does not leak to the DOM;
+					// the grid lifts it to a slot separately.
+					const typedChild = child as React.ReactElement< {
+						actionableArea?: React.ReactNode;
+					} >;
+					const { actionableArea } = typedChild.props;
+					const stripped =
+						actionableArea !== undefined
+							? cloneElement( typedChild, {
+									actionableArea: undefined,
+							  } )
+							: child;
+
+					byKey.set( key, stripped );
+
+					if ( layoutKeys.has( key ) ) {
+						if ( actionableArea !== undefined ) {
+							actionableMap.set( key, actionableArea );
+						}
+						childMap.set( key, stripped );
+					} else {
+						rest.push( child );
+					}
+				} );
+
+				return [ childMap, actionableMap, rest, byKey ];
+			}, [ children, layoutKeys ] );
+
+		// Persist the latest rendered children so a removed tile's content
+		// is still available for its exit overlay. Filled from an effect so a
+		// discarded render never writes to the cache.
+		useLayoutEffect( () => {
+			for ( const [ key, child ] of renderedByKey ) {
+				childrenCacheRef.current.set( key, child );
+			}
+		}, [ renderedByKey ] );
 
 		const sensors = useSensors(
 			useSensor( PointerSensor ),
@@ -525,13 +559,15 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		const dragOverlayContent =
 			activeId && activeClone ? (
 				<div className={ styles[ 'drag-preview-frame' ] }>
-					{ DragPreview ? (
-						<DragPreview itemId={ activeId }>
-							{ activeClone }
-						</DragPreview>
-					) : (
-						activeClone
-					) }
+					<div className={ styles[ 'drag-preview-frame__lift' ] }>
+						{ DragPreview ? (
+							<DragPreview itemId={ activeId }>
+								{ activeClone }
+							</DragPreview>
+						) : (
+							activeClone
+						) }
+					</div>
 				</div>
 			) : null;
 
@@ -575,20 +611,28 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 			]
 		);
 
-		const layoutAnimating =
-			editMode && ( isResizing || temporaryLayout !== undefined );
 		const layoutFingerprint = useMemo(
 			() => getLayoutFingerprint( [ ...resolvedItemMap.values() ] ),
 			[ resolvedItemMap ]
 		);
 		const excludeLayoutAnimationKey =
 			activeId ?? ( isResizing ? resizeSnapPreview?.id : null );
-		const { captureLayoutSnapshot } = useLayoutShiftAnimation( {
+		const { captureLayoutSnapshot, getPositionsBeforeLastChange } =
+			useLayoutShiftAnimation( {
+				container: gridRoot,
+				enabled: editMode,
+				layoutFingerprint,
+				excludeItemKey: excludeLayoutAnimationKey,
+			} );
+		const { exitingItems, clearExitingItem } = useItemExitAnimation( {
 			container: gridRoot,
-			enabled: layoutAnimating,
-			layoutFingerprint,
-			excludeItemKey: excludeLayoutAnimationKey,
+			enabled: editMode,
+			layoutKeys,
+			getPositionsBeforeLastChange,
+			childrenCacheRef,
 		} );
+		// Transform transitions on tiles for FLIP (drag, resize, removal).
+		const layoutAnimating = editMode;
 		useLayoutEffect( () => {
 			captureLayoutSnapshotRef.current = captureLayoutSnapshot;
 		}, [ captureLayoutSnapshot ] );
@@ -601,8 +645,8 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 				onDragMove={ handleDragMove }
 				onDragEnd={ () => {
 					persistTemporaryLayout();
-					setActiveId( null );
 					lastReorderCursorRef.current = null;
+					setActiveId( null );
 				} }
 			>
 				{ /* No-op strategy: reorder comes from `temporaryLayout`
@@ -655,9 +699,21 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 							</GridItem>
 						) ) }
 						{ remaining }
+						{ exitingItems.map( ( { key, rect, child } ) => (
+							<ItemExitOverlay
+								key={ `exiting-${ key }` }
+								itemKey={ key }
+								rect={ rect }
+								onAnimationEnd={ () => clearExitingItem( key ) }
+							>
+								{ child }
+							</ItemExitOverlay>
+						) ) }
 					</div>
 				</SortableContext>
-				<DragOverlay>{ dragOverlayContent }</DragOverlay>
+				<DragOverlay dropAnimation={ dashboardDragDropAnimation }>
+					{ dragOverlayContent }
+				</DragOverlay>
 			</DndContext>
 		);
 	}
