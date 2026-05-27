@@ -16,9 +16,11 @@
  * @return string Returns the block content.
  */
 function render_block_core_shortcode( $attributes, $content ) {
+	if ( ! empty( $attributes['hidden'] ) ) {
+		return '';
+	}
 	return wpautop( $content );
 }
-
 /**
  * Registers the `core/shortcode` block on server.
  *
