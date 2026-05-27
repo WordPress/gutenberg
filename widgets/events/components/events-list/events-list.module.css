@@ -6,7 +6,7 @@
 }
 
 .eventIcon {
-	width: 100%;
+	height: 100%;
 	background-color: var(--wpds-color-bg-track-neutral-weak);
 	color: var(--wpds-color-fg-content-neutral-weak);
 }
