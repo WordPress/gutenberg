@@ -136,21 +136,6 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
-			{ imageMeasurement && cropMeasurement && (
-				<dl
-					className="media-editor__crop-measurements"
-					aria-label={ __( 'Image and crop measurements' ) }
-				>
-					<div className="media-editor__crop-measurement">
-						<dt>{ __( 'Image' ) }</dt>
-						<dd>{ formatMeasurement( imageMeasurement ) }</dd>
-					</div>
-					<div className="media-editor__crop-measurement">
-						<dt>{ __( 'Crop' ) }</dt>
-						<dd>{ formatMeasurement( cropMeasurement ) }</dd>
-					</div>
-				</dl>
-			) }
 			<SelectControl
 				__next40pxDefaultSize
 				label={ __( 'Aspect ratio' ) }
@@ -191,6 +176,26 @@ export default function MediaEditorCropPanel( {
 					} }
 				/>
 			</div>
+			{ imageMeasurement && cropMeasurement && (
+				<div className="media-editor__crop-measurements-section">
+					<h3 className="media-editor__crop-measurements-heading">
+						{ __( 'Measurements' ) }
+					</h3>
+					<dl
+						className="media-editor__crop-measurements"
+						aria-label={ __( 'Image and crop measurements' ) }
+					>
+						<div className="media-editor__crop-measurement">
+							<dt>{ __( 'Image' ) }</dt>
+							<dd>{ formatMeasurement( imageMeasurement ) }</dd>
+						</div>
+						<div className="media-editor__crop-measurement">
+							<dt>{ __( 'Crop' ) }</dt>
+							<dd>{ formatMeasurement( cropMeasurement ) }</dd>
+						</div>
+					</dl>
+				</div>
+			) }
 		</Stack>
 	);
 }

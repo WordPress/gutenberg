@@ -72,6 +72,12 @@ describe( 'MediaEditorCropPanel', () => {
 			}
 		);
 
+		const zoom = screen.getByRole( 'slider', { name: 'Zoom' } );
+		const heading = screen.getByRole( 'heading', {
+			name: 'Measurements',
+		} );
+
+		expectElementBefore( zoom, heading );
 		expect( screen.getByText( 'Image' ) ).toBeInTheDocument();
 		expect( screen.getByText( '1200 x 600 px - 2:1' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'Crop' ) ).toBeInTheDocument();
