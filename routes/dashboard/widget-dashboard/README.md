@@ -88,7 +88,7 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so hosts that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Layout settings" (when `onGridSettingsChange` is provided), "Cancel", "Done" while it is on. Layout settings is only available in customize mode. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
