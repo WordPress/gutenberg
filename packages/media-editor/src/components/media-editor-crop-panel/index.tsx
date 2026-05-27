@@ -129,6 +129,7 @@ export default function MediaEditorCropPanel( {
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
 		// metadata field (which would suppress undo).
 		<Stack
+			className="media-editor__crop-panel"
 			direction="column"
 			gap="xl"
 			{ ...{ [ CROP_CONTROL_ATTR ]: true } }

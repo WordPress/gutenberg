@@ -44,6 +44,8 @@ function CurrentZoomValue() {
 
 describe( 'MediaEditorCropPanel', () => {
 	it( 'renders crop shape controls before zoom controls', () => {
+		expect.assertions( 2 );
+
 		setupCropPanel();
 
 		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );

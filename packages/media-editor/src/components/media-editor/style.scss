@@ -55,14 +55,42 @@
 
 	.media-editor__sidebar {
 		@include reset;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.media-editor__sidebar-panel {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.media-editor__sidebar-panel > [role="tabpanel"]:not([hidden]) {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		min-height: 0;
+		overflow: auto;
 	}
 
 	.media-editor__panel {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
 		padding: $grid-unit-20;
 	}
 
+	.media-editor__crop-panel {
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+
 	.media-editor__crop-measurements-section {
-		margin: 0;
+		margin-top: auto;
 		padding-top: $grid-unit-15;
 		border-top: 1px solid $gray-300;
 	}
