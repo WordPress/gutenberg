@@ -23,7 +23,7 @@ function Dashboard() {
 
 	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
-	const { widgetTypes, isResolvingWidgetTypes } = useWidgetTypes();
+	const [ widgetTypes, isResolving ] = useWidgetTypes();
 
 	const [ editMode, setEditMode ] = useState( false );
 
@@ -51,7 +51,7 @@ function Dashboard() {
 	return (
 		<WidgetDashboard
 			widgetTypes={ widgetTypes }
-			isResolvingWidgetTypes={ isResolvingWidgetTypes }
+			isResolvingWidgetTypes={ isResolving }
 			layout={ layout }
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }

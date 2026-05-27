@@ -253,7 +253,7 @@ export function WidgetDashboardProvider( {
 	onEditChange,
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
 	gridSettings: committedGridSettings = DEFAULT_GRID,
-	onGridSettingsChange: publishCommittedGridSettings,
+	onGridSettingsChange,
 	children,
 }: ProviderProps ) {
 	const [ stagingLayout, setStagingLayout ] =
@@ -290,28 +290,14 @@ export function WidgetDashboardProvider( {
 
 	const hasUncommittedChanges = hasLayoutChanges || hasGridSettingsChanges;
 
-	const publishLayout = useCallback(
-		( nextLayout: DashboardWidget[] ) => {
-			const canonical = canonicalize( nextLayout );
-			setStagingLayout( canonical );
-
-			if (
-				! fastDeepEqual( canonicalize( committedLayout ), canonical )
-			) {
-				onLayoutChange( canonical );
-			}
-		},
-		[ committedLayout, onLayoutChange ]
-	);
-
 	const commit = useCallback(
 		( options?: { exitEditMode?: boolean } ) => {
 			if ( hasLayoutChanges ) {
-				publishLayout( stagingLayout );
+				onLayoutChange( canonicalize( stagingLayout ) );
 			}
 
 			if ( hasGridSettingsChanges ) {
-				publishCommittedGridSettings?.( stagingGridSettings );
+				onGridSettingsChange?.( stagingGridSettings );
 			}
 
 			if ( options?.exitEditMode !== false ) {
@@ -321,8 +307,8 @@ export function WidgetDashboardProvider( {
 		[
 			hasLayoutChanges,
 			hasGridSettingsChanges,
-			publishCommittedGridSettings,
-			publishLayout,
+			onLayoutChange,
+			onGridSettingsChange,
 			stagingLayout,
 			stagingGridSettings,
 			onEditChange,
@@ -355,14 +341,14 @@ export function WidgetDashboardProvider( {
 			setStagingLayout( next.layout );
 			setStagingGridSettings( next.gridSettings );
 			onLayoutChange( canonicalize( next.layout ) );
-			publishCommittedGridSettings?.( next.gridSettings );
+			onGridSettingsChange?.( next.gridSettings );
 			onEditChange?.( false );
 		},
 		[
 			stagingLayout,
 			stagingGridSettings,
 			onLayoutChange,
-			publishCommittedGridSettings,
+			onGridSettingsChange,
 			onEditChange,
 		]
 	);
@@ -382,7 +368,7 @@ export function WidgetDashboardProvider( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ stagingLayout.length === 0 ] );
 
-	const canEditGridSettings = publishCommittedGridSettings !== undefined;
+	const canEditGridSettings = onGridSettingsChange !== undefined;
 
 	const value = useMemo< InternalDashboardContextValue >(
 		() => ( {

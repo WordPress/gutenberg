@@ -42,15 +42,14 @@ interface WidgetModuleRecord {
 	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
 }
 
-export interface UseWidgetTypesResult {
-	widgetTypes: WidgetType[];
-	/**
-	 * True while widget-module records or their metadata imports have not
-	 * finished resolving. Layout instances must not be treated as missing
-	 * until this is false.
-	 */
-	isResolvingWidgetTypes: boolean;
-}
+/**
+ * Tuple of `[ widgetTypes, isResolvingWidgetTypes ]`.
+ *
+ * The boolean is true while widget-module records or their metadata imports
+ * have not finished resolving. Layout instances must not be treated as missing
+ * until it is false.
+ */
+export type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
 /**
  * Returns the registered widget types, with each record's metadata
@@ -136,5 +135,5 @@ export function useWidgetTypes(): UseWidgetTypesResult {
 		};
 	}, [ records ] );
 
-	return { widgetTypes, isResolvingWidgetTypes };
+	return [ widgetTypes, isResolvingWidgetTypes ];
 }
