@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.47.0 (2026-05-27)
+
 ### Internal
 
 -   Import form: remove `Notice` margin and padding overrides ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
