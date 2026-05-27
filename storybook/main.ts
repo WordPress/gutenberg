@@ -1,3 +1,4 @@
+import path from 'node:path';
 import {
 	type InlineConfig,
 	type PluginOption,
@@ -77,6 +78,17 @@ const config: StorybookConfig = {
 		// Should match defaults in Storybook except for the propFilter.
 		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
 		reactDocgenTypescriptOptions: {
+			// Use a docgen-specific TypeScript configuration that disables
+			// project references. Without this, docgen follows referenced
+			// projects' built `.d.ts` declarations and emits a duplicate
+			// `__docgenInfo` block per component (one from source, one from the
+			// declaration file) that clobbers source-derived descriptions.
+			// Separate `tsconfig.json` is used instead of `compilerOptions` to
+			// allow the rest of the base `tsconfig.base.json` to be inherited.
+			tsconfigPath: path.join(
+				import.meta.dirname,
+				'tsconfig.docgen.json'
+			),
 			shouldExtractLiteralValuesFromEnum: true,
 			shouldRemoveUndefinedFromOptional: true,
 			propFilter: ( prop ) => {
