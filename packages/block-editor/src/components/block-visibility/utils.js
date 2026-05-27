@@ -108,6 +108,37 @@ export function getHideEverywhereCheckboxState( blocks ) {
 }
 
 /**
+ * Gets the checkbox state for a user authentication visibility setting across multiple blocks.
+ * Returns `true` if all blocks are hidden, `null` if some are hidden, `false` if none are hidden.
+ *
+ * @param {Array}  blocks Array of blocks to check.
+ * @param {string} key    The user authentication key to check ('loggedOut' or 'loggedIn').
+ * @return {boolean|null} `true` if all hidden, `null` if some hidden, `false` if none hidden.
+ */
+export function getUserAuthCheckboxState( blocks, key ) {
+	if ( ! blocks?.length ) {
+		return false;
+	}
+
+	const hiddenCount = blocks.filter( ( block ) => {
+		const blockVisibility = block?.attributes?.metadata?.blockVisibility;
+		if ( ! blockVisibility || typeof blockVisibility !== 'object' ) {
+			return false;
+		}
+		return blockVisibility.userAuthentication?.[ key ] === true;
+	} ).length;
+
+	if ( hiddenCount === 0 ) {
+		return false;
+	}
+	if ( hiddenCount === blocks.length ) {
+		return true;
+	}
+
+	return null;
+}
+
+/**
  * Get a human-readable label describing which viewports a block is hidden on.
  *
  * @param {boolean|Object} blockVisibility The block's visibility metadata.
@@ -124,6 +155,8 @@ export function getBlockVisibilityLabel( blockVisibility ) {
 		return __( 'Block is hidden' );
 	}
 
+	const labels = [];
+
 	if ( blockVisibility?.viewport ) {
 		// Hidden on specific viewports - list them
 		const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
@@ -131,12 +164,27 @@ export function getBlockVisibilityLabel( blockVisibility ) {
 		).map( ( [ , viewport ] ) => viewport.label );
 
 		if ( hiddenViewports.length > 0 ) {
-			return sprintf(
-				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
-				hiddenViewports.join( ', ' )
+			labels.push(
+				sprintf(
+					/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+					__( 'Hidden on %s' ),
+					hiddenViewports.join( ', ' )
+				)
 			);
 		}
+	}
+
+	if ( blockVisibility?.userAuthentication ) {
+		if ( blockVisibility.userAuthentication.loggedOut ) {
+			labels.push( __( 'Hidden from logged out users' ) );
+		}
+		if ( blockVisibility.userAuthentication.loggedIn ) {
+			labels.push( __( 'Hidden from logged in users' ) );
+		}
+	}
+
+	if ( labels.length > 0 ) {
+		return labels.join( '; ' );
 	}
 
 	return null;
