@@ -8,8 +8,10 @@ import {
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
-import { Link, Stack, Text } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
+import { mapMarker } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Icon, Link, Stack, Text, Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -143,7 +145,11 @@ export default function WordPressEvents( {
 	}, [ activeLocation, hasSelectedLocation, userLocale ] );
 
 	return (
-		<>
+		<Stack
+			direction="column"
+			justify="space-between"
+			className={ styles.container }
+		>
 			{ ! locationLabel && (
 				<Stack
 					className={ styles.locationPickerInWidget }
@@ -162,20 +168,6 @@ export default function WordPressEvents( {
 					/>
 				</Stack>
 			) }
-			{ locationLabel && (
-				<div className={ styles.locationSummary }>
-					{ createInterpolateElement(
-						sprintf(
-							/* translators: %s: location name */
-							__( 'Upcoming events near <strong>%s</strong>.' ),
-							locationLabel
-						),
-						{
-							strong: <strong />,
-						}
-					) }
-				</div>
-			) }
 			{ hasSelectedLocation && (
 				<EventsListSection
 					events={ events }
@@ -185,7 +177,7 @@ export default function WordPressEvents( {
 				/>
 			) }
 			<div className={ styles.footer }>
-				<Stack direction="row" align="center" gap="sm">
+				<Stack direction="row" align="center" gap="sm" wrap="wrap">
 					<Link
 						href="https://make.wordpress.org/community/meetups-landing-page"
 						openInNewTab
@@ -198,8 +190,41 @@ export default function WordPressEvents( {
 					>
 						{ __( 'WordCamps' ) }
 					</Link>
+
+					{ locationLabel && (
+						<div className={ styles.footerLocation }>
+							<Tooltip.Root>
+								<Tooltip.Trigger
+									aria-label={ __( 'Change from settings.' ) }
+									render={
+										<Stack
+											direction="row"
+											align="center"
+											gap="xs"
+										>
+											<Icon
+												icon={ mapMarker }
+												size={ 16 }
+											/>
+											<Text
+												variant="body-sm"
+												className={
+													styles.locationSummary
+												}
+											>
+												{ locationLabel }
+											</Text>
+										</Stack>
+									}
+								/>
+								<Tooltip.Popup>
+									{ __( 'Change from settings.' ) }
+								</Tooltip.Popup>
+							</Tooltip.Root>
+						</div>
+					) }
 				</Stack>
 			</div>
-		</>
+		</Stack>
 	);
 }
