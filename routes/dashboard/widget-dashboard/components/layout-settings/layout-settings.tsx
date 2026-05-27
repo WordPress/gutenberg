@@ -22,7 +22,7 @@ import { LayoutModelEditField } from './layout-model-edit-field';
 
 const DEFAULT_FIXED_COLUMNS = 12;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
-const DEFAULT_ROW_HEIGHT = 300;
+const DEFAULT_ROW_HEIGHT = 200;
 const ROW_HEIGHT_AUTO = 'auto' as const;
 
 function getModel( item: WidgetGridSettings ): WidgetGridModel {

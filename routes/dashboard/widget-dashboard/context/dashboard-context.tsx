@@ -42,7 +42,7 @@ const DEFAULT_GRID: WidgetGridSettings = {
 	model: 'grid',
 	columns: 12,
 	minColumnWidth: 350,
-	rowHeight: 300,
+	rowHeight: 200,
 };
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };

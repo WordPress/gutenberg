@@ -15,6 +15,7 @@ import { AlertDialog, Button, Stack } from '@wordpress/ui';
 import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
+import { usePendingWhenEditMode } from '../dashboard-commands/use-pending-when-edit-mode';
 import { LayoutModeDropdown } from '../layout-mode-dropdown';
 import { MoreActionsDropdown } from '../more-actions-dropdown';
 import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
@@ -22,9 +23,11 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 /**
  * Header chrome for the dashboard. Two independent flows are exposed:
  *
- * - **Customize** (layout edits): toggles edit mode, surfaces the Add
- *   widgets / Layout / Cancel / Done toolbar. Commits the layout staging
- *   buffer on Done.
+ * - **Customize** (layout edits): toggles edit mode and surfaces Layout /
+ *   Cancel / Done. Commits the layout staging buffer on Done.
+ * - **Add widget**: to the right of Customize (or to the right of the edit
+ *   toolbar while customizing); opens the inserter (enters customize mode
+ *   first when not already editing).
  * - **Layout** (dropdown next to Add widget): switches between Grid and
  *   Masonry immediately via `commitGridModelChange` while staying in edit
  *   mode.
@@ -83,9 +86,14 @@ export function Actions(): React.ReactNode {
 		onEditChange?.( ! editMode );
 	}, [ editMode, onEditChange ] );
 
+	const runWhenInEditMode = usePendingWhenEditMode( {
+		editMode,
+		onEditChange,
+	} );
+
 	const insert = useCallback( () => {
-		setInserterOpen( true );
-	}, [ setInserterOpen ] );
+		runWhenInEditMode( () => setInserterOpen( true ) );
+	}, [ runWhenInEditMode, setInserterOpen ] );
 
 	const cancel = useCallback( () => {
 		cancelStaging();
@@ -119,16 +127,6 @@ export function Actions(): React.ReactNode {
 							: styles.editActionsEnter
 					}
 				>
-					<Button
-						variant="minimal"
-						tone="brand"
-						size="compact"
-						onClick={ insert }
-					>
-						{ ! isMobileViewport && <Button.Icon icon={ plus } /> }
-						{ __( 'Add widget' ) }
-					</Button>
-
 					{ canEditGridSettings && <LayoutModeDropdown /> }
 
 					<div
@@ -165,6 +163,16 @@ export function Actions(): React.ReactNode {
 					{ __( 'Customize' ) }
 				</Button>
 			) }
+
+			<Button
+				variant="minimal"
+				tone="brand"
+				size="compact"
+				onClick={ insert }
+			>
+				{ ! isMobileViewport && <Button.Icon icon={ plus } /> }
+				{ __( 'Add widget' ) }
+			</Button>
 
 			<MoreActionsDropdown items={ moreActionsItems } />
 
