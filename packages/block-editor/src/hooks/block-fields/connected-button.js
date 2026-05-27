@@ -7,7 +7,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 import { connection, linkOff } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
@@ -41,19 +41,22 @@ const { Menu } = unlock( componentsPrivateApis );
  * @param {Object}  props
  * @param {boolean} props.isConnected Whether the field is currently bound.
  */
-export function ConnectedButton( { isConnected, ...props } ) {
-	const label = isConnected ? __( 'Disconnect' ) : __( 'Connect' );
+export const ConnectedButton = forwardRef(
+	( { isConnected, ...props }, ref ) => {
+		const label = isConnected ? __( 'Disconnect' ) : __( 'Connect' );
 
-	return (
-		<Button
-			{ ...props }
-			size="small"
-			icon={ isConnected ? connection : linkOff }
-			iconSize={ 24 }
-			label={ label }
-		/>
-	);
-}
+		return (
+			<Button
+				ref={ ref }
+				{ ...props }
+				size="small"
+				icon={ isConnected ? connection : linkOff }
+				iconSize={ 24 }
+				label={ label }
+			/>
+		);
+	}
+);
 
 export default ConnectedButton;
 
