@@ -4,17 +4,16 @@
 import clsx from 'clsx';
 import type {
 	ComponentPropsWithoutRef,
-	ForwardedRef,
 	HTMLAttributes,
 	MouseEvent,
 	ReactElement,
+	Ref,
 } from 'react';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -104,10 +103,10 @@ function useDeprecatedProps( {
  * );
  * ```
  */
-export function UnforwardedButton(
-	props: ButtonProps & DeprecatedButtonProps,
-	ref: ForwardedRef< any >
-) {
+export function Button( {
+	ref,
+	...props
+}: ButtonProps & DeprecatedButtonProps & { ref?: Ref< any > } ) {
 	const {
 		__next40pxDefaultSize,
 		accessibleWhenDisabled,
@@ -303,6 +302,4 @@ export function UnforwardedButton(
 	);
 }
 
-export const Button = forwardRef( UnforwardedButton );
-Button.displayName = 'Button';
 export default Button;
