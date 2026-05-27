@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { WidgetName, WidgetType } from '../types';
+import type { WidgetName, WidgetType, WidgetTypeMetadata } from '../types';
 
 /**
  * Registers the `widgetModule` core-data entity at module load.
@@ -39,7 +39,17 @@ interface WidgetModuleRecord {
 	name: string;
 	render_module?: string | null;
 	widget_module?: string | null;
+	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
 }
+
+/**
+ * Tuple of `[ widgetTypes, isResolvingWidgetTypes ]`.
+ *
+ * The boolean is true while widget-module records or their metadata imports
+ * have not finished resolving. Layout instances must not be treated as missing
+ * until it is false.
+ */
+export type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
 /**
  * Returns the registered widget types, with each record's metadata
@@ -49,13 +59,12 @@ interface WidgetModuleRecord {
  * which fetches `/wp/v2/widget-modules` on first selector resolution.
  * For each record this hook dynamically imports `widget_module` and
  * merges the module's default export with the runtime fields (`name`,
- * `renderModule`). Until the imports resolve the hook returns an empty
- * array.
+ * `renderModule`).
  *
  * Consumers do not register or dispatch anything; the data layer owns
  * caching and invalidation.
  */
-export function useWidgetTypes(): WidgetType[] {
+export function useWidgetTypes(): UseWidgetTypesResult {
 	const records = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
@@ -65,13 +74,23 @@ export function useWidgetTypes(): WidgetType[] {
 	);
 
 	const [ widgetTypes, setWidgetTypes ] = useState< WidgetType[] >( [] );
+	const [ isResolvingWidgetTypes, setIsResolvingWidgetTypes ] =
+		useState( true );
 
 	useEffect( () => {
-		if ( ! records ) {
+		if ( records === null ) {
+			setIsResolvingWidgetTypes( true );
+			return;
+		}
+
+		if ( records.length === 0 ) {
+			setWidgetTypes( [] );
+			setIsResolvingWidgetTypes( false );
 			return;
 		}
 
 		let cancelled = false;
+		setIsResolvingWidgetTypes( true );
 
 		Promise.all(
 			records.map( async ( record ) => {
@@ -92,6 +111,9 @@ export function useWidgetTypes(): WidgetType[] {
 						...( module.default as Partial< WidgetType > ),
 						name: record.name as WidgetName,
 						renderModule: record.render_module ?? '',
+						...( record.presentation
+							? { presentation: record.presentation }
+							: {} ),
 					} as WidgetType;
 				} catch {
 					return null;
@@ -105,6 +127,7 @@ export function useWidgetTypes(): WidgetType[] {
 			setWidgetTypes(
 				results.filter( ( t ): t is WidgetType => t !== null )
 			);
+			setIsResolvingWidgetTypes( false );
 		} );
 
 		return () => {
@@ -112,5 +135,5 @@ export function useWidgetTypes(): WidgetType[] {
 		};
 	}, [ records ] );
 
-	return widgetTypes;
+	return [ widgetTypes, isResolvingWidgetTypes ];
 }

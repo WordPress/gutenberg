@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * External dependencies
  */
-import { View, Text, TouchableOpacity } from 'react-native';
 
 /**
  * Internal dependencies
@@ -44,7 +44,7 @@ const BlockSelectionButton = ( {
 			>
 				{ rootClientId &&
 					rootBlockIcon && [
-						<Icon
+						<WCIcon
 							key="parent-icon"
 							size={ 24 }
 							icon={ rootBlockIcon.src }

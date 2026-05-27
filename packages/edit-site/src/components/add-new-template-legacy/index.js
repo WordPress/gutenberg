@@ -13,7 +13,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
@@ -123,7 +123,7 @@ function TemplateListItem( {
 				direction={ direction }
 			>
 				<div className="edit-site-add-new-template__template-icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 				<VStack
 					className="edit-site-add-new-template__template-name"

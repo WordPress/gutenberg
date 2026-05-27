@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Tooltip } from '@wordpress/components';
+import { Tooltip as WCTooltip } from '@wordpress/components';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { _x, sprintf } from '@wordpress/i18n';
@@ -107,7 +107,7 @@ export default function Variation( {
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			{ showTooltip ? (
-				<Tooltip text={ variation?.title }>{ content }</Tooltip>
+				<WCTooltip text={ variation?.title }>{ content }</WCTooltip>
 			) : (
 				content
 			) }

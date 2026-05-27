@@ -152,7 +152,7 @@ function TileActions( {
 				variant="solid"
 				tone={ isFill ? 'brand' : 'neutral' }
 				icon={ justifyStretch }
-				label="Fill width"
+				label="Fill available width"
 				aria-pressed={ isFill }
 				onClick={ onToggleFill }
 			/>
@@ -332,6 +332,50 @@ export const Responsive: Story = {
 };
 
 /**
+ * Layered configuration: `columns` caps the count and
+ * `minColumnWidth` enforces a per-tile width floor. The grid renders
+ * up to `columns` columns on wide containers and reduces the count
+ * on narrow ones whenever fitting all of them would push tiles
+ * below `minColumnWidth`. Resize the preview to see the cap apply
+ * on wide widths and the floor reduce the count on narrow widths.
+ */
+export const Layered: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 1, order: 1 },
+			{ key: 'b', width: 2, order: 2 },
+			{ key: 'c', width: 2, order: 3 },
+			{ key: 'd', width: 1, order: 4 },
+			{ key: 'e', width: 2, order: 5 },
+			{ key: 'f', width: 2, order: 6 },
+		],
+		rowHeight: 96,
+		columns: 6,
+		minColumnWidth: 240,
+		children: [
+			<Tile key="a" tone="brand">
+				width: 1
+			</Tile>,
+			<Tile key="b" tone="info">
+				width: 2
+			</Tile>,
+			<Tile key="c" tone="success">
+				width: 2
+			</Tile>,
+			<Tile key="d" tone="warning">
+				width: 1
+			</Tile>,
+			<Tile key="e" tone="error">
+				width: 2
+			</Tile>,
+			<Tile key="f" tone="neutral">
+				width: 2
+			</Tile>,
+		],
+	},
+};
+
+/**
  * A `width: 'fill'` item expands to cover the remaining columns in
  * its row. Mix it with fixed-width items on either side to build
  * sidebar-like layouts that adapt to the column count.
@@ -436,15 +480,11 @@ export const RowHeight: Story = {
 /**
  * Edit mode with drag, resize, and all width modes. While `editMode`
  * is on, `<DashboardGrid />` paints its default overlay behind the
- * tiles to visualize the underlying template: diagonal stripes, a
- * dashed outline on each column track, a subtle column fill that
- * marks the drop zones against the gaps, and a 1px row divider when
- * `rowHeight` is numeric. The overlay disappears when `editMode`
- * flips back to `false`.
+ * tiles to visualize the underlying template: rounded row-marker
+ * tiles in each column when `rowHeight` is numeric. The overlay
+ * disappears when `editMode` flips back to `false`.
  *
- * Theme the default look in place via CSS custom properties exposed
- * by the package (`--wp-grid-overlay-stripe-color`,
- * `--wp-grid-overlay-track-color`, `--wp-grid-overlay-column-fill`),
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
  * or replace the visual wholesale by passing `renderGridOverlay`.
  * See the `Custom Grid Overlay` story for a full override example.
  *
@@ -669,23 +709,14 @@ function CustomResizeHandle( {
 }
 
 /**
- * Drop-in wrapper that bumps the dragged-clone shadow and clips its
- * corners. The grid keeps the lift scale and the grabbing cursor on
- * the functional frame; the consumer's wrapper sits inside it.
+ * Example `renderDragPreview` wrapper: keeps the clone height chain
+ * intact. Lift, shadow, and motion live on the grid
+ * `.drag-preview-frame`; set `--wp-grid-drag-preview-radius` on the
+ * surface when the lift shadow should match rounded tiles (see widget
+ * dashboard).
  */
 function CustomDragPreview( { children }: DragPreviewRenderProps ) {
-	return (
-		<div
-			style={ {
-				height: '100%',
-				boxShadow: 'var(--wpds-elevation-lg)',
-				borderRadius: 'var(--wpds-border-radius-lg)',
-				overflow: 'hidden',
-			} }
-		>
-			{ children }
-		</div>
-	);
+	return <div style={ { height: '100%' } }>{ children }</div>;
 }
 
 /**
@@ -693,8 +724,8 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
  *
  * 1. `renderResizeHandle` swaps the default corner triangle for a
  *    custom diagonal-arrow icon.
- * 2. `renderDragPreview` wraps the dragged clone with extra chrome
- *    (stronger shadow, rounded corners, overflow clipping).
+ * 2. `renderDragPreview` wraps the dragged clone (here only for the
+ *    height chain; lift and shadow stay on the grid frame).
  * 3. CSS custom properties on an ancestor retheme the lift scale,
  *    placeholder opacity, placeholder outline color, and placeholder
  *    border-radius without touching the package.
@@ -787,7 +818,7 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				inset: 0,
 				display: 'grid',
 				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
-				gap: 'var(--wpds-dimension-gap-md)',
+				gap: 'var(--wpds-dimension-gap-xl)',
 				pointerEvents: 'none',
 				opacity: isActive ? 1 : 0,
 				visibility: isActive ? 'visible' : 'hidden',
