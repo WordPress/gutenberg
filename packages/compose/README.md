@@ -597,7 +597,7 @@ _Parameters_
 
 -   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
 -   _operator_ `[WPViewportOperator]`: Viewport operator.
--   _view_ `[Window]`: Window instance in which to perform viewport matching.
+-   _view_ `[Window|undefined]`: Window instance in which to perform viewport matching.
 
 _Returns_
 
