@@ -98,14 +98,14 @@ export default function ScaleTool( {
 
 	return (
 		<ToolsPanelItem
-			label={ __( 'Scale' ) }
+			label={ _x( 'Scale', 'Image scaling options' ) }
 			isShownByDefault={ isShownByDefault }
 			hasValue={ () => displayValue !== defaultValue }
 			onDeselect={ () => onChange( defaultValue ) }
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				label={ __( 'Scale' ) }
+				label={ _x( 'Scale', 'Image scaling options' ) }
 				isBlock
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }

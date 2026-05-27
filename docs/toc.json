@@ -223,10 +223,13 @@
 								"docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md": []
 							},
 							{
+								"docs/reference-guides/interactivity-api/core-concepts/using-typescript.md": []
+							},
+							{
 								"docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md": []
 							},
 							{
-								"docs/reference-guides/interactivity-api/core-concepts/using-typescript.md": []
+								"docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md": []
 							}
 						]
 					},
@@ -389,6 +392,7 @@
 					},
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
+					{ "docs/contributors/code/workspace-development.md": [] },
 					{
 						"docs/contributors/code/release/README.md": [
 							{

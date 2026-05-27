@@ -34,6 +34,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
 } from './private-keys';
@@ -147,7 +148,7 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 	] )
 );
 
@@ -170,7 +171,7 @@ export const getEnabledBlockParents = createSelector(
 	},
 	( state ) => [
 		state.blocks.parents,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
 	]
@@ -361,7 +362,9 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 
 				return mapUserPattern(
 					block,
-					state.settings.__experimentalUserPatternCategories
+					state.settings[ userPatternCategoriesSelectKey ]?.(
+						select
+					) ?? state.settings.__experimentalUserPatternCategories
 				);
 			}
 
@@ -393,7 +396,9 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				.map( ( userPattern ) =>
 					mapUserPattern(
 						userPattern,
-						state.settings.__experimentalUserPatternCategories
+						state.settings[ userPatternCategoriesSelectKey ]?.(
+							select
+						) ?? state.settings.__experimentalUserPatternCategories
 					)
 				),
 			// This setting is left for back compat.
@@ -1051,4 +1056,58 @@ export function getViewportModalClientIds( state ) {
  */
 export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
+}
+
+const DEFAULT_BLOCK_STYLE_STATE = {
+	viewport: 'default',
+	pseudo: 'default',
+};
+
+/**
+ * Returns the selected style state for a block's style controls.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {Object} The selected block style state.
+ */
+export function getSelectedBlockStyleState( state, clientId ) {
+	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
+		return DEFAULT_BLOCK_STYLE_STATE;
+	}
+
+	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
+}
+
+/**
+ * Returns whether a non-default style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a non-default block style state is selected.
+ */
+export function hasSelectedStyleState( state, clientId ) {
+	const selectedState = getSelectedBlockStyleState( state, clientId );
+
+	return (
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
+		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
+	);
+}
+
+/**
+ * Returns whether the selected style state is shown on the canvas.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether the selected style state is shown on the canvas.
+ */
+export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
+	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
+		return true;
+	}
+
+	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
 }

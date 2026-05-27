@@ -12,6 +12,7 @@
 	height: 24px;
 	border-radius: 50%;
 	overflow: hidden;
+	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
 	margin-right: 8px;
 	opacity: 0;
 	transition: opacity 0.1s ease-in;
@@ -33,6 +34,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
 	margin-right: 8px;
 	color: $gray-700;
 }

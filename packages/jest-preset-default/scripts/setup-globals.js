@@ -3,7 +3,6 @@
 globalThis.SCRIPT_DEBUG = true;
 
 // These are necessary to load TinyMCE successfully.
-global.URL = window.URL;
 global.window.tinyMCEPreInit = {
 	// Without this, TinyMCE tries to determine its URL by looking at the
 	// <script> tag where it was loaded from, which of course fails here.
@@ -12,18 +11,6 @@ global.window.tinyMCEPreInit = {
 
 global.window.setImmediate = function ( callback ) {
 	return setTimeout( callback, 0 );
-};
-
-global.window.requestAnimationFrame = function requestAnimationFrame(
-	callback
-) {
-	const randomDelay = Math.round( ( Math.random() * 1_000 ) / 60 );
-
-	return setTimeout( () => callback( Date.now() ), randomDelay );
-};
-
-global.window.cancelAnimationFrame = function cancelAnimationFrame( handle ) {
-	return clearTimeout( handle );
 };
 
 // Ignoring `options` argument since we unconditionally schedule this ASAP.

@@ -7,58 +7,76 @@ import { render } from '@testing-library/react';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { PostPublishPanel } from '../index';
+import PostPublishPanel from '../index';
 
 describe( 'PostPublishPanel', () => {
-	jest.spyOn( select( coreStore ), 'getPostType' ).mockReturnValue( {
-		labels: {
-			singular_name: 'post',
-		},
+	beforeEach( () => {
+		jest.spyOn( select( coreStore ), 'getPostType' ).mockReturnValue( {
+			labels: {
+				singular_name: 'post',
+			},
+		} );
+
+		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+			link: 'https://wordpress.local/sample-page/',
+		} );
 	} );
 
-	jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
-		link: 'https://wordpress.local/sample-page/',
+	afterEach( () => {
+		jest.restoreAllMocks();
 	} );
 
 	it( 'should render the pre-publish panel if the post is not saving, published or scheduled', () => {
-		const { container } = render(
-			<PostPublishPanel
-				isPublished={ false }
-				isScheduled={ false }
-				isSaving={ false }
-			/>
-		);
+		const { container } = render( <PostPublishPanel /> );
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render the pre-publish panel if post status is scheduled but date is before now', () => {
-		const { container } = render(
-			<PostPublishPanel isScheduled isBeingScheduled={ false } />
-		);
+		jest.spyOn(
+			select( editorStore ),
+			'isCurrentPostScheduled'
+		).mockReturnValue( true );
 
+		const { container } = render( <PostPublishPanel /> );
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render the spinner if the post is being saved', () => {
-		const { container } = render( <PostPublishPanel isSaving /> );
+		jest.spyOn( select( editorStore ), 'isSavingPost' ).mockReturnValue(
+			true
+		);
+
+		const { container } = render( <PostPublishPanel /> );
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render the post-publish panel if the post is published', () => {
-		const { container } = render( <PostPublishPanel isPublished /> );
+		jest.spyOn(
+			select( editorStore ),
+			'isCurrentPostPublished'
+		).mockReturnValue( true );
+
+		const { container } = render( <PostPublishPanel /> );
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render the post-publish panel if the post is scheduled', () => {
-		const { container } = render(
-			<PostPublishPanel isScheduled isBeingScheduled />
-		);
+		jest.spyOn(
+			select( editorStore ),
+			'isCurrentPostScheduled'
+		).mockReturnValue( true );
+		jest.spyOn(
+			select( editorStore ),
+			'isEditedPostBeingScheduled'
+		).mockReturnValue( true );
+
+		const { container } = render( <PostPublishPanel /> );
 		expect( container ).toMatchSnapshot();
 	} );
 } );

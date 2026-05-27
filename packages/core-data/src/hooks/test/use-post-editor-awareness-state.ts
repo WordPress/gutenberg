@@ -295,6 +295,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			expect( result.current( mockSelection ) ).toEqual( {
 				richTextOffset: null,
 				localClientId: null,
+				attributeKey: null,
 			} );
 		} );
 
@@ -309,6 +310,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.convertSelectionStateToAbsolute.mockReturnValue( {
 				richTextOffset: 10,
 				localClientId: 'block-1',
+				attributeKey: 'content',
 			} );
 
 			const { result } = renderHook( () =>
@@ -323,6 +325,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			expect( position ).toEqual( {
 				richTextOffset: 10,
 				localClientId: 'block-1',
+				attributeKey: 'content',
 			} );
 		} );
 	} );

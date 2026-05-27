@@ -22,7 +22,12 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
-export function QuickEditModal( { postType, postId, closeModal } ) {
+export function QuickEditModal( {
+	postType,
+	postId,
+	closeModal,
+	quickEditForm,
+} ) {
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
@@ -93,61 +98,21 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 	);
 
 	const form = useMemo( () => {
-		const allFields = [
-			{
-				id: 'featured_media',
-				layout: {
-					type: 'regular',
-					labelPosition: 'none',
-				},
-			},
-			{
-				id: 'post-content-info',
-				layout: { type: 'regular', labelPosition: 'none' },
-			},
-			{
-				id: 'status',
-				label: __( 'Status' ),
-				children: [
-					{
-						id: 'status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'scheduled_date',
-					'password',
-				],
-			},
-			'author',
-			'date',
-			'slug',
-			'parent',
-			{
-				id: 'discussion',
-				label: __( 'Discussion' ),
-				children: [
-					{
-						id: 'comment_status',
-						layout: { type: 'regular', labelPosition: 'none' },
-					},
-					'ping_status',
-				],
-			},
-			'template',
-		];
-
+		if ( ! quickEditForm ) {
+			return { layout: { type: 'panel' }, fields: [] };
+		}
+		if ( ! isBulk ) {
+			return quickEditForm;
+		}
 		return {
-			layout: {
-				type: 'panel',
-			},
-			fields: isBulk
-				? allFields.filter( ( field ) =>
-						fieldsWithBulkEditSupport.includes(
-							typeof field === 'string' ? field : field.id
-						)
-				  )
-				: allFields,
+			...quickEditForm,
+			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+				fieldsWithBulkEditSupport.includes(
+					typeof field === 'string' ? field : field.id
+				)
+			),
 		};
-	}, [ isBulk ] );
+	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits ) => {
 		const currentData = { ...record, ...localEdits };

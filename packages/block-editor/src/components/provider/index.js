@@ -8,6 +8,7 @@ import {
 	MediaUploadProvider,
 	store as uploadStore,
 	detectClientSideMediaSupport,
+	isHeicCanvasSupported,
 } from '@wordpress/upload-media';
 
 /**
@@ -37,6 +38,17 @@ let hasLoggedFallback = false;
  * This is computed once per session for efficiency and stability.
  */
 let isClientSideMediaEnabledCache = null;
+
+/**
+ * Cached result of whether HEIC-only canvas processing should be enabled.
+ */
+let isHeicCanvasEnabledCache = null;
+
+/**
+ * HEIC MIME types that should be routed through the upload-media pipeline
+ * when in HEIC-only mode.
+ */
+const HEIC_MIME_TYPES = [ 'image/heic', 'image/heif' ];
 
 /**
  * Checks if client-side media processing should be enabled.
@@ -86,6 +98,44 @@ function shouldEnableClientSideMediaProcessing() {
 }
 
 /**
+ * Checks if HEIC-only canvas processing should be enabled.
+ *
+ * Returns true when:
+ * 1. Full client-side processing is NOT available (otherwise it handles HEIC already)
+ * 2. The server has set the __heicUploadSupport flag
+ * 3. The browser supports createImageBitmap + OffscreenCanvas (e.g. Safari)
+ *
+ * @return {boolean} Whether HEIC-only canvas processing should be enabled.
+ */
+function shouldEnableHeicCanvasProcessing() {
+	if ( isHeicCanvasEnabledCache !== null ) {
+		return isHeicCanvasEnabledCache;
+	}
+
+	// If full client-side processing is enabled, it already handles HEIC.
+	if ( shouldEnableClientSideMediaProcessing() ) {
+		isHeicCanvasEnabledCache = false;
+		return false;
+	}
+
+	if ( ! window.__heicUploadSupport ) {
+		isHeicCanvasEnabledCache = false;
+		return false;
+	}
+
+	if (
+		typeof isHeicCanvasSupported !== 'function' ||
+		! isHeicCanvasSupported()
+	) {
+		isHeicCanvasEnabledCache = false;
+		return false;
+	}
+
+	isHeicCanvasEnabledCache = true;
+	return true;
+}
+
+/**
  * Upload a media file when the file upload button is activated
  * or when adding a file to the editor via drag & drop.
  *
@@ -129,6 +179,92 @@ function mediaUpload(
 }
 
 /**
+ * Upload interceptor for HEIC-only mode.
+ *
+ * Routes HEIC files through the upload-media pipeline for canvas-based
+ * conversion, while passing non-HEIC files to the original mediaUpload
+ * function for standard server-side processing.
+ *
+ * @param {WPDataRegistry} registry
+ * @param {Object}         settings          Block editor settings.
+ * @param {Object}         $3                Parameters object passed to the function.
+ * @param {Array}          $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
+ * @param {Object}         $3.additionalData Additional data to include in the request.
+ * @param {Array<File>}    $3.filesList      List of files.
+ * @param {Function}       $3.onError        Function called when an error happens.
+ * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
+ * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ */
+function heicMediaUpload(
+	registry,
+	settings,
+	{
+		allowedTypes,
+		additionalData = {},
+		filesList,
+		onError = noop,
+		onFileChange,
+		onSuccess,
+		onBatchSuccess,
+	}
+) {
+	const files = Array.from( filesList );
+	const heicFiles = files.filter( ( file ) =>
+		HEIC_MIME_TYPES.includes( file.type )
+	);
+	const otherFiles = files.filter(
+		( file ) => ! HEIC_MIME_TYPES.includes( file.type )
+	);
+
+	// When the batch contains both HEIC and non-HEIC files, coordinate
+	// onBatchSuccess so it fires only after *both* paths have completed.
+	const hasBothPaths =
+		heicFiles.length > 0 && otherFiles.length > 0 && settings?.mediaUpload;
+	let pathsRemaining = hasBothPaths ? 2 : 1;
+	const coordinatedBatchSuccess = hasBothPaths
+		? () => {
+				pathsRemaining--;
+				if ( pathsRemaining <= 0 ) {
+					onBatchSuccess?.();
+				}
+		  }
+		: onBatchSuccess;
+
+	// Route HEIC files through the upload-media pipeline.
+	if ( heicFiles.length > 0 ) {
+		void registry.dispatch( uploadStore ).addItems( {
+			files: heicFiles,
+			onChange: onFileChange,
+			onSuccess: ( attachments ) => {
+				settings?.[ mediaUploadOnSuccessKey ]?.( attachments );
+				onSuccess?.( attachments );
+			},
+			onBatchSuccess: coordinatedBatchSuccess,
+			onError: ( error ) =>
+				onError(
+					typeof error === 'string' ? error : error?.message ?? ''
+				),
+			additionalData,
+			allowedTypes,
+		} );
+	}
+
+	// Pass non-HEIC files to the original server-side upload function.
+	if ( otherFiles.length > 0 && settings?.mediaUpload ) {
+		settings.mediaUpload( {
+			allowedTypes,
+			additionalData,
+			filesList: otherFiles,
+			onError,
+			onFileChange,
+			onSuccess,
+			onBatchSuccess: coordinatedBatchSuccess,
+		} );
+	}
+}
+
+/**
  * Calls useBlockSync as a child of SelectionContext.Provider so that the
  * hook can read selection state from the context provided by this tree
  * rather than from a parent provider (which may not exist for the root).
@@ -152,6 +288,9 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const isClientSideMediaEnabled =
 			shouldEnableClientSideMediaProcessing();
+		const isHeicCanvasEnabled = shouldEnableHeicCanvasProcessing();
+		const useUploadMediaPipeline =
+			isClientSideMediaEnabled || isHeicCanvasEnabled;
 
 		// Nested providers (e.g. from useBlockPreview) inherit settings
 		// where mediaUpload has already been replaced with the
@@ -162,16 +301,17 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const settings = useMemo( () => {
 			if (
-				isClientSideMediaEnabled &&
+				useUploadMediaPipeline &&
 				_settings?.mediaUpload &&
 				! isMediaUploadIntercepted
 			) {
-				// Create a new object so that the original props.settings.mediaUpload is not modified.
-				const interceptor = mediaUpload.bind(
-					null,
-					registry,
-					_settings
-				);
+				// Choose the right interceptor:
+				// - Full mode: all uploads go through upload-media pipeline.
+				// - HEIC-only mode: only HEIC files go through, rest use legacy path.
+				const uploadFn = isClientSideMediaEnabled
+					? mediaUpload
+					: heicMediaUpload;
+				const interceptor = uploadFn.bind( null, registry, _settings );
 				interceptor.__isMediaUploadInterceptor = true;
 				return {
 					..._settings,
@@ -182,6 +322,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		}, [
 			_settings,
 			registry,
+			useUploadMediaPipeline,
 			isClientSideMediaEnabled,
 			isMediaUploadIntercepted,
 		] );
@@ -258,7 +399,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		// overwrite the store's server-side function with the
 		// interceptor, causing uploads to loop instead of reaching
 		// the server.
-		if ( isClientSideMediaEnabled && ! isMediaUploadIntercepted ) {
+		if ( useUploadMediaPipeline && ! isMediaUploadIntercepted ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }

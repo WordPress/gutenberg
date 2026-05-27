@@ -1,0 +1,27 @@
+.root {
+	/*
+	 * Inline-axis queries only; block size stays content-driven so a masonry
+	 * tile sizes to content (size containment would collapse it to zero).
+	 * `min-height: 100%` still fills a fixed-height grid tile, and is ignored
+	 * when no ancestor defines a height.
+	 */
+	container-type: inline-size;
+	min-height: 100%;
+}
+
+.columns {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: var(--wpds-dimension-gap-2xl);
+	flex: 1;
+	align-items: center;
+	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
+	margin: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
+}
+
+@container (max-width: 420px) {
+	.columns {
+		padding: var(--wpds-dimension-padding-lg);
+		margin: 0;
+	}
+}

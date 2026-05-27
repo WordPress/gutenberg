@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import type { ConnectionStatus } from '@wordpress/core-data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 interface UseRetryCountdownResult {
 	onManualRetry: () => void;
@@ -13,6 +13,7 @@ export function useRetryCountdown(
 	connectionStatus?: ConnectionStatus | null
 ): UseRetryCountdownResult {
 	const [ secondsRemaining, setSecondsRemaining ] = useState< number >();
+	const hasRetriedRef = useRef( false );
 
 	useEffect( () => {
 		if ( ! connectionStatus ) {
@@ -22,6 +23,7 @@ export function useRetryCountdown(
 		// Only clear countdown when explicitly connected.
 		if ( 'connected' === connectionStatus.status ) {
 			setSecondsRemaining( undefined );
+			hasRetriedRef.current = false;
 			return;
 		}
 
@@ -37,21 +39,55 @@ export function useRetryCountdown(
 
 		const { willAutoRetryInMs: retryInMs } = connectionStatus;
 		const retryAt = Date.now() + retryInMs;
-		setSecondsRemaining( Math.ceil( retryInMs / 1000 ) );
 
-		const intervalId = setInterval( () => {
-			const remaining = Math.ceil( ( retryAt - Date.now() ) / 1000 );
-			setSecondsRemaining( Math.max( 0, remaining ) );
-			if ( remaining <= 0 ) {
-				clearInterval( intervalId );
+		// After a retry attempt (manual or automatic), show "Retrying..."
+		// for 500ms before starting the next countdown. Skip the delay on
+		// the very first disconnect so the countdown starts immediately.
+		const hasRetried = hasRetriedRef.current;
+		hasRetriedRef.current = true;
+
+		if ( hasRetried ) {
+			setSecondsRemaining( 0 );
+		}
+
+		let countdownIntervalId: ReturnType< typeof setInterval > | null = null;
+
+		const startCountdown = () => {
+			setSecondsRemaining( Math.ceil( ( retryAt - Date.now() ) / 1000 ) );
+
+			countdownIntervalId = setInterval( () => {
+				const remaining = Math.ceil( ( retryAt - Date.now() ) / 1000 );
+				setSecondsRemaining( Math.max( 0, remaining ) );
+
+				if ( remaining <= 0 && countdownIntervalId ) {
+					clearInterval( countdownIntervalId );
+				}
+			}, 1000 );
+		};
+
+		const retryingDelayId = hasRetried
+			? setTimeout( startCountdown, 500 )
+			: null;
+
+		if ( ! retryingDelayId ) {
+			startCountdown();
+		}
+
+		return () => {
+			if ( retryingDelayId ) {
+				clearTimeout( retryingDelayId );
 			}
-		}, 1000 );
 
-		return () => clearInterval( intervalId );
+			if ( countdownIntervalId ) {
+				clearInterval( countdownIntervalId );
+			}
+		};
 	}, [ connectionStatus ] );
 
 	return {
-		onManualRetry: () => setSecondsRemaining( 0 ),
+		onManualRetry: () => {
+			setSecondsRemaining( 0 );
+		},
 		secondsRemaining,
 	};
 }

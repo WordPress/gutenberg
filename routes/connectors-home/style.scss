@@ -29,6 +29,10 @@ $sticky-header-clearance: 120px;
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
+	&__file-mods-notice {
+		margin-bottom: 16px;
+	}
+
 	&--empty {
 		flex-grow: 1;
 		display: flex;
@@ -44,15 +48,18 @@ $sticky-header-clearance: 120px;
 		overflow: hidden;
 		border-radius: 8px;
 		padding: 24px;
-		padding-inline-end: 220px;
-		background:
-			linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
-			linear-gradient(90deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
+		padding-inline-end: 150px;
+		background-color: #e7d4e4;
+		background-image:
+			radial-gradient(ellipse 70% 120% at 18% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
+			radial-gradient(ellipse 55% 110% at 92% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
+			radial-gradient(ellipse 40% 85% at 58% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
 
 		[dir="rtl"] & {
-			background:
-				linear-gradient(270deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%),
-				linear-gradient(270deg, #89dcdc 0%, #c7eb5c 46.15%, #a920c1 100%);
+			background-image:
+				radial-gradient(ellipse 70% 120% at 82% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
+				radial-gradient(ellipse 55% 110% at 8% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
+				radial-gradient(ellipse 40% 85% at 42% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
 		}
 
 		&__content {
@@ -60,6 +67,7 @@ $sticky-header-clearance: 120px;
 			flex-direction: column;
 			gap: 12px;
 			padding-top: 2px;
+			align-items: flex-start;
 
 			p {
 				margin: 0;
@@ -68,42 +76,39 @@ $sticky-header-clearance: 120px;
 			}
 		}
 
-		&__actions {
-			display: flex;
-			gap: 12px;
-			align-items: center;
-		}
-
 		&__decoration {
 			position: absolute;
-			inset-inline-end: 8px;
-			top: -15px;
-			width: 248px;
-			height: 248px;
+			inset-inline-end: 16px;
+			top: 12px;
+			width: 110px;
+			height: 110px;
 		}
 	}
 
 	> p {
-		text-align: center;
 		color: $gray-600;
 	}
 
 	@media (max-width: 680px) {
 		.ai-plugin-callout {
 			padding: 12px;
-			padding-inline-end: 84px;
+			padding-inline-end: 100px;
 
 			&__decoration {
-				width: 134px;
-				height: 134px;
-				inset-inline-end: 4px;
-				top: -8px;
+				width: 75px;
+				height: 75px;
+				inset-inline-end: 8px;
+				top: 8px;
 			}
 		}
 	}
 
 	@media (max-width: 480px) {
 		padding: 8px;
+
+		.ai-plugin-callout {
+			padding-inline-end: 130px;
+		}
 
 		.components-item {
 			padding: 12px;

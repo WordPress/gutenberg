@@ -25,13 +25,13 @@ import type { ConnectorConfig } from './types';
  * import { __experimentalRegisterConnector as registerConnector, __experimentalConnectorItem as ConnectorItem } from '@wordpress/connectors';
  *
  * registerConnector( 'my-plugin/openai', {
- *     label: 'OpenAI',
+ *     name: 'OpenAI',
  *     description: 'Text, image, and code generation with GPT.',
- *     icon: <MyOpenAIIcon />,
- *     render: ( { slug, label, description, icon } ) => (
+ *     logo: <MyOpenAIIcon />,
+ *     render: ( { slug, name, description, logo } ) => (
  *         <ConnectorItem
- *             icon={ icon }
- *             name={ label }
+ *             logo={ logo }
+ *             name={ name }
  *             description={ description }
  *         >
  *             <MyCustomSettings />

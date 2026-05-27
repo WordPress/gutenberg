@@ -11,3 +11,5 @@ This section provides some guides on important concepts and mental models relate
 4. **[Using TypeScript](/docs/reference-guides/interactivity-api/core-concepts/using-typescript.md):** This guide will walk you through the process of using TypeScript with Interactivity API stores, covering everything from basic type definitions to advanced techniques for handling complex store structures.
 
 5. **[Client-Side Navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md):** This guide explains how to use the `@wordpress/interactivity-router` package to implement client-side navigation, enabling faster page transitions by updating only the parts of the page that change.
+
+6. **[Client-Side Navigation Compatibility](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md):** This guide explains how to declare that a block is compatible with client-side navigation and what to consider when evaluating compatibility.

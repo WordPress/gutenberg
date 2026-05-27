@@ -140,7 +140,9 @@ export function MediaControl( {
 						filename={ filename }
 						className="block-library-utils__media-control__inspector-media-replace-title"
 						label={
-							mediaUrl ? getFilename( filename ) : emptyLabel
+							mediaUrl
+								? getFilename( filename ) || emptyLabel
+								: emptyLabel
 						}
 					/>
 				}

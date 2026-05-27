@@ -1,12 +1,9 @@
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
-
 .dataviews-view-config {
 	width: 320px;
 	/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */
 	container-type: inline-size;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
 }
 
 .dataviews-config__popover.is-expanded .dataviews-config__popover-content-wrapper {
@@ -22,7 +19,7 @@
 }
 
 .dataviews-settings-section__title.dataviews-settings-section__title {
-	line-height: $grid-unit-30;
+	line-height: var(--wpds-typography-line-height-md);
 	font-size: 15px;
 }
 
@@ -74,11 +71,11 @@
 
 .dataviews-view-config__modified-indicator {
 	position: absolute;
-	top: $grid-unit-05;
-	right: $grid-unit-05;
-	width: $grid-unit-05;
-	height: $grid-unit-05;
-	background: var(--wp-admin-theme-color, #3858e9);
+	top: var(--wpds-dimension-gap-xs);
+	right: var(--wpds-dimension-gap-xs);
+	width: var(--wpds-dimension-gap-xs);
+	height: var(--wpds-dimension-gap-xs);
+	background: var(--wpds-color-bg-interactive-brand-strong);
 	border-radius: 50%;
 	pointer-events: none;
 }

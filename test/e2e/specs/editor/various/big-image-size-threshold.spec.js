@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -89,6 +89,7 @@ test.describe( 'Big image size threshold', () => {
 				const items = uploadStore.getItems();
 				return items.length === 0;
 			},
+			undefined,
 			{ timeout: 120000 }
 		);
 
@@ -191,6 +192,7 @@ test.describe( 'Big image size threshold', () => {
 				const items = uploadStore.getItems();
 				return items.length === 0;
 			},
+			undefined,
 			{ timeout: 120000 }
 		);
 
@@ -221,23 +223,20 @@ class ImageBlockUtils {
 	constructor( { page } ) {
 		/** @type {Page} */
 		this.page = page;
-		this.basePath = path.join( __dirname, '..', '..', '..', 'assets' );
+		this.basePath = './assets';
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			this.basePath,
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = `${ this.basePath }/10x10_e2e_test_image_z9T8jK.png`;
 	}
 
 	async upload( inputElement, customFile = null ) {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const extension = customFile ? path.extname( customFile ) : '.png';
 		const tmpFileName = path.join( tmpDirectory, fileName + extension );
 		const filePath = customFile
-			? path.join( this.basePath, customFile )
+			? `${ this.basePath }/${ customFile }`
 			: this.TEST_IMAGE_FILE_PATH;
 		await fs.copyFile( filePath, tmpFileName );
 

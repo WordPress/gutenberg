@@ -3,7 +3,6 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	ExternalLink,
 	FocalPointPicker,
 	RangeControl,
 	TextareaControl,
@@ -27,6 +26,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -124,9 +124,20 @@ export default function CoverInspectorControls( {
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
-	const { getSettings } = useSelect( blockEditorStore );
+	const { imageSizes, hasSelectedStyleState } = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				hasSelectedStyleState: hasSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
 
-	const imageSizes = getSettings()?.imageSizes;
+			return {
+				imageSizes: getSettings()?.imageSizes,
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 
 	const image = useSelect(
 		( select ) =>
@@ -193,8 +204,8 @@ export default function CoverInspectorControls( {
 
 	return (
 		<>
-			<InspectorControls>
-				{ ( !! url || useFeaturedImage ) && (
+			{ ( !! url || useFeaturedImage ) && (
+				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
@@ -299,7 +310,8 @@ export default function CoverInspectorControls( {
 									}
 									help={
 										<>
-											<ExternalLink
+											<Link
+												openInNewTab
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 													__(
@@ -310,7 +322,7 @@ export default function CoverInspectorControls( {
 												{ __(
 													'Describe the purpose of the image.'
 												) }
-											</ExternalLink>
+											</Link>
 											<br />
 											{ __(
 												'Leave empty if decorative.'
@@ -329,8 +341,8 @@ export default function CoverInspectorControls( {
 							/>
 						) }
 					</ToolsPanel>
-				) }
-			</InspectorControls>
+				</InspectorControls>
+			) }
 			{ colorGradientSettings.hasColorsOrGradients && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown
@@ -386,51 +398,53 @@ export default function CoverInspectorControls( {
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
-			<InspectorControls group="dimensions">
-				<ToolsPanelItem
-					className="single-column"
-					hasValue={ () => !! minHeight }
-					label={ __( 'Minimum height' ) }
-					onDeselect={ () =>
-						setAttributes( {
+			{ ! hasSelectedStyleState && (
+				<InspectorControls group="dimensions">
+					<ToolsPanelItem
+						className="single-column"
+						hasValue={ () => !! minHeight }
+						label={ __( 'Minimum height' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								minHeight: undefined,
+								minHeightUnit: undefined,
+							} )
+						}
+						resetAllFilter={ () => ( {
 							minHeight: undefined,
 							minHeightUnit: undefined,
-						} )
-					}
-					resetAllFilter={ () => ( {
-						minHeight: undefined,
-						minHeightUnit: undefined,
-					} ) }
-					isShownByDefault
-					panelId={ clientId }
-				>
-					<CoverHeightInput
-						value={
-							attributes?.style?.dimensions?.aspectRatio
-								? ''
-								: minHeight
-						}
-						unit={ minHeightUnit }
-						onChange={ ( newMinHeight ) =>
-							setAttributes( {
-								minHeight: newMinHeight,
-								style: cleanEmptyObject( {
-									...attributes?.style,
-									dimensions: {
-										...attributes?.style?.dimensions,
-										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
-									},
-								} ),
-							} )
-						}
-						onUnitChange={ ( nextUnit ) =>
-							setAttributes( {
-								minHeightUnit: nextUnit,
-							} )
-						}
-					/>
-				</ToolsPanelItem>
-			</InspectorControls>
+						} ) }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<CoverHeightInput
+							value={
+								attributes?.style?.dimensions?.aspectRatio
+									? ''
+									: minHeight
+							}
+							unit={ minHeightUnit }
+							onChange={ ( newMinHeight ) =>
+								setAttributes( {
+									minHeight: newMinHeight,
+									style: cleanEmptyObject( {
+										...attributes?.style,
+										dimensions: {
+											...attributes?.style?.dimensions,
+											aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+										},
+									} ),
+								} )
+							}
+							onUnitChange={ ( nextUnit ) =>
+								setAttributes( {
+									minHeightUnit: nextUnit,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ tagName }

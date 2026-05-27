@@ -20,7 +20,6 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
 	getNormalizedCommaSeparable,
-	isRawAttribute,
 	setNestedValue,
 	isNumericID,
 	getUserPermissionCacheKey,
@@ -534,7 +533,7 @@ export const getRawEntityRecord = createSelector(
 		// comparisons, and joins with edits easier.
 		return Object.fromEntries(
 			Object.keys( record ).map( ( _key ) => {
-				if ( isRawAttribute( config, _key ) ) {
+				if ( config.rawAttributes.includes( _key ) ) {
 					const rawValue = record[ _key ]?.raw;
 					return [
 						_key,
@@ -656,7 +655,10 @@ export const getEntityRecords = ( <
 	if ( ! queriedState ) {
 		return null;
 	}
-	return getQueriedItems( queriedState, query );
+	return getQueriedItems( queriedState, query, {
+		supportsPagination: !! getEntityConfig( state, kind, name )
+			?.supportsPagination,
+	} );
 } ) as GetEntityRecords;
 
 /**
@@ -714,7 +716,10 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query?.per_page === -1 ) {
+	if (
+		! getEntityConfig( state, kind, name )?.supportsPagination ||
+		query?.per_page === -1
+	) {
 		return 1;
 	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
@@ -1656,35 +1661,3 @@ export const getRevision = createSelector(
 		];
 	}
 );
-
-/**
- * Returns the current sync connection status across all entities. Prioritizes
- * disconnected states, then connecting, then connected.
- *
- * @param state Data state.
- *
- * @return The current sync connection state, prioritized by importance.
- */
-export function getSyncConnectionStatus(
-	state: State
-): ConnectionStatus | undefined {
-	if ( ! state.syncConnectionStatuses ) {
-		return undefined;
-	}
-
-	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
-
-	let coalesced: ConnectionStatus | undefined;
-
-	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
-		if (
-			! coalesced ||
-			PRIORITIZED_STATUSES.indexOf( status.status ) <
-				PRIORITIZED_STATUSES.indexOf( coalesced.status )
-		) {
-			coalesced = status;
-		}
-	}
-
-	return coalesced;
-}

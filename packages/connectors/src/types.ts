@@ -3,18 +3,42 @@
  */
 import type { ReactNode } from 'react';
 
+export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
+
+export type ConnectorAuthentication =
+	| {
+			method: 'api_key';
+			settingName: string;
+			credentialsUrl: string | null;
+			keySource?: ApiKeySource;
+			isConnected?: boolean;
+	  }
+	| { method: 'none' };
+
+export interface ConnectorPlugin {
+	file: string;
+	isInstalled: boolean;
+	isActivated: boolean;
+}
+
 export interface ConnectorRenderProps {
 	slug: string;
-	label: string;
+	name: string;
 	description: string;
-	icon?: ReactNode;
+	type?: string;
+	logo?: ReactNode;
+	authentication?: ConnectorAuthentication;
+	plugin?: ConnectorPlugin;
 }
 
 export interface ConnectorConfig {
 	slug: string;
-	label: string;
+	name: string;
 	description: string;
-	icon?: ReactNode;
+	type?: string;
+	logo?: ReactNode;
+	authentication?: ConnectorAuthentication;
+	plugin?: ConnectorPlugin;
 	render?: ( props: ConnectorRenderProps ) => ReactNode;
 }
 

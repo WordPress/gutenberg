@@ -13,7 +13,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	__experimentalItem as Item,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
@@ -142,14 +142,14 @@ export default function BlockBindingsAttributeControl( {
 						className="block-editor-bindings__item"
 						spacing={ 0 }
 					>
-						<Text truncate>{ attribute }</Text>
-						<Text
+						<WCText truncate>{ attribute }</WCText>
+						<WCText
 							truncate
 							variant={ isValid ? 'muted' : undefined }
 							isDestructive={ ! isValid }
 						>
 							{ displayText }
-						</Text>
+						</WCText>
 					</VStack>
 				</Menu.TriggerButton>
 				{ ! isAttributeReadOnly && (
