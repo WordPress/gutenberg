@@ -32,31 +32,24 @@ type LocationOption = {
 const DRAFT_DEBOUNCE_MS = 300;
 
 export function LocationPicker( {
-	hidden,
 	onSubmit = () => {},
-	showCancel,
-	onCancel,
 	seedInput = '',
 	hideLabelFromVision = true,
-	hideSelectButton = false,
-	onDraftChange,
+	selectButton = true,
+	onChange,
 }: {
-	hidden: boolean;
 	onSubmit?: ( location: string ) => void;
-	showCancel: boolean;
-	onCancel: () => void;
 	seedInput?: string;
 	hideLabelFromVision?: boolean;
 	/**
-	 * When true, omits the Select button; use with `onDraftChange` so the parent
-	 * (e.g. widget settings drawer) can persist on its own Save action.
+	 * Controls Select button visibility.
 	 */
-	hideSelectButton?: boolean;
+	selectButton?: boolean;
 	/**
-	 * Called after the input value settles (debounced). Used when `hideSelectButton`
-	 * is true to stage attribute updates before Save.
+	 * Called after the input value settles (debounced). Used when `selectButton`
+	 * is false to stage attribute updates before Save.
 	 */
-	onDraftChange?: ( location: string ) => void;
+	onChange?: ( location: string ) => void;
 } ) {
 	const locationInputId = useId();
 	const [ locationInput, setLocationInput ] = useState( seedInput );
@@ -69,14 +62,10 @@ export function LocationPicker( {
 	);
 
 	useEffect( () => {
-		if ( hideSelectButton ) {
-			setLocationInput( seedInput );
-			return;
-		}
-		if ( showCancel && seedInput ) {
+		if ( ! selectButton || seedInput ) {
 			setLocationInput( seedInput );
 		}
-	}, [ hideSelectButton, showCancel, seedInput ] );
+	}, [ selectButton, seedInput ] );
 
 	const clearDraftTimeout = useCallback( () => {
 		if ( draftTimeoutRef.current ) {
@@ -86,7 +75,7 @@ export function LocationPicker( {
 	}, [] );
 
 	const tryPublishDraft = useCallback( () => {
-		if ( ! hideSelectButton || ! onDraftChange ) {
+		if ( selectButton || ! onChange ) {
 			return;
 		}
 		const draft = locationInput.trim();
@@ -94,11 +83,11 @@ export function LocationPicker( {
 		if ( draft === saved ) {
 			return;
 		}
-		onDraftChange( locationInput );
-	}, [ hideSelectButton, locationInput, onDraftChange, seedInput ] );
+		onChange( locationInput );
+	}, [ selectButton, locationInput, onChange, seedInput ] );
 
 	const scheduleDraftPublish = useCallback( () => {
-		if ( ! hideSelectButton || ! onDraftChange ) {
+		if ( selectButton || ! onChange ) {
 			return;
 		}
 		clearDraftTimeout();
@@ -106,26 +95,16 @@ export function LocationPicker( {
 			draftTimeoutRef.current = null;
 			tryPublishDraft();
 		}, DRAFT_DEBOUNCE_MS );
-	}, [
-		clearDraftTimeout,
-		hideSelectButton,
-		onDraftChange,
-		tryPublishDraft,
-	] );
+	}, [ clearDraftTimeout, selectButton, onChange, tryPublishDraft ] );
 
 	useEffect( () => {
-		if ( ! hideSelectButton || ! onDraftChange ) {
+		if ( selectButton || ! onChange ) {
 			clearDraftTimeout();
 			return;
 		}
 		scheduleDraftPublish();
 		return clearDraftTimeout;
-	}, [
-		clearDraftTimeout,
-		hideSelectButton,
-		onDraftChange,
-		scheduleDraftPublish,
-	] );
+	}, [ clearDraftTimeout, selectButton, onChange, scheduleDraftPublish ] );
 
 	const flushDraftPublish = useCallback( () => {
 		clearDraftTimeout();
@@ -255,15 +234,11 @@ export function LocationPicker( {
 		};
 	}, [ locationInput ] );
 
-	if ( hidden ) {
-		return null;
-	}
-
 	return (
 		<form
 			onSubmit={ ( e ) => {
 				e.preventDefault();
-				if ( ! hideSelectButton ) {
+				if ( selectButton ) {
 					onSubmit( locationInput );
 				}
 			} }
@@ -288,7 +263,7 @@ export function LocationPicker( {
 								) }
 								onValueChange={ () => {} }
 								onBlur={
-									hideSelectButton
+									! selectButton
 										? flushDraftPublish
 										: undefined
 								}
@@ -333,7 +308,7 @@ export function LocationPicker( {
 						</Autocomplete.Popup>
 					) }
 				</Autocomplete.Root>
-				{ ! hideSelectButton && (
+				{ selectButton && (
 					<Button
 						variant="outline"
 						size="compact"
@@ -341,16 +316,6 @@ export function LocationPicker( {
 						disabled={ ! locationInput.trim() }
 					>
 						{ __( 'Select' ) }
-					</Button>
-				) }
-				{ showCancel && (
-					<Button
-						size="compact"
-						tone="neutral"
-						variant="minimal"
-						onClick={ onCancel }
-					>
-						{ __( 'Cancel' ) }
 					</Button>
 				) }
 			</Stack>

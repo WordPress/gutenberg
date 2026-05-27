@@ -25,7 +25,7 @@ export function LocationSettingControl( {
 }: DataFormControlProps< EventsWidgetAttributes > ) {
 	const value = field.getValue( { item: data } ) as string | undefined;
 
-	const onDraftChange = useCallback(
+	const onLocationChange = useCallback(
 		( location: string ) => {
 			onChange(
 				field.setValue( {
@@ -39,13 +39,10 @@ export function LocationSettingControl( {
 
 	return (
 		<LocationPicker
-			hidden={ false }
-			showCancel={ false }
-			onCancel={ () => {} }
 			seedInput={ value ?? '' }
 			hideLabelFromVision={ hideLabelFromVision }
-			hideSelectButton
-			onDraftChange={ onDraftChange }
+			selectButton={ false }
+			onChange={ onLocationChange }
 		/>
 	);
 }

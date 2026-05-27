@@ -20,7 +20,6 @@ import {
 	type EventsWidgetAttributes,
 	type WPEvent,
 } from './components';
-import renderStyles from './render.module.css';
 import styles from './style.module.css';
 
 interface WPEventsResponse {
@@ -99,7 +98,6 @@ export default function WordPressEvents( {
 
 	const [ activeLocation, setActiveLocation ] = useState( persistedLocation );
 	const [ locationLabel, setLocationLabel ] = useState( '' );
-	const [ isEditingLocation, setIsEditingLocation ] = useState( false );
 
 	useEffect( () => {
 		setActiveLocation( persistedLocation );
@@ -146,36 +144,36 @@ export default function WordPressEvents( {
 
 	return (
 		<>
-			<div className={ renderStyles.locationPickerInWidget }>
-				<LocationPicker
-					hidden={ Boolean( locationLabel ) && ! isEditingLocation }
-					onSubmit={ ( location ) => {
-						const next = location.trim();
-						setActiveLocation( next );
-						setIsEditingLocation( false );
-						setAttributes?.( { location: next } );
-					} }
-					showCancel={ isEditingLocation }
-					onCancel={ () => setIsEditingLocation( false ) }
-					seedInput={ activeLocation }
-					hideLabelFromVision
-				/>
-			</div>
-			{ locationLabel && ! isEditingLocation && (
-				<div className={ renderStyles.locationSummary }>
+			{ ! locationLabel && (
+				<Stack
+					className={ styles.locationPickerInWidget }
+					direction="column"
+					align="center"
+					justify="center"
+				>
+					<LocationPicker
+						onSubmit={ ( location ) => {
+							const next = location.trim();
+							setActiveLocation( next );
+							setAttributes?.( { location: next } );
+						} }
+						seedInput={ activeLocation }
+						hideLabelFromVision
+					/>
+				</Stack>
+			) }
+			{ locationLabel && (
+				<div className={ styles.locationSummary }>
 					{ createInterpolateElement(
 						sprintf(
-							/* translators: %s: city name */
+							/* translators: %s: location name */
 							__( 'Upcoming events near <strong>%s</strong>.' ),
 							locationLabel
 						),
 						{
 							strong: <strong />,
 						}
-					) }{ ' ' }
-					<Link onClick={ () => setIsEditingLocation( true ) }>
-						{ __( 'Change' ) }
-					</Link>
+					) }
 				</div>
 			) }
 			{ hasSelectedLocation && (
@@ -186,7 +184,7 @@ export default function WordPressEvents( {
 					showEmptyState
 				/>
 			) }
-			<div className={ renderStyles.footer }>
+			<div className={ styles.footer }>
 				<Stack direction="row" align="center" gap="sm">
 					<Link
 						href="https://make.wordpress.org/community/meetups-landing-page"
