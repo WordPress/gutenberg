@@ -87,7 +87,18 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	// Resolve from the package root context to get correct versions
 	const contextPath = path.join( packageRoot, 'package.json' );
 	const require = createRequire( contextPath );
-	const resolved = require.resolve( `${ fullPackageName }/package.json` );
+
+	// `require.resolve` throws when the package isn't installed. Treat that as a
+	// cache-able miss and return `null`, honoring the documented contract so callers
+	// (e.g. the externals plugin) can fall through to esbuild's own resolution.
+	let resolved;
+	try {
+		resolved = require.resolve( `${ fullPackageName }/package.json` );
+	} catch {
+		packageJsonCache.set( cacheKey, null );
+		return null;
+	}
+
 	const result = getPackageInfoFromFile( resolved );
 	packageJsonCache.set( cacheKey, result );
 
