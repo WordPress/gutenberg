@@ -227,7 +227,29 @@ jobs:
                   name: changelog trunk
                   path: trunk
 
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  svn_error_file="$(mktemp)"
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping release commit to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    svn_status=$?
+                    if grep -q 'E160013' "$svn_error_file"; then
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                    else
+                      cat "$svn_error_file" >&2
+                      rm -f "$svn_error_file"
+                      exit "$svn_status"
+                    fi
+                  fi
+                  rm -f "$svn_error_file"
+
             - name: Commit the release
+              if: steps.check_svn_tag.outputs.exists != 'true'
               working-directory: ./trunk
               run: |
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
@@ -279,7 +301,29 @@ jobs:
                   name: changelog trunk
                   path: ${{ github.event.release.name }}
 
+            - name: Check if SVN tag already exists
+              id: check_svn_tag
+              run: |
+                  svn_error_file="$(mktemp)"
+                  if svn list "$PLUGIN_REPO_URL/tags/$VERSION" \
+                    --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                    --non-interactive --no-auth-cache >/dev/null 2>"$svn_error_file"; then
+                    echo "::warning::SVN tag tags/$VERSION already exists. Skipping import to avoid E150002."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    svn_status=$?
+                    if grep -q 'E160013' "$svn_error_file"; then
+                      echo "exists=false" >> "$GITHUB_OUTPUT"
+                    else
+                      cat "$svn_error_file" >&2
+                      rm -f "$svn_error_file"
+                      exit "$svn_status"
+                    fi
+                  fi
+                  rm -f "$svn_error_file"
+
             - name: Add the new version directory and commit changes to the SVN repository
+              if: steps.check_svn_tag.outputs.exists != 'true'
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
