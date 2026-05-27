@@ -55,7 +55,11 @@ import {
 	useSaveMediaEditor,
 	type MediaEditorSaveResult,
 } from './use-save-media-editor';
-import { useCropOptions } from './use-crop-options';
+import {
+	useCropOptions,
+	getSessionAspectRatioValue,
+	shouldRestoreAspectRatio,
+} from './use-crop-options';
 
 export type { MediaEditorSaveResult } from './use-save-media-editor';
 
@@ -558,8 +562,45 @@ function MediaEditorContent( {
 }
 
 export function MediaEditor( props: MediaEditorProps ) {
+	// Seed the cropOptions slice from the session-scoped memory so the
+	// user's last aspect-ratio choice carries across modal close/reopen
+	// within the same page session — but only when applying it would
+	// produce a crop matching what the user sees on open. A 16:9 image
+	// opened with a stored 1:1 selection would otherwise show a smaller
+	// crop than the visible image and feel broken; we fall back to Free.
+	const { mediaWidth, mediaHeight } = useSelect(
+		( select ) => {
+			const record = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				'attachment',
+				props.id
+			) as Media | undefined;
+			return {
+				mediaWidth: Number( record?.media_details?.width ),
+				mediaHeight: Number( record?.media_details?.height ),
+			};
+		},
+		[ props.id ]
+	);
+	const storedAspectRatioValue = getSessionAspectRatioValue();
+	const initialCropOptions =
+		storedAspectRatioValue !== null &&
+		shouldRestoreAspectRatio(
+			storedAspectRatioValue,
+			mediaWidth,
+			mediaHeight
+		)
+			? { aspectRatioValue: storedAspectRatioValue }
+			: undefined;
+	// Dimensions are included in the key so a cold-load (media record
+	// fetched async) still re-mounts the provider with the seed once
+	// dimensions arrive. The cropper UI is hidden behind a spinner until
+	// then, so the remount is a no-op from the user's perspective.
 	return (
-		<MediaEditorStateProvider key={ props.id }>
+		<MediaEditorStateProvider
+			key={ `${ props.id }:${ mediaWidth }x${ mediaHeight }` }
+			initialCropOptions={ initialCropOptions }
+		>
 			<MediaEditorContent { ...props } />
 		</MediaEditorStateProvider>
 	);
