@@ -16,11 +16,11 @@ import { __ } from '@wordpress/i18n';
  * Toolbar control that turns an animated GIF Image block into a converted Video
  * block once the GIF's sideloaded video companion is available.
  *
- * Mirrors the Video block's "Display as GIF" toolbar control: when the GIF was
- * uploaded earlier in the session it auto-swaps on render; this control is the
- * explicit path for image blocks that came in already opted out (for example
- * after using "Display as GIF" to restore the original) or that were saved
- * before the companion finished sideloading.
+ * Mirrors the Video block's "Display as GIF" toolbar control. Fresh uploads
+ * are swapped automatically from the image block's `onSelectImage`; this
+ * control is the explicit path for image blocks that came from saved post
+ * content (or that the author restored from a converted Video block via
+ * "Display as GIF") and now want to be played as a looping video.
  *
  * @param {Object} props            Component props.
  * @param {Object} props.attributes Image block attributes.

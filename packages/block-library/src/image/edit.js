@@ -237,6 +237,40 @@ export function ImageEdit( {
 			return;
 		}
 
+		// Switch to a converted GIF video block when the selected media is
+		// an animated GIF whose sideloaded video companion is available.
+		// Triggering off the upload's onChange (rather than watching the
+		// attachment record) means already-saved image blocks are left
+		// alone on page load - the explicit "Display as video" toolbar
+		// button is the path for converting those. `animated_video` is
+		// only ever set on GIF image attachments, so its presence is a
+		// sufficient signal that this swap applies.
+		if (
+			! context?.galleryId &&
+			media.media_details?.animated_video &&
+			media.url
+		) {
+			const dir = media.url.slice( 0, media.url.lastIndexOf( '/' ) + 1 );
+			const poster = media.media_details.animated_video_poster;
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceBlock(
+				clientId,
+				createBlock( 'core/video', {
+					id: media.id,
+					src: dir + media.media_details.animated_video,
+					poster: poster ? dir + poster : undefined,
+					caption: media.caption?.raw ?? media.caption,
+					controls: false,
+					loop: true,
+					autoplay: true,
+					muted: true,
+					playsInline: true,
+				} )
+			);
+			setTemporaryURL();
+			return;
+		}
+
 		const { imageDefaultSize } = getSettings();
 
 		// Try to use the previous selected image size if its available

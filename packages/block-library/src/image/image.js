@@ -64,7 +64,6 @@ import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
-import AnimatedGifConverter from './animated-gif-converter';
 import AnimatedGifConvertControl from './animated-gif-convert-control';
 import {
 	MIN_SIZE,
@@ -299,7 +298,6 @@ export default function Image( {
 		lightbox,
 		metadata,
 		isDecorative,
-		preserveAnimatedGif,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -1380,14 +1378,6 @@ export default function Image( {
 
 	return (
 		<>
-			<AnimatedGifConverter
-				id={ id }
-				clientId={ clientId }
-				url={ url }
-				caption={ attributes.caption }
-				galleryId={ context.galleryId }
-				preserveAnimatedGif={ preserveAnimatedGif }
-			/>
 			{ ! context.galleryId && (
 				<AnimatedGifConvertControl
 					attributes={ attributes }

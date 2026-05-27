@@ -70,8 +70,6 @@ export default function GifRestoreControl( { attributes, clientId } ) {
 				url: gif.source_url,
 				alt: gif.alt_text || '',
 				caption,
-				// Keep it as the original GIF instead of re-converting it.
-				preserveAnimatedGif: true,
 			} )
 		);
 	}
