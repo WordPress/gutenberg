@@ -435,7 +435,7 @@ Runs a media query and returns its value when it changes.
 _Parameters_
 
 -   _query_ `[string]`: Media Query.
--   _view_ `[Window]`: Window instance, else default to global window
+-   _view_ `[Window | undefined]`: Window instance, else default to global window
 
 _Returns_
 

@@ -75,7 +75,13 @@ ViewportMatchWidthContext.displayName = 'ViewportMatchWidthContext';
  *
  * @return {boolean} Whether viewport matches query.
  */
-const useViewportMatch = ( breakpoint, operator = '>=', view = window ) => {
+const useViewportMatch = (
+	breakpoint,
+	operator = '>=',
+	// Resolve the default lazily so SSR (where `window` is undeclared) does not
+	// throw a ReferenceError when this default expression is evaluated.
+	view = typeof window !== 'undefined' ? window : undefined
+) => {
 	const simulatedWidth = useContext( ViewportMatchWidthContext );
 	const mediaQuery =
 		! simulatedWidth &&
