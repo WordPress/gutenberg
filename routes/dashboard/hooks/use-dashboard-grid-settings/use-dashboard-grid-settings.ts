@@ -13,6 +13,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import type { WidgetGridSettings } from '../../widget-dashboard/types';
+import { normalizeGridSettings } from '../../widget-dashboard/utils/normalize-grid-settings';
+import { DEFAULT_ROW_HEIGHT } from '../../widget-dashboard/utils/row-height-presets';
 
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardGridSettings';
@@ -28,7 +30,7 @@ const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
 	model: 'grid',
 	columns: 12,
 	minColumnWidth: 140,
-	rowHeight: 140,
+	rowHeight: DEFAULT_ROW_HEIGHT,
 };
 
 /**
@@ -48,13 +50,15 @@ export function useDashboardGridSettings(): [
 	( settings: WidgetGridSettings ) => void,
 	() => void,
 ] {
-	const settings = useSelect(
-		( select ) =>
-			( select( preferencesStore ).get( SCOPE, KEY ) as
-				| WidgetGridSettings
-				| undefined ) ?? DEFAULT_GRID_SETTINGS,
-		[]
-	);
+	const settings = useSelect( ( select ) => {
+		const stored = select( preferencesStore ).get( SCOPE, KEY ) as
+			| WidgetGridSettings
+			| undefined;
+		return normalizeGridSettings(
+			stored ?? DEFAULT_GRID_SETTINGS,
+			DEFAULT_ROW_HEIGHT
+		);
+	}, [] );
 
 	const { set } = useDispatch( preferencesStore );
 
