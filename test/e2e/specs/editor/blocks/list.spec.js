@@ -1664,9 +1664,8 @@ test.describe( 'List (@firefox)', () => {
 			await editor.insertBlock( block );
 		}
 
-		// Click directly on "b" (the inner item of list 1) to place
-		// the caret there.
-		await editor.canvas.getByText( 'b', { exact: true } ).click();
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowRight' );
 
 		// Verify the setup: caret lands at end of the first list's
 		// inner "b".
