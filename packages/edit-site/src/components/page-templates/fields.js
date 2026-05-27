@@ -157,6 +157,10 @@ export const activeField = {
 	label: __( 'Status' ),
 	id: 'active',
 	type: 'boolean',
+	elements: [
+		{ value: true, label: _x( 'Active', 'template status' ) },
+		{ value: false, label: _x( 'Inactive', 'template status' ) },
+	],
 	getValue: ( { item } ) => item._isActive,
 	render: function Render( { item } ) {
 		const activeLabel = item._isCustom
