@@ -10,7 +10,6 @@ import {
 	TextareaControl,
 	TextControl,
 	CheckboxControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -66,6 +65,7 @@ import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
 import AnimatedGifConverter from './animated-gif-converter';
+import AnimatedGifConvertControl from './animated-gif-convert-control';
 import {
 	MIN_SIZE,
 	ALLOWED_MEDIA_TYPES,
@@ -1006,33 +1006,6 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
-						{ !! image?.media_details?.animated_video && (
-							<ToolsPanelItem
-								label={ __( 'Animation' ) }
-								isShownByDefault
-								hasValue={ () => !! preserveAnimatedGif }
-								onDeselect={ () =>
-									setAttributes( {
-										preserveAnimatedGif: undefined,
-									} )
-								}
-							>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Display as original GIF' ) }
-									checked={ !! preserveAnimatedGif }
-									onChange={ ( value ) =>
-										setAttributes( {
-											preserveAnimatedGif:
-												value || undefined,
-										} )
-									}
-									help={ __(
-										'Enabled keeps the original animated GIF. Disable to play it as an optimized, looping video instead.'
-									) }
-								/>
-							</ToolsPanelItem>
-						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
@@ -1415,6 +1388,12 @@ export default function Image( {
 				galleryId={ context.galleryId }
 				preserveAnimatedGif={ preserveAnimatedGif }
 			/>
+			{ ! context.galleryId && (
+				<AnimatedGifConvertControl
+					attributes={ attributes }
+					clientId={ clientId }
+				/>
+			) }
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }
