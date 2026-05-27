@@ -108,6 +108,7 @@ export function MediaEditorModal( {
 			renderFrame={ ( {
 				children,
 				headerActions,
+				footerActions,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -127,6 +128,9 @@ export function MediaEditorModal( {
 						headerActions={ headerActions }
 					>
 						{ children }
+						<div className="media-editor-modal__footer">
+							{ footerActions }
+						</div>
 					</Modal>
 				</ShortcutProvider>
 			) }
