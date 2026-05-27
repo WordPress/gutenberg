@@ -1510,6 +1510,95 @@ describe( 'polling-manager', () => {
 			);
 		} );
 
+		it( 'ignores forbidden rooms that were not in the failed request', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'primary',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+				],
+			} );
+
+			const primaryDoc = createMockDoc( 1 );
+			pollingManager.registerRoom( {
+				room: 'primary',
+				doc: primaryDoc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+			for ( let i = 1; i <= 10; i++ ) {
+				pollingManager.registerRoom( {
+					room: `overflow-${ i }`,
+					doc: createMockDoc( i + 1 ),
+					awareness: createMockAwareness(),
+					log: jest.fn(),
+					onStatusChange: jest.fn(),
+					onSync: jest.fn(),
+				} );
+			}
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			const onPrimaryDocUpdate = getOnDocUpdate( primaryDoc );
+			onPrimaryDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync one or more entities: overflow-1, overflow-10.',
+				data: {
+					status: 403,
+					rooms: [ 'overflow-1', 'overflow-10' ],
+				},
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ] as {
+				rooms: Array< { room: string; updates: unknown[] } >;
+			};
+			expect( failedPayload.rooms.map( ( room ) => room.room ) ).toEqual(
+				[
+					'primary',
+					'overflow-1',
+					'overflow-2',
+					'overflow-3',
+					'overflow-4',
+					'overflow-5',
+					'overflow-6',
+					'overflow-7',
+					'overflow-8',
+					'overflow-9',
+				]
+			);
+			const failedPrimaryRoom = failedPayload.rooms.find(
+				( room ) => room.room === 'primary'
+			);
+			expect( failedPrimaryRoom!.updates.length ).toBeGreaterThan( 0 );
+
+			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
+				rooms: Array< { room: string; updates: unknown[] } >;
+			};
+			const retryRooms = retryPayload.rooms.map( ( room ) => room.room );
+			expect( retryRooms ).toContain( 'primary' );
+			expect( retryRooms ).toContain( 'overflow-10' );
+			expect( retryRooms ).not.toContain( 'overflow-1' );
+			expect(
+				retryPayload.rooms.find( ( room ) => room.room === 'primary' )!
+					.updates
+			).toEqual( failedPrimaryRoom!.updates );
+		} );
+
 		it( 'retries normally on a 401 (not treated as forbidden)', async () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 

@@ -245,7 +245,11 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			if ( ! empty( $forbidden_rooms ) ) {
 				return new WP_Error(
 					'rest_cannot_edit',
-					__( 'You do not have permission to sync one or more entities.', 'gutenberg' ),
+					sprintf(
+						/* translators: %s: Comma-separated list of room names. */
+						__( 'You do not have permission to sync one or more entities: %s.', 'gutenberg' ),
+						implode( ', ', $forbidden_rooms )
+					),
 					array(
 						'status' => rest_authorization_required_code(),
 						'rooms'  => $forbidden_rooms,
