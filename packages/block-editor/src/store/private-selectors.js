@@ -34,6 +34,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
 } from './private-keys';
@@ -361,7 +362,9 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 
 				return mapUserPattern(
 					block,
-					state.settings.__experimentalUserPatternCategories
+					state.settings[ userPatternCategoriesSelectKey ]?.(
+						select
+					) ?? state.settings.__experimentalUserPatternCategories
 				);
 			}
 
@@ -393,7 +396,9 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				.map( ( userPattern ) =>
 					mapUserPattern(
 						userPattern,
-						state.settings.__experimentalUserPatternCategories
+						state.settings[ userPatternCategoriesSelectKey ]?.(
+							select
+						) ?? state.settings.__experimentalUserPatternCategories
 					)
 				),
 			// This setting is left for back compat.
@@ -1072,6 +1077,23 @@ export function getSelectedBlockStyleState( state, clientId ) {
 	}
 
 	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
+}
+
+/**
+ * Returns whether a non-default style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a non-default block style state is selected.
+ */
+export function hasSelectedStyleState( state, clientId ) {
+	const selectedState = getSelectedBlockStyleState( state, clientId );
+
+	return (
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
+		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
+	);
 }
 
 /**

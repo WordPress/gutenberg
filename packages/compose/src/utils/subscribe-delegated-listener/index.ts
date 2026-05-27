@@ -34,29 +34,21 @@ const registries = new WeakMap<
 	Map< string, WeakMap< EventTarget, Set< EventListener > > >
 >();
 
-function getRoot( target: EventTarget ): EventTarget {
-	// Detect Document / Window via duck typing (works across realms —
-	// the iframe's `Document` constructor is distinct from the parent
-	// window's, so `instanceof` is unreliable).
-	if ( ( target as Document ).nodeType === 9 /* DOCUMENT_NODE */ ) {
-		return target;
-	}
-	if ( ( target as Window ).window === target ) {
-		return target;
-	}
-	// Assume Element/Node.
-	return ( target as Node ).ownerDocument as Document;
-}
-
 export default function subscribeDelegatedListener(
 	target: EventTarget,
 	eventType: string,
 	callback: EventListener,
 	capture: boolean = false
 ): () => void {
-	const root = getRoot( target );
-	// Duck-type detection (cross-realm safe).
-	const isWindow = ( root as Window ).window === root;
+	// Where the native listener is attached:
+	//   Element  → its `ownerDocument`
+	//   Document → itself (own `ownerDocument` is `null`)
+	//   Window   → itself (no `ownerDocument` property)
+	// `undefined` (Window) → use a fan-out branch on dispatch since
+	// events bubble *to* window but never *from* it via `parentNode`.
+	const ownerDoc = ( target as Node ).ownerDocument;
+	const root = ownerDoc ?? target;
+	const isWindow = ownerDoc === undefined;
 
 	let perRoot = registries.get( root );
 	if ( ! perRoot ) {

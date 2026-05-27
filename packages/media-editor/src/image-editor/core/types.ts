@@ -109,7 +109,8 @@ export interface CropperState {
  *
  * This type is intentionally not exported from the image-editor public barrel.
  * Consumers should drive state through the controller returned by
- * `useCropperState()` or through serializable `TransformOperation` values.
+ * `useCropperReducer()` (or a composite store) or through serializable
+ * `TransformOperation` values.
  */
 export type CropperAction =
 	/** Sets the loaded image metadata (natural size, src). */

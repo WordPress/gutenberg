@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { scopeSelector } from '../components/global-styles/utils';
+import { splitSelectorList } from '@wordpress/global-styles-engine';
 
 /**
  * Given a block's `selectors.root` value, returns the part of the selector
@@ -36,6 +32,70 @@ export function getRelativeRootSelector( rootSelector ) {
 }
 
 /**
+ * Builds a scoped selector from a block selector and optional suffix.
+ *
+ * If the block selector targets a descendant, the descendant portion is scoped
+ * under the provided base selector. Otherwise the base selector itself is used.
+ *
+ * @param {string} baseSelector  The block-instance scoping selector.
+ * @param {string} blockSelector The block or feature selector from block metadata.
+ * @param {string} suffix        Optional selector suffix, e.g. ":hover".
+ * @return {string} The scoped CSS selector.
+ */
+export function buildScopedBlockSelector(
+	baseSelector,
+	blockSelector,
+	suffix = ''
+) {
+	if ( typeof blockSelector !== 'string' || ! blockSelector ) {
+		return splitSelectorList( baseSelector )
+			.map( ( selector ) => `${ selector.trim() }${ suffix }` )
+			.join( ', ' );
+	}
+
+	const baseSelectors = splitSelectorList( baseSelector ).filter(
+		( selector ) => selector.trim()
+	);
+	const selectors = splitSelectorList( blockSelector ).filter( ( selector ) =>
+		selector.trim()
+	);
+
+	if ( ! selectors.length ) {
+		return baseSelectors
+			.map( ( selector ) => `${ selector.trim() }${ suffix }` )
+			.join( ', ' );
+	}
+
+	return selectors
+		.map( ( selector ) => {
+			selector = selector.trim();
+
+			/*
+			 * Replace only the leading block selector part (e.g. class name,
+			 * attribute selector, ID, or tag name) with the block instance selector.
+			 * Preserve anything after that prefix, including modifier classes on the
+			 * same element and combinators without spaces.
+			 */
+			const match = selector.match( /^([.#]?[-_a-zA-Z0-9]+|\[[^\]]+\])/ );
+			if ( match ) {
+				return baseSelectors
+					.map(
+						( base ) =>
+							`${ base.trim() }${ selector.slice(
+								match[ 0 ].length
+							) }${ suffix }`
+					)
+					.join( ', ' );
+			}
+
+			return baseSelectors
+				.map( ( base ) => `${ base.trim() }${ suffix }` )
+				.join( ', ' );
+		} )
+		.join( ', ' );
+}
+
+/**
  * Builds the scoped selector for root block style state styles.
  *
  * Uses the block's `selectors.root` to determine which element should receive
@@ -50,13 +110,7 @@ export function getRelativeRootSelector( rootSelector ) {
  */
 export function buildRootStyleStateSelector( baseSelector, name ) {
 	const rootSelector = getBlockType( name )?.selectors?.root;
-	if ( rootSelector ) {
-		const relativeSelector = getRelativeRootSelector( rootSelector );
-		if ( relativeSelector ) {
-			return scopeSelector( baseSelector, relativeSelector );
-		}
-	}
-	return baseSelector;
+	return buildScopedBlockSelector( baseSelector, rootSelector );
 }
 
 /**
@@ -77,6 +131,11 @@ export function buildPseudoStyleStateSelector( baseSelector, name, state ) {
 	return `${ buildRootStyleStateSelector( baseSelector, name ) }${ state }`;
 }
 
+export function buildStateSelector( baseSelector, name, state ) {
+	const rootSelector = getBlockType( name )?.selectors?.root;
+	return buildScopedBlockSelector( baseSelector, rootSelector, state );
+}
+
 /**
  * Builds the CSS selector used to preview a state on the editor canvas,
  * scoped to a specific block instance via its `data-block` attribute.
@@ -92,11 +151,8 @@ export function buildPseudoStyleStateSelector( baseSelector, name, state ) {
  */
 export function buildCanvasStateSelector( clientId, name ) {
 	const rootSelector = getBlockType( name )?.selectors?.root;
-	if ( rootSelector ) {
-		const relativeSelector = getRelativeRootSelector( rootSelector );
-		if ( relativeSelector ) {
-			return `[data-block="${ clientId }"] ${ relativeSelector }`;
-		}
-	}
-	return `[data-block="${ clientId }"]`;
+	return buildScopedBlockSelector(
+		`[data-block="${ clientId }"]`,
+		rootSelector
+	);
 }

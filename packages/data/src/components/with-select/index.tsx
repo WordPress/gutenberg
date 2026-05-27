@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -58,7 +59,7 @@ const withSelect = (
 ) =>
 	createHigherOrderComponent(
 		( WrappedComponent ) =>
-			pure( ( ownProps: Record< string, unknown > ) => {
+			memo( function WithSelect( ownProps: Record< string, unknown > ) {
 				const mapSelect = (
 					select: SelectFunction,
 					registry: DataRegistry

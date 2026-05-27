@@ -27,7 +27,7 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		 * single source of truth across the registry, REST schema, and
 		 * any consumer that needs to validate or enumerate the set.
 		 */
-		const PRESENTATION_VALUES = array( 'framed', 'full-bleed' );
+		const PRESENTATION_VALUES = array( 'framed', 'content-bleed', 'full-bleed' );
 
 		/**
 		 * Widget type key. Namespaced identifier, e.g. `core/hello-world`.
