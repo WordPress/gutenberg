@@ -100,7 +100,7 @@ interface RoomState {
 interface WPRestError {
 	code?: string;
 	message?: string;
-	data: { status: number };
+	data: { status: number; rooms?: string[] };
 }
 
 /**
@@ -189,31 +189,42 @@ function handleForbiddenError(
 	error: WPRestError,
 	requestedRooms: SyncPayload[ 'rooms' ]
 ): void {
-	const forbiddenRoom = identifyForbiddenRoom(
-		error,
-		requestedRooms.map( ( r ) => r.room )
-	);
+	const requestedRoomNames = requestedRooms.map( ( r ) => r.room );
+	const forbiddenRooms = Array.isArray( error.data.rooms )
+		? error.data.rooms.filter( ( room ) =>
+				requestedRoomNames.includes( room )
+		  )
+		: [];
+	const forbiddenRoom =
+		forbiddenRooms.length === 0
+			? identifyForbiddenRoom( error, requestedRoomNames )
+			: null;
 
 	if ( forbiddenRoom ) {
-		// A specific room was denied — unregister only that room.
-		const state = roomStates.get( forbiddenRoom );
-		if ( state ) {
-			state.log(
-				'Permission denied, unregistering room',
-				{ error },
-				'error',
-				true // force
-			);
-			unregisterRoom( forbiddenRoom, { sendDisconnectSignal: false } );
+		forbiddenRooms.push( forbiddenRoom );
+	}
+
+	if ( forbiddenRooms.length > 0 ) {
+		for ( const room of forbiddenRooms ) {
+			const state = roomStates.get( room );
+			if ( state ) {
+				state.log(
+					'Permission denied, unregistering room',
+					{ error },
+					'error',
+					true // force
+				);
+				unregisterRoom( room, { sendDisconnectSignal: false } );
+			}
 		}
 
 		// Restore updates for remaining rooms so they can be retried on
 		// the next poll cycle.
 		for ( const room of requestedRooms ) {
-			if (
-				room.room === forbiddenRoom ||
-				! roomStates.has( room.room )
-			) {
+			if ( forbiddenRooms.includes( room.room ) ) {
+				continue;
+			}
+			if ( ! roomStates.has( room.room ) ) {
 				continue;
 			}
 			const remainingState = roomStates.get( room.room )!;

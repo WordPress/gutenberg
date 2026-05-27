@@ -1415,6 +1415,101 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
 
+		it( 'unregisters all rooms listed in a forbidden error response', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'keep-room',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+					{
+						room: 'forbidden-room-a',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+					{
+						room: 'forbidden-room-b',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+
+			const keepDoc = createMockDoc( 1 );
+			pollingManager.registerRoom( {
+				room: 'keep-room',
+				doc: keepDoc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+			pollingManager.registerRoom( {
+				room: 'forbidden-room-a',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+			pollingManager.registerRoom( {
+				room: 'forbidden-room-b',
+				doc: createMockDoc( 3 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			const onDocUpdate = getOnDocUpdate( keepDoc );
+			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync one or more entities.',
+				data: {
+					status: 403,
+					rooms: [ 'forbidden-room-a', 'forbidden-room-b' ],
+				},
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
+			const failedKeepRoom = failedPayload.rooms.find(
+				( room: { room: string } ) => room.room === 'keep-room'
+			);
+			expect( failedKeepRoom!.updates.length ).toBeGreaterThan( 0 );
+
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'keep-room',
+						end_cursor: 2,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ];
+			expect( retryPayload.rooms.map( ( room ) => room.room ) ).toEqual( [
+				'keep-room',
+			] );
+			expect( retryPayload.rooms[ 0 ].updates ).toEqual(
+				failedKeepRoom!.updates
+			);
+		} );
+
 		it( 'retries normally on a 401 (not treated as forbidden)', async () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 
