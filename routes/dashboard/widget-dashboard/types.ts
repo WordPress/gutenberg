@@ -2,7 +2,7 @@
  * Widget type definitions for the dashboard engine.
  *
  * The widget identity types (`WidgetName`, `WidgetTypeMetadata`,
- * `WidgetType`) live in `routes/dashboard/widget-types/types` and are
+ * `WidgetType`) live in `routes/dashboard/widget-kit/types` and are
  * re-exported here so dashboard internals can pull every type they need
  * from a single module. The local declarations below cover the
  * dashboard-specific surface area: `DashboardWidget`, render props,
@@ -29,7 +29,7 @@ import type {
 	WidgetName,
 	WidgetTypeMetadata,
 	WidgetType,
-} from '../widget-types/types';
+} from '../widget-kit/types';
 
 export type { WidgetName, WidgetTypeMetadata, WidgetType };
 
