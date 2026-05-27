@@ -16,6 +16,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -46,6 +47,9 @@ import {
 	isPercentageUnit,
 } from './utils.js';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { unlock } from '../lock-unlock';
+
+const { HTMLElementControl } = unlock( blockEditorPrivateApis );
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -70,7 +74,7 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		useSearchElement,
+		tagName,
 		style,
 	} = attributes;
 
@@ -325,7 +329,6 @@ export default function SearchEdit( {
 							showLabel: true,
 							buttonUseIcon: false,
 							buttonPosition: 'button-outside',
-							useSearchElement: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -477,25 +480,21 @@ export default function SearchEdit( {
 							</ToggleGroupControl>
 						</VStack>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ () => !! useSearchElement }
-						label={ __( 'Use the search element' ) }
-						onDeselect={ () => {
-							setAttributes( { useSearchElement: false } );
-						} }
-					>
-						<ToggleControl
-							checked={ !! useSearchElement }
-							label={ __( 'Use the search element' ) }
-							help={ __(
-								'Render the block in the semantic HTML <search> landmark element instead of a form with the search role. Affects the published output only.'
-							) }
-							onChange={ ( value ) =>
-								setAttributes( { useSearchElement: value } )
-							}
-						/>
-					</ToolsPanelItem>
 				</ToolsPanel>
+			</InspectorControls>
+			<InspectorControls group="advanced">
+				<HTMLElementControl
+					tagName={ tagName ?? '' }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value || undefined } )
+					}
+					clientId={ clientId }
+					options={ [
+						{ label: __( 'Default' ), value: '' },
+						{ label: '<search>', value: 'search' },
+						{ label: '<form>', value: 'form' },
+					] }
+				/>
 			</InspectorControls>
 		</>
 	);

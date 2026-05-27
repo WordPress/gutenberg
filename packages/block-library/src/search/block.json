@@ -43,9 +43,8 @@
 			"type": "object",
 			"default": {}
 		},
-		"useSearchElement": {
-			"type": "boolean",
-			"default": false
+		"tagName": {
+			"type": "string"
 		}
 	},
 	"supports": {

@@ -34,6 +34,9 @@ export const htmlElementMessages = {
 	nav: __(
 		'The <nav> element should be used to identify groups of links that are intended to be used for website or page content navigation.'
 	),
+	search: __(
+		'The <search> element should represent a set of form controls used to perform a search and is announced as a search landmark by assistive technologies.'
+	),
 	section: __(
 		"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
 	),
