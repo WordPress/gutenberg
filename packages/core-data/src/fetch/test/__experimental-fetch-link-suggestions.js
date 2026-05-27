@@ -5,10 +5,28 @@ import {
 	default as fetchLinkSuggestions,
 	sortResults,
 	tokenize,
+	extractSlug,
 } from '../__experimental-fetch-link-suggestions';
 
 jest.mock( '@wordpress/api-fetch', () =>
 	jest.fn( ( { path } ) => {
+		// Slug-based queries (/wp/v2/{type}?slug=...) are handled generically.
+		// Unknown slugs return empty, only add cases for slugs under active test.
+		if ( path.includes( 'slug=' ) ) {
+			if ( path.includes( 'slug=kurse' ) ) {
+				return Promise.resolve( [
+					{
+						id: 42,
+						title: { rendered: 'Kursübersicht' },
+						link: 'http://wordpress.local/kurse/',
+						type: 'page',
+					},
+				] );
+			}
+			// All other slug lookups return no match.
+			return Promise.resolve( [] );
+		}
+
 		switch ( path ) {
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
@@ -84,6 +102,15 @@ jest.mock( '@wordpress/api-fetch', () =>
 						type: 'attachment',
 						source_url:
 							'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+					},
+				] );
+			case '/wp/v2/pages?slug=kurse&per_page=20':
+				return Promise.resolve( [
+					{
+						id: 42,
+						title: { rendered: 'Kursübersicht' },
+						link: 'http://wordpress.local/kurse/',
+						type: 'page',
 					},
 				] );
 			default:
@@ -320,6 +347,20 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
+	it( 'finds pages by slug when title does not match the search query', () => {
+		return fetchLinkSuggestions( 'kurse', {
+			type: 'post',
+			subtype: 'page',
+		} ).then( ( suggestions ) => {
+			expect( suggestions[ 0 ] ).toEqual( {
+				id: 42,
+				title: 'Kursübersicht',
+				url: 'http://wordpress.local/kurse/',
+				type: 'page',
+				kind: 'post-type',
+			} );
+		} );
+	} );
 } );
 
 describe( 'sortResults', () => {
@@ -446,5 +487,24 @@ describe( 'tokenize', () => {
 			'こんにちは',
 			'世界',
 		] );
+	} );
+} );
+
+describe( 'extractSlug', () => {
+	it( 'returns empty string for invalid URL', () => {
+		expect( extractSlug( 'not-a-url' ) ).toBe( '' );
+	} );
+	it( 'extracts slug from URL with trailing slash', () => {
+		expect( extractSlug( 'http://wordpress.local/kurse/' ) ).toBe(
+			'kurse'
+		);
+	} );
+	it( 'extracts slug from URL without trailing slash', () => {
+		expect( extractSlug( 'http://wordpress.local/kurse' ) ).toBe( 'kurse' );
+	} );
+	it( 'extracts slug from nested URL', () => {
+		expect(
+			extractSlug( 'http://wordpress.local/kurse/freies-training/' )
+		).toBe( 'freies-training' );
 	} );
 } );

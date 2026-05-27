@@ -58,6 +58,13 @@ type MediaAPIResult = {
 	type: string;
 };
 
+type PostAPIResult = {
+	id: number;
+	title: { rendered: string };
+	link: string;
+	type: string;
+};
+
 export type SearchResult = {
 	/**
 	 * Post or term id.
@@ -80,6 +87,21 @@ export type SearchResult = {
 	 */
 	kind?: string;
 };
+
+/**
+ * Maps a post subtype slug to its WP REST API base path.
+ * Falls back to appending 's' for custom post types.
+ *
+ * @param subtype
+ */
+function getRestBase( subtype: string ): string {
+	const map: Record< string, string > = {
+		post: 'posts',
+		page: 'pages',
+		attachment: 'media',
+	};
+	return map[ subtype ] ?? `${ subtype }s`;
+}
 
 /**
  * Fetches link suggestions from the WordPress API.
@@ -156,6 +178,38 @@ export default async function fetchLinkSuggestions(
 				} )
 				.catch( () => [] ) // Fail by returning no results.
 		);
+	}
+
+	// Slug-based post search. Query the individual REST endpoints
+	// by slug to surface those results, then deduplicate below.
+	if ( ( ! type || type === 'post' ) && search ) {
+		const slugEndpoints = subtype
+			? [ getRestBase( subtype ) ]
+			: [ 'posts', 'pages' ];
+
+		for ( const endpoint of slugEndpoints ) {
+			queries.push(
+				apiFetch< PostAPIResult[] >( {
+					path: addQueryArgs( `/wp/v2/${ endpoint }`, {
+						slug: search,
+						per_page: perPage,
+					} ),
+				} )
+					.then( ( results ) => {
+						return results.map( ( result ) => ( {
+							id: result.id,
+							url: result.link,
+							title:
+								decodeEntities(
+									result.title?.rendered || ''
+								) || __( '(no title)' ),
+							type: result.type,
+							kind: 'post-type' as const,
+						} ) );
+					} )
+					.catch( () => [] )
+			);
+		}
 	}
 
 	if ( ! type || type === 'term' ) {
@@ -244,6 +298,16 @@ export default async function fetchLinkSuggestions(
 
 	let results = responses.flat();
 	results = results.filter( ( result ) => !! result.id );
+	// Deduplicate by id: slug search and title search can return the same post.
+	// Keep the first occurrence (title-search results come first in `queries`).
+	const seen = new Set< number | string >();
+	results = results.filter( ( result ) => {
+		if ( seen.has( result.id ) ) {
+			return false;
+		}
+		seen.add( result.id );
+		return true;
+	} );
 	results = sortResults( results, search );
 	results = results.slice( 0, perPage );
 	return results;
@@ -265,9 +329,12 @@ export default async function fetchLinkSuggestions(
  */
 export function sortResults( results: SearchResult[], search: string ) {
 	const searchTokens = tokenize( search );
+	const scores: Record< string | number, number > = {};
 
-	const scores = {};
 	for ( const result of results ) {
+		let score = 0;
+
+		// Title-based scoring (exact match weight: 10, sub-match weight: ~1).
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
 			const exactMatchingTokens = titleTokens.filter( ( titleToken ) =>
@@ -282,23 +349,50 @@ export function sortResults( results: SearchResult[], search: string ) {
 						titleToken.includes( searchToken )
 				)
 			);
-
-			// The score is a combination of exact matches and sub-matches.
-			// More weight is given to exact matches, as they are more relevant (e.g. "cat" vs "caterpillar").
-			// Diving by the total number of tokens in the title normalizes the score and skews
-			// the results towards shorter titles.
-			const exactMatchScore =
-				( exactMatchingTokens.length / titleTokens.length ) * 10;
-
-			const subMatchScore = subMatchingTokens.length / titleTokens.length;
-
-			scores[ result.id ] = exactMatchScore + subMatchScore;
-		} else {
-			scores[ result.id ] = 0;
+			score +=
+				( exactMatchingTokens.length / titleTokens.length ) * 10 +
+				subMatchingTokens.length / titleTokens.length;
 		}
+
+		// Slug-based scoring (exact match weight: 8, sub-match weight: ~0.5).
+		// Sits between exact-title (≤10) and fuzzy-title (<1) so the final order is:
+		//   1. exact title  2. exact slug  3. fuzzy title  4. fuzzy slug
+		if ( result.url ) {
+			const slug = extractSlug( result.url );
+			if ( slug ) {
+				const slugTokens = tokenize( slug );
+				const exactSlugTokens = slugTokens.filter( ( slugToken ) =>
+					searchTokens.some(
+						( searchToken ) => slugToken === searchToken
+					)
+				);
+				const subSlugTokens = slugTokens.filter( ( slugToken ) =>
+					searchTokens.some(
+						( searchToken ) =>
+							slugToken !== searchToken &&
+							slugToken.includes( searchToken )
+					)
+				);
+				score +=
+					( exactSlugTokens.length / slugTokens.length ) * 8 +
+					( subSlugTokens.length / slugTokens.length ) * 0.5;
+			}
+		}
+
+		scores[ result.id ] = score;
 	}
 
 	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
+}
+
+export function extractSlug( url: string ): string {
+	try {
+		const { pathname } = new URL( url );
+		const parts = pathname.replace( /\/$/, '' ).split( '/' );
+		return parts[ parts.length - 1 ] || '';
+	} catch {
+		return '';
+	}
 }
 
 /**
