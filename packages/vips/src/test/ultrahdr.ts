@@ -38,6 +38,8 @@ class MockVipsImage {
 jest.mock( 'wasm-vips', () =>
 	jest.fn( () => ( {
 		Image: MockVipsImage,
+		// getVips() calls Cache.max(0) to disable libvips's operation cache.
+		Cache: { max: jest.fn() },
 	} ) )
 );
 
