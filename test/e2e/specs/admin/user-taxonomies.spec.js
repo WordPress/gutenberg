@@ -28,7 +28,6 @@ async function createUserTaxonomy( requestUtils ) {
 			show_tagcloud: true,
 			show_in_quick_edit: true,
 			show_admin_column: false,
-			show_in_rest: true,
 		},
 	} );
 }
