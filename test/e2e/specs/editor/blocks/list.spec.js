@@ -1624,14 +1624,14 @@ test.describe( 'List (@firefox)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: 'test' },
+						attributes: { content: 'a' },
 						innerBlocks: [
 							{
 								name: 'core/list',
 								innerBlocks: [
 									{
 										name: 'core/list-item',
-										attributes: { content: 'test' },
+										attributes: { content: 'b' },
 									},
 								],
 							},
@@ -1644,7 +1644,18 @@ test.describe( 'List (@firefox)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: 'one' },
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: '2' },
+									},
+								],
+							},
+						],
 					},
 				],
 			},
@@ -1653,15 +1664,12 @@ test.describe( 'List (@firefox)', () => {
 			await editor.insertBlock( block );
 		}
 
-		// Place the cursor at the end of the inner "test" in the
-		// first list. After insertion the caret is at the end of
-		// "one" (the only item of the second, flat list); stepping
-		// back one block boundary lands at the end of inner "test".
-		await page.keyboard.press( 'Home' );
-		await page.keyboard.press( 'ArrowLeft' );
+		// Click directly on "b" (the inner item of list 1) to place
+		// the caret there.
+		await editor.canvas.getByText( 'b', { exact: true } ).click();
 
-		// Verify the setup: caret should land at end of the first
-		// list's inner "test".
+		// Verify the setup: caret lands at end of the first list's
+		// inner "b".
 		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -1669,14 +1677,14 @@ test.describe( 'List (@firefox)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: 'test' },
+						attributes: { content: 'a' },
 						innerBlocks: [
 							{
 								name: 'core/list',
 								innerBlocks: [
 									{
 										name: 'core/list-item',
-										attributes: { content: 'test‸' },
+										attributes: { content: 'b‸' },
 									},
 								],
 							},
@@ -1689,7 +1697,18 @@ test.describe( 'List (@firefox)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: 'one' },
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: '2' },
+									},
+								],
+							},
+						],
 					},
 				],
 			},
@@ -1699,8 +1718,8 @@ test.describe( 'List (@firefox)', () => {
 		// Action under test.
 		await page.keyboard.press( 'Delete' );
 
-		// Caret should stay at the end of the inner "test"; the
-		// second list's items are absorbed as outer-level siblings.
+		// Caret stays at end of "b"; the second list's items are
+		// absorbed as outer-level siblings of "a".
 		await page.keyboard.type( '‸' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -1708,14 +1727,14 @@ test.describe( 'List (@firefox)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: 'test' },
+						attributes: { content: 'a' },
 						innerBlocks: [
 							{
 								name: 'core/list',
 								innerBlocks: [
 									{
 										name: 'core/list-item',
-										attributes: { content: 'test‸' },
+										attributes: { content: 'b‸' },
 									},
 								],
 							},
@@ -1723,7 +1742,18 @@ test.describe( 'List (@firefox)', () => {
 					},
 					{
 						name: 'core/list-item',
-						attributes: { content: 'one' },
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: '2' },
+									},
+								],
+							},
+						],
 					},
 				],
 			},
