@@ -167,7 +167,7 @@ export type WidgetGridModel = 'grid' | 'masonry';
 interface BaseWidgetGridSettings {
 	/**
 	 * Target column count (cap). When omitted alongside
-	 * `minColumnWidth`, the grid renders six columns.
+	 * `minColumnWidth`, the grid uses the dashboard default column cap.
 	 */
 	columns?: number;
 
