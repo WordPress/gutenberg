@@ -3,6 +3,7 @@
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { columns as columnsIcon, grid } from '@wordpress/icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -128,6 +129,26 @@ const variations = [
 			[ 'core/column', { width: '25%' } ],
 		],
 		scope: [ 'block' ],
+	},
+	{
+		name: 'columns',
+		title: __( 'Columns' ),
+		description: __( 'Arrange blocks in columns.' ),
+		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
+		scope: [ 'transform' ],
+		isActive: ( blockAttributes ) =>
+			blockAttributes.layout?.type !== 'grid',
+		icon: columnsIcon,
+	},
+	{
+		name: 'columns-grid',
+		title: __( 'Columns grid' ),
+		description: __( 'Arrange columns in a grid.' ),
+		attributes: { layout: { type: 'grid' } },
+		scope: [ 'transform' ],
+		isActive: ( blockAttributes ) =>
+			blockAttributes.layout?.type === 'grid',
+		icon: grid,
 	},
 ];
 

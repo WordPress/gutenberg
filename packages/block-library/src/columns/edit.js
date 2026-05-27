@@ -31,6 +31,7 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -205,26 +206,71 @@ function ColumnInspectorControls( {
 }
 
 function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
-	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
+	const { isStackedOnMobile, layout, verticalAlignment, templateLock } =
+		attributes;
+	const layoutType = layout?.type ?? 'flex';
+	const isGridLayout = layoutType === 'grid';
+	const previousLayoutTypeRef = useRef( layoutType );
 	const registry = useRegistry();
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const columnCount = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockOrder( clientId ).length,
+		[ clientId ]
+	);
+
+	// Seed the grid with the current number of Column children only when
+	// switching from the default flex layout.
+	useEffect( () => {
+		const didSwitchToGrid =
+			previousLayoutTypeRef.current !== 'grid' && isGridLayout;
+		previousLayoutTypeRef.current = layoutType;
+
+		if (
+			! didSwitchToGrid ||
+			layout?.columnCount !== undefined ||
+			columnCount < 1
+		) {
+			return;
+		}
+
+		setAttributes( {
+			layout: {
+				...layout,
+				columnCount,
+			},
+		} );
+	}, [ columnCount, isGridLayout, layout, layoutType, setAttributes ] );
 
 	const classes = clsx( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile && ! isGridLayout,
 	} );
 
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+	const innerBlocksOptions = {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
-		orientation: 'horizontal',
-		renderAppender: false,
+		renderAppender: isGridLayout ? undefined : false,
 		templateLock,
-	} );
+		...( isGridLayout
+			? {
+					layout: {
+						...layout,
+						allowSizingOnChildren: true,
+					},
+			  }
+			: {
+					orientation: 'horizontal',
+			  } ),
+	};
+	const innerBlocksProps = useInnerBlocksProps(
+		blockProps,
+		innerBlocksOptions
+	);
 
 	/**
 	 * Update all child Column blocks with a new vertical alignment setting
@@ -254,13 +300,15 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 					value={ verticalAlignment }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ColumnInspectorControls
-					clientId={ clientId }
-					setAttributes={ setAttributes }
-					isStackedOnMobile={ isStackedOnMobile }
-				/>
-			</InspectorControls>
+			{ ! isGridLayout && (
+				<InspectorControls>
+					<ColumnInspectorControls
+						clientId={ clientId }
+						setAttributes={ setAttributes }
+						isStackedOnMobile={ isStackedOnMobile }
+					/>
+				</InspectorControls>
+			) }
 			<div { ...innerBlocksProps } />
 		</>
 	);

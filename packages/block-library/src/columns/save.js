@@ -9,11 +9,12 @@ import clsx from 'clsx';
 import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { isStackedOnMobile, verticalAlignment } = attributes;
+	const { isStackedOnMobile, layout, verticalAlignment } = attributes;
+	const isGridLayout = layout?.type === 'grid';
 
 	const className = clsx( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile && ! isGridLayout,
 	} );
 
 	const blockProps = useBlockProps.save( { className } );

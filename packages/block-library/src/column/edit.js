@@ -75,21 +75,27 @@ function ColumnEdit( {
 	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
-		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } =
-				select( blockEditorStore );
+	const { columnsIds, hasChildBlocks, isParentGridLayout, rootClientId } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockAttributes,
+					getBlockOrder,
+					getBlockRootClientId,
+				} = select( blockEditorStore );
 
-			const rootId = getBlockRootClientId( clientId );
+				const rootId = getBlockRootClientId( clientId );
+				const rootAttributes = getBlockAttributes( rootId );
 
-			return {
-				hasChildBlocks: getBlockOrder( clientId ).length > 0,
-				rootClientId: rootId,
-				columnsIds: getBlockOrder( rootId ),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					hasChildBlocks: getBlockOrder( clientId ).length > 0,
+					rootClientId: rootId,
+					columnsIds: getBlockOrder( rootId ),
+					isParentGridLayout: rootAttributes?.layout?.type === 'grid',
+				};
+			},
+			[ clientId ]
+		);
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -105,7 +111,10 @@ function ColumnEdit( {
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+		style:
+			widthWithUnit && ! isParentGridLayout
+				? { flexBasis: widthWithUnit }
+				: undefined,
 	} );
 
 	const columnsCount = columnsIds.length;
@@ -139,12 +148,14 @@ function ColumnEdit( {
 					controls={ [ 'top', 'center', 'bottom', 'stretch' ] }
 				/>
 			</BlockControls>
-			<InspectorControls>
-				<ColumnInspectorControls
-					width={ width }
-					setAttributes={ setAttributes }
-				/>
-			</InspectorControls>
+			{ ! isParentGridLayout && (
+				<InspectorControls>
+					<ColumnInspectorControls
+						width={ width }
+						setAttributes={ setAttributes }
+					/>
+				</InspectorControls>
+			) }
 			<div { ...innerBlocksProps } />
 		</>
 	);
