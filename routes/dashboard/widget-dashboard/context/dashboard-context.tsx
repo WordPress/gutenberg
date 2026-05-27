@@ -36,14 +36,10 @@ import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
  *
- * `widgets.tsx` also applies a hard-coded floor when `minColumnWidth`
- * resolves to `undefined`, to keep legibility intact for stored settings
- * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
 	model: 'grid',
 	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
-	minColumnWidth: 140,
 	rowHeight: DEFAULT_ROW_HEIGHT,
 };
 
