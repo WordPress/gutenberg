@@ -45,6 +45,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
@@ -381,9 +382,11 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
+	const cropButtonRef = useRef();
 	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
 		attributes,
 		setAttributes,
+		onClose: () => cropButtonRef.current?.focus(),
 	} );
 
 	const {
@@ -868,6 +871,7 @@ export default function Image( {
 					) }
 					{ allowCrop && (
 						<ToolbarButton
+							ref={ cropButtonRef }
 							onClick={
 								openImageMediaEditorModal
 									? openImageMediaEditorModal
