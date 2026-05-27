@@ -19,7 +19,7 @@ import type {
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { WidgetChrome } from '../widget-chrome';
+import { DashboardWidgetChrome } from '../dashboard-widget-chrome';
 import { WidgetSettingsToolbar } from '../widget-settings';
 import { WidgetLayoutToolbar } from './widget-layout-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
@@ -154,7 +154,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			}
 
 			return (
-				<WidgetChrome
+				<DashboardWidgetChrome
 					key={ widget.uuid }
 					widget={ widget }
 					index={ index }

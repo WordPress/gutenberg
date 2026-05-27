@@ -1660,7 +1660,7 @@
 			"count": 3
 		}
 	},
-	"routes/dashboard/widget-dashboard/components/widget-chrome/widget-chrome.tsx": {
+	"routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
