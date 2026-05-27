@@ -8,7 +8,7 @@ import type {
 	WidgetGridSettings,
 } from '../../types';
 
-const DEFAULT_FIXED_COLUMNS = 6;
+const DEFAULT_FIXED_COLUMNS = 12;
 
 export function getGridModel( settings: WidgetGridSettings ): WidgetGridModel {
 	return settings.model ?? 'grid';

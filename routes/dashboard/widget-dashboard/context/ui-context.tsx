@@ -16,8 +16,6 @@ import {
 interface DashboardUIContextValue {
 	inserterOpen: boolean;
 	setInserterOpen: ( next: boolean ) => void;
-	layoutSettingsOpen: boolean;
-	setLayoutSettingsOpen: ( next: boolean ) => void;
 	resetDialogOpen: boolean;
 	setResetDialogOpen: ( next: boolean ) => void;
 
@@ -73,14 +71,14 @@ interface ProviderProps {
 
 /**
  * Holds transient UI state shared across compounds (the inserter modal and
- * the per-instance settings drawer). Kept separate from the data context so
+ * the per-instance settings drawer). Layout mode is changed from the
+ * customize toolbar, not this context. Kept separate from the data context so
  * that data mutations don't churn the UI state and vice-versa.
  * @param root0
  * @param root0.children
  */
 export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 	const [ inserterOpen, setInserterOpen ] = useState( false );
-	const [ layoutSettingsOpen, setLayoutSettingsOpen ] = useState( false );
 	const [ resetDialogOpen, setResetDialogOpen ] = useState( false );
 	const [ settingsWidgetUuid, setSettingsWidgetUuid ] = useState<
 		string | null
@@ -94,8 +92,6 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 		() => ( {
 			inserterOpen,
 			setInserterOpen,
-			layoutSettingsOpen,
-			setLayoutSettingsOpen,
 			resetDialogOpen,
 			setResetDialogOpen,
 			settingsWidgetUuid,
@@ -107,7 +103,6 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 		} ),
 		[
 			inserterOpen,
-			layoutSettingsOpen,
 			resetDialogOpen,
 			settingsWidgetUuid,
 			settingsDrawerSide,

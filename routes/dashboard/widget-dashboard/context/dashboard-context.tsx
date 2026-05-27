@@ -41,8 +41,8 @@ import type {
 const DEFAULT_GRID: WidgetGridSettings = {
 	model: 'grid',
 	columns: 12,
-	minColumnWidth: 140,
-	rowHeight: 140,
+	minColumnWidth: 350,
+	rowHeight: 200,
 };
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
@@ -130,8 +130,14 @@ interface InternalDashboardContextValue {
 	 * Switches the layout model, updates staging, and publishes
 	 * immediately — equivalent to changing the model in layout
 	 * settings and clicking Save.
+	 *
+	 * Pass `{ preserveEditMode: true }` when switching from the customize
+	 * toolbar so the user stays in edit mode.
 	 */
-	commitGridModelChange: ( targetModel: WidgetGridModel ) => void;
+	commitGridModelChange: (
+		targetModel: WidgetGridModel,
+		options?: { preserveEditMode?: boolean }
+	) => void;
 
 	/**
 	 * Reverts both staging slices. By default also exits edit mode; pass
@@ -224,10 +230,10 @@ interface ProviderProps {
  * Two invariants the provider does not enforce on its own:
  *
  * - The shared commit assumes the two slices are not edited
- *   simultaneously. The bundled `Actions` keeps the layout-edit and
- *   settings-drawer flows mutually exclusive; consumers that compose
- *   a different surface must uphold the same invariant or accept the
- *   cross-publish.
+ *   simultaneously. The bundled `Actions` keeps layout edits and
+ *   immediate layout-model switches from overlapping with incompatible
+ *   flows; consumers that compose a different surface must uphold the
+ *   same invariant or accept the cross-publish.
  * - Staging re-syncs from the committed props on prop change.
  *   In-flight edits are dropped silently when an external update
  *   (cross-tab commit, reset, websocket push) lands. Consumers that
@@ -320,7 +326,10 @@ export function WidgetDashboardProvider( {
 	);
 
 	const commitGridModelChange = useCallback(
-		( targetModel: WidgetGridModel ) => {
+		(
+			targetModel: WidgetGridModel,
+			options?: { preserveEditMode?: boolean }
+		) => {
 			const next = computeGridModelChange( {
 				layout: stagingLayout,
 				gridSettings: stagingGridSettings,
@@ -335,7 +344,9 @@ export function WidgetDashboardProvider( {
 			setStagingGridSettings( next.gridSettings );
 			onLayoutChange( canonicalize( next.layout ) );
 			onGridSettingsChange?.( next.gridSettings );
-			onEditChange?.( false );
+			if ( options?.preserveEditMode !== true ) {
+				onEditChange?.( false );
+			}
 		},
 		[
 			stagingLayout,

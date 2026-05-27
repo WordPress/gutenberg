@@ -21,7 +21,8 @@ function Dashboard() {
 		'gutenberg_dashboard'
 	);
 
-	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
+	const [ gridSettings, setGridSettings, resetGridSettings ] =
+		useDashboardGridSettings();
 
 	const widgetTypes = useWidgetTypes();
 
@@ -46,6 +47,11 @@ function Dashboard() {
 		} );
 	};
 
+	const handleReset = async () => {
+		await resetLayout();
+		resetGridSettings();
+	};
+
 	const pageTitle = editMode ? customizeDashboardLabel : dashboardLabel;
 
 	return (
@@ -53,7 +59,7 @@ function Dashboard() {
 			widgetTypes={ widgetTypes }
 			layout={ layout }
 			onLayoutChange={ handleLayoutChange }
-			onLayoutReset={ resetLayout }
+			onLayoutReset={ handleReset }
 			gridSettings={ gridSettings }
 			onGridSettingsChange={ setGridSettings }
 			editMode={ editMode }

@@ -15,23 +15,22 @@ import { AlertDialog, Button, Stack } from '@wordpress/ui';
 import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
-import { LayoutSettings } from '../layout-settings';
+import { usePendingWhenEditMode } from '../dashboard-commands/use-pending-when-edit-mode';
+import { LayoutModeDropdown } from '../layout-mode-dropdown';
 import { MoreActionsDropdown } from '../more-actions-dropdown';
 import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 
 /**
  * Header chrome for the dashboard. Two independent flows are exposed:
  *
- * - **Customize** (layout edits): toggles edit mode, surfaces the Add
- *   widgets / Cancel / Done toolbar. Commits the layout staging buffer
- *   on Done.
- * - **Layout settings** (more-actions dropdown entry): opens a side
- *   drawer with model, column behavior, and row height. Commits the
- *   settings staging buffer on Save inside the drawer.
- *
- * The two flows are mutually exclusive: the Layout settings entry is
- * disabled while edit mode is on so the settings drawer cannot
- * accumulate changes on top of pending layout edits, and vice versa.
+ * - **Customize** (layout edits): toggles edit mode and surfaces Layout /
+ *   Cancel / Done. Commits the layout staging buffer on Done.
+ * - **Add widget**: to the right of Customize (or to the right of the edit
+ *   toolbar while customizing); opens the inserter (enters customize mode
+ *   first when not already editing).
+ * - **Layout** (dropdown next to Add widget): switches between Grid and
+ *   Masonry immediately via `commitGridModelChange` while staying in edit
+ *   mode.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
  * so surfaces that don't expose edit mode can keep `Actions` in their
@@ -74,13 +73,8 @@ export function Actions(): React.ReactNode {
 		return () => clearTimeout( exitTimeout );
 	}, [ editMode, isEditActionsMounted ] );
 
-	const {
-		setInserterOpen,
-		layoutSettingsOpen,
-		setLayoutSettingsOpen,
-		resetDialogOpen,
-		setResetDialogOpen,
-	} = useDashboardUIContext();
+	const { setInserterOpen, resetDialogOpen, setResetDialogOpen } =
+		useDashboardUIContext();
 	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
 	// https://github.com/WordPress/gutenberg/issues/77628
 	const isMobileViewport = useSelect(
@@ -92,9 +86,14 @@ export function Actions(): React.ReactNode {
 		onEditChange?.( ! editMode );
 	}, [ editMode, onEditChange ] );
 
+	const runWhenInEditMode = usePendingWhenEditMode( {
+		editMode,
+		onEditChange,
+	} );
+
 	const insert = useCallback( () => {
-		setInserterOpen( true );
-	}, [ setInserterOpen ] );
+		runWhenInEditMode( () => setInserterOpen( true ) );
+	}, [ runWhenInEditMode, setInserterOpen ] );
 
 	const cancel = useCallback( () => {
 		cancelStaging();
@@ -104,10 +103,6 @@ export function Actions(): React.ReactNode {
 		commit();
 	}, [ commit ] );
 
-	const openLayoutSettings = useCallback( () => {
-		setLayoutSettingsOpen( true );
-	}, [ setLayoutSettingsOpen ] );
-
 	const moreActionsItems: MoreActionsDropdownItem[] = [
 		{
 			label: __( 'Reset to default' ),
@@ -115,15 +110,6 @@ export function Actions(): React.ReactNode {
 			disabled: ! onLayoutReset,
 		},
 	];
-
-	if ( canEditGridSettings ) {
-		moreActionsItems.unshift( {
-			label: __( 'Layout settings' ),
-			onClick: openLayoutSettings,
-			disabled: editMode,
-			disabledTooltip: __( 'Disabled while editing widgets' ),
-		} );
-	}
 
 	if ( ! onEditChange ) {
 		return null;
@@ -141,15 +127,7 @@ export function Actions(): React.ReactNode {
 							: styles.editActionsEnter
 					}
 				>
-					<Button
-						variant="minimal"
-						tone="brand"
-						size="compact"
-						onClick={ insert }
-					>
-						{ ! isMobileViewport && <Button.Icon icon={ plus } /> }
-						{ __( 'Add widget' ) }
-					</Button>
+					{ canEditGridSettings && <LayoutModeDropdown /> }
 
 					<div
 						className={ styles.editActionsDivider }
@@ -186,6 +164,16 @@ export function Actions(): React.ReactNode {
 				</Button>
 			) }
 
+			<Button
+				variant="minimal"
+				tone="brand"
+				size="compact"
+				onClick={ insert }
+			>
+				{ ! isMobileViewport && <Button.Icon icon={ plus } /> }
+				{ __( 'Add widget' ) }
+			</Button>
+
 			<MoreActionsDropdown items={ moreActionsItems } />
 
 			<AlertDialog.Root
@@ -206,13 +194,6 @@ export function Actions(): React.ReactNode {
 					confirmButtonText={ __( 'Reset' ) }
 				/>
 			</AlertDialog.Root>
-
-			{ canEditGridSettings && (
-				<LayoutSettings
-					open={ layoutSettingsOpen }
-					onOpenChange={ setLayoutSettingsOpen }
-				/>
-			) }
 		</Stack>
 	);
 }

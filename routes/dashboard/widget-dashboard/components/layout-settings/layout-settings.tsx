@@ -20,7 +20,7 @@ import type {
 } from '../../types';
 import { LayoutModelEditField } from './layout-model-edit-field';
 
-const DEFAULT_FIXED_COLUMNS = 6;
+const DEFAULT_FIXED_COLUMNS = 12;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
 const DEFAULT_ROW_HEIGHT = 200;
 const ROW_HEIGHT_AUTO = 'auto' as const;
@@ -153,6 +153,7 @@ const fields: Field< WidgetGridSettings >[] = [
 			rowHeight: value ? ROW_HEIGHT_AUTO : DEFAULT_ROW_HEIGHT,
 		} ),
 		isVisible: ( item ) => ! isMasonry( item ),
+		isDisabled: () => true,
 	},
 	{
 		id: 'rowHeight',
@@ -172,14 +173,9 @@ const fields: Field< WidgetGridSettings >[] = [
 
 const form: Form = {
 	layout: { type: 'regular', labelPosition: 'top' },
-	fields: [
-		'model',
-		'columns',
-		'adaptiveColumns',
-		'minColumnWidth',
-		'autoRowHeight',
-		'rowHeight',
-	],
+	// Column count, adaptive width, and row-height controls stay defined in
+	// `fields` above; only the layout model is exposed in the UI for now.
+	fields: [ 'model' ],
 };
 
 interface LayoutSettingsProps {
@@ -212,10 +208,10 @@ interface LayoutSettingsProps {
  * buttons is treated as Cancel. None of these exit customize mode.
  *
  * Settings and layout-editing are kept as separate flows on the
- * dashboard surface (the Layout settings entry that opens this
- * drawer is disabled while edit mode is on), so the drawer's
- * commit never publishes layout edits that the user is in the
- * middle of staging through the toolbar.
+ * dashboard surface (grid settings mutations are not mixed with
+ * in-flight layout edits without an explicit commit). None of these exit
+ * customize mode except `commit` / `cancel` defaults and `commitGridModelChange`
+ * when `preserveEditMode` is not set.
  *
  * @param {LayoutSettingsProps} props Layout settings props.
  * @return {React.ReactNode} The layout settings component.

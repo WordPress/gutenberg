@@ -54,9 +54,12 @@ function Harness( {
 }
 
 describe( 'WidgetDashboard.Actions', () => {
-	it( 'renders the Customize button when editMode is false', () => {
+	it( 'renders Add widget and Customize when editMode is false', () => {
 		render( <Harness /> );
 
+		expect(
+			screen.getByRole( 'button', { name: 'Add widget' } )
+		).toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', { name: 'Customize' } )
 		).toBeInTheDocument();
@@ -74,6 +77,17 @@ describe( 'WidgetDashboard.Actions', () => {
 		expect(
 			screen.queryByRole( 'button', { name: 'Customize' } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'enters edit mode when Add widget is clicked outside customize', async () => {
+		const onEditChange = jest.fn();
+		render( <Harness onEditChange={ onEditChange } /> );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Add widget' } )
+		);
+
+		expect( onEditChange ).toHaveBeenLastCalledWith( true );
 	} );
 
 	it( 'fires onEditChange with true when Customize is clicked', async () => {

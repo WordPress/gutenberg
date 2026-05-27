@@ -27,8 +27,8 @@ const KEY = 'dashboardGridSettings';
 const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
 	model: 'grid',
 	columns: 12,
-	minColumnWidth: 140,
-	rowHeight: 140,
+	minColumnWidth: 350,
+	rowHeight: 200,
 };
 
 /**
