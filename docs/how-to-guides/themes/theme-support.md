@@ -477,7 +477,7 @@ Use this setting to enable the following Global Styles settings:
 - spacing: blockGap, margin, padding
 - typography: lineHeight, textColumns
 - dimensions: aspectRatio, height, minHeight, minWidth, width
-- position: sticky (and `fixed`, currently experimental)
+- position: sticky
 
 ```php
 add_theme_support( 'appearance-tools' );
