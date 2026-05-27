@@ -16,8 +16,5 @@ export type {
 	WidgetTypeMetadata,
 	WidgetType,
 	WidgetRenderProps,
-	WidgetModule,
 	ResolveWidgetModule,
 } from './types';
-
-export type { UseWidgetTypesResult } from './hooks/use-widget-types';

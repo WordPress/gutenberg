@@ -6,7 +6,7 @@ import { sprintf, __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { WidgetType } from '../../../../widget-kit/types';
+import type { WidgetType } from '../../../../widget-kit';
 
 /**
  * Localized "<Widget> settings" label, falling back to a generic title

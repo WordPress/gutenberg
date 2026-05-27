@@ -8,7 +8,8 @@ import { useCallback } from '@wordpress/element';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { getLazyWidgetComponent } from '../../../widget-kit';
-import type { DashboardWidget, WidgetType } from '../../types';
+import type { DashboardWidget } from '../../types';
+import type { WidgetType } from '../../../widget-kit';
 
 interface WidgetRenderInternalProps {
 	widget: DashboardWidget< unknown >;

@@ -1,12 +1,10 @@
 /**
- * Widget type definitions for the dashboard engine.
+ * Dashboard-specific types: `DashboardWidget`, grid settings, and the
+ * `WidgetDashboard` prop bag.
  *
- * The widget identity types (`WidgetName`, `WidgetTypeMetadata`,
- * `WidgetType`) live in `routes/dashboard/widget-kit/types` and are
- * re-exported here so dashboard internals can pull every type they need
- * from a single module. The local declarations below cover the
- * dashboard-specific surface area: `DashboardWidget`, grid settings,
- * and the `WidgetDashboard` prop bag.
+ * The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`,
+ * `ResolveWidgetModule`) live in `widget-kit` and are imported from there
+ * directly; this module does not re-export them.
  */
 
 /**
@@ -27,12 +25,9 @@ import type {
  */
 import type {
 	WidgetName,
-	WidgetTypeMetadata,
 	WidgetType,
 	ResolveWidgetModule,
-} from '../widget-kit/types';
-
-export type { WidgetName, WidgetTypeMetadata, WidgetType };
+} from '../widget-kit';
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
 export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
