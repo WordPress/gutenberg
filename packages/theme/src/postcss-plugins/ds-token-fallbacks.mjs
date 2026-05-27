@@ -1,8 +1,5 @@
-import _tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
+import tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
 import { addFallbackToVar as _addFallbackToVar } from './add-fallback-to-var.mjs';
-
-/** @type {Record<string, string>} */
-const tokenFallbacks = _tokenFallbacks;
 
 /**
  * Replace bare `var(--wpds-*)` references in a CSS value string with
