@@ -14,24 +14,35 @@ import {
 	usePostContentBlocks,
 } from '../block-lookup';
 
+type MockBlock = {
+	clientId: string;
+	name: string;
+	innerBlocks: MockBlock[];
+};
+
 let mockGetBlocks: jest.Mock;
+
+function mockFlattenBlocks( blocks: MockBlock[] ): MockBlock[] {
+	return blocks.flatMap( ( b ) => [
+		b,
+		...mockFlattenBlocks( b.innerBlocks ),
+	] );
+}
 
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: ( selector: Function ) =>
 		selector( () => ( {
 			getBlocks: ( ...args: any[] ) => mockGetBlocks( ...args ),
+			getBlocksByName: ( blockName: string ) =>
+				mockFlattenBlocks( mockGetBlocks( '' ) )
+					.filter( ( b ) => b.name === blockName )
+					.map( ( b ) => b.clientId ),
 		} ) ),
 } ) );
 
 jest.mock( '@wordpress/block-editor', () => ( {
 	store: 'core/block-editor',
 } ) );
-
-type MockBlock = {
-	clientId: string;
-	name: string;
-	innerBlocks: MockBlock[];
-};
 
 /**
  * Create a Y.Map block with a clientId and empty innerBlocks, matching the

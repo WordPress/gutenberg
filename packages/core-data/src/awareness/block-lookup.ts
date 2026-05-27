@@ -155,43 +155,8 @@ export function resolveBlockClientIdByPath(
  */
 export function usePostContentBlocks(): EditorStoreBlock[] {
 	return useSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
-		const rootBlocks = getBlocks();
-		const postContentBlock = findBlockByName(
-			rootBlocks,
-			'core/post-content'
-		);
-		if ( postContentBlock ) {
-			// Use getBlocks(clientId) to read controlled inner blocks from
-			// the store, since postContentBlock.innerBlocks is empty.
-			return getBlocks( postContentBlock.clientId );
-		}
-
-		return rootBlocks;
+		const { getBlocks, getBlocksByName } = select( blockEditorStore );
+		const [ postContentClientId ] = getBlocksByName( 'core/post-content' );
+		return getBlocks( postContentClientId ?? '' );
 	}, [] );
-}
-
-/**
- * Recursively search the block tree for a block with a given name.
- *
- * @param blocks - The blocks to search.
- * @param name   - The block name to find.
- * @return The first matching block, or null if not found.
- */
-function findBlockByName(
-	blocks: EditorStoreBlock[],
-	name: string
-): EditorStoreBlock | null {
-	for ( const block of blocks ) {
-		if ( block.name === name ) {
-			return block;
-		}
-		if ( block.innerBlocks?.length ) {
-			const found = findBlockByName( block.innerBlocks, name );
-			if ( found ) {
-				return found;
-			}
-		}
-	}
-	return null;
 }
