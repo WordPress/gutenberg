@@ -47,6 +47,11 @@
 		"html": false,
 		"reusable": false,
 		"inserter": false,
+		"__experimentalBorder": {
+			"color": true,
+			"style": true,
+			"width": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
