@@ -17,6 +17,22 @@ function assignRef< T >( ref: Ref< T >, value: T ): ( () => void ) | undefined {
 	return undefined;
 }
 
+// Tear down a ref at the given index: prefer the stored cleanup; otherwise
+// fall back to calling the ref with `null`.
+function detachRef< T >(
+	ref: Ref< T >,
+	index: number,
+	cleanups: Array< ( () => void ) | undefined >
+): void {
+	const cleanup = cleanups[ index ];
+	if ( cleanup ) {
+		cleanups[ index ] = undefined;
+		cleanup();
+	} else {
+		assignRef( ref, null );
+	}
+}
+
 /**
  * Merges refs into one ref callback.
  *
@@ -88,15 +104,7 @@ export default function useMergeRefs< T >(
 			refs.forEach( ( ref, index ) => {
 				const previousRef = previousRefsRef.current[ index ];
 				if ( ref !== previousRef ) {
-					// Tear down: prefer the stored cleanup; otherwise fall
-					// back to calling the previous ref with `null`.
-					const cleanup = cleanupsRef.current[ index ];
-					if ( cleanup ) {
-						cleanupsRef.current[ index ] = undefined;
-						cleanup();
-					} else {
-						assignRef( previousRef, null );
-					}
+					detachRef( previousRef, index, cleanupsRef.current );
 					cleanupsRef.current[ index ] = assignRef(
 						ref,
 						elementRef.current as T
@@ -128,15 +136,7 @@ export default function useMergeRefs< T >(
 		// with the new element and the previous one with `null`.
 		if ( value === null ) {
 			previousRefsRef.current.forEach( ( ref, index ) => {
-				// Tear down: prefer the stored cleanup; otherwise fall back
-				// to calling the ref with `null`.
-				const cleanup = cleanupsRef.current[ index ];
-				if ( cleanup ) {
-					cleanupsRef.current[ index ] = undefined;
-					cleanup();
-				} else {
-					assignRef( ref, null );
-				}
+				detachRef( ref, index, cleanupsRef.current );
 			} );
 		} else {
 			currentRefsRef.current.forEach( ( ref, index ) => {
