@@ -907,7 +907,7 @@ export const toggleDistractionFree =
 			registry
 				.dispatch( preferencesStore )
 				.set( 'core', 'fixedToolbar', false );
-			// Restore the inserter and list view to their previous states.
+
 			const previousIsInserterOpened = registry
 				.select( preferencesStore )
 				.get( 'core', 'distractionFreePreviousIsInserterOpened' );
@@ -918,7 +918,6 @@ export const toggleDistractionFree =
 			dispatch.setIsListViewOpened( previousIsListViewOpened ?? false );
 		}
 		if ( ! isDistractionFree ) {
-			// Save the current state of inserter and list view before closing them.
 			const isInserterOpened = select.isInserterOpened();
 			const isListViewOpened = select.isListViewOpened();
 
