@@ -27,7 +27,7 @@ function gutenberg_wordpress_version_notice() {
 	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), GUTENBERG_MINIMUM_WP_VERSION );
 	echo '</p></div>';
 
-	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
+	deactivate_plugins( array( plugin_basename( __FILE__ ) ) );
 }
 
 /**
