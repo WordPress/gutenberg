@@ -68,6 +68,22 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $presentation = null;
 
 		/**
+		 * Classic dashboard widget id from `wp_add_dashboard_widget()`.
+		 *
+		 * Set for classic bridge types; null for script-module widgets.
+		 *
+		 * @var string|null
+		 */
+		public $classic_id = null;
+
+		/**
+		 * Display title for classic widget types without a metadata module.
+		 *
+		 * @var string|null
+		 */
+		public $title = null;
+
+		/**
 		 * Constructor.
 		 *
 		 * @param string $name Widget type name including namespace.

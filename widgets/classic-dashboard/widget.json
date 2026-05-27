@@ -1,0 +1,7 @@
+{
+	"name": "wp-classic/classic-dashboard",
+	"title": "Classic Dashboard Widget",
+	"description": "Renders a classic wp-admin dashboard widget inside an iframe.",
+	"category": "classic",
+	"presentation": "framed"
+}

@@ -169,6 +169,8 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'render_module', $properties );
 		$this->assertArrayHasKey( 'widget_module', $properties );
+		$this->assertArrayHasKey( 'classic_id', $properties );
+		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertSame( 'string', $properties['name']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['render_module']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['widget_module']['type'] );

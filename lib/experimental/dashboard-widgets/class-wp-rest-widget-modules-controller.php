@@ -135,6 +135,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 		 * @return WP_REST_Response Response object on success.
 		 */
 		public function get_items( $request ) {
+			if ( function_exists( 'gutenberg_register_classic_dashboard_widget_types' ) ) {
+				gutenberg_register_classic_dashboard_widget_types();
+			}
+
 			$registered = WP_Widget_Type_Registry::get_instance()->get_all_registered();
 			$data       = array();
 
@@ -154,6 +158,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 		 *                                   WP_Error on failure.
 		 */
 		public function get_item( $request ) {
+			if ( function_exists( 'gutenberg_register_classic_dashboard_widget_types' ) ) {
+				gutenberg_register_classic_dashboard_widget_types();
+			}
+
 			$widget_type = WP_Widget_Type_Registry::get_instance()->get_registered( $request['id'] );
 			if ( null === $widget_type ) {
 				return new WP_Error(
@@ -193,6 +201,14 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 
 			if ( rest_is_field_included( 'presentation', $fields ) ) {
 				$data['presentation'] = $widget_type->presentation;
+			}
+
+			if ( rest_is_field_included( 'classic_id', $fields ) ) {
+				$data['classic_id'] = $widget_type->classic_id;
+			}
+
+			if ( rest_is_field_included( 'title', $fields ) ) {
+				$data['title'] = $widget_type->title;
 			}
 
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -242,6 +258,20 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'description' => __( 'Authoring intent about how the widget wants to render.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'enum'        => array_merge( WP_Widget_Type::PRESENTATION_VALUES, array( null ) ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'classic_id'    => array(
+						'description' => __( 'Classic dashboard widget id when this type bridges `wp_add_dashboard_widget()`.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'title'         => array(
+						'description' => __( 'Display title for classic widget types without a metadata module.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

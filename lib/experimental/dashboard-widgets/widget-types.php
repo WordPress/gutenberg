@@ -92,6 +92,10 @@ add_action( 'rest_api_init', 'gutenberg_register_widget_modules_rest_controller'
  * @return array Updated boot dependencies.
  */
 function gutenberg_add_widget_modules_to_dashboard_boot_deps( $boot_dependencies ) {
+	if ( function_exists( 'gutenberg_register_classic_dashboard_widget_types' ) ) {
+		gutenberg_register_classic_dashboard_widget_types();
+	}
+
 	foreach ( gutenberg_get_registered_widget_types() as $widget_type ) {
 		if ( $widget_type->render_module ) {
 			$boot_dependencies[] = array(

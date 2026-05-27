@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { dispatch, useSelect } from '@wordpress/data';
+import { dispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -40,6 +40,20 @@ interface WidgetModuleRecord {
 	render_module?: string | null;
 	widget_module?: string | null;
 	presentation?: WidgetTypeMetadata[ 'presentation' ] | null;
+	classic_id?: string | null;
+	title?: string | null;
+}
+
+type WidgetModuleRecordWithAliases = WidgetModuleRecord &
+	Record< string, unknown >;
+
+function getRecordString(
+	record: WidgetModuleRecordWithAliases,
+	snakeKey: keyof WidgetModuleRecord,
+	camelKey: string
+): string | null | undefined {
+	const value = record[ snakeKey ] ?? record[ camelKey ];
+	return typeof value === 'string' ? value : null;
 }
 
 /**
@@ -57,18 +71,36 @@ interface WidgetModuleRecord {
  * caching and invalidation.
  */
 export function useWidgetTypes(): WidgetType[] {
-	const records = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
-				| WidgetModuleRecord[]
-				| null,
-		[]
-	);
+	const registry = useRegistry();
+
+	const { records, hasResolved } = useSelect( ( select ) => {
+		const query = {};
+		const storeSelect = select( coreStore );
+		return {
+			records: storeSelect.getEntityRecords(
+				'root',
+				'widgetModule',
+				query
+			) as WidgetModuleRecord[] | null,
+			hasResolved: storeSelect.hasFinishedResolution(
+				'getEntityRecords',
+				[ 'root', 'widgetModule', query ]
+			),
+		};
+	}, [] );
 
 	const [ widgetTypes, setWidgetTypes ] = useState< WidgetType[] >( [] );
 
+	// Ensure the collection resolver runs (the entity is registered at module load).
 	useEffect( () => {
-		if ( ! records ) {
+		registry
+			.resolveSelect( coreStore )
+			.getEntityRecords( 'root', 'widgetModule' )
+			.catch( () => {} );
+	}, [ registry ] );
+
+	useEffect( () => {
+		if ( ! hasResolved || ! records ) {
 			return;
 		}
 
@@ -76,26 +108,94 @@ export function useWidgetTypes(): WidgetType[] {
 
 		Promise.all(
 			records.map( async ( record ) => {
-				if ( ! record.widget_module ) {
+				const classicId = getRecordString(
+					record,
+					'classic_id',
+					'classicId'
+				);
+
+				// Build artifact for the shared classic render module; not insertable.
+				if (
+					'wp-classic/classic-dashboard' === record.name &&
+					! classicId
+				) {
+					return null;
+				}
+
+				if ( classicId ) {
+					const renderModule = getRecordString(
+						record,
+						'render_module',
+						'renderModule'
+					);
+					const widgetModule = getRecordString(
+						record,
+						'widget_module',
+						'widgetModule'
+					);
+					const title = getRecordString( record, 'title', 'title' );
+					const presentation = record.presentation;
+
+					let icon: WidgetType[ 'icon' ];
+					if ( widgetModule ) {
+						try {
+							const module = await import(
+								/* webpackIgnore: true */ widgetModule
+							);
+							icon = ( module.default as Partial< WidgetType > )
+								?.icon;
+						} catch {
+							// Fall through without a custom icon.
+						}
+					}
+
+					return {
+						apiVersion: 1,
+						name: record.name as WidgetName,
+						title: title ?? classicId,
+						renderModule: renderModule ?? '',
+						category: 'classic',
+						...( presentation ? { presentation } : {} ),
+						...( icon ? { icon } : {} ),
+						example: {
+							attributes: {
+								classicId,
+							},
+						},
+					} as WidgetType;
+				}
+
+				const widgetModule = getRecordString(
+					record,
+					'widget_module',
+					'widgetModule'
+				);
+
+				if ( ! widgetModule ) {
 					return null;
 				}
 
 				try {
 					const module = await import(
-						/* webpackIgnore: true */ record.widget_module
+						/* webpackIgnore: true */ widgetModule
 					);
 
 					if ( ! module?.default ) {
 						return null;
 					}
 
+					const renderModule = getRecordString(
+						record,
+						'render_module',
+						'renderModule'
+					);
+					const presentation = record.presentation;
+
 					return {
 						...( module.default as Partial< WidgetType > ),
 						name: record.name as WidgetName,
-						renderModule: record.render_module ?? '',
-						...( record.presentation
-							? { presentation: record.presentation }
-							: {} ),
+						renderModule: renderModule ?? '',
+						...( presentation ? { presentation } : {} ),
 					} as WidgetType;
 				} catch {
 					return null;
@@ -114,7 +214,7 @@ export function useWidgetTypes(): WidgetType[] {
 		return () => {
 			cancelled = true;
 		};
-	}, [ records ] );
+	}, [ hasResolved, records ] );
 
 	return widgetTypes;
 }

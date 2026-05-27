@@ -13,9 +13,9 @@ Public surface for widget type discovery in the dashboard route.
 The data flow uses `@wordpress/core-data` and dynamic module imports. There is no custom data store and no client-side registration step.
 
 1. **Server (PHP).** `WP_Widget_Type_Registry` is hydrated at `init` from the build manifest. One entry per widget folder under `widgets/`.
-2. **REST endpoint.** `/wp/v2/widget-modules` exposes the registry. Each record returns `{ name, render_module, widget_module }`.
+2. **REST endpoint.** `/wp/v2/widget-modules` exposes the registry. Each record returns `{ name, render_module, widget_module, classic_id?, title? }`.
 3. **core-data entity.** A `widgetModule` entity reads the endpoint via `getEntityRecords( 'root', 'widgetModule' )`.
-4. **Hook.** `useWidgetTypes()` reads those records and `await import( record.widget_module )` to fetch each widget's metadata. The metadata is merged with `name` and `renderModule` into a `WidgetType`.
+4. **Hook.** `useWidgetTypes()` reads those records and `await import( record.widget_module )` to fetch each widget's metadata. The metadata is merged with `name` and `renderModule` into a `WidgetType`. Classic dashboard widgets registered via `wp_add_dashboard_widget()` omit `widget_module`; their title and `classic_id` come from REST and render through a shared iframe module.
 
 ## Identity vs surface
 
@@ -37,6 +37,7 @@ For `import( widget.renderModule )` to resolve at runtime, the render module nee
 - `lib/experimental/dashboard-widgets/class-wp-widget-type-registry.php`
 - `lib/experimental/dashboard-widgets/class-wp-rest-widget-modules-controller.php`
 - `lib/experimental/dashboard-widgets/widget-types.php`
+- `lib/experimental/dashboard-widgets/classic-dashboard-widgets.php`
 
 ## Status
 
