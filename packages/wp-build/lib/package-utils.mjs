@@ -96,9 +96,10 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 		// expose its package.json) as `null` so callers can fall through to
 		// esbuild's own resolution. Rethrow anything unexpected so real errors
 		// (invalid specifiers, resolver bugs) aren't silently swallowed.
+		const code = /** @type {NodeJS.ErrnoException} */ ( error ).code;
 		if (
-			error?.code === 'MODULE_NOT_FOUND' ||
-			error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+			code === 'MODULE_NOT_FOUND' ||
+			code === 'ERR_PACKAGE_PATH_NOT_EXPORTED'
 		) {
 			packageJsonCache.set( cacheKey, null );
 			return null;
