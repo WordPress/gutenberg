@@ -1039,7 +1039,7 @@ test.describe( 'Synced pattern', () => {
 
 		await expect(
 			page
-				.getByRole( 'listbox', { name: 'Block patterns' } )
+				.getByRole( 'listbox', { name: 'Patterns' } )
 				.getByRole( 'option', {
 					name: 'Awesome empty',
 				} )
