@@ -64,7 +64,7 @@ ViewportMatchWidthContext.displayName = 'ViewportMatchWidthContext';
  *
  * @param {WPBreakpoint}       breakpoint      Breakpoint size name.
  * @param {WPViewportOperator} [operator=">="] Viewport operator.
- * @param {Window}             [view=window]   Window instance in which to perform viewport matching.
+ * @param {Window|undefined}   [view=window]   Window instance in which to perform viewport matching.
  *
  * @example
  *
