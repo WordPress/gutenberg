@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.0 (2026-05-27)
+
 ### Enhancements
 
 -   `get_component_details` now optionally accepts an array of component names so multiple components can be fetched in a single call. ([#78185](https://github.com/WordPress/gutenberg/pull/78185))
