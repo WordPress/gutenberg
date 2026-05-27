@@ -13,7 +13,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	__experimentalVStack as VStack,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -23,7 +23,7 @@ import { useState } from '@wordpress/element';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 const RANGE_CONTROL_MAX_VALUES = {
@@ -70,6 +70,8 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
+		clientId,
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
 
@@ -79,29 +81,87 @@ export default {
 		const showMinWidthControl =
 			! layout?.isManualPlacement ||
 			window.__experimentalEnableGridInteractivity;
+		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const hasGridTypeValue = () =>
+			hasLayoutValue( 'isManualPlacement', false );
+		const hasColumnsAndRowsValue = () =>
+			hasLayoutValue( 'columnCount', defaultColumnCount ) ||
+			hasLayoutValue( 'rowCount' );
+		const hasMinimumColumnWidthValue = () =>
+			hasLayoutValue( 'minimumColumnWidth' );
+		const resetGridType = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					isManualPlacement: resetLayout?.isManualPlacement,
+					rowCount: resetLayout?.rowCount,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+		const resetColumnsAndRows = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					columnCount: resetLayout?.columnCount ?? defaultColumnCount,
+					rowCount: resetLayout?.rowCount,
+				} )
+			);
+		const resetMinimumColumnWidth = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					minimumColumnWidth: resetLayout?.minimumColumnWidth,
+				} )
+			);
+
 		return (
 			<>
 				{ window.__experimentalEnableGridInteractivity && (
-					<GridLayoutTypeControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
+					<ToolsPanelItem
+						label={ __( 'Grid item position' ) }
+						hasValue={ hasGridTypeValue }
+						onDeselect={ resetGridType }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<GridLayoutTypeControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
 				) }
-				<VStack spacing={ 4 }>
-					{ showColumnsControl && (
+				{ showColumnsControl && (
+					<ToolsPanelItem
+						label={ __( 'Columns and rows' ) }
+						hasValue={ hasColumnsAndRowsValue }
+						onDeselect={ resetColumnsAndRows }
+						isShownByDefault
+						panelId={ clientId }
+					>
 						<GridLayoutColumnsAndRowsControl
 							layout={ layout }
 							onChange={ onChange }
 							allowSizingOnChildren={ allowSizingOnChildren }
 						/>
-					) }
-					{ showMinWidthControl && (
+					</ToolsPanelItem>
+				) }
+				{ showMinWidthControl && (
+					<ToolsPanelItem
+						label={ __( 'Min. column width' ) }
+						hasValue={ hasMinimumColumnWidthValue }
+						onDeselect={ resetMinimumColumnWidth }
+						isShownByDefault
+						panelId={ clientId }
+					>
 						<GridLayoutMinimumWidthControl
 							layout={ layout }
 							onChange={ onChange }
 						/>
-					) }
-				</VStack>
+					</ToolsPanelItem>
+				) }
 			</>
 		);
 	},
@@ -110,18 +170,25 @@ export default {
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
-		layout,
+		layout = {},
+		viewportOverrides,
 		style,
 		blockName,
 		hasBlockGapSupport,
 		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
+		const hasViewportOverrides = viewportOverrides !== undefined;
+		const effectiveLayout = hasViewportOverrides
+			? { ...layout, ...viewportOverrides }
+			: layout;
+		const hasViewportOverride = ( key ) =>
+			Object.hasOwn( viewportOverrides || {}, key );
 		const {
 			minimumColumnWidth = null,
 			columnCount = null,
 			rowCount = null,
-		} = layout;
+		} = effectiveLayout;
 
 		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
 		// write code that stores a string attribute instead of a number.
@@ -159,11 +226,27 @@ export default {
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
+		const hasBlockGapOverride =
+			! hasViewportOverrides ||
+			Object.hasOwn( style?.spacing || {}, 'blockGap' );
 
 		let output = '';
 		const rules = [];
+		const shouldOutputGridColumns =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'minimumColumnWidth' ) ||
+			hasViewportOverride( 'columnCount' ) ||
+			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
+		const shouldOutputGridRows =
+			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
+			columnCount &&
+			rowCount;
 
-		if ( minimumColumnWidth && columnCount > 0 ) {
+		if (
+			shouldOutputGridColumns &&
+			minimumColumnWidth &&
+			columnCount > 0
+		) {
 			let blockGapToUse = blockGapValue || fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
@@ -173,29 +256,36 @@ export default {
 				columnCount - 1
 			}) ) / ${ columnCount })`;
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
-				`container-type: inline-size`
+				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`
 			);
-			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
-				);
-			}
-		} else if ( columnCount ) {
+		} else if ( shouldOutputGridColumns && columnCount ) {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
-			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
-				);
-			}
-		} else {
+		} else if ( shouldOutputGridColumns ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${
 					minimumColumnWidth || '12rem'
-				}, 100%), 1fr))`,
-				'container-type: inline-size'
+				}, 100%), 1fr))`
+			);
+		}
+
+		if ( shouldOutputGridColumns ) {
+			const baseHasContainerType =
+				! layout?.columnCount ||
+				( layout?.columnCount && layout?.minimumColumnWidth );
+			const needsContainerType = ! columnCount || minimumColumnWidth;
+			if (
+				needsContainerType &&
+				( ! hasViewportOverrides || ! baseHasContainerType )
+			) {
+				rules.push( 'container-type: inline-size' );
+			}
+		}
+
+		if ( shouldOutputGridRows ) {
+			rules.push(
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 			);
 		}
 
@@ -206,7 +296,7 @@ export default {
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
-		if ( hasBlockGapSupport && blockGapValue ) {
+		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {
 			output += getBlockGapCSS(
 				selector,
 				layoutDefinitions,

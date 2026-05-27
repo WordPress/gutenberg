@@ -241,13 +241,11 @@ test.describe( 'Image', () => {
 		} );
 	} );
 
-	test( 'allows zooming using the crop tools', async ( {
+	test( 'allows rotating an image using the media editor modal', async ( {
 		editor,
 		page,
-		pageUtils,
 		imageBlockUtils,
 	} ) => {
-		// Insert the block, upload a file and crop.
 		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = editor.canvas.locator(
@@ -265,156 +263,36 @@ test.describe( 'Image', () => {
 		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
 			timeout: 30_000,
 		} );
+		const [
+			{
+				attributes: { id: initialId, url: initialUrl },
+			},
+		] = await editor.getBlocks();
 
-		// Assert that the image is initially unscaled and unedited.
-		const initialImageSrc = await image.getAttribute( 'src' );
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 10,
-				width: 10,
-			} );
-
-		// Zoom in to twice the amount using the zoom input.
+		// Open the media editor modal from the block toolbar.
 		await editor.clickBlockToolbarButton( 'Crop' );
-		await editor.clickBlockToolbarButton( 'Zoom' );
-		await expect(
-			page.locator( 'role=slider[name="Zoom"i]' )
-		).toBeFocused();
+		const modal = page.locator( 'role=dialog[name="Edit media"i]' );
+		await expect( modal ).toBeVisible();
 
-		await pageUtils.pressKeys( 'Tab' );
-		await expect(
-			page.locator( 'role=spinbutton[name="Zoom"i]' )
-		).toBeFocused();
+		// Rotate and save.
+		await modal
+			.locator( 'role=button[name="Rotate 90° clockwise"i]' )
+			.click();
+		await modal.locator( 'role=button[name="Save"i]' ).click();
 
-		await pageUtils.pressKeys( 'primary+a' );
-		await page.keyboard.type( '200' );
-		await page.keyboard.press( 'Escape' );
-		await editor.clickBlockToolbarButton( 'Apply' );
-
-		// Wait for the cropping tools to disappear.
-		await expect(
-			page.locator( 'role=button[name="Save"i]' )
-		).toBeHidden();
-
-		// Assert that the image is edited.
-		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
-		const updatedImageSrc = await image.getAttribute( 'src' );
-
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 5,
-				width: 5,
-			} );
-
-		expect(
-			await imageBlockUtils.getImageBuffer( updatedImageSrc )
-		).toMatchSnapshot();
-	} );
-
-	test( 'allows changing aspect ratio using the crop tools', async ( {
-		editor,
-		page,
-		imageBlockUtils,
-	} ) => {
-		// Insert the block, upload a file and crop.
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-
-		await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-
-		// Wait for upload to complete (includes client-side media processing time).
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		// Assert that the image is initially unscaled and unedited.
-		const initialImageSrc = await image.getAttribute( 'src' );
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 10,
-				width: 10,
-			} );
-
-		// Zoom in to twice the amount using the zoom input.
-		await editor.clickBlockToolbarButton( 'Crop' );
-		await editor.clickBlockToolbarButton( 'Aspect Ratio' );
-		await page.click(
-			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="Wide - 16:9"i]'
-		);
-		await editor.clickBlockToolbarButton( 'Apply' );
-
-		// Wait for the cropping tools to disappear.
-		await expect(
-			page.locator( 'role=button[name="Save"i]' )
-		).toBeHidden();
-
-		// Assert that the image is edited.
-		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
-		const updatedImageSrc = await image.getAttribute( 'src' );
-
-		await expect
-			.poll( () => image.boundingBox() )
-			.toMatchObject( {
-				height: 6,
-				width: 10,
-			} );
-
-		expect(
-			await imageBlockUtils.getImageBuffer( updatedImageSrc )
-		).toMatchSnapshot();
-	} );
-
-	test( 'allows rotating using the crop tools', async ( {
-		editor,
-		page,
-		imageBlockUtils,
-	} ) => {
-		// Insert the block, upload a file and crop.
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-
-		await imageBlockUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' )
-		);
-
-		// Wait for upload to complete (includes client-side media processing time).
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		// Rotate the image.
-		await editor.clickBlockToolbarButton( 'Crop' );
-		await editor.clickBlockToolbarButton( 'Rotate' );
-		await editor.clickBlockToolbarButton( 'Apply' );
-
-		// Wait for the cropping tools to disappear.
-		await expect(
-			page.locator( 'role=button[name="Save"i]' )
-		).toBeHidden();
-
-		// Assert that the image is edited.
-		const updatedImageSrc = await image.getAttribute( 'src' );
-
-		expect(
-			await imageBlockUtils.getImageBuffer( updatedImageSrc )
-		).toMatchSnapshot();
+		// Modal closes and the block now points at a child attachment whose
+		// URL matches the rendered <img>. The `/edit` endpoint creates a new
+		// attachment rather than mutating the original, so id must change.
+		await expect( modal ).toBeHidden();
+		await expect( image ).not.toHaveAttribute( 'src', initialUrl );
+		const [
+			{
+				attributes: { id, url },
+			},
+		] = await editor.getBlocks();
+		expect( id ).not.toBe( initialId );
+		expect( url ).not.toBe( initialUrl );
+		await expect( image ).toHaveAttribute( 'src', url );
 	} );
 
 	test( 'should undo without broken temporary state', async ( {

@@ -2259,7 +2259,7 @@ export function listViewContentPanelOpen( state = false, action ) {
  * @param {Object|null} state  Current state.
  * @param {Object}      action Dispatched action.
  *
- * @return {Object|null} Updated state.
+ * @return {Object|undefined} Updated state.
  */
 export function requestedInspectorTab( state = null, action ) {
 	switch ( action.type ) {
@@ -2270,6 +2270,109 @@ export function requestedInspectorTab( state = null, action ) {
 			};
 		case 'CLEAR_REQUESTED_INSPECTOR_TAB':
 			return null;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer tracking the selected style state for block style controls.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object|null} Updated state.
+ */
+export function selectedBlockStyleState( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_SELECTED_BLOCK_STYLE_STATE': {
+			if ( ! action.clientId || ! action.value ) {
+				return undefined;
+			}
+			const showStateOnCanvas =
+				state?.clientId === action.clientId
+					? state.showStateOnCanvas ?? true
+					: true;
+			const previousValue =
+				state?.clientId === action.clientId ? state.value : {};
+
+			return {
+				clientId: action.clientId,
+				showStateOnCanvas,
+				value: {
+					viewport: 'default',
+					pseudo: 'default',
+					...previousValue,
+					...action.value,
+				},
+			};
+		}
+
+		case 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW': {
+			if ( ! action.clientId || typeof action.value !== 'boolean' ) {
+				return state;
+			}
+
+			const previousValue =
+				state?.clientId === action.clientId ? state.value : {};
+
+			return {
+				clientId: action.clientId,
+				showStateOnCanvas: action.value,
+				value: {
+					viewport: 'default',
+					pseudo: 'default',
+					...previousValue,
+				},
+			};
+		}
+
+		case 'SELECT_BLOCK':
+		case 'SELECTION_CHANGE': {
+			if ( state?.clientId && state.clientId !== action.clientId ) {
+				return undefined;
+			}
+
+			break;
+		}
+
+		case 'RESET_SELECTION': {
+			if (
+				state?.clientId &&
+				state.clientId !== action.selectionStart?.clientId
+			) {
+				return undefined;
+			}
+
+			break;
+		}
+
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'MULTI_SELECT':
+			return undefined;
+
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			if (
+				state?.clientId &&
+				action.clientIds?.includes( state.clientId )
+			) {
+				return undefined;
+			}
+
+			break;
+		}
+
+		case 'RESET_BLOCKS': {
+			if (
+				state?.clientId &&
+				! getFlattenedClientIds( action.blocks )[ state.clientId ]
+			) {
+				return undefined;
+			}
+
+			break;
+		}
 	}
 
 	return state;
@@ -2310,6 +2413,7 @@ const combinedReducers = combineReducers( {
 	listViewExpandRevision,
 	listViewContentPanelOpen,
 	requestedInspectorTab,
+	selectedBlockStyleState,
 } );
 
 /**

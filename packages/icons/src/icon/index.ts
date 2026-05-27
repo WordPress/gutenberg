@@ -30,12 +30,15 @@ export interface IconProps extends SVGProps {
  * @return Icon component
  */
 export default forwardRef< HTMLElement, IconProps >(
-	( { icon, size = 24, ...props }: IconProps, ref ) => {
-		return cloneElement( icon, {
-			width: size,
-			height: size,
-			...props,
-			ref,
-		} );
+	( { icon, size = 24, ...props }, ref ) => {
+		return cloneElement(
+			icon as ReactElement< React.RefAttributes< Element > >,
+			{
+				width: size,
+				height: size,
+				...props,
+				ref,
+			}
+		);
 	}
 );

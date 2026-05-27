@@ -24,6 +24,8 @@ import {
 	getViewportModalClientIds,
 	isSectionBlock,
 	getParentSectionBlock,
+	getSelectedBlockStyleState,
+	isSelectedBlockStyleStateShownOnCanvas,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -69,6 +71,94 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'getSelectedBlockStyleState', () => {
+		it( 'returns default when the block has no selected state', () => {
+			const state = {};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns the selected state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'mobile',
+				pseudo: ':hover',
+			} );
+		} );
+
+		it( 'returns default when the selected state has no value', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns default when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'isSelectedBlockStyleStateShownOnCanvas', () => {
+		it( 'returns true when the block has no canvas preview state', () => {
+			const state = {};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
+		} );
+
+		it( 'returns the canvas preview state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( false );
+		} );
+
+		it( 'returns true when another block has canvas preview state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
 		} );
 	} );
 

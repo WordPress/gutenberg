@@ -46,7 +46,8 @@
 		"zod": "4.3.6"
 	},
 	"devDependencies": {
-		"@types/jest": "^29.5.14"
+		"@types/jest": "^29.5.14",
+		"storybook": "^10.2.8"
 	},
 	"publishConfig": {
 		"access": "public"

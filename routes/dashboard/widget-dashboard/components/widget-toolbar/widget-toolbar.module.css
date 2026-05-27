@@ -1,0 +1,12 @@
+/*
+ * Per-tile toolbar shell: anchored top-right (the grid item is the positioned
+ * ancestor) with the shared padding and radius. Variants add the background.
+ */
+.widgetToolbar {
+	position: absolute;
+	inset-block-start: var(--wpds-dimension-padding-sm);
+	inset-inline-end: var(--wpds-dimension-padding-sm);
+	z-index: 1;
+	padding: var(--wpds-dimension-padding-xs);
+	border-radius: var(--wpds-border-radius-md);
+}

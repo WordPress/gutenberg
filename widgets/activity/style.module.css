@@ -1,0 +1,14 @@
+.loading {
+	height: 100%;
+}
+
+/*
+ * Bound the event list height. No `overflow` here on purpose: the dashboard
+ * chrome already owns a scroll container, so a second one would nest a double
+ * scrollbar when the tile is shorter than the cap. On a content-driven (masonry)
+ * tile this caps the measured height; on a fixed grid tile the chrome scrolls to
+ * the tile edge. Tune the value to taste.
+ */
+.list {
+	max-height: 420px;
+}
