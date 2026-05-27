@@ -1236,7 +1236,7 @@ _Returns_
 
 ### PostPublishButton
 
-Renders the publish button.
+Undocumented declaration.
 
 ### PostPublishButtonLabel
 

@@ -5,14 +5,50 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import { dispatch, select } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { PostPublishButton } from '../';
+import PostPublishButton from '../';
+import { store as editorStore } from '../../../store';
+
+// The label component runs its own selectors. Stub it so each test can
+// assert on a stable button name without coupling to the label's logic.
+jest.mock( '../label', () => () => 'Submit for Review' );
 
 describe( 'PostPublishButton', () => {
+	beforeEach( () => {
+		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+			_links: {},
+		} );
+		jest.spyOn( dispatch( editorStore ), 'editPost' ).mockReturnValue();
+		jest.spyOn( dispatch( editorStore ), 'savePost' ).mockReturnValue();
+	} );
+
+	afterEach( () => {
+		jest.restoreAllMocks();
+	} );
+
+	function mockSelector( name, value ) {
+		jest.spyOn( select( editorStore ), name ).mockReturnValue( value );
+	}
+
+	function mockHasPublishAction( hasPublishAction ) {
+		jest.spyOn( select( editorStore ), 'getCurrentPost' ).mockReturnValue( {
+			_links: hasPublishAction ? { 'wp:action-publish': true } : {},
+		} );
+	}
+
 	describe( 'aria-disabled', () => {
 		it( 'should be true if post is currently saving', () => {
-			render( <PostPublishButton isPublishable isSaveable isSaving /> );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isSavingPost', true );
+
+			render( <PostPublishButton /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
@@ -20,13 +56,10 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
-			render(
-				<PostPublishButton
-					isSaveable
-					isPublishable={ false }
-					forceIsDirty={ false }
-				/>
-			);
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isEditedPostPublishable', false );
+
+			render( <PostPublishButton forceIsDirty={ false } /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
@@ -34,7 +67,10 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be true if post is not saveable', () => {
-			render( <PostPublishButton isPublishable isSaveable={ false } /> );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', false );
+
+			render( <PostPublishButton /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
@@ -42,13 +78,11 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be true if post saving is locked', () => {
-			render(
-				<PostPublishButton
-					isPublishable
-					isSaveable
-					isPostSavingLocked
-				/>
-			);
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isPostSavingLocked', true );
+
+			render( <PostPublishButton /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
@@ -56,13 +90,10 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be false if post is saveable but not publishable and forceIsDirty is true', () => {
-			render(
-				<PostPublishButton
-					isSaveable
-					isPublishable={ false }
-					forceIsDirty
-				/>
-			);
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isEditedPostPublishable', false );
+
+			render( <PostPublishButton forceIsDirty /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
@@ -70,7 +101,10 @@ describe( 'PostPublishButton', () => {
 		} );
 
 		it( 'should be false if post is publishave and saveable', () => {
-			render( <PostPublishButton isPublishable isSaveable /> );
+			mockSelector( 'isEditedPostPublishable', true );
+			mockSelector( 'isEditedPostSaveable', true );
+
+			render( <PostPublishButton /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
@@ -81,106 +115,105 @@ describe( 'PostPublishButton', () => {
 	describe( 'publish status', () => {
 		it( 'should be pending for contributor', async () => {
 			const user = userEvent.setup();
-			const savePostStatus = jest.fn();
-			render(
-				<PostPublishButton
-					hasPublishAction={ false }
-					savePostStatus={ savePostStatus }
-					isSaveable
-					isPublishable
-				/>
-			);
+			mockHasPublishAction( false );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isEditedPostPublishable', true );
+
+			render( <PostPublishButton /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
+			expect( dispatch( editorStore ).editPost ).toHaveBeenCalledWith(
+				{ status: 'pending' },
+				{ undoIgnore: true }
+			);
 		} );
 
 		it( 'should be future for scheduled post', async () => {
 			const user = userEvent.setup();
-			const savePostStatus = jest.fn();
-			render(
-				<PostPublishButton
-					hasPublishAction
-					savePostStatus={ savePostStatus }
-					isBeingScheduled
-					isSaveable
-					isPublishable
-				/>
-			);
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostBeingScheduled', true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isEditedPostPublishable', true );
+
+			render( <PostPublishButton /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( savePostStatus ).toHaveBeenCalledWith( 'future' );
+			expect( dispatch( editorStore ).editPost ).toHaveBeenCalledWith(
+				{ status: 'future' },
+				{ undoIgnore: true }
+			);
 		} );
 
 		it( 'should be private for private visibility', async () => {
 			const user = userEvent.setup();
-			const savePostStatus = jest.fn();
-			render(
-				<PostPublishButton
-					hasPublishAction
-					savePostStatus={ savePostStatus }
-					visibility="private"
-					isSaveable
-					isPublishable
-				/>
-			);
+			mockHasPublishAction( true );
+			mockSelector( 'getEditedPostVisibility', 'private' );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isEditedPostPublishable', true );
+
+			render( <PostPublishButton /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( savePostStatus ).toHaveBeenCalledWith( 'private' );
+			expect( dispatch( editorStore ).editPost ).toHaveBeenCalledWith(
+				{ status: 'private' },
+				{ undoIgnore: true }
+			);
 		} );
 
 		it( 'should be publish otherwise', async () => {
 			const user = userEvent.setup();
-			const savePostStatus = jest.fn();
-			render(
-				<PostPublishButton
-					hasPublishAction
-					savePostStatus={ savePostStatus }
-					isSaveable
-					isPublishable
-				/>
-			);
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isEditedPostPublishable', true );
+
+			render( <PostPublishButton /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( savePostStatus ).toHaveBeenCalledWith( 'publish' );
+			expect( dispatch( editorStore ).editPost ).toHaveBeenCalledWith(
+				{ status: 'publish' },
+				{ undoIgnore: true }
+			);
 		} );
 	} );
 
 	describe( 'click', () => {
 		it( 'should save with status', async () => {
 			const user = userEvent.setup();
-			const savePostStatus = jest.fn();
-			render(
-				<PostPublishButton
-					hasPublishAction
-					savePostStatus={ savePostStatus }
-					isSaveable
-					isPublishable
-				/>
-			);
+			mockHasPublishAction( true );
+			mockSelector( 'isEditedPostSaveable', true );
+			mockSelector( 'isEditedPostPublishable', true );
+
+			render( <PostPublishButton /> );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( savePostStatus ).toHaveBeenCalledWith( 'publish' );
+			expect( dispatch( editorStore ).editPost ).toHaveBeenCalledWith(
+				{ status: 'publish' },
+				{ undoIgnore: true }
+			);
+			expect( dispatch( editorStore ).savePost ).toHaveBeenCalled();
 		} );
 	} );
 
 	it( 'should have save modifier class', () => {
-		render( <PostPublishButton isSaving isPublished /> );
+		mockSelector( 'isSavingPost', true );
+		mockSelector( 'isCurrentPostPublished', true );
+
+		render( <PostPublishButton /> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Submit for Review' } )
