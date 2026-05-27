@@ -4,7 +4,7 @@ This document introduces the main concepts related to styles that affect the use
 
 ## HTML and CSS
 
-By creating a post in the block editor the user is creating a number of artifacts: a HTML document plus a number of CSS stylesheets, either embedded in the document or external.
+By creating a post in the block editor, the user is creating a number of artifacts: an HTML document plus a number of CSS stylesheets, either embedded in the document or external.
 
 The final HTML document is the result of a few things:
 
