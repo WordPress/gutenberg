@@ -87,8 +87,7 @@ export default function MediaEditorCropPanel( {
 				} ) ) }
 			/>
 			<ToggleControl
-				label={ __( 'Resize crop area' ) }
-				help={ __( 'Show handles to adjust the crop box.' ) }
+				label={ __( 'Show resize handles' ) }
 				checked={ freeformCrop }
 				onChange={ onFreeformChange }
 			/>
