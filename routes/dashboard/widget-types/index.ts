@@ -12,3 +12,4 @@ export type {
 	WidgetType,
 	WidgetRenderProps,
 } from './types';
+export type { UseWidgetTypesResult } from './hooks/use-widget-types';

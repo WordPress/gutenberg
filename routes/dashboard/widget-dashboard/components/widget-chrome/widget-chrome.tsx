@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { Icon as WCIcon, Spinner } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import {
 	Component,
 	Suspense,
@@ -16,9 +16,8 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Stack, Notice, VisuallyHidden } from '@wordpress/ui';
+import { plugins } from '@wordpress/icons';
+import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -69,6 +68,37 @@ function LoadingOverlay() {
 	);
 }
 
+interface UnavailableWidgetProps {
+	widgetTypeName: string;
+}
+
+function UnavailableWidget( { widgetTypeName }: UnavailableWidgetProps ) {
+	return (
+		<>
+			<Card.Header>
+				<span
+					className={ styles.widgetChromeHeaderIcon }
+					aria-hidden="true"
+				>
+					<Icon icon={ plugins } />
+				</span>
+			</Card.Header>
+			<Card.Content className={ styles.widgetChromeContent }>
+				<Stack
+					direction="column"
+					justify="center"
+					align="center"
+					gap="md"
+					className={ styles.unavailable }
+				>
+					<Text>{ __( 'Widget is no longer available.' ) }</Text>
+					<Text render={ <code /> }>{ widgetTypeName }</Text>
+				</Stack>
+			</Card.Content>
+		</>
+	);
+}
+
 interface HeaderProps {
 	titleId: string;
 	widgetType: WidgetType;
@@ -87,7 +117,7 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 						className={ styles.widgetChromeHeaderIcon }
 						aria-hidden="true"
 					>
-						<WCIcon icon={ widgetType.icon } />
+						<Icon icon={ widgetType.icon } />
 					</span>
 				) }
 				<Card.Title id={ titleId } render={ <h3 /> }>
@@ -119,7 +149,8 @@ export interface WidgetChromeProps {
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 	function WidgetChrome( { widget, index, className }, ref ) {
-		const { widgetTypes, editMode } = useDashboardInternalContext();
+		const { widgetTypes, isResolvingWidgetTypes, editMode } =
+			useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 		const titleId = useId();
 
@@ -133,7 +164,38 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 		);
 
 		if ( ! widgetType ) {
-			return null;
+			if ( isResolvingWidgetTypes ) {
+				return (
+					<WidgetContextProvider value={ contextValue }>
+						<Card.Root
+							render={ <section /> }
+							ref={ ref }
+							className={ clsx( styles.widgetChrome, className ) }
+							aria-busy="true"
+							aria-label={ __( 'Loading' ) }
+						>
+							<Card.Content
+								className={ styles.widgetChromeContent }
+							>
+								<LoadingOverlay />
+							</Card.Content>
+						</Card.Root>
+					</WidgetContextProvider>
+				);
+			}
+
+			return (
+				<WidgetContextProvider value={ contextValue }>
+					<Card.Root
+						render={ <section /> }
+						ref={ ref }
+						className={ clsx( styles.widgetChrome, className ) }
+						aria-label={ __( 'Missing widget' ) }
+					>
+						<UnavailableWidget widgetTypeName={ widget.type } />
+					</Card.Root>
+				</WidgetContextProvider>
+			);
 		}
 
 		// `presentation` encodes two independent axes. `full-bleed` hides

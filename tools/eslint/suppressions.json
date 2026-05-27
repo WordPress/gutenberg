@@ -1660,6 +1660,11 @@
 			"count": 3
 		}
 	},
+	"routes/dashboard/widget-dashboard/components/widget-chrome/widget-chrome.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"routes/experiments-home/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
