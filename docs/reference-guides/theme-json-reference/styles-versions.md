@@ -53,11 +53,11 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `spacing.margin.bottom`       | 5.8 | 5.9 |
 | `spacing.blockGap`            | 5.9 | 5.9 |
 | `background.backgroundAttachment` | 6.7 | 6.7 |
-| `background.backgroundImage`      | 6.6 | 6.5 |
-| `background.backgroundPosition`   | 6.5 | 6.5 |
-| `background.backgroundRepeat`     | 6.5 | 6.5 |
-| `background.backgroundSize`       | 6.5 | 6.5 |
-| `dimensions.aspectRatio`      | 6.6 | 6.6 |
+| `background.backgroundImage`      | 6.4 | 6.5 |
+| `background.backgroundPosition`   | 6.6 | 6.6 |
+| `background.backgroundRepeat`     | 6.6 | 6.6 |
+| `background.backgroundSize`       | 6.6 | 6.6 |
+| `dimensions.aspectRatio`      | 6.5 | 6.6 |
 | `dimensions.height`           | 7.0 | N/A |
 | `dimensions.minHeight`        | 6.2 | N/A |
 | `dimensions.minWidth`         | 7.1 | 7.1 |
