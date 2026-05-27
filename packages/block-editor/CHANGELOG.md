@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Block Bindings: Surface a connect/disconnect picker inline next to RichText and plain-text Block Fields, gated behind `window.__experimentalContentOnlyInspectorFields`. Relocates the legacy "Attributes" panel to the Content tab when the flag is on; behavior is unchanged when the flag is off ([#75022](https://github.com/WordPress/gutenberg/issues/75022)).
+
 ### Bug Fixes
 
 -   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).
