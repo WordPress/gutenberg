@@ -8,6 +8,7 @@ import {
 } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
@@ -112,12 +113,14 @@ export default function WordPressEvents( {
 
 	useEffect( () => {
 		if ( ! hasSelectedLocation ) {
+			setLocationLabel( '' );
 			return;
 		}
 
 		const controller = new AbortController();
 		setEventsLoading( true );
 		setEventsError( false );
+		setLocationLabel( '' );
 
 		const params = new URLSearchParams( {
 			number: '5',
@@ -150,7 +153,7 @@ export default function WordPressEvents( {
 			justify="space-between"
 			className={ styles.container }
 		>
-			{ ! locationLabel && (
+			{ ! hasSelectedLocation && (
 				<Stack
 					className={ styles.locationPickerInWidget }
 					direction="column"
@@ -168,7 +171,17 @@ export default function WordPressEvents( {
 					/>
 				</Stack>
 			) }
-			{ hasSelectedLocation && (
+			{ hasSelectedLocation && eventsLoading && (
+				<Stack
+					className={ styles.locationPickerInWidget }
+					direction="column"
+					align="center"
+					justify="center"
+				>
+					<Spinner />
+				</Stack>
+			) }
+			{ hasSelectedLocation && ! eventsLoading && (
 				<EventsListSection
 					events={ events }
 					loading={ eventsLoading }
