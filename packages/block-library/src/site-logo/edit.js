@@ -10,6 +10,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
 	useEffect,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -73,6 +74,7 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
+	const cropButtonRef = useRef();
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -401,12 +403,15 @@ const SiteLogo = ( {
 				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
+							ref={ cropButtonRef }
 							onClick={
 								openMediaEditorModal && logoId
 									? () =>
 											openMediaEditorModal( {
 												id: logoId,
 												onUpdate: handleMediaUpdate,
+												onClose: () =>
+													cropButtonRef.current?.focus(),
 											} )
 									: () => setIsEditingImage( true )
 							}
