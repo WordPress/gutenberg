@@ -42,18 +42,20 @@ function CurrentZoomValue() {
 	return <output data-testid="current-zoom">{ state.zoom }</output>;
 }
 
+function expectElementBefore( first: Element, second: Element ) {
+	expect( first.compareDocumentPosition( second ) ).toBe(
+		Node.DOCUMENT_POSITION_FOLLOWING
+	);
+}
+
 describe( 'MediaEditorCropPanel', () => {
 	it( 'renders crop shape controls before zoom controls', () => {
-		expect.assertions( 2 );
-
 		setupCropPanel();
 
 		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
 		const zoom = screen.getByRole( 'slider', { name: 'Zoom (%)' } );
 
-		expect( aspectRatio.compareDocumentPosition( zoom ) ).toBe(
-			Node.DOCUMENT_POSITION_FOLLOWING
-		);
+		expectElementBefore( aspectRatio, zoom );
 	} );
 
 	it( 'renders compact image and crop measurements when an image is loaded', () => {
@@ -74,7 +76,7 @@ describe( 'MediaEditorCropPanel', () => {
 			}
 		);
 
-		const zoom = screen.getByRole( 'slider', { name: 'Zoom' } );
+		const zoom = screen.getByRole( 'slider', { name: 'Zoom (%)' } );
 		const heading = screen.getByRole( 'heading', {
 			name: 'Measurements',
 		} );
