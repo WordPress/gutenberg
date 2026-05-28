@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	RangeControl,
-	SelectControl,
-	ToggleControl,
-} from '@wordpress/components';
+import { RangeControl, SelectControl } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -41,10 +37,6 @@ export interface MediaEditorCropPanelProps {
 	aspectRatioValue: string;
 	/** Setter for the aspect-ratio preset value. */
 	onAspectRatioChange: ( value: string ) => void;
-	/** Whether the cropper is in freeform (resize-handle) mode. */
-	freeformCrop: boolean;
-	/** Setter for freeform mode. */
-	onFreeformChange: ( value: boolean ) => void;
 	/** Signal that a placement-oriented control is being adjusted. */
 	onPlacementControlInteraction?: () => void;
 	/** Aspect-ratio presets to display in the selector. */
@@ -52,22 +44,17 @@ export interface MediaEditorCropPanelProps {
 }
 
 /**
- * Sidebar panel for crop-shape controls — aspect-ratio presets and
- * freeform toggle. The tactile verbs (rotate, flip) live in the
- * bottom toolbar instead.
+ * Sidebar panel for crop-shape controls. The tactile verbs (rotate, flip)
+ * live in the bottom toolbar instead.
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
- * @param props.freeformCrop
- * @param props.onFreeformChange
  * @param props.onPlacementControlInteraction
  * @param props.aspectRatioOptions
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
-	freeformCrop,
-	onFreeformChange,
 	onPlacementControlInteraction,
 	aspectRatioOptions,
 }: MediaEditorCropPanelProps ) {
@@ -79,11 +66,11 @@ export default function MediaEditorCropPanel( {
 
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
-		// Cmd+Z handler doesn't mistake the SelectControl / ToggleControl
-		// inputs for metadata fields (which would suppress undo).
+		// Cmd+Z handler doesn't mistake the SelectControl input for a
+		// metadata field (which would suppress undo).
 		<Stack
 			direction="column"
-			gap="md"
+			gap="xl"
 			{ ...{ [ CROP_CONTROL_ATTR ]: true } }
 		>
 			<VisuallyHidden render={ <h2 /> }>
@@ -98,11 +85,6 @@ export default function MediaEditorCropPanel( {
 					label: preset.label,
 					value: preset.value.toString(),
 				} ) ) }
-			/>
-			<ToggleControl
-				label={ __( 'Show resize handles' ) }
-				checked={ freeformCrop }
-				onChange={ onFreeformChange }
 			/>
 			<div role="presentation" { ...zoomGestureHandlers }>
 				<RangeControl
