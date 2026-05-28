@@ -19,7 +19,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -54,6 +54,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -87,9 +88,22 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           class="components-panel__body post-publish-panel__postpublish-header is-opened"
         >
           <a
+            class="components-external-link"
             href="https://wordpress.local/sample-page/"
+            rel="external noopener"
+            target="_blank"
           >
-            (no title)
+            <span
+              class="components-external-link__contents"
+            >
+              (no title)
+            </span>
+            <span
+              aria-label="(opens in a new tab)"
+              class="components-external-link__icon wp-exclude-emoji"
+            >
+              ↗
+            </span>
           </a>
            
           is now live.
@@ -143,9 +157,28 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-next-40px-default-size is-primary"
+              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
               href="https://wordpress.local/sample-page/"
-            />
+              target="_blank"
+            >
+              <span
+                data-visually-hidden=""
+              >
+                (opens in a new tab)
+              </span>
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19.5 4.5h-7V6h4.44l-5.97 5.97 1.06 1.06L18 7.06v4.44h1.5v-7Zm-13 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3H17v3a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h3V5.5h-3Z"
+                />
+              </svg>
+            </a>
             <a
               class="components-button is-next-40px-default-size is-secondary"
               href="post-new.php?"
@@ -211,7 +244,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 
 .emotion-4 {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 499;
   line-height: 1.4;
   text-transform: uppercase;
   display: block;
@@ -246,6 +279,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -279,12 +313,28 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           class="components-panel__body post-publish-panel__postpublish-header is-opened"
         >
           <a
+            class="components-external-link"
             href="https://wordpress.local/sample-page/"
+            rel="external noopener"
+            target="_blank"
           >
-            (no title)
+            <span
+              class="components-external-link__contents"
+            >
+              (no title)
+            </span>
+            <span
+              aria-label="(opens in a new tab)"
+              class="components-external-link__icon wp-exclude-emoji"
+            >
+              ↗
+            </span>
           </a>
            
-          is now live.
+          is now scheduled. It will go live on
+           
+          Immediately
+          .
         </div>
         <div
           class="components-panel__body is-opened"
@@ -336,10 +386,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           >
             <a
               class="components-button is-next-40px-default-size is-primary"
-              href="https://wordpress.local/sample-page/"
-            />
-            <a
-              class="components-button is-next-40px-default-size is-secondary"
               href="post-new.php?"
             />
           </div>
@@ -428,6 +474,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -581,6 +628,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -778,6 +826,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
 <div>
   <div
     class="editor-post-publish-panel"
+    tabindex="-1"
   >
     <div
       class="editor-post-publish-panel__header"
@@ -797,7 +846,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
       >
         <button
           aria-disabled="true"
-          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary is-compact"
+          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary is-compact is-busy"
           type="button"
         >
           Submit for Review

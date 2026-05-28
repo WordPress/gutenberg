@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react';
+import type { Meta } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies
@@ -25,17 +26,13 @@ import './style.css';
  * This component is deprecated. Consider using `Navigator` instead.
  */
 const meta: Meta< typeof Navigation > = {
-	title: 'Components (Deprecated)/Navigation',
+	title: 'Components/Deprecated/Navigation',
 	id: 'components-navigation',
 	component: Navigation,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationBackButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		NavigationMenu,
 	},
 	argTypes: {
@@ -44,8 +41,10 @@ const meta: Meta< typeof Navigation > = {
 		children: { control: false },
 		onActivateMenu: { control: false },
 	},
+	args: {
+		onActivateMenu: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},

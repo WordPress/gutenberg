@@ -79,7 +79,6 @@ function PostTitleRaw( _, forwardedRef ) {
 			autoComplete="off"
 			dir="auto"
 			rows={ 1 }
-			__nextHasNoMarginBottom
 		/>
 	);
 }

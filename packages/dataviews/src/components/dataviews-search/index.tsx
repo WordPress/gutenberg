@@ -21,7 +21,9 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 		view.search
 	);
 	useEffect( () => {
-		setSearch( view.search ?? '' );
+		if ( view.search !== debouncedSearch ) {
+			setSearch( view.search ?? '' );
+		}
 	}, [ view.search, setSearch ] );
 	const onChangeViewRef = useRef( onChangeView );
 	const viewRef = useRef( view );
@@ -33,7 +35,8 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 		if ( debouncedSearch !== viewRef.current?.search ) {
 			onChangeViewRef.current( {
 				...viewRef.current,
-				page: 1,
+				page: view.page ? 1 : undefined,
+				startPosition: view.startPosition ? 1 : undefined,
 				search: debouncedSearch,
 			} );
 		}
@@ -42,7 +45,6 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 	return (
 		<SearchControl
 			className="dataviews-search"
-			__nextHasNoMarginBottom
 			onChange={ setSearch }
 			value={ search }
 			label={ searchLabel }

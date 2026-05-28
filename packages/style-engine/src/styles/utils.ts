@@ -98,7 +98,7 @@ export function generateBoxRules(
 		rules.push( {
 			selector: options?.selector,
 			key: ruleKeys.default,
-			value: boxStyle,
+			value: getCSSValueFromRawStyle( boxStyle ),
 		} );
 	} else {
 		const sideRules = individualProperties.reduce(
@@ -207,7 +207,7 @@ export function camelCaseJoin( strings: string[] ): string {
 export function safeDecodeURI( uri: string ): string {
 	try {
 		return decodeURI( uri );
-	} catch ( uriError ) {
+	} catch {
 		return uri;
 	}
 }

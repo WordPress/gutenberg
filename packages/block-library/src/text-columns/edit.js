@@ -34,7 +34,6 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ columns }

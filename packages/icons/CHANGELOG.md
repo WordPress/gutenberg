@@ -2,6 +2,96 @@
 
 ## Unreleased
 
+## 13.1.0 (2026-05-14)
+
+## 13.0.0 (2026-04-29)
+
+### Breaking Changes
+
+- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+
+## 12.2.0 (2026-04-15)
+
+## 12.1.0 (2026-04-01)
+
+## 12.0.0 (2026-03-18)
+
+### Breaking Changes
+
+-   Rename `formatLtr` icon to `formatLTR`. ([#76074](https://github.com/WordPress/gutenberg/pull/76074))
+
+## 11.8.0 (2026-03-04)
+
+## 11.7.0 (2026-02-18)
+
+### Enhancements
+
+-   Add new `navigation-overlay` icon. ([#75249](https://github.com/WordPress/gutenberg/issues/75249))
+
+## 11.6.0 (2026-01-29)
+
+## 11.5.0 (2026-01-16)
+
+## 11.3.0 (2025-11-26)
+
+### Enhancements
+
+-   Add new `cart` icon. ([#73509](https://github.com/WordPress/gutenberg/pull/73509))
+
+## 11.2.0 (2025-11-12)
+
+## 11.1.0 (2025-10-29)
+
+## 11.0.0 (2025-10-17)
+
+### Breaking Changes
+
+-   Remove `edit` and `warning` icons, which were aliases to `pencil` and `cautionFilled`, respectively. Switch to SVG icons as canonical source format, letting the system auto-generate the React elements and index. ([#71878](https://github.com/WordPress/gutenberg/pull/71878)).
+-   Ensure both SVG and generated TSX code in `src/` are included in the published package. ([#72299](https://github.com/WordPress/gutenberg/pull/72299))
+
+### Enhancements
+
+-   Update `check` to be more optically balanced. ([#72101](https://github.com/WordPress/gutenberg/pull/72101))
+-   Add new `timeToRead` and `wordCount` icons. ([#72240](https://github.com/WordPress/gutenberg/pull/72240))
+
+## 10.32.0 (2025-10-01)
+
+## 10.31.0 (2025-09-17)
+
+## 10.30.0 (2025-09-03)
+
+## 10.29.0 (2025-08-20)
+
+-   Breaking change: deprecate `moreHorizontalMobile` icon. This was added in error, and `moreHorizontal` should be used instead. ([#71172](https://github.com/WordPress/gutenberg/pull/71172))
+
+## 10.28.0 (2025-08-07)
+
+-   Add new `dashboard` icon ([#70300](https://github.com/WordPress/gutenberg/pull/70300)).
+
+## 10.27.0 (2025-07-23)
+
+-   Update `cancelCircleFilled`, `currencyDollar`, `currencyPound`, `currencyEuro`, `globe`, `helpFilled`, `siteLogo`, `swatch`, to have unified circular size footprints. ([https://github.com/WordPress/gutenberg/pull/70581](#70581)).
+-   Update `help`, `plusCircle`, and `typography` icons to have a unified circular footprint that matches other circle icons. ([#70299](https://github.com/WordPress/gutenberg/pull/70299)).
+-   Update `plusCircleFilled` to have unified circular size footprints. ([https://github.com/WordPress/gutenberg/pull/70650](#70650)).
+
+## 10.26.0 (2025-06-25)
+
+## 10.25.0 (2025-06-04)
+
+## 10.24.0 (2025-05-22)
+
+## 10.23.0 (2025-05-07)
+
+## 10.22.0 (2025-04-11)
+
+## 10.21.0 (2025-03-27)
+
+## 10.20.0 (2025-03-13)
+
+## 10.19.0 (2025-02-28)
+
+## 10.18.0 (2025-02-12)
+
 ## 10.17.0 (2025-01-29)
 
 ## 10.16.0 (2025-01-15)

@@ -22,7 +22,7 @@ test.describe( 'Navigation colors', () => {
 		const { id: menuId } = await requestUtils.createNavigationMenu( {
 			title: 'Colored menu',
 			content: `<!-- wp:navigation-submenu {"label":"Custom Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Page Link","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
-			attributes: { openSubmenusOnClick: true },
+			attributes: { submenuVisibility: 'click' },
 		} );
 
 		await admin.createNewPost();
@@ -88,9 +88,8 @@ test.describe( 'Navigation colors', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();
 
-		// In the sidebar inspector we add a link color and link hover color to the group block.
+		// In the sidebar inspector we add text and background colors to the group block.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Text' } ).click();
 		await page
 			.getByRole( 'option', { name: 'White' } )
@@ -142,13 +141,14 @@ test.describe( 'Navigation colors', () => {
 
 		// In the sidebar inspector we add a link color and link hover color to the group block.
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Color options' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
 			.click();
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Link', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Link', exact: true } )
+			.click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
 			.getByRole( 'option', { name: 'Vivid red' } )
@@ -408,7 +408,10 @@ class ColorControl {
 		// Switch to settings tab.
 		await this.page.getByRole( 'tab', { name: 'Settings' } ).click();
 		// Set it to always be the mobile view, but don't save this setting so we can still check all the frontend colors.
-		await this.page.getByRole( 'radio', { name: 'Always' } ).click();
+		await this.page
+			.getByRole( 'radiogroup', { name: 'Configure overlay visibility' } )
+			.getByRole( 'radio', { name: 'Always' } )
+			.click();
 		await this.editor.canvas
 			.getByRole( 'button', { name: 'Open menu' } )
 			.click();

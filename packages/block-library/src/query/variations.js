@@ -13,6 +13,20 @@ import {
 	imageDateTitle,
 } from './icons';
 
+const postDate = [
+	'core/post-date',
+	{
+		metadata: {
+			bindings: {
+				datetime: {
+					source: 'core/post-data',
+					args: { field: 'date' },
+				},
+			},
+		},
+	},
+];
+
 const variations = [
 	{
 		name: 'title-date',
@@ -20,11 +34,7 @@ const variations = [
 		icon: titleDate,
 		attributes: {},
 		innerBlocks: [
-			[
-				'core/post-template',
-				{},
-				[ [ 'core/post-title' ], [ 'core/post-date' ] ],
-			],
+			[ 'core/post-template', {}, [ [ 'core/post-title' ], postDate ] ],
 			[ 'core/query-pagination' ],
 			[ 'core/query-no-results' ],
 		],
@@ -55,11 +65,7 @@ const variations = [
 			[
 				'core/post-template',
 				{},
-				[
-					[ 'core/post-title' ],
-					[ 'core/post-date' ],
-					[ 'core/post-excerpt' ],
-				],
+				[ [ 'core/post-title' ], postDate, [ 'core/post-excerpt' ] ],
 			],
 			[ 'core/query-pagination' ],
 			[ 'core/query-no-results' ],
@@ -77,7 +83,7 @@ const variations = [
 				{},
 				[
 					[ 'core/post-featured-image' ],
-					[ 'core/post-date' ],
+					postDate,
 					[ 'core/post-title' ],
 				],
 			],

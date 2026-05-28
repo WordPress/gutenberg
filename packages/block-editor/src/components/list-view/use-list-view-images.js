@@ -11,47 +11,70 @@ import { store as blockEditorStore } from '../../store';
 
 // Maximum number of images to display in a list view row.
 const MAX_IMAGES = 3;
+const IMAGE_GETTERS = {
+	'core/image': ( { clientId, attributes } ) => {
+		if ( attributes.url ) {
+			return {
+				url: attributes.url,
+				alt: attributes.alt || '',
+				clientId,
+			};
+		}
+	},
+	'core/cover': ( { clientId, attributes } ) => {
+		if ( attributes.backgroundType === 'image' && attributes.url ) {
+			return {
+				url: attributes.url,
+				alt: attributes.alt || '',
+				clientId,
+			};
+		}
+	},
+	'core/media-text': ( { clientId, attributes } ) => {
+		if ( attributes.mediaType === 'image' && attributes.mediaUrl ) {
+			return {
+				url: attributes.mediaUrl,
+				alt: attributes.mediaAlt || '',
+				clientId,
+			};
+		}
+	},
+	'core/gallery': ( { innerBlocks } ) => {
+		const images = [];
+		const getValues = !! innerBlocks?.length
+			? IMAGE_GETTERS[ innerBlocks[ 0 ].name ]
+			: undefined;
+		if ( ! getValues ) {
+			return images;
+		}
 
-function getImage( block ) {
-	if ( block.name !== 'core/image' ) {
-		return;
-	}
+		for ( const innerBlock of innerBlocks ) {
+			const img = getValues( innerBlock );
+			if ( img ) {
+				images.push( img );
+			}
+			if ( images.length >= MAX_IMAGES ) {
+				return images;
+			}
+		}
 
-	if ( block.attributes?.url ) {
-		return {
-			url: block.attributes.url,
-			alt: block.attributes.alt,
-			clientId: block.clientId,
-		};
-	}
-}
+		return images;
+	},
+};
 
-function getImagesFromGallery( block ) {
-	if ( block.name !== 'core/gallery' || ! block.innerBlocks ) {
+function getImagesFromBlock( block, isExpanded ) {
+	const getImages = IMAGE_GETTERS[ block.name ];
+	const images = !! getImages ? getImages( block ) : undefined;
+
+	if ( ! images ) {
 		return [];
 	}
 
-	const images = [];
-
-	for ( const innerBlock of block.innerBlocks ) {
-		const img = getImage( innerBlock );
-		if ( img ) {
-			images.push( img );
-		}
-		if ( images.length >= MAX_IMAGES ) {
-			return images;
-		}
+	if ( ! Array.isArray( images ) ) {
+		return [ images ];
 	}
 
-	return images;
-}
-
-function getImagesFromBlock( block, isExpanded ) {
-	const img = getImage( block );
-	if ( img ) {
-		return [ img ];
-	}
-	return isExpanded ? [] : getImagesFromGallery( block );
+	return isExpanded ? [] : images;
 }
 
 /**
@@ -69,12 +92,10 @@ function getImagesFromBlock( block, isExpanded ) {
 export default function useListViewImages( { clientId, isExpanded } ) {
 	const { block } = useSelect(
 		( select ) => {
-			const _block = select( blockEditorStore ).getBlock( clientId );
-			return { block: _block };
+			return { block: select( blockEditorStore ).getBlock( clientId ) };
 		},
 		[ clientId ]
 	);
-
 	const images = useMemo( () => {
 		return getImagesFromBlock( block, isExpanded );
 	}, [ block, isExpanded ] );

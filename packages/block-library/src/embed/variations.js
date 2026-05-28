@@ -48,10 +48,10 @@ function getTitle( providerName ) {
 const variations = [
 	{
 		name: 'twitter',
-		title: getTitle( 'Twitter' ),
+		title: getTitle( 'X' ),
 		icon: embedTwitterIcon,
-		keywords: [ 'tweet', __( 'social' ) ],
-		description: __( 'Embed a tweet.' ),
+		keywords: [ 'x', 'twitter', 'tweet', __( 'social' ) ],
+		description: __( 'Embed an X post.' ),
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
 		attributes: { providerNameSlug: 'twitter', responsive: true },
 	},
@@ -250,14 +250,6 @@ const variations = [
 		description: __( 'Embed ReverbNation content.' ),
 		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
 		attributes: { providerNameSlug: 'reverbnation', responsive: true },
-	},
-	{
-		name: 'screencast',
-		title: getTitle( 'Screencast' ),
-		icon: embedVideoIcon,
-		description: __( 'Embed Screencast content.' ),
-		patterns: [ /^https?:\/\/(www\.)?screencast\.com\/.+/i ],
-		attributes: { providerNameSlug: 'screencast', responsive: true },
 	},
 	{
 		name: 'scribd',

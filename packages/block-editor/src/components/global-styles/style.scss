@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-global-styles__toggle-icon {
 	fill: currentColor;
 }
@@ -20,18 +23,53 @@
 	text-align: right;
 }
 
+.block-editor-global-styles-state-control {
+	// Ensure alignment with block heading.
+	margin-top: -$grid-unit-05;
+}
+
+.block-editor-global-styles-state-control__badges {
+	min-height: $grid-unit-30;
+}
+
 .block-editor-global-styles-filters-panel__dropdown,
 .block-editor-global-styles__shadow-dropdown {
 	display: block;
 	padding: 0;
+	position: relative;
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+}
 
-	button {
-		width: 100%;
-		padding: $grid-unit-10;
+.block-editor-global-styles-filters-panel__dropdown-toggle,
+.block-editor-global-styles__shadow-dropdown-toggle {
+	width: 100%;
+	padding: $grid-unit-10;
 
-		&.is-open {
-			background-color: $gray-100;
-		}
+	&.is-open {
+		background-color: $gray-100;
+	}
+}
+
+.block-editor-global-styles__shadow-editor__remove-button {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles__shadow-dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
 	}
 }
 
@@ -42,7 +80,7 @@
 	color: $gray-800;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-small;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	display: inline-flex;
 	align-items: center;
 
@@ -71,9 +109,35 @@
 	}
 }
 
-.block-editor-global-styles-advanced-panel__custom-css-input textarea {
-	font-family: $editor_html_font;
-	// CSS input is always LTR regardless of language.
-	/*rtl:ignore*/
-	direction: ltr;
+.block-editor-global-styles-advanced-panel__custom-css-input {
+	margin-bottom: $grid-unit-20;
+
+	textarea {
+		font-family: $editor_html_font;
+		// CSS input is always LTR regardless of language.
+		/*rtl:ignore*/
+		direction: ltr;
+	}
+}
+
+.block-editor-panel-duotone-settings__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.block-editor-global-styles-filters-panel__dropdown:hover &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
+	}
 }

@@ -12,6 +12,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import { isNavigationOverlayContextKey } from '../../../store/private-keys';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
 
@@ -35,6 +36,16 @@ const usePatternsState = (
 		() => ( { [ isFiltered ]: !! isQuick } ),
 		[ isQuick ]
 	);
+
+	// Check if we're editing a navigation-overlay template part.
+	// This information is passed through block editor settings to avoid
+	// cross-package dependencies.
+	const isWithinNavigationOverlayContext = useSelect( ( select ) => {
+		const { getSettings } = unlock( select( blockEditorStore ) );
+		const settings = getSettings();
+		return settings[ isNavigationOverlayContextKey ] ?? false;
+	}, [] );
+
 	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
 			const { getSettings, __experimentalGetAllowedPatterns } = unlock(
@@ -55,6 +66,20 @@ const usePatternsState = (
 		},
 		[ rootClientId, options ]
 	);
+
+	// Filter out patterns with "navigation" category unless we're in
+	// navigation-overlay template part context.
+	// TO DO: create an api for patterns to decide in which context they should be shown.
+	const filteredPatterns = useMemo( () => {
+		return patterns.filter( ( pattern ) => {
+			const hasNavigationCategory =
+				pattern.categories?.includes( 'navigation' );
+			if ( hasNavigationCategory && ! isWithinNavigationOverlayContext ) {
+				return false;
+			}
+			return true;
+		} );
+	}, [ patterns, isWithinNavigationOverlayContext ] );
 	const { getClosestAllowedInsertionPointForPattern } = unlock(
 		useSelect( blockEditorStore )
 	);
@@ -131,7 +156,7 @@ const usePatternsState = (
 		]
 	);
 
-	return [ patterns, allCategories, onClickPattern ];
+	return [ filteredPatterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

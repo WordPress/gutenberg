@@ -8,15 +8,15 @@ import clsx from 'clsx';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
-	Tooltip,
+	Tooltip as WCTooltip,
 	Spinner,
-	VisuallyHidden,
 	Composite,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -101,7 +101,7 @@ function DownloadableBlockListItem( { item, onClick } ) {
 	} );
 
 	return (
-		<Tooltip placement="top" text={ itemLabel }>
+		<WCTooltip placement="top" text={ itemLabel }>
 			<Composite.Item
 				className={ clsx(
 					'block-directory-downloadable-block-list-item',
@@ -162,7 +162,7 @@ function DownloadableBlockListItem( { item, onClick } ) {
 					) }
 				</span>
 			</Composite.Item>
-		</Tooltip>
+		</WCTooltip>
 	);
 }
 

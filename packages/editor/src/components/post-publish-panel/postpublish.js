@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody, Button, TextControl } from '@wordpress/components';
+import {
+	PanelBody,
+	Button,
+	TextControl,
+	ExternalLink,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -9,6 +14,8 @@ import { addQueryArgs, safeDecodeURIComponent } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -118,9 +125,9 @@ export default function PostPublishPanelPostpublish( {
 	return (
 		<div className="post-publish-panel__postpublish">
 			<PanelBody className="post-publish-panel__postpublish-header">
-				<a ref={ postLinkRef } href={ link }>
+				<ExternalLink ref={ postLinkRef } href={ link }>
 					{ decodeEntities( post.title ) || __( '(no title)' ) }
-				</a>{ ' ' }
+				</ExternalLink>{ ' ' }
 				{ postPublishNonLinkHeader }
 			</PanelBody>
 			<PanelBody>
@@ -130,7 +137,6 @@ export default function PostPublishPanelPostpublish( {
 				<div className="post-publish-panel__postpublish-post-address-container">
 					<TextControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						className="post-publish-panel__postpublish-post-address"
 						readOnly
 						label={ sprintf(
@@ -153,8 +159,17 @@ export default function PostPublishPanelPostpublish( {
 							variant="primary"
 							href={ link }
 							__next40pxDefaultSize
+							icon={ external }
+							iconPosition="right"
+							target="_blank"
 						>
 							{ viewPostLabel }
+							<VisuallyHidden render={ <span /> }>
+								{
+									/* translators: accessibility text */
+									__( '(opens in a new tab)' )
+								}
+							</VisuallyHidden>
 						</Button>
 					) }
 					<Button

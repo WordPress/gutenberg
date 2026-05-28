@@ -37,11 +37,17 @@ export const StyledTextarea = styled.textarea`
 	display: block;
 	font-family: ${ font( 'default.fontFamily' ) };
 	line-height: 20px;
+	background: ${ COLORS.theme.background };
+	color: ${ COLORS.theme.foreground };
+	resize: vertical;
 
 	// Vertical padding is to match the standard 40px control height when rows=1,
 	// in conjunction with the 20px line-height.
 	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
 	padding: 9px 11px;
+
+	// Matching the 20px line-height + the 9px top and bottom padding.
+	min-height: 38px;
 
 	${ inputStyleNeutral };
 
@@ -56,13 +62,18 @@ export const StyledTextarea = styled.textarea`
 		${ inputStyleFocus }
 	}
 
+	&:disabled {
+		background: ${ COLORS.ui.backgroundDisabled };
+		border-color: ${ COLORS.ui.borderDisabled };
+		color: ${ COLORS.ui.textDisabled };
+	}
+
 	// Use opacity to work in various editor styles.
 	&::-webkit-input-placeholder {
 		color: ${ COLORS.ui.darkGrayPlaceholder };
 	}
 
 	&::-moz-placeholder {
-		opacity: 1; // Necessary because Firefox reduces this from 1.
 		color: ${ COLORS.ui.darkGrayPlaceholder };
 	}
 
@@ -76,7 +87,6 @@ export const StyledTextarea = styled.textarea`
 		}
 
 		&::-moz-placeholder {
-			opacity: 1; // Necessary because Firefox reduces this from 1.
 			color: ${ COLORS.ui.lightGrayPlaceholder };
 		}
 

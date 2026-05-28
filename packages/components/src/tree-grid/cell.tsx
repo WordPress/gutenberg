@@ -41,5 +41,6 @@ function UnforwardedTreeGridCell(
  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
  */
 export const TreeGridCell = forwardRef( UnforwardedTreeGridCell );
+TreeGridCell.displayName = 'TreeGridCell';
 
 export default TreeGridCell;

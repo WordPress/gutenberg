@@ -196,7 +196,7 @@ export function useScaleCanvas( {
 
 	/**
 	 * The starting transition state for the zoom out animation.
-	 * @type {import('react').RefObject<TransitionState>}
+	 * @type {React.RefObject<TransitionState>}
 	 */
 	const transitionFromRef = useRef( {
 		scaleValue,
@@ -208,7 +208,7 @@ export function useScaleCanvas( {
 
 	/**
 	 * The ending transition state for the zoom out animation.
-	 * @type {import('react').RefObject<TransitionState>}
+	 * @type {React.RefObject<TransitionState>}
 	 */
 	const transitionToRef = useRef( {
 		scaleValue,
@@ -286,10 +286,6 @@ export function useScaleCanvas( {
 
 		iframeDocument.documentElement.classList.remove( 'zoom-out-animation' );
 
-		// Set the final scroll position that was just animated to.
-		// Disable reason: Eslint isn't smart enough to know that this is a
-		// DOM element. https://github.com/facebook/react/issues/31483
-		// eslint-disable-next-line react-compiler/react-compiler
 		iframeDocument.documentElement.scrollTop =
 			transitionToRef.current.scrollTop;
 

@@ -8,7 +8,9 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import { unlock } from '../../lock-unlock';
+import { isThemeDataLoaded } from './utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -27,8 +29,29 @@ export const navigationRoute = {
 	name: 'navigation',
 	path: '/navigation',
 	areas: {
-		sidebar: <SidebarNavigationScreenNavigationMenus backPath="/" />,
-		preview: <Editor />,
-		mobile: <MobileNavigationView />,
+		sidebar( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
+				<SidebarNavigationScreenNavigationMenus backPath="/" />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+		preview( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? <Editor /> : undefined;
+		},
+		mobile( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return <></>;
+			}
+			return siteData.currentTheme.is_block_theme ? (
+				<MobileNavigationView />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
 	},
 };

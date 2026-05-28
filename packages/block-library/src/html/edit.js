@@ -2,88 +2,94 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	BlockControls,
-	PlainText,
+	BlockIcon,
+	InspectorControls,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
-	Disabled,
 	ToolbarGroup,
-	VisuallyHidden,
+	Placeholder,
+	Button,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useInstanceId } from '@wordpress/compose';
+import { code } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Preview from './preview';
+import HTMLEditModal from './modal';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
-	const [ isPreview, setIsPreview ] = useState();
-	const isDisabled = useContext( Disabled.Context );
-
-	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
-
-	const isPreviewMode = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().isPreviewMode;
-	}, [] );
-
-	function switchToPreview() {
-		setIsPreview( true );
-	}
-
-	function switchToHTML() {
-		setIsPreview( false );
-	}
-
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
-		'aria-describedby': isPreview ? instanceId : undefined,
 	} );
+
+	// Show placeholder when content is empty
+	if ( ! attributes.content?.trim() ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ code } /> }
+					label={ __( 'Custom HTML' ) }
+					instructions={ __(
+						'Add custom HTML code and preview how it looks.'
+					) }
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit HTML' ) }
+					</Button>
+				</Placeholder>
+				<HTMLEditModal
+					isOpen={ isModalOpen }
+					onRequestClose={ () => setIsModalOpen( false ) }
+					content={ attributes.content }
+					setAttributes={ setAttributes }
+				/>
+			</div>
+		);
+	}
 
 	return (
 		<div { ...blockProps }>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarButton
-						isPressed={ ! isPreview }
-						onClick={ switchToHTML }
-					>
-						HTML
-					</ToolbarButton>
-					<ToolbarButton
-						isPressed={ isPreview }
-						onClick={ switchToPreview }
-					>
-						{ __( 'Preview' ) }
+					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
+						{ __( 'Edit code' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ isPreview || isPreviewMode || isDisabled ? (
-				<>
-					<Preview
-						content={ attributes.content }
-						isSelected={ isSelected }
-					/>
-					<VisuallyHidden id={ instanceId }>
-						{ __(
-							'HTML preview is not yet fully accessible. Please switch screen reader to virtualized mode to navigate the below iFrame.'
-						) }
-					</VisuallyHidden>
-				</>
-			) : (
-				<PlainText
-					value={ attributes.content }
-					onChange={ ( content ) => setAttributes( { content } ) }
-					placeholder={ __( 'Write HTML…' ) }
-					aria-label={ __( 'HTML' ) }
-				/>
-			) }
+			<InspectorControls>
+				<VStack
+					className="block-editor-block-inspector-edit-contents"
+					expanded
+				>
+					<Button
+						className="block-editor-block-inspector-edit-contents__button"
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit code' ) }
+					</Button>
+				</VStack>
+			</InspectorControls>
+			<Preview content={ attributes.content } isSelected={ isSelected } />
+			<HTMLEditModal
+				isOpen={ isModalOpen }
+				onRequestClose={ () => setIsModalOpen( false ) }
+				content={ attributes.content }
+				setAttributes={ setAttributes }
+			/>
 		</div>
 	);
 }

@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import { Button, Modal } from '@wordpress/components';
 import {
 	EntitiesSavedStates,
@@ -27,17 +28,22 @@ import { useActivateTheme } from '../../utils/use-activate-theme';
 import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-const { EntitiesSavedStatesExtensible, NavigableRegion } =
-	unlock( privateApis );
+const { EntitiesSavedStatesExtensible } = unlock( privateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
-const EntitiesSavedStatesForPreview = ( { onClose, renderDialog } ) => {
+const EntitiesSavedStatesForPreview = ( {
+	onClose,
+	renderDialog,
+	variant,
+} ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
-	let activateSaveLabel;
+	let activateSaveLabel, successNoticeContent;
 	if ( isDirtyProps.isDirty ) {
 		activateSaveLabel = __( 'Activate & Save' );
+		successNoticeContent = __( 'Theme activated and site updated.' );
 	} else {
 		activateSaveLabel = __( 'Activate' );
+		successNoticeContent = __( 'Theme activated.' );
 	}
 
 	const currentTheme = useActualCurrentTheme();
@@ -76,22 +82,29 @@ const EntitiesSavedStatesForPreview = ( { onClose, renderDialog } ) => {
 				saveEnabled: true,
 				saveLabel: activateSaveLabel,
 				renderDialog,
+				variant,
+				successNoticeContent,
 			} }
 		/>
 	);
 };
 
-const _EntitiesSavedStates = ( { onClose, renderDialog } ) => {
+const _EntitiesSavedStates = ( { onClose, renderDialog, variant } ) => {
 	if ( isPreviewingTheme() ) {
 		return (
 			<EntitiesSavedStatesForPreview
 				onClose={ onClose }
 				renderDialog={ renderDialog }
+				variant={ variant }
 			/>
 		);
 	}
 	return (
-		<EntitiesSavedStates close={ onClose } renderDialog={ renderDialog } />
+		<EntitiesSavedStates
+			close={ onClose }
+			renderDialog={ renderDialog }
+			variant={ variant }
+		/>
 	);
 };
 
@@ -130,12 +143,10 @@ export default function SavePanel() {
 			<Modal
 				className="edit-site-save-panel__modal"
 				onRequestClose={ onClose }
-				__experimentalHideHeader
-				contentLabel={ __(
-					'Save site, content, and template changes'
-				) }
+				title={ __( 'Review changes' ) }
+				size="small"
 			>
-				<_EntitiesSavedStates onClose={ onClose } />
+				<_EntitiesSavedStates onClose={ onClose } variant="inline" />
 			</Modal>
 		) : null;
 	}

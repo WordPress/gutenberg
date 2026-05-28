@@ -31,9 +31,11 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"style",
-		"openSubmenusOnClick"
+		"openSubmenusOnClick",
+		"submenuVisibility"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"typography": {
@@ -76,7 +78,8 @@
 				"padding": false,
 				"margin": false
 			}
-		}
+		},
+		"contentRole": true
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"

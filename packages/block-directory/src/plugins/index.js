@@ -13,6 +13,9 @@ import InstalledBlocksPrePublishPanel from './installed-blocks-pre-publish-panel
 import getInstallMissing from './get-install-missing';
 
 registerPlugin( 'block-directory', {
+	// The icon is explicitly set to undefined to prevent PluginPrePublishPanel
+	// from rendering the fallback icon pluginIcon.
+	icon: undefined,
 	render() {
 		return (
 			<>

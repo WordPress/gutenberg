@@ -26,6 +26,26 @@ const {
 	getAsBooleanFromENV,
 } = require( '../utils' );
 
+/**
+ * @typedef {import('../../env/lib/config/load-config').WPConfig} WPConfig
+ */
+
+/**
+ * Loads any configuration from a given directory.
+ *
+ * @type {(configDirectoryPath: string) => Promise<WPConfig> | null}
+ */
+let loadConfig = null;
+
+try {
+	// First, try to load the package installed from among the optional peerDependencies.
+	loadConfig = require( '@wordpress/env/lib/config' ).loadConfig;
+} catch {
+	console.log(
+		'Notice: Could not find @wordpress/env package. Using WP_BASE_URL environment variable or else the default http://localhost:8889 URL for tests.'
+	);
+}
+
 if ( ! getAsBooleanFromENV( 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD' ) ) {
 	const result = spawn( 'npx', [ 'playwright', 'install' ], {
 		stdio: 'inherit',
@@ -51,19 +71,32 @@ if ( ! process.env.WP_ARTIFACTS_PATH ) {
 	);
 }
 
-const testResult = spawn(
-	'node',
-	[
-		require.resolve( '@playwright/test/cli' ),
-		'test',
-		...config,
-		...getArgsFromCLI(),
-	],
-	{
-		stdio: 'inherit',
-	}
-);
+function spawnProcess() {
+	const testResult = spawn(
+		'node',
+		[
+			require.resolve( '@playwright/test/cli' ),
+			'test',
+			...config,
+			...getArgsFromCLI(),
+		],
+		{
+			stdio: 'inherit',
+		}
+	);
 
-if ( testResult.status > 0 ) {
-	process.exit( testResult.status );
+	if ( testResult.status > 0 ) {
+		process.exit( testResult.status );
+	}
+}
+
+if ( loadConfig ) {
+	loadConfig( resolve( '.' ) ).then( ( envConfig ) => {
+		if ( ! process.env.WP_BASE_URL && envConfig?.env?.tests?.port ) {
+			process.env.WP_BASE_URL = `http://localhost:${ envConfig.env.tests.port }`;
+		}
+		spawnProcess();
+	} );
+} else {
+	spawnProcess();
 }

@@ -78,18 +78,13 @@ export default function useFocusOutside(
 
 	const preventBlurCheckRef = useRef( false );
 
-	const blurCheckTimeoutIdRef = useRef< number | undefined >();
+	const blurCheckTimeoutIdRef = useRef< number >( undefined );
 
 	/**
 	 * Cancel a blur check timeout.
 	 */
 	const cancelBlurCheck = useCallback( () => {
 		clearTimeout( blurCheckTimeoutIdRef.current );
-	}, [] );
-
-	// Cancel blur checks on unmount.
-	useEffect( () => {
-		return () => cancelBlurCheck();
 	}, [] );
 
 	// Cancel a blur check if the callback or ref is no longer provided.

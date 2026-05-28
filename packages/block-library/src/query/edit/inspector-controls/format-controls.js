@@ -81,9 +81,8 @@ export default function FormatControls( { onChange, query: { format } } ) {
 					format: formatNamesToValues( newValues, formats ),
 				} );
 			} }
-			__experimentalShowHowTo={ false }
+			help=""
 			__experimentalExpandOnFocus
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 		/>
 	);

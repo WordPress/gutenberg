@@ -3,12 +3,10 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	ExternalLink,
 	FocalPointPicker,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
-	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -28,6 +26,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { Link } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -36,9 +35,11 @@ import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import { htmlElementMessages } from '../../utils/messages';
+import PosterImage from '../../utils/poster-image';
 
-const { cleanEmptyObject, ResolutionTool } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
+	blockEditorPrivateApis
+);
 
 function CoverHeightInput( {
 	onChange,
@@ -110,6 +111,7 @@ export default function CoverInspectorControls( {
 		minHeightUnit,
 		alt,
 		tagName,
+		poster,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -129,7 +131,12 @@ export default function CoverInspectorControls( {
 	const image = useSelect(
 		( select ) =>
 			id && isImageBackground
-				? select( coreStore ).getMedia( id, { context: 'view' } )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id,
+						{ context: 'view' }
+				  )
 				: null,
 		[ id, isImageBackground ]
 	);
@@ -171,9 +178,7 @@ export default function CoverInspectorControls( {
 		} );
 	};
 
-	const showFocalPointPicker =
-		isVideoBackground ||
-		( isImageBackground && ( ! hasParallax || isRepeated ) );
+	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
@@ -188,8 +193,8 @@ export default function CoverInspectorControls( {
 
 	return (
 		<>
-			<InspectorControls>
-				{ !! url && (
+			{ ( !! url || useFeaturedImage ) && (
+				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
@@ -198,8 +203,9 @@ export default function CoverInspectorControls( {
 								focalPoint: undefined,
 								isRepeated: false,
 								alt: '',
-								sizeSlug: undefined,
+								poster: undefined,
 							} );
+							updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
@@ -208,7 +214,7 @@ export default function CoverInspectorControls( {
 								<ToolsPanelItem
 									label={ __( 'Fixed background' ) }
 									isShownByDefault
-									hasValue={ () => hasParallax }
+									hasValue={ () => !! hasParallax }
 									onDeselect={ () =>
 										setAttributes( {
 											hasParallax: false,
@@ -217,9 +223,8 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Fixed background' ) }
-										checked={ hasParallax }
+										checked={ !! hasParallax }
 										onChange={ toggleParallax }
 									/>
 								</ToolsPanelItem>
@@ -235,7 +240,6 @@ export default function CoverInspectorControls( {
 									}
 								>
 									<ToggleControl
-										__nextHasNoMarginBottom
 										label={ __( 'Repeated background' ) }
 										checked={ isRepeated }
 										onChange={ toggleIsRepeated }
@@ -255,7 +259,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
-									__nextHasNoMarginBottom
 									label={ __( 'Focal point' ) }
 									url={ url }
 									value={ focalPoint }
@@ -269,6 +272,16 @@ export default function CoverInspectorControls( {
 								/>
 							</ToolsPanelItem>
 						) }
+						{ isVideoBackground && (
+							<PosterImage
+								poster={ poster }
+								onChange={ ( posterImage ) =>
+									setAttributes( {
+										poster: posterImage?.url,
+									} )
+								}
+							/>
+						) }
 						{ ! useFeaturedImage && url && ! isVideoBackground && (
 							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
@@ -279,7 +292,6 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<TextareaControl
-									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
 									value={ alt }
 									onChange={ ( newAlt ) =>
@@ -287,7 +299,8 @@ export default function CoverInspectorControls( {
 									}
 									help={
 										<>
-											<ExternalLink
+											<Link
+												openInNewTab
 												href={
 													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 													__(
@@ -298,7 +311,7 @@ export default function CoverInspectorControls( {
 												{ __(
 													'Describe the purpose of the image.'
 												) }
-											</ExternalLink>
+											</Link>
 											<br />
 											{ __(
 												'Leave empty if decorative.'
@@ -317,8 +330,8 @@ export default function CoverInspectorControls( {
 							/>
 						) }
 					</ToolsPanel>
-				) }
-			</InspectorControls>
+				</InspectorControls>
+			) }
 			{ colorGradientSettings.hasColorsOrGradients && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown
@@ -360,7 +373,6 @@ export default function CoverInspectorControls( {
 						panelId={ clientId }
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
 							onChange={ ( newDimRatio ) =>
@@ -421,10 +433,12 @@ export default function CoverInspectorControls( {
 				</ToolsPanelItem>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'HTML element' ) }
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					clientId={ clientId }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<header>', value: 'header' },
@@ -434,11 +448,6 @@ export default function CoverInspectorControls( {
 						{ label: '<aside>', value: 'aside' },
 						{ label: '<footer>', value: 'footer' },
 					] }
-					value={ tagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					help={ htmlElementMessages[ tagName ] }
 				/>
 			</InspectorControls>
 		</>
