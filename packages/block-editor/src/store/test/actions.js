@@ -20,6 +20,7 @@ const {
 	mergeBlocks,
 	moveBlocksToPosition,
 	multiSelect,
+	multiSelectSet,
 	removeBlock,
 	removeBlocks,
 	replaceBlock,
@@ -199,6 +200,48 @@ describe( 'actions', () => {
 			const dispatch = jest.fn();
 
 			multiSelect( start, end )( { select, dispatch } );
+
+			expect( dispatch ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'multiSelectSet', () => {
+		it( 'dispatches MULTI_SELECT_SET with block-order client IDs', () => {
+			const clientIds = [ 'cell-3', 'cell-1' ];
+			const select = {
+				getBlockRootClientId() {
+					return 'parent';
+				},
+				getBlockOrder() {
+					return [ 'cell-1', 'cell-2', 'cell-3' ];
+				},
+			};
+			const dispatch = jest.fn();
+
+			multiSelectSet( clientIds )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'MULTI_SELECT_SET',
+				clientIds: [ 'cell-1', 'cell-3' ],
+				selectionStart: { clientId: 'cell-3' },
+				selectionEnd: { clientId: 'cell-1' },
+				initialPosition: null,
+			} );
+		} );
+
+		it( 'does nothing for blocks with different root client IDs', () => {
+			const clientIds = [ 'cell-1', 'cell-2' ];
+			const select = {
+				getBlockRootClientId( clientId ) {
+					return clientId === 'cell-1' ? 'parent' : 'other-parent';
+				},
+				getBlockOrder() {
+					return [ 'cell-1', 'cell-2' ];
+				},
+			};
+			const dispatch = jest.fn();
+
+			multiSelectSet( clientIds )( { select, dispatch } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );

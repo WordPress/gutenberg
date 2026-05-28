@@ -1407,6 +1407,7 @@ export function selection( state = {}, action ) {
 		case 'SELECTION_CHANGE':
 			if ( action.clientId ) {
 				return {
+					type: 'range',
 					selectionStart: {
 						clientId: action.clientId,
 						attributeKey: action.attributeKey,
@@ -1421,17 +1422,20 @@ export function selection( state = {}, action ) {
 			}
 
 			return {
+				type: 'range',
 				selectionStart: action.start || state.selectionStart,
 				selectionEnd: action.end || state.selectionEnd,
 			};
 		case 'RESET_SELECTION':
 			const { selectionStart, selectionEnd } = action;
 			return {
+				type: 'range',
 				selectionStart,
 				selectionEnd,
 			};
 		case 'MULTI_SELECT':
 			const nextSelection = {
+				type: 'range',
 				selectionStart: { clientId: action.start },
 				selectionEnd: { clientId: action.end },
 			};
@@ -1444,6 +1448,21 @@ export function selection( state = {}, action ) {
 			}
 
 			return nextSelection;
+		case 'MULTI_SELECT_SET':
+			if (
+				fastDeepEqual( action.clientIds, state.selectionClientIds ) &&
+				fastDeepEqual( action.selectionStart, state.selectionStart ) &&
+				fastDeepEqual( action.selectionEnd, state.selectionEnd )
+			) {
+				return state;
+			}
+
+			return {
+				type: 'set',
+				selectionStart: action.selectionStart,
+				selectionEnd: action.selectionEnd,
+				selectionClientIds: action.clientIds,
+			};
 		case 'RESET_BLOCKS':
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
@@ -1460,6 +1479,7 @@ export function selection( state = {}, action ) {
 				)
 			) {
 				return {
+					type: 'range',
 					selectionStart: {},
 					selectionEnd: {},
 				};
@@ -1473,7 +1493,9 @@ export function selection( state = {}, action ) {
 			) {
 				return {
 					...state,
+					type: 'range',
 					selectionEnd: state.selectionStart,
+					selectionClientIds: undefined,
 				};
 			}
 	}
@@ -1489,6 +1511,7 @@ export function selection( state = {}, action ) {
 	}
 
 	return {
+		type: 'range',
 		selectionStart,
 		selectionEnd,
 	};

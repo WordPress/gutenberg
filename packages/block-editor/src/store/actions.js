@@ -352,6 +352,76 @@ export const multiSelect =
 	};
 
 /**
+ * Action that changes block multi-selection to an explicit set of blocks.
+ *
+ * @param {string[]}    clientIds                     Client IDs to select.
+ * @param {number|null} __experimentalInitialPosition Optional initial position. Pass as null to skip focus within editor canvas.
+ */
+export const multiSelectSet =
+	( clientIds, __experimentalInitialPosition = null ) =>
+	( { select, dispatch } ) => {
+		const uniqueClientIds = [ ...new Set( clientIds ) ];
+
+		if ( ! uniqueClientIds.length ) {
+			return;
+		}
+
+		const rootClientId = select.getBlockRootClientId(
+			uniqueClientIds[ 0 ]
+		);
+		if ( rootClientId === null ) {
+			return;
+		}
+
+		if (
+			uniqueClientIds.some(
+				( clientId ) =>
+					select.getBlockRootClientId( clientId ) !== rootClientId
+			)
+		) {
+			return;
+		}
+
+		const blockOrder = select.getBlockOrder( rootClientId );
+		const normalizedClientIds = uniqueClientIds
+			.filter( ( clientId ) => blockOrder.includes( clientId ) )
+			.sort(
+				( a, b ) => blockOrder.indexOf( a ) - blockOrder.indexOf( b )
+			);
+
+		if ( normalizedClientIds.length < 2 ) {
+			dispatch.selectBlock(
+				normalizedClientIds[ 0 ],
+				__experimentalInitialPosition
+			);
+			return;
+		}
+
+		dispatch( {
+			type: 'MULTI_SELECT_SET',
+			clientIds: normalizedClientIds,
+			selectionStart: { clientId: uniqueClientIds[ 0 ] },
+			selectionEnd: {
+				clientId: uniqueClientIds[ uniqueClientIds.length - 1 ],
+			},
+			initialPosition: __experimentalInitialPosition,
+		} );
+
+		speak(
+			sprintf(
+				/* translators: %s: number of selected blocks */
+				_n(
+					'%s block selected.',
+					'%s blocks selected.',
+					normalizedClientIds.length
+				),
+				normalizedClientIds.length
+			),
+			'assertive'
+		);
+	};
+
+/**
  * Action that clears the block selection.
  *
  * @return {Object} Action object.

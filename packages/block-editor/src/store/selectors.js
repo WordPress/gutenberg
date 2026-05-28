@@ -456,6 +456,39 @@ export function getSelectionEnd( state ) {
 }
 
 /**
+ * Returns the current block selection type.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {string} Selection type.
+ */
+export function getSelectionType( state ) {
+	return state.selection.type || 'range';
+}
+
+/**
+ * Returns true if the current selection is a range selection.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {boolean} Whether the selection is a range.
+ */
+export function isSelectionRange( state ) {
+	return getSelectionType( state ) === 'range';
+}
+
+/**
+ * Returns true if the current selection is a set selection.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {boolean} Whether the selection is a set.
+ */
+export function isSelectionSet( state ) {
+	return getSelectionType( state ) === 'set';
+}
+
+/**
  * Returns the current block selection start. This value may be null, and it
  * may represent either a singular block selection or multi-selection start.
  * A selection is singular if its start and end match.
@@ -826,6 +859,10 @@ function getSelectionNestingAncestor( state ) {
  */
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
+		if ( isSelectionSet( state ) ) {
+			return state.selection.selectionClientIds || EMPTY_ARRAY;
+		}
+
 		const { selectionStart, selectionEnd } = state.selection;
 
 		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
@@ -865,11 +902,55 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
+<<<<<<< HEAD
 		state.blocks.parents,
+=======
+		state.selection.type,
+		state.selection.selectionClientIds,
+>>>>>>> a793702fbd1 (Add set-based block multi-selection)
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
 );
+
+/**
+ * Returns true if the selected blocks are contiguous in block order.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {boolean} Whether the selection is contiguous.
+ */
+export function isSelectionContiguous( state ) {
+	if ( ! isSelectionSet( state ) ) {
+		return true;
+	}
+
+	const selectedClientIds = getSelectedBlockClientIds( state );
+	if ( selectedClientIds.length < 2 ) {
+		return true;
+	}
+
+	const rootClientId = getBlockRootClientId( state, selectedClientIds[ 0 ] );
+	if ( rootClientId === null ) {
+		return false;
+	}
+
+	const blockOrder = getBlockOrder( state, rootClientId );
+	const startIndex = blockOrder.indexOf( selectedClientIds[ 0 ] );
+	const endIndex = blockOrder.indexOf(
+		selectedClientIds[ selectedClientIds.length - 1 ]
+	);
+
+	if ( startIndex === -1 || endIndex === -1 ) {
+		return false;
+	}
+
+	return blockOrder
+		.slice( startIndex, endIndex + 1 )
+		.every(
+			( clientId, index ) => clientId === selectedClientIds[ index ]
+		);
+}
 
 /**
  * Returns the current multi-selection set of block client IDs, or an empty
@@ -880,6 +961,11 @@ export const getSelectedBlockClientIds = createSelector(
  * @return {Array} Multi-selected block client IDs.
  */
 export function getMultiSelectedBlockClientIds( state ) {
+	if ( isSelectionSet( state ) ) {
+		const selectedClientIds = getSelectedBlockClientIds( state );
+		return selectedClientIds.length > 1 ? selectedClientIds : EMPTY_ARRAY;
+	}
+
 	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId === selectionEnd.clientId ) {
@@ -991,6 +1077,8 @@ export const isAncestorMultiSelected = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
+		state.selection.type,
+		state.selection.selectionClientIds,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -1100,6 +1188,10 @@ export function __unstableSelectionHasUnmergeableBlock( state ) {
  * @return {boolean} Whether the selection is mergeable.
  */
 export function __unstableIsSelectionMergeable( state, isForward ) {
+	if ( isSelectionSet( state ) ) {
+		return false;
+	}
+
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 
@@ -1185,6 +1277,10 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
  * @return {Object[]} Updated partial selected blocks.
  */
 export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
+	if ( isSelectionSet( state ) ) {
+		return EMPTY_ARRAY;
+	}
+
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 
@@ -1416,6 +1512,10 @@ export function isBlockWithinSelection( state, clientId ) {
  * @return {boolean} Whether multi-selection has been made.
  */
 export function hasMultiSelection( state ) {
+	if ( isSelectionSet( state ) ) {
+		return getSelectedBlockClientIds( state ).length > 1;
+	}
+
 	const { selectionStart, selectionEnd } = state.selection;
 	return selectionStart.clientId !== selectionEnd.clientId;
 }

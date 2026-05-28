@@ -27,6 +27,9 @@ const {
 	hasSelectedBlock,
 	getSelectedBlock,
 	getSelectedBlockClientId,
+	getSelectionType,
+	isSelectionRange,
+	isSelectionSet,
 	getBlockRootClientId,
 	getBlockHierarchyRootClientId,
 	getGlobalBlockCount,
@@ -42,6 +45,7 @@ const {
 	isBlockSelected,
 	hasSelectedInnerBlock,
 	isBlockWithinSelection,
+	isSelectionContiguous,
 	hasMultiSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
@@ -1470,6 +1474,39 @@ describe( 'selectors', () => {
 				'7',
 			] );
 		} );
+
+		it( 'returns explicit set selection client IDs', () => {
+			const state = {
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '5', '4', '3', '2', '1' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
+				},
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '4' },
+					selectionEnd: { clientId: '1' },
+					selectionClientIds: [ '4', '2', '1' ],
+				},
+			};
+
+			expect( getSelectedBlockClientIds( state ) ).toEqual( [
+				'4',
+				'2',
+				'1',
+			] );
+		} );
 	} );
 
 	describe( 'getMultiSelectedBlockClientIds', () => {
@@ -1583,6 +1620,107 @@ describe( 'selectors', () => {
 			expect( getMultiSelectedBlocks( state ) ).toBe(
 				getMultiSelectedBlocks( state )
 			);
+		} );
+	} );
+
+	describe( 'getSelectionType', () => {
+		it( 'defaults to range selection', () => {
+			const state = {
+				selection: {
+					selectionStart: {},
+					selectionEnd: {},
+				},
+			};
+
+			expect( getSelectionType( state ) ).toBe( 'range' );
+			expect( isSelectionRange( state ) ).toBe( true );
+			expect( isSelectionSet( state ) ).toBe( false );
+		} );
+
+		it( 'returns set selection type', () => {
+			const state = {
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '4' },
+					selectionClientIds: [ '2', '4' ],
+				},
+			};
+
+			expect( getSelectionType( state ) ).toBe( 'set' );
+			expect( isSelectionRange( state ) ).toBe( false );
+			expect( isSelectionSet( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isSelectionContiguous', () => {
+		it( 'returns true for range selections', () => {
+			const state = {
+				selection: {
+					selectionStart: { clientId: '2' },
+					selectionEnd: { clientId: '4' },
+				},
+			};
+
+			expect( isSelectionContiguous( state ) ).toBe( true );
+		} );
+
+		it( 'returns false for non-contiguous set selections', () => {
+			const state = {
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '5', '4', '3', '2', '1' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
+				},
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '4' },
+					selectionEnd: { clientId: '1' },
+					selectionClientIds: [ '4', '2', '1' ],
+				},
+			};
+
+			expect( isSelectionContiguous( state ) ).toBe( false );
+		} );
+
+		it( 'returns true for contiguous set selections', () => {
+			const state = {
+				blocks: {
+					order: new Map(
+						Object.entries( {
+							'': [ '5', '4', '3', '2', '1' ],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							1: '',
+							2: '',
+							3: '',
+							4: '',
+							5: '',
+						} )
+					),
+				},
+				selection: {
+					type: 'set',
+					selectionStart: { clientId: '4' },
+					selectionEnd: { clientId: '2' },
+					selectionClientIds: [ '4', '3', '2' ],
+				},
+			};
+
+			expect( isSelectionContiguous( state ) ).toBe( true );
 		} );
 	} );
 
