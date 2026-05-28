@@ -171,9 +171,9 @@ function block_core_image_get_lightbox_settings( $block ) {
  *
  * @since 6.4.0
  *
- * @param string $block_content  Rendered block content.
- * @param array  $block          Block object.
- * @param array  $block_instance Block instance.
+ * @param string   $block_content  Rendered block content.
+ * @param array    $block          Block object.
+ * @param WP_Block $block_instance Block instance.
  *
  * @return string Filtered block content.
  */
