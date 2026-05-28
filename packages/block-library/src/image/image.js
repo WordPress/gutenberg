@@ -383,10 +383,14 @@ export default function Image( {
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
 	const cropButtonRef = useRef();
+	const handleMediaEditorModalClose = useCallback(
+		() => cropButtonRef.current?.focus(),
+		[]
+	);
 	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
 		attributes,
 		setAttributes,
-		onClose: () => cropButtonRef.current?.focus(),
+		onClose: handleMediaEditorModalClose,
 	} );
 
 	const {
