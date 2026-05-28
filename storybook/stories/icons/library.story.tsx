@@ -16,6 +16,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
+	RangeControl,
 } from '@wordpress/components';
 
 /**
@@ -79,6 +80,7 @@ const meta: Meta = {
 	argTypes: {
 		filter: { control: false },
 		size: { control: false },
+		strokeWidth: { control: false },
 		highlightPublicIcons: { control: false },
 	},
 };
@@ -87,6 +89,7 @@ export default meta;
 type LibraryArgs = {
 	filter: string;
 	size: string | number;
+	strokeWidth: number;
 	highlightPublicIcons: boolean;
 };
 
@@ -97,6 +100,7 @@ type LibraryExampleProps = LibraryArgs & {
 const LibraryExample = ( {
 	filter,
 	size,
+	strokeWidth,
 	highlightPublicIcons,
 	updateArgs,
 }: LibraryExampleProps ): ReactElement => {
@@ -148,6 +152,19 @@ const LibraryExample = ( {
 							/>
 						) ) }
 					</ToggleGroupControl>
+					<div style={ { width: 200 } }>
+						<RangeControl
+							__next40pxDefaultSize
+							label="Stroke width"
+							value={ strokeWidth }
+							onChange={ ( value: number | undefined ) =>
+								updateArgs( { strokeWidth: value } )
+							}
+							min={ 0.5 }
+							max={ 5 }
+							step={ 0.25 }
+						/>
+					</div>
 					<ToggleControl
 						label="Highlight public icons"
 						checked={ highlightPublicIcons }
@@ -186,6 +203,7 @@ const LibraryExample = ( {
 										<Icon
 											icon={ icon }
 											size={ Number( size ) }
+											strokeWidth={ strokeWidth }
 										/>
 										<span
 											style={ {
@@ -213,6 +231,7 @@ export const Library: StoryObj< typeof meta > = {
 	args: {
 		filter: '',
 		size: '24',
+		strokeWidth: 1.5,
 		highlightPublicIcons: false,
 	},
 	render: function Library() {
