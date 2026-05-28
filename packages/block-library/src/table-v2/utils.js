@@ -203,6 +203,41 @@ function doesPlacementIntersectRectangle( placement, rectangle ) {
 	);
 }
 
+function getPlacementEndRow( placement ) {
+	return placement.rowIndex + ( placement.cell.attributes.rowSpan || 1 ) - 1;
+}
+
+function getPlacementEndColumn( placement ) {
+	return (
+		placement.columnIndex + ( placement.cell.attributes.colSpan || 1 ) - 1
+	);
+}
+
+function getSelectedPlacementRectangle( placements, selectedClientIds ) {
+	const selectedClientIdSet = new Set( selectedClientIds );
+	const selectedPlacements = placements.filter( ( placement ) =>
+		selectedClientIdSet.has( placement.cell.clientId )
+	);
+
+	if ( ! selectedPlacements.length ) {
+		return null;
+	}
+
+	return {
+		selectedPlacements,
+		startRow: Math.min(
+			...selectedPlacements.map( ( placement ) => placement.rowIndex )
+		),
+		endRow: Math.max( ...selectedPlacements.map( getPlacementEndRow ) ),
+		startColumn: Math.min(
+			...selectedPlacements.map( ( placement ) => placement.columnIndex )
+		),
+		endColumn: Math.max(
+			...selectedPlacements.map( getPlacementEndColumn )
+		),
+	};
+}
+
 /**
  * Gets all cells inside the rectangle between two cell blocks.
  *
@@ -250,6 +285,74 @@ export function getCellRectangleClientIds(
 			doesPlacementIntersectRectangle( placement, rectangle )
 		)
 		.map( ( placement ) => placement.cell.clientId );
+}
+
+/**
+ * Gets per-cell attributes for applying a border to the outside of a selected rectangle.
+ *
+ * @param {Array}  rows              Row descriptors.
+ * @param {Array}  cells             Cell inner blocks.
+ * @param {number} columnCount       Number of columns.
+ * @param {Array}  selectedClientIds Selected cell client IDs.
+ * @param {Object} border            Border value to apply.
+ * @return {Object} Attributes keyed by client ID.
+ */
+export function getCellSelectionOutsideBorderAttributes(
+	rows,
+	cells,
+	columnCount,
+	selectedClientIds,
+	border
+) {
+	if ( ! border ) {
+		return {};
+	}
+
+	const rectangle = getSelectedPlacementRectangle(
+		getCellPlacements( rows, cells, columnCount ),
+		selectedClientIds
+	);
+
+	if ( ! rectangle ) {
+		return {};
+	}
+
+	return rectangle.selectedPlacements.reduce( ( updates, placement ) => {
+		const nextBorder = {
+			...placement.cell.attributes.style?.border,
+		};
+		let hasBorderUpdate = false;
+
+		if ( placement.rowIndex === rectangle.startRow ) {
+			nextBorder.top = border;
+			hasBorderUpdate = true;
+		}
+		if ( getPlacementEndColumn( placement ) === rectangle.endColumn ) {
+			nextBorder.right = border;
+			hasBorderUpdate = true;
+		}
+		if ( getPlacementEndRow( placement ) === rectangle.endRow ) {
+			nextBorder.bottom = border;
+			hasBorderUpdate = true;
+		}
+		if ( placement.columnIndex === rectangle.startColumn ) {
+			nextBorder.left = border;
+			hasBorderUpdate = true;
+		}
+
+		if ( ! hasBorderUpdate ) {
+			return updates;
+		}
+
+		updates[ placement.cell.clientId ] = {
+			style: {
+				...placement.cell.attributes.style,
+				border: nextBorder,
+			},
+		};
+
+		return updates;
+	}, {} );
 }
 
 /**

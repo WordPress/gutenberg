@@ -7,10 +7,17 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToolbarDropdownMenu } from '@wordpress/components';
+import {
+	BorderControl,
+	Dropdown,
+	ToolbarButton,
+	ToolbarDropdownMenu,
+} from '@wordpress/components';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	border,
 	table,
 	tableColumnAfter,
 	tableColumnBefore,
@@ -28,9 +35,29 @@ import {
 	deleteRow,
 	getCellLocation,
 	getCellPlacements,
+	getCellSelectionOutsideBorderAttributes,
 	insertColumn,
 	insertRow,
 } from '../table-v2/utils';
+
+const DEFAULT_SELECTION_BORDER = {
+	color: '#000000',
+	style: 'solid',
+	width: '1px',
+};
+
+function normalizeBorder( nextBorder ) {
+	if ( ! nextBorder ) {
+		return null;
+	}
+
+	return {
+		...nextBorder,
+		style:
+			nextBorder.style ||
+			( nextBorder.color || nextBorder.width ? 'solid' : undefined ),
+	};
+}
 
 export default function TableCellEdit( {
 	attributes,
@@ -38,21 +65,49 @@ export default function TableCellEdit( {
 	clientId,
 } ) {
 	const { content, tag: CellTag } = attributes;
+	const [ selectionBorder, setSelectionBorder ] = useState(
+		DEFAULT_SELECTION_BORDER
+	);
 	const registry = useRegistry();
 	const { multiSelectSet, replaceInnerBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const { columnCount, parentClientId, rows, siblingCells } = useSelect(
+	const {
+		columnCount,
+		isCellSetSelection,
+		parentClientId,
+		rows,
+		selectedClientIds,
+		siblingCells,
+	} = useSelect(
 		( select ) => {
-			const { getBlock, getBlockRootClientId, getBlocks } =
-				select( blockEditorStore );
+			const {
+				getBlock,
+				getBlockName,
+				getBlockRootClientId,
+				getBlocks,
+				getSelectedBlockClientIds,
+				getSelectionType,
+			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const parentBlock = rootClientId ? getBlock( rootClientId ) : null;
+			const selectionClientIds = getSelectedBlockClientIds();
 
 			return {
 				columnCount: parentBlock?.attributes?.columnCount || 0,
+				isCellSetSelection:
+					getSelectionType() === 'set' &&
+					selectionClientIds.length > 1 &&
+					selectionClientIds.every(
+						( selectedClientId ) =>
+							getBlockName( selectedClientId ) ===
+								'core/table-v2-cell' &&
+							getBlockRootClientId( selectedClientId ) ===
+								rootClientId
+					),
 				parentClientId: rootClientId,
 				rows: parentBlock?.attributes?.rows || [],
+				selectedClientIds: selectionClientIds,
 				siblingCells: rootClientId ? getBlocks( rootClientId ) : [],
 			};
 		},
@@ -171,6 +226,30 @@ export default function TableCellEdit( {
 		multiSelectSet( columnCellIds );
 	}
 
+	function applyOutsideBorder( nextBorder ) {
+		const normalizedBorder = normalizeBorder( nextBorder );
+		if ( ! normalizedBorder ) {
+			return;
+		}
+
+		const updates = getCellSelectionOutsideBorderAttributes(
+			rows,
+			siblingCells,
+			columnCount,
+			selectedClientIds,
+			normalizedBorder
+		);
+
+		if ( ! Object.keys( updates ).length ) {
+			return;
+		}
+
+		setSelectionBorder( normalizedBorder );
+		updateBlockAttributes( Object.keys( updates ), updates, {
+			uniqueByBlock: true,
+		} );
+	}
+
 	const tableControls = [
 		{
 			icon: tableRowAfter,
@@ -225,6 +304,35 @@ export default function TableCellEdit( {
 
 	return (
 		<CellTag { ...blockProps }>
+			{ isCellSetSelection && (
+				<BlockControls group="block">
+					<Dropdown
+						popoverProps={ { placement: 'bottom-start' } }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								aria-expanded={ isOpen }
+								icon={ border }
+								label={ __( 'Outside border' ) }
+								onClick={ onToggle }
+								showTooltip
+							/>
+						) }
+						renderContent={ () => (
+							<div style={ { padding: '16px', width: '280px' } }>
+								<BorderControl
+									__next40pxDefaultSize
+									enableAlpha
+									enableStyle
+									label={ __( 'Outside border' ) }
+									onChange={ applyOutsideBorder }
+									value={ selectionBorder }
+									withSlider
+								/>
+							</div>
+						) }
+					/>
+				</BlockControls>
+			) }
 			<BlockControls group="other">
 				<ToolbarDropdownMenu
 					icon={ table }
