@@ -2,40 +2,34 @@
  * External dependencies
  */
 import _sprintf from '@tannin/sprintf';
-import type { SprintfArgs } from '@tannin/sprintf/types';
 
 /**
  * Internal dependencies
  */
-import type { TranslatableText } from './types';
-
-type DistributeSprintfArgs< T extends string > = T extends any
-	? SprintfArgs< T >
-	: never;
+import type { DistributeSprintfArgs, TransformedText } from './types';
 
 export function sprintf< T extends string >(
-	format: T | TranslatableText< T >,
+	format: T | TransformedText< T >,
 	...args: DistributeSprintfArgs< T >
-): string;
+): TransformedText< T >;
 export function sprintf< T extends string >(
-	format: T | TranslatableText< T >,
+	format: T | TransformedText< T >,
 	args: DistributeSprintfArgs< T >
-): string;
+): TransformedText< T >;
 
 /**
  * Returns a formatted string.
  *
- * @template {string} T
- * @param {T | TranslatableText<T>}  format The format of the string to generate.
- * @param {DistributeSprintfArgs<T>} args   Arguments to apply to the format.
+ * @param format The format of the string to generate.
+ * @param args   Arguments to apply to the format.
  *
  * @see https://www.npmjs.com/package/@tannin/sprintf
  *
- * @return {string} The formatted string.
+ * @return The formatted string.
  */
 export function sprintf< T extends string >(
-	format: T | TranslatableText< T >,
+	format: T | TransformedText< T >,
 	...args: DistributeSprintfArgs< T >
-): string {
-	return _sprintf( format as T, ...( args as DistributeSprintfArgs< T > ) );
+): TransformedText< T > {
+	return _sprintf( format, ...args ) as TransformedText< T >;
 }

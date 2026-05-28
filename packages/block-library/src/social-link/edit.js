@@ -17,13 +17,14 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import {
-	Icon,
+	Icon as WCIcon,
 	Button,
 	Dropdown,
 	TextControl,
 	ToolbarButton,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
@@ -191,7 +192,6 @@ const SocialLinkEdit = ( {
 						renderContent={ () => (
 							<TextControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								className="wp-block-social-link__toolbar_content_text"
 								label={ __( 'Text' ) }
 								help={ __(
@@ -225,7 +225,6 @@ const SocialLinkEdit = ( {
 					>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
 								'The text is visible when enabled from the parent Social Icons block.'
@@ -242,8 +241,17 @@ const SocialLinkEdit = ( {
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ __( 'Link rel' ) }
+					label={ __( 'Link relation' ) }
+					help={ createInterpolateElement(
+						__(
+							'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+						),
+						{
+							a: (
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+							),
+						}
+					) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>
@@ -269,7 +277,7 @@ const SocialLinkEdit = ( {
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<button aria-haspopup="dialog" { ...blockProps } role="button">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 					<span
 						className={ clsx( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,

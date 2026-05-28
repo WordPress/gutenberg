@@ -37,7 +37,7 @@ import styles from './dropping-insertion-point.scss';
  * @param {import('react-native-reanimated').SharedValue} props.isDragging       Whether or not dragging has started.
  * @param {import('react-native-reanimated').SharedValue} props.targetBlockIndex Current block target index.
  *
- * @return {JSX.Element} The component to be rendered.
+ * @return {React.JSX.Element} The component to be rendered.
  */
 export default function DroppingInsertionPoint( {
 	scroll,

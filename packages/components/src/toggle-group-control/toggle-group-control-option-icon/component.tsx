@@ -52,7 +52,7 @@ function UnforwardedToggleGroupControlOptionIcon(
  *
  * function Example() {
  *  return (
- *    <ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
+ *    <ToggleGroupControl __next40pxDefaultSize>
  *      <ToggleGroupControlOptionIcon
  *        value="uppercase"
  *        label="Uppercase"
@@ -71,5 +71,6 @@ function UnforwardedToggleGroupControlOptionIcon(
 export const ToggleGroupControlOptionIcon = forwardRef(
 	UnforwardedToggleGroupControlOptionIcon
 );
+ToggleGroupControlOptionIcon.displayName = 'ToggleGroupControlOptionIcon';
 
 export default ToggleGroupControlOptionIcon;

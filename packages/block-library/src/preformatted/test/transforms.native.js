@@ -19,7 +19,7 @@ const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
 const blockTransforms = [
 	'Paragraph',
 	'Code',
-	'Verse',
+	'Poetry',
 	...transformsWithInnerBlocks,
 ];
 

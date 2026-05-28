@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import Icon from '../../icon';
 import Snackbar from '..';
 
 const meta: Meta< typeof Snackbar > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Snackbar',
 	id: 'components-snackbar',
 	component: Snackbar,
@@ -37,6 +38,10 @@ const meta: Meta< typeof Snackbar > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

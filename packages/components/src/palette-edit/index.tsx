@@ -22,7 +22,7 @@ import { useDebounce } from '@wordpress/compose';
  */
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
-import { FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import { HStack } from '../h-stack';
 import { Item, ItemGroup } from '../item-group';
 import { VStack } from '../v-stack';
@@ -229,7 +229,7 @@ function Option< T extends PaletteElement >( {
 				>
 					<IndicatorStyled colorValue={ value } />
 				</Button>
-				<FlexItem>
+				<FlexBlock>
 					{ ! canOnlyChangeValues ? (
 						<NameInput
 							label={
@@ -256,7 +256,7 @@ function Option< T extends PaletteElement >( {
 								  '\u00A0' }
 						</NameContainer>
 					) }
-				</FlexItem>
+				</FlexBlock>
 				{ ! canOnlyChangeValues && (
 					<FlexItem>
 						<RemoveButton
@@ -297,7 +297,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 	addColorRef,
 }: PaletteEditListViewProps< T > ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
-	const elementsReferenceRef = useRef< typeof elements >();
+	const elementsReferenceRef = useRef< T[] >( undefined );
 	useEffect( () => {
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
@@ -420,7 +420,7 @@ export function PaletteEdit( {
 		[ isGradient, elements ]
 	);
 
-	const addColorRef = useRef< HTMLButtonElement | null >( null );
+	const addColorRef = useRef< HTMLButtonElement >( null );
 
 	return (
 		<PaletteEditStyles>

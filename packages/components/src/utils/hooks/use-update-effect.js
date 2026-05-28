@@ -8,8 +8,8 @@ import { useRef, useEffect } from '@wordpress/element';
  * Source:
  * https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/utils/hooks.ts
  *
- * @param {import('react').EffectCallback} effect
- * @param {import('react').DependencyList} deps
+ * @param {React.EffectCallback} effect
+ * @param {React.DependencyList} deps
  */
 function useUpdateEffect( effect, deps ) {
 	const mountedRef = useRef( false );

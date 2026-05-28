@@ -153,7 +153,7 @@ type DayOfWeek = {
  * @param {Modifiers}                              modifiers   - The modifiers associated with the event.
  * @param {React.MouseEvent | React.KeyboardEvent} e           - The event object.
  */
-type OnSelectHandler< T > = (
+export type OnSelectHandler< T > = (
 	selected: T,
 	triggerDate: Date,
 	modifiers: Modifiers,
@@ -187,6 +187,18 @@ export interface BaseProps
 	 * @default 1
 	 */
 	numberOfMonths?: number;
+	/**
+	 * When `true`, days from adjacent months are shown in the grid and receive
+	 * the `outside` modifier and the class.
+	 * @default false
+	 */
+	showOutsideDays?: boolean;
+	/**
+	 * When `true`, the calendar always shows a fixed number of weeks (e.g. 6)
+	 * so the grid height does not change between months.
+	 * @default false
+	 */
+	fixedWeeks?: boolean;
 	/**
 	 * The earliest month to start the month navigation.
 	 */

@@ -83,10 +83,17 @@ store( 'directive-each', {
 				isbn: '9780553573428',
 			},
 		],
+		get bookItem() {
+			return getContext().bookItem;
+		},
 	},
 	actions: {
 		removeBook() {
 			const { book } = getContext();
+			state.books.splice( state.books.indexOf( book ), 1 );
+		},
+		removeBookUsingDerivedState() {
+			const book = state.bookItem;
 			state.books.splice( state.books.indexOf( book ), 1 );
 		},
 		rotateBooks() {
@@ -112,6 +119,9 @@ store( 'directive-each', {
 		modifyBook() {
 			const [ book ] = state.books;
 			book.title = book.title.toUpperCase();
+		},
+		replaceAllBooks() {
+			state.books = state.books.map( ( book ) => ( { ...book } ) );
 		},
 	},
 } );

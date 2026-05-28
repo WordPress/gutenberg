@@ -7,18 +7,15 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Button,
-	__experimentalHStack as HStack,
-	VisuallyHidden,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { __, isRTL } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { memo, forwardRef, useContext } from '@wordpress/element';
-import { search } from '@wordpress/icons';
+import { Icon, arrowUpLeft, arrowUpRight, search } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
+import { VisuallyHidden } from '@wordpress/ui';
 import { filterURLForDisplay } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -84,7 +81,7 @@ const SiteHub = memo(
 								target="_blank"
 							>
 								{ decodeEntities( siteTitle ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )
@@ -120,6 +117,7 @@ export const SiteHubMobile = memo(
 		const { path } = useLocation();
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
+		const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 
 		const {
 			dashboardLink,
@@ -134,7 +132,7 @@ export const SiteHubMobile = memo(
 			const currentTheme = getCurrentTheme();
 			const settings = getSettings();
 			const supportsEditorStyles =
-				currentTheme.theme_supports[ 'editor-styles' ];
+				currentTheme?.theme_supports[ 'editor-styles' ];
 			// This is a temp solution until the has_theme_json value is available for the current theme.
 			const hasThemeJson = settings.supportsLayout;
 
@@ -202,7 +200,16 @@ export const SiteHubMobile = memo(
 							} }
 							{ ...backButtonProps }
 						>
-							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							{ hasAdminBarInEditor ? (
+								<Icon
+									icon={
+										isRTL() ? arrowUpRight : arrowUpLeft
+									}
+									size={ 48 }
+								/>
+							) : (
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							) }
 						</Button>
 					</div>
 

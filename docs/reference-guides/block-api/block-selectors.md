@@ -77,6 +77,42 @@ elements to which it should be applied.
 }
 ```
 
+## Custom CSS selector
+
+The `css` selector controls which selector is used when generating a block's
+custom CSS rules set via Global Styles. This maps to the
+`styles.blocks.<block-type>.css` property in theme.json.
+
+If not set, the block's root selector is used.
+
+### Examples
+
+As a string:
+
+```json
+{
+	...
+	"selectors": {
+		"root": ".my-custom-block-selector",
+		"css": ".my-custom-block-selector > .inner-wrapper"
+	}
+}
+```
+
+As an object with a `root` key:
+
+```json
+{
+	...
+	"selectors": {
+		"root": ".my-custom-block-selector",
+		"css": {
+			"root": ".my-custom-block-selector > .inner-wrapper"
+		}
+	}
+}
+```
+
 ## Shorthand
 
 Rather than specify a CSS selector for every subfeature, you can set a single

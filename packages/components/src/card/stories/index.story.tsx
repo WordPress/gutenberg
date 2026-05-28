@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	Card,
 	CardHeader,
@@ -20,7 +13,6 @@ import Button from '../../button';
 
 const meta: Meta< typeof Card > = {
 	component: Card,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
 	title: 'Components/Containers/Card',
 	id: 'components-card',
@@ -37,6 +29,11 @@ const meta: Meta< typeof Card > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use `Card` or `CollapsibleCard` from `@wordpress/ui` instead.',
+		},
 	},
 };
 
@@ -67,7 +64,9 @@ export const Default: StoryObj< typeof Card > = {
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>
-					<Button variant="secondary">Action Button</Button>
+					<Button __next40pxDefaultSize variant="secondary">
+						Action Button
+					</Button>
 				</CardFooter>
 			</>
 		),
@@ -90,4 +89,63 @@ export const FullBleedContent: StoryObj< typeof Card > = {
 			</CardMedia>
 		),
 	},
+};
+
+/**
+ * The Card component supports three approaches to padding:
+ * 1. Default padding (medium) - no size prop needed
+ * 2. Token-based padding - using size tokens: xSmall, small, medium, large
+ * 3. Logical padding - customize each direction using logical properties
+ *
+ * Each component (Card, CardHeader, CardBody) can have its own padding configuration.
+ */
+export const PaddingVariations: StoryObj< typeof Card > = {
+	render: () => (
+		<div
+			style={ { display: 'flex', flexDirection: 'column', gap: '32px' } }
+		>
+			{ /* 1. Default Padding */ }
+			<div>
+				<Card>
+					<CardHeader>
+						<Text>Header with default padding</Text>
+					</CardHeader>
+					<CardBody>
+						<Text>Body with default padding (medium)</Text>
+					</CardBody>
+				</Card>
+			</div>
+
+			<div>
+				<Card>
+					<CardHeader
+						size={ {
+							blockStart: 'large',
+							blockEnd: 'small',
+							inlineStart: 'xSmall',
+							inlineEnd: 'large',
+						} }
+					>
+						<Text>
+							Header with logical padding (large blockStart, small
+							blockEnd, xSmall inlineStart, large inlineEnd)
+						</Text>
+					</CardHeader>
+					<CardBody
+						size={ {
+							blockStart: 'medium',
+							blockEnd: 'xSmall',
+							inlineStart: 'large',
+							inlineEnd: 'xSmall',
+						} }
+					>
+						<Text>
+							Body with logical padding (medium blockStart, xSmall
+							blockEnd, large inlineStart, xSmall inlineEnd)
+						</Text>
+					</CardBody>
+				</Card>
+			</div>
+		</div>
+	),
 };

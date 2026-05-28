@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -10,7 +9,12 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import BlockPreview from '../block-preview';
 
-export default function PreviewBlockPopover( { blocks } ) {
+export default function PreviewBlockPopover( {
+	blocks,
+	placement = 'right-start',
+	offset = 16,
+	anchor,
+} ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	if ( isMobile ) {
@@ -21,14 +25,12 @@ export default function PreviewBlockPopover( { blocks } ) {
 		<div className="block-editor-block-switcher__popover-preview-container">
 			<Popover
 				className="block-editor-block-switcher__popover-preview"
-				placement="right-start"
+				placement={ placement }
 				focusOnMount={ false }
-				offset={ 16 }
+				offset={ offset }
+				anchor={ anchor }
 			>
 				<div className="block-editor-block-switcher__preview">
-					<div className="block-editor-block-switcher__preview-title">
-						{ __( 'Preview' ) }
-					</div>
 					{ /* 600px is the value of $break-small in base-styles/_breakpoints.scss.
 						We set the viewport width to 601px to make sure that the media-text 
 						block which uses this breakpoint has the correct padding. */ }

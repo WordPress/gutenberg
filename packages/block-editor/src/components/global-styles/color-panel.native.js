@@ -5,13 +5,13 @@ import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import PanelColorGradientSettings from '../colors-gradients/panel-color-gradient-settings';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable } from './utils';
 import { setImmutably } from '../../utils/object';
 import ContrastChecker from '../contrast-checker';
 import InspectorControls from '../inspector-controls';

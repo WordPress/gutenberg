@@ -31,5 +31,5 @@ export type WithNoticeProps = {
 		 */
 		removeAllNotices: () => void;
 	};
-	noticeUI: false | JSX.Element;
+	noticeUI: false | React.JSX.Element;
 };

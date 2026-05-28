@@ -56,13 +56,24 @@ Renders with rounded corners.
 - Required: No
 - Default: `true`
 
-### `size`: `string`
+### `size`: `string | object`
 
-Determines the amount of padding within the component.
+Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
 
 - Required: No
 - Default: `medium`
-- Allowed values: `xSmall`, `small`, `medium`, `large`
+- Allowed values:
+   	- Single size token: `none`, `xSmall`, `small`, `medium`, `large`
+   	- Object:
+
+    ```ts
+    {
+      blockStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
+    }
+    ```
 
 ### Inherited props
 
@@ -100,6 +111,40 @@ const Example = () => (
 			<img src="..." />
 		</CardMedia>
 		<CardFooter>...</CardFooter>
+	</Card>
+);
+```
+
+### Logical Padding Properties
+
+The `size` prop supports logical properties that adapt to different writing directions:
+
+- `blockStart` - Maps to `top` in horizontal writing modes
+- `blockEnd` - Maps to `bottom` in horizontal writing modes
+- `inlineStart` - Maps to `left` in horizontal left-to-right writing modes
+- `inlineEnd` - Maps to `right` in horizontal left-to-right writing modes
+
+```jsx
+import { Card, CardBody } from '@wordpress/components';
+
+const Example = () => (
+	<Card
+		size={ {
+			blockStart: 'large',
+			blockEnd: 'small',
+			inlineStart: 'medium',
+			inlineEnd: 'medium',
+		} }
+	>
+		<CardBody
+			size={ {
+				blockStart: 'small',
+				inlineStart: 'large',
+				inlineEnd: 'large',
+			} }
+		>
+			Content with logical padding properties
+		</CardBody>
 	</Card>
 );
 ```

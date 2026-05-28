@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/docgen",
-	"version": "2.26.0",
+	"version": "2.47.0",
 	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,6 +27,9 @@
 		"bin",
 		"lib"
 	],
+	"exports": {
+		"./package.json": "./package.json"
+	},
 	"bin": {
 		"docgen": "./bin/cli.js"
 	},
@@ -38,6 +41,9 @@
 		"remark": "10.0.1",
 		"remark-parse": "6.0.3",
 		"unified": "7.1.0"
+	},
+	"devDependencies": {
+		"@types/babel__core": "^7.20.5"
 	},
 	"publishConfig": {
 		"access": "public"

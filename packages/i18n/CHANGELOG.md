@@ -2,6 +2,50 @@
 
 ## Unreleased
 
+## 6.20.0 (2026-05-27)
+
+## 6.19.0 (2026-05-14)
+
+## 6.18.0 (2026-04-29)
+
+## 6.17.0 (2026-04-15)
+
+### Enhancement
+
+-   `sprintf` now returns `TransformedText<T>` instead of `string`, preserving the format string literal type for downstream type inference (e.g., `createInterpolateElement`). ([76974](https://github.com/WordPress/gutenberg/pull/76974))
+
+## 6.16.0 (2026-04-01)
+
+## 6.15.0 (2026-03-18)
+
+## 6.14.0 (2026-03-04)
+
+## 6.13.0 (2026-02-18)
+
+## 6.12.0 (2026-01-29)
+
+## 6.11.0 (2026-01-16)
+
+## 6.9.0 (2025-11-26)
+
+## 6.8.0 (2025-11-12)
+
+## 6.7.0 (2025-10-29)
+
+## 6.6.0 (2025-10-17)
+
+## 6.5.0 (2025-10-01)
+
+## 6.4.0 (2025-09-17)
+
+## 6.3.0 (2025-09-03)
+
+## 6.2.0 (2025-08-20)
+
+## 6.1.0 (2025-08-07)
+
+## 6.0.0 (2025-07-23)
+
 ### Breaking Changes
 
 -   Improve type declarations for `sprintf` by replacing the `sprintf-js` dependency with `@tannin/sprintf` ([#70434](https://github.com/WordPress/gutenberg/pull/70434))

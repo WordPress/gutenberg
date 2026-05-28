@@ -570,6 +570,12 @@ Please refer to the [JavaScript Testing Overview docs](https://developer.wordpre
 
 All new components should add stories to the project's [Storybook](https://storybook.js.org/). Each [story](https://storybook.js.org/docs/react/get-started/whats-a-story) captures the rendered state of a UI component in isolation. This greatly simplifies working on a given component, while also serving as an interactive form of documentation.
 
+### Source code display
+
+Storybook displays source code snippets in the Docs tab. To ensure component names display correctly (instead of minified names like `<J>`), the build uses [terser](https://terser.org/) with `keep_fnames: true` (configured in `storybook/main.ts`).
+
+For function declaration components, no additional configuration is needed — the function name is preserved automatically. For `forwardRef` components, ensure the unforwarded function is named (not an arrow function), and set `displayName` on the forwarded component.
+
 A component's story should be showcasing its different states — for example, the different variants of a `Button`:
 
 ```jsx

@@ -4,13 +4,11 @@
 // See https://babeljs.io/docs/en/babel-types.
 const { types: babelTypes } = require( '@babel/core' );
 
-/* eslint-disable jsdoc/valid-types */
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
 /** @typedef {babelTypes.TSType} TypeAnnotation */
 /** @typedef {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
 /** @typedef {import('@babel/core').Node} ASTNode */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * @param {ExtendedTypeAnnotation} typeAnnotation
@@ -600,7 +598,7 @@ function getVariableTypeAnnotation( declarationToken ) {
 
 	try {
 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
-	} catch ( e ) {
+	} catch {
 		// Assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
 	}
 }

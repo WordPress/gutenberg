@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, ReactElement } from 'react';
+import type { ComponentProps, ReactElement, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -15,10 +15,10 @@ import type {
 	View,
 	Action,
 	NormalizedField,
-	SupportedLayouts,
+	NormalizedSupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import { LAYOUT_TABLE } from '../../constants';
 
 type DataViewsContextType< Item > = {
@@ -46,12 +46,18 @@ type DataViewsContextType< Item > = {
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
 	containerWidth: number;
-	containerRef: React.MutableRefObject< HTMLDivElement | null >;
-	defaultLayouts: SupportedLayouts;
+	containerRef: React.RefObject< HTMLDivElement | null >;
+	resizeObserverRef: React.Ref< HTMLDivElement | null >;
+	defaultLayouts: NormalizedSupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
-	perPageSizes?: [ number, number, number, number ];
+	config: { perPageSizes: number[] };
+	empty?: ReactNode;
+	hasInitiallyLoaded?: boolean;
+	itemListLabel?: string;
+	onReset?: ( () => void ) | false;
+	intersectionObserver?: IntersectionObserver | null;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -72,10 +78,18 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	renderItemLink: undefined,
 	containerWidth: 0,
 	containerRef: createRef(),
+	resizeObserverRef: () => {},
 	defaultLayouts: { list: {}, grid: {}, table: {} },
 	filters: [],
 	isShowingFilter: false,
 	setIsShowingFilter: () => {},
+	hasInitiallyLoaded: false,
+	config: {
+		perPageSizes: [],
+	},
+	intersectionObserver: null,
 } );
+
+DataViewsContext.displayName = 'DataViewsContext';
 
 export default DataViewsContext;

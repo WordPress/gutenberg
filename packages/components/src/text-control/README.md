@@ -62,7 +62,6 @@ const MyTextControl = () => {
 
 	return (
 		<TextControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label="Additional CSS Class"
 			value={ className }
