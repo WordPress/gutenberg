@@ -27,9 +27,6 @@
 		},
 		"scope": {
 			"type": "string"
-		},
-		"align": {
-			"type": "string"
 		}
 	},
 	"supports": {
@@ -40,6 +37,9 @@
 		"removable": false,
 		"reusable": false,
 		"inserter": false,
+		"typography": {
+			"textAlign": true
+		},
 		"color": {
 			"text": true,
 			"background": true,

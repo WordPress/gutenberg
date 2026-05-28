@@ -1,13 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
-	AlignmentControl,
 	BlockControls,
 	RichText,
 	store as blockEditorStore,
@@ -17,9 +11,6 @@ import { ToolbarDropdownMenu } from '@wordpress/components';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
-	alignCenter,
-	alignLeft,
-	alignRight,
 	table,
 	tableColumnAfter,
 	tableColumnBefore,
@@ -41,30 +32,12 @@ import {
 	insertRow,
 } from '../table-v2/utils';
 
-const ALIGNMENT_CONTROLS = [
-	{
-		icon: alignLeft,
-		title: __( 'Align column left' ),
-		align: 'left',
-	},
-	{
-		icon: alignCenter,
-		title: __( 'Align column center' ),
-		align: 'center',
-	},
-	{
-		icon: alignRight,
-		title: __( 'Align column right' ),
-		align: 'right',
-	},
-];
-
 export default function TableCellEdit( {
 	attributes,
 	setAttributes,
 	clientId,
 } ) {
-	const { content, tag: CellTag, align } = attributes;
+	const { content, tag: CellTag } = attributes;
 	const registry = useRegistry();
 	const { multiSelectSet, replaceInnerBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
@@ -172,22 +145,6 @@ export default function TableCellEdit( {
 		);
 	}
 
-	function onChangeColumnAlignment( nextAlign ) {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-		const { columnIndex } = selectedCellLocation;
-		registry.batch( () => {
-			for ( const placement of cellPlacements ) {
-				if ( placement.columnIndex === columnIndex ) {
-					updateBlockAttributes( placement.cell.clientId, {
-						align: nextAlign,
-					} );
-				}
-			}
-		} );
-	}
-
 	function onSelectRow() {
 		if ( ! selectedCellLocation ) {
 			return;
@@ -212,18 +169,6 @@ export default function TableCellEdit( {
 			.map( ( placement ) => placement.cell.clientId );
 
 		multiSelectSet( columnCellIds );
-	}
-
-	function getColumnAlignment() {
-		if ( ! selectedCellLocation ) {
-			return undefined;
-		}
-		const placement = cellPlacements.find(
-			( siblingPlacement ) =>
-				siblingPlacement.columnIndex ===
-				selectedCellLocation.columnIndex
-		);
-		return placement?.cell?.attributes?.align;
 	}
 
 	const tableControls = [
@@ -276,22 +221,10 @@ export default function TableCellEdit( {
 		placeholder = __( 'Footer label' );
 	}
 
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ align }` ]: align,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	return (
 		<CellTag { ...blockProps }>
-			<BlockControls group="block">
-				<AlignmentControl
-					label={ __( 'Change column alignment' ) }
-					alignmentControls={ ALIGNMENT_CONTROLS }
-					value={ getColumnAlignment() }
-					onChange={ onChangeColumnAlignment }
-				/>
-			</BlockControls>
 			<BlockControls group="other">
 				<ToolbarDropdownMenu
 					icon={ table }
