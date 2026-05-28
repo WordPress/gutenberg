@@ -25,3 +25,9 @@
 .emptyState {
 	margin-block: var(--wpds-dimension-padding-2xl);
 }
+
+.eventNone {
+	padding-block: var(--wpds-dimension-padding-sm);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	color: var(--wpds-color-fg-content-neutral-weak);
+}

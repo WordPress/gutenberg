@@ -308,6 +308,18 @@ export function EventsList( {
 			>
 				<DataViews.Layout />
 			</DataViews>
+			{ events.length > 0 && events.length <= 2 && (
+				<Text variant="body-sm" className={ styles.eventNone }>
+					{ createInterpolateElement(
+						__(
+							'Want more events? <a>Help organize the next one!</a>'
+						),
+						{
+							a: <Link href={ organizeUrl } openInNewTab />,
+						}
+					) }
+				</Text>
+			) }
 		</div>
 	);
 }

@@ -22,12 +22,6 @@
 	color: var(--wpds-color-fg-content-neutral-weak);
 }
 
-.eventNone {
-	padding-block: var(--wpds-dimension-padding-sm);
-	padding-inline: var(--wpds-dimension-padding-2xl);
-	color: var(--wpds-color-fg-content-neutral-weak);
-}
-
 .statusText {
 	padding-inline: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-fg-content-neutral-weak);

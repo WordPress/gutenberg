@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useEffect,
-	createInterpolateElement,
-} from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Spinner } from '@wordpress/components';
@@ -53,30 +49,12 @@ function EventsListSection( {
 		);
 	}
 
-	const organizeUrl = __(
-		'https://make.wordpress.org/community/organize-event-landing-page/'
-	);
-
 	return (
-		<>
-			<EventsList
-				events={ events }
-				showEmptyState={ showEmptyState }
-				isLoading={ loading }
-			/>
-			{ events.length > 0 && events.length <= 2 && (
-				<Text variant="body-sm" className={ styles.eventNone }>
-					{ createInterpolateElement(
-						__(
-							'Want more events? <a>Help organize the next one!</a>'
-						),
-						{
-							a: <Link href={ organizeUrl } openInNewTab />,
-						}
-					) }
-				</Text>
-			) }
-		</>
+		<EventsList
+			events={ events }
+			showEmptyState={ showEmptyState }
+			isLoading={ loading }
+		/>
 	);
 }
 
