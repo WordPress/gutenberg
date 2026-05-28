@@ -16,7 +16,6 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -47,9 +46,20 @@ import {
 	isPercentageUnit,
 } from './utils.js';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { unlock } from '../lock-unlock';
 
-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+// Help text describing each wrapper element option. Kept local to the block
+// because the choices and their guidance are specific to the Search block.
+const TAG_NAME_MESSAGES = {
+	'': __(
+		'Lets the theme decide. Uses the <search> landmark element if the theme opts in, otherwise a <form>.'
+	),
+	search: __(
+		'Wraps the block in a <search> landmark, announced as a search region by assistive technologies.'
+	),
+	form: __(
+		'Uses a <form role="search"> wrapper for backward compatibility with existing theme styles.'
+	),
+};
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -483,17 +493,19 @@ export default function SearchEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<HTMLElementControl
-					tagName={ tagName ?? '' }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value || undefined } )
-					}
-					clientId={ clientId }
+				<SelectControl
+					__next40pxDefaultSize
+					label={ __( 'HTML element' ) }
+					value={ tagName ?? '' }
 					options={ [
 						{ label: __( 'Default' ), value: '' },
 						{ label: '<search>', value: 'search' },
 						{ label: '<form>', value: 'form' },
 					] }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value || undefined } )
+					}
+					help={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
 				/>
 			</InspectorControls>
 		</>
@@ -578,8 +590,13 @@ export default function SearchEdit( {
 		typographyProps.className
 	);
 
+	// Reflect an explicit <search> choice in the editor markup so wrapper
+	// styles match the front end. The <form> and theme-deferred default keep
+	// the historical <div> to avoid nesting a live <form> in the editor.
+	const Wrapper = 'search' === tagName ? 'search' : 'div';
+
 	return (
-		<div { ...blockProps }>
+		<Wrapper { ...blockProps }>
 			{ controls }
 
 			{ showLabel && (
@@ -636,6 +653,6 @@ export default function SearchEdit( {
 
 				{ hasNoButton && renderTextField() }
 			</ResizableBox>
-		</div>
+		</Wrapper>
 	);
 }
