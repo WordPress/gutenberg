@@ -318,7 +318,7 @@ export default function TableCellEdit( {
 							/>
 						) }
 						renderContent={ () => (
-							<div style={ { padding: '16px', width: '280px' } }>
+							<div style={ { padding: '16px', width: '360px' } }>
 								<BorderControl
 									__next40pxDefaultSize
 									enableAlpha
