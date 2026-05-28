@@ -14,6 +14,7 @@ import { PinnedItems } from '@wordpress/interface';
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
+import { DistributedEditingPresenceToolbar } from '../distributed-editing-status';
 import HeaderSkeleton from './header-skeleton';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
@@ -106,11 +107,14 @@ function Header( {
 			toolbar={
 				<>
 					{ ! isAttachment && (
-						<DocumentTools
-							disableBlockTools={
-								isStylesCanvasActive || isTextEditor
-							}
-						/>
+						<>
+							<DocumentTools
+								disableBlockTools={
+									isStylesCanvasActive || isTextEditor
+								}
+							/>
+							<DistributedEditingPresenceToolbar />
+						</>
 					) }
 					{ hasFixedToolbar && isLargeViewport && (
 						<CollapsibleBlockToolbar

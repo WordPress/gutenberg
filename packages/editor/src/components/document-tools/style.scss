@@ -7,6 +7,7 @@
 	align-items: center;
 
 	// Hide all action buttons except the inserter on mobile.
+	.editor-document-tools__left > .editor-history__document-history,
 	.editor-document-tools__left > .editor-history__redo,
 	.editor-document-tools__left > .editor-history__undo {
 		display: none;
@@ -87,4 +88,39 @@
 
 .show-icon-labels .editor-document-tools__left > * + * {
 	margin-left: $grid-unit-10;
+}
+
+.editor-document-history-modal__controls {
+	align-items: center;
+	display: grid;
+	gap: $grid-unit-15;
+	grid-template-columns: auto minmax( 220px, 1fr ) auto;
+}
+
+.editor-document-history-modal__slider {
+	margin-bottom: 0;
+}
+
+.editor-document-history-modal__meta {
+	color: $gray-700;
+	margin: $grid-unit-10 0 $grid-unit-20;
+}
+
+.editor-document-history-modal__preview {
+	border: $border-width solid $gray-300;
+	border-radius: $radius-small;
+	max-height: min( 60vh, 620px );
+	overflow: auto;
+	padding: $grid-unit-20;
+}
+
+.editor-document-history-modal__empty-preview,
+.editor-document-history-modal__loading {
+	align-items: center;
+	border: $border-width solid $gray-300;
+	border-radius: $radius-small;
+	color: $gray-700;
+	display: flex;
+	justify-content: center;
+	min-height: 180px;
 }

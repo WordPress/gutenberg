@@ -21,6 +21,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import EditorDocumentHistory from '../editor-history/document-history';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
 
@@ -128,6 +129,12 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 					<>
 						<ToolbarItem
 							as={ EditorHistoryUndo }
+							showTooltip={ ! showIconLabels }
+							variant={ showIconLabels ? 'tertiary' : undefined }
+							size="compact"
+						/>
+						<ToolbarItem
+							as={ EditorDocumentHistory }
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
 							size="compact"

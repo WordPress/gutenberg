@@ -1,0 +1,108 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-distributed-editing-server-sync-button__icon {
+	display: inline-grid;
+	height: $icon-size;
+	place-items: center;
+	position: relative;
+	width: $icon-size;
+}
+
+.editor-distributed-editing-server-sync-button__icon > svg {
+	grid-area: 1 / 1;
+}
+
+.editor-distributed-editing-server-sync-button__icon-trace {
+	color: var(--wp-admin-theme-color);
+	fill: none;
+	inset: 0;
+	opacity: 0.9;
+	pointer-events: none;
+	position: absolute;
+	stroke: currentColor;
+	stroke-dasharray: 3 44;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.7;
+	transform: translateZ(0);
+}
+
+.editor-distributed-editing-server-sync-button__icon-trace path {
+	animation:
+		editor-distributed-editing-server-sync-button-trace
+		var(--wp-de-rtc-server-sync-poll-interval-ms, 5000ms) linear forwards;
+}
+
+.editor-distributed-editing-server-sync-button__icon::after {
+	animation:
+		editor-distributed-editing-server-sync-button-sparkle
+		var(--wp-de-rtc-server-sync-poll-interval-ms, 5000ms) linear forwards;
+	background: var(--wp-admin-theme-color);
+	border: 1px solid $white;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+	content: "";
+	height: 5px;
+	left: 50%;
+	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	transform: translate(6px, -8px) scale(1);
+	width: 5px;
+}
+
+@keyframes editor-distributed-editing-server-sync-button-trace {
+	from {
+		stroke-dashoffset: 47;
+	}
+
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes editor-distributed-editing-server-sync-button-sparkle {
+	0% {
+		opacity: 0;
+		transform: translate(6px, -8px) scale(0.7);
+	}
+
+	12% {
+		opacity: 1;
+		transform: translate(8px, -3px) scale(1);
+	}
+
+	28% {
+		transform: translate(6px, 5px) scale(1);
+	}
+
+	46% {
+		transform: translate(-5px, 5px) scale(1);
+	}
+
+	68% {
+		transform: translate(-8px, -2px) scale(1);
+	}
+
+	88% {
+		opacity: 1;
+		transform: translate(0, -9px) scale(1);
+	}
+
+	100% {
+		opacity: 0;
+		transform: translate(6px, -8px) scale(0.7);
+	}
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+	.editor-distributed-editing-server-sync-button__icon-trace path,
+	.editor-distributed-editing-server-sync-button__icon::after {
+		animation: none;
+	}
+
+	.editor-distributed-editing-server-sync-button__icon::after {
+		opacity: 0;
+	}
+}

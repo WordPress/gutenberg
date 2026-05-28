@@ -34,6 +34,7 @@ function PostLockedModal() {
 		activePostLock,
 		postType,
 		previewLink,
+		distributedEditingEnabled,
 	} = useSelect( ( select ) => {
 		const {
 			isPostLocked,
@@ -55,10 +56,25 @@ function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
+			distributedEditingEnabled: Boolean(
+				getEditorSettings().distributedEditing?.enabled
+			),
 		};
 	}, [] );
 
 	useEffect( () => {
+		if ( distributedEditingEnabled ) {
+			if ( isLocked ) {
+				updatePostLock( {
+					isLocked: false,
+					isTakeover: false,
+					user: null,
+				} );
+			}
+
+			return undefined;
+		}
+
 		/**
 		 * Keep the lock refreshed.
 		 *
@@ -142,9 +158,19 @@ function PostLockedModal() {
 			removeAction( 'heartbeat.tick', hookName );
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
-	}, [] );
+	}, [
+		activePostLock,
+		autosave,
+		distributedEditingEnabled,
+		hookName,
+		isLocked,
+		postId,
+		postLockUtils?.ajaxUrl,
+		postLockUtils?.unlockNonce,
+		updatePostLock,
+	] );
 
-	if ( ! isLocked ) {
+	if ( distributedEditingEnabled || ! isLocked ) {
 		return null;
 	}
 

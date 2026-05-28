@@ -60,6 +60,11 @@
 		clip-path: none;
 	}
 
+	&:has(.editor-distributed-editing-status__presence-roster--toolbar) {
+		clip-path: none;
+		overflow: visible;
+	}
+
 	.table-of-contents {
 		display: none;
 
