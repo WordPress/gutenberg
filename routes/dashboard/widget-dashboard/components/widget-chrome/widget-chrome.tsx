@@ -27,7 +27,7 @@ import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-chrome.module.css';
 import type { DashboardWidget } from '../../types';
-import type { WidgetType } from '../../../widget-kit';
+import type { WidgetType } from '../../../widget-primitives';
 
 interface ErrorBoundaryProps {
 	children: ReactNode;

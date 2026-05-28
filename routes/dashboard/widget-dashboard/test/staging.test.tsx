@@ -15,7 +15,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { useDashboardInternalContext } from '../context/dashboard-context';
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget, WidgetGridSettings } from '../types';
-import type { WidgetType } from '../../widget-kit';
+import type { WidgetType } from '../../widget-primitives';
 
 const widgetTypes: WidgetType[] = [];
 

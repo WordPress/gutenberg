@@ -15,7 +15,7 @@ import { useState } from '@wordpress/element';
  */
 import { WidgetDashboard } from '../widget-dashboard';
 import type { DashboardWidget } from '../types';
-import type { WidgetType } from '../../widget-kit';
+import type { WidgetType } from '../../widget-primitives';
 
 const widgetTypes: WidgetType[] = [];
 

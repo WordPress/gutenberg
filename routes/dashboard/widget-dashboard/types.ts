@@ -3,7 +3,7 @@
  * `WidgetDashboard` prop bag.
  *
  * The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`,
- * `ResolveWidgetModule`) live in `widget-kit` and are imported from there
+ * `ResolveWidgetModule`) live in `widget-primitives` and are imported from there
  * directly; this module does not re-export them.
  */
 
@@ -27,7 +27,7 @@ import type {
 	WidgetName,
 	WidgetType,
 	ResolveWidgetModule,
-} from '../widget-kit';
+} from '../widget-primitives';
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
 export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;

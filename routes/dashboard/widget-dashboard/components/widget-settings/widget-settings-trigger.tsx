@@ -14,7 +14,7 @@ import { IconButton } from '@wordpress/ui';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getAdminMenuInset } from './utils';
 import type { DashboardWidget } from '../../types';
-import type { WidgetType } from '../../../widget-kit';
+import type { WidgetType } from '../../../widget-primitives';
 
 export interface WidgetSettingsTriggerProps {
 	/**

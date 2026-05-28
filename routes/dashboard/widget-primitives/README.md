@@ -1,4 +1,4 @@
-# `widget-kit`
+# `widget-primitives`
 
 The host-agnostic toolkit for dashboard widgets. It is the single source of
 truth for what a widget *is* (the contract types) and the runtime for working
@@ -8,7 +8,7 @@ modules). It is not tied to any host.
 ## Purpose
 
 A widget is a self-contained unit; a *host* is any context that renders one (the
-dashboard today, a sidebar or an inspector tomorrow). `widget-kit` sits between
+dashboard today, a sidebar or an inspector tomorrow). `widget-primitives` sits between
 the build pipeline that produces widgets and the hosts that render them, so
 neither side has to know about the other:
 
@@ -16,7 +16,7 @@ neither side has to know about the other:
   `WidgetTypeMetadata`, `WidgetName`) and the render contract
   (`WidgetRenderProps`). Authors type their `widget.ts` / `render.tsx` against
   these, and hosts consume the same types. Nothing re-exports them: every
-  consumer imports from `widget-kit` directly, so the source of truth stays in
+  consumer imports from `widget-primitives` directly, so the source of truth stays in
   one place.
 - **Discovery.** `useWidgetTypes()` returns the `WidgetType[]` registered on the
   current page.
@@ -70,6 +70,6 @@ when to import; they do not register widgets.
 
 This module lives inside the dashboard route while its API stabilizes. Because
 both hosts and widget authors consume it, its destination is a top-level,
-private (unpublished) package, `@wordpress/widget-kit`, in the same vein as
+private (unpublished) package, `@wordpress/widget-primitives`, in the same vein as
 `@wordpress/grid`. The current layout (`index.ts`, `types.ts`, `hooks/`,
 `tools/`) already matches that future shape.

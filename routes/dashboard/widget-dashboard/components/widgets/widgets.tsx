@@ -29,7 +29,7 @@ import type {
 	GridTilePlacement,
 	MasonryTilePlacement,
 } from '../../types';
-import type { WidgetName } from '../../../widget-kit';
+import type { WidgetName } from '../../../widget-primitives';
 
 // Floor applied as `minColumnWidth` on every surface render. Acts as a
 // safety net for stored settings that predate the layered model (where

@@ -25,7 +25,7 @@ import type {
 	WidgetGridSettings,
 	DashboardWidget,
 } from '../types';
-import type { ResolveWidgetModule, WidgetType } from '../../widget-kit';
+import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits
