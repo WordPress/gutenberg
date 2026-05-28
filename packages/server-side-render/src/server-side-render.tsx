@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { RawHTML, useEffect, useState, useMemo } from '@wordpress/element';
+import {
+	RawHTML,
+	useEffect,
+	useState,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -10,21 +16,15 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useServerSideRender } from './hook';
-import type { UseServerSideRenderArgs } from './hook';
+import type {
+	PlaceholderProps,
+	ErrorPlaceholderProps,
+	LoadingPlaceholderProps,
+	ServerSideRenderProps,
+	ServerSideRenderWithPostIdProps,
+} from './types';
 
 const EMPTY_OBJECT = {};
-
-interface PlaceholderProps {
-	className?: string;
-}
-
-interface ErrorPlaceholderProps extends PlaceholderProps {
-	message?: string;
-}
-
-interface LoadingPlaceholderProps {
-	children?: React.ReactNode;
-}
 
 function DefaultEmptyResponsePlaceholder( { className }: PlaceholderProps ) {
 	return (
@@ -81,15 +81,8 @@ function DefaultLoadingResponsePlaceholder( {
 	);
 }
 
-interface ServerSideRenderProps extends UseServerSideRenderArgs {
-	className?: string;
-	EmptyResponsePlaceholder?: React.ComponentType< PlaceholderProps >;
-	ErrorResponsePlaceholder?: React.ComponentType< ErrorPlaceholderProps >;
-	LoadingResponsePlaceholder?: React.ComponentType< LoadingPlaceholderProps >;
-}
-
 export function ServerSideRender( props: ServerSideRenderProps ) {
-	const [ prevContent, setPrevContent ] = useState( '' );
+	const prevContentRef = useRef( '' );
 	const {
 		className,
 		EmptyResponsePlaceholder = DefaultEmptyResponsePlaceholder,
@@ -103,15 +96,21 @@ export function ServerSideRender( props: ServerSideRenderProps ) {
 	// Store the previous successful HTML response to show while loading.
 	useEffect( () => {
 		if ( content ) {
-			setPrevContent( content );
+			prevContentRef.current = content;
 		}
 	}, [ content ] );
 
 	if ( status === 'loading' ) {
 		return (
 			<LoadingResponsePlaceholder { ...props }>
-				{ !! prevContent && (
-					<RawHTML className={ className }>{ prevContent }</RawHTML>
+				{ /* eslint-disable-next-line react-hooks/refs */ }
+				{ !! prevContentRef.current && (
+					<RawHTML className={ className }>
+						{
+							// eslint-disable-next-line react-hooks/refs
+							prevContentRef.current
+						}
+					</RawHTML>
 				) }
 			</LoadingResponsePlaceholder>
 		);
@@ -126,11 +125,6 @@ export function ServerSideRender( props: ServerSideRenderProps ) {
 	}
 
 	return <RawHTML className={ className }>{ content || '' }</RawHTML>;
-}
-
-interface ServerSideRenderWithPostIdProps
-	extends Omit< ServerSideRenderProps, 'urlQueryArgs' > {
-	urlQueryArgs?: Record< string, unknown >;
 }
 
 /**
@@ -169,11 +163,8 @@ export function ServerSideRenderWithPostId( {
 		// FIXME: @wordpress/server-side-render should not depend on @wordpress/editor.
 		// It is used by blocks that can be loaded into a *non-post* block editor.
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const editorStore = select( 'core/editor' ) as
-			| {
-					getCurrentPostId?: () => number | string | null;
-			  }
-			| undefined;
+		const editorStore = select( 'core/editor' );
+		// @ts-expect-error - editorStore is not typed in @wordpress/data
 		const postId = editorStore?.getCurrentPostId?.();
 
 		// For templates and template parts we use a custom ID format.
