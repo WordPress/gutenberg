@@ -14,13 +14,14 @@ import {
 	usePostContentBlocks,
 } from '../block-lookup';
 
-type MockBlock = {
-	clientId: string;
+import type { EditorStoreBlock } from '../block-lookup';
+
+type MockBlock = EditorStoreBlock & {
 	name: string;
 	innerBlocks: MockBlock[];
 };
 
-let mockGetBlocks: jest.Mock;
+let mockGetClientIdsTree: jest.Mock;
 
 function mockFlattenBlocks( blocks: MockBlock[] ): MockBlock[] {
 	return blocks.flatMap( ( b ) => [
@@ -29,12 +30,17 @@ function mockFlattenBlocks( blocks: MockBlock[] ): MockBlock[] {
 	] );
 }
 
+jest.mock( '../../lock-unlock', () => ( {
+	unlock: ( obj: any ) => obj,
+} ) );
+
 jest.mock( '@wordpress/data', () => ( {
 	useSelect: ( selector: Function ) =>
 		selector( () => ( {
-			getBlocks: ( ...args: any[] ) => mockGetBlocks( ...args ),
+			getClientIdsTree: ( ...args: any[] ) =>
+				mockGetClientIdsTree( ...args ),
 			getBlocksByName: ( blockName: string ) =>
-				mockFlattenBlocks( mockGetBlocks( '' ) )
+				mockFlattenBlocks( mockGetClientIdsTree( '' ) )
 					.filter( ( b ) => b.name === blockName )
 					.map( ( b ) => b.clientId ),
 		} ) ),
@@ -377,7 +383,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 
 			// Template structure: header → post-content → footer.
 			// post-content's innerBlocks are empty in the tree (controlled
-			// inner blocks), so getBlocks( postContentClientId ) is used.
+			// inner blocks), so getClientIdsTree( postContentClientId ) is used.
 			const templateBlocks: MockBlock[] = [
 				{
 					clientId: 'header',
@@ -396,10 +402,10 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			// Override getBlocks to return post content blocks when called
-			// with the post-content clientId (mimicking controlled inner
-			// blocks behavior in useBlockSync).
-			mockGetBlocks = jest.fn( ( rootClientId: string = '' ) => {
+			// Override getClientIdsTree to return post content blocks when
+			// called with the post-content clientId (mimicking controlled
+			// inner blocks behavior in useBlockSync).
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
@@ -420,7 +426,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 			);
 		} );
 
-		it( 'should call getBlocks with post-content clientId', () => {
+		it( 'should call getClientIdsTree with post-content clientId', () => {
 			const templateBlocks: MockBlock[] = [
 				{
 					clientId: 'header',
@@ -434,7 +440,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetBlocks = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
@@ -452,8 +458,8 @@ describe( 'resolveBlockClientIdByPath', () => {
 
 			renderHook( () => usePostContentBlocks() );
 
-			// Verify getBlocks was called with the post-content clientId.
-			expect( mockGetBlocks ).toHaveBeenCalledWith( 'pc' );
+			// Verify getClientIdsTree was called with the post-content clientId.
+			expect( mockGetClientIdsTree ).toHaveBeenCalledWith( 'pc' );
 		} );
 
 		it( 'should find core/post-content nested inside template parts', () => {
@@ -481,7 +487,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetBlocks = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}
@@ -513,7 +519,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetBlocks = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return postContentBlocks;
 				}
@@ -545,7 +551,7 @@ describe( 'resolveBlockClientIdByPath', () => {
 				},
 			];
 
-			mockGetBlocks = jest.fn( ( rootClientId: string = '' ) => {
+			mockGetClientIdsTree = jest.fn( ( rootClientId: string = '' ) => {
 				if ( rootClientId === '' ) {
 					return templateBlocks;
 				}

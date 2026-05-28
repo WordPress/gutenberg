@@ -10,15 +10,15 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import type { AbsoluteBlockIndexPath } from '../types';
+import { unlock } from '../lock-unlock';
 
 /**
- * A block as represented in the block-editor store (from `getBlocks()`).
+ * A block as represented in the block-editor store's client ID tree.
  *
  * This is a minimal interface covering only the fields used by RTC awareness.
  */
 export type EditorStoreBlock = {
 	clientId: string;
-	name: string;
 	innerBlocks: EditorStoreBlock[];
 };
 
@@ -143,20 +143,20 @@ export function resolveBlockClientIdByPath(
  * In template mode, the block tree contains template parts wrapping a
  * core/post-content block. The Yjs document only stores the post content
  * blocks, so we need to find the core/post-content block and use
- * getBlocks(clientId) to retrieve its inner blocks from the store.
+ * getClientIdsTree(clientId) to retrieve its inner blocks from the store.
  *
- * We must use getBlocks(clientId) rather than reading .innerBlocks from
- * the block object because useBlockSync() injects post content as
- * controlled inner blocks — they exist in the store's block order map
- * but are not populated in the .innerBlocks property of the tree
- * returned by getBlocks().
+ * Uses the private getClientIdsTree selector which depends only on
+ * state.blocks.order, avoiding unnecessary re-renders when block
+ * attributes change (which would happen with getBlocks()).
  *
  * @return The blocks that correspond to the Yjs document root.
  */
 export function usePostContentBlocks(): EditorStoreBlock[] {
 	return useSelect( ( select ) => {
-		const { getBlocks, getBlocksByName } = select( blockEditorStore );
+		const { getBlocksByName, getClientIdsTree } = unlock(
+			select( blockEditorStore )
+		);
 		const [ postContentClientId ] = getBlocksByName( 'core/post-content' );
-		return getBlocks( postContentClientId ?? '' );
+		return getClientIdsTree( postContentClientId ?? '' );
 	}, [] );
 }

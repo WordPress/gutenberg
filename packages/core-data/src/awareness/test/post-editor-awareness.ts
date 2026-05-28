@@ -15,7 +15,6 @@ import type {
 	SelectionWholeBlock,
 } from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
-import type { EditorStoreBlock } from '../block-lookup';
 import type { CollaboratorInfo } from '../types';
 
 // Mock WordPress dependencies
@@ -585,7 +584,7 @@ describe( 'PostEditorAwareness', () => {
 	} );
 
 	describe( 'convertSelectionStateToAbsolute', () => {
-		const defaultEditorBlocks: EditorStoreBlock[] = [
+		const defaultEditorBlocks = [
 			{
 				clientId: 'block-1',
 				name: 'core/paragraph',
@@ -923,7 +922,7 @@ describe( 'PostEditorAwareness', () => {
 				} ),
 			] );
 
-			const editorBlocks: EditorStoreBlock[] = [
+			const editorBlocks = [
 				{
 					clientId: 'local-0',
 					name: 'core/paragraph',
@@ -998,7 +997,7 @@ describe( 'PostEditorAwareness', () => {
 
 			const nestedDoc = createTestDocWithBlocks( [ outerColumn ] );
 
-			const editorBlocks: EditorStoreBlock[] = [
+			const editorBlocks = [
 				{
 					clientId: 'local-outer',
 					name: 'core/column',
@@ -1071,7 +1070,7 @@ describe( 'PostEditorAwareness', () => {
 
 			const nestedDoc = createTestDocWithBlocks( [ outerColumn ] );
 
-			const editorBlocks: EditorStoreBlock[] = [
+			const editorBlocks = [
 				{
 					clientId: 'local-col',
 					name: 'core/column',
@@ -1147,7 +1146,7 @@ describe( 'PostEditorAwareness', () => {
 				outerColumns1,
 			] );
 
-			const editorBlocks: EditorStoreBlock[] = [
+			const editorBlocks = [
 				{
 					clientId: 'local-outer-0',
 					name: 'core/columns',
@@ -1227,7 +1226,7 @@ describe( 'PostEditorAwareness', () => {
 	} );
 
 	describe( 'convertSelectionStateToAbsolute with nested rich-text attributes', () => {
-		const editorBlocks: EditorStoreBlock[] = [
+		const editorBlocks = [
 			{
 				clientId: 'local-nested-attrs',
 				name: 'test/nested-rich-text',
@@ -1310,7 +1309,7 @@ describe( 'PostEditorAwareness', () => {
 
 			// The caller provides post content blocks directly
 			// (template detection is handled by usePostContentBlocks).
-			const postContentBlocks: EditorStoreBlock[] = [
+			const postContentBlocks = [
 				{
 					clientId: 'local-para-0',
 					name: 'core/paragraph',
@@ -1368,7 +1367,7 @@ describe( 'PostEditorAwareness', () => {
 				createYBlock( 'yjs-img', 'core/image' ),
 			] );
 
-			const postContentBlocks: EditorStoreBlock[] = [
+			const postContentBlocks = [
 				{
 					clientId: 'local-img',
 					name: 'core/image',
@@ -1416,7 +1415,7 @@ describe( 'PostEditorAwareness', () => {
 				} ),
 			] );
 
-			const editorBlocks: EditorStoreBlock[] = [
+			const editorBlocks = [
 				{
 					clientId: 'local-para',
 					name: 'core/paragraph',
