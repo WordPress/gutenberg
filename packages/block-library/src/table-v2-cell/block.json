@@ -30,11 +30,20 @@
 		},
 		"align": {
 			"type": "string"
+		},
+		"lock": {
+			"type": "object",
+			"default": {
+				"move": true,
+				"remove": true
+			},
+			"role": "local"
 		}
 	},
 	"supports": {
 		"anchor": false,
 		"html": false,
+		"lock": false,
 		"reusable": false,
 		"inserter": false,
 		"color": {

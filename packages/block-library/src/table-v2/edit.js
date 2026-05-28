@@ -128,6 +128,7 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 			{
 				allowedBlocks: [ 'core/table-v2-cell' ],
 				renderAppender: false,
+				__unstableDisableDropZone: true,
 				__experimentalCaptureToolbars: true,
 			}
 		);
