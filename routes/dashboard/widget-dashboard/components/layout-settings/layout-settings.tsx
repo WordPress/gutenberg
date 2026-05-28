@@ -209,13 +209,13 @@ interface LayoutSettingsProps {
  * restores the package's built-in defaults in staging (still
  * subject to Save/Cancel). Closing the drawer through the X icon,
  * an Escape press, or any path other than the explicit Cancel/Save
- * buttons is treated as Cancel.
+ * buttons is treated as Cancel. None of these exit customize mode.
  *
  * Settings and layout-editing are kept as separate flows on the
- * dashboard surface (the Layout settings entry that opens this
- * drawer is disabled while edit mode is on), so the drawer's
- * commit never publishes layout edits that the user is in the
- * middle of staging through the toolbar.
+ * dashboard (the Layout settings entry that opens this drawer is
+ * disabled while edit mode is on), so the drawer's commit never
+ * publishes layout edits that the user is in the middle of staging
+ * through the toolbar.
  *
  * @param {LayoutSettingsProps} props Layout settings props.
  * @return {React.ReactNode} The layout settings component.
@@ -259,19 +259,19 @@ export function LayoutSettings( {
 	);
 
 	const handleCancel = useCallback( () => {
-		cancelStaging();
+		cancelStaging( { exitEditMode: false } );
 		onOpenChange( false );
 	}, [ cancelStaging, onOpenChange ] );
 
 	const handleSave = useCallback( () => {
-		commit();
+		commit( { exitEditMode: false } );
 		onOpenChange( false );
 	}, [ commit, onOpenChange ] );
 
 	const handleOpenChange = useCallback(
 		( nextOpen: boolean ) => {
 			if ( ! nextOpen && open ) {
-				cancelStaging();
+				cancelStaging( { exitEditMode: false } );
 			}
 			onOpenChange( nextOpen );
 		},

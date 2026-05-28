@@ -3,6 +3,8 @@
  * Tests for the Guidelines Post Type registration and type-term behavior.
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 
@@ -12,12 +14,18 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	protected static $admin_id;
 
 	/**
+	 * @var int Contributor user ID.
+	 */
+	protected static $contributor_id;
+
+	/**
 	 * Set up class fixtures.
 	 *
 	 * @param WP_UnitTest_Factory $factory Factory instance.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$admin_id = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$admin_id       = $factory->user->create( array( 'role' => 'administrator' ) );
+		self::$contributor_id = $factory->user->create( array( 'role' => 'contributor' ) );
 	}
 
 	/**
@@ -25,36 +33,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	 */
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$admin_id );
-	}
-
-	/**
-	 * Clean up guidelines posts and taxonomy terms after each test.
-	 */
-	public function tear_down() {
-		$posts = get_posts(
-			array(
-				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
-				'post_status'    => array( 'publish', 'draft' ),
-				'posts_per_page' => -1,
-			)
-		);
-		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
-		}
-
-		$terms = get_terms(
-			array(
-				'taxonomy'   => Gutenberg_Guidelines_Post_Type::TAXONOMY,
-				'hide_empty' => false,
-			)
-		);
-		if ( ! is_wp_error( $terms ) ) {
-			foreach ( $terms as $term ) {
-				wp_delete_term( $term->term_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
-			}
-		}
-
-		parent::tear_down();
+		self::delete_user( self::$contributor_id );
 	}
 
 	/**
@@ -77,25 +56,28 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The post type maps generated guideline primitive caps back to the core
-	 * post caps used by built-in roles.
+	 * The post type exposes a self-contained, guideline-prefixed capability
+	 * namespace. The CPT-level `read` is remapped to keep Subscribers blocked
+	 * at the post-type door; every other primitive is auto-derived from
+	 * `capability_type = 'guideline'` and granted at runtime via the
+	 * `user_has_cap` synthesis filter.
 	 */
-	public function test_post_type_uses_core_primitive_capabilities() {
+	public function test_post_type_uses_guideline_prefixed_capabilities() {
 		$post_type = get_post_type_object( Gutenberg_Guidelines_Post_Type::POST_TYPE );
 
 		$this->assertNotFalse( $post_type );
-		$this->assertSame( 'edit_posts', $post_type->cap->read );
-		$this->assertSame( 'publish_posts', $post_type->cap->create_posts );
-		$this->assertSame( 'edit_posts', $post_type->cap->edit_posts );
-		$this->assertSame( 'publish_posts', $post_type->cap->publish_posts );
-		$this->assertSame( 'read_private_posts', $post_type->cap->read_private_posts );
-		$this->assertSame( 'edit_private_posts', $post_type->cap->edit_private_posts );
-		$this->assertSame( 'edit_published_posts', $post_type->cap->edit_published_posts );
-		$this->assertSame( 'delete_private_posts', $post_type->cap->delete_private_posts );
-		$this->assertSame( 'delete_published_posts', $post_type->cap->delete_published_posts );
-		$this->assertSame( 'delete_posts', $post_type->cap->delete_posts );
-		$this->assertSame( 'edit_others_posts', $post_type->cap->edit_others_posts );
-		$this->assertSame( 'delete_others_posts', $post_type->cap->delete_others_posts );
+		$this->assertSame( 'read_guidelines', $post_type->cap->read );
+		$this->assertSame( 'edit_guidelines', $post_type->cap->create_posts );
+		$this->assertSame( 'edit_guidelines', $post_type->cap->edit_posts );
+		$this->assertSame( 'publish_guidelines', $post_type->cap->publish_posts );
+		$this->assertSame( 'read_private_guidelines', $post_type->cap->read_private_posts );
+		$this->assertSame( 'edit_private_guidelines', $post_type->cap->edit_private_posts );
+		$this->assertSame( 'edit_published_guidelines', $post_type->cap->edit_published_posts );
+		$this->assertSame( 'delete_private_guidelines', $post_type->cap->delete_private_posts );
+		$this->assertSame( 'delete_published_guidelines', $post_type->cap->delete_published_posts );
+		$this->assertSame( 'delete_guidelines', $post_type->cap->delete_posts );
+		$this->assertSame( 'edit_others_guidelines', $post_type->cap->edit_others_posts );
+		$this->assertSame( 'delete_others_guidelines', $post_type->cap->delete_others_posts );
 	}
 
 	/**
@@ -103,16 +85,13 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	 * the save_post hook (replacement for default_term).
 	 */
 	public function test_save_post_assigns_artifact_fallback() {
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
 				'post_title'  => 'No-type guideline',
 			)
 		);
-
-		$this->assertIsInt( $post_id );
-		$this->assertGreaterThan( 0, $post_id );
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
 		$this->assertCount( 1, $terms );
@@ -125,16 +104,18 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	/**
 	 * A post inserted with an explicit type keeps that type.
 	 */
-	public function test_explicit_term_is_preserved() {
+	public function test_save_post_preserves_explicit_term() {
 		wp_set_current_user( self::$admin_id );
 
-		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
-			Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
-			'Content'
+		$content_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Content',
+				'slug'     => Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+			)
 		);
-		$this->assertIsInt( $content_term_id );
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
@@ -142,12 +123,8 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 				'tax_input'   => array(
 					Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $content_term_id ),
 				),
-			),
-			true
+			)
 		);
-
-		$this->assertIsInt( $post_id );
-		$this->assertNotWPError( $post_id );
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
@@ -155,17 +132,57 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Updates to an existing post do not overwrite an already-assigned term.
+	 * End-to-end check for the agent flow the cap relaxation enables: a
+	 * Contributor creates a new `wp_guideline_type` term and attaches a
+	 * private guideline to it in the same session. The post must end up
+	 * tagged with the new term instead of the `artifact` fallback.
 	 */
-	public function test_term_is_not_overwritten_on_update() {
-		wp_set_current_user( self::$admin_id );
+	public function test_save_post_preserves_new_term_for_contributor() {
+		wp_set_current_user( self::$contributor_id );
 
-		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
-			Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
-			'Content'
+		$memory_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Memory',
+				'slug'     => 'memory',
+			)
 		);
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
+				'post_status' => 'private',
+				'post_title'  => 'Contributor memory',
+				'post_author' => self::$contributor_id,
+				'tax_input'   => array(
+					Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $memory_term_id ),
+				),
+			)
+		);
+
+		$terms = wp_get_object_terms(
+			$post_id,
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'fields' => 'slugs' )
+		);
+		$this->assertSame( array( 'memory' ), $terms );
+	}
+
+	/**
+	 * Updates to an existing post do not overwrite an already-assigned term.
+	 */
+	public function test_save_post_preserves_term_on_update() {
+		wp_set_current_user( self::$admin_id );
+
+		$content_term_id = self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Content',
+				'slug'     => Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+			)
+		);
+
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
@@ -173,8 +190,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 				'tax_input'   => array(
 					Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $content_term_id ),
 				),
-			),
-			true
+			)
 		);
 
 		wp_update_post(
@@ -193,10 +209,10 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	 * The fallback is skipped for revisions (including autosaves, which are
 	 * stored as revisions).
 	 */
-	public function test_revision_is_ignored() {
+	public function test_save_post_skips_revisions() {
 		wp_set_current_user( self::$admin_id );
 
-		$post_id = wp_insert_post(
+		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',

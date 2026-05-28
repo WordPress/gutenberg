@@ -11,12 +11,12 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 	 * Internal class representing a widget type.
 	 *
 	 * Holds the metadata for a widget discovered by the build pipeline. Stored
-	 * inside `WP_Widget_Type_Registry` once registered, and consumed by surface
+	 * inside `WP_Widget_Type_Registry` once registered, and consumed by host
 	 * code that needs to enumerate or look up widget types.
 	 *
 	 * The shape is intentionally minimal: identity (`name`) plus the
 	 * script-module handles the build pipeline produced for the widget.
-	 * Placement and surface concerns (which page or sidebar uses the widget)
+	 * Placement and host concerns (which page or sidebar uses the widget)
 	 * live with the consumer, not on the type definition.
 	 */
 	#[AllowDynamicProperties]

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+
+/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -21,9 +26,9 @@ const KEY = 'dashboardGridSettings';
  */
 const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
 	model: 'grid',
-	columns: 6,
-	minColumnWidth: 350,
-	rowHeight: 200,
+	columns: 12,
+	minColumnWidth: 140,
+	rowHeight: 140,
 };
 
 /**
@@ -31,10 +36,10 @@ const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
  *
  * Returns the persisted settings, a setter that writes through to the
  * preferences store, and a reset action that applies the bundled
- * defaults. The preference is shared across dashboard surfaces today;
- * if a per-dashboard split is needed later, the signature can grow a
- * surface-identifying parameter without touching call sites that pass
- * the dashboard's name through.
+ * defaults. The preference is shared across dashboards today; if a
+ * per-dashboard split is needed later, the signature can grow a
+ * dashboard-identifying parameter without touching call sites that
+ * pass the dashboard's name through.
  *
  * @return Tuple `[ settings, setSettings, resetSettings ]`.
  */
@@ -54,11 +59,20 @@ export function useDashboardGridSettings(): [
 	const { set } = useDispatch( preferencesStore );
 
 	function setSettings( next: WidgetGridSettings ) {
+		// Persist "back to default" as a cleared preference rather than a stored
+		// copy of the defaults: the dashboard then tracks the current code
+		// default and the value can never drift. Reset routes through here (the
+		// drawer commit fires the setter with the default), so this is what makes
+		// Reset + Save truly clear the stored preference.
+		if ( fastDeepEqual( next, DEFAULT_GRID_SETTINGS ) ) {
+			void set( SCOPE, KEY, null );
+			return;
+		}
 		void set( SCOPE, KEY, next );
 	}
 
 	function resetSettings() {
-		void set( SCOPE, KEY, DEFAULT_GRID_SETTINGS );
+		void set( SCOPE, KEY, null );
 	}
 
 	return [ settings, setSettings, resetSettings ];

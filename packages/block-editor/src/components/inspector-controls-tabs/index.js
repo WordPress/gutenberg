@@ -3,12 +3,14 @@
  */
 import {
 	Icon as WCIcon,
-	Tooltip as WCTooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect, useDispatch } from '@wordpress/data';
+
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -175,14 +177,16 @@ export default function InspectorControlsTabs( {
 								{ tab.title }
 							</Tabs.Tab>
 						) : (
-							<WCTooltip text={ tab.title } key={ tab.name }>
+							<Tooltip.Root key={ tab.name }>
 								<Tabs.Tab
 									tabId={ tab.name }
 									aria-label={ tab.title }
+									render={ <Tooltip.Trigger /> }
 								>
 									<WCIcon icon={ tab.icon } />
 								</Tabs.Tab>
-							</WCTooltip>
+								<Tooltip.Popup>{ tab.title }</Tooltip.Popup>
+							</Tooltip.Root>
 						)
 					) }
 				</Tabs.TabList>
