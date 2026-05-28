@@ -314,12 +314,38 @@ export const multiSelect =
 			return;
 		}
 
-		dispatch( {
-			type: 'MULTI_SELECT',
-			start,
-			end,
-			initialPosition: __experimentalInitialPosition,
-		} );
+		const defaultMultiSelect = (
+			defaultStart = start,
+			defaultEnd = end,
+			defaultInitialPosition = __experimentalInitialPosition
+		) => {
+			dispatch( {
+				type: 'MULTI_SELECT',
+				start: defaultStart,
+				end: defaultEnd,
+				initialPosition: defaultInitialPosition,
+			} );
+		};
+
+		const { onMultiSelect } =
+			select.getBlockListSettings( startBlockRootClientId ) || {};
+
+		if ( onMultiSelect ) {
+			onMultiSelect( {
+				startClientId: start,
+				endClientId: end,
+				rootClientId: startBlockRootClientId,
+				initialPosition: __experimentalInitialPosition,
+				select,
+				dispatch: {
+					multiSelect: defaultMultiSelect,
+					multiSelectSet: dispatch.multiSelectSet,
+					selectBlock: dispatch.selectBlock,
+				},
+			} );
+		} else {
+			defaultMultiSelect();
+		}
 
 		const blockCount = select.getSelectedBlockCount();
 		const nestedBlockCount = select.getClientIdsOfDescendants(

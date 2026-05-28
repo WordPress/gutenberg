@@ -33,7 +33,12 @@ import { blockTable as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { createTable, mapCellsToSections, toggleSection } from './utils';
+import {
+	createTable,
+	getCellRectangleClientIds,
+	mapCellsToSections,
+	toggleSection,
+} from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function TSection( { name, ...props } ) {
@@ -106,6 +111,43 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 	}
 
 	const blockProps = useBlockProps();
+	const innerBlocksOptions = useMemo(
+		() => ( {
+			allowedBlocks: [ 'core/table-v2-cell' ],
+			renderAppender: false,
+			__unstableDisableDropZone: true,
+			__experimentalCaptureToolbars: true,
+			onMultiSelect( {
+				startClientId,
+				endClientId,
+				initialPosition,
+				dispatch,
+			} ) {
+				const selectedClientIds = getCellRectangleClientIds(
+					rows,
+					innerBlocks,
+					columnCount,
+					startClientId,
+					endClientId
+				);
+
+				if ( selectedClientIds ) {
+					dispatch.multiSelectSet(
+						selectedClientIds,
+						initialPosition
+					);
+					return;
+				}
+
+				dispatch.multiSelect(
+					startClientId,
+					endClientId,
+					initialPosition
+				);
+			},
+		} ),
+		[ rows, innerBlocks, columnCount ]
+	);
 
 	// useInnerBlocksProps sets up inner block infrastructure (nested settings,
 	// drop zones, template sync, allowed blocks). We destructure `children` out
@@ -125,12 +167,7 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 					...borderProps.style,
 				},
 			},
-			{
-				allowedBlocks: [ 'core/table-v2-cell' ],
-				renderAppender: false,
-				__unstableDisableDropZone: true,
-				__experimentalCaptureToolbars: true,
-			}
+			innerBlocksOptions
 		);
 
 	// Get individual block elements that we can place in the table structure.
@@ -170,7 +207,6 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Fixed width table cells' ) }
 							checked={ !! hasFixedLayout }
 							onChange={ onChangeFixedLayout }
@@ -185,7 +221,6 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 								isShownByDefault
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Header section' ) }
 									checked={ hasHeader }
 									onChange={ onToggleHeaderSection }
@@ -198,7 +233,6 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 								isShownByDefault
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Footer section' ) }
 									checked={ hasFooter }
 									onChange={ onToggleFooterSection }

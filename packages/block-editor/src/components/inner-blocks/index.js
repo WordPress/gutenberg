@@ -65,6 +65,7 @@ function UncontrolledInnerBlocks( props ) {
 		blockType,
 		parentLock,
 		defaultLayout,
+		onMultiSelect,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -79,7 +80,8 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		layout
+		layout,
+		onMultiSelect
 	);
 
 	useInnerBlockTemplateSync(

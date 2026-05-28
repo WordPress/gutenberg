@@ -102,7 +102,9 @@ export default function useSelectionObserver() {
 		stopMultiSelect,
 	} = useDispatch( blockEditorStore );
 	const {
+		getBlockListSettings,
 		getBlockParents,
+		getBlockRootClientId,
 		getBlockSelectionStart,
 		isMultiSelecting,
 		getSelectionStart,
@@ -380,6 +382,15 @@ export default function useSelectionObserver() {
 						return;
 					}
 
+					const rootClientId = getBlockRootClientId( startClientId );
+					if (
+						rootClientId === getBlockRootClientId( endClientId ) &&
+						getBlockListSettings( rootClientId )?.onMultiSelect
+					) {
+						multiSelect( startClientId, endClientId );
+						return;
+					}
+
 					const richTextElementStart =
 						getRichTextElement( startNode );
 					const richTextElementEnd = getRichTextElement( endNode );
@@ -500,6 +511,13 @@ export default function useSelectionObserver() {
 				);
 			};
 		},
-		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
+		[
+			multiSelect,
+			selectBlock,
+			selectionChange,
+			getBlockListSettings,
+			getBlockParents,
+			getBlockRootClientId,
+		]
 	);
 }

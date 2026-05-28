@@ -166,6 +166,9 @@ describe( 'actions', () => {
 				getClientIdsOfDescendants() {
 					return [];
 				},
+				getBlockListSettings() {
+					return {};
+				},
 			};
 			const dispatch = jest.fn();
 
@@ -202,6 +205,81 @@ describe( 'actions', () => {
 			multiSelect( start, end )( { select, dispatch } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
+		} );
+
+		it( 'runs the block list multi-selection handler', () => {
+			const start = 'start';
+			const end = 'end';
+			const onMultiSelect = jest.fn( ( { dispatch: innerDispatch } ) => {
+				innerDispatch.multiSelectSet( [ 'cell-1', 'cell-3' ], null );
+			} );
+			const select = {
+				getBlockRootClientId() {
+					return 'parent';
+				},
+				getSelectedBlockCount() {
+					return 0;
+				},
+				getBlockListSettings() {
+					return { onMultiSelect };
+				},
+			};
+			const dispatch = jest.fn();
+			dispatch.multiSelectSet = jest.fn();
+
+			multiSelect( start, end, null )( { select, dispatch } );
+
+			expect( onMultiSelect ).toHaveBeenCalledWith( {
+				startClientId: start,
+				endClientId: end,
+				rootClientId: 'parent',
+				initialPosition: null,
+				select,
+				dispatch: {
+					multiSelect: expect.any( Function ),
+					multiSelectSet: dispatch.multiSelectSet,
+					selectBlock: dispatch.selectBlock,
+				},
+			} );
+			expect( dispatch.multiSelectSet ).toHaveBeenCalledWith(
+				[ 'cell-1', 'cell-3' ],
+				null
+			);
+			expect( dispatch ).not.toHaveBeenCalledWith( {
+				type: 'MULTI_SELECT',
+				start,
+				end,
+				initialPosition: null,
+			} );
+		} );
+
+		it( 'lets the block list handler run the default multi-selection', () => {
+			const start = 'start';
+			const end = 'end';
+			const onMultiSelect = ( { dispatch: innerDispatch } ) => {
+				innerDispatch.multiSelect();
+			};
+			const select = {
+				getBlockRootClientId() {
+					return 'parent';
+				},
+				getSelectedBlockCount() {
+					return 0;
+				},
+				getBlockListSettings() {
+					return { onMultiSelect };
+				},
+			};
+			const dispatch = jest.fn();
+
+			multiSelect( start, end, null )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'MULTI_SELECT',
+				start,
+				end,
+				initialPosition: null,
+			} );
 		} );
 	} );
 

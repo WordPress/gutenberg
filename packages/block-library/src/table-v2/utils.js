@@ -190,6 +190,68 @@ export function getCellLocation( rows, cells, columnCount, clientId ) {
 	);
 }
 
+function doesPlacementIntersectRectangle( placement, rectangle ) {
+	const { rowSpan = 1, colSpan = 1 } = placement.cell.attributes;
+	const placementEndRow = placement.rowIndex + rowSpan - 1;
+	const placementEndColumn = placement.columnIndex + colSpan - 1;
+
+	return (
+		placement.rowIndex <= rectangle.endRow &&
+		placementEndRow >= rectangle.startRow &&
+		placement.columnIndex <= rectangle.endColumn &&
+		placementEndColumn >= rectangle.startColumn
+	);
+}
+
+/**
+ * Gets all cells inside the rectangle between two cell blocks.
+ *
+ * @param {Array}  rows          Row descriptors.
+ * @param {Array}  cells         Cell inner blocks.
+ * @param {number} columnCount   Number of columns.
+ * @param {string} startClientId Starting cell clientId.
+ * @param {string} endClientId   Ending cell clientId.
+ * @return {Array|null} Client IDs in the rectangular selection, or null if either cell is missing.
+ */
+export function getCellRectangleClientIds(
+	rows,
+	cells,
+	columnCount,
+	startClientId,
+	endClientId
+) {
+	const placements = getCellPlacements( rows, cells, columnCount );
+	const startPlacement = placements.find(
+		( placement ) => placement.cell.clientId === startClientId
+	);
+	const endPlacement = placements.find(
+		( placement ) => placement.cell.clientId === endClientId
+	);
+
+	if ( ! startPlacement || ! endPlacement ) {
+		return null;
+	}
+
+	const rectangle = {
+		startRow: Math.min( startPlacement.rowIndex, endPlacement.rowIndex ),
+		endRow: Math.max( startPlacement.rowIndex, endPlacement.rowIndex ),
+		startColumn: Math.min(
+			startPlacement.columnIndex,
+			endPlacement.columnIndex
+		),
+		endColumn: Math.max(
+			startPlacement.columnIndex,
+			endPlacement.columnIndex
+		),
+	};
+
+	return placements
+		.filter( ( placement ) =>
+			doesPlacementIntersectRectangle( placement, rectangle )
+		)
+		.map( ( placement ) => placement.cell.clientId );
+}
+
 /**
  * Inserts a new row into the table.
  *
