@@ -95,7 +95,7 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const registry = useRegistry();
 
-	const { replaceInnerBlocks, updateBlockAttributes } =
+	const { multiSelectSet, replaceInnerBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
 	const { innerBlocks, selectedCellId } = useSelect(
@@ -237,6 +237,36 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 		} );
 	}
 
+	function onSelectRow() {
+		if ( ! selectedCellLocation ) {
+			return;
+		}
+
+		const { section, row } = selectedCellLocation;
+		const rowCellIds = sortCells(
+			innerBlocks.filter(
+				( cell ) =>
+					cell.attributes.section === section &&
+					cell.attributes.row === row
+			)
+		).map( ( cell ) => cell.clientId );
+
+		multiSelectSet( rowCellIds );
+	}
+
+	function onSelectColumn() {
+		if ( ! selectedCellLocation ) {
+			return;
+		}
+
+		const { column } = selectedCellLocation;
+		const columnCellIds = sortCells(
+			innerBlocks.filter( ( cell ) => cell.attributes.column === column )
+		).map( ( cell ) => cell.clientId );
+
+		multiSelectSet( columnCellIds );
+	}
+
 	function getCellAlignment() {
 		if ( ! selectedCellLocation ) {
 			return undefined;
@@ -248,6 +278,18 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 	}
 
 	const tableControls = [
+		{
+			icon: tableRowAfter,
+			title: __( 'Select row' ),
+			isDisabled: ! selectedCellLocation,
+			onClick: onSelectRow,
+		},
+		{
+			icon: tableColumnAfter,
+			title: __( 'Select column' ),
+			isDisabled: ! selectedCellLocation,
+			onClick: onSelectColumn,
+		},
 		{
 			icon: tableRowBefore,
 			title: __( 'Insert row before' ),
