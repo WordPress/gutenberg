@@ -21,12 +21,11 @@ import {
  */
 import { computeGridModelChange } from '../utils/grid-model-change';
 import type {
-	ResolveWidgetModule,
 	WidgetGridModel,
 	WidgetGridSettings,
 	DashboardWidget,
-	WidgetType,
 } from '../types';
+import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits

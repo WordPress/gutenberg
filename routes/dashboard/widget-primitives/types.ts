@@ -13,7 +13,7 @@
 /**
  * External dependencies
  */
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ComponentType } from 'react';
 import type { Field } from '@wordpress/dataviews';
 import type { Icon } from '@wordpress/ui';
 
@@ -162,3 +162,19 @@ export interface WidgetRenderProps< Item = unknown > {
 	 */
 	setAttributes?: ( next: Partial< Item > ) => void;
 }
+
+/**
+ * Widget render module shape returned by the module resolver.
+ */
+export interface WidgetModule {
+	default: ComponentType< WidgetRenderProps< unknown > >;
+}
+
+/**
+ * Resolver hook: maps a `WidgetType.renderModule` id to a React component.
+ * Defaults to a dynamic `import()`; override for tests, Storybook, or to load
+ * from a non-URL source.
+ */
+export type ResolveWidgetModule = (
+	moduleId: string
+) => Promise< WidgetModule >;
