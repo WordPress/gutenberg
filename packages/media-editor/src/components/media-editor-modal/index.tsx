@@ -109,7 +109,7 @@ export function MediaEditorModal( {
 				children,
 				headerActions,
 				footerActions,
-				isWideFooter,
+				footerLayout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -130,11 +130,7 @@ export function MediaEditorModal( {
 					>
 						{ children }
 						<div
-							className={
-								isWideFooter
-									? 'media-editor-modal__footer is-wide'
-									: 'media-editor-modal__footer'
-							}
+							className={ `media-editor-modal__footer is-${ footerLayout }` }
 							role="region"
 							aria-label={ __( 'Editor actions' ) }
 						>

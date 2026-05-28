@@ -50,7 +50,8 @@ import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
-import MediaEditorToolbar from '../media-editor-toolbar';
+import MediaEditorFineRotation from '../media-editor-fine-rotation';
+import MediaEditorTransformControls from '../media-editor-transform-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
@@ -88,12 +89,16 @@ export interface MediaEditorFrameProps {
 	headerActions: ReactNode;
 	footerActions: ReactNode;
 	/**
-	 * True when the footer should render as a single horizontal row
-	 * (History | Toolbar | Cancel/Save); false when it should stack
-	 * (toolbar on top, history + Cancel/Save beneath). Frames apply this
-	 * to the footer container as a layout modifier.
+	 * Footer layout selector. Frames apply this to the footer container
+	 * as a modifier class.
+	 *
+	 * - `wide`   — single row: History | Ruler | Transform | Cancel/Save.
+	 * - `medium` — two rows: ruler on top; History | Transform | Cancel/Save
+	 *              beneath.
+	 * - `narrow` — three rows: ruler; transform (centered); History |
+	 *              Cancel/Save.
 	 */
-	isWideFooter: boolean;
+	footerLayout: 'wide' | 'medium' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -342,10 +347,19 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
-	// Above this viewport the footer fits History | Toolbar | Cancel/Save on
-	// a single row. Below it, we render a stacked composition so DOM order
-	// matches visual order in both layouts (no `order` reshuffling needed).
-	const isWideFooter = useViewportMatch( 'xlarge' );
+	// Three footer layouts, picked from the viewport so DOM order matches
+	// visual order in all three (no `order` reshuffling needed):
+	//   wide   (≥ xlarge): single row.
+	//   medium (≥ medium): ruler on top; rest beneath.
+	//   narrow (< medium): ruler, then transform centered, then history/save.
+	const isWideViewport = useViewportMatch( 'xlarge' );
+	const isMediumViewport = useViewportMatch( 'medium' );
+	let footerLayout: 'wide' | 'medium' | 'narrow' = 'narrow';
+	if ( isWideViewport ) {
+		footerLayout = 'wide';
+	} else if ( isMediumViewport ) {
+		footerLayout = 'medium';
+	}
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -649,11 +663,12 @@ function MediaEditorContent( {
 			onReset={ resetCropOptions }
 		/>
 	) : null;
-	const toolbar = isImage ? (
-		<MediaEditorToolbar
+	const ruler = isImage ? (
+		<MediaEditorFineRotation
 			onPlacementControlInteraction={ signalPlacementControlInteraction }
 		/>
 	) : null;
+	const transform = isImage ? <MediaEditorTransformControls /> : null;
 	const actions = (
 		<FooterActions
 			isSaving={ isSaving }
@@ -664,25 +679,47 @@ function MediaEditorContent( {
 		/>
 	);
 
-	// DOM order matches visual order in both layouts — wide reads L→R, narrow
-	// reads top→bottom and then L→R inside the secondary row. No `order`
-	// reshuffling, which the project's stylelint rule treats as an a11y red
-	// flag.
-	const footerActions = isWideFooter ? (
-		<>
-			{ history }
-			{ toolbar }
-			{ actions }
-		</>
-	) : (
-		<>
-			{ toolbar }
-			<div className="media-editor-modal__footer-row">
+	// One JSX tree per layout. DOM order matches visual order in all three.
+	// `.media-editor-modal__footer-toolbar` (wide only) groups ruler +
+	// transform with the centered cluster and divider that the wide layout
+	// has always had.
+	let footerActions: ReactNode;
+	if ( footerLayout === 'wide' ) {
+		footerActions = (
+			<>
 				{ history }
+				{ isImage && (
+					<div className="media-editor-modal__footer-toolbar">
+						{ ruler }
+						{ transform }
+					</div>
+				) }
 				{ actions }
-			</div>
-		</>
-	);
+			</>
+		);
+	} else if ( footerLayout === 'medium' ) {
+		footerActions = (
+			<>
+				{ ruler }
+				<div className="media-editor-modal__footer-row">
+					{ history }
+					{ transform }
+					{ actions }
+				</div>
+			</>
+		);
+	} else {
+		footerActions = (
+			<>
+				{ ruler }
+				{ transform }
+				<div className="media-editor-modal__footer-row">
+					{ history }
+					{ actions }
+				</div>
+			</>
+		);
+	}
 
 	return renderFrame( {
 		children,
@@ -695,7 +732,7 @@ function MediaEditorContent( {
 			/>
 		),
 		footerActions,
-		isWideFooter,
+		footerLayout,
 		onRequestClose: handleRequestClose,
 		onKeyDown: handleKeyDown,
 		shouldCloseOnClickOutside: ! hasChanges && ! isSaving,
