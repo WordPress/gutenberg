@@ -716,15 +716,15 @@ export function createSyncManager( debug = false ): SyncManager {
 	function createPersistedCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): Promise< string | null > {
+	): string | null {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState?.ydoc ) {
-			return Promise.resolve( null );
+			return null;
 		}
 
-		return Promise.resolve( serializeCrdtDoc( entityState.ydoc ) );
+		return serializeCrdtDoc( entityState.ydoc );
 	}
 
 	// Collect internal functions so that they can be wrapped before calling.
