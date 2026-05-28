@@ -44,6 +44,8 @@ import {
 	getParentSectionBlock,
 	isZoomOut,
 	isContainerInsertableToInContentOnlyMode,
+	getClientIdWithClientIdsTree,
+	getClientIdsTree,
 } from './private-selectors';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -225,22 +227,16 @@ export function getBlocks( state, rootClientId ) {
  *
  * @return {Object} Client IDs of the post blocks.
  */
-export const __unstableGetClientIdWithClientIdsTree = createSelector(
-	( state, clientId ) => {
-		deprecated(
-			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
-			{
-				since: '6.3',
-				version: '6.5',
-			}
-		);
-		return {
-			clientId,
-			innerBlocks: __unstableGetClientIdsTree( state, clientId ),
-		};
-	},
-	( state ) => [ state.blocks.order ]
-);
+export function __unstableGetClientIdWithClientIdsTree( state, clientId ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree",
+		{
+			since: '6.3',
+			version: '6.5',
+		}
+	);
+	return getClientIdWithClientIdsTree( state, clientId );
+}
 
 /**
  * Returns the block tree represented in the block-editor store from the
@@ -254,21 +250,16 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  *
  * @return {Object[]} Client IDs of the post blocks.
  */
-export const __unstableGetClientIdsTree = createSelector(
-	( state, rootClientId = '' ) => {
-		deprecated(
-			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
-			{
-				since: '6.3',
-				version: '6.5',
-			}
-		);
-		return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
-			__unstableGetClientIdWithClientIdsTree( state, clientId )
-		);
-	},
-	( state ) => [ state.blocks.order ]
-);
+export function __unstableGetClientIdsTree( state, rootClientId ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
+		{
+			since: '6.3',
+			version: '6.5',
+		}
+	);
+	return getClientIdsTree( state, rootClientId );
+}
 
 /**
  * Returns an array containing the clientIds of all descendants of the blocks

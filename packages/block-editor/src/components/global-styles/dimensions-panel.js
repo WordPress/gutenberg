@@ -33,6 +33,7 @@ import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
 	isDefaultBlockStyleState,
+	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
@@ -741,6 +742,9 @@ export default function DimensionsPanel( {
 					onChange={ setChildLayout }
 					parentLayout={ settings?.parentLayout }
 					panelId={ panelId }
+					showGridSpanDefaults={
+						! hasViewportBlockStyleState( styleState )
+					}
 					isShownByDefault={
 						defaultControls.childLayout ??
 						DEFAULT_CONTROLS.childLayout
