@@ -35,13 +35,26 @@ function Dashboard() {
 		[]
 	);
 
-	const customizeDashboardLabel = __( 'Customize Dashboard' );
-	const dashboardLabel = __( 'Dashboard' );
+	const greetingName = useSelect( ( select ) => {
+		const user = select( coreStore ).getCurrentUser();
+		if ( ! user ) {
+			return undefined;
+		}
 
-	const displayName = useSelect(
-		( select ) => select( coreStore ).getCurrentUser()?.name,
-		[]
-	);
+		const displayName = user.name?.trim();
+		if ( displayName ) {
+			return displayName;
+		}
+
+		if ( 'username' in user && typeof user.username === 'string' ) {
+			const username = user.username.trim();
+			if ( username ) {
+				return username;
+			}
+		}
+
+		return user.slug;
+	}, [] );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -52,14 +65,14 @@ function Dashboard() {
 		} );
 	};
 
-	let pageTitle = dashboardLabel;
+	let pageTitle: string = __( 'Dashboard' );
 	if ( editMode ) {
-		pageTitle = customizeDashboardLabel;
-	} else if ( displayName ) {
+		pageTitle = __( 'Customize Dashboard' );
+	} else if ( greetingName ) {
 		pageTitle = sprintf(
 			/* translators: %s: current user's display name. */
 			__( 'Howdy, %s' ),
-			displayName
+			greetingName
 		);
 	}
 
