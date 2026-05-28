@@ -29,7 +29,6 @@ const {
 	getSelectedBlockClientId,
 	getSelectionType,
 	isSelectionRange,
-	isSelectionSet,
 	getBlockRootClientId,
 	getBlockHierarchyRootClientId,
 	getGlobalBlockCount,
@@ -1647,7 +1646,6 @@ describe( 'selectors', () => {
 
 			expect( getSelectionType( state ) ).toBe( 'range' );
 			expect( isSelectionRange( state ) ).toBe( true );
-			expect( isSelectionSet( state ) ).toBe( false );
 		} );
 
 		it( 'returns set selection type', () => {
@@ -1662,7 +1660,6 @@ describe( 'selectors', () => {
 
 			expect( getSelectionType( state ) ).toBe( 'set' );
 			expect( isSelectionRange( state ) ).toBe( false );
-			expect( isSelectionSet( state ) ).toBe( true );
 		} );
 	} );
 

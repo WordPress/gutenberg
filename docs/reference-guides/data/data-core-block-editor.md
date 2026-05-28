@@ -1217,18 +1217,6 @@ _Returns_
 
 -   `boolean`: Whether the selection is a range.
 
-### isSelectionSet
-
-Returns true if the current selection is a set selection.
-
-_Parameters_
-
--   _state_ `Object`: Block editor state.
-
-_Returns_
-
--   `boolean`: Whether the selection is a set.
-
 ### isTyping
 
 Returns true if the user is typing, or false otherwise.

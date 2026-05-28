@@ -478,17 +478,6 @@ export function isSelectionRange( state ) {
 }
 
 /**
- * Returns true if the current selection is a set selection.
- *
- * @param {Object} state Block editor state.
- *
- * @return {boolean} Whether the selection is a set.
- */
-export function isSelectionSet( state ) {
-	return getSelectionType( state ) === 'set';
-}
-
-/**
  * Returns the current block selection start. This value may be null, and it
  * may represent either a singular block selection or multi-selection start.
  * A selection is singular if its start and end match.
@@ -859,7 +848,7 @@ function getSelectionNestingAncestor( state ) {
  */
 export const getSelectedBlockClientIds = createSelector(
 	( state ) => {
-		if ( isSelectionSet( state ) ) {
+		if ( getSelectionType( state ) === 'set' ) {
 			return state.selection.selectionClientIds || EMPTY_ARRAY;
 		}
 
@@ -918,7 +907,7 @@ export const getSelectedBlockClientIds = createSelector(
  * @return {boolean} Whether the selection is contiguous.
  */
 export function isSelectionContiguous( state ) {
-	if ( ! isSelectionSet( state ) ) {
+	if ( getSelectionType( state ) !== 'set' ) {
 		return true;
 	}
 
@@ -958,7 +947,7 @@ export function isSelectionContiguous( state ) {
  * @return {Array} Multi-selected block client IDs.
  */
 export function getMultiSelectedBlockClientIds( state ) {
-	if ( isSelectionSet( state ) ) {
+	if ( getSelectionType( state ) === 'set' ) {
 		const selectedClientIds = getSelectedBlockClientIds( state );
 		return selectedClientIds.length > 1 ? selectedClientIds : EMPTY_ARRAY;
 	}
@@ -1185,7 +1174,7 @@ export function __unstableSelectionHasUnmergeableBlock( state ) {
  * @return {boolean} Whether the selection is mergeable.
  */
 export function __unstableIsSelectionMergeable( state, isForward ) {
-	if ( isSelectionSet( state ) ) {
+	if ( getSelectionType( state ) === 'set' ) {
 		return false;
 	}
 
@@ -1274,7 +1263,7 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
  * @return {Object[]} Updated partial selected blocks.
  */
 export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
-	if ( isSelectionSet( state ) ) {
+	if ( getSelectionType( state ) === 'set' ) {
 		return EMPTY_ARRAY;
 	}
 
@@ -1509,7 +1498,7 @@ export function isBlockWithinSelection( state, clientId ) {
  * @return {boolean} Whether multi-selection has been made.
  */
 export function hasMultiSelection( state ) {
-	if ( isSelectionSet( state ) ) {
+	if ( getSelectionType( state ) === 'set' ) {
 		return getSelectedBlockClientIds( state ).length > 1;
 	}
 
