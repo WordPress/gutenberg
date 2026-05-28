@@ -902,12 +902,9 @@ export const getSelectedBlockClientIds = createSelector(
 	},
 	( state ) => [
 		state.blocks.order,
-<<<<<<< HEAD
 		state.blocks.parents,
-=======
 		state.selection.type,
 		state.selection.selectionClientIds,
->>>>>>> a793702fbd1 (Add set-based block multi-selection)
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -2109,6 +2106,12 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
+	if (
+		! hasBlockSupport( getBlockName( state, clientId ), 'removable', true )
+	) {
+		return false;
+	}
+
 	// Blocks within static inner content are fixed in place; a `lock`
 	// attribute can't override the structural constraint.
 	if (
@@ -2215,6 +2218,12 @@ export function canRemoveBlocks( state, clientIds ) {
 export function canMoveBlock( state, clientId ) {
 	// Disable moving in preview mode.
 	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
+	if (
+		! hasBlockSupport( getBlockName( state, clientId ), 'movable', true )
+	) {
 		return false;
 	}
 

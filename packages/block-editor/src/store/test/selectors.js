@@ -205,6 +205,18 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/test-structural-block', {
+			apiVersion: 3,
+			save: () => null,
+			category: 'text',
+			title: 'Test Structural Block',
+			supports: {
+				inserter: false,
+				movable: false,
+				removable: false,
+			},
+		} );
+
 		setFreeformContentHandlerName( 'core/freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
@@ -222,6 +234,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-requires-ancestor' );
 		unregisterBlockType( 'core/test-block-requires-ancestor-parent' );
 		unregisterBlockType( 'core/test-content-block' );
+		unregisterBlockType( 'core/test-structural-block' );
 
 		setFreeformContentHandlerName( undefined );
 	} );
@@ -4917,6 +4930,31 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'canRemoveBlock', () => {
+		it( 'prevents removal when the block does not support removal', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block: { name: 'core/test-structural-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block: {},
+						} )
+					),
+					parents: new Map( [ [ 'block', '' ] ] ),
+					order: new Map( [ [ '', [ 'block' ] ] ] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				derivedBlockEditingModes: new Map(),
+			};
+
+			expect( canRemoveBlock( state, 'block' ) ).toBe( false );
+		} );
+
 		it( 'allows removal from a non-section contentOnly container', () => {
 			// When the parent has contentOnly editing mode but is NOT
 			// within a section, the contentOnly removal restriction
@@ -5210,6 +5248,31 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'canMoveBlock', () => {
+		it( 'prevents moving when the block does not support moving', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							block: { name: 'core/test-structural-block' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							block: {},
+						} )
+					),
+					parents: new Map( [ [ 'block', '' ] ] ),
+					order: new Map( [ [ '', [ 'block' ] ] ] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				derivedBlockEditingModes: new Map(),
+			};
+
+			expect( canMoveBlock( state, 'block' ) ).toBe( false );
+		} );
+
 		it( 'allows moving within a non-section contentOnly container', () => {
 			// When the parent has contentOnly editing mode but is NOT
 			// within a section, the contentOnly move restriction does
