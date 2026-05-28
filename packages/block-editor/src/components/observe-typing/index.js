@@ -141,11 +141,13 @@ export function useTypingObserver() {
 					// before the keydown event, wait until after current stack
 					// before evaluating whether typing is to be stopped. Otherwise,
 					// typing will re-start.
-					timerId = node.ownerDocument.defaultView.setTimeout( () => {
-						if ( ! isTextField( target ) ) {
-							stopTyping();
+					timerId = node.ownerDocument.defaultView?.setTimeout(
+						() => {
+							if ( ! isTextField( target ) ) {
+								stopTyping();
+							}
 						}
-					} );
+					);
 				}
 
 				/**
@@ -169,8 +171,8 @@ export function useTypingObserver() {
 				 */
 				function stopTypingOnSelectionUncollapse() {
 					const selection =
-						node.ownerDocument.defaultView.getSelection();
-					if ( ! selection.isCollapsed ) {
+						node.ownerDocument.defaultView?.getSelection();
+					if ( selection && ! selection.isCollapsed ) {
 						stopTyping();
 					}
 				}
@@ -184,7 +186,7 @@ export function useTypingObserver() {
 				);
 
 				return () => {
-					node.ownerDocument.defaultView.clearTimeout( timerId );
+					node.ownerDocument.defaultView?.clearTimeout( timerId );
 					node.removeEventListener(
 						'focus',
 						stopTypingOnNonTextField

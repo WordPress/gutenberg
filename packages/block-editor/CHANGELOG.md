@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useTypingObserver`: Guard `node.ownerDocument.defaultView` accesses with optional chaining so that ref cleanup no longer throws when the iframe-hosted editor is unmounted mid-typing and the iframe's `defaultView` has already been detached (the throw was also leaking the `removeEventListener` calls that follow it).
+
 ## 15.21.0 (2026-06-10)
 
 ### Code Quality
