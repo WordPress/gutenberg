@@ -2,7 +2,7 @@
  * Widget type definitions.
  *
  * Canonical home for widget identity types consumed by the registry,
- * surfaces that render widgets, and tools that author them
+ * hosts that render widgets, and tools that author them
  * (`@wordpress/build`, schema validators, IDE autocomplete).
  *
  * Each type is generic over the widget's attribute object (`Item`) so a
@@ -35,7 +35,7 @@ export type WidgetName = `${ string }/${ string }`;
  * (`render.*`, `widget.*`, `render.scss`), not declared here.
  *
  * Consumed by tooling (IDE autocomplete, validation, the build pipeline).
- * Surfaces that render widgets consume the richer `WidgetType` below,
+ * Hosts that render widgets consume the richer `WidgetType` below,
  * which extends this shape with runtime-only fields produced by the
  * build manifest.
  */
@@ -106,7 +106,7 @@ export interface WidgetTypeMetadata< Item = unknown > {
 
 	/**
 	 * Declarative attribute schema, bound to the widget's attribute
-	 * object via `Item`. Surfaces render forms straight from this list
+	 * object via `Item`. Hosts render forms straight from this list
 	 * via `DataForm`, with no per-widget form wiring.
 	 */
 	attributes?: Field< Item >[];
@@ -122,7 +122,7 @@ export interface WidgetTypeMetadata< Item = unknown > {
 }
 
 /**
- * Runtime widget type consumed by surfaces.
+ * Runtime widget type consumed by hosts.
  *
  * Extends `WidgetTypeMetadata` (the authoring shape of `widget.json`) with
  * runtime-only fields produced by the build pipeline. Notably
@@ -144,7 +144,7 @@ export interface WidgetType< Item = unknown >
 }
 
 /**
- * Props passed to a widget's render component by the consuming surface.
+ * Props passed to a widget's render component by the consuming host.
  *
  * Bound over `Item` so the destructured `attributes` and any
  * `setAttributes` payload are typed against the widget's attribute
@@ -158,7 +158,7 @@ export interface WidgetRenderProps< Item = unknown > {
 
 	/**
 	 * Updates the attributes of this instance. Optional because some
-	 * surfaces render widgets in read-only contexts.
+	 * hosts render widgets in read-only contexts.
 	 */
 	setAttributes?: ( next: Partial< Item > ) => void;
 }

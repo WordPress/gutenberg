@@ -34,7 +34,7 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
  * accumulate changes on top of pending layout edits, and vice versa.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
- * so surfaces that don't expose edit mode can keep `Actions` in their
+ * so hosts that don't expose edit mode can keep `Actions` in their
  * tree unconditionally.
  *
  * @return {React.ReactNode} - The Actions component.
