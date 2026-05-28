@@ -529,4 +529,185 @@ describe( 'validateValueFromSchema', () => {
 			);
 		} );
 	} );
+
+	describe( 'WordPress-specific schema keywords', () => {
+		// AJV's strict mode rejects keywords it doesn't recognize at
+		// compile time, so any WordPress-specific keyword leaking into a
+		// client schema fails the whole validation rather than being
+		// ignored.
+		it( 'should fail compilation when schema contains sanitize_callback', () => {
+			const schema = {
+				type: 'string',
+				sanitize_callback: 'sanitize_text_field',
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'should fail compilation when schema contains validate_callback', () => {
+			const schema = {
+				type: 'string',
+				validate_callback: 'rest_validate_request_arg',
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'should fail compilation when schema contains arg_options', () => {
+			const schema = {
+				type: 'string',
+				arg_options: { sanitize_callback: 'sanitize_key' },
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'should fail compilation when a nested property uses sanitize_callback', () => {
+			const schema = {
+				type: 'object',
+				properties: {
+					name: {
+						type: 'string',
+						sanitize_callback: 'sanitize_text_field',
+					},
+				},
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( { name: 'hello' }, schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		// `example` (OpenAPI / WordPress REST docs) and `examples`
+		// (JSON Schema draft-06+) are not part of draft-04.
+		it( 'should fail compilation when schema contains `example`', () => {
+			const schema = {
+				type: 'string',
+				example: 'an example value',
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'should fail compilation when schema contains `examples`', () => {
+			const schema = {
+				type: 'string',
+				examples: [ 'first', 'second' ],
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		// WordPress REST argument definitions mark a per-arg `required`
+		// flag as a boolean, whereas JSON Schema expects `required` to be
+		// an array of property names on the parent object.
+		it( 'should fail compilation when `required` is a boolean', () => {
+			const schema = {
+				type: 'string',
+				required: true,
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( 'hello', schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'should fail compilation when a nested property has `required: true`', () => {
+			const schema = {
+				type: 'object',
+				properties: {
+					name: {
+						type: 'string',
+						required: true,
+					},
+				},
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( { name: 'hello' }, schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+	} );
 } );
