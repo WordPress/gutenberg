@@ -91,6 +91,7 @@
 // they're close enough that the offset is imperceptible.
 .media-editor-modal__footer-row {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: $grid-unit-20;
 
