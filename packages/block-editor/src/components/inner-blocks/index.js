@@ -45,44 +45,18 @@ const BlockListItemsMemo = memo( BlockListItems );
 function UncontrolledInnerBlocks( props ) {
 	const {
 		clientId,
-		allowedBlocks,
-		prioritizedInserterBlocks,
-		defaultBlock,
-		directInsert,
-		__experimentalDefaultBlock,
-		__experimentalDirectInsert,
 		template,
 		templateLock,
 		wrapperRef,
 		templateInsertUpdatesSelection,
-		__experimentalCaptureToolbars: captureToolbars,
 		__experimentalAppenderTagName,
 		renderAppender,
-		orientation,
 		placeholder,
 		layout,
 		name,
 		blockType,
-		parentLock,
 		defaultLayout,
-		onMultiSelect,
 	} = props;
-
-	useNestedSettingsUpdate(
-		clientId,
-		parentLock,
-		allowedBlocks,
-		prioritizedInserterBlocks,
-		defaultBlock,
-		directInsert,
-		__experimentalDefaultBlock,
-		__experimentalDirectInsert,
-		templateLock,
-		captureToolbars,
-		orientation,
-		layout,
-		onMultiSelect
-	);
 
 	useInnerBlockTemplateSync(
 		clientId,
@@ -257,6 +231,22 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		isDropZoneDisabled,
 		defaultLayout,
 	} = selected;
+
+	useNestedSettingsUpdate(
+		clientId,
+		parentLock,
+		options.allowedBlocks,
+		options.prioritizedInserterBlocks,
+		options.defaultBlock,
+		options.directInsert,
+		options.__experimentalDefaultBlock,
+		options.__experimentalDirectInsert,
+		options.templateLock,
+		options.__experimentalCaptureToolbars ?? __experimentalCaptureToolbars,
+		options.orientation,
+		layout,
+		options.onMultiSelect
+	);
 
 	const blockDropZoneRef = useBlockDropZone( {
 		dropZoneElement,
