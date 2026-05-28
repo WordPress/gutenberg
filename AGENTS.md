@@ -5,12 +5,14 @@
 ```bash
 # Setup
 npm install && composer install
-npm run wp-env status   # Always check status first
-npm run wp-env start    # Only start if not already running
+npm run wp-env status      # Always check status first.
+npm run wp-env start       # Only start if not already running.
+npm run wp-env-test status # Status of test environment. Always check first.
+npm run wp-env-test start  # Start the test env, only start if not already running.
 
 # Development
-npm start               # Development with watch
-npm run build          # Production build
+npm start     # Development with watch
+npm run build # Production build
 ```
 
 ### Key Directories
@@ -28,7 +30,7 @@ npm run build          # Production build
 
 ## Testing instructions
 
-> **Note**: PHP/E2E tests require wp-env running.
+> **Note**: PHP/E2E tests require `wp-env-test` running.
 
 ```bash
 # JavaScript
@@ -37,12 +39,12 @@ npm run test:unit         # Unit tests
 npm run test:unit -- --testNamePattern="<TestName>"  # Specific test
 npm run test:unit <path_to_test_directory>
 
-# PHP (requires wp-env)
+# PHP (requires wp-env-test)
 composer test             # All PHP tests
 vendor/bin/phpunit <path_to_test_file.php>  # Specific file
 vendor/bin/phpunit <path_to_test_directory>/              # Directory
 
-# E2E (requires wp-env)
+# E2E (requires wp-env-test)
 npm run test:e2e
 npm run test:e2e -- <path_to_test_file.spec.js>  # Specific test file
 npm run test:e2e -- --headed                   # Run with browser visible
@@ -72,8 +74,10 @@ For full architecture details, see `docs/explanations/architecture/`.
 -   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
 -   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
+-   Avoid adding new APIs prefixed with `__experimental` or `__unstable`. This pattern is now not used. Instead use private APIs or in bundled packages regular exports.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
 -   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
+-   Never run `npx prettier`. WordPress uses its own fork of prettier, `wp-prettier`. Use npm scripts (e.g. `npm run format`) commands to format code instead.
 
 ## PR instructions
 

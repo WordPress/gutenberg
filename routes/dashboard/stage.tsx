@@ -14,7 +14,7 @@ import { store as viewportStore } from '@wordpress/viewport';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
-import { useWidgetTypes } from './widget-types';
+import { useWidgetTypes } from './widget-primitives';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
@@ -23,7 +23,7 @@ function Dashboard() {
 
 	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
-	const widgetTypes = useWidgetTypes();
+	const [ widgetTypes, isResolving ] = useWidgetTypes();
 
 	const [ editMode, setEditMode ] = useState( false );
 
@@ -51,6 +51,7 @@ function Dashboard() {
 	return (
 		<WidgetDashboard
 			widgetTypes={ widgetTypes }
+			isResolvingWidgetTypes={ isResolving }
 			layout={ layout }
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
