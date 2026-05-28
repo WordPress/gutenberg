@@ -821,6 +821,65 @@ describe( 'actions', () => {
 			} );
 		} );
 
+		it( 'should remove blockA and focus blockB if blockA has a merge function but empty content', () => {
+			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
+				attributes: {
+					content: {
+						type: 'rich-text',
+						role: 'content',
+					},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							( attributes.content || '' ) +
+							( attributesToMerge.content || '' ),
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			// blockA is empty (no content attribute set).
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: {},
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getBlockEditingMode: () => 'default',
+				isBlockSelected: () => true,
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				selectBlock: jest.fn(),
+				removeBlock: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			// Should remove the empty blockA without selecting previous.
+			expect( dispatch.removeBlock ).toHaveBeenCalledWith(
+				'chicken',
+				false
+			);
+			// Should focus blockB so it remains unchanged.
+			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'ribs' );
+		} );
+
 		it( 'should only focus the blockA if the blockA has no merge function and the content of blockB is modified', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
