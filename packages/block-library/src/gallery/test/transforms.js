@@ -90,7 +90,7 @@ describe( 'transforms', () => {
 			name: 'core/group',
 			attributes: {
 				align: 'wide',
-				layout: { type: 'grid' },
+				layout: { type: 'grid', columnCount: 2 },
 			},
 		} );
 		expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
@@ -127,5 +127,29 @@ describe( 'transforms', () => {
 		expect( transformedBlocks[ 0 ].innerBlocks[ 1 ].clientId ).not.toBe(
 			secondImage.clientId
 		);
+	} );
+
+	it( 'transforms Gallery to the Grid variation of Group with the default gallery column count', () => {
+		const block = createBlock( 'core/gallery', {}, [
+			createBlock( 'core/image', {
+				url: 'https://example.com/one.jpg',
+			} ),
+			createBlock( 'core/image', {
+				url: 'https://example.com/two.jpg',
+			} ),
+		] );
+
+		const transformedBlocks = switchToBlockType(
+			block,
+			'core/group',
+			'group-grid'
+		);
+
+		expect( transformedBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/group',
+			attributes: {
+				layout: { type: 'grid', columnCount: 2 },
+			},
+		} );
 	} );
 } );

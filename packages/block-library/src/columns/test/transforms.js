@@ -78,7 +78,7 @@ describe( 'transforms', () => {
 			name: 'core/group',
 			attributes: {
 				align: 'wide',
-				layout: { type: 'grid' },
+				layout: { type: 'grid', columnCount: 2 },
 			},
 		} );
 		expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
@@ -106,5 +106,59 @@ describe( 'transforms', () => {
 				} ),
 			],
 		} );
+	} );
+
+	it( 'transforms Grid variation of Group to Columns using the explicit grid column count', () => {
+		const block = createBlock(
+			'core/group',
+			{
+				align: 'wide',
+				layout: { type: 'grid', columnCount: 3 },
+			},
+			[
+				createBlock( 'core/paragraph', { content: 'One' } ),
+				createBlock( 'core/paragraph', { content: 'Two' } ),
+			]
+		);
+
+		const transformedBlocks = switchToBlockType( block, 'core/columns' );
+
+		expect( transformedBlocks[ 0 ] ).toMatchObject( {
+			name: 'core/columns',
+			attributes: {
+				align: 'wide',
+			},
+		} );
+		expect( transformedBlocks[ 0 ].attributes ).not.toHaveProperty(
+			'layout'
+		);
+		expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 3 );
+		expect( transformedBlocks[ 0 ].innerBlocks ).toEqual( [
+			expect.objectContaining( {
+				name: 'core/column',
+				attributes: { width: '33.33%' },
+				innerBlocks: [
+					expect.objectContaining( {
+						name: 'core/paragraph',
+						attributes: { content: 'One' },
+					} ),
+				],
+			} ),
+			expect.objectContaining( {
+				name: 'core/column',
+				attributes: { width: '33.33%' },
+				innerBlocks: [
+					expect.objectContaining( {
+						name: 'core/paragraph',
+						attributes: { content: 'Two' },
+					} ),
+				],
+			} ),
+			expect.objectContaining( {
+				name: 'core/column',
+				attributes: { width: '33.33%' },
+				innerBlocks: [],
+			} ),
+		] );
 	} );
 } );

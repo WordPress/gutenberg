@@ -8,6 +8,23 @@ import {
 
 const MAXIMUM_SELECTED_BLOCKS = 6;
 
+const getColumnBlocksFromGrid = ( innerBlocks, columnCount ) => {
+	const columnWidth = +( 100 / columnCount ).toFixed( 2 );
+	const innerBlocksTemplate = Array.from(
+		{ length: columnCount },
+		( _, columnIndex ) => [
+			'core/column',
+			{ width: `${ columnWidth }%` },
+			innerBlocks.filter(
+				( _innerBlock, blockIndex ) =>
+					blockIndex % columnCount === columnIndex
+			),
+		]
+	);
+
+	return createBlocksFromInnerBlocksTemplate( innerBlocksTemplate );
+};
+
 const getGridInnerBlocks = ( innerBlocks ) =>
 	innerBlocks.flatMap( ( column ) => {
 		const columnInnerBlocks = column.innerBlocks || [];
@@ -25,6 +42,25 @@ const getGridInnerBlocks = ( innerBlocks ) =>
 
 const transforms = {
 	from: [
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			priority: 1,
+			transform: ( attributes, innerBlocks ) => {
+				const { layout, ...rest } = attributes;
+				const { columnCount } = layout;
+
+				return createBlock(
+					'core/columns',
+					rest,
+					getColumnBlocksFromGrid( innerBlocks, columnCount )
+				);
+			},
+			isMatch: ( { layout } ) =>
+				layout?.type === 'grid' &&
+				Number.isInteger( layout?.columnCount ) &&
+				layout.columnCount > 0,
+		},
 		{
 			type: 'block',
 			isMultiBlock: true,
@@ -126,13 +162,17 @@ const transforms = {
 			blocks: [ 'core/group' ],
 			variationName: 'group-grid',
 			transform: ( attributes, innerBlocks ) => {
+				const columnCount = innerBlocks.length;
 				return createBlock(
 					'core/group',
 					{
 						...attributes,
 						isStackedOnMobile: undefined,
 						verticalAlignment: undefined,
-						layout: { type: 'grid' },
+						layout: {
+							type: 'grid',
+							...( columnCount && { columnCount } ),
+						},
 					},
 					getGridInnerBlocks( innerBlocks )
 				);

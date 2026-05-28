@@ -13,6 +13,7 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
+import { defaultColumnsNumber } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -296,7 +297,12 @@ const transforms = {
 					'core/group',
 					{
 						...rest,
-						layout: { type: 'grid' },
+						layout: {
+							type: 'grid',
+							columnCount:
+								columns ??
+								defaultColumnsNumber( innerBlocks.length ),
+						},
 					},
 					cloneInnerBlocks( innerBlocks )
 				);
