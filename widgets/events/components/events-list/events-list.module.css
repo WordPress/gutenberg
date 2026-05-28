@@ -1,8 +1,19 @@
 .root {
+	display: flex;
+	flex-direction: column;
 	flex: 1;
 	min-width: 0;
 	min-height: 0;
-	overflow: auto;
+	overflow: hidden;
+}
+
+.listArea {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
 }
 
 .eventIcon {
@@ -27,7 +38,8 @@
 }
 
 .eventNone {
-	padding-block: var(--wpds-dimension-padding-sm);
+	flex-shrink: 0;
+	padding-block: var(--wpds-dimension-padding-md);
 	padding-inline: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-fg-content-neutral-weak);
 }

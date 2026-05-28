@@ -295,19 +295,24 @@ export function EventsList( {
 
 	return (
 		<div className={ styles.root }>
-			<DataViews
-				data={ items }
-				fields={ fields }
-				view={ view }
-				onChangeView={ setView }
-				getItemId={ ( item ) => item.id }
-				isLoading={ isLoading }
-				paginationInfo={ { totalItems: items.length, totalPages: 1 } }
-				defaultLayouts={ DEFAULT_LAYOUTS }
-				empty={ empty }
-			>
-				<DataViews.Layout />
-			</DataViews>
+			<div className={ styles.listArea }>
+				<DataViews
+					data={ items }
+					fields={ fields }
+					view={ view }
+					onChangeView={ setView }
+					getItemId={ ( item ) => item.id }
+					isLoading={ isLoading }
+					paginationInfo={ {
+						totalItems: items.length,
+						totalPages: 1,
+					} }
+					defaultLayouts={ DEFAULT_LAYOUTS }
+					empty={ empty }
+				>
+					<DataViews.Layout />
+				</DataViews>
+			</div>
 			{ events.length > 0 && events.length <= 2 && (
 				<Text variant="body-sm" className={ styles.eventNone }>
 					{ createInterpolateElement(
