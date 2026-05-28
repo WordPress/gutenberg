@@ -5,10 +5,18 @@ const meta: Meta< typeof Select.Root > = {
 	title: 'Design System/Components/Form/Primitives/Select',
 	component: Select.Root,
 	subcomponents: {
-		Trigger: Select.Trigger,
-		Portal: Select.Portal,
-		Popup: Select.Popup,
-		Item: Select.Item,
+		'Select.Trigger': Select.Trigger,
+		'Select.Portal': Select.Portal,
+		'Select.Positioner': Select.Positioner,
+		'Select.Popup': Select.Popup,
+		'Select.Item': Select.Item,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;

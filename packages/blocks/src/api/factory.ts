@@ -442,7 +442,8 @@ export function getBlockTransforms(
 	// Validate that block type exists and has array of direction.
 	const blockType = normalizeBlockType( blockTypeOrName );
 	const { name: blockName, transforms } = blockType || {};
-	if ( ! transforms || ! Array.isArray( transforms[ direction ] ) ) {
+	const directionTransforms = transforms?.[ direction ];
+	if ( ! transforms || ! Array.isArray( directionTransforms ) ) {
 		return [];
 	}
 
@@ -450,7 +451,7 @@ export function getBlockTransforms(
 		transforms.supportedMobileTransforms &&
 		Array.isArray( transforms.supportedMobileTransforms );
 	const filteredTransforms = usingMobileTransformations
-		? transforms[ direction ].filter( ( t ) => {
+		? directionTransforms.filter( ( t ) => {
 				if ( t.type === 'raw' ) {
 					return true;
 				}
@@ -473,7 +474,7 @@ export function getBlockTransforms(
 					)
 				);
 		  } )
-		: transforms[ direction ];
+		: directionTransforms;
 
 	// Map transforms to normal form.
 	return filteredTransforms.map( ( transform ) => ( {

@@ -17,7 +17,7 @@
 		}
 
 		@media not (prefers-reduced-motion) {
-			transition: opacity 0.2s ease-out;
+			transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
 		}
 	}
 
@@ -60,14 +60,8 @@
 
 		@media not (prefers-reduced-motion) {
 			transition:
-				opacity 0.2s cubic-bezier(1, 0, 0.2, 1),
-				transform 0.2s cubic-bezier(1, 0, 0.2, 1);
-
-			&[data-open] {
-				transition:
-					opacity 0.2s cubic-bezier(0.29, 0, 0, 1),
-					transform 0.2s cubic-bezier(0.29, 0, 0, 1);
-			}
+				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive),
+				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive);
 		}
 
 		@media (min-width: 480px) {

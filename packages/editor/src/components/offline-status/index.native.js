@@ -11,7 +11,7 @@ import {
 	useNetworkConnectivity,
 	usePrevious,
 } from '@wordpress/compose';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { offline as offlineIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -90,7 +90,7 @@ const OfflineStatus = () => {
 			) }
 			style={ containerStyle }
 		>
-			<Icon fill={ iconStyle.fill } icon={ offlineIcon } />
+			<WCIcon fill={ iconStyle.fill } icon={ offlineIcon } />
 			<Text style={ textStyle }>{ __( 'Working Offline' ) } </Text>
 		</View>
 	) : null;

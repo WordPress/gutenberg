@@ -1,7 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { isRangeEqual } from '../../is-range-equal';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * Sometimes some browsers are not firing a `selectionchange` event when
@@ -44,10 +52,18 @@ export default () => ( element ) => {
 		range = getRange();
 	}
 
-	element.addEventListener( 'pointerdown', onDown );
-	element.addEventListener( 'keydown', onDown );
+	const unsubscribePointerDown = subscribeDelegatedListener(
+		element,
+		'pointerdown',
+		onDown
+	);
+	const unsubscribeKeyDown = subscribeDelegatedListener(
+		element,
+		'keydown',
+		onDown
+	);
 	return () => {
-		element.removeEventListener( 'pointerdown', onDown );
-		element.removeEventListener( 'keydown', onDown );
+		unsubscribePointerDown();
+		unsubscribeKeyDown();
 	};
 };

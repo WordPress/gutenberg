@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
-
-/**
- * Internal dependencies
- */
 import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
@@ -22,6 +15,7 @@ const config: Config = {
 		'./tokens/cursor.json',
 		'./tokens/dimension.json',
 		'./tokens/elevation.json',
+		'./tokens/motion.json',
 		'./tokens/typography.json',
 	],
 	outDir: './src/prebuilt',
@@ -70,27 +64,6 @@ const config: Config = {
 			baseSelector: ':root',
 			modeSelectors: [
 				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'compact',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'comfortable',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: '.',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='default']",
-					],
-				},
-				{
 					mode: 'high-dpi',
 					selectors: [
 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',
@@ -125,6 +98,16 @@ const config: Config = {
 					name: 'SurfaceWidthSize',
 					description: 'Size scale for surface width tokens.',
 					patterns: [ /^wpds-dimension\.surface-width\.([^.]+)$/ ],
+				},
+				{
+					name: 'DurationSize',
+					description: 'Size scale for duration tokens.',
+					patterns: [ /^wpds-motion\.duration\.([^.]+)$/ ],
+				},
+				{
+					name: 'Easing',
+					description: 'Easing curve variants.',
+					patterns: [ /^wpds-motion\.easing\.([^.]+)$/ ],
 				},
 				{
 					name: 'BorderRadiusSize',

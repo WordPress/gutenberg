@@ -11,16 +11,23 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 	 * Internal class representing a widget type.
 	 *
 	 * Holds the metadata for a widget discovered by the build pipeline. Stored
-	 * inside `WP_Widget_Type_Registry` once registered, and consumed by surface
+	 * inside `WP_Widget_Type_Registry` once registered, and consumed by host
 	 * code that needs to enumerate or look up widget types.
 	 *
 	 * The shape is intentionally minimal: identity (`name`) plus the
 	 * script-module handles the build pipeline produced for the widget.
-	 * Placement and surface concerns (which page or sidebar uses the widget)
+	 * Placement and host concerns (which page or sidebar uses the widget)
 	 * live with the consumer, not on the type definition.
 	 */
 	#[AllowDynamicProperties]
 	class WP_Widget_Type {
+
+		/**
+		 * Allowed values for the `presentation` field. Treated as the
+		 * single source of truth across the registry, REST schema, and
+		 * any consumer that needs to validate or enumerate the set.
+		 */
+		const PRESENTATION_VALUES = array( 'framed', 'content-bleed', 'full-bleed' );
 
 		/**
 		 * Widget type key. Namespaced identifier, e.g. `core/hello-world`.
@@ -48,6 +55,17 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		 * @var string|null
 		 */
 		public $widget_module = null;
+
+		/**
+		 * Authoring intent about how the widget wants to render. Static
+		 * and declarative; not a user-editable attribute.
+		 *
+		 * One of {@see self::PRESENTATION_VALUES} (first entry is the
+		 * default). Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $presentation = null;
 
 		/**
 		 * Constructor.

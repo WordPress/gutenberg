@@ -51,11 +51,6 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables a dedicated route-based media editor screen for editing media items (metadata and content).', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-media-editor-modal',
-					'label'       => __( 'Media Editor Modal', 'gutenberg' ),
-					'description' => __( 'Enables an in-place modal for image editing — cropping, adjustments, and metadata — opened from blocks like the image block without navigating away from the current post.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-dataviews-media-modal',
 					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
@@ -134,6 +129,11 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-admin-bar-in-editor',
+					'label'       => __( 'Toolbar in editor', 'gutenberg' ),
+					'description' => __( 'Shows the Toolbar in the fullscreen Post and Site Editor.', 'gutenberg' ),
 				),
 			),
 		),

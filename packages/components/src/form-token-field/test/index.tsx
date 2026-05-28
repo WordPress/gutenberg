@@ -1929,6 +1929,195 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expectTokensToBeInTheDocument( [ 'cherry', 'Cranberry' ] );
 		} );
+
+		it( 'should still preventDefault on Enter when validation rejects the value', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const onSubmitSpy = jest.fn( ( e: React.FormEvent ) =>
+				e.preventDefault()
+			);
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<form onSubmit={ onSubmitSpy }>
+					<FormTokenFieldWithState
+						onChange={ onChangeSpy }
+						__experimentalValidateInput={ startsWithCapitalLetter }
+					/>
+				</form>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type 'hello' — lowercase, fails validation.
+			// Press Enter — should NOT submit the parent form.
+			await user.type( input, 'hello[Enter]' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( onSubmitSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'hello' );
+		} );
+
+		it( 'should not preventDefault on space when validation fails and `tokenizeOnSpace` is true', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnSpace
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type 'hello ', lowercase, fails validation.
+			// The space should be typed into the input (not prevented), and
+			// the trailing space should be preserved by the rejoin so the
+			// user can keep typing past the failed-validation space.
+			await user.type( input, 'hello ' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'hello ' );
+
+			// User can keep typing past the failed-validation space.
+			await user.type( input, 'w' );
+			expect( input ).toHaveValue( 'hello w' );
+
+			// Clear and type 'Hello ', capital letter, passes validation.
+			// The space should be prevented, and a token should be created.
+			await user.clear( input );
+			await user.type( input, 'Hello ' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Hello' ] );
+			expectTokensToBeInTheDocument( [ 'Hello' ] );
+		} );
+
+		it( 'should filter out invalid tokens when pasting with separators', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Paste values separated by comma, only valid ones should be added.
+			// Uses paste (not type) because comma keystrokes go through
+			// handleCommaKey, while pasted text goes through
+			// onInputChangeHandler which splits by separator.
+			await user.click( input );
+			await user.paste( 'Apple,banana,Cherry,' );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expectTokensNotToBeInTheDocument( [ 'banana' ] );
+			expect( input ).toHaveValue( 'banana,' );
+		} );
+
+		it( 'should leave all segments in the input when none pass validation on paste', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'apple,banana,cherry,' );
+
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'apple,banana,cherry,' );
+		} );
+
+		it( 'should commit a trailing valid segment and leave only failed segments in the input when pasting without a trailing separator', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,banana,Cherry' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( 'banana' );
+		} );
+
+		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'Apple' ] }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,Cherry,' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( '' );
+		} );
+
+		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values with `__experimentalValidateInput`', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'Apple' ] }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,Cherry,' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( '' );
+		} );
 	} );
 
 	describe( 'maxLength', () => {

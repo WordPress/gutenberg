@@ -24,23 +24,18 @@ The iframed post editor will make life easier for block and theme authors by red
 
 While most editors, including the template editor, already work as iframes, for backward compatibility, the current post editor only works as an iframe when the following conditions are met (determined by [the useShouldIframe hook](https://github.com/WordPress/gutenberg/blob/cd4fae71551e0ebf27472da1d7bbdfce91a131ec/packages/edit-post/src/components/layout/use-should-iframe.js#L16)):
 
-- **If the Gutenberg plugin is enabled:**: The active theme is a block-based theme OR all registered blocks have `apiVersion` 3 or higher
-- **If the Gutenberg plugin is not enabled:**: All registered blocks have `apiVersion` 3 or higher
+- **If the Gutenberg plugin is enabled:** The active theme is a block-based theme OR all registered blocks have `apiVersion` 3 or higher
+- **If the Gutenberg plugin is not enabled:** All blocks present in the post content have `apiVersion` 3 or higher
 
 In summary, if you haven't been able to fully test your blocks in the iframe editor yet, by maintaining `apiVersion` 2, you can prevent the post editor from working as an iframe in most cases. Once you've confirmed that your blocks work in the iframe editor, you can then migrate to `apiVersion` 3.
 
 ### When will the post editor work as an iframe?
 
-**In WordPress 7.0, the post editor is planned to always work as an iframe, regardless of the `apiVersion` of registered blocks**.
+**In WordPress 7.1, the post editor is planned to always work as an iframe, regardless of the `apiVersion` of registered blocks**.
 
-Ahead of this, to encourage developers to test in the iframe editor, WordPress 6.9 introduces the following developer warnings and schema changes:
+Ahead of this, to encourage developers to test in the iframe editor, WordPress 6.9 introduces a browser console warning when blocks are registered with `apiVersion` 2 or lower, and updates the [block.json schema](https://github.com/WordPress/gutenberg/blob/trunk/schemas/json/block.json) to only allow `apiVersion: 3`. For details, see [Preparing the post editor for full iframe integration](https://make.wordpress.org/core/2025/11/12/preparing-the-post-editor-for-full-iframe-integration/).
 
--   **Browser console warnings**: When blocks are registered with `apiVersion` 2 or lower, WordPress displays the following message in the browser console:
-  ```
-  Block with API version 2 or lower is deprecated since version 6.9. See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/
-	Note: The block "my-plugin/my-block" is registered with API version 2. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.
-  ```
--   **block.json schema update**: The [block.json schema](https://github.com/WordPress/gutenberg/blob/trunk/schemas/json/block.json) has been updated to only allow `apiVersion: 3` for new or updated blocks. Older versions (`1` or `2`) will no longer pass schema validation.
+In WordPress 7.0, the iframe condition is evaluated against the `apiVersion` of *blocks actually inserted in the post content*, instead of *all registered blocks*. The iframe is still not enforced: if a block with `apiVersion` 2 or lower is in the content, the post editor falls back to a non-iframe editor. For details, see [Iframed editor changes in WordPress 7.0](https://make.wordpress.org/core/2026/02/24/iframed-editor-changes-in-wordpress-7-0/).
 
 ## How to test your blocks in the iframe post editor
 
@@ -183,3 +178,49 @@ export default function Edit() {
 	);
 }
 ```
+
+### Patching a library
+
+When an external library references the global `document` or `window` and you cannot wait for an upstream fix, you can apply your own patch to make it iframe compatible. The following steps use [patch-package](https://www.npmjs.com/package/patch-package) to keep the patch under version control (assuming npm):
+
+1. Edit the library's code directly in `node_modules` to make it work, replacing global `document` / `window` references with `ownerDocument` / `defaultView` derived from the block's element. For example, for `@panzoom/panzoom`, edit `node_modules/@panzoom/panzoom/dist/panzoom.es.js`.
+2. Install `patch-package`:
+    ```bash
+    npm add -D patch-package
+    ```
+3. Generate the patch for the library:
+    ```bash
+    npx patch-package @panzoom/panzoom
+    ```
+4. Add a `postinstall` script to your `package.json` so the patch is applied automatically after every install:
+    ```json
+    "scripts": {
+        "postinstall": "patch-package"
+    }
+    ```
+5. Commit the generated `.patch` file (in the `patches` directory) and the updated `package.json` to version control.
+
+The patch typically replaces global references with the element's `ownerDocument`. For example, the patch for `@panzoom/panzoom` looks like this:
+
+```diff
+ function isAttached(node) {
++    var { ownerDocument } = node;
+     var currentNode = node;
+     while (currentNode && currentNode.parentNode) {
+-        if (currentNode.parentNode === document)
++        if (currentNode.parentNode === ownerDocument)
+             return true;
+         currentNode =
+             currentNode.parentNode instanceof ShadowRoot
+@@ function Panzoom(elem, options) {
+         bound = true;
++        var { ownerDocument } = elem;
+         onPointer('down', options.canvas ? parent : elem, handleDown);
+-        onPointer('move', document, handleMove, { passive: true });
+-        onPointer('up', document, handleUp, { passive: true });
++        onPointer('move', ownerDocument, handleMove, { passive: true });
++        onPointer('up', ownerDocument, handleUp, { passive: true });
+     }
+```
+
+Even when patching works, prefer submitting an upstream issue or PR so the library supports iframe environments natively.

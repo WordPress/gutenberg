@@ -23,6 +23,12 @@ import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -69,8 +75,10 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
-	const isEnabled = useHasDimensionsPanel( settings );
-	const value = useSelect(
+	const selectedState = useBlockStyleState();
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
+	const isEnabled = useHasDimensionsPanel( settings, selectedState );
+	const style = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
@@ -81,13 +89,21 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		},
 		[ clientId, isEnabled ]
 	);
-
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const onChange = ( newStyle ) => {
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
+	const value = isStateSelected
+		? getStyleForState( style, selectedState )
+		: style;
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				setAttributes( {
+					style: cleanEmptyObject( newStyle ),
+				} );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;
@@ -119,9 +135,13 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
-				onVisualize={ setVisualizedProperty }
+				styleState={ selectedState }
+				onVisualize={
+					isStateSelected ? undefined : setVisualizedProperty
+				}
 			/>
-			{ !! settings?.spacing?.padding &&
+			{ ! isStateSelected &&
+				!! settings?.spacing?.padding &&
 				visualizedProperty === 'padding' && (
 					<PaddingVisualizer
 						forceShow={ visualizedProperty === 'padding' }
@@ -129,7 +149,8 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 						value={ value }
 					/>
 				) }
-			{ !! settings?.spacing?.margin &&
+			{ ! isStateSelected &&
+				!! settings?.spacing?.margin &&
 				visualizedProperty === 'margin' && (
 					<MarginVisualizer
 						forceShow={ visualizedProperty === 'margin' }

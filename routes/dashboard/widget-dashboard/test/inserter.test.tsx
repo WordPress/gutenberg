@@ -78,32 +78,38 @@ function Harness( {
 }
 
 describe( 'WidgetDashboard.Inserter', () => {
-	it( 'is hidden until the "Add widgets" trigger is clicked', () => {
+	it( 'is hidden until the "Add widget" trigger is clicked', () => {
 		render( <Harness /> );
-		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Add widget' } )
+		).not.toBeInTheDocument();
 	} );
 
-	it( 'opens after clicking the "Add widgets" trigger', async () => {
+	it( 'opens after clicking the "Add widget" trigger', async () => {
 		const user = userEvent.setup();
 		render( <Harness /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect(
+			await screen.findByRole( 'dialog', { name: 'Add widget' } )
+		).toBeInTheDocument();
 	} );
 
-	it( 'inserts the selected widget type into the layout and closes', async () => {
+	it( 'inserts the selected widget type into the layout on Done', async () => {
 		const user = userEvent.setup();
 		const onLayoutChange = jest.fn();
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		const options = within( dialog ).getAllByRole( 'option' );
 		expect( options ).toHaveLength( widgetTypes.length );
 
@@ -111,6 +117,17 @@ describe( 'WidgetDashboard.Inserter', () => {
 		await user.click(
 			within( dialog ).getByRole( 'button', { name: 'Select' } )
 		);
+
+		// Inserts stay in staging until Done.
+		expect( onLayoutChange ).not.toHaveBeenCalled();
+
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'dialog', { name: 'Add widget' } )
+			).not.toBeInTheDocument()
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
 
 		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
 		const [ updated ] = onLayoutChange.mock.calls[ 0 ];
@@ -120,10 +137,6 @@ describe( 'WidgetDashboard.Inserter', () => {
 			attributes: { label: 'welcome-example' },
 		} );
 		expect( updated[ 0 ].uuid ).toEqual( expect.any( String ) );
-
-		await waitFor( () =>
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
-		);
 	} );
 
 	it( 'inserts multiple widgets via multi-select in a single layout change', async () => {
@@ -132,10 +145,12 @@ describe( 'WidgetDashboard.Inserter', () => {
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		const options = within( dialog ).getAllByRole( 'option' );
 
 		await user.click( options[ 0 ] );
@@ -144,6 +159,8 @@ describe( 'WidgetDashboard.Inserter', () => {
 		await user.click(
 			within( dialog ).getByRole( 'button', { name: 'Select' } )
 		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
 
 		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
 		const [ updated ] = onLayoutChange.mock.calls[ 0 ];
@@ -172,14 +189,18 @@ describe( 'WidgetDashboard.Inserter', () => {
 		);
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		await user.click( within( dialog ).getAllByRole( 'option' )[ 1 ] );
 		await user.click(
 			within( dialog ).getByRole( 'button', { name: 'Select' } )
 		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
 
 		const [ updated ] = onLayoutChange.mock.calls[ 0 ];
 		expect( updated ).toHaveLength( 2 );

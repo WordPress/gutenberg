@@ -4,9 +4,10 @@
 import { Button } from '@wordpress/components';
 import { DataViews, type Field, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
-import { useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useNavigate } from '@wordpress/route';
+import { useNavigate, useSearch } from '@wordpress/route';
+import { useView } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -17,6 +18,7 @@ import deleteTaxonomyAction from './actions/delete';
 import duplicateTaxonomyAction from './actions/duplicate';
 import viewTermsAction from './actions/view-terms';
 import {
+	countField,
 	hierarchicalField,
 	publicField,
 	useObjectTypeField,
@@ -37,14 +39,37 @@ const DEFAULT_VIEW: View = {
 	type: 'table',
 	perPage: 20,
 	page: 1,
-	fields: [ 'object_type', 'status', 'public' ],
+	fields: [ 'object_type', 'count', 'status' ],
 	titleField: 'title',
-	layout: {},
+	layout: {
+		styles: {
+			object_type: { minWidth: 230 },
+		},
+	},
 };
 
 export function TaxonomiesList() {
 	const navigate = useNavigate();
-	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const searchParams = useSearch( { from: TAXONOMIES_PATH } );
+	const handleQueryParamsChange = useCallback(
+		( params: { page?: number; search?: string } ) => {
+			navigate( {
+				search: {
+					...searchParams,
+					...params,
+				},
+			} );
+		},
+		[ searchParams, navigate ]
+	);
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: TAXONOMY_ENTITY,
+		slug: 'default',
+		defaultView: DEFAULT_VIEW,
+		queryParams: searchParams,
+		onChangeQueryParams: handleQueryParamsChange,
+	} );
 	const editAction = useEditTaxonomyAction();
 	const taxonomyActions = useMemo(
 		() => [
@@ -65,6 +90,7 @@ export function TaxonomiesList() {
 			[
 				titleField,
 				objectTypeField,
+				countField,
 				statusField,
 				publicField,
 				slugField,
@@ -113,7 +139,8 @@ export function TaxonomiesList() {
 			fields={ fields }
 			actions={ taxonomyActions }
 			view={ view }
-			onChangeView={ setView }
+			onChangeView={ updateView }
+			onReset={ isModified ? resetToDefault : false }
 			isLoading={ isResolving || ! hasResolved }
 			paginationInfo={ paginationInfo }
 			defaultLayouts={ defaultLayouts }

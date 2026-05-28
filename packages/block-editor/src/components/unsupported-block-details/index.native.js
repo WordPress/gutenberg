@@ -6,7 +6,11 @@ import { View, Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, Icon, TextControl } from '@wordpress/components';
+import {
+	BottomSheet,
+	Icon as WCIcon,
+	TextControl,
+} from '@wordpress/components';
 import {
 	requestUnsupportedBlockFallback,
 	sendActionButtonPressedAction,
@@ -148,7 +152,7 @@ const UnsupportedBlockDetails = ( {
 			} }
 		>
 			<View style={ styles[ 'unsupported-block-details__container' ] }>
-				<Icon
+				<WCIcon
 					icon={ icon || help }
 					color={ iconStyle.color }
 					size={ iconStyle.size }
