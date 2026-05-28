@@ -177,7 +177,7 @@ function block_core_image_get_lightbox_settings( $block ) {
  *
  * @return string Filtered block content.
  */
-function block_core_image_render_lightbox( $block_content, $block, $block_instance ) {
+function block_core_image_render_lightbox( $block_content, array $block, WP_Block $block_instance ) {
 	/*
 	 * If there's no IMG tag in the block then return the given block content
 	 * as-is. There's nothing that this code can knowingly modify to add the
