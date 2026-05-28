@@ -4,6 +4,7 @@
 import {
 	getCellRectangleClientIds,
 	getCellSelectionOutsideBorderAttributes,
+	getCellSelectionOutsideBorderValue,
 } from '../utils';
 
 function createCell( clientId, attributes = {} ) {
@@ -151,6 +152,62 @@ describe( 'table-v2 utils', () => {
 				bottom: border,
 				left: border,
 			} );
+		} );
+	} );
+
+	describe( 'getCellSelectionOutsideBorderValue', () => {
+		it( 'returns the shared outside border value', () => {
+			const border = {
+				color: '#cc1818',
+				style: 'solid',
+				width: '4px',
+			};
+			const rows = [
+				{ type: 'body', cellCount: 2 },
+				{ type: 'body', cellCount: 2 },
+			];
+			const cells = [
+				createCell( 'cell-1', {
+					style: { border: { top: border, left: border } },
+				} ),
+				createCell( 'cell-2', {
+					style: { border: { top: border, right: border } },
+				} ),
+				createCell( 'cell-3', {
+					style: { border: { bottom: border, left: border } },
+				} ),
+				createCell( 'cell-4', {
+					style: { border: { right: border, bottom: border } },
+				} ),
+			];
+
+			expect(
+				getCellSelectionOutsideBorderValue( rows, cells, 2, [
+					'cell-1',
+					'cell-2',
+					'cell-3',
+					'cell-4',
+				] )
+			).toEqual( border );
+		} );
+
+		it( 'returns undefined for mixed outside border values', () => {
+			const rows = [ { type: 'body', cellCount: 2 } ];
+			const cells = [
+				createCell( 'cell-1', {
+					style: { border: { top: { width: '4px' } } },
+				} ),
+				createCell( 'cell-2', {
+					style: { border: { top: { width: '2px' } } },
+				} ),
+			];
+
+			expect(
+				getCellSelectionOutsideBorderValue( rows, cells, 2, [
+					'cell-1',
+					'cell-2',
+				] )
+			).toBeUndefined();
 		} );
 	} );
 } );

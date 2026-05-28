@@ -238,6 +238,29 @@ function getSelectedPlacementRectangle( placements, selectedClientIds ) {
 	};
 }
 
+function getOutsideBorderSides( placement, rectangle ) {
+	const sides = [];
+
+	if ( placement.rowIndex === rectangle.startRow ) {
+		sides.push( 'top' );
+	}
+	if ( getPlacementEndColumn( placement ) === rectangle.endColumn ) {
+		sides.push( 'right' );
+	}
+	if ( getPlacementEndRow( placement ) === rectangle.endRow ) {
+		sides.push( 'bottom' );
+	}
+	if ( placement.columnIndex === rectangle.startColumn ) {
+		sides.push( 'left' );
+	}
+
+	return sides;
+}
+
+function areBordersEqual( borderA, borderB ) {
+	return JSON.stringify( borderA ) === JSON.stringify( borderB );
+}
+
 /**
  * Gets all cells inside the rectangle between two cell blocks.
  *
@@ -321,27 +344,14 @@ export function getCellSelectionOutsideBorderAttributes(
 		const nextBorder = {
 			...placement.cell.attributes.style?.border,
 		};
-		let hasBorderUpdate = false;
+		const sides = getOutsideBorderSides( placement, rectangle );
 
-		if ( placement.rowIndex === rectangle.startRow ) {
-			nextBorder.top = border;
-			hasBorderUpdate = true;
-		}
-		if ( getPlacementEndColumn( placement ) === rectangle.endColumn ) {
-			nextBorder.right = border;
-			hasBorderUpdate = true;
-		}
-		if ( getPlacementEndRow( placement ) === rectangle.endRow ) {
-			nextBorder.bottom = border;
-			hasBorderUpdate = true;
-		}
-		if ( placement.columnIndex === rectangle.startColumn ) {
-			nextBorder.left = border;
-			hasBorderUpdate = true;
-		}
-
-		if ( ! hasBorderUpdate ) {
+		if ( ! sides.length ) {
 			return updates;
+		}
+
+		for ( const side of sides ) {
+			nextBorder[ side ] = border;
 		}
 
 		updates[ placement.cell.clientId ] = {
@@ -353,6 +363,54 @@ export function getCellSelectionOutsideBorderAttributes(
 
 		return updates;
 	}, {} );
+}
+
+/**
+ * Gets the shared outside border value for a selected rectangle.
+ *
+ * @param {Array}  rows              Row descriptors.
+ * @param {Array}  cells             Cell inner blocks.
+ * @param {number} columnCount       Number of columns.
+ * @param {Array}  selectedClientIds Selected cell client IDs.
+ * @return {Object|undefined} Shared outside border value, if one exists.
+ */
+export function getCellSelectionOutsideBorderValue(
+	rows,
+	cells,
+	columnCount,
+	selectedClientIds
+) {
+	const rectangle = getSelectedPlacementRectangle(
+		getCellPlacements( rows, cells, columnCount ),
+		selectedClientIds
+	);
+
+	if ( ! rectangle ) {
+		return undefined;
+	}
+
+	let outsideBorder;
+
+	for ( const placement of rectangle.selectedPlacements ) {
+		const sides = getOutsideBorderSides( placement, rectangle );
+
+		for ( const side of sides ) {
+			const sideBorder =
+				placement.cell.attributes.style?.border?.[ side ];
+
+			if ( ! sideBorder ) {
+				return undefined;
+			}
+
+			if ( outsideBorder === undefined ) {
+				outsideBorder = sideBorder;
+			} else if ( ! areBordersEqual( outsideBorder, sideBorder ) ) {
+				return undefined;
+			}
+		}
+	}
+
+	return outsideBorder;
 }
 
 /**

@@ -36,6 +36,7 @@ import {
 	getCellLocation,
 	getCellPlacements,
 	getCellSelectionOutsideBorderAttributes,
+	getCellSelectionOutsideBorderValue,
 	insertColumn,
 	insertRow,
 } from '../table-v2/utils';
@@ -121,6 +122,12 @@ export default function TableCellEdit( {
 		clientId
 	);
 	const cellPlacements = getCellPlacements( rows, siblingCells, columnCount );
+	const selectedOutsideBorder = getCellSelectionOutsideBorderValue(
+		rows,
+		siblingCells,
+		columnCount,
+		selectedClientIds
+	);
 
 	function replaceTable( nextTable, nextColumnCount = columnCount ) {
 		if ( ! parentClientId ) {
@@ -325,7 +332,9 @@ export default function TableCellEdit( {
 									enableStyle
 									label={ __( 'Outside border' ) }
 									onChange={ applyOutsideBorder }
-									value={ selectionBorder }
+									value={
+										selectedOutsideBorder || selectionBorder
+									}
 									withSlider
 								/>
 							</div>
