@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Add `strokeWidth` prop to the `Icon` component for per-call override of stroke width on stroke-based icons. ([#78774](https://github.com/WordPress/gutenberg/pull/78774))
+
 ## 13.2.0 (2026-05-27)
 
 ## 13.1.0 (2026-05-14)
