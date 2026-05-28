@@ -106,7 +106,7 @@ export default function MediaEditorCropPanel( {
 				onChange={ onFreeformChange }
 			/>
 			<div role="presentation" { ...zoomGestureHandlers }>
-				<Flex align="flex-end" gap={ 2 }>
+				<Flex align="flex-end" gap={ 4 }>
 					<FlexBlock>
 						<RangeControl
 							__next40pxDefaultSize
@@ -136,7 +136,7 @@ export default function MediaEditorCropPanel( {
 					<FlexItem>
 						<NumberControl
 							__next40pxDefaultSize
-							__unstableInputWidth="80px"
+							__unstableInputWidth="96px"
 							label={ __( 'Zoom percentage' ) }
 							hideLabelFromVision
 							min={ minZoomPercentage }
