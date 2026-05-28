@@ -50,7 +50,7 @@ describe( 'MediaEditorCropPanel', () => {
 
 		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
 		const resizeCropArea = screen.getByLabelText( 'Show resize handles' );
-		const zoom = screen.getByRole( 'slider', { name: 'Zoom' } );
+		const zoom = screen.getByRole( 'slider', { name: 'Zoom (%)' } );
 
 		expect( aspectRatio.compareDocumentPosition( resizeCropArea ) ).toBe(
 			Node.DOCUMENT_POSITION_FOLLOWING
@@ -92,7 +92,7 @@ describe( 'MediaEditorCropPanel', () => {
 		setupCropPanel( {}, { zoom: 3.749999999999999 } );
 
 		const zoomInput = screen.getByRole( 'spinbutton', {
-			name: 'Zoom percentage',
+			name: 'Zoom (%)',
 		} );
 
 		expect( zoomInput ).toHaveValue( 375 );
@@ -107,7 +107,7 @@ describe( 'MediaEditorCropPanel', () => {
 		} );
 
 		fireEvent.change(
-			screen.getByRole( 'spinbutton', { name: 'Zoom percentage' } ),
+			screen.getByRole( 'spinbutton', { name: 'Zoom (%)' } ),
 			{
 				target: { value: '250' },
 			}

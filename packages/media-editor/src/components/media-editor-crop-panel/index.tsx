@@ -2,11 +2,6 @@
  * WordPress dependencies
  */
 import {
-	Flex,
-	FlexBlock,
-	FlexItem,
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-	__experimentalNumberControl as NumberControl,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
@@ -31,6 +26,10 @@ const MAX_ZOOM_PERCENTAGE = MAX_ZOOM * ZOOM_PERCENTAGE_SCALE;
 
 function getZoomPercentageForDisplay( zoom: number ): number {
 	return Math.round( zoom * ZOOM_PERCENTAGE_SCALE );
+}
+
+function getMinZoomPercentageForDisplay( zoom: number ): number {
+	return Math.ceil( zoom * ZOOM_PERCENTAGE_SCALE );
 }
 
 export interface MediaEditorCropPanelProps {
@@ -76,7 +75,7 @@ export default function MediaEditorCropPanel( {
 	const zoomGestureHandlers = useCropGestureHandlers();
 	const minZoom = getMinZoom( state );
 	const zoomPercentage = getZoomPercentageForDisplay( state.zoom );
-	const minZoomPercentage = getZoomPercentageForDisplay( minZoom );
+	const minZoomPercentage = getMinZoomPercentageForDisplay( minZoom );
 
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
@@ -106,65 +105,34 @@ export default function MediaEditorCropPanel( {
 				onChange={ onFreeformChange }
 			/>
 			<div role="presentation" { ...zoomGestureHandlers }>
-				<Flex align="flex-end" gap={ 4 }>
-					<FlexBlock>
-						<RangeControl
-							__next40pxDefaultSize
-							label={ __( 'Zoom' ) }
-							min={ minZoom }
-							max={ MAX_ZOOM }
-							step={ 0.1 }
-							value={ state.zoom }
-							onChange={ ( value ) => {
-								onPlacementControlInteraction?.();
-								setZoom(
-									typeof value === 'number' ? value : minZoom
-								);
-							} }
-							renderTooltipContent={ ( value ) => {
-								const zoom =
-									typeof value === 'number' ? value : minZoom;
-								return sprintf(
-									/* translators: %d: zoom level as a percentage. */
-									__( '%d%%' ),
-									getZoomPercentageForDisplay( zoom )
-								);
-							} }
-							withInputField={ false }
-						/>
-					</FlexBlock>
-					<FlexItem>
-						<NumberControl
-							__next40pxDefaultSize
-							__unstableInputWidth="96px"
-							label={ __( 'Zoom percentage' ) }
-							hideLabelFromVision
-							min={ minZoomPercentage }
-							max={ MAX_ZOOM_PERCENTAGE }
-							step={ 1 }
-							shiftStep={ 10 }
-							value={ zoomPercentage }
-							onChange={ ( value ) => {
-								const nextZoomPercentage = parseFloat(
-									value ?? ''
-								);
-								if ( Number.isNaN( nextZoomPercentage ) ) {
-									return;
-								}
-
-								onPlacementControlInteraction?.();
-								setZoom(
-									nextZoomPercentage / ZOOM_PERCENTAGE_SCALE
-								);
-							} }
-							suffix={
-								<InputControlSuffixWrapper>
-									%
-								</InputControlSuffixWrapper>
-							}
-						/>
-					</FlexItem>
-				</Flex>
+				<RangeControl
+					__next40pxDefaultSize
+					label={ __( 'Zoom (%)' ) }
+					min={ minZoomPercentage }
+					max={ MAX_ZOOM_PERCENTAGE }
+					step={ 1 }
+					shiftStep={ 10 }
+					value={ zoomPercentage }
+					onChange={ ( value ) => {
+						onPlacementControlInteraction?.();
+						setZoom(
+							typeof value === 'number'
+								? value / ZOOM_PERCENTAGE_SCALE
+								: minZoom
+						);
+					} }
+					renderTooltipContent={ ( value ) => {
+						const percentage =
+							typeof value === 'number'
+								? value
+								: minZoomPercentage;
+						return sprintf(
+							/* translators: %d: zoom level as a percentage. */
+							__( '%d%%' ),
+							Math.round( percentage )
+						);
+					} }
+				/>
 			</div>
 		</Stack>
 	);
