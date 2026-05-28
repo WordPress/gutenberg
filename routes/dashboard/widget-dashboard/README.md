@@ -70,7 +70,7 @@ Optional. Configures the underlying grid.
 
 #### `children`: `ReactNode`
 
-Optional. Composition slot for arbitrary host markup. When omitted, the engine renders `<WidgetDashboard.Widgets />` directly.
+Optional. Composition slot for arbitrary dashboard markup. When omitted, the engine renders `<WidgetDashboard.Widgets />` directly.
 
 ## Compound components
 
@@ -90,7 +90,7 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so hosts that don't expose edit mode can keep `Actions` in their tree unconditionally.
 
-`<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin surfaces (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
+`<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
 ```tsx
 import { Page } from '@wordpress/admin-ui';
