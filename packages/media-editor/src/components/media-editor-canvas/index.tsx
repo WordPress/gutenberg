@@ -44,7 +44,7 @@ export default function MediaEditorCanvas( {
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useMediaEditor();
-	const { aspectRatioValue, freeformCrop } = controller.cropOptions;
+	const { aspectRatioValue } = controller.cropOptions;
 	const cropperImage = controller.state.image;
 	const { beginGesture, endGesture, setImage } = controller;
 
@@ -100,7 +100,7 @@ export default function MediaEditorCanvas( {
 				src={ mediaUrl }
 				controller={ controller }
 				aspectRatio={ aspectRatio }
-				freeformCrop={ freeformCrop }
+				freeformCrop
 				focusOnMount={ focusOnMount }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }

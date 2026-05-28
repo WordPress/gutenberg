@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
+
 ## 0.14.0 (2026-05-27)
 
 ### Breaking Changes

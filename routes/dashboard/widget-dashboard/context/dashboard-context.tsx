@@ -21,12 +21,11 @@ import {
  */
 import { computeGridModelChange } from '../utils/grid-model-change';
 import type {
-	ResolveWidgetModule,
 	WidgetGridModel,
 	WidgetGridSettings,
 	DashboardWidget,
-	WidgetType,
 } from '../types';
+import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits
@@ -104,6 +103,7 @@ function canonicalize( layout: DashboardWidget[] ): DashboardWidget[] {
  */
 interface InternalDashboardContextValue {
 	widgetTypes: WidgetType[];
+	isResolvingWidgetTypes: boolean;
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
@@ -169,6 +169,11 @@ interface ProviderProps {
 	widgetTypes: WidgetType[];
 
 	/**
+	 * When true, widget types are still loading.
+	 */
+	isResolvingWidgetTypes?: boolean;
+
+	/**
 	 * Committed layout.
 	 */
 	layout: DashboardWidget[];
@@ -226,7 +231,7 @@ interface ProviderProps {
  * - The shared commit assumes the two slices are not edited
  *   simultaneously. The bundled `Actions` keeps the layout-edit and
  *   settings-drawer flows mutually exclusive; consumers that compose
- *   a different surface must uphold the same invariant or accept the
+ *   a different host must uphold the same invariant or accept the
  *   cross-publish.
  * - Staging re-syncs from the committed props on prop change.
  *   In-flight edits are dropped silently when an external update
@@ -239,6 +244,7 @@ interface ProviderProps {
  */
 export function WidgetDashboardProvider( {
 	widgetTypes,
+	isResolvingWidgetTypes = false,
 	layout: committedLayout,
 	onLayoutChange,
 	onLayoutReset,
@@ -366,6 +372,7 @@ export function WidgetDashboardProvider( {
 	const value = useMemo< InternalDashboardContextValue >(
 		() => ( {
 			widgetTypes,
+			isResolvingWidgetTypes,
 			layout: stagingLayout,
 			onLayoutChange: setStagingLayout,
 			onLayoutReset,
@@ -383,6 +390,7 @@ export function WidgetDashboardProvider( {
 		} ),
 		[
 			widgetTypes,
+			isResolvingWidgetTypes,
 			stagingLayout,
 			onLayoutReset,
 			stagingGridSettings,
