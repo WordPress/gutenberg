@@ -36,4 +36,16 @@ describe( 'formatDesignTokenFallbacksScss', () => {
 			'\'--wpds-typography-font-family-mono\': \'"Menlo", "Consolas", monaco, monospace\''
 		);
 	} );
+
+	it( 'escapes backslashes and single quotes', () => {
+		const scss = formatDesignTokenFallbacksScss( {
+			'--wpds-x-single-quote': "a'b",
+			'--wpds-x-backslash': 'a\\b',
+			'--wpds-x-both': "a'\\b",
+		} );
+
+		expect( scss ).toContain( "'--wpds-x-single-quote': 'a\\'b'" );
+		expect( scss ).toContain( "'--wpds-x-backslash': 'a\\\\b'" );
+		expect( scss ).toContain( "'--wpds-x-both': 'a\\'\\\\b'" );
+	} );
 } );
