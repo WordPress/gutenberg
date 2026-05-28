@@ -1258,6 +1258,16 @@ export const mergeBlocks =
 			return;
 		}
 
+		// If blockA has no content (e.g. an empty heading), just remove it
+		// and keep blockB focused. Without this check, merging would transform
+		// blockB into blockA's type (e.g. paragraph → heading), which is
+		// unexpected when the leading block is simply empty.
+		if ( blockAType.merge && isUnmodifiedBlock( blockA, 'content' ) ) {
+			dispatch.removeBlock( clientIdA, false );
+			dispatch.selectBlock( clientIdB );
+			return;
+		}
+
 		if ( isUnmodifiedDefaultBlock( blockB ) ) {
 			dispatch.removeBlock(
 				clientIdB,
