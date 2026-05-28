@@ -17,384 +17,326 @@ const SECTION_TAGS = {
 	foot: 'tfoot',
 };
 
-/**
- * Derives the grid dimensions from the cell blocks.
- *
- * @param {Array} cells Array of cell inner blocks.
- * @return {Object} Object with columnCount and per-section row counts.
- */
-export function getGridDimensions( cells ) {
-	let columnCount = 0;
-	const sectionRowCounts = { head: 0, body: 0, foot: 0 };
+function getCellAttributesForRowType( type ) {
+	return {
+		tag: type === 'head' ? 'th' : 'td',
+		scope: type === 'head' ? 'col' : undefined,
+		content: '',
+	};
+}
 
-	for ( const cell of cells ) {
-		const { column, colSpan = 1, row, section = 'body' } = cell.attributes;
-		columnCount = Math.max( columnCount, column + colSpan );
-		if ( section in sectionRowCounts ) {
-			sectionRowCounts[ section ] = Math.max(
-				sectionRowCounts[ section ],
-				row + 1
-			);
+function createCell( type ) {
+	return createBlock(
+		'core/table-v2-cell',
+		getCellAttributesForRowType( type )
+	);
+}
+
+function getRowCellOffset( rows, rowIndex ) {
+	return rows
+		.slice( 0, rowIndex )
+		.reduce( ( total, row ) => total + row.cellCount, 0 );
+}
+
+function markOccupiedSlots( occupiedSlots, rowIndex, columnIndex, cell ) {
+	const { rowSpan = 1, colSpan = 1 } = cell.attributes;
+
+	for ( let rowOffset = 0; rowOffset < rowSpan; rowOffset++ ) {
+		const occupiedRowIndex = rowIndex + rowOffset;
+		if ( ! occupiedSlots.has( occupiedRowIndex ) ) {
+			occupiedSlots.set( occupiedRowIndex, new Set() );
+		}
+		const occupiedRow = occupiedSlots.get( occupiedRowIndex );
+		for ( let columnOffset = 0; columnOffset < colSpan; columnOffset++ ) {
+			occupiedRow.add( columnIndex + columnOffset );
 		}
 	}
-
-	return { columnCount, sectionRowCounts };
 }
 
 /**
- * Maps a flat array of cell inner blocks into a structured table
- * representation with sections and rows.
- *
- * @param {Array} cells Array of cell inner blocks.
- * @return {Array} Array of section objects, each with { name, tag, rows }.
- *                 Each row is an array of cell blocks sorted by column.
- */
-export function mapCellsToSections( cells ) {
-	// Group cells by section, then by row.
-	const sectionMap = {};
-
-	for ( const cell of cells ) {
-		const { section = 'body', row = 0 } = cell.attributes;
-
-		if ( ! sectionMap[ section ] ) {
-			sectionMap[ section ] = {};
-		}
-		if ( ! sectionMap[ section ][ row ] ) {
-			sectionMap[ section ][ row ] = [];
-		}
-		sectionMap[ section ][ row ].push( cell );
-	}
-
-	// Build the structured output in section order.
-	const sections = [];
-
-	for ( const sectionName of SECTION_ORDER ) {
-		const rowMap = sectionMap[ sectionName ];
-		if ( ! rowMap ) {
-			continue;
-		}
-
-		const rowIndices = Object.keys( rowMap )
-			.map( Number )
-			.sort( ( a, b ) => a - b );
-
-		const rows = rowIndices.map( ( rowIndex ) => {
-			const rowCells = rowMap[ rowIndex ];
-			// Sort cells within the row by column index.
-			rowCells.sort(
-				( a, b ) => a.attributes.column - b.attributes.column
-			);
-			return rowCells;
-		} );
-
-		sections.push( {
-			name: sectionName,
-			tag: SECTION_TAGS[ sectionName ],
-			rows,
-		} );
-	}
-
-	return sections;
-}
-
-/**
- * Creates an array of cell blocks for a new table.
+ * Creates row descriptors and cell blocks for a new table.
  *
  * @param {Object}  options
  * @param {number}  options.rowCount    Number of body rows.
  * @param {number}  options.columnCount Number of columns.
  * @param {boolean} options.hasHeader   Whether to include a header row.
  * @param {boolean} options.hasFooter   Whether to include a footer row.
- * @return {Array} Array of cell block objects suitable for createBlock.
+ * @return {Object} Object with rows and cells.
  */
-export function createTableCells( {
+export function createTable( {
 	rowCount,
 	columnCount,
 	hasHeader = false,
 	hasFooter = false,
 } ) {
+	const rows = [];
 	const cells = [];
 
 	if ( hasHeader ) {
-		for ( let col = 0; col < columnCount; col++ ) {
-			cells.push(
-				createBlock( 'core/table-v2-cell', {
-					section: 'head',
-					row: 0,
-					column: col,
-					tag: 'th',
-					scope: 'col',
-					content: '',
-				} )
-			);
-		}
+		rows.push( { type: 'head', cellCount: columnCount } );
 	}
 
 	for ( let row = 0; row < rowCount; row++ ) {
-		for ( let col = 0; col < columnCount; col++ ) {
-			cells.push(
-				createBlock( 'core/table-v2-cell', {
-					section: 'body',
-					row,
-					column: col,
-					tag: 'td',
-					content: '',
-				} )
-			);
-		}
+		rows.push( { type: 'body', cellCount: columnCount } );
 	}
 
 	if ( hasFooter ) {
-		for ( let col = 0; col < columnCount; col++ ) {
-			cells.push(
-				createBlock( 'core/table-v2-cell', {
-					section: 'foot',
-					row: 0,
-					column: col,
-					tag: 'td',
-					content: '',
-				} )
-			);
+		rows.push( { type: 'foot', cellCount: columnCount } );
+	}
+
+	for ( const row of rows ) {
+		for ( let cellIndex = 0; cellIndex < row.cellCount; cellIndex++ ) {
+			cells.push( createCell( row.type ) );
 		}
 	}
 
-	return cells;
+	return { rows, cells };
 }
 
 /**
- * Inserts a new row of cells into the table.
+ * Gets row and column placements for the flat table cell list.
  *
- * @param {Array}  cells               Current cell inner blocks.
- * @param {Object} options
- * @param {string} options.section     Section to insert into ('head', 'body', 'foot').
- * @param {number} options.rowIndex    Row index to insert at (existing rows at this index and above shift up).
- * @param {number} options.columnCount Number of columns (derived if not provided).
- * @return {Array} New array of cell blocks with the row inserted.
+ * @param {Array}  rows        Row descriptors.
+ * @param {Array}  cells       Cell inner blocks.
+ * @param {number} columnCount Number of columns.
+ * @return {Array} Cell placement objects.
  */
-export function insertRow(
-	cells,
-	{ section, rowIndex, columnCount: explicitColumnCount }
-) {
-	const { columnCount: derivedColumnCount } = getGridDimensions( cells );
-	const columnCount = explicitColumnCount || derivedColumnCount;
-	const tag = section === 'head' ? 'th' : 'td';
+export function getCellPlacements( rows, cells, columnCount ) {
+	const placements = [];
+	const occupiedSlots = new Map();
+	let cellIndex = 0;
 
-	// Shift existing rows in the same section at or after rowIndex.
-	const updatedCells = cells.map( ( cell ) => {
-		const attrs = cell.attributes;
-		if ( attrs.section === section && attrs.row >= rowIndex ) {
-			return {
-				...cell,
-				attributes: { ...attrs, row: attrs.row + 1 },
-			};
+	for ( let rowIndex = 0; rowIndex < rows.length; rowIndex++ ) {
+		const row = rows[ rowIndex ];
+		let columnIndex = 0;
+
+		for (
+			let rowCellIndex = 0;
+			rowCellIndex < row.cellCount;
+			rowCellIndex++
+		) {
+			const cell = cells[ cellIndex ];
+			if ( ! cell ) {
+				break;
+			}
+
+			while (
+				occupiedSlots.get( rowIndex )?.has( columnIndex ) &&
+				columnIndex < columnCount
+			) {
+				columnIndex++;
+			}
+
+			placements.push( {
+				cell,
+				rowIndex,
+				rowType: row.type,
+				columnIndex,
+			} );
+			markOccupiedSlots( occupiedSlots, rowIndex, columnIndex, cell );
+			columnIndex++;
+			cellIndex++;
 		}
-		return cell;
-	} );
-
-	// Create new cells for the inserted row.
-	const newCells = [];
-	for ( let col = 0; col < columnCount; col++ ) {
-		newCells.push(
-			createBlock( 'core/table-v2-cell', {
-				section,
-				row: rowIndex,
-				column: col,
-				tag,
-				scope: tag === 'th' ? 'col' : undefined,
-				content: '',
-			} )
-		);
 	}
 
-	return [ ...updatedCells, ...newCells ];
+	return placements;
+}
+
+/**
+ * Maps rows and flat cell blocks into renderable table sections.
+ *
+ * @param {Array} rows  Row descriptors.
+ * @param {Array} cells Cell inner blocks.
+ * @return {Array} Array of section objects, each with { name, tag, rows }.
+ */
+export function mapCellsToSections( rows, cells ) {
+	const sectionsByName = {};
+	let cellIndex = 0;
+
+	for ( const row of rows ) {
+		if ( ! sectionsByName[ row.type ] ) {
+			sectionsByName[ row.type ] = {
+				name: row.type,
+				tag: SECTION_TAGS[ row.type ],
+				rows: [],
+			};
+		}
+
+		sectionsByName[ row.type ].rows.push(
+			cells.slice( cellIndex, cellIndex + row.cellCount )
+		);
+		cellIndex += row.cellCount;
+	}
+
+	return SECTION_ORDER.filter(
+		( sectionName ) => sectionsByName[ sectionName ]
+	).map( ( sectionName ) => sectionsByName[ sectionName ] );
+}
+
+/**
+ * Determines the location of a selected cell block within the table.
+ *
+ * @param {Array}  rows        Row descriptors.
+ * @param {Array}  cells       Cell inner blocks.
+ * @param {number} columnCount Number of columns.
+ * @param {string} clientId    Selected cell clientId.
+ * @return {Object|null} Placement object or null if not found.
+ */
+export function getCellLocation( rows, cells, columnCount, clientId ) {
+	return (
+		getCellPlacements( rows, cells, columnCount ).find(
+			( placement ) => placement.cell.clientId === clientId
+		) || null
+	);
+}
+
+/**
+ * Inserts a new row into the table.
+ *
+ * @param {Array}  rows                Row descriptors.
+ * @param {Array}  cells               Current cell inner blocks.
+ * @param {Object} options             Options.
+ * @param {number} options.rowIndex    Row index to insert at.
+ * @param {string} options.type        Row type.
+ * @param {number} options.columnCount Number of cells to create.
+ * @return {Object} Object with rows and cells.
+ */
+export function insertRow( rows, cells, { rowIndex, type, columnCount } ) {
+	const insertIndex = getRowCellOffset( rows, rowIndex );
+	const newCells = Array.from( { length: columnCount }, () =>
+		createCell( type )
+	);
+
+	return {
+		rows: [
+			...rows.slice( 0, rowIndex ),
+			{ type, cellCount: columnCount },
+			...rows.slice( rowIndex ),
+		],
+		cells: [
+			...cells.slice( 0, insertIndex ),
+			...newCells,
+			...cells.slice( insertIndex ),
+		],
+	};
 }
 
 /**
  * Deletes a row from the table.
  *
+ * @param {Array}  rows             Row descriptors.
  * @param {Array}  cells            Current cell inner blocks.
- * @param {Object} options
- * @param {string} options.section  Section to delete from.
+ * @param {Object} options          Options.
  * @param {number} options.rowIndex Row index to delete.
- * @return {Array} New array of cell blocks with the row removed.
+ * @return {Object} Object with rows and cells.
  */
-export function deleteRow( cells, { section, rowIndex } ) {
-	return cells
-		.filter( ( cell ) => {
-			const attrs = cell.attributes;
-			return ! ( attrs.section === section && attrs.row === rowIndex );
-		} )
-		.map( ( cell ) => {
-			const attrs = cell.attributes;
-			if ( attrs.section === section && attrs.row > rowIndex ) {
-				return {
-					...cell,
-					attributes: { ...attrs, row: attrs.row - 1 },
-				};
-			}
-			return cell;
-		} );
+export function deleteRow( rows, cells, { rowIndex } ) {
+	const deleteIndex = getRowCellOffset( rows, rowIndex );
+	const cellCount = rows[ rowIndex ]?.cellCount || 0;
+
+	return {
+		rows: [ ...rows.slice( 0, rowIndex ), ...rows.slice( rowIndex + 1 ) ],
+		cells: [
+			...cells.slice( 0, deleteIndex ),
+			...cells.slice( deleteIndex + cellCount ),
+		],
+	};
 }
 
 /**
  * Inserts a new column into the table.
  *
+ * @param {Array}  rows                Row descriptors.
  * @param {Array}  cells               Current cell inner blocks.
- * @param {Object} options
+ * @param {Object} options             Options.
  * @param {number} options.columnIndex Column index to insert at.
- * @return {Array} New array of cell blocks with the column inserted.
+ * @return {Object} Object with rows and cells.
  */
-export function insertColumn( cells, { columnIndex } ) {
-	// Shift existing columns at or after columnIndex.
-	const updatedCells = cells.map( ( cell ) => {
-		const attrs = cell.attributes;
-		if ( attrs.column >= columnIndex ) {
-			return {
-				...cell,
-				attributes: { ...attrs, column: attrs.column + 1 },
-			};
-		}
-		return cell;
-	} );
-
-	// Determine which section/row combinations exist.
-	const existingRows = new Map();
-	for ( const cell of cells ) {
-		const { section = 'body', row = 0 } = cell.attributes;
-		const key = `${ section }:${ row }`;
-		if ( ! existingRows.has( key ) ) {
-			existingRows.set( key, { section, row } );
-		}
-	}
-
-	// Create a new cell for each existing row.
+export function insertColumn( rows, cells, { columnIndex } ) {
+	const newRows = [];
 	const newCells = [];
-	for ( const { section, row } of existingRows.values() ) {
-		const tag = section === 'head' ? 'th' : 'td';
+	let cellIndex = 0;
+
+	for ( const row of rows ) {
+		const insertIndex = Math.min( columnIndex, row.cellCount );
+		newRows.push( { ...row, cellCount: row.cellCount + 1 } );
+
+		newCells.push( ...cells.slice( cellIndex, cellIndex + insertIndex ) );
+		newCells.push( createCell( row.type ) );
 		newCells.push(
-			createBlock( 'core/table-v2-cell', {
-				section,
-				row,
-				column: columnIndex,
-				tag,
-				scope: tag === 'th' ? 'col' : undefined,
-				content: '',
-			} )
+			...cells.slice( cellIndex + insertIndex, cellIndex + row.cellCount )
 		);
+		cellIndex += row.cellCount;
 	}
 
-	return [ ...updatedCells, ...newCells ];
+	return { rows: newRows, cells: newCells };
 }
 
 /**
  * Deletes a column from the table.
  *
+ * @param {Array}  rows                Row descriptors.
  * @param {Array}  cells               Current cell inner blocks.
- * @param {Object} options
+ * @param {Object} options             Options.
  * @param {number} options.columnIndex Column index to delete.
- * @return {Array} New array of cell blocks with the column removed.
+ * @return {Object} Object with rows and cells.
  */
-export function deleteColumn( cells, { columnIndex } ) {
-	return cells
-		.filter( ( cell ) => cell.attributes.column !== columnIndex )
-		.map( ( cell ) => {
-			const attrs = cell.attributes;
-			if ( attrs.column > columnIndex ) {
-				return {
-					...cell,
-					attributes: { ...attrs, column: attrs.column - 1 },
-				};
-			}
-			return cell;
-		} );
+export function deleteColumn( rows, cells, { columnIndex } ) {
+	const newRows = [];
+	const newCells = [];
+	let cellIndex = 0;
+
+	for ( const row of rows ) {
+		const deleteIndex = Math.min( columnIndex, row.cellCount - 1 );
+		newRows.push( { ...row, cellCount: row.cellCount - 1 } );
+
+		newCells.push( ...cells.slice( cellIndex, cellIndex + deleteIndex ) );
+		newCells.push(
+			...cells.slice(
+				cellIndex + deleteIndex + 1,
+				cellIndex + row.cellCount
+			)
+		);
+		cellIndex += row.cellCount;
+	}
+
+	return { rows: newRows, cells: newCells };
 }
 
 /**
  * Toggles a table section (header or footer).
- * If the section has cells, removes them. If it doesn't, creates a row.
  *
- * @param {Array}  cells           Current cell inner blocks.
- * @param {Object} options
- * @param {string} options.section Section to toggle ('head' or 'foot').
- * @return {Array} New array of cell blocks.
+ * @param {Array}  rows                Row descriptors.
+ * @param {Array}  cells               Current cell inner blocks.
+ * @param {Object} options             Options.
+ * @param {string} options.type        Section row type to toggle.
+ * @param {number} options.columnCount Number of cells to create.
+ * @return {Object} Object with rows and cells.
  */
-export function toggleSection( cells, { section } ) {
-	const hasCellsInSection = cells.some(
-		( cell ) => cell.attributes.section === section
-	);
+export function toggleSection( rows, cells, { type, columnCount } ) {
+	const hasRowsInSection = rows.some( ( row ) => row.type === type );
 
-	if ( hasCellsInSection ) {
-		// Remove all cells in the section.
-		return cells.filter( ( cell ) => cell.attributes.section !== section );
-	}
+	if ( hasRowsInSection ) {
+		const nextRows = [];
+		const nextCells = [];
+		let cellIndex = 0;
 
-	// Add a single row to the section.
-	const { columnCount } = getGridDimensions( cells );
-	const tag = section === 'head' ? 'th' : 'td';
-
-	const newCells = [];
-	for ( let col = 0; col < columnCount; col++ ) {
-		newCells.push(
-			createBlock( 'core/table-v2-cell', {
-				section,
-				row: 0,
-				column: col,
-				tag,
-				scope: tag === 'th' ? 'col' : undefined,
-				content: '',
-			} )
-		);
-	}
-
-	return [ ...cells, ...newCells ];
-}
-
-/**
- * Determines the location (section, row, column) of a selected cell block
- * within the table's inner blocks.
- *
- * @param {Array}  cells          Array of cell inner blocks.
- * @param {string} selectedCellId The clientId of the selected cell.
- * @return {Object|null} Object with { section, row, column } or null if not found.
- */
-export function getSelectedCellLocation( cells, selectedCellId ) {
-	for ( const cell of cells ) {
-		if ( cell.clientId === selectedCellId ) {
-			return {
-				section: cell.attributes.section,
-				row: cell.attributes.row,
-				column: cell.attributes.column,
-			};
-		}
-	}
-	return null;
-}
-
-/**
- * Sorts cell blocks in the canonical order:
- * head rows first, then body, then foot; within each section by row, then column.
- *
- * @param {Array} cells Array of cell blocks.
- * @return {Array} Sorted array of cell blocks.
- */
-export function sortCells( cells ) {
-	const sectionWeight = { head: 0, body: 1, foot: 2 };
-	return [ ...cells ].sort( ( a, b ) => {
-		const aAttrs = a.attributes;
-		const bAttrs = b.attributes;
-
-		const sectionDiff =
-			( sectionWeight[ aAttrs.section ] || 1 ) -
-			( sectionWeight[ bAttrs.section ] || 1 );
-		if ( sectionDiff !== 0 ) {
-			return sectionDiff;
+		for ( const row of rows ) {
+			if ( row.type !== type ) {
+				nextRows.push( row );
+				nextCells.push(
+					...cells.slice( cellIndex, cellIndex + row.cellCount )
+				);
+			}
+			cellIndex += row.cellCount;
 		}
 
-		const rowDiff = ( aAttrs.row || 0 ) - ( bAttrs.row || 0 );
-		if ( rowDiff !== 0 ) {
-			return rowDiff;
-		}
+		return { rows: nextRows, cells: nextCells };
+	}
 
-		return ( aAttrs.column || 0 ) - ( bAttrs.column || 0 );
+	return insertRow( rows, cells, {
+		rowIndex: type === 'head' ? 0 : rows.length,
+		type,
+		columnCount,
 	} );
 }

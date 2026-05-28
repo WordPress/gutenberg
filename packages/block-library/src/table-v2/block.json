@@ -11,6 +11,14 @@
 		"hasFixedLayout": {
 			"type": "boolean",
 			"default": true
+		},
+		"columnCount": {
+			"type": "integer",
+			"default": 0
+		},
+		"rows": {
+			"type": "array",
+			"default": []
 		}
 	},
 	"supports": {

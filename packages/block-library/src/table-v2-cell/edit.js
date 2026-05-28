@@ -35,11 +35,10 @@ import {
 import {
 	deleteColumn,
 	deleteRow,
-	getGridDimensions,
-	getSelectedCellLocation,
+	getCellLocation,
+	getCellPlacements,
 	insertColumn,
 	insertRow,
-	sortCells,
 } from '../table-v2/utils';
 
 const ALIGNMENT_CONTROLS = [
@@ -65,47 +64,58 @@ export default function TableCellEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const { content, tag: CellTag, section, align } = attributes;
+	const { content, tag: CellTag, align } = attributes;
 	const registry = useRegistry();
 	const { multiSelectSet, replaceInnerBlocks, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const { parentClientId, siblingCells } = useSelect(
+	const { columnCount, parentClientId, rows, siblingCells } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlocks } =
+			const { getBlock, getBlockRootClientId, getBlocks } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
+			const parentBlock = rootClientId ? getBlock( rootClientId ) : null;
 
 			return {
+				columnCount: parentBlock?.attributes?.columnCount || 0,
 				parentClientId: rootClientId,
+				rows: parentBlock?.attributes?.rows || [],
 				siblingCells: rootClientId ? getBlocks( rootClientId ) : [],
 			};
 		},
 		[ clientId ]
 	);
 
-	const selectedCellLocation = getSelectedCellLocation(
+	const selectedCellLocation = getCellLocation(
+		rows,
 		siblingCells,
+		columnCount,
 		clientId
 	);
-	const { columnCount } = getGridDimensions( siblingCells );
+	const cellPlacements = getCellPlacements( rows, siblingCells, columnCount );
 
-	function replaceTableCells( newCells ) {
+	function replaceTable( nextTable, nextColumnCount = columnCount ) {
 		if ( ! parentClientId ) {
 			return;
 		}
-		replaceInnerBlocks( parentClientId, sortCells( newCells ), false );
+		registry.batch( () => {
+			updateBlockAttributes( parentClientId, {
+				columnCount: nextColumnCount,
+				rows: nextTable.rows,
+			} );
+			replaceInnerBlocks( parentClientId, nextTable.cells, false );
+		} );
 	}
 
 	function onInsertRow( delta ) {
 		if ( ! selectedCellLocation ) {
 			return;
 		}
-		const { section: selectedSection, row } = selectedCellLocation;
-		replaceTableCells(
-			insertRow( siblingCells, {
-				section: selectedSection,
-				rowIndex: row + delta,
+		const { rowIndex, rowType } = selectedCellLocation;
+		replaceTable(
+			insertRow( rows, siblingCells, {
+				rowIndex: rowIndex + delta,
+				type: rowType,
 				columnCount,
 			} )
 		);
@@ -123,10 +133,9 @@ export default function TableCellEdit( {
 		if ( ! selectedCellLocation ) {
 			return;
 		}
-		replaceTableCells(
-			deleteRow( siblingCells, {
-				section: selectedCellLocation.section,
-				rowIndex: selectedCellLocation.row,
+		replaceTable(
+			deleteRow( rows, siblingCells, {
+				rowIndex: selectedCellLocation.rowIndex,
 			} )
 		);
 	}
@@ -135,10 +144,11 @@ export default function TableCellEdit( {
 		if ( ! selectedCellLocation ) {
 			return;
 		}
-		replaceTableCells(
-			insertColumn( siblingCells, {
-				columnIndex: selectedCellLocation.column + delta,
-			} )
+		replaceTable(
+			insertColumn( rows, siblingCells, {
+				columnIndex: selectedCellLocation.columnIndex + delta,
+			} ),
+			columnCount + 1
 		);
 	}
 
@@ -151,13 +161,14 @@ export default function TableCellEdit( {
 	}
 
 	function onDeleteColumn() {
-		if ( ! selectedCellLocation ) {
+		if ( ! selectedCellLocation || columnCount <= 1 ) {
 			return;
 		}
-		replaceTableCells(
-			deleteColumn( siblingCells, {
-				columnIndex: selectedCellLocation.column,
-			} )
+		replaceTable(
+			deleteColumn( rows, siblingCells, {
+				columnIndex: selectedCellLocation.columnIndex,
+			} ),
+			columnCount - 1
 		);
 	}
 
@@ -165,11 +176,11 @@ export default function TableCellEdit( {
 		if ( ! selectedCellLocation ) {
 			return;
 		}
-		const { column } = selectedCellLocation;
+		const { columnIndex } = selectedCellLocation;
 		registry.batch( () => {
-			for ( const cell of siblingCells ) {
-				if ( cell.attributes.column === column ) {
-					updateBlockAttributes( cell.clientId, {
+			for ( const placement of cellPlacements ) {
+				if ( placement.columnIndex === columnIndex ) {
+					updateBlockAttributes( placement.cell.clientId, {
 						align: nextAlign,
 					} );
 				}
@@ -182,14 +193,10 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { section: selectedSection, row } = selectedCellLocation;
-		const rowCellIds = sortCells(
-			siblingCells.filter(
-				( cell ) =>
-					cell.attributes.section === selectedSection &&
-					cell.attributes.row === row
-			)
-		).map( ( cell ) => cell.clientId );
+		const { rowIndex } = selectedCellLocation;
+		const rowCellIds = cellPlacements
+			.filter( ( placement ) => placement.rowIndex === rowIndex )
+			.map( ( placement ) => placement.cell.clientId );
 
 		multiSelectSet( rowCellIds );
 	}
@@ -199,10 +206,10 @@ export default function TableCellEdit( {
 			return;
 		}
 
-		const { column } = selectedCellLocation;
-		const columnCellIds = sortCells(
-			siblingCells.filter( ( cell ) => cell.attributes.column === column )
-		).map( ( cell ) => cell.clientId );
+		const { columnIndex } = selectedCellLocation;
+		const columnCellIds = cellPlacements
+			.filter( ( placement ) => placement.columnIndex === columnIndex )
+			.map( ( placement ) => placement.cell.clientId );
 
 		multiSelectSet( columnCellIds );
 	}
@@ -211,11 +218,12 @@ export default function TableCellEdit( {
 		if ( ! selectedCellLocation ) {
 			return undefined;
 		}
-		const cell = siblingCells.find(
-			( siblingCell ) =>
-				siblingCell.attributes.column === selectedCellLocation.column
+		const placement = cellPlacements.find(
+			( siblingPlacement ) =>
+				siblingPlacement.columnIndex ===
+				selectedCellLocation.columnIndex
 		);
-		return cell?.attributes?.align;
+		return placement?.cell?.attributes?.align;
 	}
 
 	const tableControls = [
@@ -262,9 +270,9 @@ export default function TableCellEdit( {
 	];
 
 	let placeholder;
-	if ( section === 'head' ) {
+	if ( selectedCellLocation?.rowType === 'head' ) {
 		placeholder = __( 'Header label' );
-	} else if ( section === 'foot' ) {
+	} else if ( selectedCellLocation?.rowType === 'foot' ) {
 		placeholder = __( 'Footer label' );
 	}
 
@@ -299,9 +307,9 @@ export default function TableCellEdit( {
 				placeholder={ placeholder }
 				aria-label={
 					// eslint-disable-next-line no-nested-ternary
-					section === 'head'
+					selectedCellLocation?.rowType === 'head'
 						? __( 'Header cell text' )
-						: section === 'foot'
+						: selectedCellLocation?.rowType === 'foot'
 						? __( 'Footer cell text' )
 						: __( 'Body cell text' )
 				}

@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockIcon,
@@ -33,13 +33,7 @@ import { blockTable as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import {
-	createTableCells,
-	getGridDimensions,
-	mapCellsToSections,
-	toggleSection,
-	sortCells,
-} from './utils';
+import { createTable, mapCellsToSections, toggleSection } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function TSection( { name, ...props } ) {
@@ -48,7 +42,7 @@ function TSection( { name, ...props } ) {
 }
 
 export default function TableEdit( { attributes, setAttributes, clientId } ) {
-	const { hasFixedLayout } = attributes;
+	const { columnCount, hasFixedLayout, rows } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 
@@ -65,37 +59,46 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 		[ clientId ]
 	);
 
-	const isEmpty = innerBlocks.length === 0;
-	const { sectionRowCounts } = isEmpty
-		? { sectionRowCounts: { head: 0, body: 0, foot: 0 } }
-		: getGridDimensions( innerBlocks );
-
-	const hasHeader = sectionRowCounts.head > 0;
-	const hasFooter = sectionRowCounts.foot > 0;
+	const isEmpty = rows.length === 0 || innerBlocks.length === 0;
+	const hasHeader = rows.some( ( row ) => row.type === 'head' );
+	const hasFooter = rows.some( ( row ) => row.type === 'foot' );
 
 	// Structural operations: these replace the entire inner blocks array.
-	const replaceTableCells = useCallback(
-		( newCells ) => {
-			replaceInnerBlocks( clientId, sortCells( newCells ), false );
-		},
-		[ clientId, replaceInnerBlocks ]
-	);
+	function replaceTable( nextTable ) {
+		setAttributes( { rows: nextTable.rows } );
+		replaceInnerBlocks( clientId, nextTable.cells, false );
+	}
 
 	function onCreateTable( event ) {
 		event.preventDefault();
-		const cells = createTableCells( {
+		const nextColumnCount = parseInt( initialColumnCount, 10 ) || 2;
+		const nextTable = createTable( {
 			rowCount: parseInt( initialRowCount, 10 ) || 2,
-			columnCount: parseInt( initialColumnCount, 10 ) || 2,
+			columnCount: nextColumnCount,
 		} );
-		replaceInnerBlocks( clientId, cells, true );
+		setAttributes( {
+			columnCount: nextColumnCount,
+			rows: nextTable.rows,
+		} );
+		replaceInnerBlocks( clientId, nextTable.cells, true );
 	}
 
 	function onToggleHeaderSection() {
-		replaceTableCells( toggleSection( innerBlocks, { section: 'head' } ) );
+		replaceTable(
+			toggleSection( rows, innerBlocks, {
+				type: 'head',
+				columnCount,
+			} )
+		);
 	}
 
 	function onToggleFooterSection() {
-		replaceTableCells( toggleSection( innerBlocks, { section: 'foot' } ) );
+		replaceTable(
+			toggleSection( rows, innerBlocks, {
+				type: 'foot',
+				columnCount,
+			} )
+		);
 	}
 
 	function onChangeFixedLayout() {
@@ -143,8 +146,8 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 
 	// Map the flat cell blocks into sections and rows.
 	const sections = useMemo(
-		() => mapCellsToSections( innerBlocks ),
-		[ innerBlocks ]
+		() => mapCellsToSections( rows, innerBlocks ),
+		[ rows, innerBlocks ]
 	);
 
 	return (

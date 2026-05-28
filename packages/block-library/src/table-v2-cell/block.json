@@ -13,16 +13,6 @@
 			"source": "rich-text",
 			"role": "content"
 		},
-		"section": {
-			"type": "string",
-			"default": "body"
-		},
-		"row": {
-			"type": "integer"
-		},
-		"column": {
-			"type": "integer"
-		},
 		"rowSpan": {
 			"type": "integer",
 			"default": 1
