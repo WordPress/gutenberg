@@ -108,6 +108,8 @@ export function MediaEditorModal( {
 			renderFrame={ ( {
 				children,
 				headerActions,
+				footerActions,
+				footerLayout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -127,6 +129,13 @@ export function MediaEditorModal( {
 						headerActions={ headerActions }
 					>
 						{ children }
+						<div
+							className={ `media-editor-modal__footer is-${ footerLayout }` }
+							role="region"
+							aria-label={ __( 'Editor actions' ) }
+						>
+							{ footerActions }
+						</div>
 					</Modal>
 				</ShortcutProvider>
 			) }

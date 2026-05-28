@@ -21,6 +21,86 @@
 	min-height: 0;
 }
 
+// Footer chrome — three layouts driven by `is-wide` / `is-medium` /
+// `is-narrow` modifier classes set from the media editor. Wide is a single
+// flex row; medium and narrow stack via `flex-direction: column`. Each
+// layout has its own JSX tree (not `order` reshuffling, which the project's
+// stylelint rule treats as an a11y red flag), so DOM order always matches
+// visual order.
+.media-editor-modal.components-modal__frame .media-editor-modal__footer {
+	flex-shrink: 0;
+	display: flex;
+	gap: $grid-unit-20;
+	padding: $grid-unit-10 $grid-unit-30;
+	border-top: $border-width solid $gray-300;
+	background: $white;
+
+	&.is-wide {
+		flex-direction: row;
+		align-items: center;
+
+		// Wide-only wrapper: ruler + transform controls are grouped
+		// together, centered between History and Cancel/Save with a
+		// divider rule between them — preserving the long-standing
+		// wide-desktop look.
+		.media-editor-modal__footer-toolbar {
+			flex: 1 1 0;
+			min-width: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: $grid-unit-10;
+		}
+
+		.media-editor-fine-rotation {
+			flex: 1 1 280px;
+			min-width: 0;
+			max-width: 360px;
+		}
+
+		.media-editor-transform-controls {
+			border-left: $border-width solid $gray-300;
+			padding-left: $grid-unit-15;
+		}
+
+		// `margin-left: auto` guarantees right alignment whether or not
+		// History / the toolbar is rendered (handles non-image
+		// attachments where only `FooterActions` is present).
+		.media-editor__footer-actions {
+			margin-left: auto;
+		}
+	}
+
+	&.is-medium,
+	&.is-narrow {
+		flex-direction: column;
+	}
+
+	// Narrow only: transform cluster sits on its own row, centered.
+	&.is-narrow > .media-editor-transform-controls {
+		align-self: center;
+	}
+}
+
+// Secondary row used by medium (History + Transform + Cancel/Save) and
+// narrow (History + Cancel/Save). `margin-left: auto` on the transform
+// cluster and on Cancel/Save splits any free space — History gets the
+// left edge, Cancel/Save the right edge, and the transform cluster (when
+// present, i.e. medium only) approximately centers. Exact centering only
+// holds when History and Cancel/Save have matching widths; in practice
+// they're close enough that the offset is imperceptible.
+.media-editor-modal__footer-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-20;
+
+	.media-editor-transform-controls,
+	.media-editor__footer-actions {
+		margin-left: auto;
+	}
+}
+
 .media-editor-modal {
 	display: flex;
 	flex-direction: column;
