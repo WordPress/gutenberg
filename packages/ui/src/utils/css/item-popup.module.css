@@ -4,7 +4,7 @@
 	.popup {
 		composes: dropdown-motion from "./dropdown-motion.module.css";
 
-		--wp-ui-popup-padding: 4px;
+		--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
 
 		display: grid;
 		grid-template-rows: auto minmax(0, 1fr);
@@ -49,11 +49,10 @@
 		}
 	}
 
-	/* TODO: Use padding token */
 	.item {
 		--wp-ui-popup-item-height: 40px;
-		--wp-ui-popup-item-padding-inline: 12px;
-		--wp-ui-popup-item-padding-block: 4px;
+		--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
+		--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
 
 		display: flex;
 		align-items: center;
@@ -66,7 +65,7 @@
 		padding-block: var(--wp-ui-popup-item-padding-block);
 
 		/* Optically adjust the prefix icon to a more balanced position. */
-		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - 4px);
+		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
 		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
 
 		&:not([data-disabled]) {
@@ -75,12 +74,12 @@
 
 		&.is-size-compact {
 			--wp-ui-popup-item-height: 32px;
-			--wp-ui-popup-item-padding-inline: 8px;
+			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 		}
 
 		&.is-size-small {
 			--wp-ui-popup-item-height: 24px;
-			--wp-ui-popup-item-padding-inline: 8px;
+			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 			--wp-ui-popup-item-padding-block: 2px;
 		}
 
@@ -109,7 +108,7 @@
 		}
 	}
 
-	.item-indicator-icon {
+	.item-icon {
 		flex-shrink: 0;
 	}
 
@@ -117,7 +116,7 @@
 	on the .list beneath it (both share grid-area: main and overlap). */
 	.empty:not(:empty) {
 		--wp-ui-popup-empty-min-height: 40px;
-		--wp-ui-popup-empty-padding-inline: 12px;
+		--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
 
 		grid-area: main;
 		display: flex;
