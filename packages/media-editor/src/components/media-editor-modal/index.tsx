@@ -68,7 +68,7 @@ export function MediaEditorModal( {
 		event.stopPropagation();
 	};
 
-	const closeAndRestoreFocus = () => {
+	const handleClose = () => {
 		closeMediaEditorModal();
 		onClose?.();
 	};
@@ -82,7 +82,7 @@ export function MediaEditorModal( {
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
 			noticesPortalElement={ portalElement }
-			onClose={ closeAndRestoreFocus }
+			onClose={ handleClose }
 			onSaved={ ( { id: savedId, url, previous } ) => {
 				if ( savedId && onUpdate ) {
 					const update: MediaEditorModalUpdate = {
@@ -91,7 +91,7 @@ export function MediaEditorModal( {
 					};
 					onUpdate( update );
 				}
-				closeAndRestoreFocus();
+				handleClose();
 				if ( previous && savedId !== previous.id && onUpdate ) {
 					// Intentionally unscoped: the modal is closing, so the
 					// snackbar surfaces in the host editor (not the media
