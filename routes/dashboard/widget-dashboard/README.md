@@ -76,11 +76,11 @@ Optional. Composition slot for arbitrary surface markup. When omitted, the engin
 
 #### `<WidgetDashboard.Widgets />`
 
-Iterates `layout`, renders each entry through `<WidgetDashboard.Widget />`, and feeds the resulting tree into the underlying grid (`@wordpress/grid`).
+Iterates `layout`, renders each entry through `<WidgetDashboard.WidgetChrome />`, and feeds the resulting tree into the underlying grid (`@wordpress/grid`).
 
-#### `<WidgetDashboard.Widget />`
+#### `<WidgetDashboard.WidgetChrome />`
 
-Per-instance wrapper. Provides widget identity to the render tree via context and hosts the widget's render module under a `Suspense` boundary and an error boundary. The instance is read from `layout`; consumers don't pass it manually.
+Per-instance wrapper (the `DashboardWidgetChrome` component). Provides widget identity to the render tree via context and hosts the widget's render module under a `Suspense` boundary and an error boundary. The instance is read from `layout`; consumers don't pass it manually.
 
 #### `<WidgetDashboard.NoWidgetsState>`
 
@@ -142,4 +142,4 @@ interface WidgetRenderProps< Item = unknown > {
 - `ResolveWidgetModule` — module resolver signature.
 - `WidgetGridSettings` — grid configuration.
 
-`WidgetName`, `WidgetTypeMetadata`, and `WidgetType` are declared locally in `types.ts` until `@wordpress/widget-types` lands in trunk; at that point those three collapse into a re-export from the package.
+The widget contract types (`WidgetName`, `WidgetTypeMetadata`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `widget-primitives` and imported from there directly; this engine does not re-export them.
