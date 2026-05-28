@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 9.0.0 (2026-05-27)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315), [#78362](https://github.com/WordPress/gutenberg/pull/78362)):
+    -   `.components-modal__header`
+    -   `.dataviews-footer`
+    -   `.dataviews-view-grid__card .dataviews-selection-checkbox`
+    -   `.dataviews-view-table thead`
+
 ## 8.0.0 (2026-05-14)
 
 ### Breaking Changes

@@ -1,8 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import _style, {
+	getCanvasStateStyleValue,
+	getBlockStateStylesCSS,
 	getInlineStyles,
+	getResponsiveStateCSSRules,
 	getStateStylesCSS,
 	omitStyle,
 } from '../style';
@@ -199,6 +207,212 @@ describe( 'getStateStylesCSS', () => {
 		).toBe(
 			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
 		);
+	} );
+} );
+
+describe( 'getBlockStateStylesCSS', () => {
+	beforeEach( () => {
+		registerBlockType( 'test/state-button', {
+			apiVersion: 3,
+			title: 'State Button',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				root: '.wp-block-button .wp-block-button__link',
+				dimensions: {
+					root: '.wp-block-button',
+					width: '.wp-block-button',
+				},
+			},
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'test/state-button' );
+	} );
+
+	it( 'routes state styles through feature selectors', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{
+					color: { background: '#ff00d0' },
+					dimensions: { width: '50%' },
+				},
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
+		);
+	} );
+
+	it( 'routes canvas preview styles through feature selectors without the pseudo state', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{
+					color: { background: '#ff00d0' },
+					dimensions: { width: '50%' },
+				},
+				{
+					name: 'test/state-button',
+					baseSelector: '[data-block="client-id"]',
+				}
+			)
+		).toBe(
+			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] { width: 50% !important; }'
+		);
+	} );
+} );
+
+describe( 'getResponsiveStateCSSRules', () => {
+	beforeEach( () => {
+		registerBlockType( 'test/state-button', {
+			apiVersion: 3,
+			title: 'State Button',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				root: '.wp-block-button .wp-block-button__link',
+				dimensions: {
+					root: '.wp-block-button',
+					width: '.wp-block-button',
+				},
+			},
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'test/state-button' );
+	} );
+
+	it( 'generates media-query scoped root styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						color: { text: 'red' },
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'routes viewport styles through feature selectors', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						color: { background: '#ff00d0' },
+						dimensions: { width: '50%' },
+					},
+				},
+				'test/state-button',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 { width: 50% !important; }}',
+		] );
+	} );
+
+	it( 'generates media-query scoped pseudo styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						':hover': {
+							color: { background: 'black' },
+						},
+					},
+				},
+				'core/button',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }}',
+		] );
+	} );
+
+	it( 'generates media-query scoped element styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						elements: {
+							link: {
+								color: { text: 'blue' },
+							},
+						},
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 a:where(:not(.wp-element-button)) { color: blue; }}',
+		] );
+	} );
+} );
+
+describe( 'getCanvasStateStyleValue', () => {
+	it( 'returns the selected pseudo state value without a viewport state', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { text: 'red' },
+					},
+				},
+				{ viewport: 'default', pseudo: ':hover' }
+			)
+		).toEqual( {
+			color: { text: 'red' },
+		} );
+	} );
+
+	it( 'falls back to default viewport pseudo styles for responsive pseudo states', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { text: 'red' },
+					},
+				},
+				{ viewport: 'mobile', pseudo: ':hover' }
+			)
+		).toEqual( {
+			color: { text: 'red' },
+		} );
+	} );
+
+	it( 'merges responsive pseudo styles over default viewport pseudo styles', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { background: 'blue', text: 'red' },
+					},
+					mobile: {
+						':hover': {
+							color: { text: 'yellow' },
+						},
+					},
+				},
+				{ viewport: 'mobile', pseudo: ':hover' }
+			)
+		).toEqual( {
+			color: { background: 'blue', text: 'yellow' },
+		} );
 	} );
 } );
 

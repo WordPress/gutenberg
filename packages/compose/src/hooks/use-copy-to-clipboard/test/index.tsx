@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import useCopyToClipboard, { copyToClipboard, clearSelection } from '../';
+import useCopyToClipboard, { copyToClipboard, restoreFocus } from '../';
 
 interface TestComponentProps {
 	text: string | ( () => string );
@@ -68,7 +68,7 @@ describe( 'useCopyToClipboard', () => {
 		expect( onSuccess ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should not call onSuccess after unmount', async () => {
+	it( 'should call onSuccess after the node unmounts', async () => {
 		let resolvePromise: () => void;
 		const delayedPromise = new Promise< void >( ( resolve ) => {
 			resolvePromise = resolve;
@@ -91,7 +91,35 @@ describe( 'useCopyToClipboard', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 		} );
 
-		expect( onSuccess ).not.toHaveBeenCalled();
+		expect( onSuccess ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not restore focus after the node unmounts', async () => {
+		let resolvePromise: () => void;
+		const delayedPromise = new Promise< void >( ( resolve ) => {
+			resolvePromise = resolve;
+		} );
+		jest.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
+			delayedPromise
+		);
+
+		const user = userEvent.setup();
+		const { unmount } = render( <TestComponent text="test" /> );
+
+		const button = screen.getByRole( 'button' );
+		const focusSpy = jest.spyOn( button, 'focus' );
+
+		await user.click( button );
+		unmount();
+		// Discard focus calls from the initial click; we only care about post-unmount calls.
+		focusSpy.mockClear();
+
+		await act( async () => {
+			resolvePromise();
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		} );
+
+		expect( focusSpy ).not.toHaveBeenCalled();
 	} );
 } );
 
@@ -129,13 +157,13 @@ describe( 'copyToClipboard', () => {
 	} );
 } );
 
-describe( 'clearSelection', () => {
+describe( 'restoreFocus', () => {
 	it( 'should focus the trigger element', () => {
 		const trigger = document.createElement( 'button' );
 		document.body.appendChild( trigger );
 		const focusMock = jest.spyOn( trigger, 'focus' );
 
-		clearSelection( trigger );
+		restoreFocus( trigger );
 
 		expect( focusMock ).toHaveBeenCalledTimes( 1 );
 

@@ -42,16 +42,13 @@ export default meta;
 /**
  * A mock application page demonstrating how `ThemeProvider` affects multiple
  * `@wordpress/ui` components in concert. Use the inline controls to adjust
- * the `primary` seed color, `bg` seed color, and `density`, and observe how
- * every surface, text element, and interactive control adapts accordingly.
+ * the `primary` and `bg` seed colors, and observe how every surface, text
+ * element, and interactive control adapts accordingly.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		const [ primary, setPrimary ] = useState< string | undefined >();
 		const [ bg, setBg ] = useState< string | undefined >();
-		const [ density, setDensity ] = useState<
-			'default' | 'compact' | 'comfortable' | undefined
-		>();
 
 		return (
 			<div>
@@ -97,38 +94,9 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							onChange={ ( e ) => setBg( e.target.value ) }
 						/>
 					</label>
-					<label
-						style={ {
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: '6px',
-						} }
-					>
-						Density
-						<select
-							value={ density ?? '' }
-							onChange={ ( e ) =>
-								setDensity(
-									( e.target.value || undefined ) as
-										| 'default'
-										| 'compact'
-										| 'comfortable'
-										| undefined
-								)
-							}
-						>
-							<option value="">Default</option>
-							<option value="compact">Compact</option>
-							<option value="comfortable">Comfortable</option>
-						</select>
-					</label>
 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
 				</div>
-				<ThemeProvider
-					color={ { primary, bg } }
-					density={ density }
-					isRoot
-				>
+				<ThemeProvider color={ { primary, bg } } isRoot>
 					<div
 						style={ {
 							display: 'grid',

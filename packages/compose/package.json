@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "7.46.0",
+	"version": "8.0.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -53,6 +53,7 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/priority-queue": "file:../priority-queue",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"change-case": "^4.1.2",
 		"mousetrap": "^1.6.5",
@@ -62,7 +63,7 @@
 		"mock-match-media": "0.4.2"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

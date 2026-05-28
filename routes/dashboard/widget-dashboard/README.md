@@ -76,11 +76,11 @@ Optional. Composition slot for arbitrary surface markup. When omitted, the engin
 
 #### `<WidgetDashboard.Widgets />`
 
-Iterates `layout`, renders each entry through `<WidgetDashboard.Widget />`, and feeds the resulting tree into the underlying grid (`@wordpress/grid`).
+Iterates `layout`, renders each entry through `<WidgetDashboard.WidgetChrome />`, and feeds the resulting tree into the underlying grid (`@wordpress/grid`).
 
-#### `<WidgetDashboard.Widget />`
+#### `<WidgetDashboard.WidgetChrome />`
 
-Per-instance wrapper. Provides widget identity to the render tree via context and hosts the widget's render module under a `Suspense` boundary and an error boundary. The instance is read from `layout`; consumers don't pass it manually.
+Per-instance wrapper (the `DashboardWidgetChrome` component). Provides widget identity to the render tree via context and hosts the widget's render module under a `Suspense` boundary and an error boundary. The instance is read from `layout`; consumers don't pass it manually.
 
 #### `<WidgetDashboard.NoWidgetsState>`
 
@@ -88,7 +88,7 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widgets", "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widgets" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin surfaces (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
@@ -115,7 +115,7 @@ import { Page } from '@wordpress/admin-ui';
 
 ## Inserting widgets
 
-A modal-based inserter is mounted automatically inside `WidgetDashboard`. It stays hidden until the "Add widgets" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
+A modal-based inserter is mounted automatically inside `WidgetDashboard`. It stays hidden until the "Add widget" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
 
 On confirmation, the inserter creates instances via `createDashboardWidget( widgetType )` (using each type's `example.attributes` as the initial values) and appends them to `layout` through `onLayoutChange`. The dialog closes after a successful insertion or when the user dismisses it.
 
@@ -142,4 +142,4 @@ interface WidgetRenderProps< Item = unknown > {
 - `ResolveWidgetModule` — module resolver signature.
 - `WidgetGridSettings` — grid configuration.
 
-`WidgetName`, `WidgetTypeMetadata`, and `WidgetType` are declared locally in `types.ts` until `@wordpress/widget-types` lands in trunk; at that point those three collapse into a re-export from the package.
+The widget contract types (`WidgetName`, `WidgetTypeMetadata`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `widget-primitives` and imported from there directly; this engine does not re-export them.

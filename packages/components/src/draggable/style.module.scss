@@ -10,20 +10,19 @@
 
 .clone {
 	position: fixed;
-	padding: 0; // Should match clonePadding variable.
+	padding: 0; // Matches the `clonePadding` JS constant.
 	background: transparent;
 	pointer-events: none;
 }
 
-// Apply the stacking fallback only outside the `@wordpress/ui` compat
-// overlay slot — inside it, the slot's isolated stacking context
-// already handles ordering.
+// Fallback for clones placed outside the compat overlay slot — the
+// slot's stacking context handles ordering inside it.
 .clone:not(.is-in-compat-slot) {
 	z-index: z-index(".components-draggable__clone");
 }
 
-// Keep this selector global so external code that toggles the same
-// body class (e.g. block-editor keyboard drag) gets the same cursor.
+// Global selector — external code (e.g. block-editor keyboard drag)
+// toggles the same body class.
 :global(body.is-dragging-components-draggable) {
 	cursor: move; /* Fallback for IE/Edge < 14 */
 	cursor: grabbing !important;

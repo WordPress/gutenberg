@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -17,6 +18,11 @@ export const PSEUDO_STATE_LABELS = {
 	':active': __( 'Active' ),
 };
 
+export const RESPONSIVE_STATE_LABELS = {
+	tablet: __( 'Tablet' ),
+	mobile: __( 'Mobile' ),
+};
+
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS
 // and packages/global-styles-engine/src/core/render.tsx.
 export const VALID_BLOCK_PSEUDO_STATES = {
@@ -24,7 +30,7 @@ export const VALID_BLOCK_PSEUDO_STATES = {
 	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
-function getStateOptions( name ) {
+function getPseudoStateOptions( name ) {
 	const validStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
 
 	return validStates
@@ -35,29 +41,49 @@ function getStateOptions( name ) {
 		} ) );
 }
 
+const DEFAULT_STATE_VALUE = 'default';
+
+function getViewportStateOptions( name ) {
+	if ( ! getBlockType( name )?.attributes?.style ) {
+		return [];
+	}
+
+	return Object.entries( RESPONSIVE_STATE_LABELS ).map(
+		( [ value, label ] ) => ( {
+			value,
+			label,
+		} )
+	);
+}
+
 /**
- * Renders a pseudo-state selector in the block card header.
- * Only shown for blocks with configured pseudo-state support.
+ * Renders a style-state selector in the block card header.
+ * Viewport states are shown for blocks with a style attribute, while
+ * pseudo-states are shown for blocks with configured pseudo-state support.
  *
  * @param {Object}   props          Component props.
  * @param {string}   props.name     Block name.
- * @param {string}   props.value    Currently selected pseudo-state value.
- * @param {Function} props.onChange Callback when pseudo-state selection changes.
+ * @param {Object}   props.value    Currently selected style-state value.
+ * @param {Function} props.onChange Callback when style-state selection changes.
  * @return {Element|null} State control component, or null if not applicable.
  */
 export function BlockStatesControl( { name, value, onChange } ) {
-	const stateOptions = getStateOptions( name );
+	const viewportStateOptions = getViewportStateOptions( name );
+	const pseudoStateOptions = getPseudoStateOptions( name );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! stateOptions.length ) {
+	if ( ! viewportStateOptions.length && ! pseudoStateOptions.length ) {
 		return null;
 	}
 
 	return (
 		<StateControl
-			pseudoStates={ stateOptions }
-			pseudoStateValue={ value }
-			onChangePseudoState={ onChange }
+			viewportStates={ viewportStateOptions }
+			pseudoStates={ pseudoStateOptions }
+			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
+			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
+			onChangeViewport={ ( viewport ) => onChange( { viewport } ) }
+			onChangePseudoState={ ( pseudo ) => onChange( { pseudo } ) }
 			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
 		/>
@@ -65,16 +91,19 @@ export function BlockStatesControl( { name, value, onChange } ) {
 }
 
 export function BlockStateBadges( { name, value } ) {
-	const stateOptions = getStateOptions( name );
+	const viewportStateOptions = getViewportStateOptions( name );
+	const pseudoStateOptions = getPseudoStateOptions( name );
 
-	if ( ! stateOptions.length ) {
+	if ( ! viewportStateOptions.length && ! pseudoStateOptions.length ) {
 		return null;
 	}
 
 	return (
 		<StateControlBadges
-			pseudoStates={ stateOptions }
-			pseudoStateValue={ value }
+			viewportStates={ viewportStateOptions }
+			pseudoStates={ pseudoStateOptions }
+			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
+			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
 		/>
 	);
 }

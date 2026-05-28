@@ -129,6 +129,20 @@ function isRequestBodyTooLargeError( error: unknown ): error is WPRestError {
 }
 
 /**
+ * Check if an error is the sync server's protocol mismatch signal. This
+ * indicates the client is running an outdated version of the code that is
+ * incompatible with the server, and the user should refresh to recover.
+ *
+ * @param error The caught error to inspect.
+ */
+function isProtocolMismatchError( error: unknown ): error is WPRestError {
+	return (
+		( error as WPRestError | undefined )?.code ===
+		'rest_sync_protocol_mismatch'
+	);
+}
+
+/**
  * Try to identify which room caused a forbidden error by checking if any
  * room name from the request appears in the error message. The WordPress
  * REST API includes the room name in per-entity permission errors (e.g.
@@ -855,6 +869,31 @@ function poll(): void {
 						true // force
 					);
 				}
+			} else if ( isProtocolMismatchError( error ) ) {
+				// The server explicitly signaled a protocol mismatch, so we fail
+				// gracefully instead of retrying indefinitely. This can happen if
+				// the client is running an outdated version of the code that is
+				// incompatible with the server.
+				const affectedRooms = [ ...roomStates.entries() ];
+
+				for ( const [ , state ] of affectedRooms ) {
+					state.onStatusChange( {
+						status: 'disconnected',
+						error: new ConnectionError(
+							ConnectionErrorCode.PROTOCOL_MISMATCH,
+							'Protocol mismatch between client and server'
+						),
+					} );
+				}
+
+				// Skip the server-side disconnect signal: by definition the
+				// server can't speak our protocol, so sending one is pointless.
+				for ( const [ room ] of affectedRooms ) {
+					unregisterRoom( room, { sendDisconnectSignal: false } );
+				}
+
+				isPolling = false;
+				return;
 			} else {
 				// Use the explicit retry delay schedule for backoff.
 				consecutiveFailures++;

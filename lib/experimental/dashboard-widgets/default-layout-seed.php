@@ -11,8 +11,8 @@
  */
 
 /**
- * Appends the bundled `core/hello-world` instance to the default layout
- * unless something earlier in the filter chain already added it.
+ * Appends the bundled widget instances to the default layout unless an
+ * earlier callback in the filter chain already added them.
  *
  * Only contributes to the bundled `gutenberg_dashboard` surface; other
  * dashboards are left untouched.
@@ -30,18 +30,65 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 
 	$uuids = array_column( $dashboard_layout, 'uuid' );
 
-	if ( in_array( 'default-hello-world-widget-instance', $uuids, true ) ) {
-		return $dashboard_layout;
+	if ( ! in_array( 'default-welcome-widget-instance', $uuids, true ) ) {
+		$dashboard_layout[] = array(
+			'uuid'      => 'default-welcome-widget-instance',
+			'type'      => 'core/welcome',
+			'placement' => array(
+				'width'  => 'full',
+				'height' => 3,
+				'order'  => 0,
+			),
+		);
 	}
 
-	$dashboard_layout[] = array(
-		'uuid'      => 'default-hello-world-widget-instance',
-		'type'      => 'core/hello-world',
-		'placement' => array(
-			'width'  => 2,
-			'height' => 1,
-		),
-	);
+	if ( ! in_array( 'default-activity-widget-instance', $uuids, true ) ) {
+		$dashboard_layout[] = array(
+			'uuid'      => 'default-activity-widget-instance',
+			'type'      => 'core/activity',
+			'placement' => array(
+				'width'  => 3,
+				'height' => 3,
+				'order'  => 1,
+			),
+		);
+	}
+
+	if ( ! in_array( 'default-quick-draft-widget-instance', $uuids, true ) ) {
+		$dashboard_layout[] = array(
+			'uuid'      => 'default-quick-draft-widget-instance',
+			'type'      => 'core/quick-draft',
+			'placement' => array(
+				'width'  => 4,
+				'height' => 3,
+				'order'  => 2,
+			),
+		);
+	}
+
+	if ( ! in_array( 'default-site-health-widget-instance', $uuids, true ) ) {
+		$dashboard_layout[] = array(
+			'uuid'      => 'default-site-health-widget-instance',
+			'type'      => 'core/site-health',
+			'placement' => array(
+				'width'  => 2,
+				'height' => 2,
+				'order'  => 3,
+			),
+		);
+	}
+
+	if ( ! in_array( 'default-preview-widget-instance', $uuids, true ) ) {
+		$dashboard_layout[] = array(
+			'uuid'      => 'default-preview-widget-instance',
+			'type'      => 'core/site-preview',
+			'placement' => array(
+				'width'  => 2,
+				'height' => 3,
+				'order'  => 4,
+			),
+		);
+	}
 
 	return $dashboard_layout;
 }

@@ -29,9 +29,11 @@ import type {
 	Size,
 	NormalizedRect,
 } from '../../core/types';
-import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
-import { getImageFit } from '../../core/camera';
-import { getImageCropBounds } from '../../core/containment';
+import type { CropperController } from '../hooks/use-cropper-reducer';
+import { getImageFit, getRotatedBBox } from '../../core/camera';
+import { getImageCropBounds, getMinZoom } from '../../core/containment';
+import { MIN_CROP_PIXELS } from '../../core/constants';
+import { computeInscribedRect } from '../../core/crop-rect';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -46,45 +48,14 @@ import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
 
-// Largest rect of the given pixel aspect ratio that fits inside the visual
-// bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
-// rect (1×1) if `aspectRatio` is unset or non-positive.
-function computeInscribedRect(
-	aspectRatio: number | undefined,
-	visualSize: Size
-): NormalizedRect {
-	let w = 1;
-	let h = 1;
-	if ( aspectRatio && aspectRatio > 0 && visualSize.width > 0 ) {
-		// normalizedRatio = w/h in normalized space that produces the
-		// desired pixel aspect ratio.
-		// pixelW = w * visualW, pixelH = h * visualH
-		// pixelW / pixelH = aspectRatio
-		// => w / h = aspectRatio * visualH / visualW
-		const normalizedRatio =
-			( aspectRatio * visualSize.height ) / visualSize.width;
-		if ( normalizedRatio <= 1 ) {
-			w = normalizedRatio;
-		} else {
-			h = 1 / normalizedRatio;
-		}
-	}
-	return {
-		x: ( 1 - w ) / 2,
-		y: ( 1 - h ) / 2,
-		width: w,
-		height: h,
-	};
-}
-
 /**
  * Props for the Cropper component.
  */
 export interface CropperProps {
 	/** Image source URL. */
 	src: string;
-	/** The full state/setter object from `useCropperState`. */
-	controller: UseCropperStateReturn;
+	/** The cropper controller from `useCropperReducer` or a composite store. */
+	controller: CropperController;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
 	/** Show the rule-of-thirds grid overlay, or only during interactions. */
@@ -95,7 +66,7 @@ export interface CropperProps {
 	showDimming?: boolean;
 	/** Show the live output dimensions tooltip during a resize. */
 	showDimensions?: boolean;
-	/** Minimum zoom level. */
+	/** Minimum zoom level override. Defaults to the coverage-aware minimum. */
 	minZoom?: number;
 	/** Maximum zoom level. */
 	maxZoom?: number;
@@ -142,13 +113,13 @@ export interface CropperProps {
  *
  * @param root0                   Component props implementing CropperProps.
  * @param root0.src               Image source URL.
- * @param root0.controller        The full state/setter object from `useCropperState`.
+ * @param root0.controller        The cropper controller from `useCropperReducer` or a composite store.
  * @param root0.stencil           Custom stencil component.
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
  * @param root0.showDimming       Show dimming overlay outside crop.
  * @param root0.showDimensions    Show live dimensions tooltip during resize.
- * @param root0.minZoom           Minimum zoom level.
+ * @param root0.minZoom           Minimum zoom level override.
  * @param root0.maxZoom           Maximum zoom level.
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
@@ -182,7 +153,14 @@ function CropperInner(
 	}: CropperProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
-	const { state, setImage, setCropRect, settleCrop } = controller;
+	const {
+		state,
+		setImage,
+		setCropRect,
+		settleCrop,
+		setVisualSize,
+		adjustCropRectForViewport,
+	} = controller;
 	const {
 		viewport: viewportState,
 		setViewportPan,
@@ -290,9 +268,47 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
-	// ratio is selected. With "Free" selected, turning freeform handles off
-	// should preserve the user's current unconstrained crop.
+	// Per-axis minimum crop size in normalized space, expressing a
+	// pixel floor on the captured source region. cropRect is normalized
+	// in the viewport's snap-rotation bbox; the captured source-pixel
+	// width is `cropRect.width * bbox.width / zoom`, so the normalized
+	// floor scales with `zoom` to keep the source-pixel floor constant.
+	// Without this, SETTLE_CROP zooms in proportional to the shrink and
+	// successive drags can crop arbitrarily small.
+	const minCropSize: Size | undefined = useMemo( () => {
+		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		return {
+			width: Math.min( 1, ( MIN_CROP_PIXELS * state.zoom ) / bbox.width ),
+			height: Math.min(
+				1,
+				( MIN_CROP_PIXELS * state.zoom ) / bbox.height
+			),
+		};
+	}, [ naturalWidth, naturalHeight, state.rotation, state.zoom ] );
+
+	// Report the rendered image size to the controller. Composite
+	// controllers need it to compute aspect-ratio reshapes from the
+	// reducer (the dropdown dispatches without DOM access); pure
+	// controllers ignore it.
+	useEffect( () => {
+		setVisualSize( visualSize );
+	}, [ visualSize, setVisualSize ] );
+
+	// In fixed-crop mode, auto-size the crop rect only when a fixed
+	// aspect ratio is selected. With "Free" selected, turning freeform
+	// handles off should preserve the user's current unconstrained
+	// crop. Uses `adjustCropRectForViewport` so window-resize-driven
+	// reshapes don't create undo entries (composite controller); the
+	// dedup at lines below avoids redundant dispatches when the
+	// reducer has already updated the cropRect for an aspect change.
 	useEffect( () => {
 		if (
 			freeformCrop ||
@@ -313,11 +329,20 @@ function CropperInner(
 		) {
 			return;
 		}
-		setCropRect( rect );
-	}, [ freeformCrop, aspectRatio, visualSize, setCropRect, state.cropRect ] );
+		adjustCropRectForViewport( rect );
+	}, [
+		freeformCrop,
+		aspectRatio,
+		visualSize,
+		adjustCropRectForViewport,
+		state.cropRect,
+	] );
 
-	// In freeform mode, when aspectRatio changes, reshape the crop to the
-	// largest inscribed rect of the new ratio.
+	// In freeform mode, when aspectRatio changes, reshape the crop to
+	// the largest inscribed rect of the new ratio. Bails out when the
+	// cropRect already matches the inscribed rect — composite stores
+	// reshape atomically inside the reducer, so this effect is a
+	// no-op there.
 	const prevAspectRatioRef = useRef( aspectRatio );
 	useEffect( () => {
 		if ( prevAspectRatioRef.current === aspectRatio ) {
@@ -334,8 +359,24 @@ function CropperInner(
 		) {
 			return;
 		}
-		setCropRect( computeInscribedRect( aspectRatio, visualSize ) );
-	}, [ aspectRatio, freeformCrop, visualSize, setCropRect ] );
+		const rect = computeInscribedRect( aspectRatio, visualSize );
+		const current = state.cropRect;
+		if (
+			Math.abs( current.x - rect.x ) < CROP_RECT_EPSILON &&
+			Math.abs( current.y - rect.y ) < CROP_RECT_EPSILON &&
+			Math.abs( current.width - rect.width ) < CROP_RECT_EPSILON &&
+			Math.abs( current.height - rect.height ) < CROP_RECT_EPSILON
+		) {
+			return;
+		}
+		adjustCropRectForViewport( rect );
+	}, [
+		aspectRatio,
+		freeformCrop,
+		visualSize,
+		adjustCropRectForViewport,
+		state.cropRect,
+	] );
 
 	// Compute the crop handle bounds from the actual image footprint.
 	// Depends on the full state object because getImageCropBounds reads
@@ -348,6 +389,8 @@ function CropperInner(
 		}
 		return getImageCropBounds( state, elementSize, visualSize );
 	}, [ state, elementSize, visualSize ] );
+	const effectiveMinZoom =
+		minZoom !== undefined ? minZoom : getMinZoom( state );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
@@ -366,7 +409,7 @@ function CropperInner(
 		isZooming,
 		isPlacementActive: isInteractionPlacementActive,
 	} = useInteraction( state, controller, canvasSize, visualSize, {
-		minZoom,
+		minZoom: effectiveMinZoom,
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,
@@ -498,7 +541,9 @@ function CropperInner(
 
 	// Settling animation: brief linear transition after resize end.
 	const [ settling, setSettling ] = useState( false );
-	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const settleTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	// Clear the pending settle timer on unmount so it can't fire a
 	// state update on an unmounted component.
@@ -740,6 +785,7 @@ function CropperInner(
 						freeformCrop={ freeformCrop }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
+						minCropSize={ minCropSize }
 					/>
 
 					{ /* Rule-of-thirds grid */ }

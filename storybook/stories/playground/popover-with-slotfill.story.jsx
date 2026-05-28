@@ -10,9 +10,9 @@ export default {
 	component: Popover.Root,
 };
 
-// Renders an iframe and portals `children` into its body once `load` fires.
-// Gating the portal on `load` avoids a Firefox-only React portal bug — see
-// https://github.com/facebook/react/issues/22847#issuecomment-991394558.
+// Renders an iframe and portals `children` into its body on `load`.
+// Gating on `load` avoids a Firefox-only React portal bug:
+// https://github.com/facebook/react/issues/22847#issuecomment-991394558
 function IframePortal( { children, iframeRef, ...iframeProps } ) {
 	const [ bodyNode, setBodyNode ] = useState( null );
 	return (

@@ -26,6 +26,7 @@
 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"@y/websocket-server": "0.1.1",
+		"esbuild": "^0.27.2",
 		"filenamify": "^4.2.0",
 		"ws": "^8.18.3",
 		"y-websocket": "^3.0.0"
