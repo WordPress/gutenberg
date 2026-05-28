@@ -34,6 +34,10 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 }
 /* stylelint-enable */
 
+[data-is-set-multi-selecting="true"] .block-editor-block-list__layout::selection,
+[data-is-set-multi-selecting="true"] .block-editor-block-list__layout ::selection {
+	background: transparent;
+}
 
 // Note to developers refactoring this, please test navigation mode, and
 // multi selection and hovering the block switcher to highlight the block.
