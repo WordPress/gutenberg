@@ -311,8 +311,8 @@ export default function TableCellEdit( {
 
 	return (
 		<CellTag { ...blockProps }>
-			{ isCellSetSelection && (
-				<BlockControls group="block">
+			<BlockControls group="other">
+				{ isCellSetSelection && (
 					<Dropdown
 						popoverProps={ { placement: 'bottom-start' } }
 						renderToggle={ ( { isOpen, onToggle } ) => (
@@ -340,9 +340,7 @@ export default function TableCellEdit( {
 							</div>
 						) }
 					/>
-				</BlockControls>
-			) }
-			<BlockControls group="other">
+				) }
 				<ToolbarDropdownMenu
 					icon={ table }
 					label={ __( 'Edit table' ) }
