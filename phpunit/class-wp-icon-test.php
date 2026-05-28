@@ -62,5 +62,4 @@ class WP_Icon_Test extends WP_UnitTestCase {
 		$output = wp_get_icon( 'core/plus', array( 'class' => '"><script>alert(1)</script>' ) );
 		$this->assertStringNotContainsString( '<script>', $output );
 	}
-
 }
