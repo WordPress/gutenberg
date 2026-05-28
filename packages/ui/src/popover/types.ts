@@ -9,7 +9,8 @@ export type PositionerProps = ComponentProps< typeof _Popover.Positioner >;
 
 export type RootProps = _Popover.Root.Props;
 
-export interface TriggerProps extends ComponentProps< typeof _Popover.Trigger > {
+export interface TriggerProps
+	extends ComponentProps< typeof _Popover.Trigger > {
 	/**
 	 * The content to be rendered inside the component.
 	 */

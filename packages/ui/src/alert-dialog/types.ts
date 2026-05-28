@@ -61,7 +61,8 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
-export interface PopupProps extends ComponentProps< typeof _AlertDialog.Popup > {
+export interface PopupProps
+	extends ComponentProps< typeof _AlertDialog.Popup > {
 	/**
 	 * Optional portal element, typically `<AlertDialog.Portal />` with
 	 * custom `container`, `className`, or `style`. Overlay content is
