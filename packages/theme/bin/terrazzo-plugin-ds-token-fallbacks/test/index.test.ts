@@ -48,4 +48,14 @@ describe( 'formatDesignTokenFallbacksScss', () => {
 		expect( scss ).toContain( "'--wpds-x-backslash': 'a\\\\b'" );
 		expect( scss ).toContain( "'--wpds-x-both': 'a\\'\\\\b'" );
 	} );
+
+	it( 'throws on Sass interpolation syntax', () => {
+		expect( () =>
+			formatDesignTokenFallbacksScss( {
+				'--wpds-x-interpolation': 'calc(#{some-value} * 1px)',
+			} )
+		).toThrow(
+			/Sass interpolation syntax is not supported in design token fallbacks: --wpds-x-interpolation/
+		);
+	} );
 } );

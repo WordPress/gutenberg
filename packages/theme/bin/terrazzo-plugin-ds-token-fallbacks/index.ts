@@ -194,10 +194,15 @@ export function formatDesignTokenFallbacksScss(
 	fallbacks: Record< string, string >
 ): string {
 	const mapEntries = Object.entries( fallbacks )
-		.map(
-			( [ token, fallback ] ) =>
-				`\t'${ token }': '${ escapeScssString( fallback ) }'`
-		)
+		.map( ( [ token, fallback ] ) => {
+			if ( fallback.includes( '#{' ) ) {
+				throw new Error(
+					`Sass interpolation syntax is not supported in design token fallbacks: ${ token }`
+				);
+			}
+
+			return `\t'${ token }': '${ escapeScssString( fallback ) }'`;
+		} )
 		.join( ',\n' );
 
 	return [
