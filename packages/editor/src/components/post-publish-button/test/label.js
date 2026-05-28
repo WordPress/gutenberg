@@ -95,10 +95,10 @@ describe( 'PublishButtonLabel', () => {
 		const label = PublishButtonLabel( {
 			distributedEditingSaveButtonState: {
 				status: 'accepted_but_unconsumed',
-				label: 'Submit reviewed changes',
+				label: 'Save',
 			},
 		} );
-		expect( label ).toBe( 'Submit reviewed changes' );
+		expect( label ).toBe( 'Save' );
 	} );
 
 	it( 'should ignore the default Distributed Editing save descriptor', () => {

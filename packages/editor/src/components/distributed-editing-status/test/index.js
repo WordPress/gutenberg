@@ -21,9 +21,13 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import DistributedEditingStatus, {
+	DistributedEditingEnabledShell,
 	DistributedEditingLocalRebaseStateInspector,
+	DistributedEditingPresenceRoster,
+	DistributedEditingPresenceToolbar,
 	DistributedEditingFreshReviewDecisionPanel,
 	DistributedEditingFreshReviewPrePublishPanel,
+	DistributedEditingLocalUpdatesImportControls,
 	DistributedEditingRetrySaveControls,
 	DistributedEditingStatusChrome,
 	DistributedEditingStatusInspector,
@@ -92,6 +96,7 @@ function setupDistributedEditingStatusSelect( {
 	currentPost = { id: 1, type: 'post' },
 	editedPostContent = '',
 	editorSettings = {},
+	isEditedPostDirty = false,
 	sessionState = {},
 	noticeDescriptors = getDistributedEditingNoticeDescriptorsForSessionState(
 		sessionState
@@ -108,6 +113,7 @@ function setupDistributedEditingStatusSelect( {
 			getDistributedEditingUnloadWarningState: () => unloadWarningState,
 			getEditedPostContent: () => editedPostContent,
 			getEditorSettings: () => editorSettings,
+			isEditedPostDirty: () => isEditedPostDirty,
 		} ) )
 	);
 }
@@ -222,7 +228,9 @@ function setupDistributedEditingStatusDispatch() {
 				status: DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.IMPORTED_FOR_RETRY_SAVE,
 			} ),
 		editPost: jest.fn(),
+		openPublishSidebar: jest.fn(),
 		resetEditorBlocks: jest.fn(),
+		receiveEntityRecords: jest.fn(),
 		resetDistributedEditingSessionState: jest.fn(),
 		setDistributedEditingSessionState: jest.fn(),
 	};
@@ -230,6 +238,38 @@ function setupDistributedEditingStatusDispatch() {
 	useDispatch.mockReturnValue( actions );
 
 	return actions;
+}
+
+function DistributedEditingPresenceStatusHarness() {
+	const { editorSettings, sessionState } = useSelect( ( select ) => {
+		const { getDistributedEditingSessionState, getEditorSettings } = select(
+			{ name: 'core/editor' }
+		);
+
+		return {
+			editorSettings: getEditorSettings?.() || {},
+			sessionState: getDistributedEditingSessionState?.() || {},
+		};
+	}, [] );
+
+	return (
+		<DistributedEditingPresenceRoster
+			initialPresenceRoster={
+				editorSettings.distributedEditing?.initialPresenceRoster
+			}
+			presenceRepeatedRefreshRuntime={
+				editorSettings.distributedEditing
+					?.presenceRepeatedRefreshRuntime
+			}
+			presenceStorageReadiness={
+				editorSettings.distributedEditing?.presenceStorageReadiness
+			}
+			presenceStartupPolicy={
+				editorSettings.distributedEditing?.presenceStartupPolicy
+			}
+			sessionState={ sessionState }
+		/>
+	);
 }
 
 afterEach( () => {
@@ -562,7 +602,7 @@ describe( 'DistributedEditingStatusInspector', () => {
 		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
-				name: 'Run guarded retry save',
+				name: 'Run WordPress Save',
 			} )
 		).toBeVisible();
 		expect( screen.getByText( 'Local rebase plan' ) ).toBeVisible();
@@ -614,12 +654,12 @@ describe( 'DistributedEditingLocalRebaseStateInspector', () => {
 		expect( screen.getByText( 'Retry submit' ) ).toBeVisible();
 		expect( screen.getByText( 'Ready' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry handoff' ) ).toBeVisible();
-		expect( screen.getByText( 'Retry proof' ) ).toBeVisible();
+		expect( screen.getByText( 'Save check' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry accepted' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry save' ) ).toBeVisible();
 		expect( screen.getByText( 'Retry save reason' ) ).toBeVisible();
-		expect( screen.getByText( 'Guarded retry save' ) ).toBeVisible();
-		expect( screen.getByText( 'Guarded retry save reason' ) ).toBeVisible();
+		expect( screen.getByText( 'WordPress Save' ) ).toBeVisible();
+		expect( screen.getByText( 'WordPress Save reason' ) ).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
 	} );
 
@@ -725,15 +765,15 @@ describe( 'DistributedEditingRetrySaveControls', () => {
 		render( <DistributedEditingRetrySaveControls onResult={ onResult } /> );
 
 		expect( screen.getByText( 'Command' ) ).toBeVisible();
-		expect( screen.getByText( 'Guarded retry save' ) ).toBeVisible();
-		expect( screen.getByText( 'Guarded retry save reason' ) ).toBeVisible();
+		expect( screen.getByText( 'WordPress Save' ) ).toBeVisible();
+		expect( screen.getByText( 'WordPress Save reason' ) ).toBeVisible();
 		expect( screen.getByText( 'Idle' ) ).toBeVisible();
 		expect( screen.getByText( 'none' ) ).toBeVisible();
 		expect( screen.getByText( 'None' ) ).toBeVisible();
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Run guarded retry save',
+				name: 'Run WordPress Save',
 			} )
 		);
 
@@ -774,7 +814,7 @@ describe( 'DistributedEditingRetrySaveControls', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Run guarded retry save',
+				name: 'Run WordPress Save',
 			} )
 		);
 
@@ -884,7 +924,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
-	it( 'renders a read-only same-block conflict comparison from safe text excerpts', () => {
+	it( 'renders a modal same-block conflict review from safe text excerpts', () => {
 		setupDistributedEditingStatusDispatch();
 		setupDistributedEditingStatusSelect( {
 			editedPostContent:
@@ -914,117 +954,17 @@ describe( 'DistributedEditingStatus', () => {
 
 		render( <DistributedEditingStatus /> );
 
-		const status = screen.getByRole( 'region', {
-			name: 'Distributed editing status',
+		const dialog = screen.getByRole( 'dialog', {
+			name: 'Review conflict',
 		} );
-		const comparison = screen.getByRole( 'region', {
+		const comparison = within( dialog ).getByRole( 'region', {
 			name: 'Distributed editing conflict comparison',
 		} );
 
 		expect(
-			screen.getByText( 'Conflicting update not saved' )
-		).toBeVisible();
-		expect(
-			screen.getByText(
-				'WordPress did not save the conflicting update. Your local changes are protected in this editor. Compare the local and WordPress versions below, then choose which one to keep.'
+			within( dialog ).getByText(
+				'WordPress could not merge these edits automatically. Choose which version to keep.'
 			)
-		).toBeVisible();
-		expect( screen.getByText( 'Compare changes' ) ).toBeVisible();
-		expect(
-			screen.getByText(
-				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
-			)
-		).toBeVisible();
-		expect( screen.getByText( 'Choose a version to keep' ) ).toBeVisible();
-		expect(
-			screen.getByText(
-				'WordPress is waiting because this editor and the saved post changed the same block. Choosing here does not save yet.'
-			)
-		).toBeVisible();
-		expect( screen.getByText( 'Choose version' ) ).toBeVisible();
-		expect( screen.getByText( 'Check choice' ) ).toBeVisible();
-		expect( screen.getByText( 'Prepare Save' ) ).toBeVisible();
-		expect( screen.getByText( 'Use Save' ) ).toBeVisible();
-		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
-			'aria-current',
-			'step'
-		);
-		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
-			'aria-label',
-			'Choose version, current step'
-		);
-		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-status',
-			'current'
-		);
-		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-status',
-			'upcoming'
-		);
-		expect(
-			within( status ).getByRole( 'button', {
-				name: 'Get latest post',
-			} )
-		).toBeVisible();
-		expect(
-			within( status ).getByRole( 'button', {
-				name: 'Export local changes',
-			} )
-		).toBeVisible();
-		expect(
-			screen.queryByText( /Review changes tracks remote activity/ )
-		).not.toBeInTheDocument();
-		expect( screen.queryByText( /Save now:/ ) ).not.toBeInTheDocument();
-		expect(
-			screen.queryByText( 'Saved by WordPress' )
-		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText( 'WordPress confirmed Save.' )
-		).not.toBeInTheDocument();
-		// eslint-disable-next-line testing-library/no-node-access
-		const actionGroups = comparison.querySelectorAll(
-			'.editor-distributed-editing-status__conflict-comparison-action-group'
-		);
-		expect( actionGroups ).toHaveLength( 2 );
-		const keepLocalButton = within( actionGroups[ 0 ] ).getByRole(
-			'button',
-			{
-				name: 'Keep your local version',
-			}
-		);
-		const useLatestButton = within( actionGroups[ 0 ] ).getByRole(
-			'button',
-			{
-				name: 'Use latest from WordPress',
-			}
-		);
-		expect( keepLocalButton ).toBeVisible();
-		expect( keepLocalButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-choice-selection-does-not-save',
-			'true'
-		);
-		expect( keepLocalButton ).toHaveAttribute(
-			'title',
-			'Select your local version. This does not save until WordPress checks the choice and Save confirms.'
-		);
-		expect( useLatestButton ).toBeVisible();
-		expect( useLatestButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-choice-selection-does-not-save',
-			'true'
-		);
-		expect( useLatestButton ).toHaveAttribute(
-			'title',
-			'Select the latest WordPress version. This does not save until WordPress checks the choice and Save confirms.'
-		);
-		expect(
-			within( actionGroups[ 1 ] ).getByRole( 'button', {
-				name: 'Export for review',
-			} )
-		).toBeVisible();
-		expect(
-			within( actionGroups[ 1 ] ).getByRole( 'button', {
-				name: 'Get latest post',
-			} )
 		).toBeVisible();
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison',
@@ -1032,7 +972,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-read-only',
-			'true'
+			'false'
 		);
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-calls-rest',
@@ -1047,10 +987,6 @@ describe( 'DistributedEditingStatus', () => {
 			'false'
 		);
 		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-has-base',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-comparison-has-server',
 			'true'
 		);
@@ -1059,125 +995,166 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-header-mode',
-			'compare_versions'
+			'data-distributed-editing-conflict-comparison-highlighted-block-count',
+			'1'
 		);
 		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-guide-steps-visible',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-guide-visible',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-choice-control-mode',
-			'choose_between_versions'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-prepared-compact',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-visible-choice-count',
-			'2'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-actions-layout',
-			'standard_grouped'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-support-actions-mode',
-			'standard_recovery'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-visible-row-count',
-			'3'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-guide-status',
-			'choose_version'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-prepare-save-ready',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-save-prepared',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-save-ready',
-			'false'
+			'data-distributed-editing-conflict-comparison-mode',
+			'modal_two_version_review'
 		);
 		expect( comparison ).toHaveAttribute(
 			'data-distributed-editing-conflict-resolution-next-step',
-			'choose_conflict_version'
+			'choose_version'
 		);
-		expect( screen.queryByText( 'Selected' ) ).not.toBeInTheDocument();
-		expect( screen.getByLabelText( 'Base version' ) ).toHaveValue(
-			'Base paragraph edit & seed.'
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const localPane = comparison.querySelector(
+			'[data-distributed-editing-conflict-modal-pane="accept_local"]'
 		);
-		expect( screen.getByLabelText( 'Latest from WordPress' ) ).toHaveValue(
-			'Server paragraph edit & update.'
+		// eslint-disable-next-line testing-library/no-node-access
+		const serverPane = comparison.querySelector(
+			'[data-distributed-editing-conflict-modal-pane="accept_remote"]'
 		);
-		expect( screen.getByLabelText( 'Your local version' ) ).toHaveValue(
-			'Local paragraph edit & draft.'
-		);
-		expect( comparison ).not.toHaveTextContent( '<p>' );
-		expect( comparison ).not.toHaveTextContent( '<!-- wp:paragraph' );
+		expect( localPane ).not.toBeNull();
+		expect( serverPane ).not.toBeNull();
+		expect( within( localPane ).getByText( 'Your version' ) ).toBeVisible();
 		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Keep your local version',
-			} )
-		).toHaveAttribute( 'aria-pressed', 'false' );
-		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Use latest from WordPress',
-			} )
-		).toHaveAttribute( 'aria-pressed', 'false' );
-		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Keep your local version',
-			} )
+			within( serverPane ).getByText( 'WordPress version' )
 		).toBeVisible();
 		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Use latest from WordPress',
+			within( localPane ).getByRole( 'button', {
+				name: 'Keep mine and overwrite WordPress',
 			} )
-		).toBeVisible();
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-modal-action',
+			'accept_local'
+		);
 		expect(
-			within( comparison ).getByRole( 'button', {
+			within( serverPane ).getByRole( 'button', {
+				name: 'Use WordPress version',
+			} )
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-modal-action',
+			'accept_remote'
+		);
+		expect( within( localPane ).getByText( 'Block 1' ) ).toBeVisible();
+		expect(
+			within( localPane ).getByText( 'Local paragraph edit & draft.' )
+		).toBeVisible();
+		expect( within( serverPane ).getByText( 'Block 1' ) ).toBeVisible();
+		expect(
+			within( serverPane ).getByText( 'Server paragraph edit & update.' )
+		).toBeVisible();
+		// eslint-disable-next-line testing-library/no-node-access
+		expect(
+			localPane.querySelector(
+				'[data-distributed-editing-conflict-modal-block="block-1"]'
+			)
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-modal-block-conflict',
+			'true'
+		);
+		// eslint-disable-next-line testing-library/no-node-access
+		expect(
+			serverPane.querySelector(
+				'[data-distributed-editing-conflict-modal-block="block-1"]'
+			)
+		).toHaveAttribute(
+			'data-distributed-editing-conflict-modal-block-conflict',
+			'true'
+		);
+
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Check version',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Continue Save',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByRole( 'button', {
 				name: 'Export for review',
 			} )
-		).toHaveAttribute(
-			'data-distributed-editing-conflict-support-action-emphasis',
-			'standard_recovery'
-		);
+		).not.toBeInTheDocument();
 		expect(
-			within( comparison ).getByRole( 'button', {
+			within( comparison ).queryByRole( 'button', {
 				name: 'Get latest post',
 			} )
-		).toHaveAttribute(
-			'data-distributed-editing-conflict-support-action-emphasis',
-			'standard_recovery'
-		);
+		).not.toBeInTheDocument();
+		expect( comparison ).not.toHaveTextContent( '<p>' );
+		expect( comparison ).not.toHaveTextContent( '<!-- wp:paragraph' );
 	} );
 
-	it( 'keeps same-block conflict actions explicit without saving by default', async () => {
+	it( 'preserves inline formatting in the same-block conflict review', () => {
+		setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editedPostContent:
+				'<!-- wp:paragraph --><p>This is <strong>bold</strong> locally.<script>alert("x")</script></p><!-- /wp:paragraph -->',
+			sessionState: {
+				disposition:
+					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+				reasonCode:
+					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+				pendingChangeCount: 1,
+				remoteChangeCount: 1,
+				requiresServerStateRefetch: false,
+				refetchedServerState: true,
+				canExportLocalUpdates: true,
+				localRebasePlanStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.READY,
+				localRebaseResultStatus:
+					DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.MANUAL_CONFLICT_REQUIRED,
+				localRebaseResultReason: 'same_block_changed',
+				requiresManualConflictResolution: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>This is bold locally.</p><!-- /wp:paragraph -->',
+				refetchedServerContent:
+					'<!-- wp:paragraph --><p>This is <em>bold</em> remotely.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render( <DistributedEditingStatus /> );
+
+		const comparison = screen.getByRole( 'region', {
+			name: 'Distributed editing conflict comparison',
+		} );
+		// eslint-disable-next-line testing-library/no-node-access
+		const localPreview = comparison.querySelector(
+			'[data-distributed-editing-conflict-modal-pane="accept_local"] [data-distributed-editing-conflict-modal-block-preview="formatted"]'
+		);
+		// eslint-disable-next-line testing-library/no-node-access
+		const serverPreview = comparison.querySelector(
+			'[data-distributed-editing-conflict-modal-pane="accept_remote"] [data-distributed-editing-conflict-modal-block-preview="formatted"]'
+		);
+
+		expect( localPreview ).not.toBeNull();
+		expect( serverPreview ).not.toBeNull();
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( localPreview.querySelector( 'strong' ) ).toHaveTextContent(
+			'bold'
+		);
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( serverPreview.querySelector( 'em' ) ).toHaveTextContent(
+			'bold'
+		);
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( localPreview.querySelector( 'script' ) ).toBeNull();
+		expect( localPreview ).toHaveTextContent( 'This is bold locally.' );
+		expect( serverPreview ).toHaveTextContent( 'This is bold remotely.' );
+	} );
+
+	it( 'saves the local version from the conflict modal through the guarded Save path', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
-		const writeText = jest.fn().mockResolvedValue();
-
-		Object.defineProperty( globalThis.navigator, 'clipboard', {
-			configurable: true,
-			value: { writeText },
-		} );
+		const editedPostContent =
+			'<!-- wp:paragraph --><p>Local same block change.</p><!-- /wp:paragraph -->';
 
 		setupDistributedEditingStatusSelect( {
 			currentPost: { id: 42, type: 'post' },
-			editedPostContent:
-				'<!-- wp:paragraph --><p>Local same block change.</p><!-- /wp:paragraph -->',
+			editedPostContent,
 			sessionState: {
 				disposition:
 					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
@@ -1209,15 +1186,10 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( comparison ).getByRole( 'button', {
-				name: 'Keep your local version',
+				name: 'Keep mine and overwrite WordPress',
 			} )
 		);
 
-		expect(
-			screen.getByText(
-				'Keeping your local text in this editor. Save is still paused until WordPress checks this choice again.'
-			)
-		).toBeVisible();
 		expect( actions.editPost ).not.toHaveBeenCalled();
 		expect(
 			actions.setDistributedEditingSessionState
@@ -1244,36 +1216,34 @@ describe( 'DistributedEditingStatus', () => {
 				staleBaseConflictResolutionClaimsSaved: false,
 			} )
 		);
-		expect( writeText ).not.toHaveBeenCalled();
-		expect(
-			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
-		).not.toHaveBeenCalled();
-
-		await user.click(
-			within( comparison ).getByRole( 'button', {
-				name: 'Export for review',
-			} )
-		);
-
-		await waitFor( () => expect( writeText ).toHaveBeenCalledTimes( 1 ) );
-		expect(
-			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
-		).not.toHaveBeenCalled();
-
-		await user.click(
-			within( comparison ).getByRole( 'button', {
-				name: 'Get latest post',
-			} )
-		);
-
 		await waitFor( () =>
 			expect(
-				actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+				actions.__experimentalRefreshDistributedEditingRetrySubmitProof
 			).toHaveBeenCalledTimes( 1 )
 		);
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				__experimentalDistributedEditingExplicitSaveClick: true,
+				proposedPostContent: editedPostContent,
+			} )
+		);
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).not.toHaveBeenCalled();
+		expect(
+			await within( comparison ).findByText( 'Saved your version.' )
+		).toBeVisible();
 	} );
 
-	it( 'can choose the latest WordPress text for the local working copy without saving', async () => {
+	it( 'can use the WordPress version for the local working copy without saving', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
 		const latestWordPressContent =
@@ -1313,10 +1283,21 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( comparison ).getByRole( 'button', {
-				name: 'Use latest from WordPress',
+				name: 'Use WordPress version',
 			} )
 		);
 
+		expect( actions.receiveEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			[
+				expect.objectContaining( {
+					id: 42,
+					type: 'post',
+					content: latestWordPressContent,
+				} ),
+			]
+		);
 		expect( actions.editPost ).toHaveBeenCalledWith(
 			{ content: latestWordPressContent },
 			{ undoIgnore: true }
@@ -1325,7 +1306,11 @@ describe( 'DistributedEditingStatus', () => {
 			actions.setDistributedEditingSessionState
 		).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				requiresManualConflictResolution: true,
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				requiresManualConflictResolution: false,
+				pendingChangeCount: 0,
+				hasPendingChanges: false,
+				canExportLocalUpdates: false,
 				readyToRetrySubmit: false,
 				retrySubmitHandoffStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
@@ -1333,10 +1318,9 @@ describe( 'DistributedEditingStatus', () => {
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
 				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 				staleBaseConflictResolutionStatus:
-					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.LATEST_WORDPRESS_SELECTED,
-				staleBaseConflictResolutionChoice:
-					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS,
-				staleBaseConflictResolutionRequiresFreshProof: true,
+					DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.NONE,
+				staleBaseConflictResolutionChoice: null,
+				staleBaseConflictResolutionRequiresFreshProof: false,
 				staleBaseConflictResolutionCallsRest: false,
 				staleBaseConflictResolutionCallsSave: false,
 				staleBaseConflictResolutionMutatesEditorContent: true,
@@ -1350,9 +1334,7 @@ describe( 'DistributedEditingStatus', () => {
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
 		expect(
-			screen.getByText(
-				'Using the latest WordPress text in this editor. Save is still paused until WordPress checks this choice again.'
-			)
+			within( comparison ).getByText( 'Using the WordPress version.' )
 		).toBeVisible();
 	} );
 
@@ -1436,7 +1418,7 @@ describe( 'DistributedEditingStatus', () => {
 		expect( cueList ).toBeVisible();
 		expect( within( cueList ).getByText( 'Starting post' ) ).toBeVisible();
 		expect(
-			within( cueList ).getByText( 'Latest from WordPress' )
+			within( cueList ).getByText( 'Saved WordPress structure' )
 		).toBeVisible();
 		expect(
 			within( cueList ).getByText( 'Your local editor' )
@@ -1703,7 +1685,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Preview latest',
+				name: 'Preview saved',
 			} )
 		);
 
@@ -1720,7 +1702,9 @@ describe( 'DistributedEditingStatus', () => {
 			name: 'Distributed editing structural preview',
 		} );
 		expect(
-			within( preview ).getByText( 'Previewing Latest from WordPress' )
+			within( preview ).getByText(
+				'Previewing Saved WordPress structure'
+			)
 		).toBeVisible();
 		expect(
 			within( preview ).getByText(
@@ -1774,7 +1758,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 	} );
 
-	it( 'applies and undoes a structural latest-WordPress choice without saving', async () => {
+	it( 'applies and undoes a structural saved-WordPress choice without saving', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
 		const localContent =
@@ -1814,7 +1798,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Use latest',
+				name: 'Use saved',
 			} )
 		);
 
@@ -1877,7 +1861,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getAllByText(
-				'Using latest structure. Save is still paused until WordPress checks this choice.'
+				'Using saved WordPress structure. Save is still paused until Save verifies this choice.'
 			).length
 		).toBeGreaterThan( 0 );
 
@@ -1993,7 +1977,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			within( summary ).getByRole( 'button', {
-				name: 'Enable Save',
+				name: 'Check structure',
 			} )
 		);
 
@@ -2003,19 +1987,15 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
 		).toHaveBeenCalledTimes( 1 );
-		if (
+		const retrySubmitProofRequest =
 			actions.__experimentalRefreshDistributedEditingRetrySubmitProof.mock
-				.calls[ 0 ][ 0 ]
-		) {
-			expect(
-				actions.__experimentalRefreshDistributedEditingRetrySubmitProof
-			).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					proposedPostContentHash:
-						expect.stringMatching( /^[0-9a-f]{64}$/ ),
-				} )
+				.calls[ 0 ][ 0 ];
+		const hasValidOptionalProofHash =
+			retrySubmitProofRequest === undefined ||
+			/^[0-9a-f]{64}$/.test(
+				retrySubmitProofRequest.proposedPostContentHash
 			);
-		}
+		expect( hasValidOptionalProofHash ).toBe( true );
 		expect(
 			actions.setDistributedEditingSessionState
 		).toHaveBeenLastCalledWith(
@@ -2047,12 +2027,12 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Save is ready for this structure. WordPress has not updated the post.'
+				'Ready to Save this structure. Use Save to ask WordPress to update the post; the saved post has not changed yet.'
 			)
 		).toBeVisible();
 		expect(
 			within( summary ).queryByRole( 'button', {
-				name: 'Make Save available',
+				name: 'Continue Save',
 			} )
 		).not.toBeInTheDocument();
 		expect(
@@ -2124,7 +2104,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		const prepareButton = within( summary ).getByRole( 'button', {
-			name: 'Make Save available',
+			name: 'Continue Save',
 		} );
 
 		expect( prepareButton ).toHaveAttribute(
@@ -2174,7 +2154,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'Save is ready for this structure. WordPress has not updated the post.'
+				'Ready to Save this structure. Use Save to ask WordPress to update the post; the saved post has not changed yet.'
 			)
 		).toBeVisible();
 		expect(
@@ -2182,9 +2162,8 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 	} );
 
-	it( 'requests fresh proof for a selected same-block conflict choice without saving', async () => {
-		const user = userEvent.setup();
-		const actions = setupDistributedEditingStatusDispatch();
+	it( 'keeps selected same-block conflicts in the two-version modal without staged check controls', () => {
+		setupDistributedEditingStatusDispatch();
 
 		setupDistributedEditingStatusSelect( {
 			currentPost: { id: 42, type: 'post' },
@@ -2225,101 +2204,54 @@ describe( 'DistributedEditingStatus', () => {
 		} );
 
 		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-proof-action',
-			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-proof-ready',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-guide-status',
-			'local_version_selected'
-		);
-		expect(
-			screen.getByText( 'Your local version is selected' )
-		).toBeVisible();
-		expect(
-			screen.getByText(
-				'Check this choice with WordPress before using Save. The WordPress post has not changed yet.'
-			)
-		).toBeVisible();
-		expect( screen.getByText( 'Prepare Save' ) ).toBeVisible();
-		expect( screen.getByText( 'Use Save' ) ).toBeVisible();
-		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-status',
-			'complete'
-		);
-		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
-			'aria-label',
-			'Choose version, complete'
-		);
-		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
-			'aria-current',
-			'step'
-		);
-		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-status',
-			'current'
+			'data-distributed-editing-conflict-comparison-mode',
+			'modal_two_version_review'
 		);
 		expect(
 			within( comparison ).getByRole( 'button', {
-				name: 'Keep your local version',
+				name: 'Keep mine and overwrite WordPress',
 			} )
-		).toHaveAttribute( 'aria-pressed', 'true' );
+		).toBeVisible();
 		expect(
 			within( comparison ).getByRole( 'button', {
-				name: 'Use latest from WordPress',
+				name: 'Use WordPress version',
 			} )
-		).toHaveAttribute( 'aria-pressed', 'false' );
-		expect( screen.getByText( 'Selected' ) ).toBeVisible();
-		const checkChoiceButton = within( comparison ).getByRole( 'button', {
-			name: 'Check this choice',
-		} );
-		expect( checkChoiceButton ).toBeVisible();
-		expect( checkChoiceButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-action',
-			'check_choice'
-		);
-		expect( checkChoiceButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-action-does-not-save',
-			'true'
-		);
-		expect( checkChoiceButton ).toHaveAttribute(
-			'title',
-			'Ask WordPress to check this choice. This does not save the post.'
-		);
-
-		await user.click( checkChoiceButton );
-
-		expect(
-			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
-		).toHaveBeenCalledTimes( 1 );
-		expect( actions.editPost ).not.toHaveBeenCalled();
-		expect(
-			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
-		).not.toHaveBeenCalled();
-		expect(
-			actions.__experimentalSaveDistributedEditingRetryAfterProof
-		).not.toHaveBeenCalled();
-		expect(
-			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
-		).not.toHaveBeenCalled();
-		expect(
-			await screen.findByText(
-				'WordPress checked this choice. Prepare Save before updating the post.'
-			)
 		).toBeVisible();
+		expect(
+			within( comparison ).getByText( 'Local same block proof choice.' )
+		).toBeVisible();
+		expect(
+			within( comparison ).getByText( 'Server same block proof choice.' )
+		).toBeVisible();
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Check version',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Continue Save',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Your local version is selected' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				'This version is ready. Continue Save before updating the post.'
+			)
+		).not.toBeInTheDocument();
 	} );
 
-	it( 'prepares Save from a checked same-block conflict choice without saving', async () => {
+	it( 'runs proof, prepare, and guarded Save from a checked same-block modal choice', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
+		const editedPostContent =
+			'<!-- wp:paragraph --><p>Local checked conflict choice.</p><!-- /wp:paragraph -->';
 
 		setupDistributedEditingStatusSelect( {
 			currentPost: { id: 42, type: 'post' },
-			editedPostContent:
-				'<!-- wp:paragraph --><p>Local checked conflict choice.</p><!-- /wp:paragraph -->',
+			editedPostContent,
 			sessionState: {
 				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 				reasonCode: null,
@@ -2356,102 +2288,37 @@ describe( 'DistributedEditingStatus', () => {
 			name: 'Distributed editing conflict comparison',
 		} );
 
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-guide-status',
-			'choice_checked'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-prepare-save-ready',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-save-prepared',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-save-ready',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-next-step',
-			'prepare_guarded_save'
-		);
-		expect(
-			screen.getByText( 'WordPress checked this choice' )
-		).toBeVisible();
-		expect(
-			screen.getByText(
-				'Prepare Save before using the editor Save button. WordPress has not changed the post yet.'
-			)
-		).toBeVisible();
-		expect( screen.getByText( 'Choose version' ) ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-status',
-			'complete'
-		);
-		expect( screen.getByText( 'Check choice' ) ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-status',
-			'complete'
-		);
-		const prepareSaveStep = within( comparison )
-			.getAllByText( 'Prepare Save' )
-			.find(
-				( element ) =>
-					element.getAttribute(
-						'data-distributed-editing-conflict-resolution-step'
-					) === 'prepare'
-			);
-		expect( prepareSaveStep ).toHaveAttribute( 'aria-current', 'step' );
-		expect( prepareSaveStep ).toHaveAttribute(
-			'aria-label',
-			'Prepare Save, current step'
-		);
-		expect( screen.getByText( 'Use Save' ) ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-step-status',
-			'upcoming'
-		);
-		expect(
-			within( comparison ).queryByRole( 'button', {
-				name: 'Check this choice',
+		await user.click(
+			within( comparison ).getByRole( 'button', {
+				name: 'Keep mine and overwrite WordPress',
 			} )
-		).not.toBeInTheDocument();
-		const prepareSaveButton = within( comparison ).getByRole( 'button', {
-			name: 'Prepare Save',
-		} );
-		expect( prepareSaveButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-action',
-			'prepare_save'
-		);
-		expect( prepareSaveButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-action-does-not-save',
-			'true'
-		);
-		expect( prepareSaveButton ).toHaveAttribute(
-			'title',
-			'Prepare this checked choice for the editor Save button. This does not save the post.'
 		);
 
-		await user.click( prepareSaveButton );
-
+		await waitFor( () =>
+			expect(
+				actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+			).toHaveBeenCalledTimes( 1 )
+		);
 		expect(
 			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
 		).toHaveBeenCalledTimes( 1 );
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
-		).not.toHaveBeenCalled();
-		expect(
-			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
-		).not.toHaveBeenCalled();
+		).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				__experimentalDistributedEditingExplicitSaveClick: true,
+				proposedPostContent: editedPostContent,
+			} )
+		);
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
 		expect(
-			await screen.findByText(
-				'Save prepared. Use Save to send these changes to WordPress.'
-			)
+			await within( comparison ).findByText( 'Saved your version.' )
 		).toBeVisible();
 	} );
 
-	it( 'keeps final Save readiness visible after preparing a checked same-block conflict choice', () => {
+	it( 'keeps prepared same-block conflicts in the modal instead of a staged readiness panel', () => {
 		setupDistributedEditingStatusDispatch();
 
 		setupDistributedEditingStatusSelect( {
@@ -2498,172 +2365,37 @@ describe( 'DistributedEditingStatus', () => {
 			name: 'Distributed editing conflict comparison',
 		} );
 		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-guide-status',
-			'save_prepared'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-prepare-save-ready',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-save-prepared',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-save-ready',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-resolution-next-step',
-			'save_guarded_update'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-header-mode',
-			'selected_version_ready_to_save'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-guide-steps-visible',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-guide-visible',
-			'false'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-prepared-compact',
-			'true'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-choice-control-mode',
-			'change_only'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-selected-row',
-			'local'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-visible-choice-count',
-			'1'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-actions-layout',
-			'prepared_recovery_inline'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-support-actions-mode',
-			'quiet_recovery'
-		);
-		expect( comparison ).toHaveAttribute(
-			'data-distributed-editing-conflict-comparison-visible-row-count',
-			'1'
+			'data-distributed-editing-conflict-comparison-mode',
+			'modal_two_version_review'
 		);
 		expect(
-			within( comparison ).queryByText( 'Choose version' )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByText( 'Check choice' )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByText( 'Use Save' )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).getByText(
-				'Selected version is ready to Save'
-			)
+			within( comparison ).getByText( 'Local prepared conflict choice.' )
 		).toBeVisible();
 		expect(
-			within( comparison ).getByText(
-				'The selected version is shown below. Use Save to update WordPress, or change to the other version before saving.'
-			)
+			within( comparison ).getByText( 'Server prepared conflict choice.' )
 		).toBeVisible();
 		expect(
-			within( comparison ).queryByText( 'Compare changes' )
+			within( comparison ).getByRole( 'button', {
+				name: 'Keep mine and overwrite WordPress',
+			} )
+		).toBeVisible();
+		expect(
+			within( comparison ).getByRole( 'button', {
+				name: 'Use WordPress version',
+			} )
+		).toBeVisible();
+		expect(
+			within( comparison ).queryByRole( 'button', {
+				name: 'Continue Save',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			within( comparison ).queryByText( 'Ready to Save' )
 		).not.toBeInTheDocument();
 		expect(
 			within( comparison ).queryByText(
-				'This editor and WordPress changed the same block. Choose the local version or the latest WordPress version before trying Save again.'
+				'Save now: use the editor Save button.'
 			)
-		).not.toBeInTheDocument();
-		expect( screen.getByText( 'Save prepared' ) ).toBeVisible();
-		expect(
-			screen.queryByText(
-				'Use the editor Save button to update WordPress. Local changes remain pending until WordPress confirms.'
-			)
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByText( 'Save is prepared' )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByText( 'Editor Save is ready' )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByText(
-				'Use the editor Save button to send this guarded update. This conflict choice has not changed the WordPress post yet.'
-			)
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByRole( 'button', {
-				name: 'Prepare Save',
-			} )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByRole( 'button', {
-				name: 'Keep your local version',
-			} )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByRole( 'button', {
-				name: 'Use latest from WordPress',
-			} )
-		).not.toBeInTheDocument();
-		const changeVersionButton = within( comparison ).getByRole( 'button', {
-			name: 'Change to latest from WordPress',
-		} );
-		expect( changeVersionButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-choice-compact-change',
-			'true'
-		);
-		expect( changeVersionButton ).toHaveAttribute(
-			'data-distributed-editing-conflict-choice-selection-does-not-save',
-			'true'
-		);
-		expect( changeVersionButton ).toHaveAttribute(
-			'title',
-			'Change the selected version. This does not save until WordPress checks the choice and Save confirms.'
-		);
-		expect(
-			within( comparison )
-				.getAllByRole( 'button' )
-				.map( ( button ) => button.textContent )
-		).toEqual( [
-			'Change to latest from WordPress',
-			'Export for review',
-			'Get latest post',
-		] );
-		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Export for review',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-conflict-support-action-emphasis',
-			'quiet_recovery'
-		);
-		expect(
-			within( comparison ).getByRole( 'button', {
-				name: 'Get latest post',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-conflict-support-action-emphasis',
-			'quiet_recovery'
-		);
-		expect(
-			within( comparison ).getByLabelText( 'Your local version' )
-		).toHaveValue( 'Local prepared conflict choice.' );
-		expect(
-			within( comparison ).queryByLabelText( 'Base version' )
-		).not.toBeInTheDocument();
-		expect(
-			within( comparison ).queryByLabelText( 'Latest from WordPress' )
 		).not.toBeInTheDocument();
 	} );
 
@@ -2727,13 +2459,13 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText(
-				'Use the editor Save button to send this guarded update. This conflict choice has not changed the WordPress post yet.'
+				'Use the editor Save button to ask WordPress to update the post. This conflict choice has not changed the WordPress post yet.'
 			)
 		).not.toBeInTheDocument();
-		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+		expect( screen.getByText( 'Saved' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+				'WordPress saved your changes. Ready for new edits.'
 			)
 		).toBeVisible();
 	} );
@@ -2800,7 +2532,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Distributed Editing activity was recorded; no fresh-review chronology is complete. Recorded 1 redacted transcript event; 1 unsafe entry was dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+				'Distributed Editing activity was recorded; no fresh-review chronology is complete. Recorded 1 redacted transcript event; 1 unsafe entry was dropped. This transcript is diagnostic only; WordPress Save evidence is still required before treating these changes as saved.'
 			)
 		).toBeVisible();
 		const timeline = screen.getByRole( 'list', {
@@ -2901,9 +2633,7 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect(
-			screen.getByText(
-				'The editor submitted a fresh-review decision and kept the activity record content-free.'
-			)
+			screen.getByText( 'The editor sent the review result.' )
 		).toBeVisible();
 		expect( screen.queryByText( '123' ) ).not.toBeInTheDocument();
 	} );
@@ -2941,7 +2671,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.getByText(
-				'The editor validated fresh-review handoff proof and kept the activity record content-free.'
+				'The editor validated the fresh-review handoff and kept the activity record content-free.'
 			)
 		).toBeVisible();
 		expect(
@@ -2992,6 +2722,11 @@ describe( 'DistributedEditingStatus', () => {
 
 	it( 'mounts production editor chrome with explicit placement', () => {
 		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
 			sessionState: {
 				pendingChangeCount: 1,
 			},
@@ -3008,9 +2743,17 @@ describe( 'DistributedEditingStatus', () => {
 			'editor-interface-notices'
 		);
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'Distributed editing enabled status',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Editing together' )
+		).not.toBeInTheDocument();
 	} );
 
-	it( 'mounts the enabled editor shell from production chrome', () => {
+	it( 'summarizes the enabled editor shell when rendered directly', () => {
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
 				distributedEditing: {
@@ -3019,7 +2762,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingEnabledShell /> );
 
 		const shell = screen.getByRole( 'region', {
 			name: 'Distributed editing enabled status',
@@ -3109,7 +2852,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-status-summary',
-			'Save can update the authoritative WordPress post.'
+			'Save can update the post in WordPress.'
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-authority-state',
@@ -3117,7 +2860,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-authority-summary',
-			'Save can update the authoritative WordPress post.'
+			'Save can update the post in WordPress.'
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-descriptor-only',
@@ -3151,98 +2894,11 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-human-loop-claims-saved-without-evidence',
 			'false'
 		);
-		expect( screen.queryByText( 'Active now' ) ).not.toBeInTheDocument();
-		expect( screen.getByText( 'No other editors shown.' ) ).toBeVisible();
-		expect( screen.getByText( 'No other editors shown.' ) ).toHaveAttribute(
-			'aria-label',
-			'Presence: No other editors shown.'
-		);
 		expect(
-			screen.queryByText( 'Editor activity has not been shown yet.' )
+			screen.queryByRole( 'group', {
+				name: 'Distributed editing presence',
+			} )
 		).not.toBeInTheDocument();
-		expect(
-			screen.queryByText( 'Use Refresh editing list to check again.' )
-		).not.toBeInTheDocument();
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-summary-scan-layout',
-			'single-line-primary-cue'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-summary-live-region',
-			'polite'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-summary-has-accessible-name',
-			'true'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-claims-absence',
-			'false'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-summary-current-count',
-			'0'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-summary-delayed-count',
-			'0'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-summary-claims-absence',
-			'false'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-refresh-hint-visible',
-			'false'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-refresh-hint',
-			'Use Refresh editing list to check again.'
-		);
-		expect(
-			screen.getByRole( 'group', {
-				name: 'Distributed editing presence',
-			} )
-		).toHaveAttribute(
-			'data-distributed-editing-presence-actions-visible',
-			'false'
-		);
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Refresh editing list',
@@ -3287,7 +2943,12 @@ describe( 'DistributedEditingStatus', () => {
 				},
 			} );
 
-			render( <DistributedEditingStatusChrome /> );
+			render(
+				<>
+					<DistributedEditingEnabledShell />
+					<DistributedEditingStatus placement="editor-interface-notices" />
+				</>
+			);
 
 			const shell = screen.getByRole( 'region', {
 				name: 'Distributed editing enabled status',
@@ -3335,12 +2996,12 @@ describe( 'DistributedEditingStatus', () => {
 			expect( within( shell ).getByText( 'Saved' ) ).toBeVisible();
 			expect(
 				screen.queryByText(
-					'WordPress will protect local changes and show sync status here when review, refresh, or server confirmation is needed.'
+					'WordPress will protect local changes and show status here when review, refresh, or confirmation is needed.'
 				)
 			).not.toBeInTheDocument();
 			expect(
 				screen.queryByText(
-					'WordPress accepted this Distributed Editing Save. You can keep editing; WordPress will protect any new local changes.'
+					'WordPress accepted this Save. You can keep editing; WordPress will protect any new local changes.'
 				)
 			).not.toBeInTheDocument();
 			expect(
@@ -3450,7 +3111,7 @@ describe( 'DistributedEditingStatus', () => {
 			);
 			expect( saveJourney ).toHaveAttribute(
 				'data-distributed-editing-save-journey-status-summary',
-				'Save can update the authoritative WordPress post.'
+				'Save can update the post in WordPress.'
 			);
 			expect( saveJourney ).toHaveAttribute(
 				'data-distributed-editing-save-journey-claims-saved-without-evidence',
@@ -3477,70 +3138,150 @@ describe( 'DistributedEditingStatus', () => {
 	} );
 
 	it( 'distinguishes a server-merged Save in the enabled editor shell without adding receipt chatter', () => {
-		setupDistributedEditingStatusSelect( {
-			editorSettings: {
-				distributedEditing: {
-					enabled: true,
+		const originalConfirmedSaveShellHoldMs =
+			globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs;
+		const originalConfirmedSaveStatusHoldMs =
+			globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs;
+		globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs = 1000;
+		globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs = 1000;
+		jest.useFakeTimers();
+
+		try {
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
 				},
-			},
-			sessionState: {
-				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
-				retrySaveAccepted: true,
-				retrySaveServerVersion: '233',
-				retrySavePreviousServerVersion: '232',
-				retrySaveSavesPost: true,
-				retrySaveMutatesPostContent: true,
-				retrySaveCreatesRevision: true,
-				retrySaveClaimsSaved: true,
-				retrySaveRevisionCreated: true,
-				retrySaveConfirmedMergedEdits: true,
-			},
-		} );
+				sessionState: {
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+					retrySaveAccepted: true,
+					retrySaveServerVersion: '233',
+					retrySavePreviousServerVersion: '232',
+					retrySaveSavesPost: true,
+					retrySaveMutatesPostContent: true,
+					retrySaveCreatesRevision: true,
+					retrySaveClaimsSaved: true,
+					retrySaveRevisionCreated: true,
+					retrySaveConfirmedMergedEdits: true,
+				},
+			} );
 
-		render( <DistributedEditingStatusChrome /> );
+			render(
+				<>
+					<DistributedEditingEnabledShell />
+					<DistributedEditingStatus placement="editor-interface-notices" />
+				</>
+			);
 
-		const shell = screen.getByRole( 'region', {
-			name: 'Distributed editing enabled status',
-		} );
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-save-state',
-			'retry_save_confirmed'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-confirmed-save-evidence-retained',
-			'true'
-		);
-		expect( shell ).toHaveAttribute(
-			'data-distributed-editing-confirmed-save-merged-edits',
-			'true'
-		);
-		expect(
-			within( shell ).getByText( 'Merged by WordPress' )
-		).toBeVisible();
-		expect(
-			within( shell ).getByText( 'Ready for new edits.' )
-		).toBeVisible();
-		expect(
-			within( shell ).queryByText( 'Saved' )
-		).not.toBeInTheDocument();
-		expect(
-			within( shell ).queryByText( 'Save confirmed' )
-		).not.toBeInTheDocument();
-		expect(
-			within( shell ).queryByText( 'Show Save evidence' )
-		).not.toBeInTheDocument();
-		expect(
-			within(
-				screen.getByRole( 'region', {
-					name: 'Distributed editing status',
-				} )
-			).getByText(
-				/WordPress saved the merged edits, advanced the sync version from 232 to 233/
-			)
-		).toBeVisible();
+			const shell = screen.getByRole( 'region', {
+				name: 'Distributed editing enabled status',
+			} );
+			const status = screen.getByRole( 'region', {
+				name: 'Distributed editing status',
+			} );
+			const confirmedSaveText = within( status ).getByText( 'Saved' );
+			// eslint-disable-next-line testing-library/no-node-access
+			const confirmedStatusItem = confirmedSaveText.closest(
+				'[data-distributed-editing-confirmed-save-status-evidence-retained]'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-save-state',
+				'retry_save_confirmed'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-evidence-retained',
+				'true'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-merged-edits',
+				'true'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-shell-quieted',
+				'false'
+			);
+			expect( confirmedStatusItem ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-merged-edits',
+				'true'
+			);
+			expect(
+				within( shell ).getByText( 'Merged by WordPress' )
+			).toBeVisible();
+			expect(
+				within( shell ).getByText( 'Ready for new edits.' )
+			).toBeVisible();
+			expect(
+				within( shell ).queryByText( 'Saved' )
+			).not.toBeInTheDocument();
+			expect(
+				within( shell ).queryByText( 'Save confirmed' )
+			).not.toBeInTheDocument();
+			expect(
+				within( shell ).queryByText( 'Show Save evidence' )
+			).not.toBeInTheDocument();
+			expect(
+				within( status ).getByText(
+					'WordPress saved the merged edits. Ready for new edits.'
+				)
+			).toBeVisible();
+
+			act( () => {
+				jest.advanceTimersByTime( 1000 );
+			} );
+
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-save-state',
+				'update_ready'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-merged-edits',
+				'true'
+			);
+			expect( shell ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-shell-quieted',
+				'true'
+			);
+			expect(
+				within( shell ).getByText( 'Merged by WordPress' )
+			).toBeVisible();
+			expect(
+				within( shell ).getByText( 'Ready for new edits.' )
+			).toBeVisible();
+			expect(
+				within( status ).getByText(
+					"Merged edits saved. Your changes and the other editor's non-conflicting changes are now in WordPress. Open details for version and revision evidence."
+				)
+			).toBeVisible();
+			expect( confirmedStatusItem ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-status-quieted',
+				'true'
+			);
+			expect( confirmedStatusItem ).toHaveAttribute(
+				'data-distributed-editing-confirmed-save-merged-edits',
+				'true'
+			);
+		} finally {
+			jest.useRealTimers();
+
+			if ( originalConfirmedSaveShellHoldMs === undefined ) {
+				delete globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs;
+			} else {
+				globalThis.__experimentalDistributedEditingConfirmedSaveShellHoldMs =
+					originalConfirmedSaveShellHoldMs;
+			}
+
+			if ( originalConfirmedSaveStatusHoldMs === undefined ) {
+				delete globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs;
+			} else {
+				globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs =
+					originalConfirmedSaveStatusHoldMs;
+			}
+		}
 	} );
 
-	it( 'shows a latency-tolerant presence roster in the enabled editor shell', () => {
+	it( 'shows a latency-tolerant presence roster in the toolbar', () => {
 		const actions = setupDistributedEditingStatusDispatch();
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
@@ -3553,7 +3294,15 @@ describe( 'DistributedEditingStatus', () => {
 					{
 						key: 'presence-mira',
 						displayName: 'Mira',
+						avatarUrl: 'https://example.test/mira.png',
 						freshness: 'current',
+						sessionDurationSeconds: 300,
+						permissionsAvailable: true,
+						permissions: {
+							canEdit: true,
+							canPublish: true,
+							canSaveDangerousHtml: false,
+						},
 					},
 					{
 						key: 'presence-hidden',
@@ -3567,10 +3316,10 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceToolbar /> );
 
 		const presence = screen.getByRole( 'group', {
-			name: 'Distributed editing presence',
+			name: 'Active editors',
 		} );
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-status',
@@ -3617,6 +3366,14 @@ describe( 'DistributedEditingStatus', () => {
 			'true'
 		);
 		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-display',
+			'caterpillar'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-caterpillar-overlap',
+			'true'
+		);
+		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-calls-rest',
 			'false'
 		);
@@ -3646,14 +3403,8 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByText( '2 other editors are active now.' )
-		).toBeVisible();
-		expect(
-			screen.getByText( '2 other editors are active now.' )
-		).toHaveAttribute(
-			'aria-label',
-			'Presence: 2 other editors are active now.'
-		);
+			screen.queryByText( '2 other editors are active now.' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText( '2 editors are active now.' )
 		).not.toBeInTheDocument();
@@ -3663,7 +3414,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-other-editor-cue-visible',
-			'true'
+			'false'
 		);
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-other-editor-cue-claims-absence',
@@ -3697,13 +3448,8 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-other-editor-cue-treats-delayed-as-error',
 			'false'
 		);
-		expect(
-			screen.getByText( '2 other editors are active now.' )
-		).toHaveClass(
-			'editor-distributed-editing-status__presence-other-editor-cue--current'
-		);
 		const rowList = screen.getByRole( 'list', {
-			name: 'Visible editors',
+			name: 'Active editors',
 		} );
 		const rows = within( rowList ).getAllByRole( 'listitem' );
 
@@ -3712,8 +3458,20 @@ describe( 'DistributedEditingStatus', () => {
 			'compact-status-badges'
 		);
 		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-row-order',
+			'remote-editors-first'
+		);
+		expect( rowList ).toHaveAttribute(
 			'data-distributed-editing-presence-row-visual-treatment-list',
 			'subtle-status-stripe'
+		);
+		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-caterpillar',
+			'overlapping-avatars'
+		);
+		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-caterpillar-click-details',
+			'true'
 		);
 		expect( rows ).toHaveLength( 2 );
 		expect( rows[ 0 ] ).toHaveClass(
@@ -3740,8 +3498,12 @@ describe( 'DistributedEditingStatus', () => {
 			'dot-and-label'
 		);
 		expect( rows[ 0 ] ).toHaveAttribute(
-			'data-distributed-editing-presence-row-has-avatar-initial',
+			'data-distributed-editing-presence-row-has-avatar-image',
 			'true'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-has-avatar-initial',
+			'false'
 		);
 		expect( rows[ 0 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-has-status-affordance',
@@ -3771,6 +3533,10 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-exposes-private-fields',
 			'false'
 		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-permissions-visible',
+			'true'
+		);
 		expect( rows[ 0 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
 		expect( rows[ 1 ] ).toHaveAttribute(
 			'aria-label',
@@ -3780,11 +3546,350 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-relationship',
 			'other_user'
 		);
-		expect( screen.getByText( 'Mira' ) ).toBeVisible();
-		expect( screen.getAllByText( 'Another editor' ) ).toHaveLength( 1 );
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-has-avatar-image',
+			'false'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-has-avatar-initial',
+			'true'
+		);
+		expect( screen.queryByText( 'Mira' ) ).not.toBeInTheDocument();
+		const miraPresenceButton = within( rows[ 0 ] ).getByRole( 'button', {
+			name: 'Mira, Active now. Show editing details',
+		} );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-tooltip-open',
+			'false'
+		);
+		fireEvent.mouseEnter( rows[ 0 ] );
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
+		fireEvent.mouseLeave( rows[ 0 ] );
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+		fireEvent.focus( miraPresenceButton );
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
+		fireEvent.blur( miraPresenceButton );
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+		fireEvent.click( miraPresenceButton );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-tooltip-open',
+			'true'
+		);
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-tooltip-pinned',
+			'true'
+		);
+		fireEvent.mouseLeave( rows[ 0 ] );
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
+		expect(
+			within( rows[ 0 ] ).getByRole( 'button', {
+				name: 'Mira, Active now. Show editing details',
+			} )
+		).toHaveAttribute( 'aria-describedby' );
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
+			'Active now'
+		);
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
+			'Editing for 5 min'
+		);
+		expect(
+			within(
+				screen.getByRole( 'list', { name: 'Permissions' } )
+			).getByText( 'Can edit' )
+		).toBeVisible();
+		expect(
+			within(
+				screen.getByRole( 'list', { name: 'Permissions' } )
+			).getByText( 'Can publish' )
+		).toBeVisible();
+		expect(
+			within(
+				screen.getByRole( 'list', { name: 'Permissions' } )
+			).queryByRole( 'checkbox' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Can save custom HTML' )
+		).not.toBeInTheDocument();
+		fireEvent.keyDown( document, { key: 'Escape' } );
+		expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
 		expect(
 			screen.queryByText( /userId|anchor|selection/i )
 		).not.toBeInTheDocument();
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows advisory document-copy state in the presence caterpillar without save authority', () => {
+		jest.useFakeTimers().setSystemTime(
+			new Date( '2026-05-20T12:01:30Z' )
+		);
+
+		try {
+			const actions = setupDistributedEditingStatusDispatch();
+			const stateHash =
+				'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+			setupDistributedEditingStatusSelect( {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				sessionState: {
+					serverVersion: '12',
+					distributedEditingPostStateHash: stateHash,
+					presenceRosterEntries: [
+						{
+							key: 'presence-sam',
+							displayName: 'Sam',
+							freshness: 'current',
+							presenceUpdatedAtGmt: '2026-05-20 12:01:00',
+							documentState: {
+								available: true,
+								confirmedBaseVersion: '12',
+								confirmedStateHash: stateHash,
+								hasPendingChanges: false,
+								confirmedAtGmt: '2026-05-20 12:00:00',
+								authoritativeForSave: true,
+								claimsSaved: true,
+								exposesRawContent: true,
+							},
+						},
+					],
+					presenceRosterTotalKnownCount: 1,
+				},
+			} );
+
+			render( <DistributedEditingPresenceToolbar /> );
+
+			const row = screen.getByRole( 'listitem', {
+				name: 'Sam, Active now, Same saved copy',
+			} );
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-document-state',
+				'same-clean'
+			);
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-document-state-authoritative-for-save',
+				'false'
+			);
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-document-state-available',
+				'true'
+			);
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-document-state-has-pending-changes',
+				'false'
+			);
+			expect( row ).toHaveAttribute(
+				'data-distributed-editing-presence-row-document-state-visual-color-only',
+				'false'
+			);
+
+			fireEvent.click(
+				within( row ).getByRole( 'button', {
+					name: 'Sam, Active now, Same saved copy. Show editing details',
+				} )
+			);
+
+			const tooltip = screen.getByRole( 'tooltip' );
+			expect(
+				within( tooltip ).getByText( 'Same saved copy' )
+			).toBeVisible();
+			expect(
+				within( tooltip ).getByText( 'No unsaved changes reported' )
+			).toBeVisible();
+			expect(
+				within( tooltip ).getByText( 'Presence updated 30 sec ago' )
+			).toBeVisible();
+			expect(
+				within( tooltip ).getByText(
+					'Confirmed copy reported 1 min ago'
+				)
+			).toBeVisible();
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'keeps remote editors first when local and same-user tabs are also visible', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-this-tab',
+						relationship: 'current_user_current_tab',
+						displayName: 'Mira',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-another-tab',
+						relationship: 'same_user_other_tab',
+						displayName: 'Mira',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-remote-sam',
+						relationship: 'other_user',
+						displayName: 'Sam',
+						freshness: 'current',
+					},
+				],
+				presenceRosterTotalKnownCount: 3,
+			},
+		} );
+
+		render( <DistributedEditingEnabledShell /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		const rowList = screen.getByRole( 'list', {
+			name: 'Visible editors',
+		} );
+		const rows = within( rowList ).getAllByRole( 'listitem' );
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-other-editor-cue',
+			'1 other editor is active now.'
+		);
+		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-row-order',
+			'remote-editors-first'
+		);
+		expect( rows ).toHaveLength( 3 );
+		expect( rows[ 0 ] ).toHaveAttribute( 'aria-label', 'Sam, Active now' );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'aria-label',
+			'Another tab, Active now'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'same_user_other_tab'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'aria-label',
+			'This tab, Active now'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'current_user_current_tab'
+		);
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'compacts repeated same-user tab rows while keeping remote editors first', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-this-tab-delayed',
+						relationship: 'current_user_current_tab',
+						freshness: 'recent',
+					},
+					{
+						key: 'presence-another-tab-a',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-another-tab-b',
+						relationship: 'same_user_other_tab',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-remote-sam',
+						relationship: 'other_user',
+						displayName: 'Sam',
+						freshness: 'current',
+					},
+				],
+				presenceRosterTotalKnownCount: 4,
+			},
+		} );
+
+		render( <DistributedEditingPresenceStatusHarness /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		const rowList = screen.getByRole( 'list', {
+			name: 'Visible editors',
+		} );
+		const rows = within( rowList ).getAllByRole( 'listitem' );
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-visible-count',
+			'3'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-current-count',
+			'3'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-summary-same-user-other-tab-visible',
+			'true'
+		);
+		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-row-order',
+			'remote-editors-first'
+		);
+		expect( rowList ).toHaveAttribute(
+			'data-distributed-editing-presence-row-compaction',
+			'same-user-tabs'
+		);
+		expect( rows ).toHaveLength( 3 );
+		expect( rows[ 0 ] ).toHaveAttribute( 'aria-label', 'Sam, Active now' );
+		expect( rows[ 0 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'aria-label',
+			'Another tab, Active now'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'same_user_other_tab'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'aria-label',
+			'This tab, Presence may be delayed'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'current_user_current_tab'
+		);
+		expect(
+			rows.filter(
+				( row ) =>
+					row.getAttribute(
+						'data-distributed-editing-presence-row-relationship'
+					) === 'same_user_other_tab'
+			)
+		).toHaveLength( 1 );
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
@@ -3810,7 +3915,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -3932,7 +4037,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -4209,7 +4314,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -4315,7 +4420,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -4456,7 +4561,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		const { unmount } = render( <DistributedEditingStatusChrome /> );
+		const { unmount } = render(
+			<DistributedEditingPresenceStatusHarness />
+		);
 
 		try {
 			const presence = screen.getByRole( 'group', {
@@ -4659,7 +4766,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		const { unmount } = render( <DistributedEditingStatusChrome /> );
+		const { unmount } = render(
+			<DistributedEditingPresenceStatusHarness />
+		);
 
 		try {
 			const presence = screen.getByRole( 'group', {
@@ -4763,7 +4872,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -4926,7 +5035,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -4986,48 +5095,48 @@ describe( 'DistributedEditingStatus', () => {
 		expect( rows ).toHaveLength( 4 );
 		expect( rows[ 0 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-current',
-			'false'
+			'true'
 		);
 		expect( rows[ 0 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-relationship',
-			'current_user_current_tab'
+			'other_user'
 		);
-		expect( rows[ 0 ] ).toHaveAttribute(
-			'aria-label',
-			'This tab, Presence may be delayed'
+		expect( rows[ 0 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-current',
+			'false'
 		);
 		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'aria-label',
+			'Sam, Presence may be delayed'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-current',
 			'true'
 		);
-		expect( rows[ 1 ] ).toHaveAttribute(
+		expect( rows[ 2 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-relationship',
 			'same_user_other_tab'
 		);
-		expect( rows[ 1 ] ).toHaveAttribute(
+		expect( rows[ 2 ] ).toHaveAttribute(
 			'aria-label',
 			'Another tab, Active now'
 		);
-		expect( rows[ 2 ] ).toHaveAttribute(
-			'data-distributed-editing-presence-row-current',
-			'true'
-		);
-		expect( rows[ 2 ] ).toHaveAttribute(
-			'data-distributed-editing-presence-row-relationship',
-			'other_user'
-		);
-		expect( rows[ 2 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
 		expect( rows[ 3 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-current',
 			'false'
 		);
 		expect( rows[ 3 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-relationship',
-			'other_user'
+			'current_user_current_tab'
 		);
 		expect( rows[ 3 ] ).toHaveAttribute(
 			'aria-label',
-			'Sam, Presence may be delayed'
+			'This tab, Presence may be delayed'
 		);
 		expect(
 			screen.queryByText(
@@ -5098,7 +5207,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -5148,36 +5257,56 @@ describe( 'DistributedEditingStatus', () => {
 		).getAllByRole( 'listitem' );
 
 		expect( rows ).toHaveLength( 6 );
-		expect( rows[ 0 ] ).toHaveAttribute(
-			'aria-label',
-			'This tab, Active now'
-		);
+		expect( rows[ 0 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
 		expect( rows[ 0 ] ).toHaveAttribute(
 			'data-distributed-editing-presence-row-relationship',
-			'current_user_current_tab'
+			'other_user'
 		);
 		expect( rows[ 1 ] ).toHaveAttribute(
-			'aria-label',
-			'Another tab, Active now'
-		);
-		expect( rows[ 1 ] ).toHaveAttribute(
-			'data-distributed-editing-presence-row-relationship',
-			'same_user_other_tab'
-		);
-		expect( rows[ 2 ] ).toHaveAttribute( 'aria-label', 'Mira, Active now' );
-		expect( rows[ 3 ] ).toHaveAttribute(
 			'aria-label',
 			'Another editor, Active now'
 		);
-		expect( rows[ 4 ] ).toHaveAttribute(
+		expect( rows[ 1 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'other_user'
+		);
+		expect( rows[ 2 ] ).toHaveAttribute(
 			'aria-label',
 			'Sam, Presence may be delayed'
 		);
-		expect( rows[ 5 ] ).toHaveAttribute(
+		expect( rows[ 3 ] ).toHaveAttribute(
 			'aria-label',
 			'Another editor, Presence may be delayed'
 		);
-		expect( screen.getAllByText( 'Another editor' ) ).toHaveLength( 2 );
+		expect( rows[ 4 ] ).toHaveAttribute(
+			'aria-label',
+			'Another tab, Active now'
+		);
+		expect( rows[ 4 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'same_user_other_tab'
+		);
+		expect( rows[ 5 ] ).toHaveAttribute(
+			'aria-label',
+			'This tab, Active now'
+		);
+		expect( rows[ 5 ] ).toHaveAttribute(
+			'data-distributed-editing-presence-row-relationship',
+			'current_user_current_tab'
+		);
+		expect(
+			within( rows[ 1 ] ).getByRole( 'button', {
+				name: 'Another editor, Active now. Show editing details',
+			} )
+		).toBeVisible();
+		expect(
+			within( rows[ 3 ] ).getByRole( 'button', {
+				name: 'Another editor, Presence may be delayed. Show editing details',
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByText( 'Another editor' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText(
 				/Hidden Current Name|Hidden Delayed Name|session_key|rawSessionKey|userId|cursor|selection/i
@@ -5269,7 +5398,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -5319,11 +5448,11 @@ describe( 'DistributedEditingStatus', () => {
 		).getAllByRole( 'listitem' );
 
 		expect( rows ).toHaveLength( 9 );
-		expect( rows[ 4 ] ).toHaveAttribute(
+		expect( rows[ 2 ] ).toHaveAttribute(
 			'aria-label',
 			'Another editor, Active now'
 		);
-		expect( rows[ 8 ] ).toHaveAttribute(
+		expect( rows[ 6 ] ).toHaveAttribute(
 			'aria-label',
 			'Another editor, Presence may be delayed'
 		);
@@ -5340,7 +5469,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 	} );
 
-	it( 'hydrates the enabled editor shell from initial WordPress presence settings', () => {
+	it( 'hydrates the toolbar presence from initial WordPress presence settings', () => {
 		const actions = setupDistributedEditingStatusDispatch();
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
@@ -5371,10 +5500,10 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceToolbar /> );
 
 		const presence = screen.getByRole( 'group', {
-			name: 'Distributed editing presence',
+			name: 'Active editors',
 		} );
 		expect( presence ).toHaveAttribute(
 			'data-distributed-editing-presence-status',
@@ -5402,10 +5531,10 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByText( '1 other editor may be delayed.' )
-		).toBeVisible();
+			screen.queryByText( '1 other editor may be delayed.' )
+		).not.toBeInTheDocument();
 		const rows = within(
-			screen.getByRole( 'list', { name: 'Visible editors' } )
+			screen.getByRole( 'list', { name: 'Active editors' } )
 		).getAllByRole( 'listitem' );
 
 		expect( rows ).toHaveLength( 1 );
@@ -5417,7 +5546,16 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-freshness',
 			'delayed'
 		);
-		expect( screen.getByText( 'Mira' ) ).toBeVisible();
+		expect( screen.queryByText( 'Mira' ) ).not.toBeInTheDocument();
+		fireEvent.click(
+			within( rows[ 0 ] ).getByRole( 'button', {
+				name: 'Mira, Presence may be delayed. Show editing details',
+			} )
+		);
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent( 'Mira' );
+		expect( screen.getByRole( 'tooltip' ) ).toHaveTextContent(
+			'Presence may be delayed'
+		);
 		expect(
 			screen.queryByText( /userId|anchor|selection/i )
 		).not.toBeInTheDocument();
@@ -5455,7 +5593,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -5525,7 +5663,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -5645,7 +5783,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -5726,7 +5864,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -5858,7 +5996,7 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingPresenceStatusHarness /> );
 
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
@@ -6053,7 +6191,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		const { unmount } = render( <DistributedEditingStatusChrome /> );
+		const { unmount } = render(
+			<DistributedEditingPresenceStatusHarness />
+		);
 
 		try {
 			const presence = screen.getByRole( 'group', {
@@ -6215,7 +6355,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		const { unmount } = render( <DistributedEditingStatusChrome /> );
+		const { unmount } = render(
+			<DistributedEditingPresenceStatusHarness />
+		);
 
 		try {
 			const presence = screen.getByRole( 'group', {
@@ -6342,7 +6484,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		const { unmount } = render( <DistributedEditingStatusChrome /> );
+		const { unmount } = render(
+			<DistributedEditingPresenceStatusHarness />
+		);
 
 		try {
 			const presence = screen.getByRole( 'group', {
@@ -6414,6 +6558,13 @@ describe( 'DistributedEditingStatus', () => {
 			expect(
 				actions.__experimentalSendDistributedEditingPresenceHeartbeat
 			).toHaveBeenCalled();
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+					.mock.invocationCallOrder[ 0 ]
+			).toBeLessThan(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+					.mock.invocationCallOrder[ 0 ]
+			);
 			expect( presence ).toHaveAttribute(
 				'data-distributed-editing-presence-repeated-refresh-scheduler-tick-count',
 				'1'
@@ -6434,6 +6585,158 @@ describe( 'DistributedEditingStatus', () => {
 					/session_key|rawSessionKey|userId|cursor|selection/i
 				)
 			).not.toBeInTheDocument();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'debounces a presence heartbeat when the local document state changes', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		const baseContent =
+			'<!-- wp:paragraph --><p>Presence clean base.</p><!-- /wp:paragraph -->';
+		const editedPostContent =
+			'<!-- wp:paragraph --><p>Presence local edit.</p><!-- /wp:paragraph -->';
+		const editorSettings = {
+			distributedEditing: {
+				enabled: true,
+				presenceStorageReadiness: {
+					status: 'ready',
+					tableExists: true,
+					schemaCurrent: true,
+				},
+			},
+		};
+		const sessionState = {
+			serverVersion: '12',
+			clientBaseContent: baseContent,
+			distributedEditingPostStateHash:
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+			presenceRosterStatus: 'empty',
+		};
+		setupDistributedEditingStatusSelect( {
+			editedPostContent: baseContent,
+			editorSettings,
+			sessionState,
+		} );
+
+		const { rerender, unmount } = render(
+			<DistributedEditingPresenceToolbar />
+		);
+
+		try {
+			await act( async () => {
+				jest.advanceTimersByTime( 499 );
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).not.toHaveBeenCalled();
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalledTimes( 1 );
+
+			setupDistributedEditingStatusSelect( {
+				editedPostContent,
+				editorSettings,
+				sessionState,
+			} );
+			rerender( <DistributedEditingPresenceToolbar /> );
+
+			await act( async () => {
+				jest.advanceTimersByTime( 500 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalledTimes( 2 );
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
+		} finally {
+			unmount();
+			jest.clearAllTimers();
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'does not send another presence heartbeat for dirty editor bookkeeping without content changes', async () => {
+		jest.useFakeTimers();
+
+		const actions = setupDistributedEditingStatusDispatch();
+		const baseContent =
+			'<!-- wp:paragraph --><p>Presence clean base.</p><!-- /wp:paragraph -->';
+		const editorSettings = {
+			distributedEditing: {
+				enabled: true,
+				presenceStorageReadiness: {
+					status: 'ready',
+					tableExists: true,
+					schemaCurrent: true,
+				},
+			},
+		};
+		const sessionState = {
+			serverVersion: '12',
+			clientBaseContent: baseContent,
+			distributedEditingPostStateHash:
+				'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+			presenceRosterStatus: 'empty',
+		};
+		setupDistributedEditingStatusSelect( {
+			editedPostContent: baseContent,
+			editorSettings,
+			sessionState,
+		} );
+
+		const { rerender, unmount } = render(
+			<DistributedEditingPresenceToolbar />
+		);
+
+		try {
+			await act( async () => {
+				jest.advanceTimersByTime( 500 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalledTimes( 1 );
+
+			setupDistributedEditingStatusSelect( {
+				editedPostContent: baseContent,
+				editorSettings,
+				isEditedPostDirty: true,
+				sessionState,
+			} );
+			rerender( <DistributedEditingPresenceToolbar /> );
+
+			await act( async () => {
+				jest.advanceTimersByTime( 500 );
+				await Promise.resolve();
+				await Promise.resolve();
+			} );
+
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+			).toHaveBeenCalledTimes( 1 );
+			expect(
+				actions.__experimentalSaveDistributedEditingRetryAfterProof
+			).not.toHaveBeenCalled();
 		} finally {
 			unmount();
 			jest.clearAllTimers();
@@ -6476,7 +6779,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		const { unmount } = render( <DistributedEditingStatusChrome /> );
+		const { unmount } = render(
+			<DistributedEditingPresenceStatusHarness />
+		);
 
 		try {
 			const presence = screen.getByRole( 'group', {
@@ -6609,7 +6914,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		const { rerender, unmount } = render(
-			<DistributedEditingStatusChrome />
+			<DistributedEditingPresenceStatusHarness />
 		);
 
 		try {
@@ -6636,7 +6941,7 @@ describe( 'DistributedEditingStatus', () => {
 					'degraded'
 				)
 			);
-			rerender( <DistributedEditingStatusChrome /> );
+			rerender( <DistributedEditingPresenceStatusHarness /> );
 			expect( sessionState ).toMatchObject( {
 				presenceHeartbeatMarksLocalEditorCurrent: false,
 				presenceHeartbeatMarksLocalEditorDelayed: true,
@@ -6672,7 +6977,7 @@ describe( 'DistributedEditingStatus', () => {
 		}
 	} );
 
-	it( 'surfaces expired-only roster evidence during a repeated presence refresh and separates the later heartbeat confirmation', async () => {
+	it( 'keeps expired-only roster evidence after the heartbeat-first repeated presence refresh', async () => {
 		jest.useFakeTimers();
 
 		let releaseHeartbeat;
@@ -6766,7 +7071,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		const { rerender, unmount } = render(
-			<DistributedEditingStatusChrome />
+			<DistributedEditingPresenceStatusHarness />
 		);
 
 		try {
@@ -6786,39 +7091,21 @@ describe( 'DistributedEditingStatus', () => {
 				await Promise.resolve();
 				await Promise.resolve();
 			} );
-			rerender( <DistributedEditingStatusChrome /> );
+			rerender( <DistributedEditingPresenceStatusHarness /> );
 
 			await waitFor( () =>
 				expect( presence ).toHaveAttribute(
-					'data-distributed-editing-presence-refresh-command-status',
-					'refreshed'
+					'data-distributed-editing-presence-heartbeat-command-status',
+					'sending'
 				)
 			);
 			expect( presence ).toHaveAttribute(
-				'data-distributed-editing-presence-heartbeat-command-status',
-				'sending'
+				'data-distributed-editing-presence-refresh-command-status',
+				'idle'
 			);
-			expect( presence ).toHaveAttribute(
-				'data-distributed-editing-presence-status',
-				'recent'
-			);
-			expect( presence ).toHaveAttribute(
-				'data-distributed-editing-presence-visible-count',
-				'0'
-			);
-			expect( presence ).toHaveAttribute(
-				'data-distributed-editing-presence-summary-expired-count',
-				'2'
-			);
-			expect( presence ).toHaveTextContent(
-				'Editor activity was seen before this refresh. Presence may be delayed.'
-			);
-			expect( presence ).not.toHaveTextContent(
-				'Some editor activity expired before this refresh.'
-			);
-			expect( presence ).not.toHaveTextContent(
-				'No other editors shown.'
-			);
+			expect(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+			).not.toHaveBeenCalled();
 			expect( presence ).toHaveAttribute(
 				'data-distributed-editing-presence-claims-absence',
 				'false'
@@ -6845,7 +7132,7 @@ describe( 'DistributedEditingStatus', () => {
 				await Promise.resolve();
 				await Promise.resolve();
 			} );
-			rerender( <DistributedEditingStatusChrome /> );
+			rerender( <DistributedEditingPresenceStatusHarness /> );
 
 			await waitFor( () =>
 				expect( presence ).toHaveAttribute(
@@ -6853,25 +7140,38 @@ describe( 'DistributedEditingStatus', () => {
 					'sent'
 				)
 			);
+			await waitFor( () =>
+				expect( presence ).toHaveAttribute(
+					'data-distributed-editing-presence-refresh-command-status',
+					'refreshed'
+				)
+			);
+			expect(
+				actions.__experimentalSendDistributedEditingPresenceHeartbeat
+					.mock.invocationCallOrder[ 0 ]
+			).toBeLessThan(
+				actions.__experimentalRefreshDistributedEditingPresenceSnapshot
+					.mock.invocationCallOrder[ 0 ]
+			);
 			expect( sessionState ).toMatchObject( {
 				presenceHeartbeatMarksLocalEditorCurrent: true,
 				presenceHeartbeatMarksLocalEditorDelayed: false,
 				presenceHeartbeatLocalRosterEntryVisible: true,
 				presenceHeartbeatLocalRosterEntryFreshness: 'current',
-				presenceRosterStatus: 'active',
+				presenceRosterStatus: 'recent',
 				presenceRosterVisibleCount: 1,
 				presenceRosterTotalKnownCount: 3,
 				presenceRosterExpiredCount: 2,
 				presenceRosterEntries: [
 					{
 						relationship: 'current_user_current_tab',
-						freshness: 'current',
+						freshness: 'recent',
 					},
 				],
 			} );
 			expect( presence ).toHaveAttribute(
 				'data-distributed-editing-presence-status',
-				'active'
+				'recent'
 			);
 			expect( presence ).toHaveAttribute(
 				'data-distributed-editing-presence-visible-count',
@@ -6879,6 +7179,10 @@ describe( 'DistributedEditingStatus', () => {
 			);
 			expect( presence ).toHaveAttribute(
 				'data-distributed-editing-presence-summary-current-count',
+				'0'
+			);
+			expect( presence ).toHaveAttribute(
+				'data-distributed-editing-presence-summary-delayed-count',
 				'1'
 			);
 			expect( presence ).toHaveAttribute(
@@ -6886,7 +7190,7 @@ describe( 'DistributedEditingStatus', () => {
 				'2'
 			);
 			expect( presence ).toHaveTextContent(
-				'You are visible in this editing session.'
+				'Your presence may be delayed.'
 			);
 			expect( presence ).not.toHaveTextContent(
 				'1 editor is active now. Some editor activity expired before this refresh.'
@@ -6950,7 +7254,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 
 		const { rerender, unmount } = render(
-			<DistributedEditingStatusChrome />
+			<DistributedEditingPresenceStatusHarness />
 		);
 
 		try {
@@ -6975,7 +7279,7 @@ describe( 'DistributedEditingStatus', () => {
 				presenceRepeatedRefreshSchedulesNextRefresh: false,
 				presenceRepeatedRefreshSchedulesNextHeartbeat: false,
 			};
-			rerender( <DistributedEditingStatusChrome /> );
+			rerender( <DistributedEditingPresenceStatusHarness /> );
 
 			await waitFor( () =>
 				expect( presence ).toHaveAttribute(
@@ -7039,7 +7343,9 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		const { unmount } = render( <DistributedEditingStatusChrome /> );
+		const { unmount } = render(
+			<DistributedEditingPresenceStatusHarness />
+		);
 
 		try {
 			const presence = screen.getByRole( 'group', {
@@ -7098,8 +7404,7 @@ describe( 'DistributedEditingStatus', () => {
 		}
 	} );
 
-	it( 'reports fresh-review jump inspection status from production chrome without saving', async () => {
-		const user = userEvent.setup();
+	it( 'keeps fresh-review jump inspection controls out of production chrome', () => {
 		const actions = setupDistributedEditingStatusDispatch();
 
 		setupDistributedEditingStatusSelect( {
@@ -7137,22 +7442,15 @@ describe( 'DistributedEditingStatus', () => {
 		render( <DistributedEditingStatusChrome /> );
 
 		expect(
-			screen.getByRole( 'group', {
+			screen.queryByRole( 'group', {
 				name: 'Distributed editing fresh review jump status',
 			} )
-		).toBeVisible();
-
-		await user.click(
-			screen.getByRole( 'button', {
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
 				name: 'Inspect jump target for Chrome jump HTML change',
 			} )
-		);
-
-		expect(
-			screen.getByText(
-				'Jump target checked. The editor found a block target for this review item; no block was selected, no focus moved, and no save was made.'
-			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 		expect(
 			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
 		).not.toHaveBeenCalled();
@@ -7170,8 +7468,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'reports fresh-review compare inspection status from production chrome without saving', async () => {
-		const user = userEvent.setup();
+	it( 'keeps fresh-review compare inspection controls out of production chrome', () => {
 		const actions = setupDistributedEditingStatusDispatch();
 
 		setupDistributedEditingStatusSelect( {
@@ -7213,55 +7510,21 @@ describe( 'DistributedEditingStatus', () => {
 		render( <DistributedEditingStatusChrome /> );
 
 		expect(
-			screen.getByRole( 'group', {
+			screen.queryByRole( 'group', {
 				name: 'Distributed editing fresh review compare status',
 			} )
-		).toBeVisible();
-
-		await user.click(
-			screen.getByRole( 'button', {
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
 				name: 'Inspect compare evidence for Chrome compare paragraph change',
 			} )
-		);
-
+		).not.toBeInTheDocument();
 		expect(
-			screen.getByText(
-				'Read-only comparison opened. The editor shows safe base and proposed block text below; no content changed, no save was made, and no server request was sent.'
-			)
-		).toBeVisible();
-		const comparisonSurface = screen.getByRole( 'group', {
-			name: 'Distributed editing fresh review comparison for Chrome compare paragraph change',
-		} );
-		expect( comparisonSurface ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-surface-status',
-			'open'
-		);
-		expect( comparisonSurface ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-surface-mode',
-			'read_only_side_by_side_block_review'
-		);
-		expect( comparisonSurface ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-surface-read-only',
-			'true'
-		);
-		expect( comparisonSurface ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-surface-calls-rest',
-			'false'
-		);
-		expect( comparisonSurface ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-surface-calls-save',
-			'false'
-		);
-		expect( comparisonSurface ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-surface-mutates-editor-content',
-			'false'
-		);
-		expect( comparisonSurface ).toHaveTextContent(
-			'Original chrome comparison text.'
-		);
-		expect( comparisonSurface ).toHaveTextContent(
-			'Updated chrome comparison text.'
-		);
+			screen.queryByText( 'Original chrome comparison text.' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Updated chrome comparison text.' )
+		).not.toBeInTheDocument();
 		expect(
 			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
 		).not.toHaveBeenCalled();
@@ -7279,7 +7542,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'describes the fresh-review compare plan without opening a comparison', () => {
+	it( 'keeps fresh-review compare plan diagnostics out of production chrome', () => {
 		const actions = setupDistributedEditingStatusDispatch();
 
 		setupDistributedEditingStatusSelect( {
@@ -7317,349 +7580,17 @@ describe( 'DistributedEditingStatus', () => {
 
 		render( <DistributedEditingStatusChrome /> );
 
-		const comparePlan = screen.getByRole( 'group', {
-			name: 'Distributed editing fresh review compare plan',
-		} );
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-status',
-			'ready'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-base-hash-evidence',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-proposed-hash-evidence',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-review-hash-evidence',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-renders-diff',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-opens-comparison',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-calls-rest',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-compare-plan-calls-save',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-readiness-status',
-			'ready_to_select'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-readiness-can-select',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-readiness-selects-block',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-readiness-moves-focus',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-readiness-opens-panel',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-readiness-opens-comparison',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-status',
-			'disabled_until_renderer_turn'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-renderable',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-renders-preview',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-computes-diff',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-opens-panel',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-opens-comparison',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-selects-block',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-moves-focus',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-calls-rest',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-calls-save',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-status',
-			'available'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-shareable',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-export-ready',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-missing-renderer-pieces',
-			'2'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-raw-content',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-hash-values',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-renders-preview',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-computes-diff',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-calls-rest',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-preview-shell-report-calls-save',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-status',
-			'disabled_until_renderer_capabilities_registered'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-registration-status',
-			'not_registered'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-capability-status',
-			'missing_required_capabilities'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-status',
-			'missing_required_capabilities'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-reason',
-			'missing_all_required_capabilities'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-present-capabilities',
-			'0'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-missing-capabilities',
-			'2'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-unknown-candidates',
-			'0'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-complete',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-resolver-only',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-candidate-map-stored',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-registers-renderer',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-renderable',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-status',
-			'available'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolution-count',
-			'1'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-missing-count',
-			'1'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-partial-count',
-			'0'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-complete-count',
-			'0'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-candidates',
-			'0'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-candidate-maps-stored',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-names',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderer-code',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolver-only',
-			'true'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-raw-content',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderable',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-missing-capabilities',
-			'2'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-registers-renderer',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-has-registered-renderer',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-renderable',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-renders-preview',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-computes-diff',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-opens-panel',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-rest',
-			'false'
-		);
-		expect( comparePlan ).toHaveAttribute(
-			'data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-save',
-			'false'
-		);
-		expect( comparePlan ).toHaveTextContent( 'Compare plan ready' );
-		expect( comparePlan ).toHaveTextContent(
-			'A future comparison can use base and proposed hash evidence for this review item.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'No comparison is open, no content is shown, and no save was made.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'This review item is ready for a future side-by-side comparison surface.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'No block is selected, no focus moves, no panel opens, and no save was made.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'A future preview shell would need base and proposed block content, a boundary-safe diff renderer, and review controls.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'The shell is disabled; no preview is rendered, no diff is computed, no panel opens, and no save was made.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'Support report available: renderer registration and review controls are not present yet.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'It records item identity, boundary policy, and requirement keys only; no raw content, hashes, proof details, or user identity are included.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'Renderer readiness: boundary-safe diff rendering and review controls must be registered before this preview shell can render.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'No renderer is registered, no preview opens, no diff is computed, and no save was made.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'Capability resolver: no required renderer capabilities are present in the candidate map.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'This only classifies readiness; no renderer is registered, no preview opens, no diff is computed, and no save was made.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			'Capability support summary: renderer capability classifications are aggregated for support without candidate maps, unknown key names, raw content, hashes, proof details, tokens, identities, or renderer code.'
-		);
-		expect( comparePlan ).toHaveTextContent(
-			/Base hash evidence\s*Available/
-		);
-		expect( comparePlan ).toHaveTextContent(
-			/Proposed hash evidence\s*Available/
-		);
-		expect( comparePlan ).toHaveTextContent(
-			/Reviewed hash evidence\s*Available/
-		);
-		expect( comparePlan ).toHaveTextContent(
-			/Comparison readiness\s*Available/
-		);
-		expect( comparePlan ).toHaveTextContent( /Preview shell\s*Disabled/ );
-		expect( comparePlan ).toHaveTextContent(
-			/Preview shell support report\s*Available/
-		);
-		expect( comparePlan ).toHaveTextContent(
-			/Renderer readiness\s*Not registered/
-		);
-		expect( comparePlan ).toHaveTextContent(
-			/Capability resolver\s*Missing/
-		);
-		expect( comparePlan ).toHaveTextContent(
-			/Capability support summary\s*Shareable/
-		);
-		expect( comparePlan ).not.toHaveTextContent(
-			/aaaaaaaaaaaaaaaa|bbbbbbbbbbbbbbbb|fresh-review-chrome-compare-plan-raw|script/i
-		);
+		expect(
+			screen.queryByRole( 'group', {
+				name: 'Distributed editing fresh review compare plan',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( 'Compare plan ready' )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText( /fresh-review-chrome-compare-plan-raw|script/i )
+		).not.toBeInTheDocument();
 		expect(
 			actions.__experimentalResolveDistributedEditingFreshReviewDecisionItem
 		).not.toHaveBeenCalled();
@@ -7689,7 +7620,12 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render(
+			<>
+				<DistributedEditingEnabledShell />
+				<DistributedEditingStatus placement="editor-interface-notices" />
+			</>
+		);
 
 		const shell = screen.getByRole( 'region', {
 			name: 'Distributed editing enabled status',
@@ -7710,22 +7646,18 @@ describe( 'DistributedEditingStatus', () => {
 		expect( screen.getByText( 'Editing together delayed' ) ).toBeVisible();
 		expect( shell ).toHaveAttribute(
 			'data-distributed-editing-human-loop-step',
-			'local_changes_protected'
+			'ready_to_edit'
 		);
 		expect(
 			screen.queryByText( 'Local changes protected' )
 		).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Keep editing' ) ).not.toBeInTheDocument();
 		expect(
-			screen.queryByText( 'Save keeps changes protected' )
+			screen.queryByText( 'Use Save when you are ready.' )
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByText(
-				'You can keep editing. If you use Save, keep this tab open until WordPress confirms the update.'
-			)
+			screen.queryByText( 'Save checks WordPress before updating.' )
 		).not.toBeInTheDocument();
-		expect(
-			screen.getByText( 'Save checks WordPress before updating.' )
-		).toBeVisible();
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 	} );
 
@@ -7750,7 +7682,12 @@ describe( 'DistributedEditingStatus', () => {
 			},
 		} );
 
-		render( <DistributedEditingStatusChrome /> );
+		render(
+			<>
+				<DistributedEditingEnabledShell />
+				<DistributedEditingStatus placement="editor-interface-notices" />
+			</>
+		);
 
 		const shell = screen.getByRole( 'region', {
 			name: 'Distributed editing enabled status',
@@ -7777,14 +7714,14 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect(
 			screen.queryByText(
-				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+				'WordPress cannot update the post until risky changes are approved or removed.'
 			)
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText( 'Review changes' )
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByText( 'Save opens review' )
+			screen.queryByText( 'Review changes' )
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText(
@@ -7792,9 +7729,7 @@ describe( 'DistributedEditingStatus', () => {
 			)
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByText(
-				'Review highlighted changes before WordPress updates the post.'
-			)
+			screen.queryByText( 'Review changes before saving.' )
 		).not.toBeInTheDocument();
 		expect(
 			screen.getByText( 'Review changes before Save.' )
@@ -7809,7 +7744,7 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-status-summary',
-			'Protected local changes need review before the authoritative post can update.'
+			'Protected local changes need review before WordPress can update the post.'
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-authority-state',
@@ -7817,17 +7752,12 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		expect( saveJourney ).toHaveAttribute(
 			'data-distributed-editing-save-journey-authority-summary',
-			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+			'WordPress cannot update the post until risky changes are approved or removed.'
 		);
 	} );
 
-	it( 'imports pasted protected local updates from production editor chrome without saving', async () => {
-		const user = userEvent.setup();
+	it( 'keeps review payload controls out of production editor chrome', () => {
 		const actions = setupDistributedEditingStatusDispatch();
-		const payloadText = JSON.stringify( {
-			version: 1,
-			format: 'wp/de-rtc-local-updates',
-		} );
 
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
@@ -7851,68 +7781,58 @@ describe( 'DistributedEditingStatus', () => {
 
 		render( <DistributedEditingStatusChrome /> );
 
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'Import reviewed changes',
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Run review check',
 			} )
-		);
-		fireEvent.change(
-			screen.getByRole( 'textbox', {
-				name: 'Reviewed changes payload',
-			} ),
-			{ target: { value: payloadText } }
-		);
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'Validate review proof and import',
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'textbox', {
+				name: 'Review payload',
 			} )
-		);
-
+		).not.toBeInTheDocument();
 		expect(
 			actions.__experimentalImportDistributedEditingLocalUpdates
-		).toHaveBeenCalledWith( payloadText );
+		).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
-		expect( await screen.findByRole( 'status' ) ).toHaveTextContent(
-			'Admin-reviewed changes were imported into this editor only, with route, hash, and signed review proof checks passing. They remain protected until WordPress confirms Save; no server request was sent.'
-		);
 	} );
 
 	it.each( [
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MALFORMED_PAYLOAD,
-			'Import blocked: the pasted protected-changes payload is missing or malformed. Nothing was imported, and local changes remain protected.',
+			'Review check blocked: the pasted protected-changes text is missing or malformed. Local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_CONTENT_HASH_MISMATCH,
-			'Import blocked: the protected post-content hash does not match the approved proof. Nothing was imported, and local changes remain protected.',
+			'Review check blocked: the protected changes do not match the approved review. Local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.POST_ROUTE_MISMATCH,
-			'Import blocked: the protected changes target a different editor route. Nothing was imported, and local changes remain protected.',
+			'Review check blocked: the protected changes are for a different editor route. Local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.MISSING_REVIEW_APPROVAL_PROOF,
-			'Import blocked: this admin review handoff is missing accepted review proof. Nothing was imported, and local changes remain protected.',
+			'Review check blocked: this admin review is missing accepted approval. Local changes remain protected.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXPIRED_REVIEW_APPROVAL_PROOF,
-			'Import blocked: the admin-reviewed changes token or proof has expired and is no longer usable. Nothing was imported, and local changes remain protected and exportable.',
+			'Review check blocked: the admin-reviewed changes token or approval has expired. Local changes remain protected and exportable.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.FRESH_REVIEW_REQUIRED,
-			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for Save. Nothing was imported, and local changes remain protected and exportable.',
+			'Review needs checking: this reviewed copy needs a fresh admin check before WordPress can Save it. Your local changes remain protected and exportable.',
 		],
 		[
 			DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_REASONS.EXTRA_SESSION_STATE_OVEREXPOSED,
-			'Import blocked: this reviewed-changes payload exposes extra distributed editing session state. Nothing was imported, and local changes remain protected.',
+			'Review check blocked: this reviewed copy exposes extra editor session state. Local changes remain protected.',
 		],
 	] )(
-		'reports blocked local-updates import for %s without saving',
+		'reports blocked local-updates review check for %s without saving',
 		async ( reason, message ) => {
 			const user = userEvent.setup();
 			const actions = setupDistributedEditingStatusDispatch();
@@ -7937,22 +7857,24 @@ describe( 'DistributedEditingStatus', () => {
 				}
 			);
 
-			render( <DistributedEditingStatusChrome /> );
+			render(
+				<DistributedEditingLocalUpdatesImportControls forceVisible />
+			);
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Import reviewed changes',
+					name: 'Run review check',
 				} )
 			);
 			fireEvent.change(
 				screen.getByRole( 'textbox', {
-					name: 'Reviewed changes payload',
+					name: 'Review payload',
 				} ),
 				{ target: { value: '{"version":1}' } }
 			);
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Validate review proof and import',
+					name: 'Run review check',
 				} )
 			);
 
@@ -7971,7 +7893,7 @@ describe( 'DistributedEditingStatus', () => {
 		}
 	);
 
-	it( 'shows fresh-review import action transcript reports without exposing raw payload details', async () => {
+	it( 'shows fresh-review check action transcript reports without exposing raw review details', async () => {
 		const user = userEvent.setup();
 		const actions = setupDistributedEditingStatusDispatch();
 
@@ -7990,7 +7912,7 @@ describe( 'DistributedEditingStatus', () => {
 					available: true,
 					canShareWithSupport: true,
 					chronologyText:
-						'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence.',
+						'Fresh-review Save confirmation was recorded; use WordPress Save evidence to confirm persistence.',
 					summaryText:
 						'Recorded 4 redacted transcript events; 2 unsafe entries were dropped.',
 					requiresSaveAuthorityForPersistence: true,
@@ -8006,16 +7928,16 @@ describe( 'DistributedEditingStatus', () => {
 			}
 		);
 
-		render( <DistributedEditingStatusChrome /> );
+		render( <DistributedEditingLocalUpdatesImportControls forceVisible /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Import reviewed changes',
+				name: 'Run review check',
 			} )
 		);
 		fireEvent.change(
 			screen.getByRole( 'textbox', {
-				name: 'Reviewed changes payload',
+				name: 'Review payload',
 			} ),
 			{
 				target: {
@@ -8029,19 +7951,19 @@ describe( 'DistributedEditingStatus', () => {
 		);
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Validate review proof and import',
+				name: 'Run review check',
 			} )
 		);
 
 		const status = await screen.findByRole( 'status' );
 		expect( status ).toHaveTextContent(
-			'Import blocked: this reviewed-changes handoff needs a fresh admin review before it can be imported for Save. Nothing was imported, and local changes remain protected and exportable.'
+			'Review needs checking: this reviewed copy needs a fresh admin check before WordPress can Save it. Your local changes remain protected and exportable.'
 		);
 		expect( status ).toHaveTextContent(
-			'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped.'
+			'Fresh-review Save confirmation was recorded; use WordPress Save evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped.'
 		);
 		expect( status ).toHaveTextContent(
-			'This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+			'This transcript is diagnostic only; WordPress Save evidence is still required before treating these changes as saved.'
 		);
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
@@ -8084,50 +8006,27 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-placement',
 			'editor-interface-notices'
 		);
-		expect( screen.getByText( 'Saving to WordPress' ) ).toBeVisible();
+		expect( screen.getByText( 'Saving' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'The editor is sending the prepared changes to WordPress. Keep this tab open; protected local changes remain exportable until WordPress confirms the save.'
-			)
-		).toBeVisible();
+			screen.getAllByText( 'WordPress is saving your changes.' ).length
+		).toBeGreaterThan( 0 );
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'Save is waiting for WordPress confirmation. Protected local changes remain pending and exportable until confirmation.'
-			)
-		).toBeVisible();
+			screen.getAllByText( 'WordPress is saving your changes.' ).length
+		).toBeGreaterThan( 0 );
 
-		await user.click(
-			screen.getByRole( 'button', {
+		expect(
+			screen.queryByRole( 'button', {
 				name: 'Export local changes',
 			} )
-		);
-
-		expect( writeText ).toHaveBeenCalledTimes( 1 );
-		expectClipboardExportPayload( writeText, {
-			currentPost: { id: 43, type: 'post' },
-			editedPostContent:
-				'<!-- wp:paragraph --><p>Saving update</p><!-- /wp:paragraph -->',
-			sessionState: {
-				pendingChangeCount: 1,
-				hasPendingChanges: true,
-				isAwaitingServerConfirmation: true,
-				canExportLocalUpdates: true,
-				mustOfferLocalCopy: true,
-				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
-			},
-		} );
+		).not.toBeInTheDocument();
+		expect( writeText ).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
-		expect(
-			await screen.findByText(
-				'Protected local changes exported. Keep this copy until the server confirms the update.'
-			)
-		).toBeVisible();
 	} );
 
 	it( 'renders already-confirmed retry-save state from production editor chrome without recovery actions and then quiets evidence', () => {
@@ -8163,13 +8062,13 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-placement',
 				'editor-interface-notices'
 			);
-			expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+			expect( screen.getByText( 'Saved' ) ).toBeVisible();
 			expect(
-				screen.getByText(
-					'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+				screen.getAllByText(
+					'WordPress saved your changes. Ready for new edits.'
 				)
-			).toBeVisible();
-			const confirmedSaveText = screen.getByText( 'Save confirmed' );
+			).toHaveLength( 1 );
+			const confirmedSaveText = screen.getByText( 'Saved' );
 			// eslint-disable-next-line testing-library/no-node-access
 			const confirmedStatusItem = confirmedSaveText.closest(
 				'[data-distributed-editing-confirmed-save-status-evidence-retained]'
@@ -8213,12 +8112,7 @@ describe( 'DistributedEditingStatus', () => {
 				'data-distributed-editing-confirmed-save-status-quieted',
 				'true'
 			);
-			expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
-			expect(
-				screen.getByText(
-					'WordPress confirmed the update. Open details for version and revision evidence.'
-				)
-			).toBeVisible();
+			expect( screen.getByText( 'Saved' ) ).toBeVisible();
 			expect( screen.getByText( 'Show Save evidence' ) ).toBeVisible();
 			// eslint-disable-next-line testing-library/no-node-access
 			const evidenceDetails = confirmedStatusItem.querySelector(
@@ -8226,10 +8120,10 @@ describe( 'DistributedEditingStatus', () => {
 			);
 			expect( evidenceDetails ).not.toHaveAttribute( 'open' );
 			expect(
-				screen.getByText(
-					'WordPress saved the prepared changes, advanced the sync version from 7 to 8, and recorded 1 revision. Protected local changes are no longer pending for this save.'
+				screen.getAllByText(
+					'WordPress saved your changes. Ready for new edits.'
 				)
-			).toBeInTheDocument();
+			).toHaveLength( 2 );
 		} finally {
 			jest.useRealTimers();
 
@@ -8271,36 +8165,20 @@ describe( 'DistributedEditingStatus', () => {
 
 		render( <DistributedEditingStatusChrome /> );
 
-		expect( screen.getByText( 'Save already in progress' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'Save is already waiting for WordPress confirmation. Protected local changes remain exportable; keep this tab open until it finishes.'
-			)
-		).toBeVisible();
-
-		await user.click(
-			screen.getByRole( 'button', {
+			screen.getAllByText( 'WordPress is saving your changes.' ).length
+		).toBeGreaterThan( 0 );
+		expect(
+			screen.queryByRole( 'button', {
 				name: 'Export local changes',
 			} )
-		);
-
-		expect( writeText ).toHaveBeenCalledTimes( 1 );
-		expectClipboardExportPayload( writeText, {
-			currentPost: { id: 44, type: 'post' },
-			editedPostContent:
-				'<!-- wp:paragraph --><p>Blocked update</p><!-- /wp:paragraph -->',
-			sessionState: {
-				pendingChangeCount: 1,
-				hasPendingChanges: true,
-				isAwaitingServerConfirmation: true,
-				canExportLocalUpdates: true,
-				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
-				retrySaveHandoffStatus:
-					DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
-				retrySaveHandoffReason:
-					DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
-			},
-		} );
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByText(
+				/Protected local changes remain exportable; keep this tab open/
+			)
+		).not.toBeInTheDocument();
+		expect( writeText ).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
@@ -8308,10 +8186,8 @@ describe( 'DistributedEditingStatus', () => {
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
 		).not.toHaveBeenCalled();
 		expect(
-			await screen.findByText(
-				'Protected local changes exported. Keep this copy until the server confirms the update.'
-			)
-		).toBeVisible();
+			screen.getAllByText( 'WordPress is saving your changes.' ).length
+		).toBeGreaterThan( 0 );
 	} );
 
 	it( 'copies local updates from production editor chrome without saving', async () => {
@@ -8443,7 +8319,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Protected local changes exported. Keep this copy until the server confirms the update.'
+				'Protected local changes exported. Keep this copy until WordPress confirms the update.'
 			)
 		).toBeVisible();
 	} );
@@ -8524,8 +8400,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 	} );
 
-	it( 'renders review-required retry-save chrome with export and refetch actions only', async () => {
-		const user = userEvent.setup();
+	it( 'renders review-required retry-save chrome without export or refetch actions', () => {
 		const writeText = jest.fn().mockResolvedValue();
 		const actions = setupDistributedEditingStatusDispatch();
 
@@ -8546,7 +8421,7 @@ describe( 'DistributedEditingStatus', () => {
 				hasPendingChanges: true,
 				requiresServerStateRefetch: true,
 				requiresManualConflictResolution: true,
-				canExportLocalUpdates: true,
+				canExportLocalUpdates: false,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 				retrySaveReason:
@@ -8556,66 +8431,27 @@ describe( 'DistributedEditingStatus', () => {
 
 		render( <DistributedEditingStatusChrome /> );
 
-		expect(
-			screen.getByText( 'HTML review required before Save' )
-		).toBeVisible();
+		expect( screen.getByText( 'Safe parts saved' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or get the latest post before deciding how to continue. Protected local changes remain exportable.'
+				'WordPress saved the safe parts, but one block was blocked.'
 			)
 		).toBeVisible();
 		expect(
 			screen.queryByRole( 'button', { name: 'Export local changes' } )
 		).not.toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Export changes for review' } )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'button', { name: 'Get latest post' } )
-		).toBeVisible();
-
-		await user.click(
-			screen.getByRole( 'button', {
+			screen.queryByRole( 'button', {
 				name: 'Export changes for review',
 			} )
-		);
-
-		expect( writeText ).toHaveBeenCalledTimes( 1 );
-		expectClipboardExportPayload( writeText, {
-			currentPost: { id: 45, type: 'post' },
-			editedPostContent:
-				'<!-- wp:html --><script>window.localChange = true;</script><!-- /wp:html -->',
-			sessionState: {
-				disposition:
-					DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
-				reasonCode:
-					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
-				pendingChangeCount: 1,
-				hasPendingChanges: true,
-				requiresServerStateRefetch: true,
-				requiresManualConflictResolution: true,
-				canExportLocalUpdates: true,
-				retrySaveStatus:
-					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
-				retrySaveReason:
-					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
-			},
-		} );
+		).not.toBeInTheDocument();
 		expect(
-			await screen.findByText(
-				'Protected local changes exported for HTML review. Keep this copy until a user with unfiltered HTML permission can inspect it.'
-			)
-		).toBeVisible();
-
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'Get latest post',
-			} )
-		);
-
+			screen.queryByRole( 'button', { name: 'Get latest post' } )
+		).not.toBeInTheDocument();
+		expect( writeText ).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
-		).toHaveBeenCalledTimes( 1 );
+		).not.toHaveBeenCalled();
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
@@ -8625,11 +8461,6 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
 		).not.toHaveBeenCalled();
-		expect(
-			await screen.findByText(
-				'Latest post loaded for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
-			)
-		).toBeVisible();
 	} );
 
 	it( 'exports a fresh-review handoff for unavailable reviewed tokens without saving or leaking proof internals', async () => {
@@ -8683,7 +8514,7 @@ describe( 'DistributedEditingStatus', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'The imported reviewed-changes token could not be found in server storage and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.'
+				'The reviewed changes token could not be found in server storage and is no longer usable for Save. No server save was made. Request a fresh admin review before trying again; protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		expect(
@@ -8725,7 +8556,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Fresh-review handoff copied. Send it to an admin reviewer; local changes remain protected until a new review proof is issued.'
+				'Fresh-review handoff copied. Send it to an admin reviewer; local changes remain protected until a new review is completed.'
 			)
 		).toBeVisible();
 	} );
@@ -8810,9 +8641,7 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-placement',
 			'editor-interface-notices'
 		);
-		expect(
-			screen.getByText( 'Save needs the latest post' )
-		).toBeVisible();
+		expect( screen.getByText( 'Load latest version' ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {
 				name: 'Export local changes',
@@ -8849,6 +8678,135 @@ describe( 'DistributedEditingStatus', () => {
 			screen.getByText(
 				'Latest post loaded. Protected local changes remain in this editor session and can still be exported before retrying.'
 			)
+		).toBeVisible();
+	} );
+
+	it( 'loads latest post for review when the standalone Review changes action is clicked', async () => {
+		const user = userEvent.setup();
+		const actions = setupDistributedEditingStatusDispatch();
+		const onAction = jest.fn();
+
+		actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase.mockResolvedValueOnce(
+			{
+				result: 'server_state_refetched',
+				serverVersion: 'server-version-2',
+				content: {
+					raw: '<!-- wp:paragraph --><p>Server changed first block.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Server added second block.</p><!-- /wp:paragraph -->',
+				},
+			}
+		);
+		setupDistributedEditingStatusSelect( {
+			editedPostContent:
+				'<!-- wp:paragraph --><p>Local changed first block.</p><!-- /wp:paragraph -->',
+			sessionState: {
+				remoteChangeCount: 1,
+				hasRemoteChanges: true,
+				pendingChangeCount: 1,
+				canExportLocalUpdates: true,
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Original first block.</p><!-- /wp:paragraph -->',
+			},
+		} );
+
+		render(
+			<SlotFillProvider>
+				<DistributedEditingStatusChrome onAction={ onAction } />
+				<PluginPrePublishPanel.Slot />
+			</SlotFillProvider>
+		);
+
+		expect( screen.getByText( 'Remote changes received' ) ).toBeVisible();
+		expect(
+			screen.getByText( '1 remote change is available for review.' )
+		).toBeVisible();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Review changes',
+			} )
+		);
+
+		expect( onAction ).toHaveBeenCalledWith(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES,
+			expect.objectContaining( {
+				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.REMOTE_CHANGES_RECEIVED,
+				actionKeys: [
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES,
+				],
+			} )
+		);
+		expect(
+			actions.__experimentalRefreshDistributedEditingServerStateAfterStaleBase
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).not.toHaveBeenCalled();
+		expect( actions.openPublishSidebar ).toHaveBeenCalledTimes( 1 );
+		expect( await screen.findByRole( 'status' ) ).toHaveAttribute(
+			'data-distributed-editing-action-status',
+			'info'
+		);
+		expect(
+			screen.getByText( 'Review loaded. Nothing was saved.' )
+		).toBeVisible();
+		const reviewPanel = screen.getByRole( 'group', {
+			name: 'Remote changes review',
+		} );
+
+		expect( reviewPanel ).toBeVisible();
+		expect( reviewPanel ).toHaveAttribute(
+			'data-distributed-editing-remote-changes-review-item-count',
+			'2'
+		);
+		expect( reviewPanel ).toHaveAttribute(
+			'data-distributed-editing-remote-changes-review-calls-normal-save',
+			'false'
+		);
+		expect( screen.getByText( 'Changed block 1' ) ).toBeVisible();
+		expect( screen.getByText( 'Added block 2' ) ).toBeVisible();
+		expect( screen.getByText( 'Original first block.' ) ).toBeVisible();
+		expect(
+			screen.getByText( 'Server changed first block.' )
+		).toBeVisible();
+		expect(
+			screen.getByText( 'Server added second block.' )
+		).toBeVisible();
+
+		await user.click( within( reviewPanel ).getAllByText( 'Reject' )[ 0 ] );
+		await user.click(
+			within( reviewPanel ).getAllByText( 'Approve' )[ 1 ]
+		);
+
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+		await waitFor( () =>
+			expect( actions.editPost ).toHaveBeenCalledWith(
+				{
+					content:
+						'<!-- wp:paragraph --><p>Local changed first block.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Server added second block.</p><!-- /wp:paragraph -->',
+				},
+				{ undoIgnore: true }
+			)
+		);
+		expect(
+			actions.__experimentalRefreshDistributedEditingRetrySubmitProof
+		).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				clientBaseVersion: 'server-version-2',
+				pendingChangeCount: 2,
+			} )
+		);
+		expect(
+			actions.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof
+		).toHaveBeenCalledWith( {
+			requiresExplicitSaveClick: true,
+		} );
+		expect(
+			screen.getByText( 'Ready to Save. Use Save to update the post.' )
 		).toBeVisible();
 	} );
 
@@ -8984,7 +8942,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Prepare changes',
+				name: 'Continue Save',
 			} )
 		);
 
@@ -9036,7 +8994,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Check with WordPress',
+				name: 'Continue Save',
 			} )
 		);
 
@@ -9054,7 +9012,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'WordPress checked these changes. Prepare Save before updating the post.'
+				'These changes are ready. Continue Save before updating the post.'
 			)
 		).toBeVisible();
 	} );
@@ -9078,7 +9036,7 @@ describe( 'DistributedEditingStatus', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Prepare Save',
+				name: 'Continue Save',
 			} )
 		);
 
@@ -9144,21 +9102,21 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-next-step',
 			'prepare_guarded_save'
 		);
-		expect( screen.getByText( 'Conflict choice checked' ) ).toBeVisible();
+		expect( screen.getByText( 'Version checked' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress checked this conflict choice. Prepare Save before updating the post; the WordPress post has not changed yet.'
+				'This version is ready. Continue Save before updating the post; the WordPress post has not changed yet.'
 			)
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Prepare Save, then use Save to send the guarded update.'
+				'Continue Save, then use Save to ask WordPress to update the post.'
 			)
 		).toBeVisible();
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Prepare Save',
+				name: 'Continue Save',
 			} )
 		);
 
@@ -9176,7 +9134,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Save prepared. Use Save to send these changes to WordPress.'
+				'Ready to Save this version. Use Save to ask WordPress to update the post; local changes remain protected until WordPress confirms.'
 			)
 		).toBeVisible();
 	} );
@@ -9332,7 +9290,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 		);
 	} );
 
-	it( 'renders server-state acceptance without inert action buttons', () => {
+	it( 'renders server-state acceptance without the unsupported accept action', () => {
+		const onAction = jest.fn();
 		const noticeDescriptors =
 			getDistributedEditingNoticeDescriptorsForSessionState( {
 				disposition:
@@ -9345,6 +9304,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		render(
 			<DistributedEditingStatusSurface
 				noticeDescriptors={ noticeDescriptors }
+				onAction={ onAction }
 			/>
 		);
 
@@ -9358,10 +9318,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 			} )
 		).not.toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', {
+			screen.getByRole( 'button', {
 				name: 'Export local changes',
 			} )
-		).not.toBeInTheDocument();
+		).toBeVisible();
+		expect( onAction ).not.toHaveBeenCalled();
 	} );
 
 	it( 'renders stale-base rejection actions for inspected state', async () => {
@@ -9401,9 +9362,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 			.getByText( 'Latest post loaded' )
 			// eslint-disable-next-line testing-library/no-node-access
 			.closest( '.editor-distributed-editing-status__notice' );
-		expect( staleBaseNotice ).toHaveTextContent(
-			"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
-		);
+		expect(
+			screen.queryByText( /tracks remote activity separately/ )
+		).not.toBeInTheDocument();
 		expect( staleBaseNotice ).toHaveTextContent(
 			'Save now: Apply local changes before Save can update the post.'
 		);
@@ -9414,7 +9375,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				.closest( '[data-distributed-editing-remote-review-context]' )
 		).toHaveAttribute(
 			'data-distributed-editing-remote-review-context',
-			'true'
+			'false'
 		);
 		const staleBaseStatusItem = screen
 			.getByText( 'Latest post loaded' )
@@ -9438,11 +9399,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				.map( ( button ) => {
 					return button.textContent.trim();
 				} )
-		).toEqual( [
-			'Apply local changes',
-			'Get latest post',
-			'Export local changes',
-		] );
+		).toEqual( [ 'Apply local changes', 'Export local changes' ] );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -9497,9 +9454,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 			.getByText( 'Latest post data missing' )
 			// eslint-disable-next-line testing-library/no-node-access
 			.closest( '.editor-distributed-editing-status__notice' );
-		expect( staleBaseNotice ).toHaveTextContent(
-			"Review changes tracks remote activity separately. Use this notice's next step to keep local changes protected before Save."
-		);
+		expect(
+			screen.queryByText( /tracks remote activity separately/ )
+		).not.toBeInTheDocument();
 		expect( staleBaseNotice ).toHaveTextContent(
 			'Save now: Get latest first before Save can update the post.'
 		);
@@ -9518,7 +9475,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				.map( ( button ) => {
 					return button.textContent.trim();
 				} )
-		).toEqual( [ 'Get latest post', 'Export local changes' ] );
+		).toEqual( [ 'Export local changes' ] );
 	} );
 
 	it( 'does not render remote-review context when stale-base has no separate remote notice', () => {
@@ -9598,7 +9555,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Local changes applied' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'The latest post is loaded and local changes were applied in this editor. Prepare these changes for a WordPress check before updating the post.'
+				'The latest post is loaded and local changes were applied in this editor. Continue Save before updating the post.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /wp:paragraph/ ) ).not.toBeInTheDocument();
@@ -9642,7 +9599,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Next step:' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Choose latest or local structure below before saving.'
+				'Choose saved WordPress or local structure below before saving.'
 			)
 		).toBeVisible();
 		expect(
@@ -9740,10 +9697,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Ready for WordPress check' ) ).toBeVisible();
+		expect( screen.getByText( 'Ready to continue Save' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Local changes are prepared against the latest post. Check with WordPress before preparing Save; nothing has been saved yet.'
+				'Local changes are ready against the latest post. Continue Save before updating the post.'
 			)
 		).toBeVisible();
 	} );
@@ -9771,7 +9728,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress checked these changes. Prepare Save before updating the post; local changes remain pending.'
+				'These changes are ready. Continue Save before updating the post; local changes remain pending.'
 			)
 		).toBeVisible();
 		expect(
@@ -9781,7 +9738,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'renders imported protected changes as local guarded-save readiness', () => {
+	it( 'renders reviewed protected changes as local guarded-save readiness', () => {
 		const noticeDescriptors =
 			getDistributedEditingNoticeDescriptorsForSessionState( {
 				pendingChangeCount: 1,
@@ -9800,13 +9757,13 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Admin-reviewed changes were imported locally with signed review proof and are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
+				'Admin-reviewed changes are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
 			)
 		).toBeVisible();
 		expect( screen.queryByText( /saved/i ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'renders generic protected import readiness separately from reviewed proof imports', () => {
+	it( 'renders generic protected readiness separately from reviewed proof readiness', () => {
 		const noticeDescriptors =
 			getDistributedEditingNoticeDescriptorsForSessionState( {
 				pendingChangeCount: 1,
@@ -9825,15 +9782,15 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Protected recovery changes were imported locally and are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
+				'Protected recovery changes are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
 			)
 		).toBeVisible();
 		expect(
-			screen.queryByText( /Admin-reviewed changes were imported/ )
+			screen.queryByText( /Admin-reviewed changes are ready/ )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'renders fresh-review import blockers as no-save review requests', async () => {
+	it( 'renders fresh-review check blockers as no-save review requests', async () => {
 		const user = userEvent.setup();
 		const onAction = jest.fn();
 		const noticeDescriptors =
@@ -9854,7 +9811,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review needed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'This fresh-review handoff cannot be imported for Save because it has no usable accepted review proof. Request a new admin review before saving; nothing was imported, saved, or sent to the server.'
+				'This reviewed copy needs a fresh admin check before WordPress can Save it. Request a new admin review before saving; nothing was saved or sent to WordPress.'
 			)
 		).toBeVisible();
 		expect(
@@ -9939,12 +9896,12 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review required' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Protected changes need hash-only admin review before Save can continue. Risky block evidence remains redacted until the review surface opens. No normal Save has run; protected local changes remain exportable.'
+				'Protected changes need admin HTML review before Save can continue. Risky block evidence remains redacted until the review surface opens. No normal Save has run; protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+				'Fresh-review Save confirmation was recorded; use WordPress Save evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; WordPress Save evidence is still required before treating these changes as saved.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -9968,8 +9925,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 			'true'
 		);
 		expect(
-			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
-		).toHaveTextContent( 'Review required' );
+			screen.queryByTestId( 'distributed-editing-fresh-review-authority' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'button', {
 				name: 'Request fresh review',
@@ -10052,7 +10009,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review required' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Protected changes need hash-only admin review before Save can continue. 1 risky block is represented only by redacted review evidence. No normal Save has run; protected local changes remain exportable.'
+				'Protected changes need admin HTML review before Save can continue. 1 risky block is represented only by redacted review evidence. No normal Save has run; protected local changes remain exportable.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -10064,8 +10021,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 			'1'
 		);
 		expect(
-			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
-		).toHaveTextContent( '1 redacted item' );
+			screen.queryByTestId( 'distributed-editing-fresh-review-authority' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText(
 				/fresh-review-raw-content|fresh-review-proof-signature|reviewerId|reviewed_block_items/i
@@ -10116,7 +10073,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 
 		expect(
 			screen.getByText(
-				'The editor is validating hash-only fresh-review proof before WordPress updates the post. No normal Save has run; keep protected local changes exportable until validation finishes.'
+				'WordPress is checking the review before it can update the post. Local changes remain protected until this finishes.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -10140,8 +10097,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 			'true'
 		);
 		expect(
-			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
-		).toHaveTextContent( 'Validating review' );
+			screen.queryByTestId( 'distributed-editing-fresh-review-authority' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText(
 				/fresh-review-handoff-raw|fresh-review-handoff-proof|reviewerUserId|reviewed_block_items/i
@@ -10187,12 +10144,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect(
-			screen.getByText( 'Fresh review validation required' )
-		).toBeVisible();
+		expect( screen.getByText( 'Ready to Save' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Reviewed changes need WordPress validation before Save can continue. Save should continue only after fresh-review validation; no normal Save fallback has run, and protected local changes remain exportable.'
+				'Save will ask WordPress to check the reviewed changes before updating the post. Local changes remain protected until WordPress confirms Save.'
 			)
 		).toBeVisible();
 		const preSaveStatus = screen.getByTestId(
@@ -10212,11 +10167,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 			'2'
 		);
 		expect(
-			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
-		).toHaveTextContent( 'Validation required' );
-		expect(
-			screen.getByTestId( 'distributed-editing-fresh-review-authority' )
-		).toHaveTextContent( '2 redacted items' );
+			screen.queryByTestId( 'distributed-editing-fresh-review-authority' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByText(
 				/fresh-review-validation-raw|fresh-review-validation-proof|reviewerUserId|reviewed_block_items/i
@@ -10284,9 +10236,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED,
-				title: 'Fresh-review Save needs the latest post',
-				message:
-					'The server changed after fresh review was validated. Protected local changes are still exportable; get the latest post before trying again.',
+				title: 'Load latest version',
+				message: 'Load the latest post before saving again.',
 				refetch: true,
 			},
 			{
@@ -10330,7 +10281,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 				title: 'Fresh-review Save needs HTML review',
 				message:
-					'The authoritative post was not updated because the server still requires HTML review. Export a new review handoff, or get the latest post before deciding how to continue. Protected local changes remain exportable.',
+					'The post in WordPress was not updated because the server still requires HTML review. Export a new review handoff, or get the latest post before deciding how to continue. Protected local changes remain exportable.',
 				nextStep:
 					'Export a new review handoff for someone with unfiltered HTML permission.',
 				nextStepAction: 'export_fresh_review_for_html_review',
@@ -10343,9 +10294,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_SYNC_META_TAMPERED,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
-				title: 'Fresh-review Save proof rejected',
+				title: 'Fresh-review Save rejected',
 				message:
-					'WordPress rejected the reviewed Save proof before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.',
+					'WordPress could not verify the reviewed Save before saving. Protected local changes are still exportable for a new review; no normal save fallback was used.',
 			},
 			{
 				disposition:
@@ -10403,8 +10354,12 @@ describe( 'DistributedEditingStatusSurface', () => {
 
 		for ( const statusCase of cases ) {
 			rerender( renderStatus( statusCase ) );
-			expect( screen.getByText( statusCase.title ) ).toBeVisible();
-			expect( screen.getByText( statusCase.message ) ).toBeVisible();
+			expect(
+				screen.getAllByText( statusCase.title )[ 0 ]
+			).toBeVisible();
+			expect(
+				screen.getAllByText( statusCase.message )[ 0 ]
+			).toBeVisible();
 			expect(
 				screen.getByRole( 'button', {
 					name: 'Export for fresh review',
@@ -10491,9 +10446,6 @@ describe( 'DistributedEditingStatusSurface', () => {
 			)
 		).toBeVisible();
 
-		const authorityStatus = screen.getByTestId(
-			'distributed-editing-fresh-review-authority'
-		);
 		const statusItem = screen.getByTestId(
 			'distributed-editing-fresh-review-status'
 		);
@@ -10514,8 +10466,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 			'data-distributed-editing-fresh-review-redacted',
 			'true'
 		);
-		expect( authorityStatus ).toHaveTextContent( 'Already consumed' );
-		expect( authorityStatus ).toHaveTextContent( '2 redacted items' );
+		expect(
+			screen.queryByTestId( 'distributed-editing-fresh-review-authority' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', {
 				name: 'Export for fresh review',
@@ -10625,7 +10578,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Fresh review decisions' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; save authority evidence is still required before treating these changes as saved.'
+				'Fresh-review Save confirmation was recorded; use WordPress Save evidence to confirm persistence. Recorded 4 redacted transcript events; 2 unsafe entries were dropped. This transcript is diagnostic only; WordPress Save evidence is still required before treating these changes as saved.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Awaiting review' ) ).toBeVisible();
@@ -10633,7 +10586,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		expect( screen.getByText( 'Reject HTML change' ) ).toBeVisible();
 		expect(
 			screen.getAllByText(
-				'Activity context: Fresh-review Save confirmed; 4 redacted transcript events, 2 unsafe entries dropped. Diagnostic only; save-authority evidence is still required.'
+				'Activity context: Fresh-review Save confirmed; 4 redacted transcript events, 2 unsafe entries dropped. Diagnostic only; WordPress Save evidence is still required.'
 			)
 		).toHaveLength( 2 );
 		expect( screen.getAllByText( 'Jump target identified.' ) ).toHaveLength(
@@ -10735,7 +10688,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toBeInTheDocument();
 		expect(
 			await screen.findByText(
-				'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains hash-only.'
+				'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains redacted.'
 			)
 		).toBeVisible();
 	} );
@@ -10786,7 +10739,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toHaveBeenCalled();
 		expect(
 			await screen.findByText(
-				'Fresh-review decision recorded for the request. No save was made, and the reviewed-block evidence remained hash-only.'
+				'Fresh-review decision recorded for the request. No save was made, and the reviewed-block evidence remained redacted.'
 			)
 		).toBeVisible();
 	} );
@@ -10887,7 +10840,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 		).not.toBeInTheDocument();
 		expect(
 			await screen.findByText(
-				'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains hash-only.'
+				'Fresh-review decision recorded locally. No save was made, and the reviewed-block evidence remains redacted.'
 			)
 		).toBeVisible();
 	} );
@@ -10970,12 +10923,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Saving to WordPress' ) ).toBeVisible();
+		expect( screen.getByText( 'Saving' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'The editor is sending the prepared changes to WordPress. Keep this tab open; protected local changes remain exportable until WordPress confirms the save.'
-			)
-		).toBeVisible();
+			screen.getAllByText( 'WordPress is saving your changes.' ).length
+		).toBeGreaterThan( 0 );
 
 		rerender(
 			<DistributedEditingStatusSurface
@@ -10983,10 +10934,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+		expect( screen.getByText( 'Saved' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress saved the prepared changes. Protected local changes are no longer pending for this save.'
+				'WordPress saved your changes. Ready for new edits.'
 			)
 		).toBeVisible();
 
@@ -10996,10 +10947,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Save confirmed' ) ).toBeVisible();
+		expect( screen.getByText( 'Saved' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress saved the merged edits. Protected local changes are no longer pending for this save.'
+				'WordPress saved the merged edits. Ready for new edits.'
 			)
 		).toBeVisible();
 	} );
@@ -11039,13 +10990,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
+		expect( screen.getAllByText( 'Load latest version' ) ).toHaveLength(
+			2
+		);
 		expect(
-			screen.getAllByText( 'Save needs the latest post' )
-		).toHaveLength( 2 );
-		expect(
-			screen.getAllByText(
-				'The post changed again before Save finished. Protected local changes are still exportable; get the latest post before trying again.'
-			)
+			screen.getAllByText( 'Load the latest post before saving again.' )
 		).toHaveLength( 2 );
 
 		rerender(
@@ -11054,10 +11003,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Save proof rejected' ) ).toBeVisible();
+		expect( screen.getByText( 'Save check rejected' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress rejected the Save proof because the sync metadata or proof flags changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
+				'WordPress could not verify this Save because the editing metadata changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
 			)
 		).toBeVisible();
 	} );
@@ -11083,7 +11032,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
 				title: 'Save needs HTML permission',
 				message:
-					'The HTML review proof was accepted, but this account cannot perform the final HTML-capable save. Protected local changes and the hash-only review proof remain exportable for someone with unfiltered HTML permission.',
+					'The HTML review was accepted, but this account cannot perform the final HTML-capable save. Protected local changes and the review approval remain exportable for someone with unfiltered HTML permission.',
 			},
 			{
 				disposition:
@@ -11129,7 +11078,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_MALFORMED_SYNC_PAYLOAD,
 				title: 'Reviewed changes token unavailable',
 				message:
-					'The imported reviewed-changes token could not be found in server storage and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
+					'The reviewed changes token could not be found in server storage and is no longer usable for Save. No server save was made. Request a fresh admin review before trying again; protected local changes remain exportable.',
 				exportLabel: 'Export for fresh review',
 			},
 			{
@@ -11143,7 +11092,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED,
 				title: 'Reviewed changes token expired',
 				message:
-					'The imported reviewed-changes token has expired and is no longer usable for Save. No server save was made. Export a fresh-review handoff for an admin reviewer; protected local changes remain exportable.',
+					'The reviewed changes token has expired and is no longer usable for Save. No server save was made. Request a fresh admin review before trying again; protected local changes remain exportable.',
 				exportLabel: 'Export for fresh review',
 			},
 			{
@@ -11153,14 +11102,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 				retrySaveStatus:
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
-				title: 'HTML review required before Save',
+				title: 'Safe parts saved',
 				message:
-					'Save did not update the authoritative post because these changes may alter unfiltered HTML. Export them for review by someone with unfiltered HTML permission, or get the latest post before deciding how to continue. Protected local changes remain exportable.',
-				exportLabel: 'Export changes for review',
-				nextStep:
-					'Export changes for review by someone with unfiltered HTML permission.',
-				nextStepAction: 'export_for_html_review',
-				refetch: true,
+					'WordPress saved the safe parts, but one block was blocked.',
+				expectNoExport: true,
 			},
 		];
 		const onAction = jest.fn();
@@ -11187,11 +11132,20 @@ describe( 'DistributedEditingStatusSurface', () => {
 			rerender( renderStatus( statusCase ) );
 			expect( screen.getByText( statusCase.title ) ).toBeVisible();
 			expect( screen.getByText( statusCase.message ) ).toBeVisible();
-			expect(
-				screen.getByText(
-					statusCase.exportLabel || 'Export local changes'
-				)
-			).toBeVisible();
+			if ( statusCase.expectNoExport ) {
+				expect(
+					screen.queryByText( 'Export local changes' )
+				).not.toBeInTheDocument();
+				expect(
+					screen.queryByText( 'Export changes for review' )
+				).not.toBeInTheDocument();
+			} else {
+				expect(
+					screen.getByText(
+						statusCase.exportLabel || 'Export local changes'
+					)
+				).toBeVisible();
+			}
 		}
 
 		for ( const statusCase of cases.filter( ( item ) => item.nextStep ) ) {
@@ -11218,18 +11172,16 @@ describe( 'DistributedEditingStatusSurface', () => {
 		const cases = [
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
-				title: 'Save needs accepted proof',
-				message:
-					'The editor could not verify accepted Save proof for this save. Protected local changes are still exportable; try again after the proof is ready.',
+				title: 'Save unavailable',
+				message: 'Try Save again in a moment.',
 				nextStep:
-					'Try Save again after WordPress accepts the Save proof.',
+					'Try Save again after WordPress accepts these changes.',
 				nextStepAction: 'wait_for_save_proof',
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
-				title: 'Save needs the latest post',
-				message:
-					'Getting the latest post only refreshes server state; it does not discard protected local changes or save over other edits. Try Save again after it loads.',
+				title: 'Load latest version',
+				message: 'Load the latest post before saving again.',
 				nextStep: 'Get the latest post before trying Save again.',
 				nextStepAction: 'get_latest_post',
 				refetch: true,
@@ -11252,10 +11204,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 			},
 			{
 				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS,
-				title: 'Save already in progress',
-				message:
-					'Save is already waiting for WordPress confirmation. Protected local changes remain exportable; keep this tab open until it finishes.',
-				nextStep: 'Keep this tab open until WordPress confirms Save.',
+				title: 'Saving',
+				message: 'WordPress is saving your changes.',
+				nextStep: 'WordPress is saving your changes.',
 				nextStepAction: 'keep_tab_open',
 				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING,
 			},
@@ -11286,9 +11237,13 @@ describe( 'DistributedEditingStatusSurface', () => {
 		for ( const statusCase of cases ) {
 			rerender( renderStatus( statusCase ) );
 			expect( screen.getByText( statusCase.title ) ).toBeVisible();
-			expect( screen.getByText( statusCase.message ) ).toBeVisible();
+			expect(
+				screen.getAllByText( statusCase.message ).length
+			).toBeGreaterThan( 0 );
 			expect( screen.getByText( 'Next step:' ) ).toBeVisible();
-			expect( screen.getByText( statusCase.nextStep ) ).toBeVisible();
+			expect(
+				screen.getAllByText( statusCase.nextStep ).length
+			).toBeGreaterThan( 0 );
 			const blockedHandoffStatusItem = screen
 				.getByText( statusCase.title )
 				// eslint-disable-next-line testing-library/no-node-access
@@ -11297,7 +11252,15 @@ describe( 'DistributedEditingStatusSurface', () => {
 				'data-distributed-editing-next-step',
 				statusCase.nextStepAction
 			);
-			expect( screen.getByText( 'Export local changes' ) ).toBeVisible();
+			if ( statusCase.nextStepAction === 'keep_tab_open' ) {
+				expect(
+					screen.queryByText( 'Export local changes' )
+				).not.toBeInTheDocument();
+			} else {
+				expect(
+					screen.getByText( 'Export local changes' )
+				).toBeVisible();
+			}
 		}
 
 		rerender( renderStatus( cases[ 1 ] ) );
@@ -11327,11 +11290,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'WordPress check is stale' ) ).toBeVisible();
+		expect( screen.getByText( 'Load latest version' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'The post changed after WordPress checked these changes. Protected local changes remain exportable; get the latest post before continuing.'
-			)
+			screen.getByText( 'Load the latest post before saving again.' )
 		).toBeVisible();
 	} );
 

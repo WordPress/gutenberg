@@ -28,6 +28,7 @@ import {
 	getDistributedEditingSaveJourneyDataAttributes,
 	getDistributedEditingSaveJourneyTitle,
 } from '../distributed-editing-save-journey-cue';
+import DistributedEditingServerSyncButton from '../distributed-editing-server-sync-button';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -74,9 +75,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 				getPostEdits,
 				getDistributedEditingSaveButtonState,
 				getDistributedEditingSaveJourneyState,
+				hasPendingDistributedEditingChanges,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
-			const editorIsDirty = forceIsDirty || isEditedPostDirty();
+			const editorIsDirty =
+				forceIsDirty ||
+				isEditedPostDirty() ||
+				Boolean( hasPendingDistributedEditingChanges?.() );
 
 			return {
 				isAutosaving: isAutosavingPost(),
@@ -120,7 +125,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		}
 
 		return () => clearTimeout( timeoutId );
-	}, [ isSaving ] );
+	}, [ isSaving, wasSaving ] );
 
 	// Attachments don't support draft mode, so hide this button.
 	if ( postType === ATTACHMENT_POST_TYPE ) {
@@ -259,50 +264,61 @@ export default function PostSavedState( { forceIsDirty } ) {
 	};
 
 	return (
-		<Button
-			{ ...distributedEditingSaveButtonDataAttributes }
-			{ ...distributedEditingSaveJourneyDataAttributes }
-			className={
-				isSaveable || isSaving || hasDistributedEditingSaveButtonState
-					? clsx( {
-							'editor-post-save-draft': ! isSavedState,
-							'editor-post-saved-state': isSavedState,
-							'is-saving':
-								isSaving || distributedEditingSaveButtonBusy,
-							'is-autosaving': isAutosaving,
-							'is-saved':
-								isSaved ||
-								distributedEditingAuthoritativePostUpdated,
-							[ getAnimateClassName( {
-								type: 'loading',
-							} ) ]: isSaving || distributedEditingSaveButtonBusy,
-					  } )
-					: undefined
-			}
-			onClick={ isDisabled ? undefined : onSaveClick }
-			/*
-			 * We want the tooltip to show the keyboard shortcut only when the
-			 * button does something, i.e. when it's not disabled.
-			 */
-			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
-			variant="tertiary"
-			size="compact"
-			isBusy={ isSaving || distributedEditingSaveButtonBusy }
-			icon={ isLargeViewport ? undefined : cloudUpload }
-			label={ text || label }
-			aria-disabled={ isDisabled }
-			title={ buttonTitle }
-		>
-			{ isSavedState && (
-				<Icon
-					icon={
-						isSaved || distributedEditingAuthoritativePostUpdated
-							? check
-							: cloud
-					}
-				/>
-			) }
-			{ text }
-		</Button>
+		<>
+			<Button
+				{ ...distributedEditingSaveButtonDataAttributes }
+				{ ...distributedEditingSaveJourneyDataAttributes }
+				className={
+					isSaveable ||
+					isSaving ||
+					hasDistributedEditingSaveButtonState
+						? clsx( {
+								'editor-post-save-draft': ! isSavedState,
+								'editor-post-saved-state': isSavedState,
+								'is-saving':
+									isSaving ||
+									distributedEditingSaveButtonBusy,
+								'is-autosaving': isAutosaving,
+								'is-saved':
+									isSaved ||
+									distributedEditingAuthoritativePostUpdated,
+								[ getAnimateClassName( {
+									type: 'loading',
+								} ) ]:
+									isSaving ||
+									distributedEditingSaveButtonBusy,
+						  } )
+						: undefined
+				}
+				onClick={ isDisabled ? undefined : onSaveClick }
+				/*
+				 * We want the tooltip to show the keyboard shortcut only when the
+				 * button does something, i.e. when it's not disabled.
+				 */
+				shortcut={
+					isDisabled ? undefined : displayShortcut.primary( 's' )
+				}
+				variant="tertiary"
+				size="compact"
+				isBusy={ isSaving || distributedEditingSaveButtonBusy }
+				icon={ isLargeViewport ? undefined : cloudUpload }
+				label={ text || label }
+				aria-disabled={ isDisabled }
+				title={ buttonTitle }
+			>
+				{ isSavedState && (
+					<Icon
+						icon={
+							isSaved ||
+							distributedEditingAuthoritativePostUpdated
+								? check
+								: cloud
+						}
+					/>
+				) }
+				{ text }
+			</Button>
+			<DistributedEditingServerSyncButton />
+		</>
 	);
 }

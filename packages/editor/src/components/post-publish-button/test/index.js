@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
 import { PostPublishButton } from '../';
+
+jest.mock( '../../distributed-editing-server-sync-button', () => () => (
+	<button data-distributed-editing-server-sync-button>Sync</button>
+) );
 
 describe( 'PostPublishButton', () => {
 	describe( 'aria-disabled', () => {
@@ -82,6 +86,21 @@ describe( 'PostPublishButton', () => {
 					isSaveable
 					isPublishable={ false }
 					forceIsDirty
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Submit for Review' } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
+		} );
+
+		it( 'should be false if Distributed Editing has pending local changes', () => {
+			render(
+				<PostPublishButton
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty={ false }
+					hasPendingDistributedEditingLocalChanges
 				/>
 			);
 
@@ -208,6 +227,124 @@ describe( 'PostPublishButton', () => {
 		).toHaveClass( 'is-busy' );
 	} );
 
+	it( 'should show a Distributed Editing Sync button beside the published Save control', () => {
+		render(
+			<PostPublishButton
+				hasPublishAction
+				isPublished
+				isPublishable
+				isSaveable
+				distributedEditingSaveButtonState={ {
+					status: 'accepted_but_unconsumed',
+					label: 'Save',
+					statusText: 'These changes are ready for Save.',
+					clickAction: 'continue_guarded_retry_save',
+				} }
+			/>
+		);
+
+		expect( screen.getByRole( 'button', { name: 'Save' } ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: 'Sync' } )
+		).toHaveAttribute( 'data-distributed-editing-server-sync-button' );
+	} );
+
+	it( 'should not show the Sync button beside Publish or Submit for Review', () => {
+		const { rerender } = render(
+			<PostPublishButton hasPublishAction isPublishable isSaveable />
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Submit for Review' } )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Sync' } )
+		).not.toBeInTheDocument();
+
+		rerender(
+			<PostPublishButton hasPublishAction isPublishable isSaveable />
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: 'Submit for Review' } )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', { name: 'Sync' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should route active Distributed Editing Save actions before non-post entity prompts', async () => {
+		const user = userEvent.setup();
+		const onSubmit = jest.fn();
+		const savePostStatus = jest.fn();
+		const setEntitiesSavedStatesCallback = jest.fn();
+
+		render(
+			<PostPublishButton
+				hasNonPostEntityChanges
+				hasPublishAction
+				isSaveable
+				isPublishable
+				onSubmit={ onSubmit }
+				savePostStatus={ savePostStatus }
+				setEntitiesSavedStatesCallback={
+					setEntitiesSavedStatesCallback
+				}
+				distributedEditingSaveButtonState={ {
+					status: 'accepted_but_unconsumed',
+					label: 'Save',
+					statusText: 'These changes are ready for Save.',
+					clickAction: 'continue_guarded_retry_save',
+					disabled: false,
+				} }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Save' } ) );
+
+		expect( setEntitiesSavedStatesCallback ).not.toHaveBeenCalled();
+		expect( onSubmit ).not.toHaveBeenCalled();
+		expect( savePostStatus ).toHaveBeenCalledWith( 'publish' );
+	} );
+
+	it( 'should route Distributed Editing review actions before non-post entity prompts', async () => {
+		const user = userEvent.setup();
+		const onSubmit = jest.fn();
+		const savePostStatus = jest.fn();
+		const setEntitiesSavedStatesCallback = jest.fn();
+
+		render(
+			<PostPublishButton
+				hasNonPostEntityChanges
+				hasPublishAction
+				isSaveable
+				isPublishable
+				onSubmit={ onSubmit }
+				savePostStatus={ savePostStatus }
+				setEntitiesSavedStatesCallback={
+					setEntitiesSavedStatesCallback
+				}
+				distributedEditingSaveButtonState={ {
+					status: 'review_blocked',
+					source: 'risky_block_review',
+					label: 'Review changes',
+					statusText:
+						'Review changes before WordPress updates the post.',
+					clickAction: 'open_pre_publish_review',
+					disabled: false,
+				} }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Review changes' } )
+		);
+
+		expect( setEntitiesSavedStatesCallback ).not.toHaveBeenCalled();
+		expect( onSubmit ).not.toHaveBeenCalled();
+		expect( savePostStatus ).toHaveBeenCalledWith( 'publish' );
+	} );
+
 	it( 'should show active Distributed Editing save descriptor text', () => {
 		render(
 			<PostPublishButton
@@ -218,15 +355,14 @@ describe( 'PostPublishButton', () => {
 					reason: 'accepted_retry_submit_proof_unconsumed',
 					source: 'retry_submit',
 					label: 'Save',
-					statusText:
-						'Accepted Distributed Editing proof is ready for WordPress Save.',
+					statusText: 'These changes are ready for Save.',
 					clickAction: 'continue_guarded_retry_save',
 					authorityState: 'ready_for_guarded_update',
 					localChangesState: 'protected_local_changes_exportable',
 					reviewCheckpointState: 'review_accepted',
 					authoritativePostState: 'ready_for_guarded_update',
 					saveStateSummaryText:
-						'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
+						'Reviewed local changes are ready for Save; the post in WordPress is not updated yet.',
 					authoritativePostUpdated: false,
 				} }
 			/>
@@ -237,7 +373,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Accepted Distributed Editing proof is ready for WordPress Save.'
+			'These changes are ready for Save.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-status',
@@ -273,7 +409,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-state-summary',
-			'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
+			'Reviewed local changes are ready for Save; the post in WordPress is not updated yet.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authoritative-post-updated',
@@ -299,23 +435,22 @@ describe( 'PostPublishButton', () => {
 					reviewCheckpointState: 'review_required',
 					authoritativePostState: 'review_required_before_update',
 					saveStateSummaryText:
-						'Protected local changes need the next Distributed Editing step before the authoritative post can update.',
+						'Protected local changes need the next recovery step before WordPress can update the post.',
 					authoritativePostUpdated: false,
 				} }
 				distributedEditingSaveJourneyState={ {
 					shouldExposeInSaveControls: true,
 					step: 'local_changes_protected',
 					action: 'apply_local_changes',
-					title: 'Save needs local changes applied',
-					summary:
-						'Apply protected local changes in this editor before WordPress can check Save.',
+					title: 'Apply local edits',
+					summary: 'Apply local edits in this editor before saving.',
 					actionHint: 'Apply local changes',
 					requiresActionBeforeSave: true,
 					statusChromeSummary:
-						'Protected local changes need the next Distributed Editing step before the authoritative post can update.',
+						'Protected local changes need the next recovery step before WordPress can update the post.',
 					statusChromeAuthorityState: 'review_required_before_update',
 					statusChromeAuthorityText:
-						'Finish the Distributed Editing recovery step before the authoritative WordPress post can be updated.',
+						'Finish the recovery step before WordPress can update the post.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
@@ -354,7 +489,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-state-summary',
-			'Protected local changes need the next Distributed Editing step before the authoritative post can update.'
+			'Protected local changes need the next recovery step before WordPress can update the post.'
 		);
 	} );
 
@@ -374,11 +509,11 @@ describe( 'PostPublishButton', () => {
 					summary:
 						'Use Save when you are ready for WordPress to update this post.',
 					statusChromeSummary:
-						'Save can update the authoritative WordPress post.',
+						'Save can update the post in WordPress.',
 					statusChromeAuthorityState:
 						'ready_to_update_authoritative_post',
 					statusChromeAuthorityText:
-						'Save can update the authoritative WordPress post.',
+						'Save can update the post in WordPress.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
@@ -389,7 +524,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the post in WordPress.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -445,7 +580,7 @@ describe( 'PostPublishButton', () => {
 		);
 		const cueLabel = screen.getByText( 'Save is available' );
 		const cue = screen.getByLabelText(
-			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the post in WordPress.'
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cue ).toHaveAttribute(
@@ -474,15 +609,15 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'title',
-			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the post in WordPress.'
 		);
 		expect( cue ).toHaveAttribute(
 			'aria-label',
-			'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
+			'Use Save when you are ready for WordPress to update this post. Save can update the post in WordPress.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-status-summary',
-			'Save can update the authoritative WordPress post.'
+			'Save can update the post in WordPress.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-state',
@@ -490,7 +625,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-summary',
-			'Save can update the authoritative WordPress post.'
+			'Save can update the post in WordPress.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-calls-normal-save',
@@ -530,7 +665,7 @@ describe( 'PostPublishButton', () => {
 					statusChromeAuthorityState:
 						'ready_to_update_authoritative_post',
 					statusChromeAuthorityText:
-						'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+						'Save checks the latest post before WordPress updates it.',
 					dirtyEditorPreflight: true,
 					claimsSavedWithoutEvidence: false,
 				} }
@@ -566,7 +701,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-summary',
-			'WordPress remains authoritative; Save checks for a newer version before updating the post.'
+			'Save checks the latest post before WordPress updates it.'
 		);
 		expect(
 			screen.getByText( 'Save checks with WordPress' )
@@ -590,7 +725,7 @@ describe( 'PostPublishButton', () => {
 					source: 'retry_save',
 					label: 'Get latest post',
 					statusText:
-						'The latest post must be loaded before Distributed Editing can save.',
+						'Load the latest post before Save can continue.',
 					clickAction: 'refetch_server_state',
 					authorityState: 'server_refresh_required_before_update',
 					localChangesState: 'protected_local_changes_exportable',
@@ -605,9 +740,8 @@ describe( 'PostPublishButton', () => {
 					shouldExposeInSaveControls: true,
 					step: 'get_latest_post',
 					action: 'get_latest_post',
-					title: 'Save needs the latest post',
-					summary:
-						'Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet.',
+					title: 'Load latest version',
+					summary: 'Load the latest post before saving again.',
 					actionHint: 'Get latest first',
 					requiresActionBeforeSave: true,
 					statusChromeSummary:
@@ -615,7 +749,7 @@ describe( 'PostPublishButton', () => {
 					statusChromeAuthorityState:
 						'server_refresh_required_before_update',
 					statusChromeAuthorityText:
-						'Server state must be refreshed before the authoritative WordPress post can be updated.',
+						'Get the latest post before WordPress can update it.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
@@ -626,7 +760,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Get latest first. Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet. Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.'
+			'Get latest first. Load the latest post before saving again. Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -648,15 +782,15 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-button-status',
 			'refetch_required'
 		);
-		const cueLabel = screen.getByText( 'Save needs the latest post' );
+		const cueLabel = screen.getByText( 'Load latest version' );
 		const cueActionHint = screen.getByText( 'Get latest first' );
 		const cue = screen.getByLabelText(
-			'Get latest first. Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet. Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.'
+			'Get latest first. Load the latest post before saving again. Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.'
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cueActionHint ).toBeVisible();
 		expect( cue ).toHaveTextContent(
-			/^Get latest first.*Save needs the latest post/
+			/^Get latest first.*Load latest version/
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
@@ -699,30 +833,29 @@ describe( 'PostPublishButton', () => {
 					source: 'fresh_review',
 					label: 'Review changes',
 					statusText:
-						'Save opens review before updating the authoritative post.',
+						'Review changes before WordPress updates the post.',
 					clickAction: 'open_pre_publish_review',
 					authorityState: 'review_required_before_update',
 					localChangesState: 'protected_local_changes_exportable',
 					reviewCheckpointState: 'review_required',
 					authoritativePostState: 'review_required_before_update',
 					saveStateSummaryText:
-						'Protected local changes need review before the authoritative post can update.',
+						'Protected local changes need review before WordPress can update the post.',
 					authoritativePostUpdated: false,
 				} }
 				distributedEditingSaveJourneyState={ {
 					shouldExposeInSaveControls: true,
 					step: 'review_changes',
 					action: 'review_changes',
-					title: 'Save opens review',
-					summary:
-						'Review highlighted changes before WordPress updates the post.',
+					title: 'Review changes',
+					summary: 'Review changes before saving.',
 					actionHint: 'Review before update',
 					requiresActionBeforeSave: true,
 					statusChromeSummary:
-						'Protected local changes need review before the authoritative post can update.',
+						'Protected local changes need review before WordPress can update the post.',
 					statusChromeAuthorityState: 'review_required_before_update',
 					statusChromeAuthorityText:
-						'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
+						'WordPress cannot update the post until risky changes are approved or removed.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
@@ -733,7 +866,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review changes before saving. Protected local changes need review before WordPress can update the post.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-status',
@@ -767,15 +900,15 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
 			'false'
 		);
-		const cueLabel = screen.getByText( 'Save opens review' );
-		const cueActionHint = screen.getByText( 'Review before update' );
 		const cue = screen.getByLabelText(
-			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review changes before saving. Protected local changes need review before WordPress can update the post.'
 		);
+		const cueLabel = within( cue ).getByText( 'Review changes' );
+		const cueActionHint = within( cue ).getByText( 'Review before update' );
 		expect( cueLabel ).toBeVisible();
 		expect( cueActionHint ).toBeVisible();
 		expect( cue ).toHaveTextContent(
-			/^Review before update.*Save opens review/
+			/^Review before update.*Review changes/
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
@@ -787,11 +920,11 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'title',
-			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review changes before saving. Protected local changes need review before WordPress can update the post.'
 		);
 		expect( cue ).toHaveAttribute(
 			'aria-label',
-			'Review before update. Review highlighted changes before WordPress updates the post. Protected local changes need review before the authoritative post can update.'
+			'Review before update. Review changes before saving. Protected local changes need review before WordPress can update the post.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-hint',
@@ -803,7 +936,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-status-summary',
-			'Protected local changes need review before the authoritative post can update.'
+			'Protected local changes need review before WordPress can update the post.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-state',
@@ -811,7 +944,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-summary',
-			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+			'WordPress cannot update the post until risky changes are approved or removed.'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -823,7 +956,7 @@ describe( 'PostPublishButton', () => {
 		);
 	} );
 
-	it( 'should show the guarded update action hint without requiring pre-Save action', async () => {
+	it( 'should show the WordPress Save action hint without requiring pre-Save action', async () => {
 		const user = userEvent.setup();
 		const savePostStatus = jest.fn();
 		render(
@@ -836,31 +969,29 @@ describe( 'PostPublishButton', () => {
 					reason: 'accepted_retry_submit_proof_unconsumed',
 					source: 'retry_submit',
 					label: 'Save',
-					statusText:
-						'Accepted Distributed Editing proof is ready for WordPress Save.',
+					statusText: 'These changes are ready for Save.',
 					clickAction: 'continue_guarded_retry_save',
 					authorityState: 'ready_for_guarded_update',
 					localChangesState: 'protected_local_changes_exportable',
 					reviewCheckpointState: 'review_accepted',
 					authoritativePostState: 'ready_for_guarded_update',
 					saveStateSummaryText:
-						'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
+						'Reviewed local changes are ready for Save; the post in WordPress is not updated yet.',
 					authoritativePostUpdated: false,
 				} }
 				distributedEditingSaveJourneyState={ {
 					shouldExposeInSaveControls: true,
 					step: 'ready_to_save',
 					action: 'save',
-					title: 'Save is ready',
-					summary:
-						'Save will send reviewed changes to WordPress for a guarded update.',
-					actionHint: 'Send guarded update',
+					title: 'Ready to Save',
+					summary: 'Use Save to update the post.',
+					actionHint: 'Send to WordPress',
 					requiresActionBeforeSave: false,
 					statusChromeSummary:
-						'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
+						'Reviewed local changes are ready for Save; the post in WordPress is not updated yet.',
 					statusChromeAuthorityState: 'ready_for_guarded_update',
 					statusChromeAuthorityText:
-						'Reviewed changes are ready for a guarded update of the authoritative WordPress post.',
+						'Reviewed changes are ready for WordPress to update the post.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
@@ -871,7 +1002,7 @@ describe( 'PostPublishButton', () => {
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Send guarded update. Save will send reviewed changes to WordPress for a guarded update. Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
+			'Send to WordPress. Use Save to update the post. Reviewed local changes are ready for Save; the post in WordPress is not updated yet.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -883,7 +1014,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-hint',
-			'Send guarded update'
+			'Send to WordPress'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
@@ -897,23 +1028,21 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
 			'false'
 		);
-		const cueLabel = screen.getByText( 'Save is ready' );
-		const cueActionHint = screen.getByText( 'Send guarded update' );
+		const cueLabel = screen.getByText( 'Ready to Save' );
+		const cueActionHint = screen.getByText( 'Send to WordPress' );
 		const cue = screen.getByLabelText(
-			'Send guarded update. Save will send reviewed changes to WordPress for a guarded update. Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
+			'Send to WordPress. Use Save to update the post. Reviewed local changes are ready for Save; the post in WordPress is not updated yet.'
 		);
 		expect( cueLabel ).toBeVisible();
 		expect( cueActionHint ).toBeVisible();
-		expect( cue ).toHaveTextContent(
-			/^Send guarded update.*Save is ready/
-		);
+		expect( cue ).toHaveTextContent( /^Send to WordPress.*Ready to Save/ );
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-hint',
-			'Send guarded update'
+			'Send to WordPress'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
@@ -986,8 +1115,7 @@ describe( 'PostPublishButton', () => {
 					localChangesState: 'authoritative_update_confirmed',
 					reviewCheckpointState: 'review_consumed',
 					authoritativePostState: 'authoritative_update_confirmed',
-					saveStateSummaryText:
-						'The authoritative post accepted the Distributed Editing update.',
+					saveStateSummaryText: 'WordPress accepted the update.',
 					authoritativePostUpdated: true,
 				} }
 			/>
@@ -1028,7 +1156,7 @@ describe( 'PostPublishButton', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-state-summary',
-			'The authoritative post accepted the Distributed Editing update.'
+			'WordPress accepted the update.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authoritative-post-updated',
@@ -1051,9 +1179,8 @@ describe( 'PostPublishButton', () => {
 				distributedEditingSaveButtonState={ {
 					status: 'accepted_but_unconsumed',
 					source: 'review_approval',
-					label: 'Submit reviewed changes',
-					statusText:
-						'Accepted Distributed Editing proof is ready for WordPress Save.',
+					label: 'Save',
+					statusText: 'These changes are ready for Save.',
 					clickAction: 'continue_guarded_retry_save',
 					disabled: false,
 				} }
@@ -1062,7 +1189,7 @@ describe( 'PostPublishButton', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Submit reviewed changes',
+				name: 'Save',
 			} )
 		);
 
@@ -1086,7 +1213,7 @@ describe( 'PostPublishButton', () => {
 					source: 'risky_block_review',
 					label: 'Review changes',
 					statusText:
-						'Save opens review before updating the authoritative post.',
+						'Review changes before WordPress updates the post.',
 					clickAction: 'open_pre_publish_review',
 					disabled: false,
 				} }
@@ -1111,9 +1238,9 @@ describe( 'PostPublishButton', () => {
 				savePostStatus={ savePostStatus }
 				distributedEditingSaveButtonState={ {
 					status: 'fresh_review_validating',
-					label: 'Validating review',
+					label: 'Checking review...',
 					statusText:
-						'Fresh-review validation is in progress before guarded save.',
+						'Review is being checked before WordPress updates the post.',
 					disabled: true,
 					busy: true,
 				} }
@@ -1121,7 +1248,7 @@ describe( 'PostPublishButton', () => {
 		);
 
 		const button = screen.getByRole( 'button', {
-			name: 'Validating review',
+			name: 'Checking review...',
 		} );
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 		expect( button ).toHaveClass( 'is-busy' );
@@ -1142,9 +1269,8 @@ describe( 'PostPublishButton', () => {
 				distributedEditingSaveButtonState={ {
 					status: 'retry_save_in_progress',
 					source: 'retry_save',
-					label: 'Saving reviewed changes',
-					statusText:
-						'Distributed Editing Save is waiting for WordPress confirmation.',
+					label: 'Saving',
+					statusText: 'WordPress is saving your changes.',
 					disabled: true,
 					busy: true,
 					authorityState: 'awaiting_server_confirmation',
@@ -1153,36 +1279,35 @@ describe( 'PostPublishButton', () => {
 					reviewCheckpointState: 'review_accepted',
 					authoritativePostState: 'awaiting_server_confirmation',
 					saveStateSummaryText:
-						'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.',
+						'Reviewed local changes are waiting for WordPress confirmation before the post updates.',
 					authoritativePostUpdated: false,
 				} }
 				distributedEditingSaveJourneyState={ {
 					shouldExposeInSaveControls: true,
 					step: 'waiting_for_wordpress',
 					action: 'keep_tab_open',
-					title: 'Save is waiting for WordPress',
-					summary:
-						'Keep this tab open until WordPress confirms whether the post was updated.',
-					actionHint: 'Keep tab open',
+					title: 'Saving',
+					summary: 'WordPress is saving your changes.',
+					actionHint: null,
 					requiresActionBeforeSave: false,
 					statusChromeSummary:
-						'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.',
+						'Reviewed local changes are waiting for WordPress confirmation before the post updates.',
 					statusChromeAuthorityState: 'awaiting_server_confirmation',
 					statusChromeAuthorityText:
-						'The authoritative WordPress post has not confirmed these protected changes yet.',
+						'WordPress has not confirmed these protected changes yet.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
 		);
 
 		const button = screen.getByRole( 'button', {
-			name: 'Saving reviewed changes',
+			name: 'Saving',
 		} );
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 		expect( button ).toHaveClass( 'is-busy' );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Keep tab open. Keep this tab open until WordPress confirms whether the post was updated. Reviewed local changes are waiting for server confirmation before the authoritative post is updated.'
+			'WordPress is saving your changes. Reviewed local changes are waiting for WordPress confirmation before the post updates.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
@@ -1192,9 +1317,8 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-action',
 			'keep_tab_open'
 		);
-		expect( button ).toHaveAttribute(
-			'data-distributed-editing-save-control-journey-action-hint',
-			'Keep tab open'
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
@@ -1204,20 +1328,17 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-save-control-journey-claims-saved-without-evidence',
 			'false'
 		);
-		const cueLabel = screen.getByText( 'Save is waiting for WordPress' );
-		const cueActionHint = screen.getByText( 'Keep tab open' );
 		const cue = screen.getByLabelText(
-			'Keep tab open. Keep this tab open until WordPress confirms whether the post was updated. Reviewed local changes are waiting for server confirmation before the authoritative post is updated.'
+			'WordPress is saving your changes. Reviewed local changes are waiting for WordPress confirmation before the post updates.'
 		);
+		const cueLabel = within( cue ).getByText( 'Saving' );
 		expect( cueLabel ).toBeVisible();
-		expect( cueActionHint ).toBeVisible();
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-visual-cue',
 			'true'
 		);
-		expect( cue ).toHaveAttribute(
-			'data-distributed-editing-save-control-journey-action-hint',
-			'Keep tab open'
+		expect( cue ).not.toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-hint'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-action-required',
@@ -1226,6 +1347,95 @@ describe( 'PostPublishButton', () => {
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-state',
 			'awaiting_server_confirmation'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-normal-save',
+			'false'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-calls-retry-save',
+			'false'
+		);
+
+		await user.click( button );
+
+		expect( savePostStatus ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should keep the in-flight Distributed Editing Save affordance visible without busy hiding', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'retry_save_in_progress',
+					reason: 'distributed_editing_save_button_click_in_flight',
+					source: 'save_button',
+					label: 'Save',
+					statusText: 'Saving.',
+					disabled: true,
+					busy: false,
+					authorityState: 'awaiting_server_confirmation',
+					localChangesState:
+						'protected_local_changes_awaiting_server_confirmation',
+					reviewCheckpointState: 'review_accepted',
+					authoritativePostState: 'awaiting_server_confirmation',
+					saveStateSummaryText:
+						'Reviewed local changes are waiting for WordPress confirmation before the post updates.',
+					authoritativePostUpdated: false,
+				} }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: true,
+					step: 'waiting_for_wordpress',
+					action: 'keep_tab_open',
+					title: 'Saving',
+					summary: 'WordPress is saving your changes.',
+					actionHint: null,
+					requiresActionBeforeSave: false,
+					statusChromeSummary:
+						'Reviewed local changes are waiting for WordPress confirmation before the post updates.',
+					statusChromeAuthorityState: 'awaiting_server_confirmation',
+					statusChromeAuthorityText:
+						'WordPress has not confirmed these protected changes yet.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', { name: 'Save' } );
+		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( button ).not.toHaveClass( 'is-busy' );
+		expect( button ).toHaveTextContent( /^Save$/ );
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-reason',
+			'distributed_editing_save_button_click_in_flight'
+		);
+		expect( button ).toHaveAttribute(
+			'data-distributed-editing-save-button-status',
+			'retry_save_in_progress'
+		);
+		expect( button ).toHaveAttribute(
+			'title',
+			'WordPress is saving your changes. Reviewed local changes are waiting for WordPress confirmation before the post updates.'
+		);
+
+		const cue = screen.getByLabelText(
+			'WordPress is saving your changes. Reviewed local changes are waiting for WordPress confirmation before the post updates.'
+		);
+		const cueLabel = within( cue ).getByText( 'Saving' );
+		expect( cueLabel ).toBeVisible();
+		expect( screen.queryByText( 'Keep tab open' ) ).not.toBeInTheDocument();
+		expect( cue ).toHaveTextContent( /^Saving$/ );
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-visual-cue',
+			'true'
+		);
+		expect( cue ).toHaveAttribute(
+			'data-distributed-editing-save-control-journey-action-required',
+			'false'
 		);
 		expect( cue ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-calls-normal-save',
@@ -1252,8 +1462,8 @@ describe( 'PostPublishButton', () => {
 				distributedEditingSaveButtonState={ {
 					status: 'retry_save_confirmed',
 					source: 'retry_save',
-					label: 'Save confirmed',
-					statusText: 'Distributed Editing Save confirmed.',
+					label: 'Saved',
+					statusText: 'WordPress saved your changes.',
 					disabled: true,
 					authorityState: 'authoritative_update_confirmed',
 					localChangesState: 'authoritative_update_confirmed',
@@ -1269,27 +1479,21 @@ describe( 'PostPublishButton', () => {
 					step: 'save_confirmed',
 					action: 'none',
 					title: 'Saved',
-					summary: 'WordPress confirmed the update.',
+					summary: 'Ready for new edits.',
 					actionHint: null,
 					requiresActionBeforeSave: false,
 					statusChromeSummary: 'Ready for new edits.',
 					statusChromeAuthorityState:
 						'authoritative_update_confirmed',
-					statusChromeAuthorityText:
-						'The authoritative WordPress post has accepted the Distributed Editing Save.',
+					statusChromeAuthorityText: 'WordPress accepted this Save.',
 					claimsSavedWithoutEvidence: false,
 				} }
 			/>
 		);
 
-		const button = screen.getByRole( 'button', {
-			name: 'Save confirmed',
-		} );
+		const button = screen.getByRole( 'button', { name: 'Saved' } );
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
-		expect( button ).toHaveAttribute(
-			'title',
-			'WordPress confirmed the update. Ready for new edits.'
-		);
+		expect( button ).toHaveAttribute( 'title', 'Ready for new edits.' );
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-step',
 			'save_confirmed'
@@ -1337,11 +1541,8 @@ describe( 'PostPublishButton', () => {
 			'data-distributed-editing-confirmed-save-button-original-status',
 			'retry_save_confirmed'
 		);
-		const cueLabel = screen.getByText( 'Saved' );
-		const cue = screen.getByLabelText(
-			'WordPress confirmed the update. Ready for new edits.'
-		);
-		expect( cueLabel ).toBeVisible();
+		const cue = screen.getByLabelText( 'Ready for new edits.' );
+		expect( cue ).toHaveTextContent( /^Saved$/ );
 		expect(
 			screen.queryByText( 'WordPress confirmed' )
 		).not.toBeInTheDocument();
@@ -1374,6 +1575,64 @@ describe( 'PostPublishButton', () => {
 		expect( savePostStatus ).not.toHaveBeenCalled();
 	} );
 
+	it( 'should let unsaved editor changes replace an idle confirmed Distributed Editing Save button', async () => {
+		const user = userEvent.setup();
+		const savePostStatus = jest.fn();
+		render(
+			<PostPublishButton
+				isSaveable
+				isPublishable={ false }
+				hasUnsavedEditorChanges
+				savePostStatus={ savePostStatus }
+				distributedEditingSaveButtonState={ {
+					status: 'retry_save_confirmed',
+					source: 'retry_save',
+					label: 'Saved',
+					statusText: 'WordPress saved your changes.',
+					disabled: true,
+					authorityState: 'authoritative_update_confirmed',
+					localChangesState: 'authoritative_update_confirmed',
+					reviewCheckpointState: 'review_consumed',
+					authoritativePostState: 'authoritative_update_confirmed',
+					saveStateSummaryText: 'Ready for new edits.',
+					authoritativePostUpdated: true,
+					hasRetrySaveSavedStateEvidence: true,
+					hasProtectedLocalChanges: false,
+				} }
+				distributedEditingSaveJourneyState={ {
+					shouldExposeInSaveControls: false,
+					step: 'local_changes_protected',
+					action: 'dirty_save_preflight',
+					title: 'Unsaved changes',
+					summary: 'Use Save when you are ready.',
+					actionHint: null,
+					requiresActionBeforeSave: false,
+					statusChromeSummary: 'Use Save when you are ready.',
+					statusChromeAuthorityState:
+						'ready_to_update_authoritative_post',
+					statusChromeAuthorityText: 'Save can update the post.',
+					claimsSavedWithoutEvidence: false,
+				} }
+			/>
+		);
+
+		const button = screen.getByRole( 'button', {
+			name: 'Submit for Review',
+		} );
+		expect( button ).toHaveAttribute( 'aria-disabled', 'false' );
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-status'
+		);
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-confirmed-save-button-evidence-retained'
+		);
+		expect( screen.queryByText( 'Saved' ) ).not.toBeInTheDocument();
+
+		await user.click( button );
+
+		expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
+	} );
+
 	it( 'should quiet an idle confirmed Distributed Editing Save button back to ordinary Save controls while retaining evidence', async () => {
 		const previousHoldMs =
 			globalThis.__experimentalDistributedEditingConfirmedSaveButtonHoldMs;
@@ -1389,8 +1648,8 @@ describe( 'PostPublishButton', () => {
 						status: 'retry_save_confirmed',
 						reason: 'retry_save_already_confirmed',
 						source: 'retry_save',
-						label: 'Save confirmed',
-						statusText: 'Distributed Editing Save confirmed.',
+						label: 'Saved',
+						statusText: 'WordPress saved your changes.',
 						disabled: true,
 						authorityState: 'authoritative_update_confirmed',
 						localChangesState: 'authoritative_update_confirmed',
@@ -1407,21 +1666,21 @@ describe( 'PostPublishButton', () => {
 						step: 'save_confirmed',
 						action: 'none',
 						title: 'Saved',
-						summary: 'WordPress confirmed the update.',
+						summary: 'Ready for new edits.',
 						actionHint: null,
 						requiresActionBeforeSave: false,
 						statusChromeSummary: 'Ready for new edits.',
 						statusChromeAuthorityState:
 							'authoritative_update_confirmed',
 						statusChromeAuthorityText:
-							'The authoritative WordPress post has accepted the Distributed Editing Save.',
+							'WordPress accepted this Save.',
 						claimsSavedWithoutEvidence: false,
 					} }
 				/>
 			);
 
 			expect(
-				screen.getByRole( 'button', { name: 'Save confirmed' } )
+				screen.getByRole( 'button', { name: 'Saved' } )
 			).toHaveAttribute(
 				'data-distributed-editing-confirmed-save-button-quieted',
 				'false'
@@ -1450,16 +1709,14 @@ describe( 'PostPublishButton', () => {
 				'data-distributed-editing-confirmed-save-button-original-status',
 				'retry_save_confirmed'
 			);
-			expect( quietedButton ).toHaveAttribute(
-				'data-distributed-editing-save-control-journey-step',
-				'ready_to_edit'
+			expect( quietedButton ).not.toHaveAttribute(
+				'data-distributed-editing-save-control-journey-step'
 			);
-			expect( quietedButton ).toHaveAttribute(
-				'title',
-				'Use Save when you are ready for WordPress to update this post. Save can update the authoritative WordPress post.'
-			);
+			expect( quietedButton ).not.toHaveAttribute( 'title' );
 			expect( screen.queryByText( 'Saved' ) ).not.toBeInTheDocument();
-			expect( screen.getByText( 'Save is available' ) ).toBeVisible();
+			expect(
+				screen.queryByText( 'Save is available' )
+			).not.toBeInTheDocument();
 		} finally {
 			jest.useRealTimers();
 

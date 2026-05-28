@@ -93,7 +93,7 @@ const SAVE_POLICY = {
 	saveButtonReviewCheckpointState: 'review_required',
 	saveButtonAuthoritativePostState: 'review_required_before_update',
 	saveButtonStateSummaryText:
-		'Protected local changes need review before the authoritative post can update.',
+		'Protected local changes need review before WordPress can update the post.',
 	saveButtonStateVocabulary: {
 		localChangesState: 'protected_local_changes_exportable',
 		reviewCheckpointState: 'review_required',
@@ -101,11 +101,11 @@ const SAVE_POLICY = {
 		localChangesText:
 			'Protected local changes remain exportable from this editor.',
 		reviewCheckpointText:
-			'Review is required before the authoritative post can update.',
+			'Review is required before WordPress can update the post.',
 		authoritativePostText:
-			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.',
+			'WordPress cannot update the post until risky changes are approved or removed.',
 		summaryText:
-			'Protected local changes need review before the authoritative post can update.',
+			'Protected local changes need review before WordPress can update the post.',
 		descriptorOnly: true,
 		rawContentIncluded: false,
 		exposesRawContent: false,
@@ -292,9 +292,7 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 			</SlotFillProvider>
 		);
 
-		expect(
-			screen.getByText( 'Distributed Editing HTML review' )
-		).toBeVisible();
+		expect( screen.getByText( 'HTML review' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'1 highlighted block needs HTML review before Save can update the post.'
@@ -312,17 +310,17 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'Review is required before the authoritative post can update.'
+				'Review is required before WordPress can update the post.'
 			)
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'The authoritative WordPress post cannot be updated until risky changes are approved or removed.'
+				'WordPress cannot update the post until risky changes are approved or removed.'
 			)
 		).toBeVisible();
 		expect( screen.getByText( 'Custom HTML' ) ).toBeVisible();
 		const panel = screen.getByRole( 'region', {
-			name: 'Distributed Editing HTML review state',
+			name: 'HTML review state',
 		} );
 
 		expect( panel ).toHaveAttribute(
@@ -339,7 +337,7 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 		);
 		expect( panel ).toHaveAttribute(
 			'data-distributed-editing-save-state-summary',
-			'Protected local changes need review before the authoritative post can update.'
+			'Protected local changes need review before WordPress can update the post.'
 		);
 		expect(
 			screen.queryByText( '<script>secret</script>' )
@@ -409,9 +407,7 @@ describe( 'DistributedEditingRiskyBlockReviewPanel', () => {
 			screen.getByText( 'HTML review is resolved for this update.' )
 		).toBeVisible();
 		expect(
-			screen.getByText(
-				'Custom HTML was approved for the guarded Save path.'
-			)
+			screen.getByText( 'Custom HTML was approved for WordPress Save.' )
 		).toBeVisible();
 		expect(
 			screen.getByRole( 'button', {

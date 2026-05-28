@@ -304,7 +304,7 @@ export default function DistributedEditingRiskyBlockReviewPrePublishPanel( {
 			className="editor-distributed-editing-risky-block-review__pre-publish-panel"
 			icon={ caution }
 			initialOpen
-			title={ __( 'Distributed Editing HTML review' ) }
+			title={ __( 'HTML review' ) }
 		>
 			<DistributedEditingRiskyBlockReviewPanel
 				onFocusItem={ focusReviewItem }
@@ -346,7 +346,7 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 
 	return (
 		<div
-			aria-label={ __( 'Distributed Editing HTML review state' ) }
+			aria-label={ __( 'HTML review state' ) }
 			className="editor-distributed-editing-risky-block-review"
 			data-distributed-editing-risky-block-review-panel
 			data-distributed-editing-save-authoritative-post-state={
@@ -371,7 +371,7 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 			</p>
 			{ shouldRenderSaveVocabulary && (
 				<dl
-					aria-label={ __( 'Distributed Editing Save state' ) }
+					aria-label={ __( 'WordPress Save state' ) }
 					className="editor-distributed-editing-risky-block-review__save-vocabulary"
 					data-distributed-editing-risky-block-review-save-vocabulary
 				>
@@ -389,7 +389,7 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 					) }
 					{ saveVocabulary.authoritativePostText && (
 						<div>
-							<dt>{ __( 'Authoritative post' ) }</dt>
+							<dt>{ __( 'WordPress post' ) }</dt>
 							<dd>{ saveVocabulary.authoritativePostText }</dd>
 						</div>
 					) }
@@ -675,14 +675,14 @@ function getRiskyBlockReviewItemAffordanceMessage( reviewItem, index ) {
 		case DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.APPROVED_FOR_RETRY_SAVE:
 			return sprintf(
 				/* translators: %s: block label. */
-				__( '%s was approved for the guarded Save path.' ),
+				__( '%s was approved for WordPress Save.' ),
 				label
 			);
 		case DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED:
 			return sprintf(
 				/* translators: %s: block label. */
 				__(
-					'%s was rejected and will not be included in the guarded Save path.'
+					'%s was rejected and will not be included when WordPress updates the post.'
 				),
 				label
 			);

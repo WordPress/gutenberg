@@ -37,6 +37,7 @@ export default function SavePublishPanels( {
 	} = useSelect( ( select ) => {
 		const {
 			getDistributedEditingSavePolicyState,
+			getDistributedEditingSessionState,
 			isPublishSidebarOpened,
 			isEditedPostPublishable,
 			isCurrentPostPublished,
@@ -46,6 +47,8 @@ export default function SavePublishPanels( {
 		const _hasOtherEntitiesChanges = hasNonPostEntityChanges();
 		const distributedEditingSavePolicy =
 			getDistributedEditingSavePolicyState?.() ?? {};
+		const distributedEditingSessionState =
+			getDistributedEditingSessionState?.() ?? {};
 
 		return {
 			publishSidebarOpened: isPublishSidebarOpened(),
@@ -56,7 +59,10 @@ export default function SavePublishPanels( {
 			forcePrePublishExtension:
 				distributedEditingSavePolicy.opensPrePublishReview ||
 				distributedEditingSavePolicy.clickAction ===
-					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW ||
+				Boolean(
+					distributedEditingSessionState.remoteChangesReviewPrePublishPanelRequired
+				),
 		};
 	}, [] );
 

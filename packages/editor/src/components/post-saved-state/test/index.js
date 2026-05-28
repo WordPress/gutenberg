@@ -17,12 +17,15 @@ import PostSavedState from '../';
 
 const mockSavePost = jest.fn();
 const mockMaybeHandleDistributedEditingSaveButtonClick = jest.fn();
+const mockSyncDistributedEditingWithServer = jest.fn();
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	return {
 		useDispatch: () => ( {
 			__experimentalMaybeHandleDistributedEditingSaveButtonClick:
 				mockMaybeHandleDistributedEditingSaveButtonClick,
+			__experimentalSyncDistributedEditingWithServer:
+				mockSyncDistributedEditingWithServer,
 			savePost: mockSavePost,
 		} ),
 		useDispatchWithMap: jest.fn(),
@@ -49,8 +52,12 @@ describe( 'PostSavedState', () => {
 	beforeEach( () => {
 		mockSavePost.mockClear();
 		mockMaybeHandleDistributedEditingSaveButtonClick.mockClear();
+		mockSyncDistributedEditingWithServer.mockClear();
 		mockMaybeHandleDistributedEditingSaveButtonClick.mockResolvedValue( {
 			allowsNormalSaveFallback: true,
+		} );
+		mockSyncDistributedEditingWithServer.mockResolvedValue( {
+			status: 'server_sync_current',
 		} );
 		useViewportMatch.mockImplementation( () => false );
 	} );
@@ -144,16 +151,15 @@ describe( 'PostSavedState', () => {
 				status: 'accepted_but_unconsumed',
 				source: 'fresh_review',
 				reason: 'fresh_review_accepted_but_unconsumed',
-				label: 'Submit reviewed changes',
-				statusText:
-					'Accepted Distributed Editing proof is ready for guarded retry save.',
+				label: 'Save',
+				statusText: 'These changes are ready for Save.',
 				clickAction: 'continue_guarded_retry_save',
 				authorityState: 'ready_for_guarded_update',
 				localChangesState: 'protected_local_changes_exportable',
 				reviewCheckpointState: 'review_accepted',
 				authoritativePostState: 'ready_for_guarded_update',
 				saveStateSummaryText:
-					'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.',
+					'Reviewed local changes are ready for Save; the post in WordPress is not updated yet.',
 				authoritativePostUpdated: false,
 			},
 		} ) );
@@ -161,11 +167,11 @@ describe( 'PostSavedState', () => {
 		render( <PostSavedState /> );
 
 		const button = screen.getByRole( 'button', {
-			name: 'Submit reviewed changes',
+			name: 'Save',
 		} );
 		expect( button ).toHaveAttribute(
 			'title',
-			'Accepted Distributed Editing proof is ready for guarded retry save.'
+			'These changes are ready for Save.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-status',
@@ -201,7 +207,7 @@ describe( 'PostSavedState', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-state-summary',
-			'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.'
+			'Reviewed local changes are ready for Save; the post in WordPress is not updated yet.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-button-authoritative-post-updated',
@@ -229,7 +235,7 @@ describe( 'PostSavedState', () => {
 				statusChromeAuthorityState:
 					'ready_to_update_authoritative_post',
 				statusChromeAuthorityText:
-					'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+					'Save checks the latest post before WordPress updates it.',
 				dirtyEditorPreflight: true,
 				claimsSavedWithoutEvidence: false,
 			},
@@ -268,7 +274,7 @@ describe( 'PostSavedState', () => {
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-authority-summary',
-			'WordPress remains authoritative; Save checks for a newer version before updating the post.'
+			'Save checks the latest post before WordPress updates it.'
 		);
 		expect( button ).toHaveAttribute(
 			'data-distributed-editing-save-control-journey-descriptor-only',
@@ -334,8 +340,7 @@ describe( 'PostSavedState', () => {
 			distributedEditingSaveButtonState: {
 				status: 'review_blocked',
 				label: 'Review changes',
-				statusText:
-					'Save opens review before updating the authoritative post.',
+				statusText: 'Review changes before WordPress updates the post.',
 				clickAction: 'open_pre_publish_review',
 				authorityState: 'review_required_before_update',
 				authoritativePostUpdated: false,
@@ -380,23 +385,22 @@ describe( 'PostSavedState', () => {
 				reviewCheckpointState: 'review_required',
 				authoritativePostState: 'review_required_before_update',
 				saveStateSummaryText:
-					'Protected local changes need the next Distributed Editing step before the authoritative post can update.',
+					'Protected local changes need the next recovery step before WordPress can update the post.',
 				authoritativePostUpdated: false,
 			},
 			distributedEditingSaveJourneyState: {
 				shouldExposeInSaveControls: true,
 				step: 'local_changes_protected',
 				action: 'apply_local_changes',
-				title: 'Save needs local changes applied',
-				summary:
-					'Apply protected local changes in this editor before WordPress can check Save.',
+				title: 'Apply local edits',
+				summary: 'Apply local edits in this editor before saving.',
 				actionHint: 'Apply local changes',
 				requiresActionBeforeSave: true,
 				statusChromeSummary:
-					'Protected local changes need the next Distributed Editing step before the authoritative post can update.',
+					'Protected local changes need the next recovery step before WordPress can update the post.',
 				statusChromeAuthorityState: 'review_required_before_update',
 				statusChromeAuthorityText:
-					'Finish the Distributed Editing recovery step before the authoritative WordPress post can be updated.',
+					'Finish the recovery step before WordPress can update the post.',
 				claimsSavedWithoutEvidence: false,
 			},
 		} ) );
@@ -442,9 +446,8 @@ describe( 'PostSavedState', () => {
 			postStatus: 'draft',
 			distributedEditingSaveButtonState: {
 				status: 'retry_save_in_progress',
-				label: 'Saving reviewed changes',
-				statusText:
-					'Distributed Editing retry save is waiting for server confirmation.',
+				label: 'Saving',
+				statusText: 'WordPress is saving your changes.',
 				disabled: true,
 				busy: true,
 				authorityState: 'awaiting_server_confirmation',
@@ -455,7 +458,7 @@ describe( 'PostSavedState', () => {
 		render( <PostSavedState /> );
 
 		const button = screen.getByRole( 'button', {
-			name: 'Saving reviewed changes',
+			name: 'Saving',
 		} );
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 		expect( button ).toHaveClass( 'is-saving' );
@@ -494,5 +497,41 @@ describe( 'PostSavedState', () => {
 		expect( button ).not.toHaveAttribute(
 			'data-distributed-editing-save-button-authority-state'
 		);
+	} );
+
+	it( 'should show a Distributed Editing Sync button next to the draft Save control', async () => {
+		const user = userEvent.setup();
+		useSelect.mockImplementation( () => ( {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: false,
+			isDistributedEditingEnabled: true,
+			postId: 44,
+			postStatus: 'draft',
+		} ) );
+		useViewportMatch.mockImplementation( () => true );
+
+		render( <PostSavedState /> );
+
+		const saveButton = screen.getByRole( 'button', {
+			name: 'Save draft',
+		} );
+		const syncButton = screen.getByRole( 'button', {
+			name: 'Sync with WordPress',
+		} );
+
+		expect( saveButton ).toBeVisible();
+		expect( syncButton ).toHaveAttribute(
+			'data-distributed-editing-server-sync-status',
+			'ready'
+		);
+
+		await user.click( syncButton );
+
+		expect( mockSyncDistributedEditingWithServer ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( mockSavePost ).not.toHaveBeenCalled();
 	} );
 } );

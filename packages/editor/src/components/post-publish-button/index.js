@@ -15,28 +15,52 @@ import DistributedEditingSaveJourneyCue, {
 	getDistributedEditingSaveJourneyDataAttributes,
 	getDistributedEditingSaveJourneyTitle,
 } from '../distributed-editing-save-journey-cue';
+import DistributedEditingServerSyncButton from '../distributed-editing-server-sync-button';
 
 const noop = () => {};
 const DISTRIBUTED_EDITING_OPEN_PRE_PUBLISH_REVIEW_ACTION =
 	'open_pre_publish_review';
+const DISTRIBUTED_EDITING_SAVE_BUTTON_CLICK_IN_FLIGHT_REASON =
+	'distributed_editing_save_button_click_in_flight';
 const DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_STATUS = 'retry_save_confirmed';
 const DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_HOLD_MS = 7000;
 const DISTRIBUTED_EDITING_QUIETED_CONFIRMED_SAVE_JOURNEY_STATE = Object.freeze(
 	{
-		shouldExposeInSaveControls: true,
+		shouldExposeInSaveControls: false,
 		step: 'ready_to_edit',
 		action: 'edit',
-		title: 'Save is available',
-		summary:
-			'Use Save when you are ready for WordPress to update this post.',
-		statusChromeSummary:
-			'Save can update the authoritative WordPress post.',
+		title: 'Ready for new edits',
+		summary: '',
+		statusChromeSummary: 'Ready for new edits.',
 		statusChromeAuthorityState: 'ready_to_update_authoritative_post',
-		statusChromeAuthorityText:
-			'Save can update the authoritative WordPress post.',
+		statusChromeAuthorityText: 'Ready for new edits.',
 		claimsSavedWithoutEvidence: false,
 	}
 );
+
+function getVisibleDistributedEditingSaveJourneyState(
+	saveButtonState,
+	saveJourneyState
+) {
+	if ( ! saveJourneyState?.shouldExposeInSaveControls ) {
+		return saveJourneyState;
+	}
+
+	if (
+		saveButtonState?.reason !==
+		DISTRIBUTED_EDITING_SAVE_BUTTON_CLICK_IN_FLIGHT_REASON
+	) {
+		return saveJourneyState;
+	}
+
+	return {
+		...saveJourneyState,
+		title: 'Saving',
+		summary: 'WordPress is saving your changes.',
+		actionHint: null,
+		requiresActionBeforeSave: false,
+	};
+}
 
 function getDistributedEditingConfirmedSaveButtonHoldMs() {
 	const holdMs =
@@ -67,8 +91,13 @@ function isQuietableDistributedEditingConfirmedSaveButtonState(
 }
 
 function getQuietableDistributedEditingConfirmedSaveButtonKey(
-	saveButtonState
+	saveButtonState,
+	hasUnsavedEditorChanges = false
 ) {
+	if ( hasUnsavedEditorChanges ) {
+		return null;
+	}
+
 	if (
 		! isQuietableDistributedEditingConfirmedSaveButtonState(
 			saveButtonState
@@ -87,6 +116,14 @@ function getQuietableDistributedEditingConfirmedSaveButtonKey(
 		saveButtonState.authoritativePostState || '',
 		saveButtonState.saveStateSummaryText || '',
 	].join( ':' );
+}
+
+function hasUnsavedPostPublishButtonEditorChanges( props ) {
+	return Boolean(
+		props.hasUnsavedEditorChanges ||
+			props.forceIsDirty ||
+			props.hasPendingDistributedEditingLocalChanges
+	);
 }
 
 export class PostPublishButton extends Component {
@@ -121,7 +158,8 @@ export class PostPublishButton extends Component {
 	updateDistributedEditingConfirmedSaveButtonTimer() {
 		const nextConfirmedSaveButtonKey =
 			getQuietableDistributedEditingConfirmedSaveButtonKey(
-				this.props.distributedEditingSaveButtonState
+				this.props.distributedEditingSaveButtonState,
+				hasUnsavedPostPublishButtonEditorChanges( this.props )
 			);
 		const {
 			distributedEditingConfirmedSaveButtonKey:
@@ -158,7 +196,8 @@ export class PostPublishButton extends Component {
 		this.distributedEditingConfirmedSaveButtonTimer = setTimeout( () => {
 			if (
 				getQuietableDistributedEditingConfirmedSaveButtonKey(
-					this.props.distributedEditingSaveButtonState
+					this.props.distributedEditingSaveButtonState,
+					hasUnsavedPostPublishButtonEditorChanges( this.props )
 				) !== nextConfirmedSaveButtonKey
 			) {
 				return;
@@ -174,12 +213,28 @@ export class PostPublishButton extends Component {
 		return ( ...args ) => {
 			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
 				this.props;
+			const distributedEditingSaveButtonState =
+				this.props.distributedEditingSaveButtonState;
+			const hasPendingDistributedEditingLocalChanges = Boolean(
+				this.props.hasPendingDistributedEditingLocalChanges
+			);
+			const shouldRouteDistributedEditingSaveAction = Boolean(
+				distributedEditingSaveButtonState?.status &&
+					( distributedEditingSaveButtonState.status !==
+						'update_ready' ||
+						hasPendingDistributedEditingLocalChanges ) &&
+					distributedEditingSaveButtonState.clickAction
+			);
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
 			// We also need to check that the `setEntitiesSavedStatesCallback`
 			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
-			if ( hasNonPostEntityChanges && setEntitiesSavedStatesCallback ) {
+			if (
+				! shouldRouteDistributedEditingSaveAction &&
+				hasNonPostEntityChanges &&
+				setEntitiesSavedStatesCallback
+			) {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
@@ -264,25 +319,45 @@ export class PostPublishButton extends Component {
 			onToggle,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
+			hasPendingDistributedEditingLocalChanges,
+			hasUnsavedEditorChanges,
 			distributedEditingSaveButtonState,
 			distributedEditingSaveJourneyState,
 		} = this.props;
+		const editorHasUnsavedChanges = Boolean(
+			hasUnsavedEditorChanges ||
+				forceIsDirty ||
+				hasPendingDistributedEditingLocalChanges
+		);
+		const effectiveForceIsDirty =
+			forceIsDirty ||
+			hasPendingDistributedEditingLocalChanges ||
+			editorHasUnsavedChanges;
 		const isQuietableDistributedEditingConfirmedSaveButton =
 			isQuietableDistributedEditingConfirmedSaveButtonState(
 				distributedEditingSaveButtonState
 			);
+		const shouldHideConfirmedSaveButtonForUnsavedChanges = Boolean(
+			editorHasUnsavedChanges &&
+				isQuietableDistributedEditingConfirmedSaveButton
+		);
 		const isDistributedEditingConfirmedSaveButtonQuieted = Boolean(
 			isQuietableDistributedEditingConfirmedSaveButton &&
+				! shouldHideConfirmedSaveButtonForUnsavedChanges &&
 				this.state.isDistributedEditingConfirmedSaveButtonQuieted
 		);
 		const visibleDistributedEditingSaveButtonState =
-			isDistributedEditingConfirmedSaveButtonQuieted
+			isDistributedEditingConfirmedSaveButtonQuieted ||
+			shouldHideConfirmedSaveButtonForUnsavedChanges
 				? undefined
 				: distributedEditingSaveButtonState;
 		const visibleDistributedEditingSaveJourneyState =
 			isDistributedEditingConfirmedSaveButtonQuieted
 				? DISTRIBUTED_EDITING_QUIETED_CONFIRMED_SAVE_JOURNEY_STATE
-				: distributedEditingSaveJourneyState;
+				: getVisibleDistributedEditingSaveJourneyState(
+						visibleDistributedEditingSaveButtonState,
+						distributedEditingSaveJourneyState
+				  );
 		const hasDistributedEditingSaveButtonState = Boolean(
 			visibleDistributedEditingSaveButtonState?.status &&
 				visibleDistributedEditingSaveButtonState.status !==
@@ -293,6 +368,10 @@ export class PostPublishButton extends Component {
 				visibleDistributedEditingSaveButtonState.clickAction &&
 				visibleDistributedEditingSaveButtonState.clickAction !==
 					DISTRIBUTED_EDITING_OPEN_PRE_PUBLISH_REVIEW_ACTION
+		);
+		const shouldRouteDistributedEditingButtonClick = Boolean(
+			hasDistributedEditingSaveButtonState &&
+				visibleDistributedEditingSaveButtonState.clickAction
 		);
 		const distributedEditingSaveButtonDisabled = Boolean(
 			hasDistributedEditingSaveButtonState &&
@@ -347,7 +426,8 @@ export class PostPublishButton extends Component {
 				  }
 				: {};
 		const distributedEditingConfirmedSaveButtonDataAttributes =
-			isQuietableDistributedEditingConfirmedSaveButton
+			isQuietableDistributedEditingConfirmedSaveButton &&
+			! shouldHideConfirmedSaveButtonForUnsavedChanges
 				? {
 						'data-distributed-editing-confirmed-save-button-evidence-retained':
 							'true',
@@ -375,7 +455,7 @@ export class PostPublishButton extends Component {
 			: isPostSavingLocked ||
 			  ( ( isSaving ||
 					! isSaveable ||
-					( ! isPublishable && ! forceIsDirty ) ) &&
+					( ! isPublishable && ! effectiveForceIsDirty ) ) &&
 					( ! hasNonPostEntityChanges ||
 						isSavingNonPostEntityChanges ) );
 
@@ -385,7 +465,7 @@ export class PostPublishButton extends Component {
 			  ( ( isPublished ||
 					isSaving ||
 					! isSaveable ||
-					( ! isPublishable && ! forceIsDirty ) ) &&
+					( ! isPublishable && ! effectiveForceIsDirty ) ) &&
 					( ! hasNonPostEntityChanges ||
 						isSavingNonPostEntityChanges ) );
 
@@ -409,6 +489,11 @@ export class PostPublishButton extends Component {
 			if ( distributedEditingClickOptions ) {
 				onSubmit( distributedEditingClickOptions );
 				savePostStatus( publishStatus, distributedEditingClickOptions );
+				return;
+			}
+
+			if ( shouldRouteDistributedEditingButtonClick ) {
+				savePostStatus( publishStatus );
 				return;
 			}
 
@@ -472,6 +557,9 @@ export class PostPublishButton extends Component {
 						}
 					/>
 				</Button>
+				{ isPublished && ! isToggle && (
+					<DistributedEditingServerSyncButton />
+				) }
 				<DistributedEditingSaveJourneyCue
 					className="editor-post-publish-button__distributed-editing-save-journey-cue"
 					saveJourneyState={
@@ -507,7 +595,15 @@ export default compose( [
 			getPostEdits,
 			getDistributedEditingSaveButtonState,
 			getDistributedEditingSaveJourneyState,
+			hasPendingDistributedEditingChanges,
 		} = select( editorStore );
+		const isDirty = isEditedPostDirty();
+		const hasPendingDistributedEditingLocalChanges = Boolean(
+			hasPendingDistributedEditingChanges?.()
+		);
+		const editorIsDirty =
+			isDirty || hasPendingDistributedEditingLocalChanges;
+
 		return {
 			isSaving: isSavingPost(),
 			isAutoSaving: isAutosavingPost(),
@@ -525,10 +621,12 @@ export default compose( [
 			postStatusHasChanged: getPostEdits()?.status,
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
+			hasPendingDistributedEditingLocalChanges,
+			hasUnsavedEditorChanges: editorIsDirty,
 			distributedEditingSaveButtonState:
 				getDistributedEditingSaveButtonState?.(),
 			distributedEditingSaveJourneyState:
-				getDistributedEditingSaveJourneyState?.( isEditedPostDirty() ),
+				getDistributedEditingSaveJourneyState?.( editorIsDirty ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
