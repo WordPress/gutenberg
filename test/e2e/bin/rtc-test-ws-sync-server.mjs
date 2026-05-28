@@ -24,10 +24,10 @@ import { WebSocketServer } from 'ws';
 
 const DEFAULT_PORT = 18991;
 const PORT = parsePortArg();
-const WS_DELAY = Number.parseInt( process.env.WS_DELAY || '0', 10 );
+const RTC_WS_DELAY = Number.parseInt( process.env.RTC_WS_DELAY || '0', 10 );
 
-if ( ! Number.isInteger( WS_DELAY ) || WS_DELAY < 0 ) {
-	throw new Error( `Invalid WS_DELAY: ${ process.env.WS_DELAY }` );
+if ( ! Number.isInteger( RTC_WS_DELAY ) || RTC_WS_DELAY < 0 ) {
+	throw new Error( `Invalid RTC_WS_DELAY: ${ process.env.RTC_WS_DELAY }` );
 }
 
 function parsePortArg() {
@@ -59,14 +59,14 @@ setPersistence( {
 const wss = new WebSocketServer( { noServer: true } );
 
 wss.on( 'connection', ( ws, request ) => {
-	if ( WS_DELAY > 0 ) {
+	if ( RTC_WS_DELAY > 0 ) {
 		const originalSend = ws.send.bind( ws );
 		ws.send = ( data, ...args ) => {
 			setTimeout( () => {
 				if ( ws.readyState === ws.OPEN ) {
 					originalSend( data, ...args );
 				}
-			}, WS_DELAY );
+			}, RTC_WS_DELAY );
 		};
 	}
 	setupWSConnection( ws, request );
