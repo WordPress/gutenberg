@@ -204,20 +204,18 @@ function render_block_core_search( $attributes ) {
 	$tag_name           = $attributes['tagName'] ?? '';
 	$use_search_element = 'search' === $tag_name || ( '' === $tag_name && current_theme_supports( 'search-element' ) );
 
-	if ( $use_search_element ) {
-		// Positional specifiers are required here because the wrapper attributes
-		// and directives precede the action URL in the markup.
-		return sprintf(
-			'<search %2$s %3$s><form method="get" action="%1$s">%4$s</form></search>',
-			esc_url( home_url( '/' ) ),
-			$wrapper_attributes,
-			$form_directives,
-			$label . $field_markup
-		);
-	}
+	/*
+	 * Only the wrapper markup differs between the semantic <search> landmark
+	 * and the classic <form role="search">. Positional specifiers keep a
+	 * single argument list usable by both formats, since the action URL
+	 * precedes the wrapper attributes in the <search> variant.
+	 */
+	$format = $use_search_element
+		? '<search %2$s %3$s><form method="get" action="%1$s">%4$s</form></search>'
+		: '<form role="search" method="get" action="%1$s" %2$s %3$s>%4$s</form>';
 
 	return sprintf(
-		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		$format,
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
