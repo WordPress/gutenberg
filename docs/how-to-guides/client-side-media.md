@@ -8,6 +8,42 @@ This guide covers how plugin and theme developers can interact with, customize, 
 
 For a deep dive into the architecture, see [Client-side media processing architecture](/docs/explanations/architecture/client-side-media-architecture.md).
 
+## Requirements
+
+Client-side media processing activates only when the browser, device, and network all meet the thresholds below. Every check must pass; if any fails, WordPress transparently falls back to server-side processing with no user-facing change.
+
+### Browser
+
+The pipeline depends on [`Document-Isolation-Policy`](https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated) (DIP) to enable `SharedArrayBuffer`, which is currently limited to Chromium-based browsers.
+
+| Browser | Minimum version | Notes |
+| --- | --- | --- |
+| Chrome | 137+ | Full support via Document-Isolation-Policy. |
+| Edge | 137+ | Full support via Document-Isolation-Policy. |
+| Firefox | — | Not supported (no Document-Isolation-Policy support). |
+| Safari | — | Not supported for the WASM pipeline; the HEIC canvas fallback still works. |
+
+### Browser capabilities
+
+In addition to a supported browser, these APIs must be available:
+
+-   **WebAssembly** — required for wasm-vips.
+-   **SharedArrayBuffer** — required for WASM threading (implies cross-origin isolation via DIP is active).
+-   **Web Worker** — required for the off-main-thread vips worker.
+-   **CSP allows `blob:` workers** — the `worker-src` directive must include `blob:` (see [Content Security Policy requirements](#content-security-policy-csp-requirements)).
+
+### Device and network
+
+| Requirement | Threshold | Reason |
+| --- | --- | --- |
+| Device memory | > 2 GB | WASM image processing holds the full image plus working buffers in memory; devices reporting ≤ 2 GB RAM are excluded to avoid out-of-memory crashes. |
+| CPU cores | ≥ 2 | A WASM worker can monopolize a core during encode; at least two cores keeps the UI thread responsive. |
+| Network connection | Not `2g`/`slow-2g`, Save-Data off | The ~13 MB worker download is gated to faster connections; `3g` and above are allowed. |
+
+> **Note:** HEIC/HEIF decoding uses a separate, looser gate. It needs only `createImageBitmap` and `OffscreenCanvas`, so Safari can convert iPhone photos even though it can't run the WASM pipeline. See [Supported file formats](#supported-file-formats).
+
+For the full list of checks and the exact detection logic, see the [architecture documentation](/docs/explanations/architecture/client-side-media-architecture.md#feature-detection).
+
 ## Disabling client-side media processing
 
 Use the `wp_client_side_media_processing_enabled` filter to disable client-side processing.
@@ -274,16 +310,3 @@ globalThis.__vipsDebug = ( text ) => console.log( '[vips]', text );
 ```
 
 Set it back to `undefined` when you're done.
-
-## Browser compatibility
-
-Client-side media processing requires `Document-Isolation-Policy` support, which is currently limited to Chromium-based browsers.
-
-| Browser | Minimum Version | Notes |
-| --- | --- | --- |
-| Chrome | 137+ | Full support via Document-Isolation-Policy. |
-| Edge | 137+ | Full support via Document-Isolation-Policy. |
-| Firefox | — | Not supported (no Document-Isolation-Policy support). |
-| Safari | — | Not supported for the WASM pipeline; the HEIC canvas fallback still works. |
-
-On unsupported browsers, WordPress automatically falls back to server-side processing with no user-facing changes.
