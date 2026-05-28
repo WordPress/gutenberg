@@ -709,5 +709,60 @@ describe( 'validateValueFromSchema', () => {
 
 			consoleErrorSpy.mockRestore();
 		} );
+
+		// `context` (e.g. `[ 'view', 'edit', 'embed' ]`) controls when a
+		// field is returned by the REST API and is the most common
+		// WP-only keyword on response schemas.
+		it( 'should fail compilation when a property uses `context`', () => {
+			const schema = {
+				type: 'object',
+				properties: {
+					name: {
+						type: 'string',
+						context: [ 'view', 'edit', 'embed' ],
+					},
+				},
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( { name: 'hello' }, schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
+
+		// `readonly` (lowercase) marks server-computed fields and is
+		// common on output schemas.
+		it( 'should fail compilation when a property uses `readonly`', () => {
+			const schema = {
+				type: 'object',
+				properties: {
+					id: {
+						type: 'integer',
+						readonly: true,
+					},
+				},
+			};
+			const consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation();
+
+			expect( validateValueFromSchema( { id: 1 }, schema ) ).toBe(
+				'Invalid schema provided for validation.'
+			);
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Schema compilation error:',
+				expect.any( Error )
+			);
+
+			consoleErrorSpy.mockRestore();
+		} );
 	} );
 } );
