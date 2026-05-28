@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "5.37.0",
+	"version": "5.47.0",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -55,11 +55,12 @@
 		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

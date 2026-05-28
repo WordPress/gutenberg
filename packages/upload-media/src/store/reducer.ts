@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import {
+	type AccumulateSubSizeAction,
 	type AddAction,
 	type AddOperationsAction,
 	type CacheBlobUrlAction,
@@ -23,7 +24,10 @@ import {
 	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
-import { DEFAULT_MAX_CONCURRENT_UPLOADS } from './constants';
+import {
+	DEFAULT_MAX_CONCURRENT_UPLOADS,
+	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+} from './constants';
 
 const noop = () => {};
 
@@ -34,10 +38,12 @@ const DEFAULT_STATE: State = {
 	settings: {
 		mediaUpload: noop,
 		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
+		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 	},
 };
 
 type Action =
+	| AccumulateSubSizeAction
 	| AddAction
 	| RemoveAction
 	| CancelAction
@@ -242,6 +248,23 @@ function reducer(
 							? {
 									...item,
 									progress: action.progress,
+							  }
+							: item
+				),
+			};
+
+		case Type.AccumulateSubSize:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									subSizes: [
+										...( item.subSizes || [] ),
+										action.subSize,
+									],
 							  }
 							: item
 				),

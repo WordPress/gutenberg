@@ -32,13 +32,7 @@ export const LayoutTableComponent = ( {
 		search: '',
 		page: 1,
 		perPage: 10,
-		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
-		},
+		layout: {},
 		filters: [],
 		fields: [ 'categories' ],
 		titleField: 'title',
@@ -68,11 +62,10 @@ export const LayoutTableComponent = ( {
 	}, [ view ] );
 	return (
 		<div
-			style={
-				{
-					'--wp-dataviews-color-background': backgroundColor,
-				} as React.CSSProperties
-			}
+			style={ {
+				height: '100%',
+				'--wp-dataviews-color-background': backgroundColor,
+			} }
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
@@ -103,7 +96,7 @@ export const LayoutTableComponent = ( {
 				) }
 				isItemClickable={ () => hasClickableItems }
 				defaultLayouts={ {
-					[ LAYOUT_TABLE ]: {},
+					[ LAYOUT_TABLE ]: true,
 				} }
 				config={ { perPageSizes } }
 			/>

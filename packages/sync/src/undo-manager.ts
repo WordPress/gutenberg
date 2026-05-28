@@ -13,7 +13,20 @@ import type { HistoryRecord } from '@wordpress/undo-manager';
  */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
-import type { ObjectData, SyncUndoManager } from './types';
+import type { ObjectData, RecordHandlers, SyncUndoManager } from './types';
+
+type UndoMetaHandlers = Pick<
+	RecordHandlers,
+	'addUndoMeta' | 'restoreUndoMeta'
+>;
+
+interface StackItemEvent {
+	stackItem: { meta: Map< any, any > };
+	origin: any;
+	type: 'undo' | 'redo';
+	changedParentTypes: Map< Y.AbstractType< any >, Y.YEvent< any >[] >;
+	ydoc: Y.Doc;
+}
 
 /**
  * Implementation of the WordPress UndoManager interface using YMultiDocUndoManager
@@ -22,12 +35,33 @@ import type { ObjectData, SyncUndoManager } from './types';
  * without conflicts.
  */
 export function createUndoManager(): SyncUndoManager {
+	const undoMetaHandlers = new Map< Y.Doc, UndoMetaHandlers >();
 	const yUndoManager = new YMultiDocUndoManager( [], {
-		// Throttle undo/redo captures. (default: 500ms)
-		captureTimeout: 200,
+		// Throttle undo/redo captures after 500ms of inactivity.
+		// 500 was selected from subjective local UX testing, shorter timeouts
+		// may cause mid-word undo stack items.
+		captureTimeout: 500,
 		// Ensure that we only scope the undo/redo to the current editor.
 		// The yjs document's clientID is added once it's available.
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
+	} );
+
+	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
+		const handlers = undoMetaHandlers.get( event.ydoc );
+		if ( ! handlers ) {
+			return;
+		}
+
+		handlers.addUndoMeta( event.ydoc, event.stackItem.meta );
+	} );
+
+	yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
+		const handlers = undoMetaHandlers.get( event.ydoc );
+		if ( ! handlers ) {
+			return;
+		}
+
+		handlers.restoreUndoMeta( event.ydoc, event.stackItem.meta );
 	} );
 
 	return {
@@ -50,10 +84,24 @@ export function createUndoManager(): SyncUndoManager {
 		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
-		 * @param {Y.Map< any >} ymap The Yjs map to add to the scope.
+		 * @param {Y.Map< any >} ymap                     The Yjs map to add to the scope.
+		 * @param                handlers
+		 * @param                handlers.addUndoMeta
+		 * @param                handlers.restoreUndoMeta
 		 */
-		addToScope( ymap: Y.Map< any > ): void {
+		addToScope( ymap: Y.Map< any >, handlers: UndoMetaHandlers ): void {
+			if ( ymap.doc === null ) {
+				// Necessary for a type check, but this shouldn't happen.
+				return;
+			}
+
+			const ydoc = ymap.doc;
 			yUndoManager.addToScope( ymap );
+
+			if ( ! undoMetaHandlers.has( ydoc ) ) {
+				ydoc.on( 'destroy', () => undoMetaHandlers.delete( ydoc ) );
+			}
+			undoMetaHandlers.set( ydoc, handlers );
 		},
 
 		/**
@@ -105,6 +153,14 @@ export function createUndoManager(): SyncUndoManager {
 		 */
 		hasRedo(): boolean {
 			return yUndoManager.canRedo();
+		},
+
+		/**
+		 * Stop capturing changes into the current undo item.
+		 * The next change will create a new undo item.
+		 */
+		stopCapturing(): void {
+			yUndoManager.stopCapturing();
 		},
 	};
 }

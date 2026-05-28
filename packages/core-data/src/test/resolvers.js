@@ -11,6 +11,7 @@ import { getSyncManager } from '../sync';
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
+	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
 
 /**
@@ -24,6 +25,7 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
+import { saveEntityRecord } from '../actions';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 
 describe( 'getEntityRecord', () => {
@@ -128,7 +130,7 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'loads entity with sync manager when IS_GUTENBERG_PLUGIN is true', async () => {
+	it( 'loads entity with sync manager', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
@@ -168,11 +170,293 @@ describe( 'getEntityRecord', () => {
 			1,
 			POST_RECORD,
 			{
+				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
-				saveRecord: expect.any( Function ),
+				onStatusChange: expect.any( Function ),
+				persistCRDTDoc: expect.any( Function ),
+				refetchRecord: expect.any( Function ),
+				restoreUndoMeta: expect.any( Function ),
 			}
 		);
+	} );
+
+	it( 'persistCRDTDoc fetches edited record and does not save full entity record when the entity does not support meta', async () => {
+		const ENTITY_RECORD = { id: 1, title: 'Test Record' };
+		const EDITED_RECORD = { id: 1, title: 'Edited Record' };
+		const ENTITY_RESPONSE = {
+			json: () => Promise.resolve( ENTITY_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'bar',
+				kind: 'foo',
+				baseURL: '/wp/v2/foo',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		dispatch.saveEntityRecord = jest.fn();
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( EDITED_RECORD )
+			),
+		};
+
+		triggerFetch.mockImplementation( () => ENTITY_RESPONSE );
+
+		await getEntityRecord(
+			'foo',
+			'bar',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		// Extract the handlers passed to syncManager.load.
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		// Call persistCRDTDoc and wait for the internal promise chain.
+		handlers.persistCRDTDoc();
+		await resolveSelectWithSync.getEditedEntityRecord();
+
+		// Should have fetched the full edited entity record.
+		expect(
+			resolveSelectWithSync.getEditedEntityRecord
+		).toHaveBeenCalledWith( 'foo', 'bar', 1 );
+
+		// Should not have called saveEntityRecord.
+		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'persistCRDTDoc saves only the entity ID and omits REST-invalid fields', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post', meta: {} };
+		const EDITED_RECORD = {
+			id: 1,
+			title: 'Edited Post',
+			ping_status: '',
+			meta: { _crdt_document: 'doc2' },
+		};
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		dispatch.saveEntityRecord = jest.fn();
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( EDITED_RECORD )
+			),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		// Extract the handlers passed to syncManager.load.
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		// Call persistCRDTDoc and wait for the internal promise chain.
+		handlers.persistCRDTDoc();
+		await resolveSelectWithSync.getEditedEntityRecord();
+
+		// Should have fetched the full edited entity record.
+		expect(
+			resolveSelectWithSync.getEditedEntityRecord
+		).toHaveBeenCalledWith( 'postType', 'post', 1 );
+
+		// Should only send the entity ID. The pre-persist hook creates the
+		// persisted CRDT meta without round-tripping the full edited record.
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			{ id: 1 },
+			{ __unstableSkipSyncUpdate: true }
+		);
+	} );
+
+	it( 'persistCRDTDoc saves even when there are no unsaved edits', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post', meta: {} };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		dispatch.saveEntityRecord = jest.fn();
+
+		// Return the same record (no edits) from getEditedEntityRecord.
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( POST_RECORD )
+			),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		// Call persistCRDTDoc and wait for the internal promise chain.
+		handlers.persistCRDTDoc();
+		await resolveSelectWithSync.getEditedEntityRecord();
+
+		// Should save only the entity ID even with no edits.
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			{ id: 1 },
+			{ __unstableSkipSyncUpdate: true }
+		);
+	} );
+
+	it( 'persistCRDTDoc does not replay a stale save response into the sync document', async () => {
+		const INITIAL_TITLE = 'Initial Title';
+		const SYNCED_TITLE = 'Synced Title';
+		const POST_RECORD = { id: 1, title: INITIAL_TITLE, meta: {} };
+		const EDITED_RECORD = { id: 1, title: SYNCED_TITLE, meta: {} };
+		const STALE_SAVE_RESPONSE = {
+			id: 1,
+			title: INITIAL_TITLE,
+			meta: { _crdt_document: 'serialized-crdt-doc' },
+		};
+		const liveSyncState = {
+			isSaved: false,
+			title: SYNCED_TITLE,
+		};
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+				__unstablePrePersist: jest.fn( async () => ( {
+					meta: { _crdt_document: 'serialized-crdt-doc' },
+				} ) ),
+			},
+		];
+
+		const select = {
+			getEditedEntityRecord: jest.fn( () => EDITED_RECORD ),
+			getRawEntityRecord: jest.fn( () => POST_RECORD ),
+		};
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( EDITED_RECORD )
+			),
+		};
+		let savePromise;
+
+		syncManager.update = jest.fn(
+			( _objectType, _objectId, changes, _origin, options ) => {
+				if (
+					Object.prototype.hasOwnProperty.call( changes, 'title' )
+				) {
+					liveSyncState.title = changes.title;
+				}
+				if ( options?.isSave ) {
+					liveSyncState.isSaved = true;
+				}
+			}
+		);
+		dispatch.saveEntityRecord = jest.fn(
+			( kind, name, record, options ) => {
+				savePromise = saveEntityRecord(
+					kind,
+					name,
+					record,
+					options
+				)( {
+					select,
+					dispatch,
+					resolveSelect: resolveSelectWithSync,
+				} );
+				return savePromise;
+			}
+		);
+
+		triggerFetch
+			.mockImplementationOnce( () => POST_RESPONSE )
+			.mockImplementationOnce( () => STALE_SAVE_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		handlers.persistCRDTDoc();
+		await Promise.resolve();
+		await savePromise;
+
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			{ id: 1 },
+			{ __unstableSkipSyncUpdate: true }
+		);
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			1,
+			{},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( liveSyncState ).toEqual( {
+			isSaved: true,
+			title: SYNCED_TITLE,
+		} );
 	} );
 
 	it( 'provides transient properties when read/write config is supplied', async () => {
@@ -220,9 +504,13 @@ describe( 'getEntityRecord', () => {
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
 			{
+				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
-				saveRecord: expect.any( Function ),
+				onStatusChange: expect.any( Function ),
+				persistCRDTDoc: expect.any( Function ),
+				refetchRecord: expect.any( Function ),
+				restoreUndoMeta: expect.any( Function ),
 			}
 		);
 	} );
@@ -716,8 +1004,8 @@ describe( 'canUser', () => {
 			batch: ( callback ) => callback(),
 		};
 		dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-			finishResolution: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
 	} );
@@ -743,7 +1031,25 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
+		expect( dispatch.receiveUserPermissions ).not.toHaveBeenCalled();
+	} );
+
+	it( 'receives false when the allow header is missing', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map(),
+		} ) );
+
+		await canUser(
+			'create',
+			'media'
+		)( { dispatch, registry, resolveSelect } );
+
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
+			'create/media': false,
+			'read/media': false,
+			'update/media': false,
+			'delete/media': false,
+		} );
 	} );
 
 	it( 'throws an error when an entity resource object is malformed', async () => {
@@ -772,10 +1078,12 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/media',
-			false
-		);
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
+			'create/media': false,
+			'read/media': true,
+			'update/media': false,
+			'delete/media': false,
+		} );
 	} );
 
 	it( 'receives false when the user is not allowed to perform an action on entities', async () => {
@@ -795,9 +1103,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/attachment',
-			false
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/postType/attachment': false } )
 		);
 	} );
 
@@ -817,9 +1124,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/media',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/media': true } )
 		);
 	} );
 
@@ -840,9 +1146,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/attachment',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/postType/attachment': true } )
 		);
 	} );
 
@@ -863,9 +1168,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/blocks/123': true } )
 		);
 	} );
 
@@ -890,9 +1194,8 @@ describe( 'canUser', () => {
 			parse: false,
 		} );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/wp_block/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( { 'create/postType/wp_block/123': true } )
 		);
 	} );
 
@@ -919,13 +1222,11 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/blocks',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/blocks': true,
+				'read/blocks': true,
+			} )
 		);
 	} );
 
@@ -960,13 +1261,11 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/wp_block',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/postType/wp_block',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/postType/wp_block': true,
+				'read/postType/wp_block': true,
+			} )
 		);
 	} );
 
@@ -999,21 +1298,13 @@ describe( 'canUser', () => {
 			'blocks'
 		)( { dispatch, registry, resolveSelect } );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/blocks',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'update/blocks',
-			false
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'delete/blocks',
-			false
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/blocks': true,
+				'read/blocks': true,
+				'update/blocks': false,
+				'delete/blocks': false,
+			} )
 		);
 	} );
 
@@ -1052,21 +1343,13 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/blocks/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/blocks/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'update/blocks/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'delete/blocks/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/blocks/123': true,
+				'read/blocks/123': true,
+				'update/blocks/123': true,
+				'delete/blocks/123': true,
+			} )
 		);
 	} );
 
@@ -1105,21 +1388,13 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'create/postType/wp_block/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'read/postType/wp_block/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'update/postType/wp_block/123',
-			true
-		);
-		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
-			'delete/postType/wp_block/123',
-			true
+		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				'create/postType/wp_block/123': true,
+				'read/postType/wp_block/123': true,
+				'update/postType/wp_block/123': true,
+				'delete/postType/wp_block/123': true,
+			} )
 		);
 	} );
 } );

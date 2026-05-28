@@ -17,10 +17,16 @@ import { generateAnchor, setAnchor } from './autogenerate-anchors';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 function HeadingEdit( props ) {
-	const { attributes, setAttributes, mergeBlocks, onReplace, clientId } =
-		props;
+	const {
+		attributes,
+		setAttributes,
+		mergeBlocks,
+		onReplace,
+		style,
+		clientId,
+	} = props;
 	useDeprecatedTextAlign( props );
-	const { style, content, level, placeholder, anchor } = attributes;
+	const { content, level, placeholder, anchor } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		style,

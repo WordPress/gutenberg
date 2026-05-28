@@ -221,6 +221,22 @@
  * Styles that are reused verbatim in a few places
  */
 
+@mixin snackbar-container() {
+	position: fixed;
+	bottom: 24px;
+	left: 0;
+	right: 0;
+	padding-inline: 16px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	.components-snackbar {
+		margin-inline: auto;
+	}
+}
+
 // These are additional styles for all captions, when the theme opts in to block styles.
 @mixin caption-style() {
 	margin-top: 0.5em;
@@ -651,11 +667,41 @@
 	}
 }
 
+@mixin inserter-toggle() {
+	// Basic look
+	background: colors.$gray-900;
+	color: colors.$white;
+	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
+	min-width: variables.$button-size-small;
+	height: variables.$button-size-small;
+
+	&:hover {
+		color: colors.$white;
+		background: var(--wp-admin-theme-color);
+	}
+
+	svg {
+		@media not (prefers-reduced-motion) {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		}
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
+}
+
 @mixin selected-block-outline($widthRatio: 1) {
 	outline-color: var(--wp-admin-theme-color);
 	outline-style: solid;
 	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
 	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	box-shadow: inset 0 0 0 calc((#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1))) + 0.5px) rgba(colors.$white, 0.7);
 }
 
 @mixin selected-block-focus($widthRatio: 1) {

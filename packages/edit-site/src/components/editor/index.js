@@ -12,15 +12,16 @@ import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Icon, arrowUpLeft } from '@wordpress/icons';
+import { Icon, arrowUpLeft, arrowUpRight } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -38,6 +39,7 @@ import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
+import { ViewportSync } from '../block-editor/use-viewport-sync';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
@@ -113,6 +115,7 @@ function getNavigationPath( location, postType ) {
 export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const disableMotion = useReducedMotion();
 	const location = useLocation();
+	const history = useHistory();
 	const { canvas = 'view' } = location.query;
 	const isLoading = useIsSiteEditorLoading();
 	useAdaptEditorToCanvas( canvas );
@@ -142,11 +145,10 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		'edit-site-editor__loading-progress'
 	);
 
-	const settings = useSpecificEditorSettings();
-	const { initialBlockSelection, ...editorSettings } = settings;
+	const editorSettings = useSpecificEditorSettings();
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const history = useHistory();
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
 			switch ( actionId ) {
@@ -206,6 +208,8 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		duration: disableMotion ? 0 : 0.2,
 	};
 
+	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
+
 	return ! isBlockBasedTheme && isHomeRoute ? (
 		<SitePreview />
 	) : (
@@ -213,7 +217,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
-			{ isEditMode && (
+			{ isEditMode && isReady && (
 				<WelcomeGuide
 					postType={ postWithTemplate ? context.postType : postType }
 				/>
@@ -224,7 +228,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					postId={ postWithTemplate ? context.postId : postId }
 					templateId={ postWithTemplate ? postId : undefined }
 					settings={ editorSettings }
-					initialSelection={ initialBlockSelection }
 					className="edit-site-editor__editor-interface"
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
@@ -238,6 +241,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 						)
 					}
 				>
+					{ isEditMode && <ViewportSync /> }
 					{ isEditMode && (
 						<BackButton>
 							{ ( { length } ) =>
@@ -257,6 +261,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 											tooltipPosition="middle right"
 											onClick={ () => {
 												resetZoomLevel();
+												setCurrentRevisionId( null );
 												history.navigate(
 													getNavigationPath(
 														location,
@@ -271,24 +276,50 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 												);
 											} }
 										>
-											<motion.div
-												variants={ siteIconVariants }
-											>
-												<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
-											</motion.div>
-										</Button>
-										<motion.div
-											className={ clsx(
-												'edit-site-editor__back-icon',
-												{
-													'has-site-icon':
-														hasSiteIcon,
-												}
+											{ ! hasAdminBarInEditor && (
+												<motion.div
+													variants={
+														! disableMotion &&
+														siteIconVariants
+													}
+												>
+													<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
+												</motion.div>
 											) }
-											variants={ toggleHomeIconVariants }
-										>
-											<Icon icon={ arrowUpLeft } />
-										</motion.div>
+										</Button>
+										{ hasAdminBarInEditor ? (
+											<div className="edit-site-editor__back-icon">
+												<Icon
+													icon={
+														isRTL()
+															? arrowUpRight
+															: arrowUpLeft
+													}
+												/>
+											</div>
+										) : (
+											<motion.div
+												className={ clsx(
+													'edit-site-editor__back-icon',
+													{
+														'has-site-icon':
+															hasSiteIcon,
+													}
+												) }
+												variants={
+													! disableMotion &&
+													toggleHomeIconVariants
+												}
+											>
+												<Icon
+													icon={
+														isRTL()
+															? arrowUpRight
+															: arrowUpLeft
+													}
+												/>
+											</motion.div>
+										) }
 									</motion.div>
 								)
 							}

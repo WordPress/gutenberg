@@ -21,6 +21,12 @@ import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { FIT_TEXT_SUPPORT_KEY } from './fit-text';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+	useBlockStyleState,
+} from './block-style-state';
 
 function omit( object, keys ) {
 	return Object.fromEntries(
@@ -31,6 +37,7 @@ function omit( object, keys ) {
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
+const TEXT_INDENT_SUPPORT_KEY = 'typography.textIndent';
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
 const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
@@ -45,6 +52,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
+	TEXT_INDENT_SUPPORT_KEY,
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
@@ -115,6 +123,7 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 }
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
+	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
 	const { style, fontFamily, fontSize, fitText } = useSelect(
@@ -138,23 +147,35 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		},
 		[ clientId, isEnabled ]
 	);
-	const value = useMemo(
-		() => attributesToStyle( { style, fontFamily, fontSize } ),
-		[ style, fontSize, fontFamily ]
-	);
 
-	const onChange = ( newStyle ) => {
-		const newAttributes = styleToAttributes( newStyle );
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
-		// If setting a font size and fitText is currently enabled, disable it
-		const hasFontSize =
-			newAttributes.fontSize || newAttributes.style?.typography?.fontSize;
-		if ( hasFontSize && fitText ) {
-			newAttributes.fitText = undefined;
+	const value = useMemo( () => {
+		if ( isStateSelected ) {
+			return getStyleForState( style, selectedState );
 		}
+		return attributesToStyle( { style, fontFamily, fontSize } );
+	}, [ isStateSelected, selectedState, style, fontSize, fontFamily ] );
 
-		setAttributes( newAttributes );
-	};
+	const onChange = isStateSelected
+		? ( newStyle ) => {
+				setAttributes( {
+					style: setStyleForState( style, selectedState, newStyle ),
+				} );
+		  }
+		: ( newStyle ) => {
+				const newAttributes = styleToAttributes( newStyle );
+
+				// If setting a font size and fitText is currently enabled, disable it.
+				const hasFontSize =
+					newAttributes.fontSize ||
+					newAttributes.style?.typography?.fontSize;
+				if ( hasFontSize && fitText ) {
+					newAttributes.fitText = undefined;
+				}
+
+				setAttributes( newAttributes );
+		  };
 
 	if ( ! isEnabled ) {
 		return null;

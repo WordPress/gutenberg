@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import {
 	Card,
 	CardHeader,
@@ -36,6 +29,11 @@ const meta: Meta< typeof Card > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use `Card` or `CollapsibleCard` from `@wordpress/ui` instead.',
+		},
 	},
 };
 
@@ -66,7 +64,9 @@ export const Default: StoryObj< typeof Card > = {
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>
-					<Button variant="secondary">Action Button</Button>
+					<Button __next40pxDefaultSize variant="secondary">
+						Action Button
+					</Button>
 				</CardFooter>
 			</>
 		),

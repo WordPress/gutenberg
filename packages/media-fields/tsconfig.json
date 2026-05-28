@@ -15,6 +15,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../primitives" },
+		{ "path": "../ui" },
 		{ "path": "../url" }
 	],
 	"files": [ "global.d.ts" ],

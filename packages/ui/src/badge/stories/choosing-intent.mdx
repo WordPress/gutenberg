@@ -1,20 +1,11 @@
-import { Meta } from '@storybook/addon-docs/blocks';
-import { Badge } from '../index';
-import '@wordpress/theme/design-tokens.css';
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as ChoosingIntentStories from './choosing-intent.story';
 
-<Meta title="Design System/Components/Badge/Choosing intent" />
+<Meta of={ ChoosingIntentStories } />
 
 # Choosing intent
 
-<div style={ { padding: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap', border: '1px solid #e0e0e0', borderRadius: '0.5rem' } }>
-	<Badge intent="high">high</Badge>
-	<Badge intent="medium">medium</Badge>
-	<Badge intent="low">low</Badge>
-	<Badge intent="stable">stable</Badge>
-	<Badge intent="informational">informational</Badge>
-	<Badge intent="draft">draft</Badge>
-	<Badge intent="none">none</Badge>
-</div>
+<Canvas of={ ChoosingIntentStories.AllIntents } />
 
 It can be difficult to determine which badge intent to use because the component's properties are not tied to any specific product view. Those properties should be balanced against the requirements of the view in which the badge appears, all while keeping an eye on high-level consistency (global statuses that appear across multiple views).
 
@@ -36,21 +27,21 @@ Use when there's something for the user to act on.
 * Needs attention as soon as possible
 * _E.g. "Payment declined", "Security issue"_
 
-<Badge intent="high">Payment declined</Badge> <Badge intent="high">Security issue</Badge>
+<Canvas of={ ChoosingIntentStories.High } />
 
 ### `medium` – Important / blocks progress
 
 * Blocks a key task, should be handled soon
 * _E.g. "Approval required", "Review needed"_
 
-<Badge intent="medium">Approval required</Badge> <Badge intent="medium">Review needed</Badge>
+<Canvas of={ ChoosingIntentStories.Medium } />
 
 ### `low` – Worth noticing / non‑urgent
 
 * Good to be aware of; action may be optional or later
 * _E.g. "Pending", "Queued", "Minor issues", "Optional setup"_
 
-<Badge intent="low">Pending</Badge> <Badge intent="low">Queued</Badge>
+<Canvas of={ ChoosingIntentStories.Low } />
 
 ## 3. Informational / draft = special non-final states
 
@@ -59,13 +50,13 @@ Use when there's something for the user to act on.
 * Context only; no clear action
 * _E.g. "Scheduled", "Beta", "Internal only"_
 
-<Badge intent="informational">Scheduled</Badge> <Badge intent="informational">Beta</Badge>
+<Canvas of={ ChoosingIntentStories.Informational } />
 
 ### `draft` – Not final / work in progress
 
 * _E.g. "Draft", "Unpublished", "Work in progress"_
 
-<Badge intent="draft">Draft</Badge> <Badge intent="draft">Unpublished</Badge>
+<Canvas of={ ChoosingIntentStories.Draft } />
 
 ## 4. Stable / none = normal states
 
@@ -74,34 +65,40 @@ Use when there's something for the user to act on.
 * Use when confirming success or "all good" is important in that view
 * _E.g. "Healthy", "Active", "Live"_
 
-<Badge intent="stable">Healthy</Badge> <Badge intent="stable">Active</Badge>
+<Canvas of={ ChoosingIntentStories.Stable } />
 
 ### `none` – Default for normal / background states
 
 * Especially in dense lists where too much color creates visual noise
 * _E.g. "Inactive", "Expired"_
 
-<Badge intent="none">Inactive</Badge> <Badge intent="none">Expired</Badge>
+<Canvas of={ ChoosingIntentStories.None } />
 
 ## Examples
 
-### Comment status:
+### Comment status
 
--   "Approved" → `none`: <Badge intent="none">Approved</Badge>
--   "Approval required" → `medium`: <Badge intent="medium">Approval required</Badge>
+- "Approved" → `none`
+- "Approval required" → `medium`
 
-### Page status:
+<Canvas of={ ChoosingIntentStories.CommentStatus } />
 
--   "Published" → `none`: <Badge intent="none">Published</Badge>
--   "Pending" → `low`: <Badge intent="low">Pending</Badge>
--   "Draft" → `draft`: <Badge intent="draft">Draft</Badge>
--   "Scheduled" → `informational`: <Badge intent="informational">Scheduled</Badge>
--   "Private" → `informational`: <Badge intent="informational">Private</Badge>
+### Page status
 
-### Plugin status:
+- "Published" → `none`
+- "Pending" → `low`
+- "Draft" → `draft`
+- "Scheduled" → `informational`
+- "Private" → `informational`
 
--   "Active" → `stable`: <Badge intent="stable">Active</Badge>
--   "Inactive" → `none`: <Badge intent="none">Inactive</Badge>
+<Canvas of={ ChoosingIntentStories.PageStatus } />
+
+### Plugin status
+
+- "Active" → `stable`
+- "Inactive" → `none`
+
+<Canvas of={ ChoosingIntentStories.PluginStatus } />
 
 ## 5. When in doubt…
 

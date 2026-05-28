@@ -18,6 +18,7 @@ import NoticeList from '../list';
 import type { NoticeListProps } from '../types';
 
 const meta: Meta< typeof Notice > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Notice',
 	id: 'components-notice',
 	component: Notice,
@@ -29,6 +30,11 @@ const meta: Meta< typeof Notice > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `Notice` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

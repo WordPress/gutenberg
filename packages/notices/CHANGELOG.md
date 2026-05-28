@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 5.47.0 (2026-05-27)
+
+### Enhancements
+
+-   `InlineNotices`: Wrap pinned and dismissible lists in a `notices-inline-notices-wrapper` container with spacing between lists. Add optional `className` prop for the wrapper.
+
+### Internal
+
+-   `InlineNotices`: Remove package-level `Notice` style overrides; `Notice` from `@wordpress/components` owns layout and chrome ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
 ### Enhancements
 
 -   Improved TypeScript definitions ([#67565](https://github.com/WordPress/gutenberg/pull/67565)).

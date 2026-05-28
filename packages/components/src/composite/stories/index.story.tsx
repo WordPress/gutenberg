@@ -16,6 +16,7 @@ import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
@@ -26,7 +27,6 @@ const meta: Meta< typeof Composite > = {
 		'Composite.Item': Composite.Item,
 		'Composite.Hover': Composite.Hover,
 		'Composite.Typeahead': Composite.Typeahead,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Context': Composite.Context,
 	},
 	argTypes: {
@@ -46,6 +46,10 @@ const meta: Meta< typeof Composite > = {
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
 		},
 	},
 	decorators: [
@@ -235,7 +239,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 
 				// Render all context providers forwarded by the Slot via fillProps.
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup

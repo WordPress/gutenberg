@@ -9,6 +9,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import BlockStyles from '../block-styles';
 import InspectorControls from '../inspector-controls';
+import PositionControls from './position-controls-panel';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { useBlockSettings } from '../../hooks/utils';
 import { store as blockEditorStore } from '../../store';
@@ -23,14 +24,14 @@ function SectionBlockColorControls( {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const { hasButton, hasHeading } = useSelect(
+	const { hasButtons, hasHeading } = useSelect(
 		( select ) => {
 			const blockNames =
 				select( blockEditorStore ).getBlockNamesByClientId(
 					contentClientIds
 				);
 			return {
-				hasButton: blockNames.includes( 'core/button' ),
+				hasButtons: blockNames.includes( 'core/buttons' ),
 				hasHeading: blockNames.includes( 'core/heading' ),
 			};
 		},
@@ -52,7 +53,7 @@ function SectionBlockColorControls( {
 			defaultControls={ {
 				text: true,
 				background: true,
-				button: hasButton,
+				button: hasButtons,
 				heading: hasHeading,
 			} }
 		/>
@@ -71,14 +72,13 @@ const StylesTab = ( {
 	return (
 		<>
 			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
-			{ isSectionBlock &&
-				window?.__experimentalContentOnlyPatternInsertion && (
-					<SectionBlockColorControls
-						blockName={ blockName }
-						clientId={ clientId }
-						contentClientIds={ contentClientIds }
-					/>
-				) }
+			{ isSectionBlock && (
+				<SectionBlockColorControls
+					blockName={ blockName }
+					clientId={ clientId }
+					contentClientIds={ contentClientIds }
+				/>
+			) }
 			{ ! isSectionBlock && (
 				<>
 					<InspectorControls.Slot
@@ -89,11 +89,16 @@ const StylesTab = ( {
 					<InspectorControls.Slot
 						group="background"
 						label={ __( 'Background image' ) }
+						className="background-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot group="filter" />
 					<InspectorControls.Slot
 						group="typography"
 						label={ __( 'Typography' ) }
+					/>
+					<InspectorControls.Slot
+						group="layout"
+						label={ __( 'Layout' ) }
 					/>
 					<InspectorControls.Slot
 						group="dimensions"
@@ -103,6 +108,7 @@ const StylesTab = ( {
 						group="border"
 						label={ borderPanelLabel }
 					/>
+					<PositionControls />
 					<InspectorControls.Slot group="styles" />
 				</>
 			) }

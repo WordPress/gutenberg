@@ -2,8 +2,8 @@
 .example {
 	background-color: var(--wpds-color-bg-surface-neutral);
 	color: var(--wpds-color-fg-content-neutral);
-	border-radius: var(--wpds-border-radius-surface-sm);
-	padding: var(--wpds-dimension-padding-surface-md);
+	border-radius: var(--wpds-border-radius-sm);
+	padding: var(--wpds-dimension-padding-2xl);
 }
 
 /* Valid: Using tokens with fallbacks */

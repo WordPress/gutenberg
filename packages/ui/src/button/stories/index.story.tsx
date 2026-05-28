@@ -1,4 +1,4 @@
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { cog } from '@wordpress/icons';
 import { Button } from '../index';
@@ -6,9 +6,19 @@ import { Button } from '../index';
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
 	component: Button,
+	subcomponents: {
+		'Button.Icon': Button.Icon,
+	},
 	argTypes: {
 		'aria-pressed': {
 			control: { type: 'boolean' },
+		},
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and text overflow behavior. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
@@ -85,7 +95,7 @@ export const AllTonesAndVariants: Story = {
 		<div
 			style={ {
 				display: 'grid',
-				gridTemplateColumns: 'max-content repeat(2, min-content)',
+				gridTemplateColumns: 'max-content repeat(2, max-content)',
 				color: 'var(--wpds-color-fg-content-neutral)',
 			} }
 		>
@@ -131,11 +141,6 @@ export const AllTonesAndVariants: Story = {
 									{ ...args }
 									tone={ tone }
 									variant={ variant }
-									// Disabling because this lint rule was meant for the
-									// `@wordpress/components` Button, but is being applied here.
-									// TODO: rework the lint rule so that it checks the package
-									// where the Button comes from.
-									// eslint-disable-next-line no-restricted-syntax
 									disabled
 								/>
 							</div>
@@ -171,8 +176,7 @@ export const Loading: Story = {
 
 /**
  * The pressed state is only available for buttons with `tone="neutral"` and
- * `variant="minimal"`. This represents a toggle button that is currently in an
- * active/pressed state.
+ * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.
  */
 export const Pressed: Story = {
 	...Default,
@@ -180,18 +184,6 @@ export const Pressed: Story = {
 		...Default.args,
 		tone: 'neutral',
 		variant: 'minimal',
-	},
-	render: ( args ) => {
-		const [ isPressed, setIsPressed ] = useState( true );
-
-		return (
-			<Button
-				{ ...args }
-				aria-pressed={ isPressed }
-				onClick={ () => setIsPressed( ! isPressed ) }
-			>
-				Button
-			</Button>
-		);
+		'aria-pressed': true,
 	},
 };

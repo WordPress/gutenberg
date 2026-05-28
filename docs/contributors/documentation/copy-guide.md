@@ -105,7 +105,7 @@ In a simple list that’s meant to be purely instructional (e.g., in UI copy whe
 > To continue, choose an action:
 >
 > -   Add a simple text block.
-> -   Add a quote block.
+> -   Add a pullquote block.
 > -   Add an image block.
 
 If your list is more persuasive (e.g., trying to convince someone to use a feature by listing its benefits) or includes multi-step instructions, you’ll want to vary your verbs to keep the reader engaged with more interesting language, as in the example above:

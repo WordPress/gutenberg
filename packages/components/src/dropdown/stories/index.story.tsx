@@ -14,6 +14,7 @@ import MenuItem from '../../menu-item';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Dropdown',
 	id: 'components-dropdown',
 	component: Dropdown,
@@ -41,6 +42,10 @@ const meta: Meta< typeof Dropdown > = {
 		controls: {
 			expanded: true,
 		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -49,6 +54,7 @@ export const Default: StoryObj< typeof Dropdown > = {
 	args: {
 		renderToggle: ( { isOpen, onToggle } ) => (
 			<Button
+				__next40pxDefaultSize
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 				variant="primary"

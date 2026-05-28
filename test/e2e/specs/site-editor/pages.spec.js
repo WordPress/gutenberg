@@ -76,20 +76,20 @@ test.describe( 'Pages', () => {
 		] );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await Promise.all( [
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.deleteAllPages(),
-		] );
-	} );
-
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllPages(),
 		] );
 		await admin.visitSiteEditor();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await Promise.all( [
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test.skip( 'create a new page, edit template and toggle page template preview', async ( {

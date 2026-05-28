@@ -5,6 +5,7 @@ const transformationCategories = {
 		'core/list',
 		'core/list-item',
 		'core/quote',
+		'core/pullquote',
 		'core/preformatted',
 		'core/verse',
 		'core/shortcode',

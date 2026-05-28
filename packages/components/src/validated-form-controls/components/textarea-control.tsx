@@ -38,3 +38,4 @@ const UnforwardedValidatedTextareaControl = (
 export const ValidatedTextareaControl = forwardRef(
 	UnforwardedValidatedTextareaControl
 );
+ValidatedTextareaControl.displayName = 'ValidatedTextareaControl';

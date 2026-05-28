@@ -66,3 +66,4 @@ const UnforwardedValidatedToggleGroupControl = (
 export const ValidatedToggleGroupControl = forwardRef(
 	UnforwardedValidatedToggleGroupControl
 );
+ValidatedToggleGroupControl.displayName = 'ValidatedToggleGroupControl';

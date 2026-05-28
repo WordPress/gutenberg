@@ -32,6 +32,11 @@ jest.mock( '../use-entity-binding', () => ( {
 	} ) ),
 } ) );
 
+// Mock the useIsInvalidLink hook
+jest.mock( '../use-is-invalid-link', () => ( {
+	useIsInvalidLink: jest.fn( () => [ false, false ] ),
+} ) );
+
 describe( 'Controls', () => {
 	// Initialize the mock function
 	beforeAll( () => {
@@ -54,6 +59,18 @@ describe( 'Controls', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
 		mockUpdateAttributes.mockClear();
+
+		// Reset useEntityBinding mock to default
+		const { useEntityBinding } = require( '../use-entity-binding' );
+		useEntityBinding.mockReturnValue( {
+			hasUrlBinding: false,
+			isBoundEntityAvailable: false,
+			clearBinding: jest.fn(),
+		} );
+
+		// Reset useIsInvalidLink mock to default
+		const { useIsInvalidLink } = require( '../use-is-invalid-link' );
+		useIsInvalidLink.mockReturnValue( [ false, false ] );
 	} );
 
 	it( 'renders all form controls', () => {
@@ -119,35 +136,11 @@ describe( 'Controls', () => {
 	} );
 
 	describe( 'URL binding help text', () => {
-		it( 'shows help text when URL is bound to an entity', () => {
+		it( 'shows invalid link help text when bound entity is not available', () => {
 			const { useEntityBinding } = require( '../use-entity-binding' );
 			useEntityBinding.mockReturnValue( {
 				hasUrlBinding: true,
-				isBoundEntityAvailable: true,
-				clearBinding: jest.fn(),
-			} );
-
-			const propsWithBinding = {
-				...defaultProps,
-				attributes: {
-					...defaultProps.attributes,
-					type: 'page',
-					kind: 'post-type',
-				},
-			};
-
-			render( <Controls { ...propsWithBinding } /> );
-
-			expect(
-				screen.getByText( 'Synced with the selected page.' )
-			).toBeInTheDocument();
-		} );
-
-		it( 'shows help text for different entity types', () => {
-			const { useEntityBinding } = require( '../use-entity-binding' );
-			useEntityBinding.mockReturnValue( {
-				hasUrlBinding: true,
-				isBoundEntityAvailable: true,
+				isBoundEntityAvailable: false,
 				clearBinding: jest.fn(),
 			} );
 
@@ -163,33 +156,39 @@ describe( 'Controls', () => {
 			render( <Controls { ...propsWithCategoryBinding } /> );
 
 			expect(
-				screen.getByText( 'Synced with the selected category.' )
+				screen.getByText(
+					'This link is invalid and will not appear on your site. Please update the link.'
+				)
 			).toBeInTheDocument();
 		} );
 
-		it( 'does not show help text when URL is not bound', () => {
-			const { useEntityBinding } = require( '../use-entity-binding' );
-			useEntityBinding.mockReturnValue( {
-				hasUrlBinding: false,
-				clearBinding: jest.fn(),
-			} );
+		it( 'shows draft help text for draft entities', () => {
+			const { useIsInvalidLink } = require( '../use-is-invalid-link' );
+			useIsInvalidLink.mockReturnValue( [ false, true ] ); // isInvalid: false, isDraft: true
 
-			render( <Controls { ...defaultProps } /> );
+			const propsWithDraftPage = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					type: 'page',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithDraftPage } /> );
 
 			expect(
-				screen.queryByText( /Synced with the selected/ )
-			).not.toBeInTheDocument();
+				screen.getByText(
+					'This link is to a draft page and will not appear on your site until the page is published.'
+				)
+			).toBeInTheDocument();
 		} );
 
-		it( 'shows help text for post entity type', () => {
-			const { useEntityBinding } = require( '../use-entity-binding' );
-			useEntityBinding.mockReturnValue( {
-				hasUrlBinding: true,
-				isBoundEntityAvailable: true,
-				clearBinding: jest.fn(),
-			} );
+		it( 'shows draft help text for different entity types', () => {
+			const { useIsInvalidLink } = require( '../use-is-invalid-link' );
+			useIsInvalidLink.mockReturnValue( [ false, true ] );
 
-			const propsWithPostBinding = {
+			const propsWithDraftPost = {
 				...defaultProps,
 				attributes: {
 					...defaultProps.attributes,
@@ -198,35 +197,111 @@ describe( 'Controls', () => {
 				},
 			};
 
-			render( <Controls { ...propsWithPostBinding } /> );
+			render( <Controls { ...propsWithDraftPost } /> );
 
 			expect(
-				screen.getByText( 'Synced with the selected post.' )
+				screen.getByText(
+					'This link is to a draft post and will not appear on your site until the post is published.'
+				)
 			).toBeInTheDocument();
 		} );
 
-		it( 'shows help text for tag entity type', () => {
-			const { useEntityBinding } = require( '../use-entity-binding' );
-			useEntityBinding.mockReturnValue( {
-				hasUrlBinding: true,
-				isBoundEntityAvailable: true,
-				clearBinding: jest.fn(),
-			} );
-
-			const propsWithTagBinding = {
+		it( 'does not show help text for valid link', () => {
+			const propsWithValidLink = {
 				...defaultProps,
 				attributes: {
 					...defaultProps.attributes,
-					type: 'tag',
+					url: 'https://example.com',
+					type: 'page',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithValidLink } /> );
+
+			// When link is valid (not invalid, not draft, no binding issues), no help text should be shown
+			expect( screen.queryByText( /This link/ ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'View button', () => {
+		it( 'shows "View link" for external URLs', () => {
+			const propsWithExternalLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: 'https://example.com',
+					// No kind or type for external links
+				},
+			};
+
+			render( <Controls { ...propsWithExternalLink } /> );
+
+			expect( screen.getByText( 'View' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View page" for page links', () => {
+			const propsWithPageLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '/about',
+					type: 'page',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithPageLink } /> );
+
+			expect( screen.getByText( 'View' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View post" for post links', () => {
+			const propsWithPostLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '/blog/my-post',
+					type: 'post',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithPostLink } /> );
+
+			expect( screen.getByText( 'View' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View category" for category links', () => {
+			const propsWithCategoryLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '/category/tech',
+					type: 'category',
 					kind: 'taxonomy',
 				},
 			};
 
-			render( <Controls { ...propsWithTagBinding } /> );
+			render( <Controls { ...propsWithCategoryLink } /> );
 
-			expect(
-				screen.getByText( 'Synced with the selected tag.' )
-			).toBeInTheDocument();
+			expect( screen.getByText( 'View' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View link" for custom type links', () => {
+			const propsWithCustomLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: 'https://example.com',
+					type: 'custom',
+					kind: 'custom',
+				},
+			};
+
+			render( <Controls { ...propsWithCustomLink } /> );
+
+			expect( screen.getByText( 'View' ) ).toBeVisible();
 		} );
 	} );
 } );

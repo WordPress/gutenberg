@@ -180,4 +180,7 @@ export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
 	> & { ref?: React.Ref< HTMLSelectElement > }
 ) => React.JSX.Element | null;
 
+// @ts-expect-error TS says: "Property 'displayName' does not exist on type ..."
+SelectControl.displayName = 'SelectControl';
+
 export default SelectControl;

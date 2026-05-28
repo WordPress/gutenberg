@@ -10,6 +10,7 @@ import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/BaseControl',
 	id: 'components-basecontrol',
 	component: BaseControl,
@@ -24,6 +25,11 @@ const meta: Meta< typeof BaseControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `Field` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -64,7 +70,9 @@ export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
 		<BaseControl { ...props }>
 			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
 			<div>
-				<Button variant="secondary">Select an author</Button>
+				<Button __next40pxDefaultSize variant="secondary">
+					Select an author
+				</Button>
 			</div>
 		</BaseControl>
 	);

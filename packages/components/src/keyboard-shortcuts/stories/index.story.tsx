@@ -9,12 +9,17 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import KeyboardShortcuts from '..';
 
 const meta: Meta< typeof KeyboardShortcuts > = {
+	tags: [ 'manifest' ],
 	component: KeyboardShortcuts,
 	title: 'Components/Utilities/KeyboardShortcuts',
 	id: 'components-keyboardshortcuts',
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

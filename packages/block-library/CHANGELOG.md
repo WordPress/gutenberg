@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 9.47.0 (2026-05-27)
+
+### Internal
+
+-   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 9.46.0 (2026-05-14)
+
+## 9.45.0 (2026-04-29)
+
+## 9.44.0 (2026-04-15)
+
+## 9.43.0 (2026-04-01)
+
+## 9.42.0 (2026-03-18)
+
+## 9.41.0 (2026-03-04)
+
+## 9.40.0 (2026-02-18)
+
+## 9.39.0 (2026-01-29)
+
+## 9.38.0 (2026-01-16)
+
 -   Post Date Block: Improve semantic HTML to add `<time>` inside link element.
 
 ## 9.37.0 (2025-12-23)

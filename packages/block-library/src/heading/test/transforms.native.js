@@ -16,7 +16,11 @@ const initialHtml = `
 <!-- /wp:heading -->`;
 
 const transformsWithInnerBlocks = [ 'List', 'Quote', 'Columns', 'Group' ];
-const blockTransforms = [ 'Paragraph', ...transformsWithInnerBlocks ];
+const blockTransforms = [
+	'Paragraph',
+	'Pullquote',
+	...transformsWithInnerBlocks,
+];
 
 setupCoreBlocks();
 

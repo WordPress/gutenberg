@@ -522,9 +522,9 @@
 		"parent": "core-concepts"
 	},
 	{
-		"title": "Understanding global state, local context and derived state",
-		"slug": "undestanding-global-state-local-context-and-derived-state",
-		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md",
+		"title": "Understanding global state, local context, derived state and config",
+		"slug": "understanding-global-state-local-context-derived-state-and-config",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md",
 		"parent": "core-concepts"
 	},
 	{
@@ -540,15 +540,27 @@
 		"parent": "core-concepts"
 	},
 	{
+		"title": "Client-Side Navigation",
+		"slug": "client-side-navigation",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Client-Side Navigation Compatibility",
+		"slug": "client-side-navigation-compatibility",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md",
+		"parent": "core-concepts"
+	},
+	{
 		"title": "Quick start guide",
 		"slug": "iapi-quick-start-guide",
 		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
 		"parent": "interactivity-api"
 	},
 	{
-		"title": "API Reference",
-		"slug": "api-reference",
-		"markdown_source": "../docs/reference-guides/interactivity-api/api-reference.md",
+		"title": "Directives and Store",
+		"slug": "directives-and-store",
+		"markdown_source": "../docs/reference-guides/interactivity-api/directives-and-store.md",
 		"parent": "interactivity-api"
 	},
 	{
@@ -846,9 +858,21 @@
 		"parent": "components"
 	},
 	{
+		"title": "DatePicker",
+		"slug": "date-picker",
+		"markdown_source": "../packages/components/src/date-time/date-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "TimePicker",
+		"slug": "time-picker",
+		"markdown_source": "../packages/components/src/date-time/time-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -1107,12 +1131,6 @@
 		"title": "NavigableContainer",
 		"slug": "navigable-container",
 		"markdown_source": "../packages/components/src/navigable-container/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "Navigation",
-		"slug": "navigation",
-		"markdown_source": "../packages/components/src/navigation/README.md",
 		"parent": "components"
 	},
 	{
@@ -1644,6 +1662,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/design-system-mcp",
+		"slug": "packages-design-system-mcp",
+		"markdown_source": "../packages/design-system-mcp/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/docgen",
 		"slug": "packages-docgen",
 		"markdown_source": "../packages/docgen/README.md",
@@ -1854,6 +1878,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/media-editor",
+		"slug": "packages-media-editor",
+		"markdown_source": "../packages/media-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/media-fields",
 		"slug": "packages-media-fields",
 		"markdown_source": "../packages/media-fields/README.md",
@@ -2022,6 +2052,12 @@
 		"parent": "packages-style-engine"
 	},
 	{
+		"title": "@wordpress/style-runtime",
+		"slug": "packages-style-runtime",
+		"markdown_source": "../packages/style-runtime/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/stylelint-config",
 		"slug": "packages-stylelint-config",
 		"markdown_source": "../packages/stylelint-config/README.md",
@@ -2082,6 +2118,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/vips",
+		"slug": "packages-vips",
+		"markdown_source": "../packages/vips/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
@@ -2097,6 +2139,12 @@
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/worker-threads",
+		"slug": "packages-worker-threads",
+		"markdown_source": "../packages/worker-threads/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2367,6 +2415,12 @@
 		"title": "Managing Packages",
 		"slug": "managing-packages",
 		"markdown_source": "../docs/contributors/code/managing-packages.md",
+		"parent": "code"
+	},
+	{
+		"title": "Workspace Development",
+		"slug": "workspace-development",
+		"markdown_source": "../docs/contributors/code/workspace-development.md",
 		"parent": "code"
 	},
 	{

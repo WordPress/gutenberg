@@ -150,3 +150,21 @@
 .navigation-link-control__error-text {
 	color: $alert-red;
 }
+
+.navigation-link-to__action-button {
+	grid-column: auto;
+	// When this is the last button AND in an odd position among its class
+	// siblings, it's unpaired — span the full grid row.
+	&:nth-last-child(1 of #{&}):nth-child(odd of #{&}) {
+		grid-column: 1 / -1;
+	}
+
+	// Artificially increase specificity to override `justify-content` styles.
+	// Not ideal, but it shouldn't be necessary once switching to the new `Button`
+	// component from `@wordpress/ui`.
+	&#{&}#{&} {
+		justify-content: center;
+	}
+
+}
+

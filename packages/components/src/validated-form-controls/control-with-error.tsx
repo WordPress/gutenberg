@@ -6,6 +6,7 @@ import {
 	cloneElement,
 	forwardRef,
 	useEffect,
+	useId,
 	useState,
 } from '@wordpress/element';
 
@@ -20,21 +21,26 @@ function appendRequiredIndicator(
 	required: boolean | undefined,
 	markWhenOptional: boolean | undefined
 ) {
+	let suffix;
 	if ( required && ! markWhenOptional ) {
-		return (
-			<>
-				{ label } { `(${ __( 'Required' ) })` }
-			</>
-		);
+		suffix = `(${ __( 'Required' ) })`;
+	} else if ( ! required && markWhenOptional ) {
+		suffix = `(${ __( 'Optional' ) })`;
 	}
-	if ( ! required && markWhenOptional ) {
-		return (
-			<>
-				{ label } { `(${ __( 'Optional' ) })` }
-			</>
-		);
+
+	if ( ! suffix ) {
+		return label;
 	}
-	return label;
+
+	if ( typeof label === 'string' ) {
+		return `${ label } ${ suffix }`;
+	}
+
+	return (
+		<>
+			{ label } { suffix }
+		</>
+	);
 }
 
 const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
@@ -54,7 +60,12 @@ type ValidityTarget =
 	| HTMLSelectElement
 	| HTMLTextAreaElement;
 
-function UnforwardedControlWithError< C extends React.ReactElement >(
+function UnforwardedControlWithError<
+	C extends React.ReactElement< {
+		label: React.ReactNode;
+		required: boolean;
+	} >,
+>(
 	{
 		required,
 		markWhenOptional,
@@ -238,22 +249,61 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		}
 	};
 
-	const message = () => {
+	const messageId = useId();
+
+	const message = ( () => {
 		if ( errorMessage ) {
 			return (
-				<ValidityIndicator type="invalid" message={ errorMessage } />
+				<ValidityIndicator
+					id={ messageId }
+					type="invalid"
+					message={ errorMessage }
+				/>
 			);
 		}
 		if ( statusMessage?.type ) {
 			return (
 				<ValidityIndicator
+					id={ messageId }
 					type={ statusMessage.type }
 					message={ statusMessage.message }
 				/>
 			);
 		}
 		return null;
-	};
+	} )();
+
+	const visibleMessage = showMessage ? message : null;
+
+	// Imperatively manage `aria-describedby` on the validity target so we
+	// merge with any value the child control sets internally (e.g. from a
+	// `help` prop), rather than competing with it at the props level.
+	useEffect( () => {
+		const target = getValidityTarget();
+		if ( ! target ) {
+			return;
+		}
+
+		function setDescribedBy( el: Element, shouldAdd: boolean ) {
+			const ids = ( el.getAttribute( 'aria-describedby' ) ?? '' )
+				.split( ' ' )
+				.filter( ( id ) => id && id !== messageId );
+
+			if ( shouldAdd ) {
+				ids.push( messageId );
+			}
+
+			if ( ids.length ) {
+				el.setAttribute( 'aria-describedby', ids.join( ' ' ) );
+			} else {
+				el.removeAttribute( 'aria-describedby' );
+			}
+		}
+
+		setDescribedBy( target, !! visibleMessage );
+
+		return () => setDescribedBy( target, false );
+	}, [ visibleMessage, messageId, getValidityTarget ] );
 
 	return (
 		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
@@ -265,9 +315,10 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				),
 				required,
 			} ) }
-			<div aria-live="polite">{ showMessage && message() }</div>
+			<div aria-live="polite">{ visibleMessage }</div>
 		</div>
 	);
 }
 
 export const ControlWithError = forwardRef( UnforwardedControlWithError );
+ControlWithError.displayName = 'ControlWithError';

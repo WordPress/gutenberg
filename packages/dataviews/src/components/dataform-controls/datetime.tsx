@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { format } from 'date-fns';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -12,7 +7,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { getSettings } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -21,21 +16,19 @@ import { Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
+import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
 
 const { DateCalendar, ValidatedInputControl } = unlock( componentsPrivateApis );
 
-const formatDateTime = ( date?: Date | string ): string => {
-	if ( ! date ) {
+const formatDateTime = ( value?: string ): string => {
+	if ( ! value ) {
 		return '';
 	}
-	if ( typeof date === 'string' ) {
-		return date;
-	}
-	// Format as datetime-local input expects: YYYY-MM-DDTHH:mm
-	return format( date, "yyyy-MM-dd'T'HH:mm" );
+	// Format in WordPress timezone for datetime-local input: YYYY-MM-DDTHH:mm
+	return dateI18n( 'Y-m-d\\TH:i', getDate( value ) );
 };
 
 function CalendarDateTimeControl< Item >( {
@@ -43,9 +36,13 @@ function CalendarDateTimeControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
+	const { compact } = config || {};
 	const { id, label, description, setValue, getValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
@@ -55,8 +52,12 @@ function CalendarDateTimeControl< Item >( {
 	} );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
-	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
-	const previousFocusRef = useRef< Element | null >( null );
+	const validationTimeoutRef =
+		useRef< ReturnType< typeof setTimeout > >( undefined );
+	const previousFocusRef = useRef< Element >( null );
+
+	const { minConstraint, maxConstraint, disabledMatchers } =
+		useDisabledDateMatchers( isValid, parseDateTime );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -77,21 +78,19 @@ function CalendarDateTimeControl< Item >( {
 		( newDate: Date | undefined | null ) => {
 			let dateTimeValue: string | undefined;
 			if ( newDate ) {
-				// Preserve time if it exists in current value, otherwise use current time
-				let finalDateTime = newDate;
+				// Extract the date part in WP timezone from the calendar selection
+				const wpDate = dateI18n( 'Y-m-d', newDate );
 
+				// Preserve time if it exists in current value, otherwise use current time
+				let wpTime: string;
 				if ( value ) {
-					const currentDateTime = parseDateTime( value );
-					if ( currentDateTime ) {
-						// Preserve the time part
-						finalDateTime = new Date( newDate );
-						finalDateTime.setHours( currentDateTime.getHours() );
-						finalDateTime.setMinutes(
-							currentDateTime.getMinutes()
-						);
-					}
+					wpTime = dateI18n( 'H:i', getDate( value ) );
+				} else {
+					wpTime = dateI18n( 'H:i', newDate );
 				}
 
+				// Combine date and time in WP timezone and convert to ISO
+				const finalDateTime = getDate( `${ wpDate }T${ wpTime }` );
 				dateTimeValue = finalDateTime.toISOString();
 				onChangeCallback( dateTimeValue );
 
@@ -131,8 +130,8 @@ function CalendarDateTimeControl< Item >( {
 	const handleManualDateTimeChange = useCallback(
 		( newValue?: string ) => {
 			if ( newValue ) {
-				// Convert from datetime-local format to ISO string
-				const dateTime = new Date( newValue );
+				// Interpret the datetime-local value in WordPress timezone
+				const dateTime = getDate( newValue );
 				onChangeCallback( dateTime.toISOString() );
 
 				// Update calendar month to match
@@ -155,10 +154,16 @@ function CalendarDateTimeControl< Item >( {
 		timezone: { string: timezoneString },
 	} = getSettings();
 
-	const displayLabel =
-		isValid?.required && ! hideLabelFromVision
-			? `${ label } (${ __( 'Required' ) })`
-			: label;
+	let displayLabel = label;
+	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if (
+		! isValid?.required &&
+		markWhenOptional &&
+		! hideLabelFromVision
+	) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<BaseControl
@@ -167,19 +172,7 @@ function CalendarDateTimeControl< Item >( {
 			help={ description }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
-			<Stack direction="column" gap="md">
-				{ /* Calendar widget */ }
-				<DateCalendar
-					style={ { width: '100%' } }
-					selected={
-						value ? parseDateTime( value ) || undefined : undefined
-					}
-					onSelect={ onSelectDate }
-					month={ calendarMonth }
-					onMonthChange={ setCalendarMonth }
-					timeZone={ timezoneString || undefined }
-					weekStartsOn={ weekStartsOn }
-				/>
+			<Stack direction="column" gap="lg">
 				{ /* Manual datetime input */ }
 				<ValidatedInputControl
 					ref={ inputControlRef }
@@ -189,15 +182,37 @@ function CalendarDateTimeControl< Item >( {
 					type="datetime-local"
 					label={ __( 'Date time' ) }
 					hideLabelFromVision
-					value={
-						value
-							? formatDateTime(
-									parseDateTime( value ) || undefined
-							  )
-							: ''
-					}
+					value={ formatDateTime( value ) }
 					onChange={ handleManualDateTimeChange }
+					disabled={ disabled }
+					min={
+						minConstraint
+							? formatDateTime( minConstraint )
+							: undefined
+					}
+					max={
+						maxConstraint
+							? formatDateTime( maxConstraint )
+							: undefined
+					}
 				/>
+				{ /* Calendar widget */ }
+				{ ! compact && (
+					<DateCalendar
+						style={ { width: '100%' } }
+						selected={
+							value
+								? parseDateTime( value ) || undefined
+								: undefined
+						}
+						onSelect={ onSelectDate }
+						month={ calendarMonth }
+						onMonthChange={ setCalendarMonth }
+						timeZone={ timezoneString || undefined }
+						weekStartsOn={ weekStartsOn }
+						disabled={ disabled || disabledMatchers }
+					/>
+				) }
 			</Stack>
 		</BaseControl>
 	);
@@ -208,8 +223,10 @@ export default function DateTime< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	operator,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -230,7 +247,9 @@ export default function DateTime< Item >( {
 			field={ field }
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			markWhenOptional={ markWhenOptional }
 			validity={ validity }
+			config={ config }
 		/>
 	);
 }

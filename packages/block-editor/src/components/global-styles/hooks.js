@@ -81,7 +81,11 @@ export function useSettingsForBlockElement(
 		};
 
 		// Some blocks can enable background colors but disable gradients.
-		if ( ! supportedStyles.includes( 'background' ) ) {
+		// Preserve gradient settings when background.gradient is supported.
+		if (
+			! supportedStyles.includes( 'background' ) &&
+			! supportedStyles.includes( 'backgroundGradient' )
+		) {
 			updatedSettings.color.gradients = [];
 			updatedSettings.color.customGradient = false;
 		}
@@ -100,6 +104,7 @@ export function useSettingsForBlockElement(
 			'textAlign',
 			'textTransform',
 			'textDecoration',
+			'textIndent',
 			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
@@ -109,6 +114,15 @@ export function useSettingsForBlockElement(
 				};
 			}
 		} );
+
+		// Text indent needs explicit handling since it may not be in parent settings.
+		if ( supportedStyles.includes( 'textIndent' ) ) {
+			updatedSettings.typography = {
+				...updatedSettings.typography,
+				textIndent:
+					updatedSettings.typography?.textIndent ?? 'subsequent',
+			};
+		}
 
 		// The column-count style is named text column to reduce confusion with
 		// the columns block and manage expectations from the support.
@@ -152,14 +166,16 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'aspectRatio', 'height', 'minHeight', 'width' ].forEach( ( key ) => {
-			if ( ! supportedStyles.includes( key ) ) {
-				updatedSettings.dimensions = {
-					...updatedSettings.dimensions,
-					[ key ]: false,
-				};
+		[ 'aspectRatio', 'height', 'minHeight', 'minWidth', 'width' ].forEach(
+			( key ) => {
+				if ( ! supportedStyles.includes( key ) ) {
+					updatedSettings.dimensions = {
+						...updatedSettings.dimensions,
+						[ key ]: false,
+					};
+				}
 			}
-		} );
+		);
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -174,11 +190,15 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'backgroundImage', 'backgroundSize' ].forEach( ( key ) => {
-			if ( ! supportedStyles.includes( key ) ) {
+		[
+			[ 'backgroundImage', 'backgroundImage' ],
+			[ 'backgroundSize', 'backgroundSize' ],
+			[ 'backgroundGradient', 'gradient' ],
+		].forEach( ( [ styleKey, settingKey ] ) => {
+			if ( ! supportedStyles.includes( styleKey ) ) {
 				updatedSettings.background = {
 					...updatedSettings.background,
-					[ key ]: false,
+					[ settingKey ]: false,
 				};
 			}
 		} );

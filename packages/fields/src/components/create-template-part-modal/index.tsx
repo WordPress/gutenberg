@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	Icon,
+	Icon as WCIcon,
 	BaseControl,
 	TextControl,
 	Button,
@@ -21,11 +21,10 @@ import {
 	footer as footerIcon,
 	header as headerIcon,
 	sidebar as sidebarIcon,
-	tableColumnAfter as overlayIcon,
+	navigationOverlay as navigationOverlayIcon,
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error serialize is not typed
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -86,30 +85,21 @@ export default function CreateTemplatePartModal( {
 }
 
 /**
- * Helper function to retrieve the corresponding icon by area name or icon name.
+ * Helper function to retrieve the corresponding icon by area name.
  *
- * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
+ * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay').
  *
  * @return {Object} The corresponding icon.
  */
 const getTemplatePartIcon = ( areaOrIconName: string ) => {
-	// Handle area names first
 	if ( 'header' === areaOrIconName ) {
 		return headerIcon;
 	} else if ( 'footer' === areaOrIconName ) {
 		return footerIcon;
 	} else if ( 'sidebar' === areaOrIconName ) {
 		return sidebarIcon;
-	} else if ( 'overlay' === areaOrIconName ) {
-		// TODO: Replace with a proper overlay icon when available.
-		// Using tableColumnAfter as a placeholder.
-		return overlayIcon;
-	}
-	// Handle icon names for backwards compatibility
-	if ( 'menu' === areaOrIconName ) {
-		// TODO: Replace with a proper overlay icon when available.
-		// Using tableColumnAfter as a placeholder.
-		return overlayIcon;
+	} else if ( 'navigation-overlay' === areaOrIconName ) {
+		return navigationOverlayIcon;
 	}
 	return symbolFilledIcon;
 };
@@ -241,7 +231,7 @@ export function CreateTemplatePartModalContents( {
 												instanceId
 											) }
 										/>
-										<Icon
+										<WCIcon
 											icon={ icon }
 											className="fields-create-template-part-modal__area-radio-icon"
 										/>
@@ -254,7 +244,7 @@ export function CreateTemplatePartModalContents( {
 										>
 											{ item.label }
 										</label>
-										<Icon
+										<WCIcon
 											icon={ check }
 											className="fields-create-template-part-modal__area-radio-checkmark"
 										/>

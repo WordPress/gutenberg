@@ -1,13 +1,6 @@
 import { forwardRef } from '@wordpress/element';
-import { type IconProps } from '../icon/types';
+import { type ButtonIconProps } from './types';
 import { Icon } from '../icon';
-
-interface ButtonIconProps extends IconProps {
-	/**
-	 * The icon to display, from the `@wordpress/icons` package.
-	 */
-	icon: IconProps[ 'icon' ];
-}
 
 export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
 	function ButtonIcon( { icon, ...props }, ref ) {

@@ -17,37 +17,52 @@
 		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
 		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
 		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
-		--wp-ui-button-padding-inline: calc(3 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
+		--wp-ui-button-padding-block: var(--wpds-dimension-padding-xs);
+		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
 		--wp-ui-button-height: 40px;
 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
-		--wp-ui-button-font-size: var(--wpds-font-size-md);
+		--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
+		--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
 
 		/* by default, borders have the same color as the background */
 		--wp-ui-button-border-color: var(--wp-ui-button-background-color);
 		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
 		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
 
+		--_gcd-button-font-family: var(--wpds-typography-font-family-body);
+		--_gcd-button-font-size: var(--wp-ui-button-font-size);
+		--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
+
 		/* Styles */
 		position: relative;
 		display: inline-flex;
 		justify-content: center;
 		align-items: center;
-		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
+		gap: var(--wpds-dimension-gap-sm);
 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
-		height: var(--wp-ui-button-height);
+		min-width: var(--wp-ui-button-min-width);
+		max-width: 100%;
+		min-height: var(--wp-ui-button-height);
+		padding-block: var(--wp-ui-button-padding-block);
 		padding-inline: var(--wp-ui-button-padding-inline);
 		border-style: solid;
 		border-width: 1px;
 		border-color: var(--wp-ui-button-border-color);
-		border-radius: var(--wpds-border-radius-surface-sm);
+		border-radius: var(--wpds-border-radius-sm);
 		background-color: var(--wp-ui-button-background-color);
 		background-clip: padding-box;
-		font-family: var(--wpds-font-family-body);
+		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wp-ui-button-font-size);
 		font-weight: var(--wp-ui-button-font-weight);
-		line-height: var(--wpds-font-line-height-sm);
+		line-height: var(--wpds-typography-line-height-sm);
+		text-align: center;
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
+		overflow-wrap: anywhere;
+
+		&:not([data-disabled]) {
+			cursor: var(--wpds-cursor-control);
+		}
 
 		@media not ( prefers-reduced-motion ) {
 			transition: color 0.1s ease-out;
@@ -59,6 +74,7 @@
 
 		/* Use pointer cursor for buttons that are links */
 		&[href] {
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
 			cursor: pointer;
 		}
 
@@ -68,20 +84,22 @@
 			text-decoration: inherit;
 		}
 
-		/* States */
-		&:not([aria-disabled="true"]):is(:hover, :active, :focus) {
+		/* States — use property declarations (not variable reassignment) so that
+		   higher CSS layers can safely override the custom property values without
+		   breaking state handling. */
+		&:not([data-disabled]):is(:hover, :active, :focus) {
 			/* hover/active/focus states apply when the button is not disabled. A non
 			disabled, loading button will have hover/active/focus styles */
-			--wp-ui-button-background-color: var(--wp-ui-button-background-color-active);
-			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-active);
-			--wp-ui-button-border-color: var(--wp-ui-button-border-color-active);
+			background-color: var(--wp-ui-button-background-color-active);
+			color: var(--wp-ui-button-foreground-color-active);
+			border-color: var(--wp-ui-button-border-color-active);
 		}
 
-		&[aria-disabled="true"]:not(.is-loading) {
+		&[data-disabled]:not(.is-loading) {
 			/* A loading button, even when disabled, won't "look" disabled */
-			--wp-ui-button-background-color: var(--wp-ui-button-background-color-disabled);
-			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-disabled);
-			--wp-ui-button-border-color: var(--wp-ui-button-border-color-disabled);
+			background-color: var(--wp-ui-button-background-color-disabled);
+			color: var(--wp-ui-button-foreground-color-disabled);
+			border-color: var(--wp-ui-button-border-color-disabled);
 
 			@media ( forced-colors: active ) {
 				border-color: GrayText;
@@ -102,7 +120,7 @@
 			height: var(--wp-ui-button-font-size);
 			aspect-ratio: 1;
 
-			border: var(--wpds-border-width-interactive-focus) solid;
+			border: var(--wpds-border-width-focus) solid;
 			border-block-start-color: var(--wp-ui-button-foreground-color);
 			border-inline-end-color: var(--wp-ui-button-foreground-color);
 			border-block-end-color: transparent;
@@ -119,7 +137,8 @@
 	}
 
 	.is-small {
-		--wp-ui-button-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
+		--wp-ui-button-padding-block: 0;
+		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
 		--wp-ui-button-height: 24px;
 	}
 
@@ -154,7 +173,9 @@
 	}
 
 	.is-neutral {
-		&.is-solid {
+		/* Solid and pressed minimal share the strong appearance */
+		&.is-solid,
+		&.is-minimal[aria-pressed="true"] {
 			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
 			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong-active);
 			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
@@ -163,9 +184,9 @@
 			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
 		}
 
-		/* Outline and minimal buttons use the same foreground color */
+		/* Outline and unpressed minimal buttons use the same foreground color */
 		&.is-outline,
-		&.is-minimal {
+		&.is-minimal:not([aria-pressed="true"]) {
 			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral);
 			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-active);
 			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
@@ -180,7 +201,7 @@
 			--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
 		}
 
-		&.is-minimal {
+		&.is-minimal:not([aria-pressed="true"]) {
 			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
 			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
 			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
@@ -188,6 +209,7 @@
 	}
 
 	.is-unstyled {
+		min-width: unset;
 		border: none;
 		background: none;
 	}
@@ -198,6 +220,12 @@
 
 	.is-loading {
 		color: transparent;
+
+		/* Keep text transparent when a loading button is hovered — needed because
+		 the hover state now sets `color` as a property declaration. */
+		&:not([data-disabled]):is(:hover, :active, :focus) {
+			color: transparent;
+		}
 
 		* {
 			opacity: 0;
@@ -213,12 +241,6 @@
 		}
 	}
 
-	[aria-pressed="true"].is-minimal.is-neutral {
-		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
-		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong);
-		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
-		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong);
-	}
 }
 
 @keyframes loading-animation {

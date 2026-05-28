@@ -19,7 +19,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const name = 'core/math';
 const title = __( 'Math' );
@@ -101,7 +101,7 @@ function InlineUI( {
 					/>
 					{ error && (
 						<>
-							<Badge
+							<WCBadge
 								intent="error"
 								className="wp-block-math__error"
 							>
@@ -110,7 +110,7 @@ function InlineUI( {
 									__( 'Error: %s' ),
 									error
 								) }
-							</Badge>
+							</WCBadge>
 							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 						</>
 					) }

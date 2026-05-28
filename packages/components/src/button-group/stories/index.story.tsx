@@ -16,7 +16,7 @@ import Button from '../../button';
  * This component is deprecated. Use `ToggleGroupControl` instead.
  */
 const meta: Meta< typeof ButtonGroup > = {
-	title: 'Components (Deprecated)/ButtonGroup',
+	title: 'Components/Deprecated/ButtonGroup',
 	id: 'components-buttongroup',
 	component: ButtonGroup,
 	argTypes: {
@@ -33,8 +33,10 @@ export const Default: StoryObj< typeof ButtonGroup > = {
 	args: {
 		children: (
 			<>
-				<Button variant="primary">Button 1</Button>
-				<Button>Button 2</Button>
+				<Button __next40pxDefaultSize variant="primary">
+					Button 1
+				</Button>
+				<Button __next40pxDefaultSize>Button 2</Button>
 			</>
 		),
 	},

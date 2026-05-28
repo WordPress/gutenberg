@@ -24,7 +24,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 			control: false,
 		},
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onCancel: fn(),
 		onConfirm: fn(),
@@ -32,6 +32,10 @@ const meta: Meta< typeof ConfirmDialog > = {
 	parameters: {
 		controls: {
 			expanded: true,
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -58,7 +62,11 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
 
 	return (
 		<>
-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ () => setIsOpen( true ) }
+			>
 				Open ConfirmDialog
 			</Button>
 

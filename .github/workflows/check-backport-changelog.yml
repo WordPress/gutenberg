@@ -9,6 +9,7 @@ on:
             - 'lib/**'
             - '!lib/load.php'
             - '!lib/experiments-page.php'
+            - '!lib/theme.json'
             - '!lib/experimental/**'
             - 'phpunit/**'
             - '!phpunit/experimental/**'
@@ -18,6 +19,7 @@ on:
             - '!packages/block-serialization-default-parser/**'
             - '!packages/widgets/**'
             - '!packages/e2e-tests/**'
+            - '!packages/icons/src/manifest.php'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
@@ -31,7 +33,7 @@ jobs:
             contents: read
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core Sync Required') && !contains(github.event.pull_request.labels.*.name, 'Backport from WordPress Core') }}
         steps:
-            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   ref: ${{ github.event.pull_request.head.ref }}
                   repository: ${{ github.event.pull_request.head.repo.full_name }}

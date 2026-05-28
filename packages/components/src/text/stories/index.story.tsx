@@ -30,6 +30,11 @@ const meta: Meta< typeof Text > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use `Text` from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

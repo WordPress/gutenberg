@@ -37,6 +37,7 @@ describe( 'block helpers', () => {
 	describe( 'isUnmodifiedDefaultBlock()', () => {
 		it( 'should return true if the default block is unmodified', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -57,6 +58,7 @@ describe( 'block helpers', () => {
 
 		it( 'should return false if the default block is updated', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -79,6 +81,7 @@ describe( 'block helpers', () => {
 
 		it( 'should invalidate cache if the default block name changed', () => {
 			registerBlockType( 'core/test-block1', {
+				apiVersion: 3,
 				attributes: {
 					includesDefault1: {
 						type: 'boolean',
@@ -90,6 +93,7 @@ describe( 'block helpers', () => {
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block2', {
+				apiVersion: 3,
 				attributes: {
 					includesDefault2: {
 						type: 'boolean',
@@ -217,7 +221,10 @@ describe( 'getAccessibleBlockLabel', () => {
 
 describe( 'isBlockRegistered', () => {
 	it( 'returns true if the block is registered', () => {
-		registerBlockType( 'core/test-block', { title: 'Test block' } );
+		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
+			title: 'Test block',
+		} );
 		expect( isBlockRegistered( 'core/test-block' ) ).toBe( true );
 		unregisterBlockType( 'core/test-block' );
 	} );
@@ -238,6 +245,7 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'sanitize block attributes not defined in the block type', () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {
 				defined: {
 					type: 'string',
@@ -272,6 +280,7 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'handles undefined values and default values', () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {
 				hasDefaultValue: {
 					type: 'string',
@@ -296,6 +305,7 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'handles node and children sources as arrays', () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {
 				nodeContent: {
 					source: 'node',
@@ -329,6 +339,7 @@ describe( 'sanitizeBlockAttributes', () => {
 describe( 'getBlockAttributesNamesByRole', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block-1', {
+			apiVersion: 3,
 			attributes: {
 				align: {
 					type: 'string',
@@ -351,6 +362,7 @@ describe( 'getBlockAttributesNamesByRole', () => {
 			title: 'test block 1',
 		} );
 		registerBlockType( 'core/test-block-2', {
+			apiVersion: 3,
 			attributes: {
 				align: { type: 'string' },
 				content: { type: 'boolean' },
@@ -361,6 +373,7 @@ describe( 'getBlockAttributesNamesByRole', () => {
 			title: 'test block 2',
 		} );
 		registerBlockType( 'core/test-block-3', {
+			apiVersion: 3,
 			save: noop,
 			category: 'text',
 			title: 'test block 3',
@@ -403,6 +416,7 @@ describe( 'getBlockAttributesNamesByRole', () => {
 describe( 'isContentBlock', () => {
 	it( 'returns true if the block has a content role attribute', () => {
 		registerBlockType( 'core/test-content-block', {
+			apiVersion: 3,
 			attributes: {
 				content: {
 					type: 'string',
@@ -421,6 +435,7 @@ describe( 'isContentBlock', () => {
 
 	it( 'returns false if the block does not have a content role attribute', () => {
 		registerBlockType( 'core/test-non-content-block', {
+			apiVersion: 3,
 			attributes: {
 				content: {
 					type: 'string',
@@ -440,6 +455,7 @@ describe( 'isContentBlock', () => {
 describe( 'isUnmodifiedBlock', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {
 				align: {
 					type: 'string',

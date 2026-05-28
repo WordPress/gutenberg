@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import {
 	useEffect,
 	useState,
@@ -13,12 +6,7 @@ import {
 	useId,
 	createPortal,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ThemeProvider } from '../theme-provider';
-import '../prebuilt/css/design-tokens.css';
 
 const meta: Meta< typeof ThemeProvider > = {
 	title: 'Design System/Theme/Theme Provider',
@@ -35,7 +23,7 @@ const meta: Meta< typeof ThemeProvider > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-private' ],
 };
 export default meta;
 
@@ -199,10 +187,10 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	},
 };
 
-const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+const NestingDebug = ( { bg = '', primary = '' } ) => (
 	<div
 		style={ {
-			padding: 'var(--wpds-dimension-padding-surface-sm)',
+			padding: 'var(--wpds-dimension-padding-lg)',
 			color: 'var(--wpds-color-fg-content-neutral)',
 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
 			display: 'flex',
@@ -212,12 +200,12 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 		} }
 	>
 		<pre style={ { margin: 0 } }>
-			bg: { bg } | primary: { primary } | density: { density }
+			bg: { bg } | primary: { primary }
 		</pre>
 		<span
 			style={ {
 				display: 'inline-block',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
 					'var(--wpds-color-bg-interactive-brand-strong)',
@@ -230,7 +218,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 			style={ {
 				display: 'inline-block',
 				marginInlineStart: '0.25rem',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
 					'var(--wpds-color-bg-interactive-neutral-weak-disabled)',
@@ -246,39 +234,27 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		return (
 			<ThemeProvider>
-				<NestingDebug
-					bg="inherit (root)"
-					primary="inherit (root)"
-					density="inherit (root)"
-				/>
+				<NestingDebug bg="inherit (root)" primary="inherit (root)" />
 				<div style={ { paddingInlineStart: '1rem' } }>
 					<ThemeProvider
 						color={ {
 							bg: '#1e1e1e',
 						} }
-						density="compact"
 					>
-						<NestingDebug
-							bg="#1e1e1e"
-							primary="inherit (root)"
-							density="compact"
-						/>
+						<NestingDebug bg="#1e1e1e" primary="inherit (root)" />
 						<div style={ { paddingInlineStart: '1rem' } }>
 							<ThemeProvider>
 								<NestingDebug
 									bg="inherit (#1e1e1e)"
 									primary="inherit (root)"
-									density="inherit (compact)"
 								/>
 								<div style={ { paddingInlineStart: '1rem' } }>
 									<ThemeProvider
 										color={ { primary: 'hotpink' } }
-										density="default"
 									>
 										<NestingDebug
 											bg="inherit (#1e1e1e)"
 											primary="hotpink"
-											density="default"
 										/>
 										<div
 											style={ {
@@ -291,7 +267,6 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 												<NestingDebug
 													bg="#f8f8f8"
 													primary="inherit (hotpink)"
-													density="inherit (default)"
 												/>
 											</ThemeProvider>
 										</div>
@@ -411,7 +386,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 				<span
 					style={ {
 						display: 'inline-block',
-						padding: 'var(--wpds-dimension-padding-surface-xs)',
+						padding: 'var(--wpds-dimension-padding-sm)',
 						borderRadius: '0.25rem',
 						backgroundColor:
 							'var(--wpds-color-bg-interactive-brand-strong)',

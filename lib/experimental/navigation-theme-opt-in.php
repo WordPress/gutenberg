@@ -91,7 +91,7 @@ add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content',
 function gutenberg_setup_block_nav_menu_item( $menu_item ) {
 	if ( 'block' === $menu_item->type ) {
 		$menu_item->type_label = __( 'Block', 'gutenberg' );
-		$menu_item->content    = ! isset( $menu_item->content ) ? get_post_meta( $menu_item->db_id, '_menu_item_content', true ) : $menu_item->content;
+		$menu_item->content    = $menu_item->content ?? get_post_meta( $menu_item->db_id, '_menu_item_content', true );
 
 		// Set to make the menu item display nicely in nav-menus.php.
 		$menu_item->object = 'block';
@@ -305,10 +305,7 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 		$menu_items_by_parent_id[ $menu_item->menu_item_parent ][] = $menu_item;
 	}
 
-	$block_attributes = array();
-	if ( isset( $args->block_attributes ) ) {
-		$block_attributes = $args->block_attributes;
-	}
+	$block_attributes = $args->block_attributes ?? array();
 
 	$navigation_block = array(
 		'blockName'   => 'core/navigation',

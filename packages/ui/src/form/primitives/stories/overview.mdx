@@ -1,0 +1,15 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+# Form Primitives
+
+<Meta title="Design System/Components/Form/Primitives" name="Overview" />
+
+These form primitives are the low-level building blocks for form-related components. Outside of rare, special use cases, a normal developer should not need to use these primitives directly.
+
+## When to use these primitives
+
+1. First check if there is a higher-level `*Control` component that meets your needs, either in this package, or if not, in [`@wordpress/components`](https://wordpress.github.io/gutenberg/?path=/docs/components-introduction--docs). Also consider using [`DataForm`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/#dataform), an even higher-level abstraction.
+2. If not, discuss with your designer whether the design can be altered to not require these primitives.
+3. If not, then these primitives are the next best option. Keep in mind that you are responsible for ensuring that your implementation is accessible, and adheres to Design System guidelines.
+
+Feel free to reach out to the `#design-system` channel on the [Make WordPress Slack](https://make.wordpress.org/chat/) for guidance.

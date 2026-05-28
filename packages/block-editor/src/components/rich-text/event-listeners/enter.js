@@ -3,6 +3,14 @@
  */
 import { ENTER } from '@wordpress/keycodes';
 import { insert, remove } from '@wordpress/rich-text';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDownDeprecated( event ) {
@@ -75,10 +83,14 @@ export default ( props ) => ( element ) => {
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	defaultView.addEventListener( 'keydown', onKeyDown );
+	const unsubscribeKeyDown = subscribeDelegatedListener(
+		defaultView,
+		'keydown',
+		onKeyDown
+	);
 	element.addEventListener( 'keydown', onKeyDownDeprecated );
 	return () => {
-		defaultView.removeEventListener( 'keydown', onKeyDown );
+		unsubscribeKeyDown();
 		element.removeEventListener( 'keydown', onKeyDownDeprecated );
 	};
 };

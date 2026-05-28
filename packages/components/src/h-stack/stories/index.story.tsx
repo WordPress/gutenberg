@@ -74,6 +74,11 @@ const meta: Meta< typeof HStack > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use `Stack` from `@wordpress/ui` instead.',
+		},
 	},
 };
 export default meta;

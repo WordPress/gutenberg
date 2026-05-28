@@ -9,10 +9,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── CONTRIBUTING.md
     │
     ├── .editorconfig
-    ├── .eslintignore
-    ├── .eslintrc
+    ├── eslint.config.cjs
+    ├── eslint.config.strict.cjs
     ├── .jshintignore
-    ├── .eslintignore
     ├── .prettierrc.js
     ├── .stylelintignore
     ├── .stylelintrc.js
@@ -60,14 +59,14 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .github/*
     │   Config of the different GitHub features (issues and PR templates, CI, owners).
     │
-    ├── bin/api-docs
+    ├── tools/api-docs
     │   Tool/script used to generate the API Docs.
     │
-    ├── bin/packages
-    │   Set of scripts used to build the WordPress packages.
+    ├── tools/build-scripts
+    │   Build orchestration scripts for the Gutenberg monorepo (@wordpress/build-scripts).
     │
-    ├── bin/plugin
-    │   Tool use to perform the Gutenberg plugin release and the npm releases as well.
+    ├── tools/release
+    │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.
     │
     ├── docs/tool
     │   Tool used to generate the Block editor handbook's markdown pages.

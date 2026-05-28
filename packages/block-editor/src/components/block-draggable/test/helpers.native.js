@@ -175,7 +175,7 @@ export const getDraggableChip = ( { getByTestId } ) => {
 	let draggableChip;
 	try {
 		draggableChip = getByTestId( 'draggable-chip' );
-	} catch ( e ) {
+	} catch {
 		// NOOP.
 	}
 	return draggableChip;

@@ -127,8 +127,8 @@ describe( 'getFormatBoundary', () => {
 			expect(
 				getFormatBoundary( record, { type: 'core/link' } )
 			).toEqual( {
-				start: null,
-				end: null,
+				start: undefined,
+				end: undefined,
 			} );
 		} );
 
@@ -168,8 +168,8 @@ describe( 'getFormatBoundary', () => {
 				expect(
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
-					start: null,
-					end: null,
+					start: undefined,
+					end: undefined,
 				} );
 			}
 		);
@@ -213,8 +213,8 @@ describe( 'getFormatBoundary', () => {
 				expect(
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
-					start: null,
-					end: null,
+					start: undefined,
+					end: undefined,
 				} );
 			}
 		);
@@ -254,7 +254,7 @@ describe( 'getFormatBoundary', () => {
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
 					start: 6,
-					end: 10,
+					end: 11,
 				} );
 			}
 		);
@@ -289,7 +289,7 @@ describe( 'getFormatBoundary', () => {
 				getFormatBoundary( record, { type: 'core/link' } )
 			).toEqual( {
 				start: 6,
-				end: 10,
+				end: 11,
 			} );
 		} );
 	} );
@@ -332,7 +332,7 @@ describe( 'getFormatBoundary', () => {
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
 					start: 6,
-					end: 10,
+					end: 11,
 				} );
 			}
 		);
@@ -381,7 +381,7 @@ describe( 'getFormatBoundary', () => {
 
 		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
 			start: 0,
-			end: 5,
+			end: 6,
 		} );
 	} );
 
@@ -417,7 +417,7 @@ describe( 'getFormatBoundary', () => {
 				getFormatBoundary( record, { type: 'core/bold' } )
 			).toEqual( {
 				start: 4,
-				end: 6,
+				end: 7,
 			} );
 		} );
 	} );
@@ -453,7 +453,7 @@ describe( 'getFormatBoundary', () => {
 			)
 		).toEqual( {
 			start: 0,
-			end: 4,
+			end: 5,
 		} );
 	} );
 } );

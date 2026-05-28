@@ -6,6 +6,7 @@
 		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
 	},
 	"references": [
+		{ "path": "../blocks" },
 		{ "path": "../data" },
 		{ "path": "../i18n" },
 		{ "path": "../style-engine" }
