@@ -25,7 +25,7 @@ import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { WidgetRender } from '../widget-render';
-import styles from './widget-chrome.module.css';
+import styles from './dashboard-widget-chrome.module.css';
 import type { DashboardWidget } from '../../types';
 import type { WidgetType } from '../../../widget-primitives';
 
@@ -129,12 +129,12 @@ function Header( { titleId, widgetType }: HeaderProps ) {
 	);
 }
 
-export interface WidgetChromeProps {
+export interface DashboardWidgetChromeProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
 	/**
 	 * Lifted by the surrounding `@wordpress/grid` surface into a sibling
-	 * slot of the grid item; not rendered by `WidgetChrome` itself.
+	 * slot of the grid item; not rendered by `DashboardWidgetChrome` itself.
 	 * Living outside `Card.Root` is what keeps these controls interactive
 	 * while edit mode applies `inert` to the chrome.
 	 */
@@ -148,73 +148,42 @@ export interface WidgetChromeProps {
  * error/loading boundaries that keep neighbours mounted when one widget fails
  * or is still resolving.
  */
-export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome( { widget, index, className }, ref ) {
-		const { widgetTypes, isResolvingWidgetTypes, editMode } =
-			useDashboardInternalContext();
-		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
-		const titleId = useId();
+export const DashboardWidgetChrome = forwardRef<
+	HTMLDivElement,
+	DashboardWidgetChromeProps
+>( function DashboardWidgetChrome( { widget, index, className }, ref ) {
+	const { widgetTypes, isResolvingWidgetTypes, editMode } =
+		useDashboardInternalContext();
+	const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
+	const titleId = useId();
 
-		const contextValue = useMemo(
-			() => ( {
-				uuid: widget.uuid,
-				name: widget.type,
-				index,
-			} ),
-			[ widget.uuid, widget.type, index ]
-		);
+	const contextValue = useMemo(
+		() => ( {
+			uuid: widget.uuid,
+			name: widget.type,
+			index,
+		} ),
+		[ widget.uuid, widget.type, index ]
+	);
 
-		if ( ! widgetType ) {
-			if ( isResolvingWidgetTypes ) {
-				return (
-					<WidgetContextProvider value={ contextValue }>
-						<Card.Root
-							render={ <section /> }
-							ref={ ref }
-							className={ clsx( styles.widgetChrome, className ) }
-							aria-busy="true"
-							aria-label={ __( 'Loading' ) }
-						>
-							<Card.Content
-								className={ styles.widgetChromeContent }
-							>
-								<LoadingOverlay />
-							</Card.Content>
-						</Card.Root>
-					</WidgetContextProvider>
-				);
-			}
-
+	if ( ! widgetType ) {
+		if ( isResolvingWidgetTypes ) {
 			return (
 				<WidgetContextProvider value={ contextValue }>
 					<Card.Root
 						render={ <section /> }
 						ref={ ref }
 						className={ clsx( styles.widgetChrome, className ) }
-						aria-label={ __( 'Missing widget' ) }
+						aria-busy="true"
+						aria-label={ __( 'Loading' ) }
 					>
-						<UnavailableWidget widgetTypeName={ widget.type } />
+						<Card.Content className={ styles.widgetChromeContent }>
+							<LoadingOverlay />
+						</Card.Content>
 					</Card.Root>
 				</WidgetContextProvider>
 			);
 		}
-
-		// `presentation` encodes two independent axes. `full-bleed` hides
-		// the header; both `full-bleed` and `content-bleed` let the body
-		// break out of the content padding.
-		const { presentation } = widgetType;
-		const isHeaderHidden = presentation === 'full-bleed';
-		const isBodyBleeding =
-			presentation === 'full-bleed' || presentation === 'content-bleed';
-		const header = <Header titleId={ titleId } widgetType={ widgetType } />;
-
-		const body = (
-			<WidgetErrorBoundary>
-				<Suspense fallback={ <LoadingOverlay /> }>
-					<WidgetRender widget={ widget } widgetType={ widgetType } />
-				</Suspense>
-			</WidgetErrorBoundary>
-		);
 
 		return (
 			<WidgetContextProvider value={ contextValue }>
@@ -222,33 +191,63 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					render={ <section /> }
 					ref={ ref }
 					className={ clsx( styles.widgetChrome, className ) }
-					aria-labelledby={ widgetType.title ? titleId : undefined }
-					inert={ editMode || undefined }
+					aria-label={ __( 'Missing widget' ) }
 				>
-					{ isHeaderHidden ? (
-						<VisuallyHidden>{ header }</VisuallyHidden>
-					) : (
-						header
-					) }
-
-					<Card.Content
-						className={ clsx(
-							styles.widgetChromeContent,
-							isBodyBleeding && styles.widgetChromeContentBleed
-						) }
-					>
-						{ isBodyBleeding ? (
-							<Card.FullBleed
-								className={ styles.widgetChromeBleedScroll }
-							>
-								{ body }
-							</Card.FullBleed>
-						) : (
-							body
-						) }
-					</Card.Content>
+					<UnavailableWidget widgetTypeName={ widget.type } />
 				</Card.Root>
 			</WidgetContextProvider>
 		);
 	}
-);
+
+	// `presentation` encodes two independent axes. `full-bleed` hides
+	// the header; both `full-bleed` and `content-bleed` let the body
+	// break out of the content padding.
+	const { presentation } = widgetType;
+	const isHeaderHidden = presentation === 'full-bleed';
+	const isBodyBleeding =
+		presentation === 'full-bleed' || presentation === 'content-bleed';
+	const header = <Header titleId={ titleId } widgetType={ widgetType } />;
+
+	const body = (
+		<WidgetErrorBoundary>
+			<Suspense fallback={ <LoadingOverlay /> }>
+				<WidgetRender widget={ widget } widgetType={ widgetType } />
+			</Suspense>
+		</WidgetErrorBoundary>
+	);
+
+	return (
+		<WidgetContextProvider value={ contextValue }>
+			<Card.Root
+				render={ <section /> }
+				ref={ ref }
+				className={ clsx( styles.widgetChrome, className ) }
+				aria-labelledby={ widgetType.title ? titleId : undefined }
+				inert={ editMode || undefined }
+			>
+				{ isHeaderHidden ? (
+					<VisuallyHidden>{ header }</VisuallyHidden>
+				) : (
+					header
+				) }
+
+				<Card.Content
+					className={ clsx(
+						styles.widgetChromeContent,
+						isBodyBleeding && styles.widgetChromeContentBleed
+					) }
+				>
+					{ isBodyBleeding ? (
+						<Card.FullBleed
+							className={ styles.widgetChromeBleedScroll }
+						>
+							{ body }
+						</Card.FullBleed>
+					) : (
+						body
+					) }
+				</Card.Content>
+			</Card.Root>
+		</WidgetContextProvider>
+	);
+} );
