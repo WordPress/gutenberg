@@ -313,6 +313,72 @@ describe( 'selectors', () => {
 
 			expect( hasEditorUndo( state ) ).toBe( false );
 		} );
+
+		it( 'uses session-owned history when Distributed Editing is enabled', () => {
+			const state = {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				postId: 42,
+				postType: 'post',
+				currentPost: {
+					id: 42,
+					type: 'post',
+					content:
+						'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+				},
+				editor: {
+					past: [],
+				},
+				distributedEditingSession: {
+					historyUndoStack: [
+						{
+							beforeContent:
+								'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+							afterContent:
+								'<!-- wp:paragraph --><p>Restored.</p><!-- /wp:paragraph -->',
+						},
+					],
+				},
+			};
+
+			expect( hasEditorUndo( state ) ).toBe( true );
+		} );
+
+		it( 'treats unsaved session edits as revertable in Distributed Editing', () => {
+			const state = {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				postId: 42,
+				postType: 'post',
+				currentPost: {
+					id: 42,
+					type: 'post',
+					content:
+						'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+				},
+				editor: {
+					past: [],
+					present: {
+						edits: {
+							content:
+								'<!-- wp:paragraph --><p>Local.</p><!-- /wp:paragraph -->',
+						},
+					},
+				},
+				distributedEditingSession: {
+					clientBaseContent:
+						'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+				},
+			};
+
+			expect( hasEditorUndo( state ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'hasEditorRedo', () => {
@@ -330,6 +396,49 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					future: [],
+				},
+			};
+
+			expect( hasEditorRedo( state ) ).toBe( false );
+		} );
+
+		it( 'uses session-owned redo history when Distributed Editing is enabled', () => {
+			const state = {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				editor: {
+					future: [],
+				},
+				distributedEditingSession: {
+					historyRedoStack: [
+						{
+							beforeContent:
+								'<!-- wp:paragraph --><p>Base.</p><!-- /wp:paragraph -->',
+							afterContent:
+								'<!-- wp:paragraph --><p>Restored.</p><!-- /wp:paragraph -->',
+						},
+					],
+				},
+			};
+
+			expect( hasEditorRedo( state ) ).toBe( true );
+		} );
+
+		it( 'ignores core-data redo history while Distributed Editing is enabled', () => {
+			const state = {
+				editorSettings: {
+					distributedEditing: {
+						enabled: true,
+					},
+				},
+				editor: {
+					future: [ {} ],
+				},
+				distributedEditingSession: {
+					historyRedoStack: [],
 				},
 			};
 

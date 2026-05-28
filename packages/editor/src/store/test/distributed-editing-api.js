@@ -10,6 +10,8 @@ import {
 	__experimentalRequestDistributedEditingRecoveryDryRun,
 	__experimentalRequestDistributedEditingFreshReviewDecision,
 	__experimentalRequestDistributedEditingFreshReviewRetrySaveHandoffValidation,
+	__experimentalRequestDistributedEditingHistory,
+	__experimentalRequestDistributedEditingHistoryPlan,
 	__experimentalRequestDistributedEditingPresenceHeartbeat,
 	__experimentalRequestDistributedEditingPresenceSnapshot,
 	__experimentalRequestDistributedEditingPresenceStorageReadiness,
@@ -20,6 +22,8 @@ import {
 	__experimentalRequestDistributedEditingStaleBaseRejection,
 	getDistributedEditingFreshReviewConsumeEndpointPath,
 	getDistributedEditingFreshReviewDecisionEndpointPath,
+	getDistributedEditingHistoryEndpointPath,
+	getDistributedEditingHistoryPlanEndpointPath,
 	getDistributedEditingPresenceHeartbeatEndpointPath,
 	getDistributedEditingPresenceEndpointPath,
 	getDistributedEditingPresenceStorageReadinessEndpointPath,
@@ -75,6 +79,21 @@ describe( 'distributed editing REST helpers', () => {
 		).toBe( '/wp/v2/pages/42/distributed-editing/retry-save' );
 	} );
 
+	it( 'builds the current document-history endpoint paths', () => {
+		expect(
+			getDistributedEditingHistoryEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/history' );
+		expect(
+			getDistributedEditingHistoryPlanEndpointPath( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).toBe( '/wp/v2/pages/42/distributed-editing/history/plan' );
+	} );
+
 	it( 'builds the current retry-save review approval endpoint path', () => {
 		expect(
 			getDistributedEditingRetrySaveReviewApprovalEndpointPath( {
@@ -108,7 +127,7 @@ describe( 'distributed editing REST helpers', () => {
 				postId: 42,
 				restBase: 'pages',
 			} )
-		).toBe( '/wp/v2/pages/42' );
+		).toBe( '/wp/v2/pages/42/distributed-editing' );
 	} );
 
 	it( 'builds the current presence snapshot endpoint path', () => {
@@ -303,6 +322,68 @@ describe( 'distributed editing REST helpers', () => {
 		);
 	} );
 
+	it( 'sends content-free document state with a presence heartbeat', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/presence\/heartbeat/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				session_key: 'turn-0173-session',
+				confirmed_base_version: '12',
+				confirmed_state_hash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				has_pending_changes: true,
+				confirmed_at_gmt: '2026-05-20T12:00:00.000Z',
+			} );
+			expect( options.data ).not.toHaveProperty(
+				'proposed_post_content'
+			);
+			expect( options.data ).not.toHaveProperty( 'cursor_offset' );
+			expect( options.data ).not.toHaveProperty( 'selection' );
+
+			return {
+				result: 'presence_heartbeat_recorded',
+				rest_route: 'post_presence_heartbeat',
+				document_state_recorded: true,
+				document_state: {
+					available: true,
+					confirmedBaseVersion: '12',
+					confirmedStateHash:
+						'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+					hasPendingChanges: true,
+					confirmedAtGmt: '2026-05-20 12:00:00',
+					authoritativeForSave: false,
+					claimsSaved: false,
+					exposesRawContent: false,
+				},
+				calls_save: false,
+				mutates_post_content: false,
+				changes_post_lock: false,
+				claims_saved: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingPresenceHeartbeat( {
+				postId: 42,
+				restBase: 'pages',
+				sessionKey: 'turn-0173-session',
+				confirmedBaseVersion: '12',
+				confirmedStateHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				hasPendingChanges: true,
+				confirmedAtGmt: '2026-05-20T12:00:00.000Z',
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'presence_heartbeat_recorded',
+				document_state_recorded: true,
+				calls_save: false,
+			} )
+		);
+	} );
+
 	it( 're-checks presence storage readiness without write data or polling', async () => {
 		apiFetch.setFetchHandler( async ( options ) => {
 			expect( options.path ).toMatch(
@@ -428,6 +509,92 @@ describe( 'distributed editing REST helpers', () => {
 			mutates_post_content: false,
 			claims_saved: false,
 		} );
+	} );
+
+	it( 'requests document history without write data', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			const url = new URL( options.path, 'https://example.test' );
+
+			expect( url.pathname ).toBe(
+				'/wp/v2/pages/42/distributed-editing/history'
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.data ).toBeUndefined();
+
+			return {
+				result: 'history_loaded',
+				history_items: [
+					{
+						revision_id: 0,
+						is_current: true,
+					},
+				],
+				saves_post: false,
+				mutates_post_content: false,
+				claims_saved: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingHistory( {
+				postId: 42,
+				restBase: 'pages',
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'history_loaded',
+				saves_post: false,
+				mutates_post_content: false,
+				claims_saved: false,
+			} )
+		);
+	} );
+
+	it( 'requests a document-history action plan without claiming a save', async () => {
+		const selectedContentHash =
+			'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			const url = new URL( options.path, 'https://example.test' );
+
+			expect( url.pathname ).toBe(
+				'/wp/v2/posts/42/distributed-editing/history/plan'
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				history_action: 'restore',
+				revision_id: 123,
+				selected_content_hash: selectedContentHash,
+			} );
+			expect( options.data.proposed_post_content ).toBeUndefined();
+
+			return {
+				result: 'history_restore_planned',
+				candidate_post_content:
+					'<!-- wp:paragraph --><p>Restore this.</p><!-- /wp:paragraph -->',
+				requires_save: true,
+				saves_post: false,
+				mutates_post_content: false,
+				claims_saved: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingHistoryPlan( {
+				postId: 42,
+				historyAction: 'restore',
+				revisionId: 123,
+				selectedContentHash,
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'history_restore_planned',
+				requires_save: true,
+				saves_post: false,
+				mutates_post_content: false,
+				claims_saved: false,
+			} )
+		);
 	} );
 
 	it( 'requests retry-save with proposed content and accepted proof evidence', async () => {
@@ -617,17 +784,14 @@ describe( 'distributed editing REST helpers', () => {
 								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 						},
 						{
-							inserted_block_nonce:
-								'inserted-1-bbbbbbbbbbbbbbbb',
+							inserted_block_nonce: 'inserted-1-bbbbbbbbbbbbbbbb',
 							block_name: 'core/paragraph',
 							ordinal_path: [ 1 ],
 							serialized_hash: insertedHash,
 						},
 					],
 					retained_block_uids: [ 'block-a' ],
-					inserted_block_nonces: [
-						'inserted-1-bbbbbbbbbbbbbbbb',
-					],
+					inserted_block_nonces: [ 'inserted-1-bbbbbbbbbbbbbbbb' ],
 					deleted_block_uids: [],
 					moved_block_uids: [],
 				},
@@ -642,9 +806,7 @@ describe( 'distributed editing REST helpers', () => {
 				options.data.block_identity_request_proof.client_id
 			).toBeUndefined();
 			expect(
-				JSON.stringify(
-					options.data.block_identity_request_proof
-				)
+				JSON.stringify( options.data.block_identity_request_proof )
 			).not.toMatch(
 				/postContent|rawContent|raw_content|blockContent|block_content|clientId|client_id/
 			);
@@ -676,17 +838,14 @@ describe( 'distributed editing REST helpers', () => {
 								'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 						},
 						{
-							insertedBlockNonce:
-								'inserted-1-bbbbbbbbbbbbbbbb',
+							insertedBlockNonce: 'inserted-1-bbbbbbbbbbbbbbbb',
 							blockName: 'core/paragraph',
 							ordinalPath: [ 1 ],
 							serializedHash: insertedHash,
 						},
 					],
 					retainedBlockUids: [ 'block-a' ],
-					insertedBlockNonces: [
-						'inserted-1-bbbbbbbbbbbbbbbb',
-					],
+					insertedBlockNonces: [ 'inserted-1-bbbbbbbbbbbbbbbb' ],
 					deletedBlockUids: [],
 					movedBlockUids: [],
 				},
@@ -694,6 +853,98 @@ describe( 'distributed editing REST helpers', () => {
 		).resolves.toEqual( {
 			result: 'retry_save_applied',
 			retry_save_accepted: true,
+		} );
+	} );
+
+	it( 'requests retry-save with native Yjs update evidence', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Yjs edited content.</p><!-- /wp:paragraph -->';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toMatchObject( {
+				client_base_version: '12',
+				accepted_proof_server_version: '12',
+				proposed_post_content: proposedPostContent,
+				yjs_client_update: {
+					format: 'native-yjs-php-update-v0',
+					operations: [
+						{
+							type: 'delete',
+							index: 28,
+							length: 4,
+							actor: 'editor-42',
+							sequence: 0,
+							id: 'editor-42:0',
+						},
+						{
+							type: 'insert',
+							index: 28,
+							text: 'edited',
+							actor: 'editor-42',
+							sequence: 1,
+							id: 'editor-42:1',
+						},
+					],
+					stateVector: {
+						'editor-42': 2,
+					},
+				},
+			} );
+			expect(
+				options.data.yjs_client_update.post_content
+			).toBeUndefined();
+			expect(
+				options.data.yjs_client_update.postContent
+			).toBeUndefined();
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+				yjs_update_applied: true,
+				yjs_encoding: 'native-yjs-php-update-v0',
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '12',
+				acceptedProofServerVersion: '12',
+				proposedPostContent,
+				yjsClientUpdate: {
+					format: 'native-yjs-php-update-v0',
+					operations: [
+						{
+							type: 'delete',
+							index: 28,
+							length: 4,
+							actor: 'editor-42',
+							sequence: 0,
+							id: 'editor-42:0',
+						},
+						{
+							type: 'insert',
+							index: 28,
+							text: 'edited',
+							actor: 'editor-42',
+							sequence: 1,
+							id: 'editor-42:1',
+						},
+					],
+					stateVector: {
+						'editor-42': 2,
+					},
+				},
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+			yjs_update_applied: true,
+			yjs_encoding: 'native-yjs-php-update-v0',
 		} );
 	} );
 
@@ -705,9 +956,7 @@ describe( 'distributed editing REST helpers', () => {
 			expect( options.path ).toMatch(
 				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
 			);
-			expect(
-				options.data.block_identity_request_proof
-			).toBeUndefined();
+			expect( options.data.block_identity_request_proof ).toBeUndefined();
 
 			return {
 				result: 'retry_save_applied',
@@ -1265,14 +1514,21 @@ describe( 'distributed editing REST helpers', () => {
 	it( 'requests server state for stale-base refetch without write data', async () => {
 		apiFetch.setFetchHandler( async ( options ) => {
 			expect( options.path ).toMatch(
-				/^\/wp\/v2\/posts\/42\?context=edit/
+				/^\/wp\/v2\/posts\/42\/distributed-editing\?_envelope=1(?:&_locale=user)?$/
 			);
 			expect( options.method ).toBe( 'GET' );
 			expect( options.data ).toBeUndefined();
+			expect( options.parse ).toBe( false );
 
 			return {
-				id: 42,
-				modified_gmt: '2026-05-13T12:00:00',
+				status: 200,
+				headers: {
+					ETag: '"snapshot-hash"',
+				},
+				body: {
+					id: 42,
+					modified_gmt: '2026-05-13T12:00:00',
+				},
 			};
 		} );
 
@@ -1283,6 +1539,108 @@ describe( 'distributed editing REST helpers', () => {
 		).resolves.toEqual( {
 			id: 42,
 			modified_gmt: '2026-05-13T12:00:00',
+			state_hash: 'snapshot-hash',
+		} );
+	} );
+
+	it( 'requests server state conditionally with the last post state hash', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\?_envelope=1(?:&_locale=user)?$/
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.headers ).toEqual( {
+				'If-None-Match': '"abc123"',
+			} );
+			expect( options.parse ).toBe( false );
+
+			return {
+				status: 304,
+				headers: {
+					ETag: '"abc123"',
+				},
+				body: null,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingServerStateRefetch( {
+				postId: 42,
+				stateHash: 'abc123',
+			} )
+		).resolves.toEqual( {
+			result: 'distributed_editing_post_not_modified',
+			not_modified: true,
+			state_hash: 'abc123',
+		} );
+	} );
+
+	it( 'normalizes an apiFetch-rejected not-modified server state response', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\?_envelope=1(?:&_locale=user)?$/
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.headers ).toEqual( {
+				'If-None-Match': '"abc123"',
+			} );
+			expect( options.parse ).toBe( false );
+
+			throw {
+				status: 304,
+				headers: {
+					get: ( headerName ) =>
+						headerName === 'ETag' ? '"abc123"' : null,
+				},
+				json: async () => {
+					throw new Error( '304 responses should not be parsed.' );
+				},
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingServerStateRefetch( {
+				postId: 42,
+				stateHash: 'abc123',
+			} )
+		).resolves.toEqual( {
+			result: 'distributed_editing_post_not_modified',
+			not_modified: true,
+			state_hash: 'abc123',
+		} );
+	} );
+
+	it( 'rejects an enveloped server-state error body', async () => {
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\?_envelope=1(?:&_locale=user)?$/
+			);
+			expect( options.method ).toBe( 'GET' );
+			expect( options.parse ).toBe( false );
+
+			return {
+				status: 409,
+				headers: {},
+				body: {
+					code: 'de_rtc_rebase_failed',
+					message: 'The server copy needs review.',
+					data: {
+						status: 409,
+					},
+				},
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingServerStateRefetch( {
+				postId: 42,
+			} )
+		).rejects.toEqual( {
+			code: 'de_rtc_rebase_failed',
+			message: 'The server copy needs review.',
+			data: {
+				status: 409,
+			},
 		} );
 	} );
 } );

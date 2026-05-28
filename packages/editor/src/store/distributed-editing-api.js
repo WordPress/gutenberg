@@ -98,6 +98,48 @@ export function getDistributedEditingRetrySaveEndpointPath( {
 }
 
 /**
+ * Returns the current DE-RTC document-history endpoint path for a post.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingHistoryEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'history',
+		errorSubject: 'history',
+	} );
+}
+
+/**
+ * Returns the current DE-RTC document-history planning endpoint path.
+ *
+ * @param {Object} args                    Endpoint args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {string} REST path.
+ */
+export function getDistributedEditingHistoryPlanEndpointPath( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return getDistributedEditingEndpointPath( {
+		postId,
+		restBase,
+		operation: 'history/plan',
+		errorSubject: 'history planning',
+	} );
+}
+
+/**
  * Returns the current DE-RTC retry-save reviewer approval proof endpoint path
  * for a post.
  *
@@ -247,7 +289,7 @@ export function getDistributedEditingPresenceStorageReadinessEndpointPath( {
 }
 
 /**
- * Returns the current edited post endpoint path for DE-RTC server-state reads.
+ * Returns the current DE-RTC post snapshot endpoint path for a post.
  *
  * @param {Object} args                    Endpoint args.
  * @param {number} args.postId             Post ID.
@@ -263,7 +305,7 @@ export function getDistributedEditingServerStateEndpointPath( {
 
 	assertDistributedEditingRestBase( restBase, 'server-state' );
 
-	return `/wp/v2/${ restBase }/${ parsedPostId }`;
+	return `/wp/v2/${ restBase }/${ parsedPostId }/distributed-editing`;
 }
 
 function getDistributedEditingEndpointPath( {
@@ -370,13 +412,18 @@ export function __experimentalRequestDistributedEditingPresenceSnapshot( {
 /**
  * Sends a one-shot Distributed Editing presence heartbeat.
  *
- * This helper posts only an opaque tab/session key. It does not include raw
- * content, cursor data, selection data, save data, or post-lock data.
+ * This helper posts only an opaque tab/session key plus content-free reported
+ * document state. It does not include raw content, cursor data, selection data,
+ * save data, or post-lock data.
  *
  * @param {Object} args                    Request args.
  * @param {number} args.postId             Post ID.
  * @param {string} [args.restBase='posts'] REST base for the edited post type.
  * @param {string} args.sessionKey         Opaque local session key.
+ * @param {string} [args.confirmedBaseVersion] Last accepted sync version.
+ * @param {string} [args.confirmedStateHash]   Last accepted opaque state hash.
+ * @param {boolean} [args.hasPendingChanges]   Whether this tab has unsaved changes.
+ * @param {string} [args.confirmedAtGmt]       When this tab observed the accepted copy.
  *
  * @return {Promise<Object>} REST response.
  */
@@ -384,11 +431,40 @@ export function __experimentalRequestDistributedEditingPresenceHeartbeat( {
 	postId,
 	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
 	sessionKey,
+	confirmedBaseVersion,
+	confirmedStateHash,
+	hasPendingChanges,
+	confirmedAtGmt,
 } = {} ) {
 	if ( typeof sessionKey !== 'string' || sessionKey.trim() === '' ) {
 		throw new TypeError(
 			'Distributed Editing presence heartbeat requests require an opaque session key.'
 		);
+	}
+
+	const data = {
+		session_key: sessionKey,
+	};
+	const trimmedConfirmedBaseVersion =
+		typeof confirmedBaseVersion === 'string'
+			? confirmedBaseVersion.trim()
+			: '';
+	const trimmedConfirmedStateHash =
+		typeof confirmedStateHash === 'string' ? confirmedStateHash.trim() : '';
+	const trimmedConfirmedAtGmt =
+		typeof confirmedAtGmt === 'string' ? confirmedAtGmt.trim() : '';
+
+	if ( trimmedConfirmedBaseVersion ) {
+		data.confirmed_base_version = trimmedConfirmedBaseVersion;
+		data.has_pending_changes = Boolean( hasPendingChanges );
+
+		if ( trimmedConfirmedStateHash ) {
+			data.confirmed_state_hash = trimmedConfirmedStateHash;
+		}
+
+		if ( trimmedConfirmedAtGmt ) {
+			data.confirmed_at_gmt = trimmedConfirmedAtGmt;
+		}
 	}
 
 	return apiFetch( {
@@ -397,9 +473,7 @@ export function __experimentalRequestDistributedEditingPresenceHeartbeat( {
 			restBase,
 		} ),
 		method: 'POST',
-		data: {
-			session_key: sessionKey,
-		},
+		data,
 	} );
 }
 
@@ -525,6 +599,69 @@ export function __experimentalRequestDistributedEditingRetrySubmitProbe( {
 }
 
 /**
+ * Requests the no-write Distributed Editing document history.
+ *
+ * @param {Object} args                    Request args.
+ * @param {number} args.postId             Post ID.
+ * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ *
+ * @return {Promise<Object>} REST response.
+ */
+export function __experimentalRequestDistributedEditingHistory( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+} = {} ) {
+	return apiFetch( {
+		path: getDistributedEditingHistoryEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'GET',
+	} );
+}
+
+/**
+ * Requests a no-write document-history action plan.
+ *
+ * The returned content is staged locally by the editor. Persistence still flows
+ * through the normal Save button and guarded DE-RTC save path.
+ *
+ * @param {Object} args                       Request args.
+ * @param {number} args.postId                Post ID.
+ * @param {string} [args.restBase='posts']    REST base for the edited post type.
+ * @param {string} args.historyAction         Either "revert" or "restore".
+ * @param {number} args.revisionId            Revision ID, or 0 for the current post.
+ * @param {string} [args.selectedContentHash] Hash of the selected stripped content.
+ *
+ * @return {Promise<Object>} REST response.
+ */
+export function __experimentalRequestDistributedEditingHistoryPlan( {
+	postId,
+	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	historyAction,
+	revisionId,
+	selectedContentHash,
+} = {} ) {
+	const data = {
+		history_action: historyAction,
+		revision_id: revisionId,
+	};
+
+	if ( selectedContentHash ) {
+		data.selected_content_hash = selectedContentHash;
+	}
+
+	return apiFetch( {
+		path: getDistributedEditingHistoryPlanEndpointPath( {
+			postId,
+			restBase,
+		} ),
+		method: 'POST',
+		data,
+	} );
+}
+
+/**
  * Requests the retry-save write contract for accepted retry-submit proof.
  *
  * This low-level helper is intentionally not wired to savePost. The server owns
@@ -548,6 +685,7 @@ export function __experimentalRequestDistributedEditingRetrySubmitProbe( {
  * @param {Object}  [args.acceptedReviewApprovalProof]           Hash-only review approval proof.
  * @param {Object}  [args.acceptedFreshReviewConsumeValidation]  Hash-only fresh-review consume validation evidence.
  * @param {Object}  [args.blockIdentityRequestProof]             Content-free block identity request proof.
+ * @param {Object}  [args.yjsClientUpdate]                       Native PHP Yjs update evidence.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -567,6 +705,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 	acceptedReviewApprovalProof,
 	acceptedFreshReviewConsumeValidation,
 	blockIdentityRequestProof,
+	yjsClientUpdate,
 } = {} ) {
 	const data = {
 		client_base_version: clientBaseVersion,
@@ -612,8 +751,14 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		);
 
 	if ( normalizedBlockIdentityRequestProof ) {
-		data.block_identity_request_proof =
-			normalizedBlockIdentityRequestProof;
+		data.block_identity_request_proof = normalizedBlockIdentityRequestProof;
+	}
+
+	const normalizedYjsClientUpdate =
+		normalizeYjsClientUpdateForRetrySaveRequest( yjsClientUpdate );
+
+	if ( normalizedYjsClientUpdate ) {
+		data.yjs_client_update = normalizedYjsClientUpdate;
 	}
 
 	return apiFetch( {
@@ -624,6 +769,122 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		method: 'POST',
 		data,
 	} );
+}
+
+function normalizeYjsClientUpdateForRetrySaveRequest( update ) {
+	if (
+		! update ||
+		typeof update !== 'object' ||
+		Array.isArray( update ) ||
+		containsRawContentEvidence( update )
+	) {
+		return null;
+	}
+
+	if ( update.format && update.format !== 'native-yjs-php-update-v0' ) {
+		return null;
+	}
+
+	const operations = Array.isArray( update.operations )
+		? update.operations
+				.map( normalizeYjsClientUpdateOperation )
+				.filter( Boolean )
+		: null;
+
+	if ( ! operations ) {
+		return null;
+	}
+
+	const normalized = {
+		format: 'native-yjs-php-update-v0',
+		operations,
+		stateVector:
+			update.stateVector &&
+			typeof update.stateVector === 'object' &&
+			! Array.isArray( update.stateVector )
+				? update.stateVector
+				: {},
+	};
+
+	if (
+		update.interop &&
+		typeof update.interop === 'object' &&
+		! Array.isArray( update.interop )
+	) {
+		normalized.interop = update.interop;
+	}
+
+	return normalized;
+}
+
+function normalizeYjsClientUpdateOperation( operation ) {
+	if (
+		! operation ||
+		typeof operation !== 'object' ||
+		Array.isArray( operation ) ||
+		containsRawContentEvidence( operation )
+	) {
+		return null;
+	}
+
+	if ( operation.type === 'delete' ) {
+		const index = normalizeProofNonNegativeInteger( operation.index );
+		const length = normalizeProofNonNegativeInteger( operation.length );
+
+		if ( index === undefined || length === undefined || length < 1 ) {
+			return null;
+		}
+
+		return {
+			type: 'delete',
+			index,
+			length,
+			...( normalizeProofString( operation.actor )
+				? { actor: normalizeProofString( operation.actor ) }
+				: {} ),
+			...( normalizeProofNonNegativeInteger( operation.sequence ) !==
+			undefined
+				? {
+						sequence: normalizeProofNonNegativeInteger(
+							operation.sequence
+						),
+				  }
+				: {} ),
+			...( normalizeProofString( operation.id )
+				? { id: normalizeProofString( operation.id ) }
+				: {} ),
+		};
+	}
+
+	if ( operation.type === 'insert' ) {
+		const index = normalizeProofNonNegativeInteger( operation.index );
+
+		if ( index === undefined || typeof operation.text !== 'string' ) {
+			return null;
+		}
+
+		return {
+			type: 'insert',
+			index,
+			text: operation.text,
+			...( normalizeProofString( operation.actor )
+				? { actor: normalizeProofString( operation.actor ) }
+				: {} ),
+			...( normalizeProofNonNegativeInteger( operation.sequence ) !==
+			undefined
+				? {
+						sequence: normalizeProofNonNegativeInteger(
+							operation.sequence
+						),
+				  }
+				: {} ),
+			...( normalizeProofString( operation.id )
+				? { id: normalizeProofString( operation.id ) }
+				: {} ),
+		};
+	}
+
+	return null;
 }
 
 function normalizeBlockIdentityRequestProofForRetrySaveRequest( proof ) {
@@ -649,8 +910,7 @@ function normalizeBlockIdentityRequestProofForRetrySaveRequest( proof ) {
 			proof.clientBaseVersion ?? proof.client_base_version
 		),
 		proposed_post_content_hash: normalizeProofString(
-			proof.proposedPostContentHash ??
-				proof.proposed_post_content_hash
+			proof.proposedPostContentHash ?? proof.proposed_post_content_hash
 		),
 		proposed_block_map: proposedBlockMap,
 		retained_block_uids: normalizeProofStringList(
@@ -703,9 +963,7 @@ function normalizeBlockIdentityRequestProofBlock( block ) {
 		...( insertedBlockNonce
 			? { inserted_block_nonce: insertedBlockNonce }
 			: {} ),
-		block_name: normalizeProofString(
-			block.blockName ?? block.block_name
-		),
+		block_name: normalizeProofString( block.blockName ?? block.block_name ),
 		ordinal_path: normalizeProofNonNegativeIntegerList(
 			block.ordinalPath ?? block.ordinal_path
 		),
@@ -1758,7 +2016,7 @@ function getNormalizedBlockItemStringField(
 }
 
 /**
- * Refetches the current server post state for a stale-base session.
+ * Refetches the current DE-RTC post snapshot for a stale-base session.
  *
  * This helper reads the post only. It does not save, apply the response to the
  * editor entity, rebase local edits, retry a submit, or change post locks.
@@ -1766,18 +2024,200 @@ function getNormalizedBlockItemStringField(
  * @param {Object} args                    Request args.
  * @param {number} args.postId             Post ID.
  * @param {string} [args.restBase='posts'] REST base for the edited post type.
+ * @param {string} [args.stateHash]        Opaque snapshot validator from the last server response.
  *
  * @return {Promise<Object>} REST response.
  */
-export function __experimentalRequestDistributedEditingServerStateRefetch( {
+export async function __experimentalRequestDistributedEditingServerStateRefetch( {
 	postId,
 	restBase = DISTRIBUTED_EDITING_RECOVERY_REST_BASE,
+	stateHash,
 } = {} ) {
-	return apiFetch( {
-		path: `${ getDistributedEditingServerStateEndpointPath( {
-			postId,
-			restBase,
-		} ) }?context=edit`,
-		method: 'GET',
-	} );
+	const headers = {};
+	const normalizedStateHash =
+		typeof stateHash === 'string' ? stateHash.trim() : '';
+
+	if ( normalizedStateHash ) {
+		headers[ 'If-None-Match' ] = `"${ normalizedStateHash }"`;
+	}
+
+	let response;
+
+	try {
+		response = await apiFetch( {
+			path: `${ getDistributedEditingServerStateEndpointPath( {
+				postId,
+				restBase,
+			} ) }?_envelope=1`,
+			method: 'GET',
+			headers,
+			parse: false,
+		} );
+	} catch ( error ) {
+		if ( error?.status === 304 && typeof error?.json === 'function' ) {
+			response = error;
+		} else {
+			throw error;
+		}
+	}
+
+	return normalizeDistributedEditingPostSnapshotResponse(
+		response,
+		normalizedStateHash
+	);
+}
+
+async function normalizeDistributedEditingPostSnapshotResponse(
+	response,
+	requestedStateHash
+) {
+	if ( isDistributedEditingRestEnvelope( response ) ) {
+		return normalizeDistributedEditingPostSnapshotEnvelope(
+			response,
+			requestedStateHash
+		);
+	}
+
+	if (
+		! response ||
+		typeof response.status !== 'number' ||
+		typeof response.json !== 'function'
+	) {
+		return response;
+	}
+
+	const responseStateHash =
+		getDistributedEditingStateHashFromResponseHeaders( response ) ||
+		requestedStateHash;
+
+	if ( response.status === 304 ) {
+		return {
+			result: 'distributed_editing_post_not_modified',
+			not_modified: true,
+			state_hash: responseStateHash,
+		};
+	}
+
+	const data = await response.json();
+
+	if ( isDistributedEditingRestEnvelope( data ) ) {
+		return normalizeDistributedEditingPostSnapshotEnvelope(
+			data,
+			requestedStateHash,
+			responseStateHash
+		);
+	}
+
+	if ( data && typeof data === 'object' && ! Array.isArray( data ) ) {
+		return {
+			...data,
+			state_hash: data.state_hash || responseStateHash,
+		};
+	}
+
+	return data;
+}
+
+function normalizeDistributedEditingPostSnapshotEnvelope(
+	envelope,
+	requestedStateHash,
+	responseStateHash = ''
+) {
+	const envelopeBody = envelope.body;
+	const envelopeStateHash =
+		getDistributedEditingStateHashFromHeaderMap( envelope.headers ) ||
+		getDistributedEditingStateHashFromSnapshotData( envelopeBody ) ||
+		responseStateHash ||
+		requestedStateHash;
+
+	if ( envelope.status === 304 ) {
+		return {
+			result: 'distributed_editing_post_not_modified',
+			not_modified: true,
+			state_hash: envelopeStateHash,
+		};
+	}
+
+	if ( envelope.status < 200 || envelope.status >= 300 ) {
+		if (
+			envelopeBody &&
+			typeof envelopeBody === 'object' &&
+			! Array.isArray( envelopeBody )
+		) {
+			throw envelopeBody;
+		}
+
+		throw {
+			code: 'distributed_editing_enveloped_response_error',
+			message: 'Distributed Editing server-state request failed.',
+			data: {
+				status: envelope.status,
+			},
+		};
+	}
+
+	if (
+		envelopeBody &&
+		typeof envelopeBody === 'object' &&
+		! Array.isArray( envelopeBody )
+	) {
+		return {
+			...envelopeBody,
+			state_hash:
+				getDistributedEditingStateHashFromSnapshotData(
+					envelopeBody
+				) || envelopeStateHash,
+		};
+	}
+
+	return envelopeBody;
+}
+
+function isDistributedEditingRestEnvelope( value ) {
+	return Boolean(
+		value &&
+			typeof value === 'object' &&
+			! Array.isArray( value ) &&
+			typeof value.status === 'number' &&
+			Object.prototype.hasOwnProperty.call( value, 'body' ) &&
+			Object.prototype.hasOwnProperty.call( value, 'headers' )
+	);
+}
+
+function getDistributedEditingStateHashFromResponseHeaders( response ) {
+	const rawHeader = response?.headers?.get?.( 'ETag' );
+
+	return normalizeDistributedEditingStateHashHeader( rawHeader );
+}
+
+function getDistributedEditingStateHashFromHeaderMap( headers ) {
+	if ( ! headers || typeof headers !== 'object' ) {
+		return '';
+	}
+
+	const rawHeader = headers.ETag || headers.Etag || headers.etag;
+
+	return normalizeDistributedEditingStateHashHeader( rawHeader );
+}
+
+function normalizeDistributedEditingStateHashHeader( rawHeader ) {
+	if ( typeof rawHeader !== 'string' ) {
+		return '';
+	}
+
+	return rawHeader.replace( /^W\//i, '' ).trim().replace( /^"|"$/g, '' );
+}
+
+function getDistributedEditingStateHashFromSnapshotData( data ) {
+	if ( ! data || typeof data !== 'object' || Array.isArray( data ) ) {
+		return '';
+	}
+
+	return (
+		data.state_hash ||
+		data.data?.state_hash ||
+		data.distributed_editing?.state_hash ||
+		data.data?.distributed_editing?.state_hash ||
+		''
+	);
 }

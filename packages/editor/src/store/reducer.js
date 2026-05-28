@@ -228,8 +228,27 @@ export function distributedEditingSession(
 			} );
 
 		case 'RESET_DISTRIBUTED_EDITING_SESSION_STATE':
-		case 'SET_EDITED_POST':
 			return DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE;
+
+		case 'SET_EDITED_POST': {
+			const statePostId = state.postId ? String( state.postId ) : null;
+			const actionPostId = action.postId ? String( action.postId ) : null;
+			const statePostType = state.postType || null;
+			const actionPostType = action.postType || null;
+
+			if (
+				statePostId &&
+				actionPostId &&
+				statePostId === actionPostId &&
+				( ! statePostType ||
+					! actionPostType ||
+					statePostType === actionPostType )
+			) {
+				return state;
+			}
+
+			return DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE;
+		}
 	}
 
 	return state;

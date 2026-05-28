@@ -56,14 +56,21 @@ import {
 	getDistributedEditingSessionStateForRetrySaveReviewApprovalProofResult,
 	getDistributedEditingSessionStateForRetrySaveRequest,
 	getDistributedEditingSessionStateForRetrySaveResult,
+	getDistributedEditingSessionStateForPendingLocalHistoryChange,
 	getDistributedEditingSessionStateForRiskyBlockReviewItemResolution,
 	getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest,
 	getDistributedEditingAcceptedReviewApprovalProofForRetrySaveRequest,
+	getDistributedEditingConflictingChangesComparisonActionStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingComparablePostContent,
+	getDistributedEditingPostContentWithYjsSyncMeta,
 	getDistributedEditingPostContentFromResponse,
+	getDistributedEditingRawPostContentFromResponse,
 	getDistributedEditingPostContentSha256Hash,
+	getDistributedEditingBlockIdentityDistinctGapInsertionDescriptor,
+	getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor,
 	getDistributedEditingBlockIdentityRequestProofDescriptor,
+	getDistributedEditingYjsClientUpdateDescriptor,
 	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingServerVersionFromResponse,
@@ -76,6 +83,7 @@ import {
 	normalizeDistributedEditingSessionState,
 	DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES,
 	DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES,
+	DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES,
 	DISTRIBUTED_EDITING_DISPOSITIONS,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
@@ -94,6 +102,7 @@ import {
 	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
 	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
+	getDistributedEditingYjsLocalMergeCandidate,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
@@ -107,6 +116,65 @@ import {
 import { unlock } from '../lock-unlock';
 
 const distributedEditingFreshReviewImportContentVault = new Map();
+const DISTRIBUTED_EDITING_CONFLICT_COMPARISON_SELECTOR =
+	'[data-distributed-editing-conflict-comparison="same-block"]';
+const DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_PANEL_SELECTOR =
+	'[data-distributed-editing-risky-block-review-panel]';
+const DISTRIBUTED_EDITING_SERVER_SYNC_CONFLICT_NOTICE_ID =
+	'core/editor/distributed-editing/server-sync-conflict';
+const DISTRIBUTED_EDITING_SERVER_SYNC_FAILED_NOTICE_ID =
+	'core/editor/distributed-editing/server-sync-failed';
+const DISTRIBUTED_EDITING_SAVE_RECOVERY_FAILED_NOTICE_ID =
+	'core/editor/distributed-editing/save-recovery-failed';
+
+function focusDistributedEditingElement( selector, { schedule = false } = {} ) {
+	const focus = () => {
+		const document = globalThis?.document;
+
+		if ( ! document || typeof document.querySelector !== 'function' ) {
+			return false;
+		}
+
+		const element = document.querySelector( selector );
+
+		if ( ! element ) {
+			return false;
+		}
+
+		try {
+			if ( ! element.hasAttribute?.( 'tabindex' ) ) {
+				element.setAttribute?.( 'tabindex', '-1' );
+			}
+
+			element.scrollIntoView?.( {
+				block: 'center',
+				inline: 'nearest',
+			} );
+			element.focus?.( {
+				preventScroll: true,
+			} );
+			return true;
+		} catch {
+			return false;
+		}
+	};
+
+	if ( focus() ) {
+		return true;
+	}
+
+	if ( schedule ) {
+		const requestFrame =
+			globalThis?.requestAnimationFrame ||
+			( ( callback ) => globalThis?.setTimeout?.( callback, 0 ) );
+
+		if ( typeof requestFrame === 'function' ) {
+			requestFrame( focus );
+		}
+	}
+
+	return false;
+}
 let distributedEditingPresenceSessionKey;
 
 const DISTRIBUTED_EDITING_STRUCTURAL_NOOP_SAVE_REASONS = new Set( [
@@ -346,19 +414,74 @@ function applyDistributedEditingStructuralNoopSaveConfirmation( {
  */
 export const setupEditor =
 	( post, edits, template ) =>
-	( { dispatch } ) => {
-		dispatch.setEditedPost( post.type, post.id );
+	( { dispatch, registry } ) => {
+		let setupPost = post;
+		let setupEdits = edits || {};
+		let distributedEditingInitialSessionState = null;
+		const rawPostContent = getDistributedEditingPostRawContent( post );
+		const strippedPostContent =
+			getDistributedEditingComparablePostContent( rawPostContent );
+		const postSyncMeta =
+			getDistributedEditingSyncMetaFromPostContent( rawPostContent );
+
+		if (
+			typeof rawPostContent === 'string' &&
+			typeof strippedPostContent === 'string' &&
+			strippedPostContent !== rawPostContent
+		) {
+			setupPost = {
+				...post,
+				content:
+					post.content && typeof post.content === 'object'
+						? {
+								...post.content,
+								raw: strippedPostContent,
+						  }
+						: strippedPostContent,
+			};
+			setupEdits = {
+				...setupEdits,
+				...( Object.prototype.hasOwnProperty.call(
+					setupEdits,
+					'content'
+				)
+					? {}
+					: { content: strippedPostContent } ),
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', post.type, [ setupPost ] );
+
+			if ( postSyncMeta?.version ) {
+				distributedEditingInitialSessionState = {
+					postId: setupPost.id,
+					postType: setupPost.type,
+					serverVersion: postSyncMeta.version,
+					clientBaseVersion: postSyncMeta.version,
+					clientBaseContent: strippedPostContent,
+					clientBaseSyncMeta: postSyncMeta,
+				};
+			}
+		}
+
+		dispatch.setEditedPost( setupPost.type, setupPost.id );
+		if ( distributedEditingInitialSessionState ) {
+			// SET_EDITED_POST resets DE session state, so apply parsed sync-meta after selecting the post.
+			dispatch.setDistributedEditingSessionState(
+				distributedEditingInitialSessionState
+			);
+		}
 		// Apply a template for new posts only, if exists.
-		const isNewPost = post.status === 'auto-draft';
+		const isNewPost = setupPost.status === 'auto-draft';
 		if ( isNewPost && template ) {
 			// In order to ensure maximum of a single parse during setup, edits are
 			// included as part of editor setup action. Assume edited content as
 			// canonical if provided, falling back to post.
 			let content;
-			if ( 'content' in edits ) {
-				content = edits.content;
+			if ( 'content' in setupEdits ) {
+				content = setupEdits.content;
 			} else {
-				content = post.content.raw;
+				content = setupPost.content.raw;
 			}
 			let blocks = parse( content );
 			blocks = synchronizeBlocksWithTemplate( blocks, template );
@@ -367,13 +490,13 @@ export const setupEditor =
 			} );
 		}
 		if (
-			edits &&
-			Object.entries( edits ).some(
+			setupEdits &&
+			Object.entries( setupEdits ).some(
 				( [ key, edit ] ) =>
-					edit !== ( post[ key ]?.raw ?? post[ key ] )
+					edit !== ( setupPost[ key ]?.raw ?? setupPost[ key ] )
 			)
 		) {
-			dispatch.editPost( edits );
+			dispatch.editPost( setupEdits );
 		}
 	};
 
@@ -571,6 +694,12 @@ export const __experimentalOpenDistributedEditingRiskyBlockReview =
 		}
 
 		dispatch.openPublishSidebar();
+		const reviewPanelFocusedImmediately = focusDistributedEditingElement(
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_PANEL_SELECTOR,
+			{
+				schedule: true,
+			}
+		);
 		const nextSessionState =
 			getDistributedEditingSessionStateWithActionTranscriptEvent(
 				select.getDistributedEditingSessionState?.() || {},
@@ -590,6 +719,8 @@ export const __experimentalOpenDistributedEditingRiskyBlockReview =
 			status: 'pre_publish_review_opened',
 			opensPublishSidebar: true,
 			focusesReviewPanel: true,
+			reviewPanelFocusRequested: true,
+			reviewPanelFocusedImmediately,
 			reviewPanel: 'distributed_editing_risky_block_review',
 			actionTranscriptItemCount:
 				nextSessionState.actionTranscriptItemCount,
@@ -609,6 +740,116 @@ export const __experimentalOpenDistributedEditingRiskyBlockReview =
 			mutatesPersistedPostContent: false,
 			changesPostLock: false,
 			claimsSaved: false,
+		};
+	};
+
+/**
+ * Records and opens the visible same-block Compare action. This is an explicit
+ * UI handoff only: it does not save, retry-save, autosave, mutate editor
+ * content, or change post locks.
+ *
+ * @param {Object} [options] Compare action options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalOpenDistributedEditingConflictingChangesComparison =
+	( options = {} ) =>
+	( { select, dispatch } ) => {
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const normalizedSessionState =
+			normalizeDistributedEditingSessionState( currentSessionState );
+		const savePolicy =
+			options.savePolicy ||
+			select.getDistributedEditingSavePolicyState?.() ||
+			{};
+		const shouldOpenComparison =
+			savePolicy.clickAction ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES ||
+			normalizedSessionState.requiresManualConflictResolution;
+		const reason =
+			options.reason ||
+			savePolicy.reason ||
+			savePolicy.saveButtonReason ||
+			'manual_conflict_review_required_before_save';
+		let actionStatus =
+			DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES.UNAVAILABLE;
+		let actionReason = 'manual_conflict_comparison_not_required';
+		let comparisonFocusedImmediately = false;
+
+		if ( shouldOpenComparison ) {
+			comparisonFocusedImmediately = focusDistributedEditingElement(
+				DISTRIBUTED_EDITING_CONFLICT_COMPARISON_SELECTOR,
+				{
+					schedule: true,
+				}
+			);
+			actionStatus = comparisonFocusedImmediately
+				? DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES.OPENED
+				: DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES.OPEN_REQUESTED;
+			actionReason = comparisonFocusedImmediately
+				? 'comparison_surface_opened'
+				: 'comparison_surface_not_available_yet';
+		}
+
+		const nextSessionState = normalizeDistributedEditingSessionState( {
+			...normalizedSessionState,
+			conflictingChangesComparisonActionStatus: actionStatus,
+			conflictingChangesComparisonActionReason: actionReason,
+			conflictingChangesComparisonActionRequested: true,
+			conflictingChangesComparisonOpenRequested: shouldOpenComparison,
+			conflictingChangesComparisonFocusRequested: shouldOpenComparison,
+			conflictingChangesComparisonFocusedImmediately:
+				comparisonFocusedImmediately,
+			conflictingChangesComparisonSurfaceOpened:
+				comparisonFocusedImmediately,
+		} );
+		const comparisonActionState =
+			getDistributedEditingConflictingChangesComparisonActionStateForSessionState(
+				nextSessionState
+			);
+		let status = 'conflicting_changes_comparison_unavailable';
+
+		if ( shouldOpenComparison ) {
+			status = comparisonFocusedImmediately
+				? 'conflicting_changes_comparison_opened'
+				: 'conflicting_changes_comparison_open_requested';
+		}
+
+		dispatch.setDistributedEditingSessionState( nextSessionState );
+
+		return {
+			status,
+			reason,
+			comparisonActionStatus: comparisonActionState.status,
+			comparisonActionReason: comparisonActionState.reason,
+			comparisonActionState,
+			opensComparison: comparisonActionState.surfaceOpened,
+			comparisonOpenRequested: comparisonActionState.openRequested,
+			focusesComparison: comparisonActionState.focusRequested,
+			comparisonFocusRequested: comparisonActionState.focusRequested,
+			comparisonFocusedImmediately:
+				comparisonActionState.focusedImmediately,
+			requiresManualConflictResolution:
+				comparisonActionState.requiresManualConflictResolution,
+			canExportLocalUpdates: comparisonActionState.canExportLocalUpdates,
+			preservesLocalChanges: comparisonActionState.preservesLocalChanges,
+			preservesCompareState: comparisonActionState.preservesCompareState,
+			allowsNormalSaveFallback: false,
+			blocksNormalSavePost: comparisonActionState.blocksNormalSavePost,
+			opensPrePublishReview: false,
+			callsServerStateRefetchEndpoint: false,
+			callsRetrySubmitEndpoint: false,
+			callsNormalSavePost: false,
+			callsAutosaveEndpoint: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			exposesProofInternals: false,
 		};
 	};
 
@@ -678,7 +919,7 @@ export const __experimentalFocusDistributedEditingRiskyBlockReviewItem =
  */
 export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 	( resolution = {} ) =>
-	( { select, dispatch } ) => {
+	( { select, dispatch, registry } ) => {
 		const reviewItemId = resolution.reviewItemId || resolution.id;
 		const currentSessionState =
 			select.getDistributedEditingSessionState?.() || {};
@@ -707,7 +948,7 @@ export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 			};
 		}
 
-		const sessionState =
+		let sessionState =
 			getDistributedEditingSessionStateForRiskyBlockReviewItemResolution(
 				currentSessionState,
 				resolution
@@ -715,6 +956,62 @@ export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 		const resolvedItem = sessionState.riskyBlockReviewItems.find(
 			( item ) => item.id === reviewItemId
 		);
+		const safeServerContent =
+			typeof sessionState.refetchedServerContent === 'string'
+				? sessionState.refetchedServerContent
+				: typeof sessionState.clientBaseContent === 'string'
+				? sessionState.clientBaseContent
+				: null;
+		const appliesSafeServerContentAfterReject =
+			sessionState.riskyBlockReviewPendingCount === 0 &&
+			sessionState.riskyBlockReviewApprovedCount === 0 &&
+			sessionState.riskyBlockReviewRejectedCount > 0 &&
+			typeof safeServerContent === 'string';
+
+		if ( appliesSafeServerContentAfterReject ) {
+			applyDistributedEditingConfirmedPostContent( {
+				dispatch,
+				registry,
+				select,
+				postContent: safeServerContent,
+			} );
+			sessionState = normalizeDistributedEditingSessionState( {
+				...sessionState,
+				clientBaseContent: null,
+				disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+				hasPendingChanges: false,
+				isAwaitingServerConfirmation: false,
+				mustOfferLocalCopy: false,
+				pendingChangeCount: 0,
+				reasonCode: null,
+				refetchedServerContent: safeServerContent,
+				refetchedServerState: true,
+				remoteChangeCount: 0,
+				requiresManualConflictResolution: false,
+				requiresServerStateAcceptance: false,
+				requiresServerStateRefetch: false,
+				retrySaveAccepted: false,
+				retrySaveClaimsSaved: false,
+				retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+				retrySubmitAccepted: false,
+				retrySubmitProofStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+				retrySubmitSavePrepared: false,
+				retrySubmitSaveReady: false,
+				retrySubmitSaveStatus:
+					DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+				riskyBlockReviewApprovedCount: 0,
+				riskyBlockReviewCanExportLocalUpdates: false,
+				riskyBlockReviewItemCount: 0,
+				riskyBlockReviewItems: [],
+				riskyBlockReviewPendingCount: 0,
+				riskyBlockReviewPrePublishPanelRequired: false,
+				riskyBlockReviewReasonCode: null,
+				riskyBlockReviewRejectedCount: 0,
+				riskyBlockReviewStatus:
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED,
+			} );
+		}
 
 		dispatch.setDistributedEditingSessionState( sessionState );
 
@@ -727,11 +1024,12 @@ export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 			approvedReviewItemCount: sessionState.riskyBlockReviewApprovedCount,
 			rejectedReviewItemCount: sessionState.riskyBlockReviewRejectedCount,
 			saveClickAction: sessionState.riskyBlockReviewSaveClickAction,
+			appliesSafeServerContentAfterReject,
 			savesPost: false,
 			callsNormalSavePost: false,
 			callsRetrySaveEndpoint: false,
 			dispatchesNotice: false,
-			mutatesEditorContent: false,
+			mutatesEditorContent: appliesSafeServerContentAfterReject,
 			mutatesPersistedPostContent: false,
 			changesPostLock: false,
 			claimsSaved: false,
@@ -759,8 +1057,18 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 				select.shouldUseDistributedEditingRiskyBlockReviewForSavePost?.(
 					options
 				);
+			const hasActiveRiskyBlockReviewPolicy =
+				savePolicy.saveButtonSource === 'risky_block_review' ||
+				savePolicy.reviewItemCount > 0 ||
+				savePolicy.pendingReviewItemCount > 0 ||
+				savePolicy.approvedReviewItemCount > 0 ||
+				savePolicy.clickAction ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 
-			if ( ! shouldUseRiskyBlockReview ) {
+			if (
+				! shouldUseRiskyBlockReview &&
+				! hasActiveRiskyBlockReviewPolicy
+			) {
 				return {
 					status: 'normal_save_fallback',
 					reason: null,
@@ -1057,18 +1365,36 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 			( shouldUseRiskyBlockReview || shouldUseRetrySave ) &&
 			Boolean( savePolicy.blocksNormalSavePost ) &&
 			! shouldAllowConfirmedSaveNormalFallback;
+		const setSaveButtonClickInFlight = ( isInFlight ) =>
+			dispatch.updateDistributedEditingSessionState( {
+				saveButtonClickInFlight: Boolean( isInFlight ),
+			} );
+
+		const shouldRefreshConfirmedSaveForDirtyEdit =
+			shouldUseRetrySave &&
+			select.isEditedPostDirty?.() &&
+			savePolicy.status ===
+				DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.RETRY_SAVE_CONFIRMED;
 
 		if (
-			! shouldHandleDistributedEditingClick &&
+			( ! shouldHandleDistributedEditingClick ||
+				shouldRefreshConfirmedSaveForDirtyEdit ) &&
 			shouldUseRetrySave &&
 			( select.isEditedPostDirty?.() ||
 				( initialSessionState.hasPendingChanges &&
 					initialSessionState.canExportLocalUpdates ) )
 		) {
-			const freshnessGuard =
-				await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
-					options
-				);
+			let freshnessGuard;
+
+			setSaveButtonClickInFlight( true );
+			try {
+				freshnessGuard =
+					await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
+						options
+					);
+			} finally {
+				setSaveButtonClickInFlight( false );
+			}
 
 			if ( ! freshnessGuard.allowsNormalSaveFallback ) {
 				return {
@@ -1092,6 +1418,7 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				allowsNormalSaveFallback: true,
 				blocksNormalSavePost: false,
 				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
 				callsNormalSavePost: false,
 				callsRetrySaveEndpoint: false,
 				dispatchesNotice: false,
@@ -1119,6 +1446,7 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				allowsNormalSaveFallback: false,
 				blocksNormalSavePost: true,
 				callsServerStateRefetchEndpoint: false,
+				callsRetrySubmitEndpoint: false,
 				callsNormalSavePost: false,
 				callsRetrySaveEndpoint: false,
 				dispatchesNotice: false,
@@ -1134,6 +1462,7 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE ||
 			savePolicy.requiresServerStateRefetch
 		) {
+			setSaveButtonClickInFlight( true );
 			try {
 				const response =
 					await dispatch.__experimentalRefreshDistributedEditingServerStateAfterStaleBase(
@@ -1227,6 +1556,8 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 					changesPostLock: false,
 					claimsSaved: false,
 				};
+			} finally {
+				setSaveButtonClickInFlight( false );
 			}
 		}
 
@@ -1243,8 +1574,13 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				savePolicy.clickAction ===
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES
 			) {
-				const sessionState =
-					select.getDistributedEditingSessionState?.() || {};
+				const comparisonAction =
+					await dispatch.__experimentalOpenDistributedEditingConflictingChangesComparison(
+						{
+							reason,
+							savePolicy,
+						}
+					);
 
 				return {
 					status: 'manual_conflict_comparison_required_before_save',
@@ -1252,19 +1588,34 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 					policy: savePolicy,
 					allowsNormalSaveFallback: false,
 					blocksNormalSavePost: true,
+					opensComparison: comparisonAction.opensComparison,
+					comparisonOpenRequested:
+						comparisonAction.comparisonOpenRequested,
+					focusesComparison: comparisonAction.focusesComparison,
+					comparisonFocusRequested:
+						comparisonAction.comparisonFocusRequested,
+					comparisonFocusedImmediately:
+						comparisonAction.comparisonFocusedImmediately,
+					comparisonActionStatus:
+						comparisonAction.comparisonActionStatus,
+					comparisonActionReason:
+						comparisonAction.comparisonActionReason,
+					comparisonActionState:
+						comparisonAction.comparisonActionState,
 					opensPrePublishReview: false,
 					requiresServerStateRefetch: false,
-					requiresManualConflictResolution: Boolean(
-						sessionState.requiresManualConflictResolution
-					),
-					canExportLocalUpdates: Boolean(
-						savePolicy.canExportLocalUpdates ||
-							sessionState.canExportLocalUpdates
-					),
-					preservesCompareState: true,
+					requiresManualConflictResolution:
+						comparisonAction.requiresManualConflictResolution,
+					canExportLocalUpdates:
+						comparisonAction.canExportLocalUpdates,
+					preservesLocalChanges:
+						comparisonAction.preservesLocalChanges,
+					preservesCompareState:
+						comparisonAction.preservesCompareState,
 					callsServerStateRefetchEndpoint: false,
 					callsRetrySubmitEndpoint: false,
 					callsNormalSavePost: false,
+					callsAutosaveEndpoint: false,
 					callsRetrySaveEndpoint: false,
 					dispatchesNotice: false,
 					mutatesEditorContent: false,
@@ -1340,6 +1691,7 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				savePolicy.clickAction ===
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CHECK_WITH_WORDPRESS
 			) {
+				setSaveButtonClickInFlight( true );
 				try {
 					const response =
 						await dispatch.__experimentalRefreshDistributedEditingRetrySubmitProof(
@@ -1389,6 +1741,8 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 						changesPostLock: false,
 						claimsSaved: false,
 					};
+				} finally {
+					setSaveButtonClickInFlight( false );
 				}
 			}
 
@@ -1455,7 +1809,11 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				'accepted_retry_submit_proof_needs_save_preparation'
 		) {
 			const result =
-				await dispatch.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof();
+				await dispatch.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof(
+					{
+						requiresExplicitSaveClick: true,
+					}
+				);
 			const sessionState =
 				select.getDistributedEditingSessionState?.() || {};
 
@@ -1490,42 +1848,48 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 			savePolicy.clickAction ===
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
 		) {
-			const retrySaveResult =
-				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
-					{
-						...options,
-						__experimentalAllowDistributedEditingStructuralNoopSave: true,
-					}
+			setSaveButtonClickInFlight( true );
+			try {
+				const retrySaveResult =
+					await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
+						{
+							...options,
+							__experimentalDistributedEditingExplicitSaveClick: true,
+							__experimentalAllowDistributedEditingStructuralNoopSave: true,
+						}
+					);
+				const allowsNormalSaveFallback = Boolean(
+					retrySaveResult.allowsNormalSaveFallback &&
+						! savePolicy.blocksNormalSavePost
 				);
-			const allowsNormalSaveFallback = Boolean(
-				retrySaveResult.allowsNormalSaveFallback &&
-					! savePolicy.blocksNormalSavePost
-			);
 
-			return {
-				...retrySaveResult,
-				status:
-					retrySaveResult.status === 'retry_save_submitted'
-						? 'guarded_retry_save_submitted_from_save_click'
-						: retrySaveResult.status,
-				reason:
-					retrySaveResult.reason ||
-					savePolicy.reason ||
-					savePolicy.saveButtonReason ||
-					null,
-				saveButtonPolicy: savePolicy,
-				allowsNormalSaveFallback,
-				blocksNormalSavePost: ! allowsNormalSaveFallback,
-				opensPrePublishReview: false,
-				callsServerStateRefetchEndpoint: false,
-				callsRetrySubmitEndpoint: false,
-				callsNormalSavePost: false,
-				callsRetrySaveEndpoint: Boolean(
-					retrySaveResult.callsRetrySaveAction
-				),
-				dispatchesNotice: false,
-				changesPostLock: false,
-			};
+				return {
+					...retrySaveResult,
+					status:
+						retrySaveResult.status === 'retry_save_submitted'
+							? 'guarded_retry_save_submitted_from_save_click'
+							: retrySaveResult.status,
+					reason:
+						retrySaveResult.reason ||
+						savePolicy.reason ||
+						savePolicy.saveButtonReason ||
+						null,
+					saveButtonPolicy: savePolicy,
+					allowsNormalSaveFallback,
+					blocksNormalSavePost: ! allowsNormalSaveFallback,
+					opensPrePublishReview: false,
+					callsServerStateRefetchEndpoint: false,
+					callsRetrySubmitEndpoint: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: Boolean(
+						retrySaveResult.callsRetrySaveAction
+					),
+					dispatchesNotice: false,
+					changesPostLock: false,
+				};
+			} finally {
+				setSaveButtonClickInFlight( false );
+			}
 		}
 
 		return dispatch.__experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockReview(
@@ -1705,6 +2069,154 @@ export const __experimentalRefreshDistributedEditingPresenceStorageReadiness =
 		}
 	};
 
+function getDistributedEditingPresenceDocumentStatePublishedKey( {
+	confirmedBaseVersion,
+	confirmedStateHash,
+	hasPendingChanges,
+	isDirty,
+} ) {
+	return [
+		confirmedBaseVersion || '',
+		confirmedStateHash || '',
+		hasPendingChanges ? 'pending' : 'clean',
+		isDirty ? 'dirty' : 'clean',
+	].join( ':' );
+}
+
+function getDistributedEditingPresenceBaseContent(
+	sessionState,
+	select,
+	options = {}
+) {
+	if ( typeof options.clientBaseContent === 'string' ) {
+		return options.clientBaseContent;
+	}
+
+	if ( typeof sessionState.clientBaseContent === 'string' ) {
+		return sessionState.clientBaseContent;
+	}
+
+	const currentPostContent = getDistributedEditingPostRawContent(
+		select.getCurrentPost?.()
+	);
+
+	return typeof currentPostContent === 'string' ? currentPostContent : '';
+}
+
+function getDistributedEditingPresenceLocalContentHasChanged(
+	sessionState,
+	select,
+	options = {}
+) {
+	if ( options.hasLocalContentChanges !== undefined ) {
+		return Boolean( options.hasLocalContentChanges );
+	}
+
+	const localContent =
+		options.localContent !== undefined
+			? options.localContent
+			: select.getEditedPostContent?.();
+
+	if ( typeof localContent !== 'string' ) {
+		return false;
+	}
+
+	const baseContent = getDistributedEditingPresenceBaseContent(
+		sessionState,
+		select,
+		options
+	);
+	const comparableLocalContent =
+		getDistributedEditingComparablePostContent( localContent );
+	const comparableBaseContent =
+		getDistributedEditingComparablePostContent( baseContent );
+
+	return (
+		typeof comparableLocalContent === 'string' &&
+		typeof comparableBaseContent === 'string' &&
+		comparableLocalContent !== comparableBaseContent
+	);
+}
+
+function getDistributedEditingPresenceHeartbeatDocumentState(
+	sessionState,
+	select,
+	options = {}
+) {
+	const confirmedBaseVersion =
+		options.confirmedBaseVersion ??
+		sessionState.clientBaseVersion ??
+		sessionState.serverVersion ??
+		null;
+	const serverAndBaseVersionsMatch =
+		! sessionState.clientBaseVersion ||
+		! sessionState.serverVersion ||
+		String( sessionState.clientBaseVersion ) ===
+			String( sessionState.serverVersion );
+	const confirmedStateHash =
+		options.confirmedStateHash ??
+		( serverAndBaseVersionsMatch
+			? sessionState.distributedEditingPostStateHash
+			: null );
+	const trimmedBaseVersion =
+		typeof confirmedBaseVersion === 'string'
+			? confirmedBaseVersion.trim()
+			: confirmedBaseVersion
+			? String( confirmedBaseVersion )
+			: '';
+	const trimmedStateHash =
+		typeof confirmedStateHash === 'string'
+			? confirmedStateHash.trim()
+			: confirmedStateHash
+			? String( confirmedStateHash )
+			: '';
+	const previouslyObservedSameCopy =
+		trimmedBaseVersion &&
+		trimmedBaseVersion ===
+			sessionState.presenceDocumentStateConfirmedBaseVersion &&
+		trimmedStateHash ===
+			( sessionState.presenceDocumentStateConfirmedStateHash || '' );
+	const confirmedAtGmt =
+		options.confirmedAtGmt ||
+		( previouslyObservedSameCopy
+			? sessionState.presenceDocumentStateConfirmedAtGmt
+			: new Date().toISOString() );
+	const hasLocalContentChanges =
+		getDistributedEditingPresenceLocalContentHasChanged(
+			sessionState,
+			select,
+			options
+		);
+	const reportedPending =
+		options.hasPendingChanges !== undefined &&
+		options.hasPendingChanges !== null
+			? Boolean( options.hasPendingChanges )
+			: Boolean(
+					sessionState.hasPendingChanges ||
+						sessionState.pendingChangeCount > 0 ||
+						hasLocalContentChanges
+			  );
+	const presenceDocumentStatePublishedKey =
+		getDistributedEditingPresenceDocumentStatePublishedKey( {
+			confirmedBaseVersion: trimmedBaseVersion,
+			confirmedStateHash: trimmedStateHash,
+			hasPendingChanges: reportedPending,
+			isDirty: hasLocalContentChanges,
+		} );
+
+	return {
+		confirmedBaseVersion: trimmedBaseVersion,
+		confirmedStateHash: trimmedStateHash,
+		hasPendingChanges: reportedPending,
+		confirmedAtGmt,
+		presenceDocumentStateConfirmedBaseVersion: trimmedBaseVersion || null,
+		presenceDocumentStateConfirmedStateHash: trimmedStateHash || null,
+		presenceDocumentStateConfirmedAtGmt: confirmedAtGmt || null,
+		presenceDocumentStatePublishedKey:
+			presenceDocumentStatePublishedKey || null,
+	};
+}
+
 /**
  * Sends a one-shot Distributed Editing presence heartbeat and stores local
  * command status. The action is gated by the editor's Distributed Editing
@@ -1734,6 +2246,12 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 		const distributedEditingEnabled =
 			options.distributedEditingEnabled ??
 			editorSettings.distributedEditing?.enabled;
+		const documentState =
+			getDistributedEditingPresenceHeartbeatDocumentState(
+				currentSessionState,
+				select,
+				options
+			);
 
 		if ( ! distributedEditingEnabled ) {
 			const response = {
@@ -1763,6 +2281,10 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 				sessionKey:
 					options.sessionKey ||
 					getDistributedEditingPresenceSessionKey(),
+				confirmedBaseVersion: documentState.confirmedBaseVersion,
+				confirmedStateHash: documentState.confirmedStateHash,
+				hasPendingChanges: documentState.hasPendingChanges,
+				confirmedAtGmt: documentState.confirmedAtGmt,
 			} );
 			const latestSessionState =
 				select.getDistributedEditingSessionState?.() ||
@@ -1771,7 +2293,17 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 			dispatch.setDistributedEditingSessionState(
 				getDistributedEditingSessionStateForPresenceHeartbeatResult(
 					response,
-					latestSessionState
+					{
+						...latestSessionState,
+						presenceDocumentStateConfirmedBaseVersion:
+							documentState.presenceDocumentStateConfirmedBaseVersion,
+						presenceDocumentStateConfirmedStateHash:
+							documentState.presenceDocumentStateConfirmedStateHash,
+						presenceDocumentStateConfirmedAtGmt:
+							documentState.presenceDocumentStateConfirmedAtGmt,
+						presenceDocumentStatePublishedKey:
+							documentState.presenceDocumentStatePublishedKey,
+					}
 				)
 			);
 
@@ -2006,6 +2538,10 @@ export const __experimentalRefreshDistributedEditingServerStateAfterStaleBase =
 				}
 			)
 		);
+		await refreshDistributedEditingPresenceAfterServerUpdate( {
+			select,
+			dispatch,
+		} );
 
 		return response;
 	};
@@ -2091,6 +2627,580 @@ export const __experimentalRebaseDistributedEditingLocalUpdatesAfterStaleBase =
 		};
 	};
 
+function getDistributedEditingPostRecordWithContent( post, content ) {
+	return {
+		...post,
+		content:
+			post?.content && typeof post.content === 'object'
+				? {
+						...post.content,
+						raw: content,
+				  }
+				: content,
+	};
+}
+
+function getDistributedEditingPostSnapshotStateHashFromResponse( response ) {
+	return (
+		response?.state_hash ||
+		response?.stateHash ||
+		response?.data?.state_hash ||
+		response?.data?.stateHash ||
+		response?.distributed_editing?.state_hash ||
+		response?.distributedEditing?.stateHash ||
+		response?.data?.distributed_editing?.state_hash ||
+		response?.data?.distributedEditing?.stateHash ||
+		null
+	);
+}
+
+function isDistributedEditingPostSnapshotNotModifiedResponse( response ) {
+	return Boolean(
+		response?.not_modified ||
+			response?.notModified ||
+			response?.status === 304 ||
+			response?.result === 'distributed_editing_post_not_modified'
+	);
+}
+
+function applyDistributedEditingSyncedEditorContent( dispatch, content ) {
+	const parsedBlocks = parse( content );
+
+	if ( parsedBlocks.length || ! content ) {
+		dispatch.resetEditorBlocks( parsedBlocks, {
+			__unstableShouldCreateUndoLevel: false,
+		} );
+	}
+
+	dispatch.editPost( { content }, { undoIgnore: true } );
+}
+
+function clearDistributedEditingServerSyncNotices( registry ) {
+	const noticeDispatch = registry.dispatch( noticesStore );
+	noticeDispatch.removeNotice?.(
+		DISTRIBUTED_EDITING_SERVER_SYNC_CONFLICT_NOTICE_ID
+	);
+	noticeDispatch.removeNotice?.(
+		DISTRIBUTED_EDITING_SERVER_SYNC_FAILED_NOTICE_ID
+	);
+}
+
+function showDistributedEditingServerSyncConflictNotice( registry ) {
+	clearDistributedEditingServerSyncNotices( registry );
+	registry
+		.dispatch( noticesStore )
+		.createErrorNotice(
+			__(
+				'WordPress has newer changes that could not be synced automatically.'
+			),
+			{
+				id: DISTRIBUTED_EDITING_SERVER_SYNC_CONFLICT_NOTICE_ID,
+			}
+		);
+}
+
+function showDistributedEditingServerSyncFailedNotice( registry ) {
+	clearDistributedEditingServerSyncNotices( registry );
+	registry
+		.dispatch( noticesStore )
+		.createErrorNotice( __( 'Couldn’t sync with WordPress. Try again.' ), {
+			id: DISTRIBUTED_EDITING_SERVER_SYNC_FAILED_NOTICE_ID,
+		} );
+}
+
+function getDistributedEditingRiskyReviewSyncPreservationFields(
+	sessionState = {}
+) {
+	const riskyBlockReviewPendingCount = Number(
+		sessionState.riskyBlockReviewPendingCount ?? 0
+	);
+	const pendingReviewCount =
+		Number.isFinite( riskyBlockReviewPendingCount ) &&
+		riskyBlockReviewPendingCount > 0
+			? Math.floor( riskyBlockReviewPendingCount )
+			: sessionState.retrySaveStatus ===
+			  DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED
+			? 1
+			: 0;
+	const hasPendingRiskyReview =
+		pendingReviewCount > 0 ||
+		sessionState.riskyBlockReviewStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED;
+
+	if ( ! hasPendingRiskyReview ) {
+		return null;
+	}
+
+	return {
+		disposition:
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+		reasonCode:
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+		pendingChangeCount: pendingReviewCount || 1,
+		hasPendingChanges: true,
+		isAwaitingServerConfirmation: true,
+		retrySaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+		retrySaveReason:
+			sessionState.retrySaveReason ||
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
+		requiresManualConflictResolution: true,
+		requiresServerStateRefetch: false,
+		canExportLocalUpdates: false,
+		mustOfferLocalCopy: false,
+	};
+}
+
+function clearDistributedEditingSaveRecoveryNotices( registry ) {
+	clearDistributedEditingServerSyncNotices( registry );
+	registry
+		.dispatch( noticesStore )
+		.removeNotice?.( DISTRIBUTED_EDITING_SAVE_RECOVERY_FAILED_NOTICE_ID );
+}
+
+function showDistributedEditingSaveRecoveryFailedNotice( registry ) {
+	clearDistributedEditingSaveRecoveryNotices( registry );
+	registry
+		.dispatch( noticesStore )
+		.createErrorNotice(
+			__( 'Couldn’t save these changes automatically.' ),
+			{
+				id: DISTRIBUTED_EDITING_SAVE_RECOVERY_FAILED_NOTICE_ID,
+			}
+		);
+}
+
+function getDistributedEditingSaveErrorData( error ) {
+	if ( ! error || typeof error !== 'object' ) {
+		return {};
+	}
+
+	return error.data && typeof error.data === 'object' ? error.data : {};
+}
+
+function getDistributedEditingSaveErrorCode( error ) {
+	return (
+		( error && typeof error === 'object' && error.code ) ||
+		getDistributedEditingSaveErrorData( error ).reason_code ||
+		null
+	);
+}
+
+function getDistributedEditingSaveErrorDetail( error ) {
+	const data = getDistributedEditingSaveErrorData( error );
+
+	return data.detail || data.reason || null;
+}
+
+function isDistributedEditingYjsRawSaveRecoveryError( error ) {
+	const code = getDistributedEditingSaveErrorCode( error );
+	const detail = getDistributedEditingSaveErrorDetail( error );
+
+	return (
+		code === 'de_rtc_rebase_failed' ||
+		( code === 'de_rtc_sync_meta_tampered' &&
+			detail === 'yjs_client_update_materialization_mismatch' )
+	);
+}
+
+/**
+ * Fetches latest server content and syncs it into the current editor session.
+ *
+ * This is a user-requested refetch, not a save path: it must not call normal
+ * Save, autosave, retry-save, review endpoints, or post-lock code. Clean
+ * editors move to the latest server body. Dirty editors only take the fetched
+ * body when the existing conservative block merge can preserve local edits.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalSyncDistributedEditingWithServer =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const currentPost = select.getCurrentPost?.() || {};
+		const postType = options.postType || currentPost.type;
+		const postId = options.postId ?? currentPost.id;
+		const postTypeRecord = postType
+			? registry.select( coreStore ).getPostType( postType )
+			: null;
+		const restBase =
+			options.restBase ||
+			postTypeRecord?.rest_base ||
+			DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const currentRawContent =
+			getDistributedEditingPostRawContent( currentPost );
+		const clientBaseContent =
+			options.clientBaseContent ??
+			currentSessionState.clientBaseContent ??
+			getDistributedEditingComparablePostContent( currentRawContent );
+		const localContent =
+			options.localContent ?? select.getEditedPostContent?.();
+		const riskyReviewSyncPreservationFields =
+			getDistributedEditingRiskyReviewSyncPreservationFields(
+				currentSessionState
+			);
+
+		if ( ! postId || ! restBase ) {
+			return {
+				status: 'server_sync_unavailable',
+				callsServerStateRefetchEndpoint: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				callsAutosaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		try {
+			const response = await requestDistributedEditingServerStateRefetch(
+				{
+					postId,
+					restBase,
+					stateHash:
+						currentSessionState.distributedEditingPostStateHash,
+				}
+			);
+			const responseStateHash =
+				getDistributedEditingPostSnapshotStateHashFromResponse(
+					response
+				) || currentSessionState.distributedEditingPostStateHash;
+
+			if (
+				isDistributedEditingPostSnapshotNotModifiedResponse( response )
+			) {
+				clearDistributedEditingServerSyncNotices( registry );
+				dispatch.setDistributedEditingSessionState( {
+					...currentSessionState,
+					disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+					reasonCode: null,
+					distributedEditingPostStateHash: responseStateHash,
+					clientBaseContent,
+					refetchedServerContent: clientBaseContent,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					requiresServerStateAcceptance: false,
+					pendingChangeCount: 0,
+					hasPendingChanges: false,
+					isAwaitingServerConfirmation: false,
+					remoteChangeCount: 0,
+					hasRemoteChanges: false,
+					mustOfferLocalCopy: false,
+					canExportLocalUpdates: false,
+					canAttemptLocalRebase: false,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+					localRebaseResultReason: null,
+					requiresManualConflictResolution: false,
+					...( riskyReviewSyncPreservationFields || {} ),
+				} );
+				await refreshDistributedEditingPresenceAfterServerUpdate( {
+					select,
+					dispatch,
+				} );
+
+				return {
+					status: 'server_sync_current',
+					serverVersion:
+						currentSessionState.serverVersion ||
+						currentSessionState.clientBaseVersion,
+					callsServerStateRefetchEndpoint: true,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					callsAutosaveEndpoint: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			const serverContent =
+				getDistributedEditingPostContentFromResponse( response );
+			const serverRawContent =
+				getDistributedEditingRawPostContentFromResponse( response );
+			const serverSyncMeta =
+				getDistributedEditingSyncMetaFromPostContent(
+					serverRawContent
+				);
+			const serverVersion =
+				getDistributedEditingServerVersionFromResponse( response ) ||
+				currentSessionState.serverVersion ||
+				currentSessionState.clientBaseVersion;
+
+			if ( typeof serverContent !== 'string' ) {
+				if ( ! options.suppressNotices ) {
+					showDistributedEditingServerSyncFailedNotice( registry );
+				}
+
+				return {
+					status: 'server_sync_failed',
+					reason: 'missing_server_content',
+					callsServerStateRefetchEndpoint: true,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					callsAutosaveEndpoint: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			const responsePostType = response.type || postType;
+			const serverPostRecord = getDistributedEditingPostRecordWithContent(
+				{
+					...currentPost,
+					...response,
+					id: response.id ?? postId,
+					type: responsePostType,
+				},
+				serverContent
+			);
+			const serverMatchesBase = serverContent === clientBaseContent;
+			const isDirty = Boolean(
+				options.isDirty ?? select.isEditedPostDirty?.()
+			);
+			const editorMatchesBase =
+				localContent === clientBaseContent || ! isDirty;
+
+			if ( serverMatchesBase ) {
+				clearDistributedEditingServerSyncNotices( registry );
+				dispatch.setDistributedEditingSessionState( {
+					...currentSessionState,
+					disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+					reasonCode: null,
+					serverVersion,
+					distributedEditingPostStateHash: responseStateHash,
+					clientBaseVersion:
+						serverVersion || currentSessionState.clientBaseVersion,
+					clientBaseContent,
+					clientBaseSyncMeta:
+						serverSyncMeta ??
+						currentSessionState.clientBaseSyncMeta,
+					refetchedServerContent: serverContent,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					requiresServerStateAcceptance: false,
+					pendingChangeCount: 0,
+					hasPendingChanges: false,
+					isAwaitingServerConfirmation: false,
+					remoteChangeCount: 0,
+					hasRemoteChanges: false,
+					mustOfferLocalCopy: false,
+					canExportLocalUpdates: false,
+					canAttemptLocalRebase: false,
+					localRebasePlanStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+					localRebaseResultStatus:
+						DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+					localRebaseResultReason: null,
+					requiresManualConflictResolution: false,
+					...( riskyReviewSyncPreservationFields || {} ),
+				} );
+				await refreshDistributedEditingPresenceAfterServerUpdate( {
+					select,
+					dispatch,
+				} );
+
+				return {
+					status: 'server_sync_current',
+					serverVersion,
+					callsServerStateRefetchEndpoint: true,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					callsAutosaveEndpoint: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if ( editorMatchesBase ) {
+				clearDistributedEditingServerSyncNotices( registry );
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', responsePostType, [
+						serverPostRecord,
+					] );
+				applyDistributedEditingSyncedEditorContent(
+					dispatch,
+					serverContent
+				);
+				dispatch.setDistributedEditingSessionState( {
+					serverVersion,
+					distributedEditingPostStateHash: responseStateHash,
+					clientBaseVersion: serverVersion,
+					clientBaseContent: serverContent,
+					clientBaseSyncMeta:
+						serverSyncMeta ??
+						currentSessionState.clientBaseSyncMeta,
+					refetchedServerContent: serverContent,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					hasPendingChanges: false,
+					pendingChangeCount: 0,
+					remoteChangeCount: 0,
+					canExportLocalUpdates: false,
+					mustOfferLocalCopy: false,
+					isAwaitingServerConfirmation: false,
+					...( riskyReviewSyncPreservationFields || {} ),
+				} );
+				await refreshDistributedEditingPresenceAfterServerUpdate( {
+					select,
+					dispatch,
+				} );
+
+				return {
+					status: 'server_sync_applied_clean',
+					serverVersion,
+					callsServerStateRefetchEndpoint: true,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					callsAutosaveEndpoint: false,
+					mutatesEditorContent: serverContent !== localContent,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			const refetchedSessionState =
+				getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+					response,
+					{
+						...currentSessionState,
+						clientBaseContent,
+						pendingChangeCount:
+							currentSessionState.pendingChangeCount || 1,
+						remoteChangeCount:
+							currentSessionState.remoteChangeCount || 1,
+						hasPendingChanges: true,
+						canExportLocalUpdates: true,
+					}
+				);
+			const mergeResult = getDistributedEditingStaleBaseLocalRebaseResult(
+				{
+					currentSessionState: refetchedSessionState,
+					clientBaseContent,
+					serverContent,
+					localContent,
+				}
+			);
+			const yjsMergeResult = mergeResult.hasCandidatePostContent
+				? null
+				: getDistributedEditingYjsLocalMergeCandidate( {
+						clientBaseContent,
+						serverContent,
+						localContent,
+				  } );
+			const selectedMergeResult =
+				mergeResult.hasCandidatePostContent ||
+				! yjsMergeResult?.hasCandidatePostContent
+					? mergeResult
+					: yjsMergeResult;
+
+			if ( selectedMergeResult.hasCandidatePostContent ) {
+				clearDistributedEditingServerSyncNotices( registry );
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', responsePostType, [
+						serverPostRecord,
+					] );
+				applyDistributedEditingSyncedEditorContent(
+					dispatch,
+					selectedMergeResult.candidatePostContent
+				);
+				dispatch.setDistributedEditingSessionState( {
+					...currentSessionState,
+					serverVersion,
+					distributedEditingPostStateHash: responseStateHash,
+					clientBaseVersion: serverVersion,
+					clientBaseContent: serverContent,
+					clientBaseSyncMeta:
+						serverSyncMeta ??
+						currentSessionState.clientBaseSyncMeta,
+					refetchedServerContent: serverContent,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+					hasPendingChanges: false,
+					pendingChangeCount: 0,
+					remoteChangeCount: 0,
+					canExportLocalUpdates: false,
+					mustOfferLocalCopy: false,
+					isAwaitingServerConfirmation: false,
+					...( riskyReviewSyncPreservationFields || {} ),
+				} );
+				await refreshDistributedEditingPresenceAfterServerUpdate( {
+					select,
+					dispatch,
+				} );
+
+				return {
+					...selectedMergeResult,
+					status: 'server_sync_merged',
+					serverVersion,
+					callsServerStateRefetchEndpoint: true,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					callsAutosaveEndpoint: false,
+					mutatesEditorContent: true,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if ( ! options.suppressNotices ) {
+				showDistributedEditingServerSyncConflictNotice( registry );
+			}
+			await refreshDistributedEditingPresenceAfterServerUpdate( {
+				select,
+				dispatch,
+				publishHeartbeat: false,
+			} );
+
+			return {
+				status: 'server_sync_conflict',
+				reason: yjsMergeResult?.reason || mergeResult.reason,
+				serverVersion,
+				callsServerStateRefetchEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				callsAutosaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		} catch ( error ) {
+			if ( ! options.suppressNotices ) {
+				showDistributedEditingServerSyncFailedNotice( registry );
+			}
+
+			return {
+				status: 'server_sync_failed',
+				reason: error?.code || error?.message || 'server_sync_failed',
+				callsServerStateRefetchEndpoint: true,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				callsAutosaveEndpoint: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+	};
+
 /**
  * Imports a protected local-updates handoff payload into this editor session.
  *
@@ -2149,6 +3259,128 @@ export const __experimentalImportDistributedEditingLocalUpdates =
 
 		return result;
 	};
+
+function shouldAttemptDistributedEditingYjsRawSaveRecovery( {
+	select,
+	options = {},
+	error,
+} ) {
+	const distributedEditingSettings =
+		select.getEditorSettings?.()?.distributedEditing || {};
+
+	return Boolean(
+		! options.isAutosave &&
+			! options.isPreview &&
+			! options.__experimentalDistributedEditingYjsRawSaveRecoveryAttempted &&
+			distributedEditingSettings.enabled &&
+			distributedEditingSettings.yjsRawPostContentSave !== false &&
+			isDistributedEditingYjsRawSaveRecoveryError( error )
+	);
+}
+
+async function maybeRecoverDistributedEditingYjsRawSave( {
+	select,
+	dispatch,
+	registry,
+	options = {},
+	error,
+} ) {
+	if (
+		! shouldAttemptDistributedEditingYjsRawSaveRecovery( {
+			select,
+			options,
+			error,
+		} )
+	) {
+		return null;
+	}
+
+	const syncResult =
+		await dispatch.__experimentalSyncDistributedEditingWithServer( {
+			suppressNotices: true,
+			localContent: select.getEditedPostContent?.(),
+			isDirty: true,
+		} );
+	const syncRecovered = [
+		'server_sync_merged',
+		'server_sync_applied_clean',
+		'server_sync_current',
+	].includes( syncResult?.status );
+
+	if ( ! syncRecovered ) {
+		showDistributedEditingSaveRecoveryFailedNotice( registry );
+
+		return {
+			status: 'yjs_raw_save_recovery_blocked',
+			reason: syncResult?.reason || syncResult?.status || null,
+			firstSaveErrorCode: getDistributedEditingSaveErrorCode( error ),
+			firstSaveErrorDetail: getDistributedEditingSaveErrorDetail( error ),
+			syncResult,
+			allowsNormalSaveFallback: false,
+			blocksNormalSavePost: true,
+			callsServerStateRefetchEndpoint: Boolean(
+				syncResult?.callsServerStateRefetchEndpoint
+			),
+			callsNormalSavePost: false,
+			callsAutosaveEndpoint: false,
+			callsRetrySaveEndpoint: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	}
+
+	clearDistributedEditingSaveRecoveryNotices( registry );
+	const retryResult = await dispatch.savePost( {
+		...options,
+		__experimentalDistributedEditingYjsRawSaveRecoveryAttempted: true,
+	} );
+
+	if (
+		retryResult &&
+		( retryResult.claimsSaved === false ||
+			retryResult.status === 'yjs_raw_save_recovery_retry_failed' )
+	) {
+		return retryResult;
+	}
+
+	return {
+		status: 'yjs_raw_save_recovered_after_refetch',
+		firstSaveErrorCode: getDistributedEditingSaveErrorCode( error ),
+		firstSaveErrorDetail: getDistributedEditingSaveErrorDetail( error ),
+		syncResult,
+		retryResult,
+		allowsNormalSaveFallback: false,
+		blocksNormalSavePost: true,
+		callsServerStateRefetchEndpoint: Boolean(
+			syncResult?.callsServerStateRefetchEndpoint
+		),
+		callsNormalSavePost: true,
+		callsAutosaveEndpoint: false,
+		callsRetrySaveEndpoint: false,
+		mutatesPersistedPostContent: true,
+		changesPostLock: false,
+		claimsSaved: true,
+	};
+}
+
+function shouldShowDistributedEditingYjsRawSaveRecoveryFailure( {
+	select,
+	options = {},
+	error,
+} ) {
+	const distributedEditingSettings =
+		select.getEditorSettings?.()?.distributedEditing || {};
+
+	return Boolean(
+		! options.isAutosave &&
+			! options.isPreview &&
+			options.__experimentalDistributedEditingYjsRawSaveRecoveryAttempted &&
+			distributedEditingSettings.enabled &&
+			distributedEditingSettings.yjsRawPostContentSave !== false &&
+			error
+	);
+}
 
 /**
  * Requests a fresh admin review for an imported local-updates handoff that
@@ -2772,7 +4004,7 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 						response,
 						preparedSessionState
 					);
-				const nextSessionState =
+				let nextSessionState =
 					getDistributedEditingSessionStateWithActionTranscriptEvent(
 						sessionState,
 						{
@@ -2782,6 +4014,16 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 								sessionState.localUpdatesImportFreshReviewRetrySaveHandoffReason,
 						}
 					);
+
+				const partialSafeServerContentResult =
+					maybeApplyDistributedEditingPartialSafeServerContent( {
+						dispatch,
+						registry,
+						select,
+						responseOrError: response,
+						sessionState: nextSessionState,
+					} );
+				nextSessionState = partialSafeServerContentResult.sessionState;
 
 				dispatch.setDistributedEditingSessionState( nextSessionState );
 
@@ -2838,6 +4080,72 @@ export const __experimentalValidateDistributedEditingFreshReviewRetrySaveHandoff
 				throw error;
 			}
 		};
+
+async function refreshDistributedEditingPresenceAfterServerUpdate( {
+	select,
+	dispatch,
+	publishHeartbeat = true,
+	refreshSnapshot = true,
+} ) {
+	const distributedEditingSettings =
+		select.getEditorSettings?.()?.distributedEditing || {};
+
+	if ( ! distributedEditingSettings.enabled ) {
+		return {
+			presenceUpdated: false,
+			reason: 'distributed_editing_disabled',
+		};
+	}
+
+	const result = {
+		presenceUpdated: false,
+		heartbeatAttempted: false,
+		heartbeatSkippedAsDuplicate: false,
+		snapshotAttempted: false,
+	};
+
+	if ( publishHeartbeat ) {
+		const sessionState = select.getDistributedEditingSessionState?.() || {};
+		const documentState =
+			getDistributedEditingPresenceHeartbeatDocumentState(
+				sessionState,
+				select
+			);
+		const hasConfirmedBase = Boolean( documentState.confirmedBaseVersion );
+		const heartbeatAlreadyPublished =
+			hasConfirmedBase &&
+			sessionState.presenceDocumentStatePublishedKey ===
+				documentState.presenceDocumentStatePublishedKey;
+
+		if ( hasConfirmedBase && ! heartbeatAlreadyPublished ) {
+			result.heartbeatAttempted = true;
+
+			try {
+				result.heartbeat =
+					await dispatch.__experimentalSendDistributedEditingPresenceHeartbeat();
+				result.presenceUpdated = true;
+			} catch ( error ) {
+				result.heartbeatError = error;
+			}
+		} else if ( heartbeatAlreadyPublished ) {
+			result.heartbeatSkippedAsDuplicate = true;
+		}
+	}
+
+	if ( refreshSnapshot ) {
+		result.snapshotAttempted = true;
+
+		try {
+			result.snapshot =
+				await dispatch.__experimentalRefreshDistributedEditingPresenceSnapshot();
+			result.presenceUpdated = true;
+		} catch ( error ) {
+			result.snapshotError = error;
+		}
+	}
+
+	return result;
+}
 
 /**
  * Prepares the retry-submit handoff after a successful local rebase.
@@ -2979,16 +4287,19 @@ export const __experimentalRefreshDistributedEditingRetrySubmitProof =
  * records whether the current accepted proof can be handed to a later save-path
  * consumer.
  *
+ * @param {Object} [options] Preparation options.
+ *
  * @return {Function} Action thunk.
  */
 export const __experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof =
-	() =>
+	( options = {} ) =>
 	( { select, dispatch } ) => {
 		const currentSessionState =
 			select.getDistributedEditingSessionState?.() || {};
 		const sessionState =
 			getDistributedEditingSessionStateForRetrySubmitSavePreparation(
-				currentSessionState
+				currentSessionState,
+				options
 			);
 		const nextSessionState = sessionState.retrySubmitSaveReady
 			? getDistributedEditingSessionStateWithActionTranscriptEvent(
@@ -3172,6 +4483,10 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					pendingChangeCount,
 					acceptedReviewApprovalProof,
 					acceptedFreshReviewConsumeValidation,
+					suppressExportDuringSave:
+						Boolean(
+							options.__experimentalDistributedEditingExplicitSaveClick
+						) && ! currentSessionState.canExportLocalUpdates,
 				}
 			);
 		const transcriptSavingSessionState =
@@ -3195,61 +4510,142 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		const proposedPostContent = getDistributedEditingComparablePostContent(
 			proposedPostContentCandidate
 		);
-		let proposedPostContentHash =
-			options.proposedPostContentHash ??
-			getDistributedEditingRetrySaveProposedContentHashEvidence(
-				currentSessionState,
+			let proposedPostContentHash =
+				options.proposedPostContentHash ??
+				getDistributedEditingRetrySaveProposedContentHashEvidence(
+					currentSessionState,
 				{
 					acceptedReviewApprovalProof,
-					acceptedFreshReviewConsumeValidation,
-				}
-			);
-		const requestClientBaseVersion =
-			options.clientBaseVersion ??
-			currentSessionState.serverVersion ??
+						acceptedFreshReviewConsumeValidation,
+					}
+				);
+			const calculatedProposedPostContentHash =
+				await getDistributedEditingPostContentSha256Hash(
+					proposedPostContent
+				);
+
+			if (
+				calculatedProposedPostContentHash &&
+				proposedPostContentHash !== calculatedProposedPostContentHash
+			) {
+				proposedPostContentHash = calculatedProposedPostContentHash;
+			}
+			const requestClientBaseVersion =
+				options.clientBaseVersion ??
+				currentSessionState.serverVersion ??
 			currentSessionState.clientBaseVersion;
 		const requestAcceptedProofServerVersion =
 			options.acceptedProofServerVersion ??
 			currentSessionState.serverVersion;
 		let blockIdentityRequestProof = options.blockIdentityRequestProof;
+		let yjsClientUpdate = options.yjsClientUpdate;
 
 		if (
 			blockIdentityRequestProof === undefined &&
-			options.prepareBlockIdentityRequestProof !== false &&
-			isDistributedEditingBlockIdentityRetrySaveRequestEligible( {
-				clientBaseVersion: requestClientBaseVersion,
-				acceptedProofServerVersion: requestAcceptedProofServerVersion,
-				sessionState: currentSessionState,
-			} )
+			options.prepareBlockIdentityRequestProof !== false
 		) {
 			const acceptedSyncMeta =
 				getDistributedEditingAcceptedBlockIdentitySyncMetaForRetrySave(
 					{
 						currentPost,
 						options,
+						sessionState: currentSessionState,
 					}
 				);
 
 			if ( acceptedSyncMeta ) {
-				const blockIdentityRequestProofDescriptor =
-					await getDistributedEditingBlockIdentityRequestProofDescriptor(
-						{
-							acceptedSyncMeta,
-							proposedPostContent,
-							proposedPostContentHash,
-							clientBaseVersion: requestClientBaseVersion,
-						}
-					);
+				let isBlockIdentityRetrySaveRequestEligible =
+					isDistributedEditingBlockIdentityRetrySaveRequestEligible( {
+						clientBaseVersion: requestClientBaseVersion,
+						acceptedProofServerVersion:
+							requestAcceptedProofServerVersion,
+						sessionState: currentSessionState,
+					} );
 
 				if (
-					blockIdentityRequestProofDescriptor.status ===
-					DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY
+					! isBlockIdentityRetrySaveRequestEligible &&
+					isDistributedEditingStaleServerBlockIdentityRetrySaveRequestVersionEligible(
+						{
+							clientBaseVersion: requestClientBaseVersion,
+							acceptedProofServerVersion:
+								requestAcceptedProofServerVersion,
+							sessionState: currentSessionState,
+						}
+					)
 				) {
-					blockIdentityRequestProof =
-						blockIdentityRequestProofDescriptor.requestProof;
-					proposedPostContentHash =
-						proposedPostContentHash ||
-						blockIdentityRequestProofDescriptor.proposedPostContentHash;
+					const serverMergeDescriptor =
+						await getDistributedEditingStaleServerBlockIdentityMergeDescriptor(
+							{
+								acceptedSyncMeta,
+								serverPostContent:
+									currentSessionState.refetchedServerContent,
+								proposedPostContent,
+							}
+						);
+
+					isBlockIdentityRetrySaveRequestEligible =
+						serverMergeDescriptor.status ===
+						DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY;
+				}
+
+				if ( isBlockIdentityRetrySaveRequestEligible ) {
+					const blockIdentityRequestProofDescriptor =
+						await getDistributedEditingBlockIdentityRequestProofDescriptor(
+							{
+								acceptedSyncMeta,
+								proposedPostContent,
+								proposedPostContentHash,
+								clientBaseVersion: requestClientBaseVersion,
+							}
+						);
+
+					if (
+						blockIdentityRequestProofDescriptor.status ===
+						DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY
+					) {
+						blockIdentityRequestProof =
+							blockIdentityRequestProofDescriptor.requestProof;
+						proposedPostContentHash =
+							proposedPostContentHash ||
+							blockIdentityRequestProofDescriptor.proposedPostContentHash;
+					}
+				}
+			}
+		}
+
+		if (
+			yjsClientUpdate === undefined &&
+			options.prepareYjsClientUpdate !== false
+		) {
+			const currentPostContent =
+				getDistributedEditingPostRawContent( currentPost );
+			const currentSyncMeta =
+				getDistributedEditingSyncMetaFromPostContent(
+					currentPostContent
+				) ?? currentSessionState.clientBaseSyncMeta;
+			const shouldPrepareYjsClientUpdate =
+				currentSyncMeta &&
+				( currentSyncMeta.schema === 'de-rtc-yjs-v1' ||
+					currentSyncMeta.yjs_encoding ===
+						'native-yjs-php-update-v0' ||
+					currentSyncMeta.yjs_update );
+			const clientBaseContent =
+				options.yjsClientBaseContent ??
+				currentSessionState.clientBaseContent ??
+				getDistributedEditingComparablePostContent(
+					currentPostContent
+				);
+
+			if ( shouldPrepareYjsClientUpdate ) {
+				const yjsClientUpdateDescriptor =
+					await getDistributedEditingYjsClientUpdateDescriptor( {
+						clientBaseContent,
+						proposedPostContent,
+						actor: `editor-${ postId || 'unknown' }`,
+					} );
+
+				if ( yjsClientUpdateDescriptor.status === 'ready' ) {
+					yjsClientUpdate = yjsClientUpdateDescriptor.update;
 				}
 			}
 		}
@@ -3280,6 +4676,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			acceptedReviewApprovalProof,
 			acceptedFreshReviewConsumeValidation,
 			blockIdentityRequestProof,
+			yjsClientUpdate,
 		};
 
 		dispatch.setDistributedEditingSessionState(
@@ -3392,6 +4789,16 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 					);
 			}
 
+			const partialSafeServerContentResult =
+				maybeApplyDistributedEditingPartialSafeServerContent( {
+					dispatch,
+					registry,
+					select,
+					responseOrError: response,
+					sessionState: nextSessionState,
+				} );
+			nextSessionState = partialSafeServerContentResult.sessionState;
+
 			dispatch.setDistributedEditingSessionState( nextSessionState );
 			if (
 				retrySaveConfirmedResponse &&
@@ -3408,6 +4815,10 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				deleteDistributedEditingFreshReviewImportContentVaultEntry( {
 					postId,
 					postType,
+				} );
+				await refreshDistributedEditingPresenceAfterServerUpdate( {
+					select,
+					dispatch,
 				} );
 			}
 
@@ -3427,11 +4838,11 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				typeof retrySaveResultSessionState.refetchedServerContent !==
 					'string';
 
-			if ( shouldHydrateManualConflict ) {
-				try {
-					const refetchResponse =
-						await requestDistributedEditingServerStateRefetch( {
-							postId,
+				if ( shouldHydrateManualConflict ) {
+					try {
+						const refetchResponse =
+							await requestDistributedEditingServerStateRefetch( {
+								postId,
 							restBase,
 						} );
 					const refetchedPostContent =
@@ -3480,14 +4891,25 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 						};
 					}
 				} catch {
-					// Keep the original protected retry-save rejection state when a follow-up refetch fails.
+						// Keep the original protected retry-save rejection state when a follow-up refetch fails.
+					}
 				}
-			}
 
-			dispatch.setDistributedEditingSessionState(
-				getDistributedEditingSessionStateWithActionTranscriptEvent(
-					retrySaveResultSessionState,
-					{
+				const partialSafeServerContentResult =
+					maybeApplyDistributedEditingPartialSafeServerContent( {
+						dispatch,
+						registry,
+						select,
+						responseOrError: error,
+						sessionState: retrySaveResultSessionState,
+					} );
+				retrySaveResultSessionState =
+					partialSafeServerContentResult.sessionState;
+
+				dispatch.setDistributedEditingSessionState(
+					getDistributedEditingSessionStateWithActionTranscriptEvent(
+						retrySaveResultSessionState,
+						{
 						eventType:
 							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
 						reasonCode: retrySaveResultSessionState.retrySaveReason,
@@ -3504,26 +4926,35 @@ function applyDistributedEditingConfirmedPostContent( {
 	registry,
 	select,
 	postContent,
+	preserveEditorContent = false,
 } ) {
 	const comparablePostContent =
 		getDistributedEditingComparablePostContent( postContent );
-	const applyPostContent = () => {
-		const parsedBlocks = parse( comparablePostContent );
+	const preservedEditorContent =
+		preserveEditorContent && typeof select.getEditedPostContent === 'function'
+			? getDistributedEditingComparablePostContent(
+					select.getEditedPostContent()
+			  )
+			: null;
+	const applyPostContent = ( nextPostContent = comparablePostContent ) => {
+		const parsedBlocks = parse( nextPostContent );
 
-		if ( parsedBlocks.length || ! comparablePostContent ) {
+		if ( parsedBlocks.length || ! nextPostContent ) {
 			dispatch.resetEditorBlocks( parsedBlocks, {
 				__unstableShouldCreateUndoLevel: false,
 			} );
 		}
 		dispatch.editPost(
-			{ content: comparablePostContent },
+			{ content: nextPostContent },
 			{
 				undoIgnore: true,
 			}
 		);
 	};
 
-	applyPostContent();
+	if ( ! preserveEditorContent ) {
+		applyPostContent();
+	}
 	const currentPost = select.getCurrentPost?.() || {};
 	const postType = currentPost.type;
 	const postId = currentPost.id;
@@ -3545,6 +4976,100 @@ function applyDistributedEditingConfirmedPostContent( {
 				content: nextContent,
 			} );
 	}
+
+	if (
+		preserveEditorContent &&
+		typeof preservedEditorContent === 'string'
+	) {
+		applyPostContent( preservedEditorContent );
+	}
+}
+
+function hasDistributedEditingPartialSafeMergeAppliedResponse(
+	responseOrError = {}
+) {
+	const responseData =
+		responseOrError?.data && typeof responseOrError.data === 'object'
+			? responseOrError.data
+			: {};
+
+	return Boolean(
+		responseOrError.partialSafeMergeApplied ||
+			responseOrError.partial_safe_merge_applied ||
+			responseData.partialSafeMergeApplied ||
+			responseData.partial_safe_merge_applied
+	);
+}
+
+function maybeApplyDistributedEditingPartialSafeServerContent( {
+	dispatch,
+	registry,
+	select,
+	responseOrError,
+	sessionState,
+} ) {
+	const responseData =
+		responseOrError?.data && typeof responseOrError.data === 'object'
+			? responseOrError.data
+			: {};
+	const responseReasonCode =
+		responseOrError?.reasonCode ||
+		responseOrError?.reason_code ||
+		responseOrError?.code ||
+		responseData.reasonCode ||
+		responseData.reason_code ||
+		responseData.code;
+	const responseResult = responseOrError?.result || responseData.result;
+	const responsePostContent =
+		getDistributedEditingPostContentFromResponse( responseOrError );
+	const safeServerContent =
+		typeof sessionState.refetchedServerContent === 'string'
+			? sessionState.refetchedServerContent
+			: responsePostContent;
+	const hasPartialSafeReviewState =
+		sessionState.reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT &&
+		sessionState.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+	const hasPartialSafeResponse =
+		responseResult === 'retry_save_partial_safe_merge' ||
+		responseReasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT;
+	const shouldApplySafeServerContent =
+		hasDistributedEditingPartialSafeMergeAppliedResponse( responseOrError ) &&
+		( hasPartialSafeReviewState || hasPartialSafeResponse ) &&
+		typeof safeServerContent === 'string';
+
+	if ( ! shouldApplySafeServerContent ) {
+		return {
+			applied: false,
+			sessionState,
+		};
+	}
+
+	// A partial-safe rejection still means WordPress has accepted the safe subset.
+	// Update the accepted base without replacing the author's unsafe local block.
+	applyDistributedEditingConfirmedPostContent( {
+		dispatch,
+		registry,
+		select,
+		postContent: safeServerContent,
+		preserveEditorContent: true,
+	} );
+
+	return {
+		applied: true,
+		sessionState: normalizeDistributedEditingSessionState( {
+			...sessionState,
+			clientBaseContent: safeServerContent,
+			refetchedServerContent: safeServerContent,
+			refetchedServerState: true,
+			requiresServerStateRefetch: false,
+			requiresManualConflictResolution: false,
+			canExportLocalUpdates: false,
+			isAwaitingServerConfirmation: false,
+		} ),
+	};
 }
 
 function isDistributedEditingRetrySaveAppliedResponse( response = {} ) {
@@ -3660,9 +5185,77 @@ function isDistributedEditingStaleUntouchedServerRetrySaveRequest( {
 	);
 }
 
+function isDistributedEditingStaleServerBlockIdentityRetrySaveRequestVersionEligible( {
+	clientBaseVersion,
+	acceptedProofServerVersion,
+	sessionState = {},
+} = {} ) {
+	const serverVersion = sessionState.serverVersion;
+	const clientBaseContent = getDistributedEditingComparablePostContent(
+		sessionState.clientBaseContent
+	);
+	const refetchedServerContent = getDistributedEditingComparablePostContent(
+		sessionState.refetchedServerContent
+	);
+
+	return (
+		clientBaseVersion !== undefined &&
+		clientBaseVersion !== null &&
+		acceptedProofServerVersion !== undefined &&
+		acceptedProofServerVersion !== null &&
+		serverVersion !== undefined &&
+		serverVersion !== null &&
+		String( clientBaseVersion ) === String( acceptedProofServerVersion ) &&
+		String( acceptedProofServerVersion ) !== String( serverVersion ) &&
+		sessionState.refetchedServerState === true &&
+		typeof clientBaseContent === 'string' &&
+		typeof refetchedServerContent === 'string'
+	);
+}
+
+function isDistributedEditingYjsRetrySaveSyncMeta( syncMeta ) {
+	return (
+		syncMeta &&
+		typeof syncMeta === 'object' &&
+		! Array.isArray( syncMeta ) &&
+		( syncMeta.schema === 'de-rtc-yjs-v1' ||
+			syncMeta.yjs_encoding === 'native-yjs-php-update-v0' ||
+			syncMeta.yjs_update )
+	);
+}
+
+async function getDistributedEditingStaleServerBlockIdentityMergeDescriptor( {
+	acceptedSyncMeta,
+	serverPostContent,
+	proposedPostContent,
+} = {} ) {
+	const retainedEditsDescriptor =
+		await getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor(
+			{
+				acceptedSyncMeta,
+				serverPostContent,
+				proposedPostContent,
+			}
+		);
+
+	if (
+		retainedEditsDescriptor.status ===
+		DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY
+	) {
+		return retainedEditsDescriptor;
+	}
+
+	return getDistributedEditingBlockIdentityDistinctGapInsertionDescriptor( {
+		acceptedSyncMeta,
+		serverPostContent,
+		proposedPostContent,
+	} );
+}
+
 function getDistributedEditingAcceptedBlockIdentitySyncMetaForRetrySave( {
 	currentPost = {},
 	options = {},
+	sessionState = {},
 } = {} ) {
 	const explicitSyncMeta =
 		options.acceptedBlockIdentitySyncMeta ?? options.acceptedSyncMeta;
@@ -3673,6 +5266,14 @@ function getDistributedEditingAcceptedBlockIdentitySyncMetaForRetrySave( {
 		! Array.isArray( explicitSyncMeta )
 	) {
 		return explicitSyncMeta;
+	}
+
+	if (
+		sessionState.clientBaseSyncMeta &&
+		typeof sessionState.clientBaseSyncMeta === 'object' &&
+		! Array.isArray( sessionState.clientBaseSyncMeta )
+	) {
+		return sessionState.clientBaseSyncMeta;
 	}
 
 	const postContent =
@@ -3961,6 +5562,36 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 			return handoff;
 		}
 
+		if (
+			currentSessionState.retrySubmitSaveRequiresExplicitSaveClick &&
+			options.__experimentalDistributedEditingExplicitSaveClick !== true
+		) {
+			const handoff = {
+				status: 'retry_save_blocked',
+				reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_SAVE_REQUIRES_EXPLICIT_SAVE_CLICK,
+				policy: {
+					...policy,
+					reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_SAVE_REQUIRES_EXPLICIT_SAVE_CLICK,
+					canRetrySave: false,
+					shouldCallRetrySaveEndpoint: false,
+				},
+				allowsNormalSaveFallback: false,
+				blocksNormalSavePost: true,
+				callsRetrySaveAction: false,
+				callsNormalSavePost: false,
+				response: null,
+			};
+
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateForRetrySaveHandoff(
+					currentSessionState,
+					handoff
+				)
+			);
+
+			return handoff;
+		}
+
 		const retrySaveAcceptedFreshReviewConsumeValidation =
 			acceptedFreshReviewConsumeValidation ??
 			policy.request.acceptedFreshReviewConsumeValidation;
@@ -3986,6 +5617,7 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 					acceptedProofCreatesRevision:
 						options.acceptedProofCreatesRevision,
 					acceptedProofClaimsSaved: options.acceptedProofClaimsSaved,
+					yjsClientBaseContent: options.yjsClientBaseContent,
 					acceptedReviewApprovalProof:
 						options.acceptedReviewApprovalProof ??
 						policy.request.acceptedReviewApprovalProof,
@@ -4063,9 +5695,13 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 			currentSessionState.clientBaseVersion ||
 			currentSessionState.serverVersion ||
 			currentPostSyncMetaVersion;
-		const clientBaseContent = getDistributedEditingComparablePostContent(
-			getDistributedEditingPostRawContent( currentPost )
-		);
+		const currentPostComparableContent =
+			getDistributedEditingComparablePostContent(
+				getDistributedEditingPostRawContent( currentPost )
+			);
+		const clientBaseContent =
+			currentSessionState.clientBaseContent ??
+			currentPostComparableContent;
 		const localContent = select.getEditedPostContent?.();
 
 		if (
@@ -4084,10 +5720,18 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 				{
 					postId,
 					restBase,
+					stateHash:
+						currentSessionState.distributedEditingPostStateHash,
 				}
 			);
+			const responseStateHash =
+				getDistributedEditingPostSnapshotStateHashFromResponse(
+					response
+				) || currentSessionState.distributedEditingPostStateHash;
 			const serverContent =
-				getDistributedEditingPostContentFromResponse( response );
+				isDistributedEditingPostSnapshotNotModifiedResponse( response )
+					? clientBaseContent
+					: getDistributedEditingPostContentFromResponse( response );
 
 			if ( typeof serverContent !== 'string' ) {
 				return getDistributedEditingNormalSaveFreshnessGuardAllowedResult(
@@ -4134,75 +5778,296 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 					...currentSessionState,
 					clientBaseVersion: rebasedFromVersion,
 					serverVersion,
+					distributedEditingPostStateHash: responseStateHash,
 					clientBaseContent,
 					pendingChangeCount,
 					hasPendingChanges: true,
+					saveButtonClickInFlight: true,
 					mustOfferLocalCopy: true,
 					canExportLocalUpdates: true,
+					retrySubmitHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+					retrySubmitHandoffReason: null,
+					retrySubmitPrepared: false,
+					retrySubmitProofStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+					retrySubmitProofReason: null,
+					retrySubmitAccepted: false,
+					retrySubmitSavePathRequired: false,
+					retrySubmitSavesPost: false,
+					retrySubmitMutatesPostContent: false,
+					retrySubmitCreatesRevision: false,
+					retrySubmitClaimsSaved: false,
+					retrySubmitSaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+					retrySubmitSaveReason: null,
+					retrySubmitSavePrepared: false,
+					retrySubmitSaveReady: false,
+					retrySubmitSaveRequiresExplicitSaveClick: false,
+					retrySaveStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+					retrySaveReason: null,
+					retrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+					retrySaveHandoffReason: null,
+					retrySaveHandoffAllowsNormalSaveFallback: false,
+					retrySaveHandoffBlocksNormalSave: false,
+					retrySaveAccepted: false,
+					retrySaveServerVersion: null,
+					retrySavePreviousServerVersion: null,
+					retrySaveSavesPost: false,
+					retrySaveMutatesPostContent: false,
+					retrySaveCreatesRevision: false,
+					retrySaveClaimsSaved: false,
+					retrySaveRevisionCreated: false,
+					retrySaveCreatedRevisionIds: [],
 				};
 
-				dispatch.setDistributedEditingSessionState(
+				let didCallRetrySubmit = false;
+				let didCallRetrySave = false;
+				let didRefetchAfterStaleRetrySubmit = false;
+				let latestServerVersion = serverVersion;
+
+				for (
+					let retrySubmitAttempt = 0;
+					retrySubmitAttempt < 2;
+					retrySubmitAttempt++
+				) {
+					dispatch.setDistributedEditingSessionState(
+						getDistributedEditingSessionStateWithActionTranscriptEvent(
+							{
+								...proofReadySessionState,
+								serverVersion: latestServerVersion,
+							},
+							{
+								eventType:
+									DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+							}
+						)
+					);
+
+					try {
+						didCallRetrySubmit = true;
+						await dispatch.__experimentalRefreshDistributedEditingRetrySubmitProof(
+							{
+								...options,
+								clientBaseVersion: latestServerVersion,
+								rebasedFromVersion,
+								pendingChangeCount,
+								proposedPostContentHash,
+							}
+						);
+						await dispatch.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof();
+
+						didCallRetrySave = true;
+						const retrySaveResult =
+							await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
+								{
+									...options,
+									proposedPostContent,
+									proposedPostContentHash,
+									clientBaseVersion: latestServerVersion,
+									acceptedProofServerVersion:
+										latestServerVersion,
+									rebasedFromVersion,
+									pendingChangeCount,
+								}
+							);
+
+						return {
+							...retrySaveResult,
+							status:
+								retrySaveResult.status ===
+								'retry_save_submitted'
+									? 'distributed_editing_normal_save_guarded_retry_save_submitted'
+									: retrySaveResult.status,
+							allowsNormalSaveFallback: false,
+							callsServerStateRefetchEndpoint: true,
+							callsRetrySubmitEndpoint: true,
+							callsNormalSavePost: false,
+							callsRetrySaveEndpoint: Boolean(
+								retrySaveResult.callsRetrySaveAction
+							),
+							retriedStaleRetrySubmitProof:
+								didRefetchAfterStaleRetrySubmit,
+							mutatesEditorContent: false,
+							changesPostLock: false,
+						};
+					} catch ( error ) {
+						const canRetryStaleRetrySubmit =
+							! didCallRetrySave &&
+							retrySubmitAttempt === 0 &&
+							isDistributedEditingStaleBaseError( error );
+
+						if ( canRetryStaleRetrySubmit ) {
+							const retryResponse =
+								await requestDistributedEditingServerStateRefetch(
+									{
+										postId,
+										restBase,
+										stateHash: responseStateHash,
+									}
+								);
+							const retryServerContent =
+								isDistributedEditingPostSnapshotNotModifiedResponse(
+									retryResponse
+								)
+									? clientBaseContent
+									: getDistributedEditingPostContentFromResponse(
+											retryResponse
+									  );
+
+							if ( retryServerContent === clientBaseContent ) {
+								latestServerVersion =
+									getDistributedEditingServerVersionFromResponse(
+										retryResponse
+									) || latestServerVersion;
+								didRefetchAfterStaleRetrySubmit = true;
+								didCallRetrySubmit = false;
+								continue;
+							}
+						}
+
+						const sessionState =
+							select.getDistributedEditingSessionState?.() || {};
+
+						return {
+							status: 'distributed_editing_normal_save_guarded_retry_save_blocked',
+							reason:
+								error?.code ||
+								sessionState.reasonCode ||
+								sessionState.retrySaveReason ||
+								sessionState.retrySubmitProofReason ||
+								DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+							error,
+							allowsNormalSaveFallback: false,
+							blocksNormalSavePost: true,
+							callsServerStateRefetchEndpoint: true,
+							callsRetrySubmitEndpoint: didCallRetrySubmit,
+							callsNormalSavePost: false,
+							callsRetrySaveEndpoint: didCallRetrySave,
+							mutatesEditorContent: false,
+							mutatesPersistedPostContent: false,
+							changesPostLock: false,
+							claimsSaved: false,
+							canExportLocalUpdates: true,
+							requiresServerStateRefetch: Boolean(
+								sessionState.requiresServerStateRefetch
+							),
+						};
+					}
+				}
+			}
+
+			const staleSessionState =
+				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
+					clientBaseVersion: rebasedFromVersion,
+					serverVersion,
+					clientBaseContent,
+					clientBaseSyncMeta: currentSessionState.clientBaseSyncMeta,
+					pendingChangeCount,
+					remoteChangeCount:
+						currentSessionState.remoteChangeCount || 1,
+					canAttemptLocalRebase: true,
+				} );
+			const refetchedSessionState =
+				getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
+					response,
+					staleSessionState
+				);
+
+			const blockIdentityProposedPostContent =
+				getDistributedEditingComparablePostContent( localContent );
+			const acceptedSyncMeta =
+				getDistributedEditingAcceptedBlockIdentitySyncMetaForRetrySave(
+					{
+						currentPost,
+						options,
+						sessionState: currentSessionState,
+					}
+				);
+			const acceptedYjsSyncMeta =
+				currentSessionState.clientBaseSyncMeta ??
+				getDistributedEditingSyncMetaFromPostContent(
+					getDistributedEditingPostRawContent( currentPost )
+				);
+
+			if (
+				isDistributedEditingYjsRetrySaveSyncMeta( acceptedYjsSyncMeta ) &&
+				typeof blockIdentityProposedPostContent === 'string'
+			) {
+				const proposedPostContentHash =
+					await getDistributedEditingPostContentSha256Hash(
+						blockIdentityProposedPostContent
+					);
+				const yjsSessionState =
 					getDistributedEditingSessionStateWithActionTranscriptEvent(
-						proofReadySessionState,
+						{
+							...refetchedSessionState,
+							saveButtonClickInFlight: true,
+						},
 						{
 							eventType:
 								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
 						}
-					)
-				);
-
-				let didCallRetrySubmit = false;
+					);
 				let didCallRetrySave = false;
 
-				try {
-					didCallRetrySubmit = true;
-					await dispatch.__experimentalRefreshDistributedEditingRetrySubmitProof(
-						{
-							...options,
-							clientBaseVersion: serverVersion,
-							rebasedFromVersion,
-							pendingChangeCount,
-							proposedPostContentHash,
-						}
-					);
-					await dispatch.__experimentalPrepareDistributedEditingRetrySubmitSaveAfterProof();
+				dispatch.setDistributedEditingSessionState( yjsSessionState );
 
+				try {
 					didCallRetrySave = true;
 					const retrySaveResult =
-						await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
+						await dispatch.__experimentalSaveDistributedEditingRetryAfterProof(
 							{
 								...options,
-								proposedPostContent,
+								proposedPostContent:
+									blockIdentityProposedPostContent,
 								proposedPostContentHash,
-								clientBaseVersion: serverVersion,
-								acceptedProofServerVersion: serverVersion,
+								clientBaseVersion: rebasedFromVersion,
+								acceptedProofServerVersion:
+									rebasedFromVersion,
 								rebasedFromVersion,
 								pendingChangeCount,
+								yjsClientBaseContent: clientBaseContent,
+								prepareBlockIdentityRequestProof: false,
 							}
+						);
+					const retrySaveSubmitted =
+						isDistributedEditingRetrySaveAppliedResponse(
+							retrySaveResult
 						);
 
 					return {
 						...retrySaveResult,
 						status:
+							retrySaveSubmitted ||
 							retrySaveResult.status === 'retry_save_submitted'
-								? 'distributed_editing_normal_save_guarded_retry_save_submitted'
+								? 'distributed_editing_normal_save_yjs_server_merge_retry_save_submitted'
 								: retrySaveResult.status,
+						yjsServerMergeCandidate: true,
 						allowsNormalSaveFallback: false,
 						callsServerStateRefetchEndpoint: true,
-						callsRetrySubmitEndpoint: true,
+						callsRetrySubmitEndpoint: false,
 						callsNormalSavePost: false,
-						callsRetrySaveEndpoint: Boolean(
-							retrySaveResult.callsRetrySaveAction
-						),
+						callsRetrySaveEndpoint: true,
 						mutatesEditorContent: false,
+						mutatesPersistedPostContent: Boolean(
+							retrySaveResult.mutates_post_content ||
+								retrySaveResult.mutatesPostContent
+						),
 						changesPostLock: false,
+						claimsSaved: Boolean(
+							retrySaveResult.claims_saved ||
+								retrySaveResult.claimsSaved
+						),
 					};
 				} catch ( error ) {
 					const sessionState =
 						select.getDistributedEditingSessionState?.() || {};
 
 					return {
-						status: 'distributed_editing_normal_save_guarded_retry_save_blocked',
+						status: 'distributed_editing_normal_save_yjs_server_merge_retry_blocked',
 						reason:
 							error?.code ||
 							sessionState.reasonCode ||
@@ -4210,10 +6075,11 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 							sessionState.retrySubmitProofReason ||
 							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 						error,
+						yjsServerMergeCandidate: true,
 						allowsNormalSaveFallback: false,
 						blocksNormalSavePost: true,
 						callsServerStateRefetchEndpoint: true,
-						callsRetrySubmitEndpoint: didCallRetrySubmit,
+						callsRetrySubmitEndpoint: false,
 						callsNormalSavePost: false,
 						callsRetrySaveEndpoint: didCallRetrySave,
 						mutatesEditorContent: false,
@@ -4228,21 +6094,124 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 				}
 			}
 
-			const staleSessionState =
-				getDistributedEditingSessionStateForStaleBaseRejectionResult( {
-					clientBaseVersion: rebasedFromVersion,
-					serverVersion,
-					clientBaseContent,
-					pendingChangeCount,
-					remoteChangeCount:
-						currentSessionState.remoteChangeCount || 1,
-					canAttemptLocalRebase: true,
-				} );
-			const refetchedSessionState =
-				getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult(
-					response,
-					staleSessionState
-				);
+			if (
+				acceptedSyncMeta &&
+				typeof blockIdentityProposedPostContent === 'string'
+			) {
+				const serverMergeDescriptor =
+					await getDistributedEditingStaleServerBlockIdentityMergeDescriptor(
+						{
+							acceptedSyncMeta,
+							serverPostContent: serverContent,
+							proposedPostContent:
+								blockIdentityProposedPostContent,
+						}
+					);
+
+				if (
+					serverMergeDescriptor.status ===
+					DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY
+				) {
+					const proposedPostContentHash =
+						await getDistributedEditingPostContentSha256Hash(
+							blockIdentityProposedPostContent
+						);
+					const blockIdentitySessionState =
+						getDistributedEditingSessionStateWithActionTranscriptEvent(
+							{
+								...refetchedSessionState,
+								saveButtonClickInFlight: true,
+							},
+							{
+								eventType:
+									DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED,
+							}
+						);
+					let didCallRetrySave = false;
+
+					dispatch.setDistributedEditingSessionState(
+						blockIdentitySessionState
+					);
+
+					try {
+						didCallRetrySave = true;
+						const retrySaveResult =
+							await dispatch.__experimentalSaveDistributedEditingRetryAfterProof(
+								{
+									...options,
+									proposedPostContent:
+										blockIdentityProposedPostContent,
+									proposedPostContentHash,
+									clientBaseVersion: rebasedFromVersion,
+									acceptedProofServerVersion:
+										rebasedFromVersion,
+									rebasedFromVersion,
+									pendingChangeCount,
+								}
+							);
+						const retrySaveSubmitted =
+							isDistributedEditingRetrySaveAppliedResponse(
+								retrySaveResult
+							);
+
+						return {
+							...retrySaveResult,
+							status:
+								retrySaveSubmitted ||
+								retrySaveResult.status ===
+									'retry_save_submitted'
+									? 'distributed_editing_normal_save_block_identity_server_merge_retry_save_submitted'
+									: retrySaveResult.status,
+							blockIdentityServerMergeCandidate: true,
+							allowsNormalSaveFallback: false,
+							callsServerStateRefetchEndpoint: true,
+							callsRetrySubmitEndpoint: false,
+							callsNormalSavePost: false,
+							callsRetrySaveEndpoint: true,
+							mutatesEditorContent: false,
+							mutatesPersistedPostContent: Boolean(
+								retrySaveResult.mutates_post_content ||
+									retrySaveResult.mutatesPostContent
+							),
+							changesPostLock: false,
+							claimsSaved: Boolean(
+								retrySaveResult.claims_saved ||
+									retrySaveResult.claimsSaved
+							),
+						};
+					} catch ( error ) {
+						const sessionState =
+							select.getDistributedEditingSessionState?.() || {};
+
+						return {
+							status: 'distributed_editing_normal_save_block_identity_server_merge_retry_blocked',
+							reason:
+								error?.code ||
+								sessionState.reasonCode ||
+								sessionState.retrySaveReason ||
+								sessionState.retrySubmitProofReason ||
+								DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+							error,
+							blockIdentityServerMergeCandidate: true,
+							allowsNormalSaveFallback: false,
+							blocksNormalSavePost: true,
+							callsServerStateRefetchEndpoint: true,
+							callsRetrySubmitEndpoint: false,
+							callsNormalSavePost: false,
+							callsRetrySaveEndpoint: didCallRetrySave,
+							mutatesEditorContent: false,
+							mutatesPersistedPostContent: false,
+							changesPostLock: false,
+							claimsSaved: false,
+							canExportLocalUpdates: true,
+							requiresServerStateRefetch: Boolean(
+								sessionState.requiresServerStateRefetch
+							),
+						};
+					}
+				}
+			}
+
 			const plannedSessionState =
 				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan(
 					refetchedSessionState
@@ -4261,7 +6230,10 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 					);
 				const rebasedSessionState =
 					getDistributedEditingSessionStateWithActionTranscriptEvent(
-						rebaseResult.sessionState,
+						{
+							...rebaseResult.sessionState,
+							saveButtonClickInFlight: true,
+						},
 						{
 							eventType:
 								DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED,
@@ -4298,6 +6270,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 								...options,
 								proposedPostContent,
 								proposedPostContentHash,
+								yjsClientBaseContent: serverContent,
 								clientBaseVersion: serverVersion,
 								acceptedProofServerVersion: serverVersion,
 								rebasedFromVersion,
@@ -4462,6 +6435,17 @@ function getDistributedEditingNormalSaveFreshnessGuardAllowedResult( {
 	};
 }
 
+function isDistributedEditingStaleBaseError( error ) {
+	return (
+		error?.code ===
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED ||
+		error?.data?.reason_code ===
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED ||
+		error?.data?.reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED
+	);
+}
+
 function getDistributedEditingPostRawContent( post ) {
 	if ( typeof post?.content === 'string' ) {
 		return post.content;
@@ -4520,52 +6504,149 @@ export const savePost =
 		}
 
 		const content = select.getEditedPostContent();
-		dispatch.editPost( { content }, { undoIgnore: true } );
+		applyDistributedEditingSyncedEditorContent( dispatch, content );
+		let contentForPersistence = content;
+		const distributedEditingSettings =
+			select.getEditorSettings?.()?.distributedEditing || {};
+
+		if (
+			! options.isAutosave &&
+			! options.isPreview &&
+			distributedEditingSettings.enabled &&
+			distributedEditingSettings.yjsRawPostContentSave !== false
+		) {
+			const currentPost = select.getCurrentPost?.() || {};
+			const currentRawContent =
+				getDistributedEditingPostRawContent( currentPost );
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const currentPostSyncMeta =
+				getDistributedEditingSyncMetaFromPostContent(
+					currentRawContent
+				);
+			const yjsPostContent =
+				await getDistributedEditingPostContentWithYjsSyncMeta( {
+					clientBaseContent: currentRawContent,
+					proposedPostContent: content,
+					existingSyncMeta: currentPostSyncMeta || {
+						version:
+							currentSessionState.serverVersion ||
+							currentSessionState.clientBaseVersion ||
+							'0',
+						schema: 'de-rtc-yjs-v1',
+					},
+					actor: `editor-${ currentPost.id || 'post' }`,
+				} );
+
+			if ( yjsPostContent.status === 'ready' ) {
+				contentForPersistence = yjsPostContent.postContent;
+			}
+		}
 
 		if (
 			select.shouldUseDistributedEditingRetrySaveForSavePost( options )
 		) {
-			const currentPost = select.getCurrentPost?.() || {};
-			const currentSessionState =
-				select.getDistributedEditingSessionState?.() || {};
-			const acceptedFreshReviewConsumeValidation =
-				options.acceptedFreshReviewConsumeValidation ??
-				getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
-					currentSessionState
-				);
-			const retrySaveProposedPostContent =
-				options.proposedPostContent ??
-				getDistributedEditingFreshReviewImportedPostContentForRetrySave(
-					{
-						postId: currentPost.id,
-						postType: currentPost.type,
-						sessionState: currentSessionState,
-						acceptedFreshReviewConsumeValidation,
-					}
-				) ??
-				content;
-			const retrySaveHandoff =
-				await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
-					{
-						...options,
-						proposedPostContent: retrySaveProposedPostContent,
-						acceptedFreshReviewConsumeValidation,
-					}
-				);
+			const preflightSavePolicy =
+				select.getDistributedEditingSavePolicyState?.() || {};
+			const preflightIsDirty = Boolean( select.isEditedPostDirty?.() );
 
-			if ( ! retrySaveHandoff.allowsNormalSaveFallback ) {
-				return retrySaveHandoff;
-			}
+			dispatch.updateDistributedEditingSessionState( {
+				saveButtonClickInFlight: true,
+			} );
 
-			const freshnessGuard =
-				await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
-					{
-						...options,
+			try {
+				const currentPost = select.getCurrentPost?.() || {};
+				const currentSessionState =
+					select.getDistributedEditingSessionState?.() || {};
+				let didRunFreshnessGuardBeforeRetryPolicy = false;
+				const shouldRunFreshnessGuardBeforeRetryPolicy =
+					preflightIsDirty &&
+					( preflightSavePolicy.status ===
+						DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.UPDATE_READY ||
+						preflightSavePolicy.clickAction ===
+							DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE ||
+						! preflightSavePolicy.blocksNormalSavePost );
+
+				if ( shouldRunFreshnessGuardBeforeRetryPolicy ) {
+					didRunFreshnessGuardBeforeRetryPolicy = true;
+					const freshnessGuard =
+						await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
+							{
+								...options,
+							}
+						);
+
+					if ( ! freshnessGuard.allowsNormalSaveFallback ) {
+						return freshnessGuard;
 					}
-				);
+				}
 
-			if ( ! freshnessGuard.allowsNormalSaveFallback ) {
-				return freshnessGuard;
+				const hasDirtyEditAfterConfirmedRetrySave =
+					select.isEditedPostDirty?.() &&
+					currentSessionState.retrySaveStatus ===
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
+					hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+						currentSessionState
+					);
+
+				if ( hasDirtyEditAfterConfirmedRetrySave ) {
+					const freshnessGuard =
+						await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
+							{
+								...options,
+							}
+						);
+
+					if ( ! freshnessGuard.allowsNormalSaveFallback ) {
+						return freshnessGuard;
+					}
+				}
+
+				const acceptedFreshReviewConsumeValidation =
+					options.acceptedFreshReviewConsumeValidation ??
+					getDistributedEditingAcceptedFreshReviewConsumeValidationForRetrySaveRequest(
+						currentSessionState
+					);
+				const retrySaveProposedPostContent =
+					options.proposedPostContent ??
+					getDistributedEditingFreshReviewImportedPostContentForRetrySave(
+						{
+							postId: currentPost.id,
+							postType: currentPost.type,
+							sessionState: currentSessionState,
+							acceptedFreshReviewConsumeValidation,
+						}
+					) ??
+					content;
+				const retrySaveHandoff =
+					await dispatch.__experimentalMaybeSavePostWithDistributedEditingRetryPolicy(
+						{
+							...options,
+							proposedPostContent: retrySaveProposedPostContent,
+							acceptedFreshReviewConsumeValidation,
+						}
+					);
+
+				if ( ! retrySaveHandoff.allowsNormalSaveFallback ) {
+					return retrySaveHandoff;
+				}
+
+				if ( ! didRunFreshnessGuardBeforeRetryPolicy ) {
+					const freshnessGuard =
+						await dispatch.__experimentalGuardDistributedEditingNormalSaveFreshness(
+							{
+								...options,
+							}
+						);
+
+					if ( ! freshnessGuard.allowsNormalSaveFallback ) {
+						return freshnessGuard;
+					}
+				}
+			} finally {
+				dispatch.updateDistributedEditingSessionState( {
+					saveButtonClickInFlight: false,
+				} );
 			}
 		}
 
@@ -4579,11 +6660,12 @@ export const savePost =
 					previousRecord.type,
 					previousRecord.id
 				),
-			content,
+			content: contentForPersistence,
 		};
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 
 		let error = false;
+		let rawSaveError = false;
 		try {
 			edits = await applyFiltersAsync(
 				'editor.preSavePost',
@@ -4592,6 +6674,7 @@ export const savePost =
 			);
 		} catch ( err ) {
 			error = err;
+			rawSaveError = err;
 		}
 
 		if ( ! error ) {
@@ -4605,10 +6688,17 @@ export const savePost =
 						options
 					);
 			} catch ( err ) {
+				rawSaveError = err;
 				error =
-					err.message && err.code !== 'unknown_error'
-						? err.message
-						: __( 'An error occurred while updating.' );
+					err?.message && err.code !== 'unknown_error'
+						? err
+						: {
+								code: err?.code || 'unknown_error',
+								data: err?.data,
+								message: __(
+									'An error occurred while updating.'
+								),
+						  };
 			}
 		}
 
@@ -4620,6 +6710,7 @@ export const savePost =
 					previousRecord.type,
 					previousRecord.id
 				);
+			rawSaveError = error;
 		}
 
 		// Run the hook with legacy unstable name for backward compatibility
@@ -4632,6 +6723,7 @@ export const savePost =
 				);
 			} catch ( err ) {
 				error = err;
+				rawSaveError = err;
 			}
 		}
 
@@ -4644,6 +6736,7 @@ export const savePost =
 				);
 			} catch ( err ) {
 				error = err;
+				rawSaveError = err;
 			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
@@ -4660,6 +6753,52 @@ export const savePost =
 		}
 
 		if ( error ) {
+			const recoveryResult =
+				await maybeRecoverDistributedEditingYjsRawSave( {
+					select,
+					dispatch,
+					registry,
+					options,
+					error: rawSaveError || error,
+				} );
+
+			if ( recoveryResult ) {
+				return recoveryResult;
+			}
+
+			if (
+				shouldShowDistributedEditingYjsRawSaveRecoveryFailure( {
+					select,
+					options,
+					error,
+				} )
+			) {
+				showDistributedEditingSaveRecoveryFailedNotice( registry );
+
+				return {
+					status: 'yjs_raw_save_recovery_retry_failed',
+					reason:
+						getDistributedEditingSaveErrorCode(
+							rawSaveError || error
+						) || 'save_retry_failed',
+					firstSaveErrorCode: getDistributedEditingSaveErrorCode(
+						rawSaveError || error
+					),
+					firstSaveErrorDetail: getDistributedEditingSaveErrorDetail(
+						rawSaveError || error
+					),
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					callsServerStateRefetchEndpoint: false,
+					callsNormalSavePost: true,
+					callsAutosaveEndpoint: false,
+					callsRetrySaveEndpoint: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
 			const args = getNotificationArgumentsForSaveFail( {
 				post: previousRecord,
 				edits,
@@ -4669,7 +6808,60 @@ export const savePost =
 				registry.dispatch( noticesStore ).createErrorNotice( ...args );
 			}
 		} else {
-			const updatedRecord = select.getCurrentPost();
+			let updatedRecord = select.getCurrentPost();
+			const updatedRawContent =
+				getDistributedEditingPostRawContent( updatedRecord );
+			const updatedStrippedContent =
+				getDistributedEditingComparablePostContent( updatedRawContent );
+			const updatedSyncMeta =
+				getDistributedEditingSyncMetaFromPostContent(
+					updatedRawContent
+				);
+
+			if (
+				typeof updatedRawContent === 'string' &&
+				typeof updatedStrippedContent === 'string' &&
+				updatedStrippedContent !== updatedRawContent
+			) {
+				updatedRecord = {
+					...updatedRecord,
+					content:
+						updatedRecord.content &&
+						typeof updatedRecord.content === 'object'
+							? {
+									...updatedRecord.content,
+									raw: updatedStrippedContent,
+							  }
+							: updatedStrippedContent,
+				};
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', updatedRecord.type, [
+						updatedRecord,
+					] );
+				dispatch.editPost(
+					{ content: updatedStrippedContent },
+					{ undoIgnore: true }
+				);
+
+				if ( updatedSyncMeta?.version ) {
+					dispatch.setDistributedEditingSessionState( {
+						serverVersion: updatedSyncMeta.version,
+						clientBaseVersion: updatedSyncMeta.version,
+						clientBaseContent: updatedStrippedContent,
+						clientBaseSyncMeta: updatedSyncMeta,
+						hasPendingChanges: false,
+						pendingChangeCount: 0,
+						canExportLocalUpdates: false,
+						mustOfferLocalCopy: false,
+						isAwaitingServerConfirmation: false,
+					} );
+					await refreshDistributedEditingPresenceAfterServerUpdate( {
+						select,
+						dispatch,
+					} );
+				}
+			}
 			const args = getNotificationArgumentsForSaveSuccess( {
 				previousPost: previousRecord,
 				post: updatedRecord,
@@ -4851,6 +7043,42 @@ export const autosave =
 					claimsSaved: false,
 				};
 			}
+
+			const sessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const hasProtectedDistributedEditingChanges = Boolean(
+				sessionState.hasPendingChanges ||
+					sessionState.mustOfferLocalCopy ||
+					sessionState.canExportLocalUpdates ||
+					sessionState.isAwaitingServerConfirmation ||
+					sessionState.pendingChangeCount > 0
+			);
+
+			if (
+				! options.isPreview &&
+				! hasProtectedDistributedEditingChanges &&
+				select.shouldUseDistributedEditingRetrySaveForSavePost?.(
+					options
+				)
+			) {
+				return {
+					status: 'distributed_editing_autosave_blocked_for_visible_save',
+					reason: 'current_base_dirty_edits_require_visible_save',
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					callsServerStateRefetchEndpoint: false,
+					callsRetrySubmitEndpoint: false,
+					callsNormalSavePost: false,
+					callsAutosaveEndpoint: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
 			await dispatch.savePost( { isAutosave: true, ...options } );
 		}
 	};
@@ -4884,11 +7112,196 @@ export const __unstableSaveForPreview =
 	};
 
 /**
+ * Stages a Distributed Editing history candidate in the editor.
+ *
+ * This deliberately avoids the normal core-data undo stack. In a distributed
+ * document, the reversible unit is this session's staged change, not a global
+ * linear editor snapshot that may contain other clients' work.
+ *
+ * @param {Object} args          Staging args.
+ * @param {string} args.content  Candidate post content without sync meta.
+ * @param {string} [args.label]  Human-facing action label.
+ * @param {string} [args.source] Action source.
+ *
+ * @return {Function} Thunk.
+ */
+export const __experimentalStageDistributedEditingHistoryContent =
+	( { content, label = 'Document history', source = 'history' } = {} ) =>
+	( { select, dispatch } ) => {
+		if ( typeof content !== 'string' ) {
+			return false;
+		}
+
+		const distributedEditingSettings =
+			select.getEditorSettings?.()?.distributedEditing || {};
+
+		if ( ! distributedEditingSettings.enabled ) {
+			return false;
+		}
+
+		const currentContent = select.getEditedPostContent();
+
+		if ( currentContent === content ) {
+			return false;
+		}
+
+		const sessionState = select.getDistributedEditingSessionState?.() || {};
+		const historyUndoStack = Array.isArray( sessionState.historyUndoStack )
+			? sessionState.historyUndoStack
+			: [];
+
+		applyDistributedEditingSyncedEditorContent( dispatch, content );
+		dispatch.updateDistributedEditingSessionState(
+			getDistributedEditingSessionStateForPendingLocalHistoryChange(
+				sessionState,
+				{
+					historyUndoStack: [
+						...historyUndoStack,
+						{
+							beforeContent: currentContent,
+							afterContent: content,
+							label,
+							source,
+						},
+					],
+					historyRedoStack: [],
+					historyLastAction: source,
+				}
+			)
+		);
+
+		return true;
+	};
+
+/**
+ * Re-applies the last Distributed Editing history change staged by this
+ * session.
+ *
+ * @return {Function} Thunk.
+ */
+export const __experimentalRedoDistributedEditingSessionChange =
+	() =>
+	( { select, dispatch } ) => {
+		const distributedEditingSettings =
+			select.getEditorSettings?.()?.distributedEditing || {};
+
+		if ( ! distributedEditingSettings.enabled ) {
+			return false;
+		}
+
+		const sessionState = select.getDistributedEditingSessionState?.() || {};
+		const historyRedoStack = Array.isArray( sessionState.historyRedoStack )
+			? sessionState.historyRedoStack
+			: [];
+		const nextChange = historyRedoStack[ historyRedoStack.length - 1 ];
+
+		if ( ! nextChange || typeof nextChange.afterContent !== 'string' ) {
+			return false;
+		}
+
+		const historyUndoStack = Array.isArray( sessionState.historyUndoStack )
+			? sessionState.historyUndoStack
+			: [];
+
+		applyDistributedEditingSyncedEditorContent(
+			dispatch,
+			nextChange.afterContent
+		);
+		dispatch.updateDistributedEditingSessionState(
+			getDistributedEditingSessionStateForPendingLocalHistoryChange(
+				sessionState,
+				{
+					historyUndoStack: [ ...historyUndoStack, nextChange ],
+					historyRedoStack: historyRedoStack.slice( 0, -1 ),
+					historyLastAction: 'redo',
+				}
+			)
+		);
+
+		return true;
+	};
+
+/**
+ * Reverts the last safe change owned by this Distributed Editing session.
+ *
+ * @return {Function} Thunk.
+ */
+export const __experimentalUndoDistributedEditingSessionChange =
+	() =>
+	( { select, dispatch } ) => {
+		const distributedEditingSettings =
+			select.getEditorSettings?.()?.distributedEditing || {};
+
+		if ( ! distributedEditingSettings.enabled ) {
+			return false;
+		}
+
+		const sessionState = select.getDistributedEditingSessionState?.() || {};
+		const currentContent = select.getEditedPostContent();
+		const historyUndoStack = Array.isArray( sessionState.historyUndoStack )
+			? sessionState.historyUndoStack
+			: [];
+		let nextChange = historyUndoStack[ historyUndoStack.length - 1 ];
+
+		if ( ! nextChange ) {
+			if (
+				typeof sessionState.clientBaseContent !== 'string' ||
+				sessionState.clientBaseContent === currentContent
+			) {
+				return false;
+			}
+
+			nextChange = {
+				beforeContent: sessionState.clientBaseContent,
+				afterContent: currentContent,
+				label: 'Session edits',
+				source: 'session',
+			};
+		}
+
+		if ( typeof nextChange.beforeContent !== 'string' ) {
+			return false;
+		}
+
+		const nextUndoStack = historyUndoStack.length
+			? historyUndoStack.slice( 0, -1 )
+			: [];
+		const historyRedoStack = Array.isArray( sessionState.historyRedoStack )
+			? sessionState.historyRedoStack
+			: [];
+
+		applyDistributedEditingSyncedEditorContent(
+			dispatch,
+			nextChange.beforeContent
+		);
+		dispatch.updateDistributedEditingSessionState(
+			getDistributedEditingSessionStateForPendingLocalHistoryChange(
+				sessionState,
+				{
+					historyUndoStack: nextUndoStack,
+					historyRedoStack: [ ...historyRedoStack, nextChange ],
+					historyLastAction: 'undo',
+				}
+			)
+		);
+
+		return true;
+	};
+
+/**
  * Action that restores last popped state in undo history.
  */
 export const redo =
 	() =>
-	( { registry } ) => {
+	( { select, dispatch, registry } ) => {
+		const distributedEditingSettings =
+			select.getEditorSettings?.()?.distributedEditing || {};
+
+		if ( distributedEditingSettings.enabled ) {
+			dispatch.__experimentalRedoDistributedEditingSessionChange();
+			return;
+		}
+
 		registry.dispatch( coreStore ).redo();
 	};
 
@@ -4897,7 +7310,15 @@ export const redo =
  */
 export const undo =
 	() =>
-	( { registry } ) => {
+	( { select, dispatch, registry } ) => {
+		const distributedEditingSettings =
+			select.getEditorSettings?.()?.distributedEditing || {};
+
+		if ( distributedEditingSettings.enabled ) {
+			dispatch.__experimentalUndoDistributedEditingSessionChange();
+			return;
+		}
+
 		registry.dispatch( coreStore ).undo();
 	};
 

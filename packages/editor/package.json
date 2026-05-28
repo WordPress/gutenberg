@@ -104,6 +104,7 @@
 		"@wordpress/views": "file:../views",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
+		"@y/y": "14.0.0-rc.16",
 		"change-case": "^4.1.2",
 		"client-zip": "^2.4.5",
 		"clsx": "^2.1.1",

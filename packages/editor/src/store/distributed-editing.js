@@ -166,15 +166,15 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_LABELS = Object.freeze( {
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_APPLIED ]:
 		'Local changes applied',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.LOCAL_CHANGES_STAGED ]:
-		'Changes ready for check',
+		'Changes ready to save',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.RETRY_SUBMIT_PROOF_REFRESHED ]:
-		'WordPress checked changes',
+		'Save verified',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_PREPARED ]:
 		'Save prepared',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED ]:
 		'Save started',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_CONFIRMED ]:
-		'WordPress confirmed Save',
+		'Saved by WordPress',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.REVIEW_REQUIRED ]:
 		'Review required',
 	[ DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.FRESH_REVIEW_REQUESTED ]:
@@ -193,7 +193,7 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT =
 		activity_recorded:
 			'Distributed Editing activity was recorded; no fresh-review chronology is complete.',
 		guarded_save_confirmed:
-			'WordPress Save confirmation was recorded; use save-authority evidence to confirm persistence.',
+			'WordPress Save confirmation was recorded; use WordPress Save evidence to confirm persistence.',
 		fresh_review_requested:
 			'Fresh review was requested for protected local updates.',
 		fresh_review_decision_submitted:
@@ -201,12 +201,12 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT =
 		fresh_review_handoff_validated:
 			'Fresh-review handoff was validated; Save still requires WordPress confirmation.',
 		fresh_review_guarded_save_confirmed:
-			'Fresh-review Save confirmation was recorded; use WordPress save-authority evidence to confirm persistence.',
+			'Fresh-review Save confirmation was recorded; use WordPress Save evidence to confirm persistence.',
 	} );
 
 const MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS = 10;
 
-const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*\\btype\\s*=\\s*(['"])wp/post-sync-meta\\1)[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
+const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*(?:\\btype\\s*=\\s*["']wp/post-sync-meta["']|(?=[^>]*\\btype\\s*=\\s*["']application/json["'])(?=[^>]*\\bdata-wp-sync-meta\\s*=\\s*["']distributed-editing["'])))[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
 
 /**
  * Stable reasons for browser unload protection.
@@ -256,6 +256,18 @@ export const DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES =
 	Object.freeze( {
 		LOCAL: 'local',
 		LATEST_WORDPRESS: 'latest_wordpress',
+	} );
+
+/**
+ * Stable statuses for the visible same-block Compare action. These describe
+ * only the editor command state; they do not authorize persistence.
+ */
+export const DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES =
+	Object.freeze( {
+		NONE: 'none',
+		OPEN_REQUESTED: 'open_requested',
+		OPENED: 'opened',
+		UNAVAILABLE: 'unavailable',
 	} );
 
 /**
@@ -575,6 +587,8 @@ export const DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS = Object.freeze( {
 	MISSING_VERSION_PROOF: 'missing_version_proof',
 	RETRY_SUBMIT_PROOF_NOT_ACCEPTED: 'retry_submit_proof_not_accepted',
 	RETRY_SUBMIT_SAVE_NOT_READY: 'retry_submit_save_not_ready',
+	RETRY_SUBMIT_SAVE_REQUIRES_EXPLICIT_SAVE_CLICK:
+		'retry_submit_save_requires_explicit_save_click',
 	RETRY_SUBMIT_PROOF_CLAIMED_SAVE: 'retry_submit_proof_claimed_save',
 	SERVER_STATE_ACCEPTANCE_REQUIRED: 'server_state_acceptance_required',
 	SERVER_STATE_REFETCH_REQUIRED: 'server_state_refetch_required',
@@ -832,6 +846,10 @@ const VALID_STALE_BASE_CONFLICT_RESOLUTION_CHOICES = new Set(
 	Object.values( DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES )
 );
 
+const VALID_CONFLICT_COMPARISON_ACTION_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES )
+);
+
 const VALID_RETRY_SUBMIT_HANDOFF_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES )
 );
@@ -916,18 +934,34 @@ const NOTICE_ID_BY_KIND = Object.freeze( {
 } );
 
 export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
+	postId: null,
+	postType: null,
 	clientBaseVersion: null,
 	serverVersion: null,
+	distributedEditingPostStateHash: null,
 	clientBaseContent: null,
+	clientBaseSyncMeta: null,
 	refetchedServerContent: null,
 	disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 	reasonCode: null,
 	pendingChangeCount: 0,
 	hasPendingChanges: false,
 	isAwaitingServerConfirmation: false,
+	saveButtonClickInFlight: false,
+	conflictingChangesComparisonActionStatus:
+		DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES.NONE,
+	conflictingChangesComparisonActionReason: null,
+	conflictingChangesComparisonActionRequested: false,
+	conflictingChangesComparisonOpenRequested: false,
+	conflictingChangesComparisonFocusRequested: false,
+	conflictingChangesComparisonFocusedImmediately: false,
+	conflictingChangesComparisonSurfaceOpened: false,
 	isConnectionDegraded: false,
 	remoteChangeCount: 0,
 	hasRemoteChanges: false,
+	remoteChangesReviewItemCount: 0,
+	remoteChangesReviewPrePublishPanelRequired: false,
+	remoteChangesReviewStatus: null,
 	actionTranscriptItems: [],
 	actionTranscriptItemCount: 0,
 	actionTranscriptDroppedItemCount: 0,
@@ -946,6 +980,9 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	actionTranscriptMutatesEditorContent: false,
 	actionTranscriptChangesPostLock: false,
 	actionTranscriptClaimsSaved: false,
+	historyUndoStack: [],
+	historyRedoStack: [],
+	historyLastAction: null,
 	presenceRosterStatus: DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.HIDDEN,
 	presenceRosterEntries: [],
 	presenceRosterFreshness: 'unknown',
@@ -955,6 +992,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	presenceRosterHiddenCount: 0,
 	presenceRosterExpiredCount: 0,
 	presenceRosterExpiredEvidenceCarriedForward: false,
+	presenceRosterEmptySnapshotPreservedEntries: false,
 	presenceRosterRefreshStatus:
 		DISTRIBUTED_EDITING_PRESENCE_REFRESH_STATUSES.NONE,
 	presenceRosterRefreshReason: null,
@@ -1008,6 +1046,10 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	presenceHeartbeatRepeatedRefreshOptional: true,
 	presenceHeartbeatSuggestedIntervalSeconds: null,
 	presenceHeartbeatCheapHostIntervalSeconds: null,
+	presenceDocumentStateConfirmedBaseVersion: null,
+	presenceDocumentStateConfirmedStateHash: null,
+	presenceDocumentStateConfirmedAtGmt: null,
+	presenceDocumentStatePublishedKey: null,
 	presenceStorageReadinessRecheckStatus:
 		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.NONE,
 	presenceStorageReadinessRecheckReason: null,
@@ -1144,6 +1186,7 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySubmitSaveReason: null,
 	retrySubmitSavePrepared: false,
 	retrySubmitSaveReady: false,
+	retrySubmitSaveRequiresExplicitSaveClick: false,
 	retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 	retrySaveReason: null,
 	retrySaveHandoffStatus:
@@ -1658,9 +1701,28 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		Boolean( sessionState.hasPendingChanges ) ||
 		pendingChangeCount > 0 ||
 		( isStaleBaseRejection && ! hasExplicitPendingChangeCount );
+	const isPartialSafePendingReview =
+		sessionState.isAwaitingServerConfirmation === false &&
+		reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT &&
+		sessionState.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED &&
+		Boolean( sessionState.refetchedServerState ) &&
+		! Boolean( sessionState.requiresServerStateRefetch );
 	const isAwaitingServerConfirmation =
-		Boolean( sessionState.isAwaitingServerConfirmation ) ||
-		hasPendingChanges;
+		isPartialSafePendingReview
+			? false
+			: Boolean( sessionState.isAwaitingServerConfirmation ) ||
+			  hasPendingChanges;
+	const saveButtonClickInFlight = Boolean(
+		sessionState.saveButtonClickInFlight
+	);
+	const conflictingChangesComparisonActionStatus =
+		VALID_CONFLICT_COMPARISON_ACTION_STATUSES.has(
+			sessionState.conflictingChangesComparisonActionStatus
+		)
+			? sessionState.conflictingChangesComparisonActionStatus
+			: DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE.conflictingChangesComparisonActionStatus;
 	const isConnectionDegraded =
 		Boolean( sessionState.isConnectionDegraded ) ||
 		disposition ===
@@ -1760,6 +1822,11 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY;
 	const retrySubmitSaveReady =
 		Boolean( sessionState.retrySubmitSaveReady ) || retrySubmitSavePrepared;
+	const retrySubmitSaveRequiresExplicitSaveClick =
+		Boolean( sessionState.retrySubmitSaveRequiresExplicitSaveClick ) &&
+		retrySubmitSaveReady &&
+		retrySubmitSaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY;
 	const retrySaveStatus = VALID_RETRY_SAVE_STATUSES.has(
 		sessionState.retrySaveStatus
 	)
@@ -1848,10 +1915,22 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		normalizeFreshReviewRetrySaveHandoffFields( sessionState, {
 			freshReviewDecisionFields,
 		} );
+	const retrySaveReviewFields =
+		normalizeRetrySaveReviewMetadataFields( sessionState );
 	const riskyBlockReviewFields =
 		normalizeRiskyBlockReviewMetadataFields( sessionState );
 	const hasPendingRiskyBlockReviewItems =
 		riskyBlockReviewFields.riskyBlockReviewHasPendingItems;
+	const shouldSuppressHashOnlyReviewLocalCopy =
+		( retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED ||
+			retrySaveReason ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT ||
+			retrySaveReason ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML ||
+			hasPendingRiskyBlockReviewItems ) &&
+		! retrySaveReviewFields.retrySaveReviewRawContentIncluded &&
+		! riskyBlockReviewFields.riskyBlockReviewRawContentIncluded;
 	const retrySaveHandoffStatus = VALID_RETRY_SAVE_HANDOFF_STATUSES.has(
 		sessionState.retrySaveHandoffStatus
 	)
@@ -1869,31 +1948,45 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			hasPendingChanges );
 
 	const mustOfferLocalCopy =
-		Boolean( sessionState.mustOfferLocalCopy ) ||
-		( requiresServerStateAcceptance && hasPendingChanges ) ||
-		( requiresServerStateRefetch && hasPendingChanges ) ||
-		( retrySubmitSavePathRequired && hasPendingChanges ) ||
-		( retrySaveStatus === DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
-			hasPendingChanges ) ||
-		( reviewTokenRecoveryRequiresFreshReview && hasPendingChanges ) ||
-		( retrySaveHandoffBlocksNormalSave && hasPendingChanges ) ||
-		( retrySaveReviewApprovalAccepted && hasPendingChanges ) ||
-		( retrySaveFreshReviewConsumeValidationAccepted &&
-			hasPendingChanges ) ||
-		hasPendingRiskyBlockReviewItems ||
-		( requiresManualConflictResolution && hasPendingChanges );
+		! shouldSuppressHashOnlyReviewLocalCopy &&
+		( Boolean( sessionState.mustOfferLocalCopy ) ||
+			( requiresServerStateAcceptance && hasPendingChanges ) ||
+			( requiresServerStateRefetch && hasPendingChanges ) ||
+			( retrySubmitSavePathRequired && hasPendingChanges ) ||
+			( retrySaveStatus ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING &&
+				hasPendingChanges ) ||
+			( reviewTokenRecoveryRequiresFreshReview && hasPendingChanges ) ||
+			( retrySaveHandoffBlocksNormalSave && hasPendingChanges ) ||
+			( retrySaveReviewApprovalAccepted && hasPendingChanges ) ||
+			( retrySaveFreshReviewConsumeValidationAccepted &&
+				hasPendingChanges ) ||
+			( hasPendingRiskyBlockReviewItems &&
+				riskyBlockReviewFields.riskyBlockReviewRawContentIncluded ) ||
+			( requiresManualConflictResolution && hasPendingChanges ) );
 	const canExportLocalUpdates =
-		Boolean( sessionState.canExportLocalUpdates ) ||
-		riskyBlockReviewFields.riskyBlockReviewCanExportLocalUpdates ||
-		mustOfferLocalCopy;
+		! shouldSuppressHashOnlyReviewLocalCopy &&
+		( Boolean( sessionState.canExportLocalUpdates ) ||
+			riskyBlockReviewFields.riskyBlockReviewCanExportLocalUpdates ||
+			mustOfferLocalCopy );
 
 	return {
+		postId: normalizeNullableIdString( sessionState.postId ),
+		postType: normalizeNullableString( sessionState.postType ),
 		clientBaseVersion: normalizeNullableString(
 			sessionState.clientBaseVersion
 		),
 		serverVersion: normalizeNullableString( sessionState.serverVersion ),
+		distributedEditingPostStateHash: normalizeNullableString(
+			sessionState.distributedEditingPostStateHash ??
+				sessionState.state_hash ??
+				sessionState.stateHash
+		),
 		clientBaseContent: normalizeNullableContentString(
 			sessionState.clientBaseContent
+		),
+		clientBaseSyncMeta: normalizeDistributedEditingSyncMeta(
+			sessionState.clientBaseSyncMeta
 		),
 		refetchedServerContent: normalizeNullableContentString(
 			sessionState.refetchedServerContent
@@ -1903,9 +1996,47 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		pendingChangeCount,
 		hasPendingChanges,
 		isAwaitingServerConfirmation,
+		saveButtonClickInFlight,
+		conflictingChangesComparisonActionStatus,
+		conflictingChangesComparisonActionReason: normalizeNullableString(
+			sessionState.conflictingChangesComparisonActionReason
+		),
+		conflictingChangesComparisonActionRequested: Boolean(
+			sessionState.conflictingChangesComparisonActionRequested
+		),
+		conflictingChangesComparisonOpenRequested: Boolean(
+			sessionState.conflictingChangesComparisonOpenRequested
+		),
+		conflictingChangesComparisonFocusRequested: Boolean(
+			sessionState.conflictingChangesComparisonFocusRequested
+		),
+		conflictingChangesComparisonFocusedImmediately: Boolean(
+			sessionState.conflictingChangesComparisonFocusedImmediately
+		),
+		conflictingChangesComparisonSurfaceOpened: Boolean(
+			sessionState.conflictingChangesComparisonSurfaceOpened
+		),
 		isConnectionDegraded,
 		remoteChangeCount,
 		hasRemoteChanges,
+		remoteChangesReviewItemCount: normalizeCount(
+			sessionState.remoteChangesReviewItemCount
+		),
+		remoteChangesReviewPrePublishPanelRequired: Boolean(
+			sessionState.remoteChangesReviewPrePublishPanelRequired
+		),
+		remoteChangesReviewStatus: normalizeNullableString(
+			sessionState.remoteChangesReviewStatus
+		),
+		historyUndoStack: normalizeDistributedEditingHistoryStack(
+			sessionState.historyUndoStack
+		),
+		historyRedoStack: normalizeDistributedEditingHistoryStack(
+			sessionState.historyRedoStack
+		),
+		historyLastAction: normalizeNullableString(
+			sessionState.historyLastAction
+		),
 		...normalizeDistributedEditingActionTranscriptFields( sessionState ),
 		...normalizeDistributedEditingPresenceRosterFields( sessionState ),
 		...normalizeDistributedEditingPresenceRefreshFields( sessionState ),
@@ -1978,6 +2109,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		),
 		retrySubmitSavePrepared,
 		retrySubmitSaveReady,
+		retrySubmitSaveRequiresExplicitSaveClick,
 		retrySaveStatus,
 		retrySaveReason,
 		retrySaveHandoffStatus,
@@ -2038,7 +2170,7 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		retrySaveServerMergeMergedStrippedContentHash: normalizeSha256Hash(
 			sessionState.retrySaveServerMergeMergedStrippedContentHash
 		),
-		...normalizeRetrySaveReviewMetadataFields( sessionState ),
+		...retrySaveReviewFields,
 		...normalizeRetrySaveReviewApprovalProofFields( {
 			...sessionState,
 			retrySaveReviewApprovalProofStatus,
@@ -2157,8 +2289,101 @@ export function getDistributedEditingActionTranscriptStateForSessionState(
 	};
 }
 
+function normalizeDistributedEditingBooleanValue( value ) {
+	if ( value === true || value === false ) {
+		return value;
+	}
+
+	if ( typeof value === 'string' ) {
+		return [ '1', 'true', 'yes' ].includes( value.toLowerCase() );
+	}
+
+	return Boolean( value );
+}
+
+function normalizeDistributedEditingPresenceDocumentState( documentState ) {
+	const source = normalizeObject( documentState );
+	const confirmedBaseVersion = normalizeNullableString(
+		getFirstDefined(
+			source.confirmedBaseVersion,
+			source.confirmed_base_version
+		)
+	);
+	const available =
+		normalizeDistributedEditingBooleanValue( source.available ) &&
+		Boolean( confirmedBaseVersion );
+
+	if ( ! available ) {
+		return {
+			available: false,
+			confirmedBaseVersion: null,
+			confirmedStateHash: null,
+			hasPendingChanges: false,
+			confirmedAtGmt: null,
+			reportedAtGmt: null,
+			presenceUpdatedAtGmt: normalizeNullableString(
+				getFirstDefined(
+					source.presenceUpdatedAtGmt,
+					source.presence_updated_at_gmt
+				)
+			),
+			source: 'unavailable',
+			authoritativeForSave: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+		};
+	}
+	const confirmedStateHash = normalizeNullableString(
+		getFirstDefined(
+			source.confirmedStateHash,
+			source.confirmed_state_hash
+		)
+	);
+
+	return {
+		available: true,
+		confirmedBaseVersion,
+		confirmedStateHash,
+		hasPendingChanges: normalizeDistributedEditingBooleanValue(
+			getFirstDefined(
+				source.hasPendingChanges,
+				source.has_pending_changes
+			)
+		),
+		confirmedAtGmt: normalizeNullableString(
+			getFirstDefined( source.confirmedAtGmt, source.confirmed_at_gmt )
+		),
+		reportedAtGmt: normalizeNullableString(
+			getFirstDefined( source.reportedAtGmt, source.reported_at_gmt )
+		),
+		presenceUpdatedAtGmt: normalizeNullableString(
+			getFirstDefined(
+				source.presenceUpdatedAtGmt,
+				source.presence_updated_at_gmt
+			)
+		),
+		source:
+			normalizeNullableString( source.source ) ||
+			'client_reported_presence',
+		authoritativeForSave: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+	};
+}
+
 function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 	const source = normalizeObject( entry );
+	const sourcePermissions = normalizeObject(
+		getFirstDefined( source.permissions, source.permission_summary )
+	);
+	const presenceUpdatedAtGmt = normalizeNullableString(
+		getFirstDefined(
+			source.presenceUpdatedAtGmt,
+			source.presence_updated_at_gmt,
+			source.lastSeenGmt,
+			source.last_seen_gmt
+		)
+	);
 	const displayName =
 		normalizeNullableString(
 			getFirstDefined(
@@ -2194,6 +2419,29 @@ function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 	)
 		? requestedFreshness
 		: 'unknown';
+	const sessionDurationSeconds = normalizeNonNegativeInteger(
+		getFirstDefined(
+			source.sessionDurationSeconds,
+			source.session_duration_seconds
+		)
+	);
+	const sessionStartedAtGmt = normalizeNullableString(
+		getFirstDefined(
+			source.sessionStartedAtGmt,
+			source.session_started_at_gmt,
+			source.createdAtGmt,
+			source.created_at_gmt
+		)
+	);
+	const permissionsAvailable = Boolean(
+		getFirstDefined(
+			source.permissionsAvailable,
+			source.permissions_available,
+			sourcePermissions.available,
+			hasOwnProperty( source, 'permissions' ) ||
+				hasOwnProperty( source, 'permission_summary' )
+		)
+	);
 
 	return {
 		key:
@@ -2207,12 +2455,53 @@ function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 		relationship,
 		activity: normalizeNullableString( source.activity ) || 'editing_post',
 		freshness,
-		location: { scope: 'post' },
+		sessionStartedAtGmt,
+		sessionDurationSeconds,
+		presenceUpdatedAtGmt,
+		permissionsAvailable,
+		permissions: {
+			canEdit: Boolean(
+				getFirstDefined(
+					sourcePermissions.canEdit,
+					sourcePermissions.can_edit,
+					source.canEdit,
+					source.can_edit_post
+				)
+			),
+			canPublish: Boolean(
+				getFirstDefined(
+					sourcePermissions.canPublish,
+					sourcePermissions.can_publish,
+					source.canPublish,
+					source.can_publish_post
+				)
+			),
+			canSaveDangerousHtml: Boolean(
+				getFirstDefined(
+					sourcePermissions.canSaveDangerousHtml,
+					sourcePermissions.can_save_dangerous_html,
+					source.canSaveDangerousHtml,
+					source.can_save_dangerous_html
+				)
+			),
+		},
+		documentState: normalizeDistributedEditingPresenceDocumentState(
+			getFirstDefined( source.documentState, source.document_state )
+		),
 		exposesUserId: false,
 		exposesCursorOffset: false,
 		exposesSelection: false,
 		exposesRawContent: false,
 	};
+}
+
+function getDistributedEditingPresenceEntriesForTransientEmptySnapshot(
+	entries = []
+) {
+	return entries.map( ( entry ) => ( {
+		...entry,
+		freshness: entry.freshness === 'stale' ? 'stale' : 'recent',
+	} ) );
 }
 
 function normalizeDistributedEditingPresenceRosterFields( sessionState = {} ) {
@@ -2328,6 +2617,13 @@ function normalizeDistributedEditingPresenceRosterFields( sessionState = {} ) {
 				sessionState.presenceRosterExpiredEvidenceCarriedForward,
 				sessionState.distributedEditingPresenceRoster
 					?.expiredEvidenceCarriedForward
+			)
+		),
+		presenceRosterEmptySnapshotPreservedEntries: Boolean(
+			getFirstDefined(
+				sessionState.presenceRosterEmptySnapshotPreservedEntries,
+				sessionState.distributedEditingPresenceRoster
+					?.emptySnapshotPreservedEntries
 			)
 		),
 	};
@@ -2549,6 +2845,18 @@ function normalizeDistributedEditingPresenceHeartbeatFields(
 					?.cheapHostIntervalSeconds
 			)
 		),
+		presenceDocumentStateConfirmedBaseVersion: normalizeNullableString(
+			sessionState.presenceDocumentStateConfirmedBaseVersion
+		),
+		presenceDocumentStateConfirmedStateHash: normalizeNullableString(
+			sessionState.presenceDocumentStateConfirmedStateHash
+		),
+		presenceDocumentStateConfirmedAtGmt: normalizeNullableString(
+			sessionState.presenceDocumentStateConfirmedAtGmt
+		),
+		presenceDocumentStatePublishedKey: normalizeNullableString(
+			sessionState.presenceDocumentStatePublishedKey
+		),
 	};
 }
 
@@ -2654,6 +2962,7 @@ function normalizeDistributedEditingPresenceRepeatedRefreshRuntimeFields(
 	const runtimeConfig = normalizeObject(
 		sessionState.distributedEditingPresenceRepeatedRefreshRuntime
 	);
+	const hasRuntimeConfig = Object.keys( runtimeConfig ).length > 0;
 	const hostProfile = normalizeNullableString(
 		getFirstDefined(
 			runtimeConfig.hostProfile,
@@ -2713,17 +3022,29 @@ function normalizeDistributedEditingPresenceRepeatedRefreshRuntimeFields(
 			sessionState.presenceRepeatedRefreshMinimumIntervalSeconds
 		)
 	);
-	const fallbackRefreshIntervalSeconds =
-		hostProfile === 'cheap_shared_host'
-			? cheapHostIntervalSeconds || standardIntervalSeconds
-			: standardIntervalSeconds || cheapHostIntervalSeconds;
+	let fallbackRefreshIntervalSeconds =
+		standardIntervalSeconds || cheapHostIntervalSeconds;
+
+	if ( hostProfile === 'cheap_shared_host' ) {
+		fallbackRefreshIntervalSeconds =
+			cheapHostIntervalSeconds || standardIntervalSeconds;
+	} else if ( hostProfile === 'local_development' ) {
+		fallbackRefreshIntervalSeconds =
+			minimumIntervalSeconds ||
+			cheapHostIntervalSeconds ||
+			standardIntervalSeconds;
+	}
 	const selectedIntervalSeconds =
 		normalizeNullableInteger(
 			getFirstDefined(
 				runtimeConfig.selectedIntervalSeconds,
 				runtimeConfig.selectedRefreshIntervalSeconds,
+				runtimeConfig.selectedPollingIntervalSeconds,
 				runtimeConfig.selected_refresh_interval_seconds,
-				sessionState.presenceRepeatedRefreshSelectedIntervalSeconds
+				runtimeConfig.selected_polling_interval_seconds,
+				hasRuntimeConfig
+					? undefined
+					: sessionState.presenceRepeatedRefreshSelectedIntervalSeconds
 			)
 		) || fallbackRefreshIntervalSeconds;
 	const selectedHeartbeatIntervalSeconds =
@@ -3671,10 +3992,15 @@ export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResul
 				...entry,
 				freshness: 'recent',
 			} ) );
-	const shouldPreserveLocalHeartbeatEntry =
+	const preservedTransientEmptySnapshotEntries =
+		getDistributedEditingPresenceEntriesForTransientEmptySnapshot(
+			currentRosterFields.presenceRosterEntries
+		);
+	const shouldPreserveTransientEmptySnapshotEntries =
 		refreshed &&
 		rosterEntries.length === 0 &&
-		preservedLocalHeartbeatEntries.length > 0;
+		preservedTransientEmptySnapshotEntries.length > 0 &&
+		! currentRosterFields.presenceRosterEmptySnapshotPreservedEntries;
 	const shouldMergeLocalHeartbeatEntryWithIncomingRoster =
 		refreshed &&
 		rosterEntries.length > 0 &&
@@ -3764,10 +4090,11 @@ export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResul
 	};
 
 	if ( refreshed ) {
-		if ( shouldPreserveLocalHeartbeatEntry ) {
+		if ( shouldPreserveTransientEmptySnapshotEntries ) {
 			nextState.presenceRosterStatus =
 				DISTRIBUTED_EDITING_PRESENCE_ROSTER_STATUSES.RECENT;
-			nextState.presenceRosterEntries = preservedLocalHeartbeatEntries;
+			nextState.presenceRosterEntries =
+				preservedTransientEmptySnapshotEntries;
 			nextState.presenceRosterTotalKnownCount = Math.max(
 				normalizeCount(
 					getFirstDefined(
@@ -3775,12 +4102,13 @@ export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResul
 						roster.total_known_count
 					)
 				),
-				preservedLocalHeartbeatEntries.length +
+				preservedTransientEmptySnapshotEntries.length +
 					rosterHiddenCount +
 					nextRosterExpiredCount
 			);
 			nextState.presenceRosterHiddenCount = rosterHiddenCount;
 			nextState.presenceRosterExpiredCount = nextRosterExpiredCount;
+			nextState.presenceRosterEmptySnapshotPreservedEntries = true;
 		} else {
 			nextState.presenceRosterStatus = roster.status;
 			nextState.presenceRosterEntries = effectiveRosterEntries;
@@ -3797,6 +4125,7 @@ export function getDistributedEditingSessionStateForPresenceSnapshotRefreshResul
 			);
 			nextState.presenceRosterHiddenCount = rosterHiddenCount;
 			nextState.presenceRosterExpiredCount = nextRosterExpiredCount;
+			nextState.presenceRosterEmptySnapshotPreservedEntries = false;
 		}
 	}
 
@@ -4150,7 +4479,68 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 		heartbeatRecorded && hasExistingLocalRosterEntry;
 	const shouldDowngradeLocalRosterEntry =
 		! heartbeatRecorded && hasExistingLocalRosterEntry;
+	const localHeartbeatEntryDetails =
+		normalizeDistributedEditingPresenceRosterEntry(
+			{
+				key: 'presence-local-heartbeat-current-tab',
+				identityVisibility: 'self',
+				relationship: 'current_user_current_tab',
+				activity: 'editing_post',
+				freshness: 'current',
+				source: 'local_heartbeat_confirmation',
+				permissions: getFirstDefined(
+					responseOrError.permissions,
+					responseOrError.permission_summary,
+					responseData.permissions,
+					responseData.permission_summary
+				),
+				permissionsAvailable: getFirstDefined(
+					responseOrError.permissionsAvailable,
+					responseOrError.permissions_available,
+					responseOrError.permissionSummaryRecorded,
+					responseOrError.permission_summary_recorded,
+					responseData.permissionsAvailable,
+					responseData.permissions_available,
+					responseData.permissionSummaryRecorded,
+					responseData.permission_summary_recorded
+				),
+				sessionStartedAtGmt: getFirstDefined(
+					responseOrError.sessionStartedAtGmt,
+					responseOrError.session_started_at_gmt,
+					responseData.sessionStartedAtGmt,
+					responseData.session_started_at_gmt
+				),
+				sessionDurationSeconds: getFirstDefined(
+					responseOrError.sessionDurationSeconds,
+					responseOrError.session_duration_seconds,
+					responseData.sessionDurationSeconds,
+					responseData.session_duration_seconds
+				),
+				presenceUpdatedAtGmt: getFirstDefined(
+					responseOrError.presenceUpdatedAtGmt,
+					responseOrError.presence_updated_at_gmt,
+					responseOrError.documentState?.presenceUpdatedAtGmt,
+					responseOrError.documentState?.presence_updated_at_gmt,
+					responseOrError.document_state?.presenceUpdatedAtGmt,
+					responseOrError.document_state?.presence_updated_at_gmt,
+					responseData.presenceUpdatedAtGmt,
+					responseData.presence_updated_at_gmt,
+					responseData.documentState?.presenceUpdatedAtGmt,
+					responseData.documentState?.presence_updated_at_gmt,
+					responseData.document_state?.presenceUpdatedAtGmt,
+					responseData.document_state?.presence_updated_at_gmt
+				),
+				documentState: getFirstDefined(
+					responseOrError.documentState,
+					responseOrError.document_state,
+					responseData.documentState,
+					responseData.document_state
+				),
+			},
+			0
+		);
 	const localRosterEntry = {
+		...localHeartbeatEntryDetails,
 		key: 'presence-local-heartbeat-current-tab',
 		displayName: null,
 		identityVisibility: 'self',
@@ -4169,6 +4559,14 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 					isDistributedEditingLocalHeartbeatRosterEntry( entry )
 						? {
 								...entry,
+								documentState: localRosterEntry.documentState,
+								permissions: localRosterEntry.permissions,
+								permissionsAvailable:
+									localRosterEntry.permissionsAvailable,
+								presenceUpdatedAtGmt:
+									localRosterEntry.presenceUpdatedAtGmt,
+								sessionDurationSeconds:
+									localRosterEntry.sessionDurationSeconds,
 								freshness: heartbeatRecorded
 									? 'current'
 									: 'recent',
@@ -5306,7 +5704,7 @@ export function getDistributedEditingFreshReviewComparisonRendererCapabilitySupp
 		headline: 'Fresh-review renderer capability support summary',
 		summaryText:
 			resolutionCount > 0
-				? 'Renderer capability classifications are summarized for support without candidate maps, unknown key names, raw content, hash values, proof details, tokens, identities, or renderer code.'
+				? 'Renderer capability classifications are summarized for support without candidate maps, unknown key names, raw content, hash values, validation details, tokens, identities, or renderer code.'
 				: 'No renderer capability classifications are available for support.',
 		requiredRendererCapabilityKeys:
 			DISTRIBUTED_EDITING_FRESH_REVIEW_COMPARISON_REQUIRED_RENDERER_CAPABILITY_KEYS,
@@ -7500,7 +7898,11 @@ export async function getDistributedEditingPostContentSha256Hash(
 	}
 
 	const bytes = new globalThis.TextEncoder().encode(
-		typeof postContent === 'string' ? postContent : ''
+		typeof postContent === 'string'
+			? canonicalizeDistributedEditingCoreBlockCommentDelimiters(
+					postContent
+			  )
+			: ''
 	);
 	const digest = await subtle.digest( 'SHA-256', bytes );
 
@@ -7517,11 +7919,11 @@ export async function getDistributedEditingPostContentSha256Hash(
  * persist post content, create revisions, change post locks, or claim saved
  * state.
  *
- * @param {Object} args                         Request-proof inputs.
- * @param {Object} args.acceptedSyncMeta        Accepted base sync metadata.
- * @param {string} args.proposedPostContent     Serialized editor content.
- * @param {string} [args.proposedPostContentHash] Optional SHA-256 evidence.
- * @param {string|number} [args.clientBaseVersion] Optional base version.
+ * @param {Object}        args                           Request-proof inputs.
+ * @param {Object}        args.acceptedSyncMeta          Accepted base sync metadata.
+ * @param {string}        args.proposedPostContent       Serialized editor content.
+ * @param {string}        [args.proposedPostContentHash] Optional SHA-256 evidence.
+ * @param {string|number} [args.clientBaseVersion]       Optional base version.
  *
  * @return {Promise<Object>} Request-proof descriptor.
  */
@@ -7545,8 +7947,13 @@ export async function getDistributedEditingBlockIdentityRequestProofDescriptor( 
 		);
 	}
 
+	const canonicalProposedPostContent =
+		canonicalizeDistributedEditingCoreBlockCommentDelimiters(
+			proposedPostContent
+		);
 	const acceptedBlocks = acceptedMeta.syncMeta.blocks;
 	const acceptedBlocksByHash = new Map();
+	const acceptedBlocksByOrdinalPath = new Map();
 
 	for ( const block of acceptedBlocks ) {
 		if ( acceptedBlocksByHash.has( block.serialized_hash ) ) {
@@ -7565,9 +7972,13 @@ export async function getDistributedEditingBlockIdentityRequestProofDescriptor( 
 		}
 
 		acceptedBlocksByHash.set( block.serialized_hash, block );
+		acceptedBlocksByOrdinalPath.set(
+			JSON.stringify( block.ordinal_path ),
+			block
+		);
 	}
 
-	const tokens = getSerializedBlockTokens( proposedPostContent );
+	const tokens = getSerializedBlockTokens( canonicalProposedPostContent );
 
 	if ( tokens.status !== 'safe' ) {
 		return createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
@@ -7585,13 +7996,15 @@ export async function getDistributedEditingBlockIdentityRequestProofDescriptor( 
 		);
 	}
 
+	const calculatedProposedPostContentHash =
+		await getDistributedEditingPostContentSha256Hash(
+			canonicalProposedPostContent
+		);
 	const normalizedProposedPostContentHash =
 		typeof proposedPostContentHash === 'string' &&
-		proposedPostContentHash.length > 0
+		proposedPostContentHash === calculatedProposedPostContentHash
 			? proposedPostContentHash
-			: await getDistributedEditingPostContentSha256Hash(
-					proposedPostContent
-			  );
+			: calculatedProposedPostContentHash;
 
 	if (
 		! isDistributedEditingBlockIdentitySha256Hash(
@@ -7696,11 +8109,27 @@ export async function getDistributedEditingBlockIdentityRequestProofDescriptor( 
 	const allAcceptedBlocksRetained = acceptedBlocks.every( ( block ) =>
 		proposedBlockHashCounts.has( block.serialized_hash )
 	);
+	const canRetainSameCountOrdinalBlockEdits =
+		proposedBlocks.length === acceptedBlocks.length;
 
 	for ( const [ index, proposedBlock ] of proposedBlocks.entries() ) {
-		const acceptedBlock = acceptedBlocksByHash.get(
+		let acceptedBlock = acceptedBlocksByHash.get(
 			proposedBlock.serializedHash
 		);
+
+		if ( ! acceptedBlock && canRetainSameCountOrdinalBlockEdits ) {
+			const ordinalAcceptedBlock = acceptedBlocksByOrdinalPath.get(
+				JSON.stringify( proposedBlock.ordinalPath )
+			);
+
+			if (
+				ordinalAcceptedBlock &&
+				ordinalAcceptedBlock.block_name === proposedBlock.blockName &&
+				! retainedBlockUidSet.has( ordinalAcceptedBlock.block_uid )
+			) {
+				acceptedBlock = ordinalAcceptedBlock;
+			}
+		}
 
 		if (
 			acceptedBlock &&
@@ -7789,6 +8218,311 @@ export async function getDistributedEditingBlockIdentityRequestProofDescriptor( 
 		insertedBlockCount: insertedBlockNonces.length,
 		deletedBlockCount: deletedBlockUids.length,
 		movedBlockCount: movedBlockUids.length,
+		contentFree: true,
+		usesGutenbergClientId: false,
+		exposesRawContent: false,
+		callsRest: false,
+		callsSave: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+/**
+ * Determines whether a newer server body and local proposed body both preserve
+ * the accepted block identity sequence while inserting blocks in distinct base
+ * gaps.
+ *
+ * The descriptor is inert and content-free. It does not return raw post
+ * content, call REST, save, mutate editor content, persist post content, create
+ * revisions, change post locks, or claim saved state.
+ *
+ * @param {Object} args                     Distinct-gap insertion inputs.
+ * @param {Object} args.acceptedSyncMeta    Accepted base sync metadata.
+ * @param {string} args.serverPostContent   Refetched server serialized content.
+ * @param {string} args.proposedPostContent Local proposed serialized content.
+ *
+ * @return {Promise<Object>} Distinct-gap insertion descriptor.
+ */
+export async function getDistributedEditingBlockIdentityDistinctGapInsertionDescriptor( {
+	acceptedSyncMeta = null,
+	serverPostContent = '',
+	proposedPostContent = '',
+} = {} ) {
+	const acceptedMeta =
+		normalizeDistributedEditingBlockIdentityAcceptedSyncMeta(
+			acceptedSyncMeta
+		);
+
+	if ( acceptedMeta.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityDistinctGapInsertionBlockedDescriptor(
+			acceptedMeta.reason,
+			{
+				invalidDetail: acceptedMeta.detail,
+			}
+		);
+	}
+
+	const acceptedBlocks = acceptedMeta.syncMeta.blocks;
+	const acceptedBlocksByHash =
+		getDistributedEditingAcceptedBlockIdentityBlocksByHash(
+			acceptedBlocks
+		);
+
+	if ( acceptedBlocksByHash.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityDistinctGapInsertionBlockedDescriptor(
+			acceptedBlocksByHash.reason,
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+			}
+		);
+	}
+
+	const serverSequence =
+		await getDistributedEditingBlockIdentityInsertionGapSequence( {
+			acceptedBlocks,
+			acceptedBlocksByHash: acceptedBlocksByHash.blocksByHash,
+			postContent: serverPostContent,
+			candidateLabel: 'server',
+		} );
+
+	if ( serverSequence.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityDistinctGapInsertionBlockedDescriptor(
+			serverSequence.reason,
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount ?? 0,
+				unsafeSerializedBlockReason:
+					serverSequence.unsafeSerializedBlockReason ?? null,
+			}
+		);
+	}
+
+	const proposedSequence =
+		await getDistributedEditingBlockIdentityInsertionGapSequence( {
+			acceptedBlocks,
+			acceptedBlocksByHash: acceptedBlocksByHash.blocksByHash,
+			postContent: proposedPostContent,
+			candidateLabel: 'proposed',
+		} );
+
+	if ( proposedSequence.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityDistinctGapInsertionBlockedDescriptor(
+			proposedSequence.reason,
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount,
+				proposedBlockCount: proposedSequence.blockCount ?? 0,
+				unsafeSerializedBlockReason:
+					proposedSequence.unsafeSerializedBlockReason ?? null,
+			}
+		);
+	}
+
+	if (
+		serverSequence.insertedGapIndexes.length === 0 ||
+		proposedSequence.insertedGapIndexes.length === 0
+	) {
+		return createDistributedEditingBlockIdentityDistinctGapInsertionBlockedDescriptor(
+			'missing_two_sided_insertions',
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount,
+				proposedBlockCount: proposedSequence.blockCount,
+				serverInsertedBlockCount:
+					serverSequence.insertedGapIndexes.length,
+				proposedInsertedBlockCount:
+					proposedSequence.insertedGapIndexes.length,
+			}
+		);
+	}
+
+	const serverInsertedGapIndexes = new Set(
+		serverSequence.insertedGapIndexes
+	);
+	const conflictingGapIndex = proposedSequence.insertedGapIndexes.find(
+		( gapIndex ) => serverInsertedGapIndexes.has( gapIndex )
+	);
+
+	if ( conflictingGapIndex !== undefined ) {
+		return createDistributedEditingBlockIdentityDistinctGapInsertionBlockedDescriptor(
+			'inserted_block_gap_conflict',
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount,
+				proposedBlockCount: proposedSequence.blockCount,
+				serverInsertedBlockCount:
+					serverSequence.insertedGapIndexes.length,
+				proposedInsertedBlockCount:
+					proposedSequence.insertedGapIndexes.length,
+				conflictingGapIndex,
+			}
+		);
+	}
+
+	return {
+		status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY,
+		reason: null,
+		requestProof: null,
+		acceptedBlockCount: acceptedBlocks.length,
+		serverBlockCount: serverSequence.blockCount,
+		proposedBlockCount: proposedSequence.blockCount,
+		serverInsertedBlockCount: serverSequence.insertedGapIndexes.length,
+		proposedInsertedBlockCount: proposedSequence.insertedGapIndexes.length,
+		serverInsertedGapIndexes: [ ...serverSequence.insertedGapIndexes ],
+		proposedInsertedGapIndexes: [ ...proposedSequence.insertedGapIndexes ],
+		conflictingGapIndex: null,
+		contentFree: true,
+		usesGutenbergClientId: false,
+		exposesRawContent: false,
+		callsRest: false,
+		callsSave: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+/**
+ * Determines whether a newer server body and local proposed body preserve the
+ * accepted block identity sequence while editing different retained blocks.
+ *
+ * The descriptor is inert and content-free. It does not return raw post
+ * content, call REST, save, mutate editor content, persist post content, create
+ * revisions, change post locks, or claim saved state.
+ *
+ * @param {Object} args                     Retained-edit merge inputs.
+ * @param {Object} args.acceptedSyncMeta    Accepted base sync metadata.
+ * @param {string} args.serverPostContent   Refetched server serialized content.
+ * @param {string} args.proposedPostContent Local proposed serialized content.
+ *
+ * @return {Promise<Object>} Retained-edit merge descriptor.
+ */
+export async function getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor( {
+	acceptedSyncMeta = null,
+	serverPostContent = '',
+	proposedPostContent = '',
+} = {} ) {
+	const acceptedMeta =
+		normalizeDistributedEditingBlockIdentityAcceptedSyncMeta(
+			acceptedSyncMeta
+		);
+
+	if ( acceptedMeta.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+			acceptedMeta.reason,
+			{
+				invalidDetail: acceptedMeta.detail,
+			}
+		);
+	}
+
+	const acceptedBlocks = acceptedMeta.syncMeta.blocks;
+	const serverSequence =
+		await getDistributedEditingBlockIdentityRetainedEditSequence( {
+			acceptedBlocks,
+			postContent: serverPostContent,
+			candidateLabel: 'server',
+		} );
+
+	if ( serverSequence.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+			serverSequence.reason,
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount ?? 0,
+				unsafeSerializedBlockReason:
+					serverSequence.unsafeSerializedBlockReason ?? null,
+			}
+		);
+	}
+
+	const proposedSequence =
+		await getDistributedEditingBlockIdentityRetainedEditSequence( {
+			acceptedBlocks,
+			postContent: proposedPostContent,
+			candidateLabel: 'proposed',
+		} );
+
+	if ( proposedSequence.status !== 'valid' ) {
+		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+			proposedSequence.reason,
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount,
+				proposedBlockCount: proposedSequence.blockCount ?? 0,
+				unsafeSerializedBlockReason:
+					proposedSequence.unsafeSerializedBlockReason ?? null,
+			}
+		);
+	}
+
+	const serverChangedBlockIndexes = new Set(
+		serverSequence.changedBlockIndexes
+	);
+	const conflictingBlockIndex = proposedSequence.changedBlockIndexes.find(
+		( blockIndex ) => serverChangedBlockIndexes.has( blockIndex )
+	);
+
+	if ( conflictingBlockIndex !== undefined ) {
+		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+			'retained_block_edit_conflict',
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount,
+				proposedBlockCount: proposedSequence.blockCount,
+				serverChangedBlockCount:
+					serverSequence.changedBlockIndexes.length,
+				proposedChangedBlockCount:
+					proposedSequence.changedBlockIndexes.length,
+				serverChangedBlockIndexes: serverSequence.changedBlockIndexes,
+				proposedChangedBlockIndexes:
+					proposedSequence.changedBlockIndexes,
+				conflictingBlockIndex,
+			}
+		);
+	}
+
+	if (
+		serverSequence.changedBlockIndexes.length === 0 ||
+		proposedSequence.changedBlockIndexes.length === 0
+	) {
+		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+			'missing_two_sided_retained_edits',
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverBlockCount: serverSequence.blockCount,
+				proposedBlockCount: proposedSequence.blockCount,
+				serverChangedBlockCount:
+					serverSequence.changedBlockIndexes.length,
+				proposedChangedBlockCount:
+					proposedSequence.changedBlockIndexes.length,
+				serverChangedBlockIndexes: serverSequence.changedBlockIndexes,
+				proposedChangedBlockIndexes:
+					proposedSequence.changedBlockIndexes,
+			}
+		);
+	}
+
+	return {
+		status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY,
+		reason: null,
+		requestProof: null,
+		acceptedBlockCount: acceptedBlocks.length,
+		serverBlockCount: serverSequence.blockCount,
+		proposedBlockCount: proposedSequence.blockCount,
+		serverChangedBlockCount: serverSequence.changedBlockIndexes.length,
+		proposedChangedBlockCount: proposedSequence.changedBlockIndexes.length,
+		serverChangedBlockIndexes: [ ...serverSequence.changedBlockIndexes ],
+		proposedChangedBlockIndexes: [
+			...proposedSequence.changedBlockIndexes,
+		],
+		conflictingBlockIndex: null,
 		contentFree: true,
 		usesGutenbergClientId: false,
 		exposesRawContent: false,
@@ -8482,6 +9216,11 @@ export function getDistributedEditingSessionStateForStaleBaseRejectionResult(
 			responseOrError.client_base_content ??
 			responseData.clientBaseContent ??
 			responseData.client_base_content,
+		clientBaseSyncMeta:
+			responseOrError.clientBaseSyncMeta ??
+			responseOrError.client_base_sync_meta ??
+			responseData.clientBaseSyncMeta ??
+			responseData.client_base_sync_meta,
 		disposition:
 			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
 		reasonCode,
@@ -8532,6 +9271,15 @@ export function getDistributedEditingSessionStateForStaleBaseServerStateRefetchR
 	const serverVersion =
 		getDistributedEditingServerVersionFromResponse( responseOrError ) ||
 		normalizeNullableString( currentSessionState.serverVersion );
+	const distributedEditingPostStateHash = normalizeNullableString(
+		responseOrError?.state_hash ??
+			responseOrError?.stateHash ??
+			responseOrError?.data?.state_hash ??
+			responseOrError?.data?.stateHash ??
+			responseOrError?.distributed_editing?.state_hash ??
+			responseOrError?.distributedEditing?.stateHash ??
+			currentSessionState.distributedEditingPostStateHash
+	);
 	const refetchedServerContent =
 		getDistributedEditingPostContentFromResponse( responseOrError ) ??
 		normalizeNullableContentString(
@@ -8550,6 +9298,7 @@ export function getDistributedEditingSessionStateForStaleBaseServerStateRefetchR
 	return normalizeDistributedEditingSessionState( {
 		...currentSessionState,
 		serverVersion,
+		distributedEditingPostStateHash,
 		refetchedServerContent,
 		disposition:
 			currentSessionState.disposition ||
@@ -8768,12 +9517,13 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 				status: 'warning',
 				priority: 'blocking',
 				actionKeys: [
-					...( normalized.canExportLocalUpdates
+					...( normalized.canExportLocalUpdates &&
+					normalized.retrySaveStatus !==
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
 						? [
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 						  ]
 						: [] ),
-					DISTRIBUTED_EDITING_NOTICE_ACTIONS.ACCEPT_SERVER_STATE,
 				],
 			} )
 		);
@@ -8828,6 +9578,10 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE ||
 		hasRetrySaveHandoffBlock
 	) {
+		const retrySaveReviewRequired =
+			normalized.retrySaveStatus ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED ||
+			normalized.retrySaveRequiresUnfilteredHtmlSaver;
 		descriptors.push(
 			createNoticeDescriptor( normalized, {
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
@@ -8840,17 +9594,19 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 						? 'status'
 						: 'blocking',
 				actionKeys: [
-					...( normalized.canExportLocalUpdates
+					...( ! retrySaveReviewRequired &&
+					normalized.canExportLocalUpdates &&
+					normalized.retrySaveStatus !==
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
 						? [
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 						  ]
 						: [] ),
-					...( normalized.retrySaveStatus ===
+					...( ! retrySaveReviewRequired &&
+					( normalized.retrySaveStatus ===
 						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED ||
-					normalized.retrySaveStatus ===
-						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED ||
-					normalized.retrySaveHandoffReason ===
-						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED
+						normalized.retrySaveHandoffReason ===
+							DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED )
 						? [
 								DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 						  ]
@@ -9099,7 +9855,7 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 		);
 	}
 
-	if ( normalized.hasRemoteChanges ) {
+	if ( normalized.hasRemoteChanges && ! normalized.saveButtonClickInFlight ) {
 		descriptors.push(
 			createNoticeDescriptor( normalized, {
 				kind: DISTRIBUTED_EDITING_NOTICE_KINDS.REMOTE_CHANGES_RECEIVED,
@@ -9115,6 +9871,17 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 	}
 
 	if ( actionTranscriptState.status === 'available' ) {
+		const shouldSuppressQuietSavedTranscript =
+			normalized.retrySaveStatus ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
+			normalized.retrySaveAccepted &&
+			! normalized.hasPendingChanges &&
+			! normalized.mustOfferLocalCopy;
+
+		if ( shouldSuppressQuietSavedTranscript ) {
+			return descriptors;
+		}
+
 		const actionTranscriptSupportReport =
 			getDistributedEditingActionTranscriptSupportReportForSessionState(
 				normalized
@@ -9193,9 +9960,19 @@ function getDistributedEditingStaleBaseStatusActionKeys( normalized ) {
 		);
 	}
 
-	actionKeys.push( DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE );
+	if (
+		normalized.requiresServerStateRefetch ||
+		! normalized.refetchedServerState
+	) {
+		actionKeys.push(
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
+		);
+	}
 
-	if ( normalized.canExportLocalUpdates ) {
+	if (
+		normalized.canExportLocalUpdates &&
+		! normalized.saveButtonClickInFlight
+	) {
 		actionKeys.push(
 			DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
 		);
@@ -9226,6 +10003,113 @@ export function hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 		normalized.retrySaveMutatesPostContent &&
 		normalized.retrySaveClaimsSaved
 	);
+}
+
+/**
+ * Returns session state for a local document-history change that still needs
+ * to be saved. Any previous save/review proof is content-bound, so it cannot
+ * authorize the newly staged editor content.
+ *
+ * @param {Object} sessionState Current DE-RTC session state.
+ * @param {Object} overrides    Fields to apply after proof state is cleared.
+ *
+ * @return {Object} Normalized pending local-change state.
+ */
+export function getDistributedEditingSessionStateForPendingLocalHistoryChange(
+	sessionState = {},
+	overrides = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+
+	return normalizeDistributedEditingSessionState( {
+		...normalized,
+		disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+		reasonCode: null,
+		pendingChangeCount: Math.max(
+			1,
+			normalizeCount( overrides.pendingChangeCount ) ||
+				normalized.pendingChangeCount ||
+				1
+		),
+		hasPendingChanges: true,
+		saveButtonClickInFlight: false,
+		requiresServerStateAcceptance: false,
+		requiresServerStateRefetch: false,
+		refetchedServerState: false,
+		refetchedServerContent: null,
+		canAttemptLocalRebase: false,
+		localRebasePlanStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
+		localRebaseResultStatus:
+			DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.NONE,
+		localRebaseResultReason: null,
+		staleBaseConflictResolutionStatus:
+			DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES.NONE,
+		staleBaseConflictResolutionChoice: null,
+		staleBaseConflictResolutionRequiresFreshProof: false,
+		staleBaseConflictResolutionCallsRest: false,
+		staleBaseConflictResolutionCallsSave: false,
+		staleBaseConflictResolutionMutatesEditorContent: false,
+		staleBaseConflictResolutionMutatesPersistedPostContent: false,
+		staleBaseConflictResolutionCreatesRevision: false,
+		staleBaseConflictResolutionChangesPostLock: false,
+		staleBaseConflictResolutionClaimsSaved: false,
+		requiresManualConflictResolution: false,
+		readyToRetrySubmit: false,
+		retrySubmitHandoffStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES.NONE,
+		retrySubmitHandoffReason: null,
+		retrySubmitPrepared: false,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+		retrySubmitProofReason: null,
+		retrySubmitAccepted: false,
+		retrySubmitSavePathRequired: false,
+		retrySubmitSavesPost: false,
+		retrySubmitMutatesPostContent: false,
+		retrySubmitCreatesRevision: false,
+		retrySubmitClaimsSaved: false,
+		retrySubmitSaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+		retrySubmitSaveReason: null,
+		retrySubmitSavePrepared: false,
+		retrySubmitSaveReady: false,
+		retrySubmitSaveRequiresExplicitSaveClick: false,
+		retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+		retrySaveReason: null,
+		retrySaveHandoffStatus:
+			DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.NONE,
+		retrySaveHandoffReason: null,
+		retrySaveHandoffAllowsNormalSaveFallback: false,
+		retrySaveHandoffBlocksNormalSave: false,
+		retrySaveAccepted: false,
+		retrySaveServerVersion: null,
+		retrySavePreviousServerVersion: null,
+		retrySaveSavesPost: false,
+		retrySaveMutatesPostContent: false,
+		retrySaveCreatesRevision: false,
+		retrySaveClaimsSaved: false,
+		retrySaveRevisionCreated: false,
+		retrySaveCreatedRevisionIds: [],
+		retrySaveConfirmedMergedEdits: false,
+		retrySaveServerMerged: false,
+		retrySaveServerMergeApplied: false,
+		retrySaveServerMergeStatus: null,
+		retrySaveServerMergeStrategy: null,
+		retrySaveServerMergeBaseVersion: null,
+		retrySaveServerMergeServerVersion: null,
+		retrySaveServerMergeBlockCount: 0,
+		retrySaveServerMergeServerChangedIndexes: [],
+		retrySaveServerMergeLocalChangedIndexes: [],
+		retrySaveServerMergeMergedStrippedContentHash: null,
+		...normalizeRetrySaveReviewMetadataFields(),
+		...normalizeRetrySaveReviewApprovalProofFields(),
+		...normalizeRetrySaveFreshReviewConsumeValidationFields(),
+		...normalizeRiskyBlockReviewMetadataFields(),
+		mustOfferLocalCopy: false,
+		canExportLocalUpdates: false,
+		...overrides,
+	} );
 }
 
 /**
@@ -9272,6 +10156,7 @@ export function getDistributedEditingRetrySaveFlowStateForSessionState(
 			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.READY &&
 		normalized.retrySubmitSaveReady;
 	const hasRetrySaveSavedStateEvidence =
+		! hasProtectedLocalChanges &&
 		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 			normalized
 		);
@@ -9487,7 +10372,7 @@ export function getDistributedEditingSessionStateForKsesRiskyBlockReviewClassifi
 		riskyBlockReviewSaveClickAction: reviewRequired
 			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
 			: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
-		riskyBlockReviewCanExportLocalUpdates: reviewRequired,
+		riskyBlockReviewCanExportLocalUpdates: false,
 		riskyBlockReviewRequiresServerStateRefetch: false,
 		riskyBlockReviewRawContentIncluded: false,
 		riskyBlockReviewExposesRawContent: false,
@@ -9546,6 +10431,21 @@ export function getDistributedEditingRiskyBlockReviewStateForSessionState(
 		changesPostLock: normalized.riskyBlockReviewChangesPostLock,
 		claimsSaved: normalized.riskyBlockReviewClaimsSaved,
 	};
+}
+
+function isDistributedEditingPartialSafePendingReviewState(
+	normalized,
+	reviewState
+) {
+	return Boolean(
+		normalized.reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT &&
+			normalized.retrySaveStatus ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED &&
+			normalized.refetchedServerState &&
+			! normalized.requiresServerStateRefetch &&
+			reviewState.hasPendingReviewItems
+	);
 }
 
 /**
@@ -9895,7 +10795,7 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			reason = 'fresh_review_accepted_for_retry_save';
 			placement =
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS;
-			saveButtonLabel = 'Submit reviewed changes';
+			saveButtonLabel = 'Save';
 			clickAction =
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 		} else if (
@@ -9907,7 +10807,7 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			reason = 'fresh_review_handoff_validating';
 			placement =
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.SAVE_BUTTON_STATUS;
-			saveButtonLabel = 'Validating review';
+			saveButtonLabel = 'Checking review...';
 		} else if (
 			handoffStatus ===
 			DISTRIBUTED_EDITING_FRESH_REVIEW_RETRY_SAVE_HANDOFF_STATUSES.READY
@@ -10603,13 +11503,12 @@ function getDistributedEditingSaveStateVocabulary( {
 	if ( authoritativePostUpdated ) {
 		localChangesState =
 			DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.AUTHORITATIVE_UPDATE_CONFIRMED;
-		localChangesText =
-			'Protected local changes were accepted by the authoritative post.';
+		localChangesText = 'WordPress saved your changes.';
 	} else if ( pendingServerConfirmation ) {
 		localChangesState =
 			DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.AWAITING_SERVER_CONFIRMATION;
 		localChangesText =
-			'Protected local changes are waiting for server confirmation.';
+			'Protected local changes are waiting for WordPress confirmation.';
 	} else if ( hasProtectedLocalChanges && canExportLocalUpdates ) {
 		localChangesState =
 			DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE;
@@ -10628,8 +11527,7 @@ function getDistributedEditingSaveStateVocabulary( {
 	if ( authoritativePostUpdated ) {
 		reviewCheckpointState =
 			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_CONSUMED;
-		reviewCheckpointText =
-			'Review proof was consumed by the authoritative update.';
+		reviewCheckpointText = 'Save is complete.';
 	} else if (
 		status ===
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.FRESH_REVIEW_VALIDATING ||
@@ -10639,7 +11537,7 @@ function getDistributedEditingSaveStateVocabulary( {
 		reviewCheckpointState =
 			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_VALIDATING;
 		reviewCheckpointText =
-			'Review proof is being validated before Save can continue.';
+			'Review is being checked before Save can continue.';
 	} else if (
 		status === DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED ||
 		authorityState ===
@@ -10661,7 +11559,7 @@ function getDistributedEditingSaveStateVocabulary( {
 			status ===
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED
 				? 'A Distributed Editing recovery step is required before Save can continue.'
-				: 'Review is required before the authoritative post can update.';
+				: 'Review is required before WordPress can update the post.';
 	} else if (
 		status ===
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED ||
@@ -10672,22 +11570,22 @@ function getDistributedEditingSaveStateVocabulary( {
 	) {
 		reviewCheckpointState =
 			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED;
-		reviewCheckpointText = 'Review is accepted for the guarded Save path.';
+		reviewCheckpointText = 'Review is accepted for WordPress Save.';
 	}
 
-	let summaryText = 'Save can update the authoritative WordPress post.';
+	let summaryText = 'Save can update the post in WordPress.';
 
 	if ( authoritativePostUpdated ) {
 		summaryText = 'Ready for new edits.';
 	} else if ( pendingServerConfirmation ) {
 		summaryText =
-			'Reviewed local changes are waiting for server confirmation before the authoritative post is updated.';
+			'Reviewed local changes are waiting for WordPress confirmation before the post updates.';
 	} else if (
 		reviewCheckpointState ===
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_VALIDATING
 	) {
 		summaryText =
-			'Reviewed local changes are being validated before the authoritative post can update.';
+			'Reviewed local changes are being checked before WordPress can update the post.';
 	} else if (
 		reviewCheckpointState ===
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED
@@ -10701,14 +11599,14 @@ function getDistributedEditingSaveStateVocabulary( {
 		summaryText =
 			status ===
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED
-				? 'Protected local changes need the next Distributed Editing step before the authoritative post can update.'
-				: 'Protected local changes need review before the authoritative post can update.';
+				? 'Protected local changes need the next recovery step before WordPress can update the post.'
+				: 'Protected local changes need review before WordPress can update the post.';
 	} else if (
 		reviewCheckpointState ===
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_ACCEPTED
 	) {
 		summaryText =
-			'Reviewed local changes are ready for guarded update; the authoritative post is not updated yet.';
+			'Reviewed local changes are ready for Save; the post in WordPress is not updated yet.';
 	}
 
 	return {
@@ -10777,9 +11675,8 @@ function getDistributedEditingRequiredSaveWorkflowAction( normalized ) {
 	if ( canPrepareChanges ) {
 		return {
 			reason: 'retry_submit_handoff_not_prepared_before_save',
-			label: 'Prepare changes',
-			statusText:
-				'Prepare protected changes before Save can check with WordPress.',
+			label: 'Continue Save',
+			statusText: 'Continue Save before the post can update.',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.PREPARE_CHANGES,
 		};
@@ -10788,8 +11685,8 @@ function getDistributedEditingRequiredSaveWorkflowAction( normalized ) {
 	if ( canCheckWithWordPress ) {
 		return {
 			reason: 'retry_submit_proof_not_checked_before_save',
-			label: 'Check with WordPress',
-			statusText: 'Check with WordPress before Save can update the post.',
+			label: 'Continue Save',
+			statusText: 'Continue Save before the post can update.',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CHECK_WITH_WORDPRESS,
 		};
@@ -10814,6 +11711,11 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 	const normalized = normalizeDistributedEditingSessionState( sessionState );
 	const reviewState =
 		getDistributedEditingRiskyBlockReviewStateForSessionState( normalized );
+	const partialSafePendingReview =
+		isDistributedEditingPartialSafePendingReviewState(
+			normalized,
+			reviewState
+		);
 	const freshReviewPreSaveState =
 		getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			normalized
@@ -10878,8 +11780,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 	let clickAction = DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
 	let authorityState =
 		DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_TO_UPDATE;
-	let authorityStatusText =
-		'Save can update the authoritative WordPress post.';
+	let authorityStatusText = 'Save can update the post in WordPress.';
 	let disabled = false;
 	let busy = false;
 	let opensPrePublishReview = false;
@@ -10889,7 +11790,21 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 	let authoritativePostUpdated = false;
 	let pendingServerConfirmation = false;
 
-	if (
+	if ( normalized.saveButtonClickInFlight ) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_IN_PROGRESS;
+		reason = 'distributed_editing_save_button_click_in_flight';
+		source = 'save_button';
+		label = 'Save';
+		statusText = 'Saving.';
+		clickAction = null;
+		disabled = true;
+		busy = false;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AWAITING_SERVER_CONFIRMATION;
+		authorityStatusText = 'WordPress is saving your changes.';
+		pendingServerConfirmation = true;
+	} else if (
 		normalized.retrySaveStatus ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
 	) {
@@ -10898,16 +11813,14 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		reason =
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS;
 		source = 'retry_save';
-		label = 'Saving reviewed changes';
-		statusText =
-			'Distributed Editing Save is waiting for WordPress confirmation.';
+		label = 'Saving';
+		statusText = 'WordPress is saving your changes.';
 		clickAction = null;
 		disabled = true;
 		busy = true;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AWAITING_SERVER_CONFIRMATION;
-		authorityStatusText =
-			'The authoritative WordPress post has not confirmed these protected changes yet.';
+		authorityStatusText = 'WordPress is saving your changes.';
 		pendingServerConfirmation = true;
 	} else if (
 		freshReviewPreSaveState.status ===
@@ -10918,16 +11831,16 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		reason =
 			freshReviewPreSaveState.reason || 'fresh_review_handoff_validating';
 		source = 'fresh_review';
-		label = 'Validating review';
+		label = 'Checking review...';
 		statusText =
-			'Fresh-review validation is in progress before WordPress updates the post.';
+			'Review is being checked before WordPress updates the post.';
 		clickAction = null;
 		disabled = true;
 		busy = true;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_VALIDATION_IN_PROGRESS;
 		authorityStatusText =
-			'Review proof is being validated before the authoritative WordPress post can be updated.';
+			'Review is being checked before WordPress can update the post.';
 	} else if (
 		reviewState.requiresServerStateRefetch ||
 		freshReviewPreSaveRequiresServerStateRefetch ||
@@ -10948,8 +11861,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			source = 'retry_save';
 		}
 		label = 'Get latest post';
-		statusText =
-			'The latest post must be loaded before Distributed Editing can save.';
+		statusText = 'Load the latest post before Save can continue.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 		requiresServerStateRefetch = true;
@@ -10957,9 +11869,9 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE;
 		authorityStatusText =
-			'Server state must be refreshed before the authoritative WordPress post can be updated.';
+			'Get the latest post before WordPress can update it.';
 	} else if (
-		reviewState.hasPendingReviewItems ||
+		( reviewState.hasPendingReviewItems && ! partialSafePendingReview ) ||
 		freshReviewPreSaveState.opensPrePublishReview ||
 		freshReviewPreSaveState.status ===
 			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED ||
@@ -10979,15 +11891,28 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			freshReviewPreSaveState.saveButtonLabel !== 'Update'
 				? freshReviewPreSaveState.saveButtonLabel
 				: 'Review changes';
-		statusText =
-			'Save opens review before updating the authoritative post.';
+		statusText = 'Review changes before WordPress updates the post.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 		opensPrePublishReview = true;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE;
 		authorityStatusText =
-			'The authoritative WordPress post cannot be updated until risky changes are approved or removed.';
+			'WordPress cannot update the post until risky changes are approved or removed.';
+	} else if ( partialSafePendingReview ) {
+		status =
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED;
+		reason = 'partial_safe_review_pending';
+		source = 'partial_safe_review';
+		label = 'Save';
+		statusText =
+			'WordPress saved the safe parts. One block is still blocked.';
+		clickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		authorityState =
+			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE;
+		authorityStatusText =
+			'Save will check the remaining local changes with WordPress.';
 	} else if ( hasAcceptedButUnconsumed ) {
 		status =
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED;
@@ -11008,35 +11933,34 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			source = 'retry_submit';
 		}
 		if ( hasAcceptedRetrySubmitProofAwaitingSavePreparation ) {
-			label = 'Prepare Save';
+			label = 'Continue Save';
 		} else if ( source === 'retry_submit' && hasAcceptedRetrySubmitProof ) {
 			label = 'Save';
 		} else {
-			label = 'Submit reviewed changes';
+			label = 'Save';
 		}
 		statusText = hasAcceptedRetrySubmitProofAwaitingSavePreparation
-			? 'Accepted Distributed Editing proof needs Save preparation before WordPress can update the post.'
-			: 'Accepted Distributed Editing proof is ready for WordPress Save.';
+			? 'Ready to continue before the post updates.'
+			: 'Ready for WordPress.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_FOR_GUARDED_UPDATE;
 		authorityStatusText =
-			'Reviewed changes are ready for a guarded update of the authoritative WordPress post.';
+			'Reviewed changes are ready for WordPress to update the post.';
 	} else if ( hasRetrySaveSavedStateEvidence ) {
 		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.RETRY_SAVE_CONFIRMED;
 		reason =
 			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_ALREADY_CONFIRMED;
 		source = 'retry_save';
-		label = 'Save confirmed';
-		statusText = 'Distributed Editing Save confirmed.';
+		label = 'Saved';
+		statusText = 'WordPress saved your changes.';
 		clickAction = null;
 		disabled = true;
 		claimsSaved = true;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.AUTHORITATIVE_UPDATE_CONFIRMED;
-		authorityStatusText =
-			'The authoritative WordPress post has accepted the Distributed Editing Save.';
+		authorityStatusText = 'WordPress accepted this Save.';
 		authoritativePostUpdated = true;
 	} else if ( workflowAction ) {
 		status =
@@ -11049,13 +11973,14 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE;
 		authorityStatusText =
-			'Finish the Distributed Editing recovery step before the authoritative WordPress post can be updated.';
+			'Finish the recovery step before WordPress can update the post.';
 	}
 
 	const blocksNormalSavePost =
 		status !== DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY;
 	const canExportLocalUpdates =
 		Boolean( normalized.canExportLocalUpdates ) &&
+		! pendingServerConfirmation &&
 		( hasProtectedLocalChanges || blocksNormalSavePost );
 	const actionKeys = [
 		canExportLocalUpdates
@@ -11239,7 +12164,11 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 	} else if ( retrySubmitCanCheck ) {
 		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
 		action = 'check_with_wordpress';
-	} else if ( hasProtectedLocalChanges ) {
+	} else if (
+		hasProtectedLocalChanges &&
+		saveButton.status !==
+			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY
+	) {
 		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
 		action = 'wait_or_export';
 	}
@@ -11280,82 +12209,138 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 	};
 }
 
+/**
+ * Returns content-free state for the visible same-block Compare action.
+ * This records whether the click opened or requested the comparison surface
+ * without saving, autosaving, mutating content, or changing post locks.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ *
+ * @return {Object} Compare action state descriptor.
+ */
+export function getDistributedEditingConflictingChangesComparisonActionStateForSessionState(
+	sessionState = {}
+) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const requested = Boolean(
+		normalized.conflictingChangesComparisonActionRequested
+	);
+	const hasProtectedLocalChanges = Boolean(
+		normalized.hasPendingChanges ||
+			normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates ||
+			normalized.isAwaitingServerConfirmation ||
+			normalized.pendingChangeCount > 0
+	);
+
+	return {
+		status: normalized.conflictingChangesComparisonActionStatus,
+		reason: normalized.conflictingChangesComparisonActionReason,
+		action: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES,
+		requested,
+		openRequested: Boolean(
+			normalized.conflictingChangesComparisonOpenRequested
+		),
+		focusRequested: Boolean(
+			normalized.conflictingChangesComparisonFocusRequested
+		),
+		focusedImmediately: Boolean(
+			normalized.conflictingChangesComparisonFocusedImmediately
+		),
+		surfaceOpened: Boolean(
+			normalized.conflictingChangesComparisonSurfaceOpened
+		),
+		requiresManualConflictResolution: Boolean(
+			normalized.requiresManualConflictResolution
+		),
+		hasProtectedLocalChanges,
+		canExportLocalUpdates: Boolean( normalized.canExportLocalUpdates ),
+		preservesLocalChanges: true,
+		preservesCompareState: true,
+		blocksNormalSavePost: requested,
+		descriptorOnly: true,
+		callsRestEndpoint: false,
+		callsServerStateRefetchEndpoint: false,
+		callsRetrySubmitEndpoint: false,
+		callsNormalSavePost: false,
+		callsAutosaveEndpoint: false,
+		callsRetrySaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofInternals: false,
+	};
+}
+
 function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 	switch ( step ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED:
 			if ( action === 'apply_local_changes' ) {
 				return {
-					title: 'Save needs local changes applied',
-					summary:
-						'Apply protected local changes in this editor before WordPress can check Save.',
+					title: 'Apply local edits',
+					summary: 'Apply local edits in this editor before saving.',
 				};
 			}
 
 			if ( action === 'prepare_changes' ) {
 				return {
-					title: 'Save needs prepared changes',
-					summary:
-						'Prepare these protected changes for WordPress to check before Save can update the post.',
+					title: 'Continue Save',
+					summary: 'Continue Save before updating the post.',
 				};
 			}
 
 			if ( action === 'check_with_wordpress' ) {
 				return {
-					title: 'Save needs WordPress check',
-					summary:
-						'Check with WordPress before preparing Save; the post is not updated yet.',
+					title: 'Continue Save',
+					summary: 'Continue Save before the post can update.',
 				};
 			}
 
 			if ( action === 'compare_conflicting_changes' ) {
 				return {
-					title: 'Save needs comparison',
-					summary:
-						'Compare the local and WordPress versions before WordPress can check Save.',
+					title: 'Compare changes',
+					summary: 'Choose which version to keep before saving.',
 				};
 			}
 
 			return {
-				title: 'Save keeps changes protected',
-				summary:
-					'You can keep editing. If you use Save, keep this tab open until WordPress confirms the update.',
+				title: 'Keep editing',
+				summary: 'Use Save when you are ready.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
 			return {
-				title: 'Save needs the latest post',
-				summary:
-					'Getting the latest post refreshes server state before Save; local changes stay protected and WordPress is not updated yet.',
+				title: 'Load latest version',
+				summary: 'Load the latest post before saving again.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return {
-				title: 'Save opens review',
-				summary:
-					'Review highlighted changes before WordPress updates the post.',
+				title: 'Review changes',
+				summary: 'Review changes before saving.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
 			if ( action === 'prepare_save' ) {
 				return {
-					title: 'Save needs preparation',
-					summary:
-						'WordPress checked these changes. Prepare Save before updating the post.',
+					title: 'Continue Save',
+					summary: 'Continue Save before updating the post.',
 				};
 			}
 
 			return {
-				title: 'Save is ready',
-				summary:
-					'Save will send reviewed changes to WordPress for a guarded update.',
+				title: 'Ready to Save',
+				summary: 'Use Save to update the post.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
 			return {
-				title: 'Save is waiting for WordPress',
-				summary:
-					'Keep this tab open until WordPress confirms whether the post was updated.',
+				title: 'Saving',
+				summary: 'WordPress is saving your changes.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
 			return {
 				title: 'Saved',
-				summary: 'WordPress confirmed the update.',
+				summary: 'Ready for new edits.',
 			};
 	}
 
@@ -11374,11 +12359,11 @@ function getDistributedEditingSaveJourneyActionHintForStep( step, action ) {
 			}
 
 			if ( action === 'prepare_changes' ) {
-				return 'Prepare changes';
+				return 'Continue Save';
 			}
 
 			if ( action === 'check_with_wordpress' ) {
-				return 'Check with WordPress';
+				return 'Continue Save';
 			}
 
 			if ( action === 'compare_conflicting_changes' ) {
@@ -11392,12 +12377,12 @@ function getDistributedEditingSaveJourneyActionHintForStep( step, action ) {
 			return 'Review before update';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
 			if ( action === 'prepare_save' ) {
-				return 'Prepare Save';
+				return 'Continue Save';
 			}
 
-			return 'Send guarded update';
+			return 'Send to WordPress';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.WAITING_FOR_WORDPRESS:
-			return 'Keep tab open';
+			return null;
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED:
 			return null;
 	}
@@ -11439,8 +12424,10 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 	sessionState = {},
 	{ isDirty = false } = {}
 ) {
+	const normalized = normalizeDistributedEditingSessionState( sessionState );
+	const editorHasDirtyEdits = Boolean( isDirty );
 	const humanLoopStep =
-		getDistributedEditingHumanLoopStepStateForSessionState( sessionState );
+		getDistributedEditingHumanLoopStepStateForSessionState( normalized );
 	const copy = getDistributedEditingSaveJourneyCopyForStep(
 		humanLoopStep.step,
 		humanLoopStep.action
@@ -11486,9 +12473,16 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 		exposesSaverIds: false,
 		dirtyEditorPreflight: false,
 	};
+	const hasDistributedEditingPendingLocalChanges = Boolean(
+		normalized.hasPendingChanges ||
+			normalized.pendingChangeCount > 0 ||
+			normalized.canExportLocalUpdates ||
+			normalized.mustOfferLocalCopy
+	);
 
 	if (
-		isDirty &&
+		! editorHasDirtyEdits &&
+		hasDistributedEditingPendingLocalChanges &&
 		saveJourneyState.step ===
 			DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT &&
 		saveJourneyState.action === 'edit'
@@ -11496,21 +12490,193 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 		return {
 			...saveJourneyState,
 			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
+			action: 'wait_or_export',
+			title: 'Keep editing',
+			summary: 'Use Save when you are ready.',
+			requiresActionBeforeSave: false,
+			statusChromeSummary: 'Use Save when you are ready.',
+			statusChromeAuthorityText: 'Save can update the post.',
+		};
+	}
+
+	if (
+		editorHasDirtyEdits &&
+		( ( saveJourneyState.step ===
+			DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT &&
+			saveJourneyState.action === 'edit' ) ||
+			( saveJourneyState.step ===
+				DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.SAVE_CONFIRMED &&
+				saveJourneyState.action === 'none' ) )
+	) {
+		return {
+			...saveJourneyState,
+			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
 			action: 'dirty_save_preflight',
-			title: 'Save checks with WordPress',
-			summary:
-				'Save will check the latest post before WordPress updates it. Keep this tab open until WordPress confirms.',
+			title: 'Unsaved changes',
+			summary: 'Use Save when you are ready.',
 			actionHint: null,
 			requiresActionBeforeSave: false,
+			saveButtonStatus: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY,
+			saveButtonReason: null,
+			saveButtonLabel: 'Update',
+			saveButtonDisabled: false,
+			saveButtonBusy: false,
+			saveButtonBlocksNormalSavePost: false,
+			confirmedByWordPress: false,
 			dirtyEditorPreflight: true,
-			statusChromeSummary:
-				'Local edits will be checked with WordPress before the post updates.',
-			statusChromeAuthorityText:
-				'WordPress remains authoritative; Save checks for a newer version before updating the post.',
+			statusChromeSummary: 'Use Save when you are ready.',
+			statusChromeAuthorityState:
+				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.READY_TO_UPDATE,
+			statusChromeAuthorityText: 'Save can update the post.',
 		};
 	}
 
 	return saveJourneyState;
+}
+
+/**
+ * Returns the content-free vocabulary used by the repeated visible Save proof.
+ * This mirrors the browser artifact shape without reading content, calling
+ * REST, saving, autosaving, mutating state, or claiming persistence.
+ *
+ * @param {Object} sessionState DE-RTC session state.
+ * @param {Object} [options]    Proof vocabulary inputs.
+ *
+ * @return {Object} Repeated visible Save proof vocabulary.
+ */
+export function getDistributedEditingRepeatedVisibleSaveProofStateForSessionState(
+	sessionState = {},
+	options = {}
+) {
+	const saveButton =
+		getDistributedEditingSaveButtonStateForSessionState( sessionState );
+	const saveJourney =
+		getDistributedEditingSaveJourneyStateForSessionState( sessionState );
+	const viewport = normalizeDistributedEditingProofViewport(
+		getFirstDefined( options.viewport, options.view_port, options )
+	);
+	const requestDeltaAfterRepeatedClick =
+		normalizeDistributedEditingRepeatedSaveRequestDelta(
+			getFirstDefined(
+				options.requestDeltaAfterRepeatedClick,
+				options.request_delta_after_repeated_click
+			)
+		);
+	const requestDeltaIsEmpty = Object.values(
+		requestDeltaAfterRepeatedClick
+	).every( ( count ) => count === 0 );
+	const repeatedClickAttempted = Boolean(
+		getFirstDefined(
+			options.repeatedClickAttempted,
+			options.repeated_click_attempted,
+			true
+		)
+	);
+	const secondClickFired = Boolean(
+		getFirstDefined( options.secondClickFired, options.second_click_fired )
+	);
+	const delayedRefetchHeld = Boolean(
+		getFirstDefined(
+			options.delayedRefetchHeld,
+			options.delayed_refetch_held
+		)
+	);
+	const delayedRefetchReleased = Boolean(
+		getFirstDefined(
+			options.delayedRefetchReleased,
+			options.delayed_refetch_released
+		)
+	);
+	const delayedServerStateRefetchCount = normalizeCount(
+		getFirstDefined(
+			options.delayedServerStateRefetchCount,
+			options.delayed_server_state_refetch_count
+		)
+	);
+	const localProposalPreserved = Boolean(
+		getFirstDefined(
+			options.localProposalPreserved,
+			options.local_proposal_preserved
+		)
+	);
+	const dirtyStatePreserved = Boolean(
+		getFirstDefined(
+			options.dirtyStatePreserved,
+			options.dirty_state_preserved
+		)
+	);
+	const normalSaveBlocked = Boolean(
+		getFirstDefined(
+			options.normalSaveBlocked,
+			options.normal_save_blocked,
+			saveButton.blocksNormalSavePost &&
+				! saveButton.shouldCallNormalSavePost
+		)
+	);
+	const duplicateGuardedWritesPrevented = Boolean(
+		getFirstDefined(
+			options.duplicateGuardedWritesPrevented,
+			options.duplicate_guarded_writes_prevented,
+			requestDeltaIsEmpty && ! secondClickFired
+		)
+	);
+
+	return {
+		viewport,
+		repeatedVisibleSaveIdempotency: {
+			repeatedClickAttempted,
+			secondClickFired,
+			delayedRefetchHeld,
+			delayedRefetchReleased,
+			delayedServerStateRefetchCount,
+			localProposalPreserved,
+			dirtyStatePreserved,
+			normalSaveBlocked,
+			requestDeltaAfterRepeatedClick,
+			buttonSnapshot: {
+				text: saveButton.label,
+				disabled: saveButton.disabled,
+				busy: saveButton.busy,
+				saveButtonStatus: saveButton.status,
+				saveButtonClickAction: saveButton.clickAction,
+				saveJourneyAction: saveJourney.action,
+				saveButtonStateSummary: saveButton.saveStateSummaryText,
+			},
+			singlePeerGuardedPipeline: Boolean(
+				getFirstDefined(
+					options.singlePeerGuardedPipeline,
+					options.single_peer_guarded_pipeline,
+					repeatedClickAttempted &&
+						delayedRefetchHeld &&
+						normalSaveBlocked &&
+						requestDeltaIsEmpty
+				)
+			),
+			duplicateGuardedWritesPrevented,
+			saveLoopPrevented: Boolean(
+				getFirstDefined(
+					options.saveLoopPrevented,
+					options.save_loop_prevented,
+					requestDeltaIsEmpty && saveButton.clickAction === null
+				)
+			),
+		},
+		descriptorOnly: true,
+		contentFree: true,
+		callsRestEndpoint: false,
+		callsNormalSavePost: false,
+		callsRetrySaveEndpoint: false,
+		callsAutosaveEndpoint: false,
+		dispatchesNotice: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		changesPostLock: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesProofInternals: false,
+		exposesReviewerIds: false,
+		exposesSaverIds: false,
+	};
 }
 
 /**
@@ -12244,11 +13410,13 @@ export function getDistributedEditingSessionStateForRetrySubmitProofResult(
  * state, dispatch notices, persist editor state, or change post locks.
  *
  * @param {Object} currentSessionState Current DE-RTC session state.
+ * @param {Object} options             Preparation options.
  *
  * @return {Object} Normalized DE-RTC session state.
  */
 export function getDistributedEditingSessionStateForRetrySubmitSavePreparation(
-	currentSessionState = {}
+	currentSessionState = {},
+	options = {}
 ) {
 	const normalized =
 		normalizeDistributedEditingSessionState( currentSessionState );
@@ -12324,6 +13492,9 @@ export function getDistributedEditingSessionStateForRetrySubmitSavePreparation(
 		retrySubmitSaveReason: null,
 		retrySubmitSavePrepared: true,
 		retrySubmitSaveReady: true,
+		retrySubmitSaveRequiresExplicitSaveClick: Boolean(
+			options.requiresExplicitSaveClick
+		),
 		mustOfferLocalCopy: true,
 		canExportLocalUpdates: true,
 	} );
@@ -12420,7 +13591,7 @@ export function getDistributedEditingSessionStateForRetrySaveRequest(
 			  }
 			: {} ),
 		mustOfferLocalCopy: true,
-		canExportLocalUpdates: true,
+		canExportLocalUpdates: ! options.suppressExportDuringSave,
 	} );
 }
 
@@ -12600,7 +13771,27 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		normalizeCount( pendingChangeCount ) ||
 		normalizedCurrent.pendingChangeCount ||
 		( normalizedCurrent.hasPendingChanges ? 1 : 0 );
-
+	const partialSafeMergeApplied = Boolean(
+		getFirstDefined(
+			responseOrError.partialSafeMergeApplied,
+			responseOrError.partial_safe_merge_applied,
+			responseData.partialSafeMergeApplied,
+			responseData.partial_safe_merge_applied
+		)
+	);
+	const partialSafeMergeContent = partialSafeMergeApplied
+		? getDistributedEditingPostContentFromResponse( responseOrError )
+		: null;
+	const partialSafeMergeFields =
+		partialSafeMergeApplied && typeof partialSafeMergeContent === 'string'
+			? {
+					clientBaseVersion: serverVersion,
+					clientBaseContent: partialSafeMergeContent,
+					refetchedServerContent: partialSafeMergeContent,
+					refetchedServerState: true,
+					requiresServerStateRefetch: false,
+			  }
+			: {};
 	if (
 		retrySaveAppliedResult &&
 		( responseOrError.retrySaveAccepted === true ||
@@ -12647,6 +13838,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			retrySubmitSaveReason: null,
 			retrySubmitSavePrepared: false,
 			retrySubmitSaveReady: false,
+			retrySubmitSaveRequiresExplicitSaveClick: false,
 			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
 			retrySaveReason: null,
 			retrySaveAccepted: true,
@@ -12719,6 +13911,15 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 				responseData.acceptedReviewApprovalProofAvailable ||
 				responseData.accepted_review_approval_proof_available )
 	);
+	const retrySaveRiskyBlockReviewState =
+		getDistributedEditingSessionStateForKsesRiskyBlockReviewClassificationResult(
+			responseOrError,
+			normalizedCurrent
+		);
+	const retrySaveRiskyBlockReviewMetadata =
+		normalizeRiskyBlockReviewMetadataFields(
+			retrySaveRiskyBlockReviewState
+		);
 
 	return getDistributedEditingRejectedRetrySaveState( {
 		normalizedCurrent,
@@ -12734,8 +13935,10 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		retrySaveReviewMetadata,
 		retrySaveReviewApprovalProofFields,
 		retrySaveFreshReviewConsumeValidationFields,
+		retrySaveRiskyBlockReviewMetadata,
 		hasAcceptedReviewApprovalProof,
 		retrySaveServerMergeConflictFields,
+		partialSafeMergeFields,
 	} );
 }
 
@@ -12837,6 +14040,7 @@ export function getDistributedEditingSessionStateForRetrySaveReviewApprovalProof
 				'retry_save_review_approval_requires_save_handoff',
 			retrySubmitSavePrepared: false,
 			retrySubmitSaveReady: false,
+			retrySubmitSaveRequiresExplicitSaveClick: false,
 			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
 			retrySaveReason: null,
 			retrySaveAccepted: false,
@@ -13313,6 +14517,8 @@ function getDistributedEditingRetrySubmitProofDescriptorFields( normalized ) {
 
 function getDistributedEditingRetrySaveNoticeStatus( retrySaveStatus ) {
 	switch ( retrySaveStatus ) {
+		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING:
+			return 'info';
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED:
 			return 'success';
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_SYNC_META_TAMPERED:
@@ -13604,6 +14810,7 @@ function getBlockedRetrySubmitSavePreparationState( normalized, reason ) {
 		retrySubmitSaveReason: reason,
 		retrySubmitSavePrepared: false,
 		retrySubmitSaveReady: false,
+		retrySubmitSaveRequiresExplicitSaveClick: false,
 		canExportLocalUpdates:
 			normalized.canExportLocalUpdates || normalized.hasPendingChanges,
 	} );
@@ -13620,7 +14827,9 @@ function getDistributedEditingRejectedRetrySaveState( {
 	retrySaveReviewMetadata = {},
 	retrySaveReviewApprovalProofFields = {},
 	retrySaveFreshReviewConsumeValidationFields = {},
+	retrySaveRiskyBlockReviewMetadata = {},
 	retrySaveServerMergeConflictFields = {},
+	partialSafeMergeFields = {},
 	hasAcceptedReviewApprovalProof = false,
 	retrySaveReason = null,
 } ) {
@@ -13629,11 +14838,17 @@ function getDistributedEditingRejectedRetrySaveState( {
 	let requiresServerStateRefetch = false;
 	let requiresManualConflictResolution =
 		normalizedCurrent.requiresManualConflictResolution;
+	const partialSafeMergeAcceptedServerState = Boolean(
+		partialSafeMergeFields.refetchedServerState &&
+			reasonCode ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT
+	);
 	const shouldPreserveRetrySubmitProof =
-		reasonCode ===
+		! partialSafeMergeAcceptedServerState &&
+		( reasonCode ===
 			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT ||
-		reasonCode ===
-			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML;
+			reasonCode ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML );
 
 	switch ( reasonCode ) {
 		case DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED:
@@ -13717,16 +14932,41 @@ function getDistributedEditingRejectedRetrySaveState( {
 		requiresServerStateRefetch = true;
 	}
 
+	if ( partialSafeMergeFields.refetchedServerState ) {
+		requiresServerStateRefetch = false;
+		requiresManualConflictResolution = false;
+	}
+	const hasHashOnlyRiskyBlockReview =
+		reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT &&
+		( retrySaveReviewMetadata.retrySaveReviewRawContentIncluded === false ||
+			normalizeCount(
+				retrySaveRiskyBlockReviewMetadata.riskyBlockReviewPendingCount
+			) > 0 ) &&
+		! retrySaveRiskyBlockReviewMetadata.riskyBlockReviewRawContentIncluded;
+	const shouldSuppressRejectedLocalCopy =
+		hasHashOnlyRiskyBlockReview ||
+		reasonCode ===
+			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_REVIEW_APPROVAL_REQUIRES_UNFILTERED_HTML;
+	const shouldOfferRejectedLocalCopy =
+		! shouldSuppressRejectedLocalCopy &&
+		normalizeCount( pendingChangeCount ) > 0;
+
 	return normalizeDistributedEditingSessionState( {
 		...normalizedCurrent,
+		...partialSafeMergeFields,
 		disposition,
 		reasonCode,
 		serverVersion,
 		pendingChangeCount,
 		hasPendingChanges: normalizeCount( pendingChangeCount ) > 0,
-		isAwaitingServerConfirmation: normalizeCount( pendingChangeCount ) > 0,
+		isAwaitingServerConfirmation: partialSafeMergeAcceptedServerState
+			? false
+			: normalizeCount( pendingChangeCount ) > 0,
 		requiresServerStateRefetch,
-		refetchedServerState: false,
+		refetchedServerState: Boolean(
+			partialSafeMergeFields.refetchedServerState
+		),
 		canAttemptLocalRebase: false,
 		readyToRetrySubmit: false,
 		retrySubmitProofStatus: shouldPreserveRetrySubmitProof
@@ -13752,6 +14992,9 @@ function getDistributedEditingRejectedRetrySaveState( {
 		retrySubmitSaveReady: shouldPreserveRetrySubmitProof
 			? normalizedCurrent.retrySubmitSaveReady
 			: false,
+		retrySubmitSaveRequiresExplicitSaveClick: shouldPreserveRetrySubmitProof
+			? normalizedCurrent.retrySubmitSaveRequiresExplicitSaveClick
+			: false,
 		retrySaveStatus,
 		retrySaveReason: retrySaveReason || reasonCode || result,
 		retrySaveAccepted: false,
@@ -13761,6 +15004,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 		...retrySaveReviewMetadata,
 		...retrySaveReviewApprovalProofFields,
 		...retrySaveFreshReviewConsumeValidationFields,
+		...retrySaveRiskyBlockReviewMetadata,
 		...( hasAcceptedReviewApprovalProof
 			? {
 					retrySaveReviewApprovalProofStatus:
@@ -13785,10 +15029,11 @@ function getDistributedEditingRejectedRetrySaveState( {
 					canAttemptLocalRebase: false,
 			  }
 			: {} ),
-		mustOfferLocalCopy: normalizeCount( pendingChangeCount ) > 0,
-		canExportLocalUpdates:
-			normalizedCurrent.canExportLocalUpdates ||
-			normalizeCount( pendingChangeCount ) > 0,
+		mustOfferLocalCopy: shouldOfferRejectedLocalCopy,
+		canExportLocalUpdates: shouldOfferRejectedLocalCopy
+			? normalizedCurrent.canExportLocalUpdates ||
+			  normalizeCount( pendingChangeCount ) > 0
+			: false,
 	} );
 }
 
@@ -15242,11 +16487,9 @@ function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
 		riskyBlockReviewPrePublishPanelRequired,
 		riskyBlockReviewSaveButtonLabel,
 		riskyBlockReviewSaveClickAction,
-		riskyBlockReviewCanExportLocalUpdates:
-			Boolean( sessionState.riskyBlockReviewCanExportLocalUpdates ) ||
-			riskyBlockReviewHasPendingItems ||
-			riskyBlockReviewStatus ===
-				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.STALE_AFTER_REVIEW,
+		riskyBlockReviewCanExportLocalUpdates: Boolean(
+			sessionState.riskyBlockReviewCanExportLocalUpdates
+		),
 		riskyBlockReviewRequiresServerStateRefetch,
 		riskyBlockReviewReviewedServerVersion: normalizeNullableString(
 			sessionState.riskyBlockReviewReviewedServerVersion
@@ -16538,8 +17781,52 @@ function normalizeNullableInteger( value ) {
 	return Number.isInteger( number ) && number > 0 ? number : null;
 }
 
+function normalizeNonNegativeInteger( value ) {
+	const number = Number( value );
+	return Number.isInteger( number ) && number >= 0 ? number : null;
+}
+
 function normalizeNullableContentString( value ) {
 	return typeof value === 'string' ? value : null;
+}
+
+function canonicalizeDistributedEditingCoreBlockCommentDelimiters( value ) {
+	if ( typeof value !== 'string' || ! value.includes( 'wp:core/' ) ) {
+		return value;
+	}
+
+	return value.replace(
+		/<!--\s*(\/?)wp:core\/([^\s>]+)([\s\S]*?)-->/g,
+		'<!-- $1wp:$2$3-->'
+	);
+}
+
+function normalizeDistributedEditingHistoryStack( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.slice( -20 )
+		.map( ( item ) => ( {
+			beforeContent: normalizeNullableContentString(
+				item?.beforeContent
+			),
+			afterContent: normalizeNullableContentString( item?.afterContent ),
+			label: normalizeNullableString( item?.label ),
+			source: normalizeNullableString( item?.source ),
+		} ) )
+		.filter(
+			( item ) =>
+				typeof item.beforeContent === 'string' &&
+				typeof item.afterContent === 'string'
+		);
+}
+
+function normalizeDistributedEditingSyncMeta( value ) {
+	return value && typeof value === 'object' && ! Array.isArray( value )
+		? value
+		: null;
 }
 
 function normalizeBlockPath( value ) {
@@ -16560,6 +17847,50 @@ function normalizeIdList( value ) {
 	return value
 		.map( ( item ) => Number( item ) )
 		.filter( ( item ) => Number.isInteger( item ) && item > 0 );
+}
+
+function normalizeDistributedEditingProofViewport( value = {} ) {
+	const viewport = normalizeObject( value );
+	const width = normalizeNullableInteger(
+		getFirstDefined( viewport.width, viewport.viewportWidth )
+	);
+	const height = normalizeNullableInteger(
+		getFirstDefined( viewport.height, viewport.viewportHeight )
+	);
+
+	return width && height ? { width, height } : null;
+}
+
+function normalizeDistributedEditingRepeatedSaveRequestDelta( value = {} ) {
+	const delta = normalizeObject( value );
+
+	return {
+		serverStateRefetch: normalizeCount(
+			getFirstDefined(
+				delta.serverStateRefetch,
+				delta.server_state_refetch
+			)
+		),
+		retrySubmit: normalizeCount(
+			getFirstDefined( delta.retrySubmit, delta.retry_submit )
+		),
+		retrySave: normalizeCount(
+			getFirstDefined( delta.retrySave, delta.retry_save )
+		),
+		distributedEditing: normalizeCount(
+			getFirstDefined(
+				delta.distributedEditing,
+				delta.distributed_editing
+			)
+		),
+		autosave: normalizeCount( delta.autosave ),
+		normalPostMutation: normalizeCount(
+			getFirstDefined(
+				delta.normalPostMutation,
+				delta.normal_post_mutation
+			)
+		),
+	};
 }
 
 function normalizeObject( value ) {
@@ -16634,14 +17965,21 @@ export function getDistributedEditingPostContentFromResponse(
 	const rawPostContent =
 		getDistributedEditingRawPostContentFromResponse( responseOrError );
 
-	return stripDistributedEditingSyncMetaFromPostContent( rawPostContent );
+	return getDistributedEditingComparablePostContent( rawPostContent );
 }
 
 export function getDistributedEditingComparablePostContent( postContent ) {
-	return stripDistributedEditingSyncMetaFromPostContent( postContent );
+	const strippedPostContent =
+		stripDistributedEditingSyncMetaFromPostContent( postContent );
+
+	return canonicalizeDistributedEditingCoreBlockCommentDelimiters(
+		strippedPostContent
+	);
 }
 
-function getDistributedEditingRawPostContentFromResponse( responseOrError ) {
+export function getDistributedEditingRawPostContentFromResponse(
+	responseOrError
+) {
 	const responseData = getDistributedEditingResponseData( responseOrError );
 
 	return normalizeNullableContentString(
@@ -16680,6 +18018,43 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 	}
 
 	const freeformWrappedSyncMetaSource = `(?:<!--\\s*wp:freeform\\s*-->\\s*)?<p>\\s*${ DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE }\\s*<\\/p>\\s*(?:<!--\\s*\\/wp:freeform\\s*-->\\s*)?`;
+	const htmlBlockWrappedSyncMetaSource = `<!--\\s*wp:html\\s*-->\\s*${ DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE }\\s*<!--\\s*\\/wp:html\\s*-->`;
+	const coreSyncMetaBlockSource = `<!--\\s*wp:(?:core\\/)?sync-meta\\b[^>]*-->\\s*${ DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE }\\s*<!--\\s*\\/wp:(?:core\\/)?sync-meta\\s*-->`;
+	const coreSyncMetaBlockPrefixPattern = new RegExp(
+		`^\\s*${ coreSyncMetaBlockSource }\\s*`,
+		'i'
+	);
+	const coreSyncMetaBlockPrefixMatch = content.match(
+		coreSyncMetaBlockPrefixPattern
+	);
+
+	if ( coreSyncMetaBlockPrefixMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice(
+				coreSyncMetaBlockPrefixMatch[ 0 ].length
+			),
+			scriptContent: getDistributedEditingSyncMetaScriptContent(
+				coreSyncMetaBlockPrefixMatch
+			),
+		} );
+	}
+
+	const htmlBlockPrefixPattern = new RegExp(
+		`^\\s*${ htmlBlockWrappedSyncMetaSource }\\s*`,
+		'i'
+	);
+	const htmlBlockPrefixMatch = content.match( htmlBlockPrefixPattern );
+
+	if ( htmlBlockPrefixMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice( htmlBlockPrefixMatch[ 0 ].length ),
+			scriptContent:
+				getDistributedEditingSyncMetaScriptContent(
+					htmlBlockPrefixMatch
+				),
+		} );
+	}
+
 	const wrappedPrefixPattern = new RegExp(
 		`^\\s*${ freeformWrappedSyncMetaSource }\\s*`,
 		'i'
@@ -16689,7 +18064,10 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 	if ( wrappedPrefixMatch ) {
 		return createDistributedEditingSyncMetaParseResult( {
 			postContent: content.slice( wrappedPrefixMatch[ 0 ].length ),
-			scriptContent: wrappedPrefixMatch[ 2 ],
+			scriptContent:
+				getDistributedEditingSyncMetaScriptContent(
+					wrappedPrefixMatch
+				),
 		} );
 	}
 
@@ -16702,7 +18080,8 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 	if ( prefixMatch ) {
 		return createDistributedEditingSyncMetaParseResult( {
 			postContent: content.slice( prefixMatch[ 0 ].length ),
-			scriptContent: prefixMatch[ 2 ],
+			scriptContent:
+				getDistributedEditingSyncMetaScriptContent( prefixMatch ),
 		} );
 	}
 
@@ -16718,7 +18097,48 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 				0,
 				content.length - wrappedTrailerMatch[ 0 ].length
 			),
-			scriptContent: wrappedTrailerMatch[ 2 ],
+			scriptContent:
+				getDistributedEditingSyncMetaScriptContent(
+					wrappedTrailerMatch
+				),
+		} );
+	}
+
+	const coreSyncMetaBlockTrailerPattern = new RegExp(
+		`\\s*${ coreSyncMetaBlockSource }\\s*$`,
+		'i'
+	);
+	const coreSyncMetaBlockTrailerMatch = content.match(
+		coreSyncMetaBlockTrailerPattern
+	);
+
+	if ( coreSyncMetaBlockTrailerMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice(
+				0,
+				content.length - coreSyncMetaBlockTrailerMatch[ 0 ].length
+			),
+			scriptContent: getDistributedEditingSyncMetaScriptContent(
+				coreSyncMetaBlockTrailerMatch
+			),
+		} );
+	}
+
+	const htmlBlockTrailerPattern = new RegExp(
+		`\\s*${ htmlBlockWrappedSyncMetaSource }\\s*$`,
+		'i'
+	);
+	const htmlBlockTrailerMatch = content.match( htmlBlockTrailerPattern );
+
+	if ( htmlBlockTrailerMatch ) {
+		return createDistributedEditingSyncMetaParseResult( {
+			postContent: content.slice(
+				0,
+				content.length - htmlBlockTrailerMatch[ 0 ].length
+			),
+			scriptContent: getDistributedEditingSyncMetaScriptContent(
+				htmlBlockTrailerMatch
+			),
 		} );
 	}
 
@@ -16734,7 +18154,8 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 				0,
 				content.length - trailerMatch[ 0 ].length
 			),
-			scriptContent: trailerMatch[ 2 ],
+			scriptContent:
+				getDistributedEditingSyncMetaScriptContent( trailerMatch ),
 		} );
 	}
 
@@ -16742,6 +18163,16 @@ function parseDistributedEditingSyncMetaFromPostContent( postContent ) {
 		postContent: content,
 		syncMeta: null,
 	};
+}
+
+function getDistributedEditingSyncMetaScriptContent( match ) {
+	for ( let index = match.length - 1; index > 0; index-- ) {
+		if ( typeof match[ index ] === 'string' ) {
+			return match[ index ];
+		}
+	}
+
+	return '';
 }
 
 function createDistributedEditingSyncMetaParseResult( {
@@ -16764,6 +18195,385 @@ function createDistributedEditingSyncMetaParseResult( {
 		return {
 			postContent,
 			syncMeta: null,
+		};
+	}
+}
+
+export async function getDistributedEditingPostContentWithYjsSyncMeta( {
+	clientBaseContent,
+	proposedPostContent,
+	existingSyncMeta = null,
+	actor = 'editor',
+} = {} ) {
+	const base =
+		getDistributedEditingComparablePostContent( clientBaseContent );
+	const proposed =
+		getDistributedEditingComparablePostContent( proposedPostContent );
+
+	if ( typeof base !== 'string' || typeof proposed !== 'string' ) {
+		return {
+			status: 'blocked',
+			reason: 'missing_yjs_content_pair',
+			postContent: proposedPostContent,
+			syncMeta: null,
+		};
+	}
+
+	const updateDescriptor =
+		await getDistributedEditingYjsClientUpdateDescriptor( {
+			clientBaseContent: base,
+			proposedPostContent: proposed,
+			actor,
+		} );
+
+	if ( updateDescriptor.status !== 'ready' || ! updateDescriptor.update ) {
+		return {
+			...updateDescriptor,
+			postContent: proposed,
+			syncMeta: null,
+		};
+	}
+
+	const clientBaseVersion = normalizeNullableString(
+		existingSyncMeta?.version ?? existingSyncMeta?.serverVersion ?? '0'
+	);
+	const syncMeta = {
+		...( existingSyncMeta &&
+		typeof existingSyncMeta === 'object' &&
+		! Array.isArray( existingSyncMeta )
+			? existingSyncMeta
+			: {} ),
+		schema: 'de-rtc-yjs-v1',
+		version: clientBaseVersion || '0',
+		client_base_version: clientBaseVersion || '0',
+		pending_yjs_encoding: 'native-yjs-php-update-v0',
+		pending_yjs_update: encodeDistributedEditingBase64Json(
+			updateDescriptor.update
+		),
+	};
+	delete syncMeta.yjs_client_update;
+	delete syncMeta.yjs_update_role;
+
+	return {
+		status: 'ready',
+		reason: null,
+		postContent: `${ formatDistributedEditingSyncMetaBlock(
+			syncMeta
+		) }${ proposed }`,
+		syncMeta,
+		update: updateDescriptor.update,
+		changeRange: updateDescriptor.changeRange,
+	};
+}
+
+function formatDistributedEditingSyncMetaBlock( syncMeta ) {
+	const json = JSON.stringify( syncMeta ).replace( /</g, '\\u003c' );
+
+	return (
+		'<!-- wp:sync-meta {"format":"yjs"} -->\n' +
+		'<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">' +
+		json +
+		'</script>\n' +
+		'<!-- /wp:sync-meta -->'
+	);
+}
+
+function encodeDistributedEditingBase64Json( value ) {
+	const json = JSON.stringify( value );
+
+	if ( typeof globalThis?.TextEncoder === 'function' ) {
+		const bytes = new globalThis.TextEncoder().encode( json );
+		let binary = '';
+
+		for ( const byte of bytes ) {
+			binary += String.fromCharCode( byte );
+		}
+
+		if ( typeof globalThis?.btoa === 'function' ) {
+			return globalThis.btoa( binary );
+		}
+	}
+
+	if ( typeof globalThis?.btoa === 'function' ) {
+		return globalThis.btoa( unescape( encodeURIComponent( json ) ) );
+	}
+
+	if ( typeof globalThis?.Buffer?.from === 'function' ) {
+		return globalThis.Buffer.from( json, 'utf8' ).toString( 'base64' );
+	}
+
+	return json;
+}
+
+export async function getDistributedEditingYjsClientUpdateDescriptor( {
+	clientBaseContent,
+	proposedPostContent,
+	actor = 'editor',
+} = {} ) {
+	const base = canonicalizeDistributedEditingCoreBlockCommentDelimiters(
+		normalizeNullableContentString( clientBaseContent )
+	);
+	const proposed = canonicalizeDistributedEditingCoreBlockCommentDelimiters(
+		normalizeNullableContentString( proposedPostContent )
+	);
+
+	if ( typeof base !== 'string' || typeof proposed !== 'string' ) {
+		return {
+			status: 'blocked',
+			reason: 'missing_yjs_content_pair',
+			update: null,
+		};
+	}
+
+	const change = getDistributedEditingYjsContentChangeDescriptor(
+		base,
+		proposed
+	);
+	const operations = [];
+	let sequence = 0;
+
+	if ( change.deleteLength > 0 ) {
+		operations.push( {
+			type: 'delete',
+			index: change.index,
+			length: change.deleteLength,
+			actor,
+			sequence,
+			id: `${ actor }:${ sequence }`,
+		} );
+		sequence += 1;
+	}
+
+	if ( change.insertText ) {
+		operations.push( {
+			type: 'insert',
+			index: change.index,
+			text: change.insertText,
+			actor,
+			sequence,
+			id: `${ actor }:${ sequence }`,
+		} );
+		sequence += 1;
+	}
+
+	return {
+		status: 'ready',
+		reason: null,
+		update: {
+			format: 'native-yjs-php-update-v0',
+			operations,
+			stateVector: sequence > 0 ? { [ actor ]: sequence } : {},
+			interop: await getDistributedEditingYjsInteropEvidence(),
+		},
+		changeRange: change.changeRange,
+	};
+}
+
+function getDistributedEditingYjsContentChangeDescriptor( base, proposed ) {
+	let prefix = 0;
+	const baseLength = base.length;
+	const proposedLength = proposed.length;
+
+	while (
+		prefix < baseLength &&
+		prefix < proposedLength &&
+		base.charCodeAt( prefix ) === proposed.charCodeAt( prefix )
+	) {
+		prefix += 1;
+	}
+
+	let suffix = 0;
+	while (
+		suffix < baseLength - prefix &&
+		suffix < proposedLength - prefix &&
+		base.charCodeAt( baseLength - 1 - suffix ) ===
+			proposed.charCodeAt( proposedLength - 1 - suffix )
+	) {
+		suffix += 1;
+	}
+
+	const deleteLength = baseLength - prefix - suffix;
+	const insertText = proposed.slice( prefix, proposedLength - suffix );
+
+	return {
+		index: prefix,
+		deleteLength,
+		insertText,
+		insertLength: insertText.length,
+		changeRange: {
+			start: prefix,
+			end: prefix + deleteLength,
+			deleteLength,
+			insertLength: insertText.length,
+			changed: deleteLength > 0 || insertText.length > 0,
+		},
+	};
+}
+
+function doDistributedEditingYjsChangeRangesOverlap( left, right ) {
+	if ( ! left?.changed || ! right?.changed ) {
+		return false;
+	}
+
+	const leftStart = left.start;
+	const leftEnd = left.end;
+	const rightStart = right.start;
+	const rightEnd = right.end;
+
+	if ( leftStart === leftEnd && rightStart === rightEnd ) {
+		return leftStart === rightStart;
+	}
+
+	if ( leftStart === leftEnd ) {
+		return leftStart >= rightStart && leftStart <= rightEnd;
+	}
+
+	if ( rightStart === rightEnd ) {
+		return rightStart >= leftStart && rightStart <= leftEnd;
+	}
+
+	return leftStart < rightEnd && rightStart < leftEnd;
+}
+
+/**
+ * Returns a Yjs-compatible text merge candidate for a stale local Save.
+ *
+ * WordPress is still the persistence authority. This mirrors the server's
+ * native-yjs-php-v0 range guard so the editor can fetch the latest body, merge
+ * non-overlapping local edits into it, and resubmit against the current sync
+ * version instead of surfacing a false conflict for same-block edits.
+ *
+ * @param {Object} args                   Merge inputs.
+ * @param {string} args.clientBaseContent Stripped content at the editor base version.
+ * @param {string} args.serverContent     Stripped content fetched from WordPress.
+ * @param {string} args.localContent      Stripped local editor content.
+ *
+ * @return {Object} Merge candidate result.
+ */
+export function getDistributedEditingYjsLocalMergeCandidate( {
+	clientBaseContent,
+	serverContent,
+	localContent,
+} = {} ) {
+	const base = normalizeNullableContentString(
+		getDistributedEditingComparablePostContent( clientBaseContent )
+	);
+	const server = normalizeNullableContentString(
+		getDistributedEditingComparablePostContent( serverContent )
+	);
+	const local = normalizeNullableContentString(
+		getDistributedEditingComparablePostContent( localContent )
+	);
+
+	if (
+		typeof base !== 'string' ||
+		typeof server !== 'string' ||
+		typeof local !== 'string'
+	) {
+		return {
+			status: 'blocked',
+			reason: 'missing_yjs_content_pair',
+			hasCandidatePostContent: false,
+			candidatePostContent: null,
+			mergeStrategy: 'native_yjs_php_v0',
+		};
+	}
+
+	const serverChange = getDistributedEditingYjsContentChangeDescriptor(
+		base,
+		server
+	);
+	const localChange = getDistributedEditingYjsContentChangeDescriptor(
+		base,
+		local
+	);
+
+	if ( ! localChange.changeRange.changed ) {
+		return {
+			status: 'no_pending_changes',
+			reason: null,
+			hasCandidatePostContent: true,
+			candidatePostContent: server,
+			mergeStrategy: 'native_yjs_php_v0',
+			serverChangeRange: serverChange.changeRange,
+			localChangeRange: localChange.changeRange,
+		};
+	}
+
+	if ( ! serverChange.changeRange.changed ) {
+		return {
+			status: 'merged',
+			reason: null,
+			hasCandidatePostContent: true,
+			candidatePostContent: local,
+			mergeStrategy: 'native_yjs_php_v0',
+			serverChangeRange: serverChange.changeRange,
+			localChangeRange: localChange.changeRange,
+		};
+	}
+
+	if (
+		doDistributedEditingYjsChangeRangesOverlap(
+			serverChange.changeRange,
+			localChange.changeRange
+		)
+	) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'yjs_overlapping_change_ranges',
+			hasCandidatePostContent: false,
+			candidatePostContent: null,
+			mergeStrategy: 'native_yjs_php_v0',
+			serverChangeRange: serverChange.changeRange,
+			localChangeRange: localChange.changeRange,
+		};
+	}
+
+	const serverDelta = serverChange.insertLength - serverChange.deleteLength;
+	const adjustedLocalIndex =
+		serverChange.changeRange.end <= localChange.index
+			? localChange.index + serverDelta
+			: localChange.index;
+	const candidatePostContent =
+		server.slice( 0, adjustedLocalIndex ) +
+		localChange.insertText +
+		server.slice( adjustedLocalIndex + localChange.deleteLength );
+
+	return {
+		status: 'merged',
+		reason: null,
+		hasCandidatePostContent: true,
+		candidatePostContent,
+		mergeStrategy: 'native_yjs_php_v0',
+		serverChangeRange: serverChange.changeRange,
+		localChangeRange: localChange.changeRange,
+	};
+}
+
+async function getDistributedEditingYjsInteropEvidence() {
+	try {
+		const { Doc: YjsDoc, encodeStateAsUpdate: encodeYjsStateAsUpdate } =
+			await import( '@y/y' );
+		const doc = new YjsDoc();
+		const update = encodeYjsStateAsUpdate( doc );
+
+		return {
+			jsPackage: '@y/y',
+			jsPackageVersion: '14.0.0-rc.16',
+			jsBinaryUpdateBytes:
+				typeof update?.byteLength === 'number'
+					? update.byteLength
+					: update?.length ?? 0,
+			serverEncoding: 'native-yjs-php-update-v0',
+			serverBinaryInteropStatus: 'pending',
+		};
+	} catch {
+		return {
+			jsPackage: '@y/y',
+			jsPackageVersion: '14.0.0-rc.16',
+			jsBinaryUpdateBytes: null,
+			serverEncoding: 'native-yjs-php-update-v0',
+			serverBinaryInteropStatus: 'unavailable',
 		};
 	}
 }
@@ -16888,9 +18698,26 @@ function getSerializedBlockLocalRebaseCandidate( {
 		const localChanged = localBlock !== baseBlock;
 
 		if ( serverChanged && localChanged && serverBlock !== localBlock ) {
+			const richTextMerge =
+				getRichTextSerializedBlockLocalRebaseCandidate( {
+					baseBlock,
+					serverBlock,
+					localBlock,
+				} );
+
+			if ( richTextMerge.status === 'rebased' ) {
+				mergedBlocks.push( richTextMerge.candidateBlock );
+				continue;
+			}
+
+			const reason =
+				richTextMerge.reason === 'rich_text_format_ranges_overlap'
+					? richTextMerge.reason
+					: 'same_block_changed';
+
 			return {
 				status: 'manual_conflict_required',
-				reason: 'same_block_changed',
+				reason,
 			};
 		}
 
@@ -16912,6 +18739,325 @@ function getSerializedBlockLocalRebaseCandidate( {
 		candidatePostContent: mergedBlocks.join( mergedBlockSeparator ),
 		mergedBlockCount: mergedBlocks.length,
 	};
+}
+
+function getRichTextSerializedBlockLocalRebaseCandidate( {
+	baseBlock,
+	serverBlock,
+	localBlock,
+} ) {
+	const base = getParagraphRichTextBlockParts( baseBlock );
+	const server = getParagraphRichTextBlockParts( serverBlock );
+	const local = getParagraphRichTextBlockParts( localBlock );
+
+	if ( ! base || ! server || ! local ) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'same_block_changed',
+		};
+	}
+
+	if (
+		base.open !== server.open ||
+		base.open !== local.open ||
+		base.close !== server.close ||
+		base.close !== local.close
+	) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'rich_text_block_shell_changed',
+		};
+	}
+
+	const baseRichText = getRichTextFormatModel( base.html );
+	const serverRichText = getRichTextFormatModel( server.html );
+	const localRichText = getRichTextFormatModel( local.html );
+
+	if (
+		! baseRichText ||
+		! serverRichText ||
+		! localRichText ||
+		baseRichText.text !== serverRichText.text ||
+		baseRichText.text !== localRichText.text
+	) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'rich_text_plain_text_changed',
+		};
+	}
+
+	const serverChanged = getRichTextChangedIndexes(
+		baseRichText,
+		serverRichText
+	);
+	const localChanged = getRichTextChangedIndexes(
+		baseRichText,
+		localRichText
+	);
+
+	if ( doRichTextChangedIndexesOverlap( serverChanged, localChanged ) ) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'rich_text_format_ranges_overlap',
+		};
+	}
+
+	const merged = mergeRichTextFormatModels( {
+		base: baseRichText,
+		server: serverRichText,
+		serverChanged,
+		local: localRichText,
+		localChanged,
+	} );
+
+	return {
+		status: 'rebased',
+		candidateBlock: `${ base.open }${ formatRichTextModelHtml( merged ) }${
+			base.close
+		}`,
+	};
+}
+
+function getParagraphRichTextBlockParts( block ) {
+	if ( typeof block !== 'string' ) {
+		return null;
+	}
+
+	const match = block.match(
+		/^(<!--\s+wp:paragraph\b[\s\S]*?-->\s*<p\b[^>]*>)([\s\S]*?)(<\/p>\s*<!--\s+\/wp:paragraph\s+-->)$/i
+	);
+
+	if ( ! match ) {
+		return null;
+	}
+
+	return {
+		open: match[ 1 ],
+		html: match[ 2 ],
+		close: match[ 3 ],
+	};
+}
+
+function getRichTextFormatModel( html ) {
+	if ( ! globalThis?.document?.createElement ) {
+		return null;
+	}
+
+	const root = globalThis.document.createElement( 'div' );
+	root.innerHTML = html;
+
+	const text = [];
+	const marks = [];
+	const unsupported = { found: false };
+
+	walkRichTextFormatNode( root, [], text, marks, unsupported );
+
+	if ( unsupported.found ) {
+		return null;
+	}
+
+	return {
+		text: text.join( '' ),
+		marks,
+	};
+}
+
+function walkRichTextFormatNode( node, activeMarks, text, marks, unsupported ) {
+	for ( const child of Array.from( node.childNodes || [] ) ) {
+		if ( child.nodeType === child.TEXT_NODE ) {
+			const value = child.nodeValue || '';
+			const start = text.join( '' ).length;
+			text.push( value );
+			const end = start + value.length;
+
+			for ( const mark of activeMarks ) {
+				if ( end > start ) {
+					marks.push( {
+						type: mark,
+						start,
+						end,
+					} );
+				}
+			}
+			continue;
+		}
+
+		if ( child.nodeType !== child.ELEMENT_NODE ) {
+			continue;
+		}
+
+		const tag = child.tagName.toLowerCase();
+		const mark = getRichTextFormatMarkForTag( tag );
+
+		if ( ! mark ) {
+			unsupported.found = true;
+			return;
+		}
+
+		walkRichTextFormatNode(
+			child,
+			[ ...activeMarks, mark ],
+			text,
+			marks,
+			unsupported
+		);
+
+		if ( unsupported.found ) {
+			return;
+		}
+	}
+}
+
+function getRichTextFormatMarkForTag( tag ) {
+	if ( tag === 'strong' || tag === 'b' ) {
+		return 'strong';
+	}
+
+	if ( tag === 'em' || tag === 'i' ) {
+		return 'em';
+	}
+
+	return null;
+}
+
+function getRichTextChangedIndexes( base, next ) {
+	const changed = new Set();
+	const length = Math.max( base.text.length, next.text.length );
+
+	for ( let index = 0; index < length; index++ ) {
+		for ( const mark of [ 'strong', 'em' ] ) {
+			if (
+				hasRichTextMarkAt( base, mark, index ) !==
+				hasRichTextMarkAt( next, mark, index )
+			) {
+				changed.add( index );
+			}
+		}
+	}
+
+	return changed;
+}
+
+function doRichTextChangedIndexesOverlap( left, right ) {
+	for ( const index of left ) {
+		if ( right.has( index ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function mergeRichTextFormatModels( {
+	base,
+	server,
+	serverChanged,
+	local,
+	localChanged,
+} ) {
+	const marks = [];
+
+	for ( let index = 0; index < base.text.length; index++ ) {
+		for ( const mark of [ 'strong', 'em' ] ) {
+			let marked = hasRichTextMarkAt( base, mark, index );
+
+			if ( serverChanged.has( index ) ) {
+				marked = hasRichTextMarkAt( server, mark, index );
+			}
+
+			if ( localChanged.has( index ) ) {
+				marked = hasRichTextMarkAt( local, mark, index );
+			}
+
+			if ( marked ) {
+				marks.push( {
+					type: mark,
+					start: index,
+					end: index + 1,
+				} );
+			}
+		}
+	}
+
+	return {
+		text: base.text,
+		marks: coalesceRichTextMarks( marks ),
+	};
+}
+
+function hasRichTextMarkAt( model, mark, index ) {
+	return model.marks.some(
+		( range ) =>
+			range.type === mark && range.start <= index && index < range.end
+	);
+}
+
+function coalesceRichTextMarks( marks ) {
+	const sorted = [ ...marks ].sort(
+		( a, b ) =>
+			a.type.localeCompare( b.type ) || a.start - b.start || a.end - b.end
+	);
+	const coalesced = [];
+
+	for ( const mark of sorted ) {
+		const previous = coalesced[ coalesced.length - 1 ];
+
+		if (
+			previous &&
+			previous.type === mark.type &&
+			previous.end === mark.start
+		) {
+			previous.end = mark.end;
+		} else {
+			coalesced.push( { ...mark } );
+		}
+	}
+
+	return coalesced;
+}
+
+function formatRichTextModelHtml( model ) {
+	const events = new Map();
+
+	for ( const mark of model.marks ) {
+		if ( ! events.has( mark.start ) ) {
+			events.set( mark.start, { open: [], close: [] } );
+		}
+		if ( ! events.has( mark.end ) ) {
+			events.set( mark.end, { open: [], close: [] } );
+		}
+		events.get( mark.start ).open.push( mark.type );
+		events.get( mark.end ).close.push( mark.type );
+	}
+
+	let html = '';
+
+	for ( let index = 0; index <= model.text.length; index++ ) {
+		const event = events.get( index );
+
+		if ( event ) {
+			for ( const mark of event.close.sort().reverse() ) {
+				html += `</${ mark }>`;
+			}
+			for ( const mark of event.open.sort() ) {
+				html += `<${ mark }>`;
+			}
+		}
+
+		if ( index < model.text.length ) {
+			html += escapeRichTextHtml( model.text[ index ] );
+		}
+	}
+
+	return html;
+}
+
+function escapeRichTextHtml( text ) {
+	return String( text )
+		.replace( /&/g, '&amp;' )
+		.replace( /</g, '&lt;' )
+		.replace( />/g, '&gt;' )
+		.replace( /"/g, '&quot;' );
 }
 
 function getSerializedBlockDeletionRebaseCandidate( {
@@ -17287,6 +19433,273 @@ function createDistributedEditingBlockIdentityRequestProofBlockedDescriptor(
 	};
 }
 
+function createDistributedEditingBlockIdentityDistinctGapInsertionBlockedDescriptor(
+	reason,
+	overrides = {}
+) {
+	return {
+		status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.BLOCKED,
+		reason,
+		requestProof: null,
+		invalidDetail: overrides.invalidDetail ?? null,
+		unsafeSerializedBlockReason:
+			overrides.unsafeSerializedBlockReason ?? null,
+		acceptedBlockCount: overrides.acceptedBlockCount ?? 0,
+		serverBlockCount: overrides.serverBlockCount ?? 0,
+		proposedBlockCount: overrides.proposedBlockCount ?? 0,
+		serverInsertedBlockCount: overrides.serverInsertedBlockCount ?? 0,
+		proposedInsertedBlockCount: overrides.proposedInsertedBlockCount ?? 0,
+		serverInsertedGapIndexes: [],
+		proposedInsertedGapIndexes: [],
+		conflictingGapIndex: overrides.conflictingGapIndex ?? null,
+		contentFree: true,
+		usesGutenbergClientId: false,
+		exposesRawContent: false,
+		callsRest: false,
+		callsSave: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+	reason,
+	overrides = {}
+) {
+	return {
+		status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.BLOCKED,
+		reason,
+		requestProof: null,
+		invalidDetail: overrides.invalidDetail ?? null,
+		unsafeSerializedBlockReason:
+			overrides.unsafeSerializedBlockReason ?? null,
+		acceptedBlockCount: overrides.acceptedBlockCount ?? 0,
+		serverBlockCount: overrides.serverBlockCount ?? 0,
+		proposedBlockCount: overrides.proposedBlockCount ?? 0,
+		serverChangedBlockCount: overrides.serverChangedBlockCount ?? 0,
+		proposedChangedBlockCount: overrides.proposedChangedBlockCount ?? 0,
+		serverChangedBlockIndexes: overrides.serverChangedBlockIndexes ?? [],
+		proposedChangedBlockIndexes:
+			overrides.proposedChangedBlockIndexes ?? [],
+		conflictingBlockIndex: overrides.conflictingBlockIndex ?? null,
+		contentFree: true,
+		usesGutenbergClientId: false,
+		exposesRawContent: false,
+		callsRest: false,
+		callsSave: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function getDistributedEditingAcceptedBlockIdentityBlocksByHash(
+	acceptedBlocks
+) {
+	const blocksByHash = new Map();
+
+	for ( const block of acceptedBlocks ) {
+		if ( blocksByHash.has( block.serialized_hash ) ) {
+			return {
+				status: 'invalid',
+				reason: 'accepted_repeated_serialized_hash_ambiguous',
+				blocksByHash: null,
+			};
+		}
+
+		blocksByHash.set( block.serialized_hash, block );
+	}
+
+	return {
+		status: 'valid',
+		reason: null,
+		blocksByHash,
+	};
+}
+
+async function getDistributedEditingBlockIdentityRetainedEditSequence( {
+	acceptedBlocks,
+	postContent,
+	candidateLabel,
+} ) {
+	const tokens = getSerializedBlockTokens( postContent );
+
+	if ( tokens.status !== 'safe' ) {
+		return {
+			status: 'invalid',
+			reason: 'unsafe_serialized_blocks',
+			unsafeSerializedBlockReason: tokens.reason,
+			blockCount: 0,
+			changedBlockIndexes: [],
+		};
+	}
+
+	if ( tokens.blocks.length !== acceptedBlocks.length ) {
+		return {
+			status: 'invalid',
+			reason: 'retained_block_count_changed',
+			blockCount: tokens.blocks.length,
+			changedBlockIndexes: [],
+		};
+	}
+
+	const tokenHashCounts = new Map();
+	const changedBlockIndexes = [];
+
+	for ( const [ index, serializedBlock ] of tokens.blocks.entries() ) {
+		const serializedHash =
+			await getDistributedEditingPostContentSha256Hash( serializedBlock );
+
+		if ( ! isDistributedEditingBlockIdentitySha256Hash( serializedHash ) ) {
+			return {
+				status: 'invalid',
+				reason: 'missing_hash_evidence',
+				blockCount: tokens.blocks.length,
+				changedBlockIndexes,
+			};
+		}
+
+		const repeatedHashCount = tokenHashCounts.get( serializedHash ) ?? 0;
+
+		if ( repeatedHashCount > 0 ) {
+			return {
+				status: 'invalid',
+				reason: `${ candidateLabel }_repeated_serialized_hash_ambiguous`,
+				blockCount: tokens.blocks.length,
+				changedBlockIndexes,
+			};
+		}
+
+		tokenHashCounts.set( serializedHash, repeatedHashCount + 1 );
+
+		const blockName =
+			getDistributedEditingBlockIdentitySerializedBlockName(
+				serializedBlock
+			);
+		const acceptedBlock = acceptedBlocks[ index ];
+
+		if (
+			! acceptedBlock ||
+			JSON.stringify( acceptedBlock.ordinal_path ) !==
+				JSON.stringify( [ index ] )
+		) {
+			return {
+				status: 'invalid',
+				reason: 'retained_block_order_changed',
+				blockCount: tokens.blocks.length,
+				changedBlockIndexes,
+			};
+		}
+
+		if ( ! blockName || acceptedBlock.block_name !== blockName ) {
+			return {
+				status: 'invalid',
+				reason: 'retained_block_name_changed',
+				blockCount: tokens.blocks.length,
+				changedBlockIndexes,
+			};
+		}
+
+		if ( acceptedBlock.serialized_hash !== serializedHash ) {
+			changedBlockIndexes.push( index );
+		}
+	}
+
+	return {
+		status: 'valid',
+		reason: null,
+		blockCount: tokens.blocks.length,
+		changedBlockIndexes,
+	};
+}
+
+async function getDistributedEditingBlockIdentityInsertionGapSequence( {
+	acceptedBlocks,
+	acceptedBlocksByHash,
+	postContent,
+	candidateLabel,
+} ) {
+	const tokens = getSerializedBlockTokens( postContent );
+
+	if ( tokens.status !== 'safe' ) {
+		return {
+			status: 'invalid',
+			reason: 'unsafe_serialized_blocks',
+			unsafeSerializedBlockReason: tokens.reason,
+			blockCount: 0,
+		};
+	}
+
+	const tokenHashCounts = new Map();
+	const insertedGapIndexes = [];
+	let nextAcceptedBlockIndex = 0;
+
+	for ( const serializedBlock of tokens.blocks ) {
+		const serializedHash =
+			await getDistributedEditingPostContentSha256Hash( serializedBlock );
+
+		if ( ! isDistributedEditingBlockIdentitySha256Hash( serializedHash ) ) {
+			return {
+				status: 'invalid',
+				reason: 'missing_hash_evidence',
+				blockCount: tokens.blocks.length,
+			};
+		}
+
+		const repeatedHashCount = tokenHashCounts.get( serializedHash ) ?? 0;
+
+		if ( repeatedHashCount > 0 ) {
+			return {
+				status: 'invalid',
+				reason: `${ candidateLabel }_repeated_serialized_hash_ambiguous`,
+				blockCount: tokens.blocks.length,
+			};
+		}
+
+		tokenHashCounts.set( serializedHash, repeatedHashCount + 1 );
+
+		if ( ! acceptedBlocksByHash.has( serializedHash ) ) {
+			insertedGapIndexes.push( nextAcceptedBlockIndex );
+			continue;
+		}
+
+		const expectedAcceptedBlock = acceptedBlocks[ nextAcceptedBlockIndex ];
+
+		if (
+			! expectedAcceptedBlock ||
+			expectedAcceptedBlock.serialized_hash !== serializedHash
+		) {
+			return {
+				status: 'invalid',
+				reason: 'retained_block_order_changed',
+				blockCount: tokens.blocks.length,
+			};
+		}
+
+		nextAcceptedBlockIndex++;
+	}
+
+	if ( nextAcceptedBlockIndex !== acceptedBlocks.length ) {
+		return {
+			status: 'invalid',
+			reason: 'accepted_block_missing',
+			blockCount: tokens.blocks.length,
+		};
+	}
+
+	return {
+		status: 'valid',
+		reason: null,
+		blockCount: tokens.blocks.length,
+		insertedGapIndexes,
+	};
+}
+
 function normalizeDistributedEditingBlockIdentityAcceptedSyncMeta( syncMeta ) {
 	if (
 		! syncMeta ||
@@ -17561,6 +19974,9 @@ function getSerializedBlockTokens( content ) {
 			reason: 'content_not_string',
 		};
 	}
+
+	content =
+		canonicalizeDistributedEditingCoreBlockCommentDelimiters( content );
 
 	const unsafeBlockCommentReason = getUnsafeBlockCommentReason( content );
 

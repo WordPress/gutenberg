@@ -33,6 +33,7 @@ import { getTemplateInfo } from '../utils/get-template-info';
 import {
 	DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE,
 	getDistributedEditingActionTranscriptStateForSessionState,
+	getDistributedEditingConflictingChangesComparisonActionStateForSessionState,
 	getDistributedEditingFreshReviewDecisionStateForSessionState,
 	getDistributedEditingFreshReviewLifecycleStateForSessionState,
 	getDistributedEditingFreshReviewPreSaveStateForSessionState,
@@ -43,6 +44,7 @@ import {
 	getDistributedEditingPresenceRepeatedRefreshRuntimeStateForSessionState,
 	getDistributedEditingPresenceRosterStateForSessionState,
 	getDistributedEditingPresenceStartupPolicyStateForSessionState,
+	getDistributedEditingRepeatedVisibleSaveProofStateForSessionState,
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
 	getDistributedEditingSaveButtonStateForSessionState,
 	getDistributedEditingSaveJourneyStateForSessionState,
@@ -70,9 +72,45 @@ const EMPTY_OBJECT = {};
  *
  * @return {boolean} Whether undo history exists.
  */
-export const hasEditorUndo = createRegistrySelector( ( select ) => () => {
-	return select( coreStore ).hasUndo();
-} );
+export const hasEditorUndo = createRegistrySelector(
+	( select ) => ( state ) => {
+		const distributedEditingSettings =
+			( getEditorSettings( state ) || EMPTY_OBJECT ).distributedEditing ||
+			EMPTY_OBJECT;
+
+		if ( distributedEditingSettings.enabled ) {
+			const sessionState = getDistributedEditingSessionState( state );
+			const postId = getCurrentPostId( state );
+			const postType = getCurrentPostType( state );
+			const record = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			let editedContent = '';
+
+			if ( record ) {
+				if ( typeof record.content === 'function' ) {
+					editedContent = record.content( record );
+				} else if ( record.blocks ) {
+					editedContent = __unstableSerializeAndClean(
+						record.blocks
+					);
+				} else if ( record.content ) {
+					editedContent = record.content;
+				}
+			}
+
+			return Boolean(
+				sessionState.historyUndoStack?.length ||
+					( typeof sessionState.clientBaseContent === 'string' &&
+						sessionState.clientBaseContent !== editedContent )
+			);
+		}
+
+		return select( coreStore ).hasUndo();
+	}
+);
 
 /**
  * Returns true if any future editor history snapshots exist, or false
@@ -82,9 +120,21 @@ export const hasEditorUndo = createRegistrySelector( ( select ) => () => {
  *
  * @return {boolean} Whether redo history exists.
  */
-export const hasEditorRedo = createRegistrySelector( ( select ) => () => {
-	return select( coreStore ).hasRedo();
-} );
+export const hasEditorRedo = createRegistrySelector(
+	( select ) => ( state ) => {
+		const distributedEditingSettings =
+			( getEditorSettings( state ) || EMPTY_OBJECT ).distributedEditing ||
+			EMPTY_OBJECT;
+
+		if ( distributedEditingSettings.enabled ) {
+			const sessionState = getDistributedEditingSessionState( state );
+
+			return Boolean( sessionState.historyRedoStack?.length );
+		}
+
+		return select( coreStore ).hasRedo();
+	}
+);
 
 /**
  * Returns true if the currently edited post is yet to be saved, or false if
@@ -482,6 +532,21 @@ export function getDistributedEditingActionTranscriptState( state ) {
 }
 
 /**
+ * Returns the visible same-block Compare click state.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Compare action state.
+ */
+export function getDistributedEditingConflictingChangesComparisonActionState(
+	state
+) {
+	return getDistributedEditingConflictingChangesComparisonActionStateForSessionState(
+		getDistributedEditingSessionState( state )
+	);
+}
+
+/**
  * Returns inert editor-presence roster state for the current post.
  *
  * @param {Object} state Editor state.
@@ -710,9 +775,31 @@ export function getDistributedEditingSaveJourneyState(
 		...saveJourney,
 		enabled: Boolean( distributedEditingSettings.enabled ),
 		shouldExposeInSaveControls: Boolean(
-			distributedEditingSettings.enabled
+			distributedEditingSettings.enabled &&
+				! (
+					saveJourney.step === 'ready_to_edit' ||
+					saveJourney.action === 'dirty_save_preflight'
+				)
 		),
 	};
+}
+
+/**
+ * Returns the content-free repeated visible Save proof vocabulary.
+ *
+ * @param {Object} state   Editor state.
+ * @param {Object} options Proof vocabulary inputs.
+ *
+ * @return {Object} Repeated visible Save proof vocabulary.
+ */
+export function getDistributedEditingRepeatedVisibleSaveProofState(
+	state,
+	options = {}
+) {
+	return getDistributedEditingRepeatedVisibleSaveProofStateForSessionState(
+		getDistributedEditingSessionState( state ),
+		options
+	);
 }
 
 /**
