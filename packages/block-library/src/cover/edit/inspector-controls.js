@@ -200,6 +200,9 @@ export default function CoverInspectorControls( {
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
+	const showOverlayControls =
+		colorGradientSettings.hasColorsOrGradients && ! hasSelectedStyleState;
+
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -343,7 +346,7 @@ export default function CoverInspectorControls( {
 					</ToolsPanel>
 				</InspectorControls>
 			) }
-			{ colorGradientSettings.hasColorsOrGradients && (
+			{ showOverlayControls && (
 				<InspectorControls group="color">
 					<ColorGradientSettingsDropdown
 						__experimentalIsRenderedInSidebar
