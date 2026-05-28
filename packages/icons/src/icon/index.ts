@@ -20,13 +20,6 @@ export interface IconProps extends SVGProps {
 	 * @default 24
 	 */
 	size?: number;
-	/**
-	 * Width of strokes in pixels. Applied to the outer `<svg>` as
-	 * `stroke-width`, inherited by stroked paths. Has no visible effect on
-	 * fill-based icons. Source SVGs of stroke-based icons carry their own
-	 * default; this prop overrides it per call.
-	 */
-	strokeWidth?: number;
 }
 
 /**
@@ -37,13 +30,12 @@ export interface IconProps extends SVGProps {
  * @return Icon component
  */
 export default forwardRef< HTMLElement, IconProps >(
-	( { icon, size = 24, strokeWidth, ...props }, ref ) => {
+	( { icon, size = 24, ...props }, ref ) => {
 		return cloneElement(
 			icon as ReactElement< React.RefAttributes< Element > >,
 			{
 				width: size,
 				height: size,
-				...( strokeWidth !== undefined && { strokeWidth } ),
 				...props,
 				ref,
 			}
