@@ -9,9 +9,7 @@ import clsx from 'clsx';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import {
 	InspectorControls,
-	BlockControls,
 	BlockIcon,
-	AlignmentControl,
 	useBlockProps,
 	useInnerBlocksProps,
 	useInnerBlockItems,
@@ -19,31 +17,18 @@ import {
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarDropdownMenu,
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import {
-	alignLeft,
-	alignRight,
-	alignCenter,
-	blockTable as icon,
-	tableColumnAfter,
-	tableColumnBefore,
-	tableColumnDelete,
-	tableRowAfter,
-	tableRowBefore,
-	tableRowDelete,
-	table,
-} from '@wordpress/icons';
+import { blockTable as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -51,34 +36,11 @@ import {
 import {
 	createTableCells,
 	getGridDimensions,
-	getSelectedCellLocation,
 	mapCellsToSections,
-	insertRow,
-	deleteRow,
-	insertColumn,
-	deleteColumn,
 	toggleSection,
 	sortCells,
 } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-
-const ALIGNMENT_CONTROLS = [
-	{
-		icon: alignLeft,
-		title: __( 'Align column left' ),
-		align: 'left',
-	},
-	{
-		icon: alignCenter,
-		title: __( 'Align column center' ),
-		align: 'center',
-	},
-	{
-		icon: alignRight,
-		title: __( 'Align column right' ),
-		align: 'right',
-	},
-];
 
 function TSection( { name, ...props } ) {
 	const TagName = `t${ name }`;
@@ -93,42 +55,23 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const registry = useRegistry();
 
-	const { multiSelectSet, replaceInnerBlocks, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
-	const { innerBlocks, selectedCellId } = useSelect(
+	const innerBlocks = useSelect(
 		( select ) => {
-			const {
-				getBlocks,
-				getSelectedBlockClientId,
-				hasSelectedInnerBlock,
-			} = select( blockEditorStore );
-			const blocks = getBlocks( clientId );
-			const selectedId = getSelectedBlockClientId();
-
-			return {
-				innerBlocks: blocks,
-				selectedCellId: hasSelectedInnerBlock( clientId, true )
-					? selectedId
-					: null,
-			};
+			return select( blockEditorStore ).getBlocks( clientId );
 		},
 		[ clientId ]
 	);
 
 	const isEmpty = innerBlocks.length === 0;
-	const { columnCount, sectionRowCounts } = isEmpty
-		? { columnCount: 0, sectionRowCounts: { head: 0, body: 0, foot: 0 } }
+	const { sectionRowCounts } = isEmpty
+		? { sectionRowCounts: { head: 0, body: 0, foot: 0 } }
 		: getGridDimensions( innerBlocks );
 
 	const hasHeader = sectionRowCounts.head > 0;
 	const hasFooter = sectionRowCounts.foot > 0;
-
-	const selectedCellLocation = selectedCellId
-		? getSelectedCellLocation( innerBlocks, selectedCellId )
-		: null;
 
 	// Structural operations: these replace the entire inner blocks array.
 	const replaceTableCells = useCallback(
@@ -158,175 +101,6 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 	function onChangeFixedLayout() {
 		setAttributes( { hasFixedLayout: ! hasFixedLayout } );
 	}
-
-	function onInsertRow( delta ) {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-		const { section, row } = selectedCellLocation;
-		const newRowIndex = row + delta;
-		replaceTableCells(
-			insertRow( innerBlocks, {
-				section,
-				rowIndex: newRowIndex,
-				columnCount,
-			} )
-		);
-	}
-
-	function onInsertRowBefore() {
-		onInsertRow( 0 );
-	}
-
-	function onInsertRowAfter() {
-		onInsertRow( 1 );
-	}
-
-	function onDeleteRow() {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-		replaceTableCells(
-			deleteRow( innerBlocks, {
-				section: selectedCellLocation.section,
-				rowIndex: selectedCellLocation.row,
-			} )
-		);
-	}
-
-	function onInsertColumn( delta ) {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-		const newColumnIndex = selectedCellLocation.column + delta;
-		replaceTableCells(
-			insertColumn( innerBlocks, { columnIndex: newColumnIndex } )
-		);
-	}
-
-	function onInsertColumnBefore() {
-		onInsertColumn( 0 );
-	}
-
-	function onInsertColumnAfter() {
-		onInsertColumn( 1 );
-	}
-
-	function onDeleteColumn() {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-		replaceTableCells(
-			deleteColumn( innerBlocks, {
-				columnIndex: selectedCellLocation.column,
-			} )
-		);
-	}
-
-	function onChangeColumnAlignment( align ) {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-		const { column } = selectedCellLocation;
-		registry.batch( () => {
-			for ( const cell of innerBlocks ) {
-				if ( cell.attributes.column === column ) {
-					updateBlockAttributes( cell.clientId, { align } );
-				}
-			}
-		} );
-	}
-
-	function onSelectRow() {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-
-		const { section, row } = selectedCellLocation;
-		const rowCellIds = sortCells(
-			innerBlocks.filter(
-				( cell ) =>
-					cell.attributes.section === section &&
-					cell.attributes.row === row
-			)
-		).map( ( cell ) => cell.clientId );
-
-		multiSelectSet( rowCellIds );
-	}
-
-	function onSelectColumn() {
-		if ( ! selectedCellLocation ) {
-			return;
-		}
-
-		const { column } = selectedCellLocation;
-		const columnCellIds = sortCells(
-			innerBlocks.filter( ( cell ) => cell.attributes.column === column )
-		).map( ( cell ) => cell.clientId );
-
-		multiSelectSet( columnCellIds );
-	}
-
-	function getCellAlignment() {
-		if ( ! selectedCellLocation ) {
-			return undefined;
-		}
-		const cell = innerBlocks.find(
-			( c ) => c.attributes.column === selectedCellLocation.column
-		);
-		return cell?.attributes?.align;
-	}
-
-	const tableControls = [
-		{
-			icon: tableRowAfter,
-			title: __( 'Select row' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onSelectRow,
-		},
-		{
-			icon: tableColumnAfter,
-			title: __( 'Select column' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onSelectColumn,
-		},
-		{
-			icon: tableRowBefore,
-			title: __( 'Insert row before' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onInsertRowBefore,
-		},
-		{
-			icon: tableRowAfter,
-			title: __( 'Insert row after' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onInsertRowAfter,
-		},
-		{
-			icon: tableRowDelete,
-			title: __( 'Delete row' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onDeleteRow,
-		},
-		{
-			icon: tableColumnBefore,
-			title: __( 'Insert column before' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onInsertColumnBefore,
-		},
-		{
-			icon: tableColumnAfter,
-			title: __( 'Insert column after' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onInsertColumnAfter,
-		},
-		{
-			icon: tableColumnDelete,
-			title: __( 'Delete column' ),
-			isDisabled: ! selectedCellLocation,
-			onClick: onDeleteColumn,
-		},
-	];
 
 	const blockProps = useBlockProps();
 
@@ -375,27 +149,6 @@ export default function TableEdit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<figure { ...blockProps }>
-			{ ! isEmpty && (
-				<>
-					<BlockControls group="block">
-						<AlignmentControl
-							label={ __( 'Change column alignment' ) }
-							alignmentControls={ ALIGNMENT_CONTROLS }
-							value={ getCellAlignment() }
-							onChange={ ( nextAlign ) =>
-								onChangeColumnAlignment( nextAlign )
-							}
-						/>
-					</BlockControls>
-					<BlockControls group="other">
-						<ToolbarDropdownMenu
-							icon={ table }
-							label={ __( 'Edit table' ) }
-							controls={ tableControls }
-						/>
-					</BlockControls>
-				</>
-			) }
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
