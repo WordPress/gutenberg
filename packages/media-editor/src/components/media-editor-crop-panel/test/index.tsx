@@ -88,22 +88,34 @@ describe( 'MediaEditorCropPanel', () => {
 		expect( controls.onFreeformChange ).toHaveBeenCalledWith( false );
 	} );
 
-	it.each( [
-		[ 3.749999999999999, 3.7 ],
-		[ 3.799999999999999, 3.8 ],
-	] )(
-		'formats displayed zoom value %s as %s without changing cropper state',
-		( zoom, displayZoom ) => {
-			setupCropPanel( {}, { zoom } );
+	it( 'displays zoom as a percentage without changing cropper state', () => {
+		setupCropPanel( {}, { zoom: 3.749999999999999 } );
 
-			const zoomInput = screen.getByRole( 'spinbutton', {
-				name: 'Zoom',
-			} );
+		const zoomInput = screen.getByRole( 'spinbutton', {
+			name: 'Zoom percentage',
+		} );
 
-			expect( zoomInput ).toHaveValue( displayZoom );
-			expect( screen.getByTestId( 'current-zoom' ) ).toHaveTextContent(
-				String( zoom )
-			);
-		}
-	);
+		expect( zoomInput ).toHaveValue( 375 );
+		expect( screen.getByTestId( 'current-zoom' ) ).toHaveTextContent(
+			'3.749999999999999'
+		);
+	} );
+
+	it( 'converts percentage input back to the cropper zoom multiplier', () => {
+		const controls = setupCropPanel( {
+			onPlacementControlInteraction: jest.fn(),
+		} );
+
+		fireEvent.change(
+			screen.getByRole( 'spinbutton', { name: 'Zoom percentage' } ),
+			{
+				target: { value: '250' },
+			}
+		);
+
+		expect( screen.getByTestId( 'current-zoom' ) ).toHaveTextContent(
+			'2.5'
+		);
+		expect( controls.onPlacementControlInteraction ).toHaveBeenCalled();
+	} );
 } );
