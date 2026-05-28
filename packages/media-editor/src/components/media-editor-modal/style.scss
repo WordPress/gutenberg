@@ -21,49 +21,48 @@
 	min-height: 0;
 }
 
-// Footer chrome. Layout differs between the wide single-row composition and
-// the narrow stacked composition; those layouts are driven by *different
-// JSX trees* selected via `useViewportMatch( 'xlarge' )` in the media editor
-// (so DOM order always matches visual order — no `order` reshuffling, which
-// the project's stylelint rule treats as an a11y red flag).
+// Footer chrome. Default layout stacks (narrow); `.is-wide` flips to a
+// single row. Wide and narrow are driven by *different JSX trees* selected
+// via `useViewportMatch( 'xlarge' )` in the media editor so DOM order always
+// matches visual order — no `order` reshuffling, which the project's
+// stylelint rule treats as an a11y red flag.
 .media-editor-modal.components-modal__frame .media-editor-modal__footer {
 	flex-shrink: 0;
 	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
+	flex-direction: column;
 	gap: $grid-unit-20;
 	padding: $grid-unit-10 $grid-unit-30;
 	border-top: $border-width solid $gray-300;
 	background: $white;
 
-	.media-editor__history-actions {
-		flex-shrink: 0;
-	}
-
-	// Toolbar fills the middle row (wide) or the top row (stacked, where
-	// `.media-editor-modal__footer-row` below claims `width: 100%` and
-	// forces the wrap). Its own outer padding is suppressed in favor of
-	// the footer's padding rhythm.
+	// Toolbar's intrinsic padding is suppressed in favor of the footer's
+	// padding rhythm in both layouts.
 	.media-editor-toolbar {
-		flex: 1 1 0;
-		min-width: 0;
 		padding: 0;
 	}
 
-	// `margin-left: auto` guarantees right alignment whether or not a
-	// toolbar / history sibling is rendered (handles non-image
-	// attachments where only `FooterActions` is present).
-	.media-editor__footer-actions {
-		flex-shrink: 0;
-		margin-left: auto;
+	&.is-wide {
+		flex-direction: row;
+		align-items: center;
+
+		// Toolbar fills the middle of the single row.
+		.media-editor-toolbar {
+			flex: 1 1 0;
+			min-width: 0;
+		}
+
+		// `margin-left: auto` guarantees right alignment whether or not a
+		// toolbar / history sibling is rendered (handles non-image
+		// attachments where only `FooterActions` is present).
+		.media-editor__footer-actions {
+			margin-left: auto;
+		}
 	}
 }
 
-// Narrow-only wrapper: groups history + Cancel/Save onto a single row
-// beneath the toolbar. `width: 100%` makes it break onto its own line via
-// the parent's `flex-wrap: wrap`.
+// Narrow-only secondary row: groups history + Cancel/Save onto one line
+// beneath the toolbar.
 .media-editor-modal__footer-row {
-	width: 100%;
 	display: flex;
 	align-items: center;
 	gap: $grid-unit-20;

@@ -87,6 +87,13 @@ export interface MediaEditorFrameProps {
 	children: ReactNode;
 	headerActions: ReactNode;
 	footerActions: ReactNode;
+	/**
+	 * True when the footer should render as a single horizontal row
+	 * (History | Toolbar | Cancel/Save); false when it should stack
+	 * (toolbar on top, history + Cancel/Save beneath). Frames apply this
+	 * to the footer container as a layout modifier.
+	 */
+	isWideFooter: boolean;
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -636,6 +643,47 @@ function MediaEditorContent( {
 		</MediaEditorProvider>
 	);
 
+	const history = isImage ? (
+		<HistoryActions
+			isUndoRedoDisabled={ isCropInteractionActive }
+			onReset={ resetCropOptions }
+		/>
+	) : null;
+	const toolbar = isImage ? (
+		<MediaEditorToolbar
+			onPlacementControlInteraction={ signalPlacementControlInteraction }
+		/>
+	) : null;
+	const actions = (
+		<FooterActions
+			isSaving={ isSaving }
+			hasMedia={ !! media }
+			hasChanges={ hasChanges }
+			onCancel={ handleRequestClose }
+			onSave={ saveMediaEditor }
+		/>
+	);
+
+	// DOM order matches visual order in both layouts — wide reads L→R, narrow
+	// reads top→bottom and then L→R inside the secondary row. No `order`
+	// reshuffling, which the project's stylelint rule treats as an a11y red
+	// flag.
+	const footerActions = isWideFooter ? (
+		<>
+			{ history }
+			{ toolbar }
+			{ actions }
+		</>
+	) : (
+		<>
+			{ toolbar }
+			<div className="media-editor-modal__footer-row">
+				{ history }
+				{ actions }
+			</div>
+		</>
+	);
+
 	return renderFrame( {
 		children,
 		headerActions: (
@@ -646,58 +694,8 @@ function MediaEditorContent( {
 				onCancel={ handleRequestClose }
 			/>
 		),
-		footerActions: isWideFooter ? (
-			// Wide: single row, DOM order matches visual L→R.
-			<>
-				{ isImage && (
-					<HistoryActions
-						isUndoRedoDisabled={ isCropInteractionActive }
-						onReset={ resetCropOptions }
-					/>
-				) }
-				{ isImage && (
-					<MediaEditorToolbar
-						onPlacementControlInteraction={
-							signalPlacementControlInteraction
-						}
-					/>
-				) }
-				<FooterActions
-					isSaving={ isSaving }
-					hasMedia={ !! media }
-					hasChanges={ hasChanges }
-					onCancel={ handleRequestClose }
-					onSave={ saveMediaEditor }
-				/>
-			</>
-		) : (
-			// Stacked: toolbar on top, history + Cancel/Save share the row
-			// beneath. DOM order matches visual top→bottom, left→right.
-			<>
-				{ isImage && (
-					<MediaEditorToolbar
-						onPlacementControlInteraction={
-							signalPlacementControlInteraction
-						}
-					/>
-				) }
-				<div className="media-editor-modal__footer-row">
-					{ isImage && (
-						<HistoryActions
-							isUndoRedoDisabled={ isCropInteractionActive }
-							onReset={ resetCropOptions }
-						/>
-					) }
-					<FooterActions
-						isSaving={ isSaving }
-						hasMedia={ !! media }
-						hasChanges={ hasChanges }
-						onCancel={ handleRequestClose }
-						onSave={ saveMediaEditor }
-					/>
-				</div>
-			</>
-		),
+		footerActions,
+		isWideFooter,
 		onRequestClose: handleRequestClose,
 		onKeyDown: handleKeyDown,
 		shouldCloseOnClickOutside: ! hasChanges && ! isSaving,
