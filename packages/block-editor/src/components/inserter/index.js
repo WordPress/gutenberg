@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -23,7 +22,7 @@ import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 import { getAppenderLabel } from './get-appender-label';
 
-const defaultRenderToggle = ( {
+function InserterToggle( {
 	onToggle,
 	disabled,
 	isOpen,
@@ -31,7 +30,7 @@ const defaultRenderToggle = ( {
 	hasSingleBlockType,
 	appenderLabel,
 	toggleProps = {},
-} ) => {
+} ) {
 	const {
 		as: Wrapper = Button,
 		label: labelProp,
@@ -78,80 +77,49 @@ const defaultRenderToggle = ( {
 			{ ...rest }
 		/>
 	);
-};
+}
 
-class Inserter extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onToggle = this.onToggle.bind( this );
-		this.renderToggle = this.renderToggle.bind( this );
-		this.renderContent = this.renderContent.bind( this );
-	}
-
-	onToggle( isOpen ) {
-		const { onToggle } = this.props;
-
-		// Surface toggle callback to parent component.
-		if ( onToggle ) {
-			onToggle( isOpen );
-		}
-	}
-
-	/**
-	 * Render callback to display Dropdown toggle element.
-	 *
-	 * @param {Object}   options
-	 * @param {Function} options.onToggle Callback to invoke when toggle is
-	 *                                    pressed.
-	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
-	 *
-	 * @return {Element} Dropdown toggle element.
-	 */
-	renderToggle( { onToggle, isOpen } ) {
-		const {
-			disabled,
-			blockTitle,
-			hasSingleBlockType,
-			appenderLabel,
-			toggleProps,
-			hasItems,
-			renderToggle = defaultRenderToggle,
-		} = this.props;
-
-		return renderToggle( {
-			onToggle,
+function Inserter( {
+	position,
+	hasSingleBlockType,
+	blockToInsert,
+	insertOnlyAllowedBlock,
+	// This prop is experimental to give some time for the quick inserter to mature
+	// Feel free to make them stable after a few releases.
+	__experimentalIsQuick: isQuick,
+	onSelectOrClose,
+	onToggle,
+	disabled,
+	blockTitle,
+	appenderLabel,
+	toggleProps,
+	hasItems,
+	renderToggle: renderToggleProp,
+	rootClientId,
+	clientId,
+	isAppender,
+	showInserterHelpPanel,
+	selectBlockOnInsert,
+} ) {
+	function renderToggle( { onToggle: dropdownOnToggle, isOpen } ) {
+		const toggleArgs = {
+			onToggle: dropdownOnToggle,
 			isOpen,
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
 			appenderLabel,
 			toggleProps,
-		} );
+		};
+
+		if ( renderToggleProp ) {
+			return renderToggleProp( toggleArgs );
+		}
+
+		return <InserterToggle { ...toggleArgs } />;
 	}
 
-	/**
-	 * Render callback to display Dropdown content element.
-	 *
-	 * @param {Object}   options
-	 * @param {Function} options.onClose Callback to invoke when dropdown is
-	 *                                   closed.
-	 *
-	 * @return {Element} Dropdown content element.
-	 */
-	renderContent( { onClose } ) {
-		const {
-			rootClientId,
-			clientId,
-			isAppender,
-			showInserterHelpPanel,
-			// This prop is experimental to give some time for the quick inserter to mature
-			// Feel free to make them stable after a few releases.
-			__experimentalIsQuick: isQuick,
-			onSelectOrClose,
-			selectBlockOnInsert,
-		} = this.props;
-
+	function renderContent( { onClose } ) {
 		if ( isQuick ) {
 			return (
 				<QuickInserter
@@ -190,36 +158,25 @@ class Inserter extends Component {
 		);
 	}
 
-	render() {
-		const {
-			position,
-			hasSingleBlockType,
-			blockToInsert,
-			insertOnlyAllowedBlock,
-			__experimentalIsQuick: isQuick,
-			onSelectOrClose,
-		} = this.props;
-
-		if ( hasSingleBlockType || blockToInsert ) {
-			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
-		}
-
-		return (
-			<Dropdown
-				className="block-editor-inserter"
-				contentClassName={ clsx( 'block-editor-inserter__popover', {
-					'is-quick': isQuick,
-				} ) }
-				popoverProps={ { position, shift: true } }
-				onToggle={ this.onToggle }
-				expandOnMobile
-				headerTitle={ __( 'Add a block' ) }
-				renderToggle={ this.renderToggle }
-				renderContent={ this.renderContent }
-				onClose={ onSelectOrClose }
-			/>
-		);
+	if ( hasSingleBlockType || blockToInsert ) {
+		return renderToggle( { onToggle: insertOnlyAllowedBlock } );
 	}
+
+	return (
+		<Dropdown
+			className="block-editor-inserter"
+			contentClassName={ clsx( 'block-editor-inserter__popover', {
+				'is-quick': isQuick,
+			} ) }
+			popoverProps={ { position, shift: true } }
+			onToggle={ onToggle }
+			expandOnMobile
+			headerTitle={ __( 'Add a block' ) }
+			renderToggle={ renderToggle }
+			renderContent={ renderContent }
+			onClose={ onSelectOrClose }
+		/>
+	);
 }
 
 export default compose( [
