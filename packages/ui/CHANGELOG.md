@@ -18,6 +18,14 @@
 
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
+### Bug Fixes
+
+-   `Tabs`: `onValueChange` now fires for automatic tab selection — when `Tabs` itself picks a tab without a consumer-supplied value (initial uncontrolled mount with no `defaultValue`, fallback to the first enabled tab when the first tab is disabled, or fallback when the currently selected tab is removed or becomes disabled) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
+
+### Internal
+
+-   Update `@base-ui/react` from `1.4.1` to [`1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
+
 ## 0.14.0 (2026-05-27)
 
 ### Breaking Changes
@@ -46,14 +54,6 @@
 -   `Autocomplete`: Disable the clear button when the autocomplete is disabled, and hide it from assistive technologies ([#78520](https://github.com/WordPress/gutenberg/pull/78520)).
 -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
 -   Stretch the compat overlay slot to viewport size so portaled popups stop collapsing to their min-content width — most visible on long-text tooltips, which wrapped to one word per line ([#78441](https://github.com/WordPress/gutenberg/pull/78441)).
-
-### Bug Fixes
-
--   `Tabs`: `onValueChange` now fires for automatic tab selection — when `Tabs` itself picks a tab without a consumer-supplied value (initial uncontrolled mount with no `defaultValue`, fallback to the first enabled tab when the first tab is disabled, or fallback when the currently selected tab is removed or becomes disabled) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
-
-### Internal
-
--   Update `@base-ui/react` from `1.4.1` to [`1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
 
 ## 0.13.0 (2026-05-14)
 
