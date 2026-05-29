@@ -1,14 +1,16 @@
 /**
  * WordPress dependencies
  */
+import {
+	NEW_ID,
+	TAXONOMIES_PATH,
+	TAXONOMY_ENTITY,
+} from '@wordpress/content-types';
 import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { redirect } from '@wordpress/route';
-
-const USER_TAXONOMY_POST_TYPE = 'wp_user_taxonomy';
-const NEW_ID = 'new';
 
 type RouteArgs = { params: { id: string } };
 
@@ -23,7 +25,7 @@ export const route = {
 			try {
 				record = await resolveSelect( coreStore ).getEntityRecord(
 					'postType',
-					USER_TAXONOMY_POST_TYPE,
+					TAXONOMY_ENTITY,
 					id
 				);
 			} catch {
@@ -35,7 +37,7 @@ export const route = {
 				__( 'Taxonomy not found.' ),
 				{ type: 'snackbar' }
 			);
-			throw redirect( { throw: true, to: '/' } );
+			throw redirect( { throw: true, to: TAXONOMIES_PATH } );
 		}
 	},
 	title: async ( { params }: RouteArgs ) => {
@@ -45,7 +47,7 @@ export const route = {
 		const id = parseInt( params.id, 10 );
 		const record = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
-			USER_TAXONOMY_POST_TYPE,
+			TAXONOMY_ENTITY,
 			id
 		) ) as { title?: { raw?: string; rendered?: string } } | null;
 		return (

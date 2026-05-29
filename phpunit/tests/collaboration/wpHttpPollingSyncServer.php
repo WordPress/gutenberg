@@ -915,7 +915,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$this->assertFalse( $data['rooms'][0]['should_compact'] );
 	}
 
-	public function test_sync_stale_compaction_succeeds_when_newer_compaction_exists() {
+	public function test_sync_stale_compaction_is_stored_as_update_when_newer_compaction_exists() {
 		wp_set_current_user( self::$editor_id );
 
 		$room   = $this->get_post_room();
@@ -945,9 +945,12 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 			)
 		);
 
-		// Client 3 sends a stale compaction at cursor 0. The server should find
-		// client 2's compaction in the updates after cursor 0 and silently discard
-		// this one.
+		// Client 3 sends a stale compaction at cursor 0 (mirroring two offline
+		// clients that reconnect from the same baseline cursor). The server
+		// cannot run remove_updates_before_cursor because client 2 has already
+		// advanced the frontier, but the bytes must still be stored as a
+		// regular update so client 3's operations can propagate to other
+		// clients via Yjs state-as-update merging.
 		$stale_compaction = array(
 			'type' => 'compaction',
 			'data' => 'c3RhbGU=',
@@ -960,16 +963,29 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 
 		$this->assertSame( 200, $response->get_status() );
 
-		// Verify the newer compaction is preserved and the stale one was not stored.
-		$response    = $this->dispatch_sync(
+		// Verify the newer compaction is preserved AND the stale compaction's
+		// bytes were persisted (now as type=update so subsequent compactions
+		// don't trip the has_newer_compaction check).
+		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $room, 4, 0, array( 'user' => 'c4' ) ),
 			)
 		);
-		$update_data = wp_list_pluck( $response->get_data()['rooms'][0]['updates'], 'data' );
+		$updates  = $response->get_data()['rooms'][0]['updates'];
 
+		$update_data = wp_list_pluck( $updates, 'data' );
 		$this->assertContains( 'Y29tcGFjdGVk', $update_data, 'The newer compaction should be preserved.' );
-		$this->assertNotContains( 'c3RhbGU=', $update_data, 'The stale compaction should not be stored.' );
+		$this->assertContains( 'c3RhbGU=', $update_data, 'The stale compaction bytes should be stored so client 3\'s operations propagate.' );
+
+		$stale_entry = null;
+		foreach ( $updates as $entry ) {
+			if ( 'c3RhbGU=' === $entry['data'] ) {
+				$stale_entry = $entry;
+				break;
+			}
+		}
+		$this->assertNotNull( $stale_entry, 'The stale compaction entry should be present in the room.' );
+		$this->assertSame( 'update', $stale_entry['type'], 'The stale compaction should be stored as type=update, not type=compaction.' );
 	}
 
 	/*

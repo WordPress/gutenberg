@@ -36,6 +36,15 @@ export const MAX_UPDATE_SIZE_IN_BYTES =
 // WP_HTTP_Polling_Sync_Server::MAX_ROOMS_PER_REQUEST.
 export const MAX_ROOMS_PER_REQUEST = 50;
 
+// Corresponds with server-side
+// WP_HTTP_Polling_Sync_Server::MAX_BODY_SIZE, with 1 MiB of headroom for
+// serialization details and future metadata.
+export const MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES = 15 * 1024 * 1024;
+
+// Keep a single maximum-sized encoded update plus room metadata sendable if a
+// request-body-too-large response forces the client to shrink its retry budget.
+export const MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES = 2 * 1024 * 1024;
+
 export const POLLING_INTERVAL_IN_MS = applyFilters(
 	'sync.pollingManager.pollingInterval',
 	4000 // 4 seconds

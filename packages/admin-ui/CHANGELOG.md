@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 2.2.0 (2026-05-27)
+
+## 2.1.0 (2026-05-14)
+
+### Bug Fixes
+
+-   `Page`: Fix nested landmark in header. [#78001](https://github.com/WordPress/gutenberg/pull/78001)
+
+## 2.0.0 (2026-04-29)
+
 ### Enhancements
 
 -   `Page`: Keep the header row at a consistent height regardless of whether actions are present, and stop rendering an empty actions container when no actions are provided [#76683](https://github.com/WordPress/gutenberg/pull/76683).

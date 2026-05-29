@@ -2,9 +2,65 @@
  * Internal dependencies
  */
 import type { CropperAction, CropperState, TransformOperation } from './types';
-import { DEFAULT_STATE, MAX_ZOOM } from './constants';
+import {
+	ABSOLUTE_MIN_ZOOM,
+	DEFAULT_STATE,
+	MAX_ZOOM,
+	MIN_ZOOM,
+} from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
+
+/** Small tolerance for cropper floating-point comparisons. */
+const STATE_EPSILON = 1e-6;
+
+function nearlyEqual( a: number, b: number ): boolean {
+	return Math.abs( a - b ) < STATE_EPSILON;
+}
+
+/**
+ * Value-equality check for two cropper states.
+ *
+ * Used by history machinery to dedup snapshots and detect no-op
+ * transitions. Compares every field that participates in the rendered
+ * output; ignores reference identity.
+ *
+ * @param a First cropper state.
+ * @param b Second cropper state.
+ * @return Whether the two states are value-equal across all tracked fields.
+ */
+export function areCropperStatesEqual(
+	a: CropperState,
+	b: CropperState
+): boolean {
+	const aImage = a.image;
+	const bImage = b.image;
+	return (
+		aImage?.src === bImage?.src &&
+		aImage?.naturalWidth === bImage?.naturalWidth &&
+		aImage?.naturalHeight === bImage?.naturalHeight &&
+		nearlyEqual( a.pan.x, b.pan.x ) &&
+		nearlyEqual( a.pan.y, b.pan.y ) &&
+		nearlyEqual( a.zoom, b.zoom ) &&
+		nearlyEqual( a.rotation, b.rotation ) &&
+		a.flip.horizontal === b.flip.horizontal &&
+		a.flip.vertical === b.flip.vertical &&
+		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&
+		nearlyEqual( a.cropRect.y, b.cropRect.y ) &&
+		nearlyEqual( a.cropRect.width, b.cropRect.width ) &&
+		nearlyEqual( a.cropRect.height, b.cropRect.height )
+	);
+}
+
+function clampRequestedZoom( state: CropperState, zoom: number ): number {
+	// With an image, enforceContainment raises zoom to the coverage-aware
+	// floor below. Without an image, no enforcement runs, so MIN_ZOOM stays
+	// the conservative resting default.
+	if ( state.image ) {
+		return Math.min( MAX_ZOOM, Math.max( ABSOLUTE_MIN_ZOOM, zoom ) );
+	}
+	return Math.min( MAX_ZOOM, Math.max( MIN_ZOOM, zoom ) );
+}
 
 /**
  * Translate a pipeline transform operation into the equivalent
@@ -185,7 +241,7 @@ export function cropperReducer(
 			);
 
 		case 'SET_ZOOM': {
-			const z = Math.min( MAX_ZOOM, Math.max( 1, action.payload ) );
+			const z = clampRequestedZoom( state, action.payload );
 			return commitBase(
 				enforceContainment( {
 					...state,
@@ -195,7 +251,7 @@ export function cropperReducer(
 		}
 
 		case 'SET_ZOOM_AT_POINT': {
-			const z = Math.min( MAX_ZOOM, Math.max( 1, action.payload.zoom ) );
+			const z = clampRequestedZoom( state, action.payload.zoom );
 			return commitBase(
 				enforceContainment( {
 					...state,
@@ -338,24 +394,27 @@ export function cropperReducer(
 				return state;
 			}
 
-			// New crop: fill height (or width), maintain aspect ratio, center.
-			const normalizedRatio = rect.width / rect.height;
-			let newH = 1;
-			let newW = normalizedRatio;
-			if ( newW > 1 ) {
-				newW = 1;
-				newH = 1 / normalizedRatio;
-			}
+			// Scale factor: how much the crop grows. fitScale fills the
+			// larger axis to 1 (viewport-filling settle). Cap so the
+			// resulting zoom stays at or below MAX_ZOOM — tight crops
+			// would otherwise push state.zoom past the user-facing cap
+			// and break wheel/slider interactions, which clamp to
+			// MAX_ZOOM and snap state.zoom down on the first input.
+			const fitScale = 1 / Math.max( rect.width, rect.height );
+			const zoomCap = state.zoom > 0 ? MAX_ZOOM / state.zoom : fitScale;
+			const s = Math.min( fitScale, zoomCap );
 
-			// Scale factor: how much the crop grew.
-			const s = newH / rect.height;
+			const newW = rect.width * s;
+			const newH = rect.height * s;
 
 			// The old crop center in normalized visual space.
 			const oldCx = rect.x + rect.width / 2;
 			const oldCy = rect.y + rect.height / 2;
 
-			// Zoom scales by s so the same image region fills the
-			// larger crop at the same relative size.
+			// Zoom scales by s so the same image region fills the new
+			// crop at the same relative size. When s is capped, the new
+			// crop is smaller than the viewport but the visible content
+			// inside it remains the source region the user framed.
 			// Pan: the visible content center was at
 			//   (cropCx - crop.x, cropCy - crop.y)
 			// in visual-normalized space. After centering the crop to
@@ -414,15 +473,15 @@ export function isStateDirty(
 	initial: CropperState
 ): boolean {
 	return (
-		current.pan.x !== initial.pan.x ||
-		current.pan.y !== initial.pan.y ||
-		current.zoom !== initial.zoom ||
-		current.rotation !== initial.rotation ||
+		! nearlyEqual( current.pan.x, initial.pan.x ) ||
+		! nearlyEqual( current.pan.y, initial.pan.y ) ||
+		! nearlyEqual( current.zoom, initial.zoom ) ||
+		! nearlyEqual( current.rotation, initial.rotation ) ||
 		current.flip.horizontal !== initial.flip.horizontal ||
 		current.flip.vertical !== initial.flip.vertical ||
-		current.cropRect.x !== initial.cropRect.x ||
-		current.cropRect.y !== initial.cropRect.y ||
-		current.cropRect.width !== initial.cropRect.width ||
-		current.cropRect.height !== initial.cropRect.height
+		! nearlyEqual( current.cropRect.x, initial.cropRect.x ) ||
+		! nearlyEqual( current.cropRect.y, initial.cropRect.y ) ||
+		! nearlyEqual( current.cropRect.width, initial.cropRect.width ) ||
+		! nearlyEqual( current.cropRect.height, initial.cropRect.height )
 	);
 }

@@ -7,7 +7,7 @@ import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
-import reactCompilerPlugin from 'eslint-plugin-react-compiler';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import rawJestDomPlugin from 'eslint-plugin-jest-dom';
 import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
@@ -158,6 +158,10 @@ const restrictedSyntax = [
 		message: 'Do not use string literals for IDs; use useId hook instead.',
 	},
 	{
+		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
+		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
+	},
+	{
 		selector:
 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
 		message:
@@ -193,6 +197,7 @@ export default dedupePlugins( [
 			'**/build-wp/**',
 			'**/node_modules/**',
 			'packages/block-serialization-spec-parser/parser.js',
+			'packages/global-styles-ui/src/font-library/lib/**',
 			'packages/icons/src/library/*.tsx',
 			'packages/react-native-editor/bundle/**',
 			'packages/vips/src/worker-code.ts',
@@ -206,13 +211,9 @@ export default dedupePlugins( [
 	...wpPlugin.configs.recommended,
 
 	// eslint-comments recommended (manually converted to flat config).
-	// Register under both names so that existing `eslint-comments/*` rule
-	// references (used below) continue to work alongside the canonical
-	// `@eslint-community/eslint-comments/*` names from the recommended config.
 	{
 		plugins: {
 			'@eslint-community/eslint-comments': eslintCommentsPlugin,
-			'eslint-comments': eslintCommentsPlugin,
 		},
 		rules: eslintCommentsPlugin.configs.recommended.rules,
 	},
@@ -220,8 +221,14 @@ export default dedupePlugins( [
 	// Storybook recommended (array of 3).
 	...storybookPlugin.configs[ 'flat/recommended' ],
 
+	// React Hooks recommended-latest (includes React Compiler rules).
+	reactHooksPlugin.configs.flat[ 'recommended-latest' ],
+
 	// Global settings applicable to all files.
 	{
+		linterOptions: {
+			reportUnusedDisableDirectives: 'error',
+		},
 		languageOptions: {
 			globals: {
 				wp: 'off',
@@ -261,10 +268,11 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						Icon: 'WCIcon',
+						Tooltip: 'WCTooltip',
 					},
 				},
 			],
-			'eslint-comments/no-unused-disable': 'error',
 			'import/default': 'error',
 			'import/named': 'error',
 			'no-restricted-imports': [
@@ -283,7 +291,7 @@ export default dedupePlugins( [
 					definedTags: [ 'jest-environment' ],
 				},
 			],
-			'react-compiler/react-compiler': [
+			'react-hooks/config': [
 				'error',
 				{
 					environment: {
@@ -294,7 +302,7 @@ export default dedupePlugins( [
 			],
 		},
 		plugins: {
-			'react-compiler': reactCompilerPlugin,
+			'react-hooks': reactHooksPlugin,
 			'@typescript-eslint': tseslint.plugin,
 		},
 	},
@@ -339,7 +347,19 @@ export default dedupePlugins( [
 			'import/no-unresolved': 'off',
 			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
-			'react-compiler/react-compiler': 'off',
+		},
+	},
+
+	// Override: React Native files — disable React Compiler rules until
+	// the native codebase's legacy patterns are migrated.
+	{
+		files: [
+			'**/*.@(android|ios|native).js',
+			'packages/react-native-*/**/*.js',
+		],
+		rules: {
+			'react-hooks/immutability': 'off',
+			'react-hooks/refs': 'off',
 		},
 	},
 
@@ -380,28 +400,17 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Package src + storybook — restricted syntax + unsafe button disabled.
+	// Override: React src + storybook — stylesheet and component rules.
 	{
 		files: [
 			'packages/*/src/**/*.[tj]s?(x)',
+			'routes/**/*.[tj]s?(x)',
+			'widgets/**/*.[tj]s?(x)',
 			'storybook/stories/**/*.[tj]s?(x)',
 		],
 		ignores: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
 		rules: {
-			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-			'@wordpress/components-no-unsafe-button-disabled': 'error',
-		},
-	},
-
-	// Override: Package src (non-test, non-stories, non-native) — add 40px size prop rule.
-	{
-		files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
-		ignores: [
-			'packages/*/src/**/@(test|stories)/**',
-			'**/*.@(android|ios|native).[tj]s?(x)',
-		],
-		rules: {
-			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
 		},
@@ -536,12 +545,7 @@ export default dedupePlugins( [
 
 	// Override: CLI/bin/env files — allow console.
 	{
-		files: [
-			'bin/**/*.js',
-			'bin/**/*.mjs',
-			'packages/env/**',
-			'packages/theme/bin/**/*.[tj]s?(x)',
-		],
+		files: [ '**/{bin,scripts,tools}/**', 'packages/env/**' ],
 		rules: {
 			'no-console': 'off',
 		},
@@ -553,6 +557,17 @@ export default dedupePlugins( [
 		rules: {
 			'jsdoc/no-undefined-types': 'off',
 			'jsdoc/valid-types': 'off',
+		},
+	},
+
+	// Override: Storybook story files — disable rules-of-hooks for the
+	// `render` method pattern (hooks in a lowercase function) and
+	// static-components for inline factories used in story setup.
+	{
+		files: [ '**/@(storybook|stories)/**/*.[tj]s?(x)' ],
+		rules: {
+			'react-hooks/rules-of-hooks': 'off',
+			'react-hooks/static-components': 'off',
 		},
 	},
 
@@ -775,11 +790,10 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Interactivity packages — disable react-compiler, require react import.
+	// Override: Interactivity packages — require react import.
 	{
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
-			'react-compiler/react-compiler': 'off',
 			'react/react-in-jsx-scope': 'error',
 		},
 	},
@@ -787,7 +801,11 @@ export default dedupePlugins( [
 	// Override: Packages which have eliminated dependency grouping comments
 	// and explicitly prevent new additions.
 	{
-		files: [ 'packages/ui/**', 'packages/design-system-mcp/**' ],
+		files: [
+			'packages/design-system-mcp/**',
+			'packages/ui/**',
+			'packages/theme/**',
+		],
 		rules: {
 			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},
@@ -845,21 +863,9 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Files with __unstable/__experimental prefixed functions that use hooks.
-	// react-hooks v5 rejects hook calls in functions not matching useX or PascalCase naming.
-	// These are known legacy patterns being phased out.
-	{
-		files: [
-			'packages/block-editor/src/components/block-variation-transforms/index.js',
-			'packages/block-editor/src/components/gradients/use-gradient.js',
-		],
-		rules: {
-			'react-hooks/rules-of-hooks': 'off',
-		},
-	},
-
 	// Override: Files with pre-existing exhaustive-deps warnings that cannot use
-	// inline eslint-disable comments (react-compiler flags those as errors).
+	// inline eslint-disable comments because the React Compiler rules in
+	// `react-hooks` flag those as errors.
 	{
 		files: [
 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',

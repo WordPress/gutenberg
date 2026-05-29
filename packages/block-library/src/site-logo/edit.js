@@ -10,6 +10,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
 	useEffect,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -73,6 +74,7 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
+	const cropButtonRef = useRef();
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -116,8 +118,9 @@ const SiteLogo = ( {
 		}
 	}, [ isSelected ] );
 
+	// Always apply modal updates as snackbar Undo may restore the original id.
 	const handleMediaUpdate = ( { id: newId } ) => {
-		if ( typeof newId === 'number' && newId !== logoId ) {
+		if ( typeof newId === 'number' ) {
 			setLogo( newId );
 		}
 	};
@@ -400,14 +403,22 @@ const SiteLogo = ( {
 				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
+							ref={ cropButtonRef }
 							onClick={
 								openMediaEditorModal && logoId
 									? () =>
 											openMediaEditorModal( {
 												id: logoId,
 												onUpdate: handleMediaUpdate,
+												onClose: () =>
+													cropButtonRef.current?.focus(),
 											} )
 									: () => setIsEditingImage( true )
+							}
+							aria-haspopup={
+								openMediaEditorModal && logoId
+									? 'dialog'
+									: undefined
 							}
 							icon={ crop }
 							label={ __( 'Crop' ) }

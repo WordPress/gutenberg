@@ -50,7 +50,6 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
-		isAttachment,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -78,9 +77,6 @@ function Header( {
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
-			isAttachment:
-				getCurrentPostType() === ATTACHMENT_POST_TYPE &&
-				window?.__experimentalMediaEditor,
 		};
 	}, [] );
 
@@ -109,13 +105,11 @@ function Header( {
 		<HeaderSkeleton
 			toolbar={
 				<>
-					{ ! isAttachment && (
-						<DocumentTools
-							disableBlockTools={
-								isStylesCanvasActive || isTextEditor
-							}
-						/>
-					) }
+					<DocumentTools
+						disableBlockTools={
+							isStylesCanvasActive || isTextEditor
+						}
+					/>
 					{ hasFixedToolbar && isLargeViewport && (
 						<CollapsibleBlockToolbar
 							isCollapsed={ isBlockToolsCollapsed }
@@ -137,6 +131,12 @@ function Header( {
 			}
 			settings={
 				<>
+					{ ! hasCenter && ! isTooNarrowForDocumentBar && (
+						<CollaboratorsPresence
+							postType={ postType }
+							postId={ postId }
+						/>
+					) }
 					{ ! customSaveButton && ! isPublishSidebarOpened && (
 						/*
 						 * This button isn't completely hidden by the publish sidebar.
@@ -177,7 +177,7 @@ function Header( {
 						/>
 					) }
 					{ customSaveButton }
-					{ ! isAttachment && <MoreMenu /> }
+					<MoreMenu />
 				</>
 			}
 		/>
