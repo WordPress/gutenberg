@@ -638,12 +638,14 @@ function useBlockProps( { name, clientId, borderColor, style } ) {
 	} );
 
 	const inherited = getInheritedBorderStyles( blockBorder, variationBorder );
-	// Note: `extraStyles.borderXStyle` values flow into the editor wrapper
-	// via `addSaveProps` but `addSaveProps` only forwards `className` to saved
+	// `extraStyles.borderXStyle` values flow into the editor wrapper via
+	// `addSaveProps`, but `addSaveProps` only forwards `className` to saved
 	// HTML. Render-time fallback for the front end is applied in PHP by
-	// `gutenberg_apply_border_support`, which runs via
-	// `WP_Block_Supports::apply_block_supports()` for both static and dynamic
-	// blocks. The two paths share the same algorithm; keep them in sync.
+	// `gutenberg_render_block_border_fallback`, hooked into the
+	// `render_block` filter so it covers both static and dynamic blocks
+	// (static blocks bypass `apply_block_supports` because they serialize
+	// their wrapper attributes at save time). The two paths share the same
+	// algorithm; keep them in sync.
 	const styleFallbacks = getBorderStyleFallbacks(
 		{ borderColor, style },
 		inherited
