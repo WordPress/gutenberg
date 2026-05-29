@@ -6,7 +6,7 @@ import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
 import { DashboardCommands } from './components/dashboard-commands';
 import { Inserter } from './components/inserter';
-import { WidgetChrome } from './components/widget-chrome';
+import { DashboardWidgetChrome } from './components/dashboard-widget-chrome';
 import { WidgetSettings } from './components/widget-settings';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
@@ -17,7 +17,7 @@ import { NoWidgetsState } from './components/no-widgets-state';
  *
  * The consumer owns `layout` and `editMode` state; every mutation fires
  * `onLayoutChange` with the fully updated array. The engine never queries a
- * widget-types store — types flow in via the `widgetTypes` prop.
+ * widget-primitives store; types flow in via the `widgetTypes` prop.
  *
  * ```tsx
  * import { WidgetDashboard } from '@wordpress/dashboard';
@@ -52,6 +52,7 @@ export const WidgetDashboard = Object.assign(
 		onLayoutChange,
 		onLayoutReset,
 		widgetTypes,
+		isResolvingWidgetTypes,
 		editMode,
 		onEditChange,
 		resolveWidgetModule,
@@ -65,6 +66,7 @@ export const WidgetDashboard = Object.assign(
 				onLayoutChange={ onLayoutChange }
 				onLayoutReset={ onLayoutReset }
 				widgetTypes={ widgetTypes }
+				isResolvingWidgetTypes={ isResolvingWidgetTypes }
 				editMode={ editMode }
 				onEditChange={ onEditChange }
 				resolveWidgetModule={ resolveWidgetModule }
@@ -87,5 +89,5 @@ export const WidgetDashboard = Object.assign(
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Actions, Widgets, WidgetChrome, NoWidgetsState }
+	{ Actions, Widgets, WidgetChrome: DashboardWidgetChrome, NoWidgetsState }
 );

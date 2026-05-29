@@ -64,27 +64,6 @@ const config: Config = {
 			baseSelector: ':root',
 			modeSelectors: [
 				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'compact',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'comfortable',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: '.',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='default']",
-					],
-				},
-				{
 					mode: 'high-dpi',
 					selectors: [
 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',

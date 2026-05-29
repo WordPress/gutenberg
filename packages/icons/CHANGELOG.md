@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+
+## 13.2.0 (2026-05-27)
+
 ## 13.1.0 (2026-05-14)
 
 ## 13.0.0 (2026-04-29)
