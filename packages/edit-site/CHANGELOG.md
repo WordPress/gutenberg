@@ -62,6 +62,10 @@
 
 -   The Site Editor now follows the user's admin color scheme ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
 
+### Bug Fixes
+
+-   `SidebarNavigationItem`: Stop forcing `style={ { fill: 'currentcolor' } }` on the icon. The explicit override was clobbering stroke-based icons' intrinsic styling. Colour is inherited via CSS `color` and the icon's own declared fills/strokes. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+
 ## 6.47.0 (2026-05-27)
 
 ## 6.46.0 (2026-05-14)

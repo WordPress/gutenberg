@@ -317,6 +317,10 @@
 -   `ToggleGroupControl`: Radio options now render an auto-generated `name` attribute, following Ariakit's `Radio` behavior ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
 
+### Bug Fixes
+
+-   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Old fill-based icons remain coloured via the surrounding `svg { fill: currentColor }` rule plus normal SVG inheritance. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+
 ## 34.0.0 (2026-05-27)
 
 ### Breaking Changes

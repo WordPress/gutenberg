@@ -57,6 +57,7 @@
 
 -   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
 -   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
+-   Stroke-based icons now declare `fill` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary 3rd-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
 
 ## 13.2.0 (2026-05-27)
 
