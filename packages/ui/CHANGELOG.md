@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `Button`: Button children are now wrapped in an inner `<span>`. Custom CSS or event handling that relies on direct-child selectors, such as `.my-button > svg`, or on `event.target` pointing to a child element may need updating. The wrapper layout and loading-content hiding styles only apply to styled variants; `variant="unstyled"` receives the wrapper DOM without the styled wrapper layout, and its loading content is no longer hidden by `@wordpress/ui` styles ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+-   `Button`: Button children are now wrapped in an inner `<span>`. Custom CSS or event handling that relies on direct-child selectors, such as `.my-button > svg`, or on `event.target` pointing to a child element may need updating. The wrapper layout and loading-content hiding styles only apply to styled variants; `variant="unstyled"` receives the wrapper DOM without the styled wrapper layout, and its loading content is no longer hidden ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
 
 ### Enhancements
 
