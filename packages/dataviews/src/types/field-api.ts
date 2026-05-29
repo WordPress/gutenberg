@@ -516,6 +516,14 @@ export type DataFormControlProps< Item > = {
 		suffix?: React.ComponentType;
 		rows?: number;
 		compact?: boolean;
+		// Rich text control options.
+		className?: string;
+		clientId?: string;
+		allowedFormats?: string[];
+		disableFormats?: boolean;
+		withoutInteractiveFormatting?: boolean;
+		preserveWhiteSpace?: boolean;
+		disableLineBreaks?: boolean;
 	};
 };
 

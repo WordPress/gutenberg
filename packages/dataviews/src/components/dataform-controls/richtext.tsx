@@ -12,23 +12,6 @@ import { useCallback } from '@wordpress/element';
  */
 import type { DataFormControlProps } from '../../types';
 
-/**
- * Configuration specific to the rich text control.
- *
- * `DataFormControlProps.config` is typed with a generic shape that does not
- * cover the rich-text specific options, so the runtime value is narrowed to
- * this interface at the consumption site.
- */
-interface RichTextControlConfig {
-	className?: string;
-	clientId?: string;
-	allowedFormats?: string[];
-	disableFormats?: boolean;
-	withoutInteractiveFormatting?: boolean;
-	preserveWhiteSpace?: boolean;
-	disableLineBreaks?: boolean;
-}
-
 export default function RichText< Item >( {
 	data,
 	field,
@@ -36,7 +19,15 @@ export default function RichText< Item >( {
 	hideLabelFromVision,
 	config,
 }: DataFormControlProps< Item > ) {
-	const richTextConfig = ( config || {} ) as RichTextControlConfig;
+	const {
+		className,
+		clientId,
+		allowedFormats,
+		disableFormats,
+		withoutInteractiveFormatting,
+		preserveWhiteSpace,
+		disableLineBreaks,
+	} = config || {};
 	const { label, placeholder, id, setValue } = field;
 	const value = field.getValue( { item: data } );
 
@@ -54,15 +45,13 @@ export default function RichText< Item >( {
 			placeholder={ placeholder }
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
-			className={ richTextConfig.className }
-			clientId={ richTextConfig.clientId }
-			allowedFormats={ richTextConfig.allowedFormats }
-			disableFormats={ richTextConfig.disableFormats }
-			withoutInteractiveFormatting={
-				richTextConfig.withoutInteractiveFormatting
-			}
-			preserveWhiteSpace={ richTextConfig.preserveWhiteSpace }
-			disableLineBreaks={ richTextConfig.disableLineBreaks }
+			className={ className }
+			clientId={ clientId }
+			allowedFormats={ allowedFormats }
+			disableFormats={ disableFormats }
+			withoutInteractiveFormatting={ withoutInteractiveFormatting }
+			preserveWhiteSpace={ preserveWhiteSpace }
+			disableLineBreaks={ disableLineBreaks }
 		/>
 	);
 }

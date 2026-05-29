@@ -153,7 +153,6 @@ describe( 'dataform-controls/richtext', () => {
 				field={ buildField() as any }
 				onChange={ jest.fn() }
 				hideLabelFromVision={ false }
-				// @ts-expect-error - exercising the runtime guard for an absent config.
 				config={ undefined }
 			/>
 		);
