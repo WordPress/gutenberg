@@ -226,14 +226,6 @@
 	}
 
 	.is-loading {
-		color: transparent;
-
-		/* Keep text transparent when a loading button is hovered — needed because
-		 the hover state now sets `color` as a property declaration. */
-		&:not([data-disabled]):is(:hover, :active, :focus) {
-			color: transparent;
-		}
-
 		.content {
 			opacity: 0;
 		}
