@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Bug Fixes
+### Internal
 
 - DataViews: Pass boolean values to the `inert` attribute instead of the string `'true'` to avoid a React 19 warning. [#78798](https://github.com/WordPress/gutenberg/pull/78798)
 
