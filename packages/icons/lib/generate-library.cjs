@@ -258,26 +258,23 @@ function svgToTsx( svgContent ) {
 	// style object syntax (e.g. `style={ { fill: 'none' } }`). Source SVGs use
 	// the CSS-string form so they remain valid SVG when read by non-React
 	// renderers (the PHP path, webpack SVG loaders, raw file preview).
-	jsxContent = jsxContent.replace(
-		/\sstyle="([^"]*)"/g,
-		( _, cssString ) => {
-			const declarations = cssString
-				.split( ';' )
-				.map( ( decl ) => decl.trim() )
-				.filter( Boolean )
-				.map( ( decl ) => {
-					const colonIndex = decl.indexOf( ':' );
-					const key = decl.slice( 0, colonIndex ).trim();
-					const value = decl.slice( colonIndex + 1 ).trim();
-					const camelKey = key.replace( /-([a-z])/g, ( _m, c ) =>
-						c.toUpperCase()
-					);
-					return `${ camelKey }: '${ value }'`;
-				} )
-				.join( ', ' );
-			return ` style={ { ${ declarations } } }`;
-		}
-	);
+	jsxContent = jsxContent.replace( /\sstyle="([^"]*)"/g, ( _, cssString ) => {
+		const declarations = cssString
+			.split( ';' )
+			.map( ( decl ) => decl.trim() )
+			.filter( Boolean )
+			.map( ( decl ) => {
+				const colonIndex = decl.indexOf( ':' );
+				const key = decl.slice( 0, colonIndex ).trim();
+				const value = decl.slice( colonIndex + 1 ).trim();
+				const camelKey = key.replace( /-([a-z])/g, ( _m, c ) =>
+					c.toUpperCase()
+				);
+				return `${ camelKey }: '${ value }'`;
+			} )
+			.join( ', ' );
+		return ` style={ { ${ declarations } } }`;
+	} );
 
 	// Tags that ought to be converted to WordPress primitives when converting
 	// SVGs to React elements
