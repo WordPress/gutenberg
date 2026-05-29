@@ -64,7 +64,7 @@
 		@media not ( prefers-reduced-motion ) {
 			transition: color 0.1s ease-out;
 
-			* {
+			.content {
 				transition: opacity 0.1s ease-out;
 			}
 		}
@@ -139,7 +139,6 @@
 		justify-content: center;
 		align-items: center;
 		gap: var(--wpds-dimension-gap-sm);
-		max-width: 100%;
 		min-width: 0;
 	}
 
