@@ -187,6 +187,12 @@ function getAllPackages() {
 			continue;
 		}
 
+		if ( depPackageJson.wpScript ) {
+			console.warn(
+				`wp-build: ${ depName } declares wpScript; ignored (external dependencies contribute script modules only).`
+			);
+		}
+
 		registry.set( depName, {
 			dir: path.dirname( pkgJsonPath ),
 			packageJson: depPackageJson,
@@ -629,7 +635,10 @@ async function bundlePackage( packageName, options = {} ) {
 
 	const builds = [];
 
-	if ( packageJson.wpScript ) {
+	// External (convention-discovered) packages contribute script modules only.
+	const buildAsScript = !! packageJson.wpScript && ! entry.external;
+
+	if ( buildAsScript ) {
 		const entryPoint = resolveEntryPoint( packageDir, packageJson );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 		const target = browserslistToEsbuild();
@@ -836,7 +845,7 @@ async function bundlePackage( packageName, options = {} ) {
 	}
 
 	let hasMainStyle = false;
-	if ( packageJson.wpScript ) {
+	if ( buildAsScript ) {
 		const buildStyleDir = path.join( packageDir, 'build-style' );
 		const outputDir = path.join( BUILD_DIR, 'styles', packageName );
 
