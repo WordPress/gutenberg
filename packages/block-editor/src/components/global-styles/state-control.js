@@ -18,6 +18,50 @@ function buildOptions( states ) {
 }
 
 /**
+ * Renders one group of state options (Viewport, Item, or Pseudo state) inside
+ * the parent DropdownMenu. Extracted so the three groups share a single
+ * source of truth for menu-item rendering, selected-icon, and close-on-select
+ * behavior.
+ *
+ * @param {Object}   props               Component props.
+ * @param {string}   props.label         Visible group label.
+ * @param {string}   props.keyPrefix     React-key namespace for the group's items.
+ * @param {Array}    props.options       Items to render (each with `value` and `label`).
+ * @param {string}   props.selectedValue Currently-selected value within this group.
+ * @param {Function} props.onChange      Called with the chosen option value.
+ * @param {Function} props.onClose       Closes the parent DropdownMenu.
+ * @param {boolean}  props.closeOnSelect Close the menu after a selection.
+ */
+function StateMenuGroup( {
+	label,
+	keyPrefix,
+	options,
+	selectedValue,
+	onChange,
+	onClose,
+	closeOnSelect,
+} ) {
+	return (
+		<MenuGroup label={ label }>
+			{ options.map( ( option ) => (
+				<MenuItem
+					key={ `${ keyPrefix }-${ option.value }` }
+					onClick={ () => {
+						onChange?.( option.value );
+						if ( closeOnSelect ) {
+							onClose();
+						}
+					} }
+					icon={ selectedValue === option.value ? check : null }
+				>
+					{ option.label }
+				</MenuItem>
+			) ) }
+		</MenuGroup>
+	);
+}
+
+/**
  * State control for managing viewport, custom (class-based), and pseudo-state styles.
  * Displays a dropdown menu with separate groups for each selector.
  *
@@ -69,50 +113,54 @@ export default function StateControl( {
 		return null;
 	}
 
-	const hasViewportOptions = viewportStates.length > 0;
-	const hasCustomStateOptions = customStates.length > 0;
-	const hasPseudoStateOptions = pseudoStates.length > 0;
 	const triggerLabel = __( 'States' );
-	const activeStates = [];
-
-	if ( hasViewportOptions && viewportValue !== 'default' ) {
-		const selectedViewport = viewportOptions.find(
-			( option ) => option.value === viewportValue
-		);
-
-		if ( selectedViewport ) {
-			activeStates.push( {
-				key: `viewport-${ selectedViewport.value }`,
-				label: selectedViewport.label,
-			} );
+	const groups = [
+		{
+			keyPrefix: 'viewport',
+			label: __( 'Viewport' ),
+			options: viewportOptions,
+			rawOptions: viewportStates,
+			selectedValue: viewportValue,
+			onChange: onChangeViewport,
+		},
+		{
+			keyPrefix: 'custom',
+			label: _x( 'Item', 'block style state group for per-item states' ),
+			options: customStateOptions,
+			rawOptions: customStates,
+			selectedValue: customStateValue,
+			onChange: onChangeCustomState,
+		},
+		{
+			keyPrefix: 'pseudo',
+			label: __( 'Pseudo state' ),
+			options: pseudoStateOptions,
+			rawOptions: pseudoStates,
+			selectedValue: pseudoStateValue,
+			onChange: onChangePseudoState,
+		},
+	];
+	const visibleGroups = groups.filter(
+		( { rawOptions } ) => rawOptions.length > 0
+	);
+	const activeStates = visibleGroups.flatMap(
+		( { keyPrefix, options, selectedValue } ) => {
+			if ( selectedValue === 'default' ) {
+				return [];
+			}
+			const selected = options.find(
+				( option ) => option.value === selectedValue
+			);
+			return selected
+				? [
+						{
+							key: `${ keyPrefix }-${ selected.value }`,
+							label: selected.label,
+						},
+				  ]
+				: [];
 		}
-	}
-
-	if ( hasCustomStateOptions && customStateValue !== 'default' ) {
-		const selectedCustomState = customStateOptions.find(
-			( option ) => option.value === customStateValue
-		);
-
-		if ( selectedCustomState ) {
-			activeStates.push( {
-				key: `custom-${ selectedCustomState.value }`,
-				label: selectedCustomState.label,
-			} );
-		}
-	}
-
-	if ( hasPseudoStateOptions && pseudoStateValue !== 'default' ) {
-		const selectedPseudoState = pseudoStateOptions.find(
-			( option ) => option.value === pseudoStateValue
-		);
-
-		if ( selectedPseudoState ) {
-			activeStates.push( {
-				key: `pseudo-${ selectedPseudoState.value }`,
-				label: selectedPseudoState.label,
-			} );
-		}
-	}
+	);
 
 	const currentStateLabel = activeStates.length
 		? activeStates.map( ( state ) => state.label ).join( ', ' )
@@ -148,93 +196,21 @@ export default function StateControl( {
 				toggleProps={ toggleProps }
 			>
 				{ ( { onClose } ) => {
-					const hasMultipleGroups =
-						[
-							hasViewportOptions,
-							hasCustomStateOptions,
-							hasPseudoStateOptions,
-						].filter( Boolean ).length > 1;
+					const closeOnSelect = visibleGroups.length <= 1;
 					return (
 						<>
-							{ hasViewportOptions && (
-								<MenuGroup label={ __( 'Viewport' ) }>
-									{ viewportOptions.map( ( option ) => (
-										<MenuItem
-											key={ `viewport-${ option.value }` }
-											onClick={ () => {
-												onChangeViewport?.(
-													option.value
-												);
-												if ( ! hasMultipleGroups ) {
-													onClose();
-												}
-											} }
-											icon={
-												viewportValue === option.value
-													? check
-													: null
-											}
-										>
-											{ option.label }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
-							) }
-							{ hasCustomStateOptions && (
-								<MenuGroup
-									label={ _x(
-										'Item',
-										'block style state group for per-item states'
-									) }
-								>
-									{ customStateOptions.map( ( option ) => (
-										<MenuItem
-											key={ `custom-${ option.value }` }
-											onClick={ () => {
-												onChangeCustomState?.(
-													option.value
-												);
-												if ( ! hasMultipleGroups ) {
-													onClose();
-												}
-											} }
-											icon={
-												customStateValue ===
-												option.value
-													? check
-													: null
-											}
-										>
-											{ option.label }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
-							) }
-							{ hasPseudoStateOptions && (
-								<MenuGroup label={ __( 'Pseudo state' ) }>
-									{ pseudoStateOptions.map( ( option ) => (
-										<MenuItem
-											key={ `pseudo-${ option.value }` }
-											onClick={ () => {
-												onChangePseudoState?.(
-													option.value
-												);
-												if ( ! hasMultipleGroups ) {
-													onClose();
-												}
-											} }
-											icon={
-												pseudoStateValue ===
-												option.value
-													? check
-													: null
-											}
-										>
-											{ option.label }
-										</MenuItem>
-									) ) }
-								</MenuGroup>
-							) }
+							{ visibleGroups.map( ( group ) => (
+								<StateMenuGroup
+									key={ group.keyPrefix }
+									label={ group.label }
+									keyPrefix={ group.keyPrefix }
+									options={ group.options }
+									selectedValue={ group.selectedValue }
+									onChange={ group.onChange }
+									onClose={ onClose }
+									closeOnSelect={ closeOnSelect }
+								/>
+							) ) }
 						</>
 					);
 				} }
