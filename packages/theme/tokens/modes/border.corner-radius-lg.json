@@ -18,14 +18,14 @@
 			"md": {
 				"$type": "dimension",
 				"$value": {
-					"value": 12,
+					"value": 8,
 					"unit": "px"
 				}
 			},
 			"lg": {
 				"$type": "dimension",
 				"$value": {
-					"value": 24,
+					"value": 16,
 					"unit": "px"
 				}
 			}

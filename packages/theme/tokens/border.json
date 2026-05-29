@@ -33,8 +33,8 @@
 				"$extensions": {
 					"mode": {
 						"corner-radius-none": { "value": 0, "unit": "px" },
-						"corner-radius-md": { "value": 8, "unit": "px" },
-						"corner-radius-lg": { "value": 12, "unit": "px" }
+						"corner-radius-md": { "value": 6, "unit": "px" },
+						"corner-radius-lg": { "value": 8, "unit": "px" }
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}
@@ -45,8 +45,8 @@
 				"$extensions": {
 					"mode": {
 						"corner-radius-none": { "value": 0, "unit": "px" },
-						"corner-radius-md": { "value": 16, "unit": "px" },
-						"corner-radius-lg": { "value": 24, "unit": "px" }
+						"corner-radius-md": { "value": 12, "unit": "px" },
+						"corner-radius-lg": { "value": 16, "unit": "px" }
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}

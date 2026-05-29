@@ -353,9 +353,9 @@
 	/* Small radius */
 	--wpds-border-radius-sm: 4px;
 	/* Medium radius */
-	--wpds-border-radius-md: 8px;
+	--wpds-border-radius-md: 6px;
 	/* Large radius */
-	--wpds-border-radius-lg: 16px;
+	--wpds-border-radius-lg: 12px;
 }
 
 [data-wpds-corner-radius='lg'],
@@ -365,7 +365,7 @@
 	/* Small radius */
 	--wpds-border-radius-sm: 6px;
 	/* Medium radius */
-	--wpds-border-radius-md: 12px;
+	--wpds-border-radius-md: 8px;
 	/* Large radius */
-	--wpds-border-radius-lg: 24px;
+	--wpds-border-radius-lg: 16px;
 }
