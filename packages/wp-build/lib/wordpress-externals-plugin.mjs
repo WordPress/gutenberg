@@ -201,33 +201,39 @@ export function createWordpressExternalsPlugin(
 					);
 				}
 
-				// Strict-name externalization for discovered internal packages.
-				// Matches the import specifier against the package's own `name`
-				// field (the registry passed in from build.mjs), letting an
-				// internal package keep its npm-scope identity end-to-end
-				// instead of being rewritten as `@<packageNamespace>/<dirName>`.
-				// Registered before the namespace-pattern handlers below so it
-				// wins for any package whose name is in the local registry; the
-				// regex pattern below still covers external dependencies that
-				// happen to live under the same namespace (e.g. `@wordpress/*`
-				// packages bundled as Core prerequisites).
-				for ( const internalName of internalPackageNames ) {
-					const escapedName = internalName.replace(
-						/[.*+?^${}()|[\]\\]/g,
-						'\\$&'
+				// Externalize internal packages by exact name. Must precede the
+				// namespace pattern below so internal names win over the wildcard.
+				if ( internalPackageNames.size > 0 ) {
+					// Longest-first: avoids `@org/block` shadowing `@org/block-editor`.
+					const namesSorted = Array.from( internalPackageNames ).sort(
+						( a, b ) => b.length - a.length
+					);
+					const escapedNames = namesSorted.map( ( n ) =>
+						n.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' )
+					);
+					const internalNamesFilter = new RegExp(
+						`^(?:${ escapedNames.join( '|' ) })(?:/|$)`
 					);
 
 					build.onResolve(
-						{ filter: new RegExp( `^${ escapedName }(/|$)` ) },
+						{ filter: internalNamesFilter },
 						/** @param {import('esbuild').OnResolveArgs} args */
 						( args ) => {
+							const head = args.path.startsWith( '@' )
+								? args.path.split( '/', 2 ).join( '/' )
+								: args.path.split( '/', 1 )[ 0 ];
+
+							if ( ! internalPackageNames.has( head ) ) {
+								return undefined;
+							}
+
 							const subpath =
-								args.path.length > internalName.length
-									? args.path.slice( internalName.length + 1 )
+								args.path.length > head.length
+									? args.path.slice( head.length + 1 )
 									: null;
 
 							const packageJson = getPackageInfo(
-								internalName,
+								head,
 								args.resolveDir
 							);
 
@@ -241,13 +247,7 @@ export function createWordpressExternalsPlugin(
 							);
 							const isScript = !! packageJson.wpScript;
 
-							// Dual packages (both wpScript and wpScriptModuleExports):
-							// let the active build's format decide which side of
-							// the package this import resolves to. In an IIFE
-							// build the import must round-trip through the script
-							// handle/global, so we yield to the namespace handler
-							// below; in an ESM build it externalizes as a script
-							// module here.
+							// Dual packages: IIFE yields to the namespace handler.
 							let externalize = isScriptModule;
 							if ( isScriptModule && isScript ) {
 								externalize = buildFormat === 'esm';
