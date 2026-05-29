@@ -231,7 +231,7 @@
 	}
 
 	.is-loading {
-		&:not(.is-unstyled) .content {
+		.content {
 			opacity: 0;
 		}
 
