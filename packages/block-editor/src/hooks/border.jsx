@@ -583,6 +583,13 @@ function useBlockProps( { name, clientId, borderColor, style } ) {
 		return {};
 	}
 
+	// Quick exit when the block has no border-related attribute at all.
+	// Avoids the preset-color resolution and fallback work below for the
+	// common case of border-supporting blocks without border data set.
+	if ( ! borderColor && ! style?.border ) {
+		return {};
+	}
+
 	const { color: borderColorValue } = getMultiOriginColor( {
 		colors,
 		namedColor: borderColor,
