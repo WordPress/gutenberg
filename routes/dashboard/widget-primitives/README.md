@@ -26,6 +26,11 @@ neither side has to know about the other:
 
 ## Public API
 
+- `<WidgetRender>`: canonical entry point for any host that mounts a widget.
+  Resolves the widget's render module via a host-provided `resolveWidgetModule`
+  and mounts the resulting component with the standard `attributes` plus
+  `setAttributes` render contract. Suspense, error handling, and chrome are
+  host concerns and live outside the primitive.
 - `useWidgetTypes()` → `[ widgetTypes, isResolvingWidgetTypes ]`: the
   `WidgetType[]` available on the current page, plus a flag that is true while
   they are still resolving.
