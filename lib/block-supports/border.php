@@ -373,20 +373,33 @@ function gutenberg_render_block_border_fallback( $block_content, $block ) {
 		return $block_content;
 	}
 
+	$attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
+
+	// Quick exit when the block has no border-related attribute at all. This
+	// is the common case and short-circuits the registry / theme-json
+	// resolver work below.
+	$has_any_border_attr =
+		! empty( $attrs['borderColor'] ) ||
+		! empty( $attrs['style']['border'] );
+	if ( ! $has_any_border_attr ) {
+		return $block_content;
+	}
+
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	if ( ! $block_type instanceof WP_Block_Type ) {
+
+	// Respect explicit opt-out of border `style` serialization. The fallback
+	// is intentionally NOT gated on whether the block opts into the `style`
+	// border feature: opting out of `style` means the user cannot pick a
+	// style via UI; it does not mean a block whose attributes carry a
+	// `color` or `width` should be rendered invisibly. The legacy CSS rule
+	// this replaces did not gate on `style` support either.
+	if (
+		$block_type instanceof WP_Block_Type &&
+		wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' )
+	) {
 		return $block_content;
 	}
 
-	if ( ! gutenberg_has_border_feature_support( $block_type, 'style' ) ) {
-		return $block_content;
-	}
-
-	if ( wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'style' ) ) {
-		return $block_content;
-	}
-
-	$attrs        = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
 	$inherited    = gutenberg_get_inherited_border_styles( $block_type, $attrs );
 	$declarations = gutenberg_get_border_style_fallbacks( $attrs, $inherited );
 
