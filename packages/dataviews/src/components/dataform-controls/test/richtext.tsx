@@ -7,11 +7,12 @@ import userEvent from '@testing-library/user-event';
 // The `RichTextControl` component depends on `@wordpress/rich-text`'s
 // useRichText hook (format types, event listeners, etc.) which is
 // integration-heavy. Mock the rich-text-control module entirely so this file
-// can verify the wrapper's prop wiring in isolation without standing up the
+// can verify the control's prop wiring in isolation without standing up the
 // real editing pipeline.
 jest.mock( '@wordpress/rich-text-control', () => ( {
-	RichTextControl( props ) {
-		const handleChange = ( event ) => props.onChange( event.target.value );
+	RichTextControl( props: any ) {
+		const handleChange = ( event: any ) =>
+			props.onChange( event.target.value );
 
 		return (
 			<textarea
@@ -43,11 +44,11 @@ jest.mock( '@wordpress/rich-text-control', () => ( {
 /**
  * Internal dependencies
  */
-import RichTextEdit from '../edit';
+import RichText from '../richtext';
 
 type TestItem = { content: string };
 
-function buildField() {
+function buildField( overrides: Record< string, any > = {} ) {
 	return {
 		id: 'content',
 		label: 'Content',
@@ -56,13 +57,14 @@ function buildField() {
 			...item,
 			content: value,
 		} ),
+		...overrides,
 	};
 }
 
-describe( 'fields/rich-text RichTextEdit', () => {
+describe( 'dataform-controls/richtext', () => {
 	it( 'forwards the field label and value to the control', () => {
 		render(
-			<RichTextEdit< TestItem >
+			<RichText< TestItem >
 				data={ { content: 'Hello world' } }
 				field={ buildField() as any }
 				onChange={ jest.fn() }
@@ -83,7 +85,7 @@ describe( 'fields/rich-text RichTextEdit', () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 		render(
-			<RichTextEdit< TestItem >
+			<RichText< TestItem >
 				data={ { content: '' } }
 				field={ buildField() as any }
 				onChange={ onChange }
@@ -99,16 +101,30 @@ describe( 'fields/rich-text RichTextEdit', () => {
 		expect( onChange ).toHaveBeenLastCalledWith( { content: 'A' } );
 	} );
 
+	it( 'reads the placeholder from the field', () => {
+		render(
+			<RichText< TestItem >
+				data={ { content: '' } }
+				field={ buildField( { placeholder: 'No title' } ) as any }
+				onChange={ jest.fn() }
+				hideLabelFromVision={ false }
+				config={ {} }
+			/>
+		);
+
+		const control = screen.getByLabelText( 'Content' );
+		expect( control.dataset.placeholder ).toBe( 'No title' );
+	} );
+
 	it( 'passes the optional config to the underlying control', () => {
 		render(
-			<RichTextEdit< TestItem >
+			<RichText< TestItem >
 				data={ { content: '' } }
 				field={ buildField() as any }
 				onChange={ jest.fn() }
 				hideLabelFromVision
 				config={ {
 					clientId: 'abc-123',
-					placeholder: 'Write…',
 					allowedFormats: [ 'core/bold' ],
 					disableFormats: true,
 					withoutInteractiveFormatting: true,
@@ -120,7 +136,6 @@ describe( 'fields/rich-text RichTextEdit', () => {
 
 		const control = screen.getByLabelText( 'Content' );
 		expect( control.dataset.clientId ).toBe( 'abc-123' );
-		expect( control.dataset.placeholder ).toBe( 'Write…' );
 		expect( control.dataset.hideLabel ).toBe( 'true' );
 		expect( control.dataset.disableFormats ).toBe( 'true' );
 		expect( control.dataset.disableLineBreaks ).toBe( 'true' );
@@ -133,7 +148,7 @@ describe( 'fields/rich-text RichTextEdit', () => {
 
 	it( 'tolerates a missing config object', () => {
 		render(
-			<RichTextEdit< TestItem >
+			<RichText< TestItem >
 				data={ { content: 'x' } }
 				field={ buildField() as any }
 				onChange={ jest.fn() }
