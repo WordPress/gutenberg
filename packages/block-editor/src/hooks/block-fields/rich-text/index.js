@@ -123,7 +123,17 @@ export default function RichTextControl( {
 						anchorRef,
 					] ) }
 					onFocus={ () => setIsSelected( true ) }
-					onBlur={ () => setIsSelected( false ) }
+					onBlur={ ( event ) => {
+						// Don't unmount if focus is going to a popover.
+						if (
+							event.relatedTarget?.closest(
+								'.components-popover'
+							)
+						) {
+							return;
+						}
+						setIsSelected( false );
+					} }
 					contentEditable
 					{ ...controlProps }
 				/>
