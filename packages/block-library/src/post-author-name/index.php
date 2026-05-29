@@ -32,7 +32,21 @@ function render_block_core_post_author_name( $attributes, $content, $block ) {
 
 	$author_name = get_the_author_meta( 'display_name', $author_id );
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-post-author-name__link">%3$s</a>', get_author_posts_url( $author_id ), esc_attr( $attributes['linkTarget'] ), $author_name );
+		// Determine link destination type: 'archive' (default) or 'website'.
+		$link_type  = isset( $attributes['linkType'] ) ? $attributes['linkType'] : 'archive';
+		$author_url = '';
+
+		// If 'website' is selected, try to get the author's website URL from their profile.
+		if ( 'website' === $link_type ) {
+			$author_url = get_the_author_meta( 'user_url', $author_id );
+		}
+
+		// Fallback to author archive if website URL is empty or if 'archive' is selected.
+		if ( empty( $author_url ) ) {
+			$author_url = get_author_posts_url( $author_id );
+		}
+
+		$author_name = sprintf( '<a href="%1$s" target="%2$s" class="wp-block-post-author-name__link">%3$s</a>', esc_url( $author_url ), esc_attr( $attributes['linkTarget'] ), $author_name );
 	}
 
 	$classes = array();

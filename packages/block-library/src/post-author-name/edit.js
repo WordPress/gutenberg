@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	SelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -24,7 +25,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 function PostAuthorNameEdit( props ) {
 	useDeprecatedTextAlign( props );
 	const {
-		attributes: { isLink, linkTarget },
+		attributes: { isLink, linkTarget, linkType },
 		setAttributes,
 		context: { postType, postId },
 	} = props;
@@ -74,6 +75,7 @@ function PostAuthorNameEdit( props ) {
 						setAttributes( {
 							isLink: false,
 							linkTarget: '_self',
+							linkType: 'archive',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -93,24 +95,61 @@ function PostAuthorNameEdit( props ) {
 						/>
 					</ToolsPanelItem>
 					{ isLink && (
-						<ToolsPanelItem
-							label={ __( 'Open in new tab' ) }
-							isShownByDefault
-							hasValue={ () => linkTarget !== '_self' }
-							onDeselect={ () =>
-								setAttributes( { linkTarget: '_self' } )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
-									setAttributes( {
-										linkTarget: value ? '_blank' : '_self',
-									} )
+						<>
+							<ToolsPanelItem
+								label={ __( 'Link destination' ) }
+								isShownByDefault
+								hasValue={ () => linkType !== 'archive' }
+								onDeselect={ () =>
+									setAttributes( { linkType: 'archive' } )
 								}
-								checked={ linkTarget === '_blank' }
-							/>
-						</ToolsPanelItem>
+							>
+								<SelectControl
+									__next40pxDefaultSize
+									label={ __( 'Link destination' ) }
+									value={ linkType }
+									options={ [
+										{
+											value: 'archive',
+											label: __( 'Author archive' ),
+											help: __(
+												'Links to a page listing all posts by this author.'
+											),
+										},
+										{
+											value: 'website',
+											label: __( 'Author website' ),
+											help: __(
+												'Links to the author’s personal website.'
+											),
+										},
+									] }
+									onChange={ ( value ) =>
+										setAttributes( { linkType: value } )
+									}
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Open in new tab' ) }
+								isShownByDefault
+								hasValue={ () => linkTarget !== '_self' }
+								onDeselect={ () =>
+									setAttributes( { linkTarget: '_self' } )
+								}
+							>
+								<ToggleControl
+									label={ __( 'Open in new tab' ) }
+									onChange={ ( value ) =>
+										setAttributes( {
+											linkTarget: value
+												? '_blank'
+												: '_self',
+										} )
+									}
+									checked={ linkTarget === '_blank' }
+								/>
+							</ToolsPanelItem>
+						</>
 					) }
 				</ToolsPanel>
 			</InspectorControls>
