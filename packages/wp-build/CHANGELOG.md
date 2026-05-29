@@ -4,7 +4,8 @@
 
 ### Enhancements
 
--   Use each package's own `name` field as its script-module ID and externalize internal-package imports by exact name. Decouples script-module identity from `wpPlugin.packageNamespace`, so the npm name survives end-to-end (npm name === import specifier === script-module ID). No-op for Core; enables consumers whose owned npm scope differs from `packageNamespace` to keep a single identifier across pnpm, IDE, and the WordPress runtime.
+-   Use each package's own `name` field as its script-module ID and externalize internal-package imports by exact name. Decouples script-module identity from `wpPlugin.packageNamespace`, so the npm name survives end-to-end (npm name === import specifier === script-module ID). No-op for Core; enables consumers whose owned npm scope differs from `packageNamespace` to keep a single identifier across npm, IDE, and the WordPress runtime.
+-   Discover script-module packages outside `./packages/` via convention. Any entry in the plugin's `dependencies` whose `package.json` declares `wpScriptModuleExports` is registered as a script module, bundled, and externalized under its own npm name. No new config; local packages still take precedence on name collision.
 
 ### Bug Fixes
 
