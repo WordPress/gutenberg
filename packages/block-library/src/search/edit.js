@@ -35,6 +35,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -502,9 +503,13 @@ export default function SearchEdit( {
 						{ label: '<search>', value: 'search' },
 						{ label: '<form>', value: 'form' },
 					] }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value || undefined } )
-					}
+					onChange={ ( value ) => {
+						setAttributes( { tagName: value || undefined } );
+						// The help text is updated via aria-describedby, which
+						// is not re-announced while focus remains on the select.
+						// Announce the new description so it is not missed.
+						speak( TAG_NAME_MESSAGES[ value ] );
+					} }
 					help={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
 				/>
 			</InspectorControls>
