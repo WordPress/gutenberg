@@ -596,63 +596,68 @@ export default function SearchEdit( {
 	const Wrapper = 'search' === tagName ? 'search' : 'div';
 
 	return (
-		<Wrapper { ...blockProps }>
+		<>
 			{ controls }
-
-			{ showLabel && (
-				<RichText
-					identifier="label"
-					className={ labelClassnames }
-					aria-label={ __( 'Label text' ) }
-					placeholder={ __( 'Add label…' ) }
-					withoutInteractiveFormatting
-					value={ label }
-					onChange={ ( html ) => setAttributes( { label: html } ) }
-					style={ typographyProps.style }
-				/>
-			) }
-
-			<ResizableBox
-				size={ {
-					width:
-						width === undefined
-							? 'auto'
-							: `${ width }${ widthUnit }`,
-					height: 'auto',
-				} }
-				className={ clsx(
-					'wp-block-search__inside-wrapper',
-					isButtonPositionInside ? borderProps.className : undefined
-				) }
-				style={ getWrapperStyles() }
-				minWidth={ MIN_WIDTH }
-				enable={ getResizableSides() }
-				onResizeStart={ ( event, direction, elt ) => {
-					setAttributes( {
-						width: parseInt( elt.offsetWidth, 10 ),
-						widthUnit: 'px',
-					} );
-					toggleSelection( false );
-				} }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					setAttributes( {
-						width: parseInt( width + delta.width, 10 ),
-					} );
-					toggleSelection( true );
-				} }
-				showHandle={ isSelected }
-			>
-				{ ( isButtonPositionInside ||
-					isButtonPositionOutside ||
-					hasOnlyButton ) && (
-					<>
-						{ renderTextField() }
-						{ renderButton() }
-					</>
+			<Wrapper { ...blockProps }>
+				{ showLabel && (
+					<RichText
+						identifier="label"
+						className={ labelClassnames }
+						aria-label={ __( 'Label text' ) }
+						placeholder={ __( 'Add label…' ) }
+						withoutInteractiveFormatting
+						value={ label }
+						onChange={ ( html ) =>
+							setAttributes( { label: html } )
+						}
+						style={ typographyProps.style }
+					/>
 				) }
 
-				{ hasNoButton && renderTextField() }
-			</ResizableBox>
-		</Wrapper>
+				<ResizableBox
+					size={ {
+						width:
+							width === undefined
+								? 'auto'
+								: `${ width }${ widthUnit }`,
+						height: 'auto',
+					} }
+					className={ clsx(
+						'wp-block-search__inside-wrapper',
+						isButtonPositionInside
+							? borderProps.className
+							: undefined
+					) }
+					style={ getWrapperStyles() }
+					minWidth={ MIN_WIDTH }
+					enable={ getResizableSides() }
+					onResizeStart={ ( event, direction, elt ) => {
+						setAttributes( {
+							width: parseInt( elt.offsetWidth, 10 ),
+							widthUnit: 'px',
+						} );
+						toggleSelection( false );
+					} }
+					onResizeStop={ ( event, direction, elt, delta ) => {
+						setAttributes( {
+							width: parseInt( width + delta.width, 10 ),
+						} );
+						toggleSelection( true );
+					} }
+					showHandle={ isSelected }
+				>
+					{ ( isButtonPositionInside ||
+						isButtonPositionOutside ||
+						hasOnlyButton ) && (
+						<>
+							{ renderTextField() }
+							{ renderButton() }
+						</>
+					) }
+
+					{ hasNoButton && renderTextField() }
+				</ResizableBox>
+			</Wrapper>
+		</>
 	);
 }
