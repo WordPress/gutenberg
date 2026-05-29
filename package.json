@@ -86,7 +86,6 @@
 		"sass": "^1.54.0",
 		"sass-embedded": "^1.97.2",
 		"sass-loader": "16.0.3",
-		"source-map": "0.6.1",
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "6.0.2",
