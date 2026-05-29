@@ -222,7 +222,9 @@ function Iframe( {
 				if ( ! isPreviewMode ) {
 					// eslint-disable-next-line no-console
 					console.warn(
-						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+						`The stylesheet "${ compatStyle.id }" contains selectors targeting the block editor (.editor-styles-wrapper or .wp-block) and was copied into the editor iframe for compatibility. ` +
+							`To silence this warning: if the stylesheet is intended for block editor content, register it via the \`style\` or \`editorStyle\` fields in block.json, or use the \`enqueue_block_assets\` hook. ` +
+							`If it is intended for the admin UI only, scope its selectors to avoid block editor class names.`,
 						compatStyle
 					);
 				}
