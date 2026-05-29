@@ -27,7 +27,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registers a block for tests when the block is not already registered.
+	 * Registers a block for tests.
+	 *
+	 * If `$selectors` or `$supports` are provided, the block is force-registered
+	 * with those overrides (unregistering any existing registration first) so
+	 * tests get a deterministic block-type shape regardless of what the
+	 * production block.json declares. Without overrides, an existing
+	 * registration is left in place.
 	 *
 	 * @param string $block_name Block name.
 	 * @param array  $selectors  Optional block selectors (e.g. `['root' => '.foo .bar']`).
@@ -35,9 +41,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @return WP_Block_Type
 	 */
 	private function ensure_block_registered( $block_name, $selectors = array(), $supports = array() ) {
+		$has_overrides    = ! empty( $selectors ) || ! empty( $supports );
 		$registered_block = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( $registered_block ) {
+		if ( $registered_block && ! $has_overrides ) {
 			return $registered_block;
+		}
+		if ( $registered_block ) {
+			unregister_block_type( $block_name );
 		}
 
 		$this->test_block_name = $block_name;
@@ -1554,14 +1564,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * class declared on the block type's `selectors.states`.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
-	 * @covers ::gutenberg_get_custom_state_suffix
 	 */
 	public function test_custom_state_generates_class_scoped_css() {
 		$this->ensure_block_registered(
 			'core/navigation-link',
 			array(
 				'states' => array(
-					'@current' => '.wp-block-navigation .current-menu-item',
+					'@current' => '.current-menu-item',
 				),
 			)
 		);
@@ -1600,7 +1609,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'core/navigation-link',
 			array(
 				'states' => array(
-					'@current' => '.wp-block-navigation .current-menu-item',
+					'@current' => '.current-menu-item',
 				),
 			)
 		);
@@ -1642,7 +1651,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'core/navigation-link',
 			array(
 				'states' => array(
-					'@current' => '.wp-block-navigation .current-menu-item',
+					'@current' => '.current-menu-item',
 				),
 			)
 		);

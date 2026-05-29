@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ export const RESPONSIVE_STATE_LABELS = {
 };
 
 export const CUSTOM_STATE_LABELS = {
-	'@current': __( 'Current' ),
+	'@current': _x( 'Current', 'block style state for the active menu item' ),
 };
 
 // Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS

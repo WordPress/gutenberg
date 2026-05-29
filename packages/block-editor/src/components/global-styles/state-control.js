@@ -1,10 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { useMemo } from '@wordpress/element';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { check, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
+
+function buildOptions( states ) {
+	return [
+		{ label: __( 'Default' ), value: 'default' },
+		...states.map( ( state ) => ( {
+			label: state.label,
+			value: state.value,
+		} ) ),
+	];
+}
 
 /**
  * State control for managing viewport, custom (class-based), and pseudo-state styles.
@@ -37,6 +48,19 @@ export default function StateControl( {
 	showText = true,
 	popoverProps = {},
 } ) {
+	const viewportOptions = useMemo(
+		() => buildOptions( viewportStates ),
+		[ viewportStates ]
+	);
+	const customStateOptions = useMemo(
+		() => buildOptions( customStates ),
+		[ customStates ]
+	);
+	const pseudoStateOptions = useMemo(
+		() => buildOptions( pseudoStates ),
+		[ pseudoStates ]
+	);
+
 	if (
 		! viewportStates.length &&
 		! customStates.length &&
@@ -44,28 +68,6 @@ export default function StateControl( {
 	) {
 		return null;
 	}
-
-	const viewportOptions = [
-		{ label: __( 'Default' ), value: 'default' },
-		...viewportStates.map( ( state ) => ( {
-			label: state.label,
-			value: state.value,
-		} ) ),
-	];
-	const customStateOptions = [
-		{ label: __( 'Default' ), value: 'default' },
-		...customStates.map( ( state ) => ( {
-			label: state.label,
-			value: state.value,
-		} ) ),
-	];
-	const pseudoStateOptions = [
-		{ label: __( 'Default' ), value: 'default' },
-		...pseudoStates.map( ( state ) => ( {
-			label: state.label,
-			value: state.value,
-		} ) ),
-	];
 
 	const hasViewportOptions = viewportStates.length > 0;
 	const hasCustomStateOptions = customStates.length > 0;
@@ -179,7 +181,12 @@ export default function StateControl( {
 								</MenuGroup>
 							) }
 							{ hasCustomStateOptions && (
-								<MenuGroup label={ __( 'Item' ) }>
+								<MenuGroup
+									label={ _x(
+										'Item',
+										'block style state group for per-item states'
+									) }
+								>
 									{ customStateOptions.map( ( option ) => (
 										<MenuItem
 											key={ `custom-${ option.value }` }

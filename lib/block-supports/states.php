@@ -237,33 +237,6 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 }
 
 /**
- * Returns the CSS selector suffix for a custom (class-based) state, by
- * extracting the trailing class/pseudo segment from the block type's
- * `selectors.states[ $state ]` entry.
- *
- * Example: for `@current` on `core/navigation-link` where
- * `selectors.states['@current'] = ".wp-block-navigation .current-menu-item"`,
- * this returns `.current-menu-item`. The leading scoping portion is dropped
- * because state styles are already scoped by the per-instance `.wp-states-X`
- * class.
- *
- * @param WP_Block_Type $block_type The registered block type.
- * @param string        $state      The custom state key, e.g. `'@current'`.
- * @return string|null The CSS suffix (e.g. `.current-menu-item`), or null if
- *                     no selector is declared for this state.
- */
-function gutenberg_get_custom_state_suffix( $block_type, $state ) {
-	$state_selector = $block_type->selectors['states'][ $state ] ?? null;
-	if ( ! is_string( $state_selector ) || '' === trim( $state_selector ) ) {
-		return null;
-	}
-	if ( preg_match( '/(\.[a-zA-Z0-9_-]+(?:\:[a-zA-Z0-9_-]+)?)\s*$/', $state_selector, $matches ) ) {
-		return $matches[1];
-	}
-	return null;
-}
-
-/**
  * Generates rule descriptors for a custom state's styles, including any nested
  * pseudo-state compound (e.g. `@current` + `:hover`).
  *
@@ -434,10 +407,17 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 
 	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
 	$supported_custom_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_CUSTOM_STATES[ $block_name ] ?? array();
-	$custom_state_suffixes   = array();
+	/*
+	 * `selectors.states[<state>]` declares a CSS suffix that is appended to the
+	 * per-instance scope class to produce the state selector. For example,
+	 * '@current' on the navigation-link block declares '.current-menu-item',
+	 * so the final selector is `.wp-states-XXXX.current-menu-item`. The block
+	 * must declare a non-empty string for the state to be honored.
+	 */
+	$custom_state_suffixes = array();
 	foreach ( $supported_custom_states as $custom_state ) {
-		$suffix = gutenberg_get_custom_state_suffix( $block_type, $custom_state );
-		if ( $suffix ) {
+		$suffix = $block_type->selectors['states'][ $custom_state ] ?? null;
+		if ( is_string( $suffix ) && '' !== trim( $suffix ) ) {
 			$custom_state_suffixes[ $custom_state ] = $suffix;
 		}
 	}

@@ -754,7 +754,13 @@ function BlockStyleControls( {
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const { globalBlockStyles, selectedState, showStateOnCanvas } = useSelect(
+	const {
+		globalBlockStyles,
+		selectedState,
+		showStateOnCanvas,
+		isPseudoSelectorState,
+		isCustomSelectorState,
+	} = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
 			const {
@@ -762,18 +768,19 @@ function BlockStyleControls( {
 				isSelectedBlockStyleStateShownOnCanvas,
 			} = unlock( blockEditorSelect );
 			const editorSettings = blockEditorSelect.getSettings();
+			const currentState = getSelectedBlockStyleState( clientId );
 			return {
 				globalBlockStyles:
 					editorSettings?.[ globalStylesDataKey ]?.blocks?.[ name ],
-				selectedState: getSelectedBlockStyleState( clientId ),
+				selectedState: currentState,
 				showStateOnCanvas:
 					isSelectedBlockStyleStateShownOnCanvas( clientId ),
+				isPseudoSelectorState: hasPseudoBlockStyleState( currentState ),
+				isCustomSelectorState: hasCustomBlockStyleState( currentState ),
 			};
 		},
 		[ clientId, name ]
 	);
-	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
-	const isCustomSelectorState = hasCustomBlockStyleState( selectedState );
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
