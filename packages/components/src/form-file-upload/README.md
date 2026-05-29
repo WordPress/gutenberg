@@ -65,7 +65,7 @@ Whether to allow multiple selection of files or not.
 
 ### `onChange`
 
- - Type: `ChangeEventHandler<HTMLInputElement> | undefined`
+ - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement> | undefined`
  - Required: Yes
 
 Callback function passed directly to the `input` file element.

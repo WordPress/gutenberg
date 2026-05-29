@@ -145,9 +145,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 		} | null >( null );
 		// Mirror of `temporaryLayout` read synchronously on drag end —
 		// the state update from `handleDragMove` may still be batched.
-		const latestLayoutRef = useRef<
-			DashboardGridLayoutItem[] | undefined
-		>();
+		const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >(
+			undefined
+		);
 		// Cursor center at the last applied reorder. Used to skip the
 		// cascade of re-measured `onDragMove` events after a layout
 		// change, when the cursor has not actually moved.
@@ -315,10 +315,13 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 
 					// Strip `actionableArea` so it does not leak to the DOM;
 					// the grid lifts it to a slot separately.
-					const { actionableArea } = child.props;
+					const typedChild = child as React.ReactElement< {
+						actionableArea?: React.ReactNode;
+					} >;
+					const { actionableArea } = typedChild.props;
 					const stripped =
 						actionableArea !== undefined
-							? cloneElement( child, {
+							? cloneElement( typedChild, {
 									actionableArea: undefined,
 							  } )
 							: child;

@@ -3,13 +3,14 @@
  */
 import {
 	createPortal,
-	findDOMNode,
 	flushSync,
-	/* eslint-disable react/no-deprecated */
-	render,
-	hydrate,
-	unmountComponentAtNode,
-	/* eslint-enable react/no-deprecated */
+	preconnect,
+	prefetchDNS,
+	preinit,
+	preinitModule,
+	preload,
+	preloadModule,
+	useFormStatus,
 } from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
@@ -25,13 +26,6 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 export { createPortal };
 
 /**
- * Finds the dom node of a React component.
- *
- * @param {React.ComponentType} component Component's instance.
- */
-export { findDOMNode };
-
-/**
  * Forces React to flush any updates inside the provided callback synchronously.
  *
  * @param {Function} callback Callback to run synchronously.
@@ -39,20 +33,60 @@ export { findDOMNode };
 export { flushSync };
 
 /**
- * Renders a given element into the target DOM node.
+ * Eagerly connect to a server that you expect to load resources from.
  *
- * @deprecated since WordPress 6.2.0. Use `createRoot` instead.
- * @see https://react.dev/reference/react-dom/render
+ * @since 7.1.0
+ * @see https://react.dev/reference/react-dom/preconnect
  */
-export { render };
+export { preconnect };
 
 /**
- * Hydrates a given element into the target DOM node.
+ * Eagerly look up the IP of a server that you expect to load resources from.
  *
- * @deprecated since WordPress 6.2.0. Use `hydrateRoot` instead.
- * @see https://react.dev/reference/react-dom/hydrate
+ * @since 7.1.0
+ * @see https://react.dev/reference/react-dom/prefetchDNS
  */
-export { hydrate };
+export { prefetchDNS };
+
+/**
+ * Eagerly fetch and evaluate a stylesheet or external script.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react-dom/preinit
+ */
+export { preinit };
+
+/**
+ * Eagerly fetch and evaluate an ESM module.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react-dom/preinitModule
+ */
+export { preinitModule };
+
+/**
+ * Eagerly fetch a resource such as a stylesheet, font, or external script.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react-dom/preload
+ */
+export { preload };
+
+/**
+ * Eagerly fetch an ESM module that you expect to use.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react-dom/preloadModule
+ */
+export { preloadModule };
+
+/**
+ * Read the status information of the parent form.
+ *
+ * @since 7.1.0
+ * @see https://react.dev/reference/react-dom/hooks/useFormStatus
+ */
+export { useFormStatus };
 
 /**
  * Creates a new React root for the target DOM node.
@@ -69,11 +103,3 @@ export { createRoot };
  * @see https://react.dev/reference/react-dom/client/hydrateRoot
  */
 export { hydrateRoot };
-
-/**
- * Removes any mounted element from the target DOM node.
- *
- * @deprecated since WordPress 6.2.0. Use `root.unmount()` instead.
- * @see https://react.dev/reference/react-dom/unmountComponentAtNode
- */
-export { unmountComponentAtNode };

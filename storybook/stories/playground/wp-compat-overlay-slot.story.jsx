@@ -1,16 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { Modal, Popover, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import {
+	Autocomplete,
+	Combobox,
+	Select,
+	SelectControl,
+	Tooltip,
+} from '@wordpress/ui';
 
-/**
- * Internal dependencies
- */
-import * as Tooltip from '../../../packages/ui/src/tooltip';
-import * as Select from '../../../packages/ui/src/form/primitives/select';
-import { SelectControl } from '../../../packages/ui/src/form/select-control';
-import * as Autocomplete from '../../../packages/ui/src/form/primitives/autocomplete';
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 const selectItems = [
@@ -25,10 +22,15 @@ const autocompleteItems = [
 	{ id: '3', value: 'Item 3' },
 ];
 
+const inputWrapperStyle = {
+	padding:
+		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
+};
+
 // Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
-// `SelectControl`, `Autocomplete`) inside a `@wordpress/components`
-// Modal / Popover should sit above the components-side overlay via the
-// compat overlay slot.
+// `Combobox`, `SelectControl`, `Autocomplete`) inside a
+// `@wordpress/components` Modal / Popover should sit above the
+// components-side overlay via the compat overlay slot.
 export default {
 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
 	decorators: [ WithWpCompatOverlaySlot ],
@@ -81,6 +83,37 @@ export const InsideComponentsModal = {
 									) ) }
 								</Select.Popup>
 							</Select.Root>
+						</div>
+
+						<div style={ { marginTop: '1rem' } }>
+							<Combobox.Root
+								defaultValue={ selectItems[ 0 ] }
+								items={ selectItems }
+							>
+								<Combobox.Trigger aria-label="Combobox primitive" />
+								<Combobox.Popup>
+									<div style={ inputWrapperStyle }>
+										<Combobox.Input placeholder="Search" />
+									</div>
+									<Combobox.Empty>
+										No results found.
+									</Combobox.Empty>
+									<Combobox.List>
+										<Combobox.ListBody>
+											<Combobox.Collection>
+												{ ( item ) => (
+													<Combobox.Item
+														key={ item.value }
+														value={ item }
+													>
+														{ item.label }
+													</Combobox.Item>
+												) }
+											</Combobox.Collection>
+										</Combobox.ListBody>
+									</Combobox.List>
+								</Combobox.Popup>
+							</Combobox.Root>
 						</div>
 
 						<div style={ { marginTop: '1rem' } }>
@@ -173,6 +206,37 @@ export const InsideComponentsPopover = {
 										) ) }
 									</Select.Popup>
 								</Select.Root>
+							</div>
+
+							<div style={ { marginTop: '1rem' } }>
+								<Combobox.Root
+									defaultValue={ selectItems[ 0 ] }
+									items={ selectItems }
+								>
+									<Combobox.Trigger aria-label="Combobox primitive" />
+									<Combobox.Popup>
+										<div style={ inputWrapperStyle }>
+											<Combobox.Input placeholder="Search" />
+										</div>
+										<Combobox.Empty>
+											No results found.
+										</Combobox.Empty>
+										<Combobox.List>
+											<Combobox.ListBody>
+												<Combobox.Collection>
+													{ ( item ) => (
+														<Combobox.Item
+															key={ item.value }
+															value={ item }
+														>
+															{ item.label }
+														</Combobox.Item>
+													) }
+												</Combobox.Collection>
+											</Combobox.ListBody>
+										</Combobox.List>
+									</Combobox.Popup>
+								</Combobox.Root>
 							</div>
 
 							<div style={ { marginTop: '1rem' } }>
