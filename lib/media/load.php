@@ -272,34 +272,6 @@ function gutenberg_get_chromium_major_version(): ?int {
 }
 
 /**
- * Determines whether Document-Isolation-Policy should be used for cross-origin isolation.
- *
- * DIP is only available in Chromium 137+. The result can be overridden via the
- * `gutenberg_use_document_isolation_policy` filter.
- *
- * @return bool Whether DIP is supported and should be used.
- */
-function gutenberg_should_use_document_isolation_policy(): bool {
-	$chromium_version = gutenberg_get_chromium_major_version();
-
-	/**
-	 * Filters whether to use Document-Isolation-Policy for cross-origin isolation.
-	 *
-	 * Document-Isolation-Policy provides per-document cross-origin isolation
-	 * without affecting other iframes on the page, avoiding breakage of plugins
-	 * whose iframes lose credentials/DOM access.
-	 *
-	 * @since 21.8.0
-	 *
-	 * @param bool $use_dip Whether DIP is supported and should be used.
-	 */
-	return (bool) apply_filters(
-		'gutenberg_use_document_isolation_policy',
-		null !== $chromium_version && $chromium_version >= 137
-	);
-}
-
-/**
  * Enables cross-origin isolation in the block editor.
  *
  * Required for enabling SharedArrayBuffer for WebAssembly-based
@@ -320,6 +292,13 @@ function gutenberg_set_up_cross_origin_isolation() {
 	}
 
 	if ( ! $screen->is_block_editor() && 'site-editor' !== $screen->id && ! ( 'widgets' === $screen->id && wp_use_widgets_block_editor() ) ) {
+		return;
+	}
+
+	// Skip when rendering the classic-theme home route, which shows the site
+	// preview in an iframe and must reach its `contentDocument` to neutralize
+	// interactive elements — DIP would block that.
+	if ( 'site-editor' === $screen->id && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
 		return;
 	}
 
@@ -357,38 +336,30 @@ remove_action( 'load-site-editor.php', 'wp_set_up_cross_origin_isolation' );
 remove_action( 'load-widgets.php', 'wp_set_up_cross_origin_isolation' );
 
 /**
- * Sends the Document-Isolation-Policy header on the classic-theme site preview frame.
- *
- * The site editor embeds the front end in a same-origin `wp_site_preview` iframe.
- * Sending the same header lets that iframe join the editor's agent cluster,
- * so the editor can still reach its `contentDocument`.
- */
-function gutenberg_send_site_preview_isolation_header(): void {
-	// Mirror core's wp_initialize_site_preview_hooks() gating so the header is
-	// only sent for genuine site preview frame requests.
-	if (
-		! isset( $_GET['wp_site_preview'] ) ||
-		1 !== (int) $_GET['wp_site_preview'] ||
-		! current_user_can( 'edit_theme_options' )
-	) {
-		return;
-	}
-
-	if ( ! gutenberg_should_use_document_isolation_policy() ) {
-		return;
-	}
-
-	header( 'Document-Isolation-Policy: isolate-and-credentialless' );
-}
-add_action( 'send_headers', 'gutenberg_send_site_preview_isolation_header' );
-
-/**
  * Sends the Document-Isolation-Policy header for cross-origin isolation.
  *
  * Uses an output buffer to add crossorigin="anonymous" where needed.
  */
 function gutenberg_start_cross_origin_isolation_output_buffer(): void {
-	if ( ! gutenberg_should_use_document_isolation_policy() ) {
+	$chromium_version = gutenberg_get_chromium_major_version();
+
+	/**
+	 * Filters whether to use Document-Isolation-Policy for cross-origin isolation.
+	 *
+	 * Document-Isolation-Policy provides per-document cross-origin isolation
+	 * without affecting other iframes on the page, avoiding breakage of plugins
+	 * whose iframes lose credentials/DOM access.
+	 *
+	 * @since 21.8.0
+	 *
+	 * @param bool $use_dip Whether DIP is supported and should be used.
+	 */
+	$use_dip = apply_filters(
+		'gutenberg_use_document_isolation_policy',
+		null !== $chromium_version && $chromium_version >= 137
+	);
+
+	if ( ! $use_dip ) {
 		return;
 	}
 
