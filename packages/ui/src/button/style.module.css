@@ -136,6 +136,15 @@
 		}
 	}
 
+	.content {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		gap: inherit;
+		max-width: 100%;
+		min-width: 0;
+	}
+
 	.is-small {
 		--wp-ui-button-padding-block: 0;
 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
@@ -227,7 +236,7 @@
 			color: transparent;
 		}
 
-		* {
+		.content {
 			opacity: 0;
 		}
 
