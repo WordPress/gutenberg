@@ -18,8 +18,6 @@ import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-too
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
 import {
 	getStyleForState,
-	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 } from './hooks/block-style-state';
@@ -106,8 +104,6 @@ lock( privateApis, {
 	useHasBlockToolbar,
 	cleanEmptyObject,
 	getStyleForState,
-	hasPseudoBlockStyleState,
-	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 	usePrivateStyleOverride,
