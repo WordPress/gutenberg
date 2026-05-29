@@ -36,10 +36,6 @@ neither side has to know about the other:
 - Contract types: `WidgetType`, `WidgetName`, `WidgetRenderProps`,
   `ResolveWidgetModule`.
 
-Anything not exported here (for example `WidgetTypeMetadata`,
-`getLazyWidgetComponent`, or the internal `WidgetModule` shape) is an
-implementation detail and should not be imported from outside the kit.
-
 ## How discovery works
 
 The data flow uses `@wordpress/core-data` and dynamic module imports. There is
@@ -74,5 +70,4 @@ when to import; they do not register widgets.
 This module lives inside the dashboard route while its API stabilizes. Because
 both hosts and widget authors consume it, its destination is a top-level,
 private (unpublished) package, `@wordpress/widget-primitives`, in the same vein as
-`@wordpress/grid`. The current layout (`index.ts`, `types.ts`, `hooks/`,
-`tools/`) already matches that future shape.
+`@wordpress/grid`.

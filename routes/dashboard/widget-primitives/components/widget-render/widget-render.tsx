@@ -9,26 +9,9 @@ import { getLazyWidgetComponent } from '../../tools/get-lazy-widget-component';
 import type { ResolveWidgetModule, WidgetType } from '../../types';
 
 interface WidgetRenderProps< Item = unknown > {
-	/**
-	 * The widget type to render.
-	 */
 	widgetType: WidgetType< Item >;
-
-	/**
-	 * Attributes the widget renders with.
-	 */
 	attributes?: Item;
-
-	/**
-	 * Callback to update the widget's attributes.
-	 */
 	setAttributes?: ( next: Partial< Item > ) => void;
-
-	/*
-	 * Host-provided resolver for the `renderModule` script. Required
-	 * because `getLazyWidgetComponent` does not default it; hosts that
-	 * want the standard dynamic-import behavior can pass it directly.
-	 */
 	resolveWidgetModule: ResolveWidgetModule;
 }
 
