@@ -261,7 +261,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			);
 		}
 
-		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
+		$content_term_id = self::get_or_create_term_id(
 			Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
 			__( 'Content', 'gutenberg' )
 		);
@@ -790,5 +790,34 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		);
 
 		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
+	 * Resolve the `wp_guideline_type` term by slug, creating it if missing.
+	 *
+	 * Used by the create flow to attach the freshly-inserted content guideline
+	 * to the `content` term on first use, before the term is otherwise needed.
+	 *
+	 * @param string $slug Term slug.
+	 * @param string $name Human-readable term name, used when creating.
+	 * @return int|WP_Error Term ID on success, WP_Error on failure.
+	 */
+	private static function get_or_create_term_id( string $slug, string $name ) {
+		$term = get_term_by( 'slug', $slug, Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		if ( $term ) {
+			return (int) $term->term_id;
+		}
+
+		$inserted = wp_insert_term(
+			$name,
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'slug' => $slug )
+		);
+
+		if ( is_wp_error( $inserted ) ) {
+			return $inserted;
+		}
+
+		return (int) $inserted['term_id'];
 	}
 }

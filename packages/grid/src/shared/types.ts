@@ -102,9 +102,16 @@ export interface GridOverlayRenderProps {
 	/**
 	 * Row height in pixels for surfaces with uniform rows. Omitted on
 	 * surfaces with content-driven heights (lanes) or when row height
-	 * is `'auto'`; in those cases the overlay paints columns only.
+	 * is `'auto'`; in those cases row markers are omitted.
 	 */
 	rowHeight?: number;
+
+	/**
+	 * Number of row tracks to mirror in each column. Derived from the
+	 * grid container height when `rowHeight` is numeric; omitted when
+	 * row height is unknown.
+	 */
+	rows?: number;
 
 	/**
 	 * Whether the overlay should be visible. Surfaces render the

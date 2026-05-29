@@ -19,15 +19,17 @@ import type {
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { WidgetChrome } from '../widget-chrome';
+import { DashboardWidgetChrome } from '../dashboard-widget-chrome';
+import { WidgetSettingsToolbar } from '../widget-settings';
+import { WidgetLayoutToolbar } from './widget-layout-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
 import styles from './widgets.module.css';
 import type {
 	DashboardWidget,
 	GridTilePlacement,
 	MasonryTilePlacement,
-	WidgetName,
 } from '../../types';
+import type { WidgetName } from '../../../widget-primitives';
 
 // Floor applied as `minColumnWidth` on every surface render. Acts as a
 // safety net for stored settings that predate the layered model (where
@@ -103,10 +105,11 @@ export interface WidgetsProps {
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
-		const { layout, onLayoutChange, editMode, gridSettings } =
+		const { layout, onLayoutChange, editMode, gridSettings, widgetTypes } =
 			useDashboardInternalContext();
-
 		const isMasonry = gridSettings.model === 'masonry';
+		const minColumnWidth =
+			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
 
 		const gridLayout = useMemo(
 			() =>
@@ -130,17 +133,38 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			[ layout, onLayoutChange ]
 		);
 
-		const children = layout.map( ( widget, index ) => (
-			<div
-				key={ widget.uuid }
-				className={ clsx( styles.tile, {
-					[ styles.tileEditMode ]: editMode,
-				} ) }
-				tabIndex={ editMode ? 0 : undefined }
-			>
-				<WidgetChrome widget={ widget } index={ index } />
-			</div>
-		) );
+		const children = layout.map( ( widget, index ) => {
+			const widgetType = widgetTypes.find(
+				( type ) => type.name === widget.type
+			);
+			const hasSettings = !! widgetType?.attributes?.length;
+
+			// One slot, chosen by mode: layout toolbar while customizing,
+			// settings toolbar otherwise (undefined when nothing to configure).
+			let actionableArea: React.ReactNode;
+			if ( editMode ) {
+				actionableArea = <WidgetLayoutToolbar widget={ widget } />;
+			} else if ( hasSettings && widgetType ) {
+				actionableArea = (
+					<WidgetSettingsToolbar
+						widget={ widget }
+						widgetType={ widgetType }
+					/>
+				);
+			}
+
+			return (
+				<DashboardWidgetChrome
+					key={ widget.uuid }
+					widget={ widget }
+					index={ index }
+					className={ clsx( styles.tile, {
+						[ styles.tileEditMode ]: editMode,
+					} ) }
+					actionableArea={ actionableArea }
+				/>
+			);
+		} );
 
 		const renderDragPreview = useCallback(
 			( { children: clone }: DragPreviewRenderProps ) => (
@@ -155,9 +179,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			renderResizeHandle:
 				WidgetResizeHandle as React.ComponentType< ResizeHandleRenderProps >,
 		};
-
-		const minColumnWidth =
-			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
 
 		const surface: React.ReactNode = isMasonry ? (
 			<DashboardLanes

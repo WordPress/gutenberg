@@ -131,6 +131,7 @@ function GuidelinesPage() {
 										<li
 											key={ item.slug }
 											className="guidelines__list-item"
+											data-slug={ item.slug }
 										>
 											<GuidelineAccordion
 												title={ item.title }

@@ -14,7 +14,8 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import { useDashboardInternalContext } from '../context/dashboard-context';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget, WidgetGridSettings, WidgetType } from '../types';
+import type { DashboardWidget, WidgetGridSettings } from '../types';
+import type { WidgetType } from '../../widget-primitives';
 
 const widgetTypes: WidgetType[] = [];
 
@@ -30,8 +31,8 @@ interface ProbeApi {
 	editMode: boolean;
 	mutate: ( next: DashboardWidget[] ) => void;
 	mutateGridSettings: ( next: WidgetGridSettings ) => void;
-	commit: () => void;
-	cancel: () => void;
+	commit: ( options?: { exitEditMode?: boolean } ) => void;
+	cancel: ( options?: { exitEditMode?: boolean } ) => void;
 }
 
 const probeRef: { current: ProbeApi | null } = { current: null };
@@ -399,5 +400,36 @@ describe( 'WidgetDashboard staging layer', () => {
 			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
 			expect( onGridSettingsChange ).not.toHaveBeenCalled();
 		} );
+	} );
+
+	it( 'stays in edit mode when commit or cancel passes exitEditMode: false', () => {
+		const onLayoutChange = jest.fn();
+		render(
+			<Harness
+				layout={ initialLayout }
+				onLayoutChange={ onLayoutChange }
+			/>
+		);
+
+		act( () => {
+			readProbe().mutate( [ initialLayout[ 0 ] ] );
+		} );
+
+		act( () => {
+			readProbe().commit( { exitEditMode: false } );
+		} );
+
+		expect( readProbe().editMode ).toBe( true );
+		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+
+		act( () => {
+			readProbe().mutate( [ initialLayout[ 0 ] ] );
+		} );
+
+		act( () => {
+			readProbe().cancel( { exitEditMode: false } );
+		} );
+
+		expect( readProbe().editMode ).toBe( true );
 	} );
 } );

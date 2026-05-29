@@ -13,7 +13,7 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { createDashboardWidget } from '../../utils/create-dashboard-widget';
 import { WidgetRender } from '../widget-render';
 import styles from './widget-picker.module.css';
-import type { WidgetType } from '../../types';
+import type { WidgetType } from '../../../widget-primitives';
 
 const DEFAULT_VIEW: View = {
 	type: 'pickerGrid',
@@ -32,7 +32,7 @@ function WidgetPreview( { item }: { item: WidgetType } ) {
 	);
 
 	return (
-		<div className={ styles.preview } { ...{ inert: '' } }>
+		<div className={ styles.preview } inert>
 			<Suspense fallback={ null }>
 				<WidgetRender widget={ exampleWidget } widgetType={ item } />
 			</Suspense>

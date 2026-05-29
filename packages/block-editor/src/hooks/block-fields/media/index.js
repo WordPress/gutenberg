@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -92,11 +92,11 @@ function MediaThumbnail( { data, field, attachment, config } ) {
 		}
 
 		if ( icon ) {
-			return <Icon icon={ icon } size={ 20 } />;
+			return <WCIcon icon={ icon } size={ 20 } />;
 		}
 	}
 
-	return <Icon icon={ mediaIcon } size={ 20 } />;
+	return <WCIcon icon={ mediaIcon } size={ 20 } />;
 }
 
 export default function Media( { data, field, onChange, config = {} } ) {

@@ -1,10 +1,18 @@
 /**
+ * WordPress dependencies
+ */
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import { toHTMLString } from '../../to-html-string';
 import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
 import { getTextContent } from '../../get-text-content';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {
@@ -31,11 +39,18 @@ export default ( props ) => ( element ) => {
 	}
 
 	const { defaultView } = element.ownerDocument;
-
-	defaultView.addEventListener( 'copy', onCopy );
-	defaultView.addEventListener( 'cut', onCopy );
+	const unsubscribeCopy = subscribeDelegatedListener(
+		defaultView,
+		'copy',
+		onCopy
+	);
+	const unsubscribeCut = subscribeDelegatedListener(
+		defaultView,
+		'cut',
+		onCopy
+	);
 	return () => {
-		defaultView.removeEventListener( 'copy', onCopy );
-		defaultView.removeEventListener( 'cut', onCopy );
+		unsubscribeCopy();
+		unsubscribeCut();
 	};
 };
