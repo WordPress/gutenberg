@@ -504,7 +504,7 @@
 		"parent": "filters"
 	},
 	{
-		"title": "Interactivity API Reference",
+		"title": "Interactivity API",
 		"slug": "interactivity-api",
 		"markdown_source": "../docs/reference-guides/interactivity-api/README.md",
 		"parent": "reference-guides"

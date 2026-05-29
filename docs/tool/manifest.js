@@ -3,10 +3,10 @@
 /**
  * External dependencies
  */
-const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
+const { pascalCase } = require( 'change-case' );
+const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
@@ -113,13 +113,30 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		}
 		let title = pascalCase( slug );
 		const markdownSource = fs.readFileSync( fileName, 'utf8' );
+
+		// Check for frontmatter and extract sidebar_label if present
+		let sidebarLabel = null;
+		const frontmatterMatch = markdownSource.match(
+			/^---\n([\s\S]*?)\n---/
+		);
+		if ( frontmatterMatch ) {
+			const sidebarLabelMatch = frontmatterMatch[ 1 ].match(
+				/^sidebar_label:\s*(.+)$/m
+			);
+			if ( sidebarLabelMatch ) {
+				sidebarLabel = sidebarLabelMatch[ 1 ].trim();
+			}
+		}
+
+		// Extract H1 for title
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {
 			title = titleMarkdown[ 1 ];
 		}
 
+		// Use sidebar_label if available, otherwise use title
 		pageItems.push( {
-			title,
+			title: sidebarLabel || title,
 			slug,
 			markdown_source: `${ baseRepoUrl }\/${ fileName }`,
 			parent,
