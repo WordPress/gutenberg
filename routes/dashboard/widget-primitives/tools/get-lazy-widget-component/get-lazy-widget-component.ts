@@ -31,7 +31,7 @@ function isValidWidgetModule( module: unknown ): module is WidgetModule {
 /*
  * Module-level cache keyed by `renderModule`. The lazy component must keep a
  * stable identity across renders: rebuilding it inline (e.g. via `useMemo`)
- * resets the Suspense boundary and the resolved module each time the surface
+ * resets the Suspense boundary and the resolved module each time the host
  * re-renders.
  */
 const componentCache = new Map< string, LazyWidgetComponent >();
@@ -40,7 +40,7 @@ const componentCache = new Map< string, LazyWidgetComponent >();
  * Resolve a widget render module to a `lazy()` React component, cached by
  * `renderModule` id. The first call for a given id builds the lazy wrapper
  * around the resolver; subsequent calls return the same instance so that
- * surfaces and Suspense boundaries can rely on a stable component identity.
+ * hosts and Suspense boundaries can rely on a stable component identity.
  * @param renderModule
  * @param resolveWidgetModule
  */
