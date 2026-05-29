@@ -239,7 +239,20 @@ export function createWordpressExternalsPlugin(
 								packageJson,
 								subpath
 							);
-							if ( ! isScriptModule ) {
+							const isScript = !! packageJson.wpScript;
+
+							// Dual packages (both wpScript and wpScriptModuleExports):
+							// let the active build's format decide which side of
+							// the package this import resolves to. In an IIFE
+							// build the import must round-trip through the script
+							// handle/global, so we yield to the namespace handler
+							// below; in an ESM build it externalizes as a script
+							// module here.
+							let externalize = isScriptModule;
+							if ( isScriptModule && isScript ) {
+								externalize = buildFormat === 'esm';
+							}
+							if ( ! externalize ) {
 								return undefined;
 							}
 
