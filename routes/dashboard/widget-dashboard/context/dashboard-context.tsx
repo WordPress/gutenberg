@@ -134,10 +134,16 @@ interface InternalDashboardContextValue {
 	commitGridModelChange: ( targetModel: WidgetGridModel ) => void;
 
 	/**
-	 * Reverts both staging slices. By default also exits edit mode; pass
-	 * `{ exitEditMode: false }` when dismissing the layout settings drawer.
+	 * Reverts staging slices. By default reverts both layout and grid
+	 * settings and exits edit mode. Pass `{ exitEditMode: false }` when
+	 * dismissing the layout settings drawer. Pass `{ revertLayout: false }`
+	 * to revert only grid settings (preserves in-progress widget layout
+	 * edits while customize mode is active).
 	 */
-	cancel: ( options?: { exitEditMode?: boolean } ) => void;
+	cancel: ( options?: {
+		exitEditMode?: boolean;
+		revertLayout?: boolean;
+	} ) => void;
 
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
@@ -226,18 +232,10 @@ interface ProviderProps {
  * `layout` and `gridSettings`; `commit` publishes whichever slice
  * differs from its committed prop, `cancel` reverts both.
  *
- * Two invariants the provider does not enforce on its own:
- *
- * - The shared commit assumes the two slices are not edited
- *   simultaneously. The bundled `Actions` keeps the layout-edit and
- *   settings-drawer flows mutually exclusive; consumers that compose
- *   a different host must uphold the same invariant or accept the
- *   cross-publish.
- * - Staging re-syncs from the committed props on prop change.
- *   In-flight edits are dropped silently when an external update
- *   (cross-tab commit, reset, websocket push) lands. Consumers that
- *   cannot tolerate this loss should mediate the prop updates before
- *   forwarding them here.
+ * Staging re-syncs from the committed props on prop change. In-flight
+ * edits are dropped silently when an external update (cross-tab commit,
+ * reset, websocket push) lands. Consumers that cannot tolerate this
+ * loss should mediate the prop updates before forwarding them here.
  *
  * @param {ProviderProps} props Provider props
  * @return {React.ReactNode} The provider component.
@@ -315,8 +313,10 @@ export function WidgetDashboardProvider( {
 	);
 
 	const cancel = useCallback(
-		( options?: { exitEditMode?: boolean } ) => {
-			setStagingLayout( committedLayout );
+		( options?: { exitEditMode?: boolean; revertLayout?: boolean } ) => {
+			if ( options?.revertLayout !== false ) {
+				setStagingLayout( committedLayout );
+			}
 			setStagingGridSettings( committedGridSettings );
 			if ( options?.exitEditMode !== false ) {
 				onEditChange?.( false );

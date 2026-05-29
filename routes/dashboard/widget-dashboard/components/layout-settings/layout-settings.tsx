@@ -195,11 +195,11 @@ interface LayoutSettingsProps {
 }
 
 /**
- * Non-modal side drawer for grid-level settings (model, column
- * behavior, row height). Reads from and writes to the staging copy
- * in `useDashboardInternalContext`, so every edit shows up live
- * behind the drawer and is committed or rolled back by the drawer's
- * Save / Cancel buttons.
+ * Modal side drawer for grid-level settings (model, column behavior,
+ * row height). Reads from and writes to the staging copy in
+ * `useDashboardInternalContext`; edits preview through the backdrop
+ * and are committed or rolled back by the drawer's Save / Cancel
+ * buttons.
  *
  * Gap is intentionally absent: the spacing between tiles is a
  * design-system concern (theme / density / viewport tokens) and
@@ -211,11 +211,9 @@ interface LayoutSettingsProps {
  * an Escape press, or any path other than the explicit Cancel/Save
  * buttons is treated as Cancel. None of these exit customize mode.
  *
- * Settings and layout-editing are kept as separate flows on the
- * dashboard (the Layout settings entry that opens this drawer is
- * disabled while edit mode is on), so the drawer's commit never
- * publishes layout edits that the user is in the middle of staging
- * through the toolbar.
+ * Opened from the customize toolbar beside Add widget. Cancel and
+ * dismiss revert only grid settings so in-progress widget layout
+ * edits in the same customize session are preserved.
  *
  * @param {LayoutSettingsProps} props Layout settings props.
  * @return {React.ReactNode} The layout settings component.
@@ -259,7 +257,7 @@ export function LayoutSettings( {
 	);
 
 	const handleCancel = useCallback( () => {
-		cancelStaging( { exitEditMode: false } );
+		cancelStaging( { exitEditMode: false, revertLayout: false } );
 		onOpenChange( false );
 	}, [ cancelStaging, onOpenChange ] );
 
@@ -271,7 +269,7 @@ export function LayoutSettings( {
 	const handleOpenChange = useCallback(
 		( nextOpen: boolean ) => {
 			if ( ! nextOpen && open ) {
-				cancelStaging( { exitEditMode: false } );
+				cancelStaging( { exitEditMode: false, revertLayout: false } );
 			}
 			onOpenChange( nextOpen );
 		},
@@ -283,8 +281,6 @@ export function LayoutSettings( {
 			open={ open }
 			onOpenChange={ handleOpenChange }
 			swipeDirection="right"
-			modal={ false }
-			disablePointerDismissal
 		>
 			<Drawer.Popup size="medium" style={ { marginTop: '32px' } }>
 				<Drawer.Header>
