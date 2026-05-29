@@ -182,26 +182,15 @@
 
 
 /**
- * Outset focus ring.
- *
  * Standard focus rings for the WordPress Design System.
- * Apply `outset-ring__rest` on the element and `outset-ring__focus` inside the
- * relevant pseudo-class at the call site, e.g. `&:focus { @include outset-ring__focus(); }`.
+
+ * Apply `outset-ring__focus` inside the relevant pseudo-class at the call site,
+ * e.g. `&:focus { @include outset-ring__focus(); }`.
  */
-
-@mixin outset-ring__rest() {
-	@media not (prefers-reduced-motion) {
-		transition: outline 0.1s ease-out;
-	}
-
-	// Outline width must be kept at 0 even with a transparent color,
-	// or else the outline will be visible in forced-colors mode.
-	outline: 0 solid transparent;
-	outline-offset: 1px;
-}
 
 @mixin outset-ring__focus() {
 	outline: wpds.wpds-var("--wpds-border-width-focus") solid wpds.wpds-var("--wpds-color-stroke-focus-brand");
+	outline-offset: 1px;
 }
 
 
