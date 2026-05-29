@@ -64,7 +64,7 @@
 		@media not ( prefers-reduced-motion ) {
 			transition: color 0.1s ease-out;
 
-			.content {
+			&:not(.is-unstyled) .content {
 				transition: opacity 0.1s ease-out;
 			}
 		}
@@ -139,7 +139,7 @@
 		}
 	}
 
-	.content {
+	.button:not(.is-unstyled) .content {
 		display: inline-flex;
 		flex: 1 1 auto;
 		justify-content: center;
@@ -231,7 +231,7 @@
 	}
 
 	.is-loading {
-		.content {
+		&:not(.is-unstyled) .content {
 			opacity: 0;
 		}
 
