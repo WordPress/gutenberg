@@ -35,7 +35,8 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useNoteThreads( postId ) {
+export function useNoteThreads( postId, options = {} ) {
+	const { enabled = true } = options;
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -47,7 +48,7 @@ export function useNoteThreads( postId ) {
 		'root',
 		'comment',
 		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
+		{ enabled: enabled && !! postId && typeof postId === 'number' }
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );

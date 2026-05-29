@@ -188,6 +188,49 @@ test.describe( 'Block Notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'shows an unresolved note indicator in List View', async ( {
+		editor,
+		page,
+		pageUtils,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Paragraph with a note' },
+			comment: 'List View note indicator',
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Paragraph without a note' },
+		} );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await expect(
+			listView.locator( '.editor-list-view-sidebar__note-indicator' )
+		).toHaveCount( 1 );
+		await expect(
+			listView.getByText( '1 unresolved note' )
+		).toBeAttached();
+
+		await blockNoteUtils.openBlockNoteSidebar();
+		await page
+			.getByRole( 'treeitem', {
+				name: 'Note: List View note indicator',
+			} )
+			.click();
+		await page.getByRole( 'button', { name: 'Resolve' } ).click();
+
+		await expect(
+			listView.locator( '.editor-list-view-sidebar__note-indicator' )
+		).toHaveCount( 0 );
+		await expect(
+			listView.getByText( '1 unresolved note' )
+		).not.toBeAttached();
+	} );
+
 	test( 'can reopen a resolved note when adding a reply', async ( {
 		page,
 		blockNoteUtils,

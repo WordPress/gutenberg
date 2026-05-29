@@ -7,6 +7,7 @@ import {
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
 	pickPrimaryNote,
+	getUnresolvedNoteCountsByBlock,
 } from '../utils';
 
 function makeRect( top ) {
@@ -313,6 +314,34 @@ describe( 'pickPrimaryNote', () => {
 			{ id: 2, status: 'approved' },
 		];
 		expect( pickPrimaryNote( threads ) ).toBe( threads[ 0 ] );
+	} );
+} );
+
+describe( 'getUnresolvedNoteCountsByBlock', () => {
+	it( 'counts unresolved notes by block client ID', () => {
+		expect(
+			getUnresolvedNoteCountsByBlock( [
+				{ id: 1, blockClientId: 'block-1', status: 'hold' },
+				{ id: 2, blockClientId: 'block-1', status: 'hold' },
+				{ id: 3, blockClientId: 'block-2', status: 'hold' },
+			] )
+		).toEqual( {
+			'block-1': 2,
+			'block-2': 1,
+		} );
+	} );
+
+	it( 'ignores resolved notes and notes without a block client ID', () => {
+		expect(
+			getUnresolvedNoteCountsByBlock( [
+				{ id: 1, blockClientId: 'block-1', status: 'approved' },
+				{ id: 2, blockClientId: 'block-1', status: 'hold' },
+				{ id: 3, blockClientId: null, status: 'hold' },
+				{ id: 4, status: 'hold' },
+			] )
+		).toEqual( {
+			'block-1': 1,
+		} );
 	} );
 } );
 

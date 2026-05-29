@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalListView as ListView,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
-import { useCallback, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -17,14 +15,52 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import ListViewOutline from './list-view-outline';
+import ListViewNoteIndicator from './list-view-note-indicator';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { useNoteThreads } from '../collab-sidebar/hooks';
+import { getUnresolvedNoteCountsByBlock } from '../collab-sidebar/utils';
+import { checkSupport } from '../post-type-support-check';
 
-const { TabbedSidebar } = unlock( blockEditorPrivateApis );
+const { PrivateListView, TabbedSidebar } = unlock( blockEditorPrivateApis );
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
-	const { getListViewToggleRef } = unlock( useSelect( editorStore ) );
+	const { getListViewToggleRef, postId, supportsNotes } = useSelect(
+		( select ) => {
+			const {
+				getCurrentPostId,
+				getListViewToggleRef: getListViewToggleRefSelector,
+			} = unlock( select( editorStore ) );
+			const postType = select( coreStore ).getPostType(
+				select( editorStore ).getEditedPostAttribute( 'type' )
+			);
+
+			return {
+				getListViewToggleRef: getListViewToggleRefSelector,
+				postId: getCurrentPostId(),
+				supportsNotes: !! postType?.supports
+					? checkSupport( postType.supports, 'editor.notes' )
+					: false,
+			};
+		},
+		[]
+	);
+	const { unresolvedNotes } = useNoteThreads( postId, {
+		enabled: supportsNotes,
+	} );
+	const unresolvedNoteCountsByBlock = useMemo(
+		() => getUnresolvedNoteCountsByBlock( unresolvedNotes ),
+		[ unresolvedNotes ]
+	);
+	const NoteIndicator = useCallback(
+		( { block } ) => (
+			<ListViewNoteIndicator
+				count={ unresolvedNoteCountsByBlock[ block.clientId ] }
+			/>
+		),
+		[ unresolvedNoteCountsByBlock ]
+	);
 
 	// This hook handles focus when the sidebar first renders.
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
@@ -126,8 +162,11 @@ export default function ListViewSidebar() {
 						panel: (
 							<div className="editor-list-view-sidebar__list-view-container">
 								<div className="editor-list-view-sidebar__list-view-panel-content">
-									<ListView
+									<PrivateListView
 										dropZoneElement={ dropZoneElement }
+										additionalBlockIndicators={
+											supportsNotes ? NoteIndicator : null
+										}
 									/>
 								</div>
 							</div>

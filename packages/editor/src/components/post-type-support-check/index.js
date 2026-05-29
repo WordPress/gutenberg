@@ -9,7 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-function checkSupport( supports = {}, key ) {
+export function checkSupport( supports = {}, key ) {
 	// Check for top-level support keys.
 	if ( supports[ key ] !== undefined ) {
 		return !! supports[ key ];
