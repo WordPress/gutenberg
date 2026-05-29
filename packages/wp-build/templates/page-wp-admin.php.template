@@ -258,10 +258,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 	<style>
 		/* Critical styles to prevent layout shifts - inlined for immediate application */
 
-		/*
-		 * Fix wp-admin menu scroll at high zoom (#73977). Do not set a #wpwrap
-		 * background here; body provides the pre-hydration surface color.
-		 */
 		#wpwrap {
 			overflow-y: auto;
 		}
