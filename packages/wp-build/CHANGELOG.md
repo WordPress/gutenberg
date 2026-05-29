@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead.
+
 ### Enhancements
 
 - Avoid unexpected results when typecasting `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE` values to Booleans ([#75844](https://github.com/WordPress/gutenberg/pull/75844)).
