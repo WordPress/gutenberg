@@ -362,6 +362,39 @@ describe( 'getResponsiveStateCSSRules', () => {
 			'@media (width <= 480px){.wp-elements-1 a:where(:not(.wp-element-button)) { color: blue; }}',
 		] );
 	} );
+
+	it( 'generates media-query scoped custom-state styles for viewport states', () => {
+		registerBlockType( 'core/navigation-link', {
+			apiVersion: 3,
+			title: 'Custom Link',
+			category: 'design',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				states: { '@current': '.current-menu-item' },
+			},
+		} );
+
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						'@current': {
+							color: { text: 'red' },
+							':hover': { color: { text: 'blue' } },
+						},
+					},
+				},
+				'core/navigation-link',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1.current-menu-item { color: red !important; }.wp-elements-1.current-menu-item:hover { color: blue !important; }}',
+		] );
+
+		unregisterBlockType( 'core/navigation-link' );
+	} );
 } );
 
 describe( 'getCanvasStateStyleValue', () => {

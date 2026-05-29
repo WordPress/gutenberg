@@ -11,6 +11,7 @@ import {
 	buildScopedBlockSelector,
 	buildRootStyleStateSelector,
 	buildPseudoStyleStateSelector,
+	getCustomStateSuffix,
 } from '../state-utils';
 
 describe( 'getRelativeRootSelector', () => {
@@ -189,5 +190,76 @@ describe( 'state selector builders', () => {
 		expect(
 			buildPseudoStyleStateSelector( BASE, 'test/unknown', ':hover' )
 		).toBe( `${ BASE }:hover` );
+	} );
+} );
+
+describe( 'getCustomStateSuffix', () => {
+	beforeEach( () => {
+		registerBlockType( 'test/with-current', {
+			apiVersion: 3,
+			title: 'With Current',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				states: { '@current': '.current-menu-item' },
+			},
+		} );
+		registerBlockType( 'test/empty-state', {
+			apiVersion: 3,
+			title: 'Empty State',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				states: { '@current': '   ' },
+			},
+		} );
+		registerBlockType( 'test/no-states', {
+			apiVersion: 3,
+			title: 'No States',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'test/with-current' );
+		unregisterBlockType( 'test/empty-state' );
+		unregisterBlockType( 'test/no-states' );
+	} );
+
+	it( 'returns the declared suffix for a registered custom state', () => {
+		expect( getCustomStateSuffix( 'test/with-current', '@current' ) ).toBe(
+			'.current-menu-item'
+		);
+	} );
+
+	it( 'returns null when the block does not declare the requested state', () => {
+		expect(
+			getCustomStateSuffix( 'test/with-current', '@unknown' )
+		).toBeNull();
+	} );
+
+	it( 'returns null when the block does not declare selectors.states at all', () => {
+		expect(
+			getCustomStateSuffix( 'test/no-states', '@current' )
+		).toBeNull();
+	} );
+
+	it( 'returns null when the declared value is empty or whitespace', () => {
+		expect(
+			getCustomStateSuffix( 'test/empty-state', '@current' )
+		).toBeNull();
+	} );
+
+	it( 'returns null for an unregistered block name', () => {
+		expect(
+			getCustomStateSuffix( 'test/unregistered', '@current' )
+		).toBeNull();
 	} );
 } );

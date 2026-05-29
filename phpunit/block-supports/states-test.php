@@ -1586,12 +1586,17 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'attrs'     => array( 'style' => $style ),
 		);
 
-		gutenberg_render_block_states_support( $block_content, $block );
-
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertMatchesRegularExpression(
-			'/\.wp-states-[a-f0-9]{8}\.current-menu-item\{color:#ff0000 !important;\}/',
+			'/^<li class="wp-block-navigation-item wp-states-[a-f0-9]{8}">Item<\/li>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '.current-menu-item{color:#ff0000 !important;}',
 			$actual_stylesheet
 		);
 		$this->assertStringNotContainsString( '@current', $actual_stylesheet );
@@ -1626,16 +1631,17 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'attrs'     => array( 'style' => $style ),
 		);
 
-		gutenberg_render_block_states_support( $block_content, $block );
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
 
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
-		$this->assertMatchesRegularExpression(
-			'/\.wp-states-[a-f0-9]{8}\.current-menu-item\{color:#ff0000 !important;\}/',
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '.current-menu-item{color:#ff0000 !important;}',
 			$actual_stylesheet
 		);
-		$this->assertMatchesRegularExpression(
-			'/\.wp-states-[a-f0-9]{8}\.current-menu-item:hover\{color:#0000ff !important;\}/',
+		$this->assertStringContainsString(
+			'.' . $matches[0] . '.current-menu-item:hover{color:#0000ff !important;}',
 			$actual_stylesheet
 		);
 	}
@@ -1669,12 +1675,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'attrs'     => array( 'style' => $style ),
 		);
 
-		gutenberg_render_block_states_support( $block_content, $block );
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
 
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
-		$this->assertMatchesRegularExpression(
-			'/@media \(width <= 480px\)\{\.wp-states-[a-f0-9]{8}\.current-menu-item\{color:#ff0000 !important;\}\}/',
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '.current-menu-item{color:#ff0000 !important;}}',
 			$actual_stylesheet
 		);
 	}
