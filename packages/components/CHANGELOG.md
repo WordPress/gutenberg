@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Disabled`: Pass a boolean to the `inert` attribute instead of the string `'true'` to avoid a React 19 warning ([#78798](https://github.com/WordPress/gutenberg/pull/78798)).
+
 ## 34.0.0 (2026-05-27)
 
 ### Breaking Changes
