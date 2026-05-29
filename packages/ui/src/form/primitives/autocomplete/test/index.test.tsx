@@ -11,6 +11,15 @@ const ITEMS = [
 	{ id: '3', value: 'Item 3' },
 ];
 
+function renderDisabledAutocompleteWithClear() {
+	return render(
+		<Autocomplete.Root items={ ITEMS } disabled defaultValue="Item 1">
+			<Autocomplete.Input placeholder="Search" />
+			<Autocomplete.Clear />
+		</Autocomplete.Root>
+	);
+}
+
 describe( 'Autocomplete', () => {
 	it( 'forwards ref', async () => {
 		const user = userEvent.setup();
@@ -347,4 +356,26 @@ describe( 'Autocomplete', () => {
 		} );
 	} );
 	/* eslint-enable testing-library/no-node-access */
+
+	describe( 'when disabled', () => {
+		it( 'hides the clear button from screen readers', () => {
+			renderDisabledAutocompleteWithClear();
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Clear' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'does not show a tooltip when the clear button is hovered', async () => {
+			const user = userEvent.setup( { pointerEventsCheck: 0 } );
+			renderDisabledAutocompleteWithClear();
+
+			const clearButton = screen.getByLabelText( 'Clear', {
+				selector: 'button',
+			} );
+			await user.hover( clearButton );
+
+			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+		} );
+	} );
 } );

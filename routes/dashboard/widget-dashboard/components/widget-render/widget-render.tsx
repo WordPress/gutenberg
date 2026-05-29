@@ -7,8 +7,9 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { getLazyWidgetComponent } from '../../utils/get-lazy-widget-component';
-import type { DashboardWidget, WidgetType } from '../../types';
+import { getLazyWidgetComponent } from '../../../widget-primitives';
+import type { DashboardWidget } from '../../types';
+import type { WidgetType } from '../../../widget-primitives';
 
 interface WidgetRenderInternalProps {
 	widget: DashboardWidget< unknown >;
@@ -58,11 +59,11 @@ function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
 /**
  * Resolves a widget's render module via the configured resolver and renders
  * it with the minimal `WidgetRenderProps` contract: `attributes` plus
- * `setAttributes`. Suspense and error handling live one layer up in the
- * `WidgetDashboard.Widget` chrome, so a failing or pending body does not tear
- * down the surrounding header or controls.
+ * `setAttributes`. Suspense and error handling live one layer up in
+ * `DashboardWidgetChrome`, so a failing or pending body does not tear down
+ * the surrounding header or controls.
  *
  * Kept internal to the package. Surfaces that want bare widget rendering
- * should compose `WidgetDashboard.Widget` instead.
+ * should compose `DashboardWidgetChrome` instead.
  */
 export const WidgetRender = WidgetRenderImpl;

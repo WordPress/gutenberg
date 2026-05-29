@@ -2238,12 +2238,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "The NUX (New User Experience) Data",
-		"slug": "data-core-nux",
-		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
-		"parent": "data"
-	},
-	{
 		"title": "Preferences",
 		"slug": "data-core-preferences",
 		"markdown_source": "../docs/reference-guides/data/data-core-preferences.md",
@@ -2415,6 +2409,12 @@
 		"title": "Managing Packages",
 		"slug": "managing-packages",
 		"markdown_source": "../docs/contributors/code/managing-packages.md",
+		"parent": "code"
+	},
+	{
+		"title": "Workspace Development",
+		"slug": "workspace-development",
+		"markdown_source": "../docs/contributors/code/workspace-development.md",
 		"parent": "code"
 	},
 	{

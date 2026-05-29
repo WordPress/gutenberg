@@ -33,7 +33,6 @@ const meta: Meta< typeof Menu > = {
 		Group: Menu.Group,
 		GroupLabel: Menu.GroupLabel,
 		Separator: Menu.Separator,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: Menu.Context,
 		RadioItem: Menu.RadioItem,
 		ItemLabel: Menu.ItemLabel,

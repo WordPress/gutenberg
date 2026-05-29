@@ -170,18 +170,25 @@ export default {
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
-		layout,
+		layout = {},
+		viewportOverrides,
 		style,
 		blockName,
 		hasBlockGapSupport,
 		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
+		const hasViewportOverrides = viewportOverrides !== undefined;
+		const effectiveLayout = hasViewportOverrides
+			? { ...layout, ...viewportOverrides }
+			: layout;
+		const hasViewportOverride = ( key ) =>
+			Object.hasOwn( viewportOverrides || {}, key );
 		const {
 			minimumColumnWidth = null,
 			columnCount = null,
 			rowCount = null,
-		} = layout;
+		} = effectiveLayout;
 
 		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
 		// write code that stores a string attribute instead of a number.
@@ -219,11 +226,27 @@ export default {
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
+		const hasBlockGapOverride =
+			! hasViewportOverrides ||
+			Object.hasOwn( style?.spacing || {}, 'blockGap' );
 
 		let output = '';
 		const rules = [];
+		const shouldOutputGridColumns =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'minimumColumnWidth' ) ||
+			hasViewportOverride( 'columnCount' ) ||
+			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
+		const shouldOutputGridRows =
+			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
+			columnCount &&
+			rowCount;
 
-		if ( minimumColumnWidth && columnCount > 0 ) {
+		if (
+			shouldOutputGridColumns &&
+			minimumColumnWidth &&
+			columnCount > 0
+		) {
 			let blockGapToUse = blockGapValue || fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
@@ -233,29 +256,36 @@ export default {
 				columnCount - 1
 			}) ) / ${ columnCount })`;
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
-				`container-type: inline-size`
+				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`
 			);
-			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
-				);
-			}
-		} else if ( columnCount ) {
+		} else if ( shouldOutputGridColumns && columnCount ) {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
-			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
-				);
-			}
-		} else {
+		} else if ( shouldOutputGridColumns ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${
 					minimumColumnWidth || '12rem'
-				}, 100%), 1fr))`,
-				'container-type: inline-size'
+				}, 100%), 1fr))`
+			);
+		}
+
+		if ( shouldOutputGridColumns ) {
+			const baseHasContainerType =
+				! layout?.columnCount ||
+				( layout?.columnCount && layout?.minimumColumnWidth );
+			const needsContainerType = ! columnCount || minimumColumnWidth;
+			if (
+				needsContainerType &&
+				( ! hasViewportOverrides || ! baseHasContainerType )
+			) {
+				rules.push( 'container-type: inline-size' );
+			}
+		}
+
+		if ( shouldOutputGridRows ) {
+			rules.push(
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 			);
 		}
 
@@ -266,7 +296,7 @@ export default {
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
-		if ( hasBlockGapSupport && blockGapValue ) {
+		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {
 			output += getBlockGapCSS(
 				selector,
 				layoutDefinitions,
