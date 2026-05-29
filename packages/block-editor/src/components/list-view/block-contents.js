@@ -27,8 +27,12 @@ const ListViewBlockContents = forwardRef(
 		ref
 	) => {
 		const { clientId } = block;
-		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
-			useListViewContext();
+		const {
+			AdditionalBlockContent,
+			AdditionalBlockIndicators,
+			insertedBlock,
+			setInsertedBlock,
+		} = useListViewContext();
 
 		// Only include all selected blocks if the currently clicked on block
 		// is one of the selected blocks. This ensures that if a user attempts
@@ -67,6 +71,13 @@ const ListViewBlockContents = forwardRef(
 							onDragStart={ onDragStart }
 							onDragEnd={ onDragEnd }
 							isExpanded={ isExpanded }
+							additionalIndicators={
+								AdditionalBlockIndicators && (
+									<AdditionalBlockIndicators
+										block={ block }
+									/>
+								)
+							}
 							{ ...props }
 						/>
 					) }

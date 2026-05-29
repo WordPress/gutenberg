@@ -55,6 +55,7 @@ function ListViewBlockSelectButton(
 		isExpanded,
 		ariaDescribedBy,
 		visibilityLabel,
+		additionalIndicators,
 	},
 	ref
 ) {
@@ -158,6 +159,7 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
+				{ additionalIndicators }
 				{ !! visibilityLabel && (
 					// The tooltip below is a sighted-hover affordance for
 					// the (decorative) visibility icon. The same
