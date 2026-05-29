@@ -29,6 +29,7 @@ function InserterToggle( {
 	hasSingleBlockType,
 	appenderLabel,
 	toggleProps = {},
+	ref,
 } ) {
 	const {
 		as: Wrapper = Button,
@@ -63,6 +64,7 @@ function InserterToggle( {
 
 	return (
 		<Wrapper
+			ref={ ref }
 			__next40pxDefaultSize={ toggleProps.as ? undefined : true }
 			icon={ plus }
 			label={ label }
@@ -94,6 +96,7 @@ function Inserter( {
 	onToggle,
 	renderToggle: renderToggleProp,
 	toggleProps,
+	ref,
 } ) {
 	const {
 		hasItems,
@@ -285,7 +288,7 @@ function Inserter( {
 			return renderToggleProp( toggleArgs );
 		}
 
-		return <InserterToggle { ...toggleArgs } />;
+		return <InserterToggle ref={ ref } { ...toggleArgs } />;
 	}
 
 	function renderContent( { onClose } ) {
