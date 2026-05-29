@@ -310,6 +310,32 @@ _Returns_
 
 -   `Object`: Content-free action transcript state.
 
+### getDistributedEditingConflictingChangesComparisonActionState
+
+Returns the visible same-block Compare click state.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Compare action state.
+
+### getDistributedEditingDocumentDirtyState
+
+Returns whether the current editable DE-RTC post body differs from the last server-confirmed body adopted by this editor session.
+
+This intentionally does not replace core-data dirtiness: WordPress still owns title, status, meta, entity, and first-save validity. DE-RTC content needs its own comparison because core dirty state can be reset by save bookkeeping while a distributed body still differs from the confirmed base.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Distributed Editing document dirty state.
+
 ### getDistributedEditingFreshReviewDecisionState
 
 Returns the current DE-RTC fresh-review decision state.
@@ -430,6 +456,19 @@ _Returns_
 
 -   `Object`: Initial-presence startup policy state.
 
+### getDistributedEditingRepeatedVisibleSaveProofState
+
+Returns the content-free repeated visible Save proof vocabulary.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _options_ `Object`: Proof vocabulary inputs.
+
+_Returns_
+
+-   `Object`: Repeated visible Save proof vocabulary.
+
 ### getDistributedEditingRetrySaveFlowState
 
 Returns a side-effect-free DE-RTC retry-save flow summary for status or demo consumers.
@@ -485,6 +524,7 @@ Returns the current DE-RTC Save journey descriptor for real editor Save controls
 _Parameters_
 
 -   _state_ `Object`: Editor state.
+-   _isDirty_ `boolean`: Whether the current editor has local edits.
 
 _Returns_
 

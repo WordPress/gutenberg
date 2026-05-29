@@ -1709,11 +1709,10 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED &&
 		Boolean( sessionState.refetchedServerState ) &&
 		! Boolean( sessionState.requiresServerStateRefetch );
-	const isAwaitingServerConfirmation =
-		isPartialSafePendingReview
-			? false
-			: Boolean( sessionState.isAwaitingServerConfirmation ) ||
-			  hasPendingChanges;
+	const isAwaitingServerConfirmation = isPartialSafePendingReview
+		? false
+		: Boolean( sessionState.isAwaitingServerConfirmation ) ||
+		  hasPendingChanges;
 	const saveButtonClickInFlight = Boolean(
 		sessionState.saveButtonClickInFlight
 	);
@@ -7947,10 +7946,6 @@ export async function getDistributedEditingBlockIdentityRequestProofDescriptor( 
 		);
 	}
 
-	const canonicalProposedPostContent =
-		canonicalizeDistributedEditingCoreBlockCommentDelimiters(
-			proposedPostContent
-		);
 	const acceptedBlocks = acceptedMeta.syncMeta.blocks;
 	const acceptedBlocksByHash = new Map();
 	const acceptedBlocksByOrdinalPath = new Map();
@@ -7978,6 +7973,10 @@ export async function getDistributedEditingBlockIdentityRequestProofDescriptor( 
 		);
 	}
 
+	const canonicalProposedPostContent =
+		canonicalizeDistributedEditingCoreBlockCommentDelimiters(
+			proposedPostContent
+		);
 	const tokens = getSerializedBlockTokens( canonicalProposedPostContent );
 
 	if ( tokens.status !== 'safe' ) {
@@ -10252,13 +10251,27 @@ export function getDistributedEditingSessionStateForKsesRiskyBlockReviewClassifi
 			responseData.reason_code
 		)
 	);
-	const reviewItems = normalizeRiskyBlockReviewItems(
-		getFirstDefined(
-			responseOrError.reviewItems,
-			responseOrError.review_items,
-			responseData.reviewItems,
-			responseData.review_items
-		)
+	const reviewItems = [
+		...normalizeRiskyBlockReviewItems(
+			getFirstDefined(
+				responseOrError.reviewItems,
+				responseOrError.review_items,
+				responseData.reviewItems,
+				responseData.review_items
+			)
+		),
+		...normalizeRiskyBlockReviewItems(
+			getFirstDefined(
+				responseOrError.reviewItemDescriptors,
+				responseOrError.review_item_descriptors,
+				responseData.reviewItemDescriptors,
+				responseData.review_item_descriptors
+			)
+		),
+	].filter(
+		( item, index, allItems ) =>
+			allItems.findIndex( ( candidate ) => candidate.id === item.id ) ===
+			index
 	);
 	const pendingReviewItemCount = normalizeCountWithFallback(
 		getFirstDefined(
@@ -10366,11 +10379,9 @@ export function getDistributedEditingSessionStateForKsesRiskyBlockReviewClassifi
 		riskyBlockReviewRejectedCount: 0,
 		riskyBlockReviewPrePublishPanelRequired:
 			reviewRequired && prePublishReviewRequired,
-		riskyBlockReviewSaveButtonLabel: reviewRequired
-			? 'Review changes'
-			: 'Update',
+		riskyBlockReviewSaveButtonLabel: reviewRequired ? 'Save' : 'Update',
 		riskyBlockReviewSaveClickAction: reviewRequired
-			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
+			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
 			: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE,
 		riskyBlockReviewCanExportLocalUpdates: false,
 		riskyBlockReviewRequiresServerStateRefetch: false,
@@ -10382,10 +10393,8 @@ export function getDistributedEditingSessionStateForKsesRiskyBlockReviewClassifi
 		riskyBlockReviewCallsRetrySaveEndpoint: false,
 		riskyBlockReviewChangesPostLock: false,
 		riskyBlockReviewClaimsSaved: false,
-		mustOfferLocalCopy:
-			normalizedCurrent.mustOfferLocalCopy || reviewRequired,
-		canExportLocalUpdates:
-			normalizedCurrent.canExportLocalUpdates || reviewRequired,
+		mustOfferLocalCopy: normalizedCurrent.mustOfferLocalCopy,
+		canExportLocalUpdates: normalizedCurrent.canExportLocalUpdates,
 	} );
 }
 
@@ -10780,9 +10789,9 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 					: 'fresh_review_consumed_requires_new_review';
 			placement =
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW;
-			saveButtonLabel = 'Review changes';
+			saveButtonLabel = 'Save';
 			clickAction =
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 		} else if (
 			! hasRetrySaveSavedStateEvidence &&
 			( handoffStatus ===
@@ -10832,7 +10841,7 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 				reason = 'fresh_review_server_state_refetch_required';
 				placement =
 					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_SAVE_STATUS;
-				saveButtonLabel = 'Get latest post';
+				saveButtonLabel = 'Save';
 				clickAction =
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 				requiresServerStateRefetch = true;
@@ -10842,9 +10851,9 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 				reason = handoffReason || 'fresh_review_handoff_blocked';
 				placement =
 					DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW;
-				saveButtonLabel = 'Review changes';
+				saveButtonLabel = 'Save';
 				clickAction =
-					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 			}
 		} else if (
 			normalized.localUpdatesImportFreshReviewDecisionPanelRequired ||
@@ -10859,18 +10868,15 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 			reason = 'fresh_review_required';
 			placement =
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW;
-			saveButtonLabel = 'Review changes';
+			saveButtonLabel = 'Save';
 			clickAction =
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 		}
 	}
 
 	const isActive =
 		status !== DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.NONE;
 	const actionKeys = [
-		isActive && normalized.canExportLocalUpdates
-			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
-			: null,
 		requiresServerStateRefetch
 			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
 			: null,
@@ -10889,7 +10895,7 @@ export function getDistributedEditingFreshReviewPreSaveStateForSessionState(
 		requiresServerStateRefetch,
 		canRefetchServerState: requiresServerStateRefetch,
 		actionKeys,
-		canExportLocalUpdates: isActive && normalized.canExportLocalUpdates,
+		canExportLocalUpdates: false,
 		hasProtectedLocalChanges,
 		reviewListStatus,
 		reviewList: {
@@ -11860,8 +11866,8 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED;
 			source = 'retry_save';
 		}
-		label = 'Get latest post';
-		statusText = 'Load the latest post before Save can continue.';
+		label = 'Save';
+		statusText = 'WordPress will get the latest post before saving.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 		requiresServerStateRefetch = true;
@@ -11869,7 +11875,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE;
 		authorityStatusText =
-			'Get the latest post before WordPress can update it.';
+			'WordPress will get the latest post before updating it.';
 	} else if (
 		( reviewState.hasPendingReviewItems && ! partialSafePendingReview ) ||
 		freshReviewPreSaveState.opensPrePublishReview ||
@@ -11886,15 +11892,12 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			reason = freshReviewPreSaveState.reason || 'fresh_review_required';
 			source = 'fresh_review';
 		}
-		label =
-			freshReviewPreSaveState.saveButtonLabel &&
-			freshReviewPreSaveState.saveButtonLabel !== 'Update'
-				? freshReviewPreSaveState.saveButtonLabel
-				: 'Review changes';
-		statusText = 'Review changes before WordPress updates the post.';
+		label = 'Save';
+		statusText =
+			'WordPress will save safe edits and keep blocked blocks for review.';
 		clickAction =
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
-		opensPrePublishReview = true;
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		opensPrePublishReview = false;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE;
 		authorityStatusText =
@@ -12317,8 +12320,8 @@ function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return {
-				title: 'Review changes',
-				summary: 'Review changes before saving.',
+				title: 'HTML review',
+				summary: 'Review blocked HTML before saving it.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
 			if ( action === 'prepare_save' ) {
@@ -12516,7 +12519,8 @@ export function getDistributedEditingSaveJourneyStateForSessionState(
 			summary: 'Use Save when you are ready.',
 			actionHint: null,
 			requiresActionBeforeSave: false,
-			saveButtonStatus: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY,
+			saveButtonStatus:
+				DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.UPDATE_READY,
 			saveButtonReason: null,
 			saveButtonLabel: 'Update',
 			saveButtonDisabled: false,
@@ -12725,9 +12729,9 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		reason = saveButton.reason;
 		saveButtonLabel = saveButton.label;
 		clickAction =
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 		blocksNormalSavePost = true;
-		opensPrePublishReview = true;
+		opensPrePublishReview = false;
 	} else if (
 		saveButton.status ===
 		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED
@@ -12897,14 +12901,14 @@ export function getDistributedEditingSessionStateForRiskyBlockReviewItemResoluti
 		riskyBlockReviewRejectedCount: rejectedReviewItemCount,
 		riskyBlockReviewPrePublishPanelRequired: hasPendingReviewItems,
 		riskyBlockReviewSaveButtonLabel: hasPendingReviewItems
-			? 'Review changes'
+			? 'Save'
 			: 'Update',
 		riskyBlockReviewSaveClickAction: hasPendingReviewItems
-			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
+			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
 			: DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
-		riskyBlockReviewCanExportLocalUpdates: true,
+		riskyBlockReviewCanExportLocalUpdates: false,
 		mustOfferLocalCopy: true,
-		canExportLocalUpdates: true,
+		canExportLocalUpdates: false,
 	} );
 }
 
@@ -12961,15 +12965,15 @@ export function getDistributedEditingSessionStateForStaleRiskyBlockReview(
 		),
 		riskyBlockReviewPendingCount: 0,
 		riskyBlockReviewPrePublishPanelRequired: false,
-		riskyBlockReviewSaveButtonLabel: 'Get latest post',
+		riskyBlockReviewSaveButtonLabel: 'Save',
 		riskyBlockReviewSaveClickAction:
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
-		riskyBlockReviewCanExportLocalUpdates: true,
+		riskyBlockReviewCanExportLocalUpdates: false,
 		riskyBlockReviewRequiresServerStateRefetch: true,
 		riskyBlockReviewReviewedServerVersion: reviewedServerVersion,
 		riskyBlockReviewCurrentServerVersion: currentServerVersion,
 		mustOfferLocalCopy: true,
-		canExportLocalUpdates: true,
+		canExportLocalUpdates: false,
 	} );
 }
 
@@ -16455,23 +16459,40 @@ function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
 		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_SAVE;
 
 	if ( riskyBlockReviewRequiresServerStateRefetch ) {
-		riskyBlockReviewSaveButtonLabel = 'Get latest post';
+		riskyBlockReviewSaveButtonLabel = 'Save';
 		riskyBlockReviewSaveClickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 	} else if ( riskyBlockReviewHasPendingItems ) {
-		riskyBlockReviewSaveButtonLabel = 'Review changes';
+		riskyBlockReviewSaveButtonLabel = 'Save';
 		riskyBlockReviewSaveClickAction =
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
 	}
 
 	riskyBlockReviewSaveButtonLabel =
 		normalizeNullableString(
 			sessionState.riskyBlockReviewSaveButtonLabel
 		) || riskyBlockReviewSaveButtonLabel;
+	if (
+		[
+			'Review changes',
+			'Get latest post',
+			'Export changes for review',
+		].includes( riskyBlockReviewSaveButtonLabel )
+	) {
+		riskyBlockReviewSaveButtonLabel = 'Save';
+	}
 	riskyBlockReviewSaveClickAction =
 		normalizeNullableString(
 			sessionState.riskyBlockReviewSaveClickAction
 		) || riskyBlockReviewSaveClickAction;
+	if (
+		riskyBlockReviewSaveClickAction ===
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW &&
+		riskyBlockReviewHasPendingItems
+	) {
+		riskyBlockReviewSaveClickAction =
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+	}
 
 	return {
 		riskyBlockReviewStatus,
@@ -16535,14 +16556,31 @@ function normalizeRiskyBlockReviewItems( value ) {
 }
 
 function normalizeRiskyBlockReviewItem( item = {} ) {
+	const rawReviewStatus = getFirstDefined(
+		item.reviewStatus,
+		item.review_status,
+		item.status,
+		item.effectiveStatus
+	);
+	let mappedReviewStatus = rawReviewStatus;
+
+	if ( rawReviewStatus === 'pending' ) {
+		mappedReviewStatus =
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW;
+	} else if ( rawReviewStatus === 'discarded' ) {
+		mappedReviewStatus =
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.REJECTED;
+	}
 	const reviewStatus = VALID_RISKY_BLOCK_REVIEW_ITEM_STATUSES.has(
-		getFirstDefined( item.reviewStatus, item.review_status )
+		mappedReviewStatus
 	)
-		? getFirstDefined( item.reviewStatus, item.review_status )
+		? mappedReviewStatus
 		: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW;
 
 	return {
-		id: normalizeNullableString( item.id ),
+		id: normalizeNullableString(
+			getFirstDefined( item.id, item.reviewItemId, item.review_item_id )
+		),
 		blockClientId: normalizeNullableString(
 			getFirstDefined( item.blockClientId, item.block_client_id )
 		),
@@ -16568,7 +16606,12 @@ function normalizeRiskyBlockReviewItem( item = {} ) {
 			getFirstDefined( item.baseVersion, item.base_version )
 		),
 		serverVersion: normalizeNullableString(
-			getFirstDefined( item.serverVersion, item.server_version )
+			getFirstDefined(
+				item.serverVersion,
+				item.server_version,
+				item.serverSyncVersion,
+				item.server_sync_version
+			)
 		),
 		baseContentHash: normalizeNullableString(
 			getFirstDefined( item.baseContentHash, item.base_content_hash )
@@ -16597,6 +16640,12 @@ function normalizeRiskyBlockReviewItem( item = {} ) {
 				item.contentReviewPolicy,
 				item.content_review_policy
 			)
+		),
+		sourceAvailable: Boolean(
+			getFirstDefined( item.sourceAvailable, item.source_available )
+		),
+		contentTransport: normalizeNullableString(
+			getFirstDefined( item.contentTransport, item.content_transport )
 		),
 		reviewerId: normalizeNullableInteger(
 			getFirstDefined( item.reviewerId, item.reviewer_id )

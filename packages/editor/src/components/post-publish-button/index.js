@@ -595,14 +595,19 @@ export default compose( [
 			getPostEdits,
 			getDistributedEditingSaveButtonState,
 			getDistributedEditingSaveJourneyState,
+			getDistributedEditingDocumentDirtyState,
 			hasPendingDistributedEditingChanges,
 		} = select( editorStore );
 		const isDirty = isEditedPostDirty();
+		const distributedEditingDocumentDirtyState =
+			getDistributedEditingDocumentDirtyState?.() || {};
 		const hasPendingDistributedEditingLocalChanges = Boolean(
 			hasPendingDistributedEditingChanges?.()
 		);
 		const editorIsDirty =
-			isDirty || hasPendingDistributedEditingLocalChanges;
+			isDirty ||
+			Boolean( distributedEditingDocumentDirtyState.isDirty ) ||
+			hasPendingDistributedEditingLocalChanges;
 
 		return {
 			isSaving: isSavingPost(),

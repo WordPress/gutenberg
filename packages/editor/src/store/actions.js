@@ -672,10 +672,14 @@ export const __experimentalOpenDistributedEditingRiskyBlockReview =
 	( { select, dispatch } ) => {
 		const savePolicy =
 			select.getDistributedEditingSavePolicyState?.() || {};
+		const reviewState =
+			select.getDistributedEditingRiskyBlockReviewState?.() || {};
 		const shouldOpenPrePublishReview =
 			savePolicy.opensPrePublishReview ||
 			savePolicy.clickAction ===
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW ||
+			reviewState.prePublishPanelRequired ||
+			reviewState.pendingReviewItemCount > 0;
 
 		if ( ! shouldOpenPrePublishReview ) {
 			return {
@@ -956,12 +960,13 @@ export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 		const resolvedItem = sessionState.riskyBlockReviewItems.find(
 			( item ) => item.id === reviewItemId
 		);
-		const safeServerContent =
-			typeof sessionState.refetchedServerContent === 'string'
-				? sessionState.refetchedServerContent
-				: typeof sessionState.clientBaseContent === 'string'
-				? sessionState.clientBaseContent
-				: null;
+		let safeServerContent = null;
+
+		if ( typeof sessionState.refetchedServerContent === 'string' ) {
+			safeServerContent = sessionState.refetchedServerContent;
+		} else if ( typeof sessionState.clientBaseContent === 'string' ) {
+			safeServerContent = sessionState.clientBaseContent;
+		}
 		const appliesSafeServerContentAfterReject =
 			sessionState.riskyBlockReviewPendingCount === 0 &&
 			sessionState.riskyBlockReviewApprovedCount === 0 &&
@@ -1057,17 +1062,15 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 				select.shouldUseDistributedEditingRiskyBlockReviewForSavePost?.(
 					options
 				);
-			const hasActiveRiskyBlockReviewPolicy =
-				savePolicy.saveButtonSource === 'risky_block_review' ||
-				savePolicy.reviewItemCount > 0 ||
-				savePolicy.pendingReviewItemCount > 0 ||
+			const hasResolvedRiskyBlockReviewApproval =
 				savePolicy.approvedReviewItemCount > 0 ||
-				savePolicy.clickAction ===
-					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
+				savePolicy.status ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE ||
+				savePolicy.saveButton?.hasAcceptedReviewApprovalProof;
 
 			if (
 				! shouldUseRiskyBlockReview &&
-				! hasActiveRiskyBlockReviewPolicy
+				! hasResolvedRiskyBlockReviewApproval
 			) {
 				return {
 					status: 'normal_save_fallback',
@@ -1369,10 +1372,16 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 			dispatch.updateDistributedEditingSessionState( {
 				saveButtonClickInFlight: Boolean( isInFlight ),
 			} );
+		const distributedEditingDocumentDirtyState =
+			select.getDistributedEditingDocumentDirtyState?.() || {};
+		const hasDistributedEditingDocumentChanges = Boolean(
+			distributedEditingDocumentDirtyState.isDirty
+		);
 
 		const shouldRefreshConfirmedSaveForDirtyEdit =
 			shouldUseRetrySave &&
-			select.isEditedPostDirty?.() &&
+			( select.isEditedPostDirty?.() ||
+				hasDistributedEditingDocumentChanges ) &&
 			savePolicy.status ===
 				DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.RETRY_SAVE_CONFIRMED;
 
@@ -1381,6 +1390,7 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 				shouldRefreshConfirmedSaveForDirtyEdit ) &&
 			shouldUseRetrySave &&
 			( select.isEditedPostDirty?.() ||
+				hasDistributedEditingDocumentChanges ||
 				( initialSessionState.hasPendingChanges &&
 					initialSessionState.canExportLocalUpdates ) )
 		) {
@@ -2158,18 +2168,20 @@ function getDistributedEditingPresenceHeartbeatDocumentState(
 		( serverAndBaseVersionsMatch
 			? sessionState.distributedEditingPostStateHash
 			: null );
-	const trimmedBaseVersion =
-		typeof confirmedBaseVersion === 'string'
-			? confirmedBaseVersion.trim()
-			: confirmedBaseVersion
-			? String( confirmedBaseVersion )
-			: '';
-	const trimmedStateHash =
-		typeof confirmedStateHash === 'string'
-			? confirmedStateHash.trim()
-			: confirmedStateHash
-			? String( confirmedStateHash )
-			: '';
+	let trimmedBaseVersion = '';
+	let trimmedStateHash = '';
+
+	if ( typeof confirmedBaseVersion === 'string' ) {
+		trimmedBaseVersion = confirmedBaseVersion.trim();
+	} else if ( confirmedBaseVersion ) {
+		trimmedBaseVersion = String( confirmedBaseVersion );
+	}
+
+	if ( typeof confirmedStateHash === 'string' ) {
+		trimmedStateHash = confirmedStateHash.trim();
+	} else if ( confirmedStateHash ) {
+		trimmedStateHash = String( confirmedStateHash );
+	}
 	const previouslyObservedSameCopy =
 		trimmedBaseVersion &&
 		trimmedBaseVersion ===
@@ -2246,13 +2258,6 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 		const distributedEditingEnabled =
 			options.distributedEditingEnabled ??
 			editorSettings.distributedEditing?.enabled;
-		const documentState =
-			getDistributedEditingPresenceHeartbeatDocumentState(
-				currentSessionState,
-				select,
-				options
-			);
-
 		if ( ! distributedEditingEnabled ) {
 			const response = {
 				code: DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_FEATURE_DISABLED,
@@ -2273,6 +2278,13 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 
 			return response;
 		}
+
+		const documentState =
+			getDistributedEditingPresenceHeartbeatDocumentState(
+				currentSessionState,
+				select,
+				options
+			);
 
 		try {
 			const response = await requestDistributedEditingPresenceHeartbeat( {
@@ -2714,14 +2726,19 @@ function getDistributedEditingRiskyReviewSyncPreservationFields(
 	const riskyBlockReviewPendingCount = Number(
 		sessionState.riskyBlockReviewPendingCount ?? 0
 	);
-	const pendingReviewCount =
+	let pendingReviewCount = 0;
+
+	if (
 		Number.isFinite( riskyBlockReviewPendingCount ) &&
 		riskyBlockReviewPendingCount > 0
-			? Math.floor( riskyBlockReviewPendingCount )
-			: sessionState.retrySaveStatus ===
-			  DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED
-			? 1
-			: 0;
+	) {
+		pendingReviewCount = Math.floor( riskyBlockReviewPendingCount );
+	} else if (
+		sessionState.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED
+	) {
+		pendingReviewCount = 1;
+	}
 	const hasPendingRiskyReview =
 		pendingReviewCount > 0 ||
 		sessionState.riskyBlockReviewStatus ===
@@ -2838,11 +2855,6 @@ export const __experimentalSyncDistributedEditingWithServer =
 			getDistributedEditingComparablePostContent( currentRawContent );
 		const localContent =
 			options.localContent ?? select.getEditedPostContent?.();
-		const riskyReviewSyncPreservationFields =
-			getDistributedEditingRiskyReviewSyncPreservationFields(
-				currentSessionState
-			);
-
 		if ( ! postId || ! restBase ) {
 			return {
 				status: 'server_sync_unavailable',
@@ -2856,6 +2868,11 @@ export const __experimentalSyncDistributedEditingWithServer =
 				claimsSaved: false,
 			};
 		}
+
+		const riskyReviewSyncPreservationFields =
+			getDistributedEditingRiskyReviewSyncPreservationFields(
+				currentSessionState
+			);
 
 		try {
 			const response = await requestDistributedEditingServerStateRefetch(
@@ -2965,8 +2982,12 @@ export const __experimentalSyncDistributedEditingWithServer =
 				serverContent
 			);
 			const serverMatchesBase = serverContent === clientBaseContent;
+			const documentDirtyState =
+				select.getDistributedEditingDocumentDirtyState?.() || {};
 			const isDirty = Boolean(
-				options.isDirty ?? select.isEditedPostDirty?.()
+				options.isDirty ??
+					( documentDirtyState.isDirty ||
+						select.isEditedPostDirty?.() )
 			);
 			const editorMatchesBase =
 				localContent === clientBaseContent || ! isDirty;
@@ -4510,29 +4531,29 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		const proposedPostContent = getDistributedEditingComparablePostContent(
 			proposedPostContentCandidate
 		);
-			let proposedPostContentHash =
-				options.proposedPostContentHash ??
-				getDistributedEditingRetrySaveProposedContentHashEvidence(
-					currentSessionState,
+		let proposedPostContentHash =
+			options.proposedPostContentHash ??
+			getDistributedEditingRetrySaveProposedContentHashEvidence(
+				currentSessionState,
 				{
 					acceptedReviewApprovalProof,
-						acceptedFreshReviewConsumeValidation,
-					}
-				);
-			const calculatedProposedPostContentHash =
-				await getDistributedEditingPostContentSha256Hash(
-					proposedPostContent
-				);
+					acceptedFreshReviewConsumeValidation,
+				}
+			);
+		const calculatedProposedPostContentHash =
+			await getDistributedEditingPostContentSha256Hash(
+				proposedPostContent
+			);
 
-			if (
-				calculatedProposedPostContentHash &&
-				proposedPostContentHash !== calculatedProposedPostContentHash
-			) {
-				proposedPostContentHash = calculatedProposedPostContentHash;
-			}
-			const requestClientBaseVersion =
-				options.clientBaseVersion ??
-				currentSessionState.serverVersion ??
+		if (
+			calculatedProposedPostContentHash &&
+			proposedPostContentHash !== calculatedProposedPostContentHash
+		) {
+			proposedPostContentHash = calculatedProposedPostContentHash;
+		}
+		const requestClientBaseVersion =
+			options.clientBaseVersion ??
+			currentSessionState.serverVersion ??
 			currentSessionState.clientBaseVersion;
 		const requestAcceptedProofServerVersion =
 			options.acceptedProofServerVersion ??
@@ -4838,11 +4859,11 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				typeof retrySaveResultSessionState.refetchedServerContent !==
 					'string';
 
-				if ( shouldHydrateManualConflict ) {
-					try {
-						const refetchResponse =
-							await requestDistributedEditingServerStateRefetch( {
-								postId,
+			if ( shouldHydrateManualConflict ) {
+				try {
+					const refetchResponse =
+						await requestDistributedEditingServerStateRefetch( {
+							postId,
 							restBase,
 						} );
 					const refetchedPostContent =
@@ -4891,25 +4912,25 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 						};
 					}
 				} catch {
-						// Keep the original protected retry-save rejection state when a follow-up refetch fails.
-					}
+					// Keep the original protected retry-save rejection state when a follow-up refetch fails.
 				}
+			}
 
-				const partialSafeServerContentResult =
-					maybeApplyDistributedEditingPartialSafeServerContent( {
-						dispatch,
-						registry,
-						select,
-						responseOrError: error,
-						sessionState: retrySaveResultSessionState,
-					} );
-				retrySaveResultSessionState =
-					partialSafeServerContentResult.sessionState;
+			const partialSafeServerContentResult =
+				maybeApplyDistributedEditingPartialSafeServerContent( {
+					dispatch,
+					registry,
+					select,
+					responseOrError: error,
+					sessionState: retrySaveResultSessionState,
+				} );
+			retrySaveResultSessionState =
+				partialSafeServerContentResult.sessionState;
 
-				dispatch.setDistributedEditingSessionState(
-					getDistributedEditingSessionStateWithActionTranscriptEvent(
-						retrySaveResultSessionState,
-						{
+			dispatch.setDistributedEditingSessionState(
+				getDistributedEditingSessionStateWithActionTranscriptEvent(
+					retrySaveResultSessionState,
+					{
 						eventType:
 							DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES.SAVE_STATE_CHANGED,
 						reasonCode: retrySaveResultSessionState.retrySaveReason,
@@ -4931,7 +4952,8 @@ function applyDistributedEditingConfirmedPostContent( {
 	const comparablePostContent =
 		getDistributedEditingComparablePostContent( postContent );
 	const preservedEditorContent =
-		preserveEditorContent && typeof select.getEditedPostContent === 'function'
+		preserveEditorContent &&
+		typeof select.getEditedPostContent === 'function'
 			? getDistributedEditingComparablePostContent(
 					select.getEditedPostContent()
 			  )
@@ -4977,10 +4999,7 @@ function applyDistributedEditingConfirmedPostContent( {
 			} );
 	}
 
-	if (
-		preserveEditorContent &&
-		typeof preservedEditorContent === 'string'
-	) {
+	if ( preserveEditorContent && typeof preservedEditorContent === 'string' ) {
 		applyPostContent( preservedEditorContent );
 	}
 }
@@ -5036,7 +5055,9 @@ function maybeApplyDistributedEditingPartialSafeServerContent( {
 		responseReasonCode ===
 			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT;
 	const shouldApplySafeServerContent =
-		hasDistributedEditingPartialSafeMergeAppliedResponse( responseOrError ) &&
+		hasDistributedEditingPartialSafeMergeAppliedResponse(
+			responseOrError
+		) &&
 		( hasPartialSafeReviewState || hasPartialSafeResponse ) &&
 		typeof safeServerContent === 'string';
 
@@ -5703,9 +5724,15 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 			currentSessionState.clientBaseContent ??
 			currentPostComparableContent;
 		const localContent = select.getEditedPostContent?.();
+		const documentDirtyState =
+			select.getDistributedEditingDocumentDirtyState?.() || {};
+		const hasDistributedEditingDocumentChanges = Boolean(
+			documentDirtyState.isDirty
+		);
 
 		if (
-			! select.isEditedPostDirty?.() ||
+			( ! select.isEditedPostDirty?.() &&
+				! hasDistributedEditingDocumentChanges ) ||
 			typeof clientBaseContent !== 'string' ||
 			typeof localContent !== 'string'
 		) {
@@ -5993,7 +6020,9 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 				);
 
 			if (
-				isDistributedEditingYjsRetrySaveSyncMeta( acceptedYjsSyncMeta ) &&
+				isDistributedEditingYjsRetrySaveSyncMeta(
+					acceptedYjsSyncMeta
+				) &&
 				typeof blockIdentityProposedPostContent === 'string'
 			) {
 				const proposedPostContentHash =
@@ -6025,8 +6054,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 									blockIdentityProposedPostContent,
 								proposedPostContentHash,
 								clientBaseVersion: rebasedFromVersion,
-								acceptedProofServerVersion:
-									rebasedFromVersion,
+								acceptedProofServerVersion: rebasedFromVersion,
 								rebasedFromVersion,
 								pendingChangeCount,
 								yjsClientBaseContent: clientBaseContent,
@@ -6548,7 +6576,12 @@ export const savePost =
 		) {
 			const preflightSavePolicy =
 				select.getDistributedEditingSavePolicyState?.() || {};
-			const preflightIsDirty = Boolean( select.isEditedPostDirty?.() );
+			const preflightDocumentDirtyState =
+				select.getDistributedEditingDocumentDirtyState?.() || {};
+			const preflightIsDirty = Boolean(
+				select.isEditedPostDirty?.() ||
+					preflightDocumentDirtyState.isDirty
+			);
 
 			dispatch.updateDistributedEditingSessionState( {
 				saveButtonClickInFlight: true,
@@ -6582,7 +6615,8 @@ export const savePost =
 				}
 
 				const hasDirtyEditAfterConfirmedRetrySave =
-					select.isEditedPostDirty?.() &&
+					( select.isEditedPostDirty?.() ||
+						preflightDocumentDirtyState.isDirty ) &&
 					currentSessionState.retrySaveStatus ===
 						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
 					hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
@@ -7036,7 +7070,13 @@ export const autosave =
 			const excerpt = select.getEditedPostAttribute( 'excerpt' );
 			localAutosaveSet( post.id, isPostNew, title, content, excerpt );
 		} else {
-			if ( select.isEditedPostDirty?.() === false ) {
+			const documentDirtyState =
+				select.getDistributedEditingDocumentDirtyState?.() || {};
+
+			if (
+				select.isEditedPostDirty?.() === false &&
+				! documentDirtyState.isDirty
+			) {
 				return {
 					status: 'autosave_skipped_clean_post',
 					callsNormalSavePost: false,
@@ -7244,9 +7284,16 @@ export const __experimentalUndoDistributedEditingSessionChange =
 		let nextChange = historyUndoStack[ historyUndoStack.length - 1 ];
 
 		if ( ! nextChange ) {
+			const baseComparableContent =
+				getDistributedEditingComparablePostContent(
+					sessionState.clientBaseContent
+				);
+			const currentComparableContent =
+				getDistributedEditingComparablePostContent( currentContent );
+
 			if (
-				typeof sessionState.clientBaseContent !== 'string' ||
-				sessionState.clientBaseContent === currentContent
+				typeof baseComparableContent !== 'string' ||
+				currentComparableContent === baseComparableContent
 			) {
 				return false;
 			}

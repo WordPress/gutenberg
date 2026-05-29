@@ -256,6 +256,16 @@ _Returns_
 
 Undocumented declaration.
 
+### DistributedEditingPresenceToolbar
+
+Renders the DE-RTC active-editor caterpillar for the editor toolbar.
+
+Presence transport still lives with the roster component; this wrapper only changes the visible chrome so the toolbar shows avatars without the old status labels or setup copy.
+
+_Returns_
+
+-   `React.ReactNode`: Rendered toolbar presence caterpillar.
+
 ### DistributedEditingStatus
 
 Renders the selector-backed DE-RTC status surface.
@@ -303,6 +313,14 @@ _Returns_
 ### DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_EVENT_TYPES
 
 Stable content-free transcript event types. These are the first editor-side operation-log vocabulary for DE-RTC. They describe categories of activity, never raw block content, proof internals, or actor identities.
+
+### DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES
+
+Stable statuses for editor-side block identity request proof preparation. These are data descriptors only; they do not save or call REST.
+
+### DISTRIBUTED_EDITING_CONFLICT_COMPARISON_ACTION_STATUSES
+
+Stable statuses for the visible same-block Compare action. These describe only the editor command state; they do not authorize persistence.
 
 ### DISTRIBUTED_EDITING_DISPOSITIONS
 
@@ -507,6 +525,14 @@ Stable Save policy states for DE-RTC human review handoff.
 ### DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES
 
 Stable review checkpoint states for DE-RTC Save semantics. These separate review work from both local editor dirtiness and authoritative post updates.
+
+### DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES
+
+Stable no-save stale-base conflict resolution choices.
+
+### DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES
+
+Stable no-save stale-base conflict resolution statuses. These describe the editor working-copy choice only; they do not authorize persistence.
 
 ### DISTRIBUTED_EDITING_UNLOAD_WARNING_REASONS
 
@@ -742,6 +768,74 @@ _Returns_
 
 -   `Object`: Content-free action transcript support summary.
 
+### getDistributedEditingBlockIdentityDistinctGapInsertionDescriptor
+
+Determines whether a newer server body and local proposed body both preserve the accepted block identity sequence while inserting blocks in distinct base gaps.
+
+The descriptor is inert and content-free. It does not return raw post content, call REST, save, mutate editor content, persist post content, create revisions, change post locks, or claim saved state.
+
+_Parameters_
+
+-   _args_ `Object`: Distinct-gap insertion inputs.
+-   _args.acceptedSyncMeta_ `Object`: Accepted base sync metadata.
+-   _args.serverPostContent_ `string`: Refetched server serialized content.
+-   _args.proposedPostContent_ `string`: Local proposed serialized content.
+
+_Returns_
+
+-   `Promise<Object>`: Distinct-gap insertion descriptor.
+
+### getDistributedEditingBlockIdentityRequestProofDescriptor
+
+Prepares content-free block identity request proof from serialized editor content and accepted sync metadata.
+
+The descriptor is inert. It does not call REST, save, mutate editor content, persist post content, create revisions, change post locks, or claim saved state.
+
+_Parameters_
+
+-   _args_ `Object`: Request-proof inputs.
+-   _args.acceptedSyncMeta_ `Object`: Accepted base sync metadata.
+-   _args.proposedPostContent_ `string`: Serialized editor content.
+-   _args.proposedPostContentHash_ `[string]`: Optional SHA-256 evidence.
+-   _args.clientBaseVersion_ `[string|number]`: Optional base version.
+
+_Returns_
+
+-   `Promise<Object>`: Request-proof descriptor.
+
+### getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor
+
+Determines whether a newer server body and local proposed body preserve the accepted block identity sequence while editing different retained blocks.
+
+The descriptor is inert and content-free. It does not return raw post content, call REST, save, mutate editor content, persist post content, create revisions, change post locks, or claim saved state.
+
+_Parameters_
+
+-   _args_ `Object`: Retained-edit merge inputs.
+-   _args.acceptedSyncMeta_ `Object`: Accepted base sync metadata.
+-   _args.serverPostContent_ `string`: Refetched server serialized content.
+-   _args.proposedPostContent_ `string`: Local proposed serialized content.
+
+_Returns_
+
+-   `Promise<Object>`: Retained-edit merge descriptor.
+
+### getDistributedEditingComparablePostContent
+
+Undocumented declaration.
+
+### getDistributedEditingConflictingChangesComparisonActionStateForSessionState
+
+Returns content-free state for the visible same-block Compare action. This records whether the click opened or requested the comparison surface without saving, autosaving, mutating content, or changing post locks.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+
+_Returns_
+
+-   `Object`: Compare action state descriptor.
+
 ### getDistributedEditingFreshReviewComparisonRendererCapabilityResolution
 
 Resolves future fresh-review comparison renderer capabilities without registering, activating, or rendering a comparison renderer.
@@ -874,6 +968,34 @@ _Returns_
 
 -   `Object`: Fresh-review retry-save handoff state.
 
+### getDistributedEditingHistoryEndpointPath
+
+Returns the current DE-RTC document-history endpoint path for a post.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
+### getDistributedEditingHistoryPlanEndpointPath
+
+Returns the current DE-RTC document-history planning endpoint path.
+
+_Parameters_
+
+-   _args_ `Object`: Endpoint args.
+-   _args.postId_ `number`: Post ID.
+-   _args.restBase_ `[string]`: REST base for the edited post type.
+
+_Returns_
+
+-   `string`: REST path.
+
 ### getDistributedEditingHumanLoopStepStateForSessionState
 
 Returns the current M0 human-loop step for the normal enabled editor shell. This condenses the DE-RTC Save/review/recovery vocabulary into one human-facing next step without exposing proof internals or performing the action it names.
@@ -946,6 +1068,10 @@ _Returns_
 
 -   `Array`: Notice descriptors.
 
+### getDistributedEditingPostContentFromResponse
+
+Undocumented declaration.
+
 ### getDistributedEditingPostContentSha256Hash
 
 Computes the SHA-256 hash WordPress uses for DE-RTC post-content evidence.
@@ -957,6 +1083,10 @@ _Parameters_
 _Returns_
 
 -   `Promise<string|null>`: Lowercase hex SHA-256 hash, or null if unavailable.
+
+### getDistributedEditingPostContentWithYjsSyncMeta
+
+Undocumented declaration.
 
 ### getDistributedEditingPresenceEndpointPath
 
@@ -1012,6 +1142,10 @@ _Returns_
 
 -   `string`: REST path.
 
+### getDistributedEditingRawPostContentFromResponse
+
+Undocumented declaration.
+
 ### getDistributedEditingRecoveryEndpointPath
 
 Returns the current DE-RTC recovery endpoint path for a post.
@@ -1025,6 +1159,19 @@ _Parameters_
 _Returns_
 
 -   `string`: REST path.
+
+### getDistributedEditingRepeatedVisibleSaveProofStateForSessionState
+
+Returns the content-free vocabulary used by the repeated visible Save proof. This mirrors the browser artifact shape without reading content, calling REST, saving, autosaving, mutating state, or claiming persistence.
+
+_Parameters_
+
+-   _sessionState_ `Object`: DE-RTC session state.
+-   _options_ `[Object]`: Proof vocabulary inputs.
+
+_Returns_
+
+-   `Object`: Repeated visible Save proof vocabulary.
 
 ### getDistributedEditingRetrySaveEndpointPath
 
@@ -1166,6 +1313,8 @@ Returns the current M0 Save journey descriptor for real editor Save controls. Th
 _Parameters_
 
 -   _sessionState_ `Object`: DE-RTC session state.
+-   _options_ `Object`: Save journey options.
+-   _options.isDirty_ `boolean`: Whether the editor has local edits.
 
 _Returns_
 
@@ -1187,7 +1336,7 @@ _Returns_
 
 ### getDistributedEditingServerStateEndpointPath
 
-Returns the current edited post endpoint path for DE-RTC server-state reads.
+Returns the current DE-RTC post snapshot endpoint path for a post.
 
 _Parameters_
 
@@ -1198,6 +1347,10 @@ _Parameters_
 _Returns_
 
 -   `string`: REST path.
+
+### getDistributedEditingServerVersionFromResponse
+
+Undocumented declaration.
 
 ### getDistributedEditingSessionStateForFreshReviewDecisionItemResolution
 
@@ -1304,6 +1457,19 @@ _Parameters_
 _Returns_
 
 -   `Object`: Normalized DE-RTC session state.
+
+### getDistributedEditingSessionStateForPendingLocalHistoryChange
+
+Returns session state for a local document-history change that still needs to be saved. Any previous save/review proof is content-bound, so it cannot authorize the newly staged editor content.
+
+_Parameters_
+
+-   _sessionState_ `Object`: Current DE-RTC session state.
+-   _overrides_ `Object`: Fields to apply after proof state is cleared.
+
+_Returns_
+
+-   `Object`: Normalized pending local-change state.
 
 ### getDistributedEditingSessionStateForPresenceHeartbeatResult
 
@@ -1482,6 +1648,7 @@ Accepted proof is only a precondition. This helper does not submit to the server
 _Parameters_
 
 -   _currentSessionState_ `Object`: Current DE-RTC session state.
+-   _options_ `Object`: Preparation options.
 
 _Returns_
 
@@ -1613,6 +1780,10 @@ _Returns_
 
 -   `Array`: Status items.
 
+### getDistributedEditingSyncMetaFromPostContent
+
+Undocumented declaration.
+
 ### getDistributedEditingUnloadWarningStateForSessionState
 
 Returns the browser-unload integration state for DE-RTC.
@@ -1624,6 +1795,27 @@ _Parameters_
 _Returns_
 
 -   `Object`: Unload-warning state.
+
+### getDistributedEditingYjsClientUpdateDescriptor
+
+Undocumented declaration.
+
+### getDistributedEditingYjsLocalMergeCandidate
+
+Returns a Yjs-compatible text merge candidate for a stale local Save.
+
+WordPress is still the persistence authority. This mirrors the server's native-yjs-php-v0 range guard so the editor can fetch the latest body, merge non-overlapping local edits into it, and resubmit against the current sync version instead of surfacing a false conflict for same-block edits.
+
+_Parameters_
+
+-   _args_ `Object`: Merge inputs.
+-   _args.clientBaseContent_ `string`: Stripped content at the editor base version.
+-   _args.serverContent_ `string`: Stripped content fetched from WordPress.
+-   _args.localContent_ `string`: Stripped local editor content.
+
+_Returns_
+
+-   `Object`: Merge candidate result.
 
 ### getFontSize
 

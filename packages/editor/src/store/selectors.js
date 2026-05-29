@@ -48,6 +48,7 @@ import {
 	getDistributedEditingRiskyBlockReviewStateForSessionState,
 	getDistributedEditingSaveButtonStateForSessionState,
 	getDistributedEditingSaveJourneyStateForSessionState,
+	getDistributedEditingComparablePostContent,
 	getDistributedEditingReviewTokenRecoveryStateForSessionState,
 	getDistributedEditingRetrySaveFlowStateForSessionState,
 	getDistributedEditingSavePolicyStateForSessionState,
@@ -101,10 +102,16 @@ export const hasEditorUndo = createRegistrySelector(
 				}
 			}
 
+			const baseContent = getDistributedEditingComparablePostContent(
+				sessionState.clientBaseContent
+			);
+			const currentContent =
+				getDistributedEditingComparablePostContent( editedContent );
+
 			return Boolean(
 				sessionState.historyUndoStack?.length ||
-					( typeof sessionState.clientBaseContent === 'string' &&
-						sessionState.clientBaseContent !== editedContent )
+					( typeof baseContent === 'string' &&
+						currentContent !== baseContent )
 			);
 		}
 
@@ -351,6 +358,15 @@ export function shouldUseDistributedEditingRetrySaveForSavePost(
 	state,
 	options = EMPTY_OBJECT
 ) {
+	/*
+	 * post-new.php starts from an auto-draft. The guarded retry-save endpoint
+	 * can only update an existing authoritative post; it must not replace the
+	 * first normal WordPress save that turns an auto-draft into a real draft.
+	 */
+	if ( isEditedPostNew( state ) ) {
+		return false;
+	}
+
 	if (
 		Object.prototype.hasOwnProperty.call(
 			options,
@@ -379,6 +395,10 @@ export function shouldUseDistributedEditingRiskyBlockReviewForSavePost(
 	options = EMPTY_OBJECT
 ) {
 	if ( options.isAutosave || options.isPreview ) {
+		return false;
+	}
+
+	if ( isEditedPostNew( state ) ) {
 		return false;
 	}
 
@@ -783,6 +803,54 @@ export function getDistributedEditingSaveJourneyState(
 		),
 	};
 }
+
+/**
+ * Returns whether the current editable DE-RTC post body differs from the last
+ * server-confirmed body adopted by this editor session.
+ *
+ * This intentionally does not replace core-data dirtiness: WordPress still
+ * owns title, status, meta, entity, and first-save validity. DE-RTC content
+ * needs its own comparison because core dirty state can be reset by save
+ * bookkeeping while a distributed body still differs from the confirmed base.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} Distributed Editing document dirty state.
+ */
+export const getDistributedEditingDocumentDirtyState = createRegistrySelector(
+	() => ( state ) => {
+		const sessionState = getDistributedEditingSessionState( state );
+		const baseCanonicalContent = getDistributedEditingComparablePostContent(
+			sessionState.clientBaseContent
+		);
+		const currentCanonicalContent =
+			getDistributedEditingComparablePostContent(
+				getEditedPostContent( state )
+			);
+		const hasBaseContent = typeof baseCanonicalContent === 'string';
+		const hasCurrentContent = typeof currentCanonicalContent === 'string';
+
+		return {
+			isDirty: Boolean(
+				hasBaseContent &&
+					hasCurrentContent &&
+					currentCanonicalContent !== baseCanonicalContent
+			),
+			hasBaseContent,
+			hasCurrentContent,
+			baseCanonicalContent: hasBaseContent ? baseCanonicalContent : null,
+			currentCanonicalContent: hasCurrentContent
+				? currentCanonicalContent
+				: null,
+			baseVersion:
+				sessionState.clientBaseVersion ||
+				sessionState.serverVersion ||
+				null,
+			serverVersion: sessionState.serverVersion || null,
+			stateHash: sessionState.distributedEditingPostStateHash || null,
+		};
+	}
+);
 
 /**
  * Returns the content-free repeated visible Save proof vocabulary.

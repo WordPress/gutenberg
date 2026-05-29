@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -107,6 +107,48 @@ describe( 'PostSavedState', () => {
 
 		expect( within( button ).getByTestId( 'test-icon' ) ).toBeVisible();
 		expect( within( button ).getByText( 'Saved' ) ).toBeVisible();
+	} );
+
+	it( 'should let new edits override the transient Saved message', async () => {
+		let editorState = {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: true,
+			postStatus: 'draft',
+		};
+
+		useSelect.mockImplementation( () => editorState );
+		useViewportMatch.mockImplementation( () => true );
+
+		const { rerender } = render( <PostSavedState /> );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Saving' } )
+		).toBeVisible();
+
+		editorState = {
+			...editorState,
+			isDirty: false,
+			isSaving: false,
+		};
+		rerender( <PostSavedState /> );
+
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Saved' } )
+			).toBeVisible()
+		);
+
+		editorState = {
+			...editorState,
+			isDirty: true,
+		};
+		rerender( <PostSavedState /> );
+
+		const button = screen.getByRole( 'button', { name: 'Save draft' } );
+		expect( button ).toBeEnabled();
+		expect( mockSavePost ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should return Save button if edits to be saved', async () => {

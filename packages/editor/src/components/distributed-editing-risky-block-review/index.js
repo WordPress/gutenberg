@@ -19,7 +19,6 @@ import { store as editorStore } from '../../store';
 import {
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
-	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 } from '../../store/distributed-editing';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 
@@ -173,15 +172,13 @@ addFilter(
 export function DistributedEditingRiskyBlockReviewStatusChrome( {
 	onOpenReview,
 } ) {
-	const { reviewState, savePolicy } =
-		useDistributedEditingRiskyBlockReviewState();
+	const { reviewState } = useDistributedEditingRiskyBlockReviewState();
 	const { __experimentalOpenDistributedEditingRiskyBlockReview } =
 		useDispatch( editorStore ) || {};
 
 	if (
 		! shouldRenderDistributedEditingRiskyBlockReview( reviewState ) ||
-		savePolicy.clickAction !==
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
+		! reviewState.prePublishPanelRequired
 	) {
 		return null;
 	}
@@ -203,7 +200,7 @@ export function DistributedEditingRiskyBlockReviewStatusChrome( {
 			<Notice
 				actions={ [
 					{
-						label: __( 'Review changes' ),
+						label: __( 'Review HTML' ),
 						onClick: openReview,
 					},
 				] }

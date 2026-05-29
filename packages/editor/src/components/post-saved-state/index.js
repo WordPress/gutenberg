@@ -75,12 +75,16 @@ export default function PostSavedState( { forceIsDirty } ) {
 				getPostEdits,
 				getDistributedEditingSaveButtonState,
 				getDistributedEditingSaveJourneyState,
+				getDistributedEditingDocumentDirtyState,
 				hasPendingDistributedEditingChanges,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
+			const distributedEditingDocumentDirtyState =
+				getDistributedEditingDocumentDirtyState?.() || {};
 			const editorIsDirty =
 				forceIsDirty ||
 				isEditedPostDirty() ||
+				Boolean( distributedEditingDocumentDirtyState.isDirty ) ||
 				Boolean( hasPendingDistributedEditingChanges?.() );
 
 			return {
@@ -217,7 +221,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		getDistributedEditingSaveJourneyDataAttributes(
 			distributedEditingSaveJourneyState
 		);
-	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
+	const isSaved = ! isDirty && ( forceSavedMessage || ! isNew );
 	const isSavedState = hasDistributedEditingSaveButtonState
 		? distributedEditingSaveButtonBusy ||
 		  distributedEditingAuthoritativePostUpdated

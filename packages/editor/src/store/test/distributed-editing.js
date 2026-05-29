@@ -2890,8 +2890,8 @@ describe( 'distributed editing session state', () => {
 			riskyBlockReviewChangesPostLock: false,
 			riskyBlockReviewClaimsSaved: false,
 			requiresManualConflictResolution: false,
-			mustOfferLocalCopy: false,
-			canExportLocalUpdates: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -2927,7 +2927,7 @@ describe( 'distributed editing session state', () => {
 			canAttemptLocalRebase: false,
 			requiresManualConflictResolution: false,
 			mustOfferLocalCopy: true,
-			canExportLocalUpdates: false,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -3756,8 +3756,8 @@ describe( 'distributed editing session state', () => {
 			retrySubmitMutatesPostContent: false,
 			retrySubmitCreatesRevision: false,
 			retrySubmitClaimsSaved: false,
-			mustOfferLocalCopy: false,
-			canExportLocalUpdates: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -3818,7 +3818,7 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED,
 			retrySubmitProofReason:
 				DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
-			canExportLocalUpdates: false,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -3880,8 +3880,8 @@ describe( 'distributed editing session state', () => {
 			retrySubmitMutatesPostContent: false,
 			retrySubmitCreatesRevision: false,
 			retrySubmitClaimsSaved: false,
-			mustOfferLocalCopy: false,
-			canExportLocalUpdates: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -3909,7 +3909,7 @@ describe( 'distributed editing session state', () => {
 			retrySubmitSavePrepared: false,
 			retrySubmitSaveReady: false,
 			hasPendingChanges: true,
-			canExportLocalUpdates: false,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -3973,8 +3973,8 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalIssuedAt: '1893456000',
 			retrySaveReviewApprovalExpiresAt: '1893456300',
 			retrySaveReviewApprovalSiteUrl: 'http://example.test',
-			mustOfferLocalCopy: false,
-			canExportLocalUpdates: false,
+			mustOfferLocalCopy: true,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -4014,7 +4014,7 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalSiteId: '1',
 			retrySaveReviewApprovalSiteUrl: 'http://example.test',
 			mustOfferLocalCopy: true,
-			canExportLocalUpdates: false,
+			canExportLocalUpdates: true,
 		} );
 	} );
 
@@ -4078,36 +4078,36 @@ describe( 'distributed editing session state', () => {
 		const safeServerContent =
 			'<!-- wp:paragraph --><p>Demo content alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Duplicated content!</p><!-- /wp:paragraph --><!-- wp:html -->\n<div>Demo content beta.</div>\n<!-- /wp:html --><!-- wp:paragraph --><p>Demo content gamma.</p><!-- /wp:paragraph -->';
 		const safeServerRawContent = `<!-- wp:sync-meta {"format":"yjs"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">{"schema":"de-rtc-yjs-v1","version":"302"}</script>\n<!-- /wp:sync-meta -->${ safeServerContent }`;
-			const normalized = getDistributedEditingSessionStateForRetrySaveResult(
-				{
-					result: 'retry_save_partial_safe_merge',
-					reason_code: 'de_rtc_unfiltered_html_would_change_content',
-					server_version: '302',
-					pending_change_count: 1,
-					pre_publish_review_required: true,
-					partial_safe_merge_applied: true,
-					partial_safe_merge_status: 'safe_subset_already_current',
-					safe_server_content_included: true,
-					unsafe_raw_content_included: false,
-					content: {
-						raw: safeServerRawContent,
-					},
-					review_items: [
-						{
-							id: 'unsafe-html-block',
-							block_path: [ 2 ],
-							block_name: 'core/html',
-							change_kind: 'modified_block',
-							review_status: 'pending_review',
-							content_review_policy: 'kses',
-							review_evidence_type: 'kses_block_hash_only_change',
-							raw_content_included: false,
-							exposes_raw_content: false,
-						},
-					],
-					pending_review_item_count: 1,
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				result: 'retry_save_partial_safe_merge',
+				reason_code: 'de_rtc_unfiltered_html_would_change_content',
+				server_version: '302',
+				pending_change_count: 1,
+				pre_publish_review_required: true,
+				partial_safe_merge_applied: true,
+				partial_safe_merge_status: 'safe_subset_already_current',
+				safe_server_content_included: true,
+				unsafe_raw_content_included: false,
+				content: {
+					raw: safeServerRawContent,
 				},
-				{
+				review_items: [
+					{
+						id: 'unsafe-html-block',
+						block_path: [ 2 ],
+						block_name: 'core/html',
+						change_kind: 'modified_block',
+						review_status: 'pending_review',
+						content_review_policy: 'kses',
+						review_evidence_type: 'kses_block_hash_only_change',
+						raw_content_included: false,
+						exposes_raw_content: false,
+					},
+				],
+				pending_review_item_count: 1,
+			},
+			{
 				clientBaseVersion: '301',
 				serverVersion: '301',
 				clientBaseContent:
@@ -4172,8 +4172,7 @@ describe( 'distributed editing session state', () => {
 		expect(
 			getDistributedEditingSavePolicyStateForSessionState( normalized )
 		).toMatchObject( {
-			status:
-				DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
+			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE,
 			saveButtonLabel: 'Save',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
@@ -5922,7 +5921,7 @@ describe( 'distributed editing session state', () => {
 			retrySaveReviewApprovalCreatesRevision: false,
 			retrySaveReviewApprovalClaimsSaved: false,
 			mustOfferLocalCopy: true,
-			canExportLocalUpdates: false,
+			canExportLocalUpdates: true,
 		} );
 		expect( normalized.retrySaveStatus ).toBe(
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE
@@ -6253,9 +6252,9 @@ describe( 'distributed editing session state', () => {
 			riskyBlockReviewItemCount: 1,
 			riskyBlockReviewPendingCount: 1,
 			riskyBlockReviewPrePublishPanelRequired: true,
-			riskyBlockReviewSaveButtonLabel: 'Review changes',
+			riskyBlockReviewSaveButtonLabel: 'Save',
 			riskyBlockReviewSaveClickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			riskyBlockReviewRawContentIncluded: false,
 			riskyBlockReviewExposesRawContent: false,
 			riskyBlockReviewDispatchesNotice: false,
@@ -6270,9 +6269,9 @@ describe( 'distributed editing session state', () => {
 			pendingReviewItemCount: 1,
 			hasPendingReviewItems: true,
 			prePublishPanelRequired: true,
-			saveButtonLabel: 'Review changes',
+			saveButtonLabel: 'Save',
 			saveClickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			canExportLocalUpdates: false,
 			dispatchesNotice: false,
 			mutatesEditorContent: false,
@@ -6319,11 +6318,11 @@ describe( 'distributed editing session state', () => {
 		expect( savePolicy ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED,
 			reason: 'risky_block_review_required',
-			saveButtonLabel: 'Review changes',
+			saveButtonLabel: 'Save',
 			clickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
-			opensPrePublishReview: true,
+			opensPrePublishReview: false,
 			requiresServerStateRefetch: false,
 			reviewItemCount: 1,
 			pendingReviewItemCount: 1,
@@ -6332,14 +6331,15 @@ describe( 'distributed editing session state', () => {
 			saveButton: expect.objectContaining( {
 				status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED,
 				source: 'risky_block_review',
-				label: 'Review changes',
-				statusText: 'Review changes before WordPress updates the post.',
+				label: 'Save',
+				statusText:
+					'WordPress will save safe edits and keep blocked blocks for review.',
 				clickAction:
-					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 				authorityStatusText:
 					'WordPress cannot update the post until risky changes are approved or removed.',
 				blocksNormalSavePost: true,
-				opensPrePublishReview: true,
+				opensPrePublishReview: false,
 				shouldCallNormalSavePost: false,
 				shouldCallRetrySaveEndpoint: false,
 				claimsSaved: false,
@@ -6469,13 +6469,13 @@ describe( 'distributed editing session state', () => {
 			reason: 'fresh_review_required',
 			placement:
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
-			saveButtonLabel: 'Review changes',
+			saveButtonLabel: 'Save',
 			clickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
 			opensPrePublishReview: true,
 			requiresServerStateRefetch: false,
-			canExportLocalUpdates: true,
+			canExportLocalUpdates: false,
 			hasProtectedLocalChanges: true,
 			requestAccepted: true,
 			requested: true,
@@ -6508,7 +6508,7 @@ describe( 'distributed editing session state', () => {
 						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
 					freshReviewPreSaveBlocksNormalSavePost: true,
 					freshReviewPreSaveOpensPrePublishReview: true,
-					freshReviewPreSaveCanExportLocalUpdates: true,
+					freshReviewPreSaveCanExportLocalUpdates: false,
 					shouldCallNormalSavePost: false,
 					shouldCallRetrySaveEndpoint: false,
 					claimsSaved: false,
@@ -6815,9 +6815,9 @@ describe( 'distributed editing session state', () => {
 			panelRequired: true,
 			reviewListStatus:
 				DISTRIBUTED_EDITING_FRESH_REVIEW_REVIEW_LIST_STATUSES.AWAITING_REVIEW,
-			saveButtonLabel: 'Review changes',
+			saveButtonLabel: 'Save',
 			saveClickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
 			opensPrePublishReview: true,
 			canRecordLocalDecisions: true,
@@ -6855,7 +6855,7 @@ describe( 'distributed editing session state', () => {
 			canShowRendererCapabilitySupportSummary: true,
 			saveAction: expect.objectContaining( {
 				actionKey:
-					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 				descriptorOnly: true,
 				callsRestEndpoint: false,
 				callsNormalSavePost: false,
@@ -6868,13 +6868,7 @@ describe( 'distributed editing session state', () => {
 				descriptorOnly: true,
 				callsRestEndpoint: false,
 			} ),
-			exportAction: expect.objectContaining( {
-				actionKey:
-					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-				enabled: true,
-				descriptorOnly: true,
-				callsRestEndpoint: false,
-			} ),
+			exportAction: null,
 			refetchAction: null,
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
@@ -7541,24 +7535,19 @@ describe( 'distributed editing session state', () => {
 				rejectionReason: 'reviewer_rejected_deleted_block',
 			} ),
 		] );
-		expect( requestedPrePublishState.actionKeys ).toEqual(
-			expect.arrayContaining( [
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-			] )
-		);
+		expect( requestedPrePublishState.actionKeys ).toEqual( [
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+		] );
 		expect( requestedPrePublishState.actionKeys ).not.toContain(
 			DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION
 		);
 		expect( requestedPrePublishState.actionKeys ).not.toContain(
 			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
 		);
-		expect( resolvedPrePublishState.actionKeys ).toEqual(
-			expect.arrayContaining( [
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-			] )
-		);
+		expect( resolvedPrePublishState.actionKeys ).toEqual( [
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.SUBMIT_FRESH_REVIEW_DECISION,
+		] );
 		expect( JSON.stringify( requestedPrePublishState ) ).not.toContain(
 			rawContentToken
 		);
@@ -7578,7 +7567,7 @@ describe( 'distributed editing session state', () => {
 			pendingChangeCount: 1,
 			hasPendingChanges: true,
 			mustOfferLocalCopy: true,
-			canExportLocalUpdates: true,
+			canExportLocalUpdates: false,
 			localUpdatesImportStatus:
 				DISTRIBUTED_EDITING_LOCAL_UPDATES_IMPORT_STATUSES.BLOCKED,
 			localUpdatesImportReason:
@@ -7618,7 +7607,7 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
 			opensPrePublishReview: false,
-			canExportLocalUpdates: true,
+			canExportLocalUpdates: false,
 			reviewedBlockItemCount: 1,
 			handoffAccepted: true,
 			freshReviewConsumed: true,
@@ -7642,7 +7631,7 @@ describe( 'distributed editing session state', () => {
 						DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 					freshReviewPreSaveBlocksNormalSavePost: true,
 					freshReviewPreSaveOpensPrePublishReview: false,
-					freshReviewPreSaveCanExportLocalUpdates: true,
+					freshReviewPreSaveCanExportLocalUpdates: false,
 					shouldCallNormalSavePost: false,
 					shouldCallRetrySaveEndpoint: false,
 					claimsSaved: false,
@@ -7809,17 +7798,17 @@ describe( 'distributed editing session state', () => {
 			placement:
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
 			clickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
 			opensPrePublishReview: true,
-			canExportLocalUpdates: true,
+			canExportLocalUpdates: false,
 		} );
 		expect( saveButton ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED,
 			reason: 'fresh_review_required',
-			label: 'Review changes',
+			label: 'Save',
 			clickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
 			authoritativePostUpdated: false,
@@ -7835,11 +7824,11 @@ describe( 'distributed editing session state', () => {
 		expect( savePolicy ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED,
 			reason: 'fresh_review_required',
-			saveButtonLabel: 'Review changes',
+			saveButtonLabel: 'Save',
 			clickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
-			opensPrePublishReview: true,
+			opensPrePublishReview: false,
 			saveButtonAuthoritativePostUpdated: false,
 			saveButtonLocalChangesState:
 				DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES.PROTECTED_CHANGES_EXPORTABLE,
@@ -7857,9 +7846,9 @@ describe( 'distributed editing session state', () => {
 					freshReviewPreSaveStatus:
 						DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED,
 					freshReviewPreSaveClickAction:
-						DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+						DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 					freshReviewPreSaveBlocksNormalSavePost: true,
-					freshReviewPreSaveCanExportLocalUpdates: true,
+					freshReviewPreSaveCanExportLocalUpdates: false,
 					claimsSaved: false,
 				} ),
 			] )
@@ -8047,12 +8036,13 @@ describe( 'distributed editing session state', () => {
 		expect( buttonStates.reviewBlocked ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED,
 			source: 'fresh_review',
-			label: 'Review changes',
-			statusText: 'Review changes before WordPress updates the post.',
+			label: 'Save',
+			statusText:
+				'WordPress will save safe edits and keep blocked blocks for review.',
 			clickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
-			opensPrePublishReview: true,
+			opensPrePublishReview: false,
 			authorityState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE,
 			authorityStatusText:
@@ -8227,7 +8217,7 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( buttonStates.refetchRequired ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
-			label: 'Get latest post',
+			label: 'Save',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 			requiresServerStateRefetch: true,
@@ -8543,8 +8533,8 @@ describe( 'distributed editing session state', () => {
 					hasPendingChanges: true,
 					canExportLocalUpdates: true,
 				},
-				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
-				action: 'wait_or_export',
+				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_EDIT,
+				action: 'edit',
 				saveButtonLabel: 'Update',
 			},
 			{
@@ -8556,7 +8546,7 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
 				action: 'get_latest_post',
-				saveButtonLabel: 'Get latest post',
+				saveButtonLabel: 'Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -8572,7 +8562,7 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
 				action: 'review_changes',
-				saveButtonLabel: 'Review changes',
+				saveButtonLabel: 'Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -8831,18 +8821,18 @@ describe( 'distributed editing session state', () => {
 				summary: 'Load the latest post before saving again.',
 				actionHint: 'Get latest first',
 				requiresActionBeforeSave: true,
-				saveButtonLabel: 'Get latest post',
+				saveButtonLabel: 'Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
 				sessionState: reviewState,
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
 				action: 'review_changes',
-				title: 'Review changes',
-				summary: 'Review changes before saving.',
+				title: 'HTML review',
+				summary: 'Review blocked HTML before saving it.',
 				actionHint: 'Review before update',
 				requiresActionBeforeSave: true,
-				saveButtonLabel: 'Review changes',
+				saveButtonLabel: 'Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -8993,7 +8983,7 @@ describe( 'distributed editing session state', () => {
 			shouldExposeInSaveControls: true,
 			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
 			action: 'review_changes',
-			title: 'Review changes',
+			title: 'HTML review',
 			statusChromeSummary:
 				'Protected local changes need review before WordPress can update the post.',
 			statusChromeAuthorityState:
@@ -9045,7 +9035,7 @@ describe( 'distributed editing session state', () => {
 			shouldExposeInSaveControls: false,
 			step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
 			action: 'review_changes',
-			title: 'Review changes',
+			title: 'HTML review',
 		} );
 	} );
 
@@ -9267,13 +9257,12 @@ describe( 'distributed editing session state', () => {
 			placement:
 				DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_PLACEMENTS.PRE_PUBLISH_REVIEW,
 			clickAction:
-				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
 			requiresServerStateRefetch: true,
 			canRefetchServerState: true,
-			canExportLocalUpdates: true,
+			canExportLocalUpdates: false,
 			actionKeys: [
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 			],
 			reviewListStatus:
@@ -9308,13 +9297,8 @@ describe( 'distributed editing session state', () => {
 			blocksNormalSavePost: true,
 			requiresServerStateRefetch: true,
 			canRefetchServerState: true,
-			canExportLocalUpdates: true,
-			exportAction: expect.objectContaining( {
-				actionKey:
-					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-				descriptorOnly: true,
-				callsRestEndpoint: false,
-			} ),
+			canExportLocalUpdates: false,
+			exportAction: null,
 			refetchAction: expect.objectContaining( {
 				actionKey:
 					DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
@@ -9327,12 +9311,10 @@ describe( 'distributed editing session state', () => {
 			changesPostLock: false,
 			claimsSaved: false,
 		} );
-		expect( prePublishState.actionKeys ).toEqual(
-			expect.arrayContaining( [
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
-			] )
-		);
+		expect( prePublishState.actionKeys ).toEqual( [
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+			DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
+		] );
 		expect( retrySavePolicy ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_STATUSES.BLOCKED,
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
@@ -9459,7 +9441,7 @@ describe( 'distributed editing session state', () => {
 			prePublishPanelRequired: false,
 			saveClickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
-			canExportLocalUpdates: true,
+			canExportLocalUpdates: false,
 			reviewItems: [
 				expect.objectContaining( {
 					id: 'risk-added',
@@ -9520,7 +9502,7 @@ describe( 'distributed editing session state', () => {
 			currentServerVersion: '31',
 			saveClickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
-			canExportLocalUpdates: true,
+			canExportLocalUpdates: false,
 		} );
 		expect( staleReviewState.reviewItems ).toEqual(
 			expect.arrayContaining( [
@@ -9680,8 +9662,8 @@ describe( 'distributed editing session state', () => {
 			status: DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED,
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 			source: 'retry_save',
-			label: 'Get latest post',
-			statusText: 'Load the latest post before Save can continue.',
+			label: 'Save',
+			statusText: 'WordPress will get the latest post before saving.',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 			requiresServerStateRefetch: true,
@@ -9710,7 +9692,7 @@ describe( 'distributed editing session state', () => {
 		expect( editorSavePolicy ).toMatchObject( {
 			status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REFETCH_REQUIRED,
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
-			saveButtonLabel: 'Get latest post',
+			saveButtonLabel: 'Save',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 			requiresServerStateRefetch: true,
@@ -12030,7 +12012,6 @@ describe( 'distributed editing session state', () => {
 			hasLocalRebaseInputs: true,
 			actionKeys: [
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 			],
 		} );
@@ -12063,7 +12044,6 @@ describe( 'distributed editing session state', () => {
 			readyToRetrySubmit: true,
 			actionKeys: [
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 			],
 		} );
@@ -12095,7 +12075,6 @@ describe( 'distributed editing session state', () => {
 			hasRefetchedServerContent: true,
 			hasLocalRebaseInputs: false,
 			actionKeys: [
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 			],
 		} );
@@ -12130,7 +12109,6 @@ describe( 'distributed editing session state', () => {
 			retrySubmitPrepared: true,
 			actionKeys: [
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 			],
 		} );

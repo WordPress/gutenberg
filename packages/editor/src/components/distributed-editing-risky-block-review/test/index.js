@@ -73,21 +73,21 @@ const REVIEW_STATE = {
 	rejectedReviewItemCount: 0,
 	hasPendingReviewItems: true,
 	prePublishPanelRequired: true,
-	saveButtonLabel: 'Review changes',
+	saveButtonLabel: 'Save',
 	saveClickAction:
-		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
-	canExportLocalUpdates: true,
+		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+	canExportLocalUpdates: false,
 	requiresServerStateRefetch: false,
 };
 
 const SAVE_POLICY = {
 	status: DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED,
 	reason: 'risky_block_review_required',
-	saveButtonLabel: 'Review changes',
+	saveButtonLabel: 'Save',
 	clickAction:
-		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW,
+		DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 	blocksNormalSavePost: true,
-	opensPrePublishReview: true,
+	opensPrePublishReview: false,
 	requiresServerStateRefetch: false,
 	saveButtonLocalChangesState: 'protected_local_changes_exportable',
 	saveButtonReviewCheckpointState: 'review_required',
@@ -225,7 +225,7 @@ describe( 'DistributedEditingRiskyBlockReviewStatusChrome', () => {
 
 		expect( screen.getByText( 'HTML review required' ) ).toBeVisible();
 		await user.click(
-			screen.getByRole( 'button', { name: 'Review changes' } )
+			screen.getByRole( 'button', { name: 'Review HTML' } )
 		);
 
 		expect(
