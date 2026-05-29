@@ -2,9 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Button`: Button children are now wrapped in an inner `<span>`. Custom CSS or event handling that relies on direct-child selectors, such as `.my-button > svg`, or on `event.target` pointing to a child element may need updating. The wrapper layout styles only apply to styled variants; `variant="unstyled"` receives the wrapper DOM without the styled wrapper layout ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
+
 ### Enhancements
 
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
+
+### Bug Fixes
+
+-   `Button`: Hide loading content and keep the loading spinner visually animated in forced colors mode ([#78820](https://github.com/WordPress/gutenberg/pull/78820)).
 
 ## 0.14.0 (2026-05-27)
 
