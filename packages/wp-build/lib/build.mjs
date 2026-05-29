@@ -109,6 +109,23 @@ function getAllPackages() {
 }
 
 const PACKAGES = getAllPackages();
+
+// Collect every discovered package's `name` field. This registry is the
+// source of truth for script-module identity: the externals plugin uses it
+// to externalize internal-package imports by exact name, and the bundler
+// uses it as the script-module ID directly. Decoupling identity from
+// `packageNamespace` lets the package's own `name` survive end-to-end
+// (npm name === import specifier === script-module ID), instead of being
+// rewritten to `@<packageNamespace>/<dirName>` at build time.
+const INTERNAL_PACKAGE_NAMES = new Set(
+	PACKAGES.map(
+		( pkg ) =>
+			getPackageInfoFromFile(
+				path.join( PACKAGES_DIR, pkg, 'package.json' )
+			).name
+	).filter( Boolean )
+);
+
 const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
 	path.join( ROOT_DIR, 'package.json' )
 );
@@ -159,7 +176,8 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	PACKAGE_NAMESPACE,
 	SCRIPT_GLOBAL,
 	EXTERNAL_NAMESPACES,
-	HANDLE_PREFIX
+	HANDLE_PREFIX,
+	INTERNAL_PACKAGE_NAMES
 );
 
 const styleRuntimeRequire = createNodeRequire( import.meta.url );
@@ -724,10 +742,19 @@ async function bundlePackage( packageName, options = {} ) {
 				);
 			}
 
+			// The script-module ID is the package's own `name` field. The
+			// PHP registry, the asset manifest, and `wp_register_script_module`
+			// all treat the ID as an opaque string, so this lets the npm name
+			// survive end-to-end without being rewritten by build configuration.
+			// Falls back to the legacy `@<packageNamespace>/<dirName>` shape
+			// only when `name` is missing (e.g. an unnamed local package).
+			const packageId =
+				packageJson.name ||
+				`@${ packageNamespace }/${ packageName }`;
 			const scriptModuleId =
 				exportName === '.'
-					? `@${ packageNamespace }/${ packageName }`
-					: `@${ packageNamespace }/${ packageName }/${ fileName }`;
+					? packageId
+					: `${ packageId }/${ fileName }`;
 
 			builtModules.push( {
 				id: scriptModuleId,
