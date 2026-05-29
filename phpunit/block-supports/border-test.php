@@ -779,6 +779,44 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * End-to-end: a block that opts into `color` (and/or `width`) but not
+	 * `style` still receives the visibility fallback. Opting out of `style`
+	 * means the user cannot pick a style via UI; it does not mean a block
+	 * whose attributes carry a color or width should be invisible. This
+	 * matches the legacy CSS `:where()` fallback behaviour.
+	 */
+	public function test_render_block_filter_applies_to_block_without_style_support() {
+		self::register_bordered_block_with_support(
+			'test/fallback-color-only-support',
+			array(
+				'__experimentalBorder' => array(
+					'color' => true,
+					'width' => true,
+				),
+			)
+		);
+
+		$inner_html = '<div style="border-color:#ff0000;border-width:2px">x</div>';
+		$rendered   = $this->render_block_through_filter(
+			'test/fallback-color-only-support',
+			array(
+				'style' => array(
+					'border' => array(
+						'color' => '#ff0000',
+						'width' => '2px',
+					),
+				),
+			),
+			$inner_html
+		);
+
+		$this->assertStringContainsString( 'border-top-style:solid', $rendered );
+		$this->assertStringContainsString( 'border-right-style:solid', $rendered );
+		$this->assertStringContainsString( 'border-bottom-style:solid', $rendered );
+		$this->assertStringContainsString( 'border-left-style:solid', $rendered );
+	}
+
+	/**
 	 * End-to-end: inheritance from the resolved global block-type border
 	 * style suppresses the fallback for all sides.
 	 */

@@ -13,13 +13,13 @@ import {
 } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
@@ -605,6 +605,13 @@ function useBlockProps( { name, clientId, borderColor, style } ) {
 		! hasBorderSupport( name, 'color' ) ||
 		shouldSkipSerialization( name, BORDER_SUPPORT_KEY, 'color' )
 	) {
+		return {};
+	}
+
+	// Quick exit when the block has no border-related attribute at all.
+	// Avoids the preset-color resolution and fallback work below for the
+	// common case of border-supporting blocks without border data set.
+	if ( ! borderColor && ! style?.border ) {
 		return {};
 	}
 
