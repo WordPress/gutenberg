@@ -1,18 +1,16 @@
 /**
- * Widget type definitions for the dashboard engine.
+ * Dashboard-specific types: `DashboardWidget`, grid settings, and the
+ * `WidgetDashboard` prop bag.
  *
- * The widget identity types (`WidgetName`, `WidgetTypeMetadata`,
- * `WidgetType`) live in `routes/dashboard/widget-types/types` and are
- * re-exported here so dashboard internals can pull every type they need
- * from a single module. The local declarations below cover the
- * dashboard-specific surface area: `DashboardWidget`, render props,
- * module resolver, grid settings, and the `WidgetDashboard` prop bag.
+ * The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`,
+ * `ResolveWidgetModule`) live in `widget-primitives` and are imported from there
+ * directly; this module does not re-export them.
  */
 
 /**
  * External dependencies
  */
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -27,11 +25,9 @@ import type {
  */
 import type {
 	WidgetName,
-	WidgetTypeMetadata,
 	WidgetType,
-} from '../widget-types/types';
-
-export type { WidgetName, WidgetTypeMetadata, WidgetType };
+	ResolveWidgetModule,
+} from '../widget-primitives';
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
 export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
@@ -88,22 +84,6 @@ export interface DashboardWidget< Item = unknown > {
 }
 
 /**
- * Props passed to every widget render component.
- */
-export interface WidgetRenderProps< Item = unknown > {
-	/**
-	 * Widget attributes configured by the user.
-	 */
-	attributes: Item;
-
-	/**
-	 * Update the attributes of this instance. Fires `onLayoutChange` on the
-	 * dashboard with the updated layout.
-	 */
-	setAttributes?: ( next: Partial< Item > ) => void;
-}
-
-/**
  * Identity of a widget within the rendering tree. Returned by
  * `useWidgetContext()`; `null` when called outside a widget render subtree.
  */
@@ -123,22 +103,6 @@ export interface WidgetContextValue {
 	 */
 	index: number;
 }
-
-/**
- * Widget render module shape returned by the module resolver.
- */
-export interface WidgetModule {
-	default: ComponentType< WidgetRenderProps< unknown > >;
-}
-
-/**
- * Resolver hook: maps a `WidgetType.renderModule` id to a React component.
- * Defaults to a dynamic `import()`; override for tests, Storybook, or to load
- * from a non-URL source.
- */
-export type ResolveWidgetModule = (
-	moduleId: string
-) => Promise< WidgetModule >;
 
 /**
  * Identifier for the active grid model. Drives which `@wordpress/grid`

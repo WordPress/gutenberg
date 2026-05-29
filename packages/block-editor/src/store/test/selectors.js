@@ -5005,6 +5005,7 @@ describe( '__unstableGetClientIdsTree', () => {
 			},
 			{ clientId: 'baz', innerBlocks: [] },
 		] );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {

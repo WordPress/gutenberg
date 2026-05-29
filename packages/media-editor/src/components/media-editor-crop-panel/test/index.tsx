@@ -18,8 +18,6 @@ function setupCropPanel(
 	const props: MediaEditorCropPanelProps = {
 		aspectRatioValue: '1',
 		onAspectRatioChange: jest.fn(),
-		freeformCrop: false,
-		onFreeformChange: jest.fn(),
 		aspectRatioOptions: [
 			{ label: 'Free', value: 0 },
 			{ label: 'Original', value: -1 },
@@ -49,13 +47,9 @@ describe( 'MediaEditorCropPanel', () => {
 		setupCropPanel();
 
 		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
-		const resizeCropArea = screen.getByLabelText( 'Show resize handles' );
 		const zoom = screen.getByRole( 'slider', { name: 'Zoom (%)' } );
 
-		expect( aspectRatio.compareDocumentPosition( resizeCropArea ) ).toBe(
-			Node.DOCUMENT_POSITION_FOLLOWING
-		);
-		expect( resizeCropArea.compareDocumentPosition( zoom ) ).toBe(
+		expect( aspectRatio.compareDocumentPosition( zoom ) ).toBe(
 			Node.DOCUMENT_POSITION_FOLLOWING
 		);
 	} );
@@ -63,7 +57,6 @@ describe( 'MediaEditorCropPanel', () => {
 	it( 'passes selected aspect ratio changes to the caller', () => {
 		const controls = setupCropPanel( {
 			aspectRatioValue: '1',
-			freeformCrop: false,
 		} );
 
 		fireEvent.change( screen.getByLabelText( 'Aspect ratio' ), {
@@ -74,18 +67,6 @@ describe( 'MediaEditorCropPanel', () => {
 		expect(
 			( controls.onAspectRatioChange as jest.Mock ).mock.calls[ 0 ][ 0 ]
 		).toBe( '0' );
-		expect( controls.onFreeformChange ).not.toHaveBeenCalled();
-	} );
-
-	it( 'passes resize-handle changes to the caller', () => {
-		const controls = setupCropPanel( {
-			aspectRatioValue: '0',
-			freeformCrop: true,
-		} );
-
-		fireEvent.click( screen.getByLabelText( 'Show resize handles' ) );
-
-		expect( controls.onFreeformChange ).toHaveBeenCalledWith( false );
 	} );
 
 	it( 'displays zoom as a percentage without changing cropper state', () => {

@@ -85,7 +85,11 @@ export default function AdvancedPanel( {
 	}
 
 	return (
-		<Stack direction="column" gap="md">
+		<Stack
+			direction="column"
+			gap="md"
+			className="block-editor-global-styles-advanced-panel"
+		>
 			{ cssError && (
 				<Notice status="error" onRemove={ () => setCSSError( null ) }>
 					{ cssError }

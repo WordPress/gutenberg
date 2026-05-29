@@ -452,8 +452,6 @@ function MediaEditorContent( {
 		aspectRatioValue,
 		setAspectRatioValue,
 		aspectRatioOptions,
-		freeformCrop,
-		setFreeformCrop,
 		resetCropOptions,
 	} = useCropOptions( {
 		aspectRatioPresets,
@@ -496,8 +494,6 @@ function MediaEditorContent( {
 						<MediaEditorCropPanel
 							aspectRatioValue={ aspectRatioValue }
 							onAspectRatioChange={ setAspectRatioValue }
-							freeformCrop={ freeformCrop }
-							onFreeformChange={ setFreeformCrop }
 							onPlacementControlInteraction={
 								signalPlacementControlInteraction
 							}
@@ -512,8 +508,6 @@ function MediaEditorContent( {
 		isImage,
 		aspectRatioValue,
 		setAspectRatioValue,
-		freeformCrop,
-		setFreeformCrop,
 		aspectRatioOptions,
 		signalPlacementControlInteraction,
 	] );

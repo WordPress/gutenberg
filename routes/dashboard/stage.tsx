@@ -14,7 +14,7 @@ import { store as viewportStore } from '@wordpress/viewport';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
-import { useWidgetTypes } from './widget-types';
+import { useWidgetTypes } from './widget-primitives';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
