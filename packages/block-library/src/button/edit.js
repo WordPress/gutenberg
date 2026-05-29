@@ -12,6 +12,9 @@ import {
 	ToolbarButton,
 	Popover,
 	ExternalLink,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToggleControl,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -48,6 +51,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
@@ -123,6 +127,42 @@ function useEnter( props ) {
 	}, [] );
 }
 
+function FullWidthOnMobilePanel( { isFullWidthOnMobile, setAttributes } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	return (
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () =>
+				setAttributes( {
+					isFullWidthOnMobile: false,
+				} )
+			}
+			dropdownMenuProps={ dropdownMenuProps }
+		>
+			<ToolsPanelItem
+				label={ __( 'Full width on mobile' ) }
+				isShownByDefault
+				hasValue={ () => !! isFullWidthOnMobile }
+				onDeselect={ () =>
+					setAttributes( { isFullWidthOnMobile: false } )
+				}
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Full width on mobile' ) }
+					checked={ isFullWidthOnMobile }
+					onChange={ () =>
+						setAttributes( {
+							isFullWidthOnMobile: ! isFullWidthOnMobile,
+						} )
+					}
+				/>
+			</ToolsPanelItem>
+		</ToolsPanel>
+	);
+}
+
 function ButtonEdit( props ) {
 	const {
 		attributes,
@@ -142,6 +182,7 @@ function ButtonEdit( props ) {
 		style,
 		text,
 		url,
+		isFullWidthOnMobile,
 		metadata,
 	} = attributes;
 	const width = style?.dimensions?.width;
@@ -331,7 +372,9 @@ function ButtonEdit( props ) {
 		<>
 			<div
 				{ ...blockProps }
-				className={ classes }
+				className={ clsx( classes, {
+					'is-full-width-on-mobile': isFullWidthOnMobile,
+				} ) }
 				style={ { ...blockProps.style, ...widthStyle } }
 			>
 				<RichText
@@ -436,6 +479,12 @@ function ButtonEdit( props ) {
 						/>
 					</Popover>
 				) }
+			<InspectorControls>
+				<FullWidthOnMobilePanel
+					isFullWidthOnMobile={ isFullWidthOnMobile }
+					setAttributes={ setAttributes }
+				/>
+			</InspectorControls>
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ tagName }
