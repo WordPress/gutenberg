@@ -46,17 +46,19 @@ async function generateContentHash(
  * This plugin handles WordPress package externals and vendor libraries,
  * treating them as external dependencies available via global variables.
  *
- * @param {string}       packageNamespace   Custom package namespace (e.g., 'wordpress', 'my-plugin').
- * @param {string|false} scriptGlobal       Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
- * @param {Object}       externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
- * @param {string}       handlePrefix       Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
+ * @param {string}       packageNamespace       Custom package namespace (e.g., 'wordpress', 'my-plugin').
+ * @param {string|false} scriptGlobal           Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
+ * @param {Object}       externalNamespaces     Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
+ * @param {string}       handlePrefix           Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
+ * @param {Set<string>}  [internalPackageNames] Exact package names discovered locally (the `name` field from each `packages/<dir>/package.json`). Imports matching any of these are externalized as script modules by exact name, regardless of `packageNamespace`. Enables a package's `name` to drive its script-module identity directly.
  * @return {Function} Function that creates the esbuild plugin instance.
  */
 export function createWordpressExternalsPlugin(
 	packageNamespace,
 	scriptGlobal,
 	externalNamespaces = {},
-	handlePrefix
+	handlePrefix,
+	internalPackageNames = new Set()
 ) {
 	/**
 	 * WordPress externals plugin for esbuild.
@@ -194,6 +196,70 @@ export function createWordpressExternalsPlugin(
 								path: args.path,
 								namespace: 'vendor-external',
 								pluginData: { global: config.global },
+							};
+						}
+					);
+				}
+
+				// Strict-name externalization for discovered internal packages.
+				// Matches the import specifier against the package's own `name`
+				// field (the registry passed in from build.mjs), letting an
+				// internal package keep its npm-scope identity end-to-end
+				// instead of being rewritten as `@<packageNamespace>/<dirName>`.
+				// Registered before the namespace-pattern handlers below so it
+				// wins for any package whose name is in the local registry; the
+				// regex pattern below still covers external dependencies that
+				// happen to live under the same namespace (e.g. `@wordpress/*`
+				// packages bundled as Core prerequisites).
+				for ( const internalName of internalPackageNames ) {
+					const escapedName = internalName.replace(
+						/[.*+?^${}()|[\]\\]/g,
+						'\\$&'
+					);
+
+					build.onResolve(
+						{ filter: new RegExp( `^${ escapedName }(/|$)` ) },
+						/** @param {import('esbuild').OnResolveArgs} args */
+						( args ) => {
+							const subpath =
+								args.path.length > internalName.length
+									? args.path.slice( internalName.length + 1 )
+									: null;
+
+							const packageJson = getPackageInfo(
+								internalName,
+								args.resolveDir
+							);
+
+							if ( ! packageJson ) {
+								return undefined;
+							}
+
+							const isScriptModule = isScriptModuleImport(
+								packageJson,
+								subpath
+							);
+							if ( ! isScriptModule ) {
+								return undefined;
+							}
+
+							const kind =
+								args.kind === 'dynamic-import'
+									? 'dynamic'
+									: 'static';
+
+							if ( kind === 'static' ) {
+								moduleDependencies.set( args.path, 'static' );
+							} else if (
+								! moduleDependencies.has( args.path )
+							) {
+								moduleDependencies.set( args.path, 'dynamic' );
+							}
+
+							return {
+								path: args.path,
+								external: true,
+								sideEffects: !! packageJson.sideEffects,
 							};
 						}
 					);

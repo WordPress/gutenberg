@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use each package's own `name` field as its script-module ID and externalize internal-package imports by exact name. Decouples script-module identity from `wpPlugin.packageNamespace`, so the npm name survives end-to-end (npm name === import specifier === script-module ID). No-op for Core; enables consumers whose owned npm scope differs from `packageNamespace` to keep a single identifier across pnpm, IDE, and the WordPress runtime.
+
 ### Bug Fixes
 
 -   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead ([#78493](https://github.com/WordPress/gutenberg/pull/78493)).
