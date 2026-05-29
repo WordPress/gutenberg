@@ -30,12 +30,17 @@ export default function SidebarDatetimeView( {
 	);
 	// `aria-label` exposes the full date to assistive tech; the visible text
 	// is a shortened summary (`<time dateTime>` is for machines, not announced
-	// by screen readers). The Tooltip remains available on mouse hover.
+	// by screen readers). `tabIndex={0}` makes the trigger keyboard-focusable
+	// so the Tooltip is available on both hover and keyboard focus.
 	return (
 		<Tooltip.Root>
 			<Tooltip.Trigger
 				render={
-					<time dateTime={ value } aria-label={ fullDatetime }>
+					<time
+						dateTime={ value }
+						aria-label={ fullDatetime }
+						tabIndex={ 0 }
+					>
 						{ dateOnly }
 					</time>
 				}
