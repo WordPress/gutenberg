@@ -78,7 +78,7 @@ function CropperPanel( { src }: { src: string } ) {
 
 ## Use the Media Editor Composite Controller
 
-Use the media editor controller when cropper state must share history with controls such as aspect ratio and freeform crop.
+Use the media editor controller when cropper state must share history with controls such as aspect ratio.
 
 ```tsx
 import { resolveAspectRatio, useMediaEditor } from '../../state';
@@ -96,7 +96,7 @@ function MediaEditorCanvas( { src }: { src: string } ) {
 			src={ src }
 			controller={ controller }
 			aspectRatio={ aspectRatio }
-			freeformCrop={ controller.cropOptions.freeformCrop }
+			freeformCrop
 			onGestureStart={ controller.beginGesture }
 			onGestureEnd={ controller.endGesture }
 		/>

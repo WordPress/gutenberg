@@ -5,14 +5,24 @@
 ### Bug Fixes
 
 -   Preserve the non-enumerable `__esModule` marker on `window.wp.*` IIFE globals so that external webpack consumers (e.g. WooCommerce) can still default-import `@wordpress/*` packages exposed as webpack externals.
+-   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead ([#78493](https://github.com/WordPress/gutenberg/pull/78493)).
 
 ## 0.15.0 (2026-05-27)
 
+### Bug Fixes
+
+-   Defer single-page admin `import( "@wordpress/boot" )` until `DOMContentLoaded` so the boot module evaluates after classic script dependencies have loaded ([#78136](https://github.com/WordPress/gutenberg/pull/78136)).
+
 ## 0.14.0 (2026-05-14)
+
+### Enhancements
+
+-   Replace getter-based `wp.*` exports with data properties for faster property access ([#78303](https://github.com/WordPress/gutenberg/pull/78303)).
 
 ### Bug Fixes
 
 -   Register generated CSS module styles with `@wordpress/style-runtime` so they can be injected into registered documents, such as editor iframes ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
+-   Guard `require_once` calls in generated PHP files against deployment race conditions ([#78110](https://github.com/WordPress/gutenberg/pull/78110)).
 
 ## 0.13.0 (2026-04-29)
 

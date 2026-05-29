@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -9,9 +9,6 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { DEFAULT_ASPECT_RATIOS } from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { useMediaEditor, resolveAspectRatio } from '../../state';
-
-/** Preset key for "Free" — no aspect lock. Round-trips through SelectControl. */
-const FREE_ASPECT_RATIO_VALUE = '0';
 
 interface UseCropOptionsArgs {
 	aspectRatioPresets?: AspectRatioPreset[];
@@ -21,8 +18,6 @@ interface UseCropOptionsReturn {
 	aspectRatioValue: string;
 	setAspectRatioValue: ( value: string ) => void;
 	aspectRatioOptions: AspectRatioPreset[];
-	freeformCrop: boolean;
-	setFreeformCrop: ( value: boolean ) => void;
 	resolvedAspectRatio: number | undefined;
 	resetCropOptions: () => void;
 }
@@ -47,9 +42,9 @@ export function getAspectRatioOptions(
 
 /**
  * Thin selector over the composite media-editor store for the Crop
- * sidebar tab. Reads the cropOptions slice (preset key, freeform) and
- * exposes the corresponding setters plus a render-time
- * `resolvedAspectRatio` derivation.
+ * sidebar tab. Reads the cropOptions slice (preset key) and exposes
+ * the corresponding setters plus a render-time `resolvedAspectRatio`
+ * derivation.
  *
  * No local React state, no refs, no synchronization effects — the
  * composite store is the single source of truth.
@@ -61,7 +56,7 @@ export function useCropOptions( {
 	aspectRatioPresets,
 }: UseCropOptionsArgs = {} ): UseCropOptionsReturn {
 	const controller = useMediaEditor();
-	const { aspectRatioValue, freeformCrop } = controller.cropOptions;
+	const { aspectRatioValue } = controller.cropOptions;
 	const cropperImage = controller.state.image;
 
 	const aspectRatioOptions = useMemo(
@@ -74,41 +69,10 @@ export function useCropOptions( {
 		[ aspectRatioValue, cropperImage ]
 	);
 
-	// Sidebar UX rule: picking Free auto-enables Resize-crop (freeform)
-	// when it's currently off — picking Free implies the user wants to
-	// freeform-edit, and there'd otherwise be no visible affordance for
-	// it. Wrapped in a gesture so the two dispatches collapse into a
-	// single undo step.
-	const { beginGesture, endGesture, setAspectRatioValue, setFreeformCrop } =
-		controller;
-	const setAspectRatioValueWithFreeformSync = useCallback(
-		( value: string ) => {
-			const shouldReenableFreeform =
-				value === FREE_ASPECT_RATIO_VALUE && ! freeformCrop;
-			if ( ! shouldReenableFreeform ) {
-				setAspectRatioValue( value );
-				return;
-			}
-			beginGesture();
-			setAspectRatioValue( value );
-			setFreeformCrop( true );
-			endGesture();
-		},
-		[
-			freeformCrop,
-			beginGesture,
-			endGesture,
-			setAspectRatioValue,
-			setFreeformCrop,
-		]
-	);
-
 	return {
 		aspectRatioValue,
-		setAspectRatioValue: setAspectRatioValueWithFreeformSync,
+		setAspectRatioValue: controller.setAspectRatioValue,
 		aspectRatioOptions,
-		freeformCrop,
-		setFreeformCrop: controller.setFreeformCrop,
 		resolvedAspectRatio,
 		resetCropOptions: controller.resetCropOptions,
 	};

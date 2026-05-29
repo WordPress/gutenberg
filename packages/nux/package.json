@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/nux",
 	"version": "9.47.0",
-	"description": "NUX (New User eXperience) module for WordPress.",
+	"description": "Deprecated no-op NUX (New User eXperience) compatibility module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -53,14 +53,8 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
-		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons"
+		"@wordpress/deprecated": "file:../deprecated"
 	},
 	"peerDependencies": {
 		"react": "^19.2.4",
