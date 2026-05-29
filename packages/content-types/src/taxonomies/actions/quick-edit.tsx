@@ -177,6 +177,7 @@ const quickEditTaxonomyAction: Action< TaxonomyFormData > = {
 	icon: pencil,
 	isPrimary: true,
 	hideModalHeader: true,
+	isEligible: ( item ) => item.config.show_in_quick_edit,
 	RenderModal: QuickEditTaxonomyModal,
 };
 
