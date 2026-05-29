@@ -208,7 +208,9 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 
 ### `plugin-wpds/no-token-fallback-values`
 
-This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins) or the [Sass helper](#sass-helper), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
+This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. In CSS processed by the [build plugins](#build-plugins), fallback values are injected automatically, so manual fallbacks in `var(--wpds-*)` references are redundant and can drift out of sync with the token definitions.
+
+For Sass sources that cannot use the build plugins, use the [Sass helper](#sass-helper) instead of writing manual fallback values.
 
 ```css
 /* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
