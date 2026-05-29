@@ -9,9 +9,8 @@ import type {
 } from '../image-editor';
 
 /**
- * Sidebar control state for the cropper — preset selection and
- * resize-handle visibility. Lives in the composite store so it
- * participates in the same undo history as cropper geometry.
+ * Sidebar control state for the cropper. Lives in the composite store
+ * so it participates in the same undo history as cropper geometry.
  */
 export interface CropOptionsSlice {
 	/**
@@ -20,8 +19,6 @@ export interface CropOptionsSlice {
 	 * decimal = fixed ratio.
 	 */
 	aspectRatioValue: string;
-	/** Whether the cropper exposes resize handles. */
-	freeformCrop: boolean;
 }
 
 /**
@@ -30,7 +27,6 @@ export interface CropOptionsSlice {
  */
 export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
 	aspectRatioValue: '0',
-	freeformCrop: true,
 };
 
 /**
@@ -86,9 +82,7 @@ export type MediaEditorAction =
 				visualSize: Size;
 			};
 	  }
-	/** Toggle the resize-handle (freeform) mode. */
-	| { type: 'SET_FREEFORM_CROP'; payload: boolean }
-	/** Reset both cropOptions fields to defaults. */
+	/** Reset cropOptions to defaults. */
 	| { type: 'RESET_CROP_OPTIONS' }
 	/**
 	 * Replace the entire composite state with `payload`. Used by

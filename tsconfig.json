@@ -1,7 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"references": [
-		{ "path": "bin" },
 		{ "path": "packages/a11y" },
 		{ "path": "packages/abilities" },
 		{ "path": "packages/admin-ui" },

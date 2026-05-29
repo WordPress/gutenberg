@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
-import { Tooltip as WCTooltip } from '@wordpress/components';
 import type { NormalizedField } from '@wordpress/dataviews';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -27,21 +28,19 @@ export default function SidebarDatetimeView( {
 		settings.formats.datetimeAbbreviated,
 		getDate( value )
 	);
-	// `aria-label` makes assistive tech announce the full date (the visible
-	// text is a shortened summary; `<time dateTime>` is for machines, not
-	// announced by screen readers). `tabIndex={-1}` keeps the Tooltip anchor
-	// out of the keyboard tab order — Ariakit's `useFocusable` preserves an
-	// explicit `tabIndex` on non-natively-focusable elements rather than
-	// defaulting it to `0`. The Tooltip remains available on mouse hover.
+	// `aria-label` exposes the full date to assistive tech; the visible text
+	// is a shortened summary (`<time dateTime>` is for machines, not announced
+	// by screen readers). The Tooltip remains available on mouse hover.
 	return (
-		<WCTooltip text={ fullDatetime } placement="top">
-			<time
-				dateTime={ value }
-				aria-label={ fullDatetime }
-				tabIndex={ -1 }
-			>
-				{ dateOnly }
-			</time>
-		</WCTooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<time dateTime={ value } aria-label={ fullDatetime }>
+						{ dateOnly }
+					</time>
+				}
+			/>
+			<Tooltip.Popup>{ fullDatetime }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }

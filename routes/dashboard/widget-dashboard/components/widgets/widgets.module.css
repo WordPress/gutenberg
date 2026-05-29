@@ -1,7 +1,8 @@
 .grid {
 	width: 100%;
-	/* Drag placeholder outline radius: matches `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
+	/* Placeholder and drag-preview radii: match `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
 	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);
+	--wp-grid-drag-preview-radius: var(--wpds-border-radius-lg);
 }
 
 .tile {
@@ -9,23 +10,11 @@
 	border-radius: var(--wpds-border-radius-lg);
 }
 
-.tileEditMode {
-	box-shadow: var(--wpds-elevation-xs);
-}
-
-.tileEditMode:hover,
-.tileEditMode:focus-visible {
-	box-shadow: var(--wpds-elevation-md);
-}
-
 /*
- * While a resize is in progress, the pointer often sits over the tile;
- * keep resting elevation so the hover lift does not flicker or fight the
- * gesture. `data-wp-grid-resizing` is set on `@wordpress/grid` surface
- * roots for the duration of the resize.
+ * Edit-mode tiles stay at resting elevation (`xs`) on hover; only the
+ * drag preview (`.drag-preview-frame` on `@wordpress/grid`) lifts to `md`.
  */
-:global([data-wp-grid-resizing]) .tileEditMode:hover,
-:global([data-wp-grid-resizing]) .tileEditMode:focus-visible {
+.tileEditMode {
 	box-shadow: var(--wpds-elevation-xs);
 }
 
@@ -38,20 +27,14 @@
  * Wrapper applied through `renderDragPreview` on @wordpress/grid.
  * `height: 100%` keeps the inner `.tile` height: 100% chain alive
  * (without it, the wrapper auto-sizes and the cloned tile collapses
- * to content height). Using an ancestor class to bump the shadow
- * lets the dragged-state shadow win over the persistent one without
- * stacking two box-shadows on the same element.
+ * to content height). Drag elevation is owned by the grid
+ * `.drag-preview-frame` (`md` while dragging); strip the cloned tile shadow so it
+ * does not stack on the frame.
  */
 .dragPreview {
 	height: 100%;
 }
 
 .dragPreview .tile {
-	box-shadow: var(--wpds-elevation-md);
-}
-
-@media not ( prefers-reduced-motion ) {
-	.tile {
-		transition: box-shadow var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
-	}
+	box-shadow: none;
 }

@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -13,7 +14,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDashboardGridSettings, useDashboardLayout } from './hooks';
 import { WidgetDashboard } from './widget-dashboard';
 import type { DashboardWidget } from './widget-dashboard';
-import { useWidgetTypes } from './widget-types';
+import { useWidgetTypes } from './widget-primitives';
 
 function Dashboard() {
 	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
@@ -22,9 +23,19 @@ function Dashboard() {
 
 	const [ gridSettings, setGridSettings ] = useDashboardGridSettings();
 
-	const widgetTypes = useWidgetTypes();
+	const [ widgetTypes, isResolving ] = useWidgetTypes();
 
 	const [ editMode, setEditMode ] = useState( false );
+
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
+	const isMobileViewport = useSelect(
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
+		[]
+	);
+
+	const customizeDashboardLabel = __( 'Customize Dashboard' );
+	const dashboardLabel = __( 'Dashboard' );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -35,9 +46,12 @@ function Dashboard() {
 		} );
 	};
 
+	const pageTitle = editMode ? customizeDashboardLabel : dashboardLabel;
+
 	return (
 		<WidgetDashboard
 			widgetTypes={ widgetTypes }
+			isResolvingWidgetTypes={ isResolving }
 			layout={ layout }
 			onLayoutChange={ handleLayoutChange }
 			onLayoutReset={ resetLayout }
@@ -47,9 +61,8 @@ function Dashboard() {
 			onEditChange={ setEditMode }
 		>
 			<Page
-				title={
-					editMode ? __( 'Customize Dashboard' ) : __( 'Dashboard' )
-				}
+				title={ editMode && isMobileViewport ? undefined : pageTitle }
+				ariaLabel={ pageTitle }
 				actions={ <WidgetDashboard.Actions /> }
 				hasPadding
 			>

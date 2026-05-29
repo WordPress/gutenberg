@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
+import { store as viewportStore } from '@wordpress/viewport';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { AlertDialog, Button, Stack } from '@wordpress/ui';
 
@@ -32,7 +34,7 @@ import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
  * accumulate changes on top of pending layout edits, and vice versa.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
- * so surfaces that don't expose edit mode can keep `Actions` in their
+ * so hosts that don't expose edit mode can keep `Actions` in their
  * tree unconditionally.
  *
  * @return {React.ReactNode} - The Actions component.
@@ -72,10 +74,19 @@ export function Actions(): React.ReactNode {
 		return () => clearTimeout( exitTimeout );
 	}, [ editMode, isEditActionsMounted ] );
 
-	const { setInserterOpen } = useDashboardUIContext();
-
-	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
-	const [ isLayoutSettingsOpen, setIsLayoutSettingsOpen ] = useState( false );
+	const {
+		setInserterOpen,
+		layoutSettingsOpen,
+		setLayoutSettingsOpen,
+		resetDialogOpen,
+		setResetDialogOpen,
+	} = useDashboardUIContext();
+	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
+	// https://github.com/WordPress/gutenberg/issues/77628
+	const isMobileViewport = useSelect(
+		( select ) => select( viewportStore ).isViewportMatch( '< small' ),
+		[]
+	);
 
 	const handleEditMode = useCallback( () => {
 		onEditChange?.( ! editMode );
@@ -94,13 +105,13 @@ export function Actions(): React.ReactNode {
 	}, [ commit ] );
 
 	const openLayoutSettings = useCallback( () => {
-		setIsLayoutSettingsOpen( true );
-	}, [] );
+		setLayoutSettingsOpen( true );
+	}, [ setLayoutSettingsOpen ] );
 
 	const moreActionsItems: MoreActionsDropdownItem[] = [
 		{
 			label: __( 'Reset to default' ),
-			onClick: () => setIsResetDialogOpen( true ),
+			onClick: () => setResetDialogOpen( true ),
 			disabled: ! onLayoutReset,
 		},
 	];
@@ -136,7 +147,7 @@ export function Actions(): React.ReactNode {
 						size="compact"
 						onClick={ insert }
 					>
-						<Button.Icon icon={ plus } />
+						{ ! isMobileViewport && <Button.Icon icon={ plus } /> }
 						{ __( 'Add widget' ) }
 					</Button>
 
@@ -178,12 +189,12 @@ export function Actions(): React.ReactNode {
 			<MoreActionsDropdown items={ moreActionsItems } />
 
 			<AlertDialog.Root
-				open={ isResetDialogOpen }
-				onOpenChange={ setIsResetDialogOpen }
+				open={ resetDialogOpen }
+				onOpenChange={ setResetDialogOpen }
 				onConfirm={ async () => {
 					await onLayoutReset?.();
 					onEditChange?.( false );
-					setIsResetDialogOpen( false );
+					setResetDialogOpen( false );
 				} }
 			>
 				<AlertDialog.Popup
@@ -198,8 +209,8 @@ export function Actions(): React.ReactNode {
 
 			{ canEditGridSettings && (
 				<LayoutSettings
-					open={ isLayoutSettingsOpen }
-					onOpenChange={ setIsLayoutSettingsOpen }
+					open={ layoutSettingsOpen }
+					onOpenChange={ setLayoutSettingsOpen }
 				/>
 			) }
 		</Stack>
