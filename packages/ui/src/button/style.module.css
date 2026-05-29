@@ -130,6 +130,12 @@
 			@media not ( prefers-reduced-motion ) {
 				transition: opacity 0.1s ease-out;
 			}
+
+			@media ( forced-colors: active ) {
+				border-color: currentColor;
+				border-block-end-style: none;
+				border-inline-start-style: none;
+			}
 		}
 	}
 
