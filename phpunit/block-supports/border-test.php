@@ -20,6 +20,19 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 	public function tear_down() {
 		unregister_block_type( $this->test_block_name );
 		$this->test_block_name = null;
+		remove_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_block_type_border_style' )
+		);
+		remove_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_root_border_style' )
+		);
+		remove_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_block_type_border_none' )
+		);
+		_gutenberg_clean_theme_json_caches();
 		parent::tear_down();
 	}
 
@@ -458,5 +471,528 @@ class WP_Block_Supports_Border_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Helper that builds a parsed-block array shape and runs it through the
+	 * `render_block` filter chain so we exercise the wired-up fallback exactly
+	 * as it runs at render time.
+	 *
+	 * @param string $block_name Registered block type name.
+	 * @param array  $attrs      Parsed block attributes.
+	 * @param string $inner_html Inner HTML (block wrapper).
+	 *
+	 * @return string Filtered block HTML.
+	 */
+	private function render_block_through_filter( $block_name, $attrs, $inner_html ) {
+		$block = array(
+			'blockName'    => $block_name,
+			'attrs'        => $attrs,
+			'innerBlocks'  => array(),
+			'innerHTML'    => $inner_html,
+			'innerContent' => array( $inner_html ),
+		);
+		return gutenberg_render_block_border_fallback( $inner_html, $block );
+	}
+
+	/**
+	 * The pure fallback helper handles flat color/width inputs by emitting
+	 * `border-{side}-style:solid` for every side.
+	 */
+	public function test_get_border_style_fallbacks_flat_color() {
+		$attrs = array( 'style' => array( 'border' => array( 'color' => '#72aee6' ) ) );
+		$this->assertSame(
+			array(
+				'border-top-style:solid',
+				'border-right-style:solid',
+				'border-bottom-style:solid',
+				'border-left-style:solid',
+			),
+			gutenberg_get_border_style_fallbacks(
+				$attrs,
+				array(
+					'top'    => false,
+					'right'  => false,
+					'bottom' => false,
+					'left'   => false,
+				)
+			)
+		);
+	}
+
+	public function test_get_border_style_fallbacks_flat_width() {
+		$attrs = array( 'style' => array( 'border' => array( 'width' => '2px' ) ) );
+		$this->assertSame(
+			array(
+				'border-top-style:solid',
+				'border-right-style:solid',
+				'border-bottom-style:solid',
+				'border-left-style:solid',
+			),
+			gutenberg_get_border_style_fallbacks(
+				$attrs,
+				array(
+					'top'    => false,
+					'right'  => false,
+					'bottom' => false,
+					'left'   => false,
+				)
+			)
+		);
+	}
+
+	public function test_get_border_style_fallbacks_border_color_preset_alone() {
+		$attrs = array( 'borderColor' => 'accent' );
+		$this->assertSame(
+			array(
+				'border-top-style:solid',
+				'border-right-style:solid',
+				'border-bottom-style:solid',
+				'border-left-style:solid',
+			),
+			gutenberg_get_border_style_fallbacks(
+				$attrs,
+				array(
+					'top'    => false,
+					'right'  => false,
+					'bottom' => false,
+					'left'   => false,
+				)
+			)
+		);
+	}
+
+	/**
+	 * An explicit shorthand `style` covers every side via CSS, so the
+	 * helper must emit nothing.
+	 */
+	public function test_get_border_style_fallbacks_shorthand_style_covers_sides() {
+		$attrs = array(
+			'style' => array(
+				'border' => array(
+					'style' => 'dashed',
+					'top'   => array( 'color' => '#fff' ),
+					'right' => array( 'color' => '#fff' ),
+				),
+			),
+		);
+		$this->assertSame(
+			array(),
+			gutenberg_get_border_style_fallbacks(
+				$attrs,
+				array(
+					'top'    => false,
+					'right'  => false,
+					'bottom' => false,
+					'left'   => false,
+				)
+			)
+		);
+	}
+
+	/**
+	 * Mixed shape: explicit per-side style on top, shorthand color elsewhere.
+	 * Top is preserved (helper emits nothing for it); right/bottom/left need
+	 * the fallback because the shorthand color leaves them otherwise invisible.
+	 */
+	public function test_get_border_style_fallbacks_mixed_preserves_explicit_side_style() {
+		$attrs = array(
+			'style' => array(
+				'border' => array(
+					'color' => '#000',
+					'top'   => array(
+						'color' => '#fff',
+						'style' => 'dashed',
+					),
+				),
+			),
+		);
+		$this->assertSame(
+			array(
+				'border-right-style:solid',
+				'border-bottom-style:solid',
+				'border-left-style:solid',
+			),
+			gutenberg_get_border_style_fallbacks(
+				$attrs,
+				array(
+					'top'    => false,
+					'right'  => false,
+					'bottom' => false,
+					'left'   => false,
+				)
+			)
+		);
+	}
+
+	/**
+	 * Per-side: only sides that have color/width but no style get the fallback.
+	 */
+	public function test_get_border_style_fallbacks_per_side_mixed() {
+		$attrs = array(
+			'style' => array(
+				'border' => array(
+					'top'   => array(
+						'color' => '#000',
+						'style' => 'dashed',
+					),
+					'right' => array( 'color' => '#000' ),
+				),
+			),
+		);
+		$this->assertSame(
+			array( 'border-right-style:solid' ),
+			gutenberg_get_border_style_fallbacks(
+				$attrs,
+				array(
+					'top'    => false,
+					'right'  => false,
+					'bottom' => false,
+					'left'   => false,
+				)
+			)
+		);
+	}
+
+	/**
+	 * Inherited shorthand style suppresses every side.
+	 */
+	public function test_get_border_style_fallbacks_inherited_shorthand_suppresses_all_sides() {
+		$attrs = array( 'style' => array( 'border' => array( 'color' => '#72aee6' ) ) );
+		$this->assertSame(
+			array(),
+			gutenberg_get_border_style_fallbacks(
+				$attrs,
+				array(
+					'top'    => true,
+					'right'  => true,
+					'bottom' => true,
+					'left'   => true,
+				)
+			)
+		);
+	}
+
+	/**
+	 * End-to-end: the `render_block` filter injects fallback styles into
+	 * the rendered wrapper for a static block that has a saved border color
+	 * but no border style.
+	 */
+	public function test_render_block_filter_injects_fallback_for_legacy_static_content() {
+		self::register_bordered_block_with_support(
+			'test/render-fallback-legacy-static',
+			array(
+				'__experimentalBorder' => array(
+					'color' => true,
+					'width' => true,
+					'style' => true,
+				),
+			)
+		);
+
+		$inner_html = '<div class="wp-block-test has-border-color" style="border-color:#ff0000;border-width:4px">x</div>';
+		$rendered   = $this->render_block_through_filter(
+			'test/render-fallback-legacy-static',
+			array(
+				'style' => array(
+					'border' => array(
+						'color' => '#ff0000',
+						'width' => '4px',
+					),
+				),
+			),
+			$inner_html
+		);
+
+		$this->assertStringContainsString( 'border-top-style:solid', $rendered );
+		$this->assertStringContainsString( 'border-right-style:solid', $rendered );
+		$this->assertStringContainsString( 'border-bottom-style:solid', $rendered );
+		$this->assertStringContainsString( 'border-left-style:solid', $rendered );
+		$this->assertStringContainsString( 'border-color:#ff0000', $rendered );
+	}
+
+	/**
+	 * End-to-end: a block with an explicit `border.style` already in its
+	 * attributes is left untouched by the filter.
+	 */
+	public function test_render_block_filter_is_noop_when_border_style_set() {
+		self::register_bordered_block_with_support(
+			'test/render-fallback-noop-style-set',
+			array(
+				'__experimentalBorder' => array(
+					'color' => true,
+					'width' => true,
+					'style' => true,
+				),
+			)
+		);
+
+		$inner_html = '<div style="border-color:#ff0000;border-style:dotted">x</div>';
+		$rendered   = $this->render_block_through_filter(
+			'test/render-fallback-noop-style-set',
+			array(
+				'style' => array(
+					'border' => array(
+						'color' => '#ff0000',
+						'style' => 'dotted',
+					),
+				),
+			),
+			$inner_html
+		);
+
+		$this->assertSame( $inner_html, $rendered );
+		$this->assertStringNotContainsString( 'solid', $rendered );
+	}
+
+	/**
+	 * End-to-end: the filter respects skipped serialization of the `style`
+	 * feature and leaves the block untouched.
+	 */
+	public function test_render_block_filter_skips_when_style_serialization_skipped() {
+		self::register_bordered_block_with_support(
+			'test/render-fallback-skip-serialization',
+			array(
+				'__experimentalBorder' => array(
+					'color'                           => true,
+					'width'                           => true,
+					'style'                           => true,
+					'__experimentalSkipSerialization' => array( 'style' ),
+				),
+			)
+		);
+
+		$inner_html = '<div style="border-color:#ff0000">x</div>';
+		$rendered   = $this->render_block_through_filter(
+			'test/render-fallback-skip-serialization',
+			array(
+				'style' => array(
+					'border' => array(
+						'color' => '#ff0000',
+					),
+				),
+			),
+			$inner_html
+		);
+
+		$this->assertSame( $inner_html, $rendered );
+	}
+
+	/**
+	 * End-to-end: inheritance from the resolved global block-type border
+	 * style suppresses the fallback for all sides.
+	 */
+	public function test_render_block_filter_suppressed_by_inherited_block_type_border_style() {
+		add_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_block_type_border_style' )
+		);
+		_gutenberg_clean_theme_json_caches();
+
+		self::register_bordered_block_with_support(
+			'test/fallback-inherited-block-type',
+			array(
+				'__experimentalBorder' => array(
+					'color' => true,
+					'width' => true,
+					'style' => true,
+				),
+			)
+		);
+		$inner_html = '<div style="border-color:#72aee6">x</div>';
+		$rendered   = $this->render_block_through_filter(
+			'test/fallback-inherited-block-type',
+			array(
+				'style' => array( 'border' => array( 'color' => '#72aee6' ) ),
+			),
+			$inner_html
+		);
+
+		remove_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_block_type_border_style' )
+		);
+		_gutenberg_clean_theme_json_caches();
+
+		$this->assertSame( $inner_html, $rendered );
+	}
+
+	/**
+	 * End-to-end: root-level `styles.border.style` must NOT suppress the
+	 * fallback (root border styles compile to `body` and `border-style`
+	 * does not cascade as an inherited CSS property).
+	 */
+	public function test_render_block_filter_not_suppressed_by_root_border_style() {
+		add_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_root_border_style' )
+		);
+		_gutenberg_clean_theme_json_caches();
+
+		self::register_bordered_block_with_support(
+			'test/fallback-root-border-noop',
+			array(
+				'__experimentalBorder' => array(
+					'color' => true,
+					'width' => true,
+					'style' => true,
+				),
+			)
+		);
+		$inner_html = '<div style="border-color:#72aee6">x</div>';
+		$rendered   = $this->render_block_through_filter(
+			'test/fallback-root-border-noop',
+			array(
+				'style' => array( 'border' => array( 'color' => '#72aee6' ) ),
+			),
+			$inner_html
+		);
+
+		remove_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_root_border_style' )
+		);
+		_gutenberg_clean_theme_json_caches();
+
+		$this->assertStringContainsString( 'border-top-style:solid', $rendered );
+	}
+
+	/**
+	 * Filter callback: injects a block-type-level border style for the
+	 * `test/fallback-inherited-block-type` block.
+	 */
+	public function filter_inject_block_type_border_style( $theme_json ) {
+		return $theme_json->update_with(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'test/fallback-inherited-block-type' => array(
+							'border' => array(
+								'style' => 'dashed',
+							),
+						),
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Filter callback: injects a root-level border style. Used to verify
+	 * that the fallback ignores root border styles.
+	 */
+	public function filter_inject_root_border_style( $theme_json ) {
+		return $theme_json->update_with(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'border' => array(
+						'style' => 'dashed',
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * End-to-end: a non-rendering inherited style (`none`/`hidden`) must
+	 * NOT suppress the fallback — otherwise a user adding a `borderColor`
+	 * would see no border at all.
+	 */
+	public function test_render_block_filter_not_suppressed_by_non_rendering_inherited_style() {
+		add_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_block_type_border_none' )
+		);
+		_gutenberg_clean_theme_json_caches();
+
+		self::register_bordered_block_with_support(
+			'test/fallback-inherited-none',
+			array(
+				'__experimentalBorder' => array(
+					'color' => true,
+					'width' => true,
+					'style' => true,
+				),
+			)
+		);
+		$inner_html = '<div style="border-color:#72aee6">x</div>';
+		$rendered   = $this->render_block_through_filter(
+			'test/fallback-inherited-none',
+			array(
+				'style' => array( 'border' => array( 'color' => '#72aee6' ) ),
+			),
+			$inner_html
+		);
+
+		remove_filter(
+			'wp_theme_json_data_theme',
+			array( $this, 'filter_inject_block_type_border_none' )
+		);
+		_gutenberg_clean_theme_json_caches();
+
+		$this->assertStringContainsString( 'border-top-style:solid', $rendered );
+	}
+
+	/**
+	 * Filter callback: injects a block-type-level `border.style: 'none'`
+	 * to verify it does not suppress the fallback.
+	 */
+	public function filter_inject_block_type_border_none( $theme_json ) {
+		return $theme_json->update_with(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'test/fallback-inherited-none' => array(
+							'border' => array(
+								'style' => 'none',
+							),
+						),
+					),
+				),
+			)
+		);
+	}
+
+	public function test_gutenberg_get_variation_name_from_class_returns_null_for_empty_inputs() {
+		$this->assertNull( gutenberg_get_variation_name_from_class( '', array() ) );
+		$this->assertNull(
+			gutenberg_get_variation_name_from_class(
+				'is-style-outlined',
+				array()
+			)
+		);
+		$this->assertNull(
+			gutenberg_get_variation_name_from_class(
+				'',
+				array( array( 'name' => 'outlined' ) )
+			)
+		);
+	}
+
+	public function test_gutenberg_get_variation_name_from_class_matches_registered_variation() {
+		$registered = array(
+			array( 'name' => 'outlined' ),
+			array( 'name' => 'flush' ),
+		);
+		$this->assertSame(
+			'outlined',
+			gutenberg_get_variation_name_from_class(
+				'wp-block-group is-style-outlined',
+				$registered
+			)
+		);
+	}
+
+	public function test_gutenberg_get_variation_name_from_class_ignores_default_and_unknowns() {
+		$registered = array( array( 'name' => 'outlined' ) );
+		$this->assertNull(
+			gutenberg_get_variation_name_from_class(
+				'is-style-default is-style-unknown',
+				$registered
+			)
+		);
 	}
 }
