@@ -104,7 +104,11 @@ The `cursor` prop accepts an object with the following optional properties:
 
 -   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
-When the `color` or `cursor` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+The `cornerRadius` prop accepts an object with the following optional properties:
+
+-   `preset`: The overall roundness preset for the theme subtree. Accepts `'none'` (sharp corners), `'sm'` (small), `'md'` (medium), or `'lg'` (large) (default: `'sm'`). This adjusts the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset names are not the same as the individual border-radius token sizes (which are also named xs–lg).
+
+When the `color`, `cursor`, or `cornerRadius` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 

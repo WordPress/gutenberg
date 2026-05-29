@@ -161,9 +161,11 @@ function generateStyles( {
 export function useThemeProviderStyles( {
 	color = {},
 	cursor,
+	cornerRadius = {},
 }: {
 	color?: ThemeProviderProps[ 'color' ];
 	cursor?: ThemeProviderProps[ 'cursor' ];
+	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -180,6 +182,8 @@ export function useThemeProviderStyles( {
 		inheritedSettings.color?.background ??
 		DEFAULT_SEED_COLORS.background;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
+	const cornerRadiusPreset =
+		cornerRadius.preset ?? inheritedSettings.cornerRadius?.preset ?? 'sm';
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -188,8 +192,9 @@ export function useThemeProviderStyles( {
 				background,
 			},
 			cursor: cursorControl ? { control: cursorControl } : undefined,
+			cornerRadius: { preset: cornerRadiusPreset },
 		} ),
-		[ primary, background, cursorControl ]
+		[ primary, background, cursorControl, cornerRadiusPreset ]
 	);
 
 	const colorStyles = useMemo( () => {

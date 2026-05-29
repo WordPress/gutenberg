@@ -333,3 +333,39 @@
 		--wpds-border-width-focus: 1.5px;
 	}
 }
+
+[data-wpds-corner-radius='none'],
+:root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='none'] ) {
+	/* Extra small radius */
+	--wpds-border-radius-xs: 0;
+	/* Small radius */
+	--wpds-border-radius-sm: 0;
+	/* Medium radius */
+	--wpds-border-radius-md: 0;
+	/* Large radius */
+	--wpds-border-radius-lg: 0;
+}
+
+[data-wpds-corner-radius='md'],
+:root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='md'] ) {
+	/* Extra small radius */
+	--wpds-border-radius-xs: 2px;
+	/* Small radius */
+	--wpds-border-radius-sm: 4px;
+	/* Medium radius */
+	--wpds-border-radius-md: 8px;
+	/* Large radius */
+	--wpds-border-radius-lg: 16px;
+}
+
+[data-wpds-corner-radius='lg'],
+:root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='lg'] ) {
+	/* Extra small radius */
+	--wpds-border-radius-xs: 3px;
+	/* Small radius */
+	--wpds-border-radius-sm: 6px;
+	/* Medium radius */
+	--wpds-border-radius-md: 12px;
+	/* Large radius */
+	--wpds-border-radius-lg: 24px;
+}
