@@ -33,6 +33,7 @@ import {
 } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+import { useCollabSidebarCommands } from './commands';
 
 function NotesSidebarContent( {
 	styles,
@@ -151,6 +152,8 @@ function NotesSidebar( { postId } ) {
 				!! blockCommentId,
 		}
 	);
+
+	useCollabSidebarCommands();
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
