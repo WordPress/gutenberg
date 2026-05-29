@@ -5,9 +5,14 @@ import { debounce } from '@wordpress/compose';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+
 import { __experimentalSanitizeBlockAttributes } from '@wordpress/blocks';
 
-export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
+export function rendererPath(
+	block: string,
+	attributes: Record< string, unknown > | null = null,
+	urlQueryArgs: Record< string, unknown > = {}
+): string {
 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
 		context: 'edit',
 		...( null !== attributes ? { attributes } : {} ),
@@ -15,7 +20,11 @@ export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
 	} );
 }
 
-export function removeBlockSupportAttributes( attributes ) {
+export function removeBlockSupportAttributes(
+	attributes: Record< string, unknown > & {
+		style?: Record< string, unknown >;
+	}
+): Record< string, unknown > {
 	const {
 		backgroundColor,
 		borderColor,
@@ -44,11 +53,32 @@ export function removeBlockSupportAttributes( attributes ) {
 }
 
 /**
- * @typedef {Object} ServerSideRenderResponse
- * @property {string} status    - The current request status: 'idle', 'loading', 'success', or 'error'.
- * @property {string} [content] - The rendered block content (available when status is 'success').
- * @property {string} [error]   - The error message (available when status is 'error').
+ * Server-side render response object.
  */
+export interface ServerSideRenderResponse {
+	/** The current request status: 'idle', 'loading', 'success', or 'error'. */
+	status: 'idle' | 'loading' | 'success' | 'error';
+	/** The rendered block content (available when status is 'success'). */
+	content?: string;
+	/** The error message (available when status is 'error'). */
+	error?: string;
+}
+
+/**
+ * Configuration object for the useServerSideRender hook.
+ */
+export interface UseServerSideRenderArgs {
+	/** The block attributes to be sent to the server for rendering. */
+	attributes: Record< string, unknown >;
+	/** The identifier of the block to be serverside rendered. Example: 'core/archives'. */
+	block: string;
+	/** Whether to remove block support attributes before sending. */
+	skipBlockSupportAttributes?: boolean;
+	/** The HTTP method to use ('GET' or 'POST'). Default is 'GET'. */
+	httpMethod?: 'GET' | 'POST';
+	/** Additional query arguments to append to the request URL. */
+	urlQueryArgs?: Record< string, unknown >;
+}
 
 /**
  * A hook for server-side rendering a preview of dynamic blocks to display in the editor.
@@ -82,18 +112,17 @@ export function removeBlockSupportAttributes( attributes ) {
  * }
  * ```
  *
- * @param {Object}  args                                    The hook configuration object.
- * @param {Object}  args.attributes                         The block attributes to be sent to the server for rendering.
- * @param {string}  args.block                              The identifier of the block to be serverside rendered. Example: 'core/archives'.
- * @param {boolean} [args.skipBlockSupportAttributes=false] Whether to remove block support attributes before sending.
- * @param {string}  [args.httpMethod='GET']                 The HTTP method to use ('GET' or 'POST'). Default is 'GET'.
- * @param {Object}  [args.urlQueryArgs]                     Additional query arguments to append to the request URL.
+ * @param args The hook configuration object.
  *
- * @return {ServerSideRenderResponse} The server-side render response object.
+ * @return The server-side render response object.
  */
-export function useServerSideRender( args ) {
-	const [ response, setResponse ] = useState( { status: 'idle' } );
-	const shouldDebounceRef = useRef( false );
+export function useServerSideRender(
+	args: UseServerSideRenderArgs
+): ServerSideRenderResponse {
+	const [ response, setResponse ] = useState< ServerSideRenderResponse >( {
+		status: 'idle',
+	} );
+	const shouldDebounceRef = useRef< boolean >( false );
 
 	const {
 		attributes,
@@ -103,11 +132,11 @@ export function useServerSideRender( args ) {
 		urlQueryArgs,
 	} = args;
 
-	let sanitizedAttributes =
+	let sanitizedAttributes: Record< string, unknown > | null =
 		attributes &&
 		__experimentalSanitizeBlockAttributes( block, attributes );
 
-	if ( skipBlockSupportAttributes ) {
+	if ( skipBlockSupportAttributes && sanitizedAttributes ) {
 		sanitizedAttributes =
 			removeBlockSupportAttributes( sanitizedAttributes );
 	}
@@ -128,7 +157,7 @@ export function useServerSideRender( args ) {
 				{
 					setResponse( { status: 'loading' } );
 
-					apiFetch( {
+					apiFetch< { rendered: string } >( {
 						path,
 						method: isPostRequest ? 'POST' : 'GET',
 						body,
@@ -145,15 +174,21 @@ export function useServerSideRender( args ) {
 								content: res ? res.rendered : '',
 							} );
 						} )
-						.catch( ( error ) => {
+						.catch( ( error: unknown ) => {
 							// The request was aborted, do not update the response.
-							if ( error.name === 'AbortError' ) {
+							if (
+								error instanceof Error &&
+								error.name === 'AbortError'
+							) {
 								return;
 							}
 
 							setResponse( {
 								status: 'error',
-								error: error.message,
+								error:
+									error instanceof Error
+										? error.message
+										: String( error ),
 							} );
 						} )
 						.finally( () => {

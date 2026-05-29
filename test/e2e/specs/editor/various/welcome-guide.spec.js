@@ -1,9 +1,6 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'New User Experience (NUX)', () => {
+test.describe( 'Welcome Guide', () => {
 	test( 'should show the guide to first-time users', async ( {
 		admin,
 		editor,

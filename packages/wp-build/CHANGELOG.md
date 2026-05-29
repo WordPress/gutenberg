@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead.
+
 ## 0.15.0 (2026-05-27)
 
 ## 0.14.0 (2026-05-14)
