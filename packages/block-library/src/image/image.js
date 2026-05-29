@@ -64,6 +64,11 @@ import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	getStateDimensions,
+	resetDimensions,
+	setStateDimensions,
+} from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
 import {
 	MIN_SIZE,
@@ -73,9 +78,12 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	DimensionsTool,
+	isDefaultBlockStyleState,
+	ResolutionTool,
+	mediaEditKey,
+} = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
 	{
@@ -673,16 +681,60 @@ export default function Image( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const selectedStyleState = useSelect(
+		( select ) => {
+			if ( ! isSingleSelected ) {
+				return undefined;
+			}
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
+			return getSelectedBlockStyleState( clientId );
+		},
+		[ clientId, isSingleSelected ]
+	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
+	const stateDimensions = hasSelectedStyleState
+		? getStateDimensions( attributes.style, selectedStyleState )
+		: {};
+	const activeWidth = hasSelectedStyleState ? stateDimensions.width : width;
+	const activeHeight = hasSelectedStyleState
+		? stateDimensions.height
+		: height;
+	const activeAspectRatio = hasSelectedStyleState
+		? stateDimensions.aspectRatio
+		: aspectRatio;
+	const activeScale = hasSelectedStyleState
+		? stateDimensions.objectFit
+		: scale;
+	const setDimensionAttributes = ( nextDimensions ) => {
+		if ( hasSelectedStyleState ) {
+			setAttributes( {
+				style: setStateDimensions(
+					attributes.style,
+					selectedStyleState,
+					nextDimensions
+				),
+			} );
+			return;
+		}
+
+		setAttributes( nextDimensions );
+	};
+
 	const dimensionsControl =
 		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
 				panelId={ clientId }
-				value={ { aspectRatio } }
+				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
 				onChange={ ( { aspectRatio: newAspectRatio } ) => {
-					setAttributes( {
+					setDimensionAttributes( {
 						aspectRatio: newAspectRatio,
-						scale: 'cover',
+						...( hasSelectedStyleState
+							? { objectFit: 'cover' }
+							: { scale: 'cover' } ),
 					} );
 				} }
 				defaultAspectRatio="auto"
@@ -691,25 +743,29 @@ export default function Image( {
 		) : (
 			<DimensionsTool
 				panelId={ clientId }
-				value={ { width, height, scale, aspectRatio } }
+				value={ {
+					width: activeWidth,
+					height: activeHeight,
+					scale: activeScale,
+					aspectRatio: activeAspectRatio,
+				} }
 				onChange={ ( {
 					width: newWidth,
 					height: newHeight,
 					scale: newScale,
 					aspectRatio: newAspectRatio,
 				} ) => {
-					// Rebuilding the object forces setting `undefined`
-					// for values that are removed since setAttributes
-					// doesn't do anything with keys that aren't set.
-					setAttributes( {
+					setDimensionAttributes( {
 						// CSS includes `height: auto`, but we need
 						// `width: auto` to fix the aspect ratio when
 						// only height is set due to the width and
 						// height attributes set via the server.
 						width: ! newWidth && newHeight ? 'auto' : newWidth,
 						height: newHeight,
-						scale: newScale,
 						aspectRatio: newAspectRatio,
+						...( hasSelectedStyleState
+							? { objectFit: newScale }
+							: { scale: newScale } ),
 					} );
 				} }
 				defaultScale="cover"
@@ -742,14 +798,11 @@ export default function Image( {
 		lockTitleControls = false,
 		lockTitleControlsMessage,
 		hideCaptionControls = false,
-		hasSelectedStyleState = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
-				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
@@ -767,7 +820,6 @@ export default function Image( {
 				titleBinding?.source
 			);
 			return {
-				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 				lockUrlControls:
 					!! urlBinding &&
 					! urlBindingSource?.canUserEditValue?.( {
@@ -812,7 +864,6 @@ export default function Image( {
 		},
 		[
 			arePatternOverridesEnabled,
-			clientId,
 			context,
 			isSingleSelected,
 			metadata?.bindings,
@@ -1018,47 +1069,51 @@ export default function Image( {
 					</ToolsPanel>
 				</InspectorControls>
 			) }
-			{ ! hasSelectedStyleState && (
-				<InspectorControls
-					group="dimensions"
-					resetAllFilter={ ( attrs ) => ( {
-						...attrs,
-						aspectRatio: undefined,
-						width: undefined,
-						height: undefined,
-						scale: undefined,
-						focalPoint: undefined,
-					} ) }
-				>
-					{ dimensionsControl }
-					{ url && scale && (
-						<ToolsPanelItem
+			<InspectorControls
+				group="dimensions"
+				resetAllFilter={ ( attrs ) => ( {
+					...attrs,
+					aspectRatio: undefined,
+					width: undefined,
+					height: undefined,
+					scale: undefined,
+					focalPoint: undefined,
+					style: resetDimensions( attrs.style, [
+						'aspectRatio',
+						'height',
+						'objectFit',
+						'width',
+					] ),
+				} ) }
+			>
+				{ dimensionsControl }
+				{ ! hasSelectedStyleState && url && scale && (
+					<ToolsPanelItem
+						label={ __( 'Focal point' ) }
+						isShownByDefault
+						hasValue={ () => !! focalPoint }
+						onDeselect={ () =>
+							setAttributes( {
+								focalPoint: undefined,
+							} )
+						}
+						panelId={ clientId }
+					>
+						<FocalPointPicker
 							label={ __( 'Focal point' ) }
-							isShownByDefault
-							hasValue={ () => !! focalPoint }
-							onDeselect={ () =>
+							url={ url }
+							value={ focalPoint }
+							onDragStart={ imperativeFocalPointPreview }
+							onDrag={ imperativeFocalPointPreview }
+							onChange={ ( newFocalPoint ) =>
 								setAttributes( {
-									focalPoint: undefined,
+									focalPoint: newFocalPoint,
 								} )
 							}
-							panelId={ clientId }
-						>
-							<FocalPointPicker
-								label={ __( 'Focal point' ) }
-								url={ url }
-								value={ focalPoint }
-								onDragStart={ imperativeFocalPointPreview }
-								onDrag={ imperativeFocalPointPreview }
-								onChange={ ( newFocalPoint ) =>
-									setAttributes( {
-										focalPoint: newFocalPoint,
-									} )
-								}
-							/>
-						</ToolsPanelItem>
-					) }
-				</InspectorControls>
-			) }
+						/>
+					</ToolsPanelItem>
+				) }
+			</InspectorControls>
 			{ !! imageSizeOptions.length && (
 				<InspectorControls>
 					<ToolsPanel

@@ -12,6 +12,16 @@ import {
 } from '@wordpress/components';
 import { useSettings } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import {
+	getStateDimensions,
+	resetDimensions,
+	resetStateDimensions,
+	setStateDimensions,
+} from '../utils/style-state';
+
 const SCALE_OPTIONS = (
 	<>
 		<ToggleGroupControlOption
@@ -34,6 +44,9 @@ const SCALE_OPTIONS = (
 
 const DEFAULT_SCALE = 'cover';
 
+const hasDimensionValue = ( value ) =>
+	value !== undefined && value !== null && value !== '';
+
 const scaleHelp = {
 	cover: __(
 		'Image is scaled and cropped to fill the entire space without being distorted.'
@@ -48,9 +61,27 @@ const scaleHelp = {
 
 const DimensionControls = ( {
 	clientId,
-	attributes: { aspectRatio, width, height, scale },
+	attributes,
 	setAttributes,
+	selectedStyleState,
+	hasSelectedStyleState = false,
 } ) => {
+	const { aspectRatio, width, height, scale, style } = attributes;
+	const stateDimensions = hasSelectedStyleState
+		? getStateDimensions( style, selectedStyleState )
+		: {};
+	const activeAspectRatio = hasSelectedStyleState
+		? stateDimensions.aspectRatio
+		: aspectRatio;
+	const activeWidth = hasSelectedStyleState ? stateDimensions.width : width;
+	const activeHeight = hasSelectedStyleState
+		? stateDimensions.height
+		: height;
+	const activeScale = hasSelectedStyleState
+		? stateDimensions.objectFit
+		: scale;
+	const displayScale = activeScale || DEFAULT_SCALE;
+
 	const [ availableUnits, defaultRatios, themeRatios, showDefaultRatios ] =
 		useSettings(
 			'spacing.units',
@@ -60,6 +91,54 @@ const DimensionControls = ( {
 		);
 	const units = useCustomUnits( {
 		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
+	} );
+
+	const setDimensionAttributes = ( nextDimensions ) => {
+		const dimensions = { ...nextDimensions };
+		const isSettingAspectRatio =
+			Object.hasOwn( dimensions, 'aspectRatio' ) &&
+			hasDimensionValue( dimensions.aspectRatio ) &&
+			dimensions.aspectRatio !== 'auto';
+		const isSettingHeight =
+			Object.hasOwn( dimensions, 'height' ) &&
+			hasDimensionValue( dimensions.height );
+
+		if ( isSettingAspectRatio ) {
+			dimensions.height = undefined;
+		}
+		if ( isSettingHeight ) {
+			dimensions.aspectRatio = undefined;
+		}
+
+		if ( hasSelectedStyleState ) {
+			const nextStateDimensions = {};
+			if ( Object.hasOwn( dimensions, 'aspectRatio' ) ) {
+				nextStateDimensions.aspectRatio = dimensions.aspectRatio;
+			}
+			if ( Object.hasOwn( dimensions, 'width' ) ) {
+				nextStateDimensions.width = dimensions.width;
+			}
+			if ( Object.hasOwn( dimensions, 'height' ) ) {
+				nextStateDimensions.height = dimensions.height;
+			}
+			if ( Object.hasOwn( dimensions, 'scale' ) ) {
+				nextStateDimensions.objectFit = dimensions.scale;
+			}
+
+			setAttributes( {
+				style: setStateDimensions( style, selectedStyleState, {
+					...nextStateDimensions,
+				} ),
+			} );
+			return;
+		}
+
+		setAttributes( dimensions );
+	};
+	const getResetDimensionAttributes = ( keys ) => ( {
+		style: hasSelectedStyleState
+			? resetStateDimensions( style, selectedStyleState, keys )
+			: resetDimensions( style, keys ),
 	} );
 
 	const onDimensionChange = ( dimension, nextValue ) => {
@@ -72,14 +151,20 @@ const DimensionControls = ( {
 		if ( isNaN( parsedValue ) && nextValue ) {
 			return;
 		}
-		setAttributes( {
+		const nextDimensions = {
 			[ dimension ]: parsedValue < 0 ? '0' : nextValue,
-		} );
+		};
+		if ( dimension === 'height' ) {
+			nextDimensions.scale = nextValue
+				? activeScale || DEFAULT_SCALE
+				: undefined;
+		}
+		setDimensionAttributes( nextDimensions );
 	};
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
 
 	const showScaleControl =
-		height || ( aspectRatio && aspectRatio !== 'auto' );
+		activeHeight || ( activeAspectRatio && activeAspectRatio !== 'auto' );
 
 	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
 		label: name,
@@ -106,11 +191,14 @@ const DimensionControls = ( {
 	return (
 		<>
 			<ToolsPanelItem
-				hasValue={ () => !! aspectRatio }
+				hasValue={ () => !! activeAspectRatio }
 				label={ __( 'Aspect ratio' ) }
-				onDeselect={ () => setAttributes( { aspectRatio: undefined } ) }
+				onDeselect={ () =>
+					setDimensionAttributes( { aspectRatio: undefined } )
+				}
 				resetAllFilter={ () => ( {
 					aspectRatio: undefined,
+					...getResetDimensionAttributes( [ 'aspectRatio' ] ),
 				} ) }
 				isShownByDefault
 				panelId={ clientId }
@@ -118,20 +206,37 @@ const DimensionControls = ( {
 				<SelectControl
 					__next40pxDefaultSize
 					label={ __( 'Aspect ratio' ) }
-					value={ aspectRatio || 'auto' }
+					value={ activeAspectRatio || 'auto' }
 					options={ aspectRatioOptions }
-					onChange={ ( nextAspectRatio ) =>
-						setAttributes( { aspectRatio: nextAspectRatio } )
-					}
+					onChange={ ( nextAspectRatio ) => {
+						nextAspectRatio =
+							nextAspectRatio === 'auto'
+								? undefined
+								: nextAspectRatio;
+						setDimensionAttributes( {
+							aspectRatio: nextAspectRatio,
+							scale: nextAspectRatio
+								? activeScale || DEFAULT_SCALE
+								: undefined,
+						} );
+					} }
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem
 				className="single-column"
-				hasValue={ () => !! height }
+				hasValue={ () => !! activeHeight }
 				label={ __( 'Height' ) }
-				onDeselect={ () => setAttributes( { height: undefined } ) }
+				onDeselect={ () =>
+					setDimensionAttributes( {
+						height: undefined,
+						scale: activeAspectRatio
+							? activeScale || DEFAULT_SCALE
+							: undefined,
+					} )
+				}
 				resetAllFilter={ () => ( {
 					height: undefined,
+					...getResetDimensionAttributes( [ 'height' ] ),
 				} ) }
 				isShownByDefault
 				panelId={ clientId }
@@ -140,7 +245,7 @@ const DimensionControls = ( {
 					__next40pxDefaultSize
 					label={ __( 'Height' ) }
 					labelPosition="top"
-					value={ height || '' }
+					value={ activeHeight || '' }
 					min={ 0 }
 					onChange={ ( nextHeight ) =>
 						onDimensionChange( 'height', nextHeight )
@@ -150,11 +255,14 @@ const DimensionControls = ( {
 			</ToolsPanelItem>
 			<ToolsPanelItem
 				className="single-column"
-				hasValue={ () => !! width }
+				hasValue={ () => !! activeWidth }
 				label={ __( 'Width' ) }
-				onDeselect={ () => setAttributes( { width: undefined } ) }
+				onDeselect={ () =>
+					setDimensionAttributes( { width: undefined } )
+				}
 				resetAllFilter={ () => ( {
 					width: undefined,
+					...getResetDimensionAttributes( [ 'width' ] ),
 				} ) }
 				isShownByDefault
 				panelId={ clientId }
@@ -163,7 +271,7 @@ const DimensionControls = ( {
 					__next40pxDefaultSize
 					label={ __( 'Width' ) }
 					labelPosition="top"
-					value={ width || '' }
+					value={ activeWidth || '' }
 					min={ 0 }
 					onChange={ ( nextWidth ) =>
 						onDimensionChange( 'width', nextWidth )
@@ -173,15 +281,18 @@ const DimensionControls = ( {
 			</ToolsPanelItem>
 			{ showScaleControl && (
 				<ToolsPanelItem
-					hasValue={ () => !! scale && scale !== DEFAULT_SCALE }
+					hasValue={ () =>
+						!! activeScale && activeScale !== DEFAULT_SCALE
+					}
 					label={ scaleLabel }
 					onDeselect={ () =>
-						setAttributes( {
+						setDimensionAttributes( {
 							scale: DEFAULT_SCALE,
 						} )
 					}
 					resetAllFilter={ () => ( {
 						scale: DEFAULT_SCALE,
+						...getResetDimensionAttributes( [ 'objectFit' ] ),
 					} ) }
 					isShownByDefault
 					panelId={ clientId }
@@ -189,10 +300,10 @@ const DimensionControls = ( {
 					<ToggleGroupControl
 						__next40pxDefaultSize
 						label={ scaleLabel }
-						value={ scale }
-						help={ scaleHelp[ scale ] }
+						value={ displayScale }
+						help={ scaleHelp[ displayScale ] }
 						onChange={ ( value ) =>
-							setAttributes( {
+							setDimensionAttributes( {
 								scale: value,
 							} )
 						}

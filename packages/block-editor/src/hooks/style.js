@@ -135,6 +135,37 @@ function getStateFallbackBorderStyles( stateStyles ) {
 }
 
 /**
+ * Returns fallback dimension styles that keep state styles aligned with the
+ * default dimensions block-support output.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {Object|undefined} Style object containing fallback dimension styles.
+ */
+function getStateFallbackDimensionStyles( stateStyles ) {
+	const dimensions = stateStyles?.dimensions;
+	if ( ! dimensions ) {
+		return undefined;
+	}
+
+	if ( dimensions.aspectRatio ) {
+		return {
+			dimensions: {
+				minHeight: 'unset',
+				height: 'unset',
+			},
+		};
+	}
+
+	if ( dimensions.minHeight || dimensions.height ) {
+		return {
+			dimensions: {
+				aspectRatio: 'unset',
+			},
+		};
+	}
+}
+
+/**
  * Generates CSS for a block instance state style object.
  *
  * State declarations need to win over preset utility classes, but fallback
@@ -146,7 +177,12 @@ function getStateFallbackBorderStyles( stateStyles ) {
  * @return {string} Generated stylesheet.
  */
 export function getStateStylesCSS( stateStyles, selector ) {
-	const css = compileCSS( stateStyles, { selector } );
+	const fallbackDimensionStyles =
+		getStateFallbackDimensionStyles( stateStyles );
+	const stylesWithDimensionFallbacks = fallbackDimensionStyles
+		? mergeStyleObjects( stateStyles, fallbackDimensionStyles )
+		: stateStyles;
+	const css = compileCSS( stylesWithDimensionFallbacks, { selector } );
 	const importantCSS = css ? css.replace( /;/g, ' !important;' ) : undefined;
 	const fallbackBorderStyles = getStateFallbackBorderStyles( stateStyles );
 	const fallbackCSS = fallbackBorderStyles

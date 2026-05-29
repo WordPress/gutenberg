@@ -49,9 +49,12 @@ import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
+import { resetDimensions } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { isDefaultBlockStyleState, ResolutionTool } = unlock(
+	blockEditorPrivateApis
+);
 const DEFAULT_MEDIA_SIZE_SLUG = 'full';
 
 function FeaturedImageResolutionTool( { image, value, onChange } ) {
@@ -137,12 +140,13 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const { media, postType, postPermalink, hasSelectedStyleState } = useSelect(
+	const { media, postType, postPermalink, selectedStyleState } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
-			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
-				unlock( select( blockEditorStore ) );
+			const { getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
 			return {
 				media:
 					featuredImage &&
@@ -155,18 +159,20 @@ export default function PostFeaturedImageEdit( {
 					postTypeSlug,
 					postId
 				)?.link,
-				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
 
 	const mediaUrl =
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ||
 		media?.source_url;
 
 	const blockProps = useBlockProps( {
-		style: { width, height, aspectRatio },
+		style: { width },
 		className: clsx( {
 			'is-transient': temporaryURL,
 		} ),
@@ -184,7 +190,8 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration
 				style={ {
-					height: !! aspectRatio && '100%',
+					aspectRatio,
+					height: aspectRatio ? undefined : height,
 					width: !! aspectRatio && '100%',
 					...borderProps.style,
 					...shadowProps.style,
@@ -240,16 +247,31 @@ export default function PostFeaturedImageEdit( {
 					clientId={ clientId }
 				/>
 			</InspectorControls>
-			{ ! hasSelectedStyleState && (
-				<InspectorControls group="dimensions">
-					<DimensionControls
-						clientId={ clientId }
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						media={ media }
-					/>
-				</InspectorControls>
-			) }
+			<InspectorControls
+				group="dimensions"
+				resetAllFilter={ ( attrs ) => ( {
+					...attrs,
+					aspectRatio: undefined,
+					height: undefined,
+					scale: undefined,
+					width: undefined,
+					style: resetDimensions( attrs.style, [
+						'aspectRatio',
+						'height',
+						'objectFit',
+						'width',
+					] ),
+				} ) }
+			>
+				<DimensionControls
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					media={ media }
+					selectedStyleState={ selectedStyleState }
+					hasSelectedStyleState={ hasSelectedStyleState }
+				/>
+			</InspectorControls>
 			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
 				<InspectorControls>
 					<ToolsPanel
@@ -398,7 +420,8 @@ export default function PostFeaturedImageEdit( {
 	const imageStyles = {
 		...borderProps.style,
 		...shadowProps.style,
-		height: aspectRatio ? '100%' : height,
+		aspectRatio,
+		height: aspectRatio ? undefined : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};

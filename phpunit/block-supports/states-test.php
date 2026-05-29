@@ -125,6 +125,49 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that fallback dimension declarations are added for aspect ratio.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_fallback_dimension_styles
+	 */
+	public function test_adds_fallback_dimension_declarations_for_aspect_ratio() {
+		$actual = gutenberg_get_state_declarations_with_fallback_dimension_styles(
+			array(
+				'aspect-ratio' => '16/9',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'aspect-ratio' => '16/9',
+				'min-height'   => 'unset',
+				'height'       => 'unset',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that fallback aspect-ratio declarations are added for height.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_fallback_dimension_styles
+	 */
+	public function test_adds_fallback_aspect_ratio_declaration_for_height() {
+		$actual = gutenberg_get_state_declarations_with_fallback_dimension_styles(
+			array(
+				'height' => '20rem',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'height'       => '20rem',
+				'aspect-ratio' => 'unset',
+			),
+			$actual
+		);
+	}
+
+	/**
 	 * Tests that modifier classes on the first compound selector are preserved
 	 * when state selectors are scoped to the block wrapper.
 	 *

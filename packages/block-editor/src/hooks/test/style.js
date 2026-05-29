@@ -208,6 +208,36 @@ describe( 'getStateStylesCSS', () => {
 			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
 		);
 	} );
+
+	it( 'adds important fallback dimensions when aspect ratio is set', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						aspectRatio: '16/9',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe(
+			'.wp-block-test { height: unset !important; min-height: unset !important; aspect-ratio: 16/9 !important; }'
+		);
+	} );
+
+	it( 'adds important fallback aspect ratio when height is set', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						height: '20rem',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe(
+			'.wp-block-test { height: 20rem !important; aspect-ratio: unset !important; }'
+		);
+	} );
 } );
 
 describe( 'getBlockStateStylesCSS', () => {

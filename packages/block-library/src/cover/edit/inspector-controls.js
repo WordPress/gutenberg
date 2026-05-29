@@ -34,12 +34,21 @@ import { Link } from '@wordpress/ui';
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import {
+	getStateDimensions,
+	resetDimensions,
+	resetStateDimensions,
+	setStateDimensions,
+} from '../../utils/style-state';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 import PosterImage from '../../utils/poster-image';
 
-const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	cleanEmptyObject,
+	isDefaultBlockStyleState,
+	ResolutionTool,
+	HTMLElementControl,
+} = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -124,20 +133,36 @@ export default function CoverInspectorControls( {
 	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
-	const { imageSizes, hasSelectedStyleState } = useSelect(
+	const { imageSizes, selectedStyleState } = useSelect(
 		( select ) => {
-			const {
-				getSettings,
-				hasSelectedStyleState: hasSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
+			const { getSettings, getSelectedBlockStyleState } = unlock(
+				select( blockEditorStore )
+			);
 
 			return {
 				imageSizes: getSettings()?.imageSizes,
-				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
 			};
 		},
 		[ clientId ]
 	);
+	const hasSelectedStyleState =
+		! isDefaultBlockStyleState( selectedStyleState );
+	const stateDimensions = hasSelectedStyleState
+		? getStateDimensions( attributes.style, selectedStyleState )
+		: {};
+	const stateMinHeight = stateDimensions.minHeight;
+	const [ stateMinHeightValue, stateMinHeightUnit ] =
+		parseQuantityAndUnitFromRawValue( stateMinHeight || '' );
+	const activeMinHeight = hasSelectedStyleState
+		? stateMinHeightValue
+		: minHeight;
+	const activeMinHeightUnit = hasSelectedStyleState
+		? stateMinHeightUnit || minHeightUnit
+		: minHeightUnit;
+	const activeAspectRatio = hasSelectedStyleState
+		? stateDimensions.aspectRatio
+		: attributes?.style?.dimensions?.aspectRatio;
 
 	const image = useSelect(
 		( select ) =>
@@ -202,6 +227,56 @@ export default function CoverInspectorControls( {
 
 	const showOverlayControls =
 		colorGradientSettings.hasColorsOrGradients && ! hasSelectedStyleState;
+
+	const setMinHeightAttributes = ( nextMinHeight, nextUnit ) => {
+		if ( hasSelectedStyleState ) {
+			setAttributes( {
+				style: setStateDimensions(
+					attributes.style,
+					selectedStyleState,
+					{
+						minHeight:
+							nextMinHeight === undefined
+								? undefined
+								: `${ nextMinHeight }${
+										nextUnit || activeMinHeightUnit || 'px'
+								  }`,
+						aspectRatio: undefined,
+					}
+				),
+			} );
+			return;
+		}
+
+		setAttributes( {
+			minHeight: nextMinHeight,
+			style: cleanEmptyObject( {
+				...attributes?.style,
+				dimensions: {
+					...attributes?.style?.dimensions,
+					aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+				},
+			} ),
+		} );
+	};
+
+	const getResetMinHeightAttributes = () => {
+		if ( hasSelectedStyleState ) {
+			return {
+				style: resetStateDimensions(
+					attributes.style,
+					selectedStyleState,
+					[ 'minHeight' ]
+				),
+			};
+		}
+
+		return {
+			minHeight: undefined,
+			minHeightUnit: undefined,
+			style: resetDimensions( attributes.style, [ 'minHeight' ] ),
+		};
+	};
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -401,53 +476,42 @@ export default function CoverInspectorControls( {
 					</ToolsPanelItem>
 				</InspectorControls>
 			) }
-			{ ! hasSelectedStyleState && (
-				<InspectorControls group="dimensions">
-					<ToolsPanelItem
-						className="single-column"
-						hasValue={ () => !! minHeight }
-						label={ __( 'Minimum height' ) }
-						onDeselect={ () =>
-							setAttributes( {
-								minHeight: undefined,
-								minHeightUnit: undefined,
-							} )
+			<InspectorControls group="dimensions">
+				<ToolsPanelItem
+					className="single-column"
+					hasValue={ () => !! activeMinHeight }
+					label={ __( 'Minimum height' ) }
+					onDeselect={ () =>
+						setAttributes( getResetMinHeightAttributes() )
+					}
+					resetAllFilter={ getResetMinHeightAttributes }
+					isShownByDefault
+					panelId={ clientId }
+				>
+					<CoverHeightInput
+						value={ activeAspectRatio ? '' : activeMinHeight }
+						unit={ activeMinHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setMinHeightAttributes( newMinHeight )
 						}
-						resetAllFilter={ () => ( {
-							minHeight: undefined,
-							minHeightUnit: undefined,
-						} ) }
-						isShownByDefault
-						panelId={ clientId }
-					>
-						<CoverHeightInput
-							value={
-								attributes?.style?.dimensions?.aspectRatio
-									? ''
-									: minHeight
+						onUnitChange={ ( nextUnit ) => {
+							if ( hasSelectedStyleState ) {
+								if ( activeMinHeight !== undefined ) {
+									setMinHeightAttributes(
+										activeMinHeight,
+										nextUnit
+									);
+								}
+								return;
 							}
-							unit={ minHeightUnit }
-							onChange={ ( newMinHeight ) =>
-								setAttributes( {
-									minHeight: newMinHeight,
-									style: cleanEmptyObject( {
-										...attributes?.style,
-										dimensions: {
-											...attributes?.style?.dimensions,
-											aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
-										},
-									} ),
-								} )
-							}
-							onUnitChange={ ( nextUnit ) =>
-								setAttributes( {
-									minHeightUnit: nextUnit,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
-				</InspectorControls>
-			) }
+
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} );
+						} }
+					/>
+				</ToolsPanelItem>
+			</InspectorControls>
 			<InspectorControls group="advanced">
 				<HTMLElementControl
 					tagName={ tagName }
