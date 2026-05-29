@@ -24,7 +24,17 @@ import {
 import * as iconsPackage from '@wordpress/icons';
 import manifest from '../../../packages/icons/src/manifest.json';
 
-const { Icon, ...availableIcons } = iconsPackage;
+/**
+ * Deprecated icon exports kept for backwards compatibility.
+ */
+const DEPRECATED_ICON_ALIASES = new Set( [ 'timeToRead' ] );
+
+const { Icon, ...allIcons } = iconsPackage;
+const availableIcons = Object.fromEntries(
+	Object.entries( allIcons ).filter(
+		( [ name ] ) => ! DEPRECATED_ICON_ALIASES.has( name )
+	)
+);
 
 const keywords: Partial< Record< string, string[] > > = {
 	archive: [ 'folder' ],
@@ -43,7 +53,7 @@ const keywords: Partial< Record< string, string[] > > = {
 	pencil: [ 'edit' ],
 	thumbsDown: [ 'dislike' ],
 	thumbsUp: [ 'like' ],
-	timeToRead: [ 'clock' ],
+	time: [ 'clock', 'duration', 'hour', 'minute', 'second' ],
 	trash: [ 'delete' ],
 	unseen: [ 'hide' ],
 };
