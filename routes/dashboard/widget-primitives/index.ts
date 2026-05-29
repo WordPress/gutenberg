@@ -1,4 +1,9 @@
 /**
+ * Components
+ */
+export { WidgetRender } from './components/widget-render';
+
+/**
  * Hooks
  */
 export { useWidgetTypes } from './hooks';
