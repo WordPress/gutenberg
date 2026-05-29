@@ -1,1 +1,1 @@
-export { privateApis } from './private-apis';
+export { default as RichTextControl } from './control';

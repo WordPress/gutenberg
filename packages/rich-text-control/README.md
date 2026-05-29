@@ -16,18 +16,18 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Usage
 
-`RichTextControl` is currently exposed as a private API. Opt in from a package on the [private-apis allowlist](https://github.com/WordPress/gutenberg/blob/HEAD/packages/private-apis/src/implementation.ts):
-
 ```js
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-import { privateApis } from '@wordpress/rich-text-control';
+import { RichTextControl } from '@wordpress/rich-text-control';
 
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/your-package'
-);
-
-const { RichTextControl } = unlock( privateApis );
+function MyField( { value, onChange } ) {
+	return (
+		<RichTextControl
+			label="Description"
+			value={ value }
+			onChange={ onChange }
+		/>
+	);
+}
 ```
 
 ## Contributing to this package

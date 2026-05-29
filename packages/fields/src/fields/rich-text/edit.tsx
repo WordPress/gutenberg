@@ -4,15 +4,8 @@
 // @ts-ignore — `@wordpress/rich-text-control` ships no `.d.ts` files, so the
 // type-declaration build cannot resolve this import even though the package
 // is declared as a dependency.
-import { privateApis as richTextControlPrivateApis } from '@wordpress/rich-text-control';
+import { RichTextControl } from '@wordpress/rich-text-control';
 import type { DataFormControlProps } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { RichTextControl } = unlock( richTextControlPrivateApis );
 
 /**
  * Configuration specific to rich text fields.
