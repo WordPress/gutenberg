@@ -7,9 +7,9 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import isURLLike from './is-url-like';
+import isURLLike, { isHashLink } from './is-url-like';
 import normalizeUrl from './normalize-url';
-import { CREATE_TYPE } from './constants';
+import { CREATE_TYPE, INTERNAL_TYPE } from './constants';
 import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
@@ -25,6 +25,38 @@ export const handleDirectEntry = ( val ) => {
 			type,
 		},
 	] );
+};
+
+const getAnchorSuggestions = ( blocks, val ) => {
+	const search = val.slice( 1 ).toLowerCase();
+	const anchors = new Set();
+	const stack = [ ...( Array.isArray( blocks ) ? blocks : [] ) ];
+
+	while ( stack.length ) {
+		const block = stack.shift();
+		const anchor = block?.attributes?.anchor?.trim();
+
+		if ( anchor && anchor.toLowerCase().includes( search ) ) {
+			anchors.add( anchor );
+		}
+
+		if ( Array.isArray( block?.innerBlocks ) && block.innerBlocks.length ) {
+			stack.push( ...block.innerBlocks );
+		}
+	}
+
+	return Array.from( anchors )
+		.sort( ( a, b ) => a.localeCompare( b ) )
+		.map( ( anchor ) => {
+			const hashLink = `#${ anchor }`;
+
+			return {
+				id: hashLink,
+				title: hashLink,
+				url: hashLink,
+				type: INTERNAL_TYPE,
+			};
+		} );
 };
 
 const handleEntitySearch = async (
@@ -88,19 +120,22 @@ export default function useSearchHandler(
 	allowDirectEntry,
 	withCreateSuggestion
 ) {
-	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
+	const {
+		fetchSearchSuggestions,
+		pageOnFront,
+		pageForPosts,
+		blocks = [],
+	} = useSelect( ( select ) => {
+		const { getSettings, getBlocks } = select( blockEditorStore );
 
-			return {
-				pageOnFront: getSettings().pageOnFront,
-				pageForPosts: getSettings().pageForPosts,
-				fetchSearchSuggestions:
-					getSettings().__experimentalFetchLinkSuggestions,
-			};
-		},
-		[]
-	);
+		return {
+			pageOnFront: getSettings().pageOnFront,
+			pageForPosts: getSettings().pageForPosts,
+			fetchSearchSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
+			blocks: getBlocks(),
+		};
+	}, [] );
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
@@ -108,6 +143,16 @@ export default function useSearchHandler(
 
 	return useCallback(
 		( val, { isInitialSuggestions } ) => {
+			if ( isHashLink( val ) ) {
+				const anchorSuggestions = getAnchorSuggestions( blocks, val );
+
+				if ( anchorSuggestions.length ) {
+					return Promise.resolve( anchorSuggestions );
+				}
+
+				return directEntryHandler( val, { isInitialSuggestions } );
+			}
+
 			return isURLLike( val )
 				? directEntryHandler( val, { isInitialSuggestions } )
 				: handleEntitySearch(
@@ -120,6 +165,7 @@ export default function useSearchHandler(
 				  );
 		},
 		[
+			blocks,
 			directEntryHandler,
 			fetchSearchSuggestions,
 			pageOnFront,
