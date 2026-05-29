@@ -20,6 +20,6 @@ exports[`Spacer block transforms to Group block 1`] = `
 
 exports[`Spacer block transforms to Separator block 1`] = `
 "<!-- wp:separator -->
-<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<hr class="wp-block-separator has-alpha-channel-opacity" role="none" aria-label=""/>
 <!-- /wp:separator -->"
 `;

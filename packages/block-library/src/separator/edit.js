@@ -12,7 +12,13 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
-import { HorizontalRule, SelectControl } from '@wordpress/components';
+import {
+	HorizontalRule,
+	SelectControl,
+	ToggleControl,
+	Notice,
+	PanelBody,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,27 +31,31 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
 		<SelectControl
 			label={ __( 'HTML element' ) }
 			value={ tagName }
-			onChange={ ( newValue ) => setAttributes( { tagName: newValue } ) }
+			onChange={ ( newValue ) => {
+				setAttributes( { tagName: newValue } );
+				// When switching to div, ensure it's decorative.
+				if ( newValue === 'div' ) {
+					setAttributes( { isDecorative: true } );
+				}
+			} }
 			options={ [
 				{ label: __( 'Default (<hr>)' ), value: 'hr' },
 				{ label: '<div>', value: 'div' },
 			] }
-			help={
-				tagName === 'hr'
-					? __(
-							'Only select <hr> if the separator conveys important information and should be announced by screen readers.'
-					  )
-					: __(
-							'The <div> element should only be used if the block is a design element with no semantic meaning.'
-					  )
-			}
+			help={ __( 'Change only if needed for custom CSS targeting.' ) }
 			__next40pxDefaultSize
 		/>
 	);
 };
 
 export default function SeparatorEdit( { attributes, setAttributes } ) {
-	const { backgroundColor, opacity, style, tagName } = attributes;
+	const {
+		backgroundColor,
+		opacity,
+		style,
+		tagName,
+		isDecorative = true,
+	} = attributes;
 	const colorProps = useColorProps( attributes );
 	const currentColor = colorProps?.style?.backgroundColor;
 	const hasCustomColor = !! style?.color?.background;
@@ -74,6 +84,36 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 
 	return (
 		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					{ tagName === 'hr' && (
+						<ToggleControl
+							label={ __( 'Decorative separator' ) }
+							checked={ isDecorative }
+							onChange={ ( value ) =>
+								setAttributes( { isDecorative: value } )
+							}
+							help={
+								isDecorative
+									? __(
+											'This separator is hidden from assistive technologies.'
+									  )
+									: __(
+											'This separator announces a thematic break to screen readers.'
+									  )
+							}
+						/>
+					) }
+
+					{ tagName === 'div' && (
+						<Notice status="info" isDismissible={ false }>
+							{ __(
+								'Non-HR elements are automatically decorative.'
+							) }
+						</Notice>
+					) }
+				</PanelBody>
+			</InspectorControls>
 			<InspectorControls group="advanced">
 				<HtmlElementControl
 					tagName={ tagName }

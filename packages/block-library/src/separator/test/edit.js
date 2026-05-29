@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import SeparatorEdit from '../edit';
 jest.mock( '@wordpress/block-editor', () => ( {
 	...jest.requireActual( '@wordpress/block-editor' ),
 	useBlockProps: jest.fn(),
+	InspectorControls: ( { children } ) => <>{ children }</>,
 } ) );
 
 const defaultAttributes = {
@@ -24,6 +25,7 @@ const defaultAttributes = {
 	style: {},
 	className: '',
 	tagName: 'hr',
+	isDecorative: true,
 };
 const defaultProps = {
 	attributes: defaultAttributes,
@@ -111,6 +113,76 @@ describe( 'Separator block edit method', () => {
 			className:
 				'has-text-color has-banana-color has-alpha-channel-opacity has-banana-background-color has-background',
 			style: undefined,
+		} );
+	} );
+
+	describe( 'isDecorative and tagName controls', () => {
+		test( 'should render a decorative toggle when tagName is hr', () => {
+			render( <SeparatorEdit { ...defaultProps } /> );
+			expect(
+				screen.getByRole( 'checkbox', {
+					name: /Decorative separator/i,
+				} )
+			).toBeInTheDocument();
+		} );
+
+		test( 'should call setAttributes with updated isDecorative when toggle is changed', () => {
+			const setAttributes = jest.fn();
+			const props = {
+				...defaultProps,
+				setAttributes,
+				attributes: { ...defaultAttributes, isDecorative: true },
+			};
+			render( <SeparatorEdit { ...props } /> );
+			const toggle = screen.getByRole( 'checkbox', {
+				name: /Decorative separator/i,
+			} );
+			fireEvent.click( toggle );
+			expect( setAttributes ).toHaveBeenCalledWith( {
+				isDecorative: false,
+			} );
+		} );
+
+		test( 'should not render decorative toggle when tagName is div', () => {
+			const props = {
+				...defaultProps,
+				attributes: { ...defaultAttributes, tagName: 'div' },
+			};
+			render( <SeparatorEdit { ...props } /> );
+			expect(
+				screen.queryByRole( 'checkbox', {
+					name: /Decorative separator/i,
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		test( 'should render info notice when tagName is div', () => {
+			const props = {
+				...defaultProps,
+				attributes: { ...defaultAttributes, tagName: 'div' },
+			};
+			render( <SeparatorEdit { ...props } /> );
+			// Notice renders text in both the visible node and an aria-live
+			// announcer region, so use getAllByText and check at least one match.
+			expect(
+				screen.getAllByText(
+					/Non-HR elements are automatically decorative/i
+				)[ 0 ]
+			).toBeInTheDocument();
+		} );
+
+		test( 'should set isDecorative to true when switching to div via HtmlElementControl', () => {
+			const setAttributes = jest.fn();
+			const props = { ...defaultProps, setAttributes };
+			render( <SeparatorEdit { ...props } /> );
+			const select = screen.getByRole( 'combobox', {
+				name: /HTML element/i,
+			} );
+			fireEvent.change( select, { target: { value: 'div' } } );
+			expect( setAttributes ).toHaveBeenCalledWith( { tagName: 'div' } );
+			expect( setAttributes ).toHaveBeenCalledWith( {
+				isDecorative: true,
+			} );
 		} );
 	} );
 } );

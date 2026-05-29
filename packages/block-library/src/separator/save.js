@@ -13,7 +13,13 @@ import {
 } from '@wordpress/block-editor';
 
 export default function separatorSave( { attributes } ) {
-	const { backgroundColor, style, opacity, tagName: Tag } = attributes;
+	const {
+		backgroundColor,
+		style,
+		opacity,
+		tagName: Tag,
+		isDecorative = true,
+	} = attributes;
 	const customColor = style?.color?.background;
 	const colorProps = getColorClassesAndStyles( attributes );
 	// The hr support changing color using border-color, since border-color
@@ -37,5 +43,21 @@ export default function separatorSave( { attributes } ) {
 		backgroundColor: colorProps?.style?.backgroundColor,
 		color: colorClass ? undefined : customColor,
 	};
-	return <Tag { ...useBlockProps.save( { className, style: styles } ) } />;
+
+	// Build aria attributes for decorative HR elements
+	const ariaProps = {};
+	if ( Tag === 'hr' && isDecorative ) {
+		ariaProps.role = 'none';
+		ariaProps[ 'aria-label' ] = '';
+	}
+
+	return (
+		<Tag
+			{ ...useBlockProps.save( {
+				className,
+				style: styles,
+				...ariaProps,
+			} ) }
+		/>
+	);
 }

@@ -11,7 +11,7 @@
 <!-- wp:post-excerpt /-->
 
 <!-- wp:separator {"opacity":"css"} -->
-<hr class="wp-block-separator has-css-opacity"/>
+<hr class="wp-block-separator has-css-opacity" role="none" aria-label=""/>
 <!-- /wp:separator -->
 
 <!-- wp:post-date {"metadata":{"bindings":{"datetime":{"source":"core/post-data","args":{"field":"date"}}}}} /-->
