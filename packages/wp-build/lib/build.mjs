@@ -168,9 +168,7 @@ function getAllPackages() {
 		// their `exports`, so fall back to a direct node_modules lookup.
 		let pkgJsonPath;
 		try {
-			pkgJsonPath = localRequire.resolve(
-				`${ depName }/package.json`
-			);
+			pkgJsonPath = localRequire.resolve( `${ depName }/package.json` );
 		} catch {
 			const direct = path.join(
 				ROOT_DIR,
@@ -824,12 +822,9 @@ async function bundlePackage( packageName, options = {} ) {
 			// Falls back to the legacy `@<packageNamespace>/<dirName>` shape
 			// only when `name` is missing (e.g. an unnamed local package).
 			const packageId =
-				packageJson.name ||
-				`@${ packageNamespace }/${ packageName }`;
+				packageJson.name || `@${ packageNamespace }/${ packageName }`;
 			const scriptModuleId =
-				exportName === '.'
-					? packageId
-					: `${ packageId }/${ fileName }`;
+				exportName === '.' ? packageId : `${ packageId }/${ fileName }`;
 
 			builtModules.push( {
 				id: scriptModuleId,
