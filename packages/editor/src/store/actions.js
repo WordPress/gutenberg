@@ -97,6 +97,9 @@ import {
 	DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
+	DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS,
+	DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+	DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS,
 	DISTRIBUTED_EDITING_REASON_CODES,
 	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
@@ -2148,6 +2151,153 @@ function getDistributedEditingPresenceLocalContentHasChanged(
 	);
 }
 
+function getDistributedEditingPresenceSelectionBlockPath(
+	blockEditorSelect,
+	clientId
+) {
+	if (
+		! clientId ||
+		typeof blockEditorSelect?.getBlockParents !== 'function' ||
+		typeof blockEditorSelect?.getBlockIndex !== 'function'
+	) {
+		return null;
+	}
+
+	const parentClientIds =
+		blockEditorSelect.getBlockParents( clientId, true ) || [];
+	const pathClientIds = [ ...parentClientIds, clientId ];
+	const blockPath = pathClientIds.map( ( pathClientId ) =>
+		blockEditorSelect.getBlockIndex( pathClientId )
+	);
+
+	if (
+		blockPath.length === 0 ||
+		blockPath.some( ( index ) => ! Number.isInteger( index ) || index < 0 )
+	) {
+		return null;
+	}
+
+	return blockPath;
+}
+
+function getDistributedEditingPresenceSelectionPoint(
+	blockEditorSelect,
+	selectionPoint
+) {
+	const clientId = selectionPoint?.clientId;
+	const blockPath = getDistributedEditingPresenceSelectionBlockPath(
+		blockEditorSelect,
+		clientId
+	);
+
+	if ( ! blockPath ) {
+		return null;
+	}
+
+	const attributeKey =
+		typeof selectionPoint.attributeKey === 'string' &&
+		/^[A-Za-z0-9_-]{1,64}$/.test( selectionPoint.attributeKey )
+			? selectionPoint.attributeKey
+			: '';
+	const numericOffset = Number( selectionPoint.offset );
+	const offset = Number.isInteger( numericOffset )
+		? Math.max( 0, Math.min( numericOffset, 1000000 ) )
+		: null;
+
+	return {
+		blockPath,
+		attributeKey,
+		offset,
+	};
+}
+
+function getDistributedEditingPresenceSelectionState( registry, options = {} ) {
+	if ( options.selectionState !== undefined ) {
+		return options.selectionState;
+	}
+
+	const blockEditorSelect = registry.select( blockEditorStore );
+	const selectionStart = blockEditorSelect.getSelectionStart?.();
+	const selectionEnd = blockEditorSelect.getSelectionEnd?.();
+	const fallbackClientId =
+		blockEditorSelect.getSelectedBlockClientId?.() ||
+		blockEditorSelect.getBlockSelectionStart?.();
+	const anchor = selectionStart?.clientId
+		? getDistributedEditingPresenceSelectionPoint(
+				blockEditorSelect,
+				selectionStart
+		  )
+		: getDistributedEditingPresenceSelectionPoint( blockEditorSelect, {
+				clientId: fallbackClientId,
+		  } );
+	const focus = selectionEnd?.clientId
+		? getDistributedEditingPresenceSelectionPoint(
+				blockEditorSelect,
+				selectionEnd
+		  )
+		: anchor;
+
+	if ( ! anchor || ! focus ) {
+		return {
+			available: false,
+			schema: DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+			kind: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.NONE,
+		};
+	}
+
+	const samePoint =
+		anchor.blockPath.join( '.' ) === focus.blockPath.join( '.' ) &&
+		anchor.attributeKey === focus.attributeKey &&
+		anchor.offset === focus.offset;
+	const sameBlock =
+		anchor.blockPath.join( '.' ) === focus.blockPath.join( '.' );
+	const hasRichTextOffsets =
+		anchor.attributeKey &&
+		focus.attributeKey &&
+		anchor.offset !== null &&
+		focus.offset !== null;
+	let kind = DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.BLOCK;
+
+	if ( hasRichTextOffsets && samePoint ) {
+		kind = DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.CARET;
+	} else if ( hasRichTextOffsets && sameBlock ) {
+		kind = DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.RICH_TEXT;
+	} else if ( ! sameBlock ) {
+		kind = DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.MULTI_BLOCK;
+	}
+
+	return {
+		available: true,
+		schema: DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+		kind,
+		isCollapsed: samePoint,
+		anchor,
+		focus,
+		baseVersion:
+			typeof options.confirmedBaseVersion === 'string'
+				? options.confirmedBaseVersion
+				: null,
+		baseStateHash:
+			typeof options.confirmedStateHash === 'string'
+				? options.confirmedStateHash
+				: null,
+		selectionSourceStatus: options.hasPendingChanges
+			? DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.LOCAL_PENDING_ONLY
+			: DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.BASE_ALIGNED,
+		reportedAtGmt: new Date().toISOString(),
+		source: 'gutenberg_selection_store',
+		contentFree: true,
+		authoritativeForSave: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesRawSelectedText: false,
+		exposesClientId: false,
+		exposesDomSelector: false,
+		exposesBoundedSelectionOffsets:
+			anchor.offset !== null || focus.offset !== null,
+	};
+}
+
 function getDistributedEditingPresenceHeartbeatDocumentState(
 	sessionState,
 	select,
@@ -2285,6 +2435,15 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 				select,
 				options
 			);
+		const selectionState = getDistributedEditingPresenceSelectionState(
+			registry,
+			{
+				...options,
+				confirmedBaseVersion: documentState.confirmedBaseVersion,
+				confirmedStateHash: documentState.confirmedStateHash,
+				hasPendingChanges: documentState.hasPendingChanges,
+			}
+		);
 
 		try {
 			const response = await requestDistributedEditingPresenceHeartbeat( {
@@ -2297,6 +2456,7 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 				confirmedStateHash: documentState.confirmedStateHash,
 				hasPendingChanges: documentState.hasPendingChanges,
 				confirmedAtGmt: documentState.confirmedAtGmt,
+				selectionState,
 			} );
 			const latestSessionState =
 				select.getDistributedEditingSessionState?.() ||

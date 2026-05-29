@@ -279,7 +279,7 @@ describe( 'distributed editing REST helpers', () => {
 		);
 	} );
 
-	it( 'sends a presence heartbeat without content, cursor, selection, or save data', async () => {
+	it( 'sends a presence heartbeat without content, raw cursor, raw selection, or save data', async () => {
 		apiFetch.setFetchHandler( async ( options ) => {
 			expect( options.path ).toMatch(
 				/^\/wp\/v2\/pages\/42\/distributed-editing\/presence\/heartbeat/
@@ -293,6 +293,7 @@ describe( 'distributed editing REST helpers', () => {
 			);
 			expect( options.data ).not.toHaveProperty( 'cursor_offset' );
 			expect( options.data ).not.toHaveProperty( 'selection' );
+			expect( options.data ).not.toHaveProperty( 'selection_state' );
 
 			return {
 				result: 'presence_heartbeat_recorded',
@@ -341,6 +342,7 @@ describe( 'distributed editing REST helpers', () => {
 			);
 			expect( options.data ).not.toHaveProperty( 'cursor_offset' );
 			expect( options.data ).not.toHaveProperty( 'selection' );
+			expect( options.data ).not.toHaveProperty( 'clientId' );
 
 			return {
 				result: 'presence_heartbeat_recorded',
@@ -379,6 +381,79 @@ describe( 'distributed editing REST helpers', () => {
 			expect.objectContaining( {
 				result: 'presence_heartbeat_recorded',
 				document_state_recorded: true,
+				calls_save: false,
+			} )
+		);
+	} );
+
+	it( 'sends content-free selection presence with a heartbeat', async () => {
+		const selectionState = {
+			available: true,
+			schema: 'de-rtc-selection-presence-v1',
+			kind: 'caret',
+			isCollapsed: true,
+			anchor: {
+				blockPath: [ 0 ],
+				attributeKey: 'content',
+				offset: 6,
+			},
+			focus: {
+				blockPath: [ 0 ],
+				attributeKey: 'content',
+				offset: 6,
+			},
+			reportedAtGmt: '2026-05-20T12:00:00.000Z',
+			contentFree: true,
+			exposesRawContent: false,
+			exposesRawSelectedText: false,
+			exposesClientId: false,
+		};
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/pages\/42\/distributed-editing\/presence\/heartbeat/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toEqual( {
+				session_key: 'turn-selection-session',
+				selection_state: selectionState,
+			} );
+			expect( options.data.selection_state ).not.toHaveProperty(
+				'clientId'
+			);
+			expect( options.data.selection_state ).not.toHaveProperty(
+				'rawContent'
+			);
+			expect( options.data.selection_state ).not.toHaveProperty(
+				'selectedText'
+			);
+			expect( JSON.stringify( options.data ) ).not.toMatch(
+				/<p|cursor_offset/
+			);
+
+			return {
+				result: 'presence_heartbeat_recorded',
+				rest_route: 'post_presence_heartbeat',
+				selection_state_recorded: true,
+				selection_state: selectionState,
+				calls_save: false,
+				mutates_post_content: false,
+				changes_post_lock: false,
+				claims_saved: false,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingPresenceHeartbeat( {
+				postId: 42,
+				restBase: 'pages',
+				sessionKey: 'turn-selection-session',
+				selectionState,
+			} )
+		).resolves.toEqual(
+			expect.objectContaining( {
+				result: 'presence_heartbeat_recorded',
+				selection_state_recorded: true,
 				calls_save: false,
 			} )
 		);

@@ -30,6 +30,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
+import DistributedEditingSelectionOverlay from '../distributed-editing-selection-overlay';
 import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
@@ -491,6 +492,7 @@ function VisualEditor( {
 									: false
 							}
 						/>
+						<DistributedEditingSelectionOverlay />
 						{ renderingMode === 'template-locked' && (
 							<EditTemplateBlocksNotification
 								contentRef={ localRef }

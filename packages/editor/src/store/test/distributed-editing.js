@@ -47,6 +47,11 @@ import {
 	DISTRIBUTED_EDITING_SAVE_LOCAL_CHANGES_STATES,
 	DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS,
 	DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES,
+	DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS,
+	DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+	DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS,
+	DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES,
+	DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES,
 	DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_REASONS,
 	DISTRIBUTED_EDITING_RETRY_SUBMIT_HANDOFF_STATUSES,
@@ -135,6 +140,8 @@ import {
 	isValidDistributedEditingDisposition,
 	isValidDistributedEditingReasonCode,
 	normalizeDistributedEditingSessionState,
+	getDistributedEditingSelectionPresenceMapping,
+	normalizeDistributedEditingPresenceSelectionState,
 	shouldWarnBeforeLeavingDistributedEditingSessionState,
 } from '../distributed-editing';
 import {
@@ -1030,6 +1037,13 @@ describe( 'distributed editing session state', () => {
 			displayName: 'Mira',
 			avatarUrl: 'https://example.test/mira.png',
 		} );
+		expect( activeRoster.entries[ 1 ] ).toMatchObject( {
+			exposesSelection: false,
+			exposesSelectionPresence: false,
+			selectionState: {
+				available: false,
+			},
+		} );
 		expect( mixedRoster ).toMatchObject( {
 			currentVisibleCount: 2,
 			delayedVisibleCount: 1,
@@ -1052,7 +1066,9 @@ describe( 'distributed editing session state', () => {
 			exposesCursorOffset: false,
 		} );
 		expect( JSON.stringify( activeRoster ) ).not.toContain( 'userId' );
-		expect( JSON.stringify( activeRoster ) ).not.toContain( 'anchor' );
+		expect( JSON.stringify( activeRoster ) ).not.toMatch(
+			/rawSelection|selectedText|"clientId"|cursor_offset/
+		);
 		expect( staleRoster.copy.summary ).toBe(
 			'Sam was here recently. Presence may be delayed.'
 		);
@@ -1094,6 +1110,229 @@ describe( 'distributed editing session state', () => {
 			},
 		} );
 		expect( storageRoster.entries[ 0 ].freshness ).toBe( 'current' );
+	} );
+
+	it( 'normalizes content-free selection presence without raw editor authority', () => {
+		const selectionState =
+			normalizeDistributedEditingPresenceSelectionState( {
+				available: true,
+				schema: DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+				kind: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.CARET,
+				isCollapsed: true,
+				baseVersion: '12',
+				baseStateHash:
+					'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+				selectionSourceStatus:
+					DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.BASE_ALIGNED,
+				anchor: {
+					blockPath: [ 1 ],
+					blockUid: 'de-rtc-block-1',
+					attributeKey: 'content',
+					offset: 4,
+					clientId: 'must-not-survive',
+				},
+				focus: {
+					blockPath: [ 1 ],
+					attributeKey: 'content',
+					offset: 4,
+				},
+				rawContent: '<p>Do not retain me</p>',
+			} );
+		const rosterState =
+			getDistributedEditingPresenceRosterStateForSessionState( {
+				presenceRosterEntries: [
+					{
+						key: 'presence-mira',
+						displayName: 'Mira',
+						freshness: 'current',
+						selectionState,
+					},
+				],
+			} );
+
+		expect( selectionState ).toMatchObject( {
+			available: true,
+			kind: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.CARET,
+			baseVersion: '12',
+			baseStateHash:
+				'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+			selectionSourceStatus:
+				DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.BASE_ALIGNED,
+			anchor: {
+				blockPath: [ 1 ],
+				blockUid: 'de-rtc-block-1',
+				attributeKey: 'content',
+				offset: 4,
+			},
+			exposesRawContent: false,
+			exposesRawSelectedText: false,
+			exposesClientId: false,
+		} );
+		expect( selectionState.anchor ).not.toHaveProperty( 'clientId' );
+		expect( rosterState ).toMatchObject( {
+			exposesSelection: false,
+			exposesSelectionPresence: true,
+			exposesRawSelectedText: false,
+			exposesCursorOffset: false,
+		} );
+		expect( JSON.stringify( rosterState ) ).not.toMatch(
+			/must-not-survive|Do not retain me|rawContent/
+		);
+
+		expect(
+			normalizeDistributedEditingPresenceSelectionState( {
+				available: true,
+				schema: DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+				kind: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.BLOCK,
+				baseVersion: '12',
+				baseStateHash:
+					'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+				mappingStatus: 'local_pending_only',
+				anchor: {
+					blockPath: [ 1 ],
+				},
+			} )
+		).toMatchObject( {
+			selectionSourceStatus:
+				DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.UNKNOWN,
+		} );
+
+		expect(
+			normalizeDistributedEditingPresenceSelectionState( {
+				available: true,
+				schema: DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+				kind: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.BLOCK,
+				baseVersion: '12',
+				baseStateHash:
+					'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+				updatedAt: '2026-05-20T12:03:00.000Z',
+				anchor: {
+					blockPath: [ 1 ],
+				},
+			} )
+		).toMatchObject( {
+			reportedAtGmt: '2026-05-20T12:03:00.000Z',
+		} );
+	} );
+
+	it( 'resolves selection presence rendering only from receiver-owned mapping evidence', () => {
+		const selectionState =
+			normalizeDistributedEditingPresenceSelectionState( {
+				available: true,
+				schema: DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+				kind: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.RICH_TEXT,
+				isCollapsed: false,
+				baseVersion: '12',
+				baseStateHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				selectionSourceStatus:
+					DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.BASE_ALIGNED,
+				mappingStatus: 'exact',
+				anchor: {
+					blockPath: [ 0, 1 ],
+					attributeKey: 'content',
+					offset: 3,
+				},
+				focus: {
+					blockPath: [ 0, 1 ],
+					attributeKey: 'content',
+					offset: 8,
+				},
+			} );
+		const resolveBlockPath = ( blockPath ) =>
+			blockPath.join( '.' ) === '0.1' ? 'local-client-id' : null;
+
+		expect(
+			getDistributedEditingSelectionPresenceMapping( selectionState, {
+				localBaseVersion: '12',
+				localBaseStateHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				localHasPendingChanges: false,
+				resolveBlockPath,
+				hasRepeatedBlockAmbiguity: true,
+			} )
+		).toMatchObject( {
+			resolvedMappingStatus:
+				DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.WITHHELD,
+			resolvedDegradationReason:
+				DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.REPEATED_BLOCK_AMBIGUITY,
+			renderable: false,
+		} );
+
+		expect(
+			getDistributedEditingSelectionPresenceMapping( selectionState, {
+				localBaseVersion: '12',
+				localBaseStateHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				localHasPendingChanges: false,
+				resolveBlockPath,
+			} )
+		).toMatchObject( {
+			resolvedMappingStatus:
+				DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.EXACT,
+			resolvedDegradationReason:
+				DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.NONE,
+			anchorClientId: 'local-client-id',
+			renderable: true,
+			authoritativeForSave: false,
+		} );
+
+		expect(
+			getDistributedEditingSelectionPresenceMapping( selectionState, {
+				localBaseVersion: '12',
+				localBaseStateHash:
+					'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+				localHasPendingChanges: true,
+				resolveBlockPath,
+			} )
+		).toMatchObject( {
+			resolvedMappingStatus:
+				DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.EXACT,
+			resolvedDegradationReason:
+				DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.NONE,
+			renderable: true,
+		} );
+
+		const pendingSenderSelectionState = {
+			...selectionState,
+			selectionSourceStatus:
+				DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.LOCAL_PENDING_ONLY,
+		};
+
+		expect(
+			getDistributedEditingSelectionPresenceMapping(
+				pendingSenderSelectionState,
+				{
+					localBaseVersion: '12',
+					localBaseStateHash:
+						'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+					localHasPendingChanges: false,
+					resolveBlockPath,
+				}
+			)
+		).toMatchObject( {
+			resolvedMappingStatus:
+				DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.EXACT,
+			resolvedDegradationReason:
+				DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.NONE,
+			renderable: true,
+		} );
+
+		expect(
+			getDistributedEditingSelectionPresenceMapping( selectionState, {
+				localBaseVersion: '12',
+				localBaseStateHash:
+					'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+				localHasPendingChanges: false,
+				resolveBlockPath,
+			} )
+		).toMatchObject( {
+			resolvedMappingStatus:
+				DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.WITHHELD,
+			resolvedDegradationReason:
+				DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.STALE_BASE,
+			renderable: false,
+		} );
 	} );
 
 	it( 'normalizes explicit presence snapshot refreshes without unsafe fields or write claims', () => {
@@ -1198,7 +1437,7 @@ describe( 'distributed editing session state', () => {
 			'Mira was here recently. Presence may be delayed.'
 		);
 		expect( JSON.stringify( normalized ) ).not.toMatch(
-			/userId|rawContent|anchor/
+			/userId|rawContent|rawSelection|selectedText|"clientId"|cursor_offset/
 		);
 	} );
 
@@ -1411,7 +1650,7 @@ describe( 'distributed editing session state', () => {
 			claimsSaved: false,
 		} );
 		expect( JSON.stringify( rosterState ) ).not.toMatch(
-			/Expired Repeated Browser|userId|raw_session_key|selection|cursor/
+			/Expired Repeated Browser|userId|raw_session_key|rawSelection|selectedText|"clientId"|cursor_offset/
 		);
 	} );
 
@@ -1517,7 +1756,7 @@ describe( 'distributed editing session state', () => {
 			presenceRosterExpiredEvidenceCarriedForward: false,
 		} );
 		expect( JSON.stringify( reconciled ) ).not.toMatch(
-			/rawSessionKey|raw_session_key|userId|selection|cursor/
+			/rawSessionKey|raw_session_key|userId|rawSelection|selectedText|"clientId"|cursor_offset/
 		);
 	} );
 
@@ -1675,7 +1914,7 @@ describe( 'distributed editing session state', () => {
 			)
 		).toHaveLength( 1 );
 		expect( JSON.stringify( heartbeatRefreshed ) ).not.toMatch(
-			/rawSessionKey|raw_session_key|userId|selection|cursor/
+			/rawSessionKey|raw_session_key|userId|rawSelection|selectedText|"clientId"|cursor_offset/
 		);
 	} );
 
@@ -1922,7 +2161,7 @@ describe( 'distributed editing session state', () => {
 			claimsSaved: false,
 		} );
 		expect( JSON.stringify( rosterState ) ).not.toMatch(
-			/rawContent|userId|raw_session_key|selection|cursor/
+			/rawContent|userId|raw_session_key|rawSelection|selectedText|"clientId"|cursor_offset/
 		);
 	} );
 
@@ -2015,7 +2254,7 @@ describe( 'distributed editing session state', () => {
 			exposesCursorOffset: false,
 		} );
 		expect( JSON.stringify( rosterState ) ).not.toMatch(
-			/rawContent|userId|raw_session_key|selection|cursor/
+			/rawContent|userId|raw_session_key|rawSelection|selectedText|"clientId"|cursor_offset/
 		);
 	} );
 
@@ -2115,7 +2354,7 @@ describe( 'distributed editing session state', () => {
 			claimsSaved: false,
 		} );
 		expect( JSON.stringify( rosterState ) ).not.toMatch(
-			/rawContent|userId|raw_session_key|selection|cursor|Hidden High Count/
+			/rawContent|userId|raw_session_key|rawSelection|selectedText|"clientId"|cursor_offset|Hidden High Count/
 		);
 	} );
 
@@ -2262,7 +2501,7 @@ describe( 'distributed editing session state', () => {
 			presenceRosterEmptySnapshotPreservedEntries: false,
 		} );
 		expect( JSON.stringify( firstEmptySnapshot ) ).not.toMatch(
-			/rawContent|userId|raw_session_key|selection|cursor/
+			/rawContent|userId|raw_session_key|rawSelection|selectedText|"clientId"|cursor_offset/
 		);
 	} );
 

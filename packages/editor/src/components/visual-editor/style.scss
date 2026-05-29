@@ -47,3 +47,56 @@
 		}
 	}
 }
+
+.editor-distributed-editing-selection-overlay {
+	inset: 0;
+	pointer-events: none;
+	position: absolute;
+	z-index: 25;
+}
+
+.editor-distributed-editing-selection-overlay__mark {
+	background: color-mix(in srgb, var(--de-rtc-selection-color) 18%, transparent);
+	border:
+		1px solid
+		color-mix(in srgb, var(--de-rtc-selection-color) 70%, transparent);
+	border-radius: 2px;
+	box-sizing: border-box;
+	min-height: 2px;
+	pointer-events: none;
+	position: absolute;
+}
+
+.editor-distributed-editing-selection-overlay__mark--caret {
+	background: var(--de-rtc-selection-color);
+	border: 0;
+	border-radius: 1px;
+	width: 2px !important;
+}
+
+.editor-distributed-editing-selection-overlay__label {
+	background: var(--de-rtc-selection-color);
+	border-radius: 2px;
+	color: #fff;
+	display: block;
+	font-family: $default-font;
+	font-size: 11px;
+	font-weight: 500;
+	inset-block-start: -22px;
+	inset-inline-start: 0;
+	line-height: 1.2;
+	max-width: min(180px, 40vw);
+	overflow: hidden;
+	padding: 3px 6px;
+	pointer-events: auto;
+	position: absolute;
+	text-overflow: ellipsis;
+	transition: opacity 120ms ease-out;
+	white-space: nowrap;
+	will-change: opacity;
+}
+
+.editor-distributed-editing-selection-overlay__label--hidden {
+	opacity: 0;
+	pointer-events: none;
+}

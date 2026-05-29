@@ -526,6 +526,34 @@ Stable Save policy states for DE-RTC human review handoff.
 
 Stable review checkpoint states for DE-RTC Save semantics. These separate review work from both local editor dirtiness and authoritative post updates.
 
+### DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS
+
+Reasons a receiver may degrade or withhold a remote selection overlay.
+
+### DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS
+
+Content-free selection shapes that a remote editor may report.
+
+### DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA
+
+Default selection presence schema sent by current editors.
+
+### DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V1
+
+Legacy content-free selection presence schema.
+
+### DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V2
+
+Current content-free selection presence schema.
+
+### DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES
+
+Receiver-side precision after mapping a remote selection into this editor.
+
+### DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES
+
+Sender-side status of the document copy used to report a selection.
+
 ### DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES
 
 Stable no-save stale-base conflict resolution choices.
@@ -1334,6 +1362,21 @@ _Returns_
 
 -   `Object`: Save policy state.
 
+### getDistributedEditingSelectionPresenceMapping
+
+Resolves whether a remote selection may be rendered in this editor.
+
+Sender-reported selection facts are deliberately not render authority. The receiver must prove that its current document can map the remote anchors safely, otherwise it withholds the canvas overlay.
+
+_Parameters_
+
+-   _selectionState_ `Object`: Normalized selection presence.
+-   _options_ `Object`: Mapping options.
+
+_Returns_
+
+-   `Object`: Receiver-computed mapping decision.
+
 ### getDistributedEditingServerStateEndpointPath
 
 Returns the current DE-RTC post snapshot endpoint path for a post.
@@ -1955,6 +1998,20 @@ _Parameters_
 ### NavigableToolbar
 
 > **Deprecated** since 5.3, use `wp.blockEditor.NavigableToolbar` instead.
+
+### normalizeDistributedEditingPresenceSelectionState
+
+Normalizes content-free selection presence for remote roster display.
+
+This descriptor may include bounded block-relative offsets so the editor can draw carets. It must not carry Gutenberg `clientId`, raw text, HTML, DOM selectors, or user identity fields.
+
+_Parameters_
+
+-   _selectionState_ `Object`: Proposed selection state.
+
+_Returns_
+
+-   `Object`: Content-free selection presence.
 
 ### normalizeDistributedEditingSessionState
 

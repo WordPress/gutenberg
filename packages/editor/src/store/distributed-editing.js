@@ -763,6 +763,82 @@ const VALID_DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES = new Set(
 	Object.values( DISTRIBUTED_EDITING_PRESENCE_HEARTBEAT_STATUSES )
 );
 
+/**
+ * Legacy content-free selection presence schema.
+ */
+export const DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V1 =
+	'de-rtc-selection-presence-v1';
+
+/**
+ * Current content-free selection presence schema.
+ */
+export const DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V2 =
+	'de-rtc-selection-presence-v2';
+
+/**
+ * Default selection presence schema sent by current editors.
+ */
+export const DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA =
+	DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V2;
+
+/**
+ * Content-free selection shapes that a remote editor may report.
+ */
+export const DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS = Object.freeze( {
+	NONE: 'none',
+	CARET: 'caret',
+	RICH_TEXT: 'rich_text',
+	RANGE: 'range',
+	MULTI_BLOCK: 'multi_block',
+	BLOCK: 'block',
+	UNSUPPORTED_SURFACE: 'unsupported_surface',
+} );
+
+const VALID_DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS = new Set(
+	Object.values( DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS )
+);
+
+/**
+ * Sender-side status of the document copy used to report a selection.
+ */
+export const DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES = Object.freeze( {
+	BASE_ALIGNED: 'base_aligned',
+	LOCAL_PENDING_ONLY: 'local_pending_only',
+	UNSUPPORTED_SURFACE: 'unsupported_surface',
+	UNKNOWN: 'unknown',
+} );
+
+const VALID_DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES = new Set(
+	Object.values( DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES )
+);
+
+/**
+ * Receiver-side precision after mapping a remote selection into this editor.
+ */
+export const DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES =
+	Object.freeze( {
+		EXACT: 'exact',
+		BLOCK_ONLY: 'block_only',
+		WITHHELD: 'withheld',
+	} );
+
+/**
+ * Reasons a receiver may degrade or withhold a remote selection overlay.
+ */
+export const DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS = Object.freeze(
+	{
+		NONE: '',
+		AMBIGUOUS_ORDINAL: 'ambiguous_ordinal',
+		LOCAL_PENDING_DIVERGENCE: 'local_pending_divergence',
+		MEASUREMENT_FAILED: 'measurement_failed',
+		MISSING_ANCHOR: 'missing_anchor',
+		OFFSET_OUT_OF_BOUNDS: 'offset_out_of_bounds',
+		REPEATED_BLOCK_AMBIGUITY: 'repeated_block_ambiguity',
+		STALE_BASE: 'stale_base',
+		UNSUPPORTED_SURFACE: 'unsupported_surface',
+	}
+);
+
 export const DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES =
 	Object.freeze( {
 		NONE: 'none',
@@ -2300,6 +2376,444 @@ function normalizeDistributedEditingBooleanValue( value ) {
 	return Boolean( value );
 }
 
+function normalizeDistributedEditingPresenceSelectionBlockPath( path ) {
+	if ( ! Array.isArray( path ) || path.length === 0 || path.length > 12 ) {
+		return null;
+	}
+
+	const normalizedPath = path.map( ( part ) => {
+		const number = Number( part );
+
+		if ( ! Number.isInteger( number ) || number < 0 || number > 10000 ) {
+			return null;
+		}
+
+		return number;
+	} );
+
+	return normalizedPath.includes( null ) ? null : normalizedPath;
+}
+
+function normalizeDistributedEditingPresenceSelectionBlockUid( value ) {
+	const normalized = normalizeNullableString( value );
+
+	return normalized && /^[A-Za-z0-9._:-]{1,191}$/.test( normalized )
+		? normalized
+		: null;
+}
+
+function normalizeDistributedEditingPresenceSelectionPoint( point ) {
+	const source = normalizeObject( point );
+	const blockPath = normalizeDistributedEditingPresenceSelectionBlockPath(
+		getFirstDefined( source.blockPath, source.block_path, source.path )
+	);
+	const blockUid = normalizeDistributedEditingPresenceSelectionBlockUid(
+		getFirstDefined( source.blockUid, source.block_uid )
+	);
+
+	if ( ! blockPath && ! blockUid ) {
+		return null;
+	}
+
+	const requestedAttributeKey =
+		normalizeNullableString(
+			getFirstDefined( source.attributeKey, source.attribute_key )
+		) || '';
+	const attributeKey = /^[A-Za-z0-9_-]{1,64}$/.test( requestedAttributeKey )
+		? requestedAttributeKey
+		: '';
+	const requestedOffset = getFirstDefined( source.offset, null );
+	let offset = null;
+
+	if ( requestedOffset !== null && requestedOffset !== undefined ) {
+		const normalizedOffset = normalizeNonNegativeInteger( requestedOffset );
+		offset =
+			normalizedOffset === null
+				? null
+				: Math.min( normalizedOffset, 1000000 );
+	}
+
+	return {
+		blockPath,
+		blockUid,
+		attributeKey,
+		offset,
+	};
+}
+
+function normalizeDistributedEditingPresenceSelectionSourceStatus( value ) {
+	const normalized = normalizeNullableString( value );
+
+	return VALID_DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.has( normalized )
+		? normalized
+		: DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.UNKNOWN;
+}
+
+function getUnavailableDistributedEditingPresenceSelectionState(
+	presenceUpdatedAtGmt = null
+) {
+	return {
+		available: false,
+		schema: DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA,
+		kind: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.NONE,
+		isCollapsed: true,
+		anchor: null,
+		focus: null,
+		baseVersion: null,
+		baseStateHash: null,
+		selectionSourceStatus:
+			DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.UNKNOWN,
+		reportedAtGmt: null,
+		presenceUpdatedAtGmt,
+		source: 'unavailable',
+		contentFree: true,
+		authoritativeForSave: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesRawSelectedText: false,
+		exposesClientId: false,
+		exposesDomSelector: false,
+		exposesBoundedSelectionOffsets: false,
+	};
+}
+
+/**
+ * Normalizes content-free selection presence for remote roster display.
+ *
+ * This descriptor may include bounded block-relative offsets so the editor can
+ * draw carets. It must not carry Gutenberg `clientId`, raw text, HTML, DOM
+ * selectors, or user identity fields.
+ *
+ * @param {Object} selectionState Proposed selection state.
+ *
+ * @return {Object} Content-free selection presence.
+ */
+export function normalizeDistributedEditingPresenceSelectionState(
+	selectionState
+) {
+	const source = normalizeObject( selectionState );
+	const schema = normalizeNullableString( source.schema );
+	const isV1Schema =
+		schema === DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V1;
+	const isV2Schema =
+		schema === DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V2;
+	const requestedKind = normalizeNullableString( source.kind );
+	const kindAliases = {
+		collapsed_caret: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.CARET,
+		rich_text_range: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.RICH_TEXT,
+		multi_block_range:
+			DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.MULTI_BLOCK,
+		block_focus: DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.BLOCK,
+	};
+	const kind = kindAliases[ requestedKind ] || requestedKind;
+
+	if (
+		( ! isV1Schema && ! isV2Schema ) ||
+		! normalizeDistributedEditingBooleanValue( source.available ) ||
+		! VALID_DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.has( kind ) ||
+		kind === DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.NONE
+	) {
+		return getUnavailableDistributedEditingPresenceSelectionState(
+			normalizeNullableString(
+				getFirstDefined(
+					source.presenceUpdatedAtGmt,
+					source.presence_updated_at_gmt
+				)
+			)
+		);
+	}
+
+	const baseVersion = isV2Schema
+		? normalizeNullableString(
+				getFirstDefined(
+					source.baseVersion,
+					source.base_version,
+					source.confirmedBaseVersion,
+					source.confirmed_base_version
+				)
+		  )
+		: null;
+	const baseStateHash = isV2Schema
+		? normalizeSha256Hash(
+				getFirstDefined(
+					source.baseStateHash,
+					source.base_state_hash,
+					source.confirmedStateHash,
+					source.confirmed_state_hash
+				)
+		  )
+		: null;
+
+	if (
+		kind ===
+		DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.UNSUPPORTED_SURFACE
+	) {
+		return {
+			available: true,
+			schema,
+			kind,
+			isCollapsed: true,
+			anchor: null,
+			focus: null,
+			baseVersion,
+			baseStateHash,
+			selectionSourceStatus:
+				DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.UNSUPPORTED_SURFACE,
+			reportedAtGmt: normalizeNullableString(
+				getFirstDefined( source.reportedAtGmt, source.reported_at_gmt )
+			),
+			presenceUpdatedAtGmt: normalizeNullableString(
+				getFirstDefined(
+					source.presenceUpdatedAtGmt,
+					source.presence_updated_at_gmt
+				)
+			),
+			source: 'client_reported_presence',
+			contentFree: true,
+			authoritativeForSave: false,
+			claimsSaved: false,
+			exposesRawContent: false,
+			exposesRawSelectedText: false,
+			exposesClientId: false,
+			exposesDomSelector: false,
+			exposesBoundedSelectionOffsets: false,
+		};
+	}
+
+	const anchor = normalizeDistributedEditingPresenceSelectionPoint(
+		source.anchor
+	);
+	const focus =
+		normalizeDistributedEditingPresenceSelectionPoint( source.focus ) ||
+		anchor;
+
+	if ( ! anchor || ! focus ) {
+		return getUnavailableDistributedEditingPresenceSelectionState();
+	}
+
+	const selectionSourceStatus =
+		normalizeDistributedEditingPresenceSelectionSourceStatus(
+			getFirstDefined(
+				source.selectionSourceStatus,
+				source.selection_source_status,
+				source.sourceStatus,
+				source.source_status
+			)
+		);
+
+	return {
+		available: true,
+		schema,
+		kind,
+		isCollapsed: normalizeDistributedEditingBooleanValue(
+			getFirstDefined( source.isCollapsed, source.is_collapsed )
+		),
+		anchor,
+		focus,
+		baseVersion,
+		baseStateHash,
+		selectionSourceStatus,
+		reportedAtGmt: normalizeNullableString(
+			getFirstDefined(
+				source.reportedAtGmt,
+				source.reported_at_gmt,
+				source.updatedAt,
+				source.updated_at
+			)
+		),
+		presenceUpdatedAtGmt: normalizeNullableString(
+			getFirstDefined(
+				source.presenceUpdatedAtGmt,
+				source.presence_updated_at_gmt
+			)
+		),
+		source:
+			normalizeNullableString( source.source ) ||
+			'client_reported_presence',
+		contentFree: true,
+		authoritativeForSave: false,
+		claimsSaved: false,
+		exposesRawContent: false,
+		exposesRawSelectedText: false,
+		exposesClientId: false,
+		exposesDomSelector: false,
+		exposesBoundedSelectionOffsets:
+			anchor.offset !== null || focus.offset !== null,
+	};
+}
+
+function getDistributedEditingSelectionPresenceResolvedPoint( point, options ) {
+	if ( ! point ) {
+		return {
+			status: DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.WITHHELD,
+			reason: DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.MISSING_ANCHOR,
+			clientId: null,
+		};
+	}
+
+	const resolveBlockUid =
+		typeof options.resolveBlockUid === 'function'
+			? options.resolveBlockUid
+			: null;
+	const resolveBlockPath =
+		typeof options.resolveBlockPath === 'function'
+			? options.resolveBlockPath
+			: null;
+	let clientId = null;
+
+	if ( point.blockUid && resolveBlockUid ) {
+		clientId = resolveBlockUid( point.blockUid, point );
+	}
+
+	if ( ! clientId && point.blockPath && resolveBlockPath ) {
+		clientId = resolveBlockPath( point.blockPath, point );
+	}
+
+	if ( ! clientId ) {
+		return {
+			status: DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.WITHHELD,
+			reason: DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.MISSING_ANCHOR,
+			clientId: null,
+		};
+	}
+
+	return {
+		status: DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.EXACT,
+		reason: DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.NONE,
+		clientId,
+	};
+}
+
+/**
+ * Resolves whether a remote selection may be rendered in this editor.
+ *
+ * Sender-reported selection facts are deliberately not render authority. The
+ * receiver must prove that its current document can map the remote anchors
+ * safely, otherwise it withholds the canvas overlay.
+ *
+ * @param {Object} selectionState Normalized selection presence.
+ * @param {Object} options        Mapping options.
+ *
+ * @return {Object} Receiver-computed mapping decision.
+ */
+export function getDistributedEditingSelectionPresenceMapping(
+	selectionState,
+	options = {}
+) {
+	const unavailable = ( reason ) => ( {
+		resolvedMappingStatus:
+			DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.WITHHELD,
+		resolvedDegradationReason: reason,
+		anchorClientId: null,
+		focusClientId: null,
+		renderable: false,
+		contentFree: true,
+		authoritativeForSave: false,
+		claimsSaved: false,
+	} );
+
+	if ( ! selectionState?.available ) {
+		return unavailable(
+			DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.MISSING_ANCHOR
+		);
+	}
+
+	if (
+		selectionState.kind ===
+			DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.UNSUPPORTED_SURFACE ||
+		selectionState.selectionSourceStatus ===
+			DISTRIBUTED_EDITING_SELECTION_SOURCE_STATUSES.UNSUPPORTED_SURFACE
+	) {
+		return unavailable(
+			DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.UNSUPPORTED_SURFACE
+		);
+	}
+
+	if (
+		selectionState.schema !==
+		DISTRIBUTED_EDITING_SELECTION_PRESENCE_SCHEMA_V2
+	) {
+		return unavailable(
+			DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.STALE_BASE
+		);
+	}
+
+	const localBaseVersion = normalizeNullableString(
+		options.localBaseVersion
+	);
+	const localBaseStateHash = normalizeSha256Hash(
+		options.localBaseStateHash
+	);
+
+	if (
+		! selectionState.baseVersion ||
+		! selectionState.baseStateHash ||
+		! localBaseVersion ||
+		! localBaseStateHash ||
+		selectionState.baseVersion !== localBaseVersion ||
+		selectionState.baseStateHash !== localBaseStateHash
+	) {
+		return unavailable(
+			DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.STALE_BASE
+		);
+	}
+
+	if (
+		options.hasRepeatedBlockAmbiguity ||
+		( typeof options.isSelectionOrdinalAmbiguous === 'function' &&
+			options.isSelectionOrdinalAmbiguous( selectionState ) )
+	) {
+		return unavailable(
+			DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.REPEATED_BLOCK_AMBIGUITY
+		);
+	}
+
+	const anchor = getDistributedEditingSelectionPresenceResolvedPoint(
+		selectionState.anchor,
+		options
+	);
+	const focus = getDistributedEditingSelectionPresenceResolvedPoint(
+		selectionState.focus || selectionState.anchor,
+		options
+	);
+
+	if (
+		anchor.status ===
+			DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.WITHHELD ||
+		focus.status ===
+			DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.WITHHELD
+	) {
+		return unavailable( anchor.reason || focus.reason );
+	}
+
+	const hasOffsets =
+		selectionState.anchor?.attributeKey &&
+		selectionState.focus?.attributeKey &&
+		selectionState.anchor?.offset !== null &&
+		selectionState.focus?.offset !== null;
+	const exactKinds = new Set( [
+		DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.CARET,
+		DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.RICH_TEXT,
+		DISTRIBUTED_EDITING_SELECTION_PRESENCE_KINDS.RANGE,
+	] );
+	const resolvedMappingStatus =
+		hasOffsets && exactKinds.has( selectionState.kind )
+			? DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.EXACT
+			: DISTRIBUTED_EDITING_SELECTION_RESOLVED_MAPPING_STATUSES.BLOCK_ONLY;
+
+	return {
+		resolvedMappingStatus,
+		resolvedDegradationReason:
+			DISTRIBUTED_EDITING_SELECTION_DEGRADATION_REASONS.NONE,
+		anchorClientId: anchor.clientId,
+		focusClientId: focus.clientId,
+		renderable: true,
+		contentFree: true,
+		authoritativeForSave: false,
+		claimsSaved: false,
+	};
+}
+
 function normalizeDistributedEditingPresenceDocumentState( documentState ) {
 	const source = normalizeObject( documentState );
 	const confirmedBaseVersion = normalizeNullableString(
@@ -2441,6 +2955,9 @@ function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 				hasOwnProperty( source, 'permission_summary' )
 		)
 	);
+	const selectionState = normalizeDistributedEditingPresenceSelectionState(
+		getFirstDefined( source.selectionState, source.selection_state )
+	);
 
 	return {
 		key:
@@ -2487,9 +3004,12 @@ function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 		documentState: normalizeDistributedEditingPresenceDocumentState(
 			getFirstDefined( source.documentState, source.document_state )
 		),
+		selectionState,
 		exposesUserId: false,
 		exposesCursorOffset: false,
 		exposesSelection: false,
+		exposesSelectionPresence: selectionState.available,
+		exposesRawSelectedText: false,
 		exposesRawContent: false,
 	};
 }
@@ -3448,6 +3968,10 @@ export function getDistributedEditingPresenceRosterStateForSessionState(
 		descriptorOnly: true,
 		exposesRawContent: false,
 		exposesSelection: false,
+		exposesSelectionPresence: entries.some(
+			( entry ) => entry.selectionState?.available
+		),
+		exposesRawSelectedText: false,
 		exposesCursorOffset: false,
 		exposesUserIds: false,
 		claimsAbsence: false,
@@ -4535,6 +5059,12 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 					responseData.documentState,
 					responseData.document_state
 				),
+				selectionState: getFirstDefined(
+					responseOrError.selectionState,
+					responseOrError.selection_state,
+					responseData.selectionState,
+					responseData.selection_state
+				),
 			},
 			0
 		);
@@ -4550,6 +5080,9 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 		exposesUserId: false,
 		exposesCursorOffset: false,
 		exposesSelection: false,
+		exposesSelectionPresence:
+			localHeartbeatEntryDetails.selectionState.available,
+		exposesRawSelectedText: false,
 		exposesRawContent: false,
 	};
 	const refreshedExistingRosterEntries =
@@ -4559,6 +5092,7 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 						? {
 								...entry,
 								documentState: localRosterEntry.documentState,
+								selectionState: localRosterEntry.selectionState,
 								permissions: localRosterEntry.permissions,
 								permissionsAvailable:
 									localRosterEntry.permissionsAvailable,
@@ -4650,6 +5184,10 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 		presenceHeartbeatExposesUserIds: false,
 		presenceHeartbeatExposesCursorOffset: false,
 		presenceHeartbeatExposesSelection: false,
+		presenceHeartbeatExposesSelectionPresence: Boolean(
+			localHeartbeatEntryDetails.selectionState.available
+		),
+		presenceHeartbeatExposesRawSelectedText: false,
 		presenceHeartbeatRawSessionKeyIncluded: false,
 		presenceHeartbeatMarksLocalEditorCurrent: heartbeatRecorded,
 		presenceHeartbeatMarksLocalEditorDelayed:

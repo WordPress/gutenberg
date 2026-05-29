@@ -413,17 +413,19 @@ export function __experimentalRequestDistributedEditingPresenceSnapshot( {
  * Sends a one-shot Distributed Editing presence heartbeat.
  *
  * This helper posts only an opaque tab/session key plus content-free reported
- * document state. It does not include raw content, cursor data, selection data,
- * save data, or post-lock data.
+ * document state and optional content-free selection presence. It does not
+ * include raw content, raw selected text, DOM data, save data, or post-lock
+ * data.
  *
- * @param {Object} args                    Request args.
- * @param {number} args.postId             Post ID.
- * @param {string} [args.restBase='posts'] REST base for the edited post type.
- * @param {string} args.sessionKey         Opaque local session key.
- * @param {string} [args.confirmedBaseVersion] Last accepted sync version.
- * @param {string} [args.confirmedStateHash]   Last accepted opaque state hash.
- * @param {boolean} [args.hasPendingChanges]   Whether this tab has unsaved changes.
- * @param {string} [args.confirmedAtGmt]       When this tab observed the accepted copy.
+ * @param {Object}  args                        Request args.
+ * @param {number}  args.postId                 Post ID.
+ * @param {string}  [args.restBase='posts']     REST base for the edited post type.
+ * @param {string}  args.sessionKey             Opaque local session key.
+ * @param {string}  [args.confirmedBaseVersion] Last accepted sync version.
+ * @param {string}  [args.confirmedStateHash]   Last accepted opaque state hash.
+ * @param {boolean} [args.hasPendingChanges]    Whether this tab has unsaved changes.
+ * @param {string}  [args.confirmedAtGmt]       When this tab observed the accepted copy.
+ * @param {Object}  [args.selectionState]       Content-free selection presence.
  *
  * @return {Promise<Object>} REST response.
  */
@@ -435,6 +437,7 @@ export function __experimentalRequestDistributedEditingPresenceHeartbeat( {
 	confirmedStateHash,
 	hasPendingChanges,
 	confirmedAtGmt,
+	selectionState,
 } = {} ) {
 	if ( typeof sessionKey !== 'string' || sessionKey.trim() === '' ) {
 		throw new TypeError(
@@ -465,6 +468,14 @@ export function __experimentalRequestDistributedEditingPresenceHeartbeat( {
 		if ( trimmedConfirmedAtGmt ) {
 			data.confirmed_at_gmt = trimmedConfirmedAtGmt;
 		}
+	}
+
+	if (
+		selectionState &&
+		typeof selectionState === 'object' &&
+		selectionState.available
+	) {
+		data.selection_state = selectionState;
 	}
 
 	return apiFetch( {

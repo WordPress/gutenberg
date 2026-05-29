@@ -6,6 +6,7 @@ import { Button, Modal, Notice, TextareaControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { safeHTML } from '@wordpress/dom';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	RawHTML,
 	useCallback,
@@ -1026,9 +1027,9 @@ export function DistributedEditingLocalUpdatesImportControls( {
  * editor state and never saves, submits proof, dispatches notices, or changes
  * post locks.
  *
- * @param {Object}  props                         Component props.
- * @param {boolean} props.forceVisible            Whether to show without requested state.
- * @param {boolean} props.showAffordanceCommands  Whether to show inspection command buttons.
+ * @param {Object}  props                        Component props.
+ * @param {boolean} props.forceVisible           Whether to show without requested state.
+ * @param {boolean} props.showAffordanceCommands Whether to show inspection command buttons.
  *
  * @return {React.ReactNode} Rendered decision panel.
  */
@@ -1993,10 +1994,6 @@ function decodeDistributedEditingHtmlEntities( value ) {
 		.replace( /&#039;/g, "'" );
 }
 
-function getConflictComparisonRows( text ) {
-	return Math.min( 8, Math.max( 3, text.split( '\n' ).length ) );
-}
-
 function getDistributedEditingRemoteChangesReviewState( {
 	editedPostContent,
 	response,
@@ -2716,129 +2713,6 @@ function getStructuralConflictCountDeltaLabel( delta ) {
 	return __( 'No count change' );
 }
 
-function getConflictComparisonGuide( comparison ) {
-	const isLocalChoice =
-		comparison.resolutionChoice ===
-		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LOCAL;
-	const isLatestWordPressChoice =
-		comparison.resolutionChoice ===
-		DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES.LATEST_WORDPRESS;
-	const isProofAccepted =
-		comparison.retrySubmitProofStatus ===
-		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE;
-
-	if ( isProofAccepted && comparison.savePrepared ) {
-		return {
-			status: 'save_prepared',
-			currentStep: 'save',
-			title: __( 'Ready to Save' ),
-			message: __(
-				'Use the editor Save button to ask WordPress to update the post with this version. Local changes remain protected until WordPress confirms.'
-			),
-		};
-	}
-
-	if ( isProofAccepted ) {
-		return {
-			status: 'choice_checked',
-			currentStep: 'prepare',
-			title: __( 'Version ready to save' ),
-			message: __(
-				'Continue Save for this version. The post will not change until Save confirms.'
-			),
-		};
-	}
-
-	if ( isLocalChoice || isLatestWordPressChoice ) {
-		return {
-			status: isLocalChoice
-				? 'local_version_selected'
-				: 'latest_wordpress_selected',
-			currentStep: 'check',
-			title: isLocalChoice
-				? __( 'Your local version is selected' )
-				: __( 'Saved WordPress version is selected' ),
-			message: __(
-				'Ask WordPress to make sure this version can still be saved. The post will not change until Save confirms.'
-			),
-		};
-	}
-
-	return {
-		status: 'choose_version',
-		currentStep: 'choose',
-		title: __( 'Choose a version to keep' ),
-		message: __(
-			'WordPress is waiting because this editor and the saved post changed the same block. Choosing here does not save yet.'
-		),
-	};
-}
-
-function getConflictComparisonGuideSteps( currentStep ) {
-	const steps = [
-		{
-			id: 'choose',
-			label: __( 'Choose version' ),
-		},
-		{
-			id: 'check',
-			label: __( 'Check version' ),
-		},
-		{
-			id: 'prepare',
-			label: __( 'Continue Save' ),
-		},
-		{
-			id: 'save',
-			label: __( 'Use Save' ),
-		},
-	];
-	const currentIndex = Math.max(
-		0,
-		steps.findIndex( ( step ) => step.id === currentStep )
-	);
-
-	return steps.map( ( step, index ) => {
-		let status = 'upcoming';
-
-		if ( index < currentIndex ) {
-			status = 'complete';
-		} else if ( index === currentIndex ) {
-			status = 'current';
-		}
-
-		return {
-			...step,
-			isCurrent: status === 'current',
-			status,
-		};
-	} );
-}
-
-function getConflictComparisonGuideStepAriaLabel( step ) {
-	if ( step.status === 'complete' ) {
-		return sprintf(
-			/* translators: %s: conflict resolution step label. */
-			__( '%s, complete' ),
-			step.label
-		);
-	}
-
-	if ( step.status === 'current' ) {
-		return sprintf(
-			/* translators: %s: conflict resolution step label. */
-			__( '%s, current step' ),
-			step.label
-		);
-	}
-
-	return sprintf(
-		/* translators: %s: conflict resolution step label. */
-		__( '%s, upcoming' ),
-		step.label
-	);
-}
-
 function DistributedEditingSameBlockConflictComparison( {
 	actionStatus,
 	comparison,
@@ -2957,6 +2831,7 @@ function DistributedEditingConflictModalPane( {
 				<strong>{ label }</strong>
 				<Button
 					__next40pxDefaultSize
+					accessibleWhenDisabled
 					disabled={ isDisabled }
 					data-distributed-editing-conflict-action={ actionName }
 					data-distributed-editing-conflict-modal-action={
@@ -4972,136 +4847,6 @@ function getFreshReviewDecisionCommandMessage( commandStatus ) {
 	);
 }
 
-function getFreshReviewComparePlanTitle( comparePlan ) {
-	return comparePlan?.status === 'ready'
-		? __( 'Compare plan ready' )
-		: __( 'Compare plan unavailable' );
-}
-
-function getFreshReviewComparePlanMessage( comparePlan ) {
-	if ( comparePlan?.comparisonSurface?.canOpenComparisonSurface ) {
-		return __(
-			'A read-only comparison is available for this safe block item. It shows base and proposed text locally without saving, calling the server, or changing editor content.'
-		);
-	}
-
-	if ( comparePlan?.status === 'ready' ) {
-		return __(
-			'A future comparison can use starting and proposed review details for this item. No comparison is open, no content is shown, and no save was made.'
-		);
-	}
-
-	return __(
-		'This review item is missing hash evidence for a future comparison. No comparison is open, no content is shown, and no save was made.'
-	);
-}
-
-function getFreshReviewComparisonReadinessMessage( comparisonHandoff ) {
-	if ( comparisonHandoff?.canSelectForFutureComparison ) {
-		return __(
-			'This review item is ready for a future side-by-side comparison surface. No block is selected, no focus moves, no panel opens, and no save was made.'
-		);
-	}
-
-	return __(
-		'This review item is not ready for a future side-by-side comparison surface. No block is selected, no focus moves, no panel opens, and no save was made.'
-	);
-}
-
-function getFreshReviewComparisonPreviewShellMessage( previewShell ) {
-	if ( previewShell?.status === 'disabled_until_renderer_turn' ) {
-		return __(
-			'A future preview shell would need starting and proposed block content, a boundary-safe diff renderer, and review controls. The shell is disabled; no preview is rendered, no diff is computed, no panel opens, and no save was made.'
-		);
-	}
-
-	return __(
-		'The comparison preview shell is not available. No preview is rendered, no diff is computed, no panel opens, and no save was made.'
-	);
-}
-
-function getFreshReviewComparisonPreviewShellSupportReportMessage(
-	supportReport
-) {
-	if ( supportReport?.available && supportReport.canShareWithSupport ) {
-		return __(
-			'Support report available: comparison and review controls are not present yet. It records only safe item details; no post content or user identity is included.'
-		);
-	}
-
-	return __(
-		'No shareable support report is available for the comparison preview shell.'
-	);
-}
-
-function getFreshReviewComparisonRendererReadinessMessage( rendererReadiness ) {
-	if (
-		rendererReadiness?.status ===
-		'disabled_until_renderer_capabilities_registered'
-	) {
-		return __(
-			'Renderer readiness: boundary-safe diff rendering and review controls must be registered before this preview shell can render. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
-		);
-	}
-
-	return __(
-		'Renderer readiness is unavailable. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
-	);
-}
-
-function getFreshReviewComparisonRendererCapabilityResolutionMessage(
-	capabilityResolution
-) {
-	if ( capabilityResolution?.status === 'complete_but_disabled' ) {
-		return __(
-			'Capability resolver: all required renderer capabilities are present in the candidate map, but the renderer remains disabled until a future renderer turn. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
-		);
-	}
-
-	if ( capabilityResolution?.status === 'partial_required_capabilities' ) {
-		return __(
-			'Capability resolver: only part of the required renderer capabilities is present in the candidate map. This only classifies readiness; no renderer is registered, no preview opens, no diff is computed, and no save was made.'
-		);
-	}
-
-	return __(
-		'Capability resolver: no required renderer capabilities are present in the candidate map. This only classifies readiness; no renderer is registered, no preview opens, no diff is computed, and no save was made.'
-	);
-}
-
-function getFreshReviewComparisonRendererCapabilityResolutionLabel(
-	capabilityResolution
-) {
-	switch ( capabilityResolution?.status ) {
-		case 'complete_but_disabled':
-			return __( 'Complete but disabled' );
-		case 'partial_required_capabilities':
-			return __( 'Partial' );
-		case 'missing_required_capabilities':
-			return __( 'Missing' );
-		default:
-			return __( 'Unavailable' );
-	}
-}
-
-function getFreshReviewComparisonRendererCapabilitySupportSummaryMessage(
-	supportSummary
-) {
-	if ( supportSummary?.available && supportSummary.canShareWithSupport ) {
-		return __(
-			'Support summary available: comparison readiness was grouped for support without post content, user identity, or editor code. No preview opens, no comparison is computed, and no save was made.'
-		);
-	}
-
-	return __(
-		'No renderer capability support summary is available. No renderer is registered, no preview opens, no diff is computed, and no save was made.'
-	);
-}
-
-function getFreshReviewComparePlanEvidenceLabel( available ) {
-	return available ? __( 'Available' ) : __( 'Unavailable' );
-}
-
 async function copyDistributedEditingLocalUpdatesToClipboard( {
 	currentPost,
 	editedPostContent,
@@ -5840,10 +5585,7 @@ export function DistributedEditingPresenceRoster( {
 	const startupSnapshotRuntimeKeyRef = useRef( null );
 	const startupSnapshotRuntimeSentRef = useRef( false );
 	const presenceEditorContentState = useSelect( ( select ) => {
-		const {
-			getCurrentPost,
-			getEditedPostContent,
-		} = select( editorStore );
+		const { getCurrentPost, getEditedPostContent } = select( editorStore );
 		const currentPost = getCurrentPost?.() || {};
 
 		return {
@@ -5851,6 +5593,21 @@ export function DistributedEditingPresenceRoster( {
 				getDistributedEditingPresenceRawPostContent( currentPost ),
 			editedPostContent: getEditedPostContent?.() || '',
 		};
+	}, [] );
+	const presenceSelectionStateKey = useSelect( ( select ) => {
+		const blockEditorSelect = select( blockEditorStore );
+		const selectionStart = blockEditorSelect.getSelectionStart?.();
+		const selectionEnd = blockEditorSelect.getSelectionEnd?.();
+
+		return [
+			selectionStart?.clientId || '',
+			selectionStart?.attributeKey || '',
+			selectionStart?.offset ?? '',
+			selectionEnd?.clientId || '',
+			selectionEnd?.attributeKey || '',
+			selectionEnd?.offset ?? '',
+			blockEditorSelect.getSelectedBlockClientId?.() || '',
+		].join( ':' );
 	}, [] );
 	const handleOpenPresenceStorageSetup = useCallback( () => {
 		setPresenceStorageSetupNavigationStatus( 'settings_opened' );
@@ -6065,6 +5822,7 @@ export function DistributedEditingPresenceRoster( {
 		hasPresenceLocalContentChanges
 			? presenceComparableEditedPostContent
 			: '',
+		presenceSelectionStateKey,
 	].join( ':' );
 	const shouldRunDocumentStateHeartbeat =
 		storageReadyForStartupHeartbeat &&
@@ -6577,6 +6335,12 @@ export function DistributedEditingPresenceRoster( {
 			) }
 			data-distributed-editing-presence-exposes-selection={ formatDataBoolean(
 				rosterState.exposesSelection
+			) }
+			data-distributed-editing-presence-exposes-selection-presence={ formatDataBoolean(
+				rosterState.exposesSelectionPresence
+			) }
+			data-distributed-editing-presence-exposes-raw-selected-text={ formatDataBoolean(
+				rosterState.exposesRawSelectedText
 			) }
 			data-distributed-editing-presence-freshness={
 				rosterState.freshness
@@ -7243,6 +7007,8 @@ export function DistributedEditingPresenceRoster( {
 								entry,
 								documentState
 							);
+						const selectionLabel =
+							getPresenceRosterEntrySelectionLabel( entry );
 						const rowClassName = [
 							'editor-distributed-editing-status__presence-roster-item',
 							'editor-distributed-editing-status__presence-caterpillar-item',
@@ -7286,6 +7052,10 @@ export function DistributedEditingPresenceRoster( {
 								data-distributed-editing-presence-row-exposes-private-fields="false"
 								data-distributed-editing-presence-row-exposes-raw-content="false"
 								data-distributed-editing-presence-row-exposes-selection="false"
+								data-distributed-editing-presence-row-exposes-selection-presence={ formatDataBoolean(
+									Boolean( entry.selectionState?.available )
+								) }
+								data-distributed-editing-presence-row-exposes-raw-selected-text="false"
 								data-distributed-editing-presence-row-freshness={
 									statusTone
 								}
@@ -7430,6 +7200,11 @@ export function DistributedEditingPresenceRoster( {
 													{ item.label }
 												</span>
 											)
+										) }
+										{ selectionLabel && (
+											<span className="editor-distributed-editing-status__presence-caterpillar-details-selection-state">
+												{ selectionLabel }
+											</span>
 										) }
 										{ hasPermissions && (
 											<ul
@@ -8169,6 +7944,30 @@ function getPresenceRosterEntryDocumentStateDetails( entry, documentState ) {
 	return items;
 }
 
+function getPresenceRosterEntrySelectionLabel( entry ) {
+	const selectionState = entry?.selectionState;
+
+	if ( ! selectionState?.available ) {
+		return null;
+	}
+
+	switch ( selectionState.kind ) {
+		case 'caret':
+			return __( 'Cursor shared' );
+		case 'rich_text':
+		case 'range':
+			return __( 'Selection shared' );
+		case 'multi_block':
+			return __( 'Multi-block selection shared' );
+		case 'block':
+			return __( 'Block focus shared' );
+		case 'unsupported_surface':
+			return __( 'Selection is outside the editable canvas' );
+		default:
+			return null;
+	}
+}
+
 function getPresenceRosterEntryRelativeTimeLabel( timestamp, prefix ) {
 	const normalizedTimestamp = normalizeDisplayValue( timestamp );
 
@@ -8344,188 +8143,6 @@ export function DistributedEditingStatusChrome( { onAction } ) {
 	);
 }
 
-function DistributedEditingFreshReviewJumpInspectionStatus() {
-	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
-	const decisionState = useSelect( ( select ) => {
-		const {
-			getDistributedEditingFreshReviewDecisionState,
-			getDistributedEditingSessionState,
-		} = select( editorStore );
-		const sessionState = getDistributedEditingSessionState?.() || {};
-
-		return (
-			getDistributedEditingFreshReviewDecisionState?.() ||
-			getDistributedEditingFreshReviewDecisionStateForSessionState(
-				sessionState
-			)
-		);
-	}, [] );
-	const reviewItem = decisionState?.reviewItems?.find(
-		( item ) => item.jumpToBlockAction?.reportsCommandStatus
-	);
-
-	if ( ! reviewItem ) {
-		return null;
-	}
-
-	const label =
-		reviewItem.blockLabel ||
-		reviewItem.blockName ||
-		reviewItem.id ||
-		__( 'Review item' );
-
-	function inspectJumpTarget() {
-		const jumpAction = reviewItem.jumpToBlockAction;
-		const nextCommandStatus =
-			jumpAction?.commandStatus ||
-			( jumpAction?.enabled
-				? 'jump-target-available'
-				: 'jump-target-unavailable' );
-
-		setCommandStatus( nextCommandStatus );
-		return jumpAction;
-	}
-
-	return (
-		<div
-			aria-label={ __( 'Distributed editing fresh review jump status' ) }
-			className="editor-distributed-editing-status__fresh-review-jump-inspection"
-			data-distributed-editing-fresh-review-jump-inspection
-			data-distributed-editing-fresh-review-jump-inspection-placement="editor-interface-notices"
-			role="group"
-		>
-			<Button
-				__next40pxDefaultSize
-				accessibleWhenDisabled
-				aria-label={ sprintf(
-					/* translators: %s: review item label. */
-					__( 'Inspect jump target for %s' ),
-					label
-				) }
-				data-distributed-editing-fresh-review-item-affordance-command="jump-to-block"
-				disabled={ ! reviewItem.jumpToBlockAction?.enabled }
-				onClick={ inspectJumpTarget }
-				variant="tertiary"
-			>
-				{ __( 'Jump target' ) }
-			</Button>
-			<div
-				aria-live="polite"
-				className="editor-distributed-editing-status__fresh-review-jump-inspection-command"
-				data-distributed-editing-fresh-review-jump-inspection-status={
-					commandStatus
-				}
-				role="status"
-			>
-				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
-			</div>
-		</div>
-	);
-}
-
-function DistributedEditingFreshReviewCompareInspectionStatus() {
-	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
-	const [ selectedComparisonItemId, setSelectedComparisonItemId ] =
-		useState( null );
-	const decisionState = useSelect( ( select ) => {
-		const {
-			getDistributedEditingFreshReviewDecisionState,
-			getDistributedEditingSessionState,
-		} = select( editorStore );
-		const sessionState = getDistributedEditingSessionState?.() || {};
-
-		return (
-			getDistributedEditingFreshReviewDecisionState?.() ||
-			getDistributedEditingFreshReviewDecisionStateForSessionState(
-				sessionState
-			)
-		);
-	}, [] );
-	const reviewItem = decisionState?.reviewItems?.find(
-		( item ) => item.compareAction?.reportsCommandStatus
-	);
-
-	if ( ! reviewItem ) {
-		return null;
-	}
-
-	const label =
-		reviewItem.blockLabel ||
-		reviewItem.blockName ||
-		reviewItem.id ||
-		__( 'Review item' );
-
-	function inspectCompareEvidence() {
-		const compareAction = reviewItem.compareAction;
-		const comparisonSurface = compareAction?.comparisonSurface;
-
-		if ( comparisonSurface?.canOpenComparisonSurface ) {
-			setSelectedComparisonItemId( reviewItem.id );
-			setCommandStatus( 'comparison-surface-open' );
-			return compareAction;
-		}
-
-		const nextCommandStatus =
-			compareAction?.commandStatus ||
-			( compareAction?.enabled
-				? 'compare-evidence-available'
-				: 'compare-evidence-unavailable' );
-
-		setSelectedComparisonItemId( null );
-		setCommandStatus( nextCommandStatus );
-		return compareAction;
-	}
-	const selectedComparisonItem =
-		decisionState?.reviewItems?.find(
-			( item ) => item.id === selectedComparisonItemId
-		) || null;
-
-	return (
-		<div
-			aria-label={ __(
-				'Distributed editing fresh review compare status'
-			) }
-			className="editor-distributed-editing-status__fresh-review-compare-inspection"
-			data-distributed-editing-fresh-review-compare-inspection
-			data-distributed-editing-fresh-review-compare-inspection-placement="editor-interface-notices"
-			role="group"
-		>
-			<Button
-				__next40pxDefaultSize
-				accessibleWhenDisabled
-				aria-label={ sprintf(
-					/* translators: %s: review item label. */
-					__( 'Inspect compare evidence for %s' ),
-					label
-				) }
-				data-distributed-editing-fresh-review-item-affordance-command="compare"
-				disabled={ ! reviewItem.compareAction?.enabled }
-				onClick={ inspectCompareEvidence }
-				variant="tertiary"
-			>
-				{ __( 'Compare' ) }
-			</Button>
-			<div
-				aria-live="polite"
-				className="editor-distributed-editing-status__fresh-review-compare-inspection-command"
-				data-distributed-editing-fresh-review-compare-inspection-status={
-					commandStatus
-				}
-				role="status"
-			>
-				{ getFreshReviewDecisionCommandMessage( commandStatus ) }
-			</div>
-			<DistributedEditingFreshReviewComparisonSurface
-				onBack={ () => {
-					setSelectedComparisonItemId( null );
-					setCommandStatus( 'comparison-surface-closed' );
-				} }
-				reviewItem={ selectedComparisonItem }
-			/>
-		</div>
-	);
-}
-
 function DistributedEditingFreshReviewComparisonSurface( {
 	reviewItem = null,
 	onBack,
@@ -8614,453 +8231,6 @@ function DistributedEditingFreshReviewComparisonSurface( {
 					{ __( 'Back to review' ) }
 				</Button>
 			) }
-		</div>
-	);
-}
-
-function DistributedEditingFreshReviewComparePlanStatus() {
-	const decisionState = useSelect( ( select ) => {
-		const {
-			getDistributedEditingFreshReviewDecisionState,
-			getDistributedEditingSessionState,
-		} = select( editorStore );
-		const sessionState = getDistributedEditingSessionState?.() || {};
-
-		return (
-			getDistributedEditingFreshReviewDecisionState?.() ||
-			getDistributedEditingFreshReviewDecisionStateForSessionState(
-				sessionState
-			)
-		);
-	}, [] );
-	const reviewItem = decisionState?.reviewItems?.find(
-		( item ) => item.compareAction?.comparePlan
-	);
-	const comparePlan = reviewItem?.compareAction?.comparePlan;
-	const comparisonSelectionHandoff = comparePlan?.comparisonSelectionHandoff;
-	const comparisonPreviewShell = comparePlan?.comparisonPreviewShell;
-	const comparisonSurface = comparePlan?.comparisonSurface;
-	const comparisonPreviewShellSupportReport =
-		comparisonPreviewShell?.supportReport;
-	const comparisonRendererCapabilitySupportSummary =
-		comparisonPreviewShellSupportReport?.rendererCapabilitySupportSummary;
-	const comparisonRendererReadiness =
-		comparisonPreviewShell?.rendererReadiness;
-	const comparisonRendererCapabilityResolution =
-		comparisonRendererReadiness?.capabilityResolution;
-
-	if ( ! comparePlan ) {
-		return null;
-	}
-
-	return (
-		<div
-			aria-label={ __( 'Distributed editing fresh review compare plan' ) }
-			className="editor-distributed-editing-status__fresh-review-compare-plan"
-			data-distributed-editing-fresh-review-compare-plan
-			data-distributed-editing-fresh-review-compare-plan-base-hash-evidence={ formatDataBoolean(
-				comparePlan.hasBaseContentHash
-			) }
-			data-distributed-editing-fresh-review-compare-plan-calls-rest={ formatDataBoolean(
-				comparePlan.callsRestEndpoint
-			) }
-			data-distributed-editing-fresh-review-compare-plan-calls-save={ formatDataBoolean(
-				comparePlan.callsSave
-			) }
-			data-distributed-editing-fresh-review-comparison-readiness-can-select={ formatDataBoolean(
-				comparisonSelectionHandoff?.canSelectForFutureComparison
-			) }
-			data-distributed-editing-fresh-review-comparison-readiness-moves-focus={ formatDataBoolean(
-				comparisonSelectionHandoff?.movesFocus
-			) }
-			data-distributed-editing-fresh-review-comparison-readiness-opens-comparison={ formatDataBoolean(
-				comparisonSelectionHandoff?.opensComparison
-			) }
-			data-distributed-editing-fresh-review-comparison-readiness-opens-panel={ formatDataBoolean(
-				comparisonSelectionHandoff?.opensPanel
-			) }
-			data-distributed-editing-fresh-review-comparison-readiness-selects-block={ formatDataBoolean(
-				comparisonSelectionHandoff?.selectsBlock
-			) }
-			data-distributed-editing-fresh-review-comparison-readiness-status={
-				comparisonSelectionHandoff?.status || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-surface-available={ formatDataBoolean(
-				comparisonSurface?.canOpenComparisonSurface
-			) }
-			data-distributed-editing-fresh-review-comparison-surface-read-only={ formatDataBoolean(
-				comparisonSurface?.readOnly
-			) }
-			data-distributed-editing-fresh-review-comparison-surface-reason={
-				comparisonSurface?.reason || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-surface-status={
-				comparisonSurface?.status || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-preview-shell-calls-rest={ formatDataBoolean(
-				comparisonPreviewShell?.callsRestEndpoint
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-calls-save={ formatDataBoolean(
-				comparisonPreviewShell?.callsSave
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-calls-rest={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.callsRestEndpoint
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-calls-save={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.callsSave
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-computes-diff={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.computesDiff
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-export-ready={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.supportExportReady
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-hash-values={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.exposesHashValues
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-missing-renderer-pieces={
-				comparisonPreviewShellSupportReport?.missingFutureRendererPieceCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonPreviewShellSupportReport.missingFutureRendererPieceCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-raw-content={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.exposesRawContent
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-renders-preview={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.rendersPreview
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-shareable={ formatDataBoolean(
-				comparisonPreviewShellSupportReport?.canShareWithSupport
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-report-status={
-				comparisonPreviewShellSupportReport?.status || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-rest={ formatDataBoolean(
-				comparisonRendererReadiness?.callsRestEndpoint
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-calls-save={ formatDataBoolean(
-				comparisonRendererReadiness?.callsSave
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-capability-status={
-				comparisonRendererReadiness?.capabilityRegistrationStatus ||
-				undefined
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-candidate-map-stored={ formatDataBoolean(
-				comparisonRendererCapabilityResolution?.candidateMapStored
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-complete={ formatDataBoolean(
-				comparisonRendererCapabilityResolution?.rendererCapabilitiesComplete
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-missing-capabilities={
-				comparisonRendererCapabilityResolution?.missingRendererCapabilityCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilityResolution.missingRendererCapabilityCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-present-capabilities={
-				comparisonRendererCapabilityResolution?.presentRendererCapabilityCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilityResolution.presentRendererCapabilityCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-reason={
-				comparisonRendererCapabilityResolution?.reason || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-registers-renderer={ formatDataBoolean(
-				comparisonRendererCapabilityResolution?.registersRenderer
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-renderable={ formatDataBoolean(
-				comparisonRendererCapabilityResolution?.renderable
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-resolver-only={ formatDataBoolean(
-				comparisonRendererCapabilityResolution?.resolverOnly
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-status={
-				comparisonRendererCapabilityResolution?.status || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-resolution-unknown-candidates={
-				comparisonRendererCapabilityResolution?.unknownCandidateRendererCapabilityCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilityResolution.unknownCandidateRendererCapabilityCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-candidate-maps-stored={ formatDataBoolean(
-				comparisonRendererCapabilitySupportSummary?.candidateMapsStored
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-complete={ formatDataBoolean(
-				comparisonRendererCapabilitySupportSummary?.hasCompleteButDisabledCapabilities
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-complete-count={
-				comparisonRendererCapabilitySupportSummary?.completeButDisabledCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilitySupportSummary.completeButDisabledCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-missing-count={
-				comparisonRendererCapabilitySupportSummary?.missingRequiredCapabilitiesCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilitySupportSummary.missingRequiredCapabilitiesCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-partial-count={
-				comparisonRendererCapabilitySupportSummary?.partialRequiredCapabilitiesCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilitySupportSummary.partialRequiredCapabilitiesCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-raw-content={ formatDataBoolean(
-				comparisonRendererCapabilitySupportSummary?.exposesRawContent
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderable={ formatDataBoolean(
-				comparisonRendererCapabilitySupportSummary?.renderable
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-renderer-code={ formatDataBoolean(
-				comparisonRendererCapabilitySupportSummary?.rendererCodeIncluded
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolution-count={
-				comparisonRendererCapabilitySupportSummary?.resolutionCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilitySupportSummary.resolutionCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-resolver-only={ formatDataBoolean(
-				comparisonRendererCapabilitySupportSummary?.resolverOnly
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-status={
-				comparisonRendererCapabilitySupportSummary?.status || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-candidates={
-				comparisonRendererCapabilitySupportSummary?.unknownCandidateRendererCapabilityCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererCapabilitySupportSummary.unknownCandidateRendererCapabilityCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-capability-support-summary-unknown-names={ formatDataBoolean(
-				comparisonRendererCapabilitySupportSummary?.unknownCandidateKeyNamesIncluded
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-computes-diff={ formatDataBoolean(
-				comparisonRendererReadiness?.computesDiff
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-has-registered-renderer={ formatDataBoolean(
-				comparisonRendererReadiness?.hasRegisteredRenderer
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-missing-capabilities={
-				comparisonRendererReadiness?.missingRendererCapabilityCount ===
-				undefined
-					? undefined
-					: String(
-							comparisonRendererReadiness.missingRendererCapabilityCount
-					  )
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-opens-panel={ formatDataBoolean(
-				comparisonRendererReadiness?.opensPanel
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-registers-renderer={ formatDataBoolean(
-				comparisonRendererReadiness?.registersRenderer
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-registration-status={
-				comparisonRendererReadiness?.registrationStatus || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-renderable={ formatDataBoolean(
-				comparisonRendererReadiness?.renderable
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-renders-preview={ formatDataBoolean(
-				comparisonRendererReadiness?.rendersPreview
-			) }
-			data-distributed-editing-fresh-review-comparison-renderer-readiness-status={
-				comparisonRendererReadiness?.status || undefined
-			}
-			data-distributed-editing-fresh-review-comparison-preview-shell-computes-diff={ formatDataBoolean(
-				comparisonPreviewShell?.computesDiff
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-moves-focus={ formatDataBoolean(
-				comparisonPreviewShell?.movesFocus
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-opens-comparison={ formatDataBoolean(
-				comparisonPreviewShell?.opensComparison
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-opens-panel={ formatDataBoolean(
-				comparisonPreviewShell?.opensPanel
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-renderable={ formatDataBoolean(
-				comparisonPreviewShell?.renderable
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-renders-preview={ formatDataBoolean(
-				comparisonPreviewShell?.rendersPreview
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-selects-block={ formatDataBoolean(
-				comparisonPreviewShell?.selectsBlock
-			) }
-			data-distributed-editing-fresh-review-comparison-preview-shell-status={
-				comparisonPreviewShell?.status || undefined
-			}
-			data-distributed-editing-fresh-review-compare-plan-opens-comparison={ formatDataBoolean(
-				comparePlan.opensComparison
-			) }
-			data-distributed-editing-fresh-review-compare-plan-placement="editor-interface-notices"
-			data-distributed-editing-fresh-review-compare-plan-proposed-hash-evidence={ formatDataBoolean(
-				comparePlan.hasProposedContentHash
-			) }
-			data-distributed-editing-fresh-review-compare-plan-renders-diff={ formatDataBoolean(
-				comparePlan.rendersDiff
-			) }
-			data-distributed-editing-fresh-review-compare-plan-review-hash-evidence={ formatDataBoolean(
-				comparePlan.hasReviewedProposedContentHash
-			) }
-			data-distributed-editing-fresh-review-compare-plan-status={
-				comparePlan.status
-			}
-			role="group"
-		>
-			<strong>{ getFreshReviewComparePlanTitle( comparePlan ) }</strong>
-			<p>{ getFreshReviewComparePlanMessage( comparePlan ) }</p>
-			{ comparisonSelectionHandoff && (
-				<p>
-					{ getFreshReviewComparisonReadinessMessage(
-						comparisonSelectionHandoff
-					) }
-				</p>
-			) }
-			{ comparisonPreviewShell && (
-				<p>
-					{ getFreshReviewComparisonPreviewShellMessage(
-						comparisonPreviewShell
-					) }
-				</p>
-			) }
-			{ comparisonPreviewShellSupportReport && (
-				<p>
-					{ getFreshReviewComparisonPreviewShellSupportReportMessage(
-						comparisonPreviewShellSupportReport
-					) }
-				</p>
-			) }
-			{ comparisonRendererReadiness && (
-				<p>
-					{ getFreshReviewComparisonRendererReadinessMessage(
-						comparisonRendererReadiness
-					) }
-				</p>
-			) }
-			{ comparisonRendererCapabilityResolution && (
-				<p>
-					{ getFreshReviewComparisonRendererCapabilityResolutionMessage(
-						comparisonRendererCapabilityResolution
-					) }
-				</p>
-			) }
-			{ comparisonRendererCapabilitySupportSummary && (
-				<p>
-					{ getFreshReviewComparisonRendererCapabilitySupportSummaryMessage(
-						comparisonRendererCapabilitySupportSummary
-					) }
-				</p>
-			) }
-			<dl className="editor-distributed-editing-status__fresh-review-compare-plan-evidence">
-				<div>
-					<dt>{ __( 'Base hash evidence' ) }</dt>
-					<dd>
-						{ getFreshReviewComparePlanEvidenceLabel(
-							comparePlan.hasBaseContentHash
-						) }
-					</dd>
-				</div>
-				<div>
-					<dt>{ __( 'Proposed hash evidence' ) }</dt>
-					<dd>
-						{ getFreshReviewComparePlanEvidenceLabel(
-							comparePlan.hasProposedContentHash
-						) }
-					</dd>
-				</div>
-				<div>
-					<dt>{ __( 'Reviewed hash evidence' ) }</dt>
-					<dd>
-						{ getFreshReviewComparePlanEvidenceLabel(
-							comparePlan.hasReviewedProposedContentHash
-						) }
-					</dd>
-				</div>
-				{ comparisonSelectionHandoff && (
-					<div>
-						<dt>{ __( 'Comparison readiness' ) }</dt>
-						<dd>
-							{ getFreshReviewComparePlanEvidenceLabel(
-								comparisonSelectionHandoff.canSelectForFutureComparison
-							) }
-						</dd>
-					</div>
-				) }
-				{ comparisonPreviewShell && (
-					<div>
-						<dt>{ __( 'Preview shell' ) }</dt>
-						<dd>
-							{ comparisonPreviewShell.renderable
-								? __( 'Available' )
-								: __( 'Disabled' ) }
-						</dd>
-					</div>
-				) }
-				{ comparisonPreviewShellSupportReport && (
-					<div>
-						<dt>{ __( 'Preview shell support report' ) }</dt>
-						<dd>
-							{ comparisonPreviewShellSupportReport.canShareWithSupport
-								? __( 'Available' )
-								: __( 'Unavailable' ) }
-						</dd>
-					</div>
-				) }
-				{ comparisonRendererReadiness && (
-					<div>
-						<dt>{ __( 'Renderer readiness' ) }</dt>
-						<dd>
-							{ comparisonRendererReadiness.hasRegisteredRenderer
-								? __( 'Registered' )
-								: __( 'Not registered' ) }
-						</dd>
-					</div>
-				) }
-				{ comparisonRendererCapabilityResolution && (
-					<div>
-						<dt>{ __( 'Capability resolver' ) }</dt>
-						<dd>
-							{ getFreshReviewComparisonRendererCapabilityResolutionLabel(
-								comparisonRendererCapabilityResolution
-							) }
-						</dd>
-					</div>
-				) }
-				{ comparisonRendererCapabilitySupportSummary && (
-					<div>
-						<dt>{ __( 'Support summary' ) }</dt>
-						<dd>
-							{ comparisonRendererCapabilitySupportSummary.canShareWithSupport
-								? __( 'Shareable' )
-								: __( 'Unavailable' ) }
-						</dd>
-					</div>
-				) }
-			</dl>
 		</div>
 	);
 }
