@@ -51,11 +51,7 @@ export default function DataViewsFooter() {
 	}
 	return (
 		( !! totalItems || isRefreshing ) && (
-			<div
-				className="dataviews-footer"
-				// @ts-ignore
-				inert={ isRefreshing ? 'true' : undefined }
-			>
+			<div className="dataviews-footer" inert={ isRefreshing }>
 				<Stack
 					direction="row"
 					justify="end"

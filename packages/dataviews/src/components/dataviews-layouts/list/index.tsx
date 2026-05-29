@@ -631,10 +631,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 				activeId={ activeCompositeId }
 				setActiveId={ setActiveCompositeId }
-				// @ts-ignore
-				inert={
-					! isInfiniteScroll && !! isLoading ? 'true' : undefined
-				}
+				inert={ ! isInfiniteScroll && !! isLoading }
 			>
 				{ data.map( ( item, index ) => {
 					const id = generateCompositeItemIdPrefix( item );

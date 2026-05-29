@@ -55,7 +55,7 @@ function ViewGrid< Item >( {
 		className: clsx( className, {
 			'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 		} ),
-		inert: ! isInfiniteScroll && !! isLoading ? 'true' : undefined,
+		inert: ! isInfiniteScroll && !! isLoading,
 		isLoading,
 		view,
 		fields,

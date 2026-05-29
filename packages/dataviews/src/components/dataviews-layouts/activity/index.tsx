@@ -63,8 +63,7 @@ export default function ViewActivity< Item >(
 				direction="column"
 				gap="sm"
 				className={ wrapperClassName }
-				// @ts-ignore
-				inert={ isInert ? 'true' : undefined }
+				inert={ isInert }
 			>
 				{ groupedEntries.map(
 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
@@ -92,8 +91,7 @@ export default function ViewActivity< Item >(
 			<div
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
-				// @ts-ignore
-				inert={ isInert ? 'true' : undefined }
+				inert={ isInert }
 			>
 				<ActivityItems< Item > { ...props } />
 			</div>

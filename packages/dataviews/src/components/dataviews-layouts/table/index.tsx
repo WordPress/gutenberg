@@ -426,8 +426,7 @@ function ViewTable< Item >( {
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
 				role={ isInfiniteScroll ? 'feed' : undefined }
-				// @ts-ignore Reason: inert is a recent HTML attribute
-				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
+				inert={ ! isInfiniteScroll && !! isLoading }
 			>
 				<colgroup>
 					{ hasBulkActions && (
