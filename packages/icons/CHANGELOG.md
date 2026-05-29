@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Enhancements
+### Breaking Changes
 
--   Rename `timeToRead` icon to `time`. The `timeToRead` export is retained for backwards compatibility. ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD))
+-   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
 
 ## 13.2.0 (2026-05-27)
 

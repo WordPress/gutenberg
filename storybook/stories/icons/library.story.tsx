@@ -24,17 +24,7 @@ import {
 import * as iconsPackage from '@wordpress/icons';
 import manifest from '../../../packages/icons/src/manifest.json';
 
-/**
- * Deprecated icon exports kept for backwards compatibility.
- */
-const DEPRECATED_ICON_ALIASES = new Set( [ 'timeToRead' ] );
-
-const { Icon, ...allIcons } = iconsPackage;
-const availableIcons = Object.fromEntries(
-	Object.entries( allIcons ).filter(
-		( [ name ] ) => ! DEPRECATED_ICON_ALIASES.has( name )
-	)
-);
+const { Icon, ...availableIcons } = iconsPackage;
 
 const keywords: Partial< Record< string, string[] > > = {
 	archive: [ 'folder' ],
