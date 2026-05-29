@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Search: Expose an HTML element selector in the Advanced inspector panel that can render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`. Defers to `add_theme_support( 'search-element' )` when the per-block value is left at "Default".
+-   Search: Expose an HTML element selector in the Advanced inspector panel that can render the block in the semantic HTML `<search>` landmark element instead of `<form role="search">`. Defers to `add_theme_support( 'html5', array( 'search-element' ) )` when the per-block value is left at "Default".
 
 ## 9.47.0 (2026-05-27)
 

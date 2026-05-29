@@ -198,11 +198,12 @@ function render_block_core_search( $attributes ) {
 	 *
 	 *   - 'search' forces the <search> wrapper
 	 *   - 'form'   forces the original <form role="search"> markup
-	 *   - empty    defers to add_theme_support( 'search-element' ), matching
-	 *              the opt-in added to get_search_form() in core
+	 *   - empty    defers to the 'search-element' html5 sub-feature
+	 *              ( add_theme_support( 'html5', array( 'search-element' ) ) ),
+	 *              matching the opt-in added to get_search_form() in core
 	 */
 	$tag_name           = $attributes['tagName'] ?? '';
-	$use_search_element = 'search' === $tag_name || ( '' === $tag_name && current_theme_supports( 'search-element' ) );
+	$use_search_element = 'search' === $tag_name || ( '' === $tag_name && current_theme_supports( 'html5', 'search-element' ) );
 
 	/*
 	 * Only the wrapper markup differs between the semantic <search> landmark
