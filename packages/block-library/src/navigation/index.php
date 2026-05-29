@@ -246,8 +246,8 @@ class WP_Navigation_Block_Renderer {
 			if ( '' === $inner_block_markup ) {
 				continue;
 			}
-			$p                  = new WP_HTML_Tag_Processor( $inner_block_markup );
-			$is_list_item       = $p->next_tag( 'LI' );
+			$p            = new WP_HTML_Tag_Processor( $inner_block_markup );
+			$is_list_item = $p->next_tag( 'LI' );
 
 			if ( $is_list_item && ! $is_list_open ) {
 				$is_list_open       = true;
