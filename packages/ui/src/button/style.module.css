@@ -36,9 +36,6 @@
 		/* Styles */
 		position: relative;
 		display: inline-flex;
-		justify-content: center;
-		align-items: center;
-		gap: var(--wpds-dimension-gap-sm);
 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
 		min-width: var(--wp-ui-button-min-width);
 		max-width: 100%;
@@ -138,9 +135,10 @@
 
 	.content {
 		display: inline-flex;
+		flex: 1 1 auto;
 		justify-content: center;
 		align-items: center;
-		gap: inherit;
+		gap: var(--wpds-dimension-gap-sm);
 		max-width: 100%;
 		min-width: 0;
 	}
