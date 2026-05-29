@@ -146,7 +146,7 @@
 	}
 
 	.icon {
-		margin: calc(-1 * var(--wp-ui-button-icon-margin, 0px));
+		margin: calc(-1 * var(--wp-ui-button-icon-margin));
 	}
 
 	/* Variants (`tone` + `variant`) overrides compared to default styles */
