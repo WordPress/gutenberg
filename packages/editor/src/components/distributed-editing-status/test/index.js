@@ -1045,8 +1045,8 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			within( serverPane ).getByText( 'Server paragraph edit & update.' )
 		).toBeVisible();
-		// eslint-disable-next-line testing-library/no-node-access
 		expect(
+			// eslint-disable-next-line testing-library/no-node-access
 			localPane.querySelector(
 				'[data-distributed-editing-conflict-modal-block="block-1"]'
 			)
@@ -1054,8 +1054,8 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-conflict-modal-block-conflict',
 			'true'
 		);
-		// eslint-disable-next-line testing-library/no-node-access
 		expect(
+			// eslint-disable-next-line testing-library/no-node-access
 			serverPane.querySelector(
 				'[data-distributed-editing-conflict-modal-block="block-1"]'
 			)
@@ -3789,6 +3789,98 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-presence-row-relationship',
 			'current_user_current_tab'
 		);
+		expect(
+			actions.__experimentalSaveDistributedEditingRetryAfterProof
+		).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows role-neutral inert pending ghosts from other editor sessions', () => {
+		const actions = setupDistributedEditingStatusDispatch();
+		setupDistributedEditingStatusSelect( {
+			editorSettings: {
+				distributedEditing: {
+					enabled: true,
+				},
+			},
+			sessionState: {
+				presenceRosterEntries: [
+					{
+						key: 'presence-this-tab',
+						relationship: 'current_user_current_tab',
+						displayName: 'Mira',
+						freshness: 'current',
+					},
+					{
+						key: 'presence-remote-author',
+						relationship: 'other_user',
+						displayName: 'Author',
+						freshness: 'current',
+						pendingPreview: {
+							available: true,
+							schema: 'de-rtc-pending-preview-v1',
+							hasPendingPreview: true,
+							items: [
+								{
+									previewId: 'ghost-html',
+									blockPath: [ 1 ],
+									blockName: 'core/html',
+									changeKind: 'added_block',
+									safePreviewText: 'Ghost text',
+									safePreviewHtml: '<p>Ghost text</p>',
+									rawContentIncluded: false,
+									exposesRawContent: false,
+									inert: true,
+								},
+							],
+							rawContentIncluded: false,
+							exposesRawContent: false,
+							inert: true,
+						},
+					},
+				],
+				presenceRosterTotalKnownCount: 2,
+			},
+		} );
+
+		render( <DistributedEditingPresenceStatusHarness /> );
+
+		const presence = screen.getByRole( 'group', {
+			name: 'Distributed editing presence',
+		} );
+		const ghostList = screen.getByRole( 'list', {
+			name: 'Pending edits from other active editors',
+		} );
+		const ghost = within( ghostList ).getByRole( 'listitem', {
+			name: 'Pending edit by Author in core/html',
+		} );
+
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-pending-ghost-count',
+			'1'
+		);
+		expect( presence ).toHaveAttribute(
+			'data-distributed-editing-presence-pending-ghosts-visible',
+			'true'
+		);
+		expect( ghostList ).toHaveAttribute(
+			'data-distributed-editing-pending-ghosts-inert',
+			'true'
+		);
+		expect( ghostList ).toHaveAttribute(
+			'data-distributed-editing-pending-ghosts-exposes-raw-content',
+			'false'
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-inert',
+			'true'
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-author',
+			'Author'
+		);
+		expect( ghost ).toHaveTextContent( 'Ghost text' );
+		expect( ghost ).toHaveTextContent( 'Author' );
+		expect( ghost ).not.toHaveTextContent( /script|alert\(1\)/i );
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
@@ -7974,7 +8066,6 @@ describe( 'DistributedEditingStatus', () => {
 	} );
 
 	it( 'renders retry-save in-progress feedback from production editor chrome without saving', async () => {
-		const user = userEvent.setup();
 		const writeText = jest.fn().mockResolvedValue();
 		const actions = setupDistributedEditingStatusDispatch();
 
@@ -8137,7 +8228,6 @@ describe( 'DistributedEditingStatus', () => {
 	} );
 
 	it( 'renders blocked retry-save in-progress handoff feedback from production editor chrome without saving', async () => {
-		const user = userEvent.setup();
 		const writeText = jest.fn().mockResolvedValue();
 		const actions = setupDistributedEditingStatusDispatch();
 
@@ -11132,20 +11222,19 @@ describe( 'DistributedEditingStatusSurface', () => {
 			rerender( renderStatus( statusCase ) );
 			expect( screen.getByText( statusCase.title ) ).toBeVisible();
 			expect( screen.getByText( statusCase.message ) ).toBeVisible();
-			if ( statusCase.expectNoExport ) {
-				expect(
-					screen.queryByText( 'Export local changes' )
-				).not.toBeInTheDocument();
-				expect(
-					screen.queryByText( 'Export changes for review' )
-				).not.toBeInTheDocument();
-			} else {
-				expect(
-					screen.getByText(
-						statusCase.exportLabel || 'Export local changes'
-					)
-				).toBeVisible();
-			}
+			expect(
+				screen.queryAllByText(
+					statusCase.exportLabel || 'Export local changes'
+				)
+			).toHaveLength( statusCase.expectNoExport ? 0 : 1 );
+			expect(
+				screen.queryAllByText( 'Export changes for review' )
+			).toHaveLength(
+				statusCase.expectNoExport ||
+					statusCase.exportLabel !== 'Export changes for review'
+					? 0
+					: 1
+			);
 		}
 
 		for ( const statusCase of cases.filter( ( item ) => item.nextStep ) ) {
@@ -11252,15 +11341,11 @@ describe( 'DistributedEditingStatusSurface', () => {
 				'data-distributed-editing-next-step',
 				statusCase.nextStepAction
 			);
-			if ( statusCase.nextStepAction === 'keep_tab_open' ) {
-				expect(
-					screen.queryByText( 'Export local changes' )
-				).not.toBeInTheDocument();
-			} else {
-				expect(
-					screen.getByText( 'Export local changes' )
-				).toBeVisible();
-			}
+			expect(
+				screen.queryAllByText( 'Export local changes' )
+			).toHaveLength(
+				statusCase.nextStepAction === 'keep_tab_open' ? 0 : 1
+			);
 		}
 
 		rerender( renderStatus( cases[ 1 ] ) );

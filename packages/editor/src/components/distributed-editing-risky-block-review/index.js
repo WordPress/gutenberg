@@ -6,8 +6,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Button, Icon, Notice } from '@wordpress/components';
+import {
+	__experimentalUseBlockPreview as useBlockPreview,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { parse } from '@wordpress/blocks';
+import { Button, Icon, Notice, TextareaControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { check, closeSmall, caution, seen } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -25,6 +31,17 @@ import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 const FILTER_NAME = 'core/editor/distributed-editing-risky-block-review';
 const RISKY_BLOCK_WASH = 'inset 0 0 0 9999px rgba(34, 113, 177, 0.08)';
 const RISKY_BLOCK_MARKER = 'inset 4px 0 0 #2271b1';
+const EMPTY_PENDING_GHOSTS = {
+	before: [],
+	after: [],
+};
+const EMPTY_ARRAY = [];
+const PENDING_GHOST_ANCHOR_ATTRIBUTE =
+	'data-distributed-editing-pending-ghost-anchor';
+const PENDING_GHOST_BLOCK_PATH_ATTRIBUTE =
+	'data-distributed-editing-pending-ghost-anchor-path';
+const PENDING_GHOST_SIBLING_COUNT_ATTRIBUTE =
+	'data-distributed-editing-pending-ghost-anchor-sibling-count';
 
 /**
  * Returns whether the risky-block review panel has any state to render.
@@ -99,6 +116,251 @@ export function getDistributedEditingRiskyBlockReviewWrapperProps(
 }
 
 /**
+ * Returns inert pending-edit ghosts that should be rendered next to a block.
+ *
+ * Ghosts represent another editor's unsaved local changes. The preview uses
+ * only the sanitized static block-save HTML returned by WordPress presence; it
+ * must never render unsanitized proposed block markup.
+ *
+ * @param {Array}  rosterEntries Presence roster entries.
+ * @param {Array}  blockPath     Current block path.
+ * @param {Object} options       Placement options.
+ *
+ * @return {Object} Ghosts grouped by placement.
+ */
+export function getDistributedEditingPendingGhostEntriesForBlockPath(
+	rosterEntries = [],
+	blockPath = [],
+	options = {}
+) {
+	const normalizedBlockPath =
+		getDistributedEditingNormalizedBlockPath( blockPath );
+
+	if ( normalizedBlockPath.length === 0 ) {
+		return EMPTY_PENDING_GHOSTS;
+	}
+
+	const ghosts = {
+		before: [],
+		after: [],
+	};
+
+	for ( const entry of Array.isArray( rosterEntries ) ? rosterEntries : [] ) {
+		if (
+			entry?.relationship === 'current_user_current_tab' ||
+			! entry?.pendingPreview?.available ||
+			! Array.isArray( entry.pendingPreview.items )
+		) {
+			continue;
+		}
+
+		const displayName = entry.displayName || __( 'Editor' );
+
+		for ( const [ index, item ] of entry.pendingPreview.items.entries() ) {
+			if (
+				! isDistributedEditingPendingGhostRenderable( item, options )
+			) {
+				continue;
+			}
+
+			const placement =
+				getDistributedEditingPendingGhostPlacementForBlockPath(
+					item,
+					normalizedBlockPath,
+					options
+				);
+
+			if ( ! placement ) {
+				continue;
+			}
+
+			ghosts[ placement ].push( {
+				...item,
+				displayName,
+				presenceUpdatedAtGmt:
+					item.presenceUpdatedAtGmt ||
+					item.presence_updated_at_gmt ||
+					entry.pendingPreview.presenceUpdatedAtGmt ||
+					entry.pendingPreview.presence_updated_at_gmt ||
+					entry.presenceUpdatedAtGmt ||
+					entry.presence_updated_at_gmt ||
+					'',
+				key: `${ entry.key || 'presence-editor' }-${
+					item.previewId || index
+				}-${ placement }`,
+				placement,
+			} );
+		}
+	}
+
+	return ghosts;
+}
+
+/**
+ * Returns fixed-position pending ghost overlay items for measured block anchors.
+ *
+ * The overlay model keeps ghost previews out of Gutenberg's editable block
+ * tree. Anchors may come from the main document or from the same-origin editor
+ * iframe; all rects are normalized to the top viewport before rendering.
+ *
+ * @param {Array}  rosterEntries Presence roster entries.
+ * @param {Array}  anchors       Measured block anchors.
+ * @param {Object} options       Overlay filtering options.
+ *
+ * @return {Array} Overlay ghost items.
+ */
+export function getDistributedEditingPendingGhostOverlayItemsForAnchors(
+	rosterEntries = [],
+	anchors = [],
+	options = {}
+) {
+	const overlayItems = [];
+
+	for ( const anchor of Array.isArray( anchors ) ? anchors : [] ) {
+		const blockPath = getDistributedEditingNormalizedBlockPath(
+			anchor?.blockPath
+		);
+		const rect = anchor?.rect || {};
+
+		if (
+			blockPath.length === 0 ||
+			! Number.isFinite( rect.top ) ||
+			! Number.isFinite( rect.left ) ||
+			! Number.isFinite( rect.width ) ||
+			rect.width <= 0
+		) {
+			continue;
+		}
+
+		const pendingGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				rosterEntries,
+				blockPath,
+				{
+					siblingCount: anchor.siblingCount,
+					minUpdatedAtMs: options.minUpdatedAtMs,
+				}
+			);
+
+		for ( const placement of [ 'before', 'after' ] ) {
+			for ( const ghost of pendingGhosts[ placement ] || [] ) {
+				overlayItems.push( {
+					...ghost,
+					key: `${ ghost.key }-${
+						anchor.key || blockPath.join( '.' )
+					}`,
+					overlayPlacement: placement,
+					style: getDistributedEditingPendingGhostOverlayStyle(
+						rect,
+						placement
+					),
+				} );
+			}
+		}
+	}
+
+	return overlayItems;
+}
+
+function isDistributedEditingPendingGhostRenderable( item = {}, options = {} ) {
+	if (
+		Number.isFinite( options.minUpdatedAtMs ) &&
+		! isDistributedEditingPendingGhostFreshEnough(
+			item,
+			options.minUpdatedAtMs
+		)
+	) {
+		return false;
+	}
+
+	const anchorStatus =
+		item.anchorStatus ||
+		item.anchor_status ||
+		item.locationStatus ||
+		item.location_status ||
+		'exact';
+
+	return ! [
+		'ambiguous',
+		'unavailable',
+		'unknown',
+		'location_unavailable',
+	].includes( String( anchorStatus ) );
+}
+
+function isDistributedEditingPendingGhostFreshEnough( item, minUpdatedAtMs ) {
+	const updatedAt =
+		item.presenceUpdatedAtGmt ||
+		item.presence_updated_at_gmt ||
+		item.updatedAtGmt ||
+		item.updated_at_gmt ||
+		item.reportedAtGmt ||
+		item.reported_at_gmt ||
+		'';
+	const updatedAtMs = updatedAt
+		? Date.parse(
+				updatedAt.includes( 'T' )
+					? updatedAt
+					: `${ updatedAt.replace( ' ', 'T' ) }Z`
+		  )
+		: NaN;
+
+	return Number.isFinite( updatedAtMs ) && updatedAtMs >= minUpdatedAtMs;
+}
+
+function getDistributedEditingPendingGhostPlacementForBlockPath(
+	item = {},
+	blockPath = [],
+	options = {}
+) {
+	const itemPath = getDistributedEditingNormalizedBlockPath( item.blockPath );
+
+	if ( itemPath.length === 0 || itemPath.length !== blockPath.length ) {
+		return null;
+	}
+
+	const itemParentPath = itemPath.slice( 0, -1 );
+	const blockParentPath = blockPath.slice( 0, -1 );
+
+	if (
+		! getDistributedEditingBlockPathsMatch(
+			itemParentPath,
+			blockParentPath
+		)
+	) {
+		return null;
+	}
+
+	const itemIndex = itemPath[ itemPath.length - 1 ];
+	const blockIndex = blockPath[ blockPath.length - 1 ];
+
+	if ( item.changeKind === 'added_block' ) {
+		if ( itemIndex === blockIndex ) {
+			return 'before';
+		}
+
+		if ( itemIndex === blockIndex + 1 ) {
+			const siblingCount = Number( options.siblingCount );
+
+			if (
+				Number.isInteger( siblingCount ) &&
+				itemIndex < siblingCount
+			) {
+				return null;
+			}
+
+			return 'after';
+		}
+
+		return null;
+	}
+
+	return getDistributedEditingBlockPathsMatch( itemPath, blockPath )
+		? 'after'
+		: null;
+}
+
+/**
  * Adds a subtle warning marker and wash to blocks that have pending risky HTML
  * review items. This annotates editor chrome only; it does not mutate content,
  * save, dispatch notices, call transport, or change post locks.
@@ -109,50 +371,385 @@ export function getDistributedEditingRiskyBlockReviewWrapperProps(
  */
 function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 	return function WithDistributedEditingRiskyBlockReviewAnnotations( props ) {
-		const reviewItem = useSelect(
+		const { blockContextJson, reviewItem } = useSelect(
 			( select ) => {
 				const { getDistributedEditingRiskyBlockReviewState } =
 					select( editorStore );
 				const reviewState =
 					getDistributedEditingRiskyBlockReviewState?.() || {};
+				const blockEditorSelect = select( blockEditorStore );
+				const blockContext =
+					getDistributedEditingBlockPathContextForClientId(
+						blockEditorSelect,
+						props.clientId
+					);
+				let nextReviewItem = null;
 
 				if (
-					! shouldRenderDistributedEditingRiskyBlockReview(
+					shouldRenderDistributedEditingRiskyBlockReview(
 						reviewState
-					) ||
-					! Array.isArray( reviewState.reviewItems )
+					) &&
+					Array.isArray( reviewState.reviewItems )
 				) {
-					return null;
+					nextReviewItem =
+						reviewState.reviewItems.find(
+							( item ) =>
+								item.blockClientId === props.clientId &&
+								item.reviewStatus ===
+									DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
+						) || null;
 				}
 
-				return reviewState.reviewItems.find(
-					( item ) =>
-						item.blockClientId === props.clientId &&
-						item.reviewStatus ===
-							DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW
-				);
+				return {
+					blockContextJson: JSON.stringify( blockContext ),
+					reviewItem: nextReviewItem,
+				};
 			},
 			[ props.clientId ]
 		);
+		const blockContext = useMemo( () => {
+			try {
+				return JSON.parse( blockContextJson );
+			} catch {
+				return {
+					blockPath: [],
+					siblingCount: null,
+				};
+			}
+		}, [ blockContextJson ] );
+		const wrapperProps =
+			getDistributedEditingPendingGhostAnchorWrapperProps(
+				reviewItem
+					? getDistributedEditingRiskyBlockReviewWrapperProps(
+							props.wrapperProps,
+							reviewItem
+					  )
+					: props.wrapperProps,
+				blockContext
+			);
 
-		if ( ! reviewItem ) {
-			return <BlockListBlock { ...props } />;
-		}
-
-		return (
+		return reviewItem ? (
 			<BlockListBlock
 				{ ...props }
 				className={ clsx(
 					props.className,
 					'is-distributed-editing-risky-block-review-target'
 				) }
-				wrapperProps={ getDistributedEditingRiskyBlockReviewWrapperProps(
-					props.wrapperProps,
-					reviewItem
-				) }
+				wrapperProps={ wrapperProps }
 			/>
+		) : (
+			<BlockListBlock { ...props } wrapperProps={ wrapperProps } />
 		);
 	};
+}
+
+function getDistributedEditingPendingGhostAnchorWrapperProps(
+	wrapperProps = {},
+	blockContext = {}
+) {
+	const blockPath = getDistributedEditingNormalizedBlockPath(
+		blockContext.blockPath
+	);
+
+	if ( blockPath.length === 0 ) {
+		return wrapperProps;
+	}
+
+	return {
+		...wrapperProps,
+		className: clsx(
+			wrapperProps.className,
+			'has-distributed-editing-pending-ghost-anchor'
+		),
+		[ PENDING_GHOST_ANCHOR_ATTRIBUTE ]: 'true',
+		[ PENDING_GHOST_BLOCK_PATH_ATTRIBUTE ]: blockPath.join( '.' ),
+		[ PENDING_GHOST_SIBLING_COUNT_ATTRIBUTE ]: Number.isInteger(
+			blockContext.siblingCount
+		)
+			? String( blockContext.siblingCount )
+			: '',
+	};
+}
+
+/**
+ * Renders inert pending-edit previews outside the editable block tree.
+ *
+ * @return {React.ReactNode} Pending ghost overlay.
+ */
+export function DistributedEditingPendingGhostOverlay() {
+	const rosterEntriesJson = useSelect( ( select ) => {
+		const sessionState =
+			select( editorStore ).getDistributedEditingSessionState?.() || {};
+
+		return JSON.stringify(
+			Array.isArray( sessionState.presenceRosterEntries )
+				? sessionState.presenceRosterEntries
+				: EMPTY_ARRAY
+		);
+	}, [] );
+	const rosterEntries = useMemo( () => {
+		try {
+			return JSON.parse( rosterEntriesJson );
+		} catch {
+			return EMPTY_ARRAY;
+		}
+	}, [ rosterEntriesJson ] );
+	const [ overlayItems, setOverlayItems ] = useState( EMPTY_ARRAY );
+	const [ mountedAtMs ] = useState( () => Date.now() );
+
+	useEffect( () => {
+		let animationFrameId = 0;
+
+		function refreshOverlayItems() {
+			if ( animationFrameId ) {
+				globalThis.cancelAnimationFrame?.( animationFrameId );
+			}
+
+			animationFrameId = globalThis.requestAnimationFrame
+				? globalThis.requestAnimationFrame( () => {
+						animationFrameId = 0;
+						setOverlayItems(
+							getDistributedEditingPendingGhostOverlayItemsForAnchors(
+								rosterEntries,
+								getDistributedEditingPendingGhostAnchorSnapshots(),
+								{
+									minUpdatedAtMs: mountedAtMs,
+								}
+							)
+						);
+				  } )
+				: 0;
+
+			if ( ! animationFrameId ) {
+				setOverlayItems(
+					getDistributedEditingPendingGhostOverlayItemsForAnchors(
+						rosterEntries,
+						getDistributedEditingPendingGhostAnchorSnapshots(),
+						{
+							minUpdatedAtMs: mountedAtMs,
+						}
+					)
+				);
+			}
+		}
+
+		refreshOverlayItems();
+
+		const intervalId = globalThis.setInterval?.(
+			refreshOverlayItems,
+			1000
+		);
+		globalThis.addEventListener?.( 'resize', refreshOverlayItems );
+		globalThis.addEventListener?.( 'scroll', refreshOverlayItems, true );
+
+		return () => {
+			if ( animationFrameId ) {
+				globalThis.cancelAnimationFrame?.( animationFrameId );
+			}
+			if ( intervalId ) {
+				globalThis.clearInterval?.( intervalId );
+			}
+			globalThis.removeEventListener?.( 'resize', refreshOverlayItems );
+			globalThis.removeEventListener?.(
+				'scroll',
+				refreshOverlayItems,
+				true
+			);
+		};
+	}, [ rosterEntries, mountedAtMs ] );
+
+	if ( overlayItems.length === 0 ) {
+		return null;
+	}
+
+	return (
+		<div
+			aria-label={ __( 'Pending edits from other sessions' ) }
+			className="editor-distributed-editing-risky-block-review__pending-ghost-overlay"
+			data-distributed-editing-pending-ghost-overlay
+			role="presentation"
+		>
+			{ overlayItems.map( ( ghost ) => (
+				<DistributedEditingPendingGhostBlock
+					ghost={ ghost }
+					isOverlay
+					key={ ghost.key }
+					style={ ghost.style }
+				/>
+			) ) }
+		</div>
+	);
+}
+
+function getDistributedEditingPendingGhostAnchorSnapshots() {
+	return getDistributedEditingPendingGhostQueryableDocuments().flatMap(
+		( { document, frameRect } ) =>
+			Array.from(
+				document.querySelectorAll(
+					`[${ PENDING_GHOST_ANCHOR_ATTRIBUTE }="true"]`
+				)
+			).map( ( element, index ) => {
+				const rect = element.getBoundingClientRect();
+				const siblingCount = Number(
+					element.getAttribute(
+						PENDING_GHOST_SIBLING_COUNT_ATTRIBUTE
+					)
+				);
+
+				return {
+					blockPath:
+						element.getAttribute(
+							PENDING_GHOST_BLOCK_PATH_ATTRIBUTE
+						) || '',
+					key: `${
+						document.location?.href || 'document'
+					}-${ index }`,
+					rect: {
+						top: rect.top + ( frameRect?.top || 0 ),
+						left: rect.left + ( frameRect?.left || 0 ),
+						width: rect.width,
+						height: rect.height,
+					},
+					siblingCount: Number.isInteger( siblingCount )
+						? siblingCount
+						: null,
+				};
+			} )
+	);
+}
+
+function getDistributedEditingPendingGhostQueryableDocuments() {
+	const currentDocument = globalThis.document;
+
+	if ( ! currentDocument ) {
+		return [];
+	}
+
+	const documents = [
+		{
+			document: currentDocument,
+			frameRect: null,
+		},
+	];
+
+	for ( const frame of currentDocument.querySelectorAll( 'iframe' ) ) {
+		try {
+			if ( frame.contentDocument?.body ) {
+				documents.push( {
+					document: frame.contentDocument,
+					frameRect: frame.getBoundingClientRect(),
+				} );
+			}
+		} catch {
+			// Cross-origin iframes are ignored; the editor iframe is same-origin.
+		}
+	}
+
+	return documents;
+}
+
+function getDistributedEditingPendingGhostOverlayStyle( rect, placement ) {
+	const verticalOffset = placement === 'before' ? -34 : 6;
+	const top = Math.max( 8, rect.top + verticalOffset );
+	const left = Math.max( 8, rect.left + 12 );
+	const width = Math.max( 180, Math.min( rect.width - 24, 520 ) );
+
+	return {
+		left,
+		top,
+		width,
+	};
+}
+
+function DistributedEditingPendingGhostBlock( { ghost, isOverlay, style } ) {
+	const previewText = getDistributedEditingPendingGhostPreviewText( ghost );
+	const previewBlocks = useMemo(
+		() => getDistributedEditingPendingGhostPreviewBlocks( ghost ),
+		[ ghost ]
+	);
+	const previewBlockProps = useBlockPreview( {
+		blocks: previewBlocks,
+		props: {
+			className:
+				'editor-distributed-editing-risky-block-review__pending-ghost-block-list',
+		},
+	} );
+	const blockName = ghost.blockName || __( 'block' );
+	const ghostLabel = sprintf(
+		/* translators: 1: editor display name, 2: block name. */
+		__( 'Pending edit by %1$s in %2$s' ),
+		ghost.displayName,
+		blockName
+	);
+
+	return (
+		<div
+			aria-label={ ghostLabel }
+			className={ clsx(
+				'editor-distributed-editing-risky-block-review__pending-ghost-block',
+				isOverlay &&
+					'editor-distributed-editing-risky-block-review__pending-ghost-block--overlay'
+			) }
+			data-distributed-editing-pending-ghost="true"
+			data-distributed-editing-pending-ghost-author={ ghost.displayName }
+			data-distributed-editing-pending-ghost-block-name={ blockName }
+			data-distributed-editing-pending-ghost-change-kind={
+				ghost.changeKind || 'unknown_change'
+			}
+			data-distributed-editing-pending-ghost-inert="true"
+			data-distributed-editing-pending-ghost-placement={
+				isOverlay ? 'overlay' : 'inline'
+			}
+			data-distributed-editing-pending-ghost-raw-content="false"
+			role="note"
+			style={ style }
+			title={ ghostLabel }
+		>
+			<span
+				aria-hidden="true"
+				className="editor-distributed-editing-risky-block-review__pending-ghost-marker"
+			/>
+			<span className="editor-distributed-editing-risky-block-review__pending-ghost-copy">
+				<div className="editor-distributed-editing-risky-block-review__pending-ghost-preview">
+					{ previewBlocks.length ? (
+						<div
+							{ ...previewBlockProps }
+							data-distributed-editing-pending-ghost-renderer="block-preview"
+						/>
+					) : (
+						previewText
+					) }
+				</div>
+				<span className="editor-distributed-editing-risky-block-review__pending-ghost-author">
+					{ ghost.displayName }
+				</span>
+			</span>
+		</div>
+	);
+}
+
+function getDistributedEditingNormalizedBlockPath( blockPath ) {
+	if ( typeof blockPath === 'string' ) {
+		return blockPath
+			.split( '.' )
+			.map( ( value ) => Number( value ) )
+			.filter( ( value ) => Number.isInteger( value ) && value >= 0 );
+	}
+
+	if ( ! Array.isArray( blockPath ) ) {
+		return [];
+	}
+
+	return blockPath
+		.map( ( value ) => Number( value ) )
+		.filter( ( value ) => Number.isInteger( value ) && value >= 0 );
+}
+
+function getDistributedEditingBlockPathsMatch( firstPath, secondPath ) {
+	return (
+		firstPath.length === secondPath.length &&
+		firstPath.every( ( value, index ) => value === secondPath[ index ] )
+	);
 }
 
 addFilter(
@@ -160,6 +757,91 @@ addFilter(
 	FILTER_NAME,
 	withDistributedEditingRiskyBlockReviewAnnotations
 );
+
+function getDistributedEditingBlockPathContextForClientId(
+	blockEditorSelect,
+	clientId
+) {
+	if (
+		! clientId ||
+		typeof blockEditorSelect?.getBlockParents !== 'function' ||
+		typeof blockEditorSelect?.getBlockIndex !== 'function'
+	) {
+		return {
+			blockPath: [],
+			siblingCount: null,
+		};
+	}
+
+	const parentClientIds = blockEditorSelect.getBlockParents( clientId ) || [];
+	const pathClientIds = [ ...parentClientIds, clientId ];
+	const blockPath = pathClientIds.map( ( pathClientId ) =>
+		blockEditorSelect.getBlockIndex( pathClientId )
+	);
+	const rootClientId =
+		typeof blockEditorSelect.getBlockRootClientId === 'function'
+			? blockEditorSelect.getBlockRootClientId( clientId )
+			: null;
+	const siblingClientIds =
+		typeof blockEditorSelect.getBlockOrder === 'function'
+			? blockEditorSelect.getBlockOrder( rootClientId )
+			: null;
+
+	return {
+		blockPath: getDistributedEditingNormalizedBlockPath( blockPath ),
+		siblingCount: Array.isArray( siblingClientIds )
+			? siblingClientIds.length
+			: null,
+	};
+}
+
+function getDistributedEditingPendingGhostPreviewText( ghost = {} ) {
+	if ( ghost.rawContentIncluded || ghost.exposesRawContent ) {
+		return __( 'Pending edit' );
+	}
+
+	const previewText =
+		ghost.safePreviewText ||
+		ghost.safePreviewHtml ||
+		( ghost.changeKind === 'deleted_block'
+			? __( 'Deleted block' )
+			: __( 'Pending edit' ) );
+
+	return String( previewText ).replace( /\s+/g, ' ' ).trim();
+}
+
+function getDistributedEditingPendingGhostPreviewSerializedBlocks(
+	ghost = {}
+) {
+	if ( ghost.rawContentIncluded || ghost.exposesRawContent ) {
+		return '';
+	}
+
+	const serialized =
+		ghost.safePreviewSerializedBlocks ||
+		ghost.safe_preview_serialized_blocks ||
+		'';
+
+	return typeof serialized === 'string' && /<!--\s*\/?wp:/.test( serialized )
+		? serialized
+		: '';
+}
+
+function getDistributedEditingPendingGhostPreviewBlocks( ghost = {} ) {
+	const serialized =
+		getDistributedEditingPendingGhostPreviewSerializedBlocks( ghost );
+
+	if ( ! serialized ) {
+		return EMPTY_ARRAY;
+	}
+
+	try {
+		const blocks = parse( serialized );
+		return Array.isArray( blocks ) ? blocks : EMPTY_ARRAY;
+	} catch {
+		return EMPTY_ARRAY;
+	}
+}
 
 /**
  * Renders the production chrome prompt that opens the pre-publish review panel.
@@ -268,6 +950,7 @@ export default function DistributedEditingRiskyBlockReviewPrePublishPanel( {
 		useDistributedEditingRiskyBlockReviewState();
 	const {
 		__experimentalFocusDistributedEditingRiskyBlockReviewItem,
+		__experimentalLoadDistributedEditingRiskyBlockReviewItemDetail,
 		__experimentalResolveDistributedEditingRiskyBlockReviewItem,
 	} = useDispatch( editorStore ) || {};
 
@@ -284,12 +967,19 @@ export default function DistributedEditingRiskyBlockReviewPrePublishPanel( {
 		return result;
 	}
 
-	async function resolveReviewItem( reviewItem, decision ) {
+	async function loadReviewItemDetail( reviewItem ) {
+		return __experimentalLoadDistributedEditingRiskyBlockReviewItemDetail?.(
+			reviewItem.id
+		);
+	}
+
+	async function resolveReviewItem( reviewItem, decision, options = {} ) {
 		const result =
 			await __experimentalResolveDistributedEditingRiskyBlockReviewItem?.(
 				{
 					reviewItemId: reviewItem.id,
 					decision,
+					...options,
 				}
 			);
 		onResolve?.( reviewItem, decision, result );
@@ -305,6 +995,7 @@ export default function DistributedEditingRiskyBlockReviewPrePublishPanel( {
 		>
 			<DistributedEditingRiskyBlockReviewPanel
 				onFocusItem={ focusReviewItem }
+				onLoadDetail={ loadReviewItemDetail }
 				onResolve={ resolveReviewItem }
 				reviewState={ reviewState }
 				savePolicy={ savePolicy }
@@ -316,23 +1007,25 @@ export default function DistributedEditingRiskyBlockReviewPrePublishPanel( {
 /**
  * Renders the hash-only review list.
  *
- * @param {Object}   props             Component props.
- * @param {Function} props.onFocusItem Optional focus handler.
- * @param {Function} props.onResolve   Optional resolution handler.
- * @param {Object}   props.reviewState Risky-block review state.
- * @param {Object}   props.savePolicy  Save policy state.
+ * @param {Object}   props              Component props.
+ * @param {Function} props.onFocusItem  Optional focus handler.
+ * @param {Function} props.onLoadDetail Optional detail loader.
+ * @param {Function} props.onResolve    Optional resolution handler.
+ * @param {Object}   props.reviewState  Risky-block review state.
+ * @param {Object}   props.savePolicy   Save policy state.
  *
  * @return {React.ReactNode} Rendered review panel.
  */
 export function DistributedEditingRiskyBlockReviewPanel( {
 	onFocusItem,
+	onLoadDetail,
 	onResolve,
 	reviewState = {},
 	savePolicy = {},
 } ) {
-	const reviewItems = Array.isArray( reviewState.reviewItems )
-		? reviewState.reviewItems
-		: [];
+	const reviewItems = getVisibleRiskyBlockReviewItems(
+		Array.isArray( reviewState.reviewItems ) ? reviewState.reviewItems : []
+	);
 	const saveVocabulary =
 		getDistributedEditingRiskyBlockReviewSaveVocabulary( savePolicy );
 	const shouldRenderSaveVocabulary = Boolean(
@@ -412,6 +1105,7 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 						index={ index }
 						key={ reviewItem.id }
 						onFocusItem={ onFocusItem }
+						onLoadDetail={ onLoadDetail }
 						onResolve={ onResolve }
 						reviewItem={ reviewItem }
 					/>
@@ -419,6 +1113,84 @@ export function DistributedEditingRiskyBlockReviewPanel( {
 			</ul>
 		</div>
 	);
+}
+
+function getVisibleRiskyBlockReviewItems( reviewItems ) {
+	const localItemsByKey = new Map();
+	const serverBackedKeys = new Set();
+
+	for ( const reviewItem of reviewItems ) {
+		const key = getRiskyBlockReviewItemDuplicateKey( reviewItem );
+
+		if ( ! key ) {
+			continue;
+		}
+
+		if ( isServerBackedRiskyBlockReviewItem( reviewItem ) ) {
+			serverBackedKeys.add( key );
+		} else if ( isLocalKsesRiskyBlockReviewItem( reviewItem ) ) {
+			localItemsByKey.set( key, reviewItem );
+		}
+	}
+
+	return reviewItems
+		.filter( ( reviewItem ) => {
+			const key = getRiskyBlockReviewItemDuplicateKey( reviewItem );
+
+			return (
+				! isLocalKsesRiskyBlockReviewItem( reviewItem ) ||
+				! serverBackedKeys.has( key )
+			);
+		} )
+		.map( ( reviewItem ) => {
+			if ( ! isServerBackedRiskyBlockReviewItem( reviewItem ) ) {
+				return reviewItem;
+			}
+
+			const localItem = localItemsByKey.get(
+				getRiskyBlockReviewItemDuplicateKey( reviewItem )
+			);
+
+			if ( ! localItem ) {
+				return reviewItem;
+			}
+
+			return {
+				...reviewItem,
+				annotation: reviewItem.annotation || localItem.annotation,
+				blockClientId:
+					reviewItem.blockClientId || localItem.blockClientId,
+				blockLabel: reviewItem.blockLabel || localItem.blockLabel,
+				blockName: reviewItem.blockName || localItem.blockName,
+			};
+		} );
+}
+
+function getRiskyBlockReviewItemDuplicateKey( reviewItem = {} ) {
+	const blockPath = Array.isArray( reviewItem.blockPath )
+		? reviewItem.blockPath.join( '.' )
+		: reviewItem.blockPath || '';
+	const fields = [
+		reviewItem.changeKind,
+		reviewItem.riskReason,
+		reviewItem.proposedContentHash,
+		reviewItem.ksesFilteredContentHash,
+		blockPath,
+	];
+
+	if ( fields.some( ( field ) => ! field ) ) {
+		return '';
+	}
+
+	return fields.join( '|' );
+}
+
+function isServerBackedRiskyBlockReviewItem( reviewItem = {} ) {
+	return String( reviewItem.id || '' ).startsWith( 'de-rtc-review-' );
+}
+
+function isLocalKsesRiskyBlockReviewItem( reviewItem = {} ) {
+	return String( reviewItem.id || '' ).startsWith( 'kses-review-' );
 }
 
 function getDistributedEditingRiskyBlockReviewSaveVocabulary(
@@ -462,13 +1234,73 @@ function getDistributedEditingRiskyBlockReviewSaveVocabulary(
 function DistributedEditingRiskyBlockReviewItem( {
 	index,
 	onFocusItem,
+	onLoadDetail,
 	onResolve,
 	reviewItem,
 } ) {
+	const [ detailItem, setDetailItem ] = useState( null );
+	const [ isDetailLoading, setIsDetailLoading ] = useState( false );
+	const [ isModifying, setIsModifying ] = useState( false );
+	const [ reviewedBlockSource, setReviewedBlockSource ] = useState( '' );
+	const activeReviewItem = detailItem || reviewItem;
 	const isPending =
 		reviewItem.reviewStatus ===
 		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW;
 	const label = getRiskyBlockReviewItemLabel( reviewItem, index );
+	const hasReviewSource = Boolean( activeReviewItem.proposedSourceDisplay );
+	const canApprove = reviewItem.canApprove === true;
+	const canModifyAdopt = reviewItem.canModifyAdopt === true;
+	const canReject = reviewItem.canReject === true;
+	const canDiscard = reviewItem.canDiscard === true;
+	const canReview = canApprove || canModifyAdopt || canReject;
+	const shouldLoadDetailBeforeReviewAction =
+		canReview && isServerBackedRiskyBlockReviewItem( reviewItem );
+	const reviewActionReady =
+		! shouldLoadDetailBeforeReviewAction || hasReviewSource;
+	const rejectDecision = canDiscard && ! canReject ? 'discarded' : 'rejected';
+	const rejectLabel =
+		canDiscard && ! canReject ? __( 'Discard' ) : __( 'Reject' );
+	const rejectButtonLabel =
+		canDiscard && ! canReject
+			? sprintf(
+					/* translators: %s: block label. */
+					__( 'Discard HTML change for %s' ),
+					label
+			  )
+			: sprintf(
+					/* translators: %s: block label. */
+					__( 'Reject HTML change for %s' ),
+					label
+			  );
+
+	async function loadDetail() {
+		if ( hasReviewSource || ! onLoadDetail ) {
+			return activeReviewItem;
+		}
+
+		setIsDetailLoading( true );
+		try {
+			const detailResult = await onLoadDetail( reviewItem );
+			const nextDetailItem = detailResult?.item || reviewItem;
+			setDetailItem( nextDetailItem );
+			return nextDetailItem;
+		} finally {
+			setIsDetailLoading( false );
+		}
+	}
+
+	async function startModify() {
+		const detailResult =
+			! hasReviewSource && onLoadDetail ? await loadDetail() : null;
+		const itemToModify = detailResult || activeReviewItem;
+
+		setReviewedBlockSource(
+			getEditableReviewItemSource( itemToModify ) ||
+				reviewedBlockSource ||
+				''
+		);
+		setIsModifying( true );
+	}
 
 	return (
 		<li
@@ -489,20 +1321,57 @@ function DistributedEditingRiskyBlockReviewItem( {
 			}
 		>
 			<div className="editor-distributed-editing-risky-block-review__item-header">
-				<Button
-					__next40pxDefaultSize
-					accessibleWhenDisabled
-					disabled={ ! isPending }
-					icon={ check }
-					label={ sprintf(
-						/* translators: %s: block label. */
-						__( 'Approve HTML change for %s' ),
-						label
-					) }
-					onClick={ () => onResolve?.( reviewItem, 'approved' ) }
-					size="compact"
-					variant="tertiary"
-				/>
+				{ canReview && ! reviewActionReady && (
+					<Button
+						__next40pxDefaultSize
+						accessibleWhenDisabled
+						disabled={ ! isPending || isDetailLoading }
+						icon={ seen }
+						label={ sprintf(
+							/* translators: %s: block label. */
+							__( 'Review HTML change for %s' ),
+							label
+						) }
+						onClick={ loadDetail }
+						size="compact"
+						variant="secondary"
+					>
+						{ isDetailLoading ? __( 'Loading' ) : __( 'Review' ) }
+					</Button>
+				) }
+				{ canApprove && reviewActionReady && (
+					<Button
+						__next40pxDefaultSize
+						accessibleWhenDisabled
+						disabled={ ! isPending }
+						icon={ check }
+						label={ sprintf(
+							/* translators: %s: block label. */
+							__( 'Approve HTML change for %s' ),
+							label
+						) }
+						onClick={ () => onResolve?.( reviewItem, 'approved' ) }
+						size="compact"
+						variant="tertiary"
+					/>
+				) }
+				{ canModifyAdopt && reviewActionReady && (
+					<Button
+						__next40pxDefaultSize
+						accessibleWhenDisabled
+						disabled={ ! isPending }
+						label={ sprintf(
+							/* translators: %s: block label. */
+							__( 'Modify HTML change for %s' ),
+							label
+						) }
+						onClick={ startModify }
+						size="compact"
+						variant="tertiary"
+					>
+						{ __( 'Modify' ) }
+					</Button>
+				) }
 				<div className="editor-distributed-editing-risky-block-review__item-title">
 					<span
 						aria-hidden="true"
@@ -510,21 +1379,23 @@ function DistributedEditingRiskyBlockReviewItem( {
 					/>
 					<span>{ label }</span>
 				</div>
-				<Button
-					__next40pxDefaultSize
-					accessibleWhenDisabled
-					disabled={ ! isPending }
-					icon={ closeSmall }
-					isDestructive
-					label={ sprintf(
-						/* translators: %s: block label. */
-						__( 'Reject HTML change for %s' ),
-						label
-					) }
-					onClick={ () => onResolve?.( reviewItem, 'rejected' ) }
-					size="compact"
-					variant="tertiary"
-				/>
+				{ ( canDiscard || ( canReject && reviewActionReady ) ) && (
+					<Button
+						__next40pxDefaultSize
+						accessibleWhenDisabled
+						disabled={ ! isPending }
+						icon={ closeSmall }
+						isDestructive
+						label={ rejectButtonLabel }
+						onClick={ () =>
+							onResolve?.( reviewItem, rejectDecision )
+						}
+						size="compact"
+						variant="tertiary"
+					>
+						{ rejectLabel }
+					</Button>
+				) }
 			</div>
 			<p className="editor-distributed-editing-risky-block-review__item-guidance">
 				{ getRiskyBlockReviewItemAffordanceMessage(
@@ -553,6 +1424,76 @@ function DistributedEditingRiskyBlockReviewItem( {
 					) }
 				</code>
 			</div>
+			{ hasReviewSource && (
+				<div
+					className="editor-distributed-editing-risky-block-review__item-detail"
+					data-distributed-editing-risky-block-review-detail
+				>
+					<div>
+						<strong>{ __( 'Proposed HTML' ) }</strong>
+						<pre>
+							<code>
+								{ getEditableReviewItemSource(
+									activeReviewItem
+								) }
+							</code>
+						</pre>
+					</div>
+					<div>
+						<strong>{ __( 'WordPress would keep' ) }</strong>
+						<pre>
+							<code>
+								{ getEscapedReviewItemSource(
+									activeReviewItem,
+									'ksesFilteredSourceDisplay'
+								) }
+							</code>
+						</pre>
+					</div>
+				</div>
+			) }
+			{ isModifying && (
+				<div className="editor-distributed-editing-risky-block-review__item-modify">
+					<TextareaControl
+						__nextHasNoMarginBottom
+						label={ sprintf(
+							/* translators: %s: block label. */
+							__( 'Edited HTML for %s' ),
+							label
+						) }
+						onChange={ setReviewedBlockSource }
+						value={ reviewedBlockSource }
+					/>
+					<div className="editor-distributed-editing-risky-block-review__item-modify-actions">
+						<Button
+							__next40pxDefaultSize
+							accessibleWhenDisabled
+							disabled={
+								! isPending ||
+								! canModifyAdopt ||
+								reviewedBlockSource.trim() === ''
+							}
+							onClick={ () =>
+								onResolve?.( reviewItem, 'modify-adopt', {
+									reviewedBlockSource,
+								} )
+							}
+							size="compact"
+							variant="primary"
+						>
+							{ __( 'Adopt edited HTML' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => setIsModifying( false ) }
+							size="compact"
+							variant="tertiary"
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+					</div>
+				</div>
+			) }
 			<Button
 				__next40pxDefaultSize
 				accessibleWhenDisabled
@@ -638,8 +1579,8 @@ function getRiskyBlockReviewSummaryMessage( reviewState = {} ) {
 		return sprintf(
 			/* translators: %d: number of blocks requiring HTML review. */
 			_n(
-				'%d highlighted block needs HTML review before Save can update the post.',
-				'%d highlighted blocks need HTML review before Save can update the post.',
+				'%d highlighted block needs HTML review.',
+				'%d highlighted blocks need HTML review.',
 				pendingCount
 			),
 			pendingCount
@@ -656,9 +1597,29 @@ function getRiskyBlockReviewAnnotationLabel( reviewItem, index = 0 ) {
 
 	return sprintf(
 		/* translators: %s: block label. */
-		__( 'HTML review required before Save for %s' ),
+		__( 'HTML review required for %s' ),
 		getRiskyBlockReviewItemLabel( reviewItem, index )
 	);
+}
+
+function getEditableReviewItemSource( reviewItem = {} ) {
+	return getEscapedReviewItemSource( reviewItem, 'proposedSourceDisplay' );
+}
+
+function getEscapedReviewItemSource( reviewItem = {}, fieldName ) {
+	const displaySource = reviewItem[ fieldName ];
+
+	if ( typeof displaySource !== 'string' || displaySource === '' ) {
+		return '';
+	}
+
+	if ( typeof document === 'undefined' ) {
+		return displaySource;
+	}
+
+	const textarea = document.createElement( 'textarea' );
+	textarea.innerHTML = displaySource;
+	return textarea.value;
 }
 
 function getRiskyBlockReviewItemAffordanceMessage( reviewItem, index ) {
@@ -692,7 +1653,7 @@ function getRiskyBlockReviewItemAffordanceMessage( reviewItem, index ) {
 	}
 
 	return __(
-		'This highlighted block needs HTML review before Save can update the post.'
+		'This highlighted block needs HTML review before it can be included.'
 	);
 }
 

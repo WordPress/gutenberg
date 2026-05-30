@@ -190,6 +190,9 @@ export default function HTMLEditModal( {
 							</div>
 							<div className="block-library-html__preview">
 								<Preview
+									canPreviewExecutableContent={
+										canUserUseUnfilteredHTML
+									}
 									content={ serializeContent( {
 										html: editedHtml,
 										css: editedCss,

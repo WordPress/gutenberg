@@ -13,6 +13,7 @@ import {
 	DistributedEditingStatusInspector,
 } from '../distributed-editing-status';
 import DistributedEditingRiskyBlockReviewPrePublishPanel, {
+	DistributedEditingPendingGhostOverlay,
 	DistributedEditingRiskyBlockReviewStatusChrome,
 } from '../distributed-editing-risky-block-review';
 
@@ -23,6 +24,7 @@ export default function EditorInterfaceNotices() {
 			dismissibleNoticesClassName="editor-notices__dismissible"
 		>
 			<TemplateValidationNotice />
+			<DistributedEditingPendingGhostOverlay />
 			<DistributedEditingRiskyBlockReviewStatusChrome />
 			<DistributedEditingRiskyBlockReviewPrePublishPanel />
 			<DistributedEditingFreshReviewPrePublishPanel />

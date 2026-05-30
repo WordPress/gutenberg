@@ -2884,6 +2884,158 @@ function normalizeDistributedEditingPresenceDocumentState( documentState ) {
 	};
 }
 
+function normalizeDistributedEditingPresencePendingPreviewState(
+	pendingPreview
+) {
+	const source = normalizeObject( pendingPreview );
+	const sourceItems = Array.isArray( source.items ) ? source.items : [];
+	const items = sourceItems
+		.slice( 0, 8 )
+		.map( ( item, index ) => {
+			const itemSource = normalizeObject( item );
+			const changeKind = [
+				'added_block',
+				'modified_block',
+				'deleted_block',
+				'unknown_change',
+			].includes( itemSource.changeKind )
+				? itemSource.changeKind
+				: 'unknown_change';
+			const blockPath = Array.isArray( itemSource.blockPath )
+				? itemSource.blockPath
+						.map( ( value ) => Number( value ) )
+						.filter(
+							( value ) => Number.isInteger( value ) && value >= 0
+						)
+						.slice( 0, 16 )
+				: [ index ];
+			const anchorStatus = [
+				'exact',
+				'ambiguous',
+				'unavailable',
+			].includes( itemSource.anchorStatus )
+				? itemSource.anchorStatus
+				: 'exact';
+			const previewScope = [
+				'leaf_block',
+				'sibling_collection',
+				'container_block',
+			].includes( itemSource.previewScope )
+				? itemSource.previewScope
+				: 'leaf_block';
+			const blockRangeSource = normalizeObject(
+				getFirstDefined( itemSource.blockRange, itemSource.block_range )
+			);
+			const blockRangeStart = Number(
+				getFirstDefined(
+					blockRangeSource.start,
+					blockRangeSource.start_index
+				)
+			);
+			const blockRangeCount = Number( blockRangeSource.count );
+
+			return {
+				previewId:
+					normalizeNullableString( itemSource.previewId ) ||
+					`pending-preview-${ index + 1 }`,
+				blockPath,
+				blockName:
+					normalizeNullableString( itemSource.blockName ) ||
+					'core/block',
+				changeKind,
+				safePreviewText:
+					normalizeNullableString( itemSource.safePreviewText ) || '',
+				safePreviewSerializedBlocks:
+					normalizeNullableString(
+						getFirstDefined(
+							itemSource.safePreviewSerializedBlocks,
+							itemSource.safe_preview_serialized_blocks
+						)
+					) || '',
+				safePreviewHtml:
+					normalizeNullableString( itemSource.safePreviewHtml ) || '',
+				isPlaceholder: Boolean( itemSource.isPlaceholder ),
+				reviewRequired: Boolean( itemSource.reviewRequired ),
+				anchorStatus,
+				previewScope,
+				...( Number.isInteger( blockRangeStart ) &&
+				blockRangeStart >= 0 &&
+				Number.isInteger( blockRangeCount ) &&
+				blockRangeCount > 0
+					? {
+							blockRange: {
+								start: blockRangeStart,
+								count: blockRangeCount,
+							},
+					  }
+					: {} ),
+				updatedAtGmt: normalizeNullableString(
+					getFirstDefined(
+						itemSource.updatedAtGmt,
+						itemSource.updated_at_gmt
+					)
+				),
+				rawContentIncluded: false,
+				exposesRawContent: false,
+				inert: true,
+			};
+		} )
+		.filter(
+			( item ) =>
+				item.changeKind === 'deleted_block' ||
+				Boolean(
+					item.safePreviewText ||
+						item.safePreviewHtml ||
+						item.safePreviewSerializedBlocks
+				)
+		);
+	const available =
+		normalizeDistributedEditingBooleanValue( source.available ) &&
+		items.length > 0;
+
+	return {
+		available,
+		schema:
+			normalizeNullableString( source.schema ) ||
+			'de-rtc-pending-preview-v1',
+		hasPendingPreview:
+			available &&
+			normalizeDistributedEditingBooleanValue(
+				getFirstDefined(
+					source.hasPendingPreview,
+					source.has_pending_preview,
+					true
+				)
+			),
+		baseVersion: normalizeNullableString(
+			getFirstDefined( source.baseVersion, source.base_version )
+		),
+		baseStateHash: normalizeNullableString(
+			getFirstDefined( source.baseStateHash, source.base_state_hash )
+		),
+		items,
+		itemCount: available ? items.length : 0,
+		reportedAtGmt: normalizeNullableString(
+			getFirstDefined( source.reportedAtGmt, source.reported_at_gmt )
+		),
+		presenceUpdatedAtGmt: normalizeNullableString(
+			getFirstDefined(
+				source.presenceUpdatedAtGmt,
+				source.presence_updated_at_gmt
+			)
+		),
+		source:
+			normalizeNullableString( source.source ) ||
+			( available ? 'client_reported_pending_preview' : 'unavailable' ),
+		ephemeral: true,
+		inert: true,
+		authoritativeForSave: false,
+		claimsSaved: false,
+		rawContentIncluded: false,
+		exposesRawContent: false,
+	};
+}
+
 function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 	const source = normalizeObject( entry );
 	const sourcePermissions = normalizeObject(
@@ -2958,6 +3110,10 @@ function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 	const selectionState = normalizeDistributedEditingPresenceSelectionState(
 		getFirstDefined( source.selectionState, source.selection_state )
 	);
+	const pendingPreview =
+		normalizeDistributedEditingPresencePendingPreviewState(
+			getFirstDefined( source.pendingPreview, source.pending_preview )
+		);
 
 	return {
 		key:
@@ -3005,10 +3161,12 @@ function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 			getFirstDefined( source.documentState, source.document_state )
 		),
 		selectionState,
+		pendingPreview,
 		exposesUserId: false,
 		exposesCursorOffset: false,
 		exposesSelection: false,
 		exposesSelectionPresence: selectionState.available,
+		exposesPendingPreview: pendingPreview.available,
 		exposesRawSelectedText: false,
 		exposesRawContent: false,
 	};
@@ -12095,7 +12253,7 @@ function getDistributedEditingSaveStateVocabulary( {
 		status === DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED ||
 		status ===
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.WORKFLOW_ACTION_REQUIRED ||
-		pendingReviewItemCount > 0
+		( pendingReviewItemCount > 0 && hasProtectedLocalChanges )
 	) {
 		reviewCheckpointState =
 			DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED;
@@ -12273,6 +12431,19 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			normalized.mustOfferLocalCopy ||
 			normalized.canExportLocalUpdates
 	);
+	const hasLocalReviewFailureEvidence = Boolean(
+		normalized.mustOfferLocalCopy ||
+			normalized.canExportLocalUpdates ||
+			normalized.riskyBlockReviewCanExportLocalUpdates ||
+			normalized.retrySaveStatus ===
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED ||
+			normalized.reasonCode ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT ||
+			normalized.riskyBlockReviewReasonCode ===
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT
+	);
+	const hasLocalRiskyReviewPending =
+		reviewState.hasPendingReviewItems && hasLocalReviewFailureEvidence;
 	const hasRetrySaveSavedStateEvidence =
 		hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 			normalized
@@ -12415,15 +12586,22 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		authorityStatusText =
 			'WordPress will get the latest post before updating it.';
 	} else if (
-		( reviewState.hasPendingReviewItems && ! partialSafePendingReview ) ||
+		( hasLocalRiskyReviewPending && ! partialSafePendingReview ) ||
 		freshReviewPreSaveState.opensPrePublishReview ||
 		freshReviewPreSaveState.status ===
 			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REVIEW_REQUIRED ||
 		freshReviewPreSaveState.status ===
 			DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED
 	) {
+		const reviewBlockedClickAction = hasLocalRiskyReviewPending
+			? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
+			: freshReviewPreSaveState.clickAction ||
+			  DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 		status = DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED;
-		if ( reviewState.hasPendingReviewItems ) {
+		if ( partialSafePendingReview ) {
+			reason = 'partial_safe_review_pending';
+			source = 'partial_safe_review';
+		} else if ( reviewState.hasPendingReviewItems ) {
 			reason = 'risky_block_review_required';
 			source = 'risky_block_review';
 		} else {
@@ -12431,15 +12609,18 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			source = 'fresh_review';
 		}
 		label = 'Save';
-		statusText =
-			'WordPress will save safe edits and keep blocked blocks for review.';
-		clickAction =
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
-		opensPrePublishReview = false;
+		statusText = partialSafePendingReview
+			? 'WordPress saved the safe parts. Choose what to do with the blocked HTML.'
+			: 'WordPress will save safe edits and keep blocked blocks for review.';
+		clickAction = reviewBlockedClickAction;
+		opensPrePublishReview =
+			reviewBlockedClickAction ===
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW;
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.REVIEW_REQUIRED_BEFORE_UPDATE;
-		authorityStatusText =
-			'WordPress cannot update the post until risky changes are approved or removed.';
+		authorityStatusText = partialSafePendingReview
+			? 'Safe edits are already in WordPress; the blocked HTML still needs a decision.'
+			: 'WordPress cannot update the post until risky changes are approved or removed.';
 	} else if ( partialSafePendingReview ) {
 		status =
 			DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED;
@@ -13266,10 +13447,9 @@ export function getDistributedEditingSavePolicyStateForSessionState(
 		status = DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED;
 		reason = saveButton.reason;
 		saveButtonLabel = saveButton.label;
-		clickAction =
-			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE;
+		clickAction = saveButton.clickAction;
 		blocksNormalSavePost = true;
-		opensPrePublishReview = false;
+		opensPrePublishReview = Boolean( saveButton.opensPrePublishReview );
 	} else if (
 		saveButton.status ===
 		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.ACCEPTED_BUT_UNCONSUMED
@@ -17184,6 +17364,42 @@ function normalizeRiskyBlockReviewItem( item = {} ) {
 		),
 		contentTransport: normalizeNullableString(
 			getFirstDefined( item.contentTransport, item.content_transport )
+		),
+		detailLoaded: Boolean(
+			getFirstDefined( item.detailLoaded, item.detail_loaded )
+		),
+		proposedSourceDisplay: normalizeNullableString(
+			getFirstDefined(
+				item.proposedSourceDisplay,
+				item.proposed_source_display
+			)
+		),
+		ksesFilteredSourceDisplay: normalizeNullableString(
+			getFirstDefined(
+				item.ksesFilteredSourceDisplay,
+				item.kses_filtered_source_display
+			)
+		),
+		proposedSourceLength: normalizeNullableInteger(
+			getFirstDefined(
+				item.proposedSourceLength,
+				item.proposed_source_length
+			)
+		),
+		ksesFilteredSourceLength: normalizeNullableInteger(
+			getFirstDefined(
+				item.ksesFilteredSourceLength,
+				item.kses_filtered_source_length
+			)
+		),
+		canApprove:
+			getFirstDefined( item.canApprove, item.can_approve ) !== false,
+		canModifyAdopt:
+			getFirstDefined( item.canModifyAdopt, item.can_modify_adopt ) !==
+			false,
+		canReject: getFirstDefined( item.canReject, item.can_reject ) !== false,
+		canDiscard: Boolean(
+			getFirstDefined( item.canDiscard, item.can_discard )
 		),
 		reviewerId: normalizeNullableInteger(
 			getFirstDefined( item.reviewerId, item.reviewer_id )

@@ -17,6 +17,8 @@ import DistributedEditingRiskyBlockReviewPrePublishPanel, {
 	DistributedEditingRiskyBlockReviewListViewMarker,
 	DistributedEditingRiskyBlockReviewPanel,
 	DistributedEditingRiskyBlockReviewStatusChrome,
+	getDistributedEditingPendingGhostEntriesForBlockPath,
+	getDistributedEditingPendingGhostOverlayItemsForAnchors,
 	getDistributedEditingRiskyBlockReviewWrapperProps,
 	shouldRenderDistributedEditingRiskyBlockReview,
 } from '../';
@@ -58,6 +60,10 @@ const RISKY_REVIEW_ITEM = {
 		'sha256:3333333333333333333333333333333333333333333333333333333333333333',
 	reviewStatus:
 		DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW,
+	canApprove: true,
+	canModifyAdopt: true,
+	canReject: true,
+	canDiscard: false,
 	annotation: {
 		visualTreatment: 'blue_warning_marker_with_focus_wash',
 	},
@@ -141,6 +147,19 @@ function setupDispatch() {
 			.mockResolvedValue( {
 				status: 'review_item_block_focused',
 			} ),
+		__experimentalLoadDistributedEditingRiskyBlockReviewItemDetail: jest
+			.fn()
+			.mockResolvedValue( {
+				status: 'review_item_detail_loaded',
+				item: {
+					...RISKY_REVIEW_ITEM,
+					proposedSourceDisplay:
+						'&lt;script&gt;secret&lt;/script&gt;Script',
+					ksesFilteredSourceDisplay: 'Script',
+					rawContentIncluded: false,
+					exposesRawContent: false,
+				},
+			} ),
 		__experimentalOpenDistributedEditingRiskyBlockReview: jest
 			.fn()
 			.mockResolvedValue( {
@@ -199,12 +218,12 @@ describe( 'getDistributedEditingRiskyBlockReviewWrapperProps', () => {
 		expect( wrapperProps ).toMatchObject( {
 			className:
 				'existing-wrapper has-distributed-editing-risky-block-review',
-			'aria-label': 'HTML review required before Save for Custom HTML',
+			'aria-label': 'HTML review required for Custom HTML',
 			'data-distributed-editing-risky-block-review': 'pending_review',
 			'data-distributed-editing-risky-block-review-item-id':
 				'risk-html-added',
 			'data-distributed-editing-risky-block-review-label':
-				'HTML review required before Save for Custom HTML',
+				'HTML review required for Custom HTML',
 			'data-distributed-editing-risky-block-review-treatment':
 				'blue_warning_marker_with_focus_wash',
 		} );
@@ -212,6 +231,307 @@ describe( 'getDistributedEditingRiskyBlockReviewWrapperProps', () => {
 		expect( wrapperProps.style.boxShadow ).toContain(
 			'rgba(34, 113, 177, 0.08)'
 		);
+	} );
+} );
+
+describe( 'getDistributedEditingPendingGhostEntriesForBlockPath', () => {
+	it( 'positions remote pending previews around the matching block path without filtering by role', () => {
+		const rosterEntries = [
+			{
+				key: 'author-session',
+				displayName: 'Author',
+				relationship: 'other_user',
+				permissions: {
+					canSaveDangerousHtml: false,
+				},
+				pendingPreview: {
+					available: true,
+					items: [
+						{
+							previewId: 'added-html',
+							blockPath: [ 1 ],
+							blockName: 'core/html',
+							changeKind: 'added_block',
+							safePreviewText: 'Script',
+						},
+					],
+				},
+			},
+			{
+				key: 'same-user-tab',
+				displayName: 'Same author in another tab',
+				relationship: 'same_user_other_tab',
+				pendingPreview: {
+					available: true,
+					items: [
+						{
+							previewId: 'modified-paragraph',
+							blockPath: [ 0 ],
+							blockName: 'core/paragraph',
+							changeKind: 'modified_block',
+							safePreviewText: 'Draft wording',
+						},
+					],
+				},
+			},
+			{
+				key: 'current-tab',
+				displayName: 'Current tab',
+				relationship: 'current_user_current_tab',
+				pendingPreview: {
+					available: true,
+					items: [
+						{
+							previewId: 'local-only',
+							blockPath: [ 0 ],
+							changeKind: 'modified_block',
+							safePreviewText: 'Local only',
+						},
+					],
+				},
+			},
+		];
+		const pendingGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				rosterEntries,
+				[ 0 ],
+				{ siblingCount: 2 }
+			);
+		const followingSiblingGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				rosterEntries,
+				[ 1 ],
+				{ siblingCount: 2 }
+			);
+
+		expect( pendingGhosts.before ).toHaveLength( 0 );
+		expect( pendingGhosts.after ).toEqual( [
+			expect.objectContaining( {
+				displayName: 'Same author in another tab',
+				key: 'same-user-tab-modified-paragraph-after',
+				placement: 'after',
+				safePreviewText: 'Draft wording',
+			} ),
+		] );
+		expect( followingSiblingGhosts.before ).toEqual( [
+			expect.objectContaining( {
+				displayName: 'Author',
+				key: 'author-session-added-html-before',
+				placement: 'before',
+				safePreviewText: 'Script',
+			} ),
+		] );
+		expect( followingSiblingGhosts.after ).toHaveLength( 0 );
+	} );
+
+	it( 'renders an inserted preview before the following sibling and ignores other parents', () => {
+		const pendingGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				[
+					{
+						key: 'author-session',
+						displayName: 'Author',
+						relationship: 'other_user',
+						pendingPreview: {
+							available: true,
+							items: [
+								{
+									previewId: 'nested-html',
+									blockPath: [ 0, 1 ],
+									blockName: 'core/html',
+									changeKind: 'added_block',
+									safePreviewText: 'Nested proposal',
+								},
+								{
+									previewId: 'top-level-html',
+									blockPath: [ 1 ],
+									blockName: 'core/html',
+									changeKind: 'added_block',
+									safePreviewText: 'Top proposal',
+								},
+							],
+						},
+					},
+				],
+				[ 0, 1 ]
+			);
+
+		expect( pendingGhosts.before ).toEqual( [
+			expect.objectContaining( {
+				key: 'author-session-nested-html-before',
+				placement: 'before',
+				safePreviewText: 'Nested proposal',
+			} ),
+		] );
+		expect( pendingGhosts.after ).toHaveLength( 0 );
+	} );
+
+	it( 'does not render ambiguous pending preview anchors in the canvas', () => {
+		const pendingGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				[
+					{
+						key: 'author-session',
+						displayName: 'Author',
+						relationship: 'other_user',
+						pendingPreview: {
+							available: true,
+							items: [
+								{
+									previewId: 'ambiguous-change',
+									blockPath: [ 1 ],
+									blockName: 'core/paragraph',
+									changeKind: 'unknown_change',
+									safePreviewText: 'Ambiguous edit',
+									anchorStatus: 'ambiguous',
+								},
+							],
+						},
+					},
+				],
+				[ 1 ]
+			);
+
+		expect( pendingGhosts.before ).toHaveLength( 0 );
+		expect( pendingGhosts.after ).toHaveLength( 0 );
+	} );
+
+	it( 'uses presence heartbeat time when suppressing load-time stale ghosts', () => {
+		const rosterEntries = [
+			{
+				key: 'stale-author-session',
+				displayName: 'Stale author',
+				relationship: 'other_user',
+				presenceUpdatedAtGmt: '2026-05-30 08:59:00',
+				pendingPreview: {
+					available: true,
+					items: [
+						{
+							previewId: 'stale-html',
+							blockPath: [ 1 ],
+							blockName: 'core/html',
+							changeKind: 'added_block',
+							safePreviewText: 'Stale ghost',
+							updatedAtGmt: '2026-05-30 09:05:00',
+							presenceUpdatedAtGmt: '2026-05-30 08:59:00',
+						},
+					],
+				},
+			},
+		];
+
+		const staleGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				rosterEntries,
+				[ 1 ],
+				{
+					minUpdatedAtMs: Date.parse( '2026-05-30T09:00:00Z' ),
+				}
+			);
+		const freshGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
+				[
+					{
+						...rosterEntries[ 0 ],
+						presenceUpdatedAtGmt: '2026-05-30 09:01:00',
+						pendingPreview: {
+							...rosterEntries[ 0 ].pendingPreview,
+							items: [
+								{
+									...rosterEntries[ 0 ].pendingPreview
+										.items[ 0 ],
+									presenceUpdatedAtGmt: '2026-05-30 09:01:00',
+								},
+							],
+						},
+					},
+				],
+				[ 1 ],
+				{
+					minUpdatedAtMs: Date.parse( '2026-05-30T09:00:00Z' ),
+				}
+			);
+
+		expect( staleGhosts.before ).toHaveLength( 0 );
+		expect( staleGhosts.after ).toHaveLength( 0 );
+		expect( freshGhosts.before ).toEqual( [
+			expect.objectContaining( {
+				displayName: 'Stale author',
+				safePreviewText: 'Stale ghost',
+			} ),
+		] );
+	} );
+
+	it( 'creates fixed overlay items for matching remote pending previews', () => {
+		const overlayItems =
+			getDistributedEditingPendingGhostOverlayItemsForAnchors(
+				[
+					{
+						key: 'author-session',
+						displayName: 'Author',
+						relationship: 'other_user',
+						pendingPreview: {
+							available: true,
+							items: [
+								{
+									previewId: 'added-html',
+									blockPath: [ 1 ],
+									blockName: 'core/html',
+									changeKind: 'added_block',
+									safePreviewText: 'Script',
+									anchorStatus: 'exact',
+								},
+								{
+									previewId: 'modified-list',
+									blockPath: [ 1 ],
+									blockName: 'core/list',
+									changeKind: 'modified_block',
+									safePreviewText: 'Bread Cheese Tomato',
+									anchorStatus: 'exact',
+								},
+							],
+						},
+					},
+				],
+				[
+					{
+						blockPath: [ 1 ],
+						key: 'anchor-list',
+						rect: {
+							top: 100,
+							left: 200,
+							width: 360,
+							height: 90,
+						},
+						siblingCount: 2,
+					},
+				]
+			);
+
+		expect( overlayItems ).toEqual( [
+			expect.objectContaining( {
+				displayName: 'Author',
+				overlayPlacement: 'before',
+				placement: 'before',
+				safePreviewText: 'Script',
+				style: expect.objectContaining( {
+					left: 212,
+					top: 66,
+					width: 336,
+				} ),
+			} ),
+			expect.objectContaining( {
+				displayName: 'Author',
+				overlayPlacement: 'after',
+				placement: 'after',
+				safePreviewText: 'Bread Cheese Tomato',
+				style: expect.objectContaining( {
+					left: 212,
+					top: 106,
+					width: 336,
+				} ),
+			} ),
+		] );
 	} );
 } );
 
@@ -246,7 +566,7 @@ describe( 'DistributedEditingRiskyBlockReviewListViewMarker', () => {
 		);
 
 		const marker = screen.getByRole( 'img', {
-			name: 'HTML review required before Save for Custom HTML',
+			name: 'HTML review required for Custom HTML',
 		} );
 
 		expect( marker ).toBeVisible();
@@ -273,7 +593,7 @@ describe( 'DistributedEditingRiskyBlockReviewListViewMarker', () => {
 
 		expect(
 			screen.queryByRole( 'img', {
-				name: 'HTML review required before Save for Custom HTML',
+				name: 'HTML review required for Custom HTML',
 			} )
 		).not.toBeInTheDocument();
 	} );
@@ -294,13 +614,11 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 
 		expect( screen.getByText( 'HTML review' ) ).toBeVisible();
 		expect(
-			screen.getByText(
-				'1 highlighted block needs HTML review before Save can update the post.'
-			)
+			screen.getByText( '1 highlighted block needs HTML review.' )
 		).toBeVisible();
 		expect(
 			screen.getByText(
-				'This highlighted block needs HTML review before Save can update the post.'
+				'This highlighted block needs HTML review before it can be included.'
 			)
 		).toBeVisible();
 		expect(
@@ -364,6 +682,35 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
+				name: 'Modify HTML change for Custom HTML',
+			} )
+		);
+		expect(
+			actions.__experimentalLoadDistributedEditingRiskyBlockReviewItemDetail
+		).toHaveBeenCalledWith( 'risk-html-added' );
+		const reviewedSource = screen.getByRole( 'textbox', {
+			name: 'Edited HTML for Custom HTML',
+		} );
+		expect( reviewedSource ).toHaveValue( '<script>secret</script>Script' );
+		await user.clear( reviewedSource );
+		await user.type(
+			reviewedSource,
+			'<!-- wp:html --><strong>Reviewed</strong><!-- /wp:html -->'
+		);
+		await user.click(
+			screen.getByRole( 'button', { name: 'Adopt edited HTML' } )
+		);
+		expect(
+			actions.__experimentalResolveDistributedEditingRiskyBlockReviewItem
+		).toHaveBeenCalledWith( {
+			reviewItemId: 'risk-html-added',
+			decision: 'modify-adopt',
+			reviewedBlockSource:
+				'<!-- wp:html --><strong>Reviewed</strong><!-- /wp:html -->',
+		} );
+
+		await user.click(
+			screen.getByRole( 'button', {
 				name: 'Reject HTML change for Custom HTML',
 			} )
 		);
@@ -378,6 +725,175 @@ describe( 'DistributedEditingRiskyBlockReviewPrePublishPanel', () => {
 } );
 
 describe( 'DistributedEditingRiskyBlockReviewPanel', () => {
+	it( 'uses discard wording for a proposer who cannot approve unfiltered HTML', async () => {
+		const user = userEvent.setup();
+		const onResolve = jest.fn();
+
+		render(
+			<DistributedEditingRiskyBlockReviewPanel
+				onResolve={ onResolve }
+				reviewState={ {
+					...REVIEW_STATE,
+					reviewItems: [
+						{
+							...RISKY_REVIEW_ITEM,
+							canApprove: false,
+							canModifyAdopt: false,
+							canReject: false,
+							canDiscard: true,
+						},
+					],
+				} }
+				savePolicy={ SAVE_POLICY }
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Approve HTML change for Custom HTML',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Modify HTML change for Custom HTML',
+			} )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Discard HTML change for Custom HTML',
+			} )
+		);
+		expect( onResolve ).toHaveBeenCalledWith(
+			expect.objectContaining( { id: 'risk-html-added' } ),
+			'discarded'
+		);
+	} );
+
+	it( 'requires server-backed admin review detail before approve or reject actions appear', async () => {
+		const user = userEvent.setup();
+		const onLoadDetail = jest.fn().mockResolvedValue( {
+			item: {
+				...RISKY_REVIEW_ITEM,
+				id: 'de-rtc-review-detail-gate',
+				proposedSourceDisplay:
+					'&lt;script&gt;alert(1);&lt;/script&gt;Script',
+				ksesFilteredSourceDisplay: 'Script',
+			},
+		} );
+		const onResolve = jest.fn();
+
+		render(
+			<DistributedEditingRiskyBlockReviewPanel
+				onLoadDetail={ onLoadDetail }
+				onResolve={ onResolve }
+				reviewState={ {
+					...REVIEW_STATE,
+					reviewItems: [
+						{
+							...RISKY_REVIEW_ITEM,
+							id: 'de-rtc-review-detail-gate',
+							proposedSourceDisplay: undefined,
+							ksesFilteredSourceDisplay: undefined,
+						},
+					],
+				} }
+				savePolicy={ SAVE_POLICY }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Review HTML change for Custom HTML',
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Approve HTML change for Custom HTML',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Reject HTML change for Custom HTML',
+			} )
+		).not.toBeInTheDocument();
+
+		await user.click(
+			screen.getByRole( 'button', {
+				name: 'Review HTML change for Custom HTML',
+			} )
+		);
+
+		expect( onLoadDetail ).toHaveBeenCalledWith(
+			expect.objectContaining( { id: 'de-rtc-review-detail-gate' } )
+		);
+		expect(
+			await screen.findByText( '<script>alert(1);</script>Script' )
+		).toBeVisible();
+		expect( screen.getByText( 'Script' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Approve HTML change for Custom HTML',
+			} )
+		).toBeVisible();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Reject HTML change for Custom HTML',
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'collapses the local review item when a matching server item exists', () => {
+		render(
+			<DistributedEditingRiskyBlockReviewPanel
+				reviewState={ {
+					...REVIEW_STATE,
+					reviewItems: [
+						{
+							...RISKY_REVIEW_ITEM,
+							id: 'kses-review-local',
+							blockPath: [ 1 ],
+						},
+						{
+							...RISKY_REVIEW_ITEM,
+							id: 'de-rtc-review-server',
+							blockClientId: '',
+							blockPath: [ 1 ],
+							canApprove: false,
+							canModifyAdopt: false,
+							canReject: false,
+							canDiscard: true,
+						},
+					],
+					reviewItemCount: 2,
+					pendingReviewItemCount: 1,
+				} }
+				savePolicy={ SAVE_POLICY }
+			/>
+		);
+
+		expect(
+			screen.getAllByText(
+				'This highlighted block needs HTML review before it can be included.'
+			)
+		).toHaveLength( 1 );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Discard HTML change for Custom HTML',
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'button', {
+				name: 'Reject HTML change for Custom HTML',
+			} )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Jump to Custom HTML',
+			} )
+		).toBeEnabled();
+	} );
+
 	it( 'renders resolved review state without enabling completed item controls', () => {
 		const resolvedReviewState = {
 			...REVIEW_STATE,

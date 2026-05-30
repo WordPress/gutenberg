@@ -68,8 +68,7 @@ export default function DistributedEditingServerSyncButton() {
 		const settings = editor.getEditorSettings?.()?.distributedEditing || {};
 		const serverSyncPollingRuntime =
 			settings.serverSyncPollingRuntime || {};
-		const sessionState =
-			editor.getDistributedEditingSessionState?.() || {};
+		const sessionState = editor.getDistributedEditingSessionState?.() || {};
 
 		return {
 			isDistributedEditingEnabled: Boolean(
@@ -159,7 +158,8 @@ export default function DistributedEditingServerSyncButton() {
 		return null;
 	}
 
-	const isDisabled = isSaving || isDistributedEditingSaveInFlight || isSyncing;
+	const isDisabled =
+		isSaving || isDistributedEditingSaveInFlight || isSyncing;
 
 	return (
 		<Button

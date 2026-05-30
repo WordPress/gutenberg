@@ -7,6 +7,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
+	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
@@ -16,6 +17,7 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { code } from '@wordpress/icons';
 
 /**
@@ -26,6 +28,12 @@ import HTMLEditModal from './modal';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const canUserUseUnfilteredHTML = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalCanUserUseUnfilteredHTML,
+		[]
+	);
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
 	} );
@@ -83,7 +91,11 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</Button>
 				</VStack>
 			</InspectorControls>
-			<Preview content={ attributes.content } isSelected={ isSelected } />
+			<Preview
+				canPreviewExecutableContent={ canUserUseUnfilteredHTML }
+				content={ attributes.content }
+				isSelected={ isSelected }
+			/>
 			<HTMLEditModal
 				isOpen={ isModalOpen }
 				onRequestClose={ () => setIsModalOpen( false ) }

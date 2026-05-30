@@ -532,11 +532,13 @@ export function shouldWarnBeforeLeavingDistributedEditingSession( state ) {
  *
  * @return {Array} Notice descriptors.
  */
-export function getDistributedEditingNoticeDescriptors( state ) {
-	return getDistributedEditingNoticeDescriptorsForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingNoticeDescriptors = createSelector(
+	( state ) =>
+		getDistributedEditingNoticeDescriptorsForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns support-safe Distributed Editing action transcript state.
@@ -614,11 +616,13 @@ export function getDistributedEditingPresenceStartupPolicyState( state ) {
  *
  * @return {Object} Unload-warning state.
  */
-export function getDistributedEditingUnloadWarningState( state ) {
-	return getDistributedEditingUnloadWarningStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingUnloadWarningState = createSelector(
+	( state ) =>
+		getDistributedEditingUnloadWarningStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns true when retry-save has server evidence that it persisted the
@@ -684,11 +688,13 @@ export function getDistributedEditingLocalUpdatesImportReviewRequestState(
  *
  * @return {Object} Fresh-review decision state.
  */
-export function getDistributedEditingFreshReviewDecisionState( state ) {
-	return getDistributedEditingFreshReviewDecisionStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingFreshReviewDecisionState = createSelector(
+	( state ) =>
+		getDistributedEditingFreshReviewDecisionStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns the current DE-RTC fresh-review retry-save handoff state.
@@ -697,11 +703,14 @@ export function getDistributedEditingFreshReviewDecisionState( state ) {
  *
  * @return {Object} Fresh-review retry-save handoff state.
  */
-export function getDistributedEditingFreshReviewRetrySaveHandoffState( state ) {
-	return getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState(
-		getDistributedEditingSessionState( state )
+export const getDistributedEditingFreshReviewRetrySaveHandoffState =
+	createSelector(
+		( state ) =>
+			getDistributedEditingFreshReviewRetrySaveHandoffStateForSessionState(
+				getDistributedEditingSessionState( state )
+			),
+		( state ) => [ getDistributedEditingSessionState( state ) ]
 	);
-}
 
 /**
  * Returns the current DE-RTC fresh-review placement for future Save and
@@ -711,11 +720,13 @@ export function getDistributedEditingFreshReviewRetrySaveHandoffState( state ) {
  *
  * @return {Object} Fresh-review pre-save state.
  */
-export function getDistributedEditingFreshReviewPreSaveState( state ) {
-	return getDistributedEditingFreshReviewPreSaveStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingFreshReviewPreSaveState = createSelector(
+	( state ) =>
+		getDistributedEditingFreshReviewPreSaveStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns the current DE-RTC fresh-review pre-publish surface state.
@@ -724,11 +735,13 @@ export function getDistributedEditingFreshReviewPreSaveState( state ) {
  *
  * @return {Object} Fresh-review pre-publish state.
  */
-export function getDistributedEditingFreshReviewPrePublishState( state ) {
-	return getDistributedEditingFreshReviewPrePublishStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingFreshReviewPrePublishState = createSelector(
+	( state ) =>
+		getDistributedEditingFreshReviewPrePublishStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns the current DE-RTC fresh-review lifecycle evidence for future
@@ -738,11 +751,13 @@ export function getDistributedEditingFreshReviewPrePublishState( state ) {
  *
  * @return {Object} Fresh-review lifecycle state.
  */
-export function getDistributedEditingFreshReviewLifecycleState( state ) {
-	return getDistributedEditingFreshReviewLifecycleStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingFreshReviewLifecycleState = createSelector(
+	( state ) =>
+		getDistributedEditingFreshReviewLifecycleStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns the current DE-RTC risky-block review state for editor annotation and
@@ -752,11 +767,13 @@ export function getDistributedEditingFreshReviewLifecycleState( state ) {
  *
  * @return {Object} Risky block review state.
  */
-export function getDistributedEditingRiskyBlockReviewState( state ) {
-	return getDistributedEditingRiskyBlockReviewStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingRiskyBlockReviewState = createSelector(
+	( state ) =>
+		getDistributedEditingRiskyBlockReviewStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns the current DE-RTC Save button semantics descriptor.
@@ -765,11 +782,13 @@ export function getDistributedEditingRiskyBlockReviewState( state ) {
  *
  * @return {Object} Save button state.
  */
-export function getDistributedEditingSaveButtonState( state ) {
-	return getDistributedEditingSaveButtonStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingSaveButtonState = createSelector(
+	( state ) =>
+		getDistributedEditingSaveButtonStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns the current DE-RTC Save journey descriptor for real editor Save
@@ -780,29 +799,34 @@ export function getDistributedEditingSaveButtonState( state ) {
  *
  * @return {Object} Save journey state.
  */
-export function getDistributedEditingSaveJourneyState(
-	state,
-	isDirty = false
-) {
-	const distributedEditingSettings =
-		getEditorSettings( state ).distributedEditing || EMPTY_OBJECT;
-	const saveJourney = getDistributedEditingSaveJourneyStateForSessionState(
-		getDistributedEditingSessionState( state ),
-		{ isDirty }
-	);
+export const getDistributedEditingSaveJourneyState = createSelector(
+	( state, isDirty = false ) => {
+		const distributedEditingSettings =
+			getEditorSettings( state ).distributedEditing || EMPTY_OBJECT;
+		const saveJourney =
+			getDistributedEditingSaveJourneyStateForSessionState(
+				getDistributedEditingSessionState( state ),
+				{ isDirty }
+			);
 
-	return {
-		...saveJourney,
-		enabled: Boolean( distributedEditingSettings.enabled ),
-		shouldExposeInSaveControls: Boolean(
-			distributedEditingSettings.enabled &&
-				! (
-					saveJourney.step === 'ready_to_edit' ||
-					saveJourney.action === 'dirty_save_preflight'
-				)
-		),
-	};
-}
+		return {
+			...saveJourney,
+			enabled: Boolean( distributedEditingSettings.enabled ),
+			shouldExposeInSaveControls: Boolean(
+				distributedEditingSettings.enabled &&
+					! (
+						saveJourney.step === 'ready_to_edit' ||
+						saveJourney.action === 'dirty_save_preflight'
+					)
+			),
+		};
+	},
+	( state, isDirty = false ) => [
+		getDistributedEditingSessionState( state ),
+		getEditorSettings( state ).distributedEditing?.enabled,
+		isDirty,
+	]
+);
 
 /**
  * Returns whether the current editable DE-RTC post body differs from the last
@@ -877,11 +901,13 @@ export function getDistributedEditingRepeatedVisibleSaveProofState(
  *
  * @return {Object} Save policy state.
  */
-export function getDistributedEditingSavePolicyState( state ) {
-	return getDistributedEditingSavePolicyStateForSessionState(
-		getDistributedEditingSessionState( state )
-	);
-}
+export const getDistributedEditingSavePolicyState = createSelector(
+	( state ) =>
+		getDistributedEditingSavePolicyStateForSessionState(
+			getDistributedEditingSessionState( state )
+		),
+	( state ) => [ getDistributedEditingSessionState( state ) ]
+);
 
 /**
  * Returns the template ID currently being rendered/edited

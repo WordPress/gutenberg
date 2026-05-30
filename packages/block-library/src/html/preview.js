@@ -10,6 +10,37 @@ import { SandBox } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
+function escapeHTMLPreviewSource( content = '' ) {
+	return content
+		.replaceAll( '&', '&amp;' )
+		.replaceAll( '<', '&lt;' )
+		.replaceAll( '>', '&gt;' )
+		.replaceAll( '"', '&quot;' )
+		.replaceAll( "'", '&#039;' );
+}
+
+export function hasPotentiallyExecutableHTML( content = '' ) {
+	return /<script\b|javascript\s*:|\son[a-z]+\s*=/i.test( String( content ) );
+}
+
+export function getHTMLPreviewContent(
+	content = '',
+	{ canPreviewExecutableContent = true } = {}
+) {
+	const source = String( content );
+
+	if (
+		canPreviewExecutableContent ||
+		! hasPotentiallyExecutableHTML( source )
+	) {
+		return source;
+	}
+
+	return `<pre class="block-library-html__inert-preview">${ escapeHTMLPreviewSource(
+		source
+	) }</pre>`;
+}
+
 // Default styles used to unset some of the styles
 // that might be inherited from the editor style.
 const DEFAULT_STYLES = `
@@ -21,10 +52,21 @@ const DEFAULT_STYLES = `
 	}
 `;
 
-export default function HTMLEditPreview( { content, isSelected } ) {
+export default function HTMLEditPreview( {
+	canPreviewExecutableContent = true,
+	content,
+	isSelected,
+} ) {
 	const settingStyles = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().styles,
 		[]
+	);
+	const previewContent = useMemo(
+		() =>
+			getHTMLPreviewContent( content, {
+				canPreviewExecutableContent,
+			} ),
+		[ canPreviewExecutableContent, content ]
 	);
 
 	const styles = useMemo(
@@ -40,7 +82,7 @@ export default function HTMLEditPreview( { content, isSelected } ) {
 	return (
 		<>
 			<SandBox
-				html={ content }
+				html={ previewContent }
 				styles={ styles }
 				title={ __( 'Custom HTML Preview' ) }
 				tabIndex={ -1 }

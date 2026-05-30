@@ -1,14 +1,14 @@
 /**
- * WordPress dependencies
- */
-import { expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
  * External dependencies
  */
 import fs from 'fs';
 import path from 'path';
 import type { Locator, Page } from '@playwright/test';
+
+/**
+ * WordPress dependencies
+ */
+import { expect } from '@wordpress/e2e-test-utils-playwright';
 
 /**
  * Internal dependencies
@@ -198,10 +198,9 @@ export class PerfUtils {
 
 	async expectExpandedState( locator: Locator, state: 'true' | 'false' ) {
 		return await Promise.any( [
-			// eslint-disable-next-line playwright/missing-playwright-await
 			expect( locator ).toHaveAttribute( 'aria-expanded', state ),
 			// Legacy selector.
-			// eslint-disable-next-line playwright/missing-playwright-await
+
 			expect( locator ).toHaveAttribute( 'aria-pressed', state ),
 		] );
 	}

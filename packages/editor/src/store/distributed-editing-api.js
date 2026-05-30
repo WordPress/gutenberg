@@ -426,6 +426,7 @@ export function __experimentalRequestDistributedEditingPresenceSnapshot( {
  * @param {boolean} [args.hasPendingChanges]    Whether this tab has unsaved changes.
  * @param {string}  [args.confirmedAtGmt]       When this tab observed the accepted copy.
  * @param {Object}  [args.selectionState]       Content-free selection presence.
+ * @param {Object}  [args.pendingPreviewState]  Sanitized-by-server pending-edit preview state.
  *
  * @return {Promise<Object>} REST response.
  */
@@ -438,6 +439,7 @@ export function __experimentalRequestDistributedEditingPresenceHeartbeat( {
 	hasPendingChanges,
 	confirmedAtGmt,
 	selectionState,
+	pendingPreviewState,
 } = {} ) {
 	if ( typeof sessionKey !== 'string' || sessionKey.trim() === '' ) {
 		throw new TypeError(
@@ -476,6 +478,14 @@ export function __experimentalRequestDistributedEditingPresenceHeartbeat( {
 		selectionState.available
 	) {
 		data.selection_state = selectionState;
+	}
+
+	if (
+		pendingPreviewState &&
+		typeof pendingPreviewState === 'object' &&
+		pendingPreviewState.available
+	) {
+		data.pending_preview_state = pendingPreviewState;
 	}
 
 	return apiFetch( {

@@ -1,6 +1,10 @@
 /**
  * Internal dependencies
  */
+import {
+	getHTMLPreviewContent,
+	hasPotentiallyExecutableHTML,
+} from '../preview';
 import { parseContent, serializeContent } from '../utils';
 
 describe( 'core/html', () => {
@@ -229,6 +233,54 @@ console.log("hello");
 			expect( parsed.html ).toBe( sections.html );
 			expect( parsed.css ).toBe( sections.css );
 			expect( parsed.js ).toBe( sections.js );
+		} );
+	} );
+
+	describe( 'getHTMLPreviewContent()', () => {
+		it( 'renders regular HTML unchanged for restricted users', () => {
+			expect(
+				getHTMLPreviewContent( '<p>Hello World</p>', {
+					canPreviewExecutableContent: false,
+				} )
+			).toBe( '<p>Hello World</p>' );
+		} );
+
+		it( 'renders potentially executable HTML as inert source for restricted users', () => {
+			const result = getHTMLPreviewContent(
+				'<script>alert(1);</script><p>Script</p>',
+				{ canPreviewExecutableContent: false }
+			);
+
+			expect( result ).toContain( 'block-library-html__inert-preview' );
+			expect( result ).toContain(
+				'&lt;script&gt;alert(1);&lt;/script&gt;'
+			);
+			expect( result ).not.toContain( '<script>' );
+		} );
+
+		it( 'allows potentially executable HTML previews for unfiltered HTML users', () => {
+			const source = '<script>alert(1);</script><p>Script</p>';
+
+			expect(
+				getHTMLPreviewContent( source, {
+					canPreviewExecutableContent: true,
+				} )
+			).toBe( source );
+		} );
+
+		it( 'detects common executable HTML shapes', () => {
+			expect( hasPotentiallyExecutableHTML( '<script></script>' ) ).toBe(
+				true
+			);
+			expect(
+				hasPotentiallyExecutableHTML( '<a href="javascript:alert(1)">' )
+			).toBe( true );
+			expect( hasPotentiallyExecutableHTML( '<img onerror="x">' ) ).toBe(
+				true
+			);
+			expect( hasPotentiallyExecutableHTML( '<p>Safe</p>' ) ).toBe(
+				false
+			);
 		} );
 	} );
 } );

@@ -88,6 +88,7 @@ import {
 	DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES,
 	DISTRIBUTED_EDITING_LOCAL_UPDATES_REVIEW_REQUEST_STATUSES,
+	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES,
 	DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES,
@@ -916,9 +917,467 @@ export const __experimentalFocusDistributedEditingRiskyBlockReviewItem =
 		};
 	};
 
+function getDistributedEditingReviewItemRestPath( {
+	action,
+	registry,
+	resolution = {},
+	reviewItemId,
+	select,
+} ) {
+	const currentPost = select.getCurrentPost?.() || {};
+	const postType = select.getCurrentPostType?.() || currentPost.type;
+	const postId = select.getCurrentPostId?.() || currentPost.id;
+	const postTypeRecord = postType
+		? registry.select( coreStore ).getPostType( postType )
+		: null;
+	const restBase =
+		resolution.restBase ||
+		postTypeRecord?.rest_base ||
+		DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+
+	if ( ! postId || ! reviewItemId ) {
+		return null;
+	}
+
+	return `/wp/v2/${ restBase }/${ postId }/distributed-editing/review-items/${ reviewItemId }${
+		action ? `/${ action }` : ''
+	}`;
+}
+
+function getDistributedEditingReviewItemsRestPath( {
+	registry,
+	resolution = {},
+	select,
+} ) {
+	const currentPost = select.getCurrentPost?.() || {};
+	const postType = select.getCurrentPostType?.() || currentPost.type;
+	const postId = select.getCurrentPostId?.() || currentPost.id;
+	const postTypeRecord = postType
+		? registry.select( coreStore ).getPostType( postType )
+		: null;
+	const restBase =
+		resolution.restBase ||
+		postTypeRecord?.rest_base ||
+		DISTRIBUTED_EDITING_RECOVERY_REST_BASE;
+
+	if ( ! postId || ! restBase ) {
+		return null;
+	}
+
+	return `/wp/v2/${ restBase }/${ postId }/distributed-editing/review-items`;
+}
+
+function getDistributedEditingReviewItemsResponseData( response = {} ) {
+	return response?.data && typeof response.data === 'object'
+		? response.data
+		: response;
+}
+
+function getDistributedEditingReviewItemsFromResponse( response = {} ) {
+	const responseData =
+		getDistributedEditingReviewItemsResponseData( response );
+
+	return Array.isArray( responseData.items ) ? responseData.items : [];
+}
+
+function getDistributedEditingPendingReviewItemCountFromResponse(
+	response = {},
+	items = []
+) {
+	const responseData =
+		getDistributedEditingReviewItemsResponseData( response );
+	const rawCount =
+		responseData.pendingReviewItemCount ??
+		responseData.pending_review_item_count ??
+		responseData.count;
+	const count = Number( rawCount );
+
+	if ( Number.isFinite( count ) ) {
+		return Math.max( 0, Math.floor( count ) );
+	}
+
+	return items.length;
+}
+
+function getDistributedEditingSessionStateForRemoteReviewItemsListResponse(
+	response = {},
+	currentSessionState = {}
+) {
+	const items = getDistributedEditingReviewItemsFromResponse( response );
+	const pendingReviewItemCount =
+		getDistributedEditingPendingReviewItemCountFromResponse(
+			response,
+			items
+		);
+	const hasPendingReviewItems =
+		pendingReviewItemCount > 0 || items.length > 0;
+
+	return normalizeDistributedEditingSessionState( {
+		...currentSessionState,
+		riskyBlockReviewStatus: hasPendingReviewItems
+			? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED
+			: DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED,
+		riskyBlockReviewItems: items,
+		riskyBlockReviewItemCount: items.length,
+		riskyBlockReviewPendingCount: pendingReviewItemCount,
+		riskyBlockReviewApprovedCount: 0,
+		riskyBlockReviewRejectedCount: 0,
+		riskyBlockReviewPrePublishPanelRequired: hasPendingReviewItems,
+		riskyBlockReviewSaveButtonLabel: 'Save',
+		riskyBlockReviewSaveClickAction:
+			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
+		riskyBlockReviewCanExportLocalUpdates: false,
+		riskyBlockReviewRequiresServerStateRefetch: false,
+		riskyBlockReviewRawContentIncluded: false,
+		riskyBlockReviewExposesRawContent: false,
+		riskyBlockReviewDispatchesNotice: false,
+		riskyBlockReviewMutatesEditorContent: false,
+		riskyBlockReviewCallsNormalSavePost: false,
+		riskyBlockReviewCallsRetrySaveEndpoint: false,
+		riskyBlockReviewChangesPostLock: false,
+		riskyBlockReviewClaimsSaved: false,
+	} );
+}
+
+function getDistributedEditingSessionStateAfterServerClearedReviewItems(
+	sessionState = {},
+	postContent = null
+) {
+	const nextState = {
+		...sessionState,
+		disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+		reasonCode: null,
+		pendingChangeCount: 0,
+		hasPendingChanges: false,
+		isAwaitingServerConfirmation: false,
+		requiresManualConflictResolution: false,
+		requiresServerStateAcceptance: false,
+		requiresServerStateRefetch: false,
+		canExportLocalUpdates: false,
+		mustOfferLocalCopy: false,
+		retrySaveAccepted: false,
+		retrySaveClaimsSaved: false,
+		retrySaveReason: null,
+		retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE,
+		retrySubmitAccepted: false,
+		retrySubmitProofStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.NONE,
+		retrySubmitSavePrepared: false,
+		retrySubmitSaveReady: false,
+		retrySubmitSaveStatus:
+			DISTRIBUTED_EDITING_RETRY_SUBMIT_SAVE_STATUSES.NONE,
+		riskyBlockReviewApprovedCount: 0,
+		riskyBlockReviewCanExportLocalUpdates: false,
+		riskyBlockReviewItemCount: 0,
+		riskyBlockReviewItems: [],
+		riskyBlockReviewPendingCount: 0,
+		riskyBlockReviewPrePublishPanelRequired: false,
+		riskyBlockReviewReasonCode: null,
+		riskyBlockReviewRejectedCount: 0,
+		riskyBlockReviewStatus:
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED,
+	};
+
+	if ( typeof postContent === 'string' ) {
+		nextState.clientBaseContent = postContent;
+		nextState.refetchedServerContent = postContent;
+		nextState.refetchedServerState = true;
+	}
+
+	return normalizeDistributedEditingSessionState( nextState );
+}
+
+async function refreshDistributedEditingRiskyBlockReviewItemsAfterServerUpdate( {
+	dispatch,
+	options = {},
+	registry,
+	select,
+	skipWhenLocalReviewPending = true,
+} ) {
+	const currentSessionState =
+		select.getDistributedEditingSessionState?.() || {};
+	const localReviewPending =
+		currentSessionState.riskyBlockReviewStatus ===
+			DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED &&
+		currentSessionState.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED;
+
+	if ( skipWhenLocalReviewPending && localReviewPending ) {
+		return {
+			status: 'review_items_refresh_skipped_local_review_pending',
+			reviewItemsUpdated: false,
+			callsReviewItemsEndpoint: false,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	}
+
+	const path = getDistributedEditingReviewItemsRestPath( {
+		registry,
+		resolution: options,
+		select,
+	} );
+
+	if ( ! path ) {
+		return {
+			status: 'review_items_refresh_missing_post_context',
+			reviewItemsUpdated: false,
+			callsReviewItemsEndpoint: false,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	}
+
+	const currentReviewItems = Array.isArray(
+		currentSessionState.riskyBlockReviewItems
+	)
+		? currentSessionState.riskyBlockReviewItems
+		: [];
+	const hasServerBackedLocalReviewItem = currentReviewItems.some(
+		( item ) =>
+			typeof item?.id === 'string' &&
+			item.id.startsWith( 'de-rtc-review-' ) &&
+			( ! item.reviewStatus ||
+				item.reviewStatus ===
+					DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES.PENDING_REVIEW )
+	);
+
+	try {
+		const response = await apiFetch( {
+			path,
+			method: 'GET',
+		} );
+		const nextSessionState =
+			getDistributedEditingSessionStateForRemoteReviewItemsListResponse(
+				response,
+				select.getDistributedEditingSessionState?.() || {}
+			);
+		const shouldClearServerBackedReview =
+			options.applySafeServerContentWhenReviewItemsClear !== false &&
+			hasServerBackedLocalReviewItem &&
+			nextSessionState.riskyBlockReviewPendingCount === 0 &&
+			nextSessionState.riskyBlockReviewItemCount === 0;
+		let sessionStateToStore = nextSessionState;
+
+		if ( shouldClearServerBackedReview ) {
+			let confirmedPostContent = null;
+
+			if ( typeof nextSessionState.refetchedServerContent === 'string' ) {
+				confirmedPostContent = nextSessionState.refetchedServerContent;
+			} else if (
+				typeof nextSessionState.clientBaseContent === 'string'
+			) {
+				confirmedPostContent = nextSessionState.clientBaseContent;
+			}
+
+			if ( typeof confirmedPostContent === 'string' ) {
+				applyDistributedEditingConfirmedPostContent( {
+					dispatch,
+					registry,
+					select,
+					postContent: confirmedPostContent,
+				} );
+			}
+
+			sessionStateToStore =
+				getDistributedEditingSessionStateAfterServerClearedReviewItems(
+					nextSessionState,
+					confirmedPostContent
+				);
+		}
+
+		dispatch.setDistributedEditingSessionState( sessionStateToStore );
+
+		return {
+			status: shouldClearServerBackedReview
+				? 'review_items_cleared_by_server'
+				: 'review_items_refreshed',
+			reviewItemsUpdated: true,
+			callsReviewItemsEndpoint: true,
+			pendingReviewItemCount:
+				sessionStateToStore.riskyBlockReviewPendingCount,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			mutatesEditorContent: shouldClearServerBackedReview,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	} catch ( error ) {
+		return {
+			status: 'review_items_refresh_failed',
+			reason:
+				error?.code || error?.message || 'review_items_refresh_failed',
+			reviewItemsUpdated: false,
+			callsReviewItemsEndpoint: true,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	}
+}
+
 /**
- * Records a hash-only reviewer decision for one risky-block item. This updates
- * only local DE-RTC session state for a future guarded save handoff.
+ * Refreshes server-backed review-needed items without changing document content.
+ *
+ * @param {Object} [options] Request options.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalRefreshDistributedEditingRiskyBlockReviewItems =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) =>
+		refreshDistributedEditingRiskyBlockReviewItemsAfterServerUpdate( {
+			dispatch,
+			options,
+			registry,
+			select,
+			skipWhenLocalReviewPending:
+				options.skipWhenLocalReviewPending !== false,
+		} );
+
+/**
+ * Loads safe text-only detail for one server-backed risky-block review item.
+ *
+ * @param {Object|string} request Review item id or request data.
+ *
+ * @return {Function} Action thunk.
+ */
+export const __experimentalLoadDistributedEditingRiskyBlockReviewItemDetail =
+	( request = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		const reviewItemId =
+			typeof request === 'string'
+				? request
+				: request.reviewItemId || request.id;
+		const currentSessionState =
+			select.getDistributedEditingSessionState?.() || {};
+		const currentItems = Array.isArray(
+			currentSessionState.riskyBlockReviewItems
+		)
+			? currentSessionState.riskyBlockReviewItems
+			: [];
+		const currentItem = currentItems.find(
+			( item ) => item.id === reviewItemId
+		);
+
+		if ( ! currentItem ) {
+			return {
+				status: 'review_item_not_found',
+				reviewItemId,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		const isServerReviewItem =
+			typeof reviewItemId === 'string' &&
+			reviewItemId.startsWith( 'de-rtc-review-' );
+
+		if ( ! isServerReviewItem ) {
+			return {
+				status: 'review_item_detail_local_only',
+				reviewItemId,
+				item: currentItem,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		const path = getDistributedEditingReviewItemRestPath( {
+			registry,
+			resolution: request,
+			reviewItemId,
+			select,
+		} );
+
+		if ( ! path ) {
+			return {
+				status: 'review_item_missing_post_context',
+				reviewItemId,
+				savesPost: false,
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: false,
+				mutatesPersistedPostContent: false,
+				changesPostLock: false,
+				claimsSaved: false,
+			};
+		}
+
+		const response = await apiFetch( {
+			path,
+			method: 'GET',
+		} );
+		const responseItem = response?.item || {};
+		const nextSessionState = normalizeDistributedEditingSessionState( {
+			...currentSessionState,
+			riskyBlockReviewItems: currentItems.map( ( item ) =>
+				item.id === reviewItemId
+					? {
+							...item,
+							...responseItem,
+							detailLoaded: true,
+							rawContentIncluded: false,
+							exposesRawContent: false,
+					  }
+					: item
+			),
+		} );
+
+		dispatch.setDistributedEditingSessionState( nextSessionState );
+
+		return {
+			status: 'review_item_detail_loaded',
+			reviewItemId,
+			item: nextSessionState.riskyBlockReviewItems.find(
+				( item ) => item.id === reviewItemId
+			),
+			rawContentIncluded: false,
+			exposesRawContent: false,
+			savesPost: false,
+			callsNormalSavePost: false,
+			callsRetrySaveEndpoint: false,
+			dispatchesNotice: false,
+			mutatesEditorContent: false,
+			mutatesPersistedPostContent: false,
+			changesPostLock: false,
+			claimsSaved: false,
+		};
+	};
+
+/**
+ * Resolves one risky-block review item. Server-backed review items are applied
+ * through the guarded review-items endpoint; local hash-only items still update
+ * editor state for a future guarded save handoff.
  *
  * @param {Object} resolution Review decision data.
  *
@@ -926,7 +1385,7 @@ export const __experimentalFocusDistributedEditingRiskyBlockReviewItem =
  */
 export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 	( resolution = {} ) =>
-	( { select, dispatch, registry } ) => {
+	async ( { select, dispatch, registry } ) => {
 		const reviewItemId = resolution.reviewItemId || resolution.id;
 		const currentSessionState =
 			select.getDistributedEditingSessionState?.() || {};
@@ -952,6 +1411,182 @@ export const __experimentalResolveDistributedEditingRiskyBlockReviewItem =
 				mutatesPersistedPostContent: false,
 				changesPostLock: false,
 				claimsSaved: false,
+			};
+		}
+
+		const isServerReviewItem =
+			typeof reviewItemId === 'string' &&
+			reviewItemId.startsWith( 'de-rtc-review-' );
+
+		if ( isServerReviewItem ) {
+			const decision = resolution.decision || 'approved';
+			let action = 'reject';
+
+			if ( decision === 'approved' ) {
+				action = 'approve';
+			} else if (
+				decision === 'modify-adopt' ||
+				decision === 'modified_adopted'
+			) {
+				action = 'modify-adopt';
+			} else if (
+				decision === 'discarded' ||
+				( decision === 'rejected' &&
+					currentItem.canReject === false &&
+					currentItem.canDiscard === true )
+			) {
+				action = 'discard';
+			}
+			const path = getDistributedEditingReviewItemRestPath( {
+				action,
+				registry,
+				resolution,
+				reviewItemId,
+				select,
+			} );
+
+			if ( ! path ) {
+				return {
+					status: 'review_item_missing_post_context',
+					reviewItemId,
+					decision,
+					serverAction: action,
+					savesPost: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			const response = await apiFetch( {
+				path,
+				method: 'POST',
+				data:
+					action === 'modify-adopt'
+						? {
+								reviewed_block_source:
+									resolution.reviewedBlockSource ||
+									resolution.reviewed_block_source ||
+									'',
+						  }
+						: undefined,
+			} );
+			const responsePostContent =
+				getDistributedEditingPostContentFromResponse( response );
+			const fallbackSafePostContent =
+				action === 'reject' || action === 'discard'
+					? currentSessionState.refetchedServerContent ||
+					  currentSessionState.clientBaseContent
+					: null;
+			let confirmedPostContent = null;
+
+			if ( typeof responsePostContent === 'string' ) {
+				confirmedPostContent = responsePostContent;
+			} else if ( typeof fallbackSafePostContent === 'string' ) {
+				confirmedPostContent = fallbackSafePostContent;
+			}
+			const nextSessionState =
+				getDistributedEditingSessionStateForRiskyBlockReviewItemResolution(
+					currentSessionState,
+					{
+						...resolution,
+						decision:
+							action === 'reject' || action === 'discard'
+								? 'rejected'
+								: 'approved',
+					}
+				);
+			const clearsReviewQueue =
+				Number( nextSessionState.riskyBlockReviewPendingCount || 0 ) ===
+				0;
+
+			if ( typeof confirmedPostContent === 'string' ) {
+				applyDistributedEditingConfirmedPostContent( {
+					dispatch,
+					registry,
+					select,
+					postContent: confirmedPostContent,
+				} );
+			}
+
+			dispatch.setDistributedEditingSessionState(
+				normalizeDistributedEditingSessionState( {
+					...nextSessionState,
+					disposition: clearsReviewQueue
+						? DISTRIBUTED_EDITING_DISPOSITIONS.IDLE
+						: nextSessionState.disposition,
+					hasPendingChanges: clearsReviewQueue
+						? false
+						: nextSessionState.hasPendingChanges,
+					isAwaitingServerConfirmation: false,
+					mustOfferLocalCopy: clearsReviewQueue
+						? false
+						: nextSessionState.mustOfferLocalCopy,
+					pendingChangeCount: clearsReviewQueue
+						? 0
+						: nextSessionState.pendingChangeCount,
+					clientBaseContent: clearsReviewQueue
+						? confirmedPostContent
+						: nextSessionState.clientBaseContent,
+					reasonCode: clearsReviewQueue
+						? null
+						: nextSessionState.reasonCode,
+					refetchedServerContent: clearsReviewQueue
+						? confirmedPostContent
+						: nextSessionState.refetchedServerContent,
+					refetchedServerState: clearsReviewQueue
+						? Boolean( confirmedPostContent )
+						: nextSessionState.refetchedServerState,
+					requiresManualConflictResolution: clearsReviewQueue
+						? false
+						: nextSessionState.requiresManualConflictResolution,
+					riskyBlockReviewItems: clearsReviewQueue
+						? []
+						: nextSessionState.riskyBlockReviewItems,
+					riskyBlockReviewItemCount: clearsReviewQueue
+						? 0
+						: nextSessionState.riskyBlockReviewItemCount,
+					riskyBlockReviewApprovedCount: clearsReviewQueue
+						? 0
+						: nextSessionState.riskyBlockReviewApprovedCount,
+					riskyBlockReviewRejectedCount: clearsReviewQueue
+						? 0
+						: nextSessionState.riskyBlockReviewRejectedCount,
+					riskyBlockReviewPrePublishPanelRequired:
+						! clearsReviewQueue,
+					riskyBlockReviewSaveButtonLabel: clearsReviewQueue
+						? 'Save'
+						: nextSessionState.riskyBlockReviewSaveButtonLabel,
+					riskyBlockReviewStatus: clearsReviewQueue
+						? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.NO_REVIEW_REQUIRED
+						: nextSessionState.riskyBlockReviewStatus,
+					serverVersion:
+						response.serverVersion ||
+						response.server_version ||
+						nextSessionState.serverVersion,
+				} )
+			);
+
+			return {
+				status: 'review_item_server_resolved',
+				reviewItemId,
+				decision,
+				serverAction: action,
+				response,
+				savesPost: Boolean( response.savesPost ),
+				callsNormalSavePost: false,
+				callsRetrySaveEndpoint: false,
+				dispatchesNotice: false,
+				mutatesEditorContent: typeof confirmedPostContent === 'string',
+				mutatesPersistedPostContent: Boolean(
+					response.mutatesPostContent
+				),
+				changesPostLock: false,
+				claimsSaved: Boolean( response.claimsSaved ),
 			};
 		}
 
@@ -1061,6 +1696,8 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 		async ( { select, dispatch } ) => {
 			const savePolicy =
 				select.getDistributedEditingSavePolicyState?.() || {};
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
 			const shouldUseRiskyBlockReview =
 				select.shouldUseDistributedEditingRiskyBlockReviewForSavePost?.(
 					options
@@ -1070,9 +1707,34 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 				savePolicy.status ===
 					DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE ||
 				savePolicy.saveButton?.hasAcceptedReviewApprovalProof;
+			const hasLocalRiskyBlockReviewFailure =
+				( savePolicy.pendingReviewItemCount ?? 0 ) > 0 &&
+				( currentSessionState.mustOfferLocalCopy ||
+					currentSessionState.canExportLocalUpdates ||
+					currentSessionState.riskyBlockReviewCanExportLocalUpdates ||
+					currentSessionState.retrySaveStatus ===
+						DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED ||
+					currentSessionState.reasonCode ===
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT ||
+					currentSessionState.riskyBlockReviewReasonCode ===
+						DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT );
+			const isRiskyBlockReviewSavePolicyActive =
+				savePolicy.saveButtonSource === 'risky_block_review' ||
+				savePolicy.reason === 'partial_safe_review_pending' ||
+				savePolicy.saveButtonReason === 'partial_safe_review_pending' ||
+				savePolicy.opensPrePublishReview ||
+				savePolicy.clickAction ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW ||
+				savePolicy.status ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.READY_FOR_REVIEWED_RETRY_SAVE ||
+				( savePolicy.status ===
+					DISTRIBUTED_EDITING_SAVE_POLICY_STATUSES.REVIEW_REQUIRED &&
+					savePolicy.saveButtonSource === 'risky_block_review' ) ||
+				hasLocalRiskyBlockReviewFailure;
 
 			if (
-				! shouldUseRiskyBlockReview &&
+				( ! shouldUseRiskyBlockReview ||
+					! isRiskyBlockReviewSavePolicyActive ) &&
 				! hasResolvedRiskyBlockReviewApproval
 			) {
 				return {
@@ -1139,6 +1801,33 @@ export const __experimentalMaybeRouteSavePostToDistributedEditingRiskyBlockRevie
 					blocksNormalSavePost: true,
 					opensPrePublishReview: false,
 					requiresServerStateRefetch: false,
+					callsNormalSavePost: false,
+					callsRetrySaveEndpoint: false,
+					dispatchesNotice: false,
+					mutatesEditorContent: false,
+					mutatesPersistedPostContent: false,
+					changesPostLock: false,
+					claimsSaved: false,
+				};
+			}
+
+			if (
+				( savePolicy.pendingReviewItemCount ?? 0 ) > 0 &&
+				( savePolicy.approvedReviewItemCount ?? 0 ) < 1 &&
+				! hasResolvedRiskyBlockReviewApproval &&
+				isRiskyBlockReviewSavePolicyActive &&
+				savePolicy.reason !== 'partial_safe_review_pending' &&
+				savePolicy.saveButtonReason !== 'partial_safe_review_pending'
+			) {
+				return {
+					status: 'risky_block_review_no_approved_items',
+					reason: 'risky_block_review_no_approved_items',
+					policy: savePolicy,
+					allowsNormalSaveFallback: false,
+					blocksNormalSavePost: true,
+					opensPrePublishReview: false,
+					requiresServerStateRefetch: false,
+					callsReviewApprovalProofEndpoint: false,
 					callsNormalSavePost: false,
 					callsRetrySaveEndpoint: false,
 					dispatchesNotice: false,
@@ -1498,10 +2187,10 @@ export const __experimentalMaybeHandleDistributedEditingSaveButtonClick =
 							? DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED
 							: sessionState.riskyBlockReviewStatus,
 						riskyBlockReviewSaveButtonLabel: hasPendingReviewItems
-							? 'Review changes'
+							? 'Save'
 							: sessionState.riskyBlockReviewSaveButtonLabel,
 						riskyBlockReviewSaveClickAction: hasPendingReviewItems
-							? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.OPEN_PRE_PUBLISH_REVIEW
+							? DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE
 							: sessionState.riskyBlockReviewSaveClickAction,
 					} );
 					sessionState =
@@ -2151,6 +2840,685 @@ function getDistributedEditingPresenceLocalContentHasChanged(
 	);
 }
 
+function getDistributedEditingPresenceSerializedBlocks( postContent ) {
+	const comparableContent =
+		getDistributedEditingComparablePostContent( postContent );
+
+	if ( typeof comparableContent !== 'string' ) {
+		return null;
+	}
+
+	if ( comparableContent.trim() === '' ) {
+		return [];
+	}
+
+	const fallbackBlocks =
+		getDistributedEditingPresenceTopLevelSerializedBlockFallbacks(
+			comparableContent
+		);
+
+	try {
+		const parsedBlocks = parse( comparableContent );
+
+		if (
+			Array.isArray( parsedBlocks ) &&
+			! getDistributedEditingPresenceParsedBlocksNeedFallback(
+				parsedBlocks,
+				fallbackBlocks
+			)
+		) {
+			return parsedBlocks;
+		}
+	} catch {
+		// Fall back to delimiter tokenization below.
+	}
+
+	if ( fallbackBlocks.length > 0 ) {
+		return fallbackBlocks;
+	}
+
+	return null;
+}
+
+function getDistributedEditingPresenceParsedBlocksNeedFallback(
+	parsedBlocks,
+	fallbackBlocks
+) {
+	return (
+		fallbackBlocks.length > 0 &&
+		parsedBlocks.length === 1 &&
+		[ 'core/block', 'core/freeform', null, undefined ].includes(
+			parsedBlocks[ 0 ]?.name
+		)
+	);
+}
+
+function getDistributedEditingPresenceSerializedBlockPreview( block ) {
+	if ( typeof block?.__unstableDeRtcSerializedPreview === 'string' ) {
+		return block.__unstableDeRtcSerializedPreview;
+	}
+
+	try {
+		return __unstableSerializeAndClean( [ block ] );
+	} catch {
+		return '';
+	}
+}
+
+function getDistributedEditingPresenceTopLevelSerializedBlockFallbacks(
+	postContent
+) {
+	const comparableContent =
+		getDistributedEditingComparablePostContent( postContent );
+
+	if ( typeof comparableContent !== 'string' ) {
+		return [];
+	}
+
+	const tokenPattern =
+		/<!--\s*(\/)?wp:([a-z0-9_/-]+)(?:\s+[\s\S]*?)?\s*(\/)?-->/gi;
+	const blocks = [];
+	let depth = 0;
+	let startIndex = null;
+	let blockName = '';
+	let match;
+
+	while ( ( match = tokenPattern.exec( comparableContent ) ) ) {
+		const isClosing = Boolean( match[ 1 ] );
+		const isSelfClosing = Boolean( match[ 3 ] );
+
+		if ( isClosing ) {
+			if ( depth > 0 ) {
+				depth--;
+			}
+
+			if ( depth === 0 && startIndex !== null ) {
+				blocks.push( {
+					name: getDistributedEditingPresenceCanonicalBlockName(
+						blockName
+					),
+					__unstableDeRtcSerializedPreview: comparableContent.slice(
+						startIndex,
+						tokenPattern.lastIndex
+					),
+				} );
+				startIndex = null;
+				blockName = '';
+			}
+
+			continue;
+		}
+
+		if ( depth === 0 ) {
+			startIndex = match.index;
+			blockName = match[ 2 ];
+		}
+
+		if ( isSelfClosing ) {
+			blocks.push( {
+				name: getDistributedEditingPresenceCanonicalBlockName(
+					match[ 2 ]
+				),
+				__unstableDeRtcSerializedPreview: comparableContent.slice(
+					match.index,
+					tokenPattern.lastIndex
+				),
+			} );
+			startIndex = null;
+			blockName = '';
+			continue;
+		}
+
+		depth++;
+	}
+
+	return blocks;
+}
+
+function getDistributedEditingPresenceCanonicalBlockName( blockName ) {
+	const normalizedName = String( blockName || '' ).trim();
+
+	if ( ! normalizedName ) {
+		return 'core/block';
+	}
+
+	return normalizedName.includes( '/' )
+		? normalizedName
+		: `core/${ normalizedName }`;
+}
+
+function getDistributedEditingPresenceSafePreviewHtml( blocks, fallbackText ) {
+	const blockList = Array.isArray( blocks ) ? blocks : [ blocks ];
+	const serialized = blockList
+		.map( getDistributedEditingPresenceSerializedBlockPreview )
+		.join( '\n' );
+	const previewHtml =
+		getDistributedEditingPresenceInertSerializedPreview( serialized );
+
+	return previewHtml || fallbackText;
+}
+
+function getDistributedEditingPresenceSafeSerializedBlockPreview( blocks ) {
+	const blockList = Array.isArray( blocks ) ? blocks : [ blocks ];
+	const serialized = blockList
+		.map( getDistributedEditingPresenceSerializedBlockPreview )
+		.join( '\n' );
+
+	return getDistributedEditingPresenceInertSerializedPreview( serialized, {
+		preserveBlockComments: true,
+	} );
+}
+
+function getDistributedEditingPresenceInertSerializedPreview(
+	serialized,
+	options = {}
+) {
+	const inertPreview = String( serialized || '' )
+		.replace(
+			/<(script|style|iframe|object|embed|svg|math)\b[^>]*>[\s\S]*?<\/\1\s*>/gi,
+			' '
+		)
+		.replace(
+			/<(script|style|iframe|object|embed|svg|math)\b[^>]*\/?>/gi,
+			' '
+		)
+		.replace( /\s+on[a-z]+\s*=\s*"[^"]*"/gi, '' )
+		.replace( /\s+on[a-z]+\s*=\s*'[^']*'/gi, '' )
+		.replace( /\s+on[a-z]+\s*=\s*[^\s>]+/gi, '' )
+		.replace(
+			/\s+(href|src|xlink:href)\s*=\s*"javascript:[^"]*"/gi,
+			' $1="#"'
+		)
+		.replace(
+			/\s+(href|src|xlink:href)\s*=\s*'javascript:[^']*'/gi,
+			" $1='#'"
+		)
+		.replace(
+			/\s+(href|src|xlink:href)\s*=\s*javascript:[^\s>]+/gi,
+			' $1="#"'
+		);
+
+	return (
+		options.preserveBlockComments
+			? inertPreview.replace( /<!--(?!\s*\/?wp:)[\s\S]*?-->/g, ' ' )
+			: inertPreview.replace( /<!--[\s\S]*?-->/g, ' ' )
+	).trim();
+}
+
+function getDistributedEditingPresenceSafeTextFromSerialized(
+	serialized,
+	fallbackText
+) {
+	const withoutExecutableText = serialized
+		.replace(
+			/<(script|style|iframe|object|embed|svg|math)\b[^>]*>[\s\S]*?<\/\1\s*>/gi,
+			' '
+		)
+		.replace(
+			/<(script|style|iframe|object|embed|svg|math)\b[^>]*\/?>/gi,
+			' '
+		);
+	const text = withoutExecutableText
+		.replace( /<!--[\s\S]*?-->/g, ' ' )
+		.replace( /<[^>]*>/g, ' ' )
+		.replace( /\s+/g, ' ' )
+		.trim()
+		.slice( 0, 280 );
+
+	return text || fallbackText;
+}
+
+function getDistributedEditingPresenceFallbackPreviewText(
+	localContent,
+	baseContent
+) {
+	const localText = getDistributedEditingPresenceSafeTextFromSerialized(
+		localContent,
+		__( 'Pending edit' )
+	);
+	const baseText = getDistributedEditingPresenceSafeTextFromSerialized(
+		baseContent,
+		''
+	);
+
+	if ( baseText && localText.startsWith( baseText ) ) {
+		return (
+			localText.slice( baseText.length ).trim() || __( 'Pending edit' )
+		);
+	}
+
+	return localText;
+}
+
+function getDistributedEditingPresencePendingPreviewItems(
+	baseBlocks,
+	localBlocks,
+	pathPrefix = []
+) {
+	const baseSerialized = baseBlocks.map(
+		getDistributedEditingPresenceSerializedBlockPreview
+	);
+	const localSerialized = localBlocks.map(
+		getDistributedEditingPresenceSerializedBlockPreview
+	);
+	const items = [];
+	const addItem = (
+		index,
+		blocks,
+		changeKind,
+		fallbackText,
+		options = {}
+	) => {
+		const blockList = Array.isArray( blocks ) ? blocks : [ blocks ];
+		const firstBlock = blockList[ 0 ];
+		const previewHtml = getDistributedEditingPresenceSafePreviewHtml(
+			blockList,
+			fallbackText
+		);
+		const safePreviewSerializedBlocks =
+			getDistributedEditingPresenceSafeSerializedBlockPreview(
+				blockList
+			);
+
+		items.push( {
+			blockPath: [ ...pathPrefix, index ],
+			blockName:
+				blockList.length === 1
+					? firstBlock?.name || 'core/block'
+					: 'core/blocks',
+			changeKind,
+			safePreviewSerializedBlocks,
+			safePreviewHtml: previewHtml,
+			safePreviewText:
+				getDistributedEditingPresenceSafeTextFromSerialized(
+					previewHtml,
+					fallbackText
+				),
+			reviewRequired: false,
+			anchorStatus: options.anchorStatus || 'exact',
+			previewScope:
+				options.previewScope ||
+				( blockList.length > 1 ? 'sibling_collection' : 'leaf_block' ),
+			...( blockList.length > 1
+				? {
+						blockRange: {
+							start: index,
+							count: blockList.length,
+						},
+				  }
+				: {} ),
+		} );
+	};
+
+	if ( baseBlocks.length === localBlocks.length ) {
+		localBlocks.forEach( ( block, index ) => {
+			if ( baseSerialized[ index ] !== localSerialized[ index ] ) {
+				const nestedItems =
+					getDistributedEditingNestedPresencePendingPreviewItems(
+						baseBlocks[ index ],
+						block,
+						[ ...pathPrefix, index ]
+					);
+
+				if ( nestedItems.length > 0 ) {
+					items.push( ...nestedItems );
+				} else {
+					addItem(
+						index,
+						block,
+						'modified_block',
+						__( 'Pending edit' )
+					);
+				}
+			}
+		} );
+
+		return items;
+	}
+
+	let prefixLength = 0;
+
+	while (
+		prefixLength < baseSerialized.length &&
+		prefixLength < localSerialized.length &&
+		baseSerialized[ prefixLength ] === localSerialized[ prefixLength ]
+	) {
+		++prefixLength;
+	}
+
+	let suffixLength = 0;
+
+	while (
+		suffixLength < baseSerialized.length - prefixLength &&
+		suffixLength < localSerialized.length - prefixLength &&
+		baseSerialized[ baseSerialized.length - 1 - suffixLength ] ===
+			localSerialized[ localSerialized.length - 1 - suffixLength ]
+	) {
+		++suffixLength;
+	}
+
+	const baseStart = prefixLength;
+	const baseEnd = baseBlocks.length - suffixLength;
+	const localStart = prefixLength;
+	const localEnd = localBlocks.length - suffixLength;
+	const matchedBaseIndexes = new Set();
+	const matchedLocalIndexes = new Set();
+
+	for ( let baseIndex = baseStart; baseIndex < baseEnd; baseIndex++ ) {
+		const localIndex = getDistributedEditingUniqueLocalBlockNameMatchIndex(
+			baseBlocks,
+			localBlocks,
+			matchedLocalIndexes,
+			baseStart,
+			baseEnd,
+			localStart,
+			localEnd,
+			baseIndex
+		);
+
+		if ( localIndex === null ) {
+			continue;
+		}
+
+		matchedBaseIndexes.add( baseIndex );
+		matchedLocalIndexes.add( localIndex );
+
+		if ( baseSerialized[ baseIndex ] !== localSerialized[ localIndex ] ) {
+			const nestedItems =
+				getDistributedEditingNestedPresencePendingPreviewItems(
+					baseBlocks[ baseIndex ],
+					localBlocks[ localIndex ],
+					[ ...pathPrefix, baseIndex ]
+				);
+
+			if ( nestedItems.length > 0 ) {
+				items.push( ...nestedItems );
+			} else {
+				addItem(
+					baseIndex,
+					localBlocks[ localIndex ],
+					'modified_block',
+					__( 'Pending edit' )
+				);
+			}
+		}
+	}
+
+	const unmatchedLocalIndexes = [];
+
+	for ( let index = localStart; index < localEnd; index++ ) {
+		if ( matchedLocalIndexes.has( index ) ) {
+			continue;
+		}
+
+		if ( localBlocks.length > baseBlocks.length ) {
+			unmatchedLocalIndexes.push( index );
+		} else {
+			addItem(
+				index,
+				localBlocks[ index ],
+				'unknown_change',
+				__( 'Pending edit' ),
+				{
+					anchorStatus: 'ambiguous',
+				}
+			);
+		}
+	}
+
+	for ( const run of getDistributedEditingContiguousIndexRuns(
+		unmatchedLocalIndexes
+	) ) {
+		addItem(
+			run.start,
+			localBlocks.slice( run.start, run.start + run.count ),
+			'added_block',
+			__( 'Pending new block' )
+		);
+	}
+
+	for ( let index = baseStart; index < baseEnd; index++ ) {
+		if ( matchedBaseIndexes.has( index ) ) {
+			continue;
+		}
+
+		if ( baseBlocks.length > localBlocks.length ) {
+			addItem(
+				index,
+				baseBlocks[ index ],
+				'deleted_block',
+				__( 'Pending deleted block' )
+			);
+		} else if ( localBlocks.length <= baseBlocks.length ) {
+			addItem(
+				index,
+				baseBlocks[ index ],
+				'unknown_change',
+				__( 'Pending edit' ),
+				{
+					anchorStatus: 'ambiguous',
+				}
+			);
+		}
+	}
+
+	return items;
+}
+
+function getDistributedEditingNestedPresencePendingPreviewItems(
+	baseBlock,
+	localBlock,
+	pathPrefix
+) {
+	if (
+		! baseBlock ||
+		! localBlock ||
+		baseBlock.name !== localBlock.name ||
+		getDistributedEditingPresenceBlockAttributeSignature( baseBlock ) !==
+			getDistributedEditingPresenceBlockAttributeSignature( localBlock )
+	) {
+		return [];
+	}
+
+	const baseInnerBlocks = Array.isArray( baseBlock.innerBlocks )
+		? baseBlock.innerBlocks
+		: [];
+	const localInnerBlocks = Array.isArray( localBlock.innerBlocks )
+		? localBlock.innerBlocks
+		: [];
+
+	if ( baseInnerBlocks.length === 0 && localInnerBlocks.length === 0 ) {
+		return [];
+	}
+
+	return getDistributedEditingPresencePendingPreviewItems(
+		baseInnerBlocks,
+		localInnerBlocks,
+		pathPrefix
+	);
+}
+
+function getDistributedEditingPresenceBlockAttributeSignature( block ) {
+	try {
+		return JSON.stringify( block?.attributes || {} );
+	} catch {
+		return '';
+	}
+}
+
+function getDistributedEditingContiguousIndexRuns( indexes ) {
+	const sortedIndexes = [ ...indexes ].sort( ( a, b ) => a - b );
+	const runs = [];
+
+	for ( const index of sortedIndexes ) {
+		const lastRun = runs[ runs.length - 1 ];
+
+		if ( lastRun && lastRun.start + lastRun.count === index ) {
+			lastRun.count++;
+		} else {
+			runs.push( {
+				start: index,
+				count: 1,
+			} );
+		}
+	}
+
+	return runs;
+}
+
+function getDistributedEditingUniqueLocalBlockNameMatchIndex(
+	baseBlocks,
+	localBlocks,
+	matchedLocalIndexes,
+	baseStart,
+	baseEnd,
+	localStart,
+	localEnd,
+	baseIndex
+) {
+	const blockName = baseBlocks[ baseIndex ]?.name;
+
+	if ( ! blockName ) {
+		return null;
+	}
+
+	const baseNameCount = baseBlocks
+		.slice( baseStart, baseEnd )
+		.filter( ( block ) => block?.name === blockName ).length;
+
+	if ( baseNameCount !== 1 ) {
+		return null;
+	}
+
+	const localMatches = [];
+
+	for ( let index = localStart; index < localEnd; index++ ) {
+		if (
+			! matchedLocalIndexes.has( index ) &&
+			localBlocks[ index ]?.name === blockName
+		) {
+			localMatches.push( index );
+		}
+	}
+
+	return localMatches.length === 1 ? localMatches[ 0 ] : null;
+}
+
+function getDistributedEditingPresencePendingPreviewState(
+	sessionState,
+	select,
+	options = {}
+) {
+	if ( options.pendingPreviewState !== undefined ) {
+		return options.pendingPreviewState;
+	}
+
+	const localContent =
+		options.localContent !== undefined
+			? options.localContent
+			: select.getEditedPostContent?.();
+
+	if ( typeof localContent !== 'string' ) {
+		return {
+			available: false,
+			schema: 'de-rtc-pending-preview-v1',
+			items: [],
+		};
+	}
+
+	const baseContent = getDistributedEditingPresenceBaseContent(
+		sessionState,
+		select,
+		options
+	);
+	const comparableLocalContent =
+		getDistributedEditingComparablePostContent( localContent );
+	const comparableBaseContent =
+		getDistributedEditingComparablePostContent( baseContent );
+
+	if (
+		typeof comparableLocalContent !== 'string' ||
+		typeof comparableBaseContent !== 'string' ||
+		comparableLocalContent === comparableBaseContent
+	) {
+		return {
+			available: false,
+			schema: 'de-rtc-pending-preview-v1',
+			items: [],
+		};
+	}
+
+	const baseBlocks = getDistributedEditingPresenceSerializedBlocks(
+		comparableBaseContent
+	);
+	const localBlocks = getDistributedEditingPresenceSerializedBlocks(
+		comparableLocalContent
+	);
+	let items = [];
+
+	if ( Array.isArray( baseBlocks ) && Array.isArray( localBlocks ) ) {
+		items = getDistributedEditingPresencePendingPreviewItems(
+			baseBlocks,
+			localBlocks
+		);
+	}
+
+	if ( items.length === 0 ) {
+		const fallbackBaseBlocks =
+			getDistributedEditingPresenceTopLevelSerializedBlockFallbacks(
+				comparableBaseContent
+			);
+		const fallbackLocalBlocks =
+			getDistributedEditingPresenceTopLevelSerializedBlockFallbacks(
+				comparableLocalContent
+			);
+
+		if ( fallbackBaseBlocks.length > 0 || fallbackLocalBlocks.length > 0 ) {
+			items = getDistributedEditingPresencePendingPreviewItems(
+				fallbackBaseBlocks,
+				fallbackLocalBlocks
+			);
+		}
+	}
+
+	if ( items.length === 0 ) {
+		items = [
+			{
+				blockPath: [ 0 ],
+				blockName: 'core/block',
+				changeKind: 'unknown_change',
+				safePreviewHtml:
+					getDistributedEditingPresenceFallbackPreviewText(
+						comparableLocalContent,
+						comparableBaseContent
+					),
+				reviewRequired: false,
+			},
+		];
+	}
+
+	return {
+		available: true,
+		schema: 'de-rtc-pending-preview-v1',
+		baseVersion:
+			typeof options.confirmedBaseVersion === 'string'
+				? options.confirmedBaseVersion
+				: sessionState.clientBaseVersion ||
+				  sessionState.serverVersion ||
+				  '',
+		baseStateHash:
+			typeof options.confirmedStateHash === 'string'
+				? options.confirmedStateHash
+				: sessionState.distributedEditingPostStateHash || '',
+		items: items.slice( 0, 8 ),
+		rawContentIncluded: false,
+		exposesRawContent: false,
+		inert: true,
+		authoritativeForSave: false,
+		claimsSaved: false,
+	};
+}
+
 function getDistributedEditingPresenceSelectionBlockPath(
 	blockEditorSelect,
 	clientId
@@ -2444,6 +3812,16 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 				hasPendingChanges: documentState.hasPendingChanges,
 			}
 		);
+		const pendingPreviewState =
+			getDistributedEditingPresencePendingPreviewState(
+				currentSessionState,
+				select,
+				{
+					...options,
+					confirmedBaseVersion: documentState.confirmedBaseVersion,
+					confirmedStateHash: documentState.confirmedStateHash,
+				}
+			);
 
 		try {
 			const response = await requestDistributedEditingPresenceHeartbeat( {
@@ -2457,6 +3835,7 @@ export const __experimentalSendDistributedEditingPresenceHeartbeat =
 				hasPendingChanges: documentState.hasPendingChanges,
 				confirmedAtGmt: documentState.confirmedAtGmt,
 				selectionState,
+				pendingPreviewState,
 			} );
 			const latestSessionState =
 				select.getDistributedEditingSessionState?.() ||
@@ -3078,6 +4457,19 @@ export const __experimentalSyncDistributedEditingWithServer =
 					requiresManualConflictResolution: false,
 					...( riskyReviewSyncPreservationFields || {} ),
 				} );
+				await refreshDistributedEditingRiskyBlockReviewItemsAfterServerUpdate(
+					{
+						dispatch,
+						options: {
+							...options,
+							applySafeServerContentWhenReviewItemsClear: true,
+							skipWhenLocalReviewPending: false,
+						},
+						registry,
+						select,
+						skipWhenLocalReviewPending: false,
+					}
+				);
 				await refreshDistributedEditingPresenceAfterServerUpdate( {
 					select,
 					dispatch,
@@ -3186,6 +4578,19 @@ export const __experimentalSyncDistributedEditingWithServer =
 					requiresManualConflictResolution: false,
 					...( riskyReviewSyncPreservationFields || {} ),
 				} );
+				await refreshDistributedEditingRiskyBlockReviewItemsAfterServerUpdate(
+					{
+						dispatch,
+						options: {
+							...options,
+							applySafeServerContentWhenReviewItemsClear: true,
+							skipWhenLocalReviewPending: false,
+						},
+						registry,
+						select,
+						skipWhenLocalReviewPending: false,
+					}
+				);
 				await refreshDistributedEditingPresenceAfterServerUpdate( {
 					select,
 					dispatch,
@@ -3235,6 +4640,19 @@ export const __experimentalSyncDistributedEditingWithServer =
 					isAwaitingServerConfirmation: false,
 					...( riskyReviewSyncPreservationFields || {} ),
 				} );
+				await refreshDistributedEditingRiskyBlockReviewItemsAfterServerUpdate(
+					{
+						dispatch,
+						options: {
+							...options,
+							applySafeServerContentWhenReviewItemsClear: true,
+							skipWhenLocalReviewPending: false,
+						},
+						registry,
+						select,
+						skipWhenLocalReviewPending: false,
+					}
+				);
 				await refreshDistributedEditingPresenceAfterServerUpdate( {
 					select,
 					dispatch,
@@ -3320,6 +4738,19 @@ export const __experimentalSyncDistributedEditingWithServer =
 					isAwaitingServerConfirmation: false,
 					...( riskyReviewSyncPreservationFields || {} ),
 				} );
+				await refreshDistributedEditingRiskyBlockReviewItemsAfterServerUpdate(
+					{
+						dispatch,
+						options: {
+							...options,
+							applySafeServerContentWhenReviewItemsClear: true,
+							skipWhenLocalReviewPending: false,
+						},
+						registry,
+						select,
+						skipWhenLocalReviewPending: false,
+					}
+				);
 				await refreshDistributedEditingPresenceAfterServerUpdate( {
 					select,
 					dispatch,

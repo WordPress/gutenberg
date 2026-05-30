@@ -6258,6 +6258,25 @@ export function DistributedEditingPresenceRoster( {
 		return null;
 	}
 
+	const pendingGhostEntries = rosterDisplayEntries.flatMap( ( entry ) => {
+		if (
+			getPresenceRosterEntryRelationship( entry ) ===
+				'current_user_current_tab' ||
+			! entry.pendingPreview?.available
+		) {
+			return [];
+		}
+
+		const displayName = getPresenceRosterEntryDisplayName( entry );
+
+		return ( entry.pendingPreview.items || [] ).map( ( item, index ) => ( {
+			...item,
+			entryKey: entry.key,
+			key: `${ entry.key }-${ item.previewId || index }`,
+			displayName,
+		} ) );
+	} );
+
 	const hasOtherEditorActivityCue = Boolean(
 		rosterState.copy.otherEditorActivityCue
 	);
@@ -6332,6 +6351,12 @@ export function DistributedEditingPresenceRoster( {
 			) }
 			data-distributed-editing-presence-exposes-raw-content={ formatDataBoolean(
 				rosterState.exposesRawContent
+			) }
+			data-distributed-editing-presence-pending-ghost-count={
+				pendingGhostEntries.length
+			}
+			data-distributed-editing-presence-pending-ghosts-visible={ formatDataBoolean(
+				! isToolbarVariant && pendingGhostEntries.length > 0
 			) }
 			data-distributed-editing-presence-exposes-selection={ formatDataBoolean(
 				rosterState.exposesSelection
@@ -7227,6 +7252,67 @@ export function DistributedEditingPresenceRoster( {
 										) }
 									</div>
 								) }
+							</li>
+						);
+					} ) }
+				</ul>
+			) }
+			{ ! isToolbarVariant && pendingGhostEntries.length > 0 && (
+				<ul
+					aria-label={ __(
+						'Pending edits from other active editors'
+					) }
+					className="editor-distributed-editing-status__pending-ghosts"
+					data-distributed-editing-pending-ghosts="true"
+					data-distributed-editing-pending-ghosts-count={
+						pendingGhostEntries.length
+					}
+					data-distributed-editing-pending-ghosts-inert="true"
+					data-distributed-editing-pending-ghosts-exposes-raw-content="false"
+				>
+					{ pendingGhostEntries.map( ( item ) => {
+						const previewText =
+							item.safePreviewText ||
+							( item.changeKind === 'deleted_block'
+								? __( 'Deleted block' )
+								: __( 'Pending edit' ) );
+						const ghostLabel = sprintf(
+							/* translators: 1: editor display name, 2: block name. */
+							__( 'Pending edit by %1$s in %2$s' ),
+							item.displayName,
+							item.blockName || __( 'block' )
+						);
+
+						return (
+							<li
+								aria-label={ ghostLabel }
+								className="editor-distributed-editing-status__pending-ghost"
+								data-distributed-editing-pending-ghost="true"
+								data-distributed-editing-pending-ghost-author={
+									item.displayName
+								}
+								data-distributed-editing-pending-ghost-block-name={
+									item.blockName || ''
+								}
+								data-distributed-editing-pending-ghost-change-kind={
+									item.changeKind
+								}
+								data-distributed-editing-pending-ghost-inert="true"
+								data-distributed-editing-pending-ghost-raw-content="false"
+								key={ item.key }
+								tabIndex="0"
+								title={ ghostLabel }
+							>
+								<span
+									aria-hidden="true"
+									className="editor-distributed-editing-status__pending-ghost-marker"
+								/>
+								<span className="editor-distributed-editing-status__pending-ghost-text">
+									{ previewText }
+								</span>
+								<span className="editor-distributed-editing-status__pending-ghost-author">
+									{ item.displayName }
+								</span>
 							</li>
 						);
 					} ) }
