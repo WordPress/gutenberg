@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Replace `extract-zip` with `adm-zip` to fix silent hang on Node 24.16.0 (libuv 1.52.1) when downloading URL-based zip sources. ([#78762](https://github.com/WordPress/gutenberg/issues/78762))
+
 ## 11.7.0 (2026-05-27)
 
 ## 11.6.0 (2026-05-14)
