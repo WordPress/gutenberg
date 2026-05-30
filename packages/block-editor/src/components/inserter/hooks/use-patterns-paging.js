@@ -3,7 +3,6 @@
  */
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
-import { getScrollContainer } from '@wordpress/dom';
 
 const PAGE_SIZE = 20;
 
@@ -43,20 +42,14 @@ export default function usePatternsPaging(
 	}, [ pageIndex, currentCategoryPatterns ] );
 	const numPages = Math.ceil( currentCategoryPatterns.length / PAGE_SIZE );
 	const changePage = ( page ) => {
-		const scrollContainer = getScrollContainer(
-			scrollContainerRef?.current
-		);
-		scrollContainer?.scrollTo( 0, 0 );
+		scrollContainerRef?.current?.scrollTo( 0, 0 );
 
 		setCurrentPage( page );
 	};
 
 	useEffect(
 		function scrollToTopOnCategoryChange() {
-			const scrollContainer = getScrollContainer(
-				scrollContainerRef?.current
-			);
-			scrollContainer?.scrollTo( 0, 0 );
+			scrollContainerRef?.current?.scrollTo( 0, 0 );
 		},
 		[ currentCategory, scrollContainerRef ]
 	);
