@@ -130,6 +130,7 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 
 // WordPress 7.1 compat.
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/admin-bar-in-editor/load.php';

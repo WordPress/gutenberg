@@ -2,7 +2,7 @@
 /**
  * Render callback for the Terms Query Pagination Previous block.
  *
- * @since 7.0.0
+ * @since 7.1.0
  *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
@@ -67,7 +67,7 @@ function render_block_core_terms_query_pagination_previous( $attributes, $conten
 /**
  * Registers the `core/terms-query-pagination-previous` block on the server.
  *
- * @since 7.0.0
+ * @since 7.1.0
  */
 function register_block_core_terms_query_pagination_previous() {
 	register_block_type_from_metadata(
