@@ -57,12 +57,14 @@ const OPERATOR_EVALUATORS = {
 const ViewportMatchWidthContext = createContext(
 	/** @type {null | number} */ ( null )
 );
+ViewportMatchWidthContext.displayName = 'ViewportMatchWidthContext';
 
 /**
  * Returns true if the viewport matches the given query, or false otherwise.
  *
  * @param {WPBreakpoint}       breakpoint      Breakpoint size name.
  * @param {WPViewportOperator} [operator=">="] Viewport operator.
+ * @param {Window|undefined}   [view=window]   Window instance in which to perform viewport matching.
  *
  * @example
  *
@@ -73,12 +75,18 @@ const ViewportMatchWidthContext = createContext(
  *
  * @return {boolean} Whether viewport matches query.
  */
-const useViewportMatch = ( breakpoint, operator = '>=' ) => {
+const useViewportMatch = (
+	breakpoint,
+	operator = '>=',
+	// Resolve the default lazily so SSR (where `window` is undeclared) does not
+	// throw a ReferenceError when this default expression is evaluated.
+	view = typeof window !== 'undefined' ? window : undefined
+) => {
 	const simulatedWidth = useContext( ViewportMatchWidthContext );
 	const mediaQuery =
 		! simulatedWidth &&
 		`(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
-	const mediaQueryResult = useMediaQuery( mediaQuery || undefined );
+	const mediaQueryResult = useMediaQuery( mediaQuery || undefined, view );
 	if ( simulatedWidth ) {
 		return OPERATOR_EVALUATORS[ operator ](
 			BREAKPOINTS[ breakpoint ],

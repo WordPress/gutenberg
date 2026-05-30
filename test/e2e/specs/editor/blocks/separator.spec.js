@@ -8,16 +8,23 @@ test.describe( 'Separator', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'can be created by three dashes and enter', async ( {
-		editor,
-		page,
-	} ) => {
+	test( 'can be created by three dashes', async ( { editor, page } ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
-		await page.keyboard.type( '---' );
-		await page.keyboard.press( 'Enter' );
+		// Should be able to keep typing after the separator transform.
+		await page.keyboard.type( '---a' );
 
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/separator',
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'a',
+				},
+			},
+		] );
 	} );
 } );

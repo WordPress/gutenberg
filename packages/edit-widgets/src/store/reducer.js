@@ -90,10 +90,36 @@ export function inserterSidebarToggleRef( state = { current: null } ) {
 	return state;
 }
 
+/**
+ * Widget saving lock.
+ *
+ * When widget saving is locked, the widget cannot be updated.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function widgetSavingLock( state = {}, action ) {
+	switch ( action.type ) {
+		case 'LOCK_WIDGET_SAVING':
+			return { ...state, [ action.lockName ]: true };
+
+		case 'UNLOCK_WIDGET_SAVING': {
+			const { [ action.lockName ]: removedLockName, ...restState } =
+				state;
+			return restState;
+		}
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	blockInserterPanel,
 	inserterSidebarToggleRef,
 	listViewPanel,
 	listViewToggleRef,
 	widgetAreasOpenState,
+	widgetSavingLock,
 } );

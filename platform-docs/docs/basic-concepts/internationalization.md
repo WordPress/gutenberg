@@ -6,7 +6,7 @@ sidebar_position: 7
 
 The Gutenberg block editor uses the `@wordpress/i18n` package to provide internationalization support.
 
-Translations can be provided by calling the `setLocaleData` function with a domain and a locale data object. The locale data object should be in the [Jed-formatted JSON object shape](http://messageformat.github.io/Jed/).
+Translations can be provided by calling the `setLocaleData` function with a domain and a locale data object. The locale data object should be in the [Jed-formatted JSON object shape](https://messageformat.github.io/Jed/).
 
 ```js
 import { setLocaleData } from '@wordpress/i18n';

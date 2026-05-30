@@ -52,5 +52,5 @@ declare module './base-entity-records' {
 }
 
 export type PostStatusObject< C extends Context = 'edit' > = OmitNevers<
-	_BaseEntityRecords.Type< C >
+	_BaseEntityRecords.PostStatusObject< C >
 >;

@@ -140,6 +140,15 @@ export class PerfUtils {
 	}
 
 	/**
+	 * Loads the content of the large post fixture.
+	 */
+	async loadContentForLargePost() {
+		return readFile(
+			path.join( process.env.ASSETS_PATH!, 'large-post.html' )
+		);
+	}
+
+	/**
 	 * Loads blocks from an HTML fixture with given path into the editor canvas.
 	 *
 	 * @param filepath Path to the HTML fixture.
@@ -189,10 +198,8 @@ export class PerfUtils {
 
 	async expectExpandedState( locator: Locator, state: 'true' | 'false' ) {
 		return await Promise.any( [
-			// eslint-disable-next-line playwright/missing-playwright-await
 			expect( locator ).toHaveAttribute( 'aria-expanded', state ),
 			// Legacy selector.
-			// eslint-disable-next-line playwright/missing-playwright-await
 			expect( locator ).toHaveAttribute( 'aria-pressed', state ),
 		] );
 	}

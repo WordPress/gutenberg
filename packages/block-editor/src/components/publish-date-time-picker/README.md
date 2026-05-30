@@ -32,6 +32,7 @@ const MyDateTimePicker = () => {
 					currentDate={ date }
 					onChange={ ( newDate ) => setDate( newDate ) }
 					onClose={ onClose }
+					title={ __( 'Select post date' ) }
 				/>
 			) }
 		/>
@@ -43,6 +44,14 @@ const MyDateTimePicker = () => {
 
 `PublishDateTimePicker` supports all of the props that
 [`DateTimePicker`](/packages/components/src/date-time#Props) supports, plus:
+
+### title
+
+The title displayed in the header of the popover that contains the `DateTimePicker`.
+
+- Type: `String`
+- Required: No
+- Default: `Publish`
 
 ### onClose
 

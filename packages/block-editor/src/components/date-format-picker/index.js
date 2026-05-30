@@ -7,11 +7,11 @@ import { useState, createInterpolateElement } from '@wordpress/element';
 import {
 	TextControl,
 	ExternalLink,
-	VisuallyHidden,
 	ToggleControl,
 	__experimentalVStack as VStack,
 	CustomSelectControl,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
 // somewhat recent, has a day greater than 12, and a month with more than three letters.
@@ -45,9 +45,10 @@ export default function DateFormatPicker( {
 			spacing={ 4 }
 			className="block-editor-date-format-picker"
 		>
-			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
+			<VisuallyHidden render={ <legend /> }>
+				{ __( 'Date format' ) }
+			</VisuallyHidden>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Default format' ) }
 				help={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,
@@ -144,7 +145,6 @@ function NonDefaultControls( { format, onChange } ) {
 			{ isCustom && (
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
 					help={ createInterpolateElement(

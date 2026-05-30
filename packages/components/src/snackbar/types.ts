@@ -1,16 +1,12 @@
 /**
  * External dependencies
  */
-import type { MutableRefObject, ReactNode } from 'react';
+import type { RefObject, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
-import type {
-	NoticeProps,
-	NoticeChildren,
-	NoticeAction,
-} from '../notice/types';
+import type { NoticeProps, NoticeAction } from '../notice/types';
 
 type SnackbarOnlyProps = {
 	/**
@@ -29,7 +25,7 @@ type SnackbarOnlyProps = {
 	/**
 	 * A ref to the list that contains the snackbar.
 	 */
-	listRef?: MutableRefObject< HTMLDivElement | null >;
+	listRef?: RefObject< HTMLDivElement | null >;
 };
 
 export type SnackbarProps = Pick<
@@ -56,7 +52,11 @@ export type SnackbarProps = Pick<
 		 *
 		 * @default []
 		 */
-		actions?: Pick< NoticeAction, 'label' | 'url' | 'onClick' >[];
+		actions?: Array<
+			Pick< NoticeAction, 'label' | 'url' | 'onClick' > & {
+				openInNewTab?: boolean;
+			}
+		>;
 	};
 
 export type SnackbarListProps = {
@@ -67,5 +67,5 @@ export type SnackbarListProps = {
 		}
 	>;
 	onRemove: ( id: string ) => void;
-	children?: NoticeChildren | Array< NoticeChildren >;
+	children?: ReactNode;
 };

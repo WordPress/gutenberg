@@ -12,11 +12,11 @@ import { _x, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import useSpacingSizes from './hooks/use-spacing-sizes';
 import AxialInputControls from './input-controls/axial';
 import SeparatedInputControls from './input-controls/separated';
 import SingleInputControl from './input-controls/single';
 import LinkedButton from './linked-button';
-import useSpacingSizes from './hooks/use-spacing-sizes';
 import {
 	ALL_SIDES,
 	DEFAULT_VALUES,
@@ -25,6 +25,49 @@ import {
 	getInitialView,
 } from './utils';
 
+/**
+ * A flexible control for managing spacing values in the block editor. Supports single, axial,
+ * and separated input controls for different spacing configurations with automatic view selection
+ * based on current values and available sides.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/spacing-sizes-control/README.md
+ *
+ * @example
+ * ```jsx
+ * import { __experimentalSpacingSizesControl as SpacingSizesControl } from '@wordpress/block-editor';
+ * import { useState } from '@wordpress/element';
+ *
+ * function Example() {
+ *   const [ sides, setSides ] = useState( {
+ *     top: '0px',
+ *     right: '0px',
+ *     bottom: '0px',
+ *     left: '0px',
+ *   } );
+ *
+ *   return (
+ *     <SpacingSizesControl
+ *       values={ sides }
+ *       onChange={ setSides }
+ *       label="Sides"
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * @param {Object}   props                    Component props.
+ * @param {Object}   props.inputProps         Additional props for input controls.
+ * @param {string}   props.label              Label for the control.
+ * @param {number}   props.minimumCustomValue Minimum value for custom input.
+ * @param {Function} props.onChange           Called when spacing values change.
+ * @param {Function} props.onMouseOut         Called when mouse leaves the control.
+ * @param {Function} props.onMouseOver        Called when mouse enters the control.
+ * @param {boolean}  props.showSideInLabel    Show side in control label.
+ * @param {Array}    props.sides              Available sides for control.
+ * @param {boolean}  props.useSelect          Use select control for predefined values.
+ * @param {Object}   props.values             Current spacing values.
+ * @return {Element}                         Spacing sizes control component.
+ */
 export default function SpacingSizesControl( {
 	inputProps,
 	label: labelProp,

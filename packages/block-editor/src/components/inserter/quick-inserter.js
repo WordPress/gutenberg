@@ -21,6 +21,7 @@ import { store as blockEditorStore } from '../../store';
 
 const SEARCH_THRESHOLD = 6;
 const SHOWN_BLOCK_TYPES = 6;
+const SHOWN_BLOCK_PATTERNS = 2;
 
 export default function QuickInserter( {
 	onSelect,
@@ -88,7 +89,6 @@ export default function QuickInserter( {
 		>
 			{ showSearch && (
 				<SearchControl
-					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					value={ filterValue }
 					onChange={ ( value ) => {
@@ -106,7 +106,9 @@ export default function QuickInserter( {
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
-					maxBlockPatterns={ 0 }
+					maxBlockPatterns={
+						!! filterValue ? SHOWN_BLOCK_PATTERNS : 0
+					}
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }
 					selectBlockOnInsert={ selectBlockOnInsert }

@@ -60,48 +60,66 @@ export const getItemPriority = ( name, searchValue ) => {
  */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
-	const [ fieldValue, setFieldValue ] = useState( false );
-	const { isHierarchical, parentPostId, parentPostTitle, pageItems } =
-		useSelect(
-			( select ) => {
-				const { getPostType, getEntityRecords, getEntityRecord } =
-					select( coreStore );
-				const { getCurrentPostId, getEditedPostAttribute } =
-					select( editorStore );
-				const postTypeSlug = getEditedPostAttribute( 'type' );
-				const pageId = getEditedPostAttribute( 'parent' );
-				const pType = getPostType( postTypeSlug );
-				const postId = getCurrentPostId();
-				const postIsHierarchical = pType?.hierarchical ?? false;
-				const query = {
-					per_page: 100,
-					exclude: postId,
-					parent_exclude: postId,
-					orderby: 'menu_order',
-					order: 'asc',
-					_fields: 'id,title,parent',
-				};
+	const [ fieldValue, setFieldValue ] = useState( '' );
+	const {
+		isHierarchical,
+		parentPostId,
+		parentPostTitle,
+		pageItems,
+		isLoading,
+	} = useSelect(
+		( select ) => {
+			const {
+				getPostType,
+				getEntityRecords,
+				getEntityRecord,
+				isResolving,
+			} = select( coreStore );
+			const { getCurrentPostId, getEditedPostAttribute } =
+				select( editorStore );
+			const postTypeSlug = getEditedPostAttribute( 'type' );
+			const pageId = getEditedPostAttribute( 'parent' );
+			const pType = getPostType( postTypeSlug );
+			const postId = getCurrentPostId();
+			const postIsHierarchical = pType?.hierarchical ?? false;
+			const query = {
+				per_page: 100,
+				exclude: postId,
+				parent_exclude: postId,
+				orderby: 'menu_order',
+				order: 'asc',
+				_fields: 'id,title,parent',
+			};
 
-				// Perform a search when the field is changed.
-				if ( !! fieldValue ) {
-					query.search = fieldValue;
-				}
+			// Perform a search by relevance when the field is changed.
+			if ( !! fieldValue ) {
+				query.search = fieldValue;
+				query.orderby = 'relevance';
+				query.search_columns = [ 'post_title' ];
+			}
 
-				const parentPost = pageId
-					? getEntityRecord( 'postType', postTypeSlug, pageId )
-					: null;
+			const parentPost = pageId
+				? getEntityRecord( 'postType', postTypeSlug, pageId )
+				: null;
 
-				return {
-					isHierarchical: postIsHierarchical,
-					parentPostId: pageId,
-					parentPostTitle: parentPost ? getTitle( parentPost ) : '',
-					pageItems: postIsHierarchical
-						? getEntityRecords( 'postType', postTypeSlug, query )
-						: null,
-				};
-			},
-			[ fieldValue ]
-		);
+			return {
+				isHierarchical: postIsHierarchical,
+				parentPostId: pageId,
+				parentPostTitle: parentPost ? getTitle( parentPost ) : '',
+				pageItems: postIsHierarchical
+					? getEntityRecords( 'postType', postTypeSlug, query )
+					: null,
+				isLoading: postIsHierarchical
+					? isResolving( 'getEntityRecords', [
+							'postType',
+							postTypeSlug,
+							query,
+					  ] )
+					: false,
+			};
+		},
+		[ fieldValue ]
+	);
 
 	const parentOptions = useMemo( () => {
 		const getOptionsFromTree = ( tree, level = 0 ) => {
@@ -177,7 +195,6 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }
@@ -187,6 +204,7 @@ export function PageAttributesParent() {
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleChange }
 			hideLabelFromVision
+			isLoading={ isLoading }
 		/>
 	);
 }

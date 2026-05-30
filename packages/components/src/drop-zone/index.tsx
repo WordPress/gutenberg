@@ -43,6 +43,7 @@ import type { WordPressComponentProps } from '../context';
  */
 export function DropZoneComponent( {
 	className,
+	icon = upload,
 	label,
 	onFilesDrop,
 	onHTMLDrop,
@@ -124,7 +125,7 @@ export function DropZoneComponent( {
 			<div className="components-drop-zone__content">
 				<div className="components-drop-zone__content-inner">
 					<Icon
-						icon={ upload }
+						icon={ icon }
 						className="components-drop-zone__content-icon"
 					/>
 					<span className="components-drop-zone__content-text">

@@ -6,7 +6,6 @@ import path from 'path';
 /**
  * WordPress dependencies
  */
-// eslint-disable-next-line no-restricted-syntax
 import {
 	jsTester,
 	phpTester,

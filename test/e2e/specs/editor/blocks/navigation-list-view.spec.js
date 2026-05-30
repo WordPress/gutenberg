@@ -164,38 +164,15 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 
 		const appender = listView.getByRole( 'button', {
-			name: 'Add block',
+			name: 'Add page',
 		} );
 
 		await expect( appender ).toBeVisible();
 
 		await appender.click();
 
-		// Expect to see the block inserter.
-		await expect(
-			page.getByRole( 'searchbox', {
-				name: 'Search',
-			} )
-		).toBeFocused();
-
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Expect to see the Page Link and Custom Link blocks as the nth(0) and nth(1) results.
-		// This is important for usability as the Page Link block is the most likely to be used.
-		await expect( blockResultOptions.nth( 0 ) ).toHaveText( 'Page Link' );
-		await expect( blockResultOptions.nth( 1 ) ).toHaveText( 'Custom Link' );
-
-		// Select the Page Link option.
-		const customLinkResult = blockResultOptions.nth( 1 );
-		await customLinkResult.click();
-
-		// Expect to see the Link creation UI be focused.
+		// Expect a Navigation Link block to be inserted
+		// and immediately trigger its Link UI.
 		const linkUIInput = linkControl.getSearchInput();
 
 		// Coverage for bug whereby Link UI input would be incorrectly prepopulated.
@@ -215,17 +192,17 @@ test.describe( 'Navigation block - List view editing', () => {
 		const thirdResult = await linkControl.getNthSearchResult( 2 );
 
 		const firstResultType =
-			await linkControl.getSearchResultType( firstResult );
+			await linkControl.getSearchResultText( firstResult );
 
 		const secondResultType =
-			await linkControl.getSearchResultType( secondResult );
+			await linkControl.getSearchResultText( secondResult );
 
 		const thirdResultType =
-			await linkControl.getSearchResultType( thirdResult );
+			await linkControl.getSearchResultText( thirdResult );
 
-		expect( firstResultType ).toBe( 'Page' );
-		expect( secondResultType ).toBe( 'Page' );
-		expect( thirdResultType ).toBe( 'Page' );
+		expect( firstResultType ).toContain( 'Page' );
+		expect( secondResultType ).toContain( 'Page' );
+		expect( thirdResultType ).toContain( 'Page' );
 
 		// Grab the text from the first result so we can check (later on) that it was inserted.
 		const firstResultText =
@@ -333,7 +310,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await expect(
 			blockSettings.getByRole( 'tab', {
-				name: 'Settings',
+				name: 'Content',
 				selected: true,
 			} )
 		).toBeVisible();
@@ -341,7 +318,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			blockSettings
 				.getByRole( 'tabpanel', {
-					name: 'Settings',
+					name: 'Content',
 				} )
 				.getByRole( 'heading', {
 					name: 'Settings',
@@ -361,7 +338,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		// Click the back button to go back to the Nav block.
 		await blockSettings
 			.getByRole( 'button', {
-				name: 'Go to parent Navigation block',
+				name: 'Go to "Navigation" block',
 			} )
 			.click();
 
@@ -499,20 +476,12 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await listView
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add page',
 			} )
 			.click();
 
-		const blockResults = page.getByRole( 'listbox', {
-			name: 'Blocks',
-		} );
-
-		await expect( blockResults ).toBeVisible();
-
-		const blockResultOptions = blockResults.getByRole( 'option' );
-
-		// Select the Page Link option.
-		await blockResultOptions.nth( 0 ).click();
+		// Expect the Link UI to be focused.
+		await expect( linkControl.getSearchInput() ).toBeFocused();
 
 		// Immediately dismiss the Link UI thereby not populating the `url` attribute
 		// of the block.
@@ -579,8 +548,57 @@ test.describe( 'Navigation block - List view editing', () => {
 				.getByRole( 'document', {
 					name: 'Block: Navigation',
 				} )
-				.getByLabel( 'Add block' )
+				.getByLabel( 'Add page' )
 		).toBeFocused();
+	} );
+
+	test( 'displays custom menu name in List View tab header in contentOnly mode', async ( {
+		page,
+		editor,
+		requestUtils,
+		pageUtils,
+	} ) => {
+		// Create a navigation menu with a custom name.
+		const headerMenu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+
+		// Use the code editor to insert a contentOnly-locked group containing
+		// the navigation block. This triggers contentOnly mode where
+		// isSelectionWithinCurrentSection is true.
+		await pageUtils.pressKeys( 'secondary+M' );
+		await page
+			.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill(
+				`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+					`<div class="wp-block-group">` +
+					`<!-- wp:navigation {"ref":${ headerMenu.id }} /-->` +
+					`</div>` +
+					`<!-- /wp:group -->`
+			);
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		// Select the navigation block inside the contentOnly group.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+
+		// Click the List View tab.
+		const listViewTab = page.getByRole( 'tab', { name: 'List View' } );
+		await listViewTab.click();
+
+		const listViewPanel = page.getByRole( 'tabpanel', {
+			name: 'List View',
+		} );
+
+		// In contentOnly mode, the PanelBody title should show the custom
+		// menu name as a collapsible panel button.
+		await expect(
+			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
+		).toBeVisible();
 	} );
 } );
 
@@ -629,14 +647,7 @@ class LinkControl {
 
 		return result
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
-			.innerText();
-	}
-
-	async getSearchResultType( result ) {
-		await expect( result ).toBeVisible();
-
-		return result
-			.locator( '.components-menu-item__shortcut' ) // this is the only way to get the type text.
+			.last()
 			.innerText();
 	}
 }

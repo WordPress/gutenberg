@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/readable-js-assets-webpack-plugin",
-	"version": "3.16.0",
+	"version": "3.47.0",
 	"description": "Generate a readable JS file for each JS asset.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,6 +28,14 @@
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./package.json": "./package.json"
+	},
+	"devDependencies": {
+		"mkdirp": "3.0.1",
+		"terser-webpack-plugin": "5.3.10"
+	},
 	"peerDependencies": {
 		"webpack": "^4.8.3 || ^5.0.0"
 	},

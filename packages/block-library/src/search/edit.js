@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import {
 	useBlockProps,
-	BlockControls,
 	InspectorControls,
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
@@ -21,9 +20,8 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import {
-	ToolbarDropdownMenu,
-	ToolbarGroup,
-	ToolbarButton,
+	SelectControl,
+	ToggleControl,
 	ResizableBox,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -41,14 +39,6 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import {
-	buttonOnly,
-	buttonOutside,
-	buttonInside,
-	noButton,
-	buttonWithIcon,
-	toggleLabel,
-} from './icons';
 import {
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
@@ -80,7 +70,6 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		isSearchFieldHidden,
 		style,
 	} = attributes;
 
@@ -149,6 +138,7 @@ export default function SearchEdit( {
 	const isButtonPositionOutside = 'button-outside' === buttonPosition;
 	const hasNoButton = 'no-button' === buttonPosition;
 	const hasOnlyButton = 'button-only' === buttonPosition;
+	const isSearchFieldHidden = hasOnlyButton && ! isSelected;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
 
@@ -156,25 +146,6 @@ export default function SearchEdit( {
 		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
-
-	useEffect( () => {
-		if ( hasOnlyButton && ! isSelected ) {
-			setAttributes( {
-				isSearchFieldHidden: true,
-			} );
-		}
-	}, [ hasOnlyButton, isSelected, setAttributes ] );
-
-	// Show the search field when width changes.
-	useEffect( () => {
-		if ( ! hasOnlyButton || ! isSelected ) {
-			return;
-		}
-
-		setAttributes( {
-			isSearchFieldHidden: false,
-		} );
-	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
 		return clsx(
@@ -193,7 +164,7 @@ export default function SearchEdit( {
 			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
 				: undefined,
-			hasOnlyButton && isSearchFieldHidden
+			isSearchFieldHidden
 				? 'wp-block-search__searchfield-hidden'
 				: undefined
 		);
@@ -201,67 +172,22 @@ export default function SearchEdit( {
 
 	const buttonPositionControls = [
 		{
-			role: 'menuitemradio',
-			title: __( 'Button outside' ),
-			isActive: buttonPosition === 'button-outside',
-			icon: buttonOutside,
-			onClick: () => {
-				setAttributes( {
-					buttonPosition: 'button-outside',
-					isSearchFieldHidden: false,
-				} );
-			},
+			label: __( 'Button outside' ),
+			value: 'button-outside',
 		},
 		{
-			role: 'menuitemradio',
-			title: __( 'Button inside' ),
-			isActive: buttonPosition === 'button-inside',
-			icon: buttonInside,
-			onClick: () => {
-				setAttributes( {
-					buttonPosition: 'button-inside',
-					isSearchFieldHidden: false,
-				} );
-			},
+			label: __( 'Button inside' ),
+			value: 'button-inside',
 		},
 		{
-			role: 'menuitemradio',
-			title: __( 'No button' ),
-			isActive: buttonPosition === 'no-button',
-			icon: noButton,
-			onClick: () => {
-				setAttributes( {
-					buttonPosition: 'no-button',
-					isSearchFieldHidden: false,
-				} );
-			},
+			label: __( 'No button' ),
+			value: 'no-button',
 		},
 		{
-			role: 'menuitemradio',
-			title: __( 'Button only' ),
-			isActive: buttonPosition === 'button-only',
-			icon: buttonOnly,
-			onClick: () => {
-				setAttributes( {
-					buttonPosition: 'button-only',
-					isSearchFieldHidden: true,
-				} );
-			},
+			label: __( 'Button only' ),
+			value: 'button-only',
 		},
 	];
-
-	const getButtonPositionIcon = () => {
-		switch ( buttonPosition ) {
-			case 'button-inside':
-				return buttonInside;
-			case 'button-outside':
-				return buttonOutside;
-			case 'no-button':
-				return noButton;
-			case 'button-only':
-				return buttonOnly;
-		}
-	};
 
 	const getResizableSides = () => {
 		if ( hasOnlyButton ) {
@@ -278,12 +204,24 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
+			hasNoButton ? colorProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
+			...( hasNoButton ? colorProps.style : {} ),
 			...( isButtonPositionInside
-				? { borderRadius }
+				? {
+						borderRadius: borderProps.style?.borderRadius,
+						borderTopLeftRadius:
+							borderProps.style?.borderTopLeftRadius,
+						borderTopRightRadius:
+							borderProps.style?.borderTopRightRadius,
+						borderBottomLeftRadius:
+							borderProps.style?.borderBottomLeftRadius,
+						borderBottomRightRadius:
+							borderProps.style?.borderBottomRightRadius,
+				  }
 				: borderProps.style ),
 			...typographyProps.style,
 			textDecoration: undefined,
@@ -324,17 +262,19 @@ export default function SearchEdit( {
 			...colorProps.style,
 			...typographyProps.style,
 			...( isButtonPositionInside
-				? { borderRadius }
+				? {
+						borderRadius: borderProps.style?.borderRadius,
+						borderTopLeftRadius:
+							borderProps.style?.borderTopLeftRadius,
+						borderTopRightRadius:
+							borderProps.style?.borderTopRightRadius,
+						borderBottomLeftRadius:
+							borderProps.style?.borderBottomLeftRadius,
+						borderBottomRightRadius:
+							borderProps.style?.borderBottomRightRadius,
+				  }
 				: borderProps.style ),
 		};
-		const handleButtonClick = () => {
-			if ( hasOnlyButton ) {
-				setAttributes( {
-					isSearchFieldHidden: ! isSearchFieldHidden,
-				} );
-			}
-		};
-
 		return (
 			<>
 				{ buttonUseIcon && (
@@ -347,7 +287,6 @@ export default function SearchEdit( {
 								? stripHTML( buttonText )
 								: __( 'Search' )
 						}
-						onClick={ handleButtonClick }
 						ref={ buttonRef }
 					>
 						<Icon icon={ search } />
@@ -366,7 +305,6 @@ export default function SearchEdit( {
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
-						onClick={ handleButtonClick }
 					/>
 				) }
 			</>
@@ -376,40 +314,6 @@ export default function SearchEdit( {
 
 	const controls = (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						title={ __( 'Show search label' ) }
-						icon={ toggleLabel }
-						onClick={ () => {
-							setAttributes( {
-								showLabel: ! showLabel,
-							} );
-						} }
-						className={ showLabel ? 'is-pressed' : undefined }
-					/>
-					<ToolbarDropdownMenu
-						icon={ getButtonPositionIcon() }
-						label={ __( 'Change button position' ) }
-						controls={ buttonPositionControls }
-					/>
-					{ ! hasNoButton && (
-						<ToolbarButton
-							title={ __( 'Use button with icon' ) }
-							icon={ buttonWithIcon }
-							onClick={ () => {
-								setAttributes( {
-									buttonUseIcon: ! buttonUseIcon,
-								} );
-							} }
-							className={
-								buttonUseIcon ? 'is-pressed' : undefined
-							}
-						/>
-					) }
-				</ToolbarGroup>
-			</BlockControls>
-
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
@@ -417,10 +321,77 @@ export default function SearchEdit( {
 						setAttributes( {
 							width: undefined,
 							widthUnit: undefined,
+							showLabel: true,
+							buttonUseIcon: false,
+							buttonPosition: 'button-outside',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<ToolsPanelItem
+						hasValue={ () => ! showLabel }
+						label={ __( 'Show label' ) }
+						onDeselect={ () => {
+							setAttributes( {
+								showLabel: true,
+							} );
+						} }
+						isShownByDefault
+					>
+						<ToggleControl
+							checked={ showLabel }
+							label={ __( 'Show label' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									showLabel: value,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => buttonPosition !== 'button-outside' }
+						label={ __( 'Button position' ) }
+						onDeselect={ () => {
+							setAttributes( {
+								buttonPosition: 'button-outside',
+							} );
+						} }
+						isShownByDefault
+					>
+						<SelectControl
+							value={ buttonPosition }
+							__next40pxDefaultSize
+							label={ __( 'Button position' ) }
+							onChange={ ( value ) => {
+								setAttributes( {
+									buttonPosition: value,
+								} );
+							} }
+							options={ buttonPositionControls }
+						/>
+					</ToolsPanelItem>
+					{ buttonPosition !== 'no-button' && (
+						<ToolsPanelItem
+							hasValue={ () => !! buttonUseIcon }
+							label={ __( 'Use button with icon' ) }
+							onDeselect={ () => {
+								setAttributes( {
+									buttonUseIcon: false,
+								} );
+							} }
+							isShownByDefault
+						>
+							<ToggleControl
+								checked={ buttonUseIcon }
+								label={ __( 'Use button with icon' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										buttonUseIcon: value,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
 						hasValue={ () => !! width }
 						label={ __( 'Width' ) }
@@ -487,7 +458,6 @@ export default function SearchEdit( {
 								} }
 								isBlock
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 							>
 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 									return (
@@ -495,7 +465,7 @@ export default function SearchEdit( {
 											key={ widthValue }
 											value={ widthValue }
 											label={ sprintf(
-												/* translators: Percentage value. */
+												/* translators: %d: Percentage value. */
 												__( '%d%%' ),
 												widthValue
 											) }
@@ -510,8 +480,13 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const isNonZeroBorderRadius = ( radius ) =>
+		radius !== undefined && parseInt( radius, 10 ) !== 0;
+
 	const padBorderRadius = ( radius ) =>
-		radius ? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })` : undefined;
+		isNonZeroBorderRadius( radius )
+			? `calc(${ radius } + ${ DEFAULT_INNER_PADDING })`
+			: undefined;
 
 	const getWrapperStyles = () => {
 		const styles = isButtonPositionInside
@@ -527,10 +502,7 @@ export default function SearchEdit( {
 						borderProps.style?.borderBottomRightRadius,
 			  };
 
-		const isNonZeroBorderRadius =
-			borderRadius !== undefined && parseInt( borderRadius, 10 ) !== 0;
-
-		if ( isButtonPositionInside && isNonZeroBorderRadius ) {
+		if ( isButtonPositionInside ) {
 			// We have button inside wrapper and a border radius value to apply.
 			// Add default padding so we don't get "fat" corners.
 			//
@@ -539,15 +511,24 @@ export default function SearchEdit( {
 
 			if ( typeof borderRadius === 'object' ) {
 				// Individual corner border radii present.
-				const { topLeft, topRight, bottomLeft, bottomRight } =
-					borderRadius;
+				const {
+					borderTopLeftRadius,
+					borderTopRightRadius,
+					borderBottomLeftRadius,
+					borderBottomRightRadius,
+				} = borderProps.style;
 
 				return {
 					...styles,
-					borderTopLeftRadius: padBorderRadius( topLeft ),
-					borderTopRightRadius: padBorderRadius( topRight ),
-					borderBottomLeftRadius: padBorderRadius( bottomLeft ),
-					borderBottomRightRadius: padBorderRadius( bottomRight ),
+					borderTopLeftRadius: padBorderRadius( borderTopLeftRadius ),
+					borderTopRightRadius:
+						padBorderRadius( borderTopRightRadius ),
+					borderBottomLeftRadius: padBorderRadius(
+						borderBottomLeftRadius
+					),
+					borderBottomRightRadius: padBorderRadius(
+						borderBottomRightRadius
+					),
 				};
 			}
 

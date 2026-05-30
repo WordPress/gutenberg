@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -10,8 +15,21 @@ import {
 	getExpandedBlock,
 	isDragging,
 	getBlockStyles,
+	isEditLockedBlock,
+	isMoveLockedBlock,
+	isRemoveLockedBlock,
+	isLockedBlock,
+	isBlockHiddenAnywhere,
+	isBlockHiddenAtViewport,
+	getViewportModalClientIds,
+	isSectionBlock,
+	getParentSectionBlock,
+	getSelectedBlockStyleState,
+	hasSelectedStyleState,
+	isSelectedBlockStyleStateShownOnCanvas,
 } from '../private-selectors';
-import { getBlockEditingMode, __unstableGetEditorMode } from '../selectors';
+import { getBlockEditingMode } from '../selectors';
+import { deviceTypeKey } from '../private-keys';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -54,6 +72,146 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'getSelectedBlockStyleState', () => {
+		it( 'returns default when the block has no selected state', () => {
+			const state = {};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns the selected state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'mobile',
+				pseudo: ':hover',
+			} );
+		} );
+
+		it( 'returns default when the selected state has no value', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+
+		it( 'returns default when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
+				viewport: 'default',
+				pseudo: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'hasSelectedStyleState', () => {
+		it( 'returns false when the block has no selected state', () => {
+			const state = {};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when another block has the selected state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when a viewport state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: 'default' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when a pseudo state is selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when viewport and pseudo states are selected', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { viewport: 'mobile', pseudo: ':hover' },
+				},
+			};
+
+			expect( hasSelectedStyleState( state, 'client-1' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isSelectedBlockStyleStateShownOnCanvas', () => {
+		it( 'returns true when the block has no canvas preview state', () => {
+			const state = {};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
+		} );
+
+		it( 'returns the canvas preview state for the block', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( false );
+		} );
+
+		it( 'returns true when another block has canvas preview state', () => {
+			const state = {
+				selectedBlockStyleState: {
+					clientId: 'client-2',
+					showStateOnCanvas: false,
+				},
+			};
+
+			expect(
+				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
+			).toBe( true );
 		} );
 	} );
 
@@ -116,13 +274,13 @@ describe( 'private selectors', () => {
 						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
 					],
 				] ),
+				blockEditingModes: new Map(),
 			},
-			blockListSettings: {
-				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-			},
-			blockEditingModes: new Map( [] ),
-			derivedBlockEditingModes: new Map( [] ),
+			blockListSettings: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+			] ),
+			derivedBlockEditingModes: new Map(),
 		};
 
 		const hasContentRoleAttribute = jest.fn( () => false );
@@ -133,17 +291,15 @@ describe( 'private selectors', () => {
 				get,
 			} ) ),
 		};
-		__unstableGetEditorMode.registry = {
-			select: jest.fn( () => ( {
-				get,
-			} ) ),
-		};
 
 		it( 'should return false when top level block is not disabled', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect(
 				isBlockSubtreeDisabled(
@@ -156,9 +312,12 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -177,7 +336,10 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled via inheritance and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -198,10 +360,13 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -219,10 +384,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -240,10 +408,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled via inheritance and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -321,22 +492,23 @@ describe( 'private selectors', () => {
 					],
 				] ),
 			},
-			blockListSettings: {
-				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-			},
+			blockListSettings: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+			] ),
 		};
 		getEnabledClientIdsTree.registry = {
-			select: jest.fn( () => ( {
-				__unstableGetEditorMode: () => 'edit',
-			} ) ),
+			select: jest.fn( () => ( {} ) ),
 		};
 
 		it( 'should return tree containing only clientId and innerBlocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
@@ -373,8 +545,11 @@ describe( 'private selectors', () => {
 		it( 'should return a subtree when rootBlockClientId is given', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect(
 				getEnabledClientIdsTree(
@@ -405,11 +580,20 @@ describe( 'private selectors', () => {
 		it( 'should filter out disabled blocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'contentOnly' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'contentOnly',
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'contentOnly',
+						],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -449,8 +633,8 @@ describe( 'private selectors', () => {
 						[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
 						[ '', [ '6cf70164-9097-4460-bcbf-200560546988' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map(),
 			};
 			expect(
@@ -495,16 +679,16 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 				] ),
-				blockListSettings: {},
+				blockListSettings: new Map(),
 			};
 			expect(
 				getEnabledBlockParents(
@@ -548,15 +732,15 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
-				blockListSettings: {},
+				blockListSettings: new Map(),
 			};
 			expect(
 				getEnabledBlockParents(
@@ -686,6 +870,966 @@ describe( 'private selectors', () => {
 				'block-1': { color: 'red' },
 				'non-existent-block': undefined,
 			} );
+		} );
+	} );
+
+	describe( 'isEditLockedBlock', () => {
+		it( 'returns false when block has no lock attribute', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when block has lock attribute but edit is false', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', { lock: { edit: false, move: true } } ],
+					] ),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock attribute with edit set to true', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', { lock: { edit: true } } ],
+					] ),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when block has no attributes', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+				},
+			};
+			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isMoveLockedBlock', () => {
+		const createState = ( templateLock, blockLock ) => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'block-1', { clientId: 'block-1' } ],
+					[ 'parent-block', { clientId: 'parent-block' } ],
+				] ),
+				attributes: new Map( [
+					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+					[ 'parent-block', {} ],
+				] ),
+				parents: new Map( [
+					[ 'block-1', 'parent-block' ],
+					[ 'parent-block', '' ],
+				] ),
+			},
+			settings: {},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
+		} );
+
+		it( 'returns false when block has no lock and no templateLock', () => {
+			const state = createState( null, null );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when parent has templateLock set to "all"', () => {
+			const state = createState( 'all', null );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when parent has templateLock set to "contentOnly"', () => {
+			const state = createState( 'contentOnly', null );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock.move set to true', () => {
+			const state = createState( null, { move: true } );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when block has lock.move set to false', () => {
+			const state = createState( null, { move: false } );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'prioritizes block lock over template lock', () => {
+			const state = createState( 'all', { move: false } );
+			expect( isMoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isRemoveLockedBlock', () => {
+		const createState = ( templateLock, blockLock ) => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'block-1', { clientId: 'block-1' } ],
+					[ 'parent-block', { clientId: 'parent-block' } ],
+				] ),
+				attributes: new Map( [
+					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+					[ 'parent-block', {} ],
+				] ),
+				parents: new Map( [
+					[ 'block-1', 'parent-block' ],
+					[ 'parent-block', '' ],
+				] ),
+			},
+			settings: {},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
+		} );
+
+		it( 'returns false when block has no lock and no templateLock', () => {
+			const state = createState( null, null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when parent has templateLock set to "all"', () => {
+			const state = createState( 'all', null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when parent has templateLock set to "insert"', () => {
+			const state = createState( 'insert', null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when parent has templateLock set to "contentOnly"', () => {
+			const state = createState( 'contentOnly', null );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock.remove set to true', () => {
+			const state = createState( null, { remove: true } );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when block has lock.remove set to false', () => {
+			const state = createState( null, { remove: false } );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'prioritizes block lock over template lock', () => {
+			const state = createState( 'all', { remove: false } );
+			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isLockedBlock', () => {
+		const createState = ( templateLock, blockLock ) => ( {
+			blocks: {
+				byClientId: new Map( [
+					[ 'block-1', { clientId: 'block-1' } ],
+					[ 'parent-block', { clientId: 'parent-block' } ],
+				] ),
+				attributes: new Map( [
+					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+					[ 'parent-block', {} ],
+				] ),
+				parents: new Map( [
+					[ 'block-1', 'parent-block' ],
+					[ 'parent-block', '' ],
+				] ),
+			},
+			settings: {},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
+		} );
+
+		it( 'returns false when block is not locked in any way', () => {
+			const state = createState( null, null );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true when block has lock.edit set to true', () => {
+			const state = createState( null, { edit: true } );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block has lock.move set to true', () => {
+			const state = createState( null, { move: true } );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block has lock.remove set to true', () => {
+			const state = createState( null, { remove: true } );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when parent has templateLock set to "all"', () => {
+			const state = createState( 'all', null );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when block has multiple locks', () => {
+			const state = createState( null, {
+				edit: true,
+				move: true,
+				remove: true,
+			} );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when only one lock type is active', () => {
+			const state = createState( null, {
+				edit: false,
+				move: true,
+				remove: false,
+			} );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when all lock types are explicitly false', () => {
+			const state = createState( null, {
+				edit: false,
+				move: false,
+				remove: false,
+			} );
+			expect( isLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockHiddenAnywhere', () => {
+		beforeAll( () => {
+			// Register a block with visibility support
+			registerBlockType( 'core/test-block-with-visibility', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Test Block With Visibility',
+				supports: {
+					visibility: true,
+				},
+			} );
+
+			// Register a block without visibility support
+			registerBlockType( 'core/test-block-without-visibility', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Test Block Without Visibility',
+				supports: {
+					visibility: false,
+				},
+			} );
+
+			// Register a block with no supports defined (defaults to true for visibility)
+			registerBlockType( 'core/test-block-default-visibility', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Test Block Default Visibility',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/test-block-with-visibility' );
+			unregisterBlockType( 'core/test-block-without-visibility' );
+			unregisterBlockType( 'core/test-block-default-visibility' );
+		} );
+
+		it( 'should return false when block has visibility support and is not hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: true,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true when block has visibility support and is hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false when block does not have visibility support', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-without-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			// Even though blockVisibility is false, the block doesn't support visibility,
+			// so it should return false
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return false when block has default visibility support and is not hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-default-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: true,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true when block has default visibility support and is hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-default-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false when block has no metadata', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return false when block has metadata but no blockVisibility property', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									someOtherProperty: 'value',
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should handle non-existent block gracefully', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+				},
+			};
+
+			// When block doesn't exist, getBlockName returns null,
+			// and hasBlockSupport should handle null gracefully
+			expect( isBlockHiddenAnywhere( state, 'non-existent-block' ) ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'isBlockHiddenAtViewport', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/test-block-with-visibility', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Test Block With Visibility',
+				supports: {
+					visibility: true,
+				},
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/test-block-with-visibility' );
+		} );
+
+		it( 'returns true when block is hidden everywhere', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Desktop' )
+			).toBe( true );
+		} );
+
+		it( 'returns visibility based on the requested viewport', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											mobile: false,
+											tablet: true,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Mobile' )
+			).toBe( true );
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockHiddenAnywhere in different devices', () => {
+		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
+			settings: {
+				[ deviceTypeKey ]: deviceType,
+			},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'test-block',
+						{
+							name: 'core/paragraph',
+							attributes: {
+								metadata: {
+									blockVisibility,
+								},
+							},
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'test-block',
+						{
+							metadata: {
+								blockVisibility,
+							},
+						},
+					],
+				] ),
+			},
+		} );
+
+		it( 'returns true when block is hidden at any viewport (mobile)', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Desktop'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on desktop', () => {
+			const state = createState(
+				{ viewport: { desktop: false } },
+				'Desktop'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on tablet', () => {
+			const state = createState(
+				{ viewport: { mobile: true, tablet: false } },
+				'Tablet'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on mobile', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Mobile'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden at any viewport even if visible at current device', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Tablet'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false when block is visible at all viewports', () => {
+			const state = createState(
+				{ mobile: true, tablet: true, desktop: true },
+				'Desktop'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'getViewportModalClientIds', () => {
+		it( 'should return null when modal is not open', () => {
+			const state = {
+				viewportModalClientIds: null,
+			};
+			expect( getViewportModalClientIds( state ) ).toBeNull();
+		} );
+
+		it( 'should return client IDs when modal is open', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			const state = {
+				viewportModalClientIds: clientIds,
+			};
+			expect( getViewportModalClientIds( state ) ).toEqual( clientIds );
+		} );
+	} );
+
+	describe( 'isSectionBlock', () => {
+		const createState = ( {
+			blockName = 'core/group',
+			patternName,
+			disableContentOnlyForUnsyncedPatterns,
+			templateLock,
+			rootTemplateLock,
+		} = {} ) => {
+			const clientId = 'block-1';
+			const rootClientId = '';
+			const attributes = patternName ? { metadata: { patternName } } : {};
+
+			return {
+				blocks: {
+					byClientId: new Map( [
+						[ clientId, { name: blockName } ],
+					] ),
+					attributes: new Map( [ [ clientId, attributes ] ] ),
+					parents: new Map( [ [ clientId, rootClientId ] ] ),
+				},
+				blockListSettings: new Map( [
+					[ clientId, templateLock ? { templateLock } : {} ],
+					[
+						'',
+						rootTemplateLock
+							? { templateLock: rootTemplateLock }
+							: {},
+					],
+				] ),
+				settings:
+					disableContentOnlyForUnsyncedPatterns !== undefined
+						? { disableContentOnlyForUnsyncedPatterns }
+						: {},
+				editedContentOnlySection: undefined,
+			};
+		};
+
+		it( 'should return true for blocks with patternName by default', () => {
+			const state = createState( {
+				patternName: 'my-pattern',
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false for blocks with patternName when disableContentOnlyForUnsyncedPatterns is true', () => {
+			const state = createState( {
+				patternName: 'my-pattern',
+				disableContentOnlyForUnsyncedPatterns: true,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should still return true for template parts when disableContentOnlyForUnsyncedPatterns is true', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				disableContentOnlyForUnsyncedPatterns: true,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should still return true for synced patterns (core/block) when disableContentOnlyForUnsyncedPatterns is true', () => {
+			const state = createState( {
+				blockName: 'core/block',
+				disableContentOnlyForUnsyncedPatterns: true,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return true for blocks with patternName when disableContentOnlyForUnsyncedPatterns is false', () => {
+			const state = createState( {
+				patternName: 'my-pattern',
+				disableContentOnlyForUnsyncedPatterns: false,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when nested inside another section block', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'inner-pattern', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[
+							'inner-pattern',
+							{ metadata: { patternName: 'inner' } },
+						],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'inner-pattern', 'outer-pattern' ],
+					] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			// inner-pattern is nested inside outer-pattern (also a section),
+			// so it is not considered a section itself.
+			expect( isSectionBlock( state, 'inner-pattern' ) ).toBe( false );
+		} );
+
+		it( 'returns false when the block itself is the editedContentOnlySection', () => {
+			const state = {
+				...createState( {
+					patternName: 'my-pattern',
+				} ),
+				editedContentOnlySection: 'block-1',
+			};
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false when the block is nested within the editedContentOnlySection', () => {
+			// Create a nested structure: outer-pattern > block-1 (with patternName)
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'block-1', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[ 'block-1', { metadata: { patternName: 'inner' } } ],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'block-1', 'outer-pattern' ],
+					] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: 'outer-pattern',
+			};
+			// block-1 has a patternName, so would normally be a section,
+			// but since its parent (outer-pattern) is being edited, it's not.
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns true for section blocks outside the editedContentOnlySection', () => {
+			// Create a structure with two sibling patterns
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-a', { name: 'core/group' } ],
+						[ 'pattern-b', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[ 'pattern-a', { metadata: { patternName: 'a' } } ],
+						[ 'pattern-b', { metadata: { patternName: 'b' } } ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-a', '' ],
+						[ 'pattern-b', '' ],
+					] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: 'pattern-a',
+			};
+			// pattern-b is not the edited section and not within it
+			expect( isSectionBlock( state, 'pattern-b' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getParentSectionBlock', () => {
+		it( 'returns undefined when there are no parent section blocks', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+					parents: new Map( [ [ 'block-1', '' ] ] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			expect( getParentSectionBlock( state, 'block-1' ) ).toBeUndefined();
+		} );
+
+		it( 'returns the parent section block clientId', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-block', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'pattern-block',
+							{ metadata: { patternName: 'my-pattern' } },
+						],
+						[ 'inner-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-block', '' ],
+						[ 'inner-block', 'pattern-block' ],
+					] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
+				'pattern-block'
+			);
+		} );
+
+		it( 'returns undefined when the parent is the editedContentOnlySection', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-block', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'pattern-block',
+							{ metadata: { patternName: 'my-pattern' } },
+						],
+						[ 'inner-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-block', '' ],
+						[ 'inner-block', 'pattern-block' ],
+					] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: 'pattern-block',
+			};
+			// Since pattern-block is the edited section, it's no longer
+			// considered a parent section for inner-block
+			expect(
+				getParentSectionBlock( state, 'inner-block' )
+			).toBeUndefined();
+		} );
+
+		it( 'returns undefined for deeply nested blocks when an ancestor is the editedContentOnlySection', () => {
+			// Structure: outer-pattern > nested-pattern > deep-block
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'nested-pattern', { name: 'core/group' } ],
+						[ 'deep-block', { name: 'core/paragraph' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[
+							'nested-pattern',
+							{ metadata: { patternName: 'nested' } },
+						],
+						[ 'deep-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'nested-pattern', 'outer-pattern' ],
+						[ 'deep-block', 'nested-pattern' ],
+					] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: 'outer-pattern',
+			};
+			// When outer-pattern is being edited, nested-pattern is no longer
+			// a section (tested above), so deep-block has no parent section
+			expect(
+				getParentSectionBlock( state, 'deep-block' )
+			).toBeUndefined();
+		} );
+
+		it( 'returns the correct parent when editedContentOnlySection is set but not in ancestry', () => {
+			// Structure: pattern-a > inner-block, pattern-b (sibling)
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'pattern-a', { name: 'core/group' } ],
+						[ 'inner-block', { name: 'core/paragraph' } ],
+						[ 'pattern-b', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[ 'pattern-a', { metadata: { patternName: 'a' } } ],
+						[ 'inner-block', {} ],
+						[ 'pattern-b', { metadata: { patternName: 'b' } } ],
+					] ),
+					parents: new Map( [
+						[ 'pattern-a', '' ],
+						[ 'inner-block', 'pattern-a' ],
+						[ 'pattern-b', '' ],
+					] ),
+				},
+				blockListSettings: new Map(),
+				settings: {},
+				editedContentOnlySection: 'pattern-b',
+			};
+			// pattern-a is not being edited, so inner-block still has pattern-a as parent
+			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
+				'pattern-a'
+			);
 		} );
 	} );
 } );
