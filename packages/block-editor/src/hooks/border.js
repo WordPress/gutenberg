@@ -27,6 +27,8 @@ import { unlock } from '../lock-unlock';
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
 
+const EMPTY_ARRAY = [];
+
 const getColorByProperty = ( colors, property, value ) => {
 	let matchedColor;
 
@@ -253,13 +255,13 @@ export function useBorderPanelLabel( {
 	hasBorderControl,
 	hasShadowControl,
 } = {} ) {
-	const settings = useSelect(
+	const [ color, radius, style, width, shadow ] = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return null;
+				return EMPTY_ARRAY;
 			}
 			const { getBlockSettings } = unlock( select( blockEditorStore ) );
-			const [ color, radius, style, width, shadow ] = getBlockSettings(
+			return getBlockSettings(
 				clientId,
 				'border.color',
 				'border.radius',
@@ -267,10 +269,10 @@ export function useBorderPanelLabel( {
 				'border.width',
 				'shadow'
 			);
-			return { border: { color, radius, style, width }, shadow };
 		},
 		[ clientId ]
 	);
+	const settings = { border: { color, radius, style, width }, shadow };
 	const controls = useHasBorderPanelControls( settings );
 
 	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
