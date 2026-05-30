@@ -103,7 +103,7 @@ const StylesTab = ( {
 	isSectionBlock,
 	contentClientIds,
 } ) => {
-	const borderPanelLabel = useBorderPanelLabel( { blockName, clientId } );
+	const borderPanelLabel = useBorderPanelLabel( { clientId } );
 
 	return (
 		<>

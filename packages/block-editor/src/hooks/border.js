@@ -250,7 +250,6 @@ export function hasShadowSupport( blockName ) {
 }
 
 export function useBorderPanelLabel( {
-	blockName,
 	clientId,
 	hasBorderControl,
 	hasShadowControl,
@@ -275,7 +274,7 @@ export function useBorderPanelLabel( {
 	const settings = { border: { color, radius, style, width }, shadow };
 	const controls = useHasBorderPanelControls( settings );
 
-	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
+	if ( ! hasBorderControl && ! hasShadowControl && clientId ) {
 		hasBorderControl =
 			controls?.hasBorderColor ||
 			controls?.hasBorderStyle ||
