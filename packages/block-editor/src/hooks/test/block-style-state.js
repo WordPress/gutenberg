@@ -11,16 +11,59 @@ describe( 'getStyleForState', () => {
 	it( 'returns the root style for the default state', () => {
 		const style = { color: { text: '#000000' } };
 
-		expect( getStyleForState( style, 'default' ) ).toBe( style );
+		expect(
+			getStyleForState( style, {
+				viewport: 'default',
+				pseudo: 'default',
+			} )
+		).toBe( style );
 	} );
 
-	it( 'returns the selected state style', () => {
+	it( 'returns the selected pseudo state style', () => {
 		const style = {
 			color: { text: '#000000' },
 			':hover': { color: { text: '#ff0000' } },
 		};
 
-		expect( getStyleForState( style, ':hover' ) ).toEqual( {
+		expect(
+			getStyleForState( style, {
+				viewport: 'default',
+				pseudo: ':hover',
+			} )
+		).toEqual( {
+			color: { text: '#ff0000' },
+		} );
+	} );
+
+	it( 'returns the selected viewport state style', () => {
+		const style = {
+			color: { text: '#000000' },
+			mobile: { color: { text: '#ff0000' } },
+		};
+
+		expect(
+			getStyleForState( style, {
+				viewport: 'mobile',
+				pseudo: 'default',
+			} )
+		).toEqual( {
+			color: { text: '#ff0000' },
+		} );
+	} );
+
+	it( 'returns the selected viewport pseudo state style', () => {
+		const style = {
+			mobile: {
+				':hover': { color: { text: '#ff0000' } },
+			},
+		};
+
+		expect(
+			getStyleForState( style, {
+				viewport: 'mobile',
+				pseudo: ':hover',
+			} )
+		).toEqual( {
 			color: { text: '#ff0000' },
 		} );
 	} );
@@ -29,27 +72,69 @@ describe( 'getStyleForState', () => {
 describe( 'setStyleForState', () => {
 	it( 'replaces the root style for the default state', () => {
 		expect(
-			setStyleForState( { color: { text: '#000000' } }, 'default', {
-				typography: { fontSize: '32px' },
-			} )
+			setStyleForState(
+				{ color: { text: '#000000' } },
+				{ viewport: 'default', pseudo: 'default' },
+				{
+					typography: { fontSize: '32px' },
+				}
+			)
 		).toEqual( {
 			typography: { fontSize: '32px' },
 		} );
 	} );
 
-	it( 'updates only the selected state style', () => {
+	it( 'updates only the selected pseudo state style', () => {
 		expect(
 			setStyleForState(
 				{
 					color: { text: '#000000' },
 					':hover': { color: { text: '#ff0000' } },
 				},
-				':hover',
+				{ viewport: 'default', pseudo: ':hover' },
 				{ typography: { fontSize: '32px' } }
 			)
 		).toEqual( {
 			color: { text: '#000000' },
 			':hover': { typography: { fontSize: '32px' } },
+		} );
+	} );
+
+	it( 'updates only the selected viewport state style', () => {
+		expect(
+			setStyleForState(
+				{
+					color: { text: '#000000' },
+					mobile: { color: { text: '#ff0000' } },
+				},
+				{ viewport: 'mobile', pseudo: 'default' },
+				{ typography: { fontSize: '32px' } }
+			)
+		).toEqual( {
+			color: { text: '#000000' },
+			mobile: { typography: { fontSize: '32px' } },
+		} );
+	} );
+
+	it( 'updates only the selected viewport pseudo state style', () => {
+		expect(
+			setStyleForState(
+				{
+					color: { text: '#000000' },
+					mobile: {
+						color: { text: '#ff0000' },
+						':hover': { color: { text: '#00ff00' } },
+					},
+				},
+				{ viewport: 'mobile', pseudo: ':hover' },
+				{ typography: { fontSize: '32px' } }
+			)
+		).toEqual( {
+			color: { text: '#000000' },
+			mobile: {
+				color: { text: '#ff0000' },
+				':hover': { typography: { fontSize: '32px' } },
+			},
 		} );
 	} );
 
@@ -60,7 +145,7 @@ describe( 'setStyleForState', () => {
 					color: { text: '#000000' },
 					':hover': { color: { text: '#ff0000' } },
 				},
-				':hover',
+				{ viewport: 'default', pseudo: ':hover' },
 				{ color: { text: undefined } }
 			)
 		).toEqual( {
@@ -91,7 +176,7 @@ describe( 'scopeResetAllFilterToState', () => {
 		};
 
 		const result = scopeResetAllFilterToState(
-			':hover',
+			{ viewport: 'default', pseudo: ':hover' },
 			innerReset
 		)( attributes );
 
@@ -119,7 +204,7 @@ describe( 'scopeResetAllFilterToState', () => {
 		};
 
 		const result = scopeResetAllFilterToState(
-			':hover',
+			{ viewport: 'default', pseudo: ':hover' },
 			innerReset
 		)( attributes );
 
@@ -136,16 +221,50 @@ describe( 'scopeResetAllFilterToState', () => {
 			style: { color: { text: '#000000' } },
 		};
 
-		scopeResetAllFilterToState( ':hover', innerReset )( attributes );
+		scopeResetAllFilterToState(
+			{ viewport: 'default', pseudo: ':hover' },
+			innerReset
+		)( attributes );
 
 		expect( innerReset ).toHaveBeenCalledWith( { style: {} } );
+	} );
+
+	it( 'passes only the selected viewport pseudo state style to the reset filter', () => {
+		const innerReset = jest.fn( () => ( { style: undefined } ) );
+		const attributes = {
+			style: {
+				color: { text: '#000000' },
+				mobile: {
+					color: { text: '#ff0000' },
+					':hover': { color: { text: '#00ff00' } },
+				},
+			},
+		};
+
+		const result = scopeResetAllFilterToState(
+			{ viewport: 'mobile', pseudo: ':hover' },
+			innerReset
+		)( attributes );
+
+		expect( innerReset ).toHaveBeenCalledWith( {
+			style: attributes.style.mobile[ ':hover' ],
+		} );
+		expect( result ).toEqual( {
+			style: {
+				color: { text: '#000000' },
+				mobile: { color: { text: '#ff0000' } },
+			},
+		} );
 	} );
 
 	it( 'returns the original reset filter for the default state', () => {
 		const innerReset = () => ( { style: undefined } );
 
-		expect( scopeResetAllFilterToState( 'default', innerReset ) ).toBe(
-			innerReset
-		);
+		expect(
+			scopeResetAllFilterToState(
+				{ viewport: 'default', pseudo: 'default' },
+				innerReset
+			)
+		).toBe( innerReset );
 	} );
 } );

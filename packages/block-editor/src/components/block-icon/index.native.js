@@ -6,7 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -29,7 +29,7 @@ export function BlockIcon( { icon, fill, size, showColors = false } ) {
 	const iconForeground = showColors ? icon?.foreground : undefined;
 
 	const renderedIcon = (
-		<Icon
+		<WCIcon
 			icon={ icon && icon.src ? icon.src : icon }
 			fill={ fill || iconForeground || defaultFill }
 			{ ...( size && { size } ) }

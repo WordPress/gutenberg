@@ -8,8 +8,27 @@ import { __ } from '@wordpress/i18n';
  */
 import type { NormalizedRect, Flip, CropperState } from './types';
 
+/**
+ * Default/resting zoom. A full, unrotated crop needs at least 1x to cover the
+ * crop area, but smaller/fine-rotated crops can be valid below 1x — the true
+ * floor for those comes from `getMinZoom`.
+ */
 export const MIN_ZOOM = 1;
+/**
+ * Safety floor for coverage-aware zoom. Degenerate crops can have a geometric
+ * coverage minimum of 0, but camera and inverse-matrix math need a stable,
+ * positive scale.
+ */
+export const ABSOLUTE_MIN_ZOOM = 0.1;
 export const MAX_ZOOM = 10;
+
+/**
+ * Minimum crop rect dimension in source-image pixels, enforced per axis
+ * during resize. Prevents accidental sub-pixel crops while staying small
+ * enough to allow tight crops (favicons, icons). Adjust here to tune the
+ * floor globally.
+ */
+export const MIN_CROP_PIXELS = 24;
 
 /**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.

@@ -143,6 +143,7 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 						disabled={ loading || ! draft }
 						accessibleWhenDisabled
 						isBusy={ loading }
+						__next40pxDefaultSize
 					>
 						{ __( 'Save guidelines' ) }
 					</Button>
@@ -153,6 +154,7 @@ export default function GuidelineAccordionForm( { slug }: { slug: string } ) {
 						accessibleWhenDisabled
 						isBusy={ loading }
 						onClick={ handleClearClick }
+						__next40pxDefaultSize
 					>
 						{ __( 'Clear guidelines' ) }
 					</Button>

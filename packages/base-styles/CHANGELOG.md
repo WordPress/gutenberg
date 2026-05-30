@@ -4,7 +4,24 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808), [#78180](https://github.com/WordPress/gutenberg/pull/78180), [#78181](https://github.com/WordPress/gutenberg/pull/78181)):
+-   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
+   -   `.nux-dot-tip`
+
+## 9.0.0 (2026-05-27)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315), [#78362](https://github.com/WordPress/gutenberg/pull/78362)):
+    -   `.components-modal__header`
+    -   `.dataviews-footer`
+    -   `.dataviews-view-grid__card .dataviews-selection-checkbox`
+    -   `.dataviews-view-table thead`
+
+## 8.0.0 (2026-05-14)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808), [#78180](https://github.com/WordPress/gutenberg/pull/78180), [#78181](https://github.com/WordPress/gutenberg/pull/78181), [#78309](https://github.com/WordPress/gutenberg/pull/78309)):
     -   `.block-editor-block-manager__category-title`
     -   `.block-editor-block-manager__disabled-blocks-count`
     -   `.block-library-query-pattern__selection-search`
@@ -20,6 +37,7 @@
     -   `.editor-post-template__swap-template-search`
     -   `.editor-start-page-options__modal__actions`
     -   `.editor-start-template-options__modal__actions`
+    -   `.editor-text-editor__toolbar`
     -   `.wp-block-cover__image-background`
     -   `.wp-block-cover__inner-container`
     -   `.wp-block-cover__video-background`

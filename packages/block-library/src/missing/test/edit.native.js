@@ -7,7 +7,7 @@ import { Text } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, Icon } from '@wordpress/components';
+import { BottomSheet, Icon as WCIcon } from '@wordpress/components';
 import { help, plugins } from '@wordpress/icons';
 import { storeConfig } from '@wordpress/block-editor';
 jest.mock( '@wordpress/block-editor/src/store/selectors' );
@@ -39,7 +39,7 @@ describe( 'Missing block', () => {
 	describe( 'help modal', () => {
 		it( 'renders help icon', () => {
 			const testInstance = getTestComponentWithContent();
-			const icons = testInstance.UNSAFE_getAllByType( Icon );
+			const icons = testInstance.UNSAFE_getAllByType( WCIcon );
 			expect( icons.length ).toBe( 2 );
 			expect( icons[ 0 ].props.icon ).toBe( help );
 		} );
@@ -66,7 +66,7 @@ describe( 'Missing block', () => {
 
 	it( 'renders admin plugins icon', () => {
 		const testInstance = getTestComponentWithContent();
-		const icons = testInstance.UNSAFE_getAllByType( Icon );
+		const icons = testInstance.UNSAFE_getAllByType( WCIcon );
 		expect( icons.length ).toBe( 2 );
 		expect( icons[ 1 ].props.icon ).toBe( plugins );
 	} );

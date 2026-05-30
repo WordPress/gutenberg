@@ -36,15 +36,45 @@ export const MAX_UPDATE_SIZE_IN_BYTES =
 // WP_HTTP_Polling_Sync_Server::MAX_ROOMS_PER_REQUEST.
 export const MAX_ROOMS_PER_REQUEST = 50;
 
-export const POLLING_INTERVAL_IN_MS = applyFilters(
-	'sync.pollingManager.pollingInterval',
-	4000 // 4 seconds
-) as number;
+// Corresponds with server-side
+// WP_HTTP_Polling_Sync_Server::MAX_BODY_SIZE, with 1 MiB of headroom for
+// serialization details and future metadata.
+export const MAX_SYNC_REQUEST_BODY_SIZE_IN_BYTES = 15 * 1024 * 1024;
 
-export const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = applyFilters(
-	'sync.pollingManager.pollingIntervalWithCollaborators',
-	1000 // 1 second
-) as number;
+// Keep a single maximum-sized encoded update plus room metadata sendable if a
+// request-body-too-large response forces the client to shrink its retry budget.
+export const MIN_SYNC_REQUEST_BODY_SIZE_LIMIT_IN_BYTES = 2 * 1024 * 1024;
+
+const DEFAULT_POLLING_INTERVAL_IN_MS = 4000; // 4 seconds
+const DEFAULT_POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 1000; // 1 second
+
+function getFilteredPollingInterval(
+	hookName: string,
+	defaultInterval: number
+): number {
+	const filteredInterval = applyFilters( hookName, defaultInterval );
+
+	if (
+		typeof filteredInterval !== 'number' ||
+		! Number.isFinite( filteredInterval ) ||
+		filteredInterval <= 0
+	) {
+		return defaultInterval;
+	}
+
+	return Math.min( filteredInterval, defaultInterval );
+}
+
+export const POLLING_INTERVAL_IN_MS = getFilteredPollingInterval(
+	'sync.pollingManager.pollingInterval',
+	DEFAULT_POLLING_INTERVAL_IN_MS
+);
+
+export const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS =
+	getFilteredPollingInterval(
+		'sync.pollingManager.pollingIntervalWithCollaborators',
+		DEFAULT_POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS
+	);
 
 // Must be less than the server-side AWARENESS_TIMEOUT (30 s) to avoid
 // false disconnects when the tab is in the background.

@@ -14,7 +14,8 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import { useDashboardInternalContext } from '../context/dashboard-context';
 import { WidgetDashboard } from '../widget-dashboard';
-import type { DashboardWidget, WidgetType } from '../types';
+import type { DashboardWidget, WidgetGridSettings } from '../types';
+import type { WidgetType } from '../../widget-primitives';
 
 const widgetTypes: WidgetType[] = [];
 
@@ -25,11 +26,16 @@ const initialLayout: DashboardWidget[] = [
 
 interface ProbeApi {
 	layout: DashboardWidget[];
+	gridSettings: WidgetGridSettings;
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
 	mutate: ( next: DashboardWidget[] ) => void;
-	commit: () => void;
-	cancel: () => void;
+	mutateGridSettings: ( next: WidgetGridSettings ) => void;
+	commit: ( options?: { exitEditMode?: boolean } ) => void;
+	cancel: ( options?: {
+		exitEditMode?: boolean;
+		revertLayout?: boolean;
+	} ) => void;
 }
 
 const probeRef: { current: ProbeApi | null } = { current: null };
@@ -39,11 +45,13 @@ function Probe() {
 	useEffect( () => {
 		probeRef.current = {
 			layout: ctx.layout,
+			gridSettings: ctx.gridSettings,
 			hasUncommittedChanges: ctx.hasUncommittedChanges,
 			editMode: ctx.editMode,
 			mutate: ctx.onLayoutChange,
-			commit: ctx.commitLayout,
-			cancel: ctx.cancelLayout,
+			mutateGridSettings: ctx.onGridSettingsChange,
+			commit: ctx.commit,
+			cancel: ctx.cancel,
 		};
 	} );
 	return null;
@@ -59,15 +67,24 @@ function readProbe(): ProbeApi {
 interface HarnessProps {
 	layout: DashboardWidget[];
 	onLayoutChange: ( next: DashboardWidget[] ) => void;
+	gridSettings?: WidgetGridSettings;
+	onGridSettingsChange?: ( next: WidgetGridSettings ) => void;
 }
 
-function Harness( { layout, onLayoutChange }: HarnessProps ) {
+function Harness( {
+	layout,
+	onLayoutChange,
+	gridSettings,
+	onGridSettingsChange,
+}: HarnessProps ) {
 	const [ editMode, setEditMode ] = useState( true );
 
 	return (
 		<WidgetDashboard
 			layout={ layout }
 			onLayoutChange={ onLayoutChange }
+			gridSettings={ gridSettings }
+			onGridSettingsChange={ onGridSettingsChange }
 			widgetTypes={ widgetTypes }
 			editMode={ editMode }
 			onEditChange={ setEditMode }
@@ -265,6 +282,195 @@ describe( 'WidgetDashboard staging layer', () => {
 
 		// Empty committed -> auto edit-mode after sync.
 		rerender( <Harness layout={ [] } onLayoutChange={ onLayoutChange } /> );
+
+		expect( readProbe().editMode ).toBe( true );
+	} );
+
+	describe( 'grid settings staging', () => {
+		const initialSettings: WidgetGridSettings = {
+			model: 'grid',
+			minColumnWidth: 350,
+			rowHeight: 200,
+		};
+
+		it( 'keeps settings mutations in staging without firing onGridSettingsChange', () => {
+			const onLayoutChange = jest.fn();
+			const onGridSettingsChange = jest.fn();
+			render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+					gridSettings={ initialSettings }
+					onGridSettingsChange={ onGridSettingsChange }
+				/>
+			);
+
+			expect( readProbe().hasUncommittedChanges ).toBe( false );
+
+			act( () => {
+				readProbe().mutateGridSettings( {
+					...initialSettings,
+					minColumnWidth: 420,
+				} );
+			} );
+
+			expect( onGridSettingsChange ).not.toHaveBeenCalled();
+			expect( readProbe().hasUncommittedChanges ).toBe( true );
+			expect( readProbe().gridSettings.minColumnWidth ).toBe( 420 );
+		} );
+
+		it( 'publishes both layout and settings on commit', () => {
+			const onLayoutChange = jest.fn();
+			const onGridSettingsChange = jest.fn();
+			render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+					gridSettings={ initialSettings }
+					onGridSettingsChange={ onGridSettingsChange }
+				/>
+			);
+
+			act( () => {
+				readProbe().mutate( [ initialLayout[ 0 ] ] );
+				readProbe().mutateGridSettings( {
+					...initialSettings,
+					model: 'masonry',
+				} );
+			} );
+
+			act( () => {
+				readProbe().commit();
+			} );
+
+			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+			expect( onGridSettingsChange ).toHaveBeenCalledTimes( 1 );
+			expect( onGridSettingsChange.mock.calls[ 0 ][ 0 ] ).toMatchObject( {
+				model: 'masonry',
+			} );
+		} );
+
+		it( 'reverts settings on cancel', () => {
+			const onLayoutChange = jest.fn();
+			const onGridSettingsChange = jest.fn();
+			render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+					gridSettings={ initialSettings }
+					onGridSettingsChange={ onGridSettingsChange }
+				/>
+			);
+
+			act( () => {
+				readProbe().mutateGridSettings( {
+					...initialSettings,
+					model: 'masonry',
+				} );
+			} );
+
+			expect( readProbe().hasUncommittedChanges ).toBe( true );
+
+			act( () => {
+				readProbe().cancel();
+			} );
+
+			expect( onGridSettingsChange ).not.toHaveBeenCalled();
+			expect( readProbe().hasUncommittedChanges ).toBe( false );
+			expect( readProbe().gridSettings.model ).toBe( 'grid' );
+		} );
+
+		it( 'skips publishing settings when only the layout changed', () => {
+			const onLayoutChange = jest.fn();
+			const onGridSettingsChange = jest.fn();
+			render(
+				<Harness
+					layout={ initialLayout }
+					onLayoutChange={ onLayoutChange }
+					gridSettings={ initialSettings }
+					onGridSettingsChange={ onGridSettingsChange }
+				/>
+			);
+
+			act( () => {
+				readProbe().mutate( [ initialLayout[ 0 ] ] );
+			} );
+
+			act( () => {
+				readProbe().commit();
+			} );
+
+			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+			expect( onGridSettingsChange ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	it( 'reverts only grid settings when cancel passes revertLayout: false', () => {
+		const onLayoutChange = jest.fn();
+		const onGridSettingsChange = jest.fn();
+		const initialSettings: WidgetGridSettings = {
+			model: 'grid',
+			minColumnWidth: 350,
+			rowHeight: 200,
+		};
+		render(
+			<Harness
+				layout={ initialLayout }
+				onLayoutChange={ onLayoutChange }
+				gridSettings={ initialSettings }
+				onGridSettingsChange={ onGridSettingsChange }
+			/>
+		);
+
+		act( () => {
+			readProbe().mutate( [ initialLayout[ 0 ] ] );
+			readProbe().mutateGridSettings( {
+				...initialSettings,
+				minColumnWidth: 420,
+			} );
+		} );
+
+		expect( readProbe().hasUncommittedChanges ).toBe( true );
+
+		act( () => {
+			readProbe().cancel( {
+				exitEditMode: false,
+				revertLayout: false,
+			} );
+		} );
+
+		expect( readProbe().hasUncommittedChanges ).toBe( true );
+		expect( readProbe().layout ).toHaveLength( 1 );
+		expect( readProbe().gridSettings.minColumnWidth ).toBe( 350 );
+	} );
+
+	it( 'stays in edit mode when commit or cancel passes exitEditMode: false', () => {
+		const onLayoutChange = jest.fn();
+		render(
+			<Harness
+				layout={ initialLayout }
+				onLayoutChange={ onLayoutChange }
+			/>
+		);
+
+		act( () => {
+			readProbe().mutate( [ initialLayout[ 0 ] ] );
+		} );
+
+		act( () => {
+			readProbe().commit( { exitEditMode: false } );
+		} );
+
+		expect( readProbe().editMode ).toBe( true );
+		expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
+
+		act( () => {
+			readProbe().mutate( [ initialLayout[ 0 ] ] );
+		} );
+
+		act( () => {
+			readProbe().cancel( { exitEditMode: false } );
+		} );
 
 		expect( readProbe().editMode ).toBe( true );
 	} );

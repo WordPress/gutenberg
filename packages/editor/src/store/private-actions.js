@@ -17,7 +17,34 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
+import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
+
+const DEVICE_TYPE_BY_VIEWPORT_STATE = {
+	mobile: 'Mobile',
+	tablet: 'Tablet',
+};
+
+/**
+ * Updates the editor preview device in response to a block-editor viewport
+ * state signal.
+ *
+ * @param {Object}  options                   Viewport state change options.
+ * @param {string}  options.viewport          Selected viewport state.
+ * @param {boolean} options.showStateOnCanvas Whether canvas preview is enabled.
+ */
+export const updateDeviceTypeForViewportState =
+	( { viewport = 'default', showStateOnCanvas = true } = {} ) =>
+	( { dispatch, registry } ) => {
+		if ( ! showStateOnCanvas ) {
+			return;
+		}
+
+		dispatch.setDeviceType(
+			DEVICE_TYPE_BY_VIEWPORT_STATE[ viewport ] ?? 'Desktop'
+		);
+		unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
+	};
 
 /**
  * Returns an action object used to set which template is currently being used/edited.

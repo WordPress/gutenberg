@@ -2,16 +2,19 @@
  * WordPress dependencies
  */
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { remove } from '../../remove';
+import { unlock } from '../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
 		const { keyCode } = event;
-		const { createRecord, handleChange } = props.current;
 
 		if ( event.defaultPrevented ) {
 			return;
@@ -21,6 +24,7 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		const { createRecord, handleChange } = props.current;
 		const currentValue = createRecord();
 		const { start, end, text } = currentValue;
 
@@ -31,8 +35,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'keydown', onKeyDown );
-	return () => {
-		element.removeEventListener( 'keydown', onKeyDown );
-	};
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
 };
