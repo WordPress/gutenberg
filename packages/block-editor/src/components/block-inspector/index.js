@@ -43,11 +43,12 @@ import {
 
 function StyleInspectorSlots( {
 	blockName,
+	clientId,
 	showAdvancedControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { blockName, clientId } );
 	return (
 		<>
 			<InspectorControls.Slot />
@@ -97,7 +98,7 @@ function StyleStateInspectorSlots( {
 	isSectionBlock,
 	selectedBlockStyleState,
 } ) {
-	const borderPanelLabel = useBorderPanelLabel( { blockName } );
+	const borderPanelLabel = useBorderPanelLabel( { blockName, clientId } );
 	const showLayoutControls =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
@@ -530,7 +531,10 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots blockName={ blockName } />
+						<StyleInspectorSlots
+							blockName={ blockName }
+							clientId={ renderedBlockClientId }
+						/>
 					) }
 				</>
 			) }

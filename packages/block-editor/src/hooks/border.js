@@ -8,11 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import {
-	cleanEmptyObject,
-	shouldSkipSerialization,
-	useBlockSettings,
-} from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	useHasBorderPanel,
 	useHasBorderPanelControls,
@@ -26,6 +22,7 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import { unlock } from '../lock-unlock';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
@@ -252,10 +249,28 @@ export function hasShadowSupport( blockName ) {
 
 export function useBorderPanelLabel( {
 	blockName,
+	clientId,
 	hasBorderControl,
 	hasShadowControl,
 } = {} ) {
-	const settings = useBlockSettings( blockName );
+	const settings = useSelect(
+		( select ) => {
+			if ( ! clientId ) {
+				return null;
+			}
+			const { getBlockSettings } = unlock( select( blockEditorStore ) );
+			const [ color, radius, style, width, shadow ] = getBlockSettings(
+				clientId,
+				'border.color',
+				'border.radius',
+				'border.style',
+				'border.width',
+				'shadow'
+			);
+			return { border: { color, radius, style, width }, shadow };
+		},
+		[ clientId ]
+	);
 	const controls = useHasBorderPanelControls( settings );
 
 	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
