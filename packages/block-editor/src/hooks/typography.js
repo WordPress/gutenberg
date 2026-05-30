@@ -23,6 +23,7 @@ import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 import {
 	getStyleForState,
+	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
@@ -147,7 +148,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		[ clientId, isEnabled ]
 	);
 
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {

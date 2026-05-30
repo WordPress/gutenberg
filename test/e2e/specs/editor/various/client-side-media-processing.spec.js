@@ -472,6 +472,84 @@ test.describe( 'Client-side media processing', () => {
 		}
 	} );
 
+	test( 'renders srcset on the front end after publishing a CSM-uploaded image', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// Regression for the CSM srcset bug: when CSM uploads the unscaled
+		// original (then sideloads sub-sizes and a -scaled file), the block
+		// must end up storing a URL that matches a known size in the
+		// attachment metadata. Otherwise wp_calculate_image_srcset() returns
+		// false and the front-end `<img>` ships with no srcset.
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'5000x4000_e2e_test_image_oversized.jpeg'
+		);
+
+		const imageInEditor = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		// Wait for the full upload pipeline (including finalize) to settle.
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
+			timeout: 30_000,
+		} );
+		await expect(
+			page.getByRole( 'button', { name: 'Publish', exact: true } )
+		).toBeEnabled( { timeout: 30_000 } );
+
+		// Confirm the stored block URL was updated to the scaled file after
+		// finalize. Without the fix, the block would keep the unscaled
+		// original's URL and the assertion would fail.
+		const blockUrl = await page.evaluate( () => {
+			return window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlock()?.attributes?.url;
+		} );
+		expect( blockUrl ).toMatch( /-scaled\.jpe?g$/ );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+
+		// The fix: srcset must be present and reference the sub-sizes that
+		// CSM sideloaded. Without it, wp_calculate_image_srcset() returns
+		// false because the src basename doesn't match anything in
+		// $image_meta['sizes']. Require at least two width descriptors —
+		// core itself returns false (no attribute) when fewer than two
+		// candidates qualify.
+		await expect( imageDom ).toHaveAttribute( 'srcset', /\d+w.*\d+w/s );
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+		const media = await mediaProcessingUtils.getMediaDetails(
+			requestUtils,
+			imageId
+		);
+		// Sanity: the metadata used by core to build srcset is populated.
+		expect( media.media_details.sizes.medium ).toBeDefined();
+		expect( media.media_details.sizes.large ).toBeDefined();
+	} );
+
 	test( 'auto-rotates images based on EXIF orientation', async ( {
 		editor,
 		mediaProcessingUtils,

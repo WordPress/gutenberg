@@ -1,0 +1,8 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.media-editor-transform-controls {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: $grid-unit-10;
+}

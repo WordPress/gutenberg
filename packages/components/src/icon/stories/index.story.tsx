@@ -1,31 +1,19 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { SVG, Path } from '@wordpress/primitives';
 import { wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Icon from '..';
 import { VStack } from '../../v-stack';
 
 const meta: Meta< typeof Icon > = {
-	tags: [ 'manifest' ],
 	title: 'Components/Icon',
 	component: Icon,
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Prefer this component over the `Icon` component from `@wordpress/icons`.',
+			notes: 'When rendering SVGs, use `Icon` from `@wordpress/ui` instead.',
 		},
 	},
 };

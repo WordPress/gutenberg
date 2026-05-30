@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -47,36 +48,63 @@ describe( 'getLayoutStyle', () => {
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
-	it( 'should render the wrap toggle by default', () => {
+	it( 'should not render the wrap toggle by default', () => {
 		renderInspectorControls();
-
-		expect(
-			screen.getByRole( 'checkbox', {
-				name: 'Allow to wrap to multiple lines',
-			} )
-		).toBeInTheDocument();
-	} );
-
-	it( 'should render the wrap toggle when allowWrap is true', () => {
-		renderInspectorControls( {
-			layoutBlockSupport: { allowWrap: true },
-		} );
-
-		expect(
-			screen.getByRole( 'checkbox', {
-				name: 'Allow to wrap to multiple lines',
-			} )
-		).toBeInTheDocument();
-	} );
-
-	it( 'should not render the wrap toggle when allowWrap is false', () => {
-		renderInspectorControls( {
-			layoutBlockSupport: { allowWrap: false },
-		} );
 
 		expect(
 			screen.queryByRole( 'checkbox', {
 				name: 'Allow to wrap to multiple lines',
+			} )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should render the wrap toggle when it has a value', () => {
+		renderInspectorControls( {
+			layout: { flexWrap: 'nowrap' },
+		} );
+
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: 'Allow to wrap to multiple lines',
+			} )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should allow the wrap toggle to be selected from the tools panel menu', async () => {
+		const user = userEvent.setup();
+		renderInspectorControls( {
+			layoutBlockSupport: { allowWrap: true },
+		} );
+
+		await user.click(
+			screen.getByRole( 'button', { name: /Layout options/i } )
+		);
+		await user.click(
+			screen.getByRole( 'menuitemcheckbox', {
+				name: 'Show Wrapping',
+			} )
+		);
+
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: 'Allow to wrap to multiple lines',
+			} )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should not include the wrap toggle in the tools panel menu when allowWrap is false', async () => {
+		const user = userEvent.setup();
+		renderInspectorControls( {
+			layoutBlockSupport: { allowWrap: false },
+		} );
+
+		await user.click(
+			screen.getByRole( 'button', { name: /Layout options/i } )
+		);
+
+		expect(
+			screen.queryByRole( 'menuitemcheckbox', {
+				name: 'Show Wrapping',
 			} )
 		).not.toBeInTheDocument();
 	} );

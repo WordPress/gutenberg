@@ -64,7 +64,7 @@ body {
 
 #### Mixing with `@wordpress/components`
 
-If your app pairs `@wordpress/ui` with `@wordpress/components` overlays (popovers, modals, tooltips, …) and you bundle both packages directly — i.e. you aren't relying on the `window.wp.components` global that WordPress's script-loader exposes — call `useEnableWpCompatOverlaySlot()` once from a component that mounts for the lifetime of your app (typically the root):
+If your app pairs `@wordpress/ui` with `@wordpress/components` overlays and bundles both packages directly (i.e. without relying on the `window.wp.components` global exposed by WordPress's script-loader), call `useEnableWpCompatOverlaySlot()` once from a long-lived root component:
 
 ```tsx
 import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
@@ -75,7 +75,7 @@ function App() {
 }
 ```
 
-This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way (a single component shouldn't be able to turn off shared infrastructure for everyone else) and idempotent (safe to call from multiple components). It is not needed in standard WordPress editor screens, where the slot auto-enables based on the presence of `window.wp.components`.
+This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
 ## Usage
 

@@ -6,6 +6,14 @@
 
 - Fields: The `rich-text` and `title` fields now use the DataViews `richtext` control, removing the dependency on `@wordpress/rich-text-control`. [#78825](https://github.com/WordPress/gutenberg/pull/78825)
 
+### Internal
+
+-   Migrate `Tooltip` consumers from `@wordpress/components` to the new compositional `Tooltip` in `@wordpress/ui` ([#78691](https://github.com/WordPress/gutenberg/pull/78691)).
+
+## 0.39.0 (2026-05-27)
+
+## 0.38.0 (2026-05-14)
+
 ## 0.37.0 (2026-04-29)
 
 ## 0.36.0 (2026-04-15)

@@ -180,6 +180,7 @@ export interface SyncManager {
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
+	unloadAll: () => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,

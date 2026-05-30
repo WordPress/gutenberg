@@ -6,7 +6,7 @@ import { render } from 'test/helpers';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -129,7 +129,7 @@ describe( 'Search Block', () => {
 		} );
 
 		it( 'search button uses icon', () => {
-			const button = instance.UNSAFE_getByType( Icon );
+			const button = instance.UNSAFE_getByType( WCIcon );
 			expect( button ).toBeTruthy();
 		} );
 
