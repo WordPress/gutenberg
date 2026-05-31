@@ -6,17 +6,15 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { useState, useRef, useCallback } from '@wordpress/element';
+import {
+	createHigherOrderComponent,
+	useIsomorphicLayoutEffect,
+} from '@wordpress/compose';
 
 type Props = {
 	node?: HTMLElement;
 	[ key: string ]: any;
-};
-
-type State = {
-	fallbackStyles?: { [ key: string ]: any };
-	grabStylesCompleted: boolean;
 };
 
 export default (
@@ -26,69 +24,52 @@ export default (
 	) => { [ key: string ]: any }
 ) =>
 	createHigherOrderComponent( ( WrappedComponent ) => {
-		return class WithFallbackStyles extends Component< Props, State > {
-			nodeRef?: HTMLElement;
+		return function WithFallbackStyles( props: Props ) {
+			const [ fallbackStyles, setFallbackStyles ] = useState<
+				{ [ key: string ]: any } | undefined
+			>( undefined );
+			const [ grabStylesCompleted, setGrabStylesCompleted ] =
+				useState( false );
 
-			constructor( props: Props ) {
-				super( props );
-				this.nodeRef = this.props.node;
-				this.state = {
-					fallbackStyles: undefined,
-					grabStylesCompleted: false,
-				};
+			const nodeRef = useRef< HTMLElement | undefined >( props.node );
 
-				this.bindRef = this.bindRef.bind( this );
-			}
-
-			bindRef( node: HTMLDivElement ) {
+			const bindRef = useCallback( ( node: HTMLDivElement | null ) => {
 				if ( ! node ) {
 					return;
 				}
-				this.nodeRef = node;
-			}
+				nodeRef.current = node;
+			}, [] );
 
-			componentDidMount() {
-				this.grabFallbackStyles();
-			}
-
-			componentDidUpdate() {
-				this.grabFallbackStyles();
-			}
-
-			grabFallbackStyles() {
-				const { grabStylesCompleted, fallbackStyles } = this.state;
-				if ( this.nodeRef && ! grabStylesCompleted ) {
+			// The original class grabbed the fallback styles synchronously in
+			// componentDidMount and componentDidUpdate (i.e. after every render,
+			// before paint). useIsomorphicLayoutEffect with no dependency array
+			// preserves that timing and stays SSR-safe.
+			useIsomorphicLayoutEffect( () => {
+				if ( nodeRef.current && ! grabStylesCompleted ) {
 					const newFallbackStyles = mapNodeToProps(
-						this.nodeRef,
-						this.props
+						nodeRef.current,
+						props
 					);
 
 					if (
 						! fastDeepEqual( newFallbackStyles, fallbackStyles )
 					) {
-						this.setState( {
-							fallbackStyles: newFallbackStyles,
-							grabStylesCompleted:
-								Object.values( newFallbackStyles ).every(
-									Boolean
-								),
-						} );
+						setFallbackStyles( newFallbackStyles );
+						setGrabStylesCompleted(
+							Object.values( newFallbackStyles ).every( Boolean )
+						);
 					}
 				}
-			}
+			} );
 
-			render() {
-				const wrappedComponent = (
-					<WrappedComponent
-						{ ...this.props }
-						{ ...this.state.fallbackStyles }
-					/>
-				);
-				return this.props.node ? (
-					wrappedComponent
-				) : (
-					<div ref={ this.bindRef }> { wrappedComponent } </div>
-				);
-			}
+			const wrappedComponent = (
+				<WrappedComponent { ...props } { ...fallbackStyles } />
+			);
+
+			return props.node ? (
+				wrappedComponent
+			) : (
+				<div ref={ bindRef }> { wrappedComponent } </div>
+			);
 		};
 	}, 'withFallbackStyles' );

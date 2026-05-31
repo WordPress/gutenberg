@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `withFallbackStyles`: Refactor from a class component to a function component with hooks ([#78837](https://github.com/WordPress/gutenberg/pull/78837)).
+
 ### Documentation
 
 -   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
