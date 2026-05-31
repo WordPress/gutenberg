@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `FullscreenMode`: Keep the admin bar and admin menu painted while the editor is loading so a cross-document view transition into the editor no longer flashes a blank white screen ([#65294](https://core.trac.wordpress.org/ticket/65294)).
+
 ## 9.32.0 (2026-05-27)
 
 ## 9.31.0 (2026-05-14)
