@@ -1,0 +1,11 @@
+[
+	{
+		"blockName": "core/accordion-heading",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<h3 class=\"wp-block-accordion-heading\">\n\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n",
+		"innerContent": [
+			"\n<h3 class=\"wp-block-accordion-heading\">\n\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n"
+		]
+	}
+]

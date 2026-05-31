@@ -1,9 +1,13 @@
-// dirty hack to clean up modal
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+$palette-max-height: 376px;
+$palette-header-height: 48px;
+
+// Here we extend the modal styles to be tighter, and to the center. Because the palette uses the modal as a container.
 .commands-command-menu {
-	border-radius: $grid-unit-05;
-	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
-	max-width: 400px;
 	position: relative;
 	top: calc(5% + #{$header-height});
 
@@ -14,6 +18,7 @@
 	.components-modal__content {
 		margin: 0;
 		padding: 0;
+		overflow: hidden;
 	}
 }
 
@@ -25,6 +30,7 @@
 .commands-command-menu__header {
 	display: flex;
 	align-items: center;
+	gap: $grid-unit-10;
 	padding: 0 $grid-unit-20;
 
 	.components-button {
@@ -42,6 +48,12 @@
 	}
 }
 
+.commands-command-menu__header-search-icon {
+	&:dir(ltr) {
+		transform: scaleX(-1);
+	}
+}
+
 .commands-command-menu__container {
 	// the style here is a hack to force safari to repaint to avoid a style glitch
 	will-change: transform;
@@ -49,12 +61,12 @@
 	[cmdk-input] {
 		border: none;
 		width: 100%;
-		padding: $grid-unit-20 $grid-unit-05;
+		padding: $grid-unit-15 $grid-unit-05;
 		outline: none;
 		color: $gray-900;
 		margin: 0;
 		font-size: 15px;
-		line-height: 28px;
+		line-height: 24px;
 		border-radius: 0;
 
 		&::placeholder {
@@ -68,22 +80,12 @@
 	}
 
 	[cmdk-item] {
-		border-radius: $radius-small;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		display: flex;
 		align-items: center;
+		padding: $grid-unit-05 0;
 		color: $gray-900;
 		font-size: $default-font-size;
-
-		&[aria-selected="true"],
-		&:active {
-			background: var(--wp-admin-theme-color);
-			color: $white;
-
-			svg {
-				fill: $white;
-			}
-		}
 
 		&[aria-disabled="true"] {
 			color: $gray-600;
@@ -95,9 +97,21 @@
 		}
 
 		> div {
-			min-height: $button-size-next-default-40px;
+			border-radius: $radius-small;
+			min-height: $grid-unit-40;
 			padding: $grid-unit-05;
 			padding-left: $grid-unit-50; // Account for commands without icons.
+			padding-right: $grid-unit-20; // Accounts for the command category.
+		}
+
+		&[aria-selected="true"] > div,
+		&:active > div {
+			background: var(--wp-admin-theme-color);
+			color: $white;
+
+			svg {
+				fill: $white;
+			}
 		}
 
 		> .has-icon {
@@ -105,17 +119,34 @@
 		}
 	}
 
-	[cmdk-root] > [cmdk-list] {
-		max-height: 368px; // Specific to not have commands overflow oddly.
-		overflow: auto;
+	[cmdk-group]:has([cmdk-group-items]:empty) {
+		display: none;
+	}
 
-		// Ensures there is always padding bottom on the last group, when there are commands.
-		& [cmdk-list-sizer] > [cmdk-group]:last-child [cmdk-group-items]:not(:empty) {
-			padding-bottom: $grid-unit-10;
+	[cmdk-root] > [cmdk-list] {
+		max-height: min($palette-max-height - $palette-header-height, calc(70vh - $palette-header-height));
+		overflow: auto;
+		scroll-padding-top: $grid-unit-10;
+		scroll-padding-bottom: $grid-unit-10;
+
+		// Show border when there are commands or "nothing found" message.
+		&:has([cmdk-group-items]:not(:empty)),
+		&:has([cmdk-empty]) {
+			border-top: $border-width solid $gray-300;
 		}
 
 		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
-			padding: 0 $grid-unit-10;
+			padding: 0 $grid-unit-10 $grid-unit-05;
+		}
+
+		[cmdk-group-heading] {
+			margin-top: $grid-unit-10;
+			padding: $grid-unit-10 $grid-unit-20;
+			line-height: $grid-unit-20;
+			font-size: $font-size-x-small;
+			font-weight: $font-weight-medium;
+			text-transform: uppercase;
+			color: $gray-900;
 		}
 	}
 
@@ -137,12 +168,29 @@
 	}
 }
 
-.commands-command-menu__item span {
+.commands-command-menu__item-label {
 	// Ensure commands do not run off the edge (great for post titles).
 	display: inline-block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	flex: 1;
+	min-width: 0;
+}
+
+.commands-command-menu__item-category {
+	flex: 0 0 auto;
+	margin-left: auto;
+	padding-left: $grid-unit-30;
+	color: $gray-700;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	text-align: right;
+
+	[aria-selected="true"] &,
+	[cmdk-item]:active & {
+		color: rgba($white, 0.8);
+	}
 }
 
 .commands-command-menu__item mark {

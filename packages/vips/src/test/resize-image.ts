@@ -26,6 +26,9 @@ class MockVipsImage {
 jest.mock( 'wasm-vips', () =>
 	jest.fn( () => ( {
 		Image: MockVipsImage,
+		Cache: {
+			max: jest.fn(),
+		},
 	} ) )
 );
 

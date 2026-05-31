@@ -2,6 +2,54 @@
 
 ## Unreleased
 
+## 32.3.0 (2026-05-27)
+
+## 32.2.0 (2026-05-14)
+
+## 32.1.0 (2026-04-29)
+
+## 32.0.0 (2026-04-15)
+
+### Breaking Changes
+
+-   The bundled `eslint` dependency has been upgraded from v8 to v10 ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The `lint-js` script now uses flat config (`eslint.config.*`) by default. Legacy `.eslintrc.*` files are still detected as a fallback, but this support is deprecated and will be removed in a future version ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The default config shipped with `wp-scripts` has changed from `config/.eslintrc.js` to `config/eslint.config.cjs` ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+
+## 31.8.0 (2026-04-01)
+
+## 31.7.0 (2026-03-18)
+
+## 31.6.0 (2026-03-04)
+
+## 31.5.0 (2026-02-18)
+
+## 31.4.0 (2026-01-29)
+
+## 31.3.0 (2026-01-16)
+
+### Internal
+
+-   The bundled `eslint` dependency has been updated from `^8.3.0` to `^8.57.1` ([#74316](https://github.com/WordPress/gutenberg/pull/74316)).
+
+## 31.1.0 (2025-11-26)
+
+## 31.0.0 (2025-11-12)
+
+### Breaking Changes
+
+-   The `lint-js` script now includes `.cjs`, `.mjs`, `.cts`, and `.mts` as default extensions to lint. This is considered a breaking change because the script may now surface lint errors in your project which would not have been previously identified.
+
+## 30.27.0 (2025-10-29)
+
+## 30.26.0 (2025-10-17)
+
+## 30.25.0 (2025-10-01)
+
+## 30.24.0 (2025-09-17)
+
+## 30.23.0 (2025-09-03)
+
 ### Internal
 
 -   Remove deprecated `clean-webpack-plugin` dependency in favor of webpack's native cleaning functionality ([#71080](https://github.com/WordPress/gutenberg/pull/71080))
@@ -27,7 +75,6 @@
 ### Bug Fixes
 
 -   Fix: `--blocks-manifest` CLI flag doesn't work when the directory name has space ([#69766](https://github.com/WordPress/gutenberg/pull/69766)).
-
 
 ## 30.14.0 (2025-03-27)
 

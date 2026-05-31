@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -16,23 +16,17 @@ import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Group': Composite.Group,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.GroupLabel': Composite.GroupLabel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Row': Composite.Row,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Hover': Composite.Hover,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Typeahead': Composite.Typeahead,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Context': Composite.Context,
 	},
 	argTypes: {
@@ -52,6 +46,10 @@ const meta: Meta< typeof Composite > = {
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
 		},
 	},
 	decorators: [
@@ -241,7 +239,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 
 				// Render all context providers forwarded by the Slot via fillProps.
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup

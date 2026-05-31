@@ -20,6 +20,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import {
+	ATTACHMENT_POST_TYPE,
 	EDIT_MERGE_PROPERTIES,
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
@@ -195,7 +196,7 @@ export function getCurrentPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {?number} ID of current post.
+ * @return {?(number|string)} The current post ID (number) or template slug (string).
  */
 export function getCurrentPostId( state ) {
 	return state.postId;
@@ -389,12 +390,6 @@ export const getAutosaveAttribute = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
-
-		// Currently template autosaving is not supported.
-		if ( postType === 'wp_template' ) {
-			return false;
-		}
-
 		const postId = getCurrentPostId( state );
 		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 		const autosave = select( coreStore ).getAutosave(
@@ -491,6 +486,11 @@ export function isEditedPostPublishable( state ) {
 	// being saveable. Currently this restriction is imposed at UI.
 	//
 	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`).
+
+	// Attachments should only be publishable if they have unsaved changes.
+	if ( post.type === ATTACHMENT_POST_TYPE ) {
+		return isEditedPostDirty( state );
+	}
 
 	return (
 		isEditedPostDirty( state ) ||
@@ -616,12 +616,7 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		const postType = getCurrentPostType( state );
 		const postTypeObject = select( coreStore ).getPostType( postType );
 
-		// Currently template autosaving is not supported.
-		// @todo: Remove hardcode check for template after bumping required WP version to 6.8.
-		if (
-			postType === 'wp_template' ||
-			! postTypeObject?.supports?.autosave
-		) {
+		if ( ! postTypeObject?.supports?.autosave ) {
 			return false;
 		}
 
@@ -1258,6 +1253,12 @@ export const isEditorPanelOpened = createRegistrySelector(
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
@@ -1870,8 +1871,6 @@ export const getPostTypeLabel = createRegistrySelector(
 	( select ) => ( state ) => {
 		const currentPostType = getCurrentPostType( state );
 		const postType = select( coreStore ).getPostType( currentPostType );
-		// Disable reason: Post type labels object is shaped like this.
-		// eslint-disable-next-line camelcase
 		return postType?.labels?.singular_name;
 	}
 );

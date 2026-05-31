@@ -14,6 +14,8 @@ import {
 	MenuItem,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarDropdownMenu,
 	PanelBody,
 } from '@wordpress/components';
@@ -94,6 +96,20 @@ const LINK_OPTIONS = [
 		noticeText: __( 'None' ),
 	},
 ];
+const NAVIGATION_BUTTON_TYPE_OPTIONS = [
+	{
+		label: __( 'Icon' ),
+		value: 'icon',
+	},
+	{
+		label: __( 'Text' ),
+		value: 'text',
+	},
+	{
+		label: __( 'Both' ),
+		value: 'both',
+	},
+];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PLACEHOLDER_TEXT = Platform.isNative
@@ -119,7 +135,13 @@ export default function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const [ lightboxSetting ] = useSettings( 'blocks.core/image.lightbox' );
+	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
+		useSettings(
+			'blocks.core/image.lightbox',
+			'dimensions.aspectRatios.default',
+			'dimensions.aspectRatios.theme',
+			'dimensions.defaultAspectRatios'
+		);
 
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
@@ -127,8 +149,16 @@ export default function GalleryEdit( props ) {
 		  )
 		: LINK_OPTIONS;
 
-	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
-		attributes;
+	const {
+		navigationButtonType,
+		columns,
+		imageCrop,
+		randomOrder,
+		linkTarget,
+		linkTo,
+		sizeSlug,
+		aspectRatio,
+	} = attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -191,6 +221,36 @@ export default function GalleryEdit( props ) {
 	const imageData = useGetMedia( innerBlockImages );
 
 	const newImages = useGetNewImages( images, imageData );
+
+	// Check if there is at least one image with lightbox enabled
+	const hasLightboxImages = lightboxSetting?.enabled
+		? images.filter(
+				( image ) =>
+					image.attributes?.lightbox?.enabled === undefined ||
+					image.attributes?.lightbox?.enabled === true
+		  ).length > 0
+		: images.filter( ( image ) => image.attributes.lightbox?.enabled )
+				.length > 0;
+
+	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+	const aspectRatioOptions = [
+		{
+			label: _x(
+				'Original',
+				'Aspect ratio option for dimensions control'
+			),
+			value: 'auto',
+		},
+		...( showDefaultRatios ? defaultOptions || [] : [] ),
+		...( themeOptions || [] ),
+	];
 
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
@@ -257,8 +317,12 @@ export default function GalleryEdit( props ) {
 			...newLinkTarget,
 			className: newClassName,
 			sizeSlug,
-			caption: imageAttributes.caption || image.caption?.raw,
+			caption:
+				imageAttributes.caption.length > 0
+					? imageAttributes.caption
+					: image.caption?.raw,
 			alt: imageAttributes.alt || image.alt_text,
+			aspectRatio: aspectRatio === 'auto' ? undefined : aspectRatio,
 		};
 	}
 
@@ -482,6 +546,39 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
+	function setAspectRatio( value ) {
+		setAttributes( { aspectRatio: value } );
+
+		// Update all inner image blocks with the new aspect ratio
+		const changedAttributes = {};
+		const blocks = [];
+
+		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			blocks.push( block.clientId );
+			changedAttributes[ block.clientId ] = {
+				aspectRatio: value === 'auto' ? undefined : value,
+			};
+		} );
+
+		updateBlockAttributes( blocks, changedAttributes, true );
+
+		const aspectRatioText = aspectRatioOptions.find(
+			( option ) => option.value === value
+		);
+
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: aspect ratio setting */
+				__( 'All gallery images updated to aspect ratio: %s' ),
+				aspectRatioText?.label || value
+			),
+			{
+				id: 'gallery-attributes-aspectRatio',
+				type: 'snackbar',
+			}
+		);
+	}
+
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php.
 		if ( ! linkTo ) {
@@ -529,7 +626,6 @@ export default function GalleryEdit( props ) {
 				instructions: PLACEHOLDER_TEXT,
 			} }
 			onSelect={ updateImages }
-			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
 			onError={ onUploadError }
@@ -575,10 +671,13 @@ export default function GalleryEdit( props ) {
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
 							setAttributes( {
+								navigationButtonType: 'icon',
 								columns: undefined,
 								imageCrop: true,
 								randomOrder: false,
 							} );
+
+							setAspectRatio( 'auto' );
 
 							if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
 								updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
@@ -602,7 +701,6 @@ export default function GalleryEdit( props ) {
 								}
 							>
 								<RangeControl
-									__nextHasNoMarginBottom
 									label={ __( 'Columns' ) }
 									value={
 										columns
@@ -634,7 +732,6 @@ export default function GalleryEdit( props ) {
 								}
 							>
 								<SelectControl
-									__nextHasNoMarginBottom
 									label={ __( 'Resolution' ) }
 									help={ __(
 										'Select the size of the source images.'
@@ -656,7 +753,6 @@ export default function GalleryEdit( props ) {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Crop images to fit' ) }
 								checked={ !! imageCrop }
 								onChange={ toggleImageCrop }
@@ -671,7 +767,6 @@ export default function GalleryEdit( props ) {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Randomize order' ) }
 								checked={ !! randomOrder }
 								onChange={ toggleRandomOrder }
@@ -685,20 +780,76 @@ export default function GalleryEdit( props ) {
 								onDeselect={ () => toggleOpenInNewTab( false ) }
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Open images in new tab' ) }
 									checked={ linkTarget === '_blank' }
 									onChange={ toggleOpenInNewTab }
 								/>
 							</ToolsPanelItem>
 						) }
+						{ aspectRatioOptions.length > 1 && (
+							<ToolsPanelItem
+								hasValue={ () =>
+									!! aspectRatio && aspectRatio !== 'auto'
+								}
+								label={ __( 'Aspect ratio' ) }
+								onDeselect={ () => setAspectRatio( 'auto' ) }
+								isShownByDefault
+							>
+								<SelectControl
+									__next40pxDefaultSize
+									label={ __( 'Aspect ratio' ) }
+									help={ __(
+										'Set a consistent aspect ratio for all images in the gallery.'
+									) }
+									value={ aspectRatio }
+									options={ aspectRatioOptions }
+									onChange={ setAspectRatio }
+								/>
+							</ToolsPanelItem>
+						) }
+						<ToolsPanelItem
+							label={ __( 'Navigation button type' ) }
+							isShownByDefault
+							hasValue={ () => navigationButtonType !== 'icon' }
+							onDeselect={ () =>
+								setAttributes( {
+									navigationButtonType: 'icon',
+								} )
+							}
+						>
+							{ hasLightboxImages && (
+								<ToggleGroupControl
+									label={ __( 'Navigation button type' ) }
+									value={ navigationButtonType }
+									onChange={ ( value ) =>
+										setAttributes( {
+											navigationButtonType: value,
+										} )
+									}
+									isBlock
+									__next40pxDefaultSize
+									help={ __(
+										'Adjust the appearance of buttons in the lightbox.'
+									) }
+								>
+									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
+										( option ) => (
+											<ToggleGroupControlOption
+												key={ option.value }
+												value={ option.value }
+												label={ option.label }
+											/>
+										)
+									) }
+								</ToggleGroupControl>
+							) }
+						</ToolsPanelItem>
 					</ToolsPanel>
 				) }
 				{ Platform.isNative && (
 					<PanelBody title={ __( 'Settings' ) }>
 						{ images.length > 1 && (
 							<RangeControl
-								__nextHasNoMarginBottom
 								label={ __( 'Columns' ) }
 								value={
 									columns
@@ -715,7 +866,6 @@ export default function GalleryEdit( props ) {
 						) }
 						{ imageSizeOptions?.length > 0 && (
 							<SelectControl
-								__nextHasNoMarginBottom
 								label={ __( 'Resolution' ) }
 								help={ __(
 									'Select the size of the source images.'
@@ -728,7 +878,6 @@ export default function GalleryEdit( props ) {
 							/>
 						) }
 						<SelectControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link' ) }
 							value={ linkTo }
 							onChange={ setLinkTo }
@@ -737,23 +886,33 @@ export default function GalleryEdit( props ) {
 							size="__unstable-large"
 						/>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Crop images to fit' ) }
 							checked={ !! imageCrop }
 							onChange={ toggleImageCrop }
 						/>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Randomize order' ) }
 							checked={ !! randomOrder }
 							onChange={ toggleRandomOrder }
 						/>
 						{ hasLinkTo && (
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open images in new tab' ) }
 								checked={ linkTarget === '_blank' }
 								onChange={ toggleOpenInNewTab }
+							/>
+						) }
+						{ aspectRatioOptions.length > 1 && (
+							<SelectControl
+								label={ __( 'Aspect Ratio' ) }
+								help={ __(
+									'Set a consistent aspect ratio for all images in the gallery.'
+								) }
+								value={ aspectRatio }
+								options={ aspectRatioOptions }
+								onChange={ setAspectRatio }
+								hideCancelButton
+								size="__unstable-large"
 							/>
 						) }
 					</PanelBody>
@@ -805,7 +964,6 @@ export default function GalleryEdit( props ) {
 						<BlockControls group="other">
 							<MediaReplaceFlow
 								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								accept="image/*"
 								handleUpload={ false }
 								onSelect={ updateImages }
 								name={ __( 'Add' ) }
@@ -814,6 +972,7 @@ export default function GalleryEdit( props ) {
 									.filter( ( image ) => image.id )
 									.map( ( image ) => image.id ) }
 								addToGallery={ hasImageIds }
+								variant="toolbar"
 							/>
 						</BlockControls>
 					) }

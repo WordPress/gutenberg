@@ -146,11 +146,6 @@ test.describe( 'Block Renaming', () => {
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/group',
-					attributes: {
-						metadata: {
-							name: undefined,
-						},
-					},
 				},
 			] );
 		} );

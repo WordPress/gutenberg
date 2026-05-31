@@ -11,6 +11,7 @@
 <section>
 	<h2>Region 1</h2>
 	<div
+		data-testid="region-1"
 		data-wp-interactive="router-regions"
 		data-wp-router-region="region-1"
 	>
@@ -54,8 +55,11 @@
 <section>
 	<h2>Region 2</h2>
 	<div
+		data-testid="region-2"
+		data-wp-key="region-2"
 		data-wp-interactive="router-regions"
 		data-wp-router-region="region-2"
+		data-wp-run="callbacks.nope"
 	>
 		<p
 			data-testid="region-2-text"
@@ -110,17 +114,58 @@
 </section>
 
 <div data-wp-interactive="router-regions">
-	<div data-wp-router-region="invalid-region-1">
-		<p data-testid="invalid-region-text-1">
+	<!-- Router region inside data-wp-interactive -->
+	<div
+		data-testid="valid-inside-interactive"
+		data-wp-key="valid-inside-interactive"
+		data-wp-interactive="router-regions"
+		data-wp-router-region="valid-inside-interactive"
+		data-wp-context='{ "counter": { "value": 0 } }'
+	>
+		<p data-testid="text-1">
 			content from page <?php echo $attributes['page']; ?>
 		</p>
-	</div>
-	<div data-wp-interactive="router-regions" data-wp-router-region="invalid-region-2">
-		<p data-testid="invalid-region-text-2">
-			content from page <?php echo $attributes['page']; ?>
-		</p>
+		<button
+			data-testid="valid-inside-interactive-counter"
+			data-wp-text="context.counter.value"
+			data-wp-on--click="actions.counter.increment"
+		>
+			NaN
+		</button>
+
+		<!-- Router region inside data-wp-router-region -->
+		<div
+			data-testid="valid-inside-router-region"
+			data-wp-key="valid-inside-router-region"
+			data-wp-interactive="router-regions"
+			data-wp-router-region="valid-inside-router-region"
+			data-wp-context='{ "counter": { "value": 0 } }'
+		>
+			<p data-testid="text-2">
+				content from page <?php echo $attributes['page']; ?>
+			</p>
+			<button
+				data-testid="valid-inside-router-region-counter"
+				data-wp-text="context.counter.value"
+				data-wp-on--click="actions.counter.increment"
+			>
+				NaN
+			</button>
+		</div>
 	</div>
 </div>
+
+<div
+	data-testid="invalid-outside-interactive"
+	data-wp-router-region="invalid-outside-interactive"
+>
+	<p data-testid="text-3">
+		content from page <?php echo $attributes['page']; ?>
+	</p>
+</div>
+
+<a data-testid="hash-link" href="#hash-link-target">Go to anchor</a>
+<div id="hash-link-target" data-testid="hash-link-target"></div>
 
 <div id="regions-with-attach-to" data-testid="regions-with-attach-to">
 	<?php
@@ -156,6 +201,7 @@
 			data-wp-interactive="router-regions"
 			data-wp-router-region='$region_data'
 			data-testid="$region_id"
+			data-wp-key="$region_id"
 			$has_directives
 		>
 			<div $context_data>

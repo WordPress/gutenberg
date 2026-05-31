@@ -144,7 +144,7 @@ describe( 'getProtocol', () => {
 	it( 'returns undefined when the provided value does not contain a URL protocol', () => {
 		expect( getProtocol( '' ) ).toBeUndefined();
 		expect( getProtocol( 'https' ) ).toBeUndefined();
-		expect( getProtocol( 'test.com' ) ).toBeUndefined();
+		expect( getProtocol( 'example.com' ) ).toBeUndefined();
 		expect( getProtocol( ' https:// ' ) ).toBeUndefined();
 	} );
 } );
@@ -206,7 +206,7 @@ describe( 'getAuthority', () => {
 		expect( getAuthority( 'https:///' ) ).toBeUndefined();
 		expect( getAuthority( 'https://#' ) ).toBeUndefined();
 		expect( getAuthority( 'https://?' ) ).toBeUndefined();
-		expect( getAuthority( 'test.com' ) ).toBeUndefined();
+		expect( getAuthority( 'example.com' ) ).toBeUndefined();
 		expect( getAuthority( 'https://#?hello' ) ).toBeUndefined();
 	} );
 } );
@@ -274,7 +274,7 @@ describe( 'getPath', () => {
 		expect( getPath( 'https:///test' ) ).toBeUndefined();
 		expect( getPath( 'https://#' ) ).toBeUndefined();
 		expect( getPath( 'https://?' ) ).toBeUndefined();
-		expect( getPath( 'test.com' ) ).toBeUndefined();
+		expect( getPath( 'example.com' ) ).toBeUndefined();
 		expect( getPath( 'https://#?hello' ) ).toBeUndefined();
 		expect( getPath( 'https' ) ).toBeUndefined();
 	} );
@@ -365,11 +365,11 @@ describe( 'getQueryString', () => {
 				'https://andalouses.example/beach?foo[]=bar&foo[]=baz'
 			)
 		).toBe( 'foo[]=bar&foo[]=baz' );
-		expect( getQueryString( 'https://test.com?foo[]=bar&foo[]=baz' ) ).toBe(
-			'foo[]=bar&foo[]=baz'
-		);
 		expect(
-			getQueryString( 'https://test.com?foo=bar&foo=baz?test' )
+			getQueryString( 'https://example.com?foo[]=bar&foo[]=baz' )
+		).toBe( 'foo[]=bar&foo[]=baz' );
+		expect(
+			getQueryString( 'https://example.com?foo=bar&foo=baz?test' )
 		).toBe( 'foo=bar&foo=baz?test' );
 	} );
 
@@ -564,7 +564,7 @@ describe( 'getFragment', () => {
 		expect( getFragment( 'https://' ) ).toBeUndefined();
 		expect( getFragment( 'https:///test' ) ).toBeUndefined();
 		expect( getFragment( 'https://?' ) ).toBeUndefined();
-		expect( getFragment( 'test.com' ) ).toBeUndefined();
+		expect( getFragment( 'example.com' ) ).toBeUndefined();
 	} );
 } );
 

@@ -29,7 +29,7 @@ add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
  *
  * This is a temporary fix until we can patch get_sample_permalink()
  *
- * @see https://core.trac.wordpress.org/ticket/46266
+ * @link https://core.trac.wordpress.org/ticket/46266
  *
  * @param array  $permalink Array containing the sample permalink with placeholder for the post name, and the post name.
  * @param int    $id        ID of the post.

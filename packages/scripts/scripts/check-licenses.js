@@ -1,13 +1,12 @@
 /**
- * External dependencies
- */
-const spawn = require( 'cross-spawn' );
-
-/**
  * Internal dependencies
  */
 const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
-const { checkDepsInTree } = require( '../utils/license' );
+const {
+	checkDeps,
+	collectDeps,
+	readPackageJson,
+} = require( '../utils/license' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -29,26 +28,33 @@ const ignored = hasArgInCLI( '--ignore' )
 			.map( ( moduleName ) => moduleName.trim() )
 	: [];
 
-// Use `npm ls` to grab a list of all the packages.
-const child = spawn.sync(
-	'npm',
-	[
-		'ls',
-		'--json',
-		'--long',
-		'--all',
-		...( prod ? [ '--omit=dev' ] : [] ),
-		...( dev ? [ '--include=dev' ] : [] ),
-	],
-	/*
-	 * Set the max buffer to ~157MB, since the output size for
-	 * prod is ~21 MB and dev is ~110 MB
-	 */
-	{ maxBuffer: 1024 * 1024 * 150 }
-);
+const cwd = process.cwd();
+const pkgJson = readPackageJson( cwd );
 
-const result = JSON.parse( child.stdout.toString() );
+if ( ! pkgJson ) {
+	process.stdout.write(
+		'Unable to find package.json in current directory.\n'
+	);
+	process.exit( 1 );
+}
 
-const topLevelDeps = result.dependencies;
+let depsToCheck = {};
+if ( prod ) {
+	depsToCheck = pkgJson.dependencies || {};
+} else if ( dev ) {
+	depsToCheck = pkgJson.devDependencies || {};
+} else {
+	depsToCheck = {
+		...( pkgJson.dependencies || {} ),
+		...( pkgJson.devDependencies || {} ),
+	};
+}
 
-checkDepsInTree( topLevelDeps, { ignored, gpl2 } );
+const depsMap = new Map();
+collectDeps( depsToCheck, cwd, {
+	gpl2,
+	depsMap,
+	visited: new Set(),
+} );
+
+checkDeps( Array.from( depsMap.values() ), { ignored, gpl2 } );

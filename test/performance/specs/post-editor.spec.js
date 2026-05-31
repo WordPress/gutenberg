@@ -1,4 +1,4 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-disable playwright/expect-expect */
 
 /**
  * WordPress dependencies
@@ -13,6 +13,8 @@ import { sum } from '../utils.js';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
 const BROWSER_IDLE_WAIT = 1000;
+
+const kebabCase = ( s ) => s.replace( /([A-Z])/g, '-$1' ).toLowerCase();
 
 const results = {
 	serverResponse: [],
@@ -53,10 +55,21 @@ test.describe( 'Post Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftId = null;
 
-		test( 'Setup the test post', async ( { admin, perfUtils } ) => {
+		test( 'Setup the test post', async ( {
+			admin,
+			requestUtils,
+			perfUtils,
+		} ) => {
 			await admin.createNewPost();
 			await perfUtils.loadBlocksForLargePost();
 			draftId = await perfUtils.saveDraft();
+
+			// Set preferences via REST so that welcomeGuide and fullscreenMode
+			// are reliably persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-post', {
+				welcomeGuide: false,
+				fullscreenMode: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -68,15 +81,28 @@ test.describe( 'Post Editor Performance', () => {
 				perfUtils,
 				metrics,
 			} ) => {
+				// Start tracing before navigating so the page load is captured.
+				await metrics.startTracing();
+
 				// Open the test draft.
-				await admin.editPost( draftId );
-				const canvas = await perfUtils.getCanvas();
+				await admin.page.goto(
+					'wp-admin/post.php?post=' + draftId + '&action=edit'
+				);
 
 				// Wait for the first block.
+				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
-				// Get the durations.
+				// Capture timing metrics before `stopTracing()`, which
+				// blocks for the trace download/parse and would otherwise
+				// inflate `timeSinceResponseEnd` by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-first-block'
+				);
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -123,7 +149,7 @@ test.describe( 'Post Editor Performance', () => {
 		} );
 
 		// Stop tracing.
-		await metrics.stopTracing();
+		await metrics.stopTracing( `post-editor-${ kebabCase( key ) }` );
 
 		// Get the durations.
 		const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -287,8 +313,10 @@ test.describe( 'Post Editor Performance', () => {
 				// Click the next paragraph.
 				await paragraphs.nth( i ).click();
 
-				// Stop tracing.
-				await metrics.stopTracing();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) && 'post-editor-focus'
+				);
 
 				// Get the durations.
 				const allDurations = metrics.getSelectionEventDurations();
@@ -337,8 +365,11 @@ test.describe( 'Post Editor Performance', () => {
 				await listViewToggle.click();
 				await perfUtils.expectExpandedState( listViewToggle, 'true' );
 
-				// Stop tracing.
-				await metrics.stopTracing();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-list-view-open'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();
@@ -392,8 +423,11 @@ test.describe( 'Post Editor Performance', () => {
 					'true'
 				);
 
-				// Stop tracing.
-				await metrics.stopTracing();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-inserter-open'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();
@@ -452,8 +486,11 @@ test.describe( 'Post Editor Performance', () => {
 				// Type to trigger search.
 				await page.keyboard.type( 'p' );
 
-				// Stop tracing.
-				await metrics.stopTracing();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-inserter-search'
+				);
 
 				// Get the durations.
 				const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -492,12 +529,14 @@ test.describe( 'Post Editor Performance', () => {
 				.getByRole( 'button', {
 					name: 'Block Inserter',
 				} );
-			const paragraphBlockItem = page.locator(
-				'.block-editor-inserter__menu .editor-block-list-item-paragraph'
-			);
-			const headingBlockItem = page.locator(
-				'.block-editor-inserter__menu .editor-block-list-item-heading'
-			);
+			const paragraphBlockItem = page.getByRole( 'option', {
+				name: 'Paragraph',
+				exact: true,
+			} );
+			const headingBlockItem = page.getByRole( 'option', {
+				name: 'Heading',
+				exact: true,
+			} );
 
 			// Open Inserter.
 			await globalInserterToggle.click();
@@ -518,8 +557,11 @@ test.describe( 'Post Editor Performance', () => {
 				await paragraphBlockItem.hover();
 				await headingBlockItem.hover();
 
-				// Stop tracing.
-				await metrics.stopTracing();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'post-editor-inserter-hover'
+				);
 
 				// Get the durations.
 				const [ mouseOverEvents, mouseOutEvents ] =
@@ -717,4 +759,4 @@ test.describe( 'Post Editor Performance', () => {
 	} );
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

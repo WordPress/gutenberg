@@ -75,20 +75,8 @@ Private exports:
 - `ColorPanel`
 - `DimensionsPanel`
 - `FiltersPanel`
-- `GlobalStylesContext`
 - `ImageSettingsPanel`
 - `TypographyPanel`
-- `areGlobalStyleConfigsEqual`
-- `getBlockCSSSelector`
-- `getBlockSelectors`
-- `getGlobalStylesChanges`
-- `getLayoutStyles`
-- `toStyles`
-- `useGlobalSetting`
-- `useGlobalStyle`
-- `useGlobalStylesOutput`
-- `useGlobalStylesOutputWithConfig`
-- `useGlobalStylesReset`
 - `useHasBackgroundPanel`
 - `useHasBorderPanel`
 - `useHasBorderPanelControls`
@@ -134,7 +122,7 @@ Private exports:
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
 - `useBlockDisplayTitle`
-- `__unstableBlockStyleVariationOverridesWithConfig`
+- `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
 - `__unstableCommentIconFill`
@@ -145,12 +133,14 @@ Private exports:
 Private actions:
 - `__experimentalUpdateSettings`: version of public `updateSettings` action that filters out some private/experimental settings.
 - `clearBlockRemovalPrompt`
+- `clearRequestedInspectorTab`
 - `deleteStyleOverride`
 - `ensureDefaultBlock`
 - `expandBlock`
 - `hideBlockInterface`
 - `modifyContentLockBlock`
 - `privateRemoveBlocks`
+- `requestInspectorTab`
 - `resetZoomLevel`
 - `setBlockRemovalRules`
 - `setInsertionPoint`
@@ -184,6 +174,7 @@ Private selectors:
 - `getPatternBySlug`
 - `getRegisteredInserterMediaCategories`
 - `getRemovalPromptData`
+- `getRequestedInspectorTab`
 - `getReusableBlocks`
 - `getSectionRootClientId`
 - `getStyleOverrides`
@@ -225,7 +216,6 @@ Private exports:
 - `CreatePatternModalContents`
 - `DuplicatePatternModal`
 - `isOverridableBlock`
-- `hasOverridableBlocks`
 - `useDuplicatePatternProps`
 - `RenamePatternModal`
 - `PatternsMenuItems`
@@ -239,7 +229,6 @@ Private exports:
 - `PATTERN_USER_CATEGORY`
 - `EXCLUDED_PATTERN_SOURCES`
 - `PATTERN_SYNC_TYPES`
-- `PARTIAL_SYNCING_SUPPORTED_BLOCKS`
 
 ### `core/patterns` store
 
@@ -276,9 +265,6 @@ Private exports:
 - `BackButton`
 - `EntitiesSavedStatesExtensible`
 - `Editor`
-- `EditorContentSlotFill`
-- `GlobalStylesProvider`
-- `mergeBaseAndUserConfigs`
 - `PluginPostExcerpt`
 - `PostCardPanel`
 - `PreferencesModal`
@@ -293,7 +279,6 @@ Private exports:
 - `ComplementaryAreaMoreMenuItem`
 - `FullscreenMode`
 - `InterfaceSkeleton`
-- `NavigableRegion`
 - `PinnedItems`
 
 ### `core/editor` store

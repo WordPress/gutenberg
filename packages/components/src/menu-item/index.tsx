@@ -56,7 +56,7 @@ function UnforwardedMenuItem(
 
 	return (
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			ref={ ref }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
@@ -109,5 +109,6 @@ function UnforwardedMenuItem(
  * ```
  */
 export const MenuItem = forwardRef( UnforwardedMenuItem );
+MenuItem.displayName = 'MenuItem';
 
 export default MenuItem;

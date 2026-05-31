@@ -196,16 +196,6 @@ const prepareStylePromise = (
 };
 
 /**
- * Cache of style promise lists per URL.
- *
- * It contains the list of style elements associated to the page with the
- * passed URL. The original order is preserved to respect the CSS cascade.
- *
- * Each included promise resolves when the associated style element is ready.
- */
-const styleSheetCache = new Map< string, Promise< StyleElement >[] >();
-
-/**
  * Prepares all style elements contained in the passed document.
  *
  * This function calls {@link updateStylesWithSCS|`updateStylesWithSCS`}
@@ -217,33 +207,24 @@ const styleSheetCache = new Map< string, Promise< StyleElement >[] >();
  * make them effectively disabled until they are applied with the
  * {@link applyStyles|`applyStyles`} function.
  *
+ * Note that this function alters the passed document, as it can transfer
+ * nodes from it to the global document.
+ *
  * @param doc Document instance.
- * @param url URL for the passed document.
  * @return A list of promises for each style element in the passed document.
  */
-export const preloadStyles = (
-	doc: Document,
-	url: string
-): Promise< StyleElement >[] => {
-	if ( ! styleSheetCache.has( url ) ) {
-		const currentStyleElements = Array.from(
-			window.document.querySelectorAll< StyleElement >(
-				'style,link[rel=stylesheet]'
-			)
-		);
-		const newStyleElements = Array.from(
-			doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
-		);
+export const preloadStyles = ( doc: Document ): Promise< StyleElement >[] => {
+	const currentStyleElements = Array.from(
+		window.document.querySelectorAll< StyleElement >(
+			'style,link[rel=stylesheet]'
+		)
+	);
+	const newStyleElements = Array.from(
+		doc.querySelectorAll< StyleElement >( 'style,link[rel=stylesheet]' )
+	);
 
-		// Set styles in order.
-		const stylePromises = updateStylesWithSCS(
-			currentStyleElements,
-			newStyleElements
-		);
-
-		styleSheetCache.set( url, stylePromises );
-	}
-	return styleSheetCache.get( url );
+	// Set styles in order.
+	return updateStylesWithSCS( currentStyleElements, newStyleElements );
 };
 
 /**

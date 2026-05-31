@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../i18n-translator-comments';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );

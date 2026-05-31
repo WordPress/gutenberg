@@ -10,10 +10,10 @@ import {
 	Button,
 	Modal,
 	__experimentalGrid as Grid,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo, useRef, useEffect } from '@wordpress/element';
@@ -26,7 +26,7 @@ import {
 	calendar,
 	category,
 	commentAuthorAvatar,
-	edit,
+	pencil,
 	home,
 	layout,
 	list,
@@ -53,7 +53,6 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
  */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
-	useExistingTemplates,
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
@@ -123,20 +122,20 @@ function TemplateListItem( {
 				direction={ direction }
 			>
 				<div className="edit-site-add-new-template__template-icon">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 				</div>
 				<VStack
 					className="edit-site-add-new-template__template-name"
 					alignment="center"
 					spacing={ 0 }
 				>
-					<Text
+					<WCText
 						align="center"
 						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
 					>
 						{ title }
-					</Text>
+					</WCText>
 					{ children }
 				</VStack>
 			</Flex>
@@ -212,7 +211,9 @@ function NewTemplateModal( { onClose } ) {
 					status: 'publish',
 					title,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
-					is_wp_suggestion: isWPSuggestion,
+					meta: {
+						is_wp_suggestion: isWPSuggestion,
+					},
 				},
 				{ throwOnError: true }
 			);
@@ -226,7 +227,8 @@ function NewTemplateModal( { onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created post or template, e.g: "Hello world".
 					__( '"%s" successfully created.' ),
-					decodeEntities( newTemplate.title?.rendered || title )
+					decodeEntities( newTemplate.title?.rendered || title ) ||
+						__( '(no title)' )
 				),
 				{
 					type: 'snackbar',
@@ -315,20 +317,20 @@ function NewTemplateModal( { onClose } ) {
 						title={ __( 'Custom template' ) }
 						direction="row"
 						className="edit-site-add-new-template__custom-template-button"
-						icon={ edit }
+						icon={ pencil }
 						onClick={ () =>
 							setModalContent(
 								modalContentMap.customGenericTemplate
 							)
 						}
 					>
-						<Text
+						<WCText
 							lineHeight={ 1.53846153846 } // 20px
 						>
 							{ __(
 								'A custom template can be manually applied to any post or page.'
 							) }
-						</Text>
+						</WCText>
 					</TemplateListItem>
 				</Grid>
 			) }
@@ -375,6 +377,7 @@ function NewTemplate() {
 				variant="primary"
 				onClick={ () => setShowModal( true ) }
 				label={ postType.labels.add_new_item }
+				size="compact"
 				__next40pxDefaultSize
 			>
 				{ postType.labels.add_new_item }
@@ -387,15 +390,9 @@ function NewTemplate() {
 }
 
 function useMissingTemplates( setEntityForSuggestions, onClick ) {
-	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-	const existingTemplateSlugs = ( existingTemplates || [] ).map(
-		( { slug } ) => slug
-	);
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
-		( template ) =>
-			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
-			! existingTemplateSlugs.includes( template.slug )
+		( template ) => DEFAULT_TEMPLATE_SLUGS.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		onClick?.();

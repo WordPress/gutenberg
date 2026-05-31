@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .patterns-menu-items__convert-modal {
 	z-index: z-index(".patterns-menu-items__convert-modal");
 
@@ -42,18 +47,4 @@
 .pattern-overrides-control__allow-overrides-button {
 	width: 100%;
 	justify-content: center;
-}
-
-
-.patterns-pattern-overrides-toolbar-indicator__popover .components-popover__content {
-	min-width: 260px;
-	padding: $grid-unit-20;
-}
-
-.patterns-pattern-overrides-toolbar-indicator .patterns-pattern-overrides-toolbar-indicator-icon.has-colors svg {
-	fill: var(--wp-block-synced-color);
-}
-
-.editor-collapsible-block-toolbar .patterns-pattern-overrides-toolbar-indicator {
-	height: 32px;
 }

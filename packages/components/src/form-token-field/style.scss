@@ -1,3 +1,9 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-form-token-field__input-container {
 	@include input-control($components-color-accent);
 	width: 100%;
@@ -5,8 +11,9 @@
 	cursor: text;
 
 	&.is-disabled {
-		background: $gray-300;
-		border-color: $gray-300;
+		background: $components-color-gray-100;
+		border-color: $components-color-gray-400;
+		cursor: default;
 	}
 
 	&.is-active {
@@ -19,6 +26,7 @@
 		flex: 1;
 		font-family: inherit;
 		font-size: 16px;
+		line-height: 1; // Override forms.css styles
 		width: 100%;
 		max-width: 100%;
 		margin-left: 4px;
@@ -72,6 +80,14 @@
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
 			color: $gray-700;
+		}
+	}
+
+	&.is-disabled {
+		.components-form-token-field__token-text,
+		.components-form-token-field__remove-token.components-button {
+			background: $components-color-gray-100;
+			color: $components-color-gray-600;
 		}
 	}
 
@@ -191,6 +207,6 @@
 	}
 
 	&:not(.is-empty) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }

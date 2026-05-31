@@ -42,6 +42,7 @@ function ColorGradientControlInner( {
 	onColorChange,
 	onGradientChange,
 	colorValue,
+	colorSlug,
 	gradientValue,
 	clearable,
 	showTitle = true,
@@ -59,18 +60,19 @@ function ColorGradientControlInner( {
 		return null;
 	}
 
+	const colorPaletteOnChange = canChooseAGradient
+		? ( newColor, _index, newSlug ) => {
+				onColorChange( newColor, newSlug );
+				onGradientChange();
+		  }
+		: ( newColor, _index, newSlug ) => onColorChange( newColor, newSlug );
+
 	const tabPanels = {
 		[ TAB_IDS.color ]: (
 			<ColorPalette
 				value={ colorValue }
-				onChange={
-					canChooseAGradient
-						? ( newColor ) => {
-								onColorChange( newColor );
-								onGradientChange();
-						  }
-						: onColorChange
-				}
+				selectedSlug={ colorSlug }
+				onChange={ colorPaletteOnChange }
 				{ ...{ colors, disableCustomColors } }
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
@@ -109,7 +111,6 @@ function ColorGradientControlInner( {
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			className={ clsx(
 				'block-editor-color-gradient-control',
 				className

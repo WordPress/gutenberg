@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dataviews",
-	"version": "7.0.0",
+	"version": "15.0.0",
 	"description": "DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,13 +22,22 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"build-wp",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./wp": {
 			"types": "./build-types/index.d.ts",
@@ -40,38 +49,47 @@
 		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
-	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.15",
-		"@babel/runtime": "7.25.7",
+		"@ariakit/react": "^0.4.21",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/date": "file:../date",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
+		"colord": "^2.7.0",
 		"date-fns": "^4.1.0",
+		"deepmerge": "4.3.1",
 		"fast-deep-equal": "^3.1.3",
 		"remove-accents": "^0.5.0"
 	},
+	"devDependencies": {
+		"@storybook/addon-docs": "^10.2.8",
+		"@storybook/react-vite": "^10.2.8",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@types/jest": "^29.5.14",
+		"esbuild": "^0.27.2",
+		"storybook": "^10.2.8"
+	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
-		"build:wp": "node build"
+		"build:wp": "node build.cjs"
 	}
 }

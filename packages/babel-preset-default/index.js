@@ -29,10 +29,6 @@ module.exports = ( api ) => {
 	const getPresetEnv = () => {
 		const opts = {
 			bugfixes: true,
-			include: [
-				'proposal-nullish-coalescing-operator',
-				'proposal-logical-assignment-operators',
-			],
 			...( wpBuildOpts.addPolyfillComments
 				? {
 						useBuiltIns: 'usage',
@@ -87,6 +83,7 @@ module.exports = ( api ) => {
 			require.resolve( '@babel/preset-typescript' ),
 		],
 		plugins: [
+			require.resolve( '@babel/plugin-syntax-import-attributes' ),
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@babel/plugin-transform-react-jsx' ),

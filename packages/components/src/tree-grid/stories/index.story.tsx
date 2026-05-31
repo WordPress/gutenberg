@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -19,15 +20,22 @@ const meta: Meta< typeof TreeGrid > = {
 	title: 'Components/Navigation/TreeGrid',
 	id: 'components-treegrid',
 	component: TreeGrid,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { TreeGridRow, TreeGridCell },
 	argTypes: {
 		children: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
+	args: {
+		onExpandRow: fn(),
+		onCollapseRow: fn(),
+		onFocusRow: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -100,7 +108,11 @@ const Rows = ( {
 								{ ( props ) => (
 									<>
 										<Descender level={ level } />
-										<Button variant="primary" { ...props }>
+										<Button
+											__next40pxDefaultSize
+											variant="primary"
+											{ ...props }
+										>
 											{ item.name }
 										</Button>
 									</>

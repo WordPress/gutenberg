@@ -18,7 +18,7 @@ import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { isBlobURL } from '@wordpress/blob';
+import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
 
@@ -61,7 +61,6 @@ function ToolbarEditButton( {
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				accept="image/*,video/*"
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
@@ -83,6 +82,12 @@ function PlaceholderContainer( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
+	const onFilesPreUpload = ( files ) => {
+		if ( files.length === 1 ) {
+			onSelectMedia( { url: createBlobURL( files[ 0 ] ) } );
+		}
+	};
+
 	return (
 		<MediaPlaceholder
 			icon={ <BlockIcon icon={ icon } /> }
@@ -91,9 +96,9 @@ function PlaceholderContainer( {
 			} }
 			className={ className }
 			onSelect={ onSelectMedia }
-			accept="image/*,video/*"
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			onFilesPreUpload={ onFilesPreUpload }
 			onError={ onUploadError }
 			disableMediaButtons={ mediaUrl }
 		/>

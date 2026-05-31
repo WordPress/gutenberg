@@ -7,25 +7,35 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	BlockToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { InlineNotices } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import EditorNotices from '../editor-notices';
+import { unlock } from '../../lock-unlock';
+import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
+import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
+import { CollaboratorsOverlay } from '../collaborators-overlay';
+import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
-import EditorContentSlotFill from './content-slot-fill';
+import StylesCanvas from '../styles-canvas';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -40,9 +50,24 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
+function Notices() {
+	const isValidTemplate = useSelect( ( select ) => {
+		return select( blockEditorStore ).isValidTemplate();
+	}, [] );
+
+	return (
+		<InlineNotices
+			className="editor-notices"
+			pinnedNoticesClassName="editor-notices__pinned"
+			dismissibleNoticesClassName="editor-notices__dismissible"
+		>
+			{ ! isValidTemplate && <TemplateValidationNotice /> }
+		</InlineNotices>
+	);
+}
+
 export default function EditorInterface( {
 	className,
-	styles,
 	children,
 	forceIsDirty,
 	contentRef,
@@ -51,22 +76,37 @@ export default function EditorInterface( {
 	customSaveButton,
 	customSavePanel,
 	forceDisableBlockTools,
-	title,
 	iframeProps,
 } ) {
 	const {
 		mode,
+		postId,
+		postType,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
 		isPreviewMode,
 		showBlockBreadcrumbs,
-		documentLabel,
+		postTypeLabel,
+		stylesPath,
+		showStylebook,
+		isRevisionsMode,
+		showDiff,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const {
+			getEditorSettings,
+			getPostTypeLabel,
+			getCurrentPostType,
+			getCurrentPostId,
+		} = select( editorStore );
+		const {
+			getStylesPath,
+			getShowStylebook,
+			isRevisionsMode: _isRevisionsMode,
+			isShowingRevisionDiff,
+		} = unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
-		const postTypeLabel = getPostTypeLabel();
 
 		let _mode = select( editorStore ).getEditorMode();
 		if ( ! editorSettings.richEditingEnabled && _mode === 'visual' ) {
@@ -78,20 +118,33 @@ export default function EditorInterface( {
 
 		return {
 			mode: _mode,
+			postId: getCurrentPostId(),
+			postType: getCurrentPostType(),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.isPreviewMode,
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			documentLabel:
-				// translators: Default label for the Document in the Block Breadcrumb.
-				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
+			postTypeLabel: getPostTypeLabel(),
+			stylesPath: getStylesPath(),
+			showStylebook: getShowStylebook(),
+			isRevisionsMode: _isRevisionsMode(),
+			showDiff: isShowingRevisionDiff(),
 		};
 	}, [] );
+	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
+
+	// Runs unconditionally so join/leave/save notifications are dispatched
+	// regardless of viewport width or whether the header centre area is visible.
+	useCollaboratorNotifications( postId, postType );
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
+	const shouldShowStylesCanvas =
+		showStylebook || stylesPath?.startsWith( '/revisions' );
+	const shouldShowBlockEditor = ! shouldShowStylesCanvas;
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -106,6 +159,24 @@ export default function EditorInterface( {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	// When in revisions mode, render the revisions interface.
+	if ( isRevisionsMode ) {
+		return (
+			<InterfaceSkeleton
+				className={ clsx( 'editor-editor-interface', className ) }
+				labels={ interfaceLabels }
+				header={
+					<RevisionsHeader
+						showDiff={ showDiff }
+						onToggleDiff={ () => setShowRevisionDiff( ! showDiff ) }
+					/>
+				}
+				content={ <RevisionsCanvas /> }
+				sidebar={ <ComplementaryArea.Slot scope="core" /> }
+			/>
+		);
+	}
 
 	return (
 		<InterfaceSkeleton
@@ -127,11 +198,10 @@ export default function EditorInterface( {
 						}
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
-						title={ title }
 					/>
 				)
 			}
-			editorNotices={ <EditorNotices /> }
+			editorNotices={ <Notices /> }
 			secondarySidebar={
 				! isPreviewMode &&
 				mode === 'visual' &&
@@ -144,45 +214,39 @@ export default function EditorInterface( {
 			}
 			content={
 				<>
-					{ ! isDistractionFree && ! isPreviewMode && (
-						<EditorNotices />
+					{ ! isDistractionFree && ! isPreviewMode && <Notices /> }
+					{ shouldShowStylesCanvas && <StylesCanvas /> }
+					{ shouldShowBlockEditor && (
+						<>
+							{ ! isPreviewMode && mode === 'text' && (
+								<TextEditor
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+								/>
+							) }
+							{ ! isPreviewMode &&
+								! isLargeViewport &&
+								mode === 'visual' && (
+									<BlockToolbar hideDragHandle />
+								) }
+							{ ( isPreviewMode || mode === 'visual' ) && (
+								<VisualEditor
+									contentRef={ contentRef }
+									disableIframe={ disableIframe }
+									// We should auto-focus the canvas (title) on load.
+									// eslint-disable-next-line jsx-a11y/no-autofocus
+									autoFocus={ autoFocus }
+									iframeProps={ iframeProps }
+								/>
+							) }
+							{ children }
+							<CollaboratorsOverlay
+								postId={ postId }
+								postType={ postType }
+							/>
+						</>
 					) }
-
-					<EditorContentSlotFill.Slot>
-						{ ( [ editorCanvasView ] ) =>
-							editorCanvasView ? (
-								editorCanvasView
-							) : (
-								<>
-									{ ! isPreviewMode && mode === 'text' && (
-										<TextEditor
-											// We should auto-focus the canvas (title) on load.
-											// eslint-disable-next-line jsx-a11y/no-autofocus
-											autoFocus={ autoFocus }
-										/>
-									) }
-									{ ! isPreviewMode &&
-										! isLargeViewport &&
-										mode === 'visual' && (
-											<BlockToolbar hideDragHandle />
-										) }
-									{ ( isPreviewMode ||
-										mode === 'visual' ) && (
-										<VisualEditor
-											styles={ styles }
-											contentRef={ contentRef }
-											disableIframe={ disableIframe }
-											// We should auto-focus the canvas (title) on load.
-											// eslint-disable-next-line jsx-a11y/no-autofocus
-											autoFocus={ autoFocus }
-											iframeProps={ iframeProps }
-										/>
-									) }
-									{ children }
-								</>
-							)
-						}
-					</EditorContentSlotFill.Slot>
 				</>
 			}
 			footer={
@@ -191,7 +255,13 @@ export default function EditorInterface( {
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				mode === 'visual' && (
-					<BlockBreadcrumb rootLabelText={ documentLabel } />
+					<BlockBreadcrumb
+						rootLabelText={
+							postTypeLabel
+								? decodeEntities( postTypeLabel )
+								: undefined
+						}
+					/>
 				)
 			}
 			actions={

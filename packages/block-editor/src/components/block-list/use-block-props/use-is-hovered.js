@@ -1,35 +1,64 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 
-function listener( event ) {
-	if ( event.defaultPrevented ) {
-		return;
-	}
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
 
-	event.preventDefault();
-	event.currentTarget.classList.toggle(
-		'is-hovered',
-		event.type === 'mouseover'
-	);
-}
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
-/*
+/**
  * Adds `is-hovered` class when the block is hovered and in navigation or
  * outline mode.
+ *
+ * @param {Object}  options                  Options object.
+ * @param {boolean} [options.isEnabled=true] Whether to enable hover detection.
+ *
+ * @return {Function} Ref callback.
  */
-export function useIsHovered() {
-	return useRefEffect( ( node ) => {
-		node.addEventListener( 'mouseout', listener );
-		node.addEventListener( 'mouseover', listener );
+export function useIsHovered( { isEnabled = true } = {} ) {
+	return useRefEffect(
+		( node ) => {
+			if ( ! isEnabled ) {
+				return;
+			}
 
-		return () => {
-			node.removeEventListener( 'mouseout', listener );
-			node.removeEventListener( 'mouseover', listener );
+			function listener( event ) {
+				if ( event.defaultPrevented ) {
+					return;
+				}
+				event.preventDefault();
+				node.classList.toggle(
+					'is-hovered',
+					event.type === 'mouseover'
+				);
+			}
 
-			// Remove class in case it lingers.
-			node.classList.remove( 'is-hovered' );
-		};
-	}, [] );
+			const unsubscribeOut = subscribeDelegatedListener(
+				node,
+				'mouseout',
+				listener
+			);
+			const unsubscribeOver = subscribeDelegatedListener(
+				node,
+				'mouseover',
+				listener
+			);
+
+			return () => {
+				unsubscribeOut();
+				unsubscribeOver();
+
+				// Remove class in case it lingers.
+				node.classList.remove( 'is-hovered' );
+			};
+		},
+		[ isEnabled ]
+	);
 }

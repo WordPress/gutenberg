@@ -3,7 +3,7 @@
  */
 import createHooks from './createHooks';
 
-export * from './types';
+export type * from './types';
 
 export const defaultHooks = createHooks();
 

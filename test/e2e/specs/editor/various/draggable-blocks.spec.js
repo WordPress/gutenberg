@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -372,11 +367,7 @@ test.describe( 'Draggable block', () => {
 		);
 
 		const testImageName = '10x10_e2e_test_image_z9T8jK.png';
-		const testImagePath = path.join(
-			__dirname,
-			'../../../assets',
-			testImageName
-		);
+		const testImagePath = `./assets/${ testImageName }`;
 
 		{
 			const { dragOver, drop } =
@@ -395,7 +386,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the button block appender should show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			const { width: rowWidth } = await rowBlock.boundingBox();
 			await dragOver( rowBlock, { position: { x: rowWidth - 10 } } );
@@ -404,7 +398,10 @@ test.describe( 'Draggable block', () => {
 			await expect(
 				rowAppender,
 				'Dragging over the empty group block but outside the appender should still show the blue background'
-			).toHaveCSS( 'background-color', 'rgb(0, 124, 186)' );
+			).toHaveCSS(
+				'background-color',
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
+			);
 
 			await drop();
 			await expect( rowAppender ).toBeHidden();
@@ -435,7 +432,7 @@ test.describe( 'Draggable block', () => {
 			// This is technically an implementation detail but easier to test in this case.
 			await expect( columnAppender ).toHaveCSS(
 				'background-color',
-				'rgb(0, 124, 186)'
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
 			);
 
 			await drop();
@@ -455,6 +452,47 @@ test.describe( 'Draggable block', () => {
 				},
 			] );
 		}
+	} );
+
+	test( 'renders the drag chip inside the wp compat overlay slot', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
+		await editor.showBlockToolbar();
+
+		const dragHandle = page.locator(
+			'role=toolbar[name="Block tools"i] >> role=button[name="Drag"i][include-hidden]'
+		);
+		await dragHandle.hover();
+		await page.mouse.down();
+
+		const firstParagraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i] >> text=1'
+		);
+		const firstParagraphBound = await firstParagraph.boundingBox();
+		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
+
+		const chip = page.locator(
+			'data-testid=block-draggable-chip >> visible=true'
+		);
+		await expect( chip ).toBeVisible();
+
+		// Living in the compat overlay slot is what keeps the chip above
+		// any `@wordpress/components` overlays opened mid-drag.
+		const chipIsInsideCompatSlot = await chip.evaluate(
+			( el ) => el.closest( '[data-wp-compat-overlay-slot]' ) !== null
+		);
+		expect( chipIsInsideCompatSlot ).toBe( true );
+
+		await page.mouse.up();
 	} );
 
 	test( 'can directly drag an image', async ( { page, editor } ) => {

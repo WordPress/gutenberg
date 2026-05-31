@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -24,10 +24,7 @@ test.describe( 'Gallery', () => {
 		await requestUtils.deleteAllMedia();
 
 		uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
 
@@ -98,16 +95,21 @@ test.describe( 'Gallery', () => {
 		);
 		await expect( galleryBlock ).toBeVisible();
 
-		const fileName = await galleryBlockUtils.upload(
+		await galleryBlockUtils.upload(
 			galleryBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
 		const image = galleryBlock.locator( 'role=img' );
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		// With client-side processing, the filename may be changed by the server.
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
 
+		// Check that content has a valid gallery with an image.
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ fileName }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		await expect.poll( editor.getEditedPostContent ).toMatch( regex );
 	} );
@@ -219,27 +221,81 @@ test.describe( 'Gallery', () => {
 			mediaLibrary.locator( 'role=button[name="Create a new gallery"i]' )
 		).toBeVisible();
 	} );
+
+	test( 'can randomize the image on the front end', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				randomOrder: true,
+			},
+			innerBlocks: numbers.map( ( i ) => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
+				},
+			} ) ),
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageElements = page.locator( '.wp-block-gallery img' );
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
+		);
+		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
+
+	test( 'can randomize the image with a lightbox effect on the front end', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				randomOrder: true,
+			},
+			innerBlocks: numbers.map( ( i ) => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
+					lightbox: { enabled: true },
+				},
+			} ) ),
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageElements = page.locator( '.wp-block-gallery img' );
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
+		);
+		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
 } );
 
 class GalleryBlockUtils {
 	constructor( { page } ) {
 		this.page = page;
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 	}
 
 	async upload( inputElement ) {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 

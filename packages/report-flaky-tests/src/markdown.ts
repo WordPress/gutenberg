@@ -37,7 +37,7 @@ const metaData = {
 			if ( matched ) {
 				return JSON.parse( matched[ 1 ] );
 			}
-		} catch ( error ) {
+		} catch {
 			// Ignore errors.
 		}
 		return undefined;

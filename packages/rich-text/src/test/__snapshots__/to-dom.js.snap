@@ -331,3 +331,28 @@ exports[`recordToDom should remove padding 1`] = `
   ﻿
 </body>
 `;
+
+exports[`recordToDom should unwrap element with data-rich-text-bogus attribute 1`] = `
+<body>
+  test
+</body>
+`;
+
+exports[`recordToDom should unwrap nested data-rich-text-bogus elements 1`] = `
+<body>
+  <strong>
+    te
+  </strong>
+  st
+</body>
+`;
+
+exports[`recordToDom should unwrap data-rich-text-bogus element but preserve child formatting 1`] = `
+<body>
+  hello 
+  <em>
+    world
+  </em>
+  
+</body>
+`;

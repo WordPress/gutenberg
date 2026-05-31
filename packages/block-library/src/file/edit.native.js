@@ -31,7 +31,7 @@ import {
 	ToggleControl,
 	TextControl,
 	SelectControl,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import {
 	file as icon,
@@ -39,7 +39,7 @@ import {
 	button,
 	external,
 	link,
-	warning,
+	cautionFilled,
 } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -476,8 +476,8 @@ export class FileEdit extends Component {
 									/>
 									{ isUploadFailed && (
 										<View style={ styles.errorContainer }>
-											<Icon
-												icon={ warning }
+											<WCIcon
+												icon={ cautionFilled }
 												style={ errorIconStyle }
 											/>
 											<PlainText
