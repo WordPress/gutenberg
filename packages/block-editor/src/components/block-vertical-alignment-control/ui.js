@@ -44,7 +44,6 @@ function BlockVerticalAlignmentUI( {
 	isCollapsed = true,
 	isToolbar,
 	label = __( 'Align content vertically' ),
-	description,
 } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
@@ -55,16 +54,7 @@ function BlockVerticalAlignmentUI( {
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
-	const extraProps = isToolbar
-		? { isCollapsed }
-		: {
-				popoverProps: { focusOnMount: 'firstElement' },
-				toggleProps: description
-					? {
-							describedBy: description,
-					  }
-					: {},
-		  };
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent
