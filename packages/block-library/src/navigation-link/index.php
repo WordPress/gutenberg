@@ -82,6 +82,25 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
 }
 
 /**
+ * Build an array with CSS classes and inline styles defining the font sizes
+ * which will be applied to the navigation markup in the front-end.
+ *
+ * @since 5.9.0
+ * @deprecated 7.0.0 Use block_core_shared_navigation_build_css_font_sizes() instead.
+ *
+ * @param  array $context Navigation block context.
+ * @return array Font size CSS classes and inline styles.
+ */
+function block_core_navigation_link_build_css_font_sizes( $context ) {
+	_deprecated_function(
+		__FUNCTION__,
+		'7.0.0',
+		'block_core_shared_navigation_build_css_font_sizes()'
+	);
+	return block_core_shared_navigation_build_css_font_sizes( $context );
+}
+
+/**
  * Returns the top-level submenu SVG chevron icon.
  *
  * @since 5.9.0
