@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 import {
 	justifyTop,
@@ -43,10 +43,7 @@ function BlockVerticalAlignmentUI( {
 	controls = DEFAULT_CONTROLS,
 	isCollapsed = true,
 	isToolbar,
-	label = _x(
-		'Align content vertically',
-		'Block vertical alignment setting label'
-	),
+	label = __( 'Align content vertically' ),
 	description,
 } ) {
 	function applyOrUnset( align ) {
