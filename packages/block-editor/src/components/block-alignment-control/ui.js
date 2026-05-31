@@ -66,9 +66,7 @@ function BlockAlignmentUI( {
 				} ),
 		  }
 		: {
-				toggleProps: description
-					? { 'aria-description': description }
-					: {},
+				toggleProps: description ? { description } : {},
 				children: ( { onClose } ) => {
 					return (
 						<>
