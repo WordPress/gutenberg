@@ -143,7 +143,7 @@ In addition to API support, the client checks several runtime conditions before 
 | --- | --- | --- |
 | Device memory | > 2 GB | WASM image processing can OOM on very low-memory devices. |
 | CPU cores | ≥ 2 | WASM image processing benefits from at least one core for the worker plus one for the UI thread. |
-| Network | not `2g`/`slow-2g`, no Save-Data | The ~13 MB worker download is gated to faster connections; `3g` is allowed. |
+| Network | not `2g`/`slow-2g`, no [`Save-Data` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Save-Data) | The ~13 MB worker download is gated to faster connections; `3g` is allowed. |
 | CSP `blob:` workers | must succeed | The worker is created from a blob URL; strict `worker-src` policies block it. |
 
 Failing any check causes a transparent fallback to server-side processing.
