@@ -31,7 +31,7 @@ function AlignmentUI( {
 	value,
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-	label = __( 'Align block' ),
+	label = __( 'Align text' ),
 	description,
 	isCollapsed = true,
 	isToolbar,
