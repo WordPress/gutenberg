@@ -135,6 +135,7 @@ export async function vipsHasTransparency( url: string ) {
  * @param addSuffix    Whether to add dimension suffix to filename.
  * @param signal       Optional abort signal to cancel the operation.
  * @param scaledSuffix Whether to add '-scaled' suffix instead of dimensions (for big image threshold).
+ * @param quality      Desired quality (0-1). Defaults to 0.82.
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
@@ -144,7 +145,8 @@ export async function vipsResizeImage(
 	smartCrop: boolean,
 	addSuffix: boolean,
 	signal?: AbortSignal,
-	scaledSuffix?: boolean
+	scaledSuffix?: boolean,
+	quality?: number
 ) {
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
@@ -157,7 +159,8 @@ export async function vipsResizeImage(
 			await file.arrayBuffer(),
 			file.type,
 			resize,
-			smartCrop
+			smartCrop,
+			quality
 		);
 
 	let fileName = file.name;
@@ -271,9 +274,53 @@ export async function vipsCancelOperations( id: QueueItemId ) {
  *
  * If the vips module has not been loaded yet (i.e., no image processing
  * has occurred), this is a no-op since there is no worker to terminate.
+ *
+ * The worker itself is recreated lazily by `getWorkerAPI()` inside
+ * `@wordpress/vips/worker` on the next vips call — the module reference
+ * cached here can keep pointing at the same module since re-importing
+ * returns the same instance from the JS module cache.
  */
 export function terminateVipsWorker(): void {
 	if ( vipsModule ) {
 		vipsModule.terminateVipsWorker();
+	}
+}
+
+/**
+ * Tracks the number of completed vips image processing operations across
+ * both the success path (`finishOperation`) and the failure path
+ * (`cancelItem`). Used to periodically recycle the WASM worker to reclaim
+ * memory, since WASM linear memory can only grow and never shrink.
+ */
+let completedVipsOperations = 0;
+
+/**
+ * Maximum number of vips operations before recycling the worker.
+ * Each operation can consume 50-100MB+ of WASM memory for large images.
+ */
+const MAX_VIPS_OPS_BEFORE_RECYCLE = 50;
+
+/**
+ * Records that a vips operation has completed and recycles the worker if
+ * the threshold has been reached and no other vips operations are in
+ * flight. Call this from both success and failure paths so that a burst
+ * of failures can't bypass the recycle budget.
+ *
+ * @param activeImageProcessingCount Number of vips operations currently
+ *                                   in flight. Recycling is deferred while
+ *                                   any are running so an in-flight worker
+ *                                   isn't killed mid-operation.
+ */
+export function maybeRecycleVipsWorker(
+	activeImageProcessingCount: number
+): void {
+	completedVipsOperations++;
+
+	if (
+		completedVipsOperations >= MAX_VIPS_OPS_BEFORE_RECYCLE &&
+		activeImageProcessingCount === 0
+	) {
+		terminateVipsWorker();
+		completedVipsOperations = 0;
 	}
 }

@@ -5,6 +5,23 @@
  * @package WordPress
  */
 
+require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
+require_once __DIR__ . '/navigation-link/shared/build-css-font-sizes.php';
+
+/**
+ * Renders the submenu icon SVG for the Navigation Submenu block.
+ *
+ * @since 5.9.0
+ * @deprecated 7.0.0 Use block_core_shared_navigation_render_submenu_icon() instead.
+ *
+ * @return string SVG markup for the submenu icon.
+ */
+function block_core_navigation_submenu_render_submenu_icon() {
+	_deprecated_function( __FUNCTION__, '7.0.0', 'block_core_shared_navigation_render_submenu_icon()' );
+	return block_core_shared_navigation_render_submenu_icon();
+}
+
 /**
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
@@ -46,52 +63,6 @@ function block_core_navigation_submenu_get_submenu_visibility( $context ) {
 	return $submenu_visibility ?? 'hover';
 }
 
-// Path differs between source and build: '../navigation-link/shared/' in source, './navigation-link/shared/' in build.
-if ( file_exists( __DIR__ . '/../navigation-link/shared/item-should-render.php' ) ) {
-	require_once __DIR__ . '/../navigation-link/shared/item-should-render.php';
-	require_once __DIR__ . '/../navigation-link/shared/render-submenu-icon.php';
-} else {
-	require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
-	require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
-}
-
-/**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the navigation markup in the front-end.
- *
- * @since 5.9.0
- *
- * @param  array $context Navigation block context.
- * @return array Font size CSS classes and inline styles.
- */
-function block_core_navigation_submenu_build_css_font_sizes( $context ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf(
-			'font-size: %s;',
-			wp_get_typography_font_size_value(
-				array(
-					'size' => $context['style']['typography']['fontSize'],
-				)
-			)
-		);
-	}
-
-	return $font_sizes;
-}
-
 /**
  * Renders the `core/navigation-submenu` block.
  *
@@ -116,7 +87,15 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$font_sizes      = block_core_navigation_submenu_build_css_font_sizes( $block->context );
+	// The build system prefixes this function with "gutenberg_" to avoid
+	// collisions with the core version. Until this function is backported to
+	// core, we need to guard its use and only call the prefixed name in
+	//  the plugin.
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$font_sizes = gutenberg_block_core_shared_navigation_build_css_font_sizes( $block->context );
+	} else {
+		$font_sizes = block_core_shared_navigation_build_css_font_sizes( $block->context );
+	}
 	$style_attribute = $font_sizes['inline_styles'];
 
 	// Render inner blocks first to check if any menu items will actually display.
@@ -240,7 +219,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $show_submenu_indicators && $has_submenu ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
-			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_render_submenu_icon() . '</button>';
+			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+			} else {
+				$html .= block_core_shared_navigation_render_submenu_icon();
+			}
+			$html .= '</button>';
 		}
 	} else {
 		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
@@ -262,7 +247,13 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</button>';
 
 		if ( $has_submenu ) {
-			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation__submenu-icon">';
+			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+				$html .= gutenberg_block_core_shared_navigation_render_submenu_icon();
+			} else {
+				$html .= block_core_shared_navigation_render_submenu_icon();
+			}
+			$html .= '</span>';
 		}
 	}
 

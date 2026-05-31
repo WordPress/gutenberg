@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Dropdown,
 	Button,
 	__experimentalVStack as VStack,
@@ -185,9 +185,9 @@ function PrivateExcerpt() {
 		return false;
 	}
 	const excerptText = !! excerpt && (
-		<Text align="left" numberOfLines={ 4 } truncate={ allowEditing }>
+		<WCText align="left" numberOfLines={ 4 } truncate={ allowEditing }>
 			{ decodeEntities( excerpt ) }
-		</Text>
+		</WCText>
 	);
 	if ( ! allowEditing ) {
 		return excerptText;

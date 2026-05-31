@@ -60,7 +60,7 @@ export const getItemPriority = ( name, searchValue ) => {
  */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
-	const [ fieldValue, setFieldValue ] = useState( false );
+	const [ fieldValue, setFieldValue ] = useState( '' );
 	const {
 		isHierarchical,
 		parentPostId,
@@ -95,6 +95,7 @@ export function PageAttributesParent() {
 			if ( !! fieldValue ) {
 				query.search = fieldValue;
 				query.orderby = 'relevance';
+				query.search_columns = [ 'post_title' ];
 			}
 
 			const parentPost = pageId

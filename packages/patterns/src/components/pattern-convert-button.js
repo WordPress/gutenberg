@@ -143,7 +143,6 @@ export default function PatternConvertButton( {
 
 			replaceBlocks( clientIds, newBlock );
 			setEditingPattern( newBlock.clientId, true );
-			closeBlockSettingsMenu();
 		}
 
 		createSuccessNotice(
@@ -164,6 +163,7 @@ export default function PatternConvertButton( {
 			}
 		);
 		setIsModalOpen( false );
+		closeBlockSettingsMenu();
 	};
 	return (
 		<>
@@ -186,6 +186,7 @@ export default function PatternConvertButton( {
 					} }
 					onClose={ () => {
 						setIsModalOpen( false );
+						closeBlockSettingsMenu();
 					} }
 				/>
 			) }

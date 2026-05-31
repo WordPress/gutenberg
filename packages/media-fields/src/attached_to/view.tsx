@@ -28,9 +28,7 @@ export default function MediaAttachedToView( {
 	useEffect( () => {
 		if ( !! parentId && parentId === embeddedPostId ) {
 			setAttachedPostTitle(
-				getRenderedContent( embeddedPostTitle ) ||
-					embeddedPostId?.toString() ||
-					''
+				getRenderedContent( embeddedPostTitle ) || __( '(no title)' )
 			);
 		}
 

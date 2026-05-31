@@ -1,5 +1,5 @@
 /* eslint-disable jest/no-conditional-expect */
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DirectionProvider } from '@base-ui/react/direction-provider';
 import { useEffect, useState, createRef } from '@wordpress/element';
@@ -2254,6 +2254,172 @@ describe( 'Tabs', () => {
 					} );
 				}
 			);
+		} );
+	} );
+
+	describe( 'Development mode validation', () => {
+		function collectUncaughtErrors() {
+			const errors: Error[] = [];
+			const handler = ( event: ErrorEvent ) => {
+				event.preventDefault();
+				errors.push( event.error );
+			};
+			window.addEventListener( 'error', handler );
+			return {
+				errors,
+				cleanup: () => window.removeEventListener( 'error', handler ),
+			};
+		}
+
+		it( 'should throw when there are more Tabs than Panels', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+						<Tabs.Tab value="three">Three</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (3 Tabs, 2 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
+			);
+
+			cleanup();
+		} );
+
+		it( 'should throw when there are more Panels than Tabs', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+					<Tabs.Panel value="three">Third panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (2 Tabs, 3 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
+			);
+
+			cleanup();
+		} );
+
+		it( 'should not throw when Tab and Panel counts match', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait a bit to ensure validation has run
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
+
+			expect( errors ).toHaveLength( 0 );
+
+			cleanup();
+		} );
+
+		it( 'should throw when tabs are used without any panels', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			render(
+				<Tabs.Root>
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+				</Tabs.Root>
+			);
+
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (2 Tabs, 0 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
+			);
+
+			cleanup();
+		} );
+
+		it( 'should detect count mismatch after dynamic changes', async () => {
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			const { rerender } = render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait for validation
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
+
+			// No errors since counts match
+			expect( errors ).toHaveLength( 0 );
+
+			// Remove a panel to create a mismatch
+			rerender(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			expect( errors[ 0 ].message ).toBe(
+				'Tabs: Tab/Panel count mismatch (2 Tabs, 1 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
+			);
+
+			cleanup();
 		} );
 	} );
 } );

@@ -419,21 +419,6 @@ export function showStylebook( state = false, action ) {
 }
 
 /**
- * Reducer for the canvas minimum height.
- *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {number} Updated state.
- */
-export function canvasMinHeight( state = 0, action ) {
-	switch ( action.type ) {
-		case 'SET_CANVAS_MIN_HEIGHT':
-			return action.minHeight;
-	}
-	return state;
-}
-
-/**
  * Reducer for the revisions preview mode.
  * Stores the current revision ID, or null if not in revisions mode.
  *
@@ -445,6 +430,45 @@ export function revisionId( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_CURRENT_REVISION_ID':
 			return action.revisionId;
+	}
+	return state;
+}
+
+/**
+ * Reducer for the current revisions page number.
+ *
+ * @param {number} state  Current page number.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
+ */
+export function revisionPage( state = 1, action ) {
+	switch ( action.type ) {
+		case 'SET_REVISION_PAGE':
+			return action.page;
+		case 'SET_CURRENT_REVISION_ID':
+			if ( ! action.revisionId ) {
+				return 1;
+			}
+			return state;
+	}
+	return state;
+}
+
+/**
+ * Reducer for whether the revision diff is shown.
+ * Resets to true when entering/exiting revisions mode.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function showRevisionDiff( state = true, action ) {
+	switch ( action.type ) {
+		case 'SET_SHOW_REVISION_DIFF':
+			return action.showDiff;
+		case 'SET_CURRENT_REVISION_ID':
+			// Reset during the exit.
+			return ! action.revisionId ? true : state;
 	}
 	return state;
 }
@@ -485,8 +509,9 @@ export default combineReducers( {
 	publishSidebarActive,
 	stylesPath,
 	showStylebook,
-	canvasMinHeight,
 	revisionId,
+	revisionPage,
+	showRevisionDiff,
 	selectedNote,
 	dataviews: dataviewsReducer,
 } );

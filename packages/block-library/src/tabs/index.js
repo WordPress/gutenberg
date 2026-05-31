@@ -21,14 +21,24 @@ export const settings = {
 	example: {
 		innerBlocks: [
 			{
-				name: 'core/tabs-menu',
-				innerBlocks: [ { name: 'core/tabs-menu-item' } ],
+				name: 'core/tab-list',
+				innerBlocks: [
+					{
+						name: 'core/tab',
+						attributes: { anchor: 'tab-1-button' },
+					},
+					{
+						name: 'core/tab',
+						attributes: { anchor: 'tab-2-button' },
+					},
+				],
 			},
 			{
-				name: 'core/tab-panel',
-				innerBlocks: [ 1, 2, 3 ].map( ( index ) => ( {
-					name: 'core/tab',
+				name: 'core/tab-panels',
+				innerBlocks: [ 1, 2 ].map( ( index ) => ( {
+					name: 'core/tab-panel',
 					attributes: {
+						anchor: `tab-${ index }`,
 						label: sprintf(
 							/** translators: %s: tab index number */
 							__( 'Tab %s' ),

@@ -64,7 +64,7 @@ async function configureWordPress( environment, config, spinner ) {
 			spinner,
 			config.debug
 		);
-	} catch ( err ) {
+	} catch {
 		// Ignore error.
 	}
 

@@ -31,12 +31,12 @@ function FiltersToggle() {
 		},
 		[ onChangeView, setIsShowingFilter ]
 	);
-	const visibleFilters = filters.filter( ( filter ) => filter.isVisible );
 
-	const hasVisibleFilters = !! visibleFilters.length;
 	if ( filters.length === 0 ) {
 		return null;
 	}
+
+	const hasVisibleFilters = filters.some( ( filter ) => filter.isVisible );
 
 	const addFilterButtonProps = {
 		label: __( 'Add filter' ),
@@ -54,12 +54,19 @@ function FiltersToggle() {
 			setIsShowingFilter( ! isShowingFilter );
 		},
 	};
+	// When there are primary or locked filters, the filter bar is always
+	// visible and cannot be hidden, so the toggle button should be disabled.
+	const hasPrimaryOrLockedFilters = filters.some(
+		( filter ) => filter.isPrimary || filter.isLocked
+	);
 	const buttonComponent = (
 		<Button
 			ref={ buttonRef }
 			className="dataviews-filters__visibility-toggle"
 			size="compact"
 			icon={ funnel }
+			disabled={ hasPrimaryOrLockedFilters }
+			accessibleWhenDisabled
 			{ ...( hasVisibleFilters
 				? toggleFiltersButtonProps
 				: addFilterButtonProps ) }

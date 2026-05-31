@@ -14,7 +14,7 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -33,11 +33,7 @@ import {
 	useEditPostAction,
 	useQuickEditPostAction,
 } from '../dataviews-actions';
-import {
-	defaultLayouts,
-	DEFAULT_VIEW,
-	getActiveViewOverridesForTab,
-} from './view-utils';
+
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
 
@@ -60,16 +56,25 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const defaultView = DEFAULT_VIEW;
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+		form: quickEditForm,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
 	const activeViewOverrides = useMemo(
-		() => getActiveViewOverridesForTab( activeView ),
-		[ activeView ]
+		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
+		[ viewList, activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
 		slug: 'default',
 		defaultView,
+		defaultLayouts,
 		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
@@ -274,6 +279,7 @@ export default function PostList( { postType } ) {
 	return (
 		<Page
 			title={ labels?.name }
+			headingLevel={ 2 }
 			actions={
 				<>
 					{ labels?.add_new_item && canCreateRecord && (
@@ -281,6 +287,7 @@ export default function PostList( { postType } ) {
 							<Button
 								variant="primary"
 								onClick={ openModal }
+								size="compact"
 								__next40pxDefaultSize
 							>
 								{ labels.add_new_item }
@@ -334,6 +341,7 @@ export default function PostList( { postType } ) {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						quickEditForm={ quickEditForm }
 					/>
 				) }
 		</Page>

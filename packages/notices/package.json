@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "5.40.0",
+	"version": "5.47.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,6 +26,7 @@
 		"src",
 		"build",
 		"build-module",
+		"build-style",
 		"build-types",
 		"*.md"
 	],
@@ -37,11 +38,16 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./package.json": "./package.json"
+		"./package.json": "./package.json",
+		"./build-style/": "./build-style/"
 	},
 	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
@@ -52,7 +58,7 @@
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

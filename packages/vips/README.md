@@ -80,6 +80,7 @@ _Parameters_
 -   _type_ `string`: Mime type.
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
+-   _quality_ Desired quality (0-1).
 
 _Returns_
 
@@ -168,6 +169,7 @@ _Parameters_
 -   _type_ `string`: Mime type.
 -   _resize_ `ImageSizeCrop`: Resize options.
 -   _smartCrop_ Whether to use smart cropping (i.e. saliency-aware).
+-   _quality_ Desired quality (0-1).
 
 _Returns_
 

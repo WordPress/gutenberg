@@ -5,7 +5,6 @@ import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
 import {
 	Popover,
 	Button,
-	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -20,6 +19,7 @@ import {
 import { useResourcePermissions } from '@wordpress/core-data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -124,13 +124,24 @@ function UnforwardedLinkUI( props, ref ) {
 			url,
 			opensInNewTab,
 			title: label && stripHTML( label ),
+			entityTitle: entityRecord?.title?.rendered || entityRecord?.name,
 			kind,
 			type,
 			id,
 			image,
 			badges,
 		} ),
-		[ label, opensInNewTab, url, kind, type, id, image, badges ]
+		[
+			label,
+			opensInNewTab,
+			url,
+			kind,
+			type,
+			id,
+			image,
+			badges,
+			entityRecord,
+		]
 	);
 
 	const handlePageCreated = ( pageLink ) => {

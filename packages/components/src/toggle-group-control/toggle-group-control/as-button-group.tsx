@@ -83,6 +83,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				{ ...otherProps }
 				ref={ forwardedRef }
 				role="group"
+				id={ baseId }
 			>
 				{ children }
 			</View>

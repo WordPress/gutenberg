@@ -50,6 +50,7 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `spacing.blockGap`            | 5.9 | 5.9 |
 | `dimensions.height`           | 7.0 | N/A |
 | `dimensions.minHeight`        | 6.2 | N/A |
+| `dimensions.minWidth`         | 7.1 | 7.1 |
 | `dimensions.width`            | 7.0 | N/A |
 | `outline.color`               | 6.2 | N/A |
 | `outline.offset`              | 6.2 | N/A |

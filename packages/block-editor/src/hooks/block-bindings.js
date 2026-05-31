@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -103,13 +103,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					Use a div element to make the ToolsPanelHiddenInnerWrapper
 					toggle the visibility of this help text automatically.
 				*/ }
-				<Text as="div" variant="muted">
+				<WCText as="div" variant="muted">
 					<p>
 						{ __(
 							'Attributes connected to custom fields or other dynamic data.'
 						) }
 					</p>
-				</Text>
+				</WCText>
 			</ToolsPanel>
 		</InspectorControls>
 	);

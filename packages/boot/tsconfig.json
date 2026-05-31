@@ -2,6 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"types": [ "style-imports" ],
 		"checkJs": false
 	},
 	"references": [
@@ -16,6 +17,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../keycodes" },
 		{ "path": "../lazy-editor" },
 		{ "path": "../notices" },
@@ -23,6 +25,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
 		{ "path": "../theme" },
+		{ "path": "../ui" },
 		{ "path": "../url" }
 	]
 }

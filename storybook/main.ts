@@ -24,14 +24,19 @@ const stories = [
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
+	'./stories/icons/**/*.story.@(ts|tsx)',
 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/media-editor/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
+	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
+	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
+	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
 
 const config: StorybookConfig = {
@@ -52,7 +57,7 @@ const config: StorybookConfig = {
 	],
 	framework: '@storybook/react-vite',
 	features: {
-		experimentalComponentsManifest: NODE_ENV === 'production',
+		experimentalComponentsManifest: NODE_ENV !== 'development',
 	},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',

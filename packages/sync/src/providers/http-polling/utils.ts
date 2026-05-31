@@ -78,6 +78,13 @@ export function createUpdateQueue(
 		pause(): void {
 			isPaused = true;
 		},
+		peek(): SyncUpdate[] {
+			if ( isPaused ) {
+				return [];
+			}
+
+			return [ ...updates ];
+		},
 		restore( restoredUpdates: SyncUpdate[] ): void {
 			// Restore to front of the queue on failure. Remove compaction updates.
 			const filtered = restoredUpdates.filter(
@@ -90,11 +97,25 @@ export function createUpdateQueue(
 
 			updates.unshift( ...filtered );
 		},
+		restoreExact( restoredUpdates: SyncUpdate[] ): void {
+			if ( 0 === restoredUpdates.length ) {
+				return;
+			}
+
+			updates.unshift( ...restoredUpdates );
+		},
 		resume(): void {
 			isPaused = false;
 		},
 		size(): number {
 			return updates.length;
+		},
+		take( count: number ): SyncUpdate[] {
+			if ( isPaused || count <= 0 ) {
+				return [];
+			}
+
+			return updates.splice( 0, count );
 		},
 	};
 }
@@ -105,26 +126,14 @@ export function createUpdateQueue(
  * @param payload The sync payload including data and after cursor
  * @return The sync server response
  */
-export async function postSyncUpdate(
+export function postSyncUpdate(
 	payload: SyncPayload
 ): Promise< SyncResponse > {
-	const response = await apiFetch< SyncResponse, false >( {
-		body: JSON.stringify( payload ),
-		headers: {
-			'Content-Type': 'application/json',
-		},
+	return apiFetch( {
 		method: 'POST',
-		parse: false,
 		path: SYNC_API_PATH,
+		data: payload,
 	} );
-
-	if ( ! response.ok ) {
-		throw new Error(
-			`Sync update failed with status ${ response.status }`
-		);
-	}
-
-	return await response.json();
 }
 
 /**
@@ -139,11 +148,54 @@ export function postSyncUpdateNonBlocking( payload: SyncPayload ): void {
 	}
 
 	apiFetch( {
-		body: JSON.stringify( payload ),
-		headers: { 'Content-Type': 'application/json' },
-		keepalive: true,
 		method: 'POST',
-		parse: false,
 		path: SYNC_API_PATH,
+		data: payload,
+		keepalive: true,
 	} ).catch( () => {} );
+}
+
+/**
+ * Parse an integer from an unknown value, returning a default if parsing fails.
+ *
+ * @param value        The value to parse as an integer.
+ * @param defaultValue The default value to return if parsing fails.
+ * @return The parsed integer or the default value.
+ */
+export function intValueOrDefault(
+	value: unknown,
+	defaultValue: number
+): number {
+	const intValue = parseInt( String( value ), 10 );
+
+	return isNaN( intValue ) ? defaultValue : intValue;
+}
+
+/**
+ * Take `size` items from `items` starting at `offset`, wrapping around the
+ * end of the list. Returns the selected window and the offset to use on the
+ * next call (advanced by `size`).
+ *
+ * @param items  The list to rotate through.
+ * @param offset The starting index. Values larger than `items.length` are
+ *               wrapped (modulo).
+ * @param size   The maximum number of items to include in the window. The
+ *               window may be shorter if `size` exceeds `items.length`.
+ */
+export function rotateWindow< T >(
+	items: T[],
+	offset: number,
+	size: number
+): { window: T[]; nextOffset: number } {
+	if ( items.length === 0 ) {
+		return { window: [], nextOffset: 0 };
+	}
+
+	const start = ( ( offset % items.length ) + items.length ) % items.length;
+	const wrapped = [ ...items.slice( start ), ...items.slice( 0, start ) ];
+
+	return {
+		window: wrapped.slice( 0, Math.max( 0, size ) ),
+		nextOffset: ( start + Math.max( 0, size ) ) % items.length,
+	};
 }

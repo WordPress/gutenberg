@@ -27,8 +27,8 @@ import {
 	LAYOUT_PICKER_GRID,
 	LAYOUT_PICKER_TABLE,
 } from '../../constants';
-import PreviewSizePicker from './utils/preview-size-picker';
 import DensityPicker from './utils/density-picker';
+import GridConfigOptions from './utils/grid-config-options';
 
 export const VIEW_LAYOUTS = [
 	{
@@ -43,7 +43,7 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Grid' ),
 		component: ViewGrid,
 		icon: category,
-		viewConfigOptions: PreviewSizePicker,
+		viewConfigOptions: GridConfigOptions,
 	},
 	{
 		type: LAYOUT_LIST,
@@ -64,7 +64,7 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Grid' ),
 		component: ViewPickerGrid,
 		icon: category,
-		viewConfigOptions: PreviewSizePicker,
+		viewConfigOptions: GridConfigOptions,
 		isPicker: true,
 	},
 	{

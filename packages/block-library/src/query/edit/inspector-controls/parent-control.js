@@ -138,7 +138,7 @@ function ParentControl( { parents, postType, onChange } ) {
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }
 			onChange={ onParentChange }
-			__experimentalShowHowTo={ false }
+			help=""
 		/>
 	);
 }

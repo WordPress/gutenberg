@@ -32,7 +32,7 @@
 
 
 	&:not([aria-disabled="true"]) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 
 	&:hover {

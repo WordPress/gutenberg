@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/mixins";
 
 .boot-navigation-item.components-item {
-	color: var(--wpds-color-fg-interactive-neutral, #1e1e1e);
+	color: var(--wpds-color-fg-interactive-neutral);
 	padding-inline: variables.$grid-unit-05;
 	padding-block: 0;
 	margin-inline: variables.$grid-unit-15;
@@ -19,13 +19,13 @@
 	}
 
 	// Rounded focus ring
-	border-radius: var(--wpds-border-radius-sm, 2px);
+	border-radius: var(--wpds-border-radius-sm);
 
 	&.active,
 	&:hover,
 	&:focus,
 	&[aria-current="true"] {
-		color: var(--wpds-color-fg-interactive-brand-active, #0073aa);
+		color: var(--wpds-color-fg-interactive-brand-active);
 	}
 
 	&.active {
@@ -37,7 +37,7 @@
 	}
 
 	&[aria-current="true"] {
-		color: var(--wpds-color-fg-interactive-brand-active, #0073aa);
+		color: var(--wpds-color-fg-interactive-brand-active);
 		font-weight: variables.$font-weight-medium;
 	}
 

@@ -22,7 +22,7 @@ import {
 	setFeaturedImage,
 } from '@wordpress/react-native-bridge';
 import {
-	Icon,
+	Icon as WCIcon,
 	PanelBody,
 	ToolbarButton,
 	ToolbarGroup,
@@ -34,7 +34,7 @@ import {
 	BottomSheetSelectControl,
 	FooterMessageControl,
 	FooterMessageLink,
-	Badge,
+	WCBadge,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -514,7 +514,7 @@ export class ImageEdit extends Component {
 
 	getPlaceholderIcon() {
 		return (
-			<Icon
+			<WCIcon
 				icon={ placeholderIcon }
 				{ ...this.props.getStylesFromColorScheme(
 					styles.iconPlaceholder,
@@ -803,7 +803,7 @@ export class ImageEdit extends Component {
 		}
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
-			<Badge label={ badgeLabelText } show={ badgeLabelShown }>
+			<WCBadge label={ badgeLabelText } show={ badgeLabelShown }>
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onImagePressed }
@@ -886,7 +886,7 @@ export class ImageEdit extends Component {
 					onBlur={ this.props.onBlur } // Always assign onBlur as props.
 					insertBlocksAfter={ this.props.insertBlocksAfter }
 				/>
-			</Badge>
+			</WCBadge>
 		);
 
 		return (

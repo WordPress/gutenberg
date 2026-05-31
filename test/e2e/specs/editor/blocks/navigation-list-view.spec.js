@@ -551,6 +551,55 @@ test.describe( 'Navigation block - List view editing', () => {
 				.getByLabel( 'Add page' )
 		).toBeFocused();
 	} );
+
+	test( 'displays custom menu name in List View tab header in contentOnly mode', async ( {
+		page,
+		editor,
+		requestUtils,
+		pageUtils,
+	} ) => {
+		// Create a navigation menu with a custom name.
+		const headerMenu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+
+		// Use the code editor to insert a contentOnly-locked group containing
+		// the navigation block. This triggers contentOnly mode where
+		// isSelectionWithinCurrentSection is true.
+		await pageUtils.pressKeys( 'secondary+M' );
+		await page
+			.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill(
+				`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+					`<div class="wp-block-group">` +
+					`<!-- wp:navigation {"ref":${ headerMenu.id }} /-->` +
+					`</div>` +
+					`<!-- /wp:group -->`
+			);
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		// Select the navigation block inside the contentOnly group.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+
+		// Click the List View tab.
+		const listViewTab = page.getByRole( 'tab', { name: 'List View' } );
+		await listViewTab.click();
+
+		const listViewPanel = page.getByRole( 'tabpanel', {
+			name: 'List View',
+		} );
+
+		// In contentOnly mode, the PanelBody title should show the custom
+		// menu name as a collapsible panel button.
+		await expect(
+			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
+		).toBeVisible();
+	} );
 } );
 
 class LinkControl {

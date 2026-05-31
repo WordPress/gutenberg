@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 /**
  * Internal dependencies
  */
 import { gotoStoryId } from '../utils';
 
-const waitUntilButtonHighlightStable = async ( page ) => {
+const waitUntilButtonHighlightStable = async ( page: Page ) => {
 	const handle = await page.waitForSelector(
 		'[aria-label="Font size"] > div[role=presentation]'
 	);

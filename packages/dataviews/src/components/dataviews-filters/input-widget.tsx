@@ -64,6 +64,10 @@ export default function InputWidget( {
 				...currentField,
 				// Deactivate validation for filters.
 				isValid: {} satisfies NormalizedRules< any >,
+				// Filter controls are always enabled.
+				isDisabled: () => false,
+				// Filter controls are always visible.
+				isVisible: () => true,
 				// Configure getValue/setValue as if Item was a plain object.
 				getValue: ( { item }: { item: any } ) =>
 					item[ currentField.id ],

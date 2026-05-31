@@ -39,10 +39,23 @@ import type {
 import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
-import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
+import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
+
+function getEffectiveAlign(
+	explicitAlign: 'start' | 'center' | 'end' | undefined,
+	fieldType: string | undefined
+): 'start' | 'center' | 'end' | undefined {
+	if ( explicitAlign ) {
+		return explicitAlign;
+	}
+	if ( fieldType === 'integer' || fieldType === 'number' ) {
+		return 'end';
+	}
+	return undefined;
+}
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -226,6 +239,8 @@ function TableRow< Item >( {
 				// Explicit picks the supported styles.
 				const { width, maxWidth, minWidth, align } =
 					view.layout?.styles?.[ column ] ?? {};
+				const field = fields.find( ( f ) => f.id === column );
+				const effectiveAlign = getEffectiveAlign( align, field?.type );
 
 				return (
 					<td
@@ -240,7 +255,7 @@ function TableRow< Item >( {
 							fields={ fields }
 							item={ item }
 							column={ column }
-							align={ align }
+							align={ effectiveAlign }
 						/>
 					</td>
 				);
@@ -252,7 +267,6 @@ function TableRow< Item >( {
 				// itself (to toggle row selection) without erroneously
 				// intercepting click events from ItemActions.
 
-				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 				<td
 					className={ clsx( 'dataviews-view-table__actions-column', {
 						'dataviews-view-table__actions-column--sticky': true,
@@ -263,7 +277,6 @@ function TableRow< Item >( {
 				>
 					<ItemActions item={ item } actions={ actions } />
 				</td>
-				/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			) }
 		</tr>
 	);
@@ -308,9 +321,9 @@ function ViewTable< Item >( {
 
 	const tableNoticeId = useId();
 
-	const isHorizontalScrollEnd = useIsHorizontalScrollEnd( {
+	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
-		enabled: !! actions?.length,
+		enabledHorizontal: !! actions?.length,
 	} );
 
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
@@ -429,7 +442,7 @@ function ViewTable< Item >( {
 							className={ clsx(
 								`dataviews-view-table__col-${ column }`,
 								{
-									'dataviews-view-table__col-first-expand':
+									'dataviews-view-table__col-expand':
 										! hasPrimaryColumn &&
 										index === columns.length - 1,
 								}
@@ -449,7 +462,13 @@ function ViewTable< Item >( {
 						<PropertiesSection showLabel={ false } />
 					</Popover>
 				) }
-				<thead onContextMenu={ handleHeaderContextMenu }>
+				<thead
+					className={ clsx( {
+						'dataviews-view-table__thead--stuck':
+							isVerticallyScrolled,
+					} ) }
+					onContextMenu={ handleHeaderContextMenu }
+				>
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th
@@ -501,6 +520,13 @@ function ViewTable< Item >( {
 							// Explicit picks the supported styles.
 							const { width, maxWidth, minWidth, align } =
 								view.layout?.styles?.[ column ] ?? {};
+							const field = fields.find(
+								( f ) => f.id === column
+							);
+							const effectiveAlign = getEffectiveAlign(
+								align,
+								field?.type
+							);
 							const canInsertOrMove =
 								view.layout?.enableMoving ?? true;
 							return (
@@ -510,7 +536,7 @@ function ViewTable< Item >( {
 										width,
 										maxWidth,
 										minWidth,
-										textAlign: align,
+										textAlign: effectiveAlign,
 									} }
 									aria-sort={
 										view.sort?.direction &&

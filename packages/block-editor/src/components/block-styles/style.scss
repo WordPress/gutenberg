@@ -67,10 +67,3 @@
 	}
 }
 
-// To prevent overflow in the preview container,
-// ensure that block contents' margin and padding
-// do not add to the block container's width.
-.block-editor-block-styles__block-preview-container,
-.block-editor-block-styles__block-preview-container * {
-	box-sizing: border-box !important;
-}

@@ -28,7 +28,7 @@ import { createInterpolateElement } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostTitleEdit( {
-	attributes: { level, levelOptions, isLink, rel, linkTarget },
+	attributes: { level, levelOptions, isLink, rel, linkTarget, placeholder },
 	setAttributes,
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
@@ -70,7 +70,9 @@ export default function PostTitleEdit( {
 	const blockEditingMode = useBlockEditingMode();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let titleElement = <TagName { ...blockProps }>{ __( 'Title' ) }</TagName>;
+	let titleElement = (
+		<TagName { ...blockProps }>{ placeholder || __( 'Title' ) }</TagName>
+	);
 
 	if ( postType && postId ) {
 		titleElement = userCanEdit ? (

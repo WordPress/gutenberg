@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -118,7 +118,7 @@ class Video extends Component {
 						style={ [ style, styles.overlayContainer ] }
 					>
 						<View style={ styles.blackOverlay } />
-						<Icon
+						<WCIcon
 							icon={ PlayIcon }
 							style={ styles.playIcon }
 							size={ styles.playIcon.size }

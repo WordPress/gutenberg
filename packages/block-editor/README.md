@@ -406,6 +406,7 @@ _Parameters_
 -   _props.label_ `?string`: A label for the control.
 -   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
 -   _props.value_ `string`: The current dimension value.
+-   _props.dimensionSizes_ `?Object`: Optional dimension size presets. Falls back to settings from the store.
 
 _Returns_
 

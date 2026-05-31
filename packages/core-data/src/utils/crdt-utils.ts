@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Y } from '@wordpress/sync';
+import { create, insert, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -83,6 +84,88 @@ export function isYMap< T extends YMapRecord >(
 	return value instanceof Y.Map;
 }
 
+declare const richTextOffsetBrand: unique symbol;
+declare const htmlStringIndexBrand: unique symbol;
+
+/**
+ * Branded type to prevent confusion between HTML string indices and RichText offsets.
+ *
+ * @see asRichTextOffset()
+ */
+export type RichTextOffset = number & {
+	readonly [ richTextOffsetBrand ]: 'RichTextOffset';
+};
+
+/**
+ * Branded type to prevent confusion between HTML string indices and RichText offsets.
+ *
+ * @see asHtmlStringIndex()
+ */
+export type HtmlStringIndex = number & {
+	readonly [ htmlStringIndexBrand ]: 'HtmlStringIndex';
+};
+
+/**
+ * Brand a number as an offset into a RichText’s text content.
+ *
+ * @param offset The rich-text offset to brand.
+ * @return The branded rich-text offset.
+ */
+export function asRichTextOffset( offset: number ): RichTextOffset {
+	return offset as RichTextOffset;
+}
+
+/**
+ * Brand a number as a string index into serialized HTML.
+ *
+ * @param index The HTML string index to brand.
+ * @return The branded HTML string index.
+ */
+export function asHtmlStringIndex( index: number ): HtmlStringIndex {
+	return index as HtmlStringIndex;
+}
+
+/**
+ * Resolve a selection attribute key to a Y.Text value.
+ *
+ * RichText identifiers are normally top-level block attribute keys, but nested
+ * rich-text fields can provide a dot path such as `body.0.cells.0.content`.
+ *
+ * @param attributes   The block attributes map.
+ * @param attributeKey The top-level attribute key or nested attribute path.
+ * @return The matching Y.Text, or null if the path is not a rich-text field.
+ */
+export function getYTextByAttributeKey(
+	attributes: Y.Map< unknown >,
+	attributeKey: string
+): Y.Text | null {
+	const directValue = attributes.get( attributeKey );
+	if ( directValue instanceof Y.Text ) {
+		return directValue;
+	}
+
+	let value: unknown = attributes;
+	for ( const pathPart of attributeKey.split( '.' ) ) {
+		if ( value instanceof Y.Map ) {
+			value = value.get( pathPart );
+		} else if ( value instanceof Y.Array ) {
+			const index = Number.parseInt( pathPart, 10 );
+			if (
+				! Number.isSafeInteger( index ) ||
+				index < 0 ||
+				index.toString() !== pathPart
+			) {
+				return null;
+			}
+			value = value.get( index );
+		} else {
+			return null;
+		}
+	}
+
+	return value instanceof Y.Text ? value : null;
+}
+
 /**
  * Given a block ID and a Y.Doc, find the block in the document.
  *
@@ -102,6 +185,106 @@ export function findBlockByClientIdInDoc(
 	}
 
 	return findBlockByClientIdInBlocks( blockId, blocks );
+}
+
+// Marker for insertion.
+const MARKER_START = 0xe000;
+
+/**
+ * Pick a marker character that does not appear in `text`. Returns the marker
+ * or `null` if all candidates are present (extremely unlikely in practice).
+ *
+ * @param text The string to check for existing marker characters.
+ */
+function pickMarker( text: string ): string | null {
+	const tryCount = 0x10;
+
+	// Scan the unicode private use area for the first code point not present
+	// in the text.
+	for ( let code = MARKER_START; code < MARKER_START + tryCount; code++ ) {
+		const candidate = String.fromCharCode( code );
+
+		if ( ! text.includes( candidate ) ) {
+			return candidate;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Convert an HTML character index (counting tag characters) to a rich-text
+ * offset (counting only text characters). Used on read paths where Y.Text
+ * resolves to an HTML index but the block editor expects a text offset.
+ *
+ * @param html      The full HTML string from Y.Text.
+ * @param htmlIndex The HTML character index.
+ * @return The corresponding rich-text offset.
+ */
+export function htmlIndexToRichTextOffset(
+	html: string,
+	htmlIndex: HtmlStringIndex
+): RichTextOffset {
+	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
+		return asRichTextOffset( htmlIndex );
+	}
+
+	const marker = pickMarker( html );
+	if ( ! marker ) {
+		return asRichTextOffset( htmlIndex );
+	}
+
+	// Insert marker and let create() do the parsing.
+	const withMarker =
+		html.slice( 0, htmlIndex ) + marker + html.slice( htmlIndex );
+	const value = create( { html: withMarker } );
+	const markerPos = value.text.indexOf( marker );
+
+	return asRichTextOffset( markerPos === -1 ? htmlIndex : markerPos );
+}
+
+/**
+ * Convert a rich-text offset (counting only text characters) to an HTML
+ * character index (counting tag characters). Used on write paths where the
+ * block editor provides a text offset but Y.Text expects an HTML index.
+ *
+ * @param html           The full HTML string from Y.Text.
+ * @param richTextOffset The rich-text text offset.
+ * @return The corresponding HTML character index.
+ */
+export function richTextOffsetToHtmlIndex(
+	html: string,
+	richTextOffset: RichTextOffset
+): HtmlStringIndex {
+	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
+		return asHtmlStringIndex( richTextOffset );
+	}
+
+	const marker = pickMarker( html );
+	if ( ! marker ) {
+		return asHtmlStringIndex( richTextOffset );
+	}
+
+	const value = create( { html } );
+	const markerValue = create( { text: marker } );
+	// The marker must inherit the formatting at the insertion point so that
+	// toHTMLString does not split surrounding tags (e.g. <strong>) around it.
+	if ( value.formats[ richTextOffset ] ) {
+		markerValue.formats[ 0 ] = value.formats[ richTextOffset ];
+	}
+
+	const withMarker = insert(
+		value,
+		markerValue,
+		richTextOffset,
+		richTextOffset
+	);
+
+	const htmlWithMarker = toHTMLString( { value: withMarker } );
+	const markerIndex = htmlWithMarker.indexOf( marker );
+	return asHtmlStringIndex(
+		markerIndex === -1 ? richTextOffset : markerIndex
+	);
 }
 
 function findBlockByClientIdInBlocks(
