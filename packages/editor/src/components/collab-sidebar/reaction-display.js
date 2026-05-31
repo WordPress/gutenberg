@@ -4,18 +4,42 @@
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { smiley as smileyIcon, plus as plusIcon } from '@wordpress/icons';
-import { useState, useCallback, lazy, Suspense } from '@wordpress/element';
+import { SVG, Path } from '@wordpress/primitives';
+import { plus as plusIcon } from '@wordpress/icons';
+import {
+	useMemo,
+	useState,
+	useCallback,
+	lazy,
+	Suspense,
+} from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+
+// Inlined while reactions remain experimental in scope. If/when this
+// icon is needed elsewhere it can be promoted to `@wordpress/icons`.
+const smileyIcon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path
+			fill="currentColor"
+			d="M14.438 14.15a.75.75 0 0 1 1.124.993A4.742 4.742 0 0 1 12 16.75a4.742 4.742 0 0 1-3.563-1.608.75.75 0 0 1 1.126-.993A3.24 3.24 0 0 0 12 15.251c.97 0 1.84-.425 2.438-1.1ZM9.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM14.5 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"
+		/>
+		<Path
+			fill="currentColor"
+			fillRule="evenodd"
+			d="M12 4a8 8 0 1 1 .001 16.001A8 8 0 0 1 12 4Zm0 1.5a6.5 6.5 0 1 0-.001 13.001A6.5 6.5 0 0 0 12 5.5Z"
+			clipRule="evenodd"
+		/>
+	</SVG>
+);
 
 /**
  * Internal dependencies
  */
 import ReactionEmojiPicker, {
 	emojiToStorageKey,
-	getEmojiBySlug,
-	getLabelBySlug,
+	hexKeyToEmoji,
+	buildEmojiBySlugMap,
 	useReactionEmojis,
 } from './reaction-emoji-picker';
 
@@ -244,6 +268,10 @@ export default function ReactionDisplay( {
 	onToggleReaction,
 } ) {
 	const emojis = useReactionEmojis();
+	const emojiBySlug = useMemo(
+		() => buildEmojiBySlugMap( emojis ),
+		[ emojis ]
+	);
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 ) {
@@ -255,6 +283,7 @@ export default function ReactionDisplay( {
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
+				const entry = emojiBySlug.get( slug );
 
 				return (
 					<ReactionButton
@@ -263,8 +292,8 @@ export default function ReactionDisplay( {
 						slug={ slug }
 						count={ count }
 						isActive={ isActive }
-						emoji={ getEmojiBySlug( slug, emojis ) }
-						emojiLabel={ getLabelBySlug( slug, emojis ) }
+						emoji={ entry?.emoji ?? hexKeyToEmoji( slug ) }
+						emojiLabel={ entry?.label ?? hexKeyToEmoji( slug ) }
 						onToggleReaction={ onToggleReaction }
 					/>
 				);
@@ -278,20 +307,25 @@ export default function ReactionDisplay( {
  * dropdown (the 5-emoji quick row).
  *
  * @param {Object}   props                  Component props.
+ * @param {boolean}  props.disabled         Whether the button is disabled
+ *                                          (e.g. on a resolved note thread).
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
-export function AddReactionButton( { onToggleReaction } ) {
+export function AddReactionButton( { disabled = false, onToggleReaction } ) {
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
 			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
-					size="compact"
+					size="small"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ smileyIcon }
+					iconSize={ 20 }
 					label={ __( 'Add reaction' ) }
 					aria-expanded={ isOpen }
+					disabled={ disabled }
+					accessibleWhenDisabled
 					onClick={ onToggle }
 				/>
 			) }

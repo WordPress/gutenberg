@@ -146,36 +146,13 @@ export function emojiToStorageKey( emoji, emojis = REACTION_EMOJIS ) {
 }
 
 /**
- * Get the emoji character for a given reaction slug.
+ * Build a Map keyed by slug for O(1) emoji and label lookups.
  *
- * @param {string} slug   The reaction slug or hex-codepoint key.
- * @param {Array}  emojis Optional emoji list to search.
- * @return {string} The emoji character, or the slug if not found.
+ * @param {Array} emojis The emoji list to index.
+ * @return {Map} Map from slug to `{ emoji, label, value }` entry.
  */
-export function getEmojiBySlug( slug, emojis = REACTION_EMOJIS ) {
-	const curated = emojis.find( ( r ) => r.value === slug );
-	if ( curated ) {
-		return curated.emoji;
-	}
-	if ( HEX_KEY_RE.test( slug ) ) {
-		return hexKeyToEmoji( slug );
-	}
-	return slug;
-}
-
-/**
- * Get the label for a given reaction slug.
- *
- * @param {string} slug   The reaction slug or hex-codepoint key.
- * @param {Array}  emojis Optional emoji list to search.
- * @return {string} The label, or the emoji character if non-curated.
- */
-export function getLabelBySlug( slug, emojis = REACTION_EMOJIS ) {
-	const curated = emojis.find( ( r ) => r.value === slug );
-	if ( curated ) {
-		return curated.label;
-	}
-	return getEmojiBySlug( slug, emojis );
+export function buildEmojiBySlugMap( emojis = REACTION_EMOJIS ) {
+	return new Map( emojis.map( ( entry ) => [ entry.value, entry ] ) );
 }
 
 /**
@@ -193,6 +170,7 @@ export default function ReactionEmojiPicker( { onSelect } ) {
 	return (
 		<Composite
 			role="listbox"
+			orientation="horizontal"
 			aria-label={ __( 'Select an emoji reaction' ) }
 			className="editor-collab-sidebar-panel__emoji-picker"
 		>

@@ -201,6 +201,7 @@ export function Note( {
 			{ isSelected && (
 				<Stack direction="row" gap="xs" justify="flex-start">
 					<AddReactionButton
+						disabled={ note.status === 'approved' }
 						onToggleReaction={ ( emoji ) =>
 							onToggleReaction?.( {
 								commentId: note.id,

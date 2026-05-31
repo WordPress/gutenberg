@@ -226,17 +226,8 @@
 }
 
 .editor-collab-sidebar-panel__add-reaction-button {
-	display: inline-flex;
-	margin: 0;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px !important; // Override Button component's size constraints.
-	min-width: 28px !important;
-	padding: 0;
 	border-radius: $radius-round;
 	border: $border-width solid $gray-300;
-	background-color: $white;
 	cursor: var(--wpds-cursor-control);
 
 	&:hover {
@@ -251,10 +242,7 @@
 	}
 
 	svg {
-		fill: none;
 		color: $gray-700;
-		width: 20px;
-		height: 20px;
 	}
 }
 
@@ -301,8 +289,6 @@
 
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
-	flex-direction: column;
-	gap: 0;
 }
 
 .editor-collab-sidebar-panel__emoji-option {
