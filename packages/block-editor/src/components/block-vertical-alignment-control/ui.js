@@ -69,22 +69,25 @@ function BlockVerticalAlignmentUI( {
 					: {},
 		  };
 
-	const commonProps = {
-		icon: activeAlignment
-			? activeAlignment.icon
-			: defaultAlignmentControl.icon,
-		label,
-		controls: controls.map( ( control ) => {
-			return {
-				...BLOCK_ALIGNMENTS_CONTROLS[ control ],
-				isActive: value === control,
-				role: isCollapsed ? 'menuitemradio' : undefined,
-				onClick: applyOrUnset( control ),
-			};
-		} ),
-	};
-
-	return <UIComponent { ...commonProps } { ...extraProps } />;
+	return (
+		<UIComponent
+			icon={
+				activeAlignment
+					? activeAlignment.icon
+					: defaultAlignmentControl.icon
+			}
+			label={ label }
+			controls={ controls.map( ( control ) => {
+				return {
+					...BLOCK_ALIGNMENTS_CONTROLS[ control ],
+					isActive: value === control,
+					role: isCollapsed ? 'menuitemradio' : undefined,
+					onClick: applyOrUnset( control ),
+				};
+			} ) }
+			{ ...extraProps }
+		/>
+	);
 }
 
 /**
