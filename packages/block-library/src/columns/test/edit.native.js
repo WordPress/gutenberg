@@ -259,7 +259,9 @@ describe( 'Columns block', () => {
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton = getByLabelText( /Align content vertically/ );
+		const verticalAlignmentButton = getByLabelText(
+			/Align content vertically/
+		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button
@@ -279,8 +281,9 @@ describe( 'Columns block', () => {
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton =
-			screen.getByLabelText( /Align content vertically/ );
+		const verticalAlignmentButton = screen.getByLabelText(
+			/Align content vertically/
+		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button
@@ -317,7 +320,9 @@ describe( 'Columns block', () => {
 		fireEvent.press( columnsBlock );
 
 		// Open vertical alignment menu
-		const verticalAlignmentButton = getByLabelText( /Align content vertically/ );
+		const verticalAlignmentButton = getByLabelText(
+			/Align content vertically/
+		);
 		fireEvent.press( verticalAlignmentButton );
 
 		// Get Align top button

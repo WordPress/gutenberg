@@ -315,7 +315,9 @@ test.describe( 'Block Grouping', () => {
 				name: 'core/heading',
 				attributes: { content: 'Heading', level: 2 },
 			} );
-			const alignOptions = page.getByRole( 'menu', { name: 'Align block' } );
+			const alignOptions = page.getByRole( 'menu', {
+				name: 'Align block',
+			} );
 
 			// Full width image.
 			await editor.insertBlock( { name: 'core/image' } );
