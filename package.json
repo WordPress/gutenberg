@@ -60,7 +60,6 @@
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
 		"babel-plugin-inline-json-import": "0.3.2",
-		"change-case": "4.1.2",
 		"concurrently": "3.5.0",
 		"cross-env": "7.0.3",
 		"css-loader": "^6.2.0",
