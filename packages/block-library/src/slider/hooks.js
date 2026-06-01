@@ -1,12 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useLayoutEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useLayoutEffect } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const SLIDE_BLOCK = 'core/slide';
-const PAGINATION_BLOCK = 'core/slider-pagination';
 
 /**
  * Returns the child blocks of the slider, including the ordered list of all
@@ -86,88 +85,4 @@ function useScrollToSelectedSlide( trackRef, selectedSlideClientId ) {
 	}, [ selectedSlideClientId, trackRef ] );
 }
 
-/**
- * Ensures the pagination block is never positioned between slide blocks.
- * If pagination is detected between the first and last slide, it is
- * automatically moved to whichever end (start or end) is closer.
- * Placing pagination before or after all slides is always allowed.
- *
- * @param {string} clientId The slider block's client ID.
- */
-function usePaginationPlacement( clientId ) {
-	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
-
-	// Compute correction data inside useSelect so we get stable primitives
-	// that only change when the actual block order changes — not on every render.
-	const { paginationClientId, needsCorrection, destinationIndex } = useSelect(
-		( select ) => {
-			const { getBlockOrder, getBlockName } = select( blockEditorStore );
-			const orderedIds = getBlockOrder( clientId );
-
-			const paginationEntries = [];
-			const slidePositions = [];
-
-			for ( let i = 0; i < orderedIds.length; i++ ) {
-				const name = getBlockName( orderedIds[ i ] );
-				if ( name === PAGINATION_BLOCK ) {
-					paginationEntries.push( { id: orderedIds[ i ], pos: i } );
-				} else if ( name === SLIDE_BLOCK ) {
-					slidePositions.push( i );
-				}
-			}
-
-			if ( paginationEntries.length === 0 || slidePositions.length < 2 ) {
-				return {
-					paginationClientId: null,
-					needsCorrection: false,
-					destinationIndex: 0,
-				};
-			}
-
-			const firstSlide = slidePositions[ 0 ];
-			const lastSlide = slidePositions[ slidePositions.length - 1 ];
-			const misplacedPagination = paginationEntries.find(
-				( { pos } ) => pos > firstSlide && pos < lastSlide
-			);
-
-			if ( ! misplacedPagination ) {
-				return {
-					paginationClientId: null,
-					needsCorrection: false,
-					destinationIndex: 0,
-				};
-			}
-
-			const moveToStart =
-				misplacedPagination.pos - firstSlide <=
-				lastSlide - misplacedPagination.pos;
-
-			return {
-				paginationClientId: misplacedPagination.id,
-				needsCorrection: true,
-				destinationIndex: moveToStart ? 0 : orderedIds.length,
-			};
-		},
-		[ clientId ]
-	);
-
-	useEffect( () => {
-		if ( ! needsCorrection || ! paginationClientId ) {
-			return;
-		}
-		moveBlocksToPosition(
-			[ paginationClientId ],
-			clientId,
-			clientId,
-			destinationIndex
-		);
-	}, [
-		needsCorrection,
-		paginationClientId,
-		destinationIndex,
-		clientId,
-		moveBlocksToPosition,
-	] );
-}
-
-export { useSliderChildren, useScrollToSelectedSlide, usePaginationPlacement };
+export { useSliderChildren, useScrollToSelectedSlide };

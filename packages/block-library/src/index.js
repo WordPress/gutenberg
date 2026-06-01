@@ -134,9 +134,6 @@ import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as slide from './slide';
 import * as slider from './slider';
-import * as sliderPagination from './slider-pagination';
-import * as sliderPaginationButton from './slider-pagination-button';
-import * as sliderPaginationIndicator from './slider-pagination-indicator';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
@@ -301,9 +298,6 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 		blocks.push( slider );
 		blocks.push( slide );
-		blocks.push( sliderPagination );
-		blocks.push( sliderPaginationButton );
-		blocks.push( sliderPaginationIndicator );
 	}
 
 	// Always register the classic block. Inserter availability is controlled

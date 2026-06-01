@@ -73,16 +73,10 @@ function getSlides( track ) {
 }
 
 function updateSlideInert( slides, currentIndex, slidesToShow ) {
-	const hasPaginationInSlides = slides.some( ( slide ) =>
-		slide.querySelector( '.wp-block-slider-pagination' )
-	);
 	const lastVisibleIndex = currentIndex + slidesToShow - 1;
 
 	slides.forEach( ( slide, index ) => {
-		if (
-			hasPaginationInSlides ||
-			( index >= currentIndex && index <= lastVisibleIndex )
-		) {
+		if ( index >= currentIndex && index <= lastVisibleIndex ) {
 			slide.removeAttribute( 'inert' );
 		} else {
 			slide.setAttribute( 'inert', '' );

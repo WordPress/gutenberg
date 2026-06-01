@@ -976,42 +976,9 @@ Display content in a scrolling slider. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/slider
 -	**Experimental:** true
 -	**Category:** design
--	**Allowed Blocks:** core/slider-pagination, core/slide
+-	**Allowed Blocks:** core/slide
 -	**Supports:** align, ariaLabel, interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin), ~~html~~
--	**Attributes:** loop, slidesToShow
-
-## Slider Pagination
-
-Container for slider controls and indicators. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-pagination))
-
--	**Name:** core/slider-pagination
--	**Experimental:** true
--	**Category:** design
--	**Ancestor:** core/slider
--	**Allowed Blocks:** core/slider-pagination-button, core/slider-pagination-indicator
--	**Supports:** color (background, text), layout (allowJustification, default, ~~allowOrientation~~), spacing (blockGap, margin, padding), ~~anchor~~, ~~html~~, ~~reusable~~
--	**Attributes:** arrowIcon, indicatorStyle, navigationButtonType
-
-## Slider Pagination Button
-
-Navigation button for a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-pagination-button))
-
--	**Name:** core/slider-pagination-button
--	**Experimental:** true
--	**Category:** design
--	**Ancestor:** core/slider-pagination
--	**Supports:** color (background, text), shadow, spacing (margin, padding), typography (fontSize), ~~anchor~~, ~~html~~, ~~reusable~~
--	**Attributes:** type
-
-## Slider Pagination Indicator
-
-Dot indicators showing the current slide position. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-pagination-indicator))
-
--	**Name:** core/slider-pagination-indicator
--	**Experimental:** true
--	**Category:** design
--	**Ancestor:** core/slider-pagination
--	**Supports:** color (text, ~~background~~), spacing (margin), ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Attributes:** arrowIcon, arrowsPosition, indicatorStyle, indicatorsPosition, loop, navigationButtonType, slidesToShow
 
 ## Social Icon
 

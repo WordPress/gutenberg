@@ -1,45 +1,131 @@
 /*
  * Editor-only layout for the slider block.
  *
- * On the frontend the track is a horizontal flex container (slider/style.scss).
- * In the editor we use the parent slider block as the inner-blocks wrapper.
- * display:block / inline-block ensures that:
- *   - core/slider-pagination renders as a full-width block row above the slides.
- *   - core/slide elements render as inline-block items side-by-side.
- *   - overflow-x scrolling lets the editor scroll to the selected slide,
- *     matching the behaviour of the removed slider-track block.
+ * Two-level structure:
  *
- * The `block-editor-block-list__layout` class is always added by useInnerBlocksProps;
- * include it in the selector so our display value wins over any editor default.
+ * .wp-block-slider          — outer wrapper (blockProps): position:relative, no
+ *                             scroll, flex column. Positioning context for
+ *                             overlay/sides previews.
+ *   .wp-block-slider-arrows / .wp-block-slider-indicators  — in-flow rows (top/bottom)
+ *   [innerBlocksProps div]  — scroll container: overflow-x:auto, holds slides
+ *     .wp-block-slide       — inline-block, side-by-side
+ *   .wp-block-slider-arrows / .wp-block-slider-indicators  — positioned (overlay/sides)
+ *                             absolute children of the outer wrapper
+ *
+ * Keeping positioned previews outside the scroll container means their CSS
+ * percentages resolve against clientWidth, not scrollWidth, so they stay
+ * fixed as slides are scrolled to.
+ *
+ * The `block-editor-block-list__layout` class is always added by
+ * useInnerBlocksProps; target it on the inner div explicitly.
  */
 .wp-block-slider {
-	&,
-	&.block-editor-block-list__layout {
+	// Outer wrapper: flex column, no overflow, is the positioning context.
+	display: flex;
+	flex-direction: column;
+	position: relative;
+
+	// Inner scroll container (the innerBlocksProps div).
+	// useInnerBlocksProps adds .block-editor-block-list__layout to this element.
+	> .block-editor-block-list__layout {
 		display: block;
 		overflow-x: auto;
 		overflow-y: hidden;
 		white-space: nowrap;
-		// Keep the scrollbar hidden (matching the frontend)
 		scrollbar-width: none;
 		-ms-overflow-style: none;
+		flex: 1 1 0%;
+		min-height: 0;
 
 		&::-webkit-scrollbar {
 			display: none;
 		}
+
+		// Slides: inline-block so they sit side-by-side inside the scroll container.
+		// Width is set by slide/style.scss via --wp--slider-slides-to-show.
+		> .wp-block-slide {
+			display: inline-block;
+			vertical-align: top;
+			white-space: normal;
+		}
 	}
 
-	> .wp-block-slider-pagination {
-		position: sticky;
-		inset-inline-start: 0;
-		z-index: 1;
-		white-space: normal;
+	// In-flow arrow/indicator rows (and the combined control bar) are normal
+	// block-flow siblings of the scroll container.
+	> .wp-block-slider-control-bar,
+	> .wp-block-slider-arrows.is-position-top,
+	> .wp-block-slider-arrows.is-position-bottom,
+	> .wp-block-slider-indicators.is-position-top,
+	> .wp-block-slider-indicators.is-position-bottom {
+		flex-shrink: 0;
 	}
 
-	// Slides: inline-block so they sit side-by-side in the same "line".
-	// Width comes from slide/style.scss using --wp--slider-slides-to-show.
-	> .wp-block-slide {
-		display: inline-block;
-		vertical-align: top;
-		white-space: normal;
+	// Positioned (overlay/sides) previews are absolute children of the outer
+	// wrapper. Because the outer wrapper does not scroll, left/top percentages
+	// resolve against clientWidth and stay fixed as slides are scrolled.
+	> .wp-block-slider-arrows.is-position-overlay,
+	> .wp-block-slider-arrows.is-position-sides,
+	> .wp-block-slider-indicators.is-position-overlay {
+		position: absolute;
+		pointer-events: none;
+		z-index: 2;
+
+		> * {
+			pointer-events: auto;
+		}
+	}
+
+	// Overlay arrows: span the full slide area, centred vertically.
+	> .wp-block-slider-arrows.is-position-overlay {
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0;
+
+		> .wp-block-slider-arrows-button {
+			background: rgb(255 255 255 / 85%);
+			border-radius: 999px;
+			backdrop-filter: blur(2px);
+			margin: 0 0.5rem;
+		}
+	}
+
+	// Sides arrows: same absolute inset box, buttons translated outside the block.
+	> .wp-block-slider-arrows.is-position-sides {
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0;
+
+		> .wp-block-slider-arrows-button {
+			background: rgb(255 255 255 / 85%);
+			border-radius: 999px;
+			backdrop-filter: blur(2px);
+			&.is-type-previous {
+				transform: translateX(-100%);
+			}
+			&.is-type-next {
+				transform: translateX(100%);
+			}
+		}
+	}
+
+	// Overlay indicator: absolute, centred at the bottom of the slide area.
+	// Because this is a child of the non-scrolling outer wrapper, left:50%
+	// resolves against clientWidth and the indicator stays centred.
+	> .wp-block-slider-indicators.is-position-overlay {
+		bottom: 0.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		display: flex;
+		padding: 0.35rem 0.5rem;
+		background: rgb(255 255 255 / 78%);
+		border-radius: 999px;
+
+		> .wp-block-slider-indicators__dots {
+			padding: 0;
+		}
 	}
 }

@@ -25,9 +25,6 @@ export const settings = {
 	example: {
 		innerBlocks: [
 			{
-				name: 'core/slider-pagination',
-			},
-			{
 				name: 'core/slide',
 				innerBlocks: [
 					{

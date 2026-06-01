@@ -7,7 +7,7 @@
 	"description": "Display content in a scrolling slider.",
 	"category": "design",
 	"textdomain": "default",
-	"allowedBlocks": [ "core/slider-pagination", "core/slide" ],
+	"allowedBlocks": [ "core/slide" ],
 	"attributes": {
 		"slidesToShow": {
 			"type": "integer",
@@ -16,6 +16,31 @@
 		"loop": {
 			"type": "boolean",
 			"default": true
+		},
+		"arrowIcon": {
+			"type": "string",
+			"enum": [ "chevron", "arrow" ],
+			"default": "chevron"
+		},
+		"indicatorStyle": {
+			"type": "string",
+			"enum": [ "dot", "line" ],
+			"default": "dot"
+		},
+		"navigationButtonType": {
+			"type": "string",
+			"enum": [ "icon", "text", "both" ],
+			"default": "icon"
+		},
+		"arrowsPosition": {
+			"type": "string",
+			"enum": [ "overlay", "sides", "top", "bottom", "none" ],
+			"default": "overlay"
+		},
+		"indicatorsPosition": {
+			"type": "string",
+			"enum": [ "overlay", "top", "bottom", "none" ],
+			"default": "overlay"
 		}
 	},
 	"supports": {

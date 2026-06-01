@@ -34,3 +34,221 @@
 .wp-block-slider-track:focus {
 	outline: 1px solid currentColor;
 }
+
+// .wp-block-slider itself is position:relative (set via block wrapper attributes)
+// and serves as the positioning context for overlay/sides arrows and indicators.
+// It is a flex column so the track and in-flow rows stack vertically.
+.wp-block-slider {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+// ---------------------------------------------------------------------------
+// Arrows
+// ---------------------------------------------------------------------------
+.wp-block-slider-arrows {
+	// In-flow (top/bottom) default layout.
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.25rem 0;
+
+	// Overlay: span the full slider area, arrows centred vertically on each edge.
+	&.is-position-overlay {
+		position: absolute;
+		inset: 0;
+		width: auto;
+		pointer-events: none;
+		z-index: 2;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0;
+
+		> .wp-block-slider-arrows-button {
+			pointer-events: auto;
+			background: rgb(255 255 255 / 85%);
+			border-radius: 999px;
+			backdrop-filter: blur(2px);
+			margin: 0 0.5rem;
+		}
+	}
+
+	// Sides: arrows pushed outside the slider bounds, one on each side.
+	&.is-position-sides {
+		position: absolute;
+		inset: 0;
+		width: auto;
+		pointer-events: none;
+		z-index: 2;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0;
+
+		> .wp-block-slider-arrows-button {
+			pointer-events: auto;
+			background: rgb(255 255 255 / 85%);
+			border-radius: 999px;
+			backdrop-filter: blur(2px);
+			// Translate each button outward so it sits outside the slider.
+			&.is-type-previous {
+				transform: translateX(-100%);
+			}
+			&.is-type-next {
+				transform: translateX(100%);
+			}
+		}
+	}
+}
+
+.wp-block-slider-arrows-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	background: none;
+	color: currentColor;
+	border: none;
+	border-radius: 2px;
+	padding: 4px;
+	line-height: 1;
+
+	&[aria-disabled="true"] {
+		cursor: default;
+		opacity: 0.4;
+		pointer-events: none;
+	}
+
+	.wp-block-slider-arrows-button__icon,
+	svg {
+		width: 24px;
+		height: 24px;
+		fill: currentColor;
+		flex-shrink: 0;
+		display: block;
+	}
+
+	[dir="rtl"] & {
+		.wp-block-slider-arrows-button__icon,
+		svg {
+			transform: scaleX(-1);
+		}
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Control bar: combined prev + indicators + next row (shared in-flow position).
+// ---------------------------------------------------------------------------
+.wp-block-slider-control-bar {
+	width: 100%;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.25rem 0;
+}
+
+// ---------------------------------------------------------------------------
+// Indicators
+// ---------------------------------------------------------------------------
+
+// Standalone indicator container (when arrows are at a different position).
+.wp-block-slider-indicators {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.25rem 0;
+
+	// Overlay: absolute, centred at the bottom of the slider.
+	&.is-position-overlay {
+		position: absolute;
+		left: 50%;
+		bottom: 0.5rem;
+		transform: translateX(-50%);
+		padding: 0.35rem 0.5rem;
+		background: rgb(255 255 255 / 78%);
+		border-radius: 999px;
+		backdrop-filter: blur(2px);
+		z-index: 2;
+	}
+}
+
+// Dot row — used both inside .wp-block-slider-indicators and inside
+// .wp-block-slider-control-bar.
+.wp-block-slider-indicators__dots {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 0.375rem;
+	padding: 0.5rem 0;
+	list-style: none;
+	margin: 0;
+	color: currentColor;
+	// Inside the control bar the dots grow to fill the space between the buttons.
+	flex: 1 1 0%;
+}
+
+.wp-block-slider-indicators__dot {
+	position: relative;
+	display: block;
+	color: inherit;
+	width: 8px;
+	height: 8px;
+	padding: 0;
+	border: 1.5px solid currentColor;
+	border-radius: 50%;
+	background: transparent;
+	cursor: pointer;
+	transition: background 0.2s ease, transform 0.2s ease;
+	flex-shrink: 0;
+
+	/* Increase the clickable area of the indicator. */
+	&::after {
+		content: "";
+		position: absolute;
+		top: -10px;
+		bottom: -10px;
+		left: 0;
+		right: 0;
+	}
+
+	&[aria-current="true"],
+	&.is-active {
+		background: currentColor;
+		transform: scale(1.2);
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+}
+
+.wp-block-slider-indicators__dots.is-style-line .wp-block-slider-indicators__dot {
+	width: 26px;
+	height: 2px;
+	border: none;
+	border-radius: 0;
+	background: currentColor;
+	opacity: 0.35;
+	transform: none;
+
+	&[aria-current="true"],
+	&.is-active {
+		opacity: 1;
+		transform: none;
+	}
+
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+}
