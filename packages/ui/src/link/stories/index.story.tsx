@@ -7,6 +7,12 @@ const meta: Meta< typeof Link > = {
 	title: 'Design System/Components/Link',
 	component: Link,
 	tags: [ 'manifest' ],
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

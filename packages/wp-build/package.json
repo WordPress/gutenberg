@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.13.0",
+	"version": "0.15.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -36,6 +36,7 @@
 	},
 	"dependencies": {
 		"@emotion/babel-plugin": "11.13.5",
+		"@wordpress/style-runtime": "file:../style-runtime",
 		"autoprefixer": "10.4.21",
 		"browserslist-to-esbuild": "2.1.1",
 		"change-case": "4.1.2",
@@ -52,7 +53,7 @@
 		"sass-embedded": "^1.97.2"
 	},
 	"devDependencies": {
-		"@types/node": "^20.17.10"
+		"@types/node": "^20.19.39"
 	},
 	"peerDependencies": {
 		"@wordpress/boot": ">=0.3.0 <1.0.0",

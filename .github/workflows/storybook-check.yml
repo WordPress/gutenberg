@@ -1,6 +1,10 @@
 name: Storybook build and Smoke Tests
 
-on: pull_request
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -36,6 +40,9 @@ jobs:
                   NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: test
               run: npm run storybook:build
+
+            - name: Validate manifest matches design-system-mcp contract
+              run: node packages/design-system-mcp/scripts/validate-manifest.mjs
 
             - name: Build E2E Storybook
               env:

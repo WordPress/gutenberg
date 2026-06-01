@@ -612,7 +612,18 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.snapRotate90 ).toHaveBeenCalledWith( 1 );
 		} );
 
-		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+		it( 'calls snapRotate90 counter-clockwise on shift+r', () => {
+			const state = makeState( { rotation: 0 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'r', { shiftKey: true } )
+			);
+
+			expect( actionMocks.snapRotate90 ).toHaveBeenCalledWith( -1 );
+		} );
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey' ] )(
 			'does not rotate when %s is held with r',
 			( modifier ) => {
 				const state = makeState( { rotation: 0 } );

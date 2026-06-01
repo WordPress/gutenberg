@@ -98,6 +98,15 @@ describe( 'RectangleStencil', () => {
 			] );
 		} );
 
+		it( 'describes keyboard resizing on resize handles', () => {
+			renderStencil();
+			expect(
+				screen.getByRole( 'button', { name: 'Resize top-left corner' } )
+			).toHaveAccessibleDescription(
+				'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
+			);
+		} );
+
 		it( 'renders corner handles clockwise from top-left when aspect ratio is locked', () => {
 			renderStencil( { aspectRatio: 16 / 9 } );
 			const labels = screen
@@ -114,21 +123,38 @@ describe( 'RectangleStencil', () => {
 	} );
 
 	describe( 'keyboard — Escape', () => {
-		it( 'calls onEscape when Escape is pressed on a handle', () => {
-			const { onEscape } = renderStencil();
+		it( 'handles Escape on a handle without bubbling', () => {
+			const onKeyDown = jest.fn();
+			const onEscape = jest.fn();
+			render(
+				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+				<div onKeyDown={ onKeyDown }>
+					<RectangleStencil
+						cropRect={ DEFAULT_CROP_RECT }
+						containerSize={ CONTAINER_SIZE }
+						imageSize={ IMAGE_SIZE }
+						onCropChange={ jest.fn() }
+						onEscape={ onEscape }
+						freeformCrop
+						cropBounds={ CROP_BOUNDS }
+					/>
+				</div>
+			);
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
 
 			expect( onEscape ).toHaveBeenCalledTimes( 1 );
+			expect( onKeyDown ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does not call onCropChange when Escape is pressed', () => {
-			const { onCropChange } = renderStencil();
+			const { onCropChange, onEscape } = renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );
 
 			fireEvent.keyDown( firstHandle, { key: 'Escape' } );
 
+			expect( onEscape ).toHaveBeenCalledTimes( 1 );
 			expect( onCropChange ).not.toHaveBeenCalled();
 		} );
 	} );

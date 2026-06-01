@@ -17,6 +17,7 @@
 		"noEmit": true,
 		"outDir": ".cache"
 	},
+	"references": [ { "path": "../style-runtime" } ],
 	"include": [ "." ],
 	"exclude": [
 		// Excluded to maintain consistency with bin/tsconfig.json

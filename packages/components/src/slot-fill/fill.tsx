@@ -37,9 +37,9 @@ export default function Fill( { name, children }: FillComponentProps ) {
 	useLayoutEffect( () => {
 		registry.updateFill( name, {
 			instance: instanceRef.current,
-			children: childrenRef.current,
+			children,
 		} );
-	} );
+	}, [ registry, name, children ] );
 
 	const slot = useObservableValue( registry.slots, name );
 

@@ -27,6 +27,7 @@ import type {
 	ObjectData,
 	ObjectType,
 	ProviderCreator,
+	ProviderCreatorResult,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
@@ -192,13 +193,23 @@ export function createSyncManager( debug = false ): SyncManager {
 		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
+		// Track whether observers have been attached to the maps.
+		let hasObserversAttached = false;
+		// Track whether unload ran (possibly while we were awaiting provider
+		// creation), so the post-await code can destroy any providers that
+		// were created after unload and bail out.
+		let isEntityUnloaded = false;
+
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadEntity', 'unloading', entityId );
-			providerResults.forEach( ( result ) => result.destroy() );
+			isEntityUnloaded = true;
+			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
-			recordMap.unobserveDeep( onRecordUpdate );
-			stateMap.unobserve( onStateMapUpdate );
+			if ( hasObserversAttached ) {
+				recordMap.unobserveDeep( onRecordUpdate );
+				stateMap.unobserve( onStateMapUpdate );
+			}
 			ydoc.destroy();
 			entityStates.delete( entityId );
 		};
@@ -256,6 +267,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			restoreUndoMeta,
 		} );
 
+		// Declare with let before using it in unload closure.
+		// eslint-disable-next-line prefer-const
+		let providerResults: ProviderCreatorResult[];
+
 		const entityState: EntityState = {
 			awareness,
 			handlers,
@@ -270,7 +285,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		log( 'loadEntity', 'connecting', entityId );
-		const providerResults = await Promise.all(
+		providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
 					objectType,
@@ -286,15 +301,29 @@ export function createSyncManager( debug = false ): SyncManager {
 			} )
 		);
 
-		// Attach observers.
-		recordMap.observeDeep( onRecordUpdate );
-		stateMap.observe( onStateMapUpdate );
+		// If unload() or unloadAll() ran while we were awaiting provider
+		// creation, destroy the just-created providers and bail out before
+		// attempting to use the connection
+		if ( isEntityUnloaded ) {
+			log( 'loadEntity', 'unloaded during connect, aborting', entityId );
+			providerResults.forEach( ( result ) => result.destroy() );
+			return;
+		}
 
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
 
 		// Get and apply the persisted CRDT document, if it exists.
+		// Observers are attached after hydration so the applyUpdateV2 inside
+		// _applyPersistedCrdtDoc does not trigger _updateEntityRecord with the
+		// just-loaded state, which would dispatch a redundant editRecord whose
+		// blocks already match the editor's parsed content.
 		internal.applyPersistedCrdtDoc( objectType, objectId, record );
+
+		// Attach observers.
+		recordMap.observeDeep( onRecordUpdate );
+		stateMap.observe( onStateMapUpdate );
+		hasObserversAttached = true;
 	}
 
 	/**
@@ -333,12 +362,22 @@ export function createSyncManager( debug = false ): SyncManager {
 		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
+		// Track whether observers have been attached to the maps.
+		let hasObserversAttached = false;
+		// Track whether unload ran (possibly while we were awaiting provider
+		// creation), so the post-await code can destroy any providers that
+		// were created after unload and bail out.
+		let isCollectionUnloaded = false;
+
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			log( 'loadCollection', 'unloading', entityId );
-			providerResults.forEach( ( result ) => result.destroy() );
+			isCollectionUnloaded = true;
+			providerResults?.forEach( ( result ) => result.destroy() );
 			handlers.onStatusChange( null );
-			stateMap.unobserve( onStateMapUpdate );
+			if ( hasObserversAttached ) {
+				stateMap.unobserve( onStateMapUpdate );
+			}
 			ydoc.destroy();
 			collectionStates.delete( objectType );
 		};
@@ -368,6 +407,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc );
 
+		// Declare with let before using it in unload closure.
+		// eslint-disable-next-line prefer-const
+		let providerResults: ProviderCreatorResult[];
+
 		const collectionState: CollectionState = {
 			awareness,
 			handlers,
@@ -380,7 +423,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		log( 'loadCollection', 'connecting', entityId );
-		const providerResults = await Promise.all(
+		providerResults = await Promise.all(
 			providerCreators.map( async ( create ) => {
 				const provider = await create( {
 					awareness,
@@ -396,8 +439,22 @@ export function createSyncManager( debug = false ): SyncManager {
 			} )
 		);
 
+		// If unload() or unloadAll() ran while we were awaiting provider
+		// creation, destroy the just-created providers and bail out before
+		// attempting to use the connection
+		if ( isCollectionUnloaded ) {
+			log(
+				'loadCollection',
+				'unloaded during connect, aborting',
+				entityId
+			);
+			providerResults.forEach( ( result ) => result.destroy() );
+			return;
+		}
+
 		// Attach observers.
 		stateMap.observe( onStateMapUpdate );
+		hasObserversAttached = true;
 
 		// Initialize the Yjs document with the necessary CRDT state.
 		initializeYjsDoc( ydoc );
@@ -415,6 +472,23 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'unloadEntity', 'unloading', entityId );
 		entityStates.get( entityId )?.unload();
 		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
+	}
+
+	/**
+	 * Unload all loaded entities, stopping all syncing.
+	 */
+	function unloadAll(): void {
+		log( 'unloadAll', 'unloading all entities', 'all' );
+
+		for ( const [ , entityState ] of [ ...entityStates ] ) {
+			entityState.unload();
+		}
+		entityStates.clear();
+
+		for ( const [ , collectionState ] of [ ...collectionStates ] ) {
+			collectionState.unload();
+		}
+		collectionStates.clear();
 	}
 
 	/**
@@ -679,6 +753,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			return undoManager;
 		},
 		unload: debugWrap( unloadEntity ),
+		unloadAll: debugWrap( unloadAll ),
 		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
 	};
 }

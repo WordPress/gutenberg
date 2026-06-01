@@ -1645,9 +1645,9 @@
 		"filePath": "library/thumbs-up.svg"
 	},
 	{
-		"slug": "time-to-read",
-		"label": "Time To Read",
-		"filePath": "library/time-to-read.svg"
+		"slug": "time",
+		"label": "Time",
+		"filePath": "library/time.svg"
 	},
 	{
 		"slug": "tip",

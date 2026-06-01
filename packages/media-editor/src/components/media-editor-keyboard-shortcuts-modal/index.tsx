@@ -10,11 +10,6 @@ import {
 	type WPKeycodeModifier,
 } from '@wordpress/keycodes';
 
-/**
- * Internal dependencies
- */
-import './style.scss';
-
 interface KeyCombination {
 	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */
 	modifier?: WPKeycodeModifier;
@@ -56,6 +51,10 @@ const SHORTCUTS: ShortcutEntry[] = [
 	{
 		description: __( 'Rotate 90° clockwise' ),
 		keyCombination: { character: 'R' },
+	},
+	{
+		description: __( 'Rotate 90° counter-clockwise' ),
+		keyCombination: { modifier: 'shift', character: 'R' },
 	},
 	{
 		description: __( 'Flip horizontal' ),

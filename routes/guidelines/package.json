@@ -22,6 +22,7 @@
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/block-library": "file:../../packages/block-library",
-		"@wordpress/blocks": "file:../../packages/blocks"
+		"@wordpress/blocks": "file:../../packages/blocks",
+		"@wordpress/ui": "file:../../packages/ui"
 	}
 }

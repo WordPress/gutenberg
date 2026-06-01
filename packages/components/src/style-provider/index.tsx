@@ -1,13 +1,8 @@
-/**
- * External dependencies
- */
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import * as uuid from 'uuid';
-
-/**
- * Internal dependencies
- */
+import { useLayoutEffect } from '@wordpress/element';
+import { registerDocument } from '@wordpress/style-runtime';
 import type { StyleProviderProps } from './types';
 
 const uuidCache = new Set();
@@ -35,6 +30,14 @@ const memoizedCreateCacheWithContainer = ( container: HTMLElement ) => {
 
 export function StyleProvider( props: StyleProviderProps ) {
 	const { children, document } = props;
+
+	useLayoutEffect( () => {
+		if ( ! document ) {
+			return;
+		}
+
+		return registerDocument( document );
+	}, [ document ] );
 
 	if ( ! document ) {
 		return null;
