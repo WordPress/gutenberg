@@ -7,10 +7,5 @@
 		"rootDir": ".."
 	},
 	"references": [],
-	"include": [
-		"**/*.ts",
-		"**/*.tsx",
-		"../packages/*/src/**/*",
-		"../routes/*/src/**/*"
-	]
+	"include": [ "**/*.ts", "**/*.tsx", "../packages/*/src/**/*" ]
 }
