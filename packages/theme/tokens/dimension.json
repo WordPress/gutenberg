@@ -162,11 +162,11 @@
 			},
 			"2xs": {
 				"$value": "{wpds-dimension.primitive.space.30}",
-				"$description": "For small controls like checkboxes and radios, or small decorative icons"
+				"$description": "Small markers"
 			},
 			"xs": {
 				"$value": "{wpds-dimension.primitive.space.40}",
-				"$description": "Small icons"
+				"$description": "For small controls like checkboxes and radios, or small decorative icons"
 			},
 			"sm": {
 				"$value": "{wpds-dimension.primitive.space.60}",

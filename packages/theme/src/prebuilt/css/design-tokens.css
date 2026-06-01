@@ -233,9 +233,9 @@
 	--wpds-dimension-size-4xs: 4px;
 	/* Visual size for small interactive elements like resize handles */
 	--wpds-dimension-size-3xs: 8px;
-	/* For small controls like checkboxes and radios, or small decorative icons */
+	/* Small markers */
 	--wpds-dimension-size-2xs: 12px;
-	/* Small icons */
+	/* For small controls like checkboxes and radios, or small decorative icons */
 	--wpds-dimension-size-xs: 16px;
 	/* For icons and small buttons */
 	--wpds-dimension-size-sm: 24px;

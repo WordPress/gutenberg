@@ -257,8 +257,8 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-dimension-gap-3xl`           | 3x extra large gap                                                       |
 | `--wpds-dimension-size-4xs`          | Notification indicators                                                  |
 | `--wpds-dimension-size-3xs`          | Visual size for small interactive elements like resize handles           |
-| `--wpds-dimension-size-2xs`          | For small controls like checkboxes and radios, or small decorative icons |
-| `--wpds-dimension-size-xs`           | Small icons                                                              |
+| `--wpds-dimension-size-2xs`          | Small markers                                                            |
+| `--wpds-dimension-size-xs`           | For small controls like checkboxes and radios, or small decorative icons |
 | `--wpds-dimension-size-sm`           | For icons and small buttons                                              |
 | `--wpds-dimension-size-md`           | For medium-sized buttons and inputs                                      |
 | `--wpds-dimension-size-lg`           | Default size for buttons and inputs                                      |
