@@ -9,6 +9,8 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 	/**
 	 * Returns the SVG markup for a registered icon.
 	 *
+	 * @since 7.1.0
+	 *
 	 * @param string $name The namespaced icon name (e.g. 'core/plus',
 	 *                     'core/arrow-down', 'my-plugin/custom-icon').
 	 * @param array  $args {
