@@ -7,9 +7,7 @@ This page lists the blocks included in the block-library package.
 -   Blocks marked with **Experimental:** fse are only available in the Site Editor.
 
 <!-- START TOKEN(Deprecated blocks) -->
-## Deprecated Blocks
-
-The following blocks are deprecated and should not be used in new content. Their documentation is preserved for reference.
+**Deprecated blocks** — the following blocks are deprecated and should not be used in new content. Their documentation is preserved for reference.
 
 - [Comment Author Avatar (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-avatar/) (`core/comment-author-avatar`) — Please use the Avatar block instead.
 - [Author (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author/) (`core/post-author`) — Please use the Avatar block, the Author Name block, and the Author Biography block instead.

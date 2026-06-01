@@ -920,10 +920,8 @@ function generateCategoryPage( category, label, blocks ) {
 function generateDeprecatedNotice( dirs ) {
 	const lines = [];
 
-	lines.push( '## Deprecated Blocks' );
-	lines.push( '' );
 	lines.push(
-		'The following blocks are deprecated and should not be used in new content. Their documentation is preserved for reference.'
+		'**Deprecated blocks** — the following blocks are deprecated and should not be used in new content. Their documentation is preserved for reference.'
 	);
 	lines.push( '' );
 
