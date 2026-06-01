@@ -87,6 +87,16 @@ HTML
 				,
 				'<p class="wp-block-paragraph">test source value</p>',
 			),
+			'verse block'     => array(
+				'content',
+				<<<HTML
+<!-- wp:verse -->
+<pre class="wp-block-verse">This should not appear</pre>
+<!-- /wp:verse -->
+HTML
+				,
+				'<pre class="wp-block-verse">test source value</pre>',
+			),
 			'button block'    => array(
 				'text',
 				<<<HTML
@@ -348,6 +358,50 @@ HTML;
 			$expected_bindings_metadata,
 			$block->attributes['metadata']['bindings'],
 			'The __default binding should be updated with the individual binding attributes in the block metadata.'
+		);
+	}
+
+	/**
+	 * Tests that the Verse block supports the default binding for pattern
+	 * overrides.
+	 *
+	 * @covers WP_Block::process_block_bindings
+	 */
+	public function test_default_binding_for_pattern_overrides_verse() {
+		$block_content = <<<HTML
+<!-- wp:verse {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test verse"}} -->
+<pre class="wp-block-verse">This should not appear</pre>
+<!-- /wp:verse -->
+HTML;
+
+		$expected_content = 'This is the verse content value';
+		$parsed_blocks    = parse_blocks( $block_content );
+		$block            = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'pattern/overrides' => array(
+					'Test verse' => array(
+						'content' => $expected_content,
+					),
+				),
+			)
+		);
+
+		$result = $block->render();
+
+		$this->assertSame(
+			"<pre class=\"wp-block-verse\">$expected_content</pre>",
+			trim( $result ),
+			'The `__default` attribute should be replaced with the verse content binding.'
+		);
+
+		$expected_bindings_metadata = array(
+			'content' => array( 'source' => 'core/pattern-overrides' ),
+		);
+		$this->assertSame(
+			$expected_bindings_metadata,
+			$block->attributes['metadata']['bindings'],
+			'The __default binding should be updated with the Verse content binding.'
 		);
 	}
 
