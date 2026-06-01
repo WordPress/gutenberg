@@ -68,8 +68,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── tools/release
     │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.
     │
-    ├── docs/tool
-    │   Tool used to generate the Block editor handbook's markdown pages.
+    ├── tools/docs
+    │   Tools for generating Gutenberg documentation (manifest generator, API docs, block library list, component docs, theme reference).
     │
     ├── docs/*.md
     │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
