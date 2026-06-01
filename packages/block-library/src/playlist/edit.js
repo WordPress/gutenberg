@@ -57,10 +57,6 @@ const PlaylistEdit = ( {
 		showArtists,
 		currentTrack,
 	} = attributes;
-
-	// Extract the visualization style from the block style variation class.
-	const visualizationStyle =
-		attributes.className?.match( /is-style-(\w+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -378,7 +374,6 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
-						visualizationStyle={ visualizationStyle }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
