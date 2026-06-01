@@ -155,6 +155,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						</div>
 
 						<Page
+							ariaLabel="Level 1 breadcrumb"
 							visual={ <Icon icon={ wordpress } size={ 24 } /> }
 							subTitle="All of the subtitle text you need goes here."
 							breadcrumbs={
