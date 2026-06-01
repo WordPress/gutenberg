@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: Fix CompactItemActions not rendered when action list equals 1 ([#78845](https://github.com/WordPress/gutenberg/pull/78845)).
+
 ## 15.0.0 (2026-05-27)
 
 ### Breaking Changes
