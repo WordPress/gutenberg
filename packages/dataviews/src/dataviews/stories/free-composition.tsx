@@ -8,13 +8,10 @@ import {
 } from '@wordpress/element';
 import {
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
-// TODO: enable in the ESlint rule once we complete
-// https://github.com/WordPress/gutenberg/issues/76135.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, Stack } from '@wordpress/ui';
 
 /**
@@ -56,7 +53,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 					<Card.Root>
 						<Card.Content>
 							<Stack direction="column" gap="sm">
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<PlanetsNumber /> planet',
@@ -71,9 +68,9 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<SatellitesNumber /> moon',
@@ -86,7 +83,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 							</Stack>
 						</Card.Content>
 					</Card.Root>
@@ -162,8 +159,8 @@ export const FreeCompositionComponent = () => {
 			actions={ actions }
 			onChangeView={ setView }
 			defaultLayouts={ {
-				table: {},
-				grid: {},
+				table: true,
+				grid: true,
 			} }
 			empty={
 				<Stack
@@ -173,11 +170,13 @@ export const FreeCompositionComponent = () => {
 					align="center"
 					className="free-composition-dataviews-empty"
 				>
-					<Text size={ 18 } as="p">
+					<WCText size={ 18 } as="p">
 						No planets
-					</Text>
-					<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
-					<Button variant="secondary">Create new planet</Button>
+					</WCText>
+					<WCText variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</WCText>
+					<Button variant="secondary" __next40pxDefaultSize>
+						Create new planet
+					</Button>
 				</Stack>
 			}
 		>

@@ -91,7 +91,7 @@ Function called when the control's search input value changes. The argument cont
 
 #### onChange
 
-Function called with the selected value changes.
+Function called when the selected value changes.
 
 -   Type: `( value: string | null | undefined ) => void`
 -   Required: No

@@ -111,7 +111,7 @@ const setupDriver = async () => {
 					'Detected Android device running Android %s',
 					androidVersion
 				);
-			} catch ( error ) {
+			} catch {
 				// Ignore error.
 			}
 		} else {
@@ -692,7 +692,7 @@ const clickIfClickable = async (
 
 	try {
 		return await element.click();
-	} catch ( error ) {
+	} catch {
 		if ( iteration >= maxIteration ) {
 			// eslint-disable-next-line no-console
 			console.error(

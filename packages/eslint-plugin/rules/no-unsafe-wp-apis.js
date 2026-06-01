@@ -1,7 +1,7 @@
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
-	type: 'problem',
 	meta: {
+		type: 'problem',
 		schema: [
 			{
 				type: 'object',

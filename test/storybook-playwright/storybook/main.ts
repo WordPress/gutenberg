@@ -1,5 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
-import baseConfig from '../../../storybook/main.ts';
+import baseConfig from '@wordpress/storybook/main';
 
 export default {
 	...baseConfig,
@@ -7,5 +7,6 @@ export default {
 	staticDirs: undefined,
 	stories: [
 		'../../../packages/components/src/**/stories/e2e/*.story.@(js|tsx|mdx)',
+		'../../../packages/ui/src/**/stories/e2e/*.story.@(ts|tsx|mdx)',
 	],
 } satisfies StorybookConfig;

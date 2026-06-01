@@ -576,7 +576,7 @@ _Note: The phpunit commands require `wp-env` to be running and composer dependen
 
 In other environments, run `composer run test` and `composer run test:watch`.
 
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test:php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint:php`.
+Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test:php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint:php`.
 
 To run unit tests only, without the linter, use `npm run test:unit:php` instead.
 
@@ -638,16 +638,16 @@ npm run test:performance
 
 This gives you the result for the current branch/code on the running environment.
 
-In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `./bin/plugin/cli.js perf [branches]`, example:
+In addition to that, you can also compare the metrics across branches (or tags or commits) by running the following command `npm exec release-cli -- perf [branches]`, example:
 
 ```
-./bin/plugin/cli.js perf trunk v8.1.0 v8.0.0
+npm exec release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 Finally, you can pass an additional `--tests-branch` argument to specify which branch's performance test files you'd like to run. This is particularly useful when modifying/extending the perf tests:
 
 ```
-./bin/plugin/cli.js perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
+npm exec release-cli -- perf trunk v8.1.0 v8.0.0 --tests-branch add/perf-tests-coverage
 ```
 
 **Note** This command needs may take some time to perform the benchmark. While running make sure to avoid using your computer or have a lot of background process to minimize external factors that can impact the results across branches.

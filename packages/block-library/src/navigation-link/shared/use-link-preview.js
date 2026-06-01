@@ -101,7 +101,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
 			// Different host - this is an external link
 			isExternal = true;
 		}
-	} catch ( e ) {
+	} catch {
 		// URL parsing failed - treat as external (e.g. no homeUrl, or URL without protocol)
 		isExternal = true;
 	}

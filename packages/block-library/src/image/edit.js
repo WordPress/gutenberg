@@ -142,8 +142,6 @@ export function ImageEdit( {
 			setAttributes( {
 				width: undefined,
 				height: undefined,
-				aspectRatio: undefined,
-				scale: undefined,
 			} );
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
@@ -355,7 +353,11 @@ export function ImageEdit( {
 
 	const isSideloading = useSelect(
 		( select ) => {
-			if ( ! window.__clientSideMediaProcessing || ! id ) {
+			if (
+				( ! window.__clientSideMediaProcessing &&
+					! window.__heicUploadSupport ) ||
+				! id
+			) {
 				return false;
 			}
 			return select( uploadStore ).isUploadingById( id );

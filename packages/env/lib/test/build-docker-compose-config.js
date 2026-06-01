@@ -3,6 +3,10 @@
  * Internal dependencies
  */
 const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
+const {
+	wordpressDockerFileContents,
+	getLoopbackPortConfig,
+} = require( '../runtime/docker/docker-config' );
 const getHostUser = require( '../runtime/docker/get-host-user' );
 
 // The basic config keys which build docker compose config requires.
@@ -277,5 +281,47 @@ describe( 'buildDockerComposeConfig', () => {
 			expect( dockerConfig.services[ 'tests-wordpress' ] ).toBeDefined();
 			expect( dockerConfig.services[ 'tests-cli' ] ).toBeDefined();
 		} );
+	} );
+} );
+
+describe( 'getLoopbackPortConfig', () => {
+	it( 'returns Apache Listen and VirtualHost edits for a non-default port using an anchored sed pattern', () => {
+		const out = getLoopbackPortConfig( 8888 );
+		expect( out ).toContain( 'Listen 8888' );
+		expect( out ).toContain( '/etc/apache2/ports.conf' );
+		expect( out ).toContain( '<VirtualHost *:80 *:8888>' );
+		expect( out ).toContain(
+			'/etc/apache2/sites-enabled/000-default.conf'
+		);
+		// Guard against a future "simplification" to a greedy s/80/.../g
+		// that would also match e.g. unrelated "80" substrings.
+		expect( out ).not.toMatch( /s\|80\|/ );
+		expect( out ).toMatch( /s\|<VirtualHost \\\*:80>\|/ );
+	} );
+
+	it( 'returns an empty string for port 80 (Apache already listens there)', () => {
+		expect( getLoopbackPortConfig( 80 ) ).toBe( '' );
+	} );
+
+	it( 'returns an empty string for port 443 (wp-env does not configure SSL)', () => {
+		expect( getLoopbackPortConfig( 443 ) ).toBe( '' );
+	} );
+} );
+
+describe( 'wordpressDockerFileContents', () => {
+	it( 'injects the resolved per-environment port into the generated Dockerfile', () => {
+		const config = {
+			xdebug: 'off',
+			spx: 'off',
+			env: {
+				development: { port: 8888, phpVersion: null },
+				tests: { port: 8889, phpVersion: null },
+			},
+		};
+		const dockerfile = wordpressDockerFileContents( 'tests', config );
+		// Proves getLoopbackPortConfig is wired in AND that each environment
+		// uses its own port (not the development port).
+		expect( dockerfile ).toContain( 'Listen 8889' );
+		expect( dockerfile ).not.toContain( 'Listen 8888' );
 	} );
 } );
