@@ -97,6 +97,20 @@ const config: Config = {
 						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="lg"])',
 					],
 				},
+				{
+					mode: 'corner-radius-xl',
+					selectors: [
+						'[data-wpds-corner-radius="xl"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="xl"])',
+					],
+				},
+				{
+					mode: 'corner-radius-2xl',
+					selectors: [
+						'[data-wpds-corner-radius="2xl"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="2xl"])',
+					],
+				},
 			],
 			legacyHex: true,
 		} ),

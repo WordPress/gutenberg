@@ -38,6 +38,8 @@ const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
 	{ id: 'none', title: 'None' },
 	{ id: 'md', title: 'Medium' },
 	{ id: 'lg', title: 'Large' },
+	{ id: 'xl', title: 'Extra large' },
+	{ id: '2xl', title: '2x extra large' },
 ];
 
 function ThemeTooltipMessage( {

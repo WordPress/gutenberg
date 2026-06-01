@@ -11,7 +11,9 @@
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-sm": { "value": 1, "unit": "px" },
 						"corner-radius-md": { "value": 2, "unit": "px" },
-						"corner-radius-lg": { "value": 3, "unit": "px" }
+						"corner-radius-lg": { "value": 3, "unit": "px" },
+						"corner-radius-xl": { "value": 5, "unit": "px" },
+						"corner-radius-2xl": { "value": 7, "unit": "px" }
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}
@@ -24,7 +26,9 @@
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-sm": { "value": 2, "unit": "px" },
 						"corner-radius-md": { "value": 4, "unit": "px" },
-						"corner-radius-lg": { "value": 6, "unit": "px" }
+						"corner-radius-lg": { "value": 6, "unit": "px" },
+						"corner-radius-xl": { "value": 10, "unit": "px" },
+						"corner-radius-2xl": { "value": 14, "unit": "px" }
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}
@@ -37,7 +41,9 @@
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-sm": { "value": 4, "unit": "px" },
 						"corner-radius-md": { "value": 6, "unit": "px" },
-						"corner-radius-lg": { "value": 8, "unit": "px" }
+						"corner-radius-lg": { "value": 8, "unit": "px" },
+						"corner-radius-xl": { "value": 12, "unit": "px" },
+						"corner-radius-2xl": { "value": 16, "unit": "px" }
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}
@@ -50,7 +56,9 @@
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-sm": { "value": 8, "unit": "px" },
 						"corner-radius-md": { "value": 12, "unit": "px" },
-						"corner-radius-lg": { "value": 16, "unit": "px" }
+						"corner-radius-lg": { "value": 16, "unit": "px" },
+						"corner-radius-xl": { "value": 24, "unit": "px" },
+						"corner-radius-2xl": { "value": 32, "unit": "px" }
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}
