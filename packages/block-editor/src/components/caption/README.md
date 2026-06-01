@@ -41,4 +41,4 @@ The properties `isSelected`, `onBlur`, `onChange`, `onFocus`, `shouldDisplay`, `
 
 ## Related components
 
-Caption components is mostly used by the [`BlockCaption`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-caption) component.
+The Caption component is mostly used by the [`BlockCaption`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-caption) component.

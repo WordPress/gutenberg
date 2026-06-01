@@ -17,7 +17,7 @@ In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/t
 
 Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
 
-The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors and density for a specific part of your application.
+The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors for a specific part of your application.
 
 #### Within WordPress
 
@@ -86,7 +86,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { primary: 'blue' } } density="compact">
+		<ThemeProvider color={ { primary: 'blue' } }>
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
@@ -104,15 +104,7 @@ The `cursor` prop accepts an object with the following optional properties:
 
 -   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
-The `density` prop controls the spacing scale throughout the UI:
-
--   `'default'`: Standard spacing for general use.
--   `'compact'`: Reduced spacing for information-dense interfaces like data tables or dashboards.
--   `'comfortable'`: Increased spacing for focused experiences like modals, dialogs, or full-screen settings panels.
-
-The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
-
-When the `color`, `cursor`, or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+When the `color` or `cursor` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
@@ -121,10 +113,10 @@ The provider can be used recursively to override or modify the theme for a speci
 ```tsx
 <ThemeProvider color={ { bg: 'white' } }>
 	{ /* light-themed UI components */ }
-	<ThemeProvider color={ { bg: '#1e1e1e' } } density="compact">
-		{ /* dark-themed UI components with compact spacing */ }
+	<ThemeProvider color={ { bg: '#1e1e1e' } }>
+		{ /* dark-themed UI components */ }
 		<ThemeProvider color={ { primary: 'red' } }>
-			{ /* dark-themed with red accent, inheriting compact density */ }
+			{ /* dark-themed with red accent */ }
 		</ThemeProvider>
 	</ThemeProvider>
 	{ /* light-themed UI components */ }

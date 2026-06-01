@@ -1,14 +1,11 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error No exported types
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	privateApis as coreDataPrivateApis,
 	type CoreDataPrivateApis,
 	type PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
@@ -73,11 +70,6 @@ export function useBlockHighlighting(
 	// Bump this counter to force the effect to re-run (e.g. after a layout shift).
 	const [ recomputeToken, rerenderHighlightsAfterDelay ] =
 		useDebouncedRecompute( delayMs );
-
-	const blockClientIds = useSelect(
-		( select ) => select( blockEditorStore ).getClientIdsWithDescendants(),
-		[]
-	);
 
 	// All DOM mutations and position computations live inside useEffect.
 	useEffect( () => {
@@ -215,7 +207,6 @@ export function useBlockHighlighting(
 		overlayElement,
 		recomputeToken,
 		resolveSelection,
-		blockClientIds,
 	] );
 
 	return { highlights, rerenderHighlightsAfterDelay };

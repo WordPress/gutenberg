@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useState } from '@wordpress/element';
+import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import type {
@@ -41,6 +41,34 @@ import {
 	getDisplaySrcFromFontFace,
 } from './utils';
 import { useSetting } from '../hooks';
+
+/**
+ * Comparison key for font families. Sorts families by slug and faces
+ * by style+weight so order differences don't produce false positives.
+ *
+ * @param fontFamilies Font families record keyed by source (e.g. "theme", "custom").
+ */
+function getFontFamiliesKey(
+	fontFamilies: Record< string, FontFamilyPreset[] > | undefined
+): string {
+	if ( ! fontFamilies ) {
+		return '';
+	}
+	const normalized: Record< string, unknown[] > = {};
+	for ( const source of Object.keys( fontFamilies ).sort() ) {
+		normalized[ source ] = ( fontFamilies[ source ] ?? [] )
+			.map( ( family ) => ( {
+				slug: family.slug,
+				fontFace: ( family.fontFace ?? [] )
+					.map(
+						( face ) => `${ face.fontStyle }-${ face.fontWeight }`
+					)
+					.sort(),
+			} ) )
+			.sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+	}
+	return JSON.stringify( normalized );
+}
 
 function InstalledFonts() {
 	const {
@@ -75,8 +103,19 @@ function InstalledFonts() {
 		'globalStyles',
 		globalStylesId
 	);
-	const fontFamiliesHasChanges =
-		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
+	const editedFontFamilies =
+		globalStyles?.edits?.settings?.typography?.fontFamilies;
+	const savedFontFamilies =
+		globalStyles?.record?.settings?.typography?.fontFamilies;
+	const fontFamiliesHasChanges = useMemo( () => {
+		if ( editedFontFamilies === undefined ) {
+			return false;
+		}
+		return (
+			getFontFamiliesKey( editedFontFamilies ) !==
+			getFontFamiliesKey( savedFontFamilies )
+		);
+	}, [ editedFontFamilies, savedFontFamilies ] );
 
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
