@@ -26,9 +26,9 @@
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-sm": { "value": 2, "unit": "px" },
 						"corner-radius-md": { "value": 4, "unit": "px" },
-						"corner-radius-lg": { "value": 6, "unit": "px" },
-						"corner-radius-xl": { "value": 10, "unit": "px" },
-						"corner-radius-2xl": { "value": 14, "unit": "px" }
+						"corner-radius-lg": { "value": 5, "unit": "px" },
+						"corner-radius-xl": { "value": 8, "unit": "px" },
+						"corner-radius-2xl": { "value": 12, "unit": "px" }
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}

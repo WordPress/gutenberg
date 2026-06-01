@@ -11,7 +11,7 @@
 			"sm": {
 				"$type": "dimension",
 				"$value": {
-					"value": 10,
+					"value": 8,
 					"unit": "px"
 				}
 			},
