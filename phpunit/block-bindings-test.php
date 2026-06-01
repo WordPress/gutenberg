@@ -87,6 +87,16 @@ HTML
 				,
 				'<p class="wp-block-paragraph">test source value</p>',
 			),
+			'code block'      => array(
+				'content',
+				<<<HTML
+<!-- wp:code -->
+<pre class="wp-block-code"><code>This should not appear</code></pre>
+<!-- /wp:code -->
+HTML
+				,
+				'<pre class="wp-block-code"><code>test source value</code></pre>',
+			),
 			'button block'    => array(
 				'text',
 				<<<HTML
@@ -348,6 +358,50 @@ HTML;
 			$expected_bindings_metadata,
 			$block->attributes['metadata']['bindings'],
 			'The __default binding should be updated with the individual binding attributes in the block metadata.'
+		);
+	}
+
+	/**
+	 * Tests that the Code block supports the default binding for pattern
+	 * overrides.
+	 *
+	 * @covers WP_Block::process_block_bindings
+	 */
+	public function test_default_binding_for_pattern_overrides_code() {
+		$block_content = <<<HTML
+<!-- wp:code {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test code"}} -->
+<pre class="wp-block-code"><code>This should not appear</code></pre>
+<!-- /wp:code -->
+HTML;
+
+		$expected_content = 'This is the code content value';
+		$parsed_blocks    = parse_blocks( $block_content );
+		$block            = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'pattern/overrides' => array(
+					'Test code' => array(
+						'content' => $expected_content,
+					),
+				),
+			)
+		);
+
+		$result = $block->render();
+
+		$this->assertSame(
+			"<pre class=\"wp-block-code\"><code>$expected_content</code></pre>",
+			trim( $result ),
+			'The `__default` attribute should be replaced with the code content binding.'
+		);
+
+		$expected_bindings_metadata = array(
+			'content' => array( 'source' => 'core/pattern-overrides' ),
+		);
+		$this->assertSame(
+			$expected_bindings_metadata,
+			$block->attributes['metadata']['bindings'],
+			'The __default binding should be updated with the Code content binding.'
 		);
 	}
 
