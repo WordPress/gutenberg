@@ -24,8 +24,9 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 	}
 
 	/*
-	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
-	 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+	 * Entity ID resolution:
+	 * - Navigation blocks: Read from block attributes (id, type)
+	 * - Other blocks: Read from block context (termId, taxonomy)
 	 */
 	$block_name          = $block_instance->name ?? '';
 	$is_navigation_block = in_array(
@@ -35,13 +36,12 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 	);
 
 	if ( $is_navigation_block ) {
-		// Navigation blocks: read from block attributes
-		$term_id = $block_instance->attributes['id'] ?? null;
-		$type    = $block_instance->attributes['type'] ?? '';
-		// Map UI shorthand to taxonomy slug when using attributes.
+		// Navigation links store entity data in block attributes
+		$term_id  = $block_instance->attributes['id'] ?? null;
+		$type     = $block_instance->attributes['type'] ?? '';
 		$taxonomy = ( 'tag' === $type ) ? 'post_tag' : $type;
 	} else {
-		// All other blocks: use context
+		// Standard blocks use block context
 		$term_id  = $block_instance->context['termId'] ?? null;
 		$taxonomy = $block_instance->context['taxonomy'] ?? '';
 	}

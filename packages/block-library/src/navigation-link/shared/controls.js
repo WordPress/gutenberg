@@ -188,83 +188,82 @@ export function Controls( {
 				/>
 			</ToolsPanelItem>
 
-			{ isLinkEditable && (
-				<>
-					<ToolsPanelItem
-						hasValue={ () => !! url }
-						label={ __( 'Link to' ) }
-						onDeselect={ () =>
-							setAttributes( {
-								url: undefined,
-								id: undefined,
-								kind: undefined,
-								type: undefined,
-							} )
-						}
-						isShownByDefault
-					>
-						<LinkPicker
-							preview={ preview }
-							onSelect={ handleLinkChange }
-							suggestionsQuery={ getSuggestionsQuery(
-								attributes.type,
-								attributes.kind
-							) }
-							label={ __( 'Link to' ) }
-							help={ helpText ? helpText : undefined }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ () => !! opensInNewTab }
-						label={ __( 'Open in new tab' ) }
-						onDeselect={ () =>
-							setAttributes( { opensInNewTab: false } )
-						}
-						isShownByDefault
-					>
-						<CheckboxControl
-							label={ __( 'Open in new tab' ) }
-							checked={ opensInNewTab }
-							onChange={ ( value ) =>
-								setAttributes( { opensInNewTab: value } )
-							}
-						/>
-					</ToolsPanelItem>
-
-					{ !! url &&
-						hasUrlBinding &&
-						isBoundEntityAvailable &&
-						entityRecord?.id &&
-						attributes.kind === 'post-type' &&
-						onNavigateToEntityRecord && (
-							<Button
-								variant="secondary"
-								onClick={ () => {
-									onNavigateToEntityRecord( {
-										postId: entityRecord.id,
-										postType: attributes.type,
-									} );
-								} }
-								__next40pxDefaultSize
-								className="navigation-link-to__action-button"
-							>
-								{ __( 'Edit' ) }
-							</Button>
-						) }
-					{ isViewableUrl && (
-						<Button
-							variant="secondary"
-							href={ viewUrl }
-							target="_blank"
-							icon={ external }
-							iconPosition="right"
-							__next40pxDefaultSize
-							className="navigation-link-to__action-button"
-						>
-							{ __( 'View' ) }
-						</Button>
+			<ToolsPanelItem
+				hasValue={ () => !! url }
+				label={ __( 'Link to' ) }
+				onDeselect={ () =>
+					setAttributes( {
+						url: undefined,
+						id: undefined,
+						kind: undefined,
+						type: undefined,
+					} )
+				}
+				isShownByDefault
+			>
+				<LinkPicker
+					preview={ preview }
+					onSelect={ handleLinkChange }
+					suggestionsQuery={ getSuggestionsQuery(
+						attributes.type,
+						attributes.kind
 					) }
-				</>
+					label={ __( 'Link to' ) }
+					help={ helpText ? helpText : undefined }
+					readOnly={ ! isLinkEditable }
+				/>
+			</ToolsPanelItem>
+			{ isLinkEditable && (
+				<ToolsPanelItem
+					hasValue={ () => !! opensInNewTab }
+					label={ __( 'Open in new tab' ) }
+					onDeselect={ () =>
+						setAttributes( { opensInNewTab: false } )
+					}
+					isShownByDefault
+				>
+					<CheckboxControl
+						label={ __( 'Open in new tab' ) }
+						checked={ opensInNewTab }
+						onChange={ ( value ) =>
+							setAttributes( { opensInNewTab: value } )
+						}
+					/>
+				</ToolsPanelItem>
+			) }
+
+			{ !! url &&
+				hasUrlBinding &&
+				isBoundEntityAvailable &&
+				entityRecord?.id &&
+				attributes.kind === 'post-type' &&
+				onNavigateToEntityRecord && (
+					<Button
+						variant="secondary"
+						onClick={ () => {
+							onNavigateToEntityRecord( {
+								postId: entityRecord.id,
+								postType: attributes.type,
+							} );
+						} }
+						__next40pxDefaultSize
+						className="navigation-link-to__action-button"
+					>
+						{ __( 'Edit' ) }
+					</Button>
+				) }
+			{ isViewableUrl && (
+				<Button
+					variant="secondary"
+					href={ viewUrl }
+					target="_blank"
+					icon={ external }
+					iconPosition="right"
+					__next40pxDefaultSize
+					className="navigation-link-to__action-button"
+				>
+					{ __( 'View' ) }
+				</Button>
 			) }
 
 			<ToolsPanelItem

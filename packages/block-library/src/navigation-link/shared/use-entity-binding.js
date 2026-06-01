@@ -8,13 +8,15 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 
 /**
  * Builds entity binding configuration for navigation link URLs.
  * This function generates the structure used to bind navigation link URLs to their entity sources.
  *
- * Using a function instead of a constant allows for future enhancements where the binding
- * might need dynamic data (e.g., entity ID, context-specific arguments).
+ * For core binding sources (core/post-data and core/term-data), the entity ID and type are read
+ * from the block's `id` and `type` attributes, not from the binding args. Custom binding sources
+ * can implement their own resolution logic.
  *
  * @param {('post-type'|'taxonomy')} kind - The kind of entity. Only 'post-type' and 'taxonomy' are supported.
  * @return {Object} Entity binding configuration object
@@ -66,10 +68,13 @@ export function useEntityBinding( { clientId, attributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
-	const expectedSource =
-		kind === 'post-type' ? 'core/post-data' : 'core/term-data';
-	const hasCorrectBinding =
-		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
+
+	// Check if the binding source is registered (allows any source, not just core/post-data and core/term-data).
+	const bindingSourceName = metadata?.bindings?.url?.source;
+	const bindingSource = bindingSourceName
+		? getBlockBindingsSource( bindingSourceName )
+		: null;
+	const hasCorrectBinding = hasUrlBinding && !! bindingSource;
 
 	// Check if the bound entity is available (not deleted) and return the entity record.
 	const { isBoundEntityAvailable, entityRecord } = useSelect(
@@ -136,6 +141,16 @@ export function useEntityBinding( { clientId, attributes } ) {
 				return;
 			}
 
+			// Don't override custom binding sources - only create core bindings for post-type/taxonomy
+			const currentSource = metadata?.bindings?.url?.source;
+			if (
+				currentSource &&
+				currentSource !== 'core/post-data' &&
+				currentSource !== 'core/term-data'
+			) {
+				return;
+			}
+
 			try {
 				const binding = buildNavigationLinkEntityBinding( kindToUse );
 				updateBlockBindings( binding );
@@ -148,7 +163,7 @@ export function useEntityBinding( { clientId, attributes } ) {
 				// Don't create binding if validation fails.
 			}
 		},
-		[ updateBlockBindings, kind ]
+		[ updateBlockBindings, kind, metadata?.bindings?.url?.source ]
 	);
 
 	return {

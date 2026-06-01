@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
@@ -95,8 +95,7 @@ export default function NavigationLinkEdit( {
 		__unstableMarkNextChangeAsNotPersistent,
 		selectBlock,
 	} = useDispatch( blockEditorStore );
-	// Have the link editing ui open on mount when lacking a url and selected.
-	const [ isLinkOpen, setIsLinkOpen ] = useState( isSelected && ! url );
+
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -169,6 +168,52 @@ export default function NavigationLinkEdit( {
 			clientId,
 			attributes,
 		} );
+
+	// Check if bindings allow editing
+	const { canEditUrl, canEditId } = useSelect(
+		( select ) => {
+			const urlBinding = metadata?.bindings?.url;
+			const idBinding = metadata?.bindings?.id;
+
+			const urlBindingSource = urlBinding
+				? getBlockBindingsSource( urlBinding.source )
+				: null;
+			const idBindingSource = idBinding
+				? getBlockBindingsSource( idBinding.source )
+				: null;
+
+			const canEditUrlResult =
+				! urlBinding ||
+				urlBindingSource?.canUserEditValue?.( {
+					select,
+					context,
+					args: urlBinding?.args,
+				} ) !== false;
+
+			const canEditIdResult =
+				! idBinding ||
+				idBindingSource?.canUserEditValue?.( {
+					select,
+					context,
+					args: idBinding?.args,
+				} ) !== false;
+
+			return {
+				canEditUrl: canEditUrlResult,
+				canEditId: canEditIdResult,
+			};
+		},
+		[ metadata?.bindings, context ]
+	);
+
+	// Link is editable only if both URL and ID are editable
+	const isLinkEditable = canEditUrl && canEditId;
+
+	// Have the link editing ui open on mount when lacking a url and selected.
+	// Don't open if link is not editable (based on binding source's canUserEditValue).
+	const [ isLinkOpen, setIsLinkOpen ] = useState(
+		isSelected && ! url && isLinkEditable
+	);
 
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
@@ -354,7 +399,7 @@ export default function NavigationLinkEdit( {
 		isDraft ||
 		( hasUrlBinding && ! isBoundEntityAvailable );
 
-	if ( needsValidLink ) {
+	if ( needsValidLink && isLinkEditable ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
 		};
@@ -377,8 +422,11 @@ export default function NavigationLinkEdit( {
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => {
-							setIsLinkOpen( true );
+							if ( isLinkEditable ) {
+								setIsLinkOpen( true );
+							}
 						} }
+						disabled={ ! isLinkEditable }
 					/>
 					{ ! isAtMaxNesting && (
 						<ToolbarButton
@@ -395,6 +443,7 @@ export default function NavigationLinkEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					isLinkEditable={ isLinkEditable }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>

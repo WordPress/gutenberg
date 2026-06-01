@@ -55,7 +55,18 @@ export function isHomepage( url, homeUrl ) {
 		const urlPath = urlParsed.pathname.replace( /\/$/, '' );
 		const homePath = homeParsed.pathname.replace( /\/$/, '' );
 
-		return urlPath === homePath;
+		// Check paths match
+		if ( urlPath !== homePath ) {
+			return false;
+		}
+
+		// Draft pages often have URLs like "/?p=123" which have the same pathname as homepage
+		// but include query parameters. The homepage should not have query parameters.
+		if ( urlParsed.search ) {
+			return false;
+		}
+
+		return true;
 	} catch {
 		return false;
 	}

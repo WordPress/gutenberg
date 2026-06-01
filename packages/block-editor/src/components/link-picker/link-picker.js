@@ -10,6 +10,7 @@ import {
 import { VisuallyHidden } from '@wordpress/ui';
 import { useState, useId, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -37,6 +38,7 @@ import { LinkPreview } from './link-preview';
  * @param {Object}            props.suggestionsQuery - Query parameters for suggestions
  * @param {string}            props.label            - Label for the control
  * @param {string}            props.help             - Help text for the control
+ * @param {boolean}           props.readOnly         - Whether the link picker is read-only
  */
 export function LinkPicker( {
 	preview,
@@ -44,6 +46,7 @@ export function LinkPicker( {
 	suggestionsQuery,
 	label,
 	help,
+	readOnly = false,
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const instanceId = useId();
@@ -78,13 +81,17 @@ export function LinkPicker( {
 			<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>
 			<Button
 				ref={ anchorRef }
-				onClick={ () => setIsOpen( ! isOpen ) }
-				aria-haspopup="dialog"
-				aria-expanded={ isOpen }
+				onClick={ () => ! readOnly && setIsOpen( ! isOpen ) }
+				aria-haspopup={ readOnly ? undefined : 'dialog' }
+				aria-expanded={ readOnly ? undefined : isOpen }
 				aria-describedby={ controlProps[ 'aria-describedby' ] }
 				variant="secondary"
 				__next40pxDefaultSize
-				className="link-preview-button"
+				className={ clsx( 'link-preview-button', {
+					'is-read-only': readOnly,
+				} ) }
+				disabled={ readOnly }
+				accessibleWhenDisabled
 			>
 				{ label && <VisuallyHidden>{ label }:</VisuallyHidden> }
 				<LinkPreview
@@ -92,9 +99,10 @@ export function LinkPicker( {
 					url={ preview.url }
 					image={ preview.image }
 					badges={ preview.badges }
+					readOnly={ readOnly }
 				/>
 			</Button>
-			{ isOpen && (
+			{ ! readOnly && isOpen && (
 				<Popover
 					anchor={ anchorRef.current }
 					onClose={ () => setIsOpen( false ) }

@@ -30,8 +30,9 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 	}
 
 	/*
-	 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
-	 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+	 * Entity ID resolution:
+	 * - Navigation blocks: Read from block attributes (id)
+	 * - Other blocks: Read from block context (postId)
 	 */
 	$block_name          = $block_instance->name ?? '';
 	$is_navigation_block = in_array(
@@ -41,10 +42,10 @@ function gutenberg_block_bindings_post_data_get_value( array $source_args, $bloc
 	);
 
 	if ( $is_navigation_block ) {
-		// Navigation blocks: read from block attributes
+		// Navigation links store entity data in block attributes
 		$post_id = $block_instance->attributes['id'] ?? null;
 	} else {
-		// All other blocks: use context
+		// Standard blocks use block context
 		$post_id = $block_instance->context['postId'] ?? null;
 	}
 

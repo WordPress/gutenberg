@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-// Navigation block types that use special handling for backwards compatibility
+// Navigation block types that store entity data in block attributes instead of context
 const NAVIGATION_BLOCK_TYPES = [
 	'core/navigation-link',
 	'core/navigation-submenu',
@@ -36,8 +36,9 @@ export default {
 	name: 'core/post-data',
 	getValues( { select, context, bindings, clientId } ) {
 		/*
-		 * BACKWARDS COMPATIBILITY: Hardcoded exception for navigation blocks.
-		 * Required for WordPress 6.9+ navigation blocks. DO NOT REMOVE.
+		 * Entity ID resolution:
+		 * - Navigation blocks: Read from block attributes (id, type)
+		 * - Other blocks: Read from block context (postId, postType)
 		 */
 		const { getBlockAttributes, getBlockName } = select( blockEditorStore );
 		const blockName = getBlockName( clientId );
@@ -46,12 +47,12 @@ export default {
 		let postId, postType;
 
 		if ( isNavigationBlock ) {
-			// Navigation blocks: read from block attributes
+			// Navigation links store entity data in block attributes
 			const blockAttributes = getBlockAttributes( clientId );
 			postId = blockAttributes?.id;
 			postType = blockAttributes?.type;
 		} else {
-			// All other blocks: use context
+			// Standard blocks use block context
 			postId = context?.postId;
 			postType = context?.postType;
 		}
@@ -83,16 +84,7 @@ export default {
 		}
 		return newValues;
 	},
-	setValues( { dispatch, context, bindings, clientId, select } ) {
-		const { getBlockName } = select( blockEditorStore );
-
-		const blockName = getBlockName( clientId );
-
-		// Navigaton block types are read-only.
-		// See https://github.com/WordPress/gutenberg/pull/72165.
-		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
-			return false;
-		}
+	setValues( { dispatch, context, bindings } ) {
 		const newData = {};
 		Object.values( bindings ).forEach( ( { args, newValue } ) => {
 			newData[ args.field ] = newValue;
@@ -111,10 +103,10 @@ export default {
 		const clientId = getSelectedBlockClientId();
 		const blockName = getBlockName( clientId );
 
-		// Navigaton block types are read-only.
-		// See https://github.com/WordPress/gutenberg/pull/72165.
+		// Navigation blocks manage entity data through block attributes, not context.
+		// They should always be editable when bound to core/post-data.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
-			return false;
+			return true;
 		}
 
 		// Lock editing in query loop.
