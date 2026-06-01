@@ -34,7 +34,17 @@ function gutenberg_block_bindings_term_data_get_value( array $source_args, $bloc
 		true
 	);
 
-	if ( $is_navigation_block ) {
+	$term_id  = null;
+	$taxonomy = '';
+
+	if ( ! empty( $source_args['id'] ) && ! empty( $source_args['taxonomy'] ) ) {
+		$term_id  = (int) $source_args['id'];
+		$taxonomy = $source_args['taxonomy'];
+		// Align with LinkControl / navigation attribute shorthand.
+		if ( 'tag' === $taxonomy ) {
+			$taxonomy = 'post_tag';
+		}
+	} elseif ( $is_navigation_block ) {
 		// Navigation blocks: read from block attributes
 		$term_id = $block_instance->attributes['id'] ?? null;
 		$type    = $block_instance->attributes['type'] ?? '';

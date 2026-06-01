@@ -30,6 +30,17 @@ const postDataFields = [
 ];
 
 /**
+ * @param {Object} args Binding args.
+ * @return {string} Field key (`field` or legacy `key`).
+ */
+function getPostDataFieldKey( args ) {
+	if ( args?.field ) {
+		return args.field;
+	}
+	return args?.key ?? '';
+}
+
+/**
  * @type {WPBlockBindingsSource}
  */
 export default {
@@ -43,42 +54,56 @@ export default {
 		const blockName = getBlockName( clientId );
 		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
-		let postId, postType;
-
-		if ( isNavigationBlock ) {
-			// Navigation blocks: read from block attributes
-			const blockAttributes = getBlockAttributes( clientId );
-			postId = blockAttributes?.id;
-			postType = blockAttributes?.type;
-		} else {
-			// All other blocks: use context
-			postId = context?.postId;
-			postType = context?.postType;
-		}
-
 		const { getEditedEntityRecord } = select( coreDataStore );
-		const entityDataValues = getEditedEntityRecord(
-			'postType',
-			postType,
-			postId
-		);
+
+		/**
+		 * Resolves which post record to use for a single binding. When `args.id`
+		 * and `args.postType` are set (e.g. Button block entity links), those
+		 * identify the post. `postType` is required in that path because the
+		 * `core-data` package stores posts under ( 'postType', postTypeSlug, id );
+		 * getEditedEntityRecord cannot look up a post by numeric id alone.
+		 *
+		 * @param {Object} binding Single attribute binding.
+		 * @return {Object|undefined} Edited entity record or undefined.
+		 */
+		const getEntityDataValuesForBinding = ( binding ) => {
+			const args = binding.args ?? {};
+			let postId;
+			let postType;
+
+			if ( args.id !== undefined && args.id !== null && args.postType ) {
+				postId = args.id;
+				postType = args.postType;
+			} else if ( isNavigationBlock ) {
+				const blockAttributes = getBlockAttributes( clientId );
+				postId = blockAttributes?.id;
+				postType = blockAttributes?.type;
+			} else {
+				postId = context?.postId;
+				postType = context?.postType;
+			}
+
+			return getEditedEntityRecord( 'postType', postType, postId );
+		};
 
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
+			const fieldKey = getPostDataFieldKey( binding.args );
 			const postDataField = postDataFields.find(
-				( field ) => field.args.field === binding.args.field
+				( field ) => field.args.field === fieldKey
 			);
+
+			const entityDataValues = getEntityDataValuesForBinding( binding );
 
 			if ( ! postDataField ) {
 				// If the field is unknown, return the field name.
-				newValues[ attributeName ] = binding.args.field;
+				newValues[ attributeName ] = fieldKey;
 			} else if ( ! entityDataValues ) {
 				// If the entity data does not exist, return the field label.
 				newValues[ attributeName ] = postDataField.label;
 			} else {
 				// If the entity data exists, return the entity value.
-				newValues[ attributeName ] =
-					entityDataValues[ binding.args.field ];
+				newValues[ attributeName ] = entityDataValues[ fieldKey ];
 			}
 		}
 		return newValues;
@@ -95,7 +120,8 @@ export default {
 		}
 		const newData = {};
 		Object.values( bindings ).forEach( ( { args, newValue } ) => {
-			newData[ args.field ] = newValue;
+			const field = getPostDataFieldKey( args );
+			newData[ field ] = newValue;
 		} );
 
 		dispatch( coreDataStore ).editEntityRecord(
@@ -105,7 +131,7 @@ export default {
 			newData
 		);
 	},
-	canUserEditValue( { select, context } ) {
+	canUserEditValue( { select, context, args } ) {
 		const { getBlockName, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
@@ -114,6 +140,12 @@ export default {
 		// Navigaton block types are read-only.
 		// See https://github.com/WordPress/gutenberg/pull/72165.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			return false;
+		}
+
+		// Bindings that pin a specific post via args are not editable through
+		// contextual post editing (setValues still targets context post only).
+		if ( args?.id !== undefined && args?.id !== null ) {
 			return false;
 		}
 

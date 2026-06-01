@@ -66,35 +66,63 @@ export default {
 		const blockName = getBlockName( clientId );
 		const isNavigationBlock = NAVIGATION_BLOCK_TYPES.includes( blockName );
 
-		let termDataValues;
+		/**
+		 * Resolves term data for one binding. When `args.id` and `args.taxonomy`
+		 * are set, those identify the term (same idea as post bindings: taxonomy
+		 * slug is required because getEntityRecord( 'taxonomy', taxonomy, id )
+		 * needs the taxonomy name, not just a numeric id.
+		 *
+		 * @param {Object} binding Single attribute binding.
+		 * @return {Object|undefined} Term record or context termData.
+		 */
+		const getTermDataForBinding = ( binding ) => {
+			const args = binding.args ?? {};
 
-		if ( isNavigationBlock ) {
-			// Navigation blocks: read from block attributes
-			const blockAttributes = getBlockAttributes( clientId );
-			const typeFromAttributes = blockAttributes?.type;
-			const taxonomy =
-				typeFromAttributes === 'tag' ? 'post_tag' : typeFromAttributes;
-			termDataValues = getEntityRecord(
-				'taxonomy',
-				taxonomy,
-				blockAttributes?.id
-			);
-		} else if ( context.termId && context.taxonomy ) {
-			// All other blocks: use context
-			termDataValues = getEntityRecord(
-				'taxonomy',
-				context.taxonomy,
-				context.termId
-			);
-		}
+			if ( args.id !== undefined && args.id !== null && args.taxonomy ) {
+				const taxonomy =
+					args.taxonomy === 'tag' ? 'post_tag' : args.taxonomy;
+				return getEntityRecord( 'taxonomy', taxonomy, args.id );
+			}
 
-		// Fall back to context termData if available.
-		if ( ! termDataValues && context?.termData && ! isNavigationBlock ) {
-			termDataValues = context.termData;
-		}
+			if ( isNavigationBlock ) {
+				const blockAttributes = getBlockAttributes( clientId );
+				const typeFromAttributes = blockAttributes?.type;
+				const taxonomy =
+					typeFromAttributes === 'tag'
+						? 'post_tag'
+						: typeFromAttributes;
+				return getEntityRecord(
+					'taxonomy',
+					taxonomy,
+					blockAttributes?.id
+				);
+			}
+
+			let termDataValues;
+			if ( context.termId && context.taxonomy ) {
+				termDataValues = getEntityRecord(
+					'taxonomy',
+					context.taxonomy,
+					context.termId
+				);
+			}
+
+			// Fall back to context termData if available (e.g. record not loaded yet).
+			if (
+				! termDataValues &&
+				context?.termData &&
+				! isNavigationBlock
+			) {
+				return context.termData;
+			}
+
+			return termDataValues;
+		};
 
 		const newValues = {};
 		for ( const [ attributeName, binding ] of Object.entries( bindings ) ) {
+			const termDataValues = getTermDataForBinding( binding );
+
 			const termDataField = termDataFields.find(
 				( field ) => field.args.field === binding.args.field
 			);
@@ -125,7 +153,7 @@ export default {
 		// Terms are typically not editable through block bindings in most contexts.
 		return false;
 	},
-	canUserEditValue( { select, context } ) {
+	canUserEditValue( { select, context, args } ) {
 		const { getBlockName, getSelectedBlockClientId } =
 			select( blockEditorStore );
 
@@ -135,6 +163,10 @@ export default {
 		// Navigaton block types are read-only.
 		// See https://github.com/WordPress/gutenberg/pull/72165.
 		if ( NAVIGATION_BLOCK_TYPES.includes( blockName ) ) {
+			return false;
+		}
+
+		if ( args?.id !== undefined && args?.id !== null ) {
 			return false;
 		}
 
