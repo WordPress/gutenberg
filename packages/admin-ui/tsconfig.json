@@ -10,6 +10,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../private-apis" },
 		{ "path": "../route" },
+		{ "path": "../style-runtime" },
 		{ "path": "../ui" }
 	]
 }

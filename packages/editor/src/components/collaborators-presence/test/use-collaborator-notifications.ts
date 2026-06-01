@@ -52,7 +52,8 @@ jest.mock( '@wordpress/core-data', () => ( {
 } ) );
 
 jest.mock( '../../../lock-unlock', () => ( {
-	unlock: jest.fn( () => ( {
+	unlock: jest.fn( ( value: unknown ) => ( {
+		...( value as object ),
 		useOnCollaboratorJoin: jest.fn(
 			( postId: unknown, _postType: unknown, callback: Function ) => {
 				lastJoinPostId = postId;

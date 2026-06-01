@@ -24,7 +24,7 @@ const meta: Meta< typeof ScrollLock > = {
 		controls: { hideNoControlsWarning: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

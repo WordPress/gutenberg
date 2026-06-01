@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import {
-	Icon,
+	Icon as WCIcon,
 	PanelBody,
 	ToggleControl,
 	RangeControl,
@@ -265,7 +265,7 @@ class LatestPostsEdit extends Component {
 			>
 				<View style={ blockStyle }>
 					{ isSelected && this.getInspectorControls() }
-					<Icon icon={ icon } { ...iconStyle } />
+					<WCIcon icon={ icon } { ...iconStyle } />
 					<Text style={ titleStyle }>{ blockTitle }</Text>
 					<Text style={ styles.latestPostBlockSubtitle }>
 						{ __( 'CUSTOMIZE' ) }

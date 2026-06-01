@@ -168,8 +168,7 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
-	const { closeModal, frameRef, frameStyle, overlayClassname } =
-		useModalExitAnimation();
+	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -259,10 +258,7 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ {
-						...frameStyle,
-						...style,
-					} }
+					style={ style }
 					ref={ useMergeRefs( [
 						frameRef,
 						constrainedTabbingRef,

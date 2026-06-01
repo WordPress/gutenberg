@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/guidelines.php';
 require_once __DIR__ . '/class-gutenberg-guidelines-post-type.php';
+require_once __DIR__ . '/class-gutenberg-guidelines-rest-controller.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-revisions-controller.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php';
 
@@ -19,6 +20,24 @@ require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php'
  * The standard /wp/v2/guidelines collection uses the default posts controller.
  */
 add_action( 'init', array( 'Gutenberg_Guidelines_Post_Type', 'register' ) );
+
+/*
+ * Ensure the post type is registered before any other `rest_api_init` callback
+ * runs. `init` normally fires before `rest_api_init`, but anything that calls
+ * `rest_get_server()` early (e.g. from `plugins_loaded`) fires `rest_api_init`
+ * before `init` priority 10. The callbacks below — both `register_post_meta`
+ * and the controller instantiations — dereference the post type object and
+ * would fatal (or trip `_doing_it_wrong`) without this guard.
+ */
+add_action(
+	'rest_api_init',
+	static function () {
+		if ( ! post_type_exists( Gutenberg_Guidelines_Post_Type::POST_TYPE ) ) {
+			Gutenberg_Guidelines_Post_Type::register();
+		}
+	},
+	1
+);
 
 // Register post meta once the REST API loads and the block registry is available.
 add_action( 'rest_api_init', array( 'Gutenberg_Guidelines_Post_Type', 'register_post_meta' ) );
@@ -38,34 +57,5 @@ add_action(
 
 		$content_revisions_controller = new Gutenberg_Content_Guidelines_Revisions_Controller();
 		$content_revisions_controller->register_routes();
-	}
-);
-
-add_action(
-	'current_screen',
-	function ( $screen ) {
-		if ( Gutenberg_Guidelines_Post_Type::POST_TYPE !== $screen->post_type ) {
-			return;
-		}
-
-		// Disable the block editor for this post type.
-		add_filter( 'use_block_editor_for_post_type', '__return_false' );
-
-		// Remove the media button.
-		remove_action( 'media_buttons', 'media_buttons' );
-
-		// Use a plain textarea by disabling TinyMCE and Quicktags.
-		add_filter(
-			'wp_editor_settings',
-			static function ( $settings, $editor_id ) {
-				if ( 'content' === $editor_id ) {
-					$settings['tinymce']   = false;
-					$settings['quicktags'] = false;
-				}
-				return $settings;
-			},
-			10,
-			2
-		);
 	}
 );

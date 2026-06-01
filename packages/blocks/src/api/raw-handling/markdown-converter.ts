@@ -36,6 +36,25 @@ function bulletsToAsterisks( text: string ): string {
 }
 
 /**
+ * Escapes an ordered-list marker at the start of single-line input so prose
+ * like "18. May 2021" isn't parsed as `<ol start="18"><li>May 2021</li></ol>`.
+ *
+ * @param text The potential Markdown text to correct.
+ */
+function escapeSingleLineOrderedListMarker( text: string ): string {
+	if ( text.includes( '\n' ) ) {
+		return text;
+	}
+	return text.replace( /^(\d+)\.(\s)/, '$1\\.$2' );
+}
+
+const correctors = [
+	escapeSingleLineOrderedListMarker,
+	bulletsToAsterisks,
+	slackMarkdownVariantCorrector,
+];
+
+/**
  * Converts a piece of text into HTML based on any Markdown present.
  * Also decodes any encoded HTML.
  *
@@ -45,6 +64,9 @@ function bulletsToAsterisks( text: string ): string {
  */
 export default function markdownConverter( text: string ): string {
 	return converter.makeHtml(
-		slackMarkdownVariantCorrector( bulletsToAsterisks( text ) )
+		correctors.reduce(
+			( current, corrector ) => corrector( current ),
+			text
+		)
 	);
 }

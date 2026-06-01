@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from '@terrazzo/parser';

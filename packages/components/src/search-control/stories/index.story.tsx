@@ -26,7 +26,7 @@ const meta: Meta< typeof SearchControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `SearchControl` in `@wordpress/ui`, but continue using for now.',
 		},
