@@ -295,7 +295,6 @@ function runCloseMorphAnimation(
 
 	animation.onfinish = () => {
 		phantom.remove();
-		closeBtn.style.opacity = '';
 		activeMorphAnimations.delete( nav );
 		onComplete();
 	};
