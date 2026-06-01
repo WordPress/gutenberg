@@ -146,6 +146,17 @@ function getBlockManifest( jsonPaths, catPaths ) {
 		}
 
 		const blockJson = require( join( __dirname, '..', '..', jsonPath ) );
+
+		// Deprecated blocks are excluded from the manifest — they appear in the
+		// sidebar via the deprecation notice on the main Core Blocks Reference page.
+		if (
+			( blockJson.description || '' ).startsWith(
+				'This block is deprecated.'
+			)
+		) {
+			return;
+		}
+
 		const title = blockJson.title || pascalCase( blockDir );
 		const category = blockJson.category || 'uncategorized';
 

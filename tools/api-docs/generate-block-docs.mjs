@@ -933,7 +933,7 @@ function generateDeprecatedNotice( dirs ) {
 			.replace( 'This block is deprecated.', '' )
 			.trim();
 		const note = replacement ? ` — ${ replacement }` : '';
-		const url = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ blockDir }/`;
+		const url = `${ SOURCE_URL_BASE }${ blockDir }/`;
 		lines.push( `- [${ title }](${ url }) (\`${ name }\`)${ note }` );
 	} );
 
