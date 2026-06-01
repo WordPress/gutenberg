@@ -42,7 +42,7 @@ const DEFAULT_KIND = 'subtitles';
 
 const KIND_OPTIONS = [
 	{ label: __( 'Subtitles' ), value: 'subtitles' },
-	{ label: __( 'Captions' ), value: 'captions' },
+	{ label: _x( 'Captions', 'descriptive subtitles' ), value: 'captions' },
 	{ label: __( 'Descriptions' ), value: 'descriptions' },
 	{ label: __( 'Chapters' ), value: 'chapters' },
 	{ label: __( 'Metadata' ), value: 'metadata' },
@@ -113,7 +113,7 @@ function SingleTrackEditor( {
 			spacing="4"
 		>
 			<span className="block-library-video-tracks-editor__single-track-editor-edit-track-label">
-				{ __( 'Edit track' ) }
+				{ _x( 'Edit track', 'text tracks' ) }
 			</span>
 			<span>
 				{ __( 'File' ) }: <b>{ fileName }</b>
@@ -129,7 +129,7 @@ function SingleTrackEditor( {
 					}
 					label={ __( 'Label' ) }
 					value={ label }
-					help={ __( 'Title of track' ) }
+					help={ _x( 'Title of track', 'text tracks' ) }
 				/>
 				<TextControl
 					__next40pxDefaultSize
@@ -160,7 +160,7 @@ function SingleTrackEditor( {
 				/>
 				<ToggleControl
 					__next40pxDefaultSize
-					label={ __( 'Set as default track' ) }
+					label={ _x( 'Set as default track', 'text tracks' ) }
 					checked={ isDefaultTrack }
 					disabled={ ! allowSettingDefault }
 					onChange={ ( defaultTrack ) =>
@@ -177,7 +177,7 @@ function SingleTrackEditor( {
 						variant="link"
 						onClick={ onRemove }
 					>
-						{ __( 'Remove track' ) }
+						{ _x( 'Remove track', 'text tracks' ) }
 					</Button>
 					<Button
 						__next40pxDefaultSize
@@ -335,7 +335,7 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 							/>
 							<MenuGroup
 								className="block-library-video-tracks-editor__add-tracks-container"
-								label={ __( 'Add tracks' ) }
+								label={ _x( 'Add tracks', 'text tracks' ) }
 							>
 								<MediaUploadCheck>
 									<MediaUpload
