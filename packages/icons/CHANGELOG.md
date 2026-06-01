@@ -51,7 +51,7 @@
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
 ### Enhancements
 
--   Redraw 34 icons as stroke-based for variable stroke-width support (per [#78774](https://github.com/WordPress/gutenberg/pull/78774)): `addCard`, `addTemplate`, `cancelCircleFilled`, `caution`, `cautionFilled`, `code`, `commentAuthorAvatar`, `cover`, `currencyDollar`, `currencyEuro`, `currencyPound`, `drafts`, `help`, `helpFilled`, `image`, `info`, `lifesaver`, `link`, `linkOff`, `navigation`, `notAllowed`, `paragraph`, `pending`, `plusCircle`, `plusCircleFilled`, `published`, `scheduled`, `siteLogo`, `starEmpty`, `starFilled`, `starHalf`, `styles`, `square`, `timeToRead`, `tip`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Redraw 35 icons as stroke-based for variable stroke-width support, and introduce the `vector-effect="non-scaling-stroke"` convention so stroke weight stays consistent across icon sizes (originally landed in [#78774](https://github.com/WordPress/gutenberg/pull/78774), reverted in [#78854](https://github.com/WordPress/gutenberg/pull/78854) due to CSS-override regressions, re-introduced here with the resilience fix): `addCard`, `addTemplate`, `cancelCircleFilled`, `caution`, `cautionFilled`, `code`, `commentAuthorAvatar`, `cover`, `currencyDollar`, `currencyEuro`, `currencyPound`, `drafts`, `help`, `helpFilled`, `image`, `info`, `lifesaver`, `link`, `linkOff`, `navigation`, `notAllowed`, `paragraph`, `pending`, `plusCircle`, `plusCircleFilled`, `published`, `scheduled`, `siteLogo`, `square`, `starEmpty`, `starFilled`, `starHalf`, `styles`, `time`, `tip`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
 
 ### Breaking Changes
 
