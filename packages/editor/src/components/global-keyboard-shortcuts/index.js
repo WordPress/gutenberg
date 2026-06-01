@@ -5,6 +5,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { ALL_NOTES_SIDEBAR } from '../collab-sidebar/constants';
 
 /**
  * Internal dependencies
@@ -115,6 +116,17 @@ export default function EditorKeyboardShortcuts() {
 				? 'edit-post/block'
 				: 'edit-post/document';
 			enableComplementaryArea( 'core', sidebarToOpen );
+		}
+	} );
+
+	useShortcut( 'core/editor/toggle-notes-panel', ( event ) => {
+		event.preventDefault();
+		const isNotesAreaOpen =
+			getActiveComplementaryArea( 'core' ) === ALL_NOTES_SIDEBAR;
+		if ( isNotesAreaOpen ) {
+			disableComplementaryArea( 'core' );
+		} else {
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 		}
 	} );
 

@@ -120,6 +120,16 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/editor/toggle-notes-panel',
+			category: 'global',
+			description: __( 'Show or hide the Notes panel.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: '.',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/editor/next-region',
 			category: 'global',
 			description: __( 'Navigate to the next part of the editor.' ),
