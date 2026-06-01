@@ -77,6 +77,13 @@ const config: Config = {
 					],
 				},
 				{
+					mode: 'corner-radius-sm',
+					selectors: [
+						'[data-wpds-corner-radius="sm"]',
+						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="sm"])',
+					],
+				},
+				{
 					mode: 'corner-radius-md',
 					selectors: [
 						'[data-wpds-corner-radius="md"]',

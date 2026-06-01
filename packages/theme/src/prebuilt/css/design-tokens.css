@@ -346,6 +346,18 @@
 	--wpds-border-radius-lg: 0;
 }
 
+[data-wpds-corner-radius='sm'],
+:root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='sm'] ) {
+	/* Extra small radius */
+	--wpds-border-radius-xs: 1px;
+	/* Small radius */
+	--wpds-border-radius-sm: 2px;
+	/* Medium radius */
+	--wpds-border-radius-md: 4px;
+	/* Large radius */
+	--wpds-border-radius-lg: 8px;
+}
+
 [data-wpds-corner-radius='md'],
 :root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='md'] ) {
 	/* Extra small radius */

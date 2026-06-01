@@ -71,9 +71,7 @@ export const ThemeProvider = ( {
 			<div
 				data-wpds-theme-provider-id={ instanceId }
 				data-wpds-root-provider={ isRoot }
-				data-wpds-corner-radius={
-					cornerRadiusPreset === 'sm' ? undefined : cornerRadiusPreset
-				}
+				data-wpds-corner-radius={ cornerRadiusPreset }
 				className={ styles.root }
 			>
 				<ThemeContext.Provider value={ contextValue }>
