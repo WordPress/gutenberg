@@ -12,6 +12,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { useBlockLibraryPrivateApis } from '@wordpress/lazy-editor';
 
 /**
  * Internal dependencies
@@ -85,6 +86,7 @@ export default function NavigationMenuContent( {
 		},
 		[ rootClientId ]
 	);
+
 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -104,6 +106,9 @@ export default function NavigationMenuContent( {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
+	const blockLibraryPrivateApis = useBlockLibraryPrivateApis();
+	const NavigationLinkUI = blockLibraryPrivateApis?.NavigationLinkUI;
+
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
@@ -113,7 +118,8 @@ export default function NavigationMenuContent( {
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender={ false }
+					additionalBlockContent={ NavigationLinkUI }
+					showAppender
 					isExpanded
 				/>
 			) }

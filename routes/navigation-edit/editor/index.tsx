@@ -7,6 +7,10 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
 // @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
+import {
+	// @ts-expect-error - No type declarations available for this export
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+} from '@wordpress/core-data';
 import { useEditorAssets } from '@wordpress/lazy-editor';
 
 /**
@@ -28,6 +32,16 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 		return [ createBlock( 'core/navigation', { ref: id } ) ];
 	}, [ assetsReady, id ] );
 
+	const settings = useMemo(
+		() => ( {
+			__experimentalFetchLinkSuggestions: (
+				search: string,
+				searchOptions: Record< string, unknown >
+			) => fetchLinkSuggestions( search, searchOptions, {} ),
+		} ),
+		[]
+	);
+
 	if ( ! assetsReady || ! blocks.length ) {
 		return (
 			<div
@@ -45,7 +59,7 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 
 	return (
 		<BlockEditorProvider
-			settings={ {} }
+			settings={ settings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }
