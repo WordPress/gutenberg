@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
 ## 14.47.0 (2026-05-27)
 
 ### Enhancements

@@ -39,10 +39,10 @@ To get the most accurate results, it's is important to use the exact same versio
 To achieve that the command first prepares the following folder structure:
 
     │
-    ├── tests/packages/e2e-tests/specs/performance/*
+    ├── test/performance/specs/*
     |   The actual performance tests to run
     │
-    ├── tests/test/emptytheme
+    ├── test/emptytheme
     |   The theme used for the tests environment. (site editor)
     │
     │── envs/branch1/.wp-env.json
