@@ -85,7 +85,7 @@ test.describe( 'Block Locking', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Lock' } )
+				.getByRole( 'button', { name: 'Lock', exact: true } )
 		).toBeFocused();
 
 		expect( await editor.getEditedPostContent() )
