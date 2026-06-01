@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { useState } from '@wordpress/element';
-import { Icon, wordpress } from '@wordpress/icons';
+import { wordpress } from '@wordpress/icons';
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import {
 	Badge,
 	Button,
 	Card,
+	Icon,
 	Link,
 	Notice,
 	Stack,
