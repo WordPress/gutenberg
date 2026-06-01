@@ -23,6 +23,7 @@ export interface FontLibraryState {
 	installFonts: ( fonts: FontFamily[] ) => Promise< void >;
 	uninstallFontFamily: ( fontFamily: FontFamily ) => Promise< {
 		deleted: boolean;
+		deletedFontFamily: boolean;
 	} >;
 	// Additional properties found in the codebase
 	baseCustomFonts: FontFamily[];

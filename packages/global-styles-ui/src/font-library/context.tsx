@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useState, useEffect } from '@wordpress/element';
+import {
+	createContext,
+	useState,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 import {
 	useSelect,
 	useDispatch,
@@ -29,7 +34,11 @@ import type {
 /**
  * Internal dependencies
  */
-import { fetchInstallFontFamily } from './api';
+import {
+	fetchInstallFontFamily,
+	fetchDeleteFontFace,
+	invalidateFontFamilyCache,
+} from './api';
 import {
 	setUIValuesNeeded,
 	mergeFontFamilies,
@@ -67,7 +76,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 
 	const [ isInstalling, setIsInstalling ] = useState( false );
 
-	const { records: libraryPosts = [], isResolving: isResolvingLibrary } =
+	const { records: libraryPosts, isResolving: isResolvingLibrary } =
 		useEntityRecords< CollectionFontFamily >(
 			'postType',
 			'wp_font_family',
@@ -76,15 +85,36 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			}
 		);
 
+	const libraryPostsList = useMemo(
+		() => ( Array.isArray( libraryPosts ) ? libraryPosts : [] ),
+		[ libraryPosts ]
+	);
+
+	const [ cachedLibraryPosts, setCachedLibraryPosts ] = useState<
+		CollectionFontFamily[]
+	>( [] );
+
+	useEffect( () => {
+		if ( libraryPostsList.length > 0 ) {
+			setCachedLibraryPosts( libraryPostsList );
+		}
+	}, [ libraryPostsList ] );
+
+	const effectiveLibraryPosts =
+		isResolvingLibrary && cachedLibraryPosts.length > 0
+			? cachedLibraryPosts
+			: libraryPostsList;
+
 	const libraryFonts: FontFamilyPreset[] =
-		( libraryPosts || [] ).map( ( fontFamilyPost ) => {
+		( effectiveLibraryPosts || [] ).map( ( fontFamilyPost ) => {
 			return {
 				id: fontFamilyPost.id,
 				...( fontFamilyPost.font_family_settings || {} ),
 				fontFace:
-					fontFamilyPost?._embedded?.font_faces?.map(
-						( face ) => face.font_face_settings
-					) || [],
+					fontFamilyPost?._embedded?.font_faces?.map( ( face ) => ( {
+						id: String( face.id ),
+						...face.font_face_settings,
+					} ) ) || [],
 			};
 		} ) || [];
 
@@ -231,6 +261,9 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		return getActivatedFontsOutline( source )[ slug ] || [];
 	};
 
+	const getFontFaceKey = ( face: FontFace ) =>
+		`${ face.fontStyle ?? '' }${ face.fontWeight ?? '' }`;
+
 	async function installFonts( fontFamiliesToInstall: FontFamilyToUpload[] ) {
 		setIsInstalling( true );
 		try {
@@ -260,17 +293,17 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 						? fontFamilyRecords[ 0 ]
 						: null;
 
-				let installedFontFamily = fontFamilyPost
+				let installedFontFamily: FontFamily | null = fontFamilyPost
 					? {
-							id: fontFamilyPost.id,
+							id: String( fontFamilyPost.id ),
 							...fontFamilyPost.font_family_settings,
 							fontFace:
 								(
 									fontFamilyPost?._embedded?.font_faces ?? []
-								).map(
-									( face: CollectionFontFace ) =>
-										face.font_face_settings
-								) || [],
+								).map( ( face: CollectionFontFace ) => ( {
+									id: String( face.id ),
+									...face.font_face_settings,
+								} ) ) || [],
 					  }
 					: null;
 
@@ -282,6 +315,11 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 						makeFontFamilyFormData( fontFamilyToInstall ),
 						registry
 					);
+				}
+
+				const installedFontFamilyId = installedFontFamily.id;
+				if ( ! installedFontFamilyId ) {
+					throw new Error( __( 'Installed font family has no ID.' ) );
 				}
 
 				// Collect font faces that have already been installed (to be activated later)
@@ -308,7 +346,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 							( fontFaceToInstall ) =>
 								! checkFontFaceInstalled(
 									fontFaceToInstall,
-									installedFontFamily.fontFace
+									installedFontFamily.fontFace ?? []
 								)
 						);
 				}
@@ -320,8 +358,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				}[] = [];
 				if ( fontFamilyToInstall?.fontFace?.length ?? 0 > 0 ) {
 					const response = await batchInstallFontFaces(
-						// @ts-expect-error - Type mismatch: WpFontFamily.id can be number | string, but batchInstallFontFaces expects only string.
-						installedFontFamily.id,
+						installedFontFamilyId,
 						makeFontFacesFormData(
 							fontFamilyToInstall as FontFamily
 						),
@@ -341,7 +378,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 					// correct font information is used.
 					installedFontFamily.fontFace = [
 						...successfullyInstalledFontFaces,
-					];
+					] as FontFamily[ 'fontFace' ];
 
 					fontFamiliesToActivate.push( installedFontFamily );
 				}
@@ -363,7 +400,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 					await deleteEntityRecord(
 						'postType',
 						'wp_font_family',
-						installedFontFamily.id,
+						installedFontFamilyId,
 						{ force: true }
 					);
 				}
@@ -385,7 +422,6 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			if ( fontFamiliesToActivate.length > 0 ) {
 				// Activate the font family (add the font family to the global styles).
 				const activeFonts = activateCustomFontFamilies(
-					// @ts-expect-error - Type mismatch: items may have id as number | string, but FontFamily.id should be string | undefined.
 					fontFamiliesToActivate
 				);
 				// Save the global styles to the database.
@@ -411,20 +447,90 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			throw new Error( __( 'Font family to uninstall is not defined.' ) );
 		}
 		try {
-			// Uninstall the font family.
-			// (Removes the font files from the server and the posts from the database).
-			await deleteEntityRecord(
-				'postType',
-				'wp_font_family',
-				fontFamilyToUninstall.id,
-				{ force: true }
+			const fontFaces = fontFamilyToUninstall.fontFace ?? [];
+			const activeFaceKeys = new Set(
+				getFontFacesActivated(
+					fontFamilyToUninstall.slug,
+					fontFamilyToUninstall.source
+				)
 			);
 
-			// Deactivate the font family (remove from global styles).
-			const activeFonts = deactivateFontFamily( fontFamilyToUninstall );
+			const fontFacesToDelete = fontFaces.filter( ( face ) =>
+				activeFaceKeys.has( getFontFaceKey( face ) )
+			);
+
+			const shouldDeleteFontFamily =
+				! fontFaces.length ||
+				fontFacesToDelete.length === fontFaces.length;
+
+			if ( shouldDeleteFontFamily ) {
+				// Uninstall the font family.
+				// (Removes the font files from the server and the posts from the database).
+				const response = await deleteEntityRecord(
+					'postType',
+					'wp_font_family',
+					fontFamilyToUninstall.id,
+					{ force: true }
+				);
+
+				if ( ! response ) {
+					throw new Error(
+						__( 'Unable to delete the selected font family.' )
+					);
+				}
+			} else {
+				if ( ! fontFacesToDelete.length ) {
+					throw new Error(
+						__( 'Select at least one font variant to delete.' )
+					);
+				}
+
+				const missingIds = fontFacesToDelete.some(
+					( face ) => ! face.id
+				);
+				if ( missingIds ) {
+					throw new Error(
+						__(
+							'Unable to delete selected font variants. Please reload and try again.'
+						)
+					);
+				}
+
+				const responses = await Promise.all(
+					fontFacesToDelete.map( ( face ) =>
+						fetchDeleteFontFace(
+							fontFamilyToUninstall.id!,
+							face.id!
+						)
+					)
+				);
+
+				if ( responses.some( ( response ) => ! response ) ) {
+					throw new Error(
+						__(
+							'Unable to delete selected font variants. Please reload and try again.'
+						)
+					);
+				}
+			}
+
+			invalidateFontFamilyCache( registry );
+			await resolveSelect( coreStore ).getEntityRecords(
+				'postType',
+				'wp_font_family',
+				{
+					_embed: true,
+				}
+			);
+
+			// Deactivate the deleted font variants from global styles.
+			const activeFonts = deactivateFontFamily(
+				fontFamilyToUninstall,
+				shouldDeleteFontFamily ? undefined : fontFacesToDelete
+			);
 			// Save the global styles to the database.
 			await saveFontFamilies( activeFonts );
-			return { deleted: true };
+			return { deleted: true, deletedFontFamily: shouldDeleteFontFamily };
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error(
@@ -435,24 +541,62 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		}
 	}
 
-	const deactivateFontFamily = ( font: FontFamily ) => {
+	const deactivateFontFamily = (
+		font: FontFamily,
+		fontFacesToDeactivate?: FontFace[]
+	) => {
 		// If the user doesn't have custom fonts defined, include as custom fonts all the theme fonts
 		// We want to save as active all the theme fonts at the beginning
-		const initialCustomFonts = fontFamilies?.[ font.source ?? '' ] ?? [];
-		const newCustomFonts = initialCustomFonts.filter(
-			( f ) => f.slug !== font.slug
-		);
+		const source = font.source ?? '';
+		const initialCustomFonts = fontFamilies?.[ source ] ?? [];
+		const newCustomFonts =
+			fontFacesToDeactivate && fontFacesToDeactivate.length > 0
+				? initialCustomFonts.reduce< FontFamily[] >(
+						( acc, currentFont ) => {
+							if ( currentFont.slug !== font.slug ) {
+								acc.push( currentFont );
+								return acc;
+							}
+
+							const facesToDeactivate = new Set(
+								fontFacesToDeactivate.map( getFontFaceKey )
+							);
+							const remainingFaces = (
+								currentFont.fontFace ?? []
+							).filter(
+								( face ) =>
+									! facesToDeactivate.has(
+										getFontFaceKey( face )
+									)
+							);
+
+							if ( ! remainingFaces.length ) {
+								return acc;
+							}
+
+							acc.push( {
+								...currentFont,
+								fontFace: remainingFaces,
+							} );
+							return acc;
+						},
+						[]
+				  )
+				: initialCustomFonts.filter( ( f ) => f.slug !== font.slug );
 		const activeFonts = {
 			...fontFamilies,
-			[ font.source ?? '' ]: newCustomFonts,
+			[ source ]: newCustomFonts,
 		};
 		setFontFamilies( activeFonts );
 
-		if ( font.fontFace ) {
-			font.fontFace.forEach( ( face ) => {
-				unloadFontFaceInBrowser( face, 'all' );
-			} );
-		}
+		const facesToUnload =
+			fontFacesToDeactivate && fontFacesToDeactivate.length > 0
+				? fontFacesToDeactivate
+				: font.fontFace ?? [];
+
+		facesToUnload.forEach( ( face ) => {
+			unloadFontFaceInBrowser( face, 'all' );
+		} );
 		return activeFonts;
 	};
 
