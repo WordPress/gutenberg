@@ -10,11 +10,13 @@
  * which will be applied to the navigation markup in the front-end.
  *
  * @since 7.1.0
+ * @deprecated 23.0.0
  *
  * @param  array $context Navigation block context.
  * @return array Font size CSS classes and inline styles.
  */
 function block_core_shared_navigation_build_css_font_sizes( $context ) {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 23.0.0', 'Standard CSS cascade inheritance');
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
