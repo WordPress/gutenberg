@@ -297,6 +297,7 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		overlayMenuIconAnimation = true,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -809,6 +810,7 @@ function Navigation( {
 								overlayMenu: 'mobile',
 								hasIcon: true,
 								icon: 'handle',
+								overlayMenuIconAnimation: true,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -928,6 +930,7 @@ function Navigation( {
 						setOverlayMenuPreview={ setOverlayMenuPreview }
 						hasIcon={ hasIcon }
 						icon={ icon }
+						overlayMenuIconAnimation={ overlayMenuIconAnimation }
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
 						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
