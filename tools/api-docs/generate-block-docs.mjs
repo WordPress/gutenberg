@@ -934,8 +934,8 @@ function generateDeprecatedNotice( dirs ) {
 			.replace( 'This block is deprecated.', '' )
 			.trim();
 		const note = replacement ? ` — ${ replacement }` : '';
-		const readmeUrl = `../../../packages/block-library/src/${ blockDir }/README.md`;
-		lines.push( `- [${ title }](${ readmeUrl }) (\`${ name }\`)${ note }` );
+		const url = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-block-${ blockDir }/`;
+		lines.push( `- [${ title }](${ url }) (\`${ name }\`)${ note }` );
 	} );
 
 	lines.push( '' );

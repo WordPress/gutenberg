@@ -134,6 +134,8 @@ function getBlockManifest( jsonPaths, catPaths ) {
 	// Add block pages (parent: core-blocks-{category}).
 	// Block slugs use "core-block-" (singular) to avoid collisions
 	// with category slugs which use "core-blocks-" (plural).
+	// Deprecated blocks (description starts with "This block is deprecated.")
+	// are added directly under core-blocks, outside any category.
 	jsonPaths.forEach( ( jsonPath ) => {
 		const blockDir = path.basename( path.dirname( jsonPath ) );
 		const readmePath = `packages/block-library/src/${ blockDir }/README.md`;
@@ -145,13 +147,16 @@ function getBlockManifest( jsonPaths, catPaths ) {
 
 		const blockJson = require( join( __dirname, '..', '..', jsonPath ) );
 		const title = blockJson.title || pascalCase( blockDir );
+		const isDeprecated = ( blockJson.description || '' ).startsWith(
+			'This block is deprecated.'
+		);
 		const category = blockJson.category || 'uncategorized';
 
 		manifest.push( {
 			title,
 			slug: `core-block-${ blockDir }`,
 			markdown_source: `${ baseRepoUrl }/${ readmePath }`,
-			parent: `core-blocks-${ category }`,
+			parent: isDeprecated ? 'core-blocks' : `core-blocks-${ category }`,
 		} );
 	} );
 
