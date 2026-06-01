@@ -734,7 +734,7 @@ class WP_Navigation_Block_Renderer {
 		);
 
 		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect class="wp-block-navigation__hamburger-line" x="4" y="7.5" width="16" height="1.5" /><rect class="wp-block-navigation__hamburger-line" x="4" y="15" width="16" height="1.5" /></svg>';
+		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h16v1.5H4z"></path><path d="M4 15h16v1.5H4z"></path></svg>';
 		if ( isset( $attributes['icon'] ) ) {
 			if ( 'menu' === $attributes['icon'] ) {
 				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5z"></path><path d="M5 12.8h14v-1.5H5v1.5z"></path><path d="M5 19h14v-1.5H5V19z"></path></svg>';
@@ -863,7 +863,7 @@ class WP_Navigation_Block_Renderer {
 		$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $is_interactive, $attributes );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -875,28 +875,24 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param bool  $is_interactive Whether the block is interactive.
-	 * @param array $attributes     The block attributes.
+	 * @param bool $is_interactive Whether the block is interactive.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $is_interactive, $attributes ) {
+	private static function get_nav_element_directives( $is_interactive ) {
 		if ( ! $is_interactive ) {
 			return '';
 		}
-		$overlay_menu_icon_animation = ! isset( $attributes['overlayMenuIconAnimation'] ) ||
-			true === $attributes['overlayMenuIconAnimation'];
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context    = wp_interactivity_data_wp_context(
 			array(
-				'overlayOpenedBy'          => array(
+				'overlayOpenedBy' => array(
 					'click' => false,
 					'hover' => false,
 					'focus' => false,
 				),
-				'type'                     => 'overlay',
-				'roleAttribute'            => '',
-				'ariaLabel'                => __( 'Menu' ),
-				'overlayMenuIconAnimation' => $overlay_menu_icon_animation,
+				'type'            => 'overlay',
+				'roleAttribute'   => '',
+				'ariaLabel'       => __( 'Menu' ),
 			)
 		);
 		$nav_element_directives = '

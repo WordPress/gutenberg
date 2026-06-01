@@ -527,49 +527,6 @@ button.wp-block-navigation-item__content {
 		transform: translateY(0);
 	}
 }
-
-// Phantom element used for the hamburger-to-close flying morph animation.
-// A cloned hamburger button flies from its position to the close button
-// while the two horizontal lines rotate into an X shape.
-.wp-block-navigation__morph-phantom {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	background: transparent;
-	border: none;
-	padding: 0;
-	color: currentColor;
-
-	svg {
-		fill: currentColor;
-		display: block;
-		width: $navigation-icon-size;
-		height: $navigation-icon-size;
-	}
-
-	.wp-block-navigation__hamburger-line {
-		transform-box: fill-box;
-		transform-origin: center;
-	}
-
-	@media not (prefers-reduced-motion) {
-		.wp-block-navigation__hamburger-line {
-			transition: transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
-		}
-	}
-
-	// Morphed state: two horizontal lines become an X.
-	// Each line translates to the SVG center (y=12), rotates, and scales
-	// to match the close icon's longer diagonal arms (~21px vs 16px).
-	&.is-morphed .wp-block-navigation__hamburger-line:first-child {
-		transform: translateY(3.75px) rotate(45deg) scaleX(1.24);
-	}
-
-	&.is-morphed .wp-block-navigation__hamburger-line:last-child {
-		transform: translateY(-3.75px) rotate(-45deg) scaleX(1.24);
-	}
-}
-
 .wp-block-navigation__responsive-container {
 	display: none;
 	position: fixed;
