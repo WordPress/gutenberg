@@ -863,7 +863,7 @@ class WP_Navigation_Block_Renderer {
 		$wrapper_attributes = get_block_wrapper_attributes( $extra_attributes );
 
 		if ( $is_responsive_menu ) {
-			$nav_element_directives = static::get_nav_element_directives( $is_interactive, $attributes );
+			$nav_element_directives = static::get_nav_element_directives( $is_interactive );
 			$wrapper_attributes    .= ' ' . $nav_element_directives;
 		}
 
@@ -875,28 +875,24 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param bool  $is_interactive Whether the block is interactive.
-	 * @param array $attributes     The block attributes.
+	 * @param bool $is_interactive Whether the block is interactive.
 	 * @return string the directives for the navigation element.
 	 */
-	private static function get_nav_element_directives( $is_interactive, $attributes ) {
+	private static function get_nav_element_directives( $is_interactive ) {
 		if ( ! $is_interactive ) {
 			return '';
 		}
-		$overlay_menu_icon_animation = ! isset( $attributes['overlayMenuIconAnimation'] ) ||
-			true === $attributes['overlayMenuIconAnimation'];
 		// When adding to this array be mindful of security concerns.
 		$nav_element_context    = wp_interactivity_data_wp_context(
 			array(
-				'overlayOpenedBy'           => array(
+				'overlayOpenedBy' => array(
 					'click' => false,
 					'hover' => false,
 					'focus' => false,
 				),
-				'type'                      => 'overlay',
-				'roleAttribute'             => '',
-				'ariaLabel'                 => __( 'Menu' ),
-				'overlayMenuIconAnimation'  => $overlay_menu_icon_animation,
+				'type'            => 'overlay',
+				'roleAttribute'   => '',
+				'ariaLabel'       => __( 'Menu' ),
 			)
 		);
 		$nav_element_directives = '

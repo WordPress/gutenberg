@@ -3,7 +3,6 @@
  */
 import {
 	PanelBody,
-	ToggleControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -29,7 +28,6 @@ import OverlayPreview from './overlay-preview';
  * @param {Function} props.setOverlayMenuPreview     Function to toggle overlay menu preview.
  * @param {boolean}  props.hasIcon                   Whether the overlay menu has an icon.
  * @param {string}   props.icon                      Icon type for overlay menu.
- * @param {boolean}  props.overlayMenuIconAnimation  Whether the overlay menu icon animates.
  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
@@ -46,7 +44,6 @@ export default function OverlayPanel( {
 	setOverlayMenuPreview,
 	hasIcon,
 	icon,
-	overlayMenuIconAnimation,
 	overlayMenuPreviewClasses,
 	overlayMenuPreviewId,
 	isResponsive,
@@ -73,19 +70,6 @@ export default function OverlayPanel( {
 						setAttributes={ setAttributes }
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
 						overlayMenuPreviewId={ overlayMenuPreviewId }
-					/>
-				) }
-
-				{ overlayMenu !== 'never' && hasIcon && icon === 'handle' && (
-					<ToggleControl
-						__nextHasNoMarginBottom
-						checked={ overlayMenuIconAnimation }
-						label={ __( 'Animate menu icon' ) }
-						onChange={ ( value ) =>
-							setAttributes( {
-								overlayMenuIconAnimation: value,
-							} )
-						}
 					/>
 				) }
 

@@ -67,10 +67,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"overlayMenuIconAnimation": {
-			"type": "boolean",
-			"default": true
-		},
 		"__unstableLocation": {
 			"type": "string"
 		},
