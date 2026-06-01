@@ -120,6 +120,8 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 									'var(--wpds-color-bg-surface-neutral-weak)',
 								padding:
 									'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
+								borderInlineEnd:
+									'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
 							} }
 						>
 							<Text
