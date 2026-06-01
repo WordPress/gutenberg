@@ -9,8 +9,8 @@ const path = require( 'path' );
  */
 const { getRootManifest } = require( './manifest' );
 
-const tocFileInput = path.resolve( __dirname, '../toc.json' );
-const manifestOutput = path.resolve( __dirname, '../manifest.json' );
+const tocFileInput = path.resolve( __dirname, '../../docs/toc.json' );
+const manifestOutput = path.resolve( __dirname, '../../docs/manifest.json' );
 
 // Process TOC file and generate manifest handbook.
 fs.writeFileSync(
