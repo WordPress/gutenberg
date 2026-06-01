@@ -48,8 +48,11 @@ const { state } = store(
 
 				const existing = playerState.get( ref );
 
-				// Skip if we already initialized with this exact URL.
-				if ( existing?.url === track.url ) {
+				// Skip if we already initialized with this exact URL and track ID.
+				if (
+					existing?.url === track.url &&
+					existing?.currentId === context.currentId
+				) {
 					return;
 				}
 
@@ -83,6 +86,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			} )
 			.then( () => {
 				existing.url = track.url;
+				existing.currentId = context.currentId;
 				if ( shouldAutoPlay ) {
 					existing.instance.play()?.catch( logPlayError );
 				}
@@ -120,6 +124,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	// Store state for cleanup, including instance for loadTrack reuse.
 	playerState.set( ref, {
 		url: track.url,
+		currentId: context.currentId,
 		instance: player.instance,
 		destroy: player.destroy,
 	} );

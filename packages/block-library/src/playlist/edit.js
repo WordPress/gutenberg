@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -57,6 +57,15 @@ const PlaylistEdit = ( {
 		showArtists,
 		currentTrack,
 	} = attributes;
+	// Track whether the player has initialized so we can autoplay on
+	// subsequent track changes (but not on the initial load).
+	const hasInitializedRef = useRef( false );
+	useEffect( () => {
+		if ( currentTrack ) {
+			hasInitializedRef.current = true;
+		}
+	}, [ currentTrack ] );
+
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -119,9 +128,9 @@ const PlaylistEdit = ( {
 				updateBlockAttributes( clientId, { currentTrack: null } );
 			}
 		} else if (
-			// If the currentTrack is not the first track, update it to the first track.
-			firstTrackId &&
-			firstTrackId !== currentTrack
+			// Only set to first track if current track is unset or no longer exists.
+			! currentTrack ||
+			! tracks.some( ( t ) => t.uniqueId === currentTrack )
 		) {
 			updateBlockAttributes( clientId, { currentTrack: firstTrackId } );
 		}
@@ -368,13 +377,15 @@ const PlaylistEdit = ( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
-				<Disabled isDisabled={ ! isSelected }>
+				<Disabled isDisabled={ ! hasAnySelected }>
 					<WaveformPlayer
+						key={ currentTrack }
 						src={ currentTrackData?.src }
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
 						onEnded={ onTrackEnded }
+						autoPlay={ hasInitializedRef.current }
 					/>
 				</Disabled>
 				{ showTracklist && (

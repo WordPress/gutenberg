@@ -23,7 +23,14 @@ import { initWaveformPlayer } from './waveform-utils';
  * @param {Function} props.onEnded - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
  */
-export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
+export function WaveformPlayer( {
+	src,
+	title,
+	artist,
+	image,
+	onEnded,
+	autoPlay,
+} ) {
 	// Store onEnded in a ref so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
 	// includes an unstable array), which would cause useRefEffect to destroy
@@ -31,6 +38,12 @@ export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
 	// during editor resizes.
 	const onEndedRef = useRef( onEnded );
 	onEndedRef.current = onEnded;
+
+	// Store autoPlay in a ref so it can be read during init without being
+	// a useRefEffect dependency. The component is remounted via key={currentTrack}
+	// when the track changes, so the value is always correct at mount time.
+	const autoPlayRef = useRef( autoPlay );
+	autoPlayRef.current = autoPlay;
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -50,6 +63,7 @@ export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
 					title,
 					artist,
 					image,
+					autoPlay: autoPlayRef.current,
 					onEnded: () => onEndedRef.current?.(),
 				} );
 				playerDestroy = destroy;

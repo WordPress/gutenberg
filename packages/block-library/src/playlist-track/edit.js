@@ -7,8 +7,9 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { isBlobURL } from '@wordpress/blob';
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
+	store as blockEditorStore,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	MediaUpload,
@@ -26,7 +27,7 @@ import {
 	BaseControl,
 	Spinner,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
@@ -40,7 +41,13 @@ import { useUploadMediaFromBlobURL } from '../utils/hooks';
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 const ALBUM_COVER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
-const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
+const PlaylistTrackEdit = ( {
+	attributes,
+	setAttributes,
+	context,
+	clientId,
+	isSelected,
+} ) => {
 	// Note that 'id' is the media attachment ID, while 'uniqueId' is a unique identifier.
 	// This is to make sure that the same media can be used in more than one track.
 	const { id, uniqueId, src, album, artist, image, length, title } =
@@ -51,6 +58,27 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 	const imageButton = useRef();
 	const blockProps = useBlockProps();
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	// Find the parent playlist block.
+	const parentPlaylistId = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockParentsByBlockName(
+				clientId,
+				'core/playlist'
+			)[ 0 ],
+		[ clientId ]
+	);
+
+	// When this track is selected, make it the current track in the parent playlist.
+	useEffect( () => {
+		if ( isSelected && uniqueId && parentPlaylistId ) {
+			updateBlockAttributes( parentPlaylistId, {
+				currentTrack: uniqueId,
+			} );
+		}
+	}, [ isSelected, uniqueId, parentPlaylistId, updateBlockAttributes ] );
+
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
