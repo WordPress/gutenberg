@@ -24,9 +24,6 @@ add_filter(
 		) {
 			$attributes[] = 'url';
 		}
-		if ( 'core/preformatted' === $block_type && ! in_array( 'content', $attributes, true ) ) {
-			$attributes[] = 'content';
-		}
 		return $attributes;
 	},
 	10,
