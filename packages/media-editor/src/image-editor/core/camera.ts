@@ -8,6 +8,12 @@ import { mat2d, vec2 } from 'gl-matrix';
  */
 import type { CropperState, NormalizedPoint, Size, Camera } from './types';
 import { degreesToRadians } from './math/rotation';
+import {
+	isSafeNumber,
+	isValidSize,
+	safeBoundedNumber,
+	sanitizeCropperState,
+} from './math/sanitize';
 
 // Pre-allocated scratch buffers for `screenToWorld`, which is called per
 // pointermove. Module-level singletons — safe because usage is synchronous.
@@ -27,6 +33,19 @@ export function getRotatedBBox(
 	height: number,
 	rotation: number
 ): Size {
+	// Short-circuit on any unsafe input. `isSafeNumber` is stricter than
+	// `Number.isFinite`: very large but technically-finite rotations (e.g.
+	// `Number.MAX_VALUE`) overflow inside `degreesToRadians` and then
+	// `Math.cos`/`Math.sin` return `NaN`, so the magnitude bound matters.
+	if (
+		! isSafeNumber( width ) ||
+		! isSafeNumber( height ) ||
+		! isSafeNumber( rotation ) ||
+		width <= 0 ||
+		height <= 0
+	) {
+		return { width: 0, height: 0 };
+	}
 	const rad = degreesToRadians( rotation );
 	const cosR = Math.abs( Math.cos( rad ) );
 	const sinR = Math.abs( Math.sin( rad ) );
@@ -54,27 +73,31 @@ export function getImageFit(
 	imageSize: Size,
 	rotation: number
 ): { elementSize: Size; visualSize: Size } {
-	if (
-		containerSize.width === 0 ||
-		containerSize.height === 0 ||
-		imageSize.width === 0 ||
-		imageSize.height === 0
-	) {
+	if ( ! isValidSize( containerSize ) || ! isValidSize( imageSize ) ) {
 		return {
 			elementSize: { width: 0, height: 0 },
 			visualSize: { width: 0, height: 0 },
 		};
 	}
+	const safeRotation = safeBoundedNumber( rotation, 0 );
 	// Snap rotation to the nearest 90° multiple for layout sizing.
 	// This keeps the stencil a stable size through fine ±45° rotation
 	// (no inflation at 15°/30° etc.) while still swapping aspect at
 	// 90°/180°/270° so the snap rotate preserves the framed content.
-	const snapRotation = Math.round( rotation / 90 ) * 90;
+	const snapRotation = Math.round( safeRotation / 90 ) * 90;
 	const naturalBBox = getRotatedBBox(
 		imageSize.width,
 		imageSize.height,
 		snapRotation
 	);
+	// Defensive: getRotatedBBox returns zero dims for hostile inputs, which
+	// would make fitScale infinite. Mirror the zero-container short-circuit.
+	if ( naturalBBox.width === 0 || naturalBBox.height === 0 ) {
+		return {
+			elementSize: { width: 0, height: 0 },
+			visualSize: { width: 0, height: 0 },
+		};
+	}
 	const fitScale = Math.min(
 		containerSize.width / naturalBBox.width,
 		containerSize.height / naturalBBox.height
@@ -113,20 +136,17 @@ export function createCamera(
 ): Camera {
 	const m = mat2d.create();
 
-	if (
-		containerSize.width === 0 ||
-		containerSize.height === 0 ||
-		imageSize.width === 0 ||
-		imageSize.height === 0
-	) {
+	if ( ! isValidSize( containerSize ) || ! isValidSize( imageSize ) ) {
 		return m;
 	}
+
+	const safeState = sanitizeCropperState( state );
 
 	// Use the nearest 90° multiple for layout sizing so the stencil
 	// and visual bounds are stable through fine rotation. The actual
 	// `state.rotation` is still used for the rotation component of
 	// the matrix below.
-	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const snapRotation = Math.round( safeState.rotation / 90 ) * 90;
 
 	// Rotated bounding box of the natural image (at snap angle).
 	const naturalBBox = getRotatedBBox(
@@ -134,6 +154,12 @@ export function createCamera(
 		imageSize.height,
 		snapRotation
 	);
+
+	// Defensive: getRotatedBBox returns zero dims for unsafe inputs. Mirror
+	// the zero-size short-circuit so `fitScale` doesn't become Infinity.
+	if ( naturalBBox.width === 0 || naturalBBox.height === 0 ) {
+		return m;
+	}
 
 	// "Contain" fit: scale rotated bounding box to fit within container.
 	const fitScale = Math.min(
@@ -162,20 +188,23 @@ export function createCamera(
 	] );
 
 	// Pan offset in visual-space pixels.
-	mat2d.translate( m, m, [ state.pan.x * visualW, state.pan.y * visualH ] );
+	mat2d.translate( m, m, [
+		safeState.pan.x * visualW,
+		safeState.pan.y * visualH,
+	] );
 
 	// Flip (viewport-relative — composed outside rotation so horizontal
 	// flip always mirrors across the viewport's vertical axis).
 	mat2d.scale( m, m, [
-		state.flip.horizontal ? -1 : 1,
-		state.flip.vertical ? -1 : 1,
+		safeState.flip.horizontal ? -1 : 1,
+		safeState.flip.vertical ? -1 : 1,
 	] );
 
 	// Rotate.
-	mat2d.rotate( m, m, degreesToRadians( state.rotation ) );
+	mat2d.rotate( m, m, degreesToRadians( safeState.rotation ) );
 
 	// Zoom.
-	mat2d.scale( m, m, [ state.zoom, state.zoom ] );
+	mat2d.scale( m, m, [ safeState.zoom, safeState.zoom ] );
 
 	// Center origin (shift so 0.5,0.5 in rendered-pixel space = origin).
 	mat2d.translate( m, m, [ -renderedW / 2, -renderedH / 2 ] );
@@ -304,15 +333,11 @@ export function createExportCamera(
 	outputSize: Size
 ): Camera {
 	const m = mat2d.create();
-	const { rotation, flip, cropRect, zoom, pan } = state;
-	if (
-		imageSize.width === 0 ||
-		imageSize.height === 0 ||
-		outputSize.width === 0 ||
-		outputSize.height === 0
-	) {
+	if ( ! isValidSize( imageSize ) || ! isValidSize( outputSize ) ) {
 		return m;
 	}
+	const { rotation, flip, cropRect, zoom, pan } =
+		sanitizeCropperState( state );
 	// Reference frame for cropRect/pan is the snap-rotation bbox — that's
 	// what the stencil and CSS matrix use in the preview (see createCamera
 	// and getImageFit). Using the true rotation here would position the

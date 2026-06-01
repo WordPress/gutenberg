@@ -153,6 +153,8 @@ function createComponents(
 			path:
 				value.path ??
 				`../packages/ui/src/${ key }/stories/index.story.tsx`,
+			stories: [],
+			jsDocTags: {},
 			...value,
 		};
 	}

@@ -89,7 +89,9 @@ function buildAnnouncement(
  */
 export function useAriaAnnouncer( state: CropperState ): string {
 	const [ ariaMessage, setAriaMessage ] = useState( '' );
-	const timerRef = useRef< ReturnType< typeof setTimeout > >();
+	const timerRef = useRef< ReturnType< typeof setTimeout > | undefined >(
+		undefined
+	);
 	const prevMessageRef = useRef( '' );
 	const prevStateRef = useRef< CropperState | null >( null );
 	const latestStateRef = useRef( state );
