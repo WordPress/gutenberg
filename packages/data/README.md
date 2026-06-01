@@ -821,7 +821,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `DataRegistry`: A custom react hook exposing the registry context value.
+-   `DataRegistry`: A custom React hook exposing the registry context value.
 
 ### useSelect
 
