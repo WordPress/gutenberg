@@ -5,7 +5,6 @@ import {
 	store,
 	getContext,
 	getElement,
-	withScope,
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
@@ -423,14 +422,10 @@ const { state, actions } = store(
 							hamburgerBtn,
 							ref,
 							ctx.morphStartRect,
-							// onComplete fires from WAAPI's onfinish,
-							// which runs outside the Interactivity scope;
-							// withScope restores it so actions.closeMenu
-							// can call getContext().
-							withScope( () => {
+							() => {
 								actions.closeMenu( 'click' );
 								actions.closeMenu( 'focus' );
-							} )
+							}
 						);
 						return;
 					}
