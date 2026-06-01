@@ -7,13 +7,16 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useLayoutEffect } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
+import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
+import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import type { GridItemProps } from './types';
 import styles from './grid-item.module.css';
@@ -39,44 +42,37 @@ export function GridItem( {
 	disabled = false,
 	verticalResizable = true,
 	interacting = false,
+	dragging = false,
 	children,
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
+	resizeSnapPreview = null,
+	minResizeWidthPx,
+	minResizeHeightPx,
 	renderResizeHandle,
 }: GridItemProps ) {
-	const [ previewDelta, setPreviewDelta ] = useState< ResizeDelta | null >(
+	const [ resizeDelta, setResizeDelta ] = useState< ResizeDelta | null >(
 		null
 	);
-	const itemRef = useRef< HTMLDivElement >( null );
-	// Tile bounding rect at the first resize frame. The cursor `delta`
-	// from the handle is anchored to the gesture start, but the
-	// overlay needs to track the cursor against the *current* tile
-	// edge — which has shifted whenever the width/height stepped a
-	// column/row. Re-anchor locally by subtracting the tile growth.
-	const initialResizeRectRef = useRef< DOMRect | null >( null );
-	// Document scroll position at the start of a resize. The handle's
-	// `delta` is in document coordinates; `getBoundingClientRect` is
-	// in viewport coordinates. Auto-scroll near the viewport edge
-	// shifts both: the delta inflates by the scroll change, while the
-	// tile's viewport bottom drifts up by the same amount. Without a
-	// scroll reference, the preview overlay would carry that
-	// inflation forward and drift away from the tile's edge.
-	const initialResizeScrollRef = useRef< {
-		x: number;
-		y: number;
+	const [ initialContentSize, setInitialContentSize ] = useState< {
+		width: number;
+		height: number;
 	} | null >( null );
-	// Latest cursor delta from the resize handle. Reading this in a
-	// `useLayoutEffect` lets the overlay re-measure the tile rect
-	// *after* React commits a width step but before paint, so the
-	// frame that follows a column step never renders the overlay
-	// at the pre-step offset.
-	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
-	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
+	const itemRef = useRef< HTMLDivElement >( null );
+	const contentRef = useRef< HTMLDivElement >( null );
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		setActivatorNodeRef,
+		isDragging,
+	} = useSortable( {
 		id: item.key,
 		disabled,
 	} );
 	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
+	const contentMergedRef = useMergeRefs( [ contentRef ] );
 	/*
 	 * With `<DragOverlay>` handling the cursor-following clone, the
 	 * sortable item stays put in its grid cell and acts as a
@@ -95,105 +91,53 @@ export function GridItem( {
 		gridRowEnd: `span ${ item.height || 1 }`,
 	};
 
+	const isResizing = resizeDelta !== null;
 	const itemClassName = clsx(
 		styles.item,
-		isDragging && styles[ 'is-dragging' ]
+		isDragging && styles[ 'is-dragging' ],
+		isResizing && styles[ 'is-resizing' ]
 	);
 
 	const handleResize = ( delta: ResizeDelta ) => {
-		const clamped = {
+		const contentNode = contentRef.current;
+		let baselineSize = initialContentSize;
+		if ( contentNode && ! baselineSize ) {
+			const { width, height } = contentNode.getBoundingClientRect();
+			baselineSize = { width, height };
+			setInitialContentSize( baselineSize );
+		}
+		let clamped: ResizeDelta = {
 			width: delta.width,
 			height: verticalResizable ? delta.height : 0,
 		};
-		const node = itemRef.current;
-		if ( node && ! initialResizeRectRef.current ) {
-			initialResizeRectRef.current = node.getBoundingClientRect();
-			const ownerWindow = node.ownerDocument.defaultView ?? window;
-			initialResizeScrollRef.current = {
-				x: ownerWindow.scrollX,
-				y: ownerWindow.scrollY,
-			};
-		}
-		lastResizeDeltaRef.current = clamped;
-		onResize( item.key, clamped );
-		// Provisional preview against the pre-commit rect; the
-		// `useLayoutEffect` below refines it once React commits the
-		// new tile size so a column step never paints with the
-		// stale offset. Subtract the scroll change so the overlay
-		// tracks the cursor's viewport-space position rather than
-		// drifting with the document scroll under it.
-		if (
-			node &&
-			initialResizeRectRef.current &&
-			initialResizeScrollRef.current
-		) {
-			const currentRect = node.getBoundingClientRect();
-			const ownerWindow = node.ownerDocument.defaultView ?? window;
-			const scrollDelta = {
-				x: ownerWindow.scrollX - initialResizeScrollRef.current.x,
-				y: ownerWindow.scrollY - initialResizeScrollRef.current.y,
-			};
-			const offsetX =
-				currentRect.right - initialResizeRectRef.current.right;
-			const offsetY =
-				currentRect.bottom - initialResizeRectRef.current.bottom;
-			setPreviewDelta( {
-				width: clamped.width - offsetX - scrollDelta.x,
-				height: verticalResizable
-					? clamped.height - offsetY - scrollDelta.y
-					: 0,
+		if ( baselineSize ) {
+			clamped = clampResizeDelta( clamped, baselineSize, {
+				width: minResizeWidthPx,
+				height: verticalResizable ? minResizeHeightPx : undefined,
 			} );
 		}
+		setResizeDelta( clamped );
+		onResize( item.key, clamped );
 	};
 
-	useLayoutEffect( () => {
-		const lastDelta = lastResizeDeltaRef.current;
-		const initialRect = initialResizeRectRef.current;
-		const initialScroll = initialResizeScrollRef.current;
-		const node = itemRef.current;
-		if ( ! lastDelta || ! initialRect || ! initialScroll || ! node ) {
-			return;
-		}
-		const currentRect = node.getBoundingClientRect();
-		const ownerWindow = node.ownerDocument.defaultView ?? window;
-		const scrollDelta = {
-			x: ownerWindow.scrollX - initialScroll.x,
-			y: ownerWindow.scrollY - initialScroll.y,
-		};
-		const offsetX = currentRect.right - initialRect.right;
-		const offsetY = currentRect.bottom - initialRect.bottom;
-		const next = {
-			width: lastDelta.width - offsetX - scrollDelta.x,
-			height: verticalResizable
-				? lastDelta.height - offsetY - scrollDelta.y
-				: 0,
-		};
-		// Use the updater form so the effect doesn't need `previewDelta`
-		// in its deps. Returning `prev` when nothing changed lets React
-		// bail out without a re-render.
-		setPreviewDelta( ( prev ) =>
-			next.width === prev?.width && next.height === prev?.height
-				? prev
-				: next
-		);
-	}, [ item.width, item.height, verticalResizable ] );
-
 	const handleResizeEnd = () => {
-		setPreviewDelta( null );
-		initialResizeRectRef.current = null;
-		initialResizeScrollRef.current = null;
-		lastResizeDeltaRef.current = null;
+		setResizeDelta( null );
+		setInitialContentSize( null );
 		onResizeEnd();
 	};
 
-	const previewOverlay = previewDelta ? (
-		<div
-			className={ styles[ 'preview-overlay' ] }
-			style={ {
-				insetInlineEnd: -previewDelta.width,
-				bottom: -previewDelta.height,
-			} }
-		/>
+	const continuousContentStyle: React.CSSProperties | undefined =
+		resizeDelta && initialContentSize
+			? {
+					width: initialContentSize.width + resizeDelta.width,
+					height: verticalResizable
+						? initialContentSize.height + resizeDelta.height
+						: undefined,
+			  }
+			: undefined;
+
+	const previewOverlay = resizeSnapPreview ? (
+		<SnapPreviewOverlay snap={ resizeSnapPreview } />
 	) : null;
 
 	return (
@@ -201,33 +145,36 @@ export function GridItem( {
 			ref={ mergedRef }
 			className={ itemClassName }
 			style={ style }
-			{ ...attributes }
+			{ ...{ [ GRID_ITEM_DATA_KEY ]: item.key } }
+			data-wp-grid-item-resizing={ isResizing || undefined }
 		>
 			{ actionableArea ? (
 				<div
-					style={ { display: 'contents' } }
-					{ ...( interacting ? { inert: '' } : {} ) }
+					className={ actionableAreaStyles[ 'actionable-area-slot' ] }
 				>
-					{ actionableArea }
+					<div
+						style={ { display: 'contents' } }
+						inert={ dragging || undefined }
+					>
+						{ actionableArea }
+					</div>
 				</div>
 			) : null }
 
 			<div
+				ref={ setActivatorNodeRef }
+				{ ...attributes }
 				{ ...listeners }
 				style={ {
 					height: '100%',
-					// Cursor lives on the listener wrapper rather
-					// than the outer tile so `actionableArea`
-					// children render their own cursor (e.g.
-					// `pointer` on buttons) instead of inheriting
-					// the grid's `grab`. Setting `undefined`
-					// during an active gesture leaves the property
-					// off the DOM so the document-level cursor
-					// lock from the resize handle takes over.
 					cursor: getItemCursor( disabled, interacting ),
 				} }
 			>
-				<div className={ styles[ 'item-content' ] }>
+				<div
+					ref={ contentMergedRef }
+					className={ styles[ 'item-content' ] }
+					style={ continuousContentStyle }
+				>
 					{ children }
 					{ ! disabled && (
 						<ResizeHandle
@@ -242,5 +189,17 @@ export function GridItem( {
 				{ previewOverlay }
 			</div>
 		</div>
+	);
+}
+
+function SnapPreviewOverlay( { snap }: { snap: ResizeSnapSize } ) {
+	return (
+		<div
+			className={ styles[ 'preview-overlay' ] }
+			style={ {
+				width: snap.widthPx,
+				height: snap.heightPx ?? '100%',
+			} }
+		/>
 	);
 }

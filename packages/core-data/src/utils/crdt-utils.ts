@@ -126,6 +126,47 @@ export function asHtmlStringIndex( index: number ): HtmlStringIndex {
 }
 
 /**
+ * Resolve a selection attribute key to a Y.Text value.
+ *
+ * RichText identifiers are normally top-level block attribute keys, but nested
+ * rich-text fields can provide a dot path such as `body.0.cells.0.content`.
+ *
+ * @param attributes   The block attributes map.
+ * @param attributeKey The top-level attribute key or nested attribute path.
+ * @return The matching Y.Text, or null if the path is not a rich-text field.
+ */
+export function getYTextByAttributeKey(
+	attributes: Y.Map< unknown >,
+	attributeKey: string
+): Y.Text | null {
+	const directValue = attributes.get( attributeKey );
+	if ( directValue instanceof Y.Text ) {
+		return directValue;
+	}
+
+	let value: unknown = attributes;
+	for ( const pathPart of attributeKey.split( '.' ) ) {
+		if ( value instanceof Y.Map ) {
+			value = value.get( pathPart );
+		} else if ( value instanceof Y.Array ) {
+			const index = Number.parseInt( pathPart, 10 );
+			if (
+				! Number.isSafeInteger( index ) ||
+				index < 0 ||
+				index.toString() !== pathPart
+			) {
+				return null;
+			}
+			value = value.get( index );
+		} else {
+			return null;
+		}
+	}
+
+	return value instanceof Y.Text ? value : null;
+}
+
+/**
  * Given a block ID and a Y.Doc, find the block in the document.
  *
  * @param blockId The block ID to find

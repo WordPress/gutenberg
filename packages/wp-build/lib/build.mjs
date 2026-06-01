@@ -564,11 +564,35 @@ async function bundlePackage( packageName, options = {} ) {
 			globalName,
 		};
 
-		// For packages with default exports, add a footer to properly expose the default
+		// Compose the footer in pieces:
+		//   1. If the package has a default export, unwrap the namespace so
+		//      `globalName` IS the default value.
+		//   2. For every package that exposes a global namespace, replace
+		//      esbuild's getter-based re-exports with direct data properties.
+		//      esbuild emits each export as `Object.defineProperty(ns, k,
+		//      { get: () => binding })` to preserve ESM live-binding semantics
+		//      across hoisting; consumers then pay a getter call on every
+		//      property access. Across the editor mount that's hundreds of
+		//      thousands of getter invocations (every hook, every selector).
+		//      Once the IIFE has finished, the bindings are stable, so we can
+		//      read each getter once and replace it with a plain data
+		//      property — same value, ~2x cheaper per access in V8.
+		const footerParts = [];
 		if ( packageJson.wpScriptDefaultExport && globalName ) {
-			baseConfig.footer = {
-				js: `if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`,
-			};
+			footerParts.push(
+				`if (typeof ${ globalName } === 'object' && ${ globalName }.default) { ${ globalName } = ${ globalName }.default; }`
+			);
+		}
+		if ( globalName ) {
+			// esbuild marks the getters non-configurable, so we can't rewrite
+			// them in place; replacing the whole namespace with a shallow
+			// copy is the simplest way to materialize each value once.
+			footerParts.push(
+				`if(${ globalName }&&typeof ${ globalName }==='object'){${ globalName }=Object.assign({},${ globalName });}`
+			);
+		}
+		if ( footerParts.length ) {
+			baseConfig.footer = { js: footerParts.join( '' ) };
 		}
 
 		const baseBundlePlugins = [
@@ -1928,7 +1952,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean, presentation: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -1949,6 +1973,7 @@ function collectWidgets() {
 				dirName: widgetName,
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
+				presentation: metadata.presentation ?? null,
 			},
 		];
 	} );
@@ -1974,11 +1999,15 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		.map( ( widget ) => {
 			const hasRenderStr = widget.hasRender ? 'true' : 'false';
 			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
+			const presentationStr = widget.presentation
+				? `'${ widget.presentation }'`
+				: 'null';
 			return `\tarray(
-		'name'       => '${ widget.name }',
-		'dir_name'   => '${ widget.dirName }',
-		'has_render' => ${ hasRenderStr },
-		'has_widget' => ${ hasWidgetStr },
+		'name'         => '${ widget.name }',
+		'dir_name'     => '${ widget.dirName }',
+		'has_render'   => ${ hasRenderStr },
+		'has_widget'   => ${ hasWidgetStr },
+		'presentation' => ${ presentationStr },
 	)`;
 		} )
 		.join( ',\n' );

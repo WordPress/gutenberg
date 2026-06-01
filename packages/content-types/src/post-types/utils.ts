@@ -205,6 +205,7 @@ export function toFormData( row: PostTypeRecord ): PostTypeFormData {
 			has_archive: config.has_archive ?? false,
 			show_in_rest: config.show_in_rest ?? true,
 		},
+		count: row.count,
 	};
 }
 

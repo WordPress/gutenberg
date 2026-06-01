@@ -29,10 +29,19 @@ import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
+import {
+	DEFAULT_BLOCK_STYLE_STATE,
+	hasPseudoBlockStyleState,
+	isDefaultBlockStyleState,
+	hasViewportBlockStyleState,
+} from '../../hooks/block-style-state';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
-export function useHasDimensionsPanel( settings ) {
+export function useHasDimensionsPanel(
+	settings,
+	styleState = DEFAULT_BLOCK_STYLE_STATE
+) {
 	return (
 		Platform.OS === 'web' &&
 		( hasContentSize( settings ) ||
@@ -44,8 +53,8 @@ export function useHasDimensionsPanel( settings ) {
 			hasMinHeight( settings ) ||
 			hasMinWidth( settings ) ||
 			hasWidth( settings ) ||
-			hasAspectRatio( settings ) ||
-			hasChildLayout( settings ) )
+			hasAspectRatio( settings, styleState ) ||
+			hasChildLayout( settings, styleState ) )
 	);
 }
 
@@ -85,11 +94,18 @@ function hasWidth( settings ) {
 	return settings?.dimensions?.width;
 }
 
-function hasAspectRatio( settings ) {
-	return settings?.dimensions?.aspectRatio;
+function hasAspectRatio( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
+	return (
+		isDefaultBlockStyleState( styleState ) &&
+		settings?.dimensions?.aspectRatio
+	);
 }
 
-function hasChildLayout( settings ) {
+function hasChildLayout( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
+	if ( hasPseudoBlockStyleState( styleState ) ) {
+		return false;
+	}
+
 	const {
 		type: parentLayoutType = 'default',
 		default: { type: defaultParentLayoutType = 'default' } = {},
@@ -231,6 +247,7 @@ export default function DimensionsPanel( {
 	// Special case because the layout controls are not part of the dimensions panel
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
+	styleState = DEFAULT_BLOCK_STYLE_STATE,
 } ) {
 	const { dimensions, spacing } = settings;
 
@@ -472,7 +489,7 @@ export default function DimensionsPanel( {
 	const hasWidthValue = () => !! value?.dimensions?.width;
 
 	// Aspect Ratio
-	const showAspectRatioControl = hasAspectRatio( settings );
+	const showAspectRatioControl = hasAspectRatio( settings, styleState );
 	const aspectRatioValue = decodeValue(
 		inheritedValue?.dimensions?.aspectRatio
 	);
@@ -490,13 +507,14 @@ export default function DimensionsPanel( {
 	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
 
 	// Child Layout
-	const showChildLayoutControl = hasChildLayout( settings );
+	const showChildLayoutControl = hasChildLayout( settings, styleState );
 	const childLayout = inheritedValue?.layout;
 
 	const setChildLayout = ( newChildLayout ) => {
 		onChange( {
 			...value,
 			layout: {
+				...value?.layout,
 				...newChildLayout,
 			},
 		} );
@@ -724,6 +742,9 @@ export default function DimensionsPanel( {
 					onChange={ setChildLayout }
 					parentLayout={ settings?.parentLayout }
 					panelId={ panelId }
+					showGridSpanDefaults={
+						! hasViewportBlockStyleState( styleState )
+					}
 					isShownByDefault={
 						defaultControls.childLayout ??
 						DEFAULT_CONTROLS.childLayout

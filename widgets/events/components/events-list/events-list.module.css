@@ -1,0 +1,27 @@
+.root {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: auto;
+}
+
+.eventIcon {
+	height: 100%;
+	background-color: var(--wpds-color-bg-track-neutral-weak);
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.titleLink {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.meta {
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.emptyState {
+	margin-block: var(--wpds-dimension-padding-2xl);
+}
