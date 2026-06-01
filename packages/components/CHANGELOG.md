@@ -319,7 +319,7 @@
 
 ### Bug Fixes
 
--   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Old fill-based icons remain coloured via the surrounding `svg { fill: currentColor }` rule plus normal SVG inheritance. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   `ItemGroup`: Drop the blanket `path { fill: currentColor }` rule that was overriding stroke-based icons' intended fill via inheritance bypass. Old fill-based icons remain coloured via the surrounding `svg { fill: currentColor }` rule plus normal SVG inheritance. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ## 34.0.0 (2026-05-27)
 
