@@ -632,11 +632,11 @@ describe( 'Cover block', () => {
 			expect( overlay ).not.toHaveClass( 'has-background-dim-100' );
 		} );
 
-		test( 'observer fires `getMediaColor` exactly once per `effectiveUrl` on mount (race-token guard precondition: single observer keyed on effectiveUrl)', async () => {
+		test( 'observer fires `getMediaColor` exactly once per dynamic media URL on mount', async () => {
 			// DC-1 precondition: a single mount fires the observer once for
-			// the resolved `effectiveUrl`. Pending promise avoids "update not
+			// the resolved dynamic URL. Pending promise avoids "update not
 			// wrapped in act" warnings from the post-await flush.
-			const URL_A = 'http://localhost/observer-counts.jpg';
+			const URL_A = TEST_RESOLVED_URL;
 			const pending = new Promise( () => {} );
 			getMediaColor.mockImplementation( ( url ) =>
 				url === URL_A ? pending : Promise.resolve( '#888888' )
@@ -646,12 +646,33 @@ describe( 'Cover block', () => {
 				url: URL_A,
 				backgroundType: 'image',
 				dimRatio: 70,
+				metadata: {
+					bindings: {
+						id: { source: TEST_SOURCE },
+						url: { source: TEST_SOURCE },
+					},
+				},
 			} );
 
 			// Filter to URL_A — harness may incidentally call with undefined.
 			expect(
 				getMediaColor.mock.calls.filter( ( [ u ] ) => u === URL_A )
 			).toHaveLength( 1 );
+		} );
+
+		test( 'observer ignores static media URLs handled by selection callbacks', async () => {
+			const URL_A = 'http://localhost/static-image.jpg';
+			getMediaColor.mockResolvedValue( '#888888' );
+
+			await setup( {
+				url: URL_A,
+				backgroundType: 'image',
+				dimRatio: 70,
+			} );
+
+			expect(
+				getMediaColor.mock.calls.filter( ( [ u ] ) => u === URL_A )
+			).toHaveLength( 0 );
 		} );
 	} );
 } );

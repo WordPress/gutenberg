@@ -173,12 +173,14 @@ function CoverEdit( {
 
 	const effectiveDimRatio =
 		bindingActive && dimRatio === 100 && effectiveUrl ? 50 : dimRatio;
+	const dynamicMediaUrl =
+		bindingResolvedUrl ?? ( useFeaturedImage && mediaUrl );
 
 	const onUrlResolved = useEffectEvent( async ( resolvedUrl ) => {
+		const myToken = ++raceTokenRef.current;
 		if ( ! resolvedUrl ) {
 			return;
 		}
-		const myToken = ++raceTokenRef.current;
 		const averageBackgroundColor = await getMediaColor( resolvedUrl );
 		if ( myToken !== raceTokenRef.current ) {
 			return;
@@ -211,8 +213,8 @@ function CoverEdit( {
 	} );
 
 	useEffect( () => {
-		onUrlResolved( effectiveUrl );
-	}, [ effectiveUrl ] );
+		onUrlResolved( dynamicMediaUrl );
+	}, [ dynamicMediaUrl ] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
