@@ -880,18 +880,14 @@ function escapeRegExp( str ) {
 }
 
 /**
- * Generate a category index page that links to individual block pages.
+ * Generate the token-delimited block list for a category index page.
  *
  * @param {string}   category Category slug.
- * @param {string}   label    Human-readable category name.
  * @param {string[]} blocks   Block directory names in this category.
- * @return {string} Markdown document.
+ * @return {string} Token-wrapped markdown block list.
  */
-function generateCategoryPage( category, label, blocks ) {
+function generateCategoryPageSection( category, blocks ) {
 	const lines = [];
-
-	lines.push( `# ${ label } Blocks` );
-	lines.push( '' );
 
 	blocks.forEach( ( blockDir ) => {
 		const blockJson = readBlockJson( blockDir );
@@ -908,7 +904,54 @@ function generateCategoryPage( category, label, blocks ) {
 
 	lines.push( '' );
 
-	return lines.join( '\n' );
+	return `${ TOKEN_START }\n${ lines.join( '\n' ) }\n${ TOKEN_END }\n`;
+}
+
+/**
+ * Write a category index page with token-delimited generated content.
+ *
+ * Follows the same three-case logic as writeBlockReadme:
+ * - File doesn't exist → create with H1 title + tokens.
+ * - File exists, has tokens → replace content between tokens.
+ * - File exists, no tokens → append tokens at the end.
+ *
+ * @param {string} category  Category slug.
+ * @param {string} label     Human-readable category label.
+ * @param {string} section   Token-wrapped generated content.
+ */
+function writeCategoryPage( category, label, section ) {
+	const filePath = path.join(
+		CATEGORY_DOCS_DIR,
+		`category-${ category }.md`
+	);
+
+	if ( ! fs.existsSync( filePath ) ) {
+		fs.writeFileSync( filePath, `# ${ label } Blocks\n\n${ section }`, {
+			encoding: 'utf8',
+		} );
+		return;
+	}
+
+	const existing = fs.readFileSync( filePath, 'utf8' );
+
+	if ( existing.includes( TOKEN_START ) ) {
+		const tokenPattern = new RegExp(
+			escapeRegExp( TOKEN_START ) +
+				'[\\s\\S]*?' +
+				escapeRegExp( TOKEN_END ) +
+				'\\n?',
+			'm'
+		);
+		fs.writeFileSync( filePath, existing.replace( tokenPattern, section ), {
+			encoding: 'utf8',
+		} );
+		return;
+	}
+
+	const separator = existing.endsWith( '\n' ) ? '\n' : '\n\n';
+	fs.writeFileSync( filePath, existing + separator + section, {
+		encoding: 'utf8',
+	} );
 }
 
 /**
@@ -1007,16 +1050,11 @@ fs.mkdirSync( CATEGORY_DOCS_DIR, { recursive: true } );
 const categoryNames = Object.keys( categories ).sort();
 categoryNames.forEach( ( category ) => {
 	const label = CATEGORY_LABELS[ category ] || category;
-	const content = generateCategoryPage(
+	const section = generateCategoryPageSection(
 		category,
-		label,
 		categories[ category ]
 	);
-	fs.writeFileSync(
-		path.join( CATEGORY_DOCS_DIR, `category-${ category }.md` ),
-		content,
-		{ encoding: 'utf8' }
-	);
+	writeCategoryPage( category, label, section );
 } );
 
 // Update the deprecated-blocks notice in the core blocks README.
