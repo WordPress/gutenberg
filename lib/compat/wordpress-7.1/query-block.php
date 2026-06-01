@@ -15,10 +15,10 @@
  */
 function gutenberg_filter_query_block_exclude_current( $query, $block ) {
 	if ( isset( $block->context['query']['excludeCurrent'] ) && $block->context['query']['excludeCurrent'] ) {
-		$query['post__not_in'] = array_merge(
-			$query['post__not_in'],
-			array( get_the_ID() )
-		);
+		$current_post_id = get_the_ID();
+		if ( $current_post_id ) {
+			$query['post__not_in'][] = $current_post_id;
+		}
 	}
 
 	return $query;
