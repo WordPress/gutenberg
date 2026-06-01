@@ -248,7 +248,7 @@ export interface WidgetDashboardProps {
 	 * Called when the user commits in-progress grid-settings edits via
 	 * the Done action. The dashboard maintains a staging copy of
 	 * settings internally; mutations stay local until commit. When
-	 * omitted, the `Layout settings` entry in the more-actions menu is
+	 * omitted, the `Layout settings` button in the customize toolbar is
 	 * hidden, since there is nowhere to persist the change.
 	 */
 	onGridSettingsChange?: ( gridSettings: WidgetGridSettings ) => void;
