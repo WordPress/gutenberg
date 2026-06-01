@@ -147,16 +147,13 @@ function getBlockManifest( jsonPaths, catPaths ) {
 
 		const blockJson = require( join( __dirname, '..', '..', jsonPath ) );
 		const title = blockJson.title || pascalCase( blockDir );
-		const isDeprecated = ( blockJson.description || '' ).startsWith(
-			'This block is deprecated.'
-		);
 		const category = blockJson.category || 'uncategorized';
 
 		manifest.push( {
 			title,
 			slug: `core-block-${ blockDir }`,
 			markdown_source: `${ baseRepoUrl }/${ readmePath }`,
-			parent: isDeprecated ? 'core-blocks' : `core-blocks-${ category }`,
+			parent: `core-blocks-${ category }`,
 		} );
 	} );
 
