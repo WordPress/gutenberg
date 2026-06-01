@@ -2191,28 +2191,6 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 	};
 };
 
-const getBlockTransformItemFromVariation = ( state, item, variationName ) => {
-	if ( ! variationName ) {
-		return item;
-	}
-	const variation = getBlockVariations( item.name, 'transform' )?.find(
-		( { name } ) => name === variationName
-	);
-	if ( ! variation ) {
-		return item;
-	}
-	const variationId = `${ item.id }/${ variation.name }`;
-	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
-	return {
-		...item,
-		id: variationId,
-		icon: variation.icon || item.icon,
-		title: variation.title || item.title,
-		frecency: calculateFrecency( time, count ),
-		variationName: variation.name,
-	};
-};
-
 /**
  * Returns the calculated frecency.
  *
@@ -2315,6 +2293,19 @@ const buildBlockTypeItem =
 			utility: 1, // Deprecated.
 		};
 	};
+
+const buildBlockVariationItem = ( state, item ) => ( variation ) => {
+	const variationId = `${ item.id }/${ variation.name }`;
+	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
+	return {
+		...item,
+		id: variationId,
+		icon: variation.icon || item.icon,
+		title: variation.title || item.title,
+		frecency: calculateFrecency( time, count ),
+		variationName: variation.name,
+	};
+};
 
 /**
  * Determines the items that appear in the inserter. Includes both static
@@ -2540,15 +2531,32 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 			const possibleTransforms = getPossibleBlockTransformations(
 				normalizedBlocks
 			).reduce( ( accumulator, block ) => {
-				if ( itemsByName[ block?.name ] ) {
-					accumulator.push(
-						getBlockTransformItemFromVariation(
-							state,
-							itemsByName[ block.name ],
-							block.variationName
-						)
-					);
+				const item = itemsByName[ block?.name ];
+
+				if ( ! item ) {
+					return accumulator;
 				}
+
+				const { variationName } = block;
+
+				if ( ! variationName ) {
+					accumulator.push( item );
+					return accumulator;
+				}
+
+				const variation = getBlockVariations(
+					item.name,
+					'transform'
+				)?.find( ( { name } ) => name === variationName );
+
+				if ( ! variation ) {
+					accumulator.push( item );
+					return accumulator;
+				}
+
+				accumulator.push(
+					buildBlockVariationItem( state, item )( variation )
+				);
 				return accumulator;
 			}, [] );
 			return orderBy(
