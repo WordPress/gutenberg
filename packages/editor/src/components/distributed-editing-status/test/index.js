@@ -3794,7 +3794,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 	} );
 
-	it( 'shows role-neutral inert pending ghosts from other editor sessions', () => {
+	it( 'keeps pending ghosts out of the compact presence chrome', () => {
 		const actions = setupDistributedEditingStatusDispatch();
 		setupDistributedEditingStatusSelect( {
 			editorSettings: {
@@ -3847,40 +3847,19 @@ describe( 'DistributedEditingStatus', () => {
 		const presence = screen.getByRole( 'group', {
 			name: 'Distributed editing presence',
 		} );
-		const ghostList = screen.getByRole( 'list', {
-			name: 'Pending edits from other active editors',
-		} );
-		const ghost = within( ghostList ).getByRole( 'listitem', {
-			name: 'Pending edit by Author in core/html',
-		} );
 
-		expect( presence ).toHaveAttribute(
-			'data-distributed-editing-presence-pending-ghost-count',
-			'1'
+		expect( presence ).not.toHaveAttribute(
+			'data-distributed-editing-presence-pending-ghost-count'
 		);
-		expect( presence ).toHaveAttribute(
-			'data-distributed-editing-presence-pending-ghosts-visible',
-			'true'
+		expect( presence ).not.toHaveAttribute(
+			'data-distributed-editing-presence-pending-ghosts-visible'
 		);
-		expect( ghostList ).toHaveAttribute(
-			'data-distributed-editing-pending-ghosts-inert',
-			'true'
-		);
-		expect( ghostList ).toHaveAttribute(
-			'data-distributed-editing-pending-ghosts-exposes-raw-content',
-			'false'
-		);
-		expect( ghost ).toHaveAttribute(
-			'data-distributed-editing-pending-ghost-inert',
-			'true'
-		);
-		expect( ghost ).toHaveAttribute(
-			'data-distributed-editing-pending-ghost-author',
-			'Author'
-		);
-		expect( ghost ).toHaveTextContent( 'Ghost text' );
-		expect( ghost ).toHaveTextContent( 'Author' );
-		expect( ghost ).not.toHaveTextContent( /script|alert\(1\)/i );
+		expect(
+			screen.queryByRole( 'list', {
+				name: 'Pending edits from other active editors',
+			} )
+		).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Ghost text' ) ).not.toBeInTheDocument();
 		expect(
 			actions.__experimentalSaveDistributedEditingRetryAfterProof
 		).not.toHaveBeenCalled();
@@ -10371,11 +10350,9 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
 				title: 'Fresh-review Save needs HTML review',
 				message:
-					'The post in WordPress was not updated because the server still requires HTML review. Export a new review handoff, or get the latest post before deciding how to continue. Protected local changes remain exportable.',
-				nextStep:
-					'Export a new review handoff for someone with unfiltered HTML permission.',
-				nextStepAction: 'export_fresh_review_for_html_review',
+					'One block still needs review from someone with HTML permission. Safe edits that WordPress accepted stay in the post, and the blocked block stays pending in this editor.',
 				refetch: true,
+				expectNoExport: true,
 			},
 			{
 				disposition:
@@ -10451,10 +10428,15 @@ describe( 'DistributedEditingStatusSurface', () => {
 				screen.getAllByText( statusCase.message )[ 0 ]
 			).toBeVisible();
 			expect(
-				screen.getByRole( 'button', {
+				screen.queryAllByRole( 'button', {
 					name: 'Export for fresh review',
 				} )
-			).toBeVisible();
+			).toHaveLength( statusCase.expectNoExport ? 0 : 1 );
+			expect(
+				screen.queryAllByRole( 'button', {
+					name: 'Get latest post',
+				} )
+			).toHaveLength( 0 );
 			expect(
 				screen.queryByText(
 					/fresh-review-rejected-raw|fresh-review-rejected-proof|reviewerUserId|reviewed_block_items/i
@@ -11122,7 +11104,8 @@ describe( 'DistributedEditingStatusSurface', () => {
 					DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED,
 				title: 'Save needs HTML permission',
 				message:
-					'The HTML review was accepted, but this account cannot perform the final HTML-capable save. Protected local changes and the review approval remain exportable for someone with unfiltered HTML permission.',
+					'The HTML review was accepted, but this account cannot perform the final HTML-capable save. Ask someone with HTML permission to complete the save.',
+				expectNoExport: true,
 			},
 			{
 				disposition:
@@ -11222,19 +11205,20 @@ describe( 'DistributedEditingStatusSurface', () => {
 			rerender( renderStatus( statusCase ) );
 			expect( screen.getByText( statusCase.title ) ).toBeVisible();
 			expect( screen.getByText( statusCase.message ) ).toBeVisible();
-			expect(
-				screen.queryAllByText(
-					statusCase.exportLabel || 'Export local changes'
-				)
-			).toHaveLength( statusCase.expectNoExport ? 0 : 1 );
+			const exportLabel =
+				statusCase.exportLabel || 'Export local changes';
+			const expectsExport = ! statusCase.expectNoExport;
+			expect( screen.queryAllByText( exportLabel ) ).toHaveLength(
+				expectsExport ? 1 : 0
+			);
 			expect(
 				screen.queryAllByText( 'Export changes for review' )
-			).toHaveLength(
-				statusCase.expectNoExport ||
-					statusCase.exportLabel !== 'Export changes for review'
-					? 0
-					: 1
-			);
+			).toHaveLength( 0 );
+			expect(
+				screen.queryAllByRole( 'button', {
+					name: 'Get latest post',
+				} )
+			).toHaveLength( 0 );
 		}
 
 		for ( const statusCase of cases.filter( ( item ) => item.nextStep ) ) {
@@ -11250,11 +11234,6 @@ describe( 'DistributedEditingStatusSurface', () => {
 				statusCase.nextStepAction
 			);
 		}
-
-		rerender(
-			renderStatus( cases.find( ( statusCase ) => statusCase.refetch ) )
-		);
-		expect( screen.getByText( 'Get latest post' ) ).toBeVisible();
 	} );
 
 	it( 'renders blocked retry-save handoff copy and actions', () => {

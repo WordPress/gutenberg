@@ -104,66 +104,6 @@
 	padding: 0;
 }
 
-.editor-distributed-editing-status__pending-ghosts {
-	display: grid;
-	gap: $grid-unit-05;
-	list-style: none;
-	margin: $grid-unit-10 0 0;
-	padding: 0;
-}
-
-.editor-distributed-editing-status__pending-ghost {
-	align-items: center;
-	background: #f6f7f7;
-	border: 1px dashed $gray-400;
-	border-radius: $radius-small;
-	color: $gray-700;
-	display: grid;
-	gap: $grid-unit-05;
-	grid-template-columns: 8px minmax(0, 1fr) auto;
-	min-height: 32px;
-	opacity: 0.76;
-	padding: $grid-unit-05 $grid-unit-10;
-	transition:
-		background-color 120ms ease,
-		opacity 120ms ease;
-}
-
-.editor-distributed-editing-status__pending-ghost:hover,
-.editor-distributed-editing-status__pending-ghost:focus-visible {
-	background: $white;
-	opacity: 1;
-}
-
-.editor-distributed-editing-status__pending-ghost-marker {
-	background: #dba617;
-	border-radius: 999px;
-	display: inline-block;
-	height: 8px;
-	width: 8px;
-}
-
-.editor-distributed-editing-status__pending-ghost-text {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.editor-distributed-editing-status__pending-ghost-author {
-	color: $gray-900;
-	font-size: $helptext-font-size;
-	font-weight: 600;
-	opacity: 0;
-	transition: opacity 120ms ease;
-}
-
-.editor-distributed-editing-status__pending-ghost:hover
-.editor-distributed-editing-status__pending-ghost-author,
-.editor-distributed-editing-status__pending-ghost:focus-visible
-.editor-distributed-editing-status__pending-ghost-author {
-	opacity: 1;
-}
-
 .editor-distributed-editing-status__presence-caterpillar {
 	align-items: center;
 	display: flex;

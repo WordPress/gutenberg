@@ -14,11 +14,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import DistributedEditingRiskyBlockReviewPrePublishPanel, {
+	DistributedEditingPendingGhostBlockListPreview,
 	DistributedEditingRiskyBlockReviewListViewMarker,
 	DistributedEditingRiskyBlockReviewPanel,
 	DistributedEditingRiskyBlockReviewStatusChrome,
 	getDistributedEditingPendingGhostEntriesForBlockPath,
-	getDistributedEditingPendingGhostOverlayItemsForAnchors,
 	getDistributedEditingRiskyBlockReviewWrapperProps,
 	shouldRenderDistributedEditingRiskyBlockReview,
 } from '../';
@@ -45,6 +45,12 @@ jest.mock( '@wordpress/data', () => {
 } );
 jest.mock( '../../../store', () => ( {
 	store: { name: 'core/editor' },
+} ) );
+jest.mock( '@wordpress/block-editor', () => ( {
+	__experimentalUseBlockPreview: jest.fn( () => ( {
+		className: 'mock-block-preview',
+	} ) ),
+	store: { name: 'core/block-editor' },
 } ) );
 
 const RISKY_REVIEW_ITEM = {
@@ -462,76 +468,135 @@ describe( 'getDistributedEditingPendingGhostEntriesForBlockPath', () => {
 		] );
 	} );
 
-	it( 'creates fixed overlay items for matching remote pending previews', () => {
-		const overlayItems =
-			getDistributedEditingPendingGhostOverlayItemsForAnchors(
+	it( 'deduplicates identical pending previews reported by duplicate presence rows', () => {
+		const duplicatePreview = {
+			previewId: 'added-html',
+			blockPath: [ 1 ],
+			blockName: 'core/html',
+			changeKind: 'added_block',
+			safePreviewHtml: 'Script',
+			safePreviewSerializedBlocks:
+				'<!-- wp:html -->\nScript\n<!-- /wp:html -->',
+			safePreviewText: 'Script',
+		};
+		const pendingGhosts =
+			getDistributedEditingPendingGhostEntriesForBlockPath(
 				[
 					{
-						key: 'author-session',
+						key: 'author-session-a',
 						displayName: 'Author',
 						relationship: 'other_user',
 						pendingPreview: {
 							available: true,
-							items: [
-								{
-									previewId: 'added-html',
-									blockPath: [ 1 ],
-									blockName: 'core/html',
-									changeKind: 'added_block',
-									safePreviewText: 'Script',
-									anchorStatus: 'exact',
-								},
-								{
-									previewId: 'modified-list',
-									blockPath: [ 1 ],
-									blockName: 'core/list',
-									changeKind: 'modified_block',
-									safePreviewText: 'Bread Cheese Tomato',
-									anchorStatus: 'exact',
-								},
-							],
+							items: [ duplicatePreview ],
+						},
+					},
+					{
+						key: 'author-session-b',
+						displayName: 'Author',
+						relationship: 'other_user',
+						pendingPreview: {
+							available: true,
+							items: [ duplicatePreview ],
 						},
 					},
 				],
-				[
-					{
-						blockPath: [ 1 ],
-						key: 'anchor-list',
-						rect: {
-							top: 100,
-							left: 200,
-							width: 360,
-							height: 90,
-						},
-						siblingCount: 2,
-					},
-				]
+				[ 1 ],
+				{ siblingCount: 2 }
 			);
 
-		expect( overlayItems ).toEqual( [
+		expect( pendingGhosts.before ).toHaveLength( 1 );
+		expect( pendingGhosts.before[ 0 ] ).toEqual(
 			expect.objectContaining( {
 				displayName: 'Author',
-				overlayPlacement: 'before',
-				placement: 'before',
 				safePreviewText: 'Script',
-				style: expect.objectContaining( {
-					left: 212,
-					top: 66,
-					width: 336,
-				} ),
-			} ),
-			expect.objectContaining( {
-				displayName: 'Author',
-				overlayPlacement: 'after',
-				placement: 'after',
-				safePreviewText: 'Bread Cheese Tomato',
-				style: expect.objectContaining( {
-					left: 212,
-					top: 106,
-					width: 336,
-				} ),
-			} ),
-		] );
+			} )
+		);
+	} );
+} );
+
+describe( 'DistributedEditingPendingGhostBlockListPreview', () => {
+	it( 'moves author information into a hover/focus callout and marks the pending block treatment', () => {
+		render(
+			<DistributedEditingPendingGhostBlockListPreview
+				ghost={ {
+					blockName: 'core/html',
+					changeKind: 'added_block',
+					displayName: 'Author',
+					key: 'author-added-html',
+					safePreviewText: 'Script',
+				} }
+			/>
+		);
+
+		const ghost = screen.getByRole( 'note', {
+			name: 'Pending edit by Author in core/html',
+		} );
+		const tooltip = screen.getByRole( 'tooltip', { hidden: true } );
+
+		expect( ghost ).not.toHaveAttribute( 'title' );
+		expect( ghost ).toHaveAttribute(
+			'aria-describedby',
+			tooltip.getAttribute( 'id' )
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-callout',
+			'hover-focus'
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-visual-treatment',
+			'subtle-wash-border'
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-placement',
+			'block-list'
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-raw-content',
+			'false'
+		);
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-author-inline',
+			'false'
+		);
+		expect( ghost ).toHaveAttribute( 'tabindex', '0' );
+		expect( tooltip ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-author-callout',
+			'true'
+		);
+		expect( tooltip ).toHaveAttribute( 'aria-hidden', 'true' );
+		expect( tooltip ).toHaveTextContent( 'Author' );
+		expect( tooltip ).toHaveTextContent( 'core/html' );
+		expect( tooltip ).toHaveTextContent( 'Pending added block' );
+		expect( screen.getByText( 'Script' ) ).toBeInTheDocument();
+	} );
+
+	it( 'renders sanitized Custom HTML preview content inside the ghost block', () => {
+		render(
+			<DistributedEditingPendingGhostBlockListPreview
+				ghost={ {
+					blockName: 'core/html',
+					changeKind: 'added_block',
+					displayName: 'Author',
+					key: 'author-added-html',
+					safePreviewHtml: 'Script',
+					safePreviewSerializedBlocks:
+						'<!-- wp:html -->\nScript\n<!-- /wp:html -->',
+					safePreviewText: 'Script',
+				} }
+			/>
+		);
+
+		const ghost = screen.getByRole( 'note', {
+			name: 'Pending edit by Author in core/html',
+		} );
+
+		expect( ghost ).toHaveTextContent( 'Script' );
+		expect(
+			screen.getByTestId(
+				'distributed-editing-pending-ghost-safe-html-preview'
+			)
+		).toBeInTheDocument();
 	} );
 } );
 

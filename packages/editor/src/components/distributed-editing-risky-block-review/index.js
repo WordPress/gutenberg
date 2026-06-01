@@ -13,7 +13,8 @@ import {
 import { parse } from '@wordpress/blocks';
 import { Button, Icon, Notice, TextareaControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { safeHTML } from '@wordpress/dom';
+import { RawHTML, useMemo, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { check, closeSmall, caution, seen } from '@wordpress/icons';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -31,17 +32,70 @@ import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 const FILTER_NAME = 'core/editor/distributed-editing-risky-block-review';
 const RISKY_BLOCK_WASH = 'inset 0 0 0 9999px rgba(34, 113, 177, 0.08)';
 const RISKY_BLOCK_MARKER = 'inset 4px 0 0 #2271b1';
+const PENDING_GHOST_BLOCK_LIST_PREVIEW_STYLE = {
+	background: 'rgba(34, 113, 177, 0.045)',
+	border: '1px dashed rgba(34, 113, 177, 0.36)',
+	borderInlineStart: '3px solid rgba(34, 113, 177, 0.55)',
+	borderRadius: '2px',
+	marginBlock: '4px 8px',
+	opacity: 0.74,
+	paddingBlock: '4px',
+	paddingInline: '12px 8px',
+	position: 'relative',
+	transition:
+		'background-color 120ms ease-out, border-color 120ms ease-out, opacity 120ms ease-out',
+};
+const PENDING_GHOST_BLOCK_LIST_PREVIEW_ACTIVE_STYLE = {
+	background: 'rgba(34, 113, 177, 0.07)',
+	borderColor: 'rgba(34, 113, 177, 0.56)',
+	opacity: 1,
+};
+const PENDING_GHOST_PREVIEW_STYLE = {
+	overflowWrap: 'anywhere',
+	pointerEvents: 'none',
+};
+const PENDING_GHOST_CALLOUT_STYLE = {
+	background: '#fff',
+	border: '1px solid #c3c4c7',
+	borderRadius: '2px',
+	boxShadow: '0 8px 24px rgba(0, 0, 0, 0.14)',
+	color: '#1e1e1e',
+	display: 'grid',
+	fontSize: '12px',
+	gap: '4px',
+	insetInlineStart: '8px',
+	maxWidth: 'min(260px, calc(100vw - 32px))',
+	minWidth: '180px',
+	opacity: 0,
+	overflowWrap: 'anywhere',
+	padding: '8px',
+	pointerEvents: 'none',
+	position: 'absolute',
+	top: 'calc(100% + 4px)',
+	transform: 'translateY(-2px)',
+	transition:
+		'opacity 120ms ease-out, transform 120ms ease-out, visibility 120ms ease-out',
+	visibility: 'hidden',
+	zIndex: 20,
+};
+const PENDING_GHOST_CALLOUT_OPEN_STYLE = {
+	opacity: 1,
+	transform: 'translateY(0)',
+	visibility: 'visible',
+};
+const PENDING_GHOST_CALLOUT_AUTHOR_STYLE = {
+	fontSize: '13px',
+	lineHeight: 1.4,
+};
+const PENDING_GHOST_CALLOUT_DETAIL_STYLE = {
+	color: '#50575e',
+	lineHeight: 1.4,
+};
 const EMPTY_PENDING_GHOSTS = {
 	before: [],
 	after: [],
 };
 const EMPTY_ARRAY = [];
-const PENDING_GHOST_ANCHOR_ATTRIBUTE =
-	'data-distributed-editing-pending-ghost-anchor';
-const PENDING_GHOST_BLOCK_PATH_ATTRIBUTE =
-	'data-distributed-editing-pending-ghost-anchor-path';
-const PENDING_GHOST_SIBLING_COUNT_ATTRIBUTE =
-	'data-distributed-editing-pending-ghost-anchor-sibling-count';
 
 /**
  * Returns whether the risky-block review panel has any state to render.
@@ -144,6 +198,7 @@ export function getDistributedEditingPendingGhostEntriesForBlockPath(
 		before: [],
 		after: [],
 	};
+	const seenGhosts = new Set();
 
 	for ( const entry of Array.isArray( rosterEntries ) ? rosterEntries : [] ) {
 		if (
@@ -174,6 +229,18 @@ export function getDistributedEditingPendingGhostEntriesForBlockPath(
 				continue;
 			}
 
+			const dedupeKey = getDistributedEditingPendingGhostDedupeKey(
+				item,
+				displayName,
+				placement
+			);
+
+			if ( seenGhosts.has( dedupeKey ) ) {
+				continue;
+			}
+
+			seenGhosts.add( dedupeKey );
+
 			ghosts[ placement ].push( {
 				...item,
 				displayName,
@@ -194,72 +261,6 @@ export function getDistributedEditingPendingGhostEntriesForBlockPath(
 	}
 
 	return ghosts;
-}
-
-/**
- * Returns fixed-position pending ghost overlay items for measured block anchors.
- *
- * The overlay model keeps ghost previews out of Gutenberg's editable block
- * tree. Anchors may come from the main document or from the same-origin editor
- * iframe; all rects are normalized to the top viewport before rendering.
- *
- * @param {Array}  rosterEntries Presence roster entries.
- * @param {Array}  anchors       Measured block anchors.
- * @param {Object} options       Overlay filtering options.
- *
- * @return {Array} Overlay ghost items.
- */
-export function getDistributedEditingPendingGhostOverlayItemsForAnchors(
-	rosterEntries = [],
-	anchors = [],
-	options = {}
-) {
-	const overlayItems = [];
-
-	for ( const anchor of Array.isArray( anchors ) ? anchors : [] ) {
-		const blockPath = getDistributedEditingNormalizedBlockPath(
-			anchor?.blockPath
-		);
-		const rect = anchor?.rect || {};
-
-		if (
-			blockPath.length === 0 ||
-			! Number.isFinite( rect.top ) ||
-			! Number.isFinite( rect.left ) ||
-			! Number.isFinite( rect.width ) ||
-			rect.width <= 0
-		) {
-			continue;
-		}
-
-		const pendingGhosts =
-			getDistributedEditingPendingGhostEntriesForBlockPath(
-				rosterEntries,
-				blockPath,
-				{
-					siblingCount: anchor.siblingCount,
-					minUpdatedAtMs: options.minUpdatedAtMs,
-				}
-			);
-
-		for ( const placement of [ 'before', 'after' ] ) {
-			for ( const ghost of pendingGhosts[ placement ] || [] ) {
-				overlayItems.push( {
-					...ghost,
-					key: `${ ghost.key }-${
-						anchor.key || blockPath.join( '.' )
-					}`,
-					overlayPlacement: placement,
-					style: getDistributedEditingPendingGhostOverlayStyle(
-						rect,
-						placement
-					),
-				} );
-			}
-		}
-	}
-
-	return overlayItems;
 }
 
 function isDistributedEditingPendingGhostRenderable( item = {}, options = {} ) {
@@ -371,10 +372,14 @@ function getDistributedEditingPendingGhostPlacementForBlockPath(
  */
 function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 	return function WithDistributedEditingRiskyBlockReviewAnnotations( props ) {
-		const { blockContextJson, reviewItem } = useSelect(
+		const [ mountedAtMs ] = useState( () => Date.now() );
+		const { pendingGhostsJson, reviewItem } = useSelect(
 			( select ) => {
-				const { getDistributedEditingRiskyBlockReviewState } =
-					select( editorStore );
+				const editorSelect = select( editorStore );
+				const {
+					getDistributedEditingRiskyBlockReviewState,
+					getDistributedEditingSessionState,
+				} = editorSelect;
 				const reviewState =
 					getDistributedEditingRiskyBlockReviewState?.() || {};
 				const blockEditorSelect = select( blockEditorStore );
@@ -382,6 +387,22 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 					getDistributedEditingBlockPathContextForClientId(
 						blockEditorSelect,
 						props.clientId
+					);
+				const sessionState =
+					getDistributedEditingSessionState?.() || {};
+				const rosterEntries = Array.isArray(
+					sessionState.presenceRosterEntries
+				)
+					? sessionState.presenceRosterEntries
+					: EMPTY_ARRAY;
+				const pendingGhosts =
+					getDistributedEditingPendingGhostEntriesForBlockPath(
+						rosterEntries,
+						blockContext.blockPath,
+						{
+							minUpdatedAtMs: mountedAtMs,
+							siblingCount: blockContext.siblingCount,
+						}
 					);
 				let nextReviewItem = null;
 
@@ -401,272 +422,80 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 				}
 
 				return {
-					blockContextJson: JSON.stringify( blockContext ),
+					pendingGhostsJson: JSON.stringify( pendingGhosts ),
 					reviewItem: nextReviewItem,
 				};
 			},
-			[ props.clientId ]
+			[ mountedAtMs, props.clientId ]
 		);
-		const blockContext = useMemo( () => {
+		const pendingGhosts = useMemo( () => {
 			try {
-				return JSON.parse( blockContextJson );
+				const parsed = JSON.parse( pendingGhostsJson );
+
+				return {
+					before: Array.isArray( parsed?.before )
+						? parsed.before
+						: EMPTY_ARRAY,
+					after: Array.isArray( parsed?.after )
+						? parsed.after
+						: EMPTY_ARRAY,
+				};
 			} catch {
-				return {
-					blockPath: [],
-					siblingCount: null,
-				};
+				return EMPTY_PENDING_GHOSTS;
 			}
-		}, [ blockContextJson ] );
-		const wrapperProps =
-			getDistributedEditingPendingGhostAnchorWrapperProps(
-				reviewItem
-					? getDistributedEditingRiskyBlockReviewWrapperProps(
-							props.wrapperProps,
-							reviewItem
-					  )
-					: props.wrapperProps,
-				blockContext
-			);
+		}, [ pendingGhostsJson ] );
+		const wrapperProps = reviewItem
+			? getDistributedEditingRiskyBlockReviewWrapperProps(
+					props.wrapperProps,
+					reviewItem
+			  )
+			: props.wrapperProps;
 
-		return reviewItem ? (
-			<BlockListBlock
-				{ ...props }
-				className={ clsx(
-					props.className,
-					'is-distributed-editing-risky-block-review-target'
+		return (
+			<>
+				{ pendingGhosts.before.map( ( ghost ) => (
+					<DistributedEditingPendingGhostBlockListPreview
+						ghost={ ghost }
+						key={ ghost.key }
+					/>
+				) ) }
+				{ reviewItem ? (
+					<BlockListBlock
+						{ ...props }
+						className={ clsx(
+							props.className,
+							'is-distributed-editing-risky-block-review-target'
+						) }
+						wrapperProps={ wrapperProps }
+					/>
+				) : (
+					<BlockListBlock
+						{ ...props }
+						wrapperProps={ wrapperProps }
+					/>
 				) }
-				wrapperProps={ wrapperProps }
-			/>
-		) : (
-			<BlockListBlock { ...props } wrapperProps={ wrapperProps } />
+				{ pendingGhosts.after.map( ( ghost ) => (
+					<DistributedEditingPendingGhostBlockListPreview
+						ghost={ ghost }
+						key={ ghost.key }
+					/>
+				) ) }
+			</>
 		);
 	};
 }
 
-function getDistributedEditingPendingGhostAnchorWrapperProps(
-	wrapperProps = {},
-	blockContext = {}
-) {
-	const blockPath = getDistributedEditingNormalizedBlockPath(
-		blockContext.blockPath
-	);
-
-	if ( blockPath.length === 0 ) {
-		return wrapperProps;
-	}
-
-	return {
-		...wrapperProps,
-		className: clsx(
-			wrapperProps.className,
-			'has-distributed-editing-pending-ghost-anchor'
-		),
-		[ PENDING_GHOST_ANCHOR_ATTRIBUTE ]: 'true',
-		[ PENDING_GHOST_BLOCK_PATH_ATTRIBUTE ]: blockPath.join( '.' ),
-		[ PENDING_GHOST_SIBLING_COUNT_ATTRIBUTE ]: Number.isInteger(
-			blockContext.siblingCount
-		)
-			? String( blockContext.siblingCount )
-			: '',
-	};
-}
-
-/**
- * Renders inert pending-edit previews outside the editable block tree.
- *
- * @return {React.ReactNode} Pending ghost overlay.
- */
-export function DistributedEditingPendingGhostOverlay() {
-	const rosterEntriesJson = useSelect( ( select ) => {
-		const sessionState =
-			select( editorStore ).getDistributedEditingSessionState?.() || {};
-
-		return JSON.stringify(
-			Array.isArray( sessionState.presenceRosterEntries )
-				? sessionState.presenceRosterEntries
-				: EMPTY_ARRAY
-		);
-	}, [] );
-	const rosterEntries = useMemo( () => {
-		try {
-			return JSON.parse( rosterEntriesJson );
-		} catch {
-			return EMPTY_ARRAY;
-		}
-	}, [ rosterEntriesJson ] );
-	const [ overlayItems, setOverlayItems ] = useState( EMPTY_ARRAY );
-	const [ mountedAtMs ] = useState( () => Date.now() );
-
-	useEffect( () => {
-		let animationFrameId = 0;
-
-		function refreshOverlayItems() {
-			if ( animationFrameId ) {
-				globalThis.cancelAnimationFrame?.( animationFrameId );
-			}
-
-			animationFrameId = globalThis.requestAnimationFrame
-				? globalThis.requestAnimationFrame( () => {
-						animationFrameId = 0;
-						setOverlayItems(
-							getDistributedEditingPendingGhostOverlayItemsForAnchors(
-								rosterEntries,
-								getDistributedEditingPendingGhostAnchorSnapshots(),
-								{
-									minUpdatedAtMs: mountedAtMs,
-								}
-							)
-						);
-				  } )
-				: 0;
-
-			if ( ! animationFrameId ) {
-				setOverlayItems(
-					getDistributedEditingPendingGhostOverlayItemsForAnchors(
-						rosterEntries,
-						getDistributedEditingPendingGhostAnchorSnapshots(),
-						{
-							minUpdatedAtMs: mountedAtMs,
-						}
-					)
-				);
-			}
-		}
-
-		refreshOverlayItems();
-
-		const intervalId = globalThis.setInterval?.(
-			refreshOverlayItems,
-			1000
-		);
-		globalThis.addEventListener?.( 'resize', refreshOverlayItems );
-		globalThis.addEventListener?.( 'scroll', refreshOverlayItems, true );
-
-		return () => {
-			if ( animationFrameId ) {
-				globalThis.cancelAnimationFrame?.( animationFrameId );
-			}
-			if ( intervalId ) {
-				globalThis.clearInterval?.( intervalId );
-			}
-			globalThis.removeEventListener?.( 'resize', refreshOverlayItems );
-			globalThis.removeEventListener?.(
-				'scroll',
-				refreshOverlayItems,
-				true
-			);
-		};
-	}, [ rosterEntries, mountedAtMs ] );
-
-	if ( overlayItems.length === 0 ) {
-		return null;
-	}
-
-	return (
-		<div
-			aria-label={ __( 'Pending edits from other sessions' ) }
-			className="editor-distributed-editing-risky-block-review__pending-ghost-overlay"
-			data-distributed-editing-pending-ghost-overlay
-			role="presentation"
-		>
-			{ overlayItems.map( ( ghost ) => (
-				<DistributedEditingPendingGhostBlock
-					ghost={ ghost }
-					isOverlay
-					key={ ghost.key }
-					style={ ghost.style }
-				/>
-			) ) }
-		</div>
-	);
-}
-
-function getDistributedEditingPendingGhostAnchorSnapshots() {
-	return getDistributedEditingPendingGhostQueryableDocuments().flatMap(
-		( { document, frameRect } ) =>
-			Array.from(
-				document.querySelectorAll(
-					`[${ PENDING_GHOST_ANCHOR_ATTRIBUTE }="true"]`
-				)
-			).map( ( element, index ) => {
-				const rect = element.getBoundingClientRect();
-				const siblingCount = Number(
-					element.getAttribute(
-						PENDING_GHOST_SIBLING_COUNT_ATTRIBUTE
-					)
-				);
-
-				return {
-					blockPath:
-						element.getAttribute(
-							PENDING_GHOST_BLOCK_PATH_ATTRIBUTE
-						) || '',
-					key: `${
-						document.location?.href || 'document'
-					}-${ index }`,
-					rect: {
-						top: rect.top + ( frameRect?.top || 0 ),
-						left: rect.left + ( frameRect?.left || 0 ),
-						width: rect.width,
-						height: rect.height,
-					},
-					siblingCount: Number.isInteger( siblingCount )
-						? siblingCount
-						: null,
-				};
-			} )
-	);
-}
-
-function getDistributedEditingPendingGhostQueryableDocuments() {
-	const currentDocument = globalThis.document;
-
-	if ( ! currentDocument ) {
-		return [];
-	}
-
-	const documents = [
-		{
-			document: currentDocument,
-			frameRect: null,
-		},
-	];
-
-	for ( const frame of currentDocument.querySelectorAll( 'iframe' ) ) {
-		try {
-			if ( frame.contentDocument?.body ) {
-				documents.push( {
-					document: frame.contentDocument,
-					frameRect: frame.getBoundingClientRect(),
-				} );
-			}
-		} catch {
-			// Cross-origin iframes are ignored; the editor iframe is same-origin.
-		}
-	}
-
-	return documents;
-}
-
-function getDistributedEditingPendingGhostOverlayStyle( rect, placement ) {
-	const verticalOffset = placement === 'before' ? -34 : 6;
-	const top = Math.max( 8, rect.top + verticalOffset );
-	const left = Math.max( 8, rect.left + 12 );
-	const width = Math.max( 180, Math.min( rect.width - 24, 520 ) );
-
-	return {
-		left,
-		top,
-		width,
-	};
-}
-
-function DistributedEditingPendingGhostBlock( { ghost, isOverlay, style } ) {
+export function DistributedEditingPendingGhostBlockListPreview( { ghost } ) {
+	const [ isCalloutOpen, setIsCalloutOpen ] = useState( false );
 	const previewText = getDistributedEditingPendingGhostPreviewText( ghost );
 	const previewBlocks = useMemo(
 		() => getDistributedEditingPendingGhostPreviewBlocks( ghost ),
 		[ ghost ]
 	);
+	const previewHtml = getDistributedEditingPendingGhostPreviewHtml( ghost );
+	const shouldRenderRawHtmlPreview =
+		previewHtml &&
+		( ghost.blockName === 'core/html' || previewBlocks.length === 0 );
 	const previewBlockProps = useBlockPreview( {
 		blocks: previewBlocks,
 		props: {
@@ -675,57 +504,150 @@ function DistributedEditingPendingGhostBlock( { ghost, isOverlay, style } ) {
 		},
 	} );
 	const blockName = ghost.blockName || __( 'block' );
+	const changeKind = ghost.changeKind || 'unknown_change';
+	const tooltipId = `distributed-editing-pending-ghost-${
+		ghost.key || 'preview'
+	}`;
 	const ghostLabel = sprintf(
 		/* translators: 1: editor display name, 2: block name. */
 		__( 'Pending edit by %1$s in %2$s' ),
 		ghost.displayName,
 		blockName
 	);
+	const changeLabel =
+		getDistributedEditingPendingGhostChangeLabel( changeKind );
+	let previewContent = (
+		<div className="editor-distributed-editing-risky-block-review__pending-ghost-placeholder">
+			{ previewText }
+		</div>
+	);
+
+	if ( shouldRenderRawHtmlPreview ) {
+		previewContent = (
+			<div
+				className="editor-distributed-editing-risky-block-review__pending-ghost-block-list"
+				data-distributed-editing-pending-ghost-renderer="safe-html"
+				data-testid="distributed-editing-pending-ghost-safe-html-preview"
+			>
+				<RawHTML>{ safeHTML( previewHtml ) }</RawHTML>
+			</div>
+		);
+	} else if ( previewBlocks.length ) {
+		previewContent = (
+			<div
+				{ ...previewBlockProps }
+				data-distributed-editing-pending-ghost-renderer="block-preview"
+			/>
+		);
+	}
 
 	return (
 		<div
 			aria-label={ ghostLabel }
-			className={ clsx(
-				'editor-distributed-editing-risky-block-review__pending-ghost-block',
-				isOverlay &&
-					'editor-distributed-editing-risky-block-review__pending-ghost-block--overlay'
-			) }
+			aria-describedby={ tooltipId }
+			className="editor-distributed-editing-risky-block-review__pending-ghost-block-list-preview"
 			data-distributed-editing-pending-ghost="true"
 			data-distributed-editing-pending-ghost-author={ ghost.displayName }
+			data-distributed-editing-pending-ghost-author-inline="false"
 			data-distributed-editing-pending-ghost-block-name={ blockName }
-			data-distributed-editing-pending-ghost-change-kind={
-				ghost.changeKind || 'unknown_change'
-			}
+			data-distributed-editing-pending-ghost-change-kind={ changeKind }
+			data-distributed-editing-pending-ghost-block-list-preview="true"
+			data-distributed-editing-pending-ghost-callout="hover-focus"
 			data-distributed-editing-pending-ghost-inert="true"
-			data-distributed-editing-pending-ghost-placement={
-				isOverlay ? 'overlay' : 'inline'
-			}
+			data-distributed-editing-pending-ghost-placement="block-list"
 			data-distributed-editing-pending-ghost-raw-content="false"
+			data-distributed-editing-pending-ghost-visual-treatment="subtle-wash-border"
+			onBlur={ ( event ) => {
+				if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
+					setIsCalloutOpen( false );
+				}
+			} }
+			onFocus={ () => setIsCalloutOpen( true ) }
+			onMouseEnter={ () => setIsCalloutOpen( true ) }
+			onMouseLeave={ () => setIsCalloutOpen( false ) }
 			role="note"
-			style={ style }
-			title={ ghostLabel }
+			style={ {
+				...PENDING_GHOST_BLOCK_LIST_PREVIEW_STYLE,
+				...( isCalloutOpen
+					? PENDING_GHOST_BLOCK_LIST_PREVIEW_ACTIVE_STYLE
+					: {} ),
+			} }
+			tabIndex="0"
 		>
-			<span
-				aria-hidden="true"
-				className="editor-distributed-editing-risky-block-review__pending-ghost-marker"
-			/>
-			<span className="editor-distributed-editing-risky-block-review__pending-ghost-copy">
-				<div className="editor-distributed-editing-risky-block-review__pending-ghost-preview">
-					{ previewBlocks.length ? (
-						<div
-							{ ...previewBlockProps }
-							data-distributed-editing-pending-ghost-renderer="block-preview"
-						/>
-					) : (
-						previewText
-					) }
-				</div>
-				<span className="editor-distributed-editing-risky-block-review__pending-ghost-author">
+			<div
+				className="editor-distributed-editing-risky-block-review__pending-ghost-preview"
+				inert=""
+				style={ PENDING_GHOST_PREVIEW_STYLE }
+			>
+				{ previewContent }
+			</div>
+			<div
+				aria-hidden={ ! isCalloutOpen }
+				className="editor-distributed-editing-risky-block-review__pending-ghost-callout"
+				data-distributed-editing-pending-ghost-author-callout="true"
+				id={ tooltipId }
+				role="tooltip"
+				style={ {
+					...PENDING_GHOST_CALLOUT_STYLE,
+					...( isCalloutOpen
+						? PENDING_GHOST_CALLOUT_OPEN_STYLE
+						: {} ),
+				} }
+			>
+				<strong
+					className="editor-distributed-editing-risky-block-review__pending-ghost-callout-author"
+					style={ PENDING_GHOST_CALLOUT_AUTHOR_STYLE }
+				>
 					{ ghost.displayName }
+				</strong>
+				<span
+					className="editor-distributed-editing-risky-block-review__pending-ghost-callout-detail"
+					style={ PENDING_GHOST_CALLOUT_DETAIL_STYLE }
+				>
+					{ blockName }
 				</span>
-			</span>
+				<span
+					className="editor-distributed-editing-risky-block-review__pending-ghost-callout-detail"
+					style={ PENDING_GHOST_CALLOUT_DETAIL_STYLE }
+				>
+					{ changeLabel }
+				</span>
+			</div>
 		</div>
 	);
+}
+
+function getDistributedEditingPendingGhostChangeLabel( changeKind ) {
+	switch ( changeKind ) {
+		case 'added_block':
+			return __( 'Pending added block' );
+		case 'modified_block':
+			return __( 'Pending block edit' );
+		case 'deleted_block':
+			return __( 'Pending deleted block' );
+		default:
+			return __( 'Pending edit' );
+	}
+}
+
+function getDistributedEditingPendingGhostDedupeKey(
+	item = {},
+	displayName = '',
+	placement = ''
+) {
+	return [
+		placement,
+		displayName,
+		item.previewId || item.preview_id || '',
+		getDistributedEditingNormalizedBlockPath( item.blockPath ).join( '.' ),
+		item.blockName || item.block_name || '',
+		item.changeKind || item.change_kind || '',
+		item.safePreviewSerializedBlocks ||
+			item.safe_preview_serialized_blocks ||
+			'',
+		item.safePreviewHtml || item.safe_preview_html || '',
+		item.safePreviewText || item.safe_preview_text || '',
+	].join( '\u0000' );
 }
 
 function getDistributedEditingNormalizedBlockPath( blockPath ) {
@@ -825,6 +747,16 @@ function getDistributedEditingPendingGhostPreviewSerializedBlocks(
 	return typeof serialized === 'string' && /<!--\s*\/?wp:/.test( serialized )
 		? serialized
 		: '';
+}
+
+function getDistributedEditingPendingGhostPreviewHtml( ghost = {} ) {
+	if ( ghost.rawContentIncluded || ghost.exposesRawContent ) {
+		return '';
+	}
+
+	const html = ghost.safePreviewHtml || ghost.safe_preview_html || '';
+
+	return typeof html === 'string' ? html : '';
 }
 
 function getDistributedEditingPendingGhostPreviewBlocks( ghost = {} ) {

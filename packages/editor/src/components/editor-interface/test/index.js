@@ -85,19 +85,9 @@ jest.mock( '../../distributed-editing-risky-block-review', () => {
 		);
 	}
 
-	function MockDistributedEditingPendingGhostOverlay() {
-		return createElement(
-			'div',
-			null,
-			'Distributed editing pending ghost overlay mount'
-		);
-	}
-
 	return {
 		__esModule: true,
 		default: MockDistributedEditingRiskyBlockReviewPrePublishPanel,
-		DistributedEditingPendingGhostOverlay:
-			MockDistributedEditingPendingGhostOverlay,
 		DistributedEditingRiskyBlockReviewStatusChrome:
 			MockDistributedEditingRiskyBlockReviewStatusChrome,
 	};
