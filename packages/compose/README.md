@@ -435,7 +435,7 @@ Runs a media query and returns its value when it changes.
 _Parameters_
 
 -   _query_ `[string]`: Media Query.
--   _view_ `[Window]`: Window instance, else default to global window
+-   _view_ `[Window | undefined]`: Window instance, else default to global window
 
 _Returns_
 
@@ -451,19 +451,19 @@ As expected, if you pass a new function on every render, the ref callback will b
 
 If you don't wish a ref callback to be called after every render, wrap it with `useCallback( callback, dependencies )`. When a dependency changes, the old ref callback will be called with `null` and the new ref callback will be called with the same value.
 
-To make ref callbacks easier to use, you can also pass the result of `useRefEffect`, which makes cleanup easier by allowing you to return a cleanup function instead of handling `null`.
+Inner ref callbacks may return a cleanup function (React 19's ref callback cleanup pattern). When a ref callback returns a function, that function is invoked at teardown (node change, dependency change, or unmount) **instead of** the callback being called with `null`. Callbacks that do not return a cleanup continue to receive `null` on teardown as before.
 
 It's also possible to _disable_ a ref (and its behaviour) by simply not passing the ref.
 
 ```jsx
-const ref = useRefEffect( ( node ) => {
+const ref = useCallback( ( node ) => {
   node.addEventListener( ... );
   return () => {
     node.removeEventListener( ... );
   };
 }, [ ...dependencies ] );
 const otherRef = useRef();
-const mergedRefs useMergeRefs( [
+const mergedRefs = useMergeRefs( [
   enabled && ref,
   otherRef,
 ] );
@@ -597,7 +597,7 @@ _Parameters_
 
 -   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
 -   _operator_ `[WPViewportOperator]`: Viewport operator.
--   _view_ `[Window]`: Window instance in which to perform viewport matching.
+-   _view_ `[Window|undefined]`: Window instance in which to perform viewport matching.
 
 _Returns_
 

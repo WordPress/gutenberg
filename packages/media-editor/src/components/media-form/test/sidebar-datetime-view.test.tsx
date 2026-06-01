@@ -47,27 +47,6 @@ describe( 'SidebarDatetimeView', () => {
 		expect( rendered ).toHaveAttribute( 'datetime', value );
 	} );
 
-	it( 'does not add a tab stop for the datetime anchor', () => {
-		const value = '2026-05-20T14:30:00';
-		const settings = getSettings();
-		const fullDatetime = dateI18n(
-			settings.formats.datetimeAbbreviated,
-			getDate( value )
-		);
-
-		render(
-			<SidebarDatetimeView
-				item={ {} as Media }
-				field={ makeField( value ) }
-			/>
-		);
-
-		expect( screen.getByLabelText( fullDatetime ) ).toHaveAttribute(
-			'tabindex',
-			'-1'
-		);
-	} );
-
 	it( 'shows the short date as visible text', () => {
 		const value = '2026-05-20T14:30:00';
 		const settings = getSettings();

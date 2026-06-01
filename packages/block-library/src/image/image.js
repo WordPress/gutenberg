@@ -45,6 +45,7 @@ import {
 	useCallback,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
@@ -381,9 +382,15 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
+	const cropButtonRef = useRef();
+	const handleMediaEditorModalClose = useCallback(
+		() => cropButtonRef.current?.focus(),
+		[]
+	);
 	const openImageMediaEditorModal = useOpenImageMediaEditorModal( {
 		attributes,
 		setAttributes,
+		onClose: handleMediaEditorModalClose,
 	} );
 
 	const {
@@ -735,11 +742,14 @@ export default function Image( {
 		lockTitleControls = false,
 		lockTitleControlsMessage,
 		hideCaptionControls = false,
+		hasSelectedStyleState = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
 			const {
 				url: urlBinding,
 				alt: altBinding,
@@ -757,6 +767,7 @@ export default function Image( {
 				titleBinding?.source
 			);
 			return {
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 				lockUrlControls:
 					!! urlBinding &&
 					! urlBindingSource?.canUserEditValue?.( {
@@ -801,6 +812,7 @@ export default function Image( {
 		},
 		[
 			arePatternOverridesEnabled,
+			clientId,
 			context,
 			isSingleSelected,
 			metadata?.bindings,
@@ -863,6 +875,7 @@ export default function Image( {
 					) }
 					{ allowCrop && (
 						<ToolbarButton
+							ref={ cropButtonRef }
 							onClick={
 								openImageMediaEditorModal
 									? openImageMediaEditorModal
@@ -1005,45 +1018,47 @@ export default function Image( {
 					</ToolsPanel>
 				</InspectorControls>
 			) }
-			<InspectorControls
-				group="dimensions"
-				resetAllFilter={ ( attrs ) => ( {
-					...attrs,
-					aspectRatio: undefined,
-					width: undefined,
-					height: undefined,
-					scale: undefined,
-					focalPoint: undefined,
-				} ) }
-			>
-				{ dimensionsControl }
-				{ url && scale && (
-					<ToolsPanelItem
-						label={ __( 'Focal point' ) }
-						isShownByDefault
-						hasValue={ () => !! focalPoint }
-						onDeselect={ () =>
-							setAttributes( {
-								focalPoint: undefined,
-							} )
-						}
-						panelId={ clientId }
-					>
-						<FocalPointPicker
+			{ ! hasSelectedStyleState && (
+				<InspectorControls
+					group="dimensions"
+					resetAllFilter={ ( attrs ) => ( {
+						...attrs,
+						aspectRatio: undefined,
+						width: undefined,
+						height: undefined,
+						scale: undefined,
+						focalPoint: undefined,
+					} ) }
+				>
+					{ dimensionsControl }
+					{ url && scale && (
+						<ToolsPanelItem
 							label={ __( 'Focal point' ) }
-							url={ url }
-							value={ focalPoint }
-							onDragStart={ imperativeFocalPointPreview }
-							onDrag={ imperativeFocalPointPreview }
-							onChange={ ( newFocalPoint ) =>
+							isShownByDefault
+							hasValue={ () => !! focalPoint }
+							onDeselect={ () =>
 								setAttributes( {
-									focalPoint: newFocalPoint,
+									focalPoint: undefined,
 								} )
 							}
-						/>
-					</ToolsPanelItem>
-				) }
-			</InspectorControls>
+							panelId={ clientId }
+						>
+							<FocalPointPicker
+								label={ __( 'Focal point' ) }
+								url={ url }
+								value={ focalPoint }
+								onDragStart={ imperativeFocalPointPreview }
+								onDrag={ imperativeFocalPointPreview }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
+				</InspectorControls>
+			) }
 			{ !! imageSizeOptions.length && (
 				<InspectorControls>
 					<ToolsPanel

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+## 34.0.0 (2026-05-27)
+
 ### Breaking Changes
 
 -   Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
@@ -25,6 +31,7 @@
 ### Internal
 
 -   `Autocomplete`: Share the per-instance `keydown` listener across instances via `subscribeDelegatedListener` so a typical post-editor mount adds 1 native keydown listener on the document instead of one per `RichText` ([#78310](https://github.com/WordPress/gutenberg/pull/78310)).
+-   Declare `@emotion/native` as a direct dependency; it was previously a phantom dependency relying on hoisting ([#78687](https://github.com/WordPress/gutenberg/pull/78687)).
 
 ## 33.1.0 (2026-05-14)
 
