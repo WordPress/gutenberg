@@ -7,6 +7,7 @@ import type {
 	HTMLAttributes,
 	MouseEvent,
 	ReactElement,
+	Ref,
 } from 'react';
 
 /**
@@ -233,7 +234,6 @@ export function Button( {
 		className: classes,
 		'aria-label': additionalProps[ 'aria-label' ] || label,
 		'aria-describedby': describedById,
-		ref,
 	};
 
 	const elementChildren = (
@@ -256,6 +256,7 @@ export function Button( {
 				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
 				{ ...disableEventProps }
 				{ ...commonProps }
+				ref={ ref as Ref< HTMLAnchorElement > }
 			>
 				{ elementChildren }
 			</a>
@@ -265,6 +266,7 @@ export function Button( {
 				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
 				{ ...disableEventProps }
 				{ ...commonProps }
+				ref={ ref as Ref< HTMLButtonElement > }
 			>
 				{ elementChildren }
 			</button>

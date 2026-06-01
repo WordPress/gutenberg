@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { createRef, forwardRef } from '@wordpress/element';
+import { createRef } from '@wordpress/element';
 import { plusCircle } from '@wordpress/icons';
 
 /**
@@ -19,11 +19,8 @@ import { press } from '@ariakit/test';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
-const Button = forwardRef(
-	(
-		props: React.ComponentProps< typeof _Button >,
-		ref: React.ForwardedRef< unknown >
-	) => <_Button __next40pxDefaultSize { ...props } ref={ ref } />
+const Button = ( props: React.ComponentProps< typeof _Button > ) => (
+	<_Button __next40pxDefaultSize { ...props } />
 );
 
 describe( 'Button', () => {
@@ -541,7 +538,7 @@ describe( 'Button', () => {
 
 	describe( 'ref forwarding', () => {
 		it( 'should enable access to DOM element', () => {
-			const ref = createRef();
+			const ref = createRef< HTMLButtonElement >();
 
 			render( <Button ref={ ref } /> );
 
