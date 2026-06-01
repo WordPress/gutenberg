@@ -1,5 +1,4 @@
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/variables" as vars;
 @use "../../../dataviews/style" as *;
 
 div.dataviews-view-list {
@@ -12,11 +11,11 @@ div.dataviews-view-list {
 	div[role="row"],
 	div[role="article"] {
 		margin: 0;
-		border-top: 1px solid $gray-100;
+		border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
-			padding: $grid-unit-20 $grid-unit-30;
+			padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
 			box-sizing: border-box;
 		}
 
@@ -24,7 +23,7 @@ div.dataviews-view-list {
 			display: flex;
 			width: max-content;
 			flex: 0 0 auto;
-			gap: $grid-unit-05;
+			gap: var(--wpds-dimension-gap-xs);
 			white-space: nowrap;
 
 			.components-button {
@@ -33,7 +32,7 @@ div.dataviews-view-list {
 			}
 
 			> div {
-				height: $button-size-small;
+				height: vars.$button-size-small;
 			}
 
 			> :not(:last-child) {
@@ -61,11 +60,11 @@ div.dataviews-view-list {
 		}
 
 		&.is-selected.is-selected {
-			border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+			border-top: 1px solid var(--wpds-color-stroke-surface-brand);
 
 			& + div[role="row"],
 			& + div[role="article"] {
-				border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+				border-top: 1px solid var(--wpds-color-stroke-surface-brand);
 			}
 		}
 
@@ -73,18 +72,12 @@ div.dataviews-view-list {
 			&:hover,
 			&.is-hovered,
 			&:focus-within {
-				color: var(--wp-admin-theme-color);
-				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-				border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
-
-				& + div[role="row"],
-				& + div[role="article"] {
-					border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
-				}
+				color: var(--wpds-color-fg-interactive-brand);
+				background-color: var(--wpds-color-bg-interactive-brand-weak);
 
 				.dataviews-title-field,
 				.dataviews-view-list__field {
-					color: var(--wp-admin-theme-color);
+					color: var(--wpds-color-fg-interactive-brand);
 				}
 			}
 		}
@@ -96,12 +89,12 @@ div.dataviews-view-list {
 	div[role="article"].is-selected,
 	div[role="article"].is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
-			color: $gray-900;
+			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			color: var(--wpds-color-fg-interactive-neutral);
 
 			.dataviews-title-field,
 			.dataviews-view-list__field {
-				color: $gray-900;
+				color: var(--wpds-color-fg-interactive-neutral-active);
 			}
 		}
 	}
@@ -110,7 +103,7 @@ div.dataviews-view-list {
 		position: absolute;
 		z-index: 1;
 		inset: 0;
-		scroll-margin: $grid-unit-10 0;
+		scroll-margin: var(--wpds-dimension-gap-sm) 0;
 		appearance: none;
 		border: none;
 		background: none;
@@ -124,8 +117,8 @@ div.dataviews-view-list {
 				position: absolute;
 				content: "";
 				inset: var(--wp-admin-border-width-focus);
-				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				border-radius: $radius-small;
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus-brand);
+				border-radius: var(--wpds-border-radius-sm);
 				// Windows High Contrast mode will show this outline, but not the box-shadow.
 				outline: 2px solid transparent;
 			}
@@ -133,8 +126,8 @@ div.dataviews-view-list {
 	}
 	.dataviews-view-list__title-field {
 		flex: 1;
-		min-height: $grid-unit-30;
-		line-height: $grid-unit-30;
+		min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+		line-height: var(--wpds-typography-line-height-md);
 		overflow: hidden;
 		// The field should be in front of the main button in case it has a link/button.
 		&:has(a, button) {
@@ -143,13 +136,13 @@ div.dataviews-view-list {
 	}
 
 	.dataviews-view-list__media-wrapper {
-		width: $grid-unit-05 * 13;
-		height: $grid-unit-05 * 13;
+		width: calc(var(--wpds-dimension-base) * 13);
+		height: calc(var(--wpds-dimension-base) * 13);
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
-		background-color: $white;
-		border-radius: $radius-medium;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border-radius: var(--wpds-border-radius-md);
 
 		img {
 			width: 100%;
@@ -164,24 +157,25 @@ div.dataviews-view-list {
 			left: 0;
 			width: 100%;
 			height: 100%;
-			box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.1);
-			border-radius: $radius-medium;
+			box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
+			border-radius: var(--wpds-border-radius-md);
 		}
 	}
 
 	.dataviews-view-list__field-wrapper {
+		min-height: calc(var(--wpds-dimension-base) * 13); // Ensures title is centrally aligned when all fields are hidden
 		flex-grow: 1;
 		min-width: 0;
 	}
 
 	.dataviews-view-list__field {
-		color: $gray-700;
+		color: var(--wpds-color-fg-interactive-neutral-weak);
 	}
 
 	.dataviews-view-list__fields {
 		display: flex;
-		gap: $grid-unit-15;
-		row-gap: $grid-unit-05;
+		gap: var(--wpds-dimension-gap-md);
+		row-gap: var(--wpds-dimension-gap-xs);
 		flex-wrap: wrap;
 		font-size: 12px;
 
@@ -196,8 +190,8 @@ div.dataviews-view-list {
 		}
 
 		.dataviews-view-list__field-value {
-			min-height: $grid-unit-30;
-			line-height: $grid-unit-05 * 5;
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+			line-height: var(--wpds-typography-line-height-sm);
 			display: flex;
 			align-items: center;
 		}
@@ -211,26 +205,30 @@ div.dataviews-view-list {
 	&.has-compact-density {
 		div[role="row"] {
 			.dataviews-view-list__item-wrapper {
-				padding: $grid-unit-10 $grid-unit-30;
+				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-2xl);
 			}
 
 			.dataviews-view-list__title-field {
-				min-height: $grid-unit-20;
-				line-height: $grid-unit-20;
+				min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+				line-height: var(--wpds-typography-line-height-xs);
 			}
 
 			.dataviews-view-list__media-wrapper {
-				width: $grid-unit-05 * 8;
-				height: $grid-unit-05 * 8;
+				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+			}
+
+			.dataviews-view-list__field-wrapper {
+				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
 			}
 
 			.dataviews-view-list__fields {
-				gap: $grid-unit-10;
-				row-gap: $grid-unit-05;
+				gap: var(--wpds-dimension-gap-sm);
+				row-gap: var(--wpds-dimension-gap-xs);
 
 				.dataviews-view-list__field-value {
-					min-height: $grid-unit-20;
-					line-height: $grid-unit-05 * 4;
+					min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+					line-height: var(--wpds-typography-line-height-xs);
 				}
 			}
 		}
@@ -239,26 +237,30 @@ div.dataviews-view-list {
 	&.has-comfortable-density {
 		div[role="row"] {
 			.dataviews-view-list__item-wrapper {
-				padding: $grid-unit-30 $grid-unit-30;
+				padding: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 			}
 
 			.dataviews-view-list__title-field {
-				min-height: $grid-unit-40;
-				line-height: $grid-unit-40;
+				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				line-height: var(--wpds-typography-line-height-xl);
 			}
 
 			.dataviews-view-list__media-wrapper {
-				width: $grid-unit-05 * 16;
-				height: $grid-unit-05 * 16;
+				width: calc(var(--wpds-dimension-base) * 16);
+				height: calc(var(--wpds-dimension-base) * 16);
+			}
+
+			.dataviews-view-list__field-wrapper {
+				min-height: calc(var(--wpds-dimension-base) * 16);
 			}
 
 			.dataviews-view-list__fields {
-				gap: $grid-unit-20;
-				row-gap: $grid-unit-10;
+				gap: var(--wpds-dimension-gap-lg);
+				row-gap: var(--wpds-dimension-gap-sm);
 
 				.dataviews-view-list__field-value {
-					min-height: $grid-unit-40;
-					line-height: $grid-unit-05 * 6;
+					min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+					line-height: var(--wpds-typography-line-height-md);
 				}
 			}
 		}
@@ -270,9 +272,9 @@ div.dataviews-view-list {
 }
 
 .dataviews-view-list__group-header {
-	font-size: $font-size-large;
-	font-weight: $font-weight-medium;
-	color: $gray-900;
-	margin: 0 0 $grid-unit-10 0;
-	padding: 0 $grid-unit-30;
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	color: var(--wpds-color-fg-content-neutral);
+	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
+	padding: 0 var(--wpds-dimension-padding-2xl);
 }

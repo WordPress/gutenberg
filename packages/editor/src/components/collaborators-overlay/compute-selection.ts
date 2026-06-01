@@ -1,6 +1,10 @@
-import { SelectionDirection, SelectionType } from '@wordpress/core-data';
-import type { ResolvedSelection } from '@wordpress/core-data';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import type {
+	CoreDataPrivateApis,
+	ResolvedSelection,
+} from '@wordpress/core-data';
 
+import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,
 	getSelectionRects,
@@ -9,6 +13,10 @@ import {
 	isNodeBefore,
 } from './cursor-dom-utils';
 import type { CursorCoords, SelectionRect } from './cursor-dom-utils';
+
+const { SelectionDirection, SelectionType } = unlock(
+	coreDataPrivateApis
+) as Pick< CoreDataPrivateApis, 'SelectionDirection' | 'SelectionType' >;
 
 /** Common parameters passed to cursor/selection computation helpers. */
 interface OverlayContext {
@@ -34,6 +42,44 @@ interface MultiBlockResult {
 export interface SelectionVisual {
 	coords?: CursorCoords | null;
 	selectionRects?: SelectionRect[];
+}
+
+/**
+ * Resolve the most specific editor element the selection refers to.
+ *
+ * When the sender carries an `attributeKey`, narrow to the RichText element
+ * matching `data-wp-block-attribute-key` inside the block. This is what makes
+ * cursor placement work for blocks with multiple RichText fields (e.g.
+ * `core/table` cells: `body.0.cells.0.content`, etc.). Falls back to the
+ * block element when `attributeKey` is missing (WholeBlock selections,
+ * older senders, or DOM lookup miss).
+ *
+ * @param editorDocument    - The editor document.
+ * @param resolvedSelection - The resolved selection.
+ * @return The target element (RichText editable or block), or null.
+ */
+function resolveTargetElement(
+	editorDocument: Document,
+	resolvedSelection: ResolvedSelection
+): HTMLElement | null {
+	if ( ! resolvedSelection.localClientId ) {
+		return null;
+	}
+
+	const blockElement = editorDocument.querySelector< HTMLElement >(
+		`[data-block="${ resolvedSelection.localClientId }"]`
+	);
+
+	if ( ! blockElement || ! resolvedSelection.attributeKey ) {
+		return blockElement;
+	}
+
+	const attrKey = CSS.escape( resolvedSelection.attributeKey );
+	return (
+		blockElement.querySelector< HTMLElement >(
+			`[data-wp-block-attribute-key="${ attrKey }"]`
+		) ?? blockElement
+	);
 }
 
 /**
@@ -83,14 +129,14 @@ function computeCursorOnly(
 	if ( ! start.localClientId ) {
 		return {};
 	}
-	const blockElement =
-		overlayContext.editorDocument.querySelector< HTMLElement >(
-			`[data-block="${ start.localClientId }"]`
-		);
+	const targetElement = resolveTargetElement(
+		overlayContext.editorDocument,
+		start
+	);
 	return {
 		coords: getCursorPosition(
 			start.richTextOffset,
-			blockElement,
+			targetElement,
 			overlayContext.editorDocument,
 			overlayContext.overlayRect
 		),
@@ -157,10 +203,10 @@ function computeTextSelection(
 	}
 
 	// Fallback: cursor at start position only.
-	const startBlock =
-		overlayContext.editorDocument.querySelector< HTMLElement >(
-			`[data-block="${ start.localClientId }"]`
-		);
+	const startBlock = resolveTargetElement(
+		overlayContext.editorDocument,
+		start
+	);
 
 	return {
 		coords: getCursorPosition(
@@ -185,10 +231,10 @@ function computeSingleBlockRects(
 	end: ResolvedSelection,
 	overlayContext: OverlayContext
 ): SingleBlockResult {
-	const blockElement =
-		overlayContext.editorDocument.querySelector< HTMLElement >(
-			`[data-block="${ start.localClientId }"]`
-		);
+	const blockElement = resolveTargetElement(
+		overlayContext.editorDocument,
+		start
+	);
 	if (
 		! blockElement ||
 		start.richTextOffset === null ||
@@ -227,11 +273,13 @@ function computeMultiBlockRects(
 ): MultiBlockResult {
 	let docFirst = start;
 	let docLast = end;
-	let firstBlock = overlayContext.editorDocument.querySelector< HTMLElement >(
-		`[data-block="${ docFirst.localClientId }"]`
+	let firstBlock = resolveTargetElement(
+		overlayContext.editorDocument,
+		docFirst
 	);
-	let lastBlock = overlayContext.editorDocument.querySelector< HTMLElement >(
-		`[data-block="${ docLast.localClientId }"]`
+	let lastBlock = resolveTargetElement(
+		overlayContext.editorDocument,
+		docLast
 	);
 
 	// Swap to document order if needed.

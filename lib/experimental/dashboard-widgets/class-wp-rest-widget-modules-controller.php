@@ -111,7 +111,7 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 		 *
 		 * Widget modules are not sensitive data; they describe what is
 		 * available to render. Gating at the same level as the dashboard
-		 * page menu (which requires `read`) keeps the surface consistent.
+		 * page menu (which requires `read`) keeps access consistent.
 		 *
 		 * @return true|WP_Error True if the request is allowed, WP_Error
 		 *                       otherwise.
@@ -182,11 +182,17 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 			if ( rest_is_field_included( 'name', $fields ) ) {
 				$data['name'] = $widget_type->name;
 			}
+
 			if ( rest_is_field_included( 'render_module', $fields ) ) {
 				$data['render_module'] = $widget_type->render_module;
 			}
+
 			if ( rest_is_field_included( 'widget_module', $fields ) ) {
 				$data['widget_module'] = $widget_type->widget_module;
+			}
+
+			if ( rest_is_field_included( 'presentation', $fields ) ) {
+				$data['presentation'] = $widget_type->presentation;
 			}
 
 			$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -217,15 +223,25 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),
+
 					'render_module' => array(
 						'description' => __( 'Script-module handle for the widget render entry point.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),
+
 					'widget_module' => array(
 						'description' => __( 'Script-module handle for the widget metadata entry point.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'presentation'  => array(
+						'description' => __( 'Authoring intent about how the widget wants to render.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'enum'        => array_merge( WP_Widget_Type::PRESENTATION_VALUES, array( null ) ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

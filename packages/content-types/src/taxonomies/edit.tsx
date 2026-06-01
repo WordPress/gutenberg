@@ -24,9 +24,12 @@ import { Stack } from '@wordpress/ui';
 import {
 	addNewItemLabelField,
 	addOrRemoveItemsField,
+	advancedFormFields,
 	allItemsField,
 	backToItemsField,
 	chooseFromMostUsedField,
+	defaultTermEnabledField,
+	defaultTermNameField,
 	descriptionField,
 	editItemField,
 	generalFormFields,
@@ -50,6 +53,7 @@ import {
 	showInRestField,
 	showTagcloudField,
 	showUiField,
+	sortField,
 	updateItemField,
 	useObjectTypeField,
 	useSlugField,
@@ -182,6 +186,10 @@ function TaxonomyPage( {
 				parentItemColonField,
 				addOrRemoveItemsField,
 				chooseFromMostUsedField,
+				// Advanced
+				sortField,
+				defaultTermEnabledField,
+				defaultTermNameField,
 			] as Field< TaxonomyFormData >[],
 		[ slugField, objectTypeField ]
 	);
@@ -225,6 +233,16 @@ function TaxonomyPage( {
 						isOpened: false,
 					},
 					children: labelsFormFields,
+				},
+				{
+					id: 'advanced',
+					label: __( 'Advanced' ),
+					layout: {
+						type: 'card',
+						isCollapsible: true,
+						isOpened: false,
+					},
+					children: advancedFormFields,
 				},
 			],
 		} ),

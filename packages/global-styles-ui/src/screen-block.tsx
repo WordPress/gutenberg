@@ -352,8 +352,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 			<BlockPreviewPanel
 				name={ name }
 				variation={ variation }
+				selectedViewport={ selectedViewport }
 				selectedState={ hasSelectedState ? stateParam : 'default' }
-				stateStyles={ hasSelectedState ? style : undefined }
+				stateStyles={ hasSelectedState ? inheritedStyle : undefined }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">

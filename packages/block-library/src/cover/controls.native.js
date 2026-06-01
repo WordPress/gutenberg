@@ -9,7 +9,7 @@ import Video from 'react-native-video';
  */
 import {
 	Image,
-	Icon,
+	Icon as WCIcon,
 	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
@@ -138,7 +138,7 @@ function Controls( {
 	];
 
 	const focalPointHint = ! hasParallax && ! displayPlaceholder && (
-		<Icon
+		<WCIcon
 			icon={ plus }
 			size={ styles.focalPointHint?.width }
 			style={ [

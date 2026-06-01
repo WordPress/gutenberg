@@ -195,6 +195,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_dimensions_width_style'          => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'width' => '50%',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'width:50%;',
+					'declarations' => array(
+						'width' => '50%',
+					),
+				),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(
