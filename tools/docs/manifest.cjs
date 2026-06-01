@@ -55,8 +55,9 @@ function getPackageManifest( packageFolderNames ) {
 		} );
 
 		// Next add any items in the docs/toc.json if found.
-		if ( fs.existsSync( join( ROOT_DIR, tocPath ) ) ) {
-			const toc = require( join( ROOT_DIR, tocPath ) ).values();
+		const tocFilePath = join( ROOT_DIR, 'packages', folderName, 'docs', 'toc.json' );
+		if ( fs.existsSync( tocFilePath ) ) {
+			const toc = require( tocFilePath ).values();
 			manifest.push( ...toc );
 		}
 		return manifest;
