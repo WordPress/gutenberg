@@ -21,9 +21,11 @@
  * the latest version automatically.
  */
 import { readFile, writeFile } from 'node:fs/promises';
+import assert from 'node:assert';
 
-const manifestPath =
-	process.argv[ 2 ] ?? 'storybook/build/manifests/components.json';
+const manifestPath = process.argv[ 2 ];
+
+assert( manifestPath, 'Manifest path is required' );
 
 function addLegacyShape( component ) {
 	if ( component.reactComponentMeta && ! component.reactDocgen ) {
