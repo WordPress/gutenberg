@@ -248,54 +248,70 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 												</Tabs.Tab>
 											</Tabs.List>
 											<Tabs.Panel value="appearance">
-												<Text
+												<Stack
+													direction="column"
+													gap="md"
 													style={ {
 														paddingBlockStart:
-															'var(--wpds-dimension-padding-lg)',
+															'var(--wpds-dimension-padding-md)',
 													} }
 												>
-													Control how your site looks
-													to visitors. Adjust{ ' ' }
-													<Link href="#">
-														typography
-													</Link>
-													,{ ' ' }
-													<Link href="#">colors</Link>
-													, and spacing to match your
-													brand.
-												</Text>
+													<Text>
+														Control how your site
+														looks to visitors.
+														Adjust{ ' ' }
+														<Link href="#">
+															typography
+														</Link>
+														,{ ' ' }
+														<Link href="#">
+															colors
+														</Link>
+														, and spacing to match
+														your brand.
+													</Text>
+												</Stack>
 											</Tabs.Panel>
 											<Tabs.Panel value="layout">
-												<Text
+												<Stack
+													direction="column"
+													gap="md"
 													style={ {
 														paddingBlockStart:
-															'var(--wpds-dimension-padding-lg)',
+															'var(--wpds-dimension-padding-md)',
 													} }
 												>
-													Choose a layout structure
-													for your pages. Options
-													include full-width, boxed,
-													and{ ' ' }
-													<Link href="#">
-														custom layouts
-													</Link>
-													.
-												</Text>
+													<Text>
+														Choose a layout
+														structure for your
+														pages. Options include
+														full-width, boxed, and{ ' ' }
+														<Link href="#">
+															custom layouts
+														</Link>
+														.
+													</Text>
+												</Stack>
 											</Tabs.Panel>
 											<Tabs.Panel value="accessibility">
-												<Text
+												<Stack
+													direction="column"
+													gap="md"
 													style={ {
 														paddingBlockStart:
-															'var(--wpds-dimension-padding-lg)',
+															'var(--wpds-dimension-padding-md)',
 													} }
 												>
-													Review your site&apos;s{ ' ' }
-													<Link href="#">
-														accessibility settings
-													</Link>{ ' ' }
-													to ensure it meets WCAG
-													guidelines.
-												</Text>
+													<Text>
+														Review your site&apos;s{ ' ' }
+														<Link href="#">
+															accessibility
+															settings
+														</Link>{ ' ' }
+														to ensure it meets WCAG
+														guidelines.
+													</Text>
+												</Stack>
 											</Tabs.Panel>
 										</Tabs.Root>
 									</Card.Content>
