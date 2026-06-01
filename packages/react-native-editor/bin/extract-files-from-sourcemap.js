@@ -29,26 +29,22 @@ if ( require.main === module ) {
 
 	// Validate arguments
 	if ( ! mapFile ) {
-		// eslint-disable-next-line no-console
 		console.error( `Map file argument is required.` );
 		process.exit( 1 );
 	}
 	if ( ! targetDir ) {
-		// eslint-disable-next-line no-console
 		console.error( `Target directory argument is required.` );
 		process.exit( 1 );
 	}
 	try {
 		fs.accessSync( mapFile );
 	} catch {
-		// eslint-disable-next-line no-console
 		console.error( `Map file "${ mapFile } doesn't exist.` );
 		process.exit( 1 );
 	}
 	try {
 		fs.accessSync( targetDir );
 	} catch {
-		// eslint-disable-next-line no-console
 		console.error( `Target directory "${ targetDir }"" doesn't exist.` );
 		process.exit( 1 );
 	}
@@ -88,14 +84,12 @@ if ( require.main === module ) {
 			try {
 				fs.accessSync( compiledFile );
 			} catch {
-				// eslint-disable-next-line no-console
 				console.warn(
 					`Couldn't find matching build file for Typescript file "${ compiledFile }".`
 				);
 				return file;
 			}
 
-			// eslint-disable-next-line no-console
 			console.log(
 				`Using compiled file "${ compiledFile }" for Typescript file "${ file }"`
 			);
@@ -110,7 +104,6 @@ if ( require.main === module ) {
 			copyFileToDir( sourceFile, targetDir )
 		);
 	} catch ( error ) {
-		// eslint-disable-next-line no-console
 		console.error(
 			`Something went wrong when copying source files to "${ targetDir }":`,
 			error

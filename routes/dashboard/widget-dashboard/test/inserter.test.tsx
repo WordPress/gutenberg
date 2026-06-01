@@ -78,20 +78,24 @@ function Harness( {
 }
 
 describe( 'WidgetDashboard.Inserter', () => {
-	it( 'is hidden until the "Add widgets" trigger is clicked', () => {
+	it( 'is hidden until the "Add widget" trigger is clicked', () => {
 		render( <Harness /> );
-		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Add widget' } )
+		).not.toBeInTheDocument();
 	} );
 
-	it( 'opens after clicking the "Add widgets" trigger', async () => {
+	it( 'opens after clicking the "Add widget" trigger', async () => {
 		const user = userEvent.setup();
 		render( <Harness /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect(
+			await screen.findByRole( 'dialog', { name: 'Add widget' } )
+		).toBeInTheDocument();
 	} );
 
 	it( 'inserts the selected widget type into the layout on Done', async () => {
@@ -100,10 +104,12 @@ describe( 'WidgetDashboard.Inserter', () => {
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		const options = within( dialog ).getAllByRole( 'option' );
 		expect( options ).toHaveLength( widgetTypes.length );
 
@@ -116,7 +122,9 @@ describe( 'WidgetDashboard.Inserter', () => {
 		expect( onLayoutChange ).not.toHaveBeenCalled();
 
 		await waitFor( () =>
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+			expect(
+				screen.queryByRole( 'dialog', { name: 'Add widget' } )
+			).not.toBeInTheDocument()
 		);
 
 		await user.click( screen.getByRole( 'button', { name: 'Done' } ) );
@@ -137,10 +145,12 @@ describe( 'WidgetDashboard.Inserter', () => {
 		render( <Harness onLayoutChange={ onLayoutChange } /> );
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		const options = within( dialog ).getAllByRole( 'option' );
 
 		await user.click( options[ 0 ] );
@@ -179,10 +189,12 @@ describe( 'WidgetDashboard.Inserter', () => {
 		);
 
 		await user.click(
-			screen.getByRole( 'button', { name: 'Add widgets' } )
+			screen.getByRole( 'button', { name: 'Add widget' } )
 		);
 
-		const dialog = await screen.findByRole( 'dialog' );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Add widget',
+		} );
 		await user.click( within( dialog ).getAllByRole( 'option' )[ 1 ] );
 		await user.click(
 			within( dialog ).getByRole( 'button', { name: 'Select' } )

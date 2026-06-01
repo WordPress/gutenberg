@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import { Cropper } from '../cropper';
-import type { UseCropperStateReturn } from '../../hooks/use-cropper-state';
+import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
 
 const GRID_TEST_ID = 'cropper-grid';
@@ -21,7 +21,7 @@ const GRID_INTERACTIVE_CLASS =
 	'wp-media-editor-image-editor__canvas--grid-interactive';
 const SHOW_GRID_CLASS = 'wp-media-editor-image-editor__canvas--show-grid';
 
-function createController(): UseCropperStateReturn {
+function createController(): CropperController {
 	return {
 		state: {
 			...DEFAULT_STATE,
@@ -37,18 +37,16 @@ function createController(): UseCropperStateReturn {
 		setZoomAtPoint: jest.fn(),
 		setRotation: jest.fn(),
 		setFlip: jest.fn(),
+		toggleFlip: jest.fn(),
 		snapRotate90: jest.fn(),
 		setCropRect: jest.fn(),
 		settleCrop: jest.fn(),
 		applyOperation: jest.fn(),
 		reset: jest.fn(),
 		isDirty: false,
-		hasUndo: false,
-		hasRedo: false,
-		undo: jest.fn(),
-		redo: jest.fn(),
-		commitHistory: jest.fn(),
 		getCroppedImage: jest.fn(),
+		setVisualSize: jest.fn(),
+		adjustCropRectForViewport: jest.fn(),
 	};
 }
 
@@ -176,6 +174,46 @@ describe( 'Cropper', () => {
 		);
 	} );
 
+	it( 'clears the keyboard-active class when a pointer drag starts on a handle', async () => {
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+				focusOnMount
+			/>
+		);
+
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const focusVisibleClass =
+			'wp-media-editor-image-editor__canvas--focus-visible';
+
+		// Simulate keyboard resize on a handle — the canvas should pick up
+		// the keyboard-active class via the capture-phase keydown listener.
+		act( () => {
+			handle.focus();
+		} );
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+		expect( canvas ).toHaveClass( focusVisibleClass );
+
+		// Switching to the mouse on the same handle must drop the
+		// keyboard-active state, even though the handle's pointerdown
+		// handler calls stopPropagation.
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		expect( canvas ).not.toHaveClass( focusVisibleClass );
+
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+	} );
+
 	it( 'returns focus to the crop area on Escape from a resize handle', async () => {
 		render(
 			<Cropper
@@ -254,6 +292,7 @@ describe( 'Cropper', () => {
 			name: 'Resize top-left corner',
 		} );
 		( controller.setCropRect as jest.Mock ).mockClear();
+		( controller.adjustCropRectForViewport as jest.Mock ).mockClear();
 
 		rerender(
 			<Cropper
@@ -270,6 +309,7 @@ describe( 'Cropper', () => {
 			} )
 		).not.toBeInTheDocument();
 		expect( controller.setCropRect ).not.toHaveBeenCalled();
+		expect( controller.adjustCropRectForViewport ).not.toHaveBeenCalled();
 	} );
 
 	it( 'centers a fixed-ratio crop when freeform handles are off', async () => {
@@ -289,12 +329,14 @@ describe( 'Cropper', () => {
 		);
 
 		await waitFor( () =>
-			expect( controller.setCropRect ).toHaveBeenCalledWith( {
-				x: expect.closeTo( 1 / 6, 5 ),
-				y: 0,
-				width: expect.closeTo( 2 / 3, 5 ),
-				height: 1,
-			} )
+			expect( controller.adjustCropRectForViewport ).toHaveBeenCalledWith(
+				{
+					x: expect.closeTo( 1 / 6, 5 ),
+					y: 0,
+					width: expect.closeTo( 2 / 3, 5 ),
+					height: 1,
+				}
+			)
 		);
 	} );
 

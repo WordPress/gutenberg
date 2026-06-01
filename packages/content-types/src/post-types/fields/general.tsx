@@ -19,6 +19,7 @@ import {
 	createDescriptionField,
 	SlugEdit,
 } from '../../utils/fields';
+import { OverflowingBadges } from '../../utils/overflowing-badges';
 import { SUPPORT_FEATURES, usePublicTaxonomies } from '../utils';
 import type { PostTypeFormData, SupportFeature } from '../types';
 
@@ -131,11 +132,12 @@ export const supportsField: Field< PostTypeFormData > = {
 			return <span aria-hidden="true">—</span>;
 		}
 		return (
-			<>
-				{ features
-					.map( ( f ) => SUPPORT_LABELS[ f ] ?? f )
-					.join( ', ' ) }
-			</>
+			<OverflowingBadges
+				items={ features.map( ( f ) => ( {
+					key: f,
+					label: SUPPORT_LABELS[ f ] ?? f,
+				} ) ) }
+			/>
 		);
 	},
 	filterBy: false,
@@ -247,11 +249,12 @@ export function useTaxonomiesField(): Field< PostTypeFormData > {
 					return <span aria-hidden="true">—</span>;
 				}
 				return (
-					<>
-						{ slugs
-							.map( ( s ) => labelMap[ s ] ?? s )
-							.join( ', ' ) }
-					</>
+					<OverflowingBadges
+						items={ slugs.map( ( s ) => ( {
+							key: s,
+							label: labelMap[ s ] ?? s,
+						} ) ) }
+					/>
 				);
 			},
 			filterBy: false,

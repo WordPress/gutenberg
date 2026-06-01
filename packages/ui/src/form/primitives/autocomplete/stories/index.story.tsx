@@ -13,6 +13,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	component: Autocomplete.Root,
 	subcomponents: {
 		'Autocomplete.Portal': Autocomplete.Portal,
+		'Autocomplete.Positioner': Autocomplete.Positioner,
 		'Autocomplete.Popup': Autocomplete.Popup,
 		'Autocomplete.Input': Autocomplete.Input,
 		'Autocomplete.InputGroup': Autocomplete.InputGroup,

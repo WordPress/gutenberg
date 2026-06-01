@@ -7,6 +7,7 @@ const meta: Meta< typeof Select.Root > = {
 	subcomponents: {
 		'Select.Trigger': Select.Trigger,
 		'Select.Portal': Select.Portal,
+		'Select.Positioner': Select.Positioner,
 		'Select.Popup': Select.Popup,
 		'Select.Item': Select.Item,
 	},

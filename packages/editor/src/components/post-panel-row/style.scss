@@ -16,6 +16,7 @@
 	padding: 6px 0; // Matches button to ensure alignment
 	line-height: $grid-unit-05 * 5;
 	hyphens: auto;
+	word-break: break-word;
 }
 
 .editor-post-panel__row-control {

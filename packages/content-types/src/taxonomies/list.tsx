@@ -41,7 +41,11 @@ const DEFAULT_VIEW: View = {
 	page: 1,
 	fields: [ 'object_type', 'count', 'status' ],
 	titleField: 'title',
-	layout: {},
+	layout: {
+		styles: {
+			object_type: { minWidth: 230 },
+		},
+	},
 };
 
 export function TaxonomiesList() {
