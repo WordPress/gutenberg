@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { useState } from '@wordpress/element';
 import { wordpress } from '@wordpress/icons';
+import type { CornerRadiusPreset } from '@wordpress/theme';
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import {
@@ -47,14 +48,15 @@ export default meta;
 /**
  * A mock application page demonstrating how `ThemeProvider` affects
  * `@wordpress/ui` and `@wordpress/admin-ui` components in concert. Use the inline controls to adjust
- * the `primary` and `background` seed colors, and observe how every surface, text
- * element, and interactive control adapts accordingly. Use the Theme toolbar
- * tool to adjust corner radius and other theme aspects.
+ * the `primary` and `background` seed colors, the corner radius preset, and observe how every surface, text
+ * element, and interactive control adapts accordingly.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		const [ primary, setPrimary ] = useState< string | undefined >();
 		const [ background, setBackground ] = useState< string | undefined >();
+		const [ cornerRadiusPreset, setCornerRadiusPreset ] =
+			useState< CornerRadiusPreset >( 'sm' );
 
 		return (
 			<div>
@@ -102,9 +104,37 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							}
 						/>
 					</label>
+					<label
+						style={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '6px',
+						} }
+					>
+						Corner radius
+						<select
+							value={ cornerRadiusPreset }
+							onChange={ ( e ) =>
+								setCornerRadiusPreset(
+									e.target.value as typeof cornerRadiusPreset
+								)
+							}
+						>
+							<option value="none">None</option>
+							<option value="sm">Small</option>
+							<option value="md">Medium</option>
+							<option value="lg">Large</option>
+							<option value="xl">Extra large</option>
+							<option value="2xl">2x extra large</option>
+						</select>
+					</label>
 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
 				</div>
-				<ThemeProvider color={ { primary, background } } isRoot>
+				<ThemeProvider
+					color={ { primary, background } }
+					cornerRadius={ { preset: cornerRadiusPreset } }
+					isRoot
+				>
 					<div
 						style={ {
 							display: 'grid',
