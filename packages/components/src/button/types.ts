@@ -14,8 +14,12 @@ export type ButtonProps =
 	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >
 	| WordPressComponentProps< ButtonAsAnchorProps, 'a', false >;
 
-export type ButtonAsButtonProps = BaseButtonProps & _ButtonProps;
-export type ButtonAsAnchorProps = BaseButtonProps & AnchorProps;
+export type ButtonAsButtonProps = BaseButtonProps &
+	_ButtonProps &
+	React.RefAttributes< HTMLButtonElement >;
+export type ButtonAsAnchorProps = BaseButtonProps &
+	AnchorProps &
+	React.RefAttributes< HTMLAnchorElement >;
 
 type BaseButtonProps = {
 	/**

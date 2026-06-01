@@ -128,11 +128,6 @@ Renders a pressed button style.
 Sets the `aria-label` of the component, if none is provided.
 Sets the Tooltip content if `showTooltip` is provided.
 
-### `ref`
-
- - Type: `Ref<any>`
- - Required: No
-
 ### `shortcut`
 
  - Type: `string | { display: string; ariaLabel: string; }`

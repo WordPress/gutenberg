@@ -7,7 +7,6 @@ import type {
 	HTMLAttributes,
 	MouseEvent,
 	ReactElement,
-	Ref,
 } from 'react';
 
 /**
@@ -106,7 +105,7 @@ function useDeprecatedProps( {
 export function Button( {
 	ref,
 	...props
-}: ButtonProps & DeprecatedButtonProps & { ref?: Ref< any > } ) {
+}: ButtonProps & DeprecatedButtonProps ) {
 	const {
 		__next40pxDefaultSize,
 		accessibleWhenDisabled,
