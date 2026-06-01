@@ -886,7 +886,7 @@ store( 'myPlugin', {
 } );
 ```
 
-You may notice the use of the [`withSyncEvent()`](#withsyncevent) utility function in this example. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access (which this example does due to the call to `event.preventDefault()`). Otherwise a deprecation warning will be triggered, and in WordPress 7.0 the behavior will change accordingly.
+You may notice the use of the [`withSyncEvent()`](#withsyncevent) utility function in this example. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access (which this example does due to the call to `event.preventDefault()`). Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
 
 #### Side Effects
 
@@ -1251,7 +1251,7 @@ store( 'mySliderPlugin', {
 
 ### withSyncEvent()
 
-Actions that require synchronous access to the `event` object need to use the `withSyncEvent()` function to annotate their handler callback. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access. Therefore, as of Gutenberg 20.4 / WordPress 6.8 all actions that require synchronous event access need to use the `withSyncEvent()` function. Otherwise a deprecation warning will be triggered, and in WordPress 7.0 the behavior will change accordingly.
+Actions that require synchronous access to the `event` object need to use the `withSyncEvent()` function to annotate their handler callback. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access. Therefore, as of Gutenberg 20.4 / WordPress 6.8 all actions that require synchronous event access need to use the `withSyncEvent()` function. Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
 
 Only very specific event methods and properties require synchronous access, so it is advised to only use `withSyncEvent()` when necessary. The following event methods and properties require synchronous access:
 
