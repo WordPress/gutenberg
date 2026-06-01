@@ -10,6 +10,24 @@ npm install @wordpress/components --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
+## Setup
+
+Many components require the package's CSS stylesheet to be loaded.
+
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+### Outside WordPress
+
+Load the stylesheet in your application:
+
+```js
+import '@wordpress/components/build-style/style.css';
+```
+
+The RTL version of the stylesheet is available at `@wordpress/components/build-style/style-rtl.css`.
+
 ## Usage
 
 Within Gutenberg, these components can be accessed by importing from the `components` root directory:
@@ -24,10 +42,6 @@ export default function MyButton() {
 	return <Button>Click Me!</Button>;
 }
 ```
-
-Many components include CSS to add styles, which you will need to load in order for them to appear correctly. Within WordPress, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
-
-In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
 
 ### Popovers
 

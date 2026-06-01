@@ -17,7 +17,7 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
@@ -374,7 +374,7 @@ export default function SearchEdit( {
 		return (
 			<View style={ richTextButtonContainerStyle }>
 				{ buttonUseIcon && (
-					<Icon
+					<WCIcon
 						icon={ search }
 						{ ...iconStyles }
 						onLayout={ onLayoutButton }

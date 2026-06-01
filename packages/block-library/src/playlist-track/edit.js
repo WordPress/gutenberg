@@ -180,7 +180,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						value={ title ? stripHTML( title ) : '' }
-						placeholder={ title ? stripHTML( title ) : '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
 						} }

@@ -1,8 +1,6 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 import {
+	ColorSpace,
 	clone,
 	set,
 	to,
@@ -11,16 +9,7 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
 import { useMemo, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
 import colorTokens from './prebuilt/ts/color-tokens';
 import {
@@ -101,6 +90,7 @@ function customRgbFormat( color: PlainColorObject ): string {
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+	ColorSpace.register( sRGB );
 	const parsedAccent = to( accent, HSL );
 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 
@@ -170,8 +160,10 @@ function generateStyles( {
 
 export function useThemeProviderStyles( {
 	color = {},
+	cursor,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
+	cursor?: ThemeProviderProps[ 'cursor' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -185,6 +177,7 @@ export function useThemeProviderStyles( {
 		DEFAULT_SEED_COLORS.primary;
 	const bg =
 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -192,11 +185,12 @@ export function useThemeProviderStyles( {
 				primary,
 				bg,
 			},
+			cursor: cursorControl ? { control: cursorControl } : undefined,
 		} ),
-		[ primary, bg ]
+		[ primary, bg, cursorControl ]
 	);
 
-	const themeProviderStyles = useMemo( () => {
+	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
@@ -223,6 +217,16 @@ export function useThemeProviderStyles( {
 			computedColorRamps,
 		} );
 	}, [ primary, bg ] );
+
+	const themeProviderStyles: CSSProperties = useMemo(
+		() => ( {
+			...colorStyles,
+			...( cursorControl && {
+				'--wpds-cursor-control': cursorControl,
+			} ),
+		} ),
+		[ colorStyles, cursorControl ]
+	);
 
 	return {
 		resolvedSettings,

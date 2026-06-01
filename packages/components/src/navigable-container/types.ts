@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -35,10 +35,6 @@ export type NavigableContainerProps = WordPressComponentProps<
 		 * Gets an offset, given an event.
 		 */
 		eventToOffset: ( event: KeyboardEvent ) => -1 | 0 | 1 | undefined;
-		/**
-		 * The forwarded ref.
-		 */
-		forwardedRef?: ForwardedRef< any >;
 		/**
 		 * Whether to only consider browser tab stops.
 		 *

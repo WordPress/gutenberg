@@ -40,13 +40,14 @@ function helpText( selfStretch, parentLayout ) {
 /**
  * Form to edit the child layout value.
  *
- * @param {Object}   props                  Props.
- * @param {Object}   props.value            The child layout value.
- * @param {Function} props.onChange         Function to update the child layout value.
- * @param {Object}   props.parentLayout     The parent layout value.
+ * @param {Object}   props                      Props.
+ * @param {Object}   props.value                The child layout value.
+ * @param {Function} props.onChange             Function to update the child layout value.
+ * @param {Object}   props.parentLayout         The parent layout value.
  *
- * @param {boolean}  props.isShownByDefault
- * @param {string}   props.panelId
+ * @param {boolean}  props.isShownByDefault     Whether the control is shown by default.
+ * @param {string}   props.panelId              The panel ID.
+ * @param {boolean}  props.showGridSpanDefaults Whether unset grid span controls should show default values.
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
@@ -55,6 +56,7 @@ export default function ChildLayoutControl( {
 	parentLayout,
 	isShownByDefault,
 	panelId,
+	showGridSpanDefaults = true,
 } ) {
 	const {
 		type: parentType,
@@ -80,6 +82,7 @@ export default function ChildLayoutControl( {
 				parentLayout={ parentLayout }
 				isShownByDefault={ isShownByDefault }
 				panelId={ panelId }
+				showGridSpanDefaults={ showGridSpanDefaults }
 			/>
 		);
 	}
@@ -206,6 +209,7 @@ function GridControls( {
 	parentLayout,
 	isShownByDefault,
 	panelId,
+	showGridSpanDefaults,
 } ) {
 	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
 	const { columnCount, rowCount } = parentLayout ?? {};
@@ -243,6 +247,9 @@ function GridControls( {
 		window.__experimentalEnableGridInteractivity && rowCount
 			? rowCount - ( rowStart ?? 1 ) + 1
 			: undefined;
+	const columnSpanValue =
+		columnSpan ?? ( showGridSpanDefaults ? 1 : undefined );
+	const rowSpanValue = rowSpan ?? ( showGridSpanDefaults ? 1 : undefined );
 
 	return (
 		<>
@@ -274,7 +281,7 @@ function GridControls( {
 								columnSpan: constrainedValue,
 							} );
 						} }
-						value={ columnSpan ?? 1 }
+						value={ columnSpanValue }
 						min={ 1 }
 						max={ maxColumnSpan }
 					/>
@@ -298,7 +305,7 @@ function GridControls( {
 								rowSpan: constrainedValue,
 							} );
 						} }
-						value={ rowSpan ?? 1 }
+						value={ rowSpanValue }
 						min={ 1 }
 						max={ maxRowSpan }
 					/>

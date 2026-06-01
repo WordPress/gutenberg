@@ -28,6 +28,10 @@
 		text-align: start;
 		user-select: none;
 
+		&:not([data-disabled]) {
+			cursor: var(--wpds-cursor-control);
+		}
+
 		&.is-minimal {
 			width: auto;
 		}
@@ -47,7 +51,8 @@
 		text-overflow: ellipsis;
 		white-space: nowrap;
 
-		&.is-placeholder {
+		/* Supports placeholder styling for both Select and Combobox triggers. */
+		.trigger[data-placeholder] & {
 			color: var(--wpds-color-fg-interactive-neutral-disabled);
 		}
 	}

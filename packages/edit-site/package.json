@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "6.40.1",
+	"version": "6.47.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -87,6 +87,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/router": "file:../router",
 		"@wordpress/style-engine": "file:../style-engine",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/views": "file:../views",
@@ -100,8 +101,8 @@
 		"react-autosize-textarea": "^7.1.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

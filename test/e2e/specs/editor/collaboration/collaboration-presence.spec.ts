@@ -43,6 +43,10 @@ test.describe( 'Collaboration - Presence', () => {
 		await presenceButton.click();
 
 		// The popover should list the second collaborator by name.
-		await expect( page.getByText( 'Test Collaborator' ) ).toBeVisible();
+		await expect(
+			page.locator( '.editor-collaborators-presence__list-item-name', {
+				hasText: 'Test Collaborator',
+			} )
+		).toBeVisible();
 	} );
 } );
