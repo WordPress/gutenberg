@@ -15,7 +15,7 @@ import { Status } from './constants';
 import { unlock } from '../lock-unlock';
 import { getNormalizedCommaSeparable } from '../utils';
 
-interface EntityRecordsResolution< RecordType > {
+export interface EntityRecordsResolution< RecordType > {
 	/** The requested entity records */
 	records: RecordType[] | null;
 
@@ -120,18 +120,20 @@ export default function useEntityRecords< RecordType >(
 					records: EMPTY_ARRAY,
 					totalItems: null,
 					totalPages: null,
+					isResolving: false,
+					hasStarted: false,
+					hasResolved: false,
+					status: Status.idle,
 				};
 			}
 
 			const storeSelectors = select( coreStore );
-			const resolutionStatus = (
-				storeSelectors as any
-			 ).getResolutionState( 'getEntityRecords', [
-				kind,
-				name,
-				queryArgs,
-			] )?.status;
-			const status: Status = resolutionStatus ?? Status.idle;
+			const status: Status =
+				storeSelectors.getResolutionState( 'getEntityRecords', [
+					kind,
+					name,
+					queryArgs,
+				] )?.status ?? Status.idle;
 
 			return {
 				records: storeSelectors.getEntityRecords(

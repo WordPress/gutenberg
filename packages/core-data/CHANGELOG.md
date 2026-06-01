@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `status` returned by `useEntityRecord`, `useEntityRecords`, and `useResourcePermissions` now uses lowercase values (`idle`, `resolving`, `finished`, `error`) instead of the previous uppercase values (`IDLE`, `RESOLVING`, `SUCCESS`, `ERROR`) ([#76198](https://github.com/WordPress/gutenberg/pull/76198)).
+
 ## 7.48.0 (2026-06-10)
 
 ### Code Quality

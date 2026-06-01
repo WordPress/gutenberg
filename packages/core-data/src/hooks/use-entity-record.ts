@@ -181,27 +181,32 @@ export default function useEntityRecord< RecordType >(
 					editedRecord: EMPTY_OBJECT,
 					hasEdits: false,
 					edits: EMPTY_OBJECT,
+					isResolving: false,
+					hasStarted: false,
+					hasResolved: false,
+					status: Status.idle,
 				};
 			}
 
 			const storeSelectors = select( coreStore );
-			const resolutionStatus = (
-				storeSelectors as any
-			 ).getResolutionState( 'getEntityRecord', [ kind, name, recordId ] )
-				?.status;
-			const status: Status = resolutionStatus ?? Status.idle;
+			const status: Status =
+				storeSelectors.getResolutionState( 'getEntityRecord', [
+					kind,
+					name,
+					recordId,
+				] )?.status ?? Status.idle;
 
 			return {
-				record: storeSelectors.getEntityRecord(
+				record: ( storeSelectors.getEntityRecord(
 					kind,
 					name,
 					recordId
-				) as RecordType | undefined,
-				editedRecord: storeSelectors.getEditedEntityRecord(
+				) ?? null ) as RecordType | null,
+				editedRecord: ( storeSelectors.getEditedEntityRecord(
 					kind,
 					name,
 					recordId
-				) as unknown as Partial< RecordType >,
+				) || EMPTY_OBJECT ) as Partial< RecordType >,
 				hasEdits: storeSelectors.hasEditsForEntityRecord(
 					kind,
 					name,
