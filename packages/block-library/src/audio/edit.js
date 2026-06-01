@@ -21,6 +21,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	RichText,
 	useBlockProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
@@ -50,7 +51,7 @@ function AudioEdit( {
 	isSelected: isSingleSelected,
 	insertBlocksAfter,
 } ) {
-	const { id, autoplay, loop, preload, src } = attributes;
+	const { id, autoplay, loop, preload, src, transcript } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
@@ -269,6 +270,20 @@ function AudioEdit( {
 						isSingleSelected && hasNonContentControls
 					}
 				/>
+				{ ( ! RichText.isEmpty( transcript ) || isSingleSelected ) && (
+					<RichText
+						tagName="p"
+						className="wp-block-audio__transcript-text"
+						value={ transcript }
+						onChange={ ( value ) =>
+							setAttributes( { transcript: value } )
+						}
+						placeholder={ __(
+							'Add a transcript to make your audio accessible to a wider range of users.'
+						) }
+						identifier="transcript"
+					/>
+				) }
 			</figure>
 		</>
 	);

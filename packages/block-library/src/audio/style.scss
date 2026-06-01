@@ -18,4 +18,11 @@
 		// We restore this as a min-width instead, for alignments.
 		min-width: 300px;
 	}
+
+	// Transcript styling. Always visible to satisfy WCAG 1.2.1 (text
+	// alternative for prerecorded audio-only content).
+	.wp-block-audio__transcript-text {
+		@include caption-style();
+		margin-top: 0.5em;
+	}
 }
