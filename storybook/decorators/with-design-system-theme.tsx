@@ -1,3 +1,4 @@
+import type { CornerRadiusPreset } from '@wordpress/theme';
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 import type { StoryContext } from 'storybook/internal/types';
@@ -30,6 +31,9 @@ export function WithDesignSystemTheme(
 
 	const colorTheme = context.globals.dsColorTheme;
 	const cursorControl = context.globals.dsCursorControl || undefined;
+	const cornerRadiusPreset = context.globals.dsCornerRadius as
+		| CornerRadiusPreset
+		| undefined;
 
 	let color;
 	if ( colorTheme === 'dark' ) {
@@ -40,6 +44,9 @@ export function WithDesignSystemTheme(
 		<ThemeProvider
 			color={ color }
 			cursor={ cursorControl ? { control: cursorControl } : undefined }
+			cornerRadius={
+				cornerRadiusPreset ? { preset: cornerRadiusPreset } : undefined
+			}
 			isRoot
 		>
 			<div
