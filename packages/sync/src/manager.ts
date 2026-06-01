@@ -186,6 +186,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			persistCRDTDoc: debugWrap( handlers.persistCRDTDoc ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
+
+			onUndoStackChange: handlers.onUndoStackChange
+				? debugWrap( handlers.onUndoStackChange )
+				: undefined,
 		};
 
 		const ydoc = createYjsDoc( { objectType } );
@@ -261,10 +265,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			undoManager = createUndoManager();
 		}
 
-		const { addUndoMeta, restoreUndoMeta } = handlers;
+		const { addUndoMeta, onUndoStackChange, restoreUndoMeta } = handlers;
 		undoManager.addToScope( recordMap, {
 			addUndoMeta,
 			restoreUndoMeta,
+			onUndoStackChange,
 		} );
 
 		// Declare with let before using it in unload closure.

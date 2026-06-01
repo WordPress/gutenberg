@@ -12,6 +12,7 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
+	syncUndoManagerChangeReference,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -529,5 +530,25 @@ describe( 'currentUser', () => {
 		);
 
 		expect( state ).toEqual( currentUserData );
+	} );
+} );
+
+describe( 'syncUndoManagerChangeReference', () => {
+	it( 'returns a new reference when the sync undo manager changes', () => {
+		const originalState = {};
+		const state = syncUndoManagerChangeReference( originalState, {
+			type: 'SYNC_UNDO_MANAGER_CHANGE',
+		} );
+
+		expect( state ).not.toBe( originalState );
+	} );
+
+	it( 'returns the same reference for unrelated actions', () => {
+		const originalState = {};
+		const state = syncUndoManagerChangeReference( originalState, {
+			type: 'UNRELATED',
+		} );
+
+		expect( state ).toBe( originalState );
 	} );
 } );

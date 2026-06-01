@@ -470,6 +470,16 @@ export function editsReference( state = {}, action ) {
 	return state;
 }
 
+// This reducer intentionally stores no data. It only changes reference so the
+// registry notifies core-data subscribers to refresh sync undo manager state.
+export function syncUndoManagerChangeReference( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SYNC_UNDO_MANAGER_CHANGE':
+			return {};
+	}
+	return state;
+}
+
 /**
  * Reducer managing embed preview data.
  *
@@ -750,6 +760,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
+	syncUndoManagerChangeReference,
 	undoManager,
 	embedPreviews,
 	userPermissions,

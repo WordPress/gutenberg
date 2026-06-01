@@ -44,6 +44,7 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Object >;
 	undoManager: UndoManager;
+	syncUndoManagerChangeReference: object;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
