@@ -5,7 +5,11 @@ import { ToolbarButton } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,6 +20,12 @@ import { getAvatarBorderColor } from './utils';
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
 export function NoteAvatarIndicator( { onClick, note } ) {
+	const defaultAvatar = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings?.avatarURL;
+	}, [] );
+
 	const threadParticipants = useMemo( () => {
 		if ( ! note ) {
 			return [];
@@ -29,7 +39,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 
 		allNotes.forEach( ( entry ) => {
 			// Track thread participants (original author + repliers).
-			if ( entry.author_name && entry.author_avatar_urls ) {
+			if ( entry.author_name ) {
 				if ( ! participantsMap.has( entry.author ) ) {
 					participantsMap.set( entry.author, {
 						name: entry.author_name,
@@ -84,7 +94,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 					{ visibleParticipants.map( ( participant ) => (
 						<img
 							key={ participant.id }
-							src={ participant.avatar }
+							src={ participant.avatar || defaultAvatar }
 							alt={ participant.name }
 							className="editor-note-indicator__avatar"
 							style={ {
