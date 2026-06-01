@@ -20,3 +20,29 @@ body.js.is-fullscreen-mode {
 		}
 	}
 }
+
+// The `is-fullscreen-mode` body class is printed server-side, before the editor
+// has loaded, to avoid a layout jump once it mounts. Until the editor renders
+// its skeleton, however, hiding the admin bar and admin menu (and pulling the
+// content up over the toolbar gap) means a cross-document view transition into
+// the editor captures a fully blank page, producing a white flash.
+//
+// While the editor is still loading -- i.e. before the skeleton adds
+// `interface-interface-skeleton__html-container` to the `html` element -- keep
+// the admin bar and admin menu painted so only the empty content area appears
+// blank. This selector is mutually exclusive with the loaded state above, so it
+// does not affect the cascade once the editor is ready.
+//
+// See: https://core.trac.wordpress.org/ticket/65294
+html:not(.interface-interface-skeleton__html-container) body.js.is-fullscreen-mode {
+
+	@include break-medium {
+		margin-top: 0;
+		height: auto;
+
+		#adminmenumain,
+		#wpadminbar {
+			display: block;
+		}
+	}
+}
