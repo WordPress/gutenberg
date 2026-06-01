@@ -72,6 +72,7 @@
 		{ "path": "packages/rich-text" },
 		{ "path": "packages/route" },
 		{ "path": "packages/router" },
+		{ "path": "packages/server-side-render" },
 		{ "path": "packages/shortcode" },
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/style-runtime" },

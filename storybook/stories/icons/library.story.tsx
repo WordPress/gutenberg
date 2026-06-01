@@ -43,7 +43,7 @@ const keywords: Partial< Record< string, string[] > > = {
 	pencil: [ 'edit' ],
 	thumbsDown: [ 'dislike' ],
 	thumbsUp: [ 'like' ],
-	timeToRead: [ 'clock' ],
+	time: [ 'clock', 'duration', 'hour', 'minute', 'second' ],
 	trash: [ 'delete' ],
 	unseen: [ 'hide' ],
 };

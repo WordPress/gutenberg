@@ -23,9 +23,6 @@ function CropOptionsHarness() {
 			<div data-testid="aspect-ratio-value">
 				{ cropOptions.aspectRatioValue }
 			</div>
-			<div data-testid="freeform-crop">
-				{ cropOptions.freeformCrop ? 'true' : 'false' }
-			</div>
 			<div data-testid="resolved-aspect-ratio">
 				{ cropOptions.resolvedAspectRatio ?? 'undefined' }
 			</div>
@@ -48,9 +45,6 @@ function CropOptionsHarness() {
 			</button>
 			<button onClick={ () => cropOptions.setAspectRatioValue( '0' ) }>
 				Free
-			</button>
-			<button onClick={ () => cropOptions.setFreeformCrop( false ) }>
-				Disable handles
 			</button>
 			<button onClick={ cropOptions.resetCropOptions }>Reset</button>
 		</div>
@@ -103,62 +97,14 @@ describe( 'useCropOptions', () => {
 		).toHaveTextContent( 'undefined' );
 	} );
 
-	it( 'picking Free auto-enables freeform when it was off', () => {
-		renderHarness();
-
-		// Pick a non-Free preset and turn freeform off.
-		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
-		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Disable handles' } )
-		);
-
-		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
-			'false'
-		);
-		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
-			'1'
-		);
-
-		// Picking Free re-enables freeform — picking Free implies the
-		// user wants to freeform-edit and there'd otherwise be no
-		// visible affordance.
-		fireEvent.click( screen.getByRole( 'button', { name: 'Free' } ) );
-
-		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
-			'0'
-		);
-		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
-			'true'
-		);
-	} );
-
-	it( 'picking Free leaves freeform alone if it was already on', () => {
-		renderHarness();
-
-		// Start clean: freeform is true by default.
-		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
-		// Don't turn freeform off — pick Free directly.
-		fireEvent.click( screen.getByRole( 'button', { name: 'Free' } ) );
-
-		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
-			'true'
-		);
-	} );
-
-	it( 'reset returns cropOptions to defaults (Free + freeform on)', () => {
+	it( 'reset returns cropOptions to defaults', () => {
 		renderHarness();
 
 		fireEvent.click( screen.getByRole( 'button', { name: 'Square' } ) );
-		fireEvent.click(
-			screen.getByRole( 'button', { name: 'Disable handles' } )
-		);
 		fireEvent.click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 		expect( screen.getByTestId( 'aspect-ratio-value' ) ).toHaveTextContent(
 			'0'
-		);
-		expect( screen.getByTestId( 'freeform-crop' ) ).toHaveTextContent(
-			'true'
 		);
 	} );
 } );

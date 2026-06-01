@@ -111,7 +111,7 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 		 *
 		 * Widget modules are not sensitive data; they describe what is
 		 * available to render. Gating at the same level as the dashboard
-		 * page menu (which requires `read`) keeps the surface consistent.
+		 * page menu (which requires `read`) keeps access consistent.
 		 *
 		 * @return true|WP_Error True if the request is allowed, WP_Error
 		 *                       otherwise.
