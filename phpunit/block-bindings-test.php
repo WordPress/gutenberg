@@ -77,7 +77,7 @@ class Tests_Block_Bindings extends WP_UnitTestCase {
 
 	public function data_update_block_with_value_from_source() {
 		return array(
-			'paragraph block' => array(
+			'paragraph block'    => array(
 				'content',
 				<<<HTML
 <!-- wp:paragraph -->
@@ -87,7 +87,17 @@ HTML
 				,
 				'<p class="wp-block-paragraph">test source value</p>',
 			),
-			'button block'    => array(
+			'preformatted block' => array(
+				'content',
+				<<<HTML
+<!-- wp:preformatted -->
+<pre class="wp-block-preformatted">This should not appear</pre>
+<!-- /wp:preformatted -->
+HTML
+				,
+				'<pre class="wp-block-preformatted">test source value</pre>',
+			),
+			'button block'       => array(
 				'text',
 				<<<HTML
 <!-- wp:button -->
@@ -97,7 +107,7 @@ HTML
 				,
 				'<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">test source value</a></div>',
 			),
-			'test block'      => array(
+			'test block'         => array(
 				'myAttribute',
 				<<<HTML
 <!-- wp:test/block -->
@@ -348,6 +358,50 @@ HTML;
 			$expected_bindings_metadata,
 			$block->attributes['metadata']['bindings'],
 			'The __default binding should be updated with the individual binding attributes in the block metadata.'
+		);
+	}
+
+	/**
+	 * Tests that the Preformatted block supports the default binding for pattern
+	 * overrides.
+	 *
+	 * @covers WP_Block::process_block_bindings
+	 */
+	public function test_default_binding_for_pattern_overrides_preformatted() {
+		$block_content = <<<HTML
+<!-- wp:preformatted {"metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test preformatted"}} -->
+<pre class="wp-block-preformatted">This should not appear</pre>
+<!-- /wp:preformatted -->
+HTML;
+
+		$expected_content = 'This is the preformatted content value';
+		$parsed_blocks    = parse_blocks( $block_content );
+		$block            = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'pattern/overrides' => array(
+					'Test preformatted' => array(
+						'content' => $expected_content,
+					),
+				),
+			)
+		);
+
+		$result = $block->render();
+
+		$this->assertSame(
+			"<pre class=\"wp-block-preformatted\">$expected_content</pre>",
+			trim( $result ),
+			'The `__default` attribute should be replaced with the preformatted content binding.'
+		);
+
+		$expected_bindings_metadata = array(
+			'content' => array( 'source' => 'core/pattern-overrides' ),
+		);
+		$this->assertSame(
+			$expected_bindings_metadata,
+			$block->attributes['metadata']['bindings'],
+			'The __default binding should be updated with the Preformatted content binding.'
 		);
 	}
 
