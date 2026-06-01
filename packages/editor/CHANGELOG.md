@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Collab Sidebar: Fall back to the discussion default avatar in the note indicator toolbar when a thread participant's avatar URL is unavailable ([#78849](https://github.com/WordPress/gutenberg/pull/78849)).
+
 ## 14.47.0 (2026-05-27)
 
 ### Enhancements
