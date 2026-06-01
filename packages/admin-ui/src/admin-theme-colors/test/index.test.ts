@@ -8,8 +8,8 @@ describe( 'getAdminThemeColors', () => {
 		document.body.className = 'foo admin-color-coffee bar';
 
 		expect( getAdminThemeColors() ).toEqual( {
-			primary: '#46403c',
-			bg: '#7c726c',
+			primary: '#916745',
+			bg: '#5b534d',
 		} );
 	} );
 } );
