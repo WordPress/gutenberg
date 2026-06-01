@@ -7,7 +7,7 @@ This page lists the blocks included in the block-library package.
 -   Blocks marked with **Experimental:** fse are only available in the Site Editor.
 
 <!-- START TOKEN(Deprecated blocks) -->
-**Deprecated blocks** — the following blocks are deprecated and should not be used in new content. Their documentation is preserved for reference.
+**Deprecated blocks** — the following blocks are deprecated and should not be used in new content.
 
 - [Comment Author Avatar (deprecated)](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar/) (`core/comment-author-avatar`) — Please use the Avatar block instead.
 - [Author (deprecated)](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author/) (`core/post-author`) — Please use the Avatar block, the Author Name block, and the Author Biography block instead.

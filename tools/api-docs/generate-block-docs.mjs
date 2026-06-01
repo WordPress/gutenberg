@@ -921,7 +921,7 @@ function generateDeprecatedNotice( dirs ) {
 	const lines = [];
 
 	lines.push(
-		'**Deprecated blocks** — the following blocks are deprecated and should not be used in new content. Their documentation is preserved for reference.'
+		'**Deprecated blocks** — the following blocks are deprecated and should not be used in new content.'
 	);
 	lines.push( '' );
 
