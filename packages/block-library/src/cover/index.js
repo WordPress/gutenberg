@@ -82,10 +82,10 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				featuredImage: item.useFeaturedImage,
 			} ),
 			setValue: ( { value } ) => ( {
-				id: value.id,
 				url: value.url,
+				id: value.id,
 				alt: value.alt,
-				mediaType: value.backgroundType,
+				backgroundType: value.mediaType,
 				useFeaturedImage: value.featuredImage,
 			} ),
 		},
