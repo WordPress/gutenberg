@@ -1376,12 +1376,12 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
-			// Second poll: 403 referencing only test-room.
+			// Second poll: 403 listing only test-room.
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_cannot_edit',
 				message:
-					'You do not have permission to sync this entity: test-room.',
-				data: { status: 403 },
+					'You do not have permission to sync one or more entities: test-room.',
+				data: { status: 403, rooms: [ 'test-room' ] },
 			} );
 			await jest.advanceTimersByTimeAsync( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
@@ -1413,6 +1413,190 @@ describe( 'polling-manager', () => {
 			} );
 			await jest.advanceTimersByTimeAsync( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'unregisters all rooms listed in a forbidden error response', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'keep-room',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+					{
+						room: 'forbidden-room-a',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+					{
+						room: 'forbidden-room-b',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+
+			const keepDoc = createMockDoc( 1 );
+			pollingManager.registerRoom( {
+				room: 'keep-room',
+				doc: keepDoc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+			pollingManager.registerRoom( {
+				room: 'forbidden-room-a',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+			pollingManager.registerRoom( {
+				room: 'forbidden-room-b',
+				doc: createMockDoc( 3 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			const onDocUpdate = getOnDocUpdate( keepDoc );
+			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync one or more entities.',
+				data: {
+					status: 403,
+					rooms: [ 'forbidden-room-a', 'forbidden-room-b' ],
+				},
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ];
+			const failedKeepRoom = failedPayload.rooms.find(
+				( room: { room: string } ) => room.room === 'keep-room'
+			);
+			expect( failedKeepRoom!.updates.length ).toBeGreaterThan( 0 );
+
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'keep-room',
+						end_cursor: 2,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ];
+			expect( retryPayload.rooms.map( ( room ) => room.room ) ).toEqual( [
+				'keep-room',
+			] );
+			expect( retryPayload.rooms[ 0 ].updates ).toEqual(
+				failedKeepRoom!.updates
+			);
+		} );
+
+		it( 'ignores forbidden rooms that were not in the failed request', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'primary',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+				],
+			} );
+
+			const primaryDoc = createMockDoc( 1 );
+			pollingManager.registerRoom( {
+				room: 'primary',
+				doc: primaryDoc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+			for ( let i = 1; i <= 10; i++ ) {
+				pollingManager.registerRoom( {
+					room: `overflow-${ i }`,
+					doc: createMockDoc( i + 1 ),
+					awareness: createMockAwareness(),
+					log: jest.fn(),
+					onStatusChange: jest.fn(),
+					onSync: jest.fn(),
+				} );
+			}
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			const onPrimaryDocUpdate = getOnDocUpdate( primaryDoc );
+			onPrimaryDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'local-origin' );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync one or more entities: overflow-1, overflow-10.',
+				data: {
+					status: 403,
+					rooms: [ 'overflow-1', 'overflow-10' ],
+				},
+			} );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			const failedPayload = mockPostSyncUpdate.mock.calls[ 1 ][ 0 ] as {
+				rooms: Array< { room: string; updates: unknown[] } >;
+			};
+			expect( failedPayload.rooms.map( ( room ) => room.room ) ).toEqual(
+				[
+					'primary',
+					'overflow-1',
+					'overflow-2',
+					'overflow-3',
+					'overflow-4',
+					'overflow-5',
+					'overflow-6',
+					'overflow-7',
+					'overflow-8',
+					'overflow-9',
+				]
+			);
+			const failedPrimaryRoom = failedPayload.rooms.find(
+				( room ) => room.room === 'primary'
+			);
+			expect( failedPrimaryRoom!.updates.length ).toBeGreaterThan( 0 );
+
+			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const retryPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
+				rooms: Array< { room: string; updates: unknown[] } >;
+			};
+			const retryRooms = retryPayload.rooms.map( ( room ) => room.room );
+			expect( retryRooms ).toContain( 'primary' );
+			expect( retryRooms ).toContain( 'overflow-10' );
+			expect( retryRooms ).not.toContain( 'overflow-1' );
+			expect(
+				retryPayload.rooms.find( ( room ) => room.room === 'primary' )!
+					.updates
+			).toEqual( failedPrimaryRoom!.updates );
 		} );
 
 		it( 'retries normally on a 401 (not treated as forbidden)', async () => {
@@ -1479,81 +1663,6 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
 
-		it( 'unregisters the correct room when room names share a prefix', async () => {
-			// Register the shorter-named room first so that, without the
-			// length-descending sort in identifyForbiddenRoom, the iteration
-			// order would match "postType/post:1" as a substring of
-			// "postType/post:10" and unregister the wrong room.
-			const twoRoomResponse = {
-				rooms: [
-					{
-						room: 'postType/post:1',
-						end_cursor: 1,
-						awareness: {},
-						updates: [],
-					},
-					{
-						room: 'postType/post:10',
-						end_cursor: 1,
-						awareness: {},
-						updates: [],
-					},
-				],
-			};
-			mockPostSyncUpdate.mockResolvedValueOnce( twoRoomResponse );
-
-			pollingManager.registerRoom( {
-				room: 'postType/post:1',
-				doc: createMockDoc( 1 ),
-				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
-			} );
-			pollingManager.registerRoom( {
-				room: 'postType/post:10',
-				doc: createMockDoc( 2 ),
-				awareness: createMockAwareness(),
-				log: jest.fn(),
-				onStatusChange: jest.fn(),
-				onSync: jest.fn(),
-			} );
-
-			await jest.advanceTimersByTimeAsync( 0 );
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
-
-			// Next poll: 403 referencing the longer-named room.
-			mockPostSyncUpdate.mockRejectedValueOnce( {
-				code: 'rest_cannot_edit',
-				message:
-					'You do not have permission to sync this entity: postType/post:10.',
-				data: { status: 403 },
-			} );
-			mockPostSyncUpdate.mockResolvedValueOnce( {
-				rooms: [
-					{
-						room: 'postType/post:1',
-						end_cursor: 2,
-						awareness: {},
-						updates: [],
-					},
-				],
-			} );
-			await jest.advanceTimersByTimeAsync( 4000 );
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
-
-			// The next poll's payload should still include the shorter
-			// room and exclude the (correctly identified) longer one.
-			await jest.advanceTimersByTimeAsync( 4000 );
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
-			const lastPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
-				rooms: { room: string }[];
-			};
-			const remainingRoomNames = lastPayload.rooms.map( ( r ) => r.room );
-			expect( remainingRoomNames ).toContain( 'postType/post:1' );
-			expect( remainingRoomNames ).not.toContain( 'postType/post:10' );
-		} );
-
 		it( 'does not send a disconnect signal when unregistering a forbidden room', async () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 
@@ -1569,12 +1678,12 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
-			// Next poll: 403 referencing the only registered room.
+			// Next poll: 403 listing the only registered room.
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_cannot_edit',
 				message:
-					'You do not have permission to sync this entity: test-room.',
-				data: { status: 403 },
+					'You do not have permission to sync one or more entities: test-room.',
+				data: { status: 403, rooms: [ 'test-room' ] },
 			} );
 			await jest.advanceTimersByTimeAsync( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
@@ -1584,7 +1693,7 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalled();
 		} );
 
-		it( 'resumes polling for a newly-registered room after a 403 unregistered all rooms', async () => {
+		it( 'resumes polling for a newly-registered room after a generic 403 unregistered all rooms', async () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 
 			pollingManager.registerRoom( {
@@ -1599,12 +1708,11 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
 
-			// Next poll: 403 referencing the only registered room.
+			// Next poll: a generic 403 without room details.
 			// All rooms get unregistered and the poll loop stops.
 			mockPostSyncUpdate.mockRejectedValueOnce( {
 				code: 'rest_cannot_edit',
-				message:
-					'You do not have permission to sync this entity: test-room.',
+				message: 'You do not have permission to perform this action.',
 				data: { status: 403 },
 			} );
 			await jest.advanceTimersByTimeAsync( 4000 );

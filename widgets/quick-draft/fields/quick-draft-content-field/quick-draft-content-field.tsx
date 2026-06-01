@@ -57,7 +57,6 @@ export default function QuickDraftContentField< Item >( {
 	return (
 		<Stack direction="column" className={ styles.root }>
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label={ field.label }
 				hideLabelFromVision={ hideLabelFromVision }
 				value={ value ?? '' }

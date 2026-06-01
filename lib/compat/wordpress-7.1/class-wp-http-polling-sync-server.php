@@ -210,8 +210,9 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				);
 			}
 
-			$rooms      = $request['rooms'];
-			$wp_user_id = get_current_user_id();
+			$rooms           = $request['rooms'];
+			$wp_user_id      = get_current_user_id();
+			$forbidden_rooms = array();
 
 			foreach ( $rooms as $room ) {
 				$client_id = $room['client_id'];
@@ -237,16 +238,23 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$object_id   = $object_parts[1] ?? null;
 
 				if ( ! $this->can_user_sync_entity_type( $entity_kind, $entity_name, $object_id ) ) {
-					return new WP_Error(
-						'rest_cannot_edit',
-						sprintf(
-							/* translators: %s: The room name encodes the current entity being synced. */
-							__( 'You do not have permission to sync this entity: %s.', 'gutenberg' ),
-							$room
-						),
-						array( 'status' => rest_authorization_required_code() )
-					);
+					$forbidden_rooms[] = $room;
 				}
+			}
+
+			if ( ! empty( $forbidden_rooms ) ) {
+				return new WP_Error(
+					'rest_cannot_edit',
+					sprintf(
+						/* translators: %s: Comma-separated list of room names. */
+						__( 'You do not have permission to sync one or more entities: %s.', 'gutenberg' ),
+						implode( ', ', $forbidden_rooms )
+					),
+					array(
+						'status' => rest_authorization_required_code(),
+						'rooms'  => $forbidden_rooms,
+					)
+				);
 			}
 
 			return true;
