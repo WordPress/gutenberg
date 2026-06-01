@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import {
 	useEffect,
+	useEffectEvent,
 	useLayoutEffect,
 	useMemo,
 	useRef,
@@ -47,6 +48,7 @@ import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCoverPopover from './resizable-cover-popover';
+import useCoverBindingState from './use-cover-binding-state';
 import {
 	getMediaColor,
 	compositeIsDark,
@@ -92,8 +94,9 @@ function CoverEdit( {
 	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	context: { postId, postType },
+	context,
 } ) {
+	const { postId, postType } = context;
 	const {
 		contentPosition,
 		id,
@@ -116,6 +119,13 @@ function CoverEdit( {
 		poster,
 	} = attributes;
 
+	const { bindingActive, bindingResolvedUrl } = useCoverBindingState( {
+		attributes,
+	} );
+
+	// Race-token guard: stale `getMediaColor` resolutions bail.
+	const raceTokenRef = useRef( 0 );
+
 	const [ featuredImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -127,8 +137,7 @@ function CoverEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	// Ref to access latest values after async operations (e.g. getMediaColor),
-	// avoiding stale values that could overwrite concurrent remote changes.
+	// Latest attributes/overlayColor for post-await reads (avoid stale closures).
 	const propsRef = useRef( { attributes, overlayColor } );
 	useLayoutEffect( () => {
 		propsRef.current = { attributes, overlayColor };
@@ -156,49 +165,54 @@ function CoverEdit( {
 		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ??
 		media?.source_url;
 
-	// User can change the featured image outside of the block, but we still
-	// need to update the block when that happens. This effect should only
-	// run when the featured image changes in that case. All other cases are
-	// handled in their respective callbacks.
-	useEffect( () => {
-		( async () => {
-			if ( ! useFeaturedImage ) {
-				return;
-			}
+	const effectiveUrl =
+		bindingResolvedUrl ??
+		( useFeaturedImage
+			? mediaUrl
+			: originalUrl?.replaceAll( '&amp;', '&' ) );
 
-			const averageBackgroundColor = await getMediaColor( mediaUrl );
+	const effectiveDimRatio =
+		bindingActive && dimRatio === 100 && effectiveUrl ? 50 : dimRatio;
 
-			// Read latest values after await to avoid stale closures.
-			const { attributes: currentAttrs, overlayColor: currentOverlay } =
-				propsRef.current;
+	const onUrlResolved = useEffectEvent( async ( resolvedUrl ) => {
+		if ( ! resolvedUrl ) {
+			return;
+		}
+		const myToken = ++raceTokenRef.current;
+		const averageBackgroundColor = await getMediaColor( resolvedUrl );
+		if ( myToken !== raceTokenRef.current ) {
+			return;
+		}
 
-			let newOverlayColor = currentOverlay.color;
-			if ( ! currentAttrs.isUserOverlayColor ) {
-				newOverlayColor = averageBackgroundColor;
-				__unstableMarkNextChangeAsNotPersistent();
-				setOverlayColor( newOverlayColor );
-			}
+		// Read latest values after await to avoid stale closures.
+		const { attributes: currentAttrs, overlayColor: currentOverlay } =
+			propsRef.current;
 
-			const newIsDark = compositeIsDark(
-				currentAttrs.dimRatio,
+		let newOverlayColor = currentOverlay.color;
+		if ( ! currentAttrs.isUserOverlayColor ) {
+			newOverlayColor = averageBackgroundColor;
+			__unstableMarkNextChangeAsNotPersistent();
+			setOverlayColor( newOverlayColor );
+		}
+
+		// Mirror `effectiveDimRatio` against the latest attrs.
+		const latestEffectiveDimRatio =
+			bindingActive && currentAttrs.dimRatio === 100 && resolvedUrl
+				? 50
+				: currentAttrs.dimRatio;
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			isDark: compositeIsDark(
+				latestEffectiveDimRatio,
 				newOverlayColor,
 				averageBackgroundColor
-			);
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				isDark: newIsDark,
-				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
-			} );
-		} )();
-		// Update the block only when the featured image changes.
-		// The other dependencies are stable references (dispatch actions / setters).
-	}, [
-		mediaUrl,
-		__unstableMarkNextChangeAsNotPersistent,
-		setAttributes,
-		setOverlayColor,
-		useFeaturedImage,
-	] );
+			),
+		} );
+	} );
+
+	useEffect( () => {
+		onUrlResolved( effectiveUrl );
+	}, [ effectiveUrl ] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -416,7 +430,9 @@ function CoverEdit( {
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
 
-	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isImageBackground =
+		IMAGE_BACKGROUND_TYPE === backgroundType ||
+		( bindingActive && !! bindingResolvedUrl );
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 	const isEmbedVideoBackground =
 		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
@@ -571,6 +587,7 @@ function CoverEdit( {
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
 			featuredImage={ media }
+			bindingActive={ bindingActive }
 		/>
 	);
 
@@ -669,14 +686,14 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ url &&
+				{ effectiveUrl &&
 					isImageBackground &&
-					( isImgElement ? (
+					( bindingActive || isImgElement ? (
 						<img
 							ref={ mediaElement }
 							className="wp-block-cover__image-background"
 							alt={ alt }
-							src={ url }
+							src={ bindingActive ? effectiveUrl : url }
 							style={ mediaStyle }
 						/>
 					) : (
@@ -688,7 +705,10 @@ function CoverEdit( {
 								classes,
 								'wp-block-cover__image-background'
 							) }
-							style={ { backgroundImage, backgroundPosition } }
+							style={ {
+								backgroundImage,
+								backgroundPosition,
+							} }
 						/>
 					) ) }
 				{ url && isVideoBackground && (
@@ -728,15 +748,18 @@ function CoverEdit( {
 						aria-hidden="true"
 						className={ clsx(
 							'wp-block-cover__background',
-							dimRatioToClass( dimRatio ),
+							dimRatioToClass( effectiveDimRatio ),
 							{
 								[ overlayColor.class ]: overlayColor.class,
-								'has-background-dim': dimRatio !== undefined,
+								'has-background-dim':
+									effectiveDimRatio !== undefined,
 								// For backwards compatibility. Former versions of the Cover Block applied
 								// `.wp-block-cover__gradient-background` in the presence of
 								// media, a gradient and a dim.
 								'wp-block-cover__gradient-background':
-									url && gradientValue && dimRatio !== 0,
+									url &&
+									gradientValue &&
+									effectiveDimRatio !== 0,
 								'has-background-gradient': gradientValue,
 								[ gradientClass ]: gradientClass,
 							}
@@ -747,12 +770,14 @@ function CoverEdit( {
 
 				{ isUploadingMedia && <Spinner /> }
 
-				<CoverPlaceholder
-					disableMediaButtons
-					onSelectMedia={ onSelectMedia }
-					onError={ onUploadError }
-					toggleUseFeaturedImage={ toggleUseFeaturedImage }
-				/>
+				{ ! bindingActive && (
+					<CoverPlaceholder
+						disableMediaButtons
+						onSelectMedia={ onSelectMedia }
+						onError={ onUploadError }
+						toggleUseFeaturedImage={ toggleUseFeaturedImage }
+					/>
+				) }
 				<div { ...innerBlocksProps } />
 			</TagName>
 			{ hasNonContentControls && isSelected && (

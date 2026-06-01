@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New features
+
+-   Cover Block: Support Block Bindings for the `id` and `url` attributes, enabling Pattern Overrides for cover images sourced from the media library. ([#77199](https://github.com/WordPress/gutenberg/issues/77199))
+
 ## 9.47.0 (2026-05-27)
 
 ### Internal

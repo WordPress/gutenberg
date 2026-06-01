@@ -571,6 +571,243 @@ test.describe( 'Cover', () => {
 	} );
 } );
 
+test.describe( 'Cover — Block Bindings — Pattern Overrides round-trip', () => {
+	const coverBindingName = 'Bound Cover';
+
+	let defaultMedia;
+	let overrideMedia;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		[ defaultMedia, overrideMedia ] = await Promise.all( [
+			requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
+			),
+			requestUtils.uploadMedia(
+				'./assets/1024x768_e2e_test_image_size.jpeg'
+			),
+		] );
+	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'Cover round-trips through default → override → reset', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const pattern = await requestUtils.createBlock( {
+			title: 'Cover Pattern',
+			content: `<!-- wp:cover {"url":"${ defaultMedia.source_url }","id":${ defaultMedia.id },"dimRatio":100,"customOverlayColor":"#000000","minHeight":80,"metadata":{"name":"${ coverBindingName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<div class="wp-block-cover" style="min-height:80px"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim" style="background-color:#000000"></span><img class="wp-block-cover__image-background wp-image-${ defaultMedia.id }" alt="" src="${ defaultMedia.source_url }" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<p class="has-text-align-center"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->`,
+			status: 'publish',
+		} );
+
+		const getCoverBlock = () =>
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.getByRole( 'document', { name: 'Block: Cover' } );
+		const getBlockToolbar = () =>
+			page.getByRole( 'toolbar', { name: 'Block tools' } );
+
+		await test.step( 'Default state — pattern instance shows defaultMedia and hides bound controls', async () => {
+			await editor.insertBlock( {
+				name: 'core/block',
+				attributes: { ref: pattern.id },
+			} );
+
+			const coverBlock = getCoverBlock();
+			await expect( coverBlock.locator( 'img' ) ).toHaveAttribute(
+				'src',
+				defaultMedia.source_url
+			);
+
+			// AC-15: dimRatio:100 relaxed so the bound <img> stays visible.
+			const overlay = coverBlock.locator( '.wp-block-cover__background' );
+			await expect( overlay ).toHaveClass( /has-background-dim(?!-100)/ );
+
+			await editor.selectBlocks( coverBlock );
+			await editor.openDocumentSettingsSidebar();
+			await editor.showBlockToolbar();
+
+			const editorSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await openStylesTabIfAvailable( editorSettings );
+
+			// AC-11/12: parallax + repeated controls absent on bound covers.
+			await expect(
+				editorSettings.getByRole( 'checkbox', {
+					name: 'Fixed background',
+				} )
+			).toHaveCount( 0 );
+			await expect(
+				editorSettings.getByRole( 'checkbox', {
+					name: 'Repeated background',
+				} )
+			).toHaveCount( 0 );
+
+			// MediaReplaceFlow stays visible on bound covers so the binding
+			// source (Pattern Overrides here) intercepts per-instance
+			// `setAttributes({ url, id })` writes.
+			await expect(
+				getBlockToolbar().getByRole( 'button', {
+					name: /^(Replace|Add media)$/,
+				} )
+			).toBeVisible();
+
+			// AC-10: Reset disabled without override.
+			await expect(
+				getBlockToolbar().getByRole( 'button', { name: 'Reset' } )
+			).toBeDisabled();
+		} );
+
+		await test.step( 'AC-21 — embed-video covers retain Replace + "Embed video from URL"', async () => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/cover',
+				attributes: {
+					url: 'https://videopress.com/v/example',
+					backgroundType: 'embed-video',
+					dimRatio: 50,
+					customOverlayColor: '#111111',
+					metadata: {
+						name: 'Embed cover',
+						bindings: {
+							url: { source: 'core/pattern-overrides' },
+							id: { source: 'core/pattern-overrides' },
+						},
+					},
+				},
+			} );
+			const embedCover = editor.canvas
+				.getByRole( 'document', { name: 'Block: Cover' } )
+				.last();
+			await editor.selectBlocks( embedCover );
+			await editor.showBlockToolbar();
+
+			const replaceToggle = getBlockToolbar().getByRole( 'button', {
+				name: /^(Replace|Add media)$/,
+			} );
+			await expect( replaceToggle ).toBeVisible();
+			await replaceToggle.click();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Embed video from URL' } )
+			).toBeVisible();
+			await page.keyboard.press( 'Escape' );
+		} );
+
+		await test.step( 'Override — instance content writes overrideMedia through the binding', async () => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/block',
+				attributes: { ref: pattern.id },
+			} );
+
+			const coverBlock = getCoverBlock();
+			await expect( coverBlock ).toBeVisible();
+
+			await page.evaluate(
+				( { name, overrideId, overrideUrl } ) => {
+					const { dispatch, select } = window.wp.data;
+					const patternClientId = select( 'core/block-editor' )
+						.getBlocks()
+						.find( ( b ) => b.name === 'core/block' )?.clientId;
+					dispatch( 'core/block-editor' ).updateBlockAttributes(
+						patternClientId,
+						{
+							content: {
+								[ name ]: {
+									id: overrideId,
+									url: overrideUrl,
+								},
+							},
+						}
+					);
+				},
+				{
+					name: coverBindingName,
+					overrideId: overrideMedia.id,
+					overrideUrl: overrideMedia.source_url,
+				}
+			);
+
+			// AC-22 editor: bound <img src> flips to the override.
+			await expect( coverBlock.locator( 'img' ) ).toHaveAttribute(
+				'src',
+				overrideMedia.source_url
+			);
+
+			// AC-10: written override flips Reset to enabled.
+			await editor.selectBlocks( coverBlock );
+			await editor.showBlockToolbar();
+			await expect(
+				getBlockToolbar().getByRole( 'button', { name: 'Reset' } )
+			).toBeEnabled();
+
+			// AC-8/16: front-end matches override + relaxed dim.
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+			await expect(
+				page.locator( '.wp-block-cover__image-background' )
+			).toHaveAttribute( 'src', overrideMedia.source_url );
+			await expect(
+				page.locator( '.wp-block-cover__background' )
+			).toHaveClass( /has-background-dim(?!-100)/ );
+		} );
+
+		await test.step( 'Reset — clicking Reset clears the override on both editor and front-end', async () => {
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/block',
+				attributes: {
+					ref: pattern.id,
+					content: {
+						[ coverBindingName ]: {
+							id: overrideMedia.id,
+							url: overrideMedia.source_url,
+						},
+					},
+				},
+			} );
+
+			const coverBlock = getCoverBlock();
+			await expect( coverBlock.locator( 'img' ) ).toHaveAttribute(
+				'src',
+				overrideMedia.source_url
+			);
+
+			await editor.selectBlocks( coverBlock );
+			await editor.showBlockToolbar();
+			await getBlockToolbar()
+				.getByRole( 'button', { name: 'Reset' } )
+				.click();
+
+			// AC-9 editor + front-end: falls back to pattern default.
+			await expect( coverBlock.locator( 'img' ) ).toHaveAttribute(
+				'src',
+				defaultMedia.source_url
+			);
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+			await expect(
+				page.locator( '.wp-block-cover__image-background' )
+			).toHaveAttribute( 'src', defaultMedia.source_url );
+		} );
+	} );
+} );
+
 class CoverBlockUtils {
 	constructor( { page } ) {
 		/** @type {Page} */
