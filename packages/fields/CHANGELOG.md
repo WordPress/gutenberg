@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Migrate `Tooltip` consumers from `@wordpress/components` to the new compositional `Tooltip` in `@wordpress/ui` ([#78691](https://github.com/WordPress/gutenberg/pull/78691)).
+
 ## 0.39.0 (2026-05-27)
 
 ## 0.38.0 (2026-05-14)
