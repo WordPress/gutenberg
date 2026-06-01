@@ -5,7 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalItem as Item,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	ExternalLink,
 	FlexBlock,
 	Button,
@@ -18,10 +18,11 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { ReactNode } from 'react';
+import type { ApiKeySource } from './types';
 
 export interface ConnectorItemProps {
 	className?: string;
-	icon?: ReactNode;
+	logo?: ReactNode;
 	name: string;
 	description: string;
 	actionArea?: ReactNode;
@@ -30,7 +31,7 @@ export interface ConnectorItemProps {
 
 export function ConnectorItem( {
 	className,
-	icon,
+	logo,
 	name,
 	description,
 	actionArea,
@@ -41,20 +42,20 @@ export function ConnectorItem( {
 		<Item className={ className }>
 			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
-					{ icon }
+					{ logo }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<Text
+							<WCText
 								weight={ 600 }
 								size={ 15 }
 								id={ headingId }
 								as="h2"
 							>
 								{ name }
-							</Text>
-							<Text variant="muted" size={ 12 }>
+							</WCText>
+							<WCText variant="muted" size={ 12 }>
 								{ description }
-							</Text>
+							</WCText>
 						</VStack>
 					</FlexBlock>
 					{ actionArea }
@@ -65,7 +66,7 @@ export function ConnectorItem( {
 	);
 }
 
-export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
+export type { ApiKeySource } from './types';
 
 export interface DefaultConnectorSettingsProps {
 	onSave?: ( apiKey: string ) => void | Promise< void >;
@@ -141,7 +142,7 @@ export function DefaultConnectorSettings( {
 						sprintf(
 							/* translators: %s: Link to provider settings. */
 							__(
-								'Your API key is stored securely. You can reset it at %s'
+								'Your API key is stored securely. You can manage it at %s'
 							),
 							'<a></a>'
 						),
@@ -189,9 +190,9 @@ export function DefaultConnectorSettings( {
 			className="connector-settings"
 			style={
 				readOnly
-					? ( {
+					? {
 							'--wp-components-color-background': '#f0f0f0',
-					  } as React.CSSProperties )
+					  }
 					: undefined
 			}
 		>

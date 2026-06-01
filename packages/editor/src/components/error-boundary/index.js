@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -26,7 +26,7 @@ function getContent() {
 		// content serialization throughout the lifetime of a non-erroring
 		// application.
 		return select( editorStore ).getEditedPostContent();
-	} catch ( error ) {}
+	} catch {}
 }
 
 function CopyButton( { text, children, variant = 'secondary' } ) {
@@ -71,9 +71,9 @@ class ErrorBoundary extends Component {
 				expanded={ false }
 				wrap
 			>
-				<Text as="p">
+				<WCText as="p">
 					{ __( 'The editor has encountered an unexpected error.' ) }
-				</Text>
+				</WCText>
 				<HStack expanded={ false }>
 					{ canCopyContent && (
 						<CopyButton text={ getContent }>

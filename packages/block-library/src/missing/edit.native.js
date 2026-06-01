@@ -6,9 +6,8 @@ import { View, Text, TouchableOpacity } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject, rawHandler, serialize } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -21,6 +20,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
+import { coreBlocks } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -116,7 +116,7 @@ export class UnsupportedBlockEdit extends Component {
 				accessibilityRole="button"
 				accessibilityHint={ __( 'Tap here to show help' ) }
 			>
-				<Icon
+				<WCIcon
 					className="unsupported-icon-help"
 					label={ __( 'Help icon' ) }
 					icon={ help }
@@ -245,7 +245,7 @@ export class UnsupportedBlockEdit extends Component {
 					{ ! this.canEditUnsupportedBlock() &&
 						this.renderHelpIcon() }
 					<View style={ styles.unsupportedBlockHeader }>
-						<Icon
+						<WCIcon
 							className={ iconClassName }
 							icon={ icon && icon.src ? icon.src : icon }
 							fill={ iconStyle.color }

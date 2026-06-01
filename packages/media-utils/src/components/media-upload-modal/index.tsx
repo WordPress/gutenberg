@@ -23,7 +23,13 @@ import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
-import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import type {
+	Field,
+	ActionButton,
+	SupportedLayouts,
+	View,
+} from '@wordpress/dataviews';
+import { useView } from '@wordpress/views';
 import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
@@ -63,6 +69,48 @@ const NOTICES_CONTEXT = 'media-modal';
 
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
+
+type ViewQueryParams = Pick< View, 'page' | 'search' >;
+
+const defaultQueryParams: ViewQueryParams = {
+	page: 1,
+	search: '',
+};
+
+const defaultView: View = {
+	type: LAYOUT_PICKER_GRID,
+	fields: [],
+	showTitle: false,
+	titleField: 'title',
+	mediaField: 'media_thumbnail',
+	perPage: 50,
+	filters: [],
+	layout: {
+		previewSize: 170,
+		density: 'compact',
+	},
+};
+
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_PICKER_GRID ]: {
+		fields: [],
+		showTitle: false,
+		layout: {
+			previewSize: 170,
+			density: 'compact',
+		},
+	},
+	[ LAYOUT_PICKER_TABLE ]: {
+		fields: [
+			'filename',
+			'filesize',
+			'media_dimensions',
+			'author',
+			'date',
+		],
+		showTitle: true,
+	},
+};
 
 interface MediaUploadModalProps {
 	/**
@@ -187,23 +235,31 @@ export function MediaUploadModal( {
 		useDispatch( noticesStore );
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
+	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
+		() => defaultQueryParams
+	);
 
-	// DataViews configuration - allow view updates
-	const [ view, setView ] = useState< View >( () => ( {
-		type: LAYOUT_PICKER_GRID,
-		fields: [],
-		showTitle: false,
-		titleField: 'title',
-		mediaField: 'media_thumbnail',
-		search: '',
-		page: 1,
-		perPage: 50,
-		filters: [],
-		layout: {
-			previewSize: 170,
-			density: 'compact',
+	// Persist view configuration across sessions via the preferences store.
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: 'attachment',
+		slug: 'media-modal',
+		defaultView,
+		queryParams,
+		onChangeQueryParams: setQueryParams,
+	} );
+
+	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
+	const handleChangeView = useCallback(
+		( nextView: View ) => {
+			const normalizedView = { ...nextView };
+			if ( normalizedView.startPosition === undefined ) {
+				delete normalizedView.startPosition;
+			}
+			updateView( normalizedView );
 		},
-	} ) );
+		[ updateView ]
+	);
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -236,11 +292,34 @@ export function MediaUploadModal( {
 			}
 		} );
 
-		// Base media type on allowedTypes if no filter is set
-		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes?.includes( '*' )
-				? undefined
-				: allowedTypes;
+		// Base media and mime type on allowedTypes if no filter is set
+		if (
+			! filters.media_type &&
+			! filters.mime_type &&
+			allowedTypes &&
+			! allowedTypes.includes( '*' )
+		) {
+			const { mediaTypes, mimeTypes } = allowedTypes.reduce(
+				( acc, type ) => {
+					if ( type.endsWith( '/*' ) ) {
+						acc.mediaTypes.push( type.replace( '/*', '' ) );
+					} else if ( type.includes( '/' ) ) {
+						acc.mimeTypes.push( type );
+					} else {
+						acc.mediaTypes.push( type );
+					}
+
+					return acc;
+				},
+				{ mediaTypes: [] as string[], mimeTypes: [] as string[] }
+			);
+
+			if ( mediaTypes.length ) {
+				filters.media_type = mediaTypes;
+			}
+			if ( mimeTypes.length ) {
+				filters.mime_type = mimeTypes;
+			}
 		}
 
 		return {
@@ -387,6 +466,12 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ removeAllNotices, onClose ] );
 
+	useEffect( () => {
+		if ( ! isOpen ) {
+			setQueryParams( defaultQueryParams );
+		}
+	}, [ isOpen ] );
+
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
@@ -449,26 +534,6 @@ export function MediaUploadModal( {
 			totalPages,
 		} ),
 		[ totalItems, totalPages ]
-	);
-
-	const defaultLayouts = useMemo(
-		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {
-				fields: [],
-				showTitle: false,
-			},
-			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [
-					'filename',
-					'filesize',
-					'media_dimensions',
-					'author',
-					'date',
-				],
-				showTitle: true,
-			},
-		} ),
-		[]
 	);
 
 	// Build accept attribute from allowedTypes
@@ -544,7 +609,7 @@ export function MediaUploadModal( {
 				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ handleChangeView }
 				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ setSelection }
@@ -553,6 +618,7 @@ export function MediaUploadModal( {
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				itemListLabel={ __( 'Media items' ) }
+				onReset={ isModified ? resetToDefault : false }
 			>
 				<Stack
 					direction="row"

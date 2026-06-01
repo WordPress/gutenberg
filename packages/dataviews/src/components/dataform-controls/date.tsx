@@ -18,7 +18,7 @@ import {
 import {
 	BaseControl,
 	Button,
-	Icon,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
@@ -38,6 +38,7 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import RelativeDateControl from './utils/relative-date-control';
+import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
@@ -268,7 +269,7 @@ function ValidatedDateControl< Item >( {
 								: undefined
 						) }
 					>
-						<Icon
+						<WCIcon
 							className="components-validated-control__indicator-icon"
 							icon={ errorIcon }
 							size={ 16 }
@@ -299,6 +300,7 @@ function CalendarDateControl< Item >( {
 		isValid,
 		format: fieldFormat,
 	} = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
@@ -316,6 +318,9 @@ function CalendarDateControl< Item >( {
 
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
+
+	const { minConstraint, maxConstraint, disabledMatchers } =
+		useDisabledDateMatchers( isValid, parseDate );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -406,6 +411,8 @@ function CalendarDateControl< Item >( {
 									variant="tertiary"
 									isPressed={ isSelected }
 									size="small"
+									disabled={ disabled }
+									accessibleWhenDisabled
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -419,8 +426,8 @@ function CalendarDateControl< Item >( {
 							variant="tertiary"
 							isPressed={ ! selectedPresetId }
 							size="small"
-							disabled={ !! selectedPresetId }
-							accessibleWhenDisabled={ false }
+							disabled={ !! selectedPresetId || disabled }
+							accessibleWhenDisabled
 						>
 							{ __( 'Custom' ) }
 						</Button>
@@ -436,6 +443,9 @@ function CalendarDateControl< Item >( {
 						value={ value }
 						onChange={ handleManualDateChange }
 						required={ !! field.isValid?.required }
+						disabled={ disabled }
+						min={ minConstraint }
+						max={ maxConstraint }
 					/>
 
 					{ /* Calendar widget */ }
@@ -449,6 +459,8 @@ function CalendarDateControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
+						disabled={ disabled || disabledMatchers }
+						disableNavigation={ disabled }
 					/>
 				</Stack>
 			</BaseControl>
@@ -470,8 +482,10 @@ function CalendarDateRangeControl< Item >( {
 		description,
 		getValue,
 		setValue,
+		isValid,
 		format: fieldFormat,
 	} = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -485,6 +499,9 @@ function CalendarDateRangeControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+
+	const { minConstraint, maxConstraint, disabledMatchers } =
+		useDisabledDateMatchers( isValid, parseDate );
 
 	const onChangeCallback = useCallback(
 		( newValue: DateRange ) => {
@@ -626,6 +643,8 @@ function CalendarDateRangeControl< Item >( {
 									variant="tertiary"
 									isPressed={ isSelected }
 									size="small"
+									disabled={ disabled }
+									accessibleWhenDisabled
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -639,8 +658,8 @@ function CalendarDateRangeControl< Item >( {
 							variant="tertiary"
 							isPressed={ ! selectedPresetId }
 							size="small"
-							accessibleWhenDisabled={ false }
-							disabled={ !! selectedPresetId }
+							accessibleWhenDisabled
+							disabled={ !! selectedPresetId || disabled }
 						>
 							{ __( 'Custom' ) }
 						</Button>
@@ -664,6 +683,9 @@ function CalendarDateRangeControl< Item >( {
 								handleManualDateChange( 'from', newValue )
 							}
 							required={ !! field.isValid?.required }
+							disabled={ disabled }
+							min={ minConstraint }
+							max={ maxConstraint }
 						/>
 						<InputControl
 							__next40pxDefaultSize
@@ -676,6 +698,9 @@ function CalendarDateRangeControl< Item >( {
 								handleManualDateChange( 'to', newValue )
 							}
 							required={ !! field.isValid?.required }
+							disabled={ disabled }
+							min={ minConstraint }
+							max={ maxConstraint }
 						/>
 					</Stack>
 
@@ -687,6 +712,7 @@ function CalendarDateRangeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
+						disabled={ disabled || disabledMatchers }
 					/>
 				</Stack>
 			</BaseControl>

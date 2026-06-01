@@ -1466,6 +1466,7 @@ class MultiBlockSelectionUtils {
 		const endBlock = this.#editor.canvas.locator(
 			`[data-block="${ selectionEnd }"]`
 		);
+		/* eslint-disable playwright/no-standalone-expect */
 
 		expect(
 			await selection.evaluate( ( _selection ) => _selection.rangeCount ),
@@ -1515,5 +1516,6 @@ class MultiBlockSelectionUtils {
 				'Expected selection to start and end in the selected block'
 			).toBe( true );
 		}
+		/* eslint-enable playwright/no-standalone-expect */
 	};
 }

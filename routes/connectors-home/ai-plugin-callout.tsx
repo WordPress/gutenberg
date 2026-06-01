@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -12,6 +11,8 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ import { WpLogoDecoration } from './wp-logo-decoration';
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
+const AI_PLUGIN_PAGE_SLUG = 'ai-wp-admin';
 const AI_PLUGIN_ID = 'ai/ai';
 const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
 
@@ -122,6 +124,8 @@ export function AiPluginCallout() {
 	}, [] );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const installPlugin = async () => {
 		setIsBusy( true );
@@ -133,9 +137,18 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
-			speak( __( 'AI plugin installed and activated successfully.' ) );
+			createSuccessNotice(
+				__( 'AI plugin installed and activated successfully.' ),
+				{
+					id: 'ai-plugin-install-success',
+					type: 'snackbar',
+				}
+			);
 		} catch {
-			speak( __( 'Failed to install the AI plugin.' ), 'assertive' );
+			createErrorNotice( __( 'Failed to install the AI plugin.' ), {
+				id: 'ai-plugin-install-error',
+				type: 'snackbar',
+			} );
 		} finally {
 			setIsBusy( false );
 		}
@@ -151,9 +164,15 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
-			speak( __( 'AI plugin activated successfully.' ) );
+			createSuccessNotice( __( 'AI plugin activated successfully.' ), {
+				id: 'ai-plugin-activate-success',
+				type: 'snackbar',
+			} );
 		} catch {
-			speak( __( 'Failed to activate the AI plugin.' ), 'assertive' );
+			createErrorNotice( __( 'Failed to activate the AI plugin.' ), {
+				id: 'ai-plugin-activate-error',
+				type: 'snackbar',
+			} );
 		} finally {
 			setIsBusy( false );
 		}
@@ -178,11 +197,6 @@ export function AiPluginCallout() {
 		return null;
 	}
 
-	// Not installed and no permissions to install.
-	if ( pluginStatus === 'not-installed' && canInstallPlugins === false ) {
-		return null;
-	}
-
 	// Installed but can't activate (no manage permissions).
 	if ( pluginStatus === 'inactive' && canManagePlugins === false ) {
 		return null;
@@ -196,20 +210,22 @@ export function AiPluginCallout() {
 		( ! initialHasConnectedProvider || justActivated );
 	const showInstallActivate =
 		pluginStatus === 'not-installed' || pluginStatus === 'inactive';
+	const hideButtons =
+		pluginStatus === 'not-installed' && canInstallPlugins === false;
 
 	const getMessage = () => {
 		if ( isJustConnected ) {
 			return __(
-				'The <strong>AI plugin</strong> is ready to use. You can use it to generate featured images, alt text, titles, excerpts and more.'
+				'The <strong>AI plugin</strong> is ready to use. You can use it to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
 			);
 		}
 		if ( isActiveNoProvider ) {
 			return __(
-				'The <strong>AI plugin</strong> is installed. Connect a provider below to generate featured images, alt text, titles, excerpts, and more.'
+				'The <strong>AI plugin</strong> is installed. Connect an AI provider below to generate featured images, alt text, titles, excerpts, and more. <a>Learn more</a>'
 			);
 		}
 		return __(
-			'The <strong>AI plugin</strong> can use your connectors to generate featured images, alt text, titles, excerpts and more.'
+			'The <strong>AI plugin</strong> can use your AI connectors to generate featured images, alt text, titles, excerpts and more. <a>Learn more</a>'
 		);
 	};
 
@@ -218,7 +234,7 @@ export function AiPluginCallout() {
 			return {
 				label: isBusy
 					? __( 'Installing…' )
-					: __( 'Install AI Experiments' ),
+					: __( 'Install the AI plugin' ),
 				disabled: isBusy,
 				onClick: isBusy ? undefined : installPlugin,
 			};
@@ -227,7 +243,7 @@ export function AiPluginCallout() {
 		return {
 			label: isBusy
 				? __( 'Activating…' )
-				: __( 'Activate AI Experiments' ),
+				: __( 'Activate the AI plugin' ),
 			disabled: isBusy,
 			onClick: isBusy ? undefined : activatePlugin,
 		};
@@ -239,12 +255,13 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
+						// @ts-ignore children are injected by createInterpolateElement at runtime.
+						a: <ExternalLink href={ AI_PLUGIN_URL } />,
 					} ) }
 				</p>
-				<div className="ai-plugin-callout__actions">
-					{ showInstallActivate ? (
+				{ ! hideButtons &&
+					( showInstallActivate ? (
 						<Button
-							ref={ actionButtonRef }
 							variant="primary"
 							size="compact"
 							isBusy={ isBusy }
@@ -255,22 +272,17 @@ export function AiPluginCallout() {
 							{ getPrimaryButtonProps().label }
 						</Button>
 					) : (
-						justActivated && (
-							<Button
-								ref={ actionButtonRef }
-								variant="secondary"
-								size="compact"
-								disabled
-								accessibleWhenDisabled
-							>
-								{ __( 'AI Experiments enabled' ) }
-							</Button>
-						)
-					) }
-					<ExternalLink href={ AI_PLUGIN_URL }>
-						{ __( 'Learn more' ) }
-					</ExternalLink>
-				</div>
+						<Button
+							ref={ actionButtonRef }
+							variant="secondary"
+							size="compact"
+							href={ addQueryArgs( 'options-general.php', {
+								page: AI_PLUGIN_PAGE_SLUG,
+							} ) }
+						>
+							{ __( 'Control features in the AI plugin' ) }
+						</Button>
+					) ) }
 			</div>
 			<WpLogoDecoration />
 		</div>

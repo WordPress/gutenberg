@@ -8,7 +8,7 @@
 		text-align: center;
 		max-width: var(--wpds-dimension-surface-width-sm);
 		gap: var(--wpds-dimension-gap-xs);
-		font-family: var(--wpds-font-family-body);
+		font-family: var(--wpds-typography-font-family-body);
 		color: var(--wpds-color-fg-content-neutral);
 		text-wrap: balance;
 	}

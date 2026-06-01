@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import {
 	useEffect,
 	useState,
@@ -13,10 +6,6 @@ import {
 	useId,
 	createPortal,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ThemeProvider } from '../theme-provider';
 
 const meta: Meta< typeof ThemeProvider > = {
@@ -198,7 +187,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	},
 };
 
-const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+const NestingDebug = ( { bg = '', primary = '' } ) => (
 	<div
 		style={ {
 			padding: 'var(--wpds-dimension-padding-lg)',
@@ -211,7 +200,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 		} }
 	>
 		<pre style={ { margin: 0 } }>
-			bg: { bg } | primary: { primary } | density: { density }
+			bg: { bg } | primary: { primary }
 		</pre>
 		<span
 			style={ {
@@ -245,39 +234,27 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		return (
 			<ThemeProvider>
-				<NestingDebug
-					bg="inherit (root)"
-					primary="inherit (root)"
-					density="inherit (root)"
-				/>
+				<NestingDebug bg="inherit (root)" primary="inherit (root)" />
 				<div style={ { paddingInlineStart: '1rem' } }>
 					<ThemeProvider
 						color={ {
 							bg: '#1e1e1e',
 						} }
-						density="compact"
 					>
-						<NestingDebug
-							bg="#1e1e1e"
-							primary="inherit (root)"
-							density="compact"
-						/>
+						<NestingDebug bg="#1e1e1e" primary="inherit (root)" />
 						<div style={ { paddingInlineStart: '1rem' } }>
 							<ThemeProvider>
 								<NestingDebug
 									bg="inherit (#1e1e1e)"
 									primary="inherit (root)"
-									density="inherit (compact)"
 								/>
 								<div style={ { paddingInlineStart: '1rem' } }>
 									<ThemeProvider
 										color={ { primary: 'hotpink' } }
-										density="default"
 									>
 										<NestingDebug
 											bg="inherit (#1e1e1e)"
 											primary="hotpink"
-											density="default"
 										/>
 										<div
 											style={ {
@@ -290,7 +267,6 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 												<NestingDebug
 													bg="#f8f8f8"
 													primary="inherit (hotpink)"
-													density="inherit (default)"
 												/>
 											</ThemeProvider>
 										</div>

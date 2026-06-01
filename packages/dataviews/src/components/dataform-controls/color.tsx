@@ -30,9 +30,11 @@ const { ValidatedInputControl } = unlock( privateApis );
 const ColorPickerDropdown = ( {
 	color,
 	onColorChange,
+	disabled,
 }: {
 	color: string;
 	onColorChange: ( newColor: string ) => void;
+	disabled?: boolean;
 } ) => {
 	const validColor = color && colord( color ).isValid() ? color : '#ffffff';
 
@@ -45,6 +47,8 @@ const ColorPickerDropdown = ( {
 					onClick={ onToggle }
 					aria-label={ __( 'Open color picker' ) }
 					size="small"
+					disabled={ disabled }
+					accessibleWhenDisabled
 					icon={ () => <ColorIndicator colorValue={ validColor } /> }
 				/>
 			) }
@@ -70,6 +74,7 @@ export default function Color< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, description, setValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const value = field.getValue( { item: data } ) || '';
 
 	const handleColorChange = useCallback(
@@ -98,11 +103,13 @@ export default function Color< Item >( {
 			onChange={ handleInputChange }
 			hideLabelFromVision={ hideLabelFromVision }
 			type="text"
+			disabled={ disabled }
 			prefix={
 				<InputControlPrefixWrapper variant="control">
 					<ColorPickerDropdown
 						color={ value }
 						onColorChange={ handleColorChange }
+						disabled={ disabled }
 					/>
 				</InputControlPrefixWrapper>
 			}

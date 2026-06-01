@@ -2,6 +2,47 @@
 
 ## Unreleased
 
+## 25.3.0 (2026-05-27)
+
+## 25.2.0 (2026-05-14)
+
+### New Features
+
+-   Added [`no-non-module-stylesheet-imports`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-non-module-stylesheet-imports.md) rule to prevent importing non-module stylesheets from JavaScript files ([#77984](https://github.com/WordPress/gutenberg/pull/77984)).
+
+## 25.1.0 (2026-04-29)
+
+### New Features
+
+-   Added [`use-import-as`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-import-as.md) rule to enforce configured aliases for selected named imports and direct `unlock( privateApis )` destructuring ([#77389](https://github.com/WordPress/gutenberg/pull/77389)).
+-   Added [`no-unsafe-render-order`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md) rule to flag unsafe render-prop composition with `VisuallyHidden` and `Link`/`Text` ([#77428](https://github.com/WordPress/gutenberg/pull/77428)).
+
+### Enhancements
+
+-   Improved the Design System token lint rules to recognize CSS declaration strings more accurately, avoiding false bare-token reports for declarations while still flagging invalid token assignments and unknown token names ([#77384](https://github.com/WordPress/gutenberg/pull/77384)).
+-   Update `use-recommended-components` rule to prefer `VisuallyHidden` from `@wordpress/ui` over `@wordpress/components` ([#77575](https://github.com/WordPress/gutenberg/pull/77575)).
+
+## 25.0.0 (2026-04-15)
+
+### Breaking Changes
+
+-   Upgraded to ESLint v10 with flat config format. The plugin now exports flat config arrays instead of eslintrc objects. Consumers must migrate from `.eslintrc.*` files to `eslint.config.mjs`. See the [migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for details ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The minimum required ESLint version is now `^9.0.0 || ^10.0.0` ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Upgraded `eslint-plugin-import` to v2.31+ (wrapped with `fixupPluginRules` for flat config compatibility) ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Upgraded `@typescript-eslint/*` from v6 to v8 (via the unified `typescript-eslint` package) ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Replaced `eslint-plugin-eslint-comments` with `@eslint-community/eslint-plugin-eslint-comments`. Rule prefixes changed from `eslint-comments/*` to `@eslint-community/eslint-comments/*` ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+
+### New Features
+
+-   Added `@wordpress/eslint-plugin/eslintrc` entry point — a compatibility wrapper for ESLint v9 consumers still using `.eslintrc.*` files. This is deprecated and will be removed in a future major version ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   Configs are now exported as flat config arrays (e.g., `wordpress.configs.recommended` returns an array of config objects suitable for spreading into `eslint.config.mjs`) ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+
+### Enhancements
+
+-   Disabled the `jsx-a11y/heading-has-content` rule in the recommended configuration, which reports many false positives when heading elements are passed via a `render` prop ([#77073](https://github.com/WordPress/gutenberg/pull/77073)).
+
+## 24.5.0 (2026-04-01)
+
 ## 24.4.0 (2026-03-18)
 
 ### New Features

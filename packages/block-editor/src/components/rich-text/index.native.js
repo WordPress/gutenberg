@@ -698,4 +698,4 @@ PrivateRichText.Raw = forwardRef( ( props, ref ) => (
 export default PrivateRichText;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';

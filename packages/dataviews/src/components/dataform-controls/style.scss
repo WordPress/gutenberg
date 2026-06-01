@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
-
 .dataviews-controls__datetime {
 	border: none;
 	padding: 0;
@@ -28,9 +26,9 @@
 }
 
 .dataviews-controls__date-preset {
-	border: 1px solid #ddd;
+	border: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	&:active {
-		background-color: $black;
+		background-color: var(--wpds-color-bg-interactive-neutral-strong-active);
 	}
 }

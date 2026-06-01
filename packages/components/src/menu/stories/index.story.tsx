@@ -33,7 +33,6 @@ const meta: Meta< typeof Menu > = {
 		Group: Menu.Group,
 		GroupLabel: Menu.GroupLabel,
 		Separator: Menu.Separator,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Context: Menu.Context,
 		RadioItem: Menu.RadioItem,
 		ItemLabel: Menu.ItemLabel,
@@ -56,7 +55,7 @@ const meta: Meta< typeof Menu > = {
 			source: { excludeDecorators: true },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
 		},
