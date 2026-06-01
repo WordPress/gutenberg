@@ -35,9 +35,9 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-no-tinymce',
-					'label'       => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
-					'description' => __( 'Disables the TinyMCE and Classic block.', 'gutenberg' ),
+					'id'          => 'gutenberg-classic-block-deprecation',
+					'label'       => __( 'Classic block deprecation', 'gutenberg' ),
+					'description' => __( 'Enables UI changes aimed at deprecating the Classic block, including prompts on existing Classic blocks to migrate their content to blocks or to a Custom HTML block.', 'gutenberg' ),
 				),
 			),
 		),
@@ -47,13 +47,8 @@ function gutenberg_initialize_experiments_settings() {
 			'items' => array(
 				array(
 					'id'          => 'gutenberg-media-editor',
-					'label'       => __( 'Media Editor', 'gutenberg' ),
-					'description' => __( 'Adds an "Edit media" action on image blocks for editing the attached media item (metadata and content) in the editor.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-media-editor-modal',
-					'label'       => __( 'Media Editor Modal', 'gutenberg' ),
-					'description' => __( 'Enables an in-place modal for image editing — cropping, adjustments, and metadata — opened from blocks like the image block without navigating away from the current post.', 'gutenberg' ),
+					'label'       => __( 'Media Editor (Route)', 'gutenberg' ),
+					'description' => __( 'Enables a dedicated route-based media editor screen for editing media items (metadata and content).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dataviews-media-modal',
@@ -128,12 +123,17 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-content-types',
 					'label'       => __( 'Content types', 'gutenberg' ),
-					'description' => __( 'Enables a UI for creating and managing custom taxonomies under Settings. Custom post types will be explored soon.', 'gutenberg' ),
+					'description' => __( 'Enables a UI for creating and managing custom taxonomies and custom post types under Settings.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-admin-bar-in-editor',
+					'label'       => __( 'Toolbar in editor', 'gutenberg' ),
+					'description' => __( 'Shows the Toolbar in the fullscreen Post and Site Editor.', 'gutenberg' ),
 				),
 			),
 		),

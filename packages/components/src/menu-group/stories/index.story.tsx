@@ -27,7 +27,7 @@ const meta: Meta< typeof MenuGroup > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Subcomponent of `DropdownMenu`.',
 		},

@@ -1,7 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreStore } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
+
+/**
  * Internal dependencies
  */
-import { getPostBlocksByName } from '../private-selectors';
+import {
+	getDefaultRenderingMode,
+	getPostBlocksByName,
+} from '../private-selectors';
 
 describe( 'getPostBlocksByName', () => {
 	const state = {
@@ -74,5 +83,102 @@ describe( 'getPostBlocksByName', () => {
 			'core/heading',
 		] );
 		expect( result ).toEqual( [ 'block1', 'block2', 'block3' ] );
+	} );
+} );
+
+describe( 'getDefaultRenderingMode', () => {
+	function setupRegistry( {
+		supportsEditor = true,
+		theme = 'twentytwentyfive',
+		renderingModes = null,
+	} = {} ) {
+		getDefaultRenderingMode.registry = {
+			select: ( store ) => {
+				if ( store === coreStore ) {
+					return {
+						getPostType: () => ( {
+							supports: { editor: supportsEditor },
+						} ),
+						getCurrentTheme: () => ( { stylesheet: theme } ),
+						hasFinishedResolution: () => true,
+					};
+				}
+				if ( store === preferencesStore ) {
+					return {
+						get: () => renderingModes,
+					};
+				}
+			},
+		};
+	}
+
+	describe( 'editor.default-mode post type support', () => {
+		it( 'default-mode from post type support should be respected when no user preference is saved', () => {
+			setupRegistry( {
+				supportsEditor: [ { 'default-mode': 'template-locked' } ],
+			} );
+			const state = {
+				editorSettings: { defaultRenderingMode: 'post-only' },
+			};
+
+			expect( getDefaultRenderingMode( state, 'post' ) ).toBe(
+				'template-locked'
+			);
+		} );
+
+		it( 'user preference should take priority over post type supports registered default-mode support', () => {
+			setupRegistry( {
+				theme: 'twentytwentyfive',
+				supportsEditor: [ { 'default-mode': 'template-locked' } ],
+				renderingModes: { twentytwentyfive: { post: 'post-only' } },
+			} );
+			const state = {
+				editorSettings: { defaultRenderingMode: 'post-only' },
+			};
+
+			expect( getDefaultRenderingMode( state, 'post' ) ).toBe(
+				'post-only'
+			);
+		} );
+	} );
+
+	describe( 'defaultRenderingMode from editor settings', () => {
+		it( 'uses defaultRenderingMode from editor settings when no user preference is saved', () => {
+			setupRegistry( { renderingModes: null } );
+			const state = {
+				editorSettings: { defaultRenderingMode: 'template-locked' },
+			};
+
+			expect( getDefaultRenderingMode( state, 'post' ) ).toBe(
+				'template-locked'
+			);
+		} );
+
+		it( 'user preference takes priority over defaultRenderingMode from editor settings', () => {
+			setupRegistry( {
+				theme: 'twentytwentyfive',
+				renderingModes: {
+					twentytwentyfive: { post: 'template-locked' },
+				},
+			} );
+			const state = {
+				editorSettings: { defaultRenderingMode: 'post-only' },
+			};
+
+			expect( getDefaultRenderingMode( state, 'post' ) ).toBe(
+				'template-locked'
+			);
+		} );
+
+		it( 'falls back to post-only when defaultRenderingMode in settings is the default', () => {
+			setupRegistry( { renderingModes: null } );
+			const state = {
+				editorSettings: { defaultRenderingMode: 'post-only' },
+			};
+
+			expect( getDefaultRenderingMode( state, 'post' ) ).toBe(
+				'post-only'
+			);
+		} );
 	} );
 } );

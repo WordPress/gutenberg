@@ -33,6 +33,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `sizeSlug` | `string` | — | — |
 | `linkDestination` | `string` | — | — |
 | `linkTarget` | `string` | — | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure > a`. [HTML attr](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `target` |
+| `isDecorative` | `boolean` | `false` | — |
 
 ## Supports
 

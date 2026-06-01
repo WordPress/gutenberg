@@ -1,3 +1,6 @@
+// CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
+const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -60,20 +63,15 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.{css,scss}' ],
+			files: [
+				'**/*.module.{css,scss}',
+				// Can be removed when all `routes/` stylesheets are converted to CSS modules.
+				'routes/**/*.{css,scss}',
+			],
 			rules: {
 				'function-no-unknown': [
 					true,
-					{
-						ignoreFunctions: [
-							// CSS stepped value math functions in Baseline 2024.
-							// This rule exception can likely be removed when
-							// updating to a more recent version of Stylelint.
-							'round',
-							'rem',
-							'mod',
-						],
-					},
+					{ ignoreFunctions: CSS_BASELINE_2024_FUNCTIONS },
 				],
 				'declaration-property-max-values': {
 					// Prevents left/right values with shorthand property names (unclear for RTL)
@@ -90,6 +88,8 @@ module.exports = {
 					{
 						ignore: [
 							// Doesn't affect RTL styles
+							'border-bottom',
+							'border-top',
 							'width',
 							'min-width',
 							'max-width',
@@ -98,8 +98,12 @@ module.exports = {
 							'max-height',
 							'margin-top',
 							'margin-bottom',
+							'overflow-x',
+							'overflow-y',
 							'padding-top',
 							'padding-bottom',
+							'scroll-margin-top',
+							'scroll-margin-bottom',
 							'top',
 							'bottom',
 						],
@@ -111,6 +115,32 @@ module.exports = {
 						ignoreProperties: [
 							// https://github.com/css-modules/css-modules/blob/master/docs/composition.md
 							'composes',
+						],
+					},
+				],
+				'selector-pseudo-class-no-unknown': [
+					true,
+					{
+						ignorePseudoClasses: [
+							// CSS Modules global escape hatch.
+							'global',
+						],
+					},
+				],
+			},
+		},
+		{
+			// SCSS-only: use the Sass-aware `function-no-unknown` variant.
+			files: [ '**/*.module.scss', 'routes/**/*.scss' ],
+			rules: {
+				'function-no-unknown': null,
+				'scss/function-no-unknown': [
+					true,
+					{
+						ignoreFunctions: [
+							...CSS_BASELINE_2024_FUNCTIONS,
+							// Sass helpers from `@wordpress/base-styles`.
+							'z-index',
 						],
 					},
 				],

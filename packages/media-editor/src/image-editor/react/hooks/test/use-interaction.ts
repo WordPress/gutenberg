@@ -33,6 +33,7 @@ function createActions(): jest.Mocked< CropperInteractionActions > {
 		setZoom: jest.fn(),
 		setZoomAtPoint: jest.fn(),
 		snapRotate90: jest.fn(),
+		toggleFlip: jest.fn(),
 	};
 }
 

@@ -70,13 +70,15 @@ export function useCollaboratorNotifications(
 ): void {
 	const { postStatus, isCollaborationEnabled, showNotifications } = useSelect(
 		( select ) => {
-			const editorSel = select( editorStore );
+			const {
+				getCurrentPostAttribute,
+				isCollaborationEnabledForCurrentPost,
+			} = unlock( select( editorStore ) );
 			return {
-				postStatus: editorSel.getCurrentPostAttribute( 'status' ) as
+				postStatus: getCurrentPostAttribute( 'status' ) as
 					| string
 					| undefined,
-				isCollaborationEnabled:
-					editorSel.isCollaborationEnabledForCurrentPost(),
+				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 				showNotifications:
 					select( preferencesStore ).get(
 						'core',

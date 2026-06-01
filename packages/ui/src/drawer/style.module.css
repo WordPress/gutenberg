@@ -91,20 +91,52 @@
 		color: var(--wpds-color-fg-content-neutral);
 		touch-action: auto;
 
+		/*
+		 * Hint compositing while the popup is in motion (opening, swiping,
+		 * or closing). Scoping `will-change` to these states avoids
+		 * retaining a transform layer while the drawer is fully idle.
+		 *
+		 * Limited to `transform` because that's the only animated property
+		 * the compositor can take off the main thread; `box-shadow` (also
+		 * transitioned below) is repainted on the main thread regardless,
+		 * so listing it here would just bloat the layer.
+		 */
 		&[data-open],
-		&[data-swiping] {
+		&[data-swiping],
+		&[data-ending-style] {
 			will-change: transform;
+		}
 
-			@media not (prefers-reduced-motion) {
-				transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+		/*
+		 * Drop the elevation shadow while the popup is offscreen
+		 * (`[data-starting-style]` and `[data-ending-style]` translate the
+		 * popup fully past the viewport edge). The shadow's blur radius
+		 * would otherwise bleed back into the viewport at the screen edge,
+		 * appearing as a faint halo at mount/unmount instead of fading
+		 * with the slide. `box-shadow: none` interpolates against the
+		 * resolved token value as a list of zero-shadow layers.
+		 *
+		 * Kept outside the `prefers-reduced-motion` guard below so the
+		 * popup still mounts / unmounts without a stray shadow when
+		 * transitions are disabled — the value flips instantly to `none`
+		 * at the offscreen states, matching the instantaneous transform.
+		 */
+		&[data-starting-style],
+		&[data-ending-style] {
+			box-shadow: none;
+		}
 
-				&[data-ending-style] {
-					transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
-				}
+		@media not (prefers-reduced-motion) {
+			transition:
+				transform 450ms cubic-bezier(0.32, 0.72, 0, 1),
+				box-shadow 450ms cubic-bezier(0.32, 0.72, 0, 1);
 
-				&[data-swiping] {
-					transition-duration: 0ms;
-				}
+			&[data-ending-style] {
+				transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
+			}
+
+			&[data-swiping] {
+				transition-duration: 0ms;
 			}
 		}
 

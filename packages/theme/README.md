@@ -17,7 +17,7 @@ In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/t
 
 Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
 
-The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors and density for a specific part of your application.
+The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors for a specific part of your application.
 
 #### Within WordPress
 
@@ -69,95 +69,13 @@ The design system follows the [Design Tokens Community Group (DTCG)](https://des
 | `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
 | `border.json`     | Border radius and width values                                                                                                   |
 | `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
+| `motion.json`     | Animation durations and easing curves                                                                                            |
 
 Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
 
 #### Token Naming
 
-Semantic tokens follow a consistent naming pattern:
-
-```
---wpds-<type>-<property>-<target>[-<modifier>]
-```
-
-**Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
-
-| Value        | Description                                                                    |
-| ------------ | ------------------------------------------------------------------------------ |
-| `color`      | Color values for backgrounds, foregrounds, and strokes                         |
-| `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
-| `border`     | Border properties like radius and width                                        |
-| `elevation`  | Shadow definitions for layering and depth                                      |
-| `typography` | Typography properties like font family, font size, and line-height             |
-
-**Property** is the specific design property being defined.
-
-| Value         | Description                        |
-| ------------- | ---------------------------------- |
-| `bg`          | Background color                   |
-| `fg`          | Foreground color (text and icons)  |
-| `stroke`      | Border and outline color           |
-| `padding`     | Internal spacing within an element |
-| `gap`         | Spacing between elements           |
-| `radius`      | Border radius for rounded corners  |
-| `width`       | Border width                       |
-| `font-size`   | Font size                          |
-| `font-family` | Font family                        |
-| `font-weight` | Font weight                        |
-| `line-height` | Line height                        |
-
-**Target** is the component or element type the token applies to.
-
-| Value         | Description                                               |
-| ------------- | --------------------------------------------------------- |
-| `surface`     | Container or layout backgrounds and borders               |
-| `interactive` | Interactive elements like buttons, inputs, and controls   |
-| `content`     | Static content like text and icons                        |
-| `track`       | Track components like scrollbars and slider tracks        |
-| `thumb`       | Thumb components like scrollbar thumbs and slider handles |
-| `focus`       | Focus indicators and rings                                |
-
-**Modifier** is an optional size or intensity modifier.
-
-| Value                                      | Description          |
-| ------------------------------------------ | -------------------- |
-| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
-
-#### Color Token Modifiers
-
-Color tokens extend the base pattern with additional modifiers for tone, emphasis, and state:
-
-```
---wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]
-```
-
-**Tone** defines the semantic intent of the color.
-
-| Value     | Description                                                                             |
-| --------- | --------------------------------------------------------------------------------------- |
-| `neutral` | Neutrally toned UI elements                                                             |
-| `brand`   | Brand-accented or primary action colors                                                 |
-| `success` | Positive or completed states                                                            |
-| `info`    | Informational or system-generated context                                               |
-| `caution` | Heads-up or low-severity issues; “proceed carefully”                                    |
-| `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors |
-| `error`   | Blocking issues, validation failures, or destructive actions                            |
-
-Note: `caution` and `warning` represent two escalation levels of non-error severity. Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
-
-**Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
-
-| Value    | Description                                    |
-| -------- | ---------------------------------------------- |
-| `strong` | Higher contrast and/or elevated emphasis       |
-| `weak`   | Subtle variant for secondary or muted elements |
-
-**State** represents the interactive state of the element, if specified. The default is an idle state.
-
-| Value      | Description                         |
-| ---------- | ----------------------------------- |
-| `active`   | Hovered, pressed, or selected state |
-| `disabled` | Unavailable or inoperable state     |
+Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), and guidance on how to pick the right token.
 
 ## Theme Provider
 
@@ -168,7 +86,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider color={ { primary: 'blue' } } density="compact">
+		<ThemeProvider color={ { primary: 'blue' } }>
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);
@@ -180,21 +98,13 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `bg`: The background seed color (default: `'#f8f8f8'`).
 
-Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+Both properties accept a hex string (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword (e.g. `'blue'`). The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
 The `cursor` prop accepts an object with the following optional properties:
 
 -   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
-The `density` prop controls the spacing scale throughout the UI:
-
--   `'default'`: Standard spacing for general use.
--   `'compact'`: Reduced spacing for information-dense interfaces like data tables or dashboards.
--   `'comfortable'`: Increased spacing for focused experiences like modals, dialogs, or full-screen settings panels.
-
-The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
-
-When the `color`, `cursor`, or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+When the `color` or `cursor` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
@@ -203,10 +113,10 @@ The provider can be used recursively to override or modify the theme for a speci
 ```tsx
 <ThemeProvider color={ { bg: 'white' } }>
 	{ /* light-themed UI components */ }
-	<ThemeProvider color={ { bg: '#1e1e1e' } } density="compact">
-		{ /* dark-themed UI components with compact spacing */ }
+	<ThemeProvider color={ { bg: '#1e1e1e' } }>
+		{ /* dark-themed UI components */ }
 		<ThemeProvider color={ { primary: 'red' } }>
-			{ /* dark-themed with red accent, inheriting compact density */ }
+			{ /* dark-themed with red accent */ }
 		</ThemeProvider>
 	</ThemeProvider>
 	{ /* light-themed UI components */ }

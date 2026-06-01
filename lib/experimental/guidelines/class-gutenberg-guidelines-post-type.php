@@ -90,7 +90,7 @@ class Gutenberg_Guidelines_Post_Type {
 		register_post_type(
 			self::POST_TYPE,
 			array(
-				'labels'             => array(
+				'labels'                => array(
 					'name'                     => _x( 'Guidelines', 'post type general name', 'gutenberg' ),
 					'singular_name'            => _x( 'Guideline', 'post type singular name', 'gutenberg' ),
 					'add_new'                  => __( 'Add Guideline', 'gutenberg' ),
@@ -112,34 +112,31 @@ class Gutenberg_Guidelines_Post_Type {
 					'view_item'                => __( 'View Guideline', 'gutenberg' ),
 					'view_items'               => __( 'View Guidelines', 'gutenberg' ),
 				),
-				'public'             => false,
-				'publicly_queryable' => false,
-				'show_ui'            => true,
-				'show_in_menu'       => false,
-				'show_in_rest'       => true,
-				'rest_base'          => 'guidelines',
-				'capability_type'    => 'guideline',
-				'map_meta_cap'       => true,
-				'capabilities'       => array(
-					'read'                   => 'edit_posts',
-					'create_posts'           => 'publish_posts',
-					'edit_posts'             => 'edit_posts',
-					'publish_posts'          => 'publish_posts',
-					'read_private_posts'     => 'read_private_posts',
-					'edit_private_posts'     => 'edit_private_posts',
-					'edit_published_posts'   => 'edit_published_posts',
-					'delete_private_posts'   => 'delete_private_posts',
-					'delete_published_posts' => 'delete_published_posts',
-					'delete_posts'           => 'delete_posts',
-					'edit_others_posts'      => 'edit_others_posts',
-					'delete_others_posts'    => 'delete_others_posts',
+				'public'                => false,
+				// Guidelines have no native post-type screens; management
+				// flows through the Settings → Guidelines page (see
+				// load.php) and the REST API.
+				'show_ui'               => false,
+				'show_in_rest'          => true,
+				'rest_base'             => 'guidelines',
+
+				'rest_controller_class' => Gutenberg_Guidelines_REST_Controller::class,
+
+				'capability_type'       => 'guideline',
+				'map_meta_cap'          => true,
+				// `read` is remapped so Subscribers (who hold the base `read`
+				// cap) are blocked at the post-type door. Every other primitive
+				// defaults to a guideline-prefixed cap synthesized by
+				// `_wp_guidelines_synthesize_caps()`.
+				'capabilities'          => array(
+					'read' => 'read_guidelines',
 				),
-				'supports'           => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
-				'hierarchical'       => false,
-				'has_archive'        => false,
-				'rewrite'            => false,
-				'query_var'          => false,
-				'can_export'         => true,
+				'supports'              => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
+				'hierarchical'          => false,
+				'has_archive'           => false,
+				'rewrite'               => false,
+				'query_var'             => false,
+				'can_export'            => true,
 			)
 		);
 
@@ -169,10 +166,10 @@ class Gutenberg_Guidelines_Post_Type {
 					'view_item'             => __( 'View Guideline Type', 'gutenberg' ),
 				),
 				'capabilities'       => array(
-					'manage_terms' => 'manage_categories',
-					'edit_terms'   => 'edit_posts',
-					'delete_terms' => 'delete_categories',
-					'assign_terms' => 'edit_posts',
+					'manage_terms' => 'manage_options',
+					'edit_terms'   => 'edit_guidelines',
+					'delete_terms' => 'manage_options',
+					'assign_terms' => 'edit_guidelines',
 				),
 				'query_var'          => false,
 				'rewrite'            => false,
@@ -183,34 +180,9 @@ class Gutenberg_Guidelines_Post_Type {
 			)
 		);
 
+		add_filter( 'user_has_cap', '_wp_guidelines_synthesize_caps', 10, 4 );
 		add_action( 'save_post_' . self::POST_TYPE, '_wp_guidelines_ensure_default_type_term' );
 		add_filter( 'wp_insert_term_data', '_wp_guidelines_maybe_map_term_label', 10, 2 );
-	}
-
-	/**
-	 * Resolves a taxonomy term by slug, creating it if it doesn't exist yet.
-	 *
-	 * @param string $slug Term slug.
-	 * @param string $name Human-readable term name, used when creating.
-	 * @return int|WP_Error Term ID on success, WP_Error on failure.
-	 */
-	public static function get_or_create_term_id( string $slug, string $name ) {
-		$term = get_term_by( 'slug', $slug, self::TAXONOMY );
-		if ( $term ) {
-			return (int) $term->term_id;
-		}
-
-		$inserted = wp_insert_term(
-			$name,
-			self::TAXONOMY,
-			array( 'slug' => $slug )
-		);
-
-		if ( is_wp_error( $inserted ) ) {
-			return $inserted;
-		}
-
-		return (int) $inserted['term_id'];
 	}
 
 	/**

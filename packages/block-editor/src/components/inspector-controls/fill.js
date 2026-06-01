@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
-import { useEffect, useContext } from '@wordpress/element';
+import { useEffect, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +19,10 @@ import {
 	isInListViewBlockSupportTreeKey,
 } from '../block-edit/context';
 import groups from './groups';
+import {
+	scopeResetAllFilterToState,
+	useBlockStyleState,
+} from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
@@ -117,18 +121,27 @@ export default function InspectorControlsFill( {
 function RegisterResetAll( { resetAllFilter, children } ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
+	const selectedState = useBlockStyleState();
+	const scopedResetAllFilter = useMemo(
+		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
+		[ resetAllFilter, selectedState ]
+	);
 	useEffect( () => {
 		if (
-			resetAllFilter &&
+			scopedResetAllFilter &&
 			registerResetAllFilter &&
 			deregisterResetAllFilter
 		) {
-			registerResetAllFilter( resetAllFilter );
+			registerResetAllFilter( scopedResetAllFilter );
 			return () => {
-				deregisterResetAllFilter( resetAllFilter );
+				deregisterResetAllFilter( scopedResetAllFilter );
 			};
 		}
-	}, [ resetAllFilter, registerResetAllFilter, deregisterResetAllFilter ] );
+	}, [
+		scopedResetAllFilter,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
+	] );
 	return children;
 }
 

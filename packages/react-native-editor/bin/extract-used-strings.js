@@ -34,10 +34,10 @@
 /**
  * External dependencies
  */
-const gettextParser = require( 'gettext-parser' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 const childProcess = require( 'child_process' );
+const gettextParser = require( 'gettext-parser' );
 
 const getStringsFromPotFile = ( potFileName ) => {
 	const potData = fs.readFileSync( potFileName );
@@ -143,7 +143,6 @@ const generatePotFiles = ( plugins, potFilesDir ) => {
 			}
 		);
 	} catch ( error ) {
-		// eslint-disable-next-line no-console
 		console.error( error );
 		process.exit( 1 );
 	}

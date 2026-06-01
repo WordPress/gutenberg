@@ -6,9 +6,16 @@ const meta: Meta< typeof Fieldset.Root > = {
 	title: 'Design System/Components/Form/Primitives/Fieldset',
 	component: Fieldset.Root,
 	subcomponents: {
-		Legend: Fieldset.Legend,
-		Description: Fieldset.Description,
-		Details: Fieldset.Details,
+		'Fieldset.Legend': Fieldset.Legend,
+		'Fieldset.Description': Fieldset.Description,
+		'Fieldset.Details': Fieldset.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
