@@ -12,7 +12,7 @@ import { store as editorStore } from '../../store';
 
 const noop = () => {};
 
-export default function PostPublishButton( {
+export function PostPublishButton( {
 	forceIsDirty,
 	isOpen,
 	isToggle,
@@ -177,3 +177,8 @@ export default function PostPublishButton( {
 		</Button>
 	);
 }
+
+/**
+ * Renders the publish button.
+ */
+export default PostPublishButton;
