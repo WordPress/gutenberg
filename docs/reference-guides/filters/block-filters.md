@@ -150,7 +150,7 @@ The callback function for this filter receives three parameters:
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Here the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used to easily add the class instead of relying on regex.
 
 ```php
-function example_add_custom_class_to_paragraph_block( $block_content, $block, $instance ) {
+function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
 	
 	// Check if the block is a Paragraph block.
 	if ( 'core/paragraph' === $block['blockName'] ) {
@@ -167,7 +167,7 @@ function example_add_custom_class_to_paragraph_block( $block_content, $block, $i
 
 	return $block_content;
 }
-add_filter( 'render_block', 'example_add_custom_class_to_paragraph_block', 10, 3 );
+add_filter( 'render_block', 'example_add_custom_class_to_paragraph_block', 10, 2 );
 ```
 
 ### `render_block_{namespace/block}`
@@ -183,7 +183,7 @@ The callback function for this filter receives three parameters:
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Notice that compared to the `render_block` example above, you no longer need to check the block type before modifying the content. Again, the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used instead of regex.
 
 ```php
-function example_add_custom_class_to_paragraph_block( $block_content, $block, $instance ) {
+function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
 	   
 	// Add the custom class to the block content using the HTML API.
 	$processor = new WP_HTML_Tag_Processor( $block_content );
@@ -194,7 +194,7 @@ function example_add_custom_class_to_paragraph_block( $block_content, $block, $i
 
 	return $processor->get_updated_html();
 }
-add_filter( 'render_block_core/paragraph', 'example_add_custom_class_to_paragraph_block', 10, 3 );
+add_filter( 'render_block_core/paragraph', 'example_add_custom_class_to_paragraph_block', 10, 2 );
 ```
 
 ## Editor
