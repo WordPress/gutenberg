@@ -12,7 +12,7 @@ import { useState, useCallback, useId, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { ValidatedInputControl } from '../components';
+import { ValidatedInputControl, ValidatedRangeControl } from '../components';
 
 describe( 'ControlWithError', () => {
 	describe( 'Async Validation', () => {
@@ -461,6 +461,33 @@ describe( 'ControlWithError', () => {
 			await waitFor( () => {
 				expect( input ).not.toHaveAttribute( 'aria-describedby' );
 			} );
+		} );
+	} );
+
+	describe( 'ValidatedRangeControl', () => {
+		it( 'should accessibly label the internal slider and spin button', () => {
+			render(
+				<ValidatedRangeControl
+					label="Opacity"
+					required
+					min={ 0 }
+					max={ 100 }
+					onChange={ () => {} }
+				/>
+			);
+
+			// The slider is styled with `opacity: 0`, so it's not "visible"
+			// in the DOM sense, but it's still accessible.
+			expect(
+				screen.getByRole( 'slider', {
+					name: 'Opacity (Required)',
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: 'Opacity (Required)',
+				} )
+			).toBeVisible();
 		} );
 	} );
 

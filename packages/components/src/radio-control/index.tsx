@@ -67,6 +67,7 @@ export function RadioControl(
 		onChange,
 		onClick,
 		hideLabelFromVision,
+		disabled,
 		options = [],
 		id: preferredId,
 		...additionalProps
@@ -89,6 +90,7 @@ export function RadioControl(
 			id={ id }
 			role="radiogroup"
 			className={ clsx( className, 'components-radio-control' ) }
+			disabled={ disabled }
 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
 			{ hideLabelFromVision ? (

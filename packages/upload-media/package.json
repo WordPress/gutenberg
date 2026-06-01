@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.27.0",
+	"version": "0.32.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,11 +58,11 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
 		"@wordpress/vips": "file:../vips",
-		"uuid": "^9.0.1"
+		"uuid": "^14.0.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

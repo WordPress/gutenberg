@@ -7,7 +7,7 @@ import {
 	Card,
 	CardBody,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 
@@ -28,17 +28,17 @@ function GoogleFontsConfirmDialog() {
 						{ __( 'Connect to Google Fonts' ) }
 					</Heading>
 					<Spacer margin={ 6 } />
-					<Text as="p">
+					<WCText as="p">
 						{ __(
 							'To install fonts from Google you must give permission to connect directly to Google servers. The fonts you install will be downloaded from Google and stored on your site. Your site will then use these locally-hosted fonts.'
 						) }
-					</Text>
+					</WCText>
 					<Spacer margin={ 3 } />
-					<Text as="p">
+					<WCText as="p">
 						{ __(
 							'You can alternatively upload files directly on the Upload tab.'
 						) }
-					</Text>
+					</WCText>
 					<Spacer margin={ 6 } />
 					<Button
 						__next40pxDefaultSize

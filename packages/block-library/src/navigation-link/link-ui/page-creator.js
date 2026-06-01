@@ -103,7 +103,7 @@ export function LinkUIPageCreator( {
 
 				onPageCreated( pageLink );
 			}
-		} catch ( error ) {
+		} catch {
 			// Show error notice
 			createErrorNotice(
 				__( 'Failed to create page. Please try again.' ),

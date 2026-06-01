@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import ToggleControl from '..';
 
 const meta: Meta< typeof ToggleControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/ToggleControl',
 	id: 'components-togglecontrol',
 	component: ToggleControl,
@@ -27,7 +28,7 @@ const meta: Meta< typeof ToggleControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `ToggleControl` in `@wordpress/ui`, but continue using for now.',
 		},

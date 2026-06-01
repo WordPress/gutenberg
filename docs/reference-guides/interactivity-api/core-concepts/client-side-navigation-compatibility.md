@@ -8,7 +8,7 @@ This guide explains what to consider when evaluating compatibility. While the ex
 
 <div class="callout callout-info">
 
-This guide assumes familiarity with [blocks](https://developer.wordpress.org/block-editor/getting-started/), [`block.json`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/), and the basics of the [Interactivity API](/docs/reference-guides/interactivity-api/). If you're new to the Interactivity API, start with the [Quick Start Guide](/docs/reference-guides/interactivity-api/iapi-quick-start-guide.md) first.
+This guide assumes familiarity with <a href="https://developer.wordpress.org/block-editor/getting-started/">blocks</a>, <a href="https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/"><code>block.json</code></a>, and the basics of the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/">Interactivity API</a>. If you're new to the Interactivity API, start with the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-quick-start-guide/">Quick Start Guide</a> first.
 
 </div>
 
@@ -158,12 +158,13 @@ The key rules for script modules and client-side navigation:
 -   Only **external** script modules (those with a `src` attribute) are processed. Inline script modules — where the code is written directly inside the `<script>` tag — are not re-executed.
 -   The Interactivity API only loads modules that contain the `data-wp-router-options='{"loadOnClientNavigation":true}'` attribute.
     -   For blocks, the `loadOnClientNavigation` flag is set automatically when the script module is declared in `block.json` and `supports.interactivity` or `supports.interactivity.clientNavigation` is `true`.
-    -   For non-block script modules (e.g., those enqueued by a theme or plugin), register the script module for client-side navigation explicitly using [`add_client_navigation_support_to_script_module()`](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#ensuring-script-modules-load-during-navigation):
-        ```php
-        wp_interactivity()->add_client_navigation_support_to_script_module(
-        	'my-plugin/navigation-handler'
-        );
-        ```
+    -   For non-block script modules (e.g., those enqueued by a theme or plugin), register the script module for client-side navigation explicitly using [`add_client_navigation_support_to_script_module()`](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#ensuring-script-modules-load-during-navigation).
+
+```php
+wp_interactivity()->add_client_navigation_support_to_script_module(
+    'my-plugin/navigation-handler'
+);
+```
 
 For more details on how script modules are handled during navigation, see the [Script module handling](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#script-module-handling) section of the Client-Side Navigation guide.
 
@@ -309,14 +310,14 @@ After implementing the guidelines above, use the following approach to confirm t
 
 Before marking your block as compatible with client-side navigation, verify the following:
 
--   [ ] The block does not inject `<style>` or `<link>` elements dynamically through JavaScript.
--   [ ] The block does not modify existing stylesheets at runtime (e.g., via CSSOM APIs).
--   [ ] CSS selectors (class names, IDs) are stable across navigations — no use of `wp_unique_id()` for selectors.
--   [ ] The block uses script modules, not regular `<script>` tags.
--   [ ] The block does not import from `window.wp.*` globals — it uses ES module imports instead.
--   [ ] The block does not rely on `DOMContentLoaded` or `load` events for initialization — it uses `data-wp-init` instead.
--   [ ] If the block needs to sync state or context from the server on each navigation, it uses `getServerState()` or `getServerContext()`.
--   [ ] Lists of sibling elements that can change between navigations use `data-wp-key`.
--   [ ] The block does not manipulate the DOM using APIs outside the Interactivity API (e.g., `document.createElement`, jQuery).
--   [ ] Any HTML that needs to live outside the block's boundaries (e.g., overlays on `<body>`) uses `attachTo` to define its own region.
--   [ ] (Optional) The block works correctly with the [experimental full-page client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#full-page-client-side-navigation-experimental) mode.
+-   The block does not inject `<style>` or `<link>` elements dynamically through JavaScript.
+-   The block does not modify existing stylesheets at runtime (e.g., via CSSOM APIs).
+-   CSS selectors (class names, IDs) are stable across navigations — no use of `wp_unique_id()` for selectors.
+-   The block uses script modules, not regular `<script>` tags.
+-   The block does not import from `window.wp.*` globals — it uses ES module imports instead.
+-   The block does not rely on `DOMContentLoaded` or `load` events for initialization — it uses `data-wp-init` instead.
+-   If the block needs to sync state or context from the server on each navigation, it uses `getServerState()` or `getServerContext()`.
+-   Lists of sibling elements that can change between navigations use `data-wp-key`.
+-   The block does not manipulate the DOM using APIs outside the Interactivity API (e.g., `document.createElement`, jQuery).
+-   Any HTML that needs to live outside the block's boundaries (e.g., overlays on `<body>`) uses `attachTo` to define its own region.
+-   (Optional) The block works correctly with the [experimental full-page client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#full-page-client-side-navigation-experimental) mode.

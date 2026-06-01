@@ -74,10 +74,11 @@ function MediaPreviewContent( {
 					<p className="media-editor-preview__mime-type">
 						{ mimeType }
 					</p>
+					{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
 					<a
 						href={ mediaUrl }
 						target="_blank"
-						rel="noopener noreferrer"
+						rel="noopener"
 						className="media-editor-preview__download-link"
 					>
 						{ __( 'View file' ) }

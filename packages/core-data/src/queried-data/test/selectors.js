@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { getQueriedItems } from '../selectors';
+import { getMergedItemIds } from '../reducer';
 
 describe( 'getQueriedItems', () => {
 	it( 'should return null if requesting but no item IDs', () => {
@@ -261,7 +262,11 @@ describe( 'getQueriedItems', () => {
 			},
 		};
 
-		const result = getQueriedItems( state, { per_page: 3 } );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 3 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -284,18 +289,22 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=100': {
-						itemIds: [ 101, 102, 103 ],
+					'': {
+						itemIds: getMergedItemIds( [], [ 101, 102, 103 ], {
+							offset: 100,
+							perPage: 50,
+						} ),
 						meta: { totalItems: 103 },
 					},
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 50,
-			offset: 100,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 50, offset: 100 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toEqual( [ { id: 101 }, { id: 102 }, { id: 103 } ] );
 	} );
 
@@ -314,18 +323,22 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=50': {
-						itemIds: [ 51, 52 ],
+					'': {
+						itemIds: getMergedItemIds( [], [ 51, 52 ], {
+							offset: 50,
+							perPage: 50,
+						} ),
 						meta: { totalItems: 200 },
 					},
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 50,
-			offset: 50,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 50, offset: 50 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -348,18 +361,22 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=3': {
-						itemIds: [ 4, 5, 6, 7, 8 ],
+					'': {
+						itemIds: getMergedItemIds( [], [ 4, 5, 6, 7, 8 ], {
+							offset: 3,
+							perPage: 10,
+						} ),
 						meta: { totalItems: 50 },
 					},
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 10,
-			offset: 3,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 10, offset: 3 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -379,7 +396,7 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=0': {
+					'': {
 						itemIds: [ 1, 2 ],
 						meta: { totalItems: 5 },
 					},
@@ -388,10 +405,11 @@ describe( 'getQueriedItems', () => {
 		};
 
 		// 2 items stored, but 5 total exist — should return null.
-		const result = getQueriedItems( state, {
-			per_page: 3,
-			offset: 0,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 3, offset: 0 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toBe( null );
 	} );
 
@@ -408,18 +426,22 @@ describe( 'getQueriedItems', () => {
 			},
 			queries: {
 				default: {
-					'offset=84': {
-						itemIds: [],
+					'': {
+						itemIds: getMergedItemIds( [], [], {
+							offset: 84,
+							perPage: 7,
+						} ),
 						meta: { totalItems: 84 },
 					},
 				},
 			},
 		};
 
-		const result = getQueriedItems( state, {
-			per_page: 7,
-			offset: 84,
-		} );
+		const result = getQueriedItems(
+			state,
+			{ per_page: 7, offset: 84 },
+			{ supportsPagination: true }
+		);
 		expect( result ).toEqual( [] );
 	} );
 } );

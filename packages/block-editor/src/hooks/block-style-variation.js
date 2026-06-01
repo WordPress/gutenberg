@@ -73,10 +73,9 @@ function OverrideStyles( { override } ) {
  * @param {Object} props.config A global styles object, containing settings and styles.
  * @return {React.JSX.Element}  An array of new block variation overrides.
  */
-export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
-	const { getBlockStyles, overrides } = useSelect(
+export function BlockStyleVariationOverridesWithConfig( { config } ) {
+	const { overrides } = useSelect(
 		( select ) => ( {
-			getBlockStyles: select( blocksStore ).getBlockStyles,
 			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		} ),
 		[]
@@ -161,7 +160,7 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 			}
 		}
 		return newOverrides;
-	}, [ config, overrides, getBlockStyles, getBlockName ] );
+	}, [ config, overrides, getBlockName ] );
 
 	if ( ! overridesWithConfig || ! overridesWithConfig.length ) {
 		return null;

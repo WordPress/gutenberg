@@ -18,7 +18,7 @@
 	font-weight: $font-weight-medium;
 	margin: 0;
 	border: 0;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	appearance: none;
 	background: none;
 
@@ -252,6 +252,8 @@
 		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: from-font;
 
 		@media not (prefers-reduced-motion) {
 			transition-property: border, background, color;
@@ -391,6 +393,14 @@
 		}
 	}
 
+	// Hide focus outline on :active to provide click feedback in forced-colors
+	// mode, where box-shadow is not visible. Higher specificity (0,3,0)
+	// ensures this wins over variant outline declarations. Placed after
+	// .is-pressed to also win by source order at equal specificity (0,3,0).
+	&:focus:active {
+		outline: none;
+	}
+
 	svg {
 		fill: currentColor;
 		outline: none;
@@ -401,12 +411,6 @@
 		@media (forced-colors: active) {
 			fill: CanvasText;
 		}
-	}
-
-	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
-	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
-	.components-visually-hidden {
-		height: auto;
 	}
 }
 

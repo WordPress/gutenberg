@@ -84,6 +84,7 @@ test.describe( 'Columns', () => {
 		await pageUtils.pressKeys( 'Tab' );
 		await expect( columnsChangeInput ).toHaveValue( '3' );
 	} );
+
 	test( 'Ungroup properly', async ( { editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/columns',

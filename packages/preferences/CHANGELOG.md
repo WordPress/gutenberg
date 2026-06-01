@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+## 4.47.0 (2026-05-27)
+
+## 4.46.0 (2026-05-14)
+
+## 4.45.0 (2026-04-29)
+
+## 4.44.0 (2026-04-15)
+
+## 4.43.0 (2026-04-01)
+
 ## 4.42.0 (2026-03-18)
 
 ## 4.41.0 (2026-03-04)
@@ -20,7 +34,7 @@
 
 ### Internal
 
-- TypeScript conversion
+-   TypeScript conversion
 
 ## 4.33.0 (2025-10-17)
 

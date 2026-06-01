@@ -358,6 +358,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
 									matchingSuggestions
 								) }
 								onChange={ onInputChange }
+								aria-describedby={
+									help
+										? // TODO: Refactor `TokenInput` to not use hardcoded IDs.
+										  `components-form-token-input-${ instanceId }__help`
+										: undefined
+								}
 							/>
 						</FlexBlock>
 						{ isLoading && <Spinner /> }

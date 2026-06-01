@@ -18,10 +18,11 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 			// Prevent accidental forwarding of `children`
 			children: _children,
 			disabled,
-			focusableWhenDisabled,
+			focusableWhenDisabled = true,
 			icon,
 			size,
 			shortcut,
+			positioner,
 			...restProps
 		}: IconButtonProps & { children?: unknown },
 		ref
@@ -52,7 +53,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 							className={ styles.icon }
 						/>
 					</Tooltip.Trigger>
-					<Tooltip.Popup>
+					<Tooltip.Popup positioner={ positioner }>
 						{ label }
 						{ shortcut && (
 							<>
