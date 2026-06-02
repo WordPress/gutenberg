@@ -10,6 +10,34 @@ import { useEvent, useRefEffect } from '@wordpress/compose';
 import { initWaveformPlayer } from './waveform-utils';
 
 /**
+ * Update a live waveform player's metadata elements in place.
+ *
+ * The title and artist are updated in place. The artwork element only exists
+ * when the track had an image when the player was created, so its URL is
+ * updated in place here; adding or removing an image (which creates or tears
+ * down that element) is instead handled by recreating the player, keyed on
+ * the `hasImage` dependency.
+ *
+ * @param {Object} instance        - The waveform player instance.
+ * @param {Object} metadata        - The track metadata.
+ * @param {string} metadata.title  - The track title.
+ * @param {string} metadata.artist - The artist name.
+ * @param {string} metadata.image  - The artwork image URL.
+ */
+function updatePlayerMetadata( instance, { title, artist, image } ) {
+	if ( instance.titleEl ) {
+		instance.titleEl.textContent = title ?? '';
+	}
+	if ( instance.subtitleEl ) {
+		instance.subtitleEl.textContent = artist ?? '';
+		instance.subtitleEl.style.display = artist ? '' : 'none';
+	}
+	if ( instance.artworkEl && image ) {
+		instance.artworkEl.src = image;
+	}
+}
+
+/**
  * A reusable WaveformPlayer component for the block editor.
  *
  * Renders an audio waveform visualization with play/pause controls.
@@ -41,8 +69,24 @@ export function WaveformPlayer( {
 	const metadataRef = useRef( { title, artist, image } );
 	const playerRef = useRef();
 
+	// Whether the player has an artwork element depends on whether an image
+	// was present when it was created. Recreate the player when the image is
+	// added or removed so that element is created or torn down; URL changes
+	// to an existing image are applied in place below.
+	const hasImage = !! image;
+
+	// Keep the freshest metadata available to init() (which runs on a
+	// deferred timeout) and update the live player in place when metadata
+	// changes. Updating in place avoids destroying and recreating the
+	// player, which would flash it on every keystroke while editing a
+	// track's title or artist.
 	useEffect( () => {
 		metadataRef.current = { title, artist, image };
+
+		const instance = playerRef.current?.instance;
+		if ( instance ) {
+			updatePlayerMetadata( instance, { title, artist, image } );
+		}
 	}, [ title, artist, image ] );
 
 	const ref = useRefEffect(
@@ -85,7 +129,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, src, waveformStyle ]
+		[ onEndedEvent, src, waveformStyle, hasImage ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
