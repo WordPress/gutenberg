@@ -49,6 +49,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",

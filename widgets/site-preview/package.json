@@ -11,5 +11,8 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/url": "file:../../packages/url"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.13"
 	}
 }
