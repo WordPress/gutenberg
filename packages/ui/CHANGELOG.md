@@ -18,10 +18,12 @@
 -   `AlertDialog`: Fix the footer collapsing to a row depending on stylesheet load order ([#78953](https://github.com/WordPress/gutenberg/pull/78953)).
 -   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
 -   `Tabs`: `onValueChange` now fires for automatic tab selection — when `Tabs` itself picks a tab without a consumer-supplied value (initial uncontrolled mount with no `defaultValue`, fallback to the first enabled tab when the first tab is disabled, or fallback when the currently selected tab is removed or becomes disabled) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
+-   `Popover.Close`: Keep the popover anchored to its trigger while closing. When the close button carries an `id` (e.g. rendered as an `IconButton`, whose tooltip generates one), Base UI re-anchored the popover to the close button on close, causing it to jump before the exit animation played.
 
 ### Enhancements
 
 -   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
+-   `Popover`: Add open/close motion to the popup (shared `dropdown-motion` slide/fade) and optional backdrop (opacity fade), using WPDS motion tokens and matching `Select` and `Dialog` overlay patterns. Visual chrome moved to an inner surface so the transformed motion layer stays borderless and `Popover.Arrow` remains aligned with the anchor while animating.
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ### Internal
