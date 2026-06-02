@@ -123,6 +123,13 @@ export interface SaveOptions< T extends string > {
 	 * it is most relevant for AVIF, as it is slow by default.
 	 */
 	effort?: number;
+	/**
+	 * Output bit depth for AVIF/HEIF (e.g. 8, 10, 12).
+	 *
+	 * Defaults to 8. Set to 10/12 to preserve high-bit-depth sources.
+	 * Requires a libaom build with high bit depth enabled.
+	 */
+	bitdepth?: number;
 }
 
 export interface ThumbnailOptions {

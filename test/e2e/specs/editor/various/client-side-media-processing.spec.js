@@ -270,6 +270,38 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.height ).toBe( 150 );
 	} );
 
+	// High-bit-depth (10/12-bit) AVIF requires the high-bit-depth libaom build
+	// (CONFIG_AV1_HIGHBITDEPTH=1). With it, vips decodes the source and encodes
+	// the sub-sizes as AVIF, preserving the format. Without it the upload fails
+	// entirely. See https://github.com/WordPress/gutenberg/issues/78889
+	test( 'uploads a 10-bit HDR AVIF and generates AVIF sub-sizes', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1920x1080_e2e_test_image_10bit_hdr.avif'
+		);
+
+		expect( media.mime_type ).toBe( 'image/avif' );
+		expect( media.media_details.width ).toBe( 1920 );
+		expect( media.media_details.height ).toBe( 1080 );
+
+		const sizes = media.media_details.sizes;
+		expect( sizes.thumbnail ).toBeDefined();
+		expect( sizes.medium ).toBeDefined();
+		expect( sizes.large ).toBeDefined();
+
+		expect( sizes.thumbnail.width ).toBe( 150 );
+		expect( sizes.thumbnail.height ).toBe( 150 );
+
+		// vips can both decode and encode high-bit-depth AVIF, so sub-sizes
+		// keep the AVIF format rather than falling back to JPEG.
+		expect( sizes.thumbnail.mime_type ).toBe( 'image/avif' );
+	} );
+
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,

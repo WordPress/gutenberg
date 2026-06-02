@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import Vips from 'wasm-vips';
+// Custom high-bit-depth wasm-vips build (libaom CONFIG_AV1_HIGHBITDEPTH=1),
+// compiled with --disable-modules so HEIF/AVIF support is linked directly into
+// a single vips.wasm rather than a separate vips-heif.wasm side module.
+// See https://github.com/WordPress/gutenberg/issues/78889
+import Vips from 'wasm-vips-hbd';
 
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
-import VipsModule from 'wasm-vips/vips.wasm';
-
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
-import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
+import VipsModule from 'wasm-vips-hbd/vips.wasm';
 
 /**
  * Internal dependencies
@@ -41,18 +42,15 @@ async function getVips(): Promise< typeof Vips > {
 	}
 
 	vipsPromise = Vips( {
-		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
-		// JXL is omitted as WordPress Core does not currently support it.
-		// It can be re-added when Core adds JXL support.
-		dynamicLibraries: [ 'vips-heif.wasm' ],
+		// HEIF/HEIC and AVIF support is compiled into the single vips.wasm
+		// (this build uses --disable-modules), so no dynamic libraries are
+		// loaded. JXL/resvg are likewise linked in.
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
 			// issues with hosts not serving WASM files with correct MIME types.
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
 				return VipsModule;
-			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return VipsHeifModule;
 			}
 			return fileName;
 		},
@@ -304,13 +302,15 @@ function applyResizeAndCrop<
 /**
  * Builds save options for writing an image to a buffer.
  *
- * @param type    Output mime type.
- * @param quality Desired quality (0-1).
+ * @param type      Output mime type.
+ * @param quality   Desired quality (0-1).
+ * @param highDepth Whether the source is high bit depth (10/12-bit).
  * @return Save options object.
  */
 function buildSaveOptions(
 	type: string,
-	quality: number
+	quality: number,
+	highDepth = false
 ): SaveOptions< typeof type > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles,
@@ -325,6 +325,14 @@ function buildSaveOptions(
 	// See https://github.com/swissspidy/media-experiments/issues/324.
 	if ( 'image/avif' === type ) {
 		saveOptions.effort = 2;
+
+		// Preserve high bit depth. The AVIF encoder defaults to 8-bit, so a
+		// 10/12-bit (HDR) source would otherwise be flattened to 8-bit. vips
+		// loads such images as `ushort`. Requires the high-bit-depth libaom
+		// build. See https://github.com/WordPress/gutenberg/issues/78889
+		if ( highDepth ) {
+			saveOptions.bitdepth = 10;
+		}
 	}
 
 	return saveOptions;
@@ -383,6 +391,10 @@ export async function resizeImage(
 
 		image.onProgress = onProgress;
 
+		// vips loads 10/12-bit (HDR) images as `ushort`. Capture this before
+		// the resize so the AVIF encoder can preserve the bit depth.
+		const isHighDepth = image.format === 'ushort';
+
 		const { width, pageHeight } = image;
 
 		image = applyResizeAndCrop(
@@ -404,7 +416,7 @@ export async function resizeImage(
 			}
 		);
 
-		const saveOptions = buildSaveOptions( type, quality );
+		const saveOptions = buildSaveOptions( type, quality, isHighDepth );
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {

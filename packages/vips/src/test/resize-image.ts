@@ -23,7 +23,7 @@ class MockVipsImage {
 	static newFromBuffer = mockNewFromBuffer;
 }
 
-jest.mock( 'wasm-vips', () =>
+jest.mock( 'wasm-vips-hbd', () =>
 	jest.fn( () => ( {
 		Image: MockVipsImage,
 		Cache: {

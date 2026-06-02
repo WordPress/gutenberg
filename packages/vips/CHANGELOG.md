@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- Use a high-bit-depth `wasm-vips` build (libaom `CONFIG_AV1_HIGHBITDEPTH=1`) so 10/12-bit AVIF images can be decoded and encoded. Previously these failed with "Bitstream not supported by this decoder". See [#78889](https://github.com/WordPress/gutenberg/issues/78889).
+
 ## 2.0.0 (2026-05-27)
 
 ### Breaking Changes

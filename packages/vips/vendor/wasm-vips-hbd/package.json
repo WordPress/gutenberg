@@ -1,0 +1,23 @@
+{
+	"name": "wasm-vips-hbd",
+	"version": "0.0.0-hbd",
+	"description": "Custom wasm-vips build with high-bit-depth (10/12-bit) AVIF/HEIF support (libaom CONFIG_AV1_HIGHBITDEPTH=1), built with --disable-modules so heif/jxl/resvg are linked into a single vips.wasm. See https://github.com/WordPress/gutenberg/issues/78889.",
+	"license": "MIT",
+	"types": "lib/vips.d.ts",
+	"main": "lib/vips-node.js",
+	"exports": {
+		".": {
+			"browser": {
+				"import": "./lib/vips-es6.js",
+				"require": "./lib/vips.js"
+			},
+			"node": {
+				"import": "./lib/vips-node.mjs",
+				"require": "./lib/vips-node.js"
+			},
+			"default": "./lib/vips.js"
+		},
+		"./versions": "./versions.json",
+		"./vips.wasm": "./lib/vips.wasm"
+	}
+}
