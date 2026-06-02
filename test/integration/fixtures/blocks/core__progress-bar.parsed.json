@@ -1,0 +1,11 @@
+[
+	{
+		"blockName": "core/progress-meter",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-progress-meter\">\n\t\t<div class=\"wp-block-progress-meter__container\">\n\t\t\t\t<div><p class=\"wp-block-progress-meter__label\"></p><p>50%</p></div>\n\t\t\t\t<div style=\"background-color:#f0f0f0;height:11px\" class=\"wp-block-progress-meter__bar\">\n\t\t\t\t\t<div style=\"background-color:#1E1E1E;width:50%\" class=\"wp-block-progress-meter__progress\"></div>\n\t\t\t\t</div>\n\t\t</div>\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-progress-meter\">\n\t\t<div class=\"wp-block-progress-meter__container\">\n\t\t\t\t<div><p class=\"wp-block-progress-meter__label\"></p><p>50%</p></div>\n\t\t\t\t<div style=\"background-color:#f0f0f0;height:11px\" class=\"wp-block-progress-meter__bar\">\n\t\t\t\t\t<div style=\"background-color:#1E1E1E;width:50%\" class=\"wp-block-progress-meter__progress\"></div>\n\t\t\t\t</div>\n\t\t</div>\n</div>\n"
+		]
+	}
+]

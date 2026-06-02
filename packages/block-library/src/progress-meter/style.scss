@@ -1,0 +1,45 @@
+.wp-block-progress-meter {
+	&__container {
+		width: 100%;
+	}
+
+	&__container > div:first-child {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	&__bar {
+		width: 100%;
+		overflow: hidden;
+		position: relative;
+	}
+
+	&__progress {
+		height: 100%;
+
+		@media not (prefers-reduced-motion) {
+			transition: width 0.3s ease;
+		}
+	}
+
+	&__read-bar {
+		width: 100%;
+		position: fixed;
+		left: 0;
+		top: 0;
+		z-index: 1000;
+
+		.admin-bar & {
+			top: 32px;
+
+			@media screen and (max-width: 779px) {
+				top: 46px;
+			}
+
+			@media screen and (max-width: 594px) {
+				top: 0;
+			}
+		}
+	}
+}

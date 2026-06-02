@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/progress-meter",
+		"isValid": true,
+		"attributes": {
+			"label": "",
+			"value": 50,
+			"max": 100,
+			"backgroundColor": "#f0f0f0",
+			"progressColor": "#1E1E1E",
+			"height": 11,
+			"showValue": true,
+			"symbol": "%",
+			"symbolPosition": "suffix",
+			"showTotal": false,
+			"seprator": "/"
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,0 +1,59 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/progress-meter",
+	"category": "design",
+	"title": "Progress Meter",
+	"description": "Display a progress meter. Useful for tracking progress on a task or project.",
+	"textdomain": "default",
+	"attributes": {
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"value": {
+			"type": "number",
+			"default": 50
+		},
+		"max": {
+			"type": "number",
+			"default": 100
+		},
+		"backgroundColor": {
+			"type": "string",
+			"default": "#f0f0f0"
+		},
+		"progressColor": {
+			"type": "string",
+			"default": "#1E1E1E"
+		},
+		"height": {
+			"type": "number",
+			"default": 11
+		},
+		"showValue": {
+			"type": "boolean",
+			"default": true
+		},
+		"symbol": {
+			"type": "string",
+			"default": "%"
+		},
+		"symbolPosition": {
+			"type": "string",
+			"default": "suffix"
+		},
+		"showTotal": {
+			"type": "boolean",
+			"default": false
+		},
+		"seprator": {
+			"type": "string",
+			"default": "/"
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"style": "wp-block-progress-meter"
+}
