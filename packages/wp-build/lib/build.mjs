@@ -1776,14 +1776,31 @@ async function buildRoute( routeName ) {
 }
 
 /**
- * Build all discovered routes.
+ * Build discovered routes.
  *
+ * @param {Set<string>} activePageIds Page ids whose routes should be built.
+ *                                    When empty, every discovered route is built.
  * @return {Promise<void>}
  */
-async function buildAllRoutes() {
+async function buildRoutes( activePageIds = new Set() ) {
 	console.log( '\n🚦 Phase 3: Building routes...\n' );
 
-	const routes = getAllRoutes( ROOT_DIR );
+	const allRoutes = getAllRoutes( ROOT_DIR );
+
+	// With no active pages specified, build every route. Otherwise, skip routes
+	// whose pages are all inactive.
+	const routes =
+		activePageIds.size === 0
+			? allRoutes
+			: allRoutes.filter( ( routeName ) => {
+					const metadata = getRouteMetadata( ROOT_DIR, routeName );
+					if ( ! metadata?.pages?.length ) {
+						return false;
+					}
+					return metadata.pages.some( ( page ) =>
+						activePageIds.has( page )
+					);
+			  } );
 
 	if ( routes.length === 0 ) {
 		console.log( '   No routes found, skipping.\n' );
@@ -2109,8 +2126,33 @@ async function buildAll( baseUrlExpression ) {
 		} )
 	);
 
-	// Build routes
-	await buildAllRoutes();
+	// Normalize PAGES config to support both string and object formats. String
+	// shorthand is treated as non-stable; pages must opt in to Core builds
+	// explicitly with `stable: true`.
+	const normalizedPages = PAGES.map( ( page ) => {
+		if ( typeof page === 'string' ) {
+			return { id: page, init: [], title: undefined, stable: false };
+		}
+		return {
+			id: page.id,
+			init: page.init || [],
+			title: page.title || undefined,
+			stable: page.stable === true,
+		};
+	} );
+
+	// When building for WordPress Core, include only pages marked stable.
+	const isCoreBuild =
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
+	const activePages = isCoreBuild
+		? normalizedPages.filter( ( page ) => page.stable )
+		: normalizedPages;
+
+	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
+
+	// Build routes (only those belonging to an active page).
+	await buildRoutes( activePageIds );
 
 	// Build widgets
 	await buildAllWidgets();
@@ -2143,28 +2185,6 @@ async function buildAll( baseUrlExpression ) {
 		} );
 	} );
 
-	// Normalize PAGES config to support both string and object formats
-	const normalizedPages = PAGES.map( ( page ) => {
-		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
-		}
-		return {
-			id: page.id,
-			init: page.init || [],
-			title: page.title || undefined,
-			experimental: page.experimental || false,
-		};
-	} );
-
-	// When building for WordPress Core, exclude experimental pages.
-	const isCoreBuild =
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
-	const activePages = isCoreBuild
-		? normalizedPages.filter( ( page ) => ! page.experimental )
-		: normalizedPages;
-
-	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
 	const activeRoutes = routes.filter( ( r ) => activePageIds.has( r.page ) );
 
 	const pageData = activePages.map( ( page ) => {

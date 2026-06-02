@@ -284,9 +284,10 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with optional init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "stable": true }` - Page with optional init modules
   - **`id`** (required): The page slug used in WordPress admin URLs
   - **`init`** (optional): Array of script module IDs to execute during page initialization
+  - **`stable`** (optional, default `false`): When `true`, the page (and its routes) is included in WordPress Core builds (`IS_WORDPRESS_CORE=true`). Pages without `stable: true` — including all string-shorthand entries — are only included in the standalone Gutenberg plugin build.
 
 **Generated Files:**
 

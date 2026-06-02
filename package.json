@@ -25,16 +25,24 @@
 		"handlePrefix": "wp",
 		"pages": [
 			{
+				"id": "font-library",
+				"stable": true
+			},
+			{
+				"id": "options-connectors",
+				"stable": true
+			},
+			{
+				"id": "guidelines",
+				"stable": true
+			},
+			{
 				"id": "site-editor-v2",
 				"init": [
 					"@wordpress/edit-site-init"
-				],
-				"experimental": true
+				]
 			},
 			"media-editor",
-			"font-library",
-			"options-connectors",
-			"guidelines",
 			"experiments",
 			"content-types",
 			"dashboard"
