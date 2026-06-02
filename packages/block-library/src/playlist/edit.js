@@ -60,7 +60,7 @@ const PlaylistEdit = ( {
 
 	// Extract the waveform style from the block style variation class.
 	const waveformStyle =
-		attributes.className?.match( /is-style-(\w+)/ )?.[ 1 ] || 'bars';
+		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
