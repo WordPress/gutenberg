@@ -12,6 +12,27 @@ import { safeDecodeURI } from '@wordpress/url';
 const TEMPLATE_POST_TYPE = 'wp_template';
 const EMPTY_OBJECT = {};
 
+interface PostFormat {
+	id: string;
+	caption: string;
+}
+
+/**
+ * All available post formats with their labels, matching WordPress core.
+ * `standard` is intentionally excluded as it has no dedicated archive.
+ */
+const POST_FORMATS: PostFormat[] = [
+	{ id: 'aside', caption: __( 'Aside' ) },
+	{ id: 'audio', caption: __( 'Audio' ) },
+	{ id: 'chat', caption: __( 'Chat' ) },
+	{ id: 'gallery', caption: __( 'Gallery' ) },
+	{ id: 'image', caption: __( 'Image' ) },
+	{ id: 'link', caption: __( 'Link' ) },
+	{ id: 'quote', caption: __( 'Quote' ) },
+	{ id: 'status', caption: __( 'Status' ) },
+	{ id: 'video', caption: __( 'Video' ) },
+];
+
 /**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
@@ -540,6 +561,111 @@ export const useTaxonomiesMenuItems = (
 	);
 	return taxonomiesMenuItems;
 };
+
+export interface PostFormatMenuItem {
+	slug: string;
+	title: string;
+	description: string | undefined;
+}
+
+export interface PostFormatEntryPoint {
+	slug: string;
+	title: string;
+	description: string;
+	onClick: ( template: any ) => void;
+}
+
+/**
+ * Hook that returns a single entry-point menu item for the "Post Format Archives"
+ * button in the template grid, plus the list of individual format templates
+ * available to create. The entry-point item is `null` when the active theme
+ * does not support any non-standard post formats, or when every supported
+ * format already has a template.
+ *
+ * @param onClickMenuItem Callback invoked when the entry-point button is
+ *                        clicked. Receives an object with `{ postFormats }`
+ *                        where `postFormats` is the array of available format
+ *                        template objects.
+ */
+export function usePostFormatMenuItems(
+	onClickMenuItem: ( data: {
+		postFormats: PostFormatMenuItem[];
+		template: any;
+	} ) => void
+): {
+	entryPoint: PostFormatEntryPoint | null;
+	availableFormats: PostFormatMenuItem[];
+} {
+	const existingTemplates = useExistingTemplates();
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const themeFormats = useSelect(
+		( select ) =>
+			( select( coreStore ).getThemeSupports() as any )?.formats as
+				| string[]
+				| undefined,
+		[]
+	);
+
+	const availableFormats = useMemo( () => {
+		// Return nothing when the theme doesn't declare any non-standard formats.
+		if ( ! themeFormats?.some( ( f ) => f !== 'standard' ) ) {
+			return [];
+		}
+
+		const existingSlugs = ( existingTemplates || [] ).map(
+			( t: any ) => t.slug
+		);
+
+		return POST_FORMATS.filter( ( format ) => {
+			// Only include formats the theme actually supports.
+			if ( ! themeFormats.includes( format.id ) ) {
+				return false;
+			}
+			// Skip formats that already have a template.
+			const templateSlug = `taxonomy-post_format-post-format-${ format.id }`;
+			return ! existingSlugs.includes( templateSlug );
+		} ).map( ( format ) => {
+			const slug = `taxonomy-post_format-post-format-${ format.id }`;
+			// Prefer the translated title/description from core's
+			// default_template_types when available.
+			const defaultType = ( defaultTemplateTypes || [] ).find(
+				( t: any ) => t.slug === slug
+			);
+			return {
+				slug,
+				title:
+					defaultType?.title ??
+					sprintf(
+						// translators: %s: Post format name e.g: "Aside".
+						__( 'Post Format: %s' ),
+						format.caption
+					),
+				description: defaultType?.description,
+			};
+		} );
+	}, [ themeFormats, existingTemplates, defaultTemplateTypes ] );
+
+	const entryPoint = useMemo( () => {
+		// Hide the entry point when there are no formats left to create.
+		if ( availableFormats.length === 0 ) {
+			return null;
+		}
+		return {
+			// This slug is not a real template slug — it is used only as a
+			// stable React key and for the icon lookup in TEMPLATE_ICONS.
+			slug: 'taxonomy-post_format',
+			title: __( 'Post Format Archives' ),
+			description: __(
+				'Displays a post format archive for themes that support post formats.'
+			),
+			onClick: ( template: any ) => {
+				onClickMenuItem( { postFormats: availableFormats, template } );
+			},
+		};
+	}, [ availableFormats, onClickMenuItem ] );
+
+	return { entryPoint, availableFormats };
+}
 
 const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX: Record< string, string > = {
 	user: 'author',

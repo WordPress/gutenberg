@@ -55,8 +55,11 @@ import {
 	usePostTypeMenuItems,
 	useAuthorMenuItem,
 	usePostTypeArchiveMenuItems,
+	usePostFormatMenuItems,
+	type PostFormatMenuItem,
 } from './utils';
 import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
+import AddPostFormatTemplateModalContent from './add-post-format-template-modal-content';
 
 const TEMPLATE_POST_TYPE = 'wp_template';
 
@@ -90,6 +93,7 @@ const TEMPLATE_ICONS: Record< string, any > = {
 	date: calendar,
 	tag,
 	attachment: media,
+	'taxonomy-post_format': archive,
 };
 
 interface TemplateListItemProps {
@@ -152,6 +156,7 @@ const modalContentMap = {
 	templatesList: 1,
 	customTemplate: 2,
 	customGenericTemplate: 3,
+	postFormats: 4,
 } as const;
 
 interface TemplateData {
@@ -171,9 +176,15 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 	>( modalContentMap.templatesList );
 	const [ entityForSuggestions, setEntityForSuggestions ] =
 		useState< EntityForSuggestions | null >();
+	const [ postFormats, setPostFormats ] = useState< PostFormatMenuItem[] >(
+		[]
+	);
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
-	const missingTemplates = useMissingTemplates( setEntityForSuggestions, () =>
-		setModalContent( modalContentMap.customTemplate )
+	const missingTemplates = useMissingTemplates(
+		setEntityForSuggestions,
+		() => setModalContent( modalContentMap.customTemplate ),
+		setPostFormats,
+		() => setModalContent( modalContentMap.postFormats )
 	);
 	const navigate = useNavigate();
 	const invalidate = useInvalidate();
@@ -292,6 +303,8 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 		);
 	} else if ( modalContent === modalContentMap.customGenericTemplate ) {
 		modalTitle = __( 'Create custom template' );
+	} else if ( modalContent === modalContentMap.postFormats ) {
+		modalTitle = __( 'Post Format Archives' );
 	}
 
 	return (
@@ -301,7 +314,8 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 				'template-list-add-new-template__modal_template_list':
 					modalContent === modalContentMap.templatesList,
 				'template-list-custom-template-modal':
-					modalContent === modalContentMap.customTemplate,
+					modalContent === modalContentMap.customTemplate ||
+					modalContent === modalContentMap.postFormats,
 			} ) }
 			onRequestClose={ onModalClose }
 			overlayClassName={
@@ -384,6 +398,16 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 					}
 				/>
 			) }
+			{ modalContent === modalContentMap.postFormats && (
+				<AddPostFormatTemplateModalContent
+					postFormats={ postFormats }
+					onSelect={ createTemplate }
+					onBack={ () =>
+						setModalContent( modalContentMap.templatesList )
+					}
+					containerRef={ containerRef }
+				/>
+			) }
 		</Modal>
 	);
 }
@@ -426,14 +450,16 @@ interface MissingTemplate extends TemplateData {
 
 function useMissingTemplates(
 	setEntityForSuggestions: ( entity: EntityForSuggestions ) => void,
-	onClick?: () => void
+	onClickCustomTemplate?: () => void,
+	setPostFormats?: ( formats: PostFormatMenuItem[] ) => void,
+	onClickPostFormats?: () => void
 ): MissingTemplate[] {
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
 		( template: any ) => DEFAULT_TEMPLATE_SLUGS.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions: EntityForSuggestions ) => {
-		onClick?.();
+		onClickCustomTemplate?.();
 		setEntityForSuggestions( _entityForSuggestions );
 	};
 	// We need to replace existing default template types with
@@ -478,9 +504,18 @@ function useMissingTemplates(
 			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
 		);
 	} );
+
+	const { entryPoint: postFormatEntryPoint } = usePostFormatMenuItems(
+		( { postFormats } ) => {
+			setPostFormats?.( postFormats );
+			onClickPostFormats?.();
+		}
+	);
+
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
 		...usePostTypeArchiveMenuItems(),
+		...( postFormatEntryPoint ? [ postFormatEntryPoint ] : [] ),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
 	];
