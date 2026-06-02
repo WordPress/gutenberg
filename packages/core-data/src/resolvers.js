@@ -25,6 +25,7 @@ import {
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
 	normalizeQueryForResolution,
+	saveCRDTDoc,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
@@ -250,9 +251,9 @@ export const getEntityRecord =
 						// persistence. As we add support for syncing additional entity,
 						// we'll need to revisit where persisted CRDT documents are stored.
 						persistCRDTDoc: () => {
-							resolveSelect
+							return resolveSelect
 								.getEditedEntityRecord( kind, name, key )
-								.then( ( editedRecord ) => {
+								.then( async ( editedRecord ) => {
 									// Don't persist the CRDT document if the record is still an
 									// auto-draft or if the entity does not support meta.
 									const { meta, status } = editedRecord;
@@ -260,17 +261,27 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a minimal save to persist the CRDT document. The
-									// entity's pre-persist hooks will create the persisted CRDT
-									// document and apply it to the record's meta.
 									const entityIdKey =
 										entityConfig.key || DEFAULT_ENTITY_KEY;
+									const entityId =
+										editedRecord[ entityIdKey ];
+
+									if ( 'postType' === kind ) {
+										await saveCRDTDoc(
+											`${ kind }/${ name }`,
+											entityId
+										);
+										return;
+									}
+
+									// Trigger a minimal save to preserve the current behavior for
+									// non-post entities until persisted CRDT support becomes an
+									// explicit sync capability.
 									dispatch.saveEntityRecord(
 										kind,
 										name,
 										{
-											[ entityIdKey ]:
-												editedRecord[ entityIdKey ],
+											[ entityIdKey ]: entityId,
 										},
 										{ __unstableSkipSyncUpdate: true }
 									);
