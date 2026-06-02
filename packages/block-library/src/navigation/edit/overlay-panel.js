@@ -4,6 +4,8 @@
 import {
 	PanelBody,
 	__experimentalVStack as VStack,
+	ToggleControl,
+	RangeControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -23,6 +25,7 @@ import OverlayPreview from './overlay-preview';
  * @param {string}   props.overlayMenu               Overlay menu setting ('never', 'mobile', 'always').
  * @param {string}   props.overlay                   Currently selected overlay template part ID.
  * @param {Function} props.setAttributes             Function to update block attributes.
+ * @param {Object}   props.attributes                Block attributes object.
  * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
  * @param {boolean}  props.overlayMenuPreview        Whether overlay menu preview is open.
  * @param {Function} props.setOverlayMenuPreview     Function to toggle overlay menu preview.
@@ -39,6 +42,7 @@ export default function OverlayPanel( {
 	overlayMenu,
 	overlay,
 	setAttributes,
+	attributes,
 	onNavigateToEntityRecord,
 	overlayMenuPreview,
 	setOverlayMenuPreview,
@@ -59,6 +63,32 @@ export default function OverlayPanel( {
 					overlayMenu={ overlayMenu }
 					setAttributes={ setAttributes }
 				/>
+
+				{ overlayMenu !== 'never' && (
+					<>
+						<ToggleControl
+							label={ __( 'Enable backdrop' ) }
+							checked={ attributes.overlayBackdrop }
+							onChange={ ( value ) =>
+								setAttributes( { overlayBackdrop: value } )
+							}
+						/>
+						{ attributes.overlayBackdrop && (
+							<RangeControl
+								label={ __( 'Backdrop blur' ) }
+								value={ attributes.overlayBackdropBlur }
+								onChange={ ( value ) =>
+									setAttributes( {
+										overlayBackdropBlur: value,
+									} )
+								}
+								min={ 0 }
+								max={ 20 }
+								__next40pxDefaultSize
+							/>
+						) }
+					</>
+				) }
 
 				{ overlayMenu !== 'never' && (
 					<OverlayMenuPreviewButton

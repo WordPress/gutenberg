@@ -122,6 +122,23 @@ const { state, actions } = store(
 				actions.closeMenu( 'click' );
 				actions.closeMenu( 'focus' );
 			},
+			closeMenuOnBackdropClick( event ) {
+				const ctx = getContext();
+				if ( ctx.type !== 'overlay' ) {
+					return;
+				}
+				const { ref } = getElement();
+				const content = ref.querySelector(
+					'.wp-block-navigation__responsive-container-content'
+				);
+
+				if ( content?.contains( event.target ) ) {
+					return;
+				}
+
+				actions.closeMenu( 'click' );
+				actions.closeMenu( 'focus' );
+			},
 			openMenuOnFocus() {
 				actions.openMenu( 'focus' );
 			},

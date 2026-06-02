@@ -799,9 +799,24 @@ class WP_Navigation_Block_Renderer {
 			);
 		}
 
+		$has_backdrop = ! empty( $attributes['overlayBackdrop'] );
+		$blur         = $has_backdrop ? intval( $attributes['overlayBackdropBlur'] ?? 0 ) : 0;
+
+		$backdrop_markup = $has_backdrop
+			? '<div class="wp-block-navigation__overlay-backdrop" data-wp-on--click="actions.closeMenuOnClick"></div>'
+			: '';
+
+		$blur_style = $blur
+			? sprintf(
+				'style="backdrop-filter: blur(%1$dpx); -webkit-backdrop-filter: blur(%1$dpx);"',
+				$blur
+			)
+			: '';
+
 		return sprintf(
 			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
-				<div class="%5$s" %7$s id="%1$s" %11$s>
+				<div class="%5$s" %7$s id="%1$s" %11$s %16$s>
+					%17$s
 					<div class="wp-block-navigation__responsive-close" tabindex="-1">
 						<div class="wp-block-navigation__responsive-dialog" %12$s>
 							%13$s
@@ -826,7 +841,9 @@ class WP_Navigation_Block_Renderer {
 			$responsive_dialog_directives,
 			$close_button_markup,
 			$responsive_container_content_directives,
-			$has_custom_overlay ? $custom_overlay_markup : ''
+			$has_custom_overlay ? $custom_overlay_markup : '',
+			$blur_style,
+			$backdrop_markup
 		);
 	}
 
