@@ -56,8 +56,7 @@ jobs:
 
             - name: Serve Storybook and run tests
               run: |
-                  STORYBOOK_PORT="$(node -e 'const net = require( "node:net" ); const server = net.createServer(); server.listen( 0, "127.0.0.1", () => { console.log( server.address().port ); server.close(); } );')"
                   npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-                  "npx http-server ./storybook/build -a 127.0.0.1 --port $STORYBOOK_PORT --silent" \
-                  "npx wait-on tcp:127.0.0.1:$STORYBOOK_PORT && \
-                  npx test-storybook --url http://127.0.0.1:$STORYBOOK_PORT --config-dir ./storybook"
+                  "npx http-server ./storybook/build --port 50240 --silent" \
+                  "npx wait-on tcp:127.0.0.1:50240 && \
+                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook"
