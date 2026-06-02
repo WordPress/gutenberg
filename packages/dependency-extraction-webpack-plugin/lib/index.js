@@ -304,6 +304,9 @@ class DependencyExtractionWebpackPlugin {
 			/** @type {Set<string>} */
 			const chunkScriptModuleDynamicDeps = new Set();
 
+			const staticDepsCurrent = new WeakSet();
+			const staticDepsCache = new WeakMap();
+
 			if ( injectPolyfill ) {
 				chunkStaticDeps.add( 'wp-polyfill' );
 			}
@@ -317,6 +320,8 @@ class DependencyExtractionWebpackPlugin {
 					if ( this.useModules ) {
 						const isStatic =
 							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								staticDepsCache,
+								staticDepsCurrent,
 								compilation,
 								m
 							);
@@ -324,21 +329,45 @@ class DependencyExtractionWebpackPlugin {
 						( isStatic ? chunkStaticDeps : chunkDynamicDeps ).add(
 							m.request
 						);
-					} else if ( m.externalType === 'import' ) {
+					} else if ( m.externalType === 'import' || m.externalType === 'module') {
 						const isStatic =
 							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								staticDepsCache,
+								staticDepsCurrent,
 								compilation,
 								m
 							);
 
-						( isStatic
-							? chunkScriptModuleStaticDeps
-							: chunkScriptModuleDynamicDeps
-						).add( userRequest );
+						(isStatic ? chunkScriptModuleStaticDeps : chunkScriptModuleDynamicDeps)
+							.add(userRequest);
 					} else {
 						chunkStaticDeps.add(
 							this.mapRequestToDependency( userRequest )
 						);
+					}
+				}
+				if (m.blocks) {
+					for (const block of m.blocks) {
+						if (block.constructor.name !== AsyncDependenciesBlock.name && block.constructor.name !== DependenciesBlock.name) {
+							continue;
+						}
+						for (const dep of block.dependencies) {
+							if (this.externalizedDeps.has(dep.userRequest)) {
+								if (block.constructor.name === AsyncDependenciesBlock.name) {
+									if (this.useModules) {
+										chunkDynamicDeps.add(dep.request);
+									} else {
+										chunkScriptModuleDynamicDeps.add(dep.userRequest)
+									}
+								} else {
+									if (this.useModules) {
+										chunkStaticDeps.add(dep.request);
+									} else {
+										chunkScriptModuleStaticDeps.add(dep.userRequest)
+									}
+								}
+							}
+						}
 					}
 				}
 			};
@@ -481,9 +510,6 @@ class DependencyExtractionWebpackPlugin {
 		}
 	}
 
-	static #staticDepsCurrent = new WeakSet();
-	static #staticDepsCache = new WeakMap();
-
 	/**
 	 * Can we trace a line of static dependencies from an entry to a module
 	 *
@@ -492,20 +518,20 @@ class DependencyExtractionWebpackPlugin {
 	 *
 	 * @return {boolean} True if there is a static import path to the root
 	 */
-	static hasStaticDependencyPathToRoot( compilation, block ) {
-		if ( DependencyExtractionWebpackPlugin.#staticDepsCache.has( block ) ) {
-			return DependencyExtractionWebpackPlugin.#staticDepsCache.get(
+	static hasStaticDependencyPathToRoot( staticDepsCache, staticDepsCurrent, compilation, block ) {
+		if ( staticDepsCache.has( block ) ) {
+			return staticDepsCache.get(
 				block
 			);
 		}
 
 		if (
-			DependencyExtractionWebpackPlugin.#staticDepsCurrent.has( block )
+			staticDepsCurrent.has( block )
 		) {
 			return false;
 		}
 
-		DependencyExtractionWebpackPlugin.#staticDepsCurrent.add( block );
+		staticDepsCurrent.add( block );
 
 		const incomingConnections = [
 			...compilation.moduleGraph.getIncomingConnections( block ),
@@ -520,11 +546,11 @@ class DependencyExtractionWebpackPlugin {
 		// If we don't have non-entry, non-library incoming connections,
 		// we've reached a root of
 		if ( ! incomingConnections.length ) {
-			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+			staticDepsCache.set(
 				block,
 				true
 			);
-			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+			staticDepsCurrent.delete(
 				block
 			);
 			return true;
@@ -545,11 +571,11 @@ class DependencyExtractionWebpackPlugin {
 
 		// All the dependencies were Async, the module was reached via a dynamic import
 		if ( ! staticDependentModules.length ) {
-			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+			staticDepsCache.set(
 				block,
 				false
 			);
-			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+			staticDepsCurrent.delete(
 				block
 			);
 			return false;
@@ -559,13 +585,14 @@ class DependencyExtractionWebpackPlugin {
 		const result = staticDependentModules.some(
 			( parentStaticDependentModule ) =>
 				DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+					staticDepsCache, staticDepsCurrent,
 					compilation,
 					parentStaticDependentModule
 				)
 		);
 
-		DependencyExtractionWebpackPlugin.#staticDepsCache.set( block, result );
-		DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete( block );
+		staticDepsCache.set( block, result );
+		staticDepsCurrent.delete( block );
 		return result;
 	}
 }
