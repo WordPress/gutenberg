@@ -17,12 +17,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { isAppleOS } from './platform';
 
 /**
  * External dependencies
  */
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 
 export type WPModifierPart =
 	| typeof ALT
