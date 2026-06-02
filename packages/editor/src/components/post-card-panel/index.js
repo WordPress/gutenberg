@@ -52,15 +52,20 @@ export default function PostCardPanel( {
 		() => ( Array.isArray( postId ) ? postId : [ postId ] ),
 		[ postId ]
 	);
-	const { postTitle, icon, labels } = useSelect(
+	const { postTitle, icon, labels, viewAction, postRecord } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getCurrentTheme, getPostType } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				getEntityRecord,
+				getCurrentTheme,
+				getPostType,
+			} = select( coreStore );
 			const {
 				getPostIcon,
 				getCurrentPostType,
 				isRevisionsMode,
 				getCurrentRevision,
+				getEntityActions,
 			} = unlock( select( editorStore ) );
 			let _title = '';
 
@@ -99,12 +104,23 @@ export default function PostCardPanel( {
 				_title = _templateInfo?.title || _record?.title;
 			}
 
+			const _actions = getEntityActions( 'postType', postType );
+			const _viewAction = _actions?.find(
+				( action ) => action.id === 'view-post'
+			);
+
 			return {
 				postTitle: _title,
 				icon: getPostIcon( postType, {
 					area: _record?.area,
 				} ),
 				labels: getPostType( postType )?.labels,
+				viewAction: _viewAction,
+				postRecord: getEntityRecord(
+					'postType',
+					postType,
+					postIds[ 0 ]
+				),
 			};
 		},
 		[ postIds, postType ]
@@ -147,6 +163,23 @@ export default function PostCardPanel( {
 						<WCBadge>{ pageTypeBadge }</WCBadge>
 					) }
 				</WCText>
+				{ ! hideActions &&
+					postIds.length === 1 &&
+					viewAction &&
+					postRecord &&
+					( ! viewAction.isEligible ||
+						viewAction.isEligible( postRecord ) ) && (
+						<Button
+							size="small"
+							icon={ viewAction.icon }
+							label={ viewAction.label }
+							onClick={ () => {
+								viewAction.callback( [ postRecord ], {
+									onActionPerformed,
+								} );
+							} }
+						/>
+					) }
 				{ ! hideActions && postIds.length === 1 && (
 					<PostActions
 						postType={ postType }
