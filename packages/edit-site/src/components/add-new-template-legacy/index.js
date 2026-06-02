@@ -16,7 +16,13 @@ import {
 	Icon as WCIcon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, memo, useRef, useEffect } from '@wordpress/element';
+import {
+	useState,
+	memo,
+	useRef,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -470,11 +476,15 @@ function useMissingTemplates(
 		);
 	} );
 
-	const { entryPoint: postFormatEntryPoint } = usePostFormatMenuItems(
+	const onClickPostFormatMenuItem = useCallback(
 		( { postFormats } ) => {
 			setPostFormats( postFormats );
 			onClickPostFormats?.();
-		}
+		},
+		[ setPostFormats, onClickPostFormats ]
+	);
+	const { entryPoint: postFormatEntryPoint } = usePostFormatMenuItems(
+		onClickPostFormatMenuItem
 	);
 
 	const missingTemplates = [
