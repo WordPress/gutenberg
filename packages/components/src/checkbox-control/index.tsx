@@ -7,8 +7,8 @@ import type { ChangeEvent } from 'react';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { useInstanceId, useRefEffect } from '@wordpress/compose';
+import { useCallback, useState } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { Icon, check, reset } from '@wordpress/icons';
 
@@ -71,8 +71,8 @@ export function CheckboxControl(
 
 	// Run the following callback every time the `ref` (and the additional
 	// dependencies) change.
-	const ref = useRefEffect< HTMLInputElement >(
-		( node ) => {
+	const ref = useCallback(
+		( node: HTMLInputElement | null ) => {
 			if ( ! node ) {
 				return;
 			}

@@ -1,8 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useState, useLayoutEffect } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useCallback,
+	useContext,
+	useState,
+	useLayoutEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,8 +25,11 @@ import { BlockRefs } from '../../provider/block-refs-provider';
  */
 export function useBlockRefProvider( clientId ) {
 	const { refsMap } = useContext( BlockRefs );
-	return useRefEffect(
+	return useCallback(
 		( element ) => {
+			if ( ! element ) {
+				return;
+			}
 			refsMap.set( clientId, element );
 			return () => refsMap.delete( clientId );
 		},

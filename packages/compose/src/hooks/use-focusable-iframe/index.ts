@@ -4,9 +4,9 @@
 import type { RefCallback } from 'react';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import useRefEffect from '../use-ref-effect';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Dispatches a bubbling focus event when the iframe receives focus. Use
@@ -15,7 +15,10 @@ import useRefEffect from '../use-ref-effect';
  * @return Ref to pass to the iframe.
  */
 export default function useFocusableIframe(): RefCallback< HTMLIFrameElement > {
-	return useRefEffect( ( element ) => {
+	return useCallback( ( element: HTMLIFrameElement | null ) => {
+		if ( ! element ) {
+			return;
+		}
 		const { ownerDocument } = element;
 		if ( ! ownerDocument ) {
 			return;

@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	useCallback,
 	useEffect,
 	useState,
 	useRef,
@@ -41,7 +42,6 @@ import {
 } from '@wordpress/blocks';
 import {
 	useMergeRefs,
-	useRefEffect,
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -69,7 +69,10 @@ function useEnter( props ) {
 		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	return useRefEffect( ( element ) => {
+	return useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
+		}
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
 				return;

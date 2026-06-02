@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect } from '@wordpress/element';
+import { useCallback, useRef, useLayoutEffect } from '@wordpress/element';
 import type { MutableRefObject, RefCallback } from 'react';
-
-/**
- * Internal dependencies
- */
-import useRefEffect from '../use-ref-effect';
 
 /**
  * Copies text to the clipboard using the Clipboard API when available,
@@ -91,7 +86,10 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 ): RefCallback< T > {
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
-	return useRefEffect( ( node ) => {
+	return useCallback( ( node: T | null ) => {
+		if ( ! node ) {
+			return;
+		}
 		// Tracks whether the node is still mounted when the Promise resolves.
 		let isActive = true;
 		const handleClick = async () => {

@@ -1,8 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import {
+	useCallback,
+	useRef,
+	useLayoutEffect,
+	useReducer,
+} from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
@@ -217,10 +222,16 @@ function useRichTextBase( {
 			onSelectionChange,
 			forceRender,
 		} ),
-		useRefEffect( () => {
-			applyFromProps();
-			didMountRef.current = true;
-		}, [ placeholder, ...__unstableDependencies ] ),
+		useCallback(
+			( node ) => {
+				if ( ! node ) {
+					return;
+				}
+				applyFromProps();
+				didMountRef.current = true;
+			},
+			[ placeholder, ...__unstableDependencies ]
+		),
 	] );
 
 	return {

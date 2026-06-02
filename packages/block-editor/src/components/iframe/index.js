@@ -6,9 +6,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, createPortal, forwardRef } from '@wordpress/element';
+import {
+	useState,
+	createPortal,
+	forwardRef,
+	useCallback,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
+import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
@@ -62,7 +67,10 @@ function bubbleEvent( event, Constructor, frame ) {
  * @param {Document} iframeDocument Document to attach listeners to.
  */
 function useBubbleEvents( iframeDocument ) {
-	return useRefEffect( () => {
+	return useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		const { defaultView } = iframeDocument;
 		if ( ! defaultView ) {
 			return;
@@ -156,7 +164,10 @@ function Iframe( {
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
-	const setRef = useRefEffect( ( node ) => {
+	const setRef = useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
@@ -282,8 +293,11 @@ function Iframe( {
 	// When an iframe element is moved in the DOM, like when reordering a list,
 	// its `window` object is destroyed and recreated, and the `defaultView` field is
 	// briefly `null`. We need to guard for such calls of the ref callbacks.
-	const bodyRef = useRefEffect(
+	const bodyRef = useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			if ( node.ownerDocument.defaultView ) {
 				unguardedBodyRef( node );
 				return () => unguardedBodyRef( null );

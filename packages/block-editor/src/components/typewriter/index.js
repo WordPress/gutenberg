@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
@@ -21,9 +21,9 @@ export function useTypewriter() {
 		[]
 	);
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
-			if ( ! hasSelectedBlock ) {
+			if ( ! node || ! hasSelectedBlock ) {
 				return;
 			}
 

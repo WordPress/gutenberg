@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { create } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
 
@@ -109,8 +109,11 @@ export default function useSelectionObserver() {
 		useDispatch( blockEditorStore );
 	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
 		useSelect( blockEditorStore );
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 

@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useResizeObserver, useRefEffect } from '@wordpress/compose';
+import { useResizeObserver } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { memo, useMemo } from '@wordpress/element';
+import { memo, useCallback, useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 
 /**
@@ -75,7 +75,10 @@ function ScaledBlockPreview( {
 			} }
 		>
 			<Iframe
-				contentRef={ useRefEffect( ( bodyElement ) => {
+				contentRef={ useCallback( ( bodyElement ) => {
+					if ( ! bodyElement ) {
+						return;
+					}
 					const {
 						ownerDocument: { documentElement },
 					} = bodyElement;

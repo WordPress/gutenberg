@@ -8,7 +8,7 @@ import {
 	useCallback,
 	useEffect,
 } from '@wordpress/element';
-import { useRefEffect, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -137,7 +137,10 @@ export function useDiffMarkers() {
 		subscribersRef.current.add( callback );
 		return () => subscribersRef.current.delete( callback );
 	}, [] );
-	const contentRef = useRefEffect( ( element ) => {
+	const contentRef = useCallback( ( element ) => {
+		if ( ! element ) {
+			return;
+		}
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 		const resizeObserver = new defaultView.ResizeObserver( () => {

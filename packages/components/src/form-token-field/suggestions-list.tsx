@@ -7,7 +7,7 @@ import type { MouseEventHandler, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -33,8 +33,11 @@ export function SuggestionsList<
 	instanceId,
 	__experimentalRenderItem,
 }: SuggestionsListProps< T > ) {
-	const listRef = useRefEffect< HTMLUListElement >(
-		( listNode ) => {
+	const listRef = useCallback(
+		( listNode: HTMLUListElement | null ) => {
+			if ( ! listNode ) {
+				return;
+			}
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
 			if (

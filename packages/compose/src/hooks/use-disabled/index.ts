@@ -1,8 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import { useCallback } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { debounce } from '../../utils/debounce';
-import useRefEffect from '../use-ref-effect';
 
 /**
  * In some circumstances, such as block previews, all focusable DOM elements
@@ -33,9 +37,9 @@ import useRefEffect from '../use-ref-effect';
 export default function useDisabled( {
 	isDisabled: isDisabledProp = false,
 } = {} ) {
-	return useRefEffect(
-		( node ) => {
-			if ( isDisabledProp ) {
+	return useCallback(
+		( node: HTMLElement | null ) => {
+			if ( ! node || isDisabledProp ) {
 				return;
 			}
 

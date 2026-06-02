@@ -1,7 +1,11 @@
 /**
+ * WordPress dependencies
+ */
+import { useCallback } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-import useRefEffect from '../use-ref-effect';
 import useEvent from '../use-event';
 
 /**
@@ -36,9 +40,9 @@ export default function useDropZone( {
 	const onDragEndEvent = useEvent( _onDragEnd );
 	const onDragOverEvent = useEvent( _onDragOver );
 
-	return useRefEffect(
+	return useCallback(
 		( elem ) => {
-			if ( isDisabled ) {
+			if ( ! elem || isDisabled ) {
 				return;
 			}
 

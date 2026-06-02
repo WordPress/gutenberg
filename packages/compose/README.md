@@ -513,9 +513,15 @@ _Returns_
 
 ### useRefEffect
 
+> **Deprecated** since WordPress 7.1.0. Use `useCallback` with a returned cleanup function (React 19's ref callback cleanup pattern) instead.
+
 Effect-like ref callback. Just like with `useEffect`, this allows you to return a cleanup function to be run if the ref changes or one of the dependencies changes. The ref is provided as an argument to the callback functions. The main difference between this and `useEffect` is that the `useEffect` callback is not called when the ref changes, but this is. Pass the returned ref callback as the component's ref and merge multiple refs with `useMergeRefs`.
 
 It's worth noting that if the dependencies array is empty, there's not strictly a need to clean up event handlers for example, because the node is to be removed. It _is_ necessary if you add dependencies because the ref callback will be called multiple times for the same node.
+
+_Related_
+
+-   <https://react.dev/reference/react/useCallback#ref-callback-cleanup>
 
 _Parameters_
 

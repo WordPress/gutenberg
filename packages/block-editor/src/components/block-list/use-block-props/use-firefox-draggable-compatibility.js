@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 const nodesByDocument = new Map();
 
@@ -77,7 +77,10 @@ function down( event ) {
  * @return {Function} Cleanup function.
  */
 export function useFirefoxDraggableCompatibility() {
-	return useRefEffect( ( node ) => {
+	return useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		add( node.ownerDocument, node );
 		return () => {
 			remove( node.ownerDocument, node );

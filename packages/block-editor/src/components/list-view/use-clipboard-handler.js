@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,7 +30,10 @@ export default function useClipboardHandler( { selectBlock } ) {
 		useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
-	return useRefEffect( ( node ) => {
+	return useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		function updateFocusAndSelection( focusClientId, shouldSelectBlock ) {
 			if ( shouldSelectBlock ) {
 				selectBlock( undefined, focusClientId, null, null );

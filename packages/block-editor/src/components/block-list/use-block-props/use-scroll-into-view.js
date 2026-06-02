@@ -1,12 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useReducedMotion, useRefEffect } from '@wordpress/compose';
+import { useReducedMotion } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 export function useScrollIntoView( { isSelected } ) {
 	const prefersReducedMotion = useReducedMotion();
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			if ( isSelected ) {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;

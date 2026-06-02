@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,9 +16,9 @@ export function useFlashEditableBlocks( {
 } = {} ) {
 	const { getEnabledClientIdsTree } = unlock( useSelect( blockEditorStore ) );
 
-	return useRefEffect(
+	return useCallback(
 		( element ) => {
-			if ( ! isEnabled ) {
+			if ( ! element || ! isEnabled ) {
 				return;
 			}
 

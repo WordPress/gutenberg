@@ -4,8 +4,8 @@
 import { focus, isFormElement } from '@wordpress/dom';
 import { TAB } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect, useMergeRefs } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { useCallback, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -108,7 +108,10 @@ export default function useTabNav() {
 		/>
 	);
 
-	const ref = useRefEffect( ( node ) => {
+	const ref = useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		function onKeyDown( event ) {
 			if ( event.defaultPrevented ) {
 				return;

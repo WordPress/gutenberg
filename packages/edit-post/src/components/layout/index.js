@@ -46,7 +46,6 @@ import {
 import {
 	useMediaQuery,
 	useMergeRefs,
-	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
 // eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
@@ -155,7 +154,10 @@ function MetaBoxesMain( { isLegacy } ) {
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
 	// aria-valuenow attribute on the separator.
-	const effectSizeConstraints = useRefEffect( ( node ) => {
+	const effectSizeConstraints = useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		const container = node.closest(
 			'.interface-interface-skeleton__content'
 		);

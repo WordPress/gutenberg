@@ -8,8 +8,8 @@ import clsx from 'clsx';
  */
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,8 +46,11 @@ export function useWritingFlow() {
 			useSelectAll(),
 			useArrowNav(),
 			usePreviewModeNav(),
-			useRefEffect(
+			useCallback(
 				( node ) => {
+					if ( ! node ) {
+						return;
+					}
 					node.tabIndex = 0;
 					node.dataset.hasMultiSelection = hasMultiSelection;
 

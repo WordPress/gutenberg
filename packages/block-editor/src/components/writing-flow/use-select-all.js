@@ -4,7 +4,7 @@
 import { isEntirelySelected } from '@wordpress/dom';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,7 +18,10 @@ export default function useSelectAll() {
 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 
-	return useRefEffect( ( node ) => {
+	return useCallback( ( node ) => {
+		if ( ! node ) {
+			return;
+		}
 		function onKeyDown( event ) {
 			if ( ! isMatch( 'core/block-editor/select-all', event ) ) {
 				return;

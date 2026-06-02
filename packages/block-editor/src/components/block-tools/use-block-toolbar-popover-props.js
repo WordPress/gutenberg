@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { getScrollContainer } from '@wordpress/dom';
 import {
@@ -142,7 +141,10 @@ export default function useBlockToolbarPopoverProps( {
 		)
 	);
 
-	const popoverRef = useRefEffect( ( popoverNode ) => {
+	const popoverRef = useCallback( ( popoverNode ) => {
+		if ( ! popoverNode ) {
+			return;
+		}
 		setToolbarHeight( popoverNode.offsetHeight );
 	}, [] );
 

@@ -5,7 +5,7 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,9 +43,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		editContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
-			if ( ! isSelected ) {
+			if ( ! node || ! isSelected ) {
 				return;
 			}
 

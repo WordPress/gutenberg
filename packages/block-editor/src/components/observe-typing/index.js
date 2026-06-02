@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect, useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
+import { useCallback } from '@wordpress/element';
 import {
 	UP,
 	RIGHT,
@@ -59,9 +60,9 @@ export function useMouseMoveTypingReset() {
 	);
 	const { stopTyping } = useDispatch( blockEditorStore );
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
-			if ( ! isTyping ) {
+			if ( ! node || ! isTyping ) {
 				return;
 			}
 
@@ -122,8 +123,11 @@ export function useTypingObserver() {
 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
 
 	const ref1 = useMouseMoveTypingReset();
-	const ref2 = useRefEffect(
+	const ref2 = useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			// Listeners to stop typing should only be added when typing.
 			// Listeners to start typing should only be added when not typing.
 			if ( isTyping ) {

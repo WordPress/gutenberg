@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,8 +14,11 @@ export default function useClickSelection() {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { isSelectionEnabled, getBlockSelectionStart, hasMultiSelection } =
 		useSelect( blockEditorStore );
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			function onMouseDown( event ) {
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button

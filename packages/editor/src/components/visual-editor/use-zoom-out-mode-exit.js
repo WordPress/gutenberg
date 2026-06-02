@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -17,8 +17,11 @@ export function useZoomOutModeExit() {
 	const { getSettings, isZoomOut } = unlock( useSelect( blockEditorStore ) );
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			function onDoubleClick( event ) {
 				if ( ! isZoomOut() ) {
 					return;

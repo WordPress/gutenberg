@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRegistry } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
@@ -13,8 +13,11 @@ const CSS =
 
 export function usePaddingAppender( enabled ) {
 	const registry = useRegistry();
-	const effect = useRefEffect(
+	const effect = useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			function onMouseDown( event ) {
 				if (
 					event.target !== node &&

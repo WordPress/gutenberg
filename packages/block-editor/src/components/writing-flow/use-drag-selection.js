@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,8 +36,11 @@ export default function useDragSelection() {
 		isDraggingBlocks,
 		isMultiSelecting,
 	} = useSelect( blockEditorStore );
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 

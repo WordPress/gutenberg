@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,8 +43,11 @@ export default function useMultiSelection() {
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 

@@ -1,6 +1,5 @@
 import { focus } from '@wordpress/dom';
-import { useEffect, useRef } from '@wordpress/element';
-import useRefEffect from '../use-ref-effect';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Determines focus behavior when the element mounts.
@@ -49,8 +48,8 @@ export function useFocusOnMount(
 		focusOnMountRef.current = focusOnMount;
 	}, [ focusOnMount ] );
 
-	return useRefEffect< HTMLElement >( ( node ) => {
-		if ( focusOnMountRef.current === false ) {
+	return useCallback( ( node: HTMLElement | null ) => {
+		if ( ! node || focusOnMountRef.current === false ) {
 			return;
 		}
 

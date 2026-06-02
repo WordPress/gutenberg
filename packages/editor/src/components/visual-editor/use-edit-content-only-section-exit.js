@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -22,8 +22,11 @@ export function useEditContentOnlySectionExit() {
 		useDispatch( blockEditorStore )
 	);
 
-	return useRefEffect(
+	return useCallback(
 		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 			function onClick( event ) {
 				const editedContentOnlySection = getEditedContentOnlySection();
 				if ( ! editedContentOnlySection ) {

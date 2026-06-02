@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -30,9 +30,9 @@ export default function useSelectNearestEditableBlock( {
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
 
-	return useRefEffect(
+	return useCallback(
 		( element ) => {
-			if ( ! isEnabled ) {
+			if ( ! element || ! isEnabled ) {
 				return;
 			}
 
