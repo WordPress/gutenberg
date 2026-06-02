@@ -219,19 +219,12 @@ jobs:
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
-            - name: Upload artifact (Gutenberg plugin build)
-              if: ${{ matrix.IS_GUTENBERG_PLUGIN }}
+            - name: Upload artifact
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
+                  name: gutenberg-${{ ! matrix.IS_GUTENBERG_PLUGIN && 'wordpress-develop' || 'plugin' }}
                   path: ./gutenberg.zip
-                  archive: false
-
-            - name: Upload artifact (WordPress develop build)
-              if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-              with:
-                  name: gutenberg-wordpress-develop
-                  path: ./gutenberg.zip
+                  archive: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
             - name: Build release notes draft
               if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
