@@ -20,7 +20,6 @@ import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_MAP_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
 	LOCAL_EDITOR_ORIGIN,
@@ -672,7 +671,7 @@ describe( 'SyncManager', () => {
 			);
 		} );
 
-		it( 'updates persistence and save metadata when the update is associated with a save', async () => {
+		it( 'updates save metadata when the update is associated with a save', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
@@ -696,7 +695,7 @@ describe( 'SyncManager', () => {
 			const now = Date.now();
 
 			manager.update( 'post', '123', changes, 'local-editor', {
-				persistenceEvent: 'userSave',
+				isSave: true,
 			} );
 
 			// Wait a tick for yieldToEventLoop.
@@ -715,53 +714,6 @@ describe( 'SyncManager', () => {
 				now
 			);
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
-			expect( stateMap.get( PERSISTED_AT_KEY ) ).toBeGreaterThanOrEqual(
-				now
-			);
-		} );
-
-		it( 'does not update save metadata for background CRDT snapshots', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
-
-			const manager = createSyncManager();
-
-			await manager.load(
-				mockSyncConfig,
-				'post',
-				'123',
-				mockRecord,
-				mockHandlers
-			);
-
-			jest.clearAllMocks();
-
-			const changes = { title: 'Updated Title' };
-			const now = Date.now();
-
-			manager.update( 'post', '123', changes, 'local-editor', {
-				persistenceEvent: 'backgroundCRDTSnapshot',
-			} );
-
-			// Wait a tick for yieldToEventLoop.
-			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-
-			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
-				expect.any( Y.Doc ),
-				changes
-			);
-
-			const ydoc = capturedDoc as unknown as Y.Doc;
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			expect( stateMap.get( SAVED_AT_KEY ) ).toBeUndefined();
-			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
-			expect( stateMap.get( PERSISTED_AT_KEY ) ).toBeGreaterThanOrEqual(
-				now
-			);
 		} );
 	} );
 
@@ -941,7 +893,7 @@ describe( 'SyncManager', () => {
 			} );
 		} );
 
-		it( 'refetches the entity record when a remote background CRDT snapshot is persisted', async () => {
+		it( 'refetches the entity record when a remote save updates save metadata', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
@@ -965,44 +917,6 @@ describe( 'SyncManager', () => {
 
 			const remoteDoc = new Y.Doc();
 			const stateMap = remoteDoc.getMap( CRDT_STATE_MAP_KEY );
-			stateMap.set( PERSISTED_AT_KEY, Date.now() + 1000 );
-			Y.applyUpdateV2(
-				capturedDoc as unknown as Y.Doc,
-				Y.encodeStateAsUpdateV2( remoteDoc )
-			);
-			remoteDoc.destroy();
-
-			// Wait a tick.
-			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
-
-			expect( mockHandlers.refetchRecord ).toHaveBeenCalledTimes( 1 );
-		} );
-
-		it( 'refetches the entity record once when a remote save updates both persistence and save metadata', async () => {
-			// Capture the Y.Doc from provider creator.
-			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
-			} );
-
-			const manager = createSyncManager();
-
-			await manager.load(
-				mockSyncConfig,
-				'post',
-				'123',
-				mockRecord,
-				mockHandlers
-			);
-
-			mockHandlers.refetchRecord.mockClear();
-
-			expect( capturedDoc ).not.toBeNull();
-
-			const remoteDoc = new Y.Doc();
-			const stateMap = remoteDoc.getMap( CRDT_STATE_MAP_KEY );
-			stateMap.set( PERSISTED_AT_KEY, Date.now() + 1000 );
 			stateMap.set( SAVED_AT_KEY, Date.now() + 1000 );
 			stateMap.set( SAVED_BY_KEY, remoteDoc.clientID );
 			Y.applyUpdateV2(

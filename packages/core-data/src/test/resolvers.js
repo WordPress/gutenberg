@@ -308,13 +308,7 @@ describe( 'getEntityRecord', () => {
 				doc: SERIALIZED_DOC,
 			},
 		} );
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			1,
-			{},
-			'local-undo-ignored',
-			{ persistenceEvent: 'backgroundCRDTSnapshot' }
-		);
+		expect( syncManager.update ).not.toHaveBeenCalled();
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
@@ -376,13 +370,7 @@ describe( 'getEntityRecord', () => {
 				doc: SERIALIZED_DOC,
 			},
 		} );
-		expect( syncManager.update ).toHaveBeenCalledWith(
-			'postType/post',
-			1,
-			{},
-			'local-undo-ignored',
-			{ persistenceEvent: 'backgroundCRDTSnapshot' }
-		);
+		expect( syncManager.update ).not.toHaveBeenCalled();
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 

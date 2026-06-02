@@ -6,7 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { getSyncManager, LOCAL_UNDO_IGNORED_ORIGIN } from '../sync';
+import { getSyncManager } from '../sync';
 
 const SYNC_SAVE_API_PATH = '/wp-sync/v1/save';
 const saveCRDTDocQueues = new Map();
@@ -29,17 +29,6 @@ async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
 			doc: serializedDoc,
 		},
 	} );
-
-	// Tell peers that the server-side CRDT snapshot changed so they can
-	// refetch CRDT meta and all peers can converge on a local _crdt_document
-	// post meta value.
-	getSyncManager()?.update(
-		objectType,
-		objectId,
-		{},
-		LOCAL_UNDO_IGNORED_ORIGIN,
-		{ persistenceEvent: 'backgroundCRDTSnapshot' }
-	);
 }
 
 /**

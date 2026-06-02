@@ -10,7 +10,6 @@ import type { Awareness } from 'y-protocols/awareness';
 import {
 	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_MAP_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
@@ -40,7 +39,6 @@ import {
 	createYjsDoc,
 	deserializeCrdtDoc,
 	initializeYjsDoc,
-	markCRDTDocAsPersisted,
 	markEntityAsSaved,
 	serializeCrdtDoc,
 } from './utils';
@@ -245,15 +243,12 @@ export function createSyncManager( debug = false ): SyncManager {
 
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
-					case PERSISTED_AT_KEY:
-						const persistedAt = stateMap.get( PERSISTED_AT_KEY );
-						if (
-							'number' === typeof persistedAt &&
-							persistedAt > now
-						) {
-							// Another peer persisted a CRDT snapshot. Refetch
-							// the entity so this cache sees the latest
-							// persisted CRDT metadata.
+					case SAVED_AT_KEY:
+						const savedAt = stateMap.get( SAVED_AT_KEY );
+						if ( 'number' === typeof savedAt && savedAt > now ) {
+							// Another peer saved the entity. Refetch the
+							// record so this cache sees server-side save
+							// mutations.
 							log( 'loadEntity', 'refetching record', entityId );
 							void handlers.refetchRecord().catch( () => {} );
 						}
@@ -479,7 +474,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		log( 'unloadEntity', 'unloading', entityId );
 		entityStates.get( entityId )?.unload();
 		updateCRDTDoc( objectType, null, {}, origin, {
-			persistenceEvent: 'userSave',
+			isSave: true,
 		} );
 	}
 
@@ -629,14 +624,13 @@ export function createSyncManager( debug = false ): SyncManager {
 	/**
 	 * Update CRDT document with changes from the local store.
 	 *
-	 * @param {ObjectType}               objectType               Object type.
-	 * @param {ObjectID}                 objectId                 Object ID.
-	 * @param {Partial< ObjectData >}    changes                  Updates to make.
-	 * @param {string}                   origin                   The source of change.
-	 * @param {SyncManagerUpdateOptions} options                  Optional flags for the update.
-	 * @param {string}                   options.persistenceEvent Type of persistence
-	 *                                                            event associated with this update.
-	 * @param {boolean}                  options.isNewUndoLevel   Whether to create a new undo level for this change. Defaults to false.
+	 * @param {ObjectType}               objectType             Object type.
+	 * @param {ObjectID}                 objectId               Object ID.
+	 * @param {Partial< ObjectData >}    changes                Updates to make.
+	 * @param {string}                   origin                 The source of change.
+	 * @param {SyncManagerUpdateOptions} options                Optional flags for the update.
+	 * @param {boolean}                  options.isSave         Whether this update represents a user-facing entity save.
+	 * @param {boolean}                  options.isNewUndoLevel Whether to create a new undo level for this change. Defaults to false.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
@@ -645,10 +639,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		origin: string,
 		options: SyncManagerUpdateOptions = {}
 	): void {
-		const { persistenceEvent, isNewUndoLevel = false } = options;
-		const isUserSave = 'userSave' === persistenceEvent;
-		const isBackgroundCRDTSnapshot =
-			'backgroundCRDTSnapshot' === persistenceEvent;
+		const { isSave = false, isNewUndoLevel = false } = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 		const collectionState = collectionStates.get( objectType );
@@ -671,17 +662,13 @@ export function createSyncManager( debug = false ): SyncManager {
 				} );
 				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 
-				if ( isUserSave || isBackgroundCRDTSnapshot ) {
-					markCRDTDocAsPersisted( ydoc );
-				}
-
-				if ( isUserSave ) {
+				if ( isSave ) {
 					markEntityAsSaved( ydoc );
 				}
 			}, origin );
 		}
 
-		if ( collectionState && isUserSave ) {
+		if ( collectionState && isSave ) {
 			collectionState.ydoc.transact( () => {
 				markEntityAsSaved( collectionState.ydoc );
 			}, origin );

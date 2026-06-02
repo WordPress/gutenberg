@@ -11,7 +11,6 @@ import { describe, expect, it, beforeEach } from '@jest/globals';
 import {
 	createYjsDoc,
 	initializeYjsDoc,
-	markCRDTDocAsPersisted,
 	markEntityAsSaved,
 	serializeCrdtDoc,
 	deserializeCrdtDoc,
@@ -20,7 +19,6 @@ import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
 	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_MAP_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
 	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
@@ -125,23 +123,6 @@ describe( 'utils', () => {
 			const secondSavedAt = stateMap.get( SAVED_AT_KEY ) as number;
 
 			expect( secondSavedAt ).toBeGreaterThanOrEqual( firstSavedAt );
-		} );
-	} );
-
-	describe( 'markCRDTDocAsPersisted', () => {
-		it( 'sets the persisted-at timestamp without save metadata', () => {
-			const ydoc = createYjsDoc();
-			const before = Date.now();
-
-			markCRDTDocAsPersisted( ydoc );
-
-			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
-			const persistedAt = stateMap.get( PERSISTED_AT_KEY ) as number;
-
-			expect( persistedAt ).toBeGreaterThanOrEqual( before );
-			expect( persistedAt ).toBeLessThanOrEqual( Date.now() );
-			expect( stateMap.get( SAVED_AT_KEY ) ).toBeUndefined();
-			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 	} );
 

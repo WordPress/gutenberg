@@ -11,7 +11,6 @@ import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
 	CRDT_STATE_MAP_KEY,
-	CRDT_STATE_MAP_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
 	CRDT_STATE_MAP_VERSION_KEY as VERSION_KEY,
@@ -62,17 +61,6 @@ export function markEntityAsSaved( ydoc: CRDTDoc ): void {
 	const recordMeta = ydoc.getMap( CRDT_STATE_MAP_KEY );
 	recordMeta.set( SAVED_AT_KEY, Date.now() );
 	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
-}
-
-/**
- * Record that the CRDT document snapshot was persisted. This marker lets peers
- * refetch CRDT meta without treating the snapshot as a user-facing entity save.
- *
- * @param {CRDTDoc} ydoc CRDT document.
- */
-export function markCRDTDocAsPersisted( ydoc: CRDTDoc ): void {
-	const recordMeta = ydoc.getMap( CRDT_STATE_MAP_KEY );
-	recordMeta.set( PERSISTED_AT_KEY, Date.now() );
 }
 
 function pseudoRandomID(): number {
