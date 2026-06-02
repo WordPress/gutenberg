@@ -152,21 +152,25 @@
 			}
 		},
 		"size": {
-			"4xs": {
+			"5xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
 				"$description": "Notification indicators"
 			},
-			"3xs": {
+			"4xs": {
 				"$value": "{wpds-dimension.primitive.space.20}",
 				"$description": "Visual size for small interactive elements like resize handles"
 			},
-			"2xs": {
+			"3xs": {
 				"$value": "{wpds-dimension.primitive.space.30}",
 				"$description": "Small markers"
 			},
-			"xs": {
+			"2xs": {
 				"$value": "{wpds-dimension.primitive.space.40}",
 				"$description": "For small controls like checkboxes and radios, or small decorative icons"
+			},
+			"xs": {
+				"$value": "{wpds-dimension.primitive.space.50}",
+				"$description": "For medium sized icons"
 			},
 			"sm": {
 				"$value": "{wpds-dimension.primitive.space.60}",
