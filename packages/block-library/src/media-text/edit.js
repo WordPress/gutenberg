@@ -50,7 +50,7 @@ import {
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { ResolutionTool, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>
@@ -210,12 +210,17 @@ function MediaTextEdit( {
 		mediaWidth,
 		mediaSizeSlug,
 		rel,
+		style: blockStyle,
 		verticalAlignment,
 		allowedBlocks,
 		useFeaturedImage,
 	} = attributes;
 
 	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
+
+	// The aspect ratio and "Crop image to fill" are mutually exclusive: a set
+	// aspect ratio takes precedence and the fill styles are ignored for it.
+	const hasAspectRatio = !! dimensionsProps.className;
 
 	const [ featuredImage ] = useEntityProp(
 		'postType',
@@ -316,7 +321,7 @@ function MediaTextEdit( {
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill-element': imageFill,
+		'is-image-fill-element': imageFill && ! hasAspectRatio,
 	} );
 	const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 	const gridTemplateColumns =
@@ -406,11 +411,25 @@ function MediaTextEdit( {
 					<ToggleControl
 						label={ __( 'Crop image to fill' ) }
 						checked={ !! imageFill }
-						onChange={ () =>
+						onChange={ () => {
+							const newImageFill = ! imageFill;
+							// Enabling fill clears any aspect ratio, as the two
+							// settings are mutually exclusive.
+							const newStyle = cleanEmptyObject( {
+								...blockStyle,
+								dimensions: {
+									...blockStyle?.dimensions,
+									aspectRatio: undefined,
+								},
+							} );
 							setAttributes( {
-								imageFill: ! imageFill,
-							} )
-						}
+								imageFill: newImageFill,
+								...( newImageFill &&
+									hasAspectRatio && {
+										style: newStyle,
+									} ),
+							} );
+						} }
 					/>
 				</ToolsPanelItem>
 			) }

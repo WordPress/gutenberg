@@ -150,17 +150,20 @@ function MediaContainer( props, ref ) {
 			left: enableResize && mediaPosition === 'right',
 		};
 
+		// A set aspect ratio and "Crop image to fill" are mutually exclusive;
+		// the aspect ratio takes precedence and the fill styles are ignored.
+		const hasAspectRatio = !! dimensionsProps.className;
 		const imageFillStyle =
-			mediaType === 'image' && imageFill
+			mediaType === 'image' && imageFill && ! hasAspectRatio
 				? imageFillStyles( mediaUrl || featuredImageURL, focalPoint )
 				: {};
 
-		// When the image is set to fill, the `aspectRatio` dimensions support is
-		// ignored in favor of the focal point driven fill styles.
-		const mediaClassName = ! imageFill
+		const mediaClassName = hasAspectRatio
 			? dimensionsProps.className
 			: undefined;
-		const mediaStyles = imageFill ? imageFillStyle : dimensionsProps.style;
+		const mediaStyles = hasAspectRatio
+			? dimensionsProps.style
+			: imageFillStyle;
 
 		const mediaTypeRenderers = {
 			image: () =>
