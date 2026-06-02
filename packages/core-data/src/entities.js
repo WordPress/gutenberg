@@ -306,7 +306,10 @@ export const prePersistPostType = async (
 		}
 	}
 
-	// Add meta for persisted CRDT document.
+	// Add meta for the persisted CRDT document during real post saves so the
+	// saved post and CRDT snapshot are committed in the same request. We don't
+	// want a post save to fail but a CRDT update to succeed or vice versa.
+	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
