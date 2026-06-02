@@ -188,7 +188,15 @@ function MediaContainer( props, ref ) {
 						/>
 					)
 				),
-			video: () => <video controls ref={ refMedia } src={ mediaUrl } />,
+			video: () => (
+				<video
+					controls
+					ref={ refMedia }
+					src={ mediaUrl }
+					className={ dimensionsProps.className }
+					style={ dimensionsProps.style }
+				/>
+			),
 		};
 
 		return (

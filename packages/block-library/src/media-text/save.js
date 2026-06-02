@@ -85,7 +85,14 @@ export default function save( { attributes } ) {
 
 	const mediaTypeRenders = {
 		image: () => image,
-		video: () => <video controls src={ mediaUrl } />,
+		video: () => (
+			<video
+				controls
+				src={ mediaUrl }
+				className={ dimensionsProps.className }
+				style={ dimensionsProps.style }
+			/>
+		),
 	};
 	const className = clsx( {
 		'has-media-on-the-right': 'right' === mediaPosition,

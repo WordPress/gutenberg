@@ -16,10 +16,6 @@
 	}
 }
 
-.wp-block-media-text__media img.has-aspect-ratio {
-	object-fit: cover;
-}
-
 .wp-block-media-text.is-vertically-aligned-top {
 	> .wp-block-media-text__content,
 	> .wp-block-media-text__media {
@@ -74,16 +70,23 @@
 	/*rtl:end:ignore*/
 }
 
-.wp-block-media-text__media a {
-	display: block;
-}
+.wp-block-media-text__media {
+	a {
+		display: block;
+	}
 
-.wp-block-media-text__media img,
-.wp-block-media-text__media video {
-	height: auto;
-	max-width: unset;
-	width: 100%;
-	vertical-align: middle;
+	img,
+	video {
+		height: auto;
+		max-width: unset;
+		width: 100%;
+		vertical-align: middle;
+	}
+
+	img.has-aspect-ratio,
+	video.has-aspect-ratio {
+		object-fit: cover;
+	}
 }
 
 /* `is-image-fill` is deprecated and the styles are kept for backwards compatibility. */
