@@ -1787,6 +1787,12 @@ async function buildRoutes( activePageIds = new Set() ) {
 
 	const allRoutes = getAllRoutes( ROOT_DIR );
 
+	if ( activePageIds.size === 0 ) {
+		console.log(
+			'   No active pages specified; building all routes, including experimental and non-stable ones.\n'
+		);
+	}
+
 	// With no active pages specified, build every route. Otherwise, skip routes
 	// whose pages are all inactive.
 	const routes =
