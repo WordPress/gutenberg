@@ -438,12 +438,11 @@ function blockLink( blockName ) {
 		return `\`${ blockName }\``;
 	}
 
-	const blockJson = readBlockJson( slug );
 	if ( isDeprecated( slug ) ) {
 		return `\`${ blockName }\``;
 	}
 
-	const { category = 'uncategorized' } = blockJson;
+	const { category = 'uncategorized' } = readBlockJson( slug );
 	const url = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ slug }/`;
 	return `[\`${ blockName }\`](${ url })`;
 }
