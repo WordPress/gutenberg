@@ -307,6 +307,50 @@
 		z-index: 2000001;
 	}
 
+	.wp-lightbox-exif {
+		position: absolute;
+		z-index: 3000001;
+		left: 50%;
+		bottom: calc(env(safe-area-inset-bottom) + 24px);
+		transform: translateX(-50%);
+		box-sizing: border-box;
+		max-width: min(90vw, 720px);
+		font-size: 13px;
+		line-height: 1.4;
+		text-align: center;
+		cursor: default;
+		pointer-events: none;
+
+		&[hidden] {
+			display: none;
+		}
+
+		dl {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 8px 16px;
+			margin: 0;
+		}
+
+		div {
+			display: flex;
+			gap: 4px;
+		}
+
+		div[hidden] {
+			display: none;
+		}
+
+		dt {
+			font-weight: 600;
+		}
+
+		dd {
+			margin: 0;
+		}
+	}
+
 	.wp-block-image {
 		position: relative;
 		transform-origin: 0 0;

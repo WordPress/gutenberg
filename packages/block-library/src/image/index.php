@@ -167,6 +167,98 @@ function block_core_image_get_lightbox_settings( $block ) {
 }
 
 /**
+ * Formats the shutter speed value for display.
+ *
+ * @since 6.9.0
+ *
+ * @param string|int|float $speed Shutter speed value.
+ *
+ * @return string Formatted shutter speed value.
+ */
+function block_core_image_format_lightbox_exif_shutter_speed( $speed ) {
+	if ( is_string( $speed ) && str_contains( $speed, '/' ) ) {
+		$parts = array_map( 'trim', explode( '/', $speed, 2 ) );
+		if (
+			2 === count( $parts ) &&
+			is_numeric( $parts[0] ) &&
+			is_numeric( $parts[1] ) &&
+			(float) $parts[1] > 0
+		) {
+			$speed = (float) $parts[0] / (float) $parts[1];
+		}
+	}
+
+	if ( ! is_numeric( $speed ) ) {
+		return '';
+	}
+
+	$speed = (float) $speed;
+	if ( $speed <= 0 ) {
+		return '';
+	}
+
+	if ( $speed >= 1 ) {
+		$rounded  = round( $speed, 1 );
+		$decimals = floor( $rounded ) === $rounded ? 0 : 1;
+		return number_format_i18n( $rounded, $decimals ) . 's';
+	}
+
+	return '1/' . (string) round( 1 / $speed ) . 's';
+}
+
+/**
+ * Returns formatted EXIF data for display in the lightbox.
+ *
+ * @since 6.9.0
+ *
+ * @param int $attachment_id Attachment ID.
+ *
+ * @return array Formatted EXIF data.
+ */
+function block_core_image_get_lightbox_exif_data( $attachment_id ) {
+	$metadata = wp_get_attachment_metadata( $attachment_id );
+	if ( empty( $metadata['image_meta'] ) || ! is_array( $metadata['image_meta'] ) ) {
+		return array();
+	}
+
+	$image_meta = $metadata['image_meta'];
+	$exif       = array();
+
+	if ( ! empty( $image_meta['camera'] ) && is_scalar( $image_meta['camera'] ) ) {
+		$exif['camera'] = trim( wp_strip_all_tags( (string) $image_meta['camera'] ) );
+	}
+
+	if (
+		! empty( $image_meta['aperture'] ) &&
+		is_numeric( $image_meta['aperture'] ) &&
+		(float) $image_meta['aperture'] > 0
+	) {
+		$exif['aperture'] = 'f/' . (string) (float) $image_meta['aperture'];
+	}
+
+	if ( ! empty( $image_meta['shutter_speed'] ) ) {
+		$shutter_speed = block_core_image_format_lightbox_exif_shutter_speed( $image_meta['shutter_speed'] );
+		if ( $shutter_speed ) {
+			$exif['shutterSpeed'] = $shutter_speed;
+		}
+	}
+
+	if (
+		! empty( $image_meta['focal_length'] ) &&
+		is_numeric( $image_meta['focal_length'] ) &&
+		(float) $image_meta['focal_length'] > 0
+	) {
+		$exif['focalLength'] = (string) (float) $image_meta['focal_length'] . 'mm';
+	}
+
+	if ( ! empty( $image_meta['copyright'] ) && is_scalar( $image_meta['copyright'] ) ) {
+		$exif['copyright'] = trim( wp_strip_all_tags( (string) $image_meta['copyright'] ) );
+	}
+
+	return array_filter( $exif, 'strlen' );
+}
+
+/**
  * Adds the directives and layout needed for the lightbox behavior.
  *
  * @since 6.4.0
@@ -199,6 +291,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$img_width        = 'none';
 	$img_height       = 'none';
 	$img_srcset       = false;
+	$img_exif         = array();
 
 	wp_interactivity_config(
 		'core/image',
@@ -223,6 +316,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		$img_srcset       = wp_get_attachment_image_srcset( $block['attrs']['id'], $srcset_size );
 		$img_width        = $img_metadata['width'] ?? 'none';
 		$img_height       = $img_metadata['height'] ?? 'none';
+		$img_exif         = block_core_image_get_lightbox_exif_data( $block['attrs']['id'] );
 	}
 
 	// Figure.
@@ -247,6 +341,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 					'targetHeight'           => $img_height,
 					'scaleAttr'              => $block['attrs']['scale'] ?? false,
 					'alt'                    => $alt,
+					'exif'                   => $img_exif,
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
@@ -325,6 +420,11 @@ function block_core_image_print_lightbox_overlay() {
 	$close_button_text = esc_attr__( 'Close' );
 	$prev_button_text  = esc_attr_x( 'Previous', 'previous image in lightbox' );
 	$next_button_text  = esc_attr_x( 'Next', 'next image in lightbox' );
+	$camera_label      = esc_html__( 'Camera' );
+	$aperture_label    = esc_html__( 'Aperture' );
+	$shutter_label     = esc_html__( 'Shutter Speed' );
+	$focal_label       = esc_html__( 'Focal Length' );
+	$copyright_label   = esc_html__( 'Copyright' );
 	$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 	$prev_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
 	$next_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
@@ -394,6 +494,30 @@ function block_core_image_print_lightbox_overlay() {
 							sizes="100vw"
 						>
 					</figure>
+				</div>
+				<div class="wp-lightbox-exif" style="color:{$close_button_color}" data-wp-bind--hidden="!state.hasExif" hidden>
+					<dl>
+						<div data-wp-bind--hidden="!state.exifCamera" hidden>
+							<dt>{$camera_label}</dt>
+							<dd data-wp-text="state.exifCamera"></dd>
+						</div>
+						<div data-wp-bind--hidden="!state.exifAperture" hidden>
+							<dt>{$aperture_label}</dt>
+							<dd data-wp-text="state.exifAperture"></dd>
+						</div>
+						<div data-wp-bind--hidden="!state.exifShutterSpeed" hidden>
+							<dt>{$shutter_label}</dt>
+							<dd data-wp-text="state.exifShutterSpeed"></dd>
+						</div>
+						<div data-wp-bind--hidden="!state.exifFocalLength" hidden>
+							<dt>{$focal_label}</dt>
+							<dd data-wp-text="state.exifFocalLength"></dd>
+						</div>
+						<div data-wp-bind--hidden="!state.exifCopyright" hidden>
+							<dt>{$copyright_label}</dt>
+							<dd data-wp-text="state.exifCopyright"></dd>
+						</div>
+					</dl>
 				</div>
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>

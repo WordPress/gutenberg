@@ -164,6 +164,27 @@ const { state, actions, callbacks } = store(
 			get enlargedSrcset() {
 				return getImageSrcset( state.selectedImage );
 			},
+			get selectedImageExif() {
+				return state.selectedImage?.exif || {};
+			},
+			get hasExif() {
+				return Object.values( state.selectedImageExif ).some( Boolean );
+			},
+			get exifCamera() {
+				return state.selectedImageExif.camera;
+			},
+			get exifAperture() {
+				return state.selectedImageExif.aperture;
+			},
+			get exifShutterSpeed() {
+				return state.selectedImageExif.shutterSpeed;
+			},
+			get exifFocalLength() {
+				return state.selectedImageExif.focalLength;
+			},
+			get exifCopyright() {
+				return state.selectedImageExif.copyright;
+			},
 			get figureStyles() {
 				return (
 					state.overlayOpened &&
@@ -548,6 +569,9 @@ const { state, actions, callbacks } = store(
 				if ( 960 < window.innerWidth ) {
 					horizontalPadding = state.hasNavigation ? 320 : 80;
 					verticalPadding = 80;
+				}
+				if ( state.hasExif ) {
+					verticalPadding = Math.max( verticalPadding, 160 );
 				}
 
 				const targetMaxWidth = Math.min(
