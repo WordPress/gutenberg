@@ -218,8 +218,19 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		hasNegativeMargin = true;
 	}
 
+	// Hidden + unselected blocks stay mounted (for lint position measurement
+	// and DOM-order tooling) but should be skipped by keyboard writing flow.
+	// Setting tabIndex -1 makes `getClosestTabbable` in use-arrow-nav.js
+	// filter them out.
+	const isHiddenAndUnselected =
+		isBlockCurrentlyHidden &&
+		! isSelected &&
+		! hasChildSelected &&
+		! isMultiSelected;
+
 	return {
-		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
+		tabIndex:
+			blockEditingMode === 'disabled' || isHiddenAndUnselected ? -1 : 0,
 		draggable: canMove && ! hasChildSelected ? true : undefined,
 		...wrapperProps,
 		...props,
@@ -254,7 +265,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockCurrentlyHidden,
+				'is-block-hidden':
+					isBlockCurrentlyHidden && ! isHiddenAndUnselected,
+				'is-block-hidden-unselected': isHiddenAndUnselected,
 			},
 			className,
 			props.className,

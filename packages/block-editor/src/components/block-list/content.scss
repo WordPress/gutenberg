@@ -122,6 +122,22 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		margin-right: 0 !important;
 	}
 
+	// Hidden + unselected. Kept mounted so the lint interface can peg
+	// notes to the block's natural y-position. Out-of-flow
+	// (`position: absolute`) so adjacent visible blocks lay out as if the
+	// hidden block weren't there — preserving WYSIWYG, including margin
+	// collapsing through the gap. `visibility: hidden` (rather than
+	// `opacity: 0`) so focus-mode / spotlight opacity rules can't
+	// accidentally reveal the block; visibility wins over opacity in the
+	// cascade. `pointer-events: none` belts-and-suspenders against the
+	// (invisible) element intercepting clicks meant for siblings
+	// overlapping it in space.
+	.block-editor-block-list__block.is-block-hidden-unselected {
+		position: absolute;
+		visibility: hidden;
+		pointer-events: none;
+	}
+
 	// Re-enable it on components inside.
 	[class^="components-"] {
 		user-select: text;

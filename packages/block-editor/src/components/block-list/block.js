@@ -905,14 +905,12 @@ function BlockListBlockProvider( props ) {
 		supportsSplitting,
 	};
 
-	if (
-		isBlockCurrentlyHidden &&
-		! isSelected &&
-		! isMultiSelected &&
-		! hasChildSelected
-	) {
-		return null;
-	}
+	// Previously, hidden + unselected blocks were unmounted as a perf
+	// optimization. We now keep them mounted (positioned absolutely with
+	// `is-block-hidden-unselected`) so their DOM coordinates remain
+	// measurable — needed by the linting interface in the Notes tray.
+	// Keyboard writing-flow skips them via `tabIndex: -1` set in
+	// useBlockProps.
 
 	// Here we separate between the props passed to BlockListBlock and any other
 	// information we selected for internal use. BlockListBlock is a filtered
