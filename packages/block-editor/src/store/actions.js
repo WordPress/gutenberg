@@ -88,6 +88,12 @@ export const validateBlocksToTemplate =
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
@@ -1770,9 +1776,9 @@ export const insertBeforeBlock =
 		const rootClientId = select.getBlockRootClientId( clientId );
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
@@ -1809,9 +1815,9 @@ export const insertAfterBlock =
 		const rootClientId = select.getBlockRootClientId( clientId );
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock(

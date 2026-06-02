@@ -20,7 +20,7 @@ import {
 } from '@wordpress/core-data';
 import {
 	BottomSheet,
-	Icon,
+	Icon as WCIcon,
 	Disabled,
 	TextControl,
 } from '@wordpress/components';
@@ -167,7 +167,7 @@ export default function ReusableBlockEdit( {
 				onClose={ closeSheet }
 			>
 				<View style={ styles.infoContainer }>
-					<Icon
+					<WCIcon
 						icon={ help }
 						color={ infoSheetIconStyle.color }
 						size={ styles.infoSheetIcon.size }

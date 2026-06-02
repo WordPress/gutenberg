@@ -54,7 +54,9 @@ function MetaBoxesArea( { location } ) {
 
 	return (
 		<div className={ classes }>
-			{ isSaving && <Spinner /> }
+			{ isSaving && (
+				<Spinner className="edit-post-meta-boxes-area__spinner" />
+			) }
 			<div
 				className="edit-post-meta-boxes-area__container"
 				ref={ container }

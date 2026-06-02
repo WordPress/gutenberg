@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "8.44.0",
+	"version": "8.47.0",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -75,6 +75,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/warning": "file:../warning",
@@ -83,8 +84,8 @@
 		"memize": "^2.1.0"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

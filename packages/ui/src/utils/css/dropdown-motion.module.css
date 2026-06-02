@@ -8,9 +8,9 @@
 @layer wp-ui-utilities {
 	.dropdown-motion {
 		--wp-ui-dropdown-slide-distance: 4px;
-		--wp-ui-dropdown-slide-duration: 200ms;
-		--wp-ui-dropdown-slide-easing: cubic-bezier(0, 0, 0, 1);
-		--wp-ui-dropdown-fade-duration: 80ms;
+		--wp-ui-dropdown-slide-duration: var(--wpds-motion-duration-md);
+		--wp-ui-dropdown-slide-easing: var(--wpds-motion-easing-expressive);
+		--wp-ui-dropdown-fade-duration: var(--wpds-motion-duration-sm);
 		--wp-ui-dropdown-fade-easing: linear;
 
 		@media not ( prefers-reduced-motion ) {

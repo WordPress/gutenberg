@@ -5,7 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalItem as Item,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	ExternalLink,
 	FlexBlock,
 	Button,
@@ -45,17 +45,17 @@ export function ConnectorItem( {
 					{ logo }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<Text
+							<WCText
 								weight={ 600 }
 								size={ 15 }
 								id={ headingId }
 								as="h2"
 							>
 								{ name }
-							</Text>
-							<Text variant="muted" size={ 12 }>
+							</WCText>
+							<WCText variant="muted" size={ 12 }>
 								{ description }
-							</Text>
+							</WCText>
 						</VStack>
 					</FlexBlock>
 					{ actionArea }

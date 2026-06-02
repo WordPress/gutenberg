@@ -4,19 +4,18 @@
 import { _x } from '@wordpress/i18n';
 
 /**
- * Sanitizes a comment string by removing non-printable ASCII characters.
+ * Sanitizes a note string by removing non-printable ASCII characters.
  *
- * @param {string} str - The comment string to sanitize.
- * @return {string} - The sanitized comment string.
+ * @param {string} str - The note string to sanitize.
+ * @return {string} - The sanitized note string.
  */
-export function sanitizeCommentString( str ) {
+export function sanitizeNoteContent( str ) {
 	return str.trim();
 }
 
 const THREAD_ALIGN_OFFSET = -16;
 const THREAD_GAP = 16;
 const OVERLAP_MARGIN = 20;
-const BOARD_BOTTOM_PADDING = 32;
 
 /**
  * Avatar border colors chosen to be visually distinct from each other and from
@@ -24,7 +23,7 @@ const BOARD_BOTTOM_PADDING = 32;
  */
 const AVATAR_BORDER_COLORS = [
 	'#C36EFF', // Purple
-	'#FF51A8', // Pink
+	'#D94145', // Red
 	'#E4780A', // Orange
 	'#FF35EE', // Magenta
 	'#879F11', // Olive
@@ -43,13 +42,13 @@ export function getAvatarBorderColor( userId ) {
 }
 
 /**
- * Generates a comment excerpt from text based on word count type and length.
+ * Generates a note excerpt from text based on word count type and length.
  *
- * @param {string} text          - The comment text to generate excerpt from.
- * @param {number} excerptLength - The maximum length for the commentexcerpt.
- * @return {string} - The generated comment excerpt.
+ * @param {string} text          - The note text to generate excerpt from.
+ * @param {number} excerptLength - The maximum length for the note excerpt.
+ * @return {string} - The generated note excerpt.
  */
-export function getCommentExcerpt( text, excerptLength = 10 ) {
+export function getNoteExcerpt( text, excerptLength = 10 ) {
 	if ( ! text ) {
 		return '';
 	}
@@ -92,22 +91,93 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
- * Calculate y offsets for all floating comment threads. Adjusts positions
- * to prevent overlapping by pushing threads above the selected one upward
- * and threads below it downward.
+ * Normalizes noteId metadata to always return an array of unique numeric ids,
+ * preserving insertion order. Handles both scalar (legacy, possibly
+ * string-typed) and array (new) values.
+ *
+ * @param {Object} metadata Block metadata object
+ * @return {number[]} Array of note IDs (may be empty)
+ */
+export function getNoteIdsFromMetadata( metadata ) {
+	const noteId = metadata?.noteId;
+	const raw = Array.isArray( noteId ) ? noteId : [ noteId ];
+	const ids = new Set();
+	for ( const value of raw ) {
+		const id = Number( value );
+		if ( Number.isFinite( id ) && id > 0 ) {
+			ids.add( id );
+		}
+	}
+	return [ ...ids ];
+}
+
+/**
+ * Adds a note ID to the metadata.
+ * Converts scalar to array if needed, otherwise appends.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to add
+ * @return {Object} Updated metadata object
+ */
+export function addNoteIdToMetadata( metadata, noteId ) {
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	const id = Number( noteId );
+	if ( ids.has( id ) ) {
+		return metadata;
+	}
+	ids.add( id );
+	return { ...metadata, noteId: [ ...ids ] };
+}
+
+/**
+ * Picks the most relevant thread from a list: first unresolved, else first.
+ *
+ * @param {Array} threads Ordered list of thread objects.
+ * @return {Object|null} Selected thread or null when the list is empty.
+ */
+export function pickPrimaryNote( threads ) {
+	return (
+		threads.find( ( thread ) => thread.status === 'hold' ) ??
+		threads[ 0 ] ??
+		null
+	);
+}
+
+/**
+ * Removes a note ID from the metadata.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to remove
+ * @return {Object} Updated metadata object
+ */
+export function removeNoteIdFromMetadata( metadata, noteId ) {
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	ids.delete( Number( noteId ) );
+	return {
+		...metadata,
+		noteId: ids.size > 0 ? [ ...ids ] : undefined,
+	};
+}
+
+/**
+ * Calculate final top positions for all floating note threads in the
+ * editor's content coordinate space. Adjusts positions to prevent overlapping
+ * by pushing threads above the selected one upward and threads below it downward.
  *
  * @param {Object}                  params
  * @param {Array}                   params.threads        Ordered list of thread objects.
  * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
  * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
- * @return {{ offsets: Object<string,number>, minHeight: number }} Computed offsets and minimum editor height.
+ * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
+ * @return {{ positions: Object<string,number> }} Computed top positions.
  */
-export function calculateAllOffsets( {
+export function calculateNotePositions( {
 	threads,
 	selectedNoteId,
 	blockRects,
 	heights,
+	scrollTop = 0,
 } ) {
 	const offsets = {};
 
@@ -119,7 +189,7 @@ export function calculateAllOffsets( {
 	const anchorThread = threads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
-		return { offsets, minHeight: 0 };
+		return { positions: {} };
 	}
 
 	const anchorRect = blockRects[ anchorThread.id ];
@@ -182,42 +252,38 @@ export function calculateAllOffsets( {
 		belowAdjustedTop = threadTop + offset;
 	}
 
-	let editorMinHeight = 0;
-	const lastThread = threads[ threads.length - 1 ];
-	const lastBlockRect = blockRects[ lastThread.id ];
-	if ( lastBlockRect ) {
-		const lastThreadTop = lastBlockRect.top || 0;
-		const lastThreadHeight = heights[ lastThread.id ] || 0;
-		const lastThreadOffset = offsets[ lastThread.id ] || 0;
-		editorMinHeight =
-			lastThreadTop +
-			lastThreadHeight +
-			lastThreadOffset +
-			BOARD_BOTTOM_PADDING;
+	// blockRect.top + scrollTop is the block's absolute y within the editor's
+	// scroll content; CSS translates each thread by -scrollTop at render time.
+	const positions = {};
+	for ( const thread of threads ) {
+		const blockRect = blockRects[ thread.id ];
+		if ( blockRect && offsets[ thread.id ] !== undefined ) {
+			positions[ thread.id ] =
+				blockRect.top + scrollTop + offsets[ thread.id ];
+		}
 	}
 
-	return { offsets, minHeight: editorMinHeight };
+	return { positions };
 }
 
 /**
- * Shift focus to the comment thread associated with a particular comment ID.
- * If an additional selector is provided, the focus will be shifted to the element matching the selector.
+ * Resolve the DOM element for a note thread once it's mounted,
+ * or `null` if not found within 3 seconds.
  *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {string}       commentId          The ID of the comment thread to focus.
- * @param {?HTMLElement} container          The container element to search within.
- * @param {string}       additionalSelector The additional selector to focus on.
+ * @param {string}       noteId             Note thread ID.
+ * @param {?HTMLElement} container          Container to search within.
+ * @param {string}       additionalSelector Optional descendant selector.
+ * @return {Promise<HTMLElement|null>} Resolved element, or `null` on timeout.
  */
-export function focusCommentThread( commentId, container, additionalSelector ) {
+function findNoteThread( noteId, container, additionalSelector ) {
 	if ( ! container ) {
-		return;
+		return Promise.resolve( null );
 	}
 
-	// A thread without a commentId is a new comment thread.
+	// A thread without a noteId is a new note thread.
 	const threadSelector =
-		commentId && commentId !== 'new'
-			? `[role=treeitem][id="comment-thread-${ commentId }"]`
+		noteId && noteId !== 'new'
+			? `[role=treeitem][id="note-thread-${ noteId }"]`
 			: '[role=treeitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`
@@ -238,15 +304,43 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 			}
 		} );
 
-		observer.observe( container, {
-			childList: true,
-			subtree: true,
-		} );
+		observer.observe( container, { childList: true, subtree: true } );
 
 		// Stop trying after 3 seconds.
 		timer = setTimeout( () => {
 			observer.disconnect();
 			resolve( null );
 		}, 3000 );
-	} ).then( ( element ) => element?.focus() );
+	} );
+}
+
+/**
+ * Focus a note thread (or a descendant) and scroll it into view.
+ *
+ * @param {string}       noteId             Note thread ID.
+ * @param {?HTMLElement} container          Container to search within.
+ * @param {string}       additionalSelector Optional descendant selector.
+ */
+export function focusNoteThread( noteId, container, additionalSelector ) {
+	return findNoteThread( noteId, container, additionalSelector ).then(
+		( element ) => {
+			if ( ! element ) {
+				return;
+			}
+			element.focus();
+			element.scrollIntoView( { block: 'nearest' } );
+		}
+	);
+}
+
+/**
+ * Scroll a note thread into view without changing focus.
+ *
+ * @param {string}       noteId    Note thread ID.
+ * @param {?HTMLElement} container Container to search within.
+ */
+export function scrollNoteThreadIntoView( noteId, container ) {
+	return findNoteThread( noteId, container ).then( ( element ) => {
+		element?.scrollIntoView( { block: 'nearest' } );
+	} );
 }

@@ -1,18 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
-import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
+import { useBlockEditingMode } from '../components/block-editing-mode';
 import InspectorControls from '../components/inspector-controls';
 import AdvancedPanel, {
 	validateCSS,
