@@ -12,7 +12,8 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
-	syncUndoManagerChangeReference,
+	syncUndoManagerState,
+	undoManager,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -533,22 +534,44 @@ describe( 'currentUser', () => {
 	} );
 } );
 
-describe( 'syncUndoManagerChangeReference', () => {
-	it( 'returns a new reference when the sync undo manager changes', () => {
-		const originalState = {};
-		const state = syncUndoManagerChangeReference( originalState, {
-			type: 'SYNC_UNDO_MANAGER_CHANGE',
-		} );
-
-		expect( state ).not.toBe( originalState );
-	} );
-
+describe( 'undoManager', () => {
 	it( 'returns the same reference for unrelated actions', () => {
-		const originalState = {};
-		const state = syncUndoManagerChangeReference( originalState, {
+		const originalState = undoManager( undefined, {} );
+		const state = undoManager( originalState, {
 			type: 'UNRELATED',
 		} );
 
 		expect( state ).toBe( originalState );
+	} );
+} );
+
+describe( 'syncUndoManagerState', () => {
+	it( 'stores sync undo manager availability', () => {
+		const state = syncUndoManagerState( undefined, {
+			type: 'SYNC_UNDO_MANAGER_CHANGE',
+			hasRedo: false,
+			hasUndo: true,
+		} );
+
+		expect( state ).toEqual( {
+			hasRedo: false,
+			hasUndo: true,
+		} );
+	} );
+
+	it( 'updates sync undo manager availability', () => {
+		const state = syncUndoManagerState(
+			{ hasRedo: false, hasUndo: true },
+			{
+				type: 'SYNC_UNDO_MANAGER_CHANGE',
+				hasRedo: true,
+				hasUndo: false,
+			}
+		);
+
+		expect( state ).toEqual( {
+			hasRedo: true,
+			hasUndo: false,
+		} );
 	} );
 } );

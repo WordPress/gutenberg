@@ -217,11 +217,11 @@ describe( 'getEntityRecord', () => {
 
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
-		handlers.onUndoStackChange();
+		handlers.onUndoStackChange( { hasRedo: false, hasUndo: true } );
 
 		expect(
 			dispatch.__unstableNotifySyncUndoManagerChange
-		).toHaveBeenCalledTimes( 1 );
+		).toHaveBeenCalledWith( { hasRedo: false, hasUndo: true } );
 	} );
 
 	it( 'persistCRDTDoc fetches edited record and does not save full entity record when the entity does not support meta', async () => {
