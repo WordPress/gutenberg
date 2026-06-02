@@ -446,7 +446,7 @@ function MediaTextEdit( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ imageFill &&
+			{ ( imageFill || hasAspectRatio ) &&
 				( mediaUrl || featuredImageURL ) &&
 				mediaType === 'image' && (
 					<ToolsPanelItem

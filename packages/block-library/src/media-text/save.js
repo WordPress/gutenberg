@@ -51,9 +51,15 @@ export default function save( { attributes } ) {
 		! imageFill && dimensionsProps.className
 	);
 
-	const mediaStyles = imageFill
+	let mediaStyles = imageFill
 		? imageFillStyles( mediaUrl, focalPoint )
 		: dimensionsProps.style;
+	if ( ! imageFill && dimensionsProps.className && focalPoint ) {
+		mediaStyles = {
+			...dimensionsProps.style,
+			...imageFillStyles( mediaUrl, focalPoint ),
+		};
+	}
 
 	let image = mediaUrl ? (
 		<img

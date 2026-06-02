@@ -158,7 +158,14 @@ function MediaContainer( props, ref ) {
 		const mediaClassName = ! imageFill
 			? dimensionsProps.className
 			: undefined;
-		const mediaStyles = imageFill ? imageFillStyle : dimensionsProps.style;
+
+		let mediaStyles = imageFill ? imageFillStyle : dimensionsProps.style;
+		if ( ! imageFill && dimensionsProps.className && focalPoint ) {
+			mediaStyles = {
+				...dimensionsProps.style,
+				...imageFillStyles( mediaUrl || featuredImageURL, focalPoint ),
+			};
+		}
 
 		const mediaTypeRenderers = {
 			image: () =>
