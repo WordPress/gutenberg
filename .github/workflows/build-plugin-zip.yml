@@ -219,12 +219,17 @@ jobs:
                   IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
                   IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
+            # When using archive: false to upload an artifact, the file name is used and the name input is ignored.
+            # This ensures unique artifiact names for `IS_GUTENBERG_PLUGIN` and `IS_WORDPRESS_CORE`.
+            - name: Rename Zip file for wordpress-develop
+              if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+              run: mv gutenberg.zip gutenberg-wordpress-develop.zip
+
             - name: Upload artifact
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: gutenberg-${{ ! matrix.IS_GUTENBERG_PLUGIN && 'wordpress-develop' || 'plugin' }}
-                  path: ./gutenberg.zip
-                  archive: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+                  path: ./gutenberg${{ ! matrix.IS_GUTENBERG_PLUGIN && '-wordpress-develop' || '' }}.zip
+                  archive: false
 
             - name: Build release notes draft
               if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
@@ -274,10 +279,7 @@ jobs:
             - name: Download build artifact
               uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
-                  name: gutenberg-wordpress-develop
-
-            - name: Unzip zip artifact
-              run: unzip gutenberg.zip && rm gutenberg.zip
+                  name: gutenberg-wordpress-develop.zip
 
             # Noting the hash helps keep track of the commit the zip was built from.
             # For pull_request events, github.sha is the ephemeral merge commit; use the PR head SHA instead
