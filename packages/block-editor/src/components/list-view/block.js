@@ -630,6 +630,7 @@ function ListViewBlock( {
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
+							visibilityLabel={ blockVisibilityDescription }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [

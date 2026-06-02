@@ -15,11 +15,6 @@
  * @package gutenberg
  */
 
-// Client-side media processing is currently plugin-only while the feature matures.
-if ( ! defined( 'IS_GUTENBERG_PLUGIN' ) || ! IS_GUTENBERG_PLUGIN ) {
-	return;
-}
-
 if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
@@ -168,7 +163,7 @@ function gutenberg_get_all_image_sizes(): array {
  * @param WP_REST_Response $response Response data.
  */
 function gutenberg_media_processing_filter_rest_index( WP_REST_Response $response ) {
-	/** This filter is documented in wp-admin/includes/images.php */
+	/** This filter is documented in wp-admin/includes/image.php */
 	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 	if ( current_user_can( 'upload_files' ) ) {
@@ -297,6 +292,13 @@ function gutenberg_set_up_cross_origin_isolation() {
 	}
 
 	if ( ! $screen->is_block_editor() && 'site-editor' !== $screen->id && ! ( 'widgets' === $screen->id && wp_use_widgets_block_editor() ) ) {
+		return;
+	}
+
+	// Skip when rendering the classic-theme home route, which shows the site
+	// preview in an iframe and must reach its `contentDocument` to neutralize
+	// interactive elements — DIP would block that.
+	if ( 'site-editor' === $screen->id && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
 		return;
 	}
 

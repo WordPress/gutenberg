@@ -28,6 +28,14 @@ jest.mock( '../../sync', () => ( {
 	getSyncManager: jest.fn(),
 } ) );
 
+const mockPostContentBlocks = [
+	{ clientId: 'block-1', name: 'core/paragraph', innerBlocks: [] },
+];
+
+jest.mock( '../../awareness/block-lookup', () => ( {
+	usePostContentBlocks: jest.fn( () => mockPostContentBlocks ),
+} ) );
+
 const mockAvatarUrls = {
 	'24': 'https://example.com/avatar-24.png',
 	'48': 'https://example.com/avatar-48.png',
@@ -299,7 +307,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			} );
 		} );
 
-		test( 'should call awareness.convertSelectionStateToAbsolute with selection', () => {
+		test( 'should call awareness.convertSelectionStateToAbsolute with selection and blocks', () => {
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
 				cursorPosition: {
@@ -321,7 +329,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 
 			expect(
 				mockAwareness.convertSelectionStateToAbsolute
-			).toHaveBeenCalledWith( mockSelection );
+			).toHaveBeenCalledWith( mockSelection, mockPostContentBlocks );
 			expect( position ).toEqual( {
 				richTextOffset: 10,
 				localClientId: 'block-1',

@@ -211,14 +211,21 @@ export default {
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
-		layout,
+		layout = {},
+		viewportOverrides,
 		style,
 		blockName,
 		hasBlockGapSupport,
 		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const { orientation = 'horizontal' } = layout;
+		const hasViewportOverrides = viewportOverrides !== undefined;
+		const effectiveLayout = hasViewportOverrides
+			? { ...layout, ...viewportOverrides }
+			: layout;
+		const hasViewportOverride = ( key ) =>
+			Object.hasOwn( viewportOverrides || {}, key );
+		const { orientation = 'horizontal' } = effectiveLayout;
 
 		// Determine the fallback gap value using global styles (theme.json),
 		// falling back to '0.5em' for backwards compatibility.
@@ -239,35 +246,57 @@ export default {
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
 				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
-		const justifyContent = justifyContentMap[ layout.justifyContent ];
-		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
-			? layout.flexWrap
+		const hasBlockGapOverride =
+			! hasViewportOverrides ||
+			Object.hasOwn( style?.spacing || {}, 'blockGap' );
+		const justifyContent =
+			justifyContentMap[ effectiveLayout.justifyContent ];
+		const flexWrap = flexWrapOptions.includes( effectiveLayout.flexWrap )
+			? effectiveLayout.flexWrap
 			: 'wrap';
 		const verticalAlignment =
-			verticalAlignmentMap[ layout.verticalAlignment ];
+			verticalAlignmentMap[ effectiveLayout.verticalAlignment ];
 		const alignItems =
-			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
+			alignItemsMap[ effectiveLayout.justifyContent ] ||
+			alignItemsMap.left;
 
 		let output = '';
 		const rules = [];
 
-		if ( flexWrap && flexWrap !== 'wrap' ) {
+		const shouldOutputFlexWrap =
+			! hasViewportOverrides || hasViewportOverride( 'flexWrap' );
+		const shouldOutputFlexOrientation =
+			! hasViewportOverrides || hasViewportOverride( 'orientation' );
+		const shouldOutputFlexJustification =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'justifyContent' ) ||
+			hasViewportOverride( 'orientation' );
+		const shouldOutputFlexAlignment =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'verticalAlignment' ) ||
+			hasViewportOverride( 'orientation' );
+
+		if ( shouldOutputFlexWrap && flexWrap && flexWrap !== 'wrap' ) {
 			rules.push( `flex-wrap: ${ flexWrap }` );
 		}
 
 		if ( orientation === 'horizontal' ) {
-			if ( verticalAlignment ) {
+			if ( shouldOutputFlexAlignment && verticalAlignment ) {
 				rules.push( `align-items: ${ verticalAlignment }` );
 			}
-			if ( justifyContent ) {
+			if ( shouldOutputFlexJustification && justifyContent ) {
 				rules.push( `justify-content: ${ justifyContent }` );
 			}
 		} else {
-			if ( verticalAlignment ) {
+			if ( shouldOutputFlexAlignment && verticalAlignment ) {
 				rules.push( `justify-content: ${ verticalAlignment }` );
 			}
-			rules.push( 'flex-direction: column' );
-			rules.push( `align-items: ${ alignItems }` );
+			if ( shouldOutputFlexOrientation ) {
+				rules.push( 'flex-direction: column' );
+			}
+			if ( shouldOutputFlexJustification ) {
+				rules.push( `align-items: ${ alignItems }` );
+			}
 		}
 
 		if ( rules.length ) {
@@ -277,7 +306,7 @@ export default {
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
-		if ( hasBlockGapSupport && blockGapValue ) {
+		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {
 			output += getBlockGapCSS(
 				selector,
 				layoutDefinitions,

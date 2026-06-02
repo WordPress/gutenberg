@@ -530,6 +530,45 @@ describe( 'block factory', () => {
 			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
 		} );
 
+		it( 'should preserve variation metadata for possible transformations', () => {
+			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							variationName: 'grid',
+							transform: noop,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [
+				block,
+			] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/text-block',
+				variationName: 'grid',
+			} );
+		} );
+
 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
 				apiVersion: 3,
@@ -1257,6 +1296,70 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
+			} );
+		} );
+
+		it( 'should switch the blockType of a block using a variation transform', () => {
+			registerBlockType( 'core/group-block', {
+				...defaultBlockSettings,
+				attributes: {
+					layout: {
+						type: 'object',
+					},
+				},
+			} );
+			registerBlockType( 'core/text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'constrained' },
+								} ),
+						},
+						{
+							type: 'block',
+							blocks: [ 'core/group-block' ],
+							variationName: 'grid',
+							transform: () =>
+								createBlock( 'core/group-block', {
+									layout: { type: 'grid' },
+								} ),
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'text-block',
+			} );
+
+			const block = createBlock( 'core/text-block', {
+				value: 'ribs',
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				block,
+				'core/group-block',
+				'grid'
+			);
+			const defaultTransformedBlocks = switchToBlockType(
+				block,
+				'core/group-block'
+			);
+
+			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'grid' },
+			} );
+			expect( defaultTransformedBlocks[ 0 ].attributes ).toEqual( {
+				layout: { type: 'constrained' },
 			} );
 		} );
 

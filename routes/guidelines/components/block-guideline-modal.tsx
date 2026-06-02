@@ -189,6 +189,7 @@ export default function BlockGuidelineModal( {
 							disabled={ isSaving }
 							accessibleWhenDisabled
 							type="button"
+							__next40pxDefaultSize
 						>
 							{ __( 'Remove' ) }
 						</Button>
@@ -199,6 +200,7 @@ export default function BlockGuidelineModal( {
 						disabled={ ! canSubmit || isSaving }
 						isBusy={ isSaving }
 						accessibleWhenDisabled
+						__next40pxDefaultSize
 					>
 						{ submitButtonLabel }
 					</Button>

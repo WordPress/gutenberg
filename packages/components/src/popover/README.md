@@ -128,7 +128,7 @@ Show the popover fullscreen on mobile viewports.
 
 Specifies whether the popover should flip across its axis if there isn't space for it in the normal placement.
 
-When the using a 'top' placement, the popover will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a `right' placement.
+When using a 'top' placement, the popover will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a 'right' placement.
 
 The popover will retain its alignment of 'start' or 'end' when flipping.
 

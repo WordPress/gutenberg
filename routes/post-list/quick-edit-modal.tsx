@@ -213,7 +213,6 @@ export function QuickEditModal( {
 				<PostCardPanel
 					postType={ postType }
 					postId={ postId }
-					onClose={ closeModal }
 					hideActions
 				/>
 			</div>

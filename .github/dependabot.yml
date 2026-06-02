@@ -9,7 +9,9 @@ updates:
           - '.github/setup-node'
       schedule:
           interval: 'daily'
-      open-pull-requests-limit: 10
+      open-pull-requests-limit: 20
+      cooldown:
+          default-days: 7
       labels:
           - 'GitHub Actions'
           - '[Type] Build Tooling'
@@ -20,5 +22,7 @@ updates:
           - dependency-name: 'ruby/setup-ruby'
       groups:
           github-actions:
-              patterns:
-                  - '*'
+              applies-to: version-updates
+              update-types:
+                  - minor
+                  - patch
