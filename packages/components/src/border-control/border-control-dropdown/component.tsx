@@ -203,17 +203,19 @@ const BorderControlDropdown = (
 	const renderContent = () => (
 		<DropdownContentWrapper paddingSize="medium">
 			<VStack className={ popoverControlsClassName } spacing={ 6 }>
-				<ColorPalette
-					className={ popoverContentClassName }
-					value={ color }
-					onChange={ onColorChange }
-					{ ...{ colors, disableCustomColors } }
-					__experimentalIsRenderedInSidebar={
-						__experimentalIsRenderedInSidebar
-					}
-					clearable={ false }
-					enableAlpha={ enableAlpha }
-				/>
+				{ ( colors.length > 0 || ! disableCustomColors ) && (
+					<ColorPalette
+						className={ popoverContentClassName }
+						value={ color }
+						onChange={ onColorChange }
+						{ ...{ colors, disableCustomColors } }
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						clearable={ false }
+						enableAlpha={ enableAlpha }
+					/>
+				) }
 				{ enableStyle && isStyleSettable && (
 					<BorderControlStylePicker
 						label={ __( 'Style' ) }
