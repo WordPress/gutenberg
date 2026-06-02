@@ -7,7 +7,6 @@
 
 require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
 require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
-require_once __DIR__ . '/navigation-link/shared/build-css-font-sizes.php';
 
 /**
  * Returns the submenu visibility value with backward compatibility

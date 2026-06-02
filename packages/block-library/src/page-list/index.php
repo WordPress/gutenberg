@@ -5,8 +5,6 @@
  * @package WordPress
  */
 
-require_once __DIR__ . '/navigation-link/shared/build-css-font-sizes.php';
-
 /**
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
