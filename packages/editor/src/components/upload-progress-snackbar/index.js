@@ -7,7 +7,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
-import { Icon, Spinner } from '@wordpress/components';
+import { Icon as WCIcon, Spinner } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
 /**
@@ -31,7 +31,7 @@ const UPLOAD_SPINNER = (
 
 const UPLOAD_DONE = (
 	<span className="editor-upload-progress-snackbar__check" aria-hidden="true">
-		<Icon icon={ check } />
+		<WCIcon icon={ check } />
 	</span>
 );
 
@@ -101,10 +101,12 @@ export default function UploadProgressSnackbar() {
 			speak( __( 'Media upload started' ), 'polite' );
 			// A new batch started during the completion display: cancel the
 			// pending dismissal so the snackbar transitions straight back
-			// into the uploading state.
+			// into the uploading state, and reset the peak so the new batch
+			// counts from `1 of N` rather than resuming the previous total.
 			if ( completionTimeoutRef.current ) {
 				clearTimeout( completionTimeoutRef.current );
 				completionTimeoutRef.current = null;
+				setPeak( 0 );
 			}
 		} else if ( ! isUploading && wasUploadingRef.current ) {
 			speak( __( 'Media upload complete' ), 'polite' );
