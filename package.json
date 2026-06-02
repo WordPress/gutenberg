@@ -33,16 +33,13 @@
 				"stable": true
 			},
 			{
-				"id": "guidelines",
-				"stable": true
-			},
-			{
 				"id": "site-editor-v2",
 				"init": [
 					"@wordpress/edit-site-init"
 				]
 			},
 			"media-editor",
+			"guidelines",
 			"experiments",
 			"content-types",
 			"dashboard"
