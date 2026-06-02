@@ -23,6 +23,9 @@
 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
 		--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
 		--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
+		/* Icons are rendered as 24px but need to occupy a 16px footprint */
+		/* TODO: replace hardcoded values with DS size tokens once available */
+		--wp-ui-button-icon-margin: calc((16px - 24px) / 2);
 
 		/* by default, borders have the same color as the background */
 		--wp-ui-button-border-color: var(--wp-ui-button-background-color);
@@ -140,6 +143,10 @@
 		--wp-ui-button-padding-block: 0;
 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
 		--wp-ui-button-height: 24px;
+	}
+
+	.icon {
+		margin: var(--wp-ui-button-icon-margin);
 	}
 
 	/* Variants (`tone` + `variant`) overrides compared to default styles */

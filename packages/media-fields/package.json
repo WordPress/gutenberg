@@ -60,6 +60,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"clsx": "2.1.1"
 	},

@@ -36,10 +36,10 @@ const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
  *
  * Returns the persisted settings, a setter that writes through to the
  * preferences store, and a reset action that applies the bundled
- * defaults. The preference is shared across dashboard surfaces today;
- * if a per-dashboard split is needed later, the signature can grow a
- * surface-identifying parameter without touching call sites that pass
- * the dashboard's name through.
+ * defaults. The preference is shared across dashboards today; if a
+ * per-dashboard split is needed later, the signature can grow a
+ * dashboard-identifying parameter without touching call sites that
+ * pass the dashboard's name through.
  *
  * @return Tuple `[ settings, setSettings, resetSettings ]`.
  */
