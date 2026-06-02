@@ -30,6 +30,9 @@ async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
 		},
 	} );
 
+	// Tell peers that the server-side CRDT snapshot changed so they can
+	// refetch CRDT meta and all peers can converge on a local _crdt_document
+	// post meta value.
 	getSyncManager()?.update(
 		objectType,
 		objectId,

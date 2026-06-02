@@ -10,6 +10,7 @@ import type { Awareness } from 'y-protocols/awareness';
 import {
 	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_MAP_PERSISTED_AT_KEY as PERSISTED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
@@ -39,6 +40,7 @@ import {
 	createYjsDoc,
 	deserializeCrdtDoc,
 	initializeYjsDoc,
+	markCRDTDocAsPersisted,
 	markEntityAsSaved,
 	serializeCrdtDoc,
 } from './utils';
@@ -243,12 +245,15 @@ export function createSyncManager( debug = false ): SyncManager {
 
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
-					case SAVED_AT_KEY:
-						const newValue = stateMap.get( SAVED_AT_KEY );
-						if ( 'number' === typeof newValue && newValue > now ) {
-							// Another peer has performed a user-facing save.
-							// Refetch it so that we have a correct understanding
-							// of our own unsaved edits.
+					case PERSISTED_AT_KEY:
+						const persistedAt = stateMap.get( PERSISTED_AT_KEY );
+						if (
+							'number' === typeof persistedAt &&
+							persistedAt > now
+						) {
+							// Another peer persisted a CRDT snapshot. Refetch
+							// the entity so this cache sees the latest
+							// persisted CRDT metadata.
 							log( 'loadEntity', 'refetching record', entityId );
 							void handlers.refetchRecord().catch( () => {} );
 						}
@@ -642,6 +647,8 @@ export function createSyncManager( debug = false ): SyncManager {
 	): void {
 		const { persistenceEvent, isNewUndoLevel = false } = options;
 		const isUserSave = 'userSave' === persistenceEvent;
+		const isBackgroundCRDTSnapshot =
+			'backgroundCRDTSnapshot' === persistenceEvent;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 		const collectionState = collectionStates.get( objectType );
@@ -663,6 +670,10 @@ export function createSyncManager( debug = false ): SyncManager {
 					changedKeys: Object.keys( changes ),
 				} );
 				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+
+				if ( isUserSave || isBackgroundCRDTSnapshot ) {
+					markCRDTDocAsPersisted( ydoc );
+				}
 
 				if ( isUserSave ) {
 					markEntityAsSaved( ydoc );

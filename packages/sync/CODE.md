@@ -24,7 +24,7 @@ Each synced entity gets its own `Y.Doc` with two root-level `Y.Map` entries:
 | Key        | Constant              | Purpose                                                                                                                                                                                |
 | ---------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `document` | `CRDT_RECORD_MAP_KEY` | Holds the entity record data (the synced properties).                                                                                                                                  |
-| `state`    | `CRDT_STATE_MAP_KEY`  | Metadata about the CRDT document and the entity: a schema version number (`version`), the timestamp of the last user-facing entity save (`savedAt`), and the client ID of the peer who performed that save (`savedBy`). Background CRDT snapshots do not update these keys. |
+| `state`    | `CRDT_STATE_MAP_KEY`  | Metadata about the CRDT document and the entity: a schema version number (`version`), the last CRDT snapshot persistence (`persistedAt`), and the last user-facing entity save (`savedAt`/`savedBy`). Peers refetch records on `persistedAt`; collaborator save notifications use `savedAt`/`savedBy`. |
 
 These constants are defined in `src/config.ts`.
 

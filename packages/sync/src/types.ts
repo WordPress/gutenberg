@@ -119,8 +119,8 @@ export interface CollectionHandlers {
 }
 
 // `userSave` represents a user-facing entity save. `backgroundCRDTSnapshot`
-// is a durable CRDT checkpoint and must not trigger save notifications or
-// remote entity refetches.
+// is a durable CRDT checkpoint. It lets peers refetch persisted CRDT metadata
+// without triggering save notifications.
 export type SyncPersistenceEvent = 'userSave' | 'backgroundCRDTSnapshot';
 
 export interface SyncManagerUpdateOptions {

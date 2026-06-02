@@ -44,7 +44,7 @@ describe( 'saveCRDTDoc', () => {
 		getSyncManager.mockReturnValue( syncManager );
 	} );
 
-	it( 'notifies the sync manager of a background CRDT snapshot after the sync save endpoint succeeds', async () => {
+	it( 'notifies the sync manager after the background CRDT snapshot succeeds', async () => {
 		const fetch = createDeferred();
 		syncManager.createPersistedCRDTDoc.mockResolvedValue( 'doc' );
 		apiFetch.mockImplementation( () => fetch.promise );
@@ -58,6 +58,14 @@ describe( 'saveCRDTDoc', () => {
 		fetch.resolve( {} );
 		await save;
 
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp-sync/v1/save',
+			method: 'POST',
+			data: {
+				room: 'postType/post:1',
+				doc: 'doc',
+			},
+		} );
 		expect( syncManager.update ).toHaveBeenCalledWith(
 			'postType/post',
 			1,
