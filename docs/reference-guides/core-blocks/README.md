@@ -174,7 +174,7 @@ Display content in multiple columns, with blocks added to each column.
 
 This block is deprecated. Please use the Avatar block instead.
 
--	**Name:** [core/comment-author-avatar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-avatar/)
+-	**Name:** `core/comment-author-avatar`
 -	**Experimental:** fse
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Ancestor:** core/comment-template
@@ -654,7 +654,7 @@ Playlist track.
 
 This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead.
 
--	**Name:** [core/post-author](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author/)
+-	**Name:** `core/post-author`
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Supports:** anchor, color (background, gradients, link, text), filter (duotone), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
 -	**Attributes:** avatarSize, byline, isLink, linkTarget, showAvatar, showBio, textAlign
@@ -680,7 +680,7 @@ The author name.
 
 This block is deprecated. Please use the Comments block instead.
 
--	**Name:** [core/post-comment](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comment/)
+-	**Name:** `core/post-comment`
 -	**Experimental:** fse
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Allowed Blocks:** core/avatar, core/comment-author-name, core/comment-content, core/comment-date, core/comment-edit-link, core/comment-reply-link
@@ -1137,7 +1137,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 
 This block is deprecated. Please use the Columns block instead.
 
--	**Name:** [core/text-columns](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-text-columns/)
+-	**Name:** `core/text-columns`
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Supports:** interactivity (clientNavigation), ~~inserter~~
 -	**Attributes:** columns, content, width

@@ -141,6 +141,7 @@ function readBlockJSON( filename ) {
 	const {
 		name,
 		category,
+		description,
 		supports,
 		attributes,
 		parent,
@@ -149,8 +150,12 @@ function readBlockJSON( filename ) {
 		allowedBlocks,
 	} = blockjson;
 	const blockdir = path.basename( path.dirname( filename ) );
+	const deprecated = description?.startsWith( 'This block is deprecated.' );
 	const blockDetailUrl = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ blockdir }/`;
-	const blockInfoList = [ `-	**Name:** [${ name }](${ blockDetailUrl })` ];
+	const nameEntry = deprecated
+		? `-	**Name:** \`${ name }\``
+		: `-	**Name:** [${ name }](${ blockDetailUrl })`;
+	const blockInfoList = [ nameEntry ];
 
 	if ( __experimental ) {
 		blockInfoList.push( `-	**Experimental:** ${ __experimental }` );
