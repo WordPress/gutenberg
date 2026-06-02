@@ -89,6 +89,16 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"linkSeparator": {
+			"type": "string",
+			"enum": [ "none", "pipe", "slash", "dash", "bullet", "cross" ],
+			"default": "none"
+		},
+		"linkSeparatorVisibility": {
+			"type": "string",
+			"enum": [ "desktop", "desktop-tablet", "all" ],
+			"default": "desktop"
 		}
 	},
 	"providesContext": {

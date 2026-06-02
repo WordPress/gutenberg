@@ -611,13 +611,15 @@ class WP_Navigation_Block_Renderer {
 		// Manually add block support text decoration as CSS class.
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
 		$text_decoration_class = sprintf( 'has-text-decoration-%s', $text_decoration );
+		$separators            = block_core_navigation_build_css_separators( $attributes );
 
 		$classes = array_merge(
 			$colors['css_classes'],
 			$font_sizes['css_classes'],
 			$is_responsive_menu ? array( 'is-responsive' ) : array(),
 			$layout_class ? array( $layout_class ) : array(),
-			$text_decoration ? array( $text_decoration_class ) : array()
+			$text_decoration ? array( $text_decoration_class ) : array(),
+			$separators['css_classes'],
 		);
 		return implode( ' ', $classes );
 	}
@@ -633,8 +635,9 @@ class WP_Navigation_Block_Renderer {
 	private static function get_styles( $attributes ) {
 		$colors       = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes   = block_core_navigation_build_css_font_sizes( $attributes );
+		$separators   = block_core_navigation_build_css_separators( $attributes );
 		$block_styles = $attributes['styles'] ?? '';
-		return $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'];
+		return $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'] . $separators['inline_styles'];
 	}
 
 	/**
@@ -1818,4 +1821,87 @@ function block_core_navigation_get_most_recently_published_navigation() {
 	}
 
 	return null;
+}
+
+/**
+ * Retrieves the block gap CSS variable value from navigation block attributes.
+ *
+ * Processes the block gap spacing attribute and converts preset references
+ * into CSS custom property syntax.
+ *
+ * @since 23.0.0
+ *
+ * @param array $attributes Navigation block attributes.
+ * @return str Block gap preset css variable.
+ */
+function block_core_navigation_get_block_gap( $attributes ) {
+	$block_gap = $attributes['style']['spacing']['blockGap'] ?? '';
+
+	if ( empty( $block_gap ) ) {
+		return '';
+	}
+
+	if ( 0 === strpos( $block_gap, 'var:preset|spacing|' ) ) {
+		$preset_slug = substr( $block_gap, strlen( 'var:preset|spacing|' ) );
+		$block_gap   = sprintf(
+			'var(--wp--preset--spacing--%s)',
+			sanitize_key( $preset_slug )
+		);
+	}
+
+	return $block_gap;
+}
+
+/**
+ * Build CSS classes and styles for link separators.
+ *
+ * @since 23.0.0
+ *
+ * @param array $attributes Navigation block attributes.
+ * @return array Separator CSS classes and inline styles.
+ */
+function block_core_navigation_build_css_separators( $attributes ) {
+	$separator_map = array(
+		'dot'    => '·',
+		'pipe'   => '|',
+		'slash'  => '/',
+		'dash'   => '—',
+		'bullet' => '•',
+		'cross'  => 'X',
+	);
+
+	$separator  = $attributes['linkSeparator'] ?? 'none';
+	$visibility = $attributes['linkSeparatorVisibility'] ?? 'desktop';
+	$separators = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+
+	if ( 'none' === $separator || ! isset( $separator_map[ $separator ] ) ) {
+		return $separators;
+	}
+
+	$separators['css_classes'][] = 'has-link-separator';
+	$separators['css_classes'][] = sprintf( 'has-link-separator-%s', sanitize_html_class( $separator ) );
+	$separators['css_classes'][] = sprintf(
+		'has-link-separator-visibility-%s',
+		sanitize_html_class( $visibility )
+	);
+
+	$block_gap = block_core_navigation_get_block_gap( $attributes );
+	if ( $block_gap ) {
+		$separators['inline_styles'] .= sprintf(
+			'--wp-navigation-link-separator-gap: %s;',
+			esc_attr( $block_gap )
+		);
+	} else {
+		$separators['inline_styles'] .= '--wp-navigation-link-separator-gap: 1em;';
+	}
+
+	$separators['inline_styles'] .= sprintf(
+		'--wp-navigation-link-separator: "%s";',
+		esc_attr( $separator_map[ $separator ] )
+	);
+
+	return $separators;
 }

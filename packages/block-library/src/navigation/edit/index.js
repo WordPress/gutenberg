@@ -297,6 +297,8 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
+		linkSeparator,
+		linkSeparatorVisibility,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -616,6 +618,41 @@ function Navigation( {
 
 	const isResponsive = 'never' !== overlayMenu && ! editorDisabledResponsive;
 
+	const LINK_SEPARATOR_OPTIONS = [
+		{ value: 'none', label: __( 'None' ) },
+		{ value: 'pipe', label: '|' },
+		{ value: 'slash', label: '/' },
+		{ value: 'dash', label: '—' },
+		{ value: 'bullet', label: '•' },
+		{ value: 'cross', label: 'X' },
+	];
+
+	const LINK_SEPARATOR_VISIBILITY_OPTIONS = [
+		{ value: 'desktop', label: __( 'Desktop only' ) },
+		{ value: 'desktop-tablet', label: __( 'Desktop + Tablet' ) },
+		{ value: 'all', label: __( 'All devices' ) },
+	];
+
+	const LINK_SEPARATOR_CHARS = {
+		pipe: '|',
+		slash: '/',
+		dash: '—',
+		bullet: '•',
+		cross: 'X',
+	};
+
+	const hasLinkSeparator = linkSeparator !== 'none';
+	const separatorChar = LINK_SEPARATOR_CHARS[ linkSeparator ] || '';
+
+	const blockGap = attributes?.style?.spacing?.blockGap;
+
+	let separatorGap;
+
+	if ( blockGap?.startsWith( 'var:preset|spacing|' ) ) {
+		const slug = blockGap.replace( 'var:preset|spacing|', '' );
+		separatorGap = `var(--wp--preset--spacing--${ slug })`;
+	}
+
 	const blockProps = useBlockProps( {
 		ref: navRef,
 		className: clsx(
@@ -640,12 +677,20 @@ function Navigation( {
 				) ]: !! backgroundColor?.slug,
 				[ `has-text-decoration-${ textDecoration }` ]: textDecoration,
 				'block-editor-block-content-overlay': hasBlockOverlay,
+				'has-link-separator': hasLinkSeparator,
+				[ `has-link-separator-${ linkSeparator }` ]: hasLinkSeparator,
+				[ `has-link-separator-visibility-${ linkSeparatorVisibility }` ]:
+					hasLinkSeparator,
 			},
 			layoutClassNames
 		),
 		style: {
 			color: ! textColor?.slug && textColor?.color,
 			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
+			'--wp-navigation-link-separator': hasLinkSeparator
+				? `"${ separatorChar }"`
+				: undefined,
+			'--wp-navigation-link-separator-gap': separatorGap || '1em',
 		},
 	} );
 
@@ -799,7 +844,7 @@ function Navigation( {
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
-				{ hasSubmenus && (
+				{
 					<ToolsPanel
 						label={ __( 'Display' ) }
 						resetAll={ () => {
@@ -914,8 +959,59 @@ function Navigation( {
 								) }
 							</>
 						) }
+						<ToolsPanelItem
+							hasValue={ () => hasLinkSeparator }
+							label={ __( 'Link separators' ) }
+							onDeselect={ () =>
+								setAttributes( {
+									linkSeparator: 'none',
+									linkSeparatorVisibility: 'desktop',
+								} )
+							}
+							isShownByDefault
+						>
+							<ToggleGroupControl
+								label={ __( 'Separator' ) }
+								value={ linkSeparator }
+								onChange={ ( value ) =>
+									setAttributes( { linkSeparator: value } )
+								}
+								__next40pxDefaultSize
+							>
+								{ LINK_SEPARATOR_OPTIONS.map( ( option ) => (
+									<ToggleGroupControlOption
+										key={ option.value }
+										value={ option.value }
+										label={ option.label }
+									/>
+								) ) }
+							</ToggleGroupControl>
+
+							{ hasLinkSeparator && (
+								<ToggleGroupControl
+									label={ __( 'Show on' ) }
+									value={ linkSeparatorVisibility }
+									onChange={ ( value ) =>
+										setAttributes( {
+											linkSeparatorVisibility: value,
+										} )
+									}
+									__next40pxDefaultSize
+								>
+									{ LINK_SEPARATOR_VISIBILITY_OPTIONS.map(
+										( option ) => (
+											<ToggleGroupControlOption
+												key={ option.value }
+												value={ option.value }
+												label={ option.label }
+											/>
+										)
+									) }
+								</ToggleGroupControl>
+							) }
+						</ToolsPanelItem>
 					</ToolsPanel>
-				) }
+				}
 			</InspectorControls>
 			{ ! isWithinOverlay && (
 				<InspectorControls>

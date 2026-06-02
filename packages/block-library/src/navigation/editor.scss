@@ -721,3 +721,42 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-navigation__overlay-help-text-wrapper {
 	margin-top: $grid-unit-10;
 }
+
+.wp-block-navigation {
+	&.has-link-separator {
+		.wp-block-navigation__container .wp-block-navigation-item {
+			& + .wp-block-navigation-item::before,
+			& + .wp-block-page-list::before {
+				content: var(--wp-navigation-link-separator);
+				display: inline-block;
+				color: currentColor;
+				font-weight: 400;
+				white-space: nowrap;
+				position: absolute;
+				margin-inline-start: calc(var(--wp-navigation-link-separator-gap, 0px) / (-2) - 0.5ch);
+			}
+		}
+
+		&.has-link-separator-visibility-desktop {
+			@media (max-width: 800px) {
+				.wp-block-navigation__container .wp-block-navigation-item {
+					& + .wp-block-navigation-item::before,
+					& + .wp-block-page-list::before {
+						content: none;
+					}
+				}
+			}
+		}
+
+		&.has-link-separator-visibility-desktop-tablet {
+			@media (max-width: 599px) {
+				.wp-block-navigation__container .wp-block-navigation-item {
+					& + .wp-block-navigation-item::before,
+					& + .wp-block-page-list::before {
+						content: none;
+					}
+				}
+			}
+		}
+	}
+}
