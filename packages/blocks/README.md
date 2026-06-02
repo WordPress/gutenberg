@@ -280,7 +280,7 @@ _Parameters_
 
 _Returns_
 
--   `BlockType[]`: Block types that the blocks argument can be transformed to.
+-   `BlockTypeWithTransformMetadata[]`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -635,7 +635,7 @@ registerBlockType( 'namespace/block-name', {
 _Parameters_
 
 -   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
--   _settings_ `Partial< BlockConfiguration< Attributes > >`: Block settings.
+-   _settings_ `Partial< SettingsBlockConfiguration< Attributes > >`: Block settings.
 
 _Returns_
 
@@ -826,6 +826,7 @@ _Parameters_
 
 -   _blocks_ `Block[] | Block`: Blocks array or block object.
 -   _name_ `string`: Block name.
+-   _variationName_ `string`: Optional target block variation name.
 
 _Returns_
 

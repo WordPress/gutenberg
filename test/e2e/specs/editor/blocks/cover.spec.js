@@ -257,6 +257,10 @@ test.describe( 'Cover', () => {
 			'.components-resizable-box__handle-bottom'
 		);
 
+		// Ensure the resize handle is in view before measuring its bounding box,
+		// so the cached coordinates match the actual position during the drag.
+		await coverBlockResizeHandle.scrollIntoViewIfNeeded();
+
 		// Establish the existing bounding boxes for the Cover block
 		// and the Cover block's resizing handle.
 		const coverBlockBox = await coverBlock.boundingBox();
@@ -266,16 +270,16 @@ test.describe( 'Cover', () => {
 		expect( coverBlockResizeHandleBox.height ).toBeTruthy();
 
 		// Increase the Cover block height by 100px.
-		await coverBlockResizeHandle.hover();
+		// Move the mouse to the handle's center, press, then drag exactly 100px down.
+		// This avoids the off-by-half-handle-height bug that arises from using
+		// `handleBox.y + 100` (top + 100) while the mouse starts at the center.
+		const handleCenterX =
+			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2;
+		const handleCenterY =
+			coverBlockResizeHandleBox.y + coverBlockResizeHandleBox.height / 2;
+		await page.mouse.move( handleCenterX, handleCenterY );
 		await page.mouse.down();
-
-		// Counter-intuitively, the mouse movement calculation should not be made using the
-		// Cover block's bounding box, but rather based on the coordinates of the
-		// resize handle.
-		await page.mouse.move(
-			coverBlockResizeHandleBox.x + coverBlockResizeHandleBox.width / 2,
-			coverBlockResizeHandleBox.y + 100
-		);
+		await page.mouse.move( handleCenterX, handleCenterY + 100 );
 		await page.mouse.up();
 
 		const newCoverBlockBox = await coverBlock.boundingBox();

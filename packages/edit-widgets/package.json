@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "6.46.0",
+	"version": "6.47.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -82,8 +82,8 @@
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

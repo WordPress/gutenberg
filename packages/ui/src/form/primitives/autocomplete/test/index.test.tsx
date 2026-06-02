@@ -1,13 +1,24 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import * as Autocomplete from '../index';
+import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
 
 const ITEMS = [
 	{ id: '1', value: 'Item 1' },
 	{ id: '2', value: 'Item 2' },
 	{ id: '3', value: 'Item 3' },
 ];
+
+function renderDisabledAutocompleteWithClear() {
+	return render(
+		<Autocomplete.Root items={ ITEMS } disabled defaultValue="Item 1">
+			<Autocomplete.Input placeholder="Search" />
+			<Autocomplete.Clear />
+		</Autocomplete.Root>
+	);
+}
 
 describe( 'Autocomplete', () => {
 	it( 'forwards ref', async () => {
@@ -198,6 +209,173 @@ describe( 'Autocomplete', () => {
 			const positioner = screen.getByTestId( 'custom-positioner' );
 
 			expect( positioner ).toContainElement( item );
+		} );
+	} );
+
+	// Slot is identified by a data attribute, not a user-facing role/text.
+	/* eslint-disable testing-library/no-node-access */
+	describe( 'wp compat overlay slot', () => {
+		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
+
+		// Exercises the public opt-in path rather than poking the flag.
+		function WithSlotEnabled( { children }: { children: ReactNode } ) {
+			useEnableWpCompatOverlaySlot();
+			return <>{ children }</>;
+		}
+
+		afterEach( () => {
+			// The hook is one-way at runtime; reset explicitly between tests.
+			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
+				.__wpUiCompatOverlaySlotEnabled;
+			document
+				.querySelectorAll( SLOT_SELECTOR )
+				.forEach( ( el ) => el.remove() );
+		} );
+
+		it( 'portals the popup into the slot when the consumer opts in', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<WithSlotEnabled>
+					<Autocomplete.Root items={ ITEMS }>
+						<Autocomplete.Input placeholder="Search" />
+						<Autocomplete.Popup>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+				</WithSlotEnabled>
+			);
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			const slot = document.querySelector( SLOT_SELECTOR );
+			expect( slot ).not.toBeNull();
+			expect( slot ).toContainElement( item );
+		} );
+
+		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Autocomplete.Root items={ ITEMS }>
+					<Autocomplete.Input placeholder="Search" />
+					<Autocomplete.Popup>
+						<Autocomplete.List>
+							<Autocomplete.ListBody>
+								<Autocomplete.Collection>
+									{ ( item ) => (
+										<Autocomplete.Item
+											key={ item.id }
+											value={ item }
+										>
+											{ item.value }
+										</Autocomplete.Item>
+									) }
+								</Autocomplete.Collection>
+							</Autocomplete.ListBody>
+						</Autocomplete.List>
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			);
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
+		} );
+
+		it( 'lets a caller-supplied portal container override the slot', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<WithSlotEnabled>
+					<Autocomplete.Root items={ ITEMS }>
+						<Autocomplete.Input placeholder="Search" />
+						<div
+							ref={ containerRef }
+							data-testid="custom-container"
+						/>
+						<Autocomplete.Popup
+							portal={
+								<Autocomplete.Portal
+									container={ containerRef }
+								/>
+							}
+						>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+				</WithSlotEnabled>
+			);
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				item
+			);
+		} );
+	} );
+	/* eslint-enable testing-library/no-node-access */
+
+	describe( 'when disabled', () => {
+		it( 'hides the clear button from screen readers', () => {
+			renderDisabledAutocompleteWithClear();
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Clear' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'does not show a tooltip when the clear button is hovered', async () => {
+			const user = userEvent.setup( { pointerEventsCheck: 0 } );
+			renderDisabledAutocompleteWithClear();
+
+			const clearButton = screen.getByLabelText( 'Clear', {
+				selector: 'button',
+			} );
+			await user.hover( clearButton );
+
+			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
 		} );
 	} );
 } );

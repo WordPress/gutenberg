@@ -13,7 +13,7 @@ import {
 	requestImageUploadCancelDialog,
 } from '@wordpress/react-native-bridge';
 import {
-	Icon,
+	Icon as WCIcon,
 	ToolbarButton,
 	ToolbarGroup,
 	PanelBody,
@@ -191,7 +191,7 @@ class VideoEdit extends Component {
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...style.icon } />;
+				return <WCIcon icon={ SvgIconRetry } { ...style.icon } />;
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = this.props.getStylesFromColorScheme(
 					style.icon,
@@ -206,7 +206,7 @@ class VideoEdit extends Component {
 				break;
 		}
 
-		return <Icon icon={ SvgIcon } { ...iconStyle } />;
+		return <WCIcon icon={ SvgIcon } { ...iconStyle } />;
 	}
 
 	render() {
