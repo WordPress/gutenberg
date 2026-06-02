@@ -60,7 +60,6 @@
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
 		"babel-plugin-inline-json-import": "0.3.2",
-		"change-case": "4.1.2",
 		"concurrently": "3.5.0",
 		"cross-env": "7.0.3",
 		"css-loader": "^6.2.0",
@@ -104,13 +103,13 @@
 		"component-usage-stats": "node ./node_modules/react-scanner/bin/react-scanner -c ./react-scanner.config.js",
 		"dev": "npm run --workspace @wordpress/build-scripts dev --",
 		"distclean": "git clean --force -d -X",
-		"docs:api-ref": "npm run --workspace @wordpress/api-docs-generator docs:api-ref",
-		"docs:blocks": "npm run --workspace @wordpress/api-docs-generator docs:blocks",
+		"docs:api-ref": "npm run --workspace @wordpress/docs-tools docs:api-ref --",
+		"docs:blocks": "npm run --workspace @wordpress/docs-tools docs:blocks --",
 		"docs:build": "npm-run-all docs:components docs:gen docs:blocks docs:api-ref docs:theme-ref",
-		"docs:check-api-docs-unstaged": "node ./tools/api-docs/are-api-docs-unstaged.js",
-		"docs:components": "npm run --workspace @wordpress/api-docs-generator docs:components",
-		"docs:gen": "node ./docs/tool/index.js",
-		"docs:theme-ref": "npm run --workspace tools/api-docs docs:theme-ref",
+		"docs:check-api-docs-unstaged": "npm run --workspace @wordpress/docs-tools docs:check-api-docs-unstaged --",
+		"docs:components": "npm run --workspace @wordpress/docs-tools docs:components --",
+		"docs:gen": "npm run --workspace @wordpress/docs-tools docs:gen --",
+		"docs:theme-ref": "npm run --workspace @wordpress/docs-tools docs:theme-ref --",
 		"env": "wp-env",
 		"fixtures:clean": "rimraf --glob \"test/integration/fixtures/blocks/*.{json,serialized.html}\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test:unit -- test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
@@ -205,14 +204,14 @@
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
 		],
-		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
-			"node ./docs/tool/index.js"
+		"{docs/toc.json,tools/docs/*.cjs,packages/{*/README.md,components/src/*/**/README.md}}": [
+			"npm run docs:gen"
 		],
 		"packages/**/*.{js,ts,tsx,json}": [
 			"npm run docs:api-ref",
 			"npm run docs:blocks",
 			"npm run docs:theme-ref",
-			"node ./tools/api-docs/are-api-docs-unstaged.js"
+			"npm run docs:check-api-docs-unstaged"
 		],
 		"packages/icons/src/library/*": [
 			"npm run -w packages/icons build"
