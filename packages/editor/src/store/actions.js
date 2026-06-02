@@ -6189,6 +6189,8 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 						await getDistributedEditingStaleServerBlockIdentityMergeDescriptor(
 							{
 								acceptedSyncMeta,
+								acceptedPostContent:
+									currentSessionState.clientBaseContent,
 								serverPostContent:
 									currentSessionState.refetchedServerContent,
 								proposedPostContent,
@@ -6238,8 +6240,10 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			const shouldPrepareYjsClientUpdate =
 				currentSyncMeta &&
 				( currentSyncMeta.schema === 'de-rtc-yjs-v1' ||
+					currentSyncMeta.schema === 'de-rtc-yjs-blocks-v1' ||
 					currentSyncMeta.yjs_encoding ===
 						'native-yjs-php-update-v0' ||
+					currentSyncMeta.yjs_encoding === 'native-yjs-blocks-v1' ||
 					currentSyncMeta.yjs_update );
 			const clientBaseContent =
 				options.yjsClientBaseContent ??
@@ -6367,7 +6371,10 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 									clientBaseVersion:
 										retrySaveResultSessionState.retrySaveServerVersion ||
 										retrySaveResultSessionState.serverVersion,
-									clientBaseContent: null,
+									clientBaseContent:
+										confirmedComparablePostContent,
+									refetchedServerContent: null,
+									refetchedServerState: false,
 							  }
 							: {} ),
 					},
@@ -6831,13 +6838,16 @@ function isDistributedEditingYjsRetrySaveSyncMeta( syncMeta ) {
 		typeof syncMeta === 'object' &&
 		! Array.isArray( syncMeta ) &&
 		( syncMeta.schema === 'de-rtc-yjs-v1' ||
+			syncMeta.schema === 'de-rtc-yjs-blocks-v1' ||
 			syncMeta.yjs_encoding === 'native-yjs-php-update-v0' ||
+			syncMeta.yjs_encoding === 'native-yjs-blocks-v1' ||
 			syncMeta.yjs_update )
 	);
 }
 
 async function getDistributedEditingStaleServerBlockIdentityMergeDescriptor( {
 	acceptedSyncMeta,
+	acceptedPostContent,
 	serverPostContent,
 	proposedPostContent,
 } = {} ) {
@@ -6845,6 +6855,7 @@ async function getDistributedEditingStaleServerBlockIdentityMergeDescriptor( {
 		await getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor(
 			{
 				acceptedSyncMeta,
+				acceptedPostContent,
 				serverPostContent,
 				proposedPostContent,
 			}
@@ -7721,6 +7732,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 					await getDistributedEditingStaleServerBlockIdentityMergeDescriptor(
 						{
 							acceptedSyncMeta,
+							acceptedPostContent: clientBaseContent,
 							serverPostContent: serverContent,
 							proposedPostContent:
 								blockIdentityProposedPostContent,
@@ -8152,7 +8164,7 @@ export const savePost =
 							currentSessionState.serverVersion ||
 							currentSessionState.clientBaseVersion ||
 							'0',
-						schema: 'de-rtc-yjs-v1',
+						schema: 'de-rtc-yjs-blocks-v1',
 					},
 					actor: `editor-${ currentPost.id || 'post' }`,
 				} );
@@ -8442,8 +8454,75 @@ export const savePost =
 				getDistributedEditingSyncMetaFromPostContent(
 					updatedRawContent
 				);
+			const persistedComparableContent =
+				getDistributedEditingComparablePostContent(
+					contentForPersistence
+				);
+			const persistedSyncMeta =
+				getDistributedEditingSyncMetaFromPostContent(
+					contentForPersistence
+				) || updatedSyncMeta;
+			const currentSessionState =
+				select.getDistributedEditingSessionState?.() || {};
+			const persistedServerVersion =
+				persistedSyncMeta?.version ||
+				getDistributedEditingServerVersionFromResponse(
+					updatedRecord
+				) ||
+				currentSessionState.serverVersion ||
+				currentSessionState.clientBaseVersion;
+			const shouldAdoptDistributedEditingNormalSave =
+				! options.isAutosave &&
+				! options.isPreview &&
+				distributedEditingSettings.enabled &&
+				typeof persistedComparableContent === 'string';
 
-			if (
+			if ( shouldAdoptDistributedEditingNormalSave ) {
+				updatedRecord = {
+					...updatedRecord,
+					content:
+						updatedRecord.content &&
+						typeof updatedRecord.content === 'object'
+							? {
+									...updatedRecord.content,
+									raw: persistedComparableContent,
+							  }
+							: persistedComparableContent,
+				};
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', updatedRecord.type, [
+						updatedRecord,
+					] );
+				dispatch.editPost(
+					{ content: persistedComparableContent },
+					{ undoIgnore: true }
+				);
+				dispatch.setDistributedEditingSessionState( {
+					...( persistedServerVersion
+						? {
+								serverVersion: persistedServerVersion,
+								clientBaseVersion: persistedServerVersion,
+						  }
+						: {} ),
+					clientBaseContent: persistedComparableContent,
+					...( persistedSyncMeta
+						? { clientBaseSyncMeta: persistedSyncMeta }
+						: {} ),
+					refetchedServerContent: null,
+					refetchedServerState: false,
+					hasPendingChanges: false,
+					pendingChangeCount: 0,
+					canExportLocalUpdates: false,
+					mustOfferLocalCopy: false,
+					isAwaitingServerConfirmation: false,
+					saveButtonClickInFlight: false,
+				} );
+				await refreshDistributedEditingPresenceAfterServerUpdate( {
+					select,
+					dispatch,
+				} );
+			} else if (
 				typeof updatedRawContent === 'string' &&
 				typeof updatedStrippedContent === 'string' &&
 				updatedStrippedContent !== updatedRawContent
@@ -8468,24 +8547,6 @@ export const savePost =
 					{ content: updatedStrippedContent },
 					{ undoIgnore: true }
 				);
-
-				if ( updatedSyncMeta?.version ) {
-					dispatch.setDistributedEditingSessionState( {
-						serverVersion: updatedSyncMeta.version,
-						clientBaseVersion: updatedSyncMeta.version,
-						clientBaseContent: updatedStrippedContent,
-						clientBaseSyncMeta: updatedSyncMeta,
-						hasPendingChanges: false,
-						pendingChangeCount: 0,
-						canExportLocalUpdates: false,
-						mustOfferLocalCopy: false,
-						isAwaitingServerConfirmation: false,
-					} );
-					await refreshDistributedEditingPresenceAfterServerUpdate( {
-						select,
-						dispatch,
-					} );
-				}
 			}
 			const args = getNotificationArgumentsForSaveSuccess( {
 				previousPost: previousRecord,

@@ -276,7 +276,8 @@ describe( 'distributed editing session state', () => {
 		).toMatchObject( {
 			version: '12',
 			client_base_version: '12',
-			pending_yjs_encoding: 'native-yjs-php-update-v0',
+			schema: 'de-rtc-yjs-blocks-v1',
+			pending_yjs_encoding: 'native-yjs-blocks-v1',
 		} );
 		expect( result.postContent ).toContain( proposedPostContent );
 		expect( result.postContent ).not.toContain( 'yjs_client_update' );
@@ -297,6 +298,8 @@ describe( 'distributed editing session state', () => {
 	} );
 
 	it( 'builds native Yjs retry-save update evidence from a normal editor edit', async () => {
+		ensureDistributedEditingTestCrypto();
+
 		const clientBaseContent =
 			'<!-- wp:paragraph --><p>Yjs base content.</p><!-- /wp:paragraph -->';
 		const proposedPostContent =
@@ -311,29 +314,62 @@ describe( 'distributed editing session state', () => {
 		).resolves.toMatchObject( {
 			status: 'ready',
 			update: {
-				format: 'native-yjs-php-update-v0',
+				format: 'native-yjs-blocks-v1',
+				schema: 'de-rtc-yjs-blocks-v1',
 				operations: [
 					{
-						type: 'delete',
-						actor: 'editor-42',
-					},
-					{
-						type: 'insert',
-						text: 'edited',
+						type: 'block.update_serialized',
+						yjsPrimitive: 'Y.Map.set',
+						path: [ 0 ],
+						blockName: 'core/paragraph',
 						actor: 'editor-42',
 					},
 				],
 				stateVector: {
-					'editor-42': 2,
+					'editor-42': 1,
 				},
+				baseBlockCount: 1,
+				proposedBlockCount: 1,
 				interop: {
 					jsPackage: '@y/y',
 					jsPackageVersion: '14.0.0-rc.16',
-					serverEncoding: 'native-yjs-php-update-v0',
+					serverEncoding: 'native-yjs-blocks-v1',
 				},
 			},
 			changeRange: {
 				changed: true,
+			},
+		} );
+	} );
+
+	it( 'maps paragraph formatting changes to block-native Y.Text operations', async () => {
+		ensureDistributedEditingTestCrypto();
+
+		const clientBaseContent =
+			'<!-- wp:paragraph --><p>This is bold and italicized.</p><!-- /wp:paragraph -->';
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>This is <strong>bold</strong> and italicized.</p><!-- /wp:paragraph -->';
+
+		await expect(
+			getDistributedEditingYjsClientUpdateDescriptor( {
+				clientBaseContent,
+				proposedPostContent,
+				actor: 'editor-42',
+			} )
+		).resolves.toMatchObject( {
+			status: 'ready',
+			update: {
+				format: 'native-yjs-blocks-v1',
+				operations: [
+					{
+						type: 'block.rich_text_format',
+						yjsPrimitive: 'Y.Text.format',
+						field: 'innerHTML',
+						path: [ 0 ],
+						blockName: 'core/paragraph',
+						changedTextIndexes: [ 8, 9, 10, 11 ],
+					},
+				],
 			},
 		} );
 	} );
@@ -4354,6 +4390,7 @@ describe( 'distributed editing session state', () => {
 				pendingChangeCount: 2,
 				hasPendingChanges: true,
 				isAwaitingServerConfirmation: true,
+				saveButtonClickInFlight: true,
 				canExportLocalUpdates: true,
 				retrySubmitProofStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
@@ -4373,12 +4410,17 @@ describe( 'distributed editing session state', () => {
 			clientBaseVersion: '302',
 			serverVersion: '302',
 			clientBaseContent: safeServerContent,
+			clientBaseSyncMeta: {
+				schema: 'de-rtc-yjs-v1',
+				version: '302',
+			},
 			refetchedServerContent: safeServerContent,
 			refetchedServerState: true,
 			requiresServerStateRefetch: false,
 			pendingChangeCount: 1,
 			hasPendingChanges: true,
 			isAwaitingServerConfirmation: false,
+			saveButtonClickInFlight: false,
 			requiresManualConflictResolution: false,
 			retrySubmitAccepted: false,
 			retrySubmitSavePathRequired: false,
@@ -4422,6 +4464,9 @@ describe( 'distributed editing session state', () => {
 	} );
 
 	it( 'normalizes confirmed server-merged retry-save evidence as saved and content-free', () => {
+		const mergedContent =
+			'<!-- wp:paragraph --><p>Server edit.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Local edit.</p><!-- /wp:paragraph -->';
+		const mergedRawContent = `<!-- wp:sync-meta {"format":"yjs"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">{"schema":"de-rtc-yjs-blocks-v1","version":"52"}</script>\n<!-- /wp:sync-meta -->${ mergedContent }`;
 		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
 			{
 				result: 'retry_save_server_merged',
@@ -4447,10 +4492,16 @@ describe( 'distributed editing session state', () => {
 					merged_stripped_content_hash:
 						'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
 				},
+				content: {
+					raw: mergedRawContent,
+				},
 			},
 			{
 				serverVersion: '51',
+				clientBaseContent:
+					'<!-- wp:paragraph --><p>Old base.</p><!-- /wp:paragraph -->',
 				pendingChangeCount: 1,
+				saveButtonClickInFlight: true,
 				retrySubmitProofStatus:
 					DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.ACCEPTED_FOR_FUTURE_SAVE,
 				retrySubmitAccepted: true,
@@ -4466,6 +4517,7 @@ describe( 'distributed editing session state', () => {
 			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 			pendingChangeCount: 0,
 			hasPendingChanges: false,
+			saveButtonClickInFlight: false,
 			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
 			retrySaveAccepted: true,
 			retrySaveServerVersion: '52',
@@ -4483,6 +4535,14 @@ describe( 'distributed editing session state', () => {
 			retrySaveServerMergeLocalChangedIndexes: [ 0 ],
 			retrySaveServerMergeMergedStrippedContentHash:
 				'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+			clientBaseVersion: '52',
+			clientBaseContent: mergedContent,
+			clientBaseSyncMeta: {
+				schema: 'de-rtc-yjs-blocks-v1',
+				version: '52',
+			},
+			refetchedServerContent: null,
+			refetchedServerState: false,
 			canExportLocalUpdates: false,
 		} );
 	} );
@@ -8605,9 +8665,9 @@ describe( 'distributed editing session state', () => {
 						'<!-- wp:paragraph --><p>Server</p><!-- /wp:paragraph -->',
 				},
 				reason: 'manual_conflict_review_required_before_save',
-				label: 'Compare changes',
+				label: 'Save',
 				statusText:
-					'Compare the local and WordPress versions before Save can update the post.',
+					'Resolve the local and WordPress versions before Save can update the post.',
 				clickAction:
 					DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES,
 				journeyAction: 'compare_conflicting_changes',
@@ -8890,6 +8950,10 @@ describe( 'distributed editing session state', () => {
 			pendingChangeCount: 1,
 			hasPendingChanges: true,
 			canExportLocalUpdates: true,
+			retrySaveStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED,
+			retrySaveReason:
+				DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT,
 			riskyBlockReviewStatus:
 				DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES.REVIEW_REQUIRED,
 			riskyBlockReviewHasPendingItems: true,
@@ -8983,11 +9047,11 @@ describe( 'distributed editing session state', () => {
 				},
 				step: DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
 				action: 'compare_conflicting_changes',
-				title: 'Compare changes',
+				title: 'Resolve changes',
 				summary: 'Choose which version to keep before saving.',
-				actionHint: 'Compare changes',
+				actionHint: 'Save',
 				requiresActionBeforeSave: true,
-				saveButtonLabel: 'Compare changes',
+				saveButtonLabel: 'Save',
 				saveButtonBlocksNormalSavePost: true,
 			},
 			{
@@ -13447,6 +13511,68 @@ describe( 'distributed editing selectors', () => {
 		} );
 		expect( JSON.stringify( descriptor ) ).not.toMatch(
 			/Alpha|Bravo|strong|em|postContent|proposedPostContent|rawPostContent|clientId|client_id/
+		);
+	} );
+
+	it( 'recognizes content-free table-cell edits in distinct cells on the same retained block', async () => {
+		const baseTable =
+			'<!-- wp:table --><figure class="wp-block-table"><table><tbody><tr><td>A1</td><td>A2</td></tr><tr><td>B1</td><td>B2</td></tr></tbody></table></figure><!-- /wp:table -->';
+		const serverTable =
+			'<!-- wp:table --><figure class="wp-block-table"><table><tbody><tr><td>A1 server</td><td>A2</td></tr><tr><td>B1</td><td>B2</td></tr></tbody></table></figure><!-- /wp:table -->';
+		const localTable =
+			'<!-- wp:table --><figure class="wp-block-table"><table><tbody><tr><td>A1</td><td>A2</td></tr><tr><td>B1</td><td>B2 local</td></tr></tbody></table></figure><!-- /wp:table -->';
+		const acceptedSyncMeta = await createAcceptedBlockIdentitySyncMeta( [
+			baseTable,
+		] );
+		acceptedSyncMeta.blocks[ 0 ].block_name = 'core/table';
+		const descriptor =
+			await getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor(
+				{
+					acceptedSyncMeta,
+					acceptedPostContent: baseTable,
+					serverPostContent: serverTable,
+					proposedPostContent: localTable,
+				}
+			);
+
+		expect( descriptor ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY,
+			reason: null,
+			requestProof: null,
+			acceptedBlockCount: 1,
+			serverBlockCount: 1,
+			proposedBlockCount: 1,
+			serverChangedBlockCount: 1,
+			proposedChangedBlockCount: 1,
+			serverChangedBlockIndexes: [ 0 ],
+			proposedChangedBlockIndexes: [ 0 ],
+			conflictingBlockIndex: null,
+			tableCellMergedIndexes: [ 0 ],
+			tableCellMergedBlockCount: 1,
+			tableCellServerChangedCells: [
+				{
+					blockIndex: 0,
+					cellIndex: 0,
+					rowIndex: 0,
+					columnIndex: 0,
+				},
+			],
+			tableCellLocalChangedCells: [
+				{
+					blockIndex: 0,
+					cellIndex: 3,
+					rowIndex: 1,
+					columnIndex: 1,
+				},
+			],
+			contentFree: true,
+			callsRest: false,
+			callsSave: false,
+			mutatesPersistedPostContent: false,
+			claimsSaved: false,
+		} );
+		expect( JSON.stringify( descriptor ) ).not.toMatch(
+			/A1|A2|B1|B2|postContent|proposedPostContent|rawPostContent|clientId|client_id/
 		);
 	} );
 

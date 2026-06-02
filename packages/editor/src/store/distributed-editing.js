@@ -207,6 +207,8 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT =
 const MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS = 10;
 
 const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*(?:\\btype\\s*=\\s*["']wp/post-sync-meta["']|(?=[^>]*\\btype\\s*=\\s*["']application/json["'])(?=[^>]*\\bdata-wp-sync-meta\\s*=\\s*["']distributed-editing["'])))[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
+const DISTRIBUTED_EDITING_YJS_BLOCKS_SCHEMA = 'de-rtc-yjs-blocks-v1';
+const DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT = 'native-yjs-blocks-v1';
 
 /**
  * Stable reasons for browser unload protection.
@@ -9093,6 +9095,7 @@ export async function getDistributedEditingBlockIdentityDistinctGapInsertionDesc
  *
  * @param {Object} args                     Retained-edit merge inputs.
  * @param {Object} args.acceptedSyncMeta    Accepted base sync metadata.
+ * @param {string} args.acceptedPostContent Accepted base serialized content.
  * @param {string} args.serverPostContent   Refetched server serialized content.
  * @param {string} args.proposedPostContent Local proposed serialized content.
  *
@@ -9100,6 +9103,7 @@ export async function getDistributedEditingBlockIdentityDistinctGapInsertionDesc
  */
 export async function getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor( {
 	acceptedSyncMeta = null,
+	acceptedPostContent = '',
 	serverPostContent = '',
 	proposedPostContent = '',
 } = {} ) {
@@ -9165,22 +9169,56 @@ export async function getDistributedEditingBlockIdentityRetainedEditsServerMerge
 	);
 
 	if ( conflictingBlockIndex !== undefined ) {
-		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
-			'retained_block_edit_conflict',
-			{
-				acceptedBlockCount: acceptedBlocks.length,
-				serverBlockCount: serverSequence.blockCount,
-				proposedBlockCount: proposedSequence.blockCount,
-				serverChangedBlockCount:
-					serverSequence.changedBlockIndexes.length,
-				proposedChangedBlockCount:
-					proposedSequence.changedBlockIndexes.length,
+		const tableCellMergeDescriptor =
+			getDistributedEditingTableCellRetainedBlockMergeDescriptor( {
+				acceptedBlocks,
+				acceptedPostContent,
+				serverBlocks: serverSequence.blocks,
+				proposedBlocks: proposedSequence.blocks,
 				serverChangedBlockIndexes: serverSequence.changedBlockIndexes,
 				proposedChangedBlockIndexes:
 					proposedSequence.changedBlockIndexes,
-				conflictingBlockIndex,
-			}
-		);
+			} );
+
+		if (
+			tableCellMergeDescriptor.status !==
+			DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY
+		) {
+			return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+				'retained_block_edit_conflict',
+				{
+					acceptedBlockCount: acceptedBlocks.length,
+					serverBlockCount: serverSequence.blockCount,
+					proposedBlockCount: proposedSequence.blockCount,
+					serverChangedBlockCount:
+						serverSequence.changedBlockIndexes.length,
+					proposedChangedBlockCount:
+						proposedSequence.changedBlockIndexes.length,
+					serverChangedBlockIndexes:
+						serverSequence.changedBlockIndexes,
+					proposedChangedBlockIndexes:
+						proposedSequence.changedBlockIndexes,
+					conflictingBlockIndex,
+				}
+			);
+		}
+
+		return {
+			...tableCellMergeDescriptor,
+			acceptedBlockCount: acceptedBlocks.length,
+			serverBlockCount: serverSequence.blockCount,
+			proposedBlockCount: proposedSequence.blockCount,
+			serverChangedBlockCount: serverSequence.changedBlockIndexes.length,
+			proposedChangedBlockCount:
+				proposedSequence.changedBlockIndexes.length,
+			serverChangedBlockIndexes: [
+				...serverSequence.changedBlockIndexes,
+			],
+			proposedChangedBlockIndexes: [
+				...proposedSequence.changedBlockIndexes,
+			],
+			conflictingBlockIndex: null,
+		};
 	}
 
 	if (
@@ -12293,7 +12331,7 @@ function getDistributedEditingSaveStateVocabulary( {
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.SERVER_REFRESH_REQUIRED
 	) {
 		summaryText =
-			'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.';
+			'Save will check WordPress before updating; protected local changes stay in this editor until Save is confirmed.';
 	} else if (
 		reviewCheckpointState ===
 		DISTRIBUTED_EDITING_SAVE_REVIEW_CHECKPOINT_STATES.REVIEW_REQUIRED
@@ -12355,9 +12393,9 @@ function getDistributedEditingRequiredSaveWorkflowAction( normalized ) {
 	if ( requiresManualConflictReview ) {
 		return {
 			reason: 'manual_conflict_review_required_before_save',
-			label: 'Compare changes',
+			label: 'Save',
 			statusText:
-				'Compare the local and WordPress versions before Save can update the post.',
+				'Resolve the local and WordPress versions before Save can update the post.',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.COMPARE_CONFLICTING_CHANGES,
 		};
@@ -12576,7 +12614,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 			source = 'retry_save';
 		}
 		label = 'Save';
-		statusText = 'WordPress will get the latest post before saving.';
+		statusText = 'WordPress will check the current post before saving.';
 		clickAction =
 			DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE;
 		requiresServerStateRefetch = true;
@@ -12584,7 +12622,7 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 		authorityState =
 			DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE;
 		authorityStatusText =
-			'WordPress will get the latest post before updating it.';
+			'WordPress will check the current post before updating it.';
 	} else if (
 		( hasLocalRiskyReviewPending && ! partialSafePendingReview ) ||
 		freshReviewPreSaveState.opensPrePublishReview ||
@@ -12707,9 +12745,6 @@ export function getDistributedEditingSaveButtonStateForSessionState(
 	const actionKeys = [
 		canExportLocalUpdates
 			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES
-			: null,
-		canRefetchServerState
-			? DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE
 			: null,
 	].filter( Boolean );
 	const stateVocabulary = getDistributedEditingSaveStateVocabulary( {
@@ -12856,8 +12891,8 @@ export function getDistributedEditingHumanLoopStepStateForSessionState(
 		saveButton.status ===
 		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REFETCH_REQUIRED
 	) {
-		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST;
-		action = 'get_latest_post';
+		step = DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED;
+		action = 'save';
 	} else if (
 		saveButton.status ===
 		DISTRIBUTED_EDITING_SAVE_BUTTON_STATUSES.REVIEW_BLOCKED
@@ -13023,7 +13058,7 @@ function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 
 			if ( action === 'compare_conflicting_changes' ) {
 				return {
-					title: 'Compare changes',
+					title: 'Resolve changes',
 					summary: 'Choose which version to keep before saving.',
 				};
 			}
@@ -13034,8 +13069,8 @@ function getDistributedEditingSaveJourneyCopyForStep( step, action ) {
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
 			return {
-				title: 'Load latest version',
-				summary: 'Load the latest post before saving again.',
+				title: 'Save will check WordPress',
+				summary: 'Save will check WordPress before updating.',
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return {
@@ -13089,12 +13124,12 @@ function getDistributedEditingSaveJourneyActionHintForStep( step, action ) {
 			}
 
 			if ( action === 'compare_conflicting_changes' ) {
-				return 'Compare changes';
+				return 'Save';
 			}
 
 			return null;
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
-			return 'Get latest first';
+			return null;
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return 'Review before update';
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
@@ -13117,10 +13152,9 @@ function getDistributedEditingSaveJourneyRequiresActionBeforeSaveForStep(
 	action
 ) {
 	return (
-		[
-			DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST,
-			DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES,
-		].includes( step ) ||
+		[ DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES ].includes(
+			step
+		) ||
 		[
 			'apply_local_changes',
 			'prepare_changes',
@@ -14396,6 +14430,14 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 	const normalizedCurrent =
 		normalizeDistributedEditingSessionState( currentSessionState );
 	const responseData = getDistributedEditingResponseData( responseOrError );
+	const responseRawPostContent =
+		getDistributedEditingRawPostContentFromResponse( responseOrError );
+	const responsePostContent = getDistributedEditingComparablePostContent(
+		responseRawPostContent
+	);
+	const responseSyncMeta = getDistributedEditingSyncMetaFromPostContent(
+		responseRawPostContent
+	);
 	const result = normalizeNullableString(
 		responseOrError.result || responseData.result
 	);
@@ -14502,13 +14544,16 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 		)
 	);
 	const partialSafeMergeContent = partialSafeMergeApplied
-		? getDistributedEditingPostContentFromResponse( responseOrError )
+		? responsePostContent
 		: null;
 	const partialSafeMergeFields =
 		partialSafeMergeApplied && typeof partialSafeMergeContent === 'string'
 			? {
 					clientBaseVersion: serverVersion,
 					clientBaseContent: partialSafeMergeContent,
+					clientBaseSyncMeta:
+						responseSyncMeta ??
+						normalizedCurrent.clientBaseSyncMeta,
 					refetchedServerContent: partialSafeMergeContent,
 					refetchedServerState: true,
 					requiresServerStateRefetch: false,
@@ -14527,6 +14572,7 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
 			reasonCode: null,
 			serverVersion,
+			saveButtonClickInFlight: false,
 			pendingChangeCount: 0,
 			hasPendingChanges: false,
 			isAwaitingServerConfirmation: false,
@@ -14534,7 +14580,6 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			hasRemoteChanges: false,
 			requiresServerStateAcceptance: false,
 			requiresServerStateRefetch: false,
-			refetchedServerState: false,
 			canAttemptLocalRebase: false,
 			localRebasePlanStatus:
 				DISTRIBUTED_EDITING_LOCAL_REBASE_PLAN_STATUSES.NONE,
@@ -14561,6 +14606,15 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 			retrySubmitSavePrepared: false,
 			retrySubmitSaveReady: false,
 			retrySubmitSaveRequiresExplicitSaveClick: false,
+			clientBaseVersion: serverVersion,
+			clientBaseContent:
+				typeof responsePostContent === 'string'
+					? responsePostContent
+					: normalizedCurrent.clientBaseContent,
+			clientBaseSyncMeta:
+				responseSyncMeta ?? normalizedCurrent.clientBaseSyncMeta,
+			refetchedServerContent: null,
+			refetchedServerState: false,
 			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
 			retrySaveReason: null,
 			retrySaveAccepted: true,
@@ -15680,6 +15734,7 @@ function getDistributedEditingRejectedRetrySaveState( {
 		disposition,
 		reasonCode,
 		serverVersion,
+		saveButtonClickInFlight: false,
 		pendingChangeCount,
 		hasPendingChanges: normalizeCount( pendingChangeCount ) > 0,
 		isAwaitingServerConfirmation: partialSafeMergeAcceptedServerState
@@ -17191,11 +17246,10 @@ function normalizeRiskyBlockReviewMetadataFields( sessionState = {} ) {
 			sessionState.riskyBlockReviewSaveButtonLabel
 		) || riskyBlockReviewSaveButtonLabel;
 	if (
-		[
-			'Review changes',
-			'Get latest post',
-			'Export changes for review',
-		].includes( riskyBlockReviewSaveButtonLabel )
+		[ 'Review changes', 'Export changes for review' ].includes(
+			riskyBlockReviewSaveButtonLabel
+		) ||
+		riskyBlockReviewSaveButtonLabel.toLowerCase().includes( 'latest post' )
 	) {
 		riskyBlockReviewSaveButtonLabel = 'Save';
 	}
@@ -18604,6 +18658,19 @@ function canonicalizeDistributedEditingCoreBlockCommentDelimiters( value ) {
 	);
 }
 
+function canonicalizeDistributedEditingSerializedBlockBoundaryWhitespace(
+	value
+) {
+	if ( typeof value !== 'string' || ! value.includes( '<!-- wp:' ) ) {
+		return value;
+	}
+
+	return value
+		.replace( /(<!--\s*wp:[\s\S]*?-->)\s+(?=<)/g, '$1' )
+		.replace( /(?<=>)\s+(<!--\s*\/wp:[\s\S]*?-->)/g, '$1' )
+		.replace( /(<!--\s*\/wp:[\s\S]*?-->)\s+(?=<!--\s*wp:)/g, '$1' );
+}
+
 function normalizeDistributedEditingHistoryStack( value ) {
 	if ( ! Array.isArray( value ) ) {
 		return [];
@@ -18775,8 +18842,10 @@ export function getDistributedEditingComparablePostContent( postContent ) {
 	const strippedPostContent =
 		stripDistributedEditingSyncMetaFromPostContent( postContent );
 
-	return canonicalizeDistributedEditingCoreBlockCommentDelimiters(
-		strippedPostContent
+	return canonicalizeDistributedEditingSerializedBlockBoundaryWhitespace(
+		canonicalizeDistributedEditingCoreBlockCommentDelimiters(
+			strippedPostContent
+		)
 	);
 }
 
@@ -19046,10 +19115,10 @@ export async function getDistributedEditingPostContentWithYjsSyncMeta( {
 		! Array.isArray( existingSyncMeta )
 			? existingSyncMeta
 			: {} ),
-		schema: 'de-rtc-yjs-v1',
+		schema: DISTRIBUTED_EDITING_YJS_BLOCKS_SCHEMA,
 		version: clientBaseVersion || '0',
 		client_base_version: clientBaseVersion || '0',
-		pending_yjs_encoding: 'native-yjs-php-update-v0',
+		pending_yjs_encoding: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
 		pending_yjs_update: encodeDistributedEditingBase64Json(
 			updateDescriptor.update
 		),
@@ -19128,47 +19197,282 @@ export async function getDistributedEditingYjsClientUpdateDescriptor( {
 		};
 	}
 
-	const change = getDistributedEditingYjsContentChangeDescriptor(
-		base,
-		proposed
-	);
-	const operations = [];
-	let sequence = 0;
+	const baseBlocks = getSerializedBlockTokens( base );
+	const proposedBlocks = getSerializedBlockTokens( proposed );
 
-	if ( change.deleteLength > 0 ) {
-		operations.push( {
-			type: 'delete',
-			index: change.index,
-			length: change.deleteLength,
-			actor,
-			sequence,
-			id: `${ actor }:${ sequence }`,
-		} );
-		sequence += 1;
+	for ( const blockSet of [ baseBlocks, proposedBlocks ] ) {
+		if ( blockSet.status !== 'safe' ) {
+			return {
+				status: 'blocked',
+				reason: blockSet.reason,
+				update: null,
+			};
+		}
 	}
 
-	if ( change.insertText ) {
-		operations.push( {
-			type: 'insert',
-			index: change.index,
-			text: change.insertText,
-			actor,
-			sequence,
-			id: `${ actor }:${ sequence }`,
-		} );
-		sequence += 1;
-	}
+	const operations = await getDistributedEditingYjsBlockNativeOperations( {
+		baseBlocks: baseBlocks.blocks,
+		proposedBlocks: proposedBlocks.blocks,
+		actor,
+	} );
+	const baseContentHash =
+		await getDistributedEditingPostContentSha256Hash( base );
+	const proposedContentHash =
+		await getDistributedEditingPostContentSha256Hash( proposed );
 
 	return {
 		status: 'ready',
 		reason: null,
 		update: {
-			format: 'native-yjs-php-update-v0',
+			format: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
+			schema: DISTRIBUTED_EDITING_YJS_BLOCKS_SCHEMA,
 			operations,
-			stateVector: sequence > 0 ? { [ actor ]: sequence } : {},
+			stateVector:
+				operations.length > 0 ? { [ actor ]: operations.length } : {},
+			baseContentHash,
+			proposedContentHash,
+			baseBlockCount: baseBlocks.blocks.length,
+			proposedBlockCount: proposedBlocks.blocks.length,
 			interop: await getDistributedEditingYjsInteropEvidence(),
 		},
-		changeRange: change.changeRange,
+		changeRange: getDistributedEditingYjsContentChangeDescriptor(
+			base,
+			proposed
+		).changeRange,
+	};
+}
+
+async function getDistributedEditingYjsBlockNativeOperations( {
+	baseBlocks,
+	proposedBlocks,
+	actor,
+} ) {
+	const operations = [];
+	const pushOperation = async ( operation ) => {
+		const sequence = operations.length;
+		operations.push( {
+			actor,
+			sequence,
+			id: `${ actor }:${ sequence }`,
+			...operation,
+		} );
+	};
+	const baseHashes = await Promise.all(
+		baseBlocks.map( ( block ) =>
+			getDistributedEditingPostContentSha256Hash( block )
+		)
+	);
+	const proposedHashes = await Promise.all(
+		proposedBlocks.map( ( block ) =>
+			getDistributedEditingPostContentSha256Hash( block )
+		)
+	);
+
+	if (
+		baseBlocks.length === proposedBlocks.length &&
+		! baseBlocks.every(
+			( block, index ) => block === proposedBlocks[ index ]
+		) &&
+		haveSameSerializedBlockMultiset( baseBlocks, proposedBlocks ) &&
+		new Set( baseHashes ).size === baseHashes.length
+	) {
+		for ( let index = 0; index < baseBlocks.length; index++ ) {
+			if ( baseBlocks[ index ] === proposedBlocks[ index ] ) {
+				continue;
+			}
+
+			const fromIndex = baseHashes.indexOf( proposedHashes[ index ] );
+
+			if ( fromIndex !== -1 && fromIndex !== index ) {
+				await pushOperation( {
+					type: 'block.move',
+					yjsPrimitive: 'Y.Array.delete+insert',
+					fromPath: [ fromIndex ],
+					toPath: [ index ],
+					blockUid: `top:${ proposedHashes[ index ] }`,
+					blockHash: proposedHashes[ index ],
+				} );
+			}
+		}
+
+		return operations;
+	}
+
+	if ( baseBlocks.length === proposedBlocks.length ) {
+		for ( let index = 0; index < baseBlocks.length; index++ ) {
+			if ( baseBlocks[ index ] === proposedBlocks[ index ] ) {
+				continue;
+			}
+
+			await pushOperation(
+				await getDistributedEditingYjsBlockUpdateOperation( {
+					baseBlock: baseBlocks[ index ],
+					proposedBlock: proposedBlocks[ index ],
+					baseBlockHash: baseHashes[ index ],
+					proposedBlockHash: proposedHashes[ index ],
+					path: [ index ],
+				} )
+			);
+		}
+
+		return operations;
+	}
+
+	let prefix = 0;
+	while (
+		prefix < baseBlocks.length &&
+		prefix < proposedBlocks.length &&
+		baseBlocks[ prefix ] === proposedBlocks[ prefix ]
+	) {
+		prefix += 1;
+	}
+
+	let suffix = 0;
+	while (
+		suffix < baseBlocks.length - prefix &&
+		suffix < proposedBlocks.length - prefix &&
+		baseBlocks[ baseBlocks.length - 1 - suffix ] ===
+			proposedBlocks[ proposedBlocks.length - 1 - suffix ]
+	) {
+		suffix += 1;
+	}
+
+	for (
+		let index = baseBlocks.length - suffix - 1;
+		index >= prefix;
+		index--
+	) {
+		await pushOperation( {
+			type: 'block.delete',
+			yjsPrimitive: 'Y.Array.delete',
+			path: [ index ],
+			index,
+			blockUid: `top:${ baseHashes[ index ] }`,
+			blockHash: baseHashes[ index ],
+		} );
+	}
+
+	for (
+		let index = prefix;
+		index < proposedBlocks.length - suffix;
+		index++
+	) {
+		await pushOperation( {
+			type: 'block.insert',
+			yjsPrimitive: 'Y.Array.insert',
+			path: [ index ],
+			index,
+			blockUid: `top:${ proposedHashes[ index ] }`,
+			blockHash: proposedHashes[ index ],
+			blockName: getDistributedEditingBlockIdentitySerializedBlockName(
+				proposedBlocks[ index ]
+			),
+			serializedBlock: proposedBlocks[ index ],
+		} );
+	}
+
+	return operations;
+}
+
+async function getDistributedEditingYjsBlockUpdateOperation( {
+	baseBlock,
+	proposedBlock,
+	baseBlockHash,
+	proposedBlockHash,
+	path,
+} ) {
+	const baseBlockName =
+		getDistributedEditingBlockIdentitySerializedBlockName( baseBlock );
+	const proposedBlockName =
+		getDistributedEditingBlockIdentitySerializedBlockName( proposedBlock );
+
+	if ( baseBlockName && baseBlockName === proposedBlockName ) {
+		const richTextChange = getDistributedEditingYjsRichTextBlockOperation( {
+			baseBlock,
+			proposedBlock,
+			path,
+			baseBlockHash,
+			proposedBlockHash,
+			blockName: baseBlockName,
+		} );
+
+		if ( richTextChange ) {
+			return richTextChange;
+		}
+
+		return {
+			type: 'block.update_serialized',
+			yjsPrimitive: 'Y.Map.set',
+			path,
+			blockUid: `top:${ baseBlockHash }`,
+			blockName: baseBlockName,
+			baseBlockHash,
+			proposedBlockHash,
+			changeRange: getDistributedEditingYjsContentChangeDescriptor(
+				baseBlock,
+				proposedBlock
+			).changeRange,
+			serializedBlock: proposedBlock,
+		};
+	}
+
+	return {
+		type: 'block.replace',
+		yjsPrimitive: 'Y.Map.set+Y.Array.insert',
+		path,
+		blockUid: `top:${ proposedBlockHash }`,
+		baseBlockHash,
+		proposedBlockHash,
+		baseBlockName,
+		proposedBlockName,
+		serializedBlock: proposedBlock,
+	};
+}
+
+function getDistributedEditingYjsRichTextBlockOperation( {
+	baseBlock,
+	proposedBlock,
+	path,
+	baseBlockHash,
+	proposedBlockHash,
+	blockName,
+} ) {
+	const base = getParagraphRichTextBlockParts( baseBlock );
+	const proposed = getParagraphRichTextBlockParts( proposedBlock );
+
+	if (
+		! base ||
+		! proposed ||
+		base.open !== proposed.open ||
+		base.close !== proposed.close
+	) {
+		return null;
+	}
+
+	const baseRichText = getRichTextFormatModel( base.html );
+	const proposedRichText = getRichTextFormatModel( proposed.html );
+
+	if (
+		! baseRichText ||
+		! proposedRichText ||
+		baseRichText.text !== proposedRichText.text
+	) {
+		return null;
+	}
+
+	return {
+		type: 'block.rich_text_format',
+		yjsPrimitive: 'Y.Text.format',
+		path,
+		blockUid: `top:${ baseBlockHash }`,
+		blockName,
+		field: 'innerHTML',
+		baseBlockHash,
+		proposedBlockHash,
+		changedTextIndexes: Array.from(
+			getRichTextChangedIndexes( baseRichText, proposedRichText )
+		),
+		serializedBlock: proposedBlock,
 	};
 }
 
@@ -19367,7 +19671,7 @@ async function getDistributedEditingYjsInteropEvidence() {
 				typeof update?.byteLength === 'number'
 					? update.byteLength
 					: update?.length ?? 0,
-			serverEncoding: 'native-yjs-php-update-v0',
+			serverEncoding: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
 			serverBinaryInteropStatus: 'pending',
 		};
 	} catch {
@@ -19375,7 +19679,7 @@ async function getDistributedEditingYjsInteropEvidence() {
 			jsPackage: '@y/y',
 			jsPackageVersion: '14.0.0-rc.16',
 			jsBinaryUpdateBytes: null,
-			serverEncoding: 'native-yjs-php-update-v0',
+			serverEncoding: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
 			serverBinaryInteropStatus: 'unavailable',
 		};
 	}
@@ -20301,6 +20605,316 @@ function createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDes
 	};
 }
 
+function getDistributedEditingTableCellRetainedBlockMergeDescriptor( {
+	acceptedBlocks = [],
+	acceptedPostContent = '',
+	serverBlocks = [],
+	proposedBlocks = [],
+	serverChangedBlockIndexes = [],
+	proposedChangedBlockIndexes = [],
+} = {} ) {
+	const acceptedTokens = getSerializedBlockTokens( acceptedPostContent );
+
+	if (
+		acceptedTokens.status !== 'safe' ||
+		acceptedTokens.blocks.length !== acceptedBlocks.length
+	) {
+		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+			'table_cell_merge_missing_accepted_base',
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverChangedBlockIndexes,
+				proposedChangedBlockIndexes,
+			}
+		);
+	}
+
+	const serverChangedBlockIndexSet = new Set( serverChangedBlockIndexes );
+	const conflictingBlockIndexes = proposedChangedBlockIndexes.filter(
+		( blockIndex ) => serverChangedBlockIndexSet.has( blockIndex )
+	);
+
+	if ( conflictingBlockIndexes.length === 0 ) {
+		return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+			'table_cell_merge_no_same_block_edits',
+			{
+				acceptedBlockCount: acceptedBlocks.length,
+				serverChangedBlockIndexes,
+				proposedChangedBlockIndexes,
+			}
+		);
+	}
+
+	const tableCellMergedIndexes = [];
+	const tableCellServerChangedCells = [];
+	const tableCellLocalChangedCells = [];
+
+	for ( const blockIndex of conflictingBlockIndexes ) {
+		const acceptedBlock = acceptedBlocks[ blockIndex ];
+
+		if ( acceptedBlock?.block_name !== 'core/table' ) {
+			return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+				'table_cell_merge_unsupported_block',
+				{
+					acceptedBlockCount: acceptedBlocks.length,
+					serverChangedBlockIndexes,
+					proposedChangedBlockIndexes,
+					conflictingBlockIndex: blockIndex,
+				}
+			);
+		}
+
+		const tableCellMerge =
+			getDistributedEditingTableCellSerializedBlockMergeDescriptor( {
+				baseBlock: acceptedTokens.blocks[ blockIndex ],
+				serverBlock: serverBlocks[ blockIndex ],
+				proposedBlock: proposedBlocks[ blockIndex ],
+			} );
+
+		if ( tableCellMerge.status !== 'ready' ) {
+			return createDistributedEditingBlockIdentityRetainedEditsServerMergeBlockedDescriptor(
+				tableCellMerge.reason,
+				{
+					acceptedBlockCount: acceptedBlocks.length,
+					serverChangedBlockIndexes,
+					proposedChangedBlockIndexes,
+					conflictingBlockIndex: blockIndex,
+				}
+			);
+		}
+
+		tableCellMergedIndexes.push( blockIndex );
+		tableCellServerChangedCells.push(
+			...tableCellMerge.serverChangedCells.map( ( cell ) => ( {
+				blockIndex,
+				...cell,
+			} ) )
+		);
+		tableCellLocalChangedCells.push(
+			...tableCellMerge.localChangedCells.map( ( cell ) => ( {
+				blockIndex,
+				...cell,
+			} ) )
+		);
+	}
+
+	return {
+		status: DISTRIBUTED_EDITING_BLOCK_IDENTITY_REQUEST_PROOF_STATUSES.READY,
+		reason: null,
+		requestProof: null,
+		tableCellMergedIndexes,
+		tableCellMergedBlockCount: tableCellMergedIndexes.length,
+		tableCellServerChangedCells,
+		tableCellLocalChangedCells,
+		contentFree: true,
+		usesGutenbergClientId: false,
+		exposesRawContent: false,
+		callsRest: false,
+		callsSave: false,
+		mutatesEditorContent: false,
+		mutatesPersistedPostContent: false,
+		createsRevision: false,
+		changesPostLock: false,
+		claimsSaved: false,
+	};
+}
+
+function getDistributedEditingTableCellSerializedBlockMergeDescriptor( {
+	baseBlock,
+	serverBlock,
+	proposedBlock,
+} = {} ) {
+	const base =
+		getDistributedEditingTableCellSerializedBlockModel( baseBlock );
+	const server =
+		getDistributedEditingTableCellSerializedBlockModel( serverBlock );
+	const proposed =
+		getDistributedEditingTableCellSerializedBlockModel( proposedBlock );
+
+	if ( ! base || ! server || ! proposed ) {
+		return {
+			status: 'blocked',
+			reason: 'table_cell_merge_unsupported_serialized_block',
+		};
+	}
+
+	if (
+		base.shell !== server.shell ||
+		base.shell !== proposed.shell ||
+		base.cells.length !== server.cells.length ||
+		base.cells.length !== proposed.cells.length
+	) {
+		return {
+			status: 'blocked',
+			reason: 'table_cell_merge_structure_changed',
+		};
+	}
+
+	const serverChangedCells = [];
+	const localChangedCells = [];
+
+	for ( const [ cellIndex, baseCell ] of base.cells.entries() ) {
+		if ( baseCell !== server.cells[ cellIndex ] ) {
+			serverChangedCells.push( cellIndex );
+		}
+
+		if ( baseCell !== proposed.cells[ cellIndex ] ) {
+			localChangedCells.push( cellIndex );
+		}
+	}
+
+	if ( serverChangedCells.length === 0 || localChangedCells.length === 0 ) {
+		return {
+			status: 'blocked',
+			reason: 'table_cell_merge_missing_two_sided_cells',
+		};
+	}
+
+	const serverChangedCellSet = new Set( serverChangedCells );
+
+	for ( const cellIndex of localChangedCells ) {
+		if (
+			serverChangedCellSet.has( cellIndex ) &&
+			server.cells[ cellIndex ] !== proposed.cells[ cellIndex ]
+		) {
+			return {
+				status: 'blocked',
+				reason: 'table_cell_merge_same_cell_conflict',
+			};
+		}
+	}
+
+	return {
+		status: 'ready',
+		reason: null,
+		serverChangedCells: getDistributedEditingTableCellChangeEvidence(
+			base,
+			serverChangedCells
+		),
+		localChangedCells: getDistributedEditingTableCellChangeEvidence(
+			base,
+			localChangedCells
+		),
+	};
+}
+
+function getDistributedEditingTableCellSerializedBlockModel( serializedBlock ) {
+	if (
+		typeof serializedBlock !== 'string' ||
+		getDistributedEditingBlockIdentitySerializedBlockName(
+			serializedBlock
+		) !== 'core/table'
+	) {
+		return null;
+	}
+
+	const cellPattern = /<(t[dh])\b[^>]*>([\s\S]*?)<\/\1>/gi;
+	const placeholder = '\u0000DE_RTC_TABLE_CELL\u0000';
+	const cells = [];
+	const cellOffsets = [];
+	let shell = '';
+	let lastOffset = 0;
+	let match;
+
+	while ( ( match = cellPattern.exec( serializedBlock ) ) ) {
+		const fullMatch = match[ 0 ];
+		const tagName = match[ 1 ].toLowerCase();
+		const startTagMatch = fullMatch.match( /^<t[dh]\b[^>]*>/i );
+		const closeTag = `</${ tagName }>`;
+
+		if (
+			! startTagMatch ||
+			! fullMatch.toLowerCase().endsWith( closeTag )
+		) {
+			return null;
+		}
+
+		const contentStart = match.index + startTagMatch[ 0 ].length;
+		const contentEnd = match.index + fullMatch.length - closeTag.length;
+
+		shell +=
+			serializedBlock.slice( lastOffset, contentStart ) + placeholder;
+		lastOffset = contentEnd;
+		cells.push( serializedBlock.slice( contentStart, contentEnd ) );
+		cellOffsets.push( match.index );
+	}
+
+	if ( cells.length === 0 ) {
+		return null;
+	}
+
+	shell += serializedBlock.slice( lastOffset );
+
+	return {
+		shell,
+		cells,
+		coordinates: getDistributedEditingTableCellCoordinates(
+			serializedBlock,
+			cellOffsets
+		),
+	};
+}
+
+function getDistributedEditingTableCellCoordinates(
+	serializedBlock,
+	cellOffsets
+) {
+	const coordinates = cellOffsets.map( ( _offset, cellIndex ) => ( {
+		cellIndex,
+		rowIndex: null,
+		columnIndex: null,
+	} ) );
+	const offsetToCellIndex = new Map(
+		cellOffsets.map( ( offset, cellIndex ) => [ offset, cellIndex ] )
+	);
+	const rowPattern = /<tr\b[^>]*>[\s\S]*?<\/tr>/gi;
+	let rowMatch;
+	let rowIndex = 0;
+
+	while ( ( rowMatch = rowPattern.exec( serializedBlock ) ) ) {
+		const rowHtml = rowMatch[ 0 ];
+		const rowOffset = rowMatch.index;
+		const rowCellPattern = /<t[dh]\b[^>]*>[\s\S]*?<\/t[dh]>/gi;
+		let rowCellMatch;
+		let columnIndex = 0;
+
+		while ( ( rowCellMatch = rowCellPattern.exec( rowHtml ) ) ) {
+			const absoluteCellOffset = rowOffset + rowCellMatch.index;
+			const cellIndex = offsetToCellIndex.get( absoluteCellOffset );
+
+			if ( cellIndex !== undefined ) {
+				coordinates[ cellIndex ] = {
+					cellIndex,
+					rowIndex,
+					columnIndex,
+				};
+			}
+
+			columnIndex++;
+		}
+
+		rowIndex++;
+	}
+
+	return coordinates;
+}
+
+function getDistributedEditingTableCellChangeEvidence( model, changedCells ) {
+	return changedCells.map( ( cellIndex ) => {
+		const coordinate = model.coordinates[ cellIndex ] ?? {
+			cellIndex,
+			rowIndex: null,
+			columnIndex: null,
+		};
+
+		return {
+			cellIndex: coordinate.cellIndex,
+			rowIndex: coordinate.rowIndex,
+			columnIndex: coordinate.columnIndex,
+		};
+	} );
+}
+
 function getDistributedEditingAcceptedBlockIdentityBlocksByHash(
 	acceptedBlocks
 ) {
@@ -20418,6 +21032,7 @@ async function getDistributedEditingBlockIdentityRetainedEditSequence( {
 		reason: null,
 		blockCount: tokens.blocks.length,
 		changedBlockIndexes,
+		blocks: tokens.blocks,
 	};
 }
 

@@ -276,6 +276,89 @@ describe( 'Post actions', () => {
 				currentCanonicalContent: editedContent,
 			} );
 		} );
+
+		it( 'detects formatting-only real block edits against the confirmed base', () => {
+			const baseContent =
+				'<!-- wp:paragraph --><p>This is bold and italicized.</p><!-- /wp:paragraph -->';
+			const editedContent =
+				'<!-- wp:paragraph --><p>This is <strong>bold</strong> and italicized.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: editedContent,
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '9',
+					serverVersion: '9',
+					clientBaseContent: baseContent,
+				} );
+
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingDocumentDirtyState()
+			).toMatchObject( {
+				isDirty: true,
+				baseCanonicalContent: baseContent,
+				currentCanonicalContent: editedContent,
+			} );
+		} );
+
+		it( 'treats Gutenberg block-boundary whitespace differences as clean', () => {
+			const baseContent =
+				'<!-- wp:paragraph --><p>Boundary whitespace should not be dirty.</p><!-- /wp:paragraph -->';
+			const editedContent =
+				'<!-- wp:paragraph -->\n<p>Boundary whitespace should not be dirty.</p>\n<!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: editedContent,
+				status: 'draft',
+			};
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: editedContent,
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '9',
+					serverVersion: '9',
+					clientBaseContent: baseContent,
+				} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingDocumentDirtyState()
+			).toMatchObject( {
+				isDirty: false,
+				baseCanonicalContent:
+					'<!-- wp:paragraph --><p>Boundary whitespace should not be dirty.</p><!-- /wp:paragraph -->',
+				currentCanonicalContent:
+					'<!-- wp:paragraph --><p>Boundary whitespace should not be dirty.</p><!-- /wp:paragraph -->',
+			} );
+		} );
 	} );
 
 	describe( '__experimentalAppendDistributedEditingActionTranscriptEvent()', () => {
@@ -15723,6 +15806,127 @@ describe( 'Post actions', () => {
 			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
 				false
 			);
+		} );
+
+		it( 'adopts a successful normal save as the clean Distributed Editing base', async () => {
+			const baseContent =
+				'<!-- wp:paragraph --><p>Normal Save base.</p><!-- /wp:paragraph -->';
+			const savedContent =
+				'<!-- wp:paragraph --><p>Normal Save persisted.</p><!-- /wp:paragraph -->';
+			const nextEditContent =
+				'<!-- wp:paragraph --><p>Normal Save next edit.</p><!-- /wp:paragraph -->';
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: baseContent,
+				excerpt: 'crackers',
+				status: 'draft',
+			};
+			let normalSaveCalls = 0;
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					normalSaveCalls++;
+					return { ...post, ...data };
+				}
+
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: savedContent,
+			} );
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				distributedEditing: {
+					enabled: true,
+					yjsRawPostContentSave: false,
+				},
+			} );
+			registry
+				.dispatch( editorStore )
+				.setDistributedEditingSessionState( {
+					clientBaseVersion: '4',
+					serverVersion: '4',
+					clientBaseContent: baseContent,
+				} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingDocumentDirtyState()
+			).toMatchObject( {
+				isDirty: true,
+				baseCanonicalContent: baseContent,
+				currentCanonicalContent: savedContent,
+			} );
+
+			await registry.dispatch( editorStore ).savePost( {
+				__experimentalUseDistributedEditingRetrySave: false,
+			} );
+
+			expect( normalSaveCalls ).toBe( 1 );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingDocumentDirtyState()
+			).toMatchObject( {
+				isDirty: false,
+				baseCanonicalContent: savedContent,
+				currentCanonicalContent: savedContent,
+			} );
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingSessionState()
+			).toMatchObject( {
+				clientBaseContent: savedContent,
+				hasPendingChanges: false,
+				pendingChangeCount: 0,
+				canExportLocalUpdates: false,
+				mustOfferLocalCopy: false,
+				isAwaitingServerConfirmation: false,
+			} );
+
+			registry.dispatch( editorStore ).editPost( {
+				content: nextEditContent,
+			} );
+
+			expect(
+				registry
+					.select( editorStore )
+					.getDistributedEditingDocumentDirtyState()
+			).toMatchObject( {
+				isDirty: true,
+				baseCanonicalContent: savedContent,
+				currentCanonicalContent: nextEditContent,
+			} );
 		} );
 
 		it( 'saves a modified post', async () => {

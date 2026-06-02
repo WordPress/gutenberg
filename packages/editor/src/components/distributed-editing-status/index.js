@@ -3526,19 +3526,6 @@ function DistributedEditingStructuralConflictSummary( {
 				>
 					{ __( 'Export for review' ) }
 				</Button>
-				<Button
-					__next40pxDefaultSize
-					data-distributed-editing-structural-conflict-support-action="get_latest_post"
-					variant="tertiary"
-					onClick={ () =>
-						onAction?.(
-							DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
-							actionItem
-						)
-					}
-				>
-					{ __( 'Get latest post' ) }
-				</Button>
 			</div>
 		</div>
 	);
@@ -5090,9 +5077,9 @@ function getDistributedEditingHumanLoopStepCopy( humanLoopStepState ) {
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
 			return {
-				title: __( 'Get latest post' ),
+				title: __( 'Save will check WordPress' ),
 				summary: __(
-					'Getting the latest post only refreshes server state. Local changes stay protected and WordPress is not updated yet.'
+					'Use Save to check the current WordPress copy before the post updates.'
 				),
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
@@ -5140,8 +5127,10 @@ function getDistributedEditingHumanLoopSaveJourneyCopy( humanLoopStepState ) {
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
 			return {
-				title: __( 'Load latest version' ),
-				summary: __( 'Load the latest post before saving again.' ),
+				title: __( 'Save will check WordPress' ),
+				summary: __(
+					'Save will check the current WordPress copy before updating.'
+				),
 			};
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return {
@@ -5222,7 +5211,7 @@ function getDistributedEditingEnabledShellProtectionLine( shellState ) {
 function getDistributedEditingEnabledShellSaveLine( shellState ) {
 	switch ( shellState.humanLoopStep ) {
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.GET_LATEST_POST:
-			return __( 'Getting the latest post only refreshes server state.' );
+			return __( 'Save checks WordPress before updating.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.REVIEW_CHANGES:
 			return __( 'Review changes before Save.' );
 		case DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.READY_TO_SAVE:
@@ -8761,7 +8750,7 @@ function getActionLabel( actionKey, item ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFRESH_RETRY_SUBMIT_PROOF:
 			return __( 'Continue Save' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
-			return __( 'Get latest post' );
+			return null;
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
 			return __( 'Apply local changes' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES:
@@ -8954,9 +8943,9 @@ function getFreshReviewPreSaveStatusText( descriptor ) {
 			};
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.REFETCH_REQUIRED:
 			return {
-				title: __( 'Fresh review needs server refresh' ),
+				title: __( 'Save will check WordPress' ),
 				message: __(
-					'The latest post must be loaded before fresh review can continue. Loading it only fetches server state; it does not save over protected local changes, which remain exportable.'
+					'Save will check the current WordPress copy before fresh review can continue. It will not save over protected local changes, which remain exportable.'
 				),
 			};
 		case DISTRIBUTED_EDITING_FRESH_REVIEW_PRE_SAVE_STATUSES.BLOCKED:
@@ -8968,7 +8957,7 @@ function getFreshReviewPreSaveStatusText( descriptor ) {
 				return {
 					title: __( 'Fresh review already used' ),
 					message: __(
-						'This fresh-review decision was already used by WordPress Save. Request a new fresh review or get the latest post before continuing; protected local changes remain exportable.'
+						'This fresh-review decision was already used by WordPress Save. Request a new fresh review before continuing; protected local changes remain exportable.'
 					),
 				};
 			}
@@ -8976,7 +8965,7 @@ function getFreshReviewPreSaveStatusText( descriptor ) {
 			return {
 				title: __( 'Fresh review blocked' ),
 				message: __(
-					'Fresh review cannot continue from the current review state. Request a new review or get the latest post before continuing; protected local changes remain exportable.'
+					'Fresh review cannot continue from the current review state. Request a new review before continuing; protected local changes remain exportable.'
 				),
 			};
 	}
@@ -9426,7 +9415,7 @@ function getDistributedEditingStatusControlLabel( key ) {
 		case 'staleBaseRetryProofAccepted':
 			return __( 'Save ready' );
 		case 'staleBaseRetryProofStale':
-			return __( 'Load latest version' );
+			return __( 'Save will check WordPress' );
 		case 'staleBaseRetrySaveReady':
 			return __( 'Save ready' );
 		case 'staleBaseRetrySaveBlockedPermission':
@@ -9436,7 +9425,7 @@ function getDistributedEditingStatusControlLabel( key ) {
 		case 'staleBaseRetrySaveSaved':
 			return __( 'Saved' );
 		case 'staleBaseRetrySaveStale':
-			return __( 'Load latest version' );
+			return __( 'Save will check WordPress' );
 		case 'staleBaseRetrySaveTampered':
 			return __( 'Save changed' );
 		case 'staleBaseRetrySaveUnfilteredHtml':
@@ -9444,7 +9433,7 @@ function getDistributedEditingStatusControlLabel( key ) {
 		case 'staleBaseRetrySaveHandoffBlockedProof':
 			return __( 'Save unavailable' );
 		case 'staleBaseRetrySaveHandoffRefetch':
-			return __( 'Load latest version' );
+			return __( 'Save will check WordPress' );
 		case 'staleBaseRetrySaveHandoffMissingRoute':
 			return __( 'Save route missing' );
 		case 'staleBaseRetrySaveHandoffMissingContent':
@@ -9486,7 +9475,7 @@ function getNextStepDescriptor( nextStepAction ) {
 			return {
 				nextStepAction,
 				nextStepMessage: __(
-					'Compare the local changes with the latest post before choosing what to keep.'
+					'Compare local changes with the WordPress copy before choosing what to keep.'
 				),
 			};
 		case 'choose_structural_version':
@@ -9515,13 +9504,6 @@ function getNextStepDescriptor( nextStepAction ) {
 				nextStepAction,
 				nextStepMessage: __(
 					'Try Save again after WordPress accepts these changes.'
-				),
-			};
-		case 'get_latest_post':
-			return {
-				nextStepAction,
-				nextStepMessage: __(
-					'Get the latest post before trying Save again.'
 				),
 			};
 		case 'export_then_reload':
@@ -9588,8 +9570,10 @@ function getStaleBaseStatusText( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED
 	) {
 		return {
-			title: __( 'Load latest version' ),
-			message: __( 'Load the latest post before saving again.' ),
+			title: __( 'Save will check WordPress' ),
+			message: __(
+				'Save will check the current WordPress copy before updating.'
+			),
 			remoteReviewContextMessage,
 			...saveNowContext,
 		};
@@ -9600,8 +9584,10 @@ function getStaleBaseStatusText( descriptor ) {
 		DISTRIBUTED_EDITING_RETRY_SUBMIT_PROOF_STATUSES.STALE_BASE_REJECTED
 	) {
 		return {
-			title: __( 'Load latest version' ),
-			message: __( 'Load the latest post before saving again.' ),
+			title: __( 'Save will check WordPress' ),
+			message: __(
+				'Save will check the current WordPress copy before updating.'
+			),
 			remoteReviewContextMessage,
 			...saveNowContext,
 		};
@@ -9614,7 +9600,7 @@ function getStaleBaseStatusText( descriptor ) {
 		return {
 			title: __( 'Ready to continue Save' ),
 			message: __(
-				'Local changes are ready against the latest post. Continue Save before updating the post.'
+				'Local changes are ready. Continue Save before updating the post.'
 			),
 			remoteReviewContextMessage,
 			...saveNowContext,
@@ -9626,7 +9612,7 @@ function getStaleBaseStatusText( descriptor ) {
 			return {
 				title: __( 'Local changes applied' ),
 				message: __(
-					'The latest post is loaded and local changes were applied in this editor. Continue Save before updating the post.'
+					'WordPress checked the post and local changes were applied in this editor. Continue Save before updating the post.'
 				),
 				remoteReviewContextMessage,
 				...saveNowContext,
@@ -9651,7 +9637,7 @@ function getStaleBaseStatusText( descriptor ) {
 			return {
 				title: __( 'Local changes not ready' ),
 				message: __(
-					'The latest post is not loaded yet. Get latest post before applying local changes.'
+					'Save needs to check WordPress before applying local changes.'
 				),
 				remoteReviewContextMessage,
 				...saveNowContext,
@@ -9664,9 +9650,9 @@ function getStaleBaseStatusText( descriptor ) {
 		descriptor.hasLocalRebaseInputs === false
 	) {
 		return {
-			title: __( 'Latest post data missing' ),
+			title: __( 'WordPress check incomplete' ),
 			message: __(
-				'The editor needs both the starting post and latest post before it can apply local changes. Export local changes before reloading.'
+				'The editor needs both the starting post and current WordPress copy before it can apply local changes. Export local changes before reloading.'
 			),
 			remoteReviewContextMessage,
 			...saveNowContext,
@@ -9679,7 +9665,7 @@ function getStaleBaseStatusText( descriptor ) {
 		descriptor.hasLocalRebaseInputs
 	) {
 		return {
-			title: __( 'Latest post loaded' ),
+			title: __( 'WordPress checked' ),
 			message: __(
 				'Apply local changes in this editor before trying Save again; WordPress is not updated yet.'
 			),
@@ -9691,7 +9677,7 @@ function getStaleBaseStatusText( descriptor ) {
 	return {
 		title: __( 'Post changed on the server' ),
 		message: __(
-			'Get latest post first. Then this editor will say whether local changes can be applied, need comparison, or are ready for WordPress to check.'
+			'Save will check WordPress and then say whether local changes can be applied, need comparison, or are ready to update.'
 		),
 		remoteReviewContextMessage,
 		...saveNowContext,
@@ -9718,9 +9704,9 @@ function getSaveNowContext( descriptor ) {
 		return {
 			saveNowContextAction: 'compare_conflicting_changes',
 			saveNowContextMessage: sprintf(
-				/* translators: %s: Distributed Editing action needed before Save can update the post, such as "Get latest first". */
+				/* translators: %s: Distributed Editing action needed before Save can update the post, such as "resolve changes". */
 				__( 'Save now: %s before Save can update the post.' ),
-				__( 'Compare changes' )
+				__( 'resolve changes' )
 			),
 			saveNowContextStep:
 				DISTRIBUTED_EDITING_HUMAN_LOOP_STEPS.LOCAL_CHANGES_PROTECTED,
@@ -9742,7 +9728,7 @@ function getSaveNowContext( descriptor ) {
 	return {
 		saveNowContextAction: saveJourneyState.action,
 		saveNowContextMessage: sprintf(
-			/* translators: %s: Distributed Editing action needed before Save can update the post, such as "Get latest first". */
+			/* translators: %s: Distributed Editing action needed before Save can update the post, such as "resolve changes". */
 			__( 'Save now: %s before Save can update the post.' ),
 			saveJourneyState.actionHint
 		),
@@ -9824,8 +9810,8 @@ function getRetrySaveStatusText( descriptor ) {
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
 			return {
-				title: __( 'Load latest version' ),
-				message: __( 'Load the latest post before saving again.' ),
+				title: __( 'Save will check WordPress' ),
+				message: __( 'Save will check WordPress before trying again.' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
 			if (
@@ -9947,8 +9933,8 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.STALE_BASE_REJECTED:
 			return {
-				title: __( 'Load latest version' ),
-				message: __( 'Load the latest post before saving again.' ),
+				title: __( 'Save will check WordPress' ),
+				message: __( 'Save will check WordPress before trying again.' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_PERMISSION_DENIED:
 			return {
@@ -9969,7 +9955,7 @@ function getFreshReviewRetrySaveStatusText( descriptor ) {
 				return {
 					title: __( 'Fresh-review decision already consumed' ),
 					message: __(
-						'This fresh-review decision was already used by WordPress Save. Protected local changes remain exportable; request a new fresh review or get the latest post before continuing.'
+						'This fresh-review decision was already used by WordPress Save. Protected local changes remain exportable; request a new fresh review before continuing.'
 					),
 				};
 			}
@@ -10149,9 +10135,8 @@ function getRetrySaveHandoffBlockedText( descriptor ) {
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED:
 			return {
-				title: __( 'Load latest version' ),
-				message: __( 'Load the latest post before saving again.' ),
-				...getNextStepDescriptor( 'get_latest_post' ),
+				title: __( 'Save will check WordPress' ),
+				message: __( 'Save will check WordPress before trying again.' ),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.MISSING_POST_ROUTE:
 			return {

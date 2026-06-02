@@ -841,6 +841,7 @@ _Parameters_
 
 -   _args_ `Object`: Retained-edit merge inputs.
 -   _args.acceptedSyncMeta_ `Object`: Accepted base sync metadata.
+-   _args.acceptedPostContent_ `string`: Accepted base serialized content.
 -   _args.serverPostContent_ `string`: Refetched server serialized content.
 -   _args.proposedPostContent_ `string`: Local proposed serialized content.
 

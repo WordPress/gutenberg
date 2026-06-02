@@ -468,7 +468,7 @@ describe( 'PostSavedState', () => {
 			'data-distributed-editing-save-control-journey-action-required',
 			'true'
 		);
-		expect( button ).toHaveAttribute( 'aria-disabled', 'false' );
+		expect( button ).toBeEnabled();
 
 		await user.click( button );
 
@@ -513,6 +513,48 @@ describe( 'PostSavedState', () => {
 		await user.click( button );
 
 		expect( mockSavePost ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should let a real dirty edit reactivate draft Save after Distributed Editing confirmation', async () => {
+		const user = userEvent.setup();
+		useSelect.mockImplementation( () => ( {
+			isDirty: true,
+			isNew: false,
+			isSaveable: true,
+			isSaving: false,
+			postStatus: 'draft',
+			distributedEditingSaveButtonState: {
+				status: 'retry_save_confirmed',
+				reason: 'retry_save_already_confirmed',
+				source: 'retry_save',
+				label: 'Saved',
+				statusText: 'WordPress saved your changes.',
+				disabled: true,
+				hasRetrySaveSavedStateEvidence: true,
+				authoritativePostUpdated: true,
+				hasProtectedLocalChanges: false,
+				pendingServerConfirmation: false,
+			},
+		} ) );
+		useViewportMatch.mockImplementation( () => true );
+
+		render( <PostSavedState /> );
+
+		const button = screen.getByRole( 'button', {
+			name: 'Save draft',
+		} );
+
+		expect( button ).toBeEnabled();
+		expect( button ).not.toHaveAttribute(
+			'data-distributed-editing-save-button-status'
+		);
+
+		await user.click( button );
+
+		expect(
+			mockMaybeHandleDistributedEditingSaveButtonClick
+		).toHaveBeenCalled();
+		expect( mockSavePost ).toHaveBeenCalled();
 	} );
 
 	it( 'should ignore the default Distributed Editing save descriptor', () => {

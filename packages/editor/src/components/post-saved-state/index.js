@@ -30,6 +30,21 @@ import {
 } from '../distributed-editing-save-journey-cue';
 import DistributedEditingServerSyncButton from '../distributed-editing-server-sync-button';
 
+const DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_STATUS = 'retry_save_confirmed';
+
+function isQuietableDistributedEditingConfirmedSaveButtonState(
+	saveButtonState
+) {
+	return Boolean(
+		saveButtonState?.status ===
+			DISTRIBUTED_EDITING_CONFIRMED_SAVE_BUTTON_STATUS &&
+			saveButtonState.hasRetrySaveSavedStateEvidence &&
+			saveButtonState.authoritativePostUpdated &&
+			! saveButtonState.hasProtectedLocalChanges &&
+			! saveButtonState.pendingServerConfirmation
+	);
+}
+
 /**
  * Component showing whether the post is saved or not and providing save
  * buttons.
@@ -167,21 +182,28 @@ export default function PostSavedState( { forceIsDirty } ) {
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const shortLabel = __( 'Save' );
 
+	const visibleDistributedEditingSaveButtonState =
+		isDirty &&
+		isQuietableDistributedEditingConfirmedSaveButtonState(
+			distributedEditingSaveButtonState
+		)
+			? undefined
+			: distributedEditingSaveButtonState;
 	const hasDistributedEditingSaveButtonState = Boolean(
-		distributedEditingSaveButtonState?.status &&
-			distributedEditingSaveButtonState.status !== 'update_ready'
+		visibleDistributedEditingSaveButtonState?.status &&
+			visibleDistributedEditingSaveButtonState.status !== 'update_ready'
 	);
 	const distributedEditingSaveButtonDisabled = Boolean(
 		hasDistributedEditingSaveButtonState &&
-			distributedEditingSaveButtonState.disabled
+			visibleDistributedEditingSaveButtonState.disabled
 	);
 	const distributedEditingSaveButtonBusy = Boolean(
 		hasDistributedEditingSaveButtonState &&
-			distributedEditingSaveButtonState.busy
+			visibleDistributedEditingSaveButtonState.busy
 	);
 	const distributedEditingAuthoritativePostUpdated = Boolean(
 		hasDistributedEditingSaveButtonState &&
-			distributedEditingSaveButtonState.authoritativePostUpdated
+			visibleDistributedEditingSaveButtonState.authoritativePostUpdated
 	);
 	const hasDistributedEditingSaveJourneyState = Boolean(
 		distributedEditingSaveJourneyState?.shouldExposeInSaveControls
@@ -190,28 +212,30 @@ export default function PostSavedState( { forceIsDirty } ) {
 		hasDistributedEditingSaveButtonState
 			? {
 					'data-distributed-editing-save-button-status':
-						distributedEditingSaveButtonState.status,
+						visibleDistributedEditingSaveButtonState.status,
 					'data-distributed-editing-save-button-source':
-						distributedEditingSaveButtonState.source || undefined,
+						visibleDistributedEditingSaveButtonState.source ||
+						undefined,
 					'data-distributed-editing-save-button-click-action':
-						distributedEditingSaveButtonState.clickAction ||
+						visibleDistributedEditingSaveButtonState.clickAction ||
 						undefined,
 					'data-distributed-editing-save-button-reason':
-						distributedEditingSaveButtonState.reason || undefined,
+						visibleDistributedEditingSaveButtonState.reason ||
+						undefined,
 					'data-distributed-editing-save-button-authority-state':
-						distributedEditingSaveButtonState.authorityState ||
+						visibleDistributedEditingSaveButtonState.authorityState ||
 						undefined,
 					'data-distributed-editing-save-button-local-changes-state':
-						distributedEditingSaveButtonState.localChangesState ||
+						visibleDistributedEditingSaveButtonState.localChangesState ||
 						undefined,
 					'data-distributed-editing-save-button-review-checkpoint-state':
-						distributedEditingSaveButtonState.reviewCheckpointState ||
+						visibleDistributedEditingSaveButtonState.reviewCheckpointState ||
 						undefined,
 					'data-distributed-editing-save-button-authoritative-post-state':
-						distributedEditingSaveButtonState.authoritativePostState ||
+						visibleDistributedEditingSaveButtonState.authoritativePostState ||
 						undefined,
 					'data-distributed-editing-save-button-state-summary':
-						distributedEditingSaveButtonState.saveStateSummaryText ||
+						visibleDistributedEditingSaveButtonState.saveStateSummaryText ||
 						undefined,
 					'data-distributed-editing-save-button-authoritative-post-updated':
 						String( distributedEditingAuthoritativePostUpdated ),
@@ -235,12 +259,12 @@ export default function PostSavedState( { forceIsDirty } ) {
 			distributedEditingSaveJourneyState
 		);
 	} else if ( hasDistributedEditingSaveButtonState ) {
-		buttonTitle = distributedEditingSaveButtonState.statusText;
+		buttonTitle = visibleDistributedEditingSaveButtonState.statusText;
 	}
 	let text;
 
 	if ( hasDistributedEditingSaveButtonState ) {
-		text = distributedEditingSaveButtonState.label;
+		text = visibleDistributedEditingSaveButtonState.label;
 	} else if ( isSaving ) {
 		text = isAutosaving ? __( 'Autosaving' ) : __( 'Saving' );
 	} else if ( isSaved ) {
