@@ -1793,8 +1793,7 @@ async function buildRoutes( activePageIds = new Set() ) {
 		);
 	}
 
-	// With no active pages specified, build every route. Otherwise, skip routes
-	// whose pages are all inactive.
+	// With no active pages specified, build every route. Otherwise, skip routes whose pages are all inactive.
 	const routes =
 		activePageIds.size === 0
 			? allRoutes
@@ -2132,9 +2131,10 @@ async function buildAll( baseUrlExpression ) {
 		} )
 	);
 
-	// Normalize PAGES config to support both string and object formats. String
-	// shorthand is treated as non-stable; pages must opt in to Core builds
-	// explicitly with `stable: true`.
+	/*
+	 * Normalize PAGES config to support both string and object formats.
+	 * String shorthand is treated as non-stable; pages must opt in to Core builds explicitly with `stable: true`.
+	 */
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
 			return { id: page, init: [], title: undefined, stable: false };
