@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- Added detection of dynamic imports of script modules
+
 ## 6.47.0 (2026-05-27)
 
 ## 6.46.0 (2026-05-14)
