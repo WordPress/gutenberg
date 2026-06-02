@@ -17,7 +17,6 @@ import { Icon, check } from '@wordpress/icons';
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { Composite } from '../composite';
-import Tooltip from '../tooltip';
 import type { OptionProps } from './types';
 
 function UnforwardedOptionAsButton(
@@ -25,15 +24,18 @@ function UnforwardedOptionAsButton(
 		id?: string;
 		className?: string;
 		isPressed?: boolean;
+		label?: string;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { isPressed, ...additionalProps } = props;
+	const { isPressed, label, ...additionalProps } = props;
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...additionalProps }
 			aria-pressed={ isPressed }
 			ref={ forwardedRef }
+			label={ label }
 		/>
 	);
 }
@@ -45,10 +47,11 @@ function UnforwardedOptionAsOption(
 		id: string;
 		className?: string;
 		isSelected?: boolean;
+		label?: string;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { id, isSelected, ...additionalProps } = props;
+	const { id, isSelected, label, ...additionalProps } = props;
 
 	const { setActiveId, activeId } = useContext( CircularOptionPickerContext );
 
@@ -65,10 +68,12 @@ function UnforwardedOptionAsOption(
 		<Composite.Item
 			render={
 				<Button
+					__next40pxDefaultSize
 					{ ...additionalProps }
 					role="option"
 					aria-selected={ !! isSelected }
 					ref={ forwardedRef }
+					label={ label }
 				/>
 			}
 			id={ id }
@@ -94,15 +99,22 @@ export function Option( {
 	const commonProps = {
 		id,
 		className: 'components-circular-option-picker__option',
-		__next40pxDefaultSize: true,
 		...additionalProps,
 	};
 
 	const isListbox = setActiveId !== undefined;
 	const optionControl = isListbox ? (
-		<OptionAsOption { ...commonProps } isSelected={ isSelected } />
+		<OptionAsOption
+			{ ...commonProps }
+			label={ tooltipText }
+			isSelected={ isSelected }
+		/>
 	) : (
-		<OptionAsButton { ...commonProps } isPressed={ isSelected } />
+		<OptionAsButton
+			{ ...commonProps }
+			label={ tooltipText }
+			isPressed={ isSelected }
+		/>
 	);
 
 	return (
@@ -112,11 +124,7 @@ export function Option( {
 				'components-circular-option-picker__option-wrapper'
 			) }
 		>
-			{ tooltipText ? (
-				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
-			) : (
-				optionControl
-			) }
+			{ optionControl }
 			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
 		</div>
 	);

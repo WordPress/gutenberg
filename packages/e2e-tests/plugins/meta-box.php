@@ -31,6 +31,7 @@ add_action( 'add_meta_boxes', 'gutenberg_test_meta_box_add_meta_box' );
 
 /**
  * Print excerpt in <meta> tag in wp_head
+ * @global WP_Post $post Global post object.
  */
 function gutenberg_test_meta_box_render_head() {
 	global $post;

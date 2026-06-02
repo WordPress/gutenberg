@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -16,8 +17,8 @@ import { CSS_UNITS } from '../utils';
 
 const meta: Meta< typeof UnitControl > = {
 	component: UnitControl,
-	title: 'Components (Experimental)/Selection & Input/UnitControl',
-	id: 'components-experimental-unitcontrol',
+	title: 'Components/Selection & Input/Common/UnitControl',
+	id: 'components-unitcontrol',
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
 		__unstableStateReducer: { control: false },
@@ -26,12 +27,22 @@ const meta: Meta< typeof UnitControl > = {
 		prefix: { control: { type: 'text' } },
 		value: { control: false },
 	},
+	tags: [ 'status-experimental', 'manifest' ],
+	args: {
+		onChange: fn(),
+		onUnitChange: fn(),
+		onFocus: fn(),
+		onBlur: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -44,6 +55,7 @@ const DefaultTemplate: StoryFn< typeof UnitControl > = ( {
 
 	return (
 		<UnitControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v, extra ) => {
@@ -111,6 +123,7 @@ export const WithCustomUnits: StoryFn< typeof UnitControl > = ( {
 
 	return (
 		<UnitControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v, extra ) => {

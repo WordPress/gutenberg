@@ -26,11 +26,15 @@ import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
+import PostRevisionSummary from './post-revision-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
+import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
+import PostRevisionsPanel from '../post-revisions-panel';
+import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -53,12 +57,16 @@ const SidebarContent = ( {
 	keyboardShortcut,
 	onActionPerformed,
 	extraPanels,
+	postType,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
+	const isRevisionsMode = useSelect( ( select ) => {
+		return unlock( select( editorStore ) ).isRevisionsMode();
+	} );
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
@@ -87,6 +95,37 @@ const SidebarContent = ( {
 		}
 	}, [ tabName ] );
 
+	let tabContent;
+	if ( isRevisionsMode ) {
+		tabContent = <PostRevisionSummary />;
+	} else {
+		tabContent = (
+			<>
+				<PostSummary onActionPerformed={ onActionPerformed } />
+				<PluginDocumentSettingPanel.Slot />
+				<TemplateContentPanel />
+				{ window?.__experimentalDataFormInspector &&
+					[
+						'post',
+						'page',
+						'wp_template',
+						'wp_template_part',
+						'wp_block',
+					].includes( postType ) && (
+						<>
+							<TemplateActionsPanel />
+							<PostRevisionsPanel />
+						</>
+					) }
+				<TemplatePartContentPanel />
+				<PostTransformPanel />
+				<PostTaxonomiesPanel />
+				<PatternOverridesPanel />
+				{ extraPanels }
+			</>
+		);
+	}
+
 	return (
 		<PluginSidebar
 			identifier={ tabName }
@@ -103,7 +142,7 @@ const SidebarContent = ( {
 			headerClassName="editor-sidebar__panel-tabs"
 			title={
 				/* translators: button label text should, if possible, be under 16 characters. */
-				_x( 'Settings', 'sidebar button label' )
+				_x( 'Settings', 'panel button label' )
 			}
 			toggleShortcut={ keyboardShortcut }
 			icon={ isRTL() ? drawerLeft : drawerRight }
@@ -111,17 +150,11 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<PostSummary onActionPerformed={ onActionPerformed } />
-					<PluginDocumentSettingPanel.Slot />
-					<TemplateContentPanel />
-					<TemplatePartContentPanel />
-					<PostTransformPanel />
-					<PostTaxonomiesPanel />
-					<PatternOverridesPanel />
-					{ extraPanels }
+					{ tabContent }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
+					{ isRevisionsMode && <RevisionBlockDiffPanel /> }
 				</Tabs.TabPanel>
 			</Tabs.Context.Provider>
 		</PluginSidebar>
@@ -130,7 +163,7 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, showSummary } = useSelect(
+	const { tabName, keyboardShortcut, showSummary, postType } = useSelect(
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
@@ -151,6 +184,8 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					: sidebars.document;
 			}
 
+			const _postType = select( editorStore ).getCurrentPostType();
+
 			return {
 				tabName: _tabName,
 				keyboardShortcut: shortcut,
@@ -158,7 +193,8 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					TEMPLATE_POST_TYPE,
 					TEMPLATE_PART_POST_TYPE,
 					NAVIGATION_POST_TYPE,
-				].includes( select( editorStore ).getCurrentPostType() ),
+				].includes( _postType ),
+				postType: _postType,
 			};
 		},
 		[]
@@ -187,6 +223,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				showSummary={ showSummary }
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
+				postType={ postType }
 			/>
 		</Tabs>
 	);

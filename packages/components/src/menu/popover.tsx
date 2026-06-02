@@ -17,18 +17,15 @@ import {
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import type { MenuPopoverProps } from './types';
+import type { PopoverProps } from './types';
 import * as Styled from './styles';
-import { MenuContext } from './context';
+import { Context } from './context';
 
-export const MenuPopover = forwardRef<
+export const Popover = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuPopoverProps, 'div', false >
->( function MenuPopover(
-	{ gutter, children, shift, modal = true, ...otherProps },
-	ref
-) {
-	const menuContext = useContext( MenuContext );
+	WordPressComponentProps< PopoverProps, 'div', false >
+>( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
+	const menuContext = useContext( Context );
 
 	// Extract the side from the applied placement — useful for animations.
 	// Using `currentPlacement` instead of `placement` to make sure that we
@@ -70,8 +67,20 @@ export const MenuPopover = forwardRef<
 		);
 	}
 
+	const renderMenu = useCallback(
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<Styled.MenuMotionRoot>
+				<Styled.MenuSurface
+					{ ...htmlProps }
+					variant={ menuContext.variant }
+				/>
+			</Styled.MenuMotionRoot>
+		),
+		[ menuContext.variant ]
+	);
+
 	return (
-		<Ariakit.Menu
+		<Styled.Menu
 			{ ...otherProps }
 			ref={ ref }
 			modal={ modal }
@@ -84,20 +93,11 @@ export const MenuPopover = forwardRef<
 			shift={ shift ?? ( menuContext.store.parent ? -4 : 0 ) }
 			hideOnHoverOutside={ false }
 			data-side={ appliedPlacementSide }
+			data-submenu={ !! menuContext.store.parent || undefined }
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			render={ ( renderProps ) => (
-				// Two wrappers are needed for the entry animation, where the menu
-				// container scales with a different factor than its contents.
-				// The {...renderProps} are passed to the inner wrapper, so that the
-				// menu element is the direct parent of the menu item elements.
-				<Styled.MenuPopoverOuterWrapper variant={ menuContext.variant }>
-					<Styled.MenuPopoverInnerWrapper { ...renderProps } />
-				</Styled.MenuPopoverOuterWrapper>
-			) }
-		>
-			{ children }
-		</Ariakit.Menu>
+			render={ renderMenu }
+		/>
 	);
 } );

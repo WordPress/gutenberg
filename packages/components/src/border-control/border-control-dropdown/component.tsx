@@ -157,9 +157,10 @@ const BorderControlDropdown = (
 		onStyleChange,
 		popoverContentClassName,
 		popoverControlsClassName,
-		resetButtonClassName,
+		resetButtonWrapperClassName,
 		size,
 		__unstablePopoverProps,
+		onToggle: onToggleProp, // Remove from `otherProps` to avoid type errors (native HTML `onToggle` vs `Dropdown` `onToggle`).
 		...otherProps
 	} = useBorderControlDropdown( props );
 
@@ -173,7 +174,7 @@ const BorderControlDropdown = (
 		enableStyle
 	);
 
-	const showResetButton = color || ( style && style !== 'none' );
+	const enableResetButton = color || ( style && style !== 'none' );
 	const dropdownPosition = __experimentalIsRenderedInSidebar
 		? 'bottom left'
 		: undefined;
@@ -199,48 +200,42 @@ const BorderControlDropdown = (
 		</Button>
 	);
 
-	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
-		onClose,
-	} ) => (
-		<>
-			<DropdownContentWrapper paddingSize="medium">
-				<VStack className={ popoverControlsClassName } spacing={ 6 }>
-					<ColorPalette
-						className={ popoverContentClassName }
-						value={ color }
-						onChange={ onColorChange }
-						{ ...{ colors, disableCustomColors } }
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						clearable={ false }
-						enableAlpha={ enableAlpha }
+	const renderContent = () => (
+		<DropdownContentWrapper paddingSize="medium">
+			<VStack className={ popoverControlsClassName } spacing={ 6 }>
+				<ColorPalette
+					className={ popoverContentClassName }
+					value={ color }
+					onChange={ onColorChange }
+					{ ...{ colors, disableCustomColors } }
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					clearable={ false }
+					enableAlpha={ enableAlpha }
+				/>
+				{ enableStyle && isStyleSettable && (
+					<BorderControlStylePicker
+						label={ __( 'Style' ) }
+						value={ style }
+						onChange={ onStyleChange }
 					/>
-					{ enableStyle && isStyleSettable && (
-						<BorderControlStylePicker
-							label={ __( 'Style' ) }
-							value={ style }
-							onChange={ onStyleChange }
-						/>
-					) }
-				</VStack>
-			</DropdownContentWrapper>
-			{ showResetButton && (
-				<DropdownContentWrapper paddingSize="none">
-					<Button
-						className={ resetButtonClassName }
-						variant="tertiary"
-						onClick={ () => {
-							onReset();
-							onClose();
-						} }
-						__next40pxDefaultSize
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</DropdownContentWrapper>
-			) }
-		</>
+				) }
+			</VStack>
+			<div className={ resetButtonWrapperClassName }>
+				<Button
+					variant="tertiary"
+					onClick={ () => {
+						onReset();
+					} }
+					disabled={ ! enableResetButton }
+					accessibleWhenDisabled
+					__next40pxDefaultSize
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			</div>
+		</DropdownContentWrapper>
 	);
 
 	return (

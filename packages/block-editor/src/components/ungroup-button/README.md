@@ -1,6 +1,6 @@
 # Ungroup Button
 
-The `UngroupButton` components adds an icon on the BlockControls toolbar when a group block is selected. Then, it's possible to ungroup the inner blocks. After click on the icon, it removes the group block holding the InnerBlocks components which are moved one level up in the hierarchy.
+The `UngroupButton` component adds an icon on the BlockControls toolbar when a group block is selected. Then, it's possible to ungroup the inner blocks. After click on the icon, it removes the group block holding the InnerBlocks components which are moved one level up in the hierarchy.
 
 This only happens in the mobile WordPress apps.
 

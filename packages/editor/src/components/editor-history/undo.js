@@ -38,7 +38,7 @@ function EditorHistoryUndo( props, ref ) {
 	);
 }
 
-/** @typedef {import('react').Ref<HTMLElement>} Ref */
+/** @typedef {React.Ref<HTMLElement>} Ref */
 
 /**
  * Renders the undo button for the editor history.

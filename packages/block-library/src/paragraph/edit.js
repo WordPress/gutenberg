@@ -13,7 +13,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
-	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -24,18 +23,19 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
-import { formatLtr } from '@wordpress/icons';
+import { formatLTR } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
+import useDeprecatedAlign from './deprecated-attributes';
 import { unlock } from '../lock-unlock';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
 			<ToolbarButton
-				icon={ formatLtr }
+				icon={ formatLTR }
 				title={ _x( 'Left to right', 'editor button' ) }
 				isActive={ direction === 'ltr' }
 				onClick={ () => {
@@ -56,15 +56,25 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 	// and type performance. By moving it within InspectorControls, the subscription is
 	// now only added for the selected block(s).
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
+	const hasSelectedStyleState = useSelect(
+		( select ) => {
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
 
-	if ( ! isDropCapFeatureEnabled ) {
+			return hasSelectedBlockStyleState( clientId );
+		},
+		[ clientId ]
+	);
+
+	if ( ! isDropCapFeatureEnabled || hasSelectedStyleState ) {
 		return null;
 	}
 
-	const { align, dropCap } = attributes;
+	const { style, dropCap } = attributes;
+	const textAlign = style?.typography?.textAlign;
 
 	let helpText;
-	if ( hasDropCapDisabled( align ) ) {
+	if ( hasDropCapDisabled( textAlign ) ) {
 		helpText = __( 'Not available for aligned text.' );
 	} else if ( dropCap ) {
 		helpText = __( 'Showing large initial letter.' );
@@ -84,17 +94,16 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 				hasValue={ () => !! dropCap }
 				label={ __( 'Drop cap' ) }
 				isShownByDefault={ isDropCapControlEnabledByDefault }
-				onDeselect={ () => setAttributes( { dropCap: undefined } ) }
-				resetAllFilter={ () => ( { dropCap: undefined } ) }
+				onDeselect={ () => setAttributes( { dropCap: false } ) }
+				resetAllFilter={ () => ( { dropCap: false } ) }
 				panelId={ clientId }
 			>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Drop cap' ) }
 					checked={ !! dropCap }
 					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
 					help={ helpText }
-					disabled={ hasDropCapDisabled( align ) }
+					disabled={ hasDropCapDisabled( textAlign ) }
 				/>
 			</ToolsPanelItem>
 		</InspectorControls>
@@ -111,42 +120,22 @@ function ParagraphBlock( {
 	isSelected: isSingleSelected,
 	name,
 } ) {
-	const isZoomOut = useSelect( ( select ) =>
-		unlock( select( blockEditorStore ) ).isZoomOut()
-	);
-
-	const { align, content, direction, dropCap } = attributes;
+	const { content, direction, dropCap, placeholder, style } = attributes;
+	const textAlign = style?.typography?.textAlign;
+	useDeprecatedAlign( attributes.align, style, setAttributes );
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
 		className: clsx( {
-			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
-			[ `has-text-align-${ align }` ]: align,
+			'has-drop-cap': hasDropCapDisabled( textAlign ) ? false : dropCap,
 		} ),
 		style: { direction },
 	} );
 	const blockEditingMode = useBlockEditingMode();
-	let { placeholder } = attributes;
-	if ( isZoomOut ) {
-		placeholder = '';
-	} else if ( ! placeholder ) {
-		placeholder = __( 'Type / to choose a block' );
-	}
 
 	return (
 		<>
 			{ blockEditingMode === 'default' && (
 				<BlockControls group="block">
-					<AlignmentControl
-						value={ align }
-						onChange={ ( newAlign ) =>
-							setAttributes( {
-								align: newAlign,
-								dropCap: hasDropCapDisabled( newAlign )
-									? false
-									: dropCap,
-							} )
-						}
-					/>
 					<ParagraphRTLControl
 						direction={ direction }
 						setDirection={ ( newDirection ) =>
@@ -182,10 +171,8 @@ function ParagraphBlock( {
 						: __( 'Block: Paragraph' )
 				}
 				data-empty={ RichText.isEmpty( content ) }
-				placeholder={ placeholder }
-				data-custom-placeholder={
-					placeholder && ! isZoomOut ? true : undefined
-				}
+				placeholder={ placeholder || __( 'Type / to choose a block' ) }
+				data-custom-placeholder={ placeholder ? true : undefined }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

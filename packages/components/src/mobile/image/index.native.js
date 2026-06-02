@@ -282,7 +282,7 @@ const ImageComponent = ( {
 				accessible
 				disabled={ ! isSelected }
 				accessibilityLabel={ alt }
-				accessibilityHint={ __( 'Double tap and hold to edit' ) }
+				accessibilityHint={ __( 'Double tap to view larger.' ) }
 				accessibilityRole="imagebutton"
 				key={ url }
 				style={ imageContainerStyles }

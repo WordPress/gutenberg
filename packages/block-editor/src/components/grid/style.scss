@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .block-editor-grid-visualizer {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
@@ -20,6 +25,7 @@
 
 .block-editor-grid-visualizer__grid {
 	display: grid;
+	position: absolute;
 }
 
 .block-editor-grid-visualizer__cell {
@@ -125,10 +131,11 @@
 			right: $grid-unit-10;
 			z-index: -1;
 
-			// Animate in.
-			animation: components-button__appear-animation 0.1s ease;
-			animation-fill-mode: forwards;
-			@include reduce-motion("animation");
+			@media not ( prefers-reduced-motion ) {
+				// Animate in.
+				animation: components-button__appear-animation 0.1s ease;
+				animation-fill-mode: forwards;
+			}
 		}
 
 		// Don't show the focus inherited by the Button component.
@@ -174,11 +181,12 @@
 
 .editor-collapsible-block-toolbar {
 	.block-editor-grid-item-mover__move-vertical-button-container {
-		// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+		// Reduce height and move up a little to prevent the toolbar
+		// shift when focus is on the vertical movers.
 		@include break-small() {
 			height: $grid-unit-50;
 			position: relative;
-			top: -5px; // Should be -4px, but that causes scrolling when focus lands on the movers, in a 60px header.
+			top: #{$grid-unit-05 * -1};
 		}
 	}
 }

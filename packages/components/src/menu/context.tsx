@@ -6,8 +6,7 @@ import { createContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { MenuContext as MenuContextType } from './types';
+import type { ContextProps } from './types';
 
-export const MenuContext = createContext< MenuContextType | undefined >(
-	undefined
-);
+export const Context = createContext< ContextProps | undefined >( undefined );
+Context.displayName = 'MenuContext';

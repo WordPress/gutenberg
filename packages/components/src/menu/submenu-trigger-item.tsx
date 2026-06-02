@@ -13,16 +13,16 @@ import { chevronRightSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import type { MenuItemProps } from './types';
-import { MenuContext } from './context';
-import { MenuItem } from './item';
+import type { ItemProps } from './types';
+import { Context } from './context';
+import { Item } from './item';
 import * as Styled from './styles';
 
-export const MenuSubmenuTriggerItem = forwardRef<
+export const SubmenuTriggerItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< MenuItemProps, 'div', false >
->( function MenuSubmenuTriggerItem( { suffix, ...otherProps }, ref ) {
-	const menuContext = useContext( MenuContext );
+	WordPressComponentProps< ItemProps, 'div', false >
+>( function SubmenuTriggerItem( { suffix, ...otherProps }, ref ) {
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store.parent ) {
 		throw new Error(
@@ -36,10 +36,10 @@ export const MenuSubmenuTriggerItem = forwardRef<
 			accessibleWhenDisabled
 			store={ menuContext.store }
 			render={
-				<MenuItem
+				<Item
 					{ ...otherProps }
 					// The menu item needs to register and be part of the parent menu.
-					// Without specifying the store explicitly, the `MenuItem` component
+					// Without specifying the store explicitly, the `Item` component
 					// would otherwise read the store via context and pick up the one from
 					// the sub-menu `Menu` component.
 					store={ menuContext.store.parent }

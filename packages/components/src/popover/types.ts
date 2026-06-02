@@ -1,8 +1,6 @@
-/**
- * External dependencies
- */
-import type { ReactNode, MutableRefObject, SyntheticEvent } from 'react';
 import type { Placement } from '@floating-ui/react-dom';
+import type { useFocusOnMount } from '@wordpress/compose';
+import type { RefObject, ReactNode, SyntheticEvent } from 'react';
 
 type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
@@ -14,9 +12,7 @@ type DomRectWithOwnerDocument = DOMRect & {
 
 type PopoverPlacement = Placement | 'overlay';
 
-export type PopoverAnchorRefReference = MutableRefObject<
-	Element | null | undefined
->;
+export type PopoverAnchorRefReference = RefObject< Element | null | undefined >;
 export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
 
 export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
@@ -75,15 +71,17 @@ export type PopoverProps = {
 	 */
 	constrainTabbing?: boolean;
 	/**
-	 * By default, the _first tabbable element_ in the popover will receive focus
-	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
-	 * Specifying a `false` value disables the focus handling entirely (this
-	 * should only be done when an appropriately accessible substitute behavior
-	 * exists).
+	 * Determines focus behavior when the popover mounts.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
 	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: 'firstElement' | boolean;
+	focusOnMount?: useFocusOnMount.Mode;
 	/**
 	 * A callback invoked when the focus leaves the opened popover. This should
 	 * only be provided in advanced use-cases when a popover should close under
@@ -129,6 +127,8 @@ export type PopoverProps = {
 	/**
 	 * Adjusts the size of the popover to prevent its contents from going out of
 	 * view when meeting the viewport edges.
+	 * _Note: The `resize` and `shift` props are not intended to be used together.
+	 * Enabling both can cause unexpected behavior._
 	 *
 	 * @default true
 	 */
@@ -136,6 +136,8 @@ export type PopoverProps = {
 	/**
 	 * Enables the `Popover` to shift in order to stay in view when meeting the
 	 * viewport edges.
+	 * _Note: The `resize` and `shift` props are not intended to be used together.
+	 * Enabling both can cause unexpected behavior._
 	 *
 	 * @default false
 	 */
@@ -205,4 +207,14 @@ export type PopoverProps = {
 	 * @deprecated
 	 */
 	isAlternate?: boolean;
+};
+
+export type PopoverSlotProps = {
+	/**
+	 * The name of the Slot in which the popover should be rendered. It should
+	 * be also passed to the corresponding `PopoverSlot` component.
+	 *
+	 * @default 'Popover'
+	 */
+	name?: string;
 };

@@ -45,7 +45,18 @@ export type AuthorSelectProps = Pick<
 };
 
 type Order = 'asc' | 'desc';
-type OrderBy = 'date' | 'title';
+type OrderBy = 'date' | 'title' | 'menu_order';
+
+export type OrderByOption = {
+	/**
+	 * The label to be shown to the user.
+	 */
+	label: string;
+	/**
+	 * Option value passed to `onChange` when the option is selected.
+	 */
+	value: `${ OrderBy }/${ Order }`;
+};
 
 type BaseQueryControlsProps = {
 	/**
@@ -99,6 +110,10 @@ type BaseQueryControlsProps = {
 	 * The meta key by which to order posts.
 	 */
 	orderBy?: OrderBy;
+	/**
+	 * List of available ordering options.
+	 */
+	orderByOptions?: OrderByOption[];
 	/**
 	 * The selected author ID.
 	 */

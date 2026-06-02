@@ -7,8 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { DELETE, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { useDispatch } from '@wordpress/data';
-
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
@@ -18,12 +17,14 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import {
+	Icon as WCIcon,
 	Button,
 	Dropdown,
 	TextControl,
 	ToolbarButton,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
@@ -31,11 +32,12 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const SocialLinkURLPopover = ( {
@@ -108,6 +110,7 @@ const SocialLinkEdit = ( {
 	isSelected,
 	setAttributes,
 	clientId,
+	name,
 } ) => {
 	const { url, service, label = '', rel } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -138,8 +141,17 @@ const SocialLinkEdit = ( {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
-	const IconComponent = getIconBySite( service );
-	const socialLinkName = getNameBySite( service );
+	const { activeVariation } = useSelect(
+		( select ) => {
+			const { getActiveBlockVariation } = select( blocksStore );
+			return {
+				activeVariation: getActiveBlockVariation( name, attributes ),
+			};
+		},
+		[ name, attributes ]
+	);
+
+	const { icon, label: socialLinkName } = getSocialService( activeVariation );
 	// The initial label (ie. the link text) is an empty string.
 	// We want to prevent empty links so that the link text always fallbacks to
 	// the social name, even when users enter and save an empty string or only
@@ -167,7 +179,7 @@ const SocialLinkEdit = ( {
 				// to edit this attribute.
 				<BlockControls group="other">
 					<Dropdown
-						popoverProps={ { position: 'bottom right' } }
+						popoverProps={ { placement: 'bottom-start' } }
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<ToolbarButton
 								onClick={ onToggle }
@@ -180,7 +192,6 @@ const SocialLinkEdit = ( {
 						renderContent={ () => (
 							<TextControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								className="wp-block-social-link__toolbar_content_text"
 								label={ __( 'Text' ) }
 								help={ __(
@@ -214,7 +225,6 @@ const SocialLinkEdit = ( {
 					>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
 								'The text is visible when enabled from the parent Social Icons block.'
@@ -231,8 +241,17 @@ const SocialLinkEdit = ( {
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
-					label={ __( 'Link rel' ) }
+					label={ __( 'Link relation' ) }
+					help={ createInterpolateElement(
+						__(
+							'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+						),
+						{
+							a: (
+								<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+							),
+						}
+					) }
 					value={ rel || '' }
 					onChange={ ( value ) => setAttributes( { rel: value } ) }
 				/>
@@ -258,7 +277,7 @@ const SocialLinkEdit = ( {
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<button aria-haspopup="dialog" { ...blockProps } role="button">
-					<IconComponent />
+					<WCIcon icon={ icon } />
 					<span
 						className={ clsx( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,

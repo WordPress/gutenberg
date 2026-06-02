@@ -22,7 +22,7 @@ type SelectControlBaseProps< V extends string > = Pick<
 	| 'size'
 	| 'suffix'
 > &
-	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
+	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'help' > & {
 		/**
 		 * An array of option property objects to be rendered,
 		 * each with a `label` and `value` property, as well as any other

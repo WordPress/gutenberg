@@ -126,7 +126,6 @@ const EMPTY_OBJECT = {};
  * 	return (
  * 		<form onSubmit={ onRename }>
  * 			<TextControl
- *				__nextHasNoMarginBottom
  *				__next40pxDefaultSize
  * 				label={ __( 'Name' ) }
  * 				value={ page.editedRecord.title }
@@ -223,7 +222,7 @@ export default function useEntityRecord< RecordType >(
 	};
 }
 
-export function __experimentalUseEntityRecord(
+export function useDeprecatedEntityRecord(
 	kind: string,
 	name: string,
 	recordId: any,

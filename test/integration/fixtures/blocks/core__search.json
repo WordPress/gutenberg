@@ -7,8 +7,7 @@
 			"placeholder": "",
 			"buttonPosition": "button-outside",
 			"buttonUseIcon": false,
-			"query": {},
-			"isSearchFieldHidden": false
+			"query": {}
 		},
 		"innerBlocks": []
 	}

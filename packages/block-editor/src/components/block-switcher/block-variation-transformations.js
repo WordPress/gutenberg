@@ -100,6 +100,8 @@ function BlockVariationTransformationItem( {
 			} }
 			onMouseLeave={ () => setHoveredTransformItemName( null ) }
 			onMouseEnter={ () => setHoveredTransformItemName( name ) }
+			onFocus={ () => setHoveredTransformItemName( name ) }
+			onBlur={ () => setHoveredTransformItemName( null ) }
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ title }

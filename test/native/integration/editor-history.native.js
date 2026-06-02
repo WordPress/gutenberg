@@ -51,7 +51,7 @@ describe( 'Editor History', () => {
 		const screen = await initializeEditor();
 
 		// Act
-		await addBlock( screen, 'Verse' );
+		await addBlock( screen, 'Poetry' );
 		await addBlock( screen, 'Image' );
 		await addBlock( screen, 'Paragraph' );
 
@@ -252,7 +252,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog.</p>
+		<p>A <a href="http://wordpress.org" target="_blank" rel="noopener">quick</a> brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 
@@ -274,7 +274,7 @@ describe( 'Editor History', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:paragraph -->
-		<p>A <a href="http://wordpress.org" target="_blank" rel="noreferrer noopener">quick</a> brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog.</p>
+		<p>A <a href="http://wordpress.org" target="_blank" rel="noopener">quick</a> brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );

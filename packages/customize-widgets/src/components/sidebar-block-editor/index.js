@@ -52,8 +52,8 @@ export default function SidebarBlockEditor( {
 		return {
 			hasUploadPermissions:
 				select( coreStore ).canUser( 'create', {
-					kind: 'root',
-					name: 'media',
+					kind: 'postType',
+					name: 'attachment',
 				} ) ?? true,
 			isFixedToolbarActive: !! get(
 				'core/customize-widgets',

@@ -43,6 +43,7 @@
 	},
 	"usesContext": [ "enhancedPagination" ],
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"html": false,
 		"spacing": {
@@ -64,6 +65,15 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
+			}
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
 			}
 		},
 		"interactivity": {

@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .edit-site-layout {
 	height: 100%;
 	background: $gray-900;
@@ -18,7 +23,7 @@
 }
 
 .edit-site-layout__sidebar-region {
-	z-index: z-index(".edit-site-layout__sidebar");
+	z-index: 1;
 	width: 100vw;
 	flex-shrink: 0;
 
@@ -55,7 +60,9 @@
 .edit-site-layout__mobile {
 	position: relative;
 	width: 100%;
-	z-index: z-index(".edit-site-layout__canvas-container");
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
 
 	/*
 	 * The SiteHubMobile component is displayed
@@ -68,26 +75,18 @@
 	.edit-site-sidebar__screen-wrapper {
 		padding: 0;
 	}
+
+	.edit-site-sidebar-navigation-screen__main {
+		padding: 0 $grid-unit-15;
+	}
 }
 
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
-	z-index: z-index(".edit-site-layout__canvas-container");
+	z-index: 2;
 	// When animating the frame size can exceed its container size.
 	overflow: visible;
-
-	&.is-resizing::after {
-		// This covers the whole content which ensures mouse up triggers
-		// even if the content is "inert".
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		content: "";
-		z-index: z-index(".edit-site-layout__canvas-container.is-resizing::after");
-	}
 }
 
 .edit-site-layout__canvas {
@@ -118,7 +117,7 @@
 			// This ensure the radius work properly.
 			overflow: hidden;
 
-			@media (prefers-reduced-motion: no-preference) {
+			@media not (prefers-reduced-motion) {
 				transition: border-radius, box-shadow 0.4s;
 			}
 
@@ -201,10 +200,10 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		content: "";
 		display: block;
 		position: absolute;
-		top: 9px;
-		right: 9px;
-		bottom: 9px;
-		left: 9px;
+		top: $grid-unit-10 + $border-width;
+		right: $grid-unit-10 + $border-width;
+		bottom: $grid-unit-10 + $border-width;
+		left: $grid-unit-20 + $border-width;
 		border-radius: $radius-medium;
 		box-shadow: none;
 
@@ -262,10 +261,6 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	}
 }
 
-.edit-site .components-editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
+.edit-site-layout__snackbar {
+	@include snackbar-container();
 }

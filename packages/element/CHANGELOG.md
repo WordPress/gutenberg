@@ -2,6 +2,82 @@
 
 ## Unreleased
 
+## 7.0.0 (2026-05-27)
+
+### Breaking Changes
+
+-   Updated dependencies to React 19.2.4 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+-   Removed the `render`, `hydrate` and `unmountComponentAtNode` exports that have been deprecated since WordPress 6.2 after upgrade to React 18 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
+### New Features
+
+-   Added new `react` exports: `Activity`, `use`, `useActionState`, `useEffectEvent`, and `useOptimistic` ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+-   Added new `react-dom` exports: `useFormStatus`, `preconnect`, `prefetchDNS`, `preinit`, `preinitModule`, `preload`, and `preloadModule` ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
+## 6.46.0 (2026-05-14)
+
+## 6.45.0 (2026-04-29)
+
+## 6.44.0 (2026-04-15)
+
+### Enhancement
+
+-   `createInterpolateElement` now infers tag names from `sprintf` return values, since `sprintf` returns `TransformedText<T>`. ([76974](https://github.com/WordPress/gutenberg/pull/76974))
+
+## 6.43.0 (2026-04-01)
+
+## 6.42.0 (2026-03-18)
+
+## 6.41.0 (2026-03-04)
+
+## 6.40.0 (2026-02-18)
+
+## 6.39.0 (2026-01-29)
+
+## 6.38.0 (2026-01-16)
+
+## 6.36.0 (2025-11-26)
+
+## 6.35.0 (2025-11-12)
+
+## 6.34.0 (2025-10-29)
+
+## 6.33.0 (2025-10-17)
+
+## 6.32.0 (2025-10-01)
+
+## 6.31.0 (2025-09-17)
+
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+## 6.27.0 (2025-07-23)
+
+## 6.26.0 (2025-06-25)
+
+## 6.25.0 (2025-06-04)
+
+## 6.24.0 (2025-05-22)
+
+## 6.23.0 (2025-05-07)
+
+## 6.22.0 (2025-04-11)
+
+## 6.21.0 (2025-03-27)
+
+## 6.20.0 (2025-03-13)
+
+## 6.19.0 (2025-02-28)
+
+## 6.18.0 (2025-02-12)
+
+## 6.17.0 (2025-01-29)
+
+## 6.16.0 (2025-01-15)
+
 ## 6.15.0 (2025-01-02)
 
 ## 6.14.0 (2024-12-11)
