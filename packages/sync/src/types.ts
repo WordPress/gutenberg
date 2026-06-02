@@ -118,8 +118,13 @@ export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
 }
 
+// `userSave` represents a user-facing entity save. `backgroundCRDTSnapshot`
+// is a durable CRDT checkpoint and must not trigger save notifications or
+// remote entity refetches.
+export type SyncPersistenceEvent = 'userSave' | 'backgroundCRDTSnapshot';
+
 export interface SyncManagerUpdateOptions {
-	isSave?: boolean;
+	persistenceEvent?: SyncPersistenceEvent;
 	isNewUndoLevel?: boolean;
 }
 

@@ -798,7 +798,7 @@ export const saveEntityRecord =
 							recordId,
 							__unstableSkipSyncUpdate ? {} : updatedRecord,
 							LOCAL_UNDO_IGNORED_ORIGIN,
-							{ isSave: true }
+							{ persistenceEvent: 'userSave' }
 						);
 					}
 				}

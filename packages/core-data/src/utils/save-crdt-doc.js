@@ -6,7 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { getSyncManager } from '../sync';
+import { getSyncManager, LOCAL_UNDO_IGNORED_ORIGIN } from '../sync';
 
 const SYNC_SAVE_API_PATH = '/wp-sync/v1/save';
 const saveCRDTDocQueues = new Map();
@@ -29,6 +29,14 @@ async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
 			doc: serializedDoc,
 		},
 	} );
+
+	getSyncManager()?.update(
+		objectType,
+		objectId,
+		{},
+		LOCAL_UNDO_IGNORED_ORIGIN,
+		{ persistenceEvent: 'backgroundCRDTSnapshot' }
+	);
 }
 
 /**
