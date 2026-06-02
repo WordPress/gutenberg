@@ -137,10 +137,12 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const { media, postType, postPermalink } = useSelect(
+	const { media, postType, postPermalink, hasSelectedStyleState } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
 			return {
 				media:
 					featuredImage &&
@@ -153,9 +155,10 @@ export default function PostFeaturedImageEdit( {
 					postTypeSlug,
 					postId
 				)?.link,
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 			};
 		},
-		[ featuredImage, postTypeSlug, postId ]
+		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
 
 	const mediaUrl =
@@ -237,14 +240,16 @@ export default function PostFeaturedImageEdit( {
 					clientId={ clientId }
 				/>
 			</InspectorControls>
-			<InspectorControls group="dimensions">
-				<DimensionControls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					media={ media }
-				/>
-			</InspectorControls>
+			{ ! hasSelectedStyleState && (
+				<InspectorControls group="dimensions">
+					<DimensionControls
+						clientId={ clientId }
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						media={ media }
+					/>
+				</InspectorControls>
+			) }
 			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
 				<InspectorControls>
 					<ToolsPanel
@@ -278,16 +283,7 @@ export default function PostFeaturedImageEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
-								label={
-									postType?.labels.singular_name
-										? sprintf(
-												// translators: %s: Name of the post type e.g: "post".
-												__( 'Link to %s' ),
-												postType.labels.singular_name
-										  )
-										: __( 'Link to post' )
-								}
+								label={ __( 'Make image a link' ) }
 								onChange={ () =>
 									setAttributes( { isLink: ! isLink } )
 								}
@@ -307,7 +303,6 @@ export default function PostFeaturedImageEdit( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Open in new tab' ) }
 									onChange={ ( value ) =>
 										setAttributes( {
@@ -333,7 +328,6 @@ export default function PostFeaturedImageEdit( {
 							>
 								<TextControl
 									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={ __( 'Link relation' ) }
 									help={ createInterpolateElement(
 										__(

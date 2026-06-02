@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -12,6 +12,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
@@ -21,16 +22,16 @@ import {
 const { useLocation } = unlock( routerPrivateApis );
 
 const postTypesWithoutParentTemplate = [
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	PATTERN_TYPES.user,
-	'wp_registered_template',
 ];
 
 const authorizedPostTypes = [ 'page', 'post' ];
 
-function getPostType( name, postId ) {
+function getPostType( name ) {
 	let postType;
 	if ( name === 'navigation-item' ) {
 		postType = NAVIGATION_POST_TYPE;
@@ -39,13 +40,9 @@ function getPostType( name, postId ) {
 	} else if ( name === 'template-part-item' ) {
 		postType = TEMPLATE_PART_POST_TYPE;
 	} else if ( name === 'templates' ) {
-		postType = /^\d+$/.test( postId )
-			? TEMPLATE_POST_TYPE
-			: 'wp_registered_template';
+		postType = TEMPLATE_POST_TYPE;
 	} else if ( name === 'template-item' ) {
 		postType = TEMPLATE_POST_TYPE;
-	} else if ( name === 'static-template-item' ) {
-		postType = 'wp_registered_template';
 	} else if ( name === 'page-item' || name === 'pages' ) {
 		postType = 'page';
 	} else if ( name === 'post-item' || name === 'posts' ) {
@@ -56,29 +53,22 @@ function getPostType( name, postId ) {
 }
 
 export function useResolveEditedEntity() {
+	const { editEntityRecord } = useDispatch( coreDataStore );
+	const { hasEntityRecord } = useSelect( coreDataStore );
 	const { name, params = {}, query } = useLocation();
-	const { postId: _postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
-	const _postType = getPostType( name, _postId ) ?? query?.postType;
+	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
+	const postType = getPostType( name, postId ) ?? query?.postType;
+	// Extract selectedBlock from URL for selection restoration on navigation back.
+	const { selectedBlock } = query;
+
+	// Track which selection we've applied to avoid re-applying the same one,
+	// but allow applying a new one if the URL changes.
+	const appliedSelectionRef = useRef( null );
 
 	const homePage = useSelect( ( select ) => {
 		const { getHomePage } = unlock( select( coreDataStore ) );
 		return getHomePage();
 	}, [] );
-
-	const [ postType, postId ] = useSelect(
-		( select ) => {
-			if ( _postType !== 'wp_registered_template' ) {
-				return [ _postType, _postId ];
-			}
-			return [
-				TEMPLATE_POST_TYPE,
-				unlock( select( coreDataStore ) ).getTemplateAutoDraftId(
-					_postId
-				),
-			];
-		},
-		[ _postType, _postId ]
-	);
 
 	/**
 	 * This is a hook that recreates the logic to resolve a template for a given WordPress postID postTypeId
@@ -126,18 +116,6 @@ export function useResolveEditedEntity() {
 		[ homePage, postId, postType ]
 	);
 
-	const editableResolvedTemplateId = useSelect(
-		( select ) => {
-			if ( typeof resolvedTemplateId !== 'string' ) {
-				return resolvedTemplateId;
-			}
-			return unlock( select( coreDataStore ) ).getTemplateAutoDraftId(
-				resolvedTemplateId
-			);
-		},
-		[ resolvedTemplateId ]
-	);
-
 	const context = useMemo( () => {
 		if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
 			return {};
@@ -155,20 +133,59 @@ export function useResolveEditedEntity() {
 		return {};
 	}, [ homePage, postType, postId ] );
 
+	// Compute entity info based on conditions
+	let entity;
 	if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
-		return { isReady: true, postType, postId, context };
-	}
-
-	if ( !! homePage ) {
-		return {
-			isReady: editableResolvedTemplateId !== undefined,
+		entity = { isReady: true, postType, postId, context };
+	} else if ( !! homePage ) {
+		entity = {
+			isReady: resolvedTemplateId !== undefined,
 			postType: TEMPLATE_POST_TYPE,
-			postId: editableResolvedTemplateId,
+			postId: resolvedTemplateId,
 			context,
 		};
+	} else {
+		entity = { isReady: false };
 	}
 
-	return { isReady: false };
+	// Restore selection from URL synchronously, before EditorProvider renders.
+	// This ensures the selection is available when blocks are reset.
+	// When editing a page with a template, EditorProvider reads selection from
+	// the page entity (context), not the template entity.
+	if (
+		selectedBlock &&
+		entity.isReady &&
+		appliedSelectionRef.current !== selectedBlock
+	) {
+		const selectionPostType = entity.context?.postId
+			? entity.context.postType
+			: entity.postType;
+		const selectionPostId = entity.context?.postId
+			? entity.context.postId
+			: entity.postId;
+
+		// Only apply selection if the entity record is loaded,
+		// otherwise editEntityRecord will throw.
+		if (
+			hasEntityRecord( 'postType', selectionPostType, selectionPostId )
+		) {
+			editEntityRecord(
+				'postType',
+				selectionPostType,
+				selectionPostId,
+				{
+					selection: {
+						selectionStart: { clientId: selectedBlock },
+						selectionEnd: { clientId: selectedBlock },
+					},
+				},
+				{ undoIgnore: true }
+			);
+			appliedSelectionRef.current = selectedBlock;
+		}
+	}
+
+	return entity;
 }
 
 export function useSyncDeprecatedEntityIntoState( {

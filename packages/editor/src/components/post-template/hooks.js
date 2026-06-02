@@ -3,7 +3,8 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -52,74 +53,130 @@ export function useAllowSwitchingTemplates() {
 }
 
 function useTemplates( postType ) {
-	// To do: create a new selector to checks if templates exist at all instead
-	// of and unbound request. In the modal, the user templates should be
-	// paginated and we should not make an unbound request.
-	const { defaultTemplateTypes, registeredTemplates, userTemplates } =
-		useSelect(
-			( select ) => {
-				return {
-					defaultTemplateTypes:
-						select( coreStore ).getCurrentTheme()
-							?.default_template_types,
-					registeredTemplates: select( coreStore ).getEntityRecords(
-						'postType',
-						'wp_registered_template',
-						{
-							per_page: -1,
-							post_type: postType,
-						}
-					),
-					userTemplates: select( coreStore ).getEntityRecords(
-						'postType',
-						'wp_template',
-						{ per_page: -1 }
-					),
-				};
-			},
-			[ postType ]
-		);
-
-	return useMemo( () => {
-		if (
-			! defaultTemplateTypes ||
-			! registeredTemplates ||
-			! userTemplates
-		) {
-			return [];
-		}
-		return [
-			...registeredTemplates,
-			...userTemplates.filter(
-				( template ) =>
-					// Only give "custom" templates as an option, which
-					// means the is_wp_suggestion meta field is not set and
-					// the slug is not found in the default template types.
-					// https://github.com/WordPress/wordpress-develop/blob/97382397b2bd7c85aef6d4cd1c10bafd397957fc/src/wp-includes/block-template-utils.php#L858-L867
-					! template.meta.is_wp_suggestion &&
-					! defaultTemplateTypes.find(
-						( type ) => type.slug === template.slug
-					)
-			),
-		];
-	}, [ registeredTemplates, userTemplates, defaultTemplateTypes ] );
+	return useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
+				per_page: -1,
+				post_type: postType,
+				// We look at the combined templates for now (old endpoint)
+				// because posts only accept slugs for templates, not IDs.
+			} ),
+		[ postType ]
+	);
 }
 
-export function useAvailableTemplates( postType ) {
+export function useAvailableTemplates() {
+	const { postType, postId } = useEditedPostContext();
+	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const templates = useTemplates( postType );
+	// Add the default template to the available ones. We don't care about
+	// possible assignment to postspage/homepage because it's guarded by
+	// `allowSwitchingTemplate` above.
+	const defaultTemplate = useSelect(
+		( select ) => {
+			// Only append the default template if the experiment is enabled.
+			if ( ! window?.__experimentalDataFormInspector ) {
+				return null;
+			}
+			// If the default template is already assigned, no need
+			// to add it to the available templates.
+			if ( ! currentTemplateSlug ) {
+				return null;
+			}
+			const { getDefaultTemplateId, getEntityRecord } =
+				select( coreStore );
+			let slug;
+			if ( postSlug ) {
+				slug =
+					postType === 'page'
+						? `${ postType }-${ postSlug }`
+						: `single-${ postType }-${ postSlug }`;
+			} else {
+				slug = postType === 'page' ? 'page' : `single-${ postType }`;
+			}
+			const templateId = getDefaultTemplateId( { slug } );
+			if ( ! templateId ) {
+				return null;
+			}
+			return getEntityRecord( 'postType', 'wp_template', templateId );
+		},
+		[ currentTemplateSlug, postSlug, postType ]
+	);
 	return useMemo(
 		() =>
 			allowSwitchingTemplate &&
-			templates?.filter(
-				( template ) =>
-					( template.is_custom || template.type === 'wp_template' ) &&
-					template.slug !== currentTemplateSlug &&
-					!! template.content.raw // Skip empty templates.
-			),
-		[ templates, currentTemplateSlug, allowSwitchingTemplate ]
+			[
+				...( templates || [] ).filter(
+					( template ) =>
+						template.is_custom &&
+						template.slug !== currentTemplateSlug &&
+						!! template.content.raw // Skip empty templates.
+				),
+				defaultTemplate && {
+					...defaultTemplate,
+					title: {
+						rendered: sprintf(
+							// translators: %s: Template name
+							__( '%s (default)' ),
+							defaultTemplate.title.rendered
+						),
+					},
+					// That's extra custom prop in order to update to an empty template
+					// when we select the default template.
+					isDefault: true,
+				},
+			].filter( Boolean ),
+		[
+			templates,
+			defaultTemplate,
+			currentTemplateSlug,
+			allowSwitchingTemplate,
+		]
 	);
+}
+
+export function usePostTemplatePanelMode() {
+	return useSelect( ( select ) => {
+		const { getEditorSettings, getCurrentTemplateId, getCurrentPostType } =
+			select( editorStore );
+		const { getPostType, canUser } = select( coreStore );
+		const postTypeSlug = getCurrentPostType();
+		const postType = getPostType( postTypeSlug );
+		const settings = getEditorSettings();
+		const isBlockTheme = settings.__unstableIsBlockBasedTheme;
+		const hasTemplates =
+			!! settings.availableTemplates &&
+			Object.keys( settings.availableTemplates ).length > 0;
+		let isVisible;
+		if ( ! postType?.viewable ) {
+			isVisible = false;
+		} else if ( hasTemplates ) {
+			isVisible = true;
+		} else if ( ! settings.supportsTemplateMode ) {
+			isVisible = false;
+		} else {
+			isVisible =
+				canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_template',
+				} ) ?? false;
+		}
+		const canViewTemplates = isVisible
+			? !! canUser( 'read', {
+					kind: 'postType',
+					name: 'wp_template',
+			  } )
+			: false;
+		if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
+			return 'classic';
+		}
+		if ( isBlockTheme && !! getCurrentTemplateId() ) {
+			return 'block-theme';
+		}
+		return null;
+	}, [] );
 }
 
 export function useCurrentTemplateSlug() {

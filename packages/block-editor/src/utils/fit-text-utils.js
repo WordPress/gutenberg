@@ -4,39 +4,70 @@
  */
 
 /**
- * Generate CSS rule for single text element.
+ * Find optimal font size using simple binary search between 0-2400px.
  *
- * @param {string} elementSelector CSS selector for the text element
- * @param {number} fontSize        Font size in pixels
- * @return {string} CSS rule string
- */
-function generateCSSRule( elementSelector, fontSize ) {
-	return `${ elementSelector } { font-size: ${ fontSize }px !important; }`;
-}
-
-/**
- * Find optimal font size using simple binary search between 5-600px.
- *
- * @param {HTMLElement} textElement     The text element
- * @param {string}      elementSelector CSS selector for the text element
- * @param {Function}    applyStylesFn   Function to apply test styles
+ * @param {HTMLElement} textElement   The text element
+ * @param {Function}    applyFontSize Function that receives font size in pixels
  * @return {number} Optimal font size
  */
-function findOptimalFontSize( textElement, elementSelector, applyStylesFn ) {
+function findOptimalFontSize( textElement, applyFontSize ) {
 	const alreadyHasScrollableHeight =
 		textElement.scrollHeight > textElement.clientHeight;
-	let minSize = 5;
-	let maxSize = 600;
+	let minSize = 0;
+	let maxSize = 2400;
 	let bestSize = minSize;
+
+	const computedStyle = window.getComputedStyle( textElement );
+	let paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
+	let paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
+	const range = document.createRange();
+	range.selectNodeContents( textElement );
+
+	let referenceElement = textElement;
+	const parentElement = textElement.parentElement;
+	if ( parentElement ) {
+		const parentElementComputedStyle =
+			window.getComputedStyle( parentElement );
+		if ( parentElementComputedStyle?.display === 'flex' ) {
+			referenceElement = parentElement;
+			paddingLeft +=
+				parseFloat( parentElementComputedStyle.paddingLeft ) || 0;
+			paddingRight +=
+				parseFloat( parentElementComputedStyle.paddingRight ) || 0;
+		}
+	}
+	let maxclientHeight = referenceElement.clientHeight;
 
 	while ( minSize <= maxSize ) {
 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
-		applyStylesFn( generateCSSRule( elementSelector, midSize ) );
+		applyFontSize( midSize );
 
-		const fitsWidth = textElement.scrollWidth <= textElement.clientWidth;
+		// When there is padding if the text overflows to the
+		// padding area, it should be considered overflowing.
+		// Use Range API to measure actual text content dimensions.
+		const rect = range.getBoundingClientRect();
+		const textWidth = rect.width;
+
+		// Check if text fits within the element's width and is not
+		// overflowing into the padding area.
+		const fitsWidth =
+			textElement.scrollWidth <= referenceElement.clientWidth &&
+			textWidth <=
+				referenceElement.clientWidth - paddingLeft - paddingRight;
+		// Check if text fits within the element's height.
 		const fitsHeight =
 			alreadyHasScrollableHeight ||
-			textElement.scrollHeight <= textElement.clientHeight;
+			textElement.scrollHeight <= referenceElement.clientHeight ||
+			textElement.scrollHeight <= maxclientHeight;
+
+		// When there are calculated line heights, text may jump in height
+		// the available space may decrease while the font size decreases,
+		// making text not fit.
+		// We store a maximum reference height: the maximum reference element height that was observed
+		// during the loop to avoid issues with such jumps.
+		if ( referenceElement.clientHeight > maxclientHeight ) {
+			maxclientHeight = referenceElement.clientHeight;
+		}
 
 		if ( fitsWidth && fitsHeight ) {
 			bestSize = midSize;
@@ -45,31 +76,27 @@ function findOptimalFontSize( textElement, elementSelector, applyStylesFn ) {
 			maxSize = midSize - 1;
 		}
 	}
+	range.detach();
 
 	return bestSize;
 }
 
 /**
  * Complete fit text optimization for a single text element.
- * Handles the full flow using callbacks for style management.
+ * Handles the full flow using callbacks for font size application.
  *
- * @param {HTMLElement} textElement     The text element (paragraph, heading, etc.)
- * @param {string}      elementSelector CSS selector for the text element
- * @param {Function}    applyStylesFn   Function to apply CSS styles (pass empty string to clear)
+ * @param {HTMLElement} textElement   The text element (paragraph, heading, etc.)
+ * @param {Function}    applyFontSize Function that receives font size in pixels (0 to clear, >0 to apply)
  */
-export function optimizeFitText( textElement, elementSelector, applyStylesFn ) {
+export function optimizeFitText( textElement, applyFontSize ) {
 	if ( ! textElement ) {
 		return;
 	}
 
-	applyStylesFn( '' );
+	applyFontSize( 0 );
 
-	const optimalSize = findOptimalFontSize(
-		textElement,
-		elementSelector,
-		applyStylesFn
-	);
+	const optimalSize = findOptimalFontSize( textElement, applyFontSize );
 
-	const cssRule = generateCSSRule( elementSelector, optimalSize );
-	applyStylesFn( cssRule );
+	applyFontSize( optimalSize );
+	return optimalSize;
 }

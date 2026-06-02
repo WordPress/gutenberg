@@ -19,6 +19,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -31,10 +32,12 @@ export default function TermNameEdit( {
 	setAttributes,
 	context: { termId, taxonomy },
 } ) {
-	const { textAlign, level = 0, isLink } = attributes;
+	const { textAlign, level = 0, isLink, levelOptions } = attributes;
 	const { term } = useTermName( termId, taxonomy );
 
-	const termName = term?.name || __( 'Term Name' );
+	const termName = term?.name
+		? decodeEntities( term.name )
+		: __( 'Term Name' );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -63,7 +66,7 @@ export default function TermNameEdit( {
 			<BlockControls group="block">
 				<HeadingLevelDropdown
 					value={ level }
-					options={ [ 0, 1, 2, 3, 4, 5, 6 ] }
+					options={ levelOptions }
 					onChange={ ( newLevel ) => {
 						setAttributes( { level: newLevel } );
 					} }
@@ -92,7 +95,6 @@ export default function TermNameEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Make term name a link' ) }
 							onChange={ () =>
 								setAttributes( { isLink: ! isLink } )

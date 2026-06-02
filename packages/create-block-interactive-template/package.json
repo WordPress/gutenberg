@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block-interactive-template",
-	"version": "2.32.0",
+	"version": "2.47.0",
 	"description": "Template for @wordpress/create-block to create interactive blocks with the Interactivity API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,9 +22,6 @@
 	"engines": {
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
-	},
-	"exports": {
-		"./package.json": "./package.json"
 	},
 	"publishConfig": {
 		"access": "public"

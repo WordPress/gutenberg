@@ -46,6 +46,9 @@ export const StyledTextarea = styled.textarea`
 	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
 	padding: 9px 11px;
 
+	// Matching the 20px line-height + the 9px top and bottom padding.
+	min-height: 38px;
+
 	${ inputStyleNeutral };
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
@@ -57,6 +60,12 @@ export const StyledTextarea = styled.textarea`
 
 	&:focus {
 		${ inputStyleFocus }
+	}
+
+	&:disabled {
+		background: ${ COLORS.ui.backgroundDisabled };
+		border-color: ${ COLORS.ui.borderDisabled };
+		color: ${ COLORS.ui.textDisabled };
 	}
 
 	// Use opacity to work in various editor styles.

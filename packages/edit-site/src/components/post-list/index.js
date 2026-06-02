@@ -12,11 +12,9 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -24,13 +22,20 @@ import { useView } from '@wordpress/views';
 import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
+	OPERATOR_BEFORE,
+	OPERATOR_AFTER,
 	LAYOUT_LIST,
 } from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
-import { defaultLayouts, getDefaultView } from './view-utils';
+import {
+	useEditPostAction,
+	useQuickEditPostAction,
+} from '../dataviews-actions';
+
+import useNotesCount from './use-notes-count';
+import { QuickEditModal } from './quick-edit-modal';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -51,17 +56,26 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const postTypeObject = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			return getPostType( postType );
-		},
-		[ postType ]
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+		form: quickEditForm,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: postType,
+	} );
+	const activeViewOverrides = useMemo(
+		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
+		[ viewList, activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: activeView,
+		slug: 'default',
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -75,15 +89,14 @@ export default function PostList( { postType } ) {
 				} )
 			);
 		},
-		defaultView: getDefaultView( postTypeObject, activeView ),
 	} );
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
 
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
@@ -98,8 +111,12 @@ export default function PostList( { postType } ) {
 		},
 		[ path, history ]
 	);
+	useEffect( () => {
+		const newSelection = postId?.split( ',' ) ?? [];
+		setSelection( newSelection );
+	}, [ postId ] );
 
-	const { isLoading: isLoadingFields, fields: fields } = usePostFields( {
+	const fields = usePostFields( {
 		postType,
 	} );
 
@@ -122,6 +139,17 @@ export default function PostList( { postType } ) {
 				filter.operator === OPERATOR_IS_NONE
 			) {
 				filters.author_exclude = filter.value;
+			}
+			if ( filter.field === 'date' ) {
+				// Skip if no value is set yet
+				if ( ! filter.value ) {
+					return;
+				}
+				if ( filter.operator === OPERATOR_BEFORE ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === OPERATOR_AFTER ) {
+					filters.after = filter.value;
+				}
 			}
 		} );
 
@@ -147,20 +175,37 @@ export default function PostList( { postType } ) {
 		isResolving: isLoadingData,
 		totalItems,
 		totalPages,
+		hasResolved,
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
+
+	const postIds = useMemo(
+		() => records?.map( ( record ) => record.id ) ?? [],
+		[ records ]
+	);
+	const { notesCount, isLoading: isLoadingNotesCount } =
+		useNotesCount( postIds );
 
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
-		if ( ! isLoadingFields && view?.sort?.field === 'author' ) {
-			return filterSortAndPaginate(
+		let processedRecords = records;
+
+		if ( view?.sort?.field === 'author' ) {
+			processedRecords = filterSortAndPaginate(
 				records,
 				{ sort: { ...view.sort } },
 				fields
 			).data;
 		}
 
-		return records;
-	}, [ records, fields, isLoadingFields, view?.sort ] );
+		if ( processedRecords ) {
+			return processedRecords.map( ( record ) => ( {
+				...record,
+				notesCount: notesCount[ record.id ] ?? 0,
+			} ) );
+		}
+
+		return processedRecords;
+	}, [ records, fields, view?.sort, notesCount ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
@@ -204,10 +249,15 @@ export default function PostList( { postType } ) {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
-	const actions = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ postTypeActions, editAction ]
-	);
+	const quickEditAction = useQuickEditPostAction();
+	const actions = useMemo( () => {
+		if ( view.type === LAYOUT_LIST ) {
+			const editActionPrimary = { ...editAction, isPrimary: true };
+			return [ editActionPrimary, ...postTypeActions ];
+		}
+
+		return [ editAction, quickEditAction, ...postTypeActions ];
+	}, [ view.type, editAction, quickEditAction, postTypeActions ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
@@ -217,28 +267,27 @@ export default function PostList( { postType } ) {
 		history.navigate( `/${ type }/${ id }?canvas=edit` );
 		closeModal();
 	};
+	const closeQuickEditModal = () => {
+		history.navigate(
+			addQueryArgs( path, {
+				...query,
+				quickEdit: undefined,
+			} )
+		);
+	};
 
 	return (
 		<Page
 			title={ labels?.name }
+			headingLevel={ 2 }
 			actions={
 				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
 					{ labels?.add_new_item && canCreateRecord && (
 						<>
 							<Button
 								variant="primary"
 								onClick={ openModal }
+								size="compact"
 								__next40pxDefaultSize
 							>
 								{ labels.add_new_item }
@@ -261,7 +310,9 @@ export default function PostList( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
-				isLoading={ isLoadingData || isLoadingFields }
+				isLoading={
+					isLoadingData || isLoadingNotesCount || ! hasResolved
+				}
 				view={ view }
 				onChangeView={ onChangeView }
 				selection={ selection }
@@ -273,26 +324,26 @@ export default function PostList( { postType } ) {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
-				header={
-					window.__experimentalQuickEditDataViews &&
-					view.type !== LAYOUT_LIST &&
-					postType === 'page' && (
-						<Button
-							size="compact"
-							isPressed={ quickEdit }
-							icon={ drawerRight }
-							label={ __( 'Details' ) }
-							onClick={ () => {
-								history.navigate(
-									addQueryArgs( path, {
-										quickEdit: quickEdit ? undefined : true,
-									} )
-								);
-							} }
-						/>
-					)
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
 				}
 			/>
+			{ quickEdit &&
+				! isLoadingData &&
+				selection.length > 0 &&
+				view.type !== LAYOUT_LIST && (
+					<QuickEditModal
+						postType={ postType }
+						postId={ selection }
+						closeModal={ closeQuickEditModal }
+						quickEditForm={ quickEditForm }
+					/>
+				) }
 		</Page>
 	);
 }

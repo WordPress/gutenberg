@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 10.47.0 (2026-05-27)
+
+## 10.46.0 (2026-05-14)
+
+## 10.45.0 (2026-04-29)
+
+### New Features
+
+-   Export `keyedReducer` higher-order reducer helper, consolidating duplicated copies previously maintained in `@wordpress/core-data` and `@wordpress/notices` ([#77364](https://github.com/WordPress/gutenberg/pull/77364)).
+
+## 10.44.0 (2026-04-15)
+
+## 10.43.0 (2026-04-01)
+
+## 10.42.0 (2026-03-18)
+
+## 10.41.0 (2026-03-04)
+
+## 10.40.0 (2026-02-18)
+
+## 10.39.0 (2026-01-29)
+
+## 10.38.0 (2026-01-16)
+
+## 10.36.0 (2025-11-26)
+
+## 10.35.0 (2025-11-12)
+
+## 10.34.0 (2025-10-29)
+
+## 10.33.0 (2025-10-17)
+
 ## 10.32.0 (2025-10-01)
 
 ## 10.31.0 (2025-09-17)

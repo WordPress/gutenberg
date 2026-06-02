@@ -2,70 +2,24 @@
  * External dependencies
  */
 import removeAccents from 'remove-accents';
-import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
 
 /**
  * WordPress dependencies
  */
-import { getDate } from '@wordpress/date';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import {
-	OPERATOR_IS,
-	OPERATOR_IS_NOT,
-	OPERATOR_IS_NONE,
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_ALL,
-	OPERATOR_IS_NOT_ALL,
-	OPERATOR_LESS_THAN,
-	OPERATOR_GREATER_THAN,
-	OPERATOR_LESS_THAN_OR_EQUAL,
-	OPERATOR_GREATER_THAN_OR_EQUAL,
-	OPERATOR_BEFORE,
-	OPERATOR_AFTER,
-	OPERATOR_BEFORE_INC,
-	OPERATOR_AFTER_INC,
-	OPERATOR_CONTAINS,
-	OPERATOR_NOT_CONTAINS,
-	OPERATOR_STARTS_WITH,
-	OPERATOR_BETWEEN,
-	OPERATOR_ON,
-	OPERATOR_NOT_ON,
-	OPERATOR_IN_THE_PAST,
-	OPERATOR_OVER,
-} from '../constants';
-import normalizeFields from './normalize-fields';
-import type { Field, View } from '../types';
+import { OPERATOR_IS_NOT_ALL } from '../constants';
+import normalizeFields from '../field-types';
+import type { Field, Operator, View } from '../types';
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
 const EMPTY_ARRAY: [] = [];
-
-/**
- * Calculates a date offset from now.
- *
- * @param value Number of units to offset.
- * @param unit  Unit of time to offset.
- * @return      Date offset from now.
- */
-function getRelativeDate( value: number, unit: string ): Date {
-	switch ( unit ) {
-		case 'days':
-			return subDays( new Date(), value );
-		case 'weeks':
-			return subWeeks( new Date(), value );
-		case 'months':
-			return subMonths( new Date(), value );
-		case 'years':
-			return subYears( new Date(), value );
-		default:
-			return new Date();
-	}
-}
 
 /**
  * Applies the filtering, sorting and pagination to the raw data based on the view configuration.
@@ -118,264 +72,20 @@ export default function filterSortAndPaginate< Item >(
 				( _field ) => _field.id === filter.field
 			);
 			if ( field ) {
-				if (
-					filter.operator === OPERATOR_IS_ANY &&
-					filter?.value?.length > 0
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						if ( Array.isArray( fieldValue ) ) {
-							return filter.value.some( ( filterValue: any ) =>
-								fieldValue.includes( filterValue )
-							);
-						} else if ( typeof fieldValue === 'string' ) {
-							return filter.value.includes( fieldValue );
-						}
-						return false;
+				// Show deprecation warning for `isNotAll` operator.
+				// We still handle this by mapping it to `isNone` in `getFilter`.
+				if ( filter.operator === OPERATOR_IS_NOT_ALL ) {
+					deprecated( "The 'isNotAll' filter operator", {
+						since: '7.0',
+						alternative: "'isNone'",
 					} );
-				} else if (
-					filter.operator === OPERATOR_IS_NONE &&
-					filter?.value?.length > 0
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						if ( Array.isArray( fieldValue ) ) {
-							return ! filter.value.some( ( filterValue: any ) =>
-								fieldValue.includes( filterValue )
-							);
-						} else if ( typeof fieldValue === 'string' ) {
-							return ! filter.value.includes( fieldValue );
-						}
-						return false;
-					} );
-				} else if (
-					filter.operator === OPERATOR_IS_ALL &&
-					filter?.value?.length > 0
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return filter.value.every( ( value: any ) => {
-							return field
-								.getValue( { item } )
-								?.includes( value );
-						} );
-					} );
-				} else if (
-					filter.operator === OPERATOR_IS_NOT_ALL &&
-					filter?.value?.length > 0
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return filter.value.every( ( value: any ) => {
-							return ! field
-								.getValue( { item } )
-								?.includes( value );
-						} );
-					} );
-				} else if ( filter.operator === OPERATOR_IS ) {
-					filteredData = filteredData.filter( ( item ) => {
-						return (
-							filter.value === field.getValue( { item } ) ||
-							filter.value === undefined
-						);
-					} );
-				} else if ( filter.operator === OPERATOR_IS_NOT ) {
-					filteredData = filteredData.filter( ( item ) => {
-						return filter.value !== field.getValue( { item } );
-					} );
-				} else if (
-					filter.operator === OPERATOR_ON &&
-					filter.value !== undefined
-				) {
-					const filterDate = getDate( filter.value );
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldDate = getDate( field.getValue( { item } ) );
-						return filterDate.getTime() === fieldDate.getTime();
-					} );
-				} else if (
-					filter.operator === OPERATOR_NOT_ON &&
-					filter.value !== undefined
-				) {
-					const filterDate = getDate( filter.value );
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldDate = getDate( field.getValue( { item } ) );
-						return filterDate.getTime() !== fieldDate.getTime();
-					} );
-				} else if (
-					filter.operator === OPERATOR_LESS_THAN &&
-					filter.value !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						return fieldValue < filter.value;
-					} );
-				} else if (
-					filter.operator === OPERATOR_GREATER_THAN &&
-					filter.value !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						return fieldValue > filter.value;
-					} );
-				} else if (
-					filter.operator === OPERATOR_LESS_THAN_OR_EQUAL &&
-					filter.value !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						return fieldValue <= filter.value;
-					} );
-				} else if (
-					filter.operator === OPERATOR_GREATER_THAN_OR_EQUAL &&
-					filter.value !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						return fieldValue >= filter.value;
-					} );
-				} else if (
-					filter.operator === OPERATOR_CONTAINS &&
-					filter?.value !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						return (
-							typeof fieldValue === 'string' &&
-							filter.value &&
-							fieldValue
-								.toLowerCase()
-								.includes(
-									String( filter.value ).toLowerCase()
-								)
-						);
-					} );
-				} else if (
-					filter.operator === OPERATOR_NOT_CONTAINS &&
-					filter?.value !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						return (
-							typeof fieldValue === 'string' &&
-							filter.value &&
-							! fieldValue
-								.toLowerCase()
-								.includes(
-									String( filter.value ).toLowerCase()
-								)
-						);
-					} );
-				} else if (
-					filter.operator === OPERATOR_STARTS_WITH &&
-					filter?.value !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						return (
-							typeof fieldValue === 'string' &&
-							filter.value &&
-							fieldValue
-								.toLowerCase()
-								.startsWith(
-									String( filter.value ).toLowerCase()
-								)
-						);
-					} );
-				} else if (
-					filter.operator === OPERATOR_BEFORE &&
-					filter.value !== undefined
-				) {
-					const filterValue = getDate( filter.value );
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = getDate(
-							field.getValue( { item } )
-						);
-						return fieldValue < filterValue;
-					} );
-				} else if (
-					filter.operator === OPERATOR_AFTER &&
-					filter.value !== undefined
-				) {
-					const filterValue = getDate( filter.value );
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = getDate(
-							field.getValue( { item } )
-						);
-						return fieldValue > filterValue;
-					} );
-				} else if (
-					filter.operator === OPERATOR_BEFORE_INC &&
-					filter.value !== undefined
-				) {
-					const filterValue = getDate( filter.value );
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = getDate(
-							field.getValue( { item } )
-						);
-						return fieldValue <= filterValue;
-					} );
-				} else if (
-					filter.operator === OPERATOR_AFTER_INC &&
-					filter.value !== undefined
-				) {
-					const filterValue = getDate( filter.value );
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = getDate(
-							field.getValue( { item } )
-						);
-						return fieldValue >= filterValue;
-					} );
-				} else if (
-					filter.operator === OPERATOR_BETWEEN &&
-					Array.isArray( filter.value ) &&
-					filter.value.length === 2 &&
-					filter.value[ 0 ] !== undefined &&
-					filter.value[ 1 ] !== undefined
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = field.getValue( { item } );
-						if (
-							typeof fieldValue === 'number' ||
-							fieldValue instanceof Date ||
-							typeof fieldValue === 'string'
-						) {
-							return (
-								fieldValue >= filter.value[ 0 ] &&
-								fieldValue <= filter.value[ 1 ]
-							);
-						}
-						return false;
-					} );
-				} else if (
-					filter.operator === OPERATOR_IN_THE_PAST &&
-					filter.value?.value !== undefined &&
-					filter.value?.unit !== undefined
-				) {
-					const targetDate = getRelativeDate(
-						filter.value.value,
-						filter.value.unit
+				}
+
+				const handler = field.filter[ filter.operator as Operator ];
+				if ( handler ) {
+					filteredData = filteredData.filter( ( item ) =>
+						handler( item, field, filter.value )
 					);
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = getDate(
-							field.getValue( { item } )
-						);
-						return (
-							fieldValue >= targetDate && fieldValue <= new Date()
-						);
-					} );
-				} else if (
-					filter.operator === OPERATOR_OVER &&
-					filter.value?.value !== undefined &&
-					filter.value?.unit !== undefined
-				) {
-					const targetDate = getRelativeDate(
-						filter.value.value,
-						filter.value.unit
-					);
-					filteredData = filteredData.filter( ( item ) => {
-						const fieldValue = getDate(
-							field.getValue( { item } )
-						);
-						return fieldValue < targetDate;
-					} );
 				}
 			}
 		} );
@@ -384,18 +94,28 @@ export default function filterSortAndPaginate< Item >(
 	// Handle sorting.
 	const sortByField = view.sort?.field
 		? _fields.find( ( field ) => {
-				return field.id === view.sort?.field;
+				return (
+					field.enableSorting !== false &&
+					field.id === view.sort?.field
+				);
 		  } )
 		: null;
-	const groupByField = view.groupByField
+	const groupByField = view.groupBy?.field
 		? _fields.find( ( field ) => {
-				return field.id === view.groupByField;
+				return (
+					field.enableSorting !== false &&
+					field.id === view.groupBy?.field
+				);
 		  } )
 		: null;
 	if ( sortByField || groupByField ) {
 		filteredData.sort( ( a, b ) => {
 			if ( groupByField ) {
-				const groupCompare = groupByField.sort( a, b, 'asc' );
+				const groupCompare = groupByField.sort(
+					a,
+					b,
+					view.groupBy?.direction ?? 'asc'
+				);
 
 				// If items are in different groups, return the group comparison result.
 				// Otherwise, fall back to sorting by the sort field.
@@ -415,7 +135,19 @@ export default function filterSortAndPaginate< Item >(
 	// Handle pagination.
 	let totalItems = filteredData.length;
 	let totalPages = 1;
-	if ( view.page !== undefined && view.perPage !== undefined ) {
+
+	// Use position-based pagination for infinite scroll
+	if (
+		view.infiniteScrollEnabled &&
+		view.startPosition !== undefined &&
+		view.perPage !== undefined
+	) {
+		// Convert 1-indexed positions to 0-indexed array indices
+		const start = view.startPosition - 1;
+		const end = Math.min( start + view.perPage, totalItems );
+		filteredData = filteredData?.slice( start, end );
+	} else if ( view.page !== undefined && view.perPage !== undefined ) {
+		// Use traditional page-based pagination
 		const start = ( view.page - 1 ) * view.perPage;
 		totalItems = filteredData?.length || 0;
 		totalPages = Math.ceil( totalItems / view.perPage );

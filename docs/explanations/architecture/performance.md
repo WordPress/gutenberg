@@ -28,10 +28,10 @@ Based on the idea that **when editing a given block, it is very rare that an upd
 
 ## The performance benchmark job
 
-A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `./bin/plugin/cli.js perf [branches]`, example:
+A tool to compare performance across multiple branches/tags/commits is provided. You can run it locally like so: `npm exec release-cli -- perf [branches]`, example:
 
 ```
-./bin/plugin/cli.js perf trunk v8.1.0 v8.0.0
+npm exec release-cli -- perf trunk v8.1.0 v8.0.0
 ```
 
 To get the most accurate results, it's is important to use the exact same version of the tests and environment (theme...) when running the tests, the only thing that need to be different between the branches is the Gutenberg plugin version (or branch used to build the plugin).
@@ -39,10 +39,10 @@ To get the most accurate results, it's is important to use the exact same versio
 To achieve that the command first prepares the following folder structure:
 
     │
-    ├── tests/packages/e2e-tests/specs/performance/*
+    ├── test/performance/specs/*
     |   The actual performance tests to run
     │
-    ├── tests/test/emptytheme
+    ├── test/emptytheme
     |   The theme used for the tests environment. (site editor)
     │
     │── envs/branch1/.wp-env.json

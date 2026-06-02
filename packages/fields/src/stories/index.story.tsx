@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { DataForm, DataViews, type Form } from '@wordpress/dataviews';
-import type { Field, View } from '@wordpress/dataviews';
+import type { Field, View, Form } from '@wordpress/dataviews';
+import { DataForm, DataViews } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -29,6 +29,38 @@ import {
 // templateTitleField,
 
 import type { BasePost, BasePostWithEmbeddedAuthor } from '../types';
+
+// Mock users for the story.
+const mockUsers = [
+	{
+		id: 1,
+		name: 'John Doe',
+		avatar_urls: {
+			'24': 'https://gravatar.com/avatar?d=retro&s=24',
+			'48': 'https://gravatar.com/avatar?d=retro&s=48',
+			'96': 'https://gravatar.com/avatar?d=retro&s=96',
+		},
+	},
+	{
+		id: 2,
+		name: 'Jane Smith',
+		avatar_urls: {
+			'24': 'https://gravatar.com/avatar/2?d=retro&s=24',
+			'48': 'https://gravatar.com/avatar/2?d=retro&s=48',
+			'96': 'https://gravatar.com/avatar/2?d=retro&s=96',
+		},
+	},
+];
+
+// Override author field with mock getElements for Storybook.
+const authorFieldForStory: Field< any > = {
+	...authorField,
+	getElements: async () =>
+		mockUsers.map( ( { id, name } ) => ( {
+			value: id,
+			label: name,
+		} ) ),
+};
 
 export default {
 	title: 'Fields/Base Fields',
@@ -61,16 +93,7 @@ const sampleBasePost: BasePost = {
 const samplePostWithAuthor: BasePostWithEmbeddedAuthor = {
 	...sampleBasePost,
 	_embedded: {
-		author: [
-			{
-				name: 'John Doe',
-				avatar_urls: {
-					'24': 'https://gravatar.com/avatar?d=retro&s=24',
-					'48': 'https://gravatar.com/avatar?d=retro&s=48',
-					'96': 'https://gravatar.com/avatar?d=retro&s=96',
-				},
-			},
-		],
+		author: [ { ...mockUsers[ 0 ] } ],
 	},
 };
 
@@ -83,7 +106,7 @@ const showcaseFields: Field< any >[] = [
 	slugField,
 	statusField,
 	dateField,
-	authorField,
+	authorFieldForStory,
 	commentStatusField,
 	passwordField,
 	orderField,
@@ -160,12 +183,6 @@ export const DataViewsPreview = () => {
 		totalPages: 1,
 	};
 
-	const defaultLayouts = {
-		table: {},
-		list: {},
-		grid: {},
-	};
-
 	return (
 		<div style={ { padding: '20px' } }>
 			<h2>Fields Package DataViews Preview</h2>
@@ -180,7 +197,6 @@ export const DataViewsPreview = () => {
 				view={ view }
 				onChangeView={ ( nextView: View ) => setView( nextView ) }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
 			/>
 		</div>
 	);

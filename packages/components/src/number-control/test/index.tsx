@@ -47,7 +47,7 @@ describe( 'NumberControl', () => {
 			);
 
 			expect(
-				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+				// eslint-disable-next-line testing-library/no-node-access
 				withoutClassName.querySelector( '.components-number-control' )
 			).not.toHaveClass( 'hello' );
 

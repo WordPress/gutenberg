@@ -6,16 +6,17 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
-	BlockControls,
+	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	ToolbarButton,
-	ToolbarGroup,
-	__experimentalDivider as Divider,
-} from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
 
 // Block name constants
 const NAVIGATION_BLOCK_NAME = 'core/navigation';
@@ -30,10 +31,12 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  *
  * @param {Object} props          Component props.
  * @param {string} props.clientId The template part block client ID.
- * @return {JSX.Element|null} The Edit navigation button component or null if not applicable.
+ * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
  */
 function TemplatePartNavigationEditButton( { clientId } ) {
+	const registry = useRegistry();
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
+	const { requestInspectorTab } = unlock( useDispatch( blockEditorStore ) );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const {
@@ -74,20 +77,25 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 	const onEditNavigation = useCallback( () => {
 		if ( firstNavigationBlockId ) {
-			// Select the first Navigation block
-			selectBlock( firstNavigationBlockId );
-
-			// Flash the block for 500ms to make it obvious
-			flashBlock( firstNavigationBlockId, 500 );
-
-			// Enable the complementary area (inspector)
-			enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
+			// Batch all dispatches so the request is in the store before
+			// InspectorControlsTabs mounts. Without this, the Content tab flashes
+			// before animating to List View.
+			registry.batch( () => {
+				selectBlock( firstNavigationBlockId );
+				flashBlock( firstNavigationBlockId, 500 );
+				enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
+				requestInspectorTab( 'list', {
+					openPanel: firstNavigationBlockId,
+				} );
+			} );
 		}
 	}, [
 		firstNavigationBlockId,
+		registry,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
+		requestInspectorTab,
 	] );
 
 	// Only show if template part contains navigation blocks and they are editable
@@ -96,15 +104,8 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 	}
 
 	return (
-		<BlockControls group="other">
+		<BlockToolbarLastItem>
 			<ToolbarGroup>
-				{ /*
-				 * Add a vertical divider to visually separate the "Edit navigation"
-				 * button from the template part's "Edit" button. Both buttons share
-				 * the same toolbar group ("other"), so without this divider they
-				 * would appear directly adjacent with no visual separation.
-				 */ }
-				<Divider orientation="vertical" marginEnd={ 3 } />
 				<ToolbarButton
 					label={ __( 'Edit navigation' ) }
 					onClick={ onEditNavigation }
@@ -112,7 +113,7 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 					{ __( 'Edit navigation' ) }
 				</ToolbarButton>
 			</ToolbarGroup>
-		</BlockControls>
+		</BlockToolbarLastItem>
 	);
 }
 

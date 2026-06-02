@@ -1,9 +1,3 @@
-// The .wp-block-accordion selector is needed to make this CSS stronger
-// than the default heading padding when background color is applied.
-.wp-block-accordion .wp-block-accordion-heading {
-	padding: 0;
-}
-
 .wp-block-accordion-heading__toggle {
 	font-family: inherit;
 	font-size: inherit;
@@ -13,6 +7,7 @@
 	text-transform: inherit;
 	text-decoration: inherit;
 	word-spacing: inherit;
+	font-style: inherit;
 	background: none;
 	border: none;
 	color: inherit;
@@ -22,17 +17,14 @@
 	display: flex;
 	align-items: center;
 	text-align: inherit;
-	position: relative;
 	width: 100%;
 
 	&:not(:focus-visible) {
 		outline: none;
 	}
 
-	&:hover {
-		.wp-block-accordion-heading__toggle-title {
-			text-decoration: underline;
-		}
+	&:hover .wp-block-accordion-heading__toggle-title {
+		text-decoration: underline;
 	}
 }
 

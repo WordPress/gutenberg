@@ -19,7 +19,7 @@ import {
 } from '@wordpress/block-editor';
 import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import {
-	Icon,
+	Icon as WCIcon,
 	Button,
 	Dropdown,
 	TextControl,
@@ -192,7 +192,6 @@ const SocialLinkEdit = ( {
 						renderContent={ () => (
 							<TextControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								className="wp-block-social-link__toolbar_content_text"
 								label={ __( 'Text' ) }
 								help={ __(
@@ -226,7 +225,6 @@ const SocialLinkEdit = ( {
 					>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
 								'The text is visible when enabled from the parent Social Icons block.'
@@ -243,7 +241,6 @@ const SocialLinkEdit = ( {
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Link relation' ) }
 					help={ createInterpolateElement(
 						__(
@@ -280,7 +277,7 @@ const SocialLinkEdit = ( {
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<button aria-haspopup="dialog" { ...blockProps } role="button">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 					<span
 						className={ clsx( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,

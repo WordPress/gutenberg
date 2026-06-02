@@ -32,17 +32,17 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		$source = get_block_bindings_source( 'core/post-data' );
 		if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
 			$source_args = array(
-				'key' => 'modified',
+				'field' => 'modified',
 			);
 		} else {
 			$source_args = array(
-				'key' => 'date',
+				'field' => 'date',
 			);
 		}
 		$attributes['datetime'] = $source->get_value( $source_args, $block, 'datetime' );
 	}
 
-	if ( isset( $source_args['key'] ) && 'modified' === $source_args['key'] ) {
+	if ( isset( $source_args['field'] ) && 'modified' === $source_args['field'] ) {
 		$classes[] = 'wp-block-post-date__modified-date';
 	}
 
@@ -81,16 +81,13 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
+	$time_tag = sprintf( '<time datetime="%1$s">%2$s</time>', $unformatted_date, $formatted_date );
+
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $block->context['postId'] ) ) {
-		$formatted_date = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $block->context['postId'] ), $formatted_date );
+		$time_tag = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $block->context['postId'] ), $time_tag );
 	}
 
-	return sprintf(
-		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
-		$wrapper_attributes,
-		$unformatted_date,
-		$formatted_date
-	);
+	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $time_tag );
 }
 
 /**

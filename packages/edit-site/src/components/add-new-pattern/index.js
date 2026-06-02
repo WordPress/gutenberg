@@ -127,6 +127,7 @@ export default function AddNewPattern() {
 					toggleProps={ {
 						variant: 'primary',
 						showTooltip: false,
+						size: 'compact',
 						__next40pxDefaultSize: true,
 					} }
 					text={ addNewPatternLabel }

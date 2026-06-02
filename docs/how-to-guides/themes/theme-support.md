@@ -471,11 +471,12 @@ The block will get attached the class `.wp-elements-<uuid>`.
 
 Use this setting to enable the following Global Styles settings:
 
+- background: backgroundImage, backgroundSize, gradient
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - spacing: blockGap, margin, padding
-- typography: lineHeight
-- dimensions: aspectRatio, minHeight
+- typography: lineHeight, textColumns
+- dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 
 ```php

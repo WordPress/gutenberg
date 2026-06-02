@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/is-shallow-equal",
-	"version": "5.32.0",
+	"version": "5.47.0",
 	"description": "Test for shallow equality between two objects or arrays.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,19 +25,19 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
+		"src",
 		"build",
 		"build-module",
 		"build-types",
-		"src",
 		"*.md"
 	],
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -45,6 +45,9 @@
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"benchmark": "2.1.4"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

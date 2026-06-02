@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback } from '@wordpress/element';
 import {
 	privateApis as corePrivateApis,
@@ -12,10 +13,11 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import { Button } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -35,9 +37,14 @@ import {
 	slugField,
 	useThemeField,
 } from './fields';
-import { defaultLayouts, getDefaultView } from './view-utils';
+import {
+	defaultLayouts,
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
+} from './view-utils';
 
-const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields, templateTitleField } =
+	unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
@@ -45,14 +52,19 @@ export default function PageTemplates() {
 	const { path, query } = useLocation();
 	const { activeView = 'active', postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
-	const defaultView = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
+	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
+		useState( false );
+	const defaultView = DEFAULT_VIEW;
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
+		[ activeView ]
+	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
-		slug: activeView,
+		slug: 'default',
 		defaultView,
+		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -68,57 +80,53 @@ export default function PageTemplates() {
 		},
 	} );
 
-	const { activeTemplatesOption, activeTheme } = useSelect( ( select ) => {
-		const { getEntityRecord, getCurrentTheme } = select( coreStore );
-		return {
-			activeTemplatesOption: getEntityRecord( 'root', 'site' )
-				?.active_templates,
-			activeTheme: getCurrentTheme(),
-		};
-	} );
+	const { activeTemplatesOption, activeTheme, defaultTemplateTypes } =
+		useSelect( ( select ) => {
+			const { getEntityRecord, getCurrentTheme } = select( coreStore );
+			return {
+				activeTemplatesOption: getEntityRecord( 'root', 'site' )
+					?.active_templates,
+				activeTheme: getCurrentTheme(),
+				defaultTemplateTypes:
+					select( coreStore ).getCurrentTheme()
+						?.default_template_types,
+			};
+		} );
 	// Todo: this will have to be better so that we're not fetching all the
 	// records all the time. Active templates query will need to move server
 	// side.
 	const { records: userRecords, isResolving: isLoadingUserRecords } =
 		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
+			combinedTemplates: false,
 		} );
 	const { records: staticRecords, isResolving: isLoadingStaticData } =
-		useEntityRecordsWithPermissions( 'postType', 'wp_registered_template', {
+		useEntityRecordsWithPermissions( 'root', 'registeredTemplate', {
+			// This should not be needed, the endpoint returns all registered
+			// templates, but it's not possible right now to turn off pagination
+			// for entity configs.
 			per_page: -1,
 		} );
 
 	const activeTemplates = useMemo( () => {
-		const _active = [ ...staticRecords ].filter(
-			( record ) => ! record.is_custom
-		);
+		const _active = [ ...staticRecords ];
 		if ( activeTemplatesOption ) {
 			for ( const activeSlug in activeTemplatesOption ) {
 				const activeId = activeTemplatesOption[ activeSlug ];
-				if ( activeId === false ) {
-					// Remove the template from the array.
+				// Replace the template in the array.
+				const template = userRecords.find(
+					( userRecord ) =>
+						userRecord.id === activeId &&
+						userRecord.theme === activeTheme.stylesheet
+				);
+				if ( template ) {
 					const index = _active.findIndex(
-						( template ) => template.slug === activeSlug
+						( { slug } ) => slug === template.slug
 					);
 					if ( index !== -1 ) {
-						_active.splice( index, 1 );
-					}
-				} else {
-					// Replace the template in the array.
-					const template = userRecords.find(
-						( userRecord ) =>
-							userRecord.id === activeId &&
-							userRecord.theme === activeTheme.stylesheet
-					);
-					if ( template ) {
-						const index = _active.findIndex(
-							( { slug } ) => slug === template.slug
-						);
-						if ( index !== -1 ) {
-							_active[ index ] = template;
-						} else {
-							_active.push( template );
-						}
+						_active[ index ] = template;
+					} else {
+						_active.push( template );
 					}
 				}
 			}
@@ -126,27 +134,55 @@ export default function PageTemplates() {
 		return _active;
 	}, [ userRecords, staticRecords, activeTemplatesOption, activeTheme ] );
 
-	let _records;
 	let isLoadingData;
 	if ( activeView === 'active' ) {
-		_records = activeTemplates;
 		isLoadingData = isLoadingUserRecords || isLoadingStaticData;
 	} else if ( activeView === 'user' ) {
-		_records = userRecords;
 		isLoadingData = isLoadingUserRecords;
 	} else {
-		_records = staticRecords;
 		isLoadingData = isLoadingStaticData;
 	}
 
 	const records = useMemo( () => {
+		function isCustom( record ) {
+			// For registered templates, the is_custom field is defined.
+			return (
+				record.is_custom ??
+				// For user templates it's custom if the is_wp_suggestion meta
+				// field is not set and the slug is not found in the default
+				// template types.
+				( ! record.meta?.is_wp_suggestion &&
+					! defaultTemplateTypes.some(
+						( type ) => type.slug === record.slug
+					) )
+			);
+		}
+
+		let _records;
+		if ( activeView === 'active' ) {
+			// Don't show active custom templates in the active view.
+			_records = activeTemplates.filter(
+				( record ) => ! isCustom( record )
+			);
+		} else if ( activeView === 'user' ) {
+			_records = userRecords;
+		} else {
+			_records = staticRecords;
+		}
 		return _records.map( ( record ) => ( {
 			...record,
-			_isActive: activeTemplates.find(
+			_isActive: activeTemplates.some(
 				( template ) => template.id === record.id
 			),
+			_isCustom: isCustom( record ),
 		} ) );
-	}, [ _records, activeTemplates ] );
+	}, [
+		activeTemplates,
+		defaultTemplateTypes,
+		userRecords,
+		staticRecords,
+		activeView,
+	] );
 
 	const users = useSelect(
 		( select ) => {
@@ -182,6 +218,10 @@ export default function PageTemplates() {
 		[ history, path, view?.type ]
 	);
 
+	const postTypeFields = usePostFields( {
+		postType: TEMPLATE_POST_TYPE,
+	} );
+	const dateField = postTypeFields.find( ( field ) => field.id === 'date' );
 	const themeField = useThemeField();
 	const fields = useMemo( () => {
 		const _fields = [
@@ -193,6 +233,9 @@ export default function PageTemplates() {
 		];
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
+			if ( dateField ) {
+				_fields.push( dateField );
+			}
 		}
 		const elements = [];
 		for ( const author in users ) {
@@ -206,15 +249,55 @@ export default function PageTemplates() {
 			elements,
 		} );
 		return _fields;
-	}, [ users, activeView ] );
+	}, [ users, activeView, themeField, dateField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const _title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						history.navigate( `/template?activeView=user` );
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post or template, e.g: "Hello world".
+								__( '"%s" successfully created.' ),
+								decodeEntities( _title ) || __( '(no title)' )
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											history.navigate(
+												`/${ newItem.type }/${ newItem.id }?canvas=edit`
+											);
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ history, createSuccessNotice ]
+	);
 	const postTypeActions = usePostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
+		onActionPerformed,
 	} );
 	const editAction = useEditPostAction();
 	const setActiveTemplateAction = useSetActiveTemplateAction();
@@ -227,33 +310,23 @@ export default function PageTemplates() {
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
+
+	const duplicateAction = actions.find(
+		( action ) => action.id === 'duplicate-post'
+	);
 
 	return (
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			headingLevel={ 2 }
+			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
 				key={ activeView }
@@ -267,13 +340,37 @@ export default function PageTemplates() {
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ () => true }
 				onClickItem={ ( item ) => {
-					history.navigate(
-						`/${ item.type }/${ item.id }?canvas=edit`
-					);
+					if ( typeof item.id === 'string' ) {
+						setSelectedRegisteredTemplate( item );
+					} else {
+						history.navigate(
+							`/${ item.type }/${ item.id }?canvas=edit`
+						);
+					}
 				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
+				}
 			/>
+			{ selectedRegisteredTemplate && duplicateAction && (
+				<Modal
+					title={ __( 'Duplicate' ) }
+					onRequestClose={ () => setSelectedRegisteredTemplate() }
+					size="small"
+				>
+					<duplicateAction.RenderModal
+						items={ [ selectedRegisteredTemplate ] }
+						closeModal={ () => setSelectedRegisteredTemplate() }
+					/>
+				</Modal>
+			) }
 		</Page>
 	);
 }

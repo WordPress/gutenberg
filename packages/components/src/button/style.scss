@@ -15,20 +15,21 @@
 	text-decoration: none;
 	font-family: inherit;
 	font-size: $default-font-size;
+	font-weight: $font-weight-medium;
 	margin: 0;
 	border: 0;
-	cursor: pointer;
-	-webkit-appearance: none;
+	cursor: var(--wpds-cursor-control);
+	appearance: none;
 	background: none;
 
-	@media not (prefers-reduced-motion) {
+	@media not ( prefers-reduced-motion ) {
 		transition: box-shadow 0.1s linear;
 	}
 
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 6px 12px;
+	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
 	color: $components-color-foreground;
 
@@ -43,11 +44,8 @@
 
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
-	&:focus:not(:disabled) {
+	&:focus:not(:active) {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 3px solid transparent;
 	}
 
 	/**
@@ -75,7 +73,7 @@
 			color: $components-color-accent-inverted;
 		}
 
-		&:focus:not(:disabled) {
+		&:focus:not(:active) {
 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 
@@ -85,9 +83,9 @@
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: $components-color-foreground-inverted;
-			background: $components-color-gray-300;
-			border-color: $components-color-gray-300;
+			color: rgba($white, 0.4);
+			background: $components-color-accent;
+			border-color: $components-color-accent;
 			outline: none;
 
 			&:focus:enabled {
@@ -158,7 +156,7 @@
 			box-shadow: inset 0 0 0 $border-width $gray-300;
 		}
 
-		&:focus:not(:disabled) {
+		&:focus:not(:active) {
 			box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		}
 	}
@@ -212,7 +210,7 @@
 				color: color.adjust($alert-red, $lightness: -20%);
 			}
 
-			&:focus {
+			&:focus:not(:active) {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
 			}
 
@@ -251,8 +249,11 @@
 		background: none;
 		outline: none;
 		text-align: left;
+		font-weight: $font-weight-regular;
 		color: $components-color-accent;
 		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-thickness: from-font;
 
 		@media not (prefers-reduced-motion) {
 			transition-property: border, background, color;
@@ -270,6 +271,14 @@
 		&[aria-disabled="true"] {
 			color: $gray-600;
 		}
+	}
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow.
+	// This rule is placed after variant outline declarations (e.g. is-primary,
+	// is-secondary, is-tertiary) to ensure it wins by source order at the same
+	// specificity, while not using `:not(:active)` to avoid outline flicker.
+	&:focus {
+		outline: 3px solid transparent;
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):active {
@@ -374,29 +383,34 @@
 			}
 		}
 
-		&:focus:not(:disabled) {
+		&:focus:not(:active) {
 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+		}
 
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		&:focus {
 			outline: 2px solid transparent;
 		}
+	}
+
+	// Hide focus outline on :active to provide click feedback in forced-colors
+	// mode, where box-shadow is not visible. Higher specificity (0,3,0)
+	// ensures this wins over variant outline declarations. Placed after
+	// .is-pressed to also win by source order at equal specificity (0,3,0).
+	&:focus:active {
+		outline: none;
 	}
 
 	svg {
 		fill: currentColor;
 		outline: none;
+		flex-shrink: 0;
 
 		// Optimize for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
 		@media (forced-colors: active) {
 			fill: CanvasText;
 		}
-	}
-
-	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
-	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
-	.components-visually-hidden {
-		height: auto;
 	}
 }
 

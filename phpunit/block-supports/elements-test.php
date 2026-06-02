@@ -89,6 +89,34 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a non-string `className` attribute does not cause a fatal
+	 * error and the block content is returned unmodified.
+	 *
+	 * Block attributes such as `className` are always expected to be strings,
+	 * however invalid stored data can result in other types being present. The
+	 * render filter should fail gracefully rather than passing an array to
+	 * `preg_match()`.
+	 *
+	 * @covers ::gutenberg_render_elements_class_name
+	 */
+	public function test_elements_block_support_class_with_non_string_class_name() {
+		$block = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => array( '0', '1' ),
+			),
+		);
+
+		$block_content = "<p class=\"0 1\">Test</p>\n";
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_elements_class_name( $block_content, $block ),
+			'Block content should be returned unchanged when className is not a string'
+		);
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array

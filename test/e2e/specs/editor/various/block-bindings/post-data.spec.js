@@ -5,9 +5,6 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Data source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
@@ -19,14 +16,10 @@ test.describe( 'Post Data source', () => {
 		await requestUtils.deleteAllPosts();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
+
 	test.describe( 'Post Data bindings UI.', () => {
 		test( 'should not include post data fields in UI to connect attributes on non date blocks', async ( {
 			editor,
@@ -41,7 +34,7 @@ test.describe( 'Post Data source', () => {
 							content: {
 								source: 'core/post-data',
 								args: {
-									key: 'modified',
+									field: 'modified',
 								},
 							},
 						},
@@ -60,7 +53,7 @@ test.describe( 'Post Data source', () => {
 			// Check the fields registered by other sources are there.
 		} );
 
-		test( 'should include post data fields in UI to connect attributes on date blocks', async ( {
+		test( 'should not render Attributes panel for date blocks', async ( {
 			editor,
 			page,
 		} ) => {
@@ -71,21 +64,15 @@ test.describe( 'Post Data source', () => {
 						bindings: {
 							datetime: {
 								source: 'core/post-data',
-								args: { key: 'date' },
+								args: { field: 'date' },
 							},
 						},
 					},
 				},
 			} );
-			await page
-				.getByRole( 'button', {
-					name: 'datetime',
-				} )
-				.click();
-			const postDataMenuItem = page.getByRole( 'menuitem', {
-				name: 'Post Data',
-			} );
-			await expect( postDataMenuItem ).toBeVisible();
+			await expect(
+				page.getByLabel( 'Attributes options' )
+			).toBeHidden();
 		} );
 	} );
 } );

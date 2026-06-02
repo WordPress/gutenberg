@@ -1,4 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
 
 /**
@@ -10,20 +10,23 @@ import {
 	createContext,
 	cloneElement,
 	type ComponentChildren,
+	type VNode,
+	type Context,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import type { VNode, Context } from 'preact';
 
 /**
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-import { warn } from './utils';
+import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
+import { PENDING_GETTER } from './proxies/state';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
 	suffix: string | null;
+	uniqueId: string | null;
 }
 
 export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {
@@ -222,10 +225,15 @@ const resolve = ( path: string, namespace: string ) => {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
+
 	try {
-		// TODO: Support lazy/dynamically initialized stores
-		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
-	} catch ( e ) {}
+		const pathParts = path.split( '.' );
+		return pathParts.reduce( ( acc, key ) => acc[ key ], current );
+	} catch ( e ) {
+		if ( e === PENDING_GETTER ) {
+			return PENDING_GETTER;
+		}
+	}
 };
 
 // Generate the evaluate function.
@@ -257,16 +265,24 @@ export const getEvaluate: GetEvaluate =
 			}
 			// Reset scope before return and wrap the function so it will still run within the correct scope.
 			resetScope();
-			return ( ...functionArgs: any[] ) => {
+			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
 				setScope( scope );
 				const functionResult = value( ...functionArgs );
 				resetScope();
 				return functionResult;
 			};
+			// Preserve the sync property from the original function
+			if ( value.sync ) {
+				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
+				syncAwareFunction.sync = true;
+			}
+			return wrappedFunction;
 		}
 		const result = value;
 		resetScope();
-		return hasNegationOperator ? ! result : result;
+		return hasNegationOperator && value !== PENDING_GETTER
+			? ! result
+			: result;
 	};
 
 // Separate directives by priority. The resulting array contains objects

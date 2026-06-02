@@ -1,7 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"__experimental": true,
 	"name": "core/term-template",
 	"title": "Term Template",
 	"category": "theme",
@@ -10,6 +9,7 @@
 	"textdomain": "default",
 	"usesContext": [ "termQuery" ],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"align": [ "wide", "full" ],

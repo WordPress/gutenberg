@@ -3,6 +3,11 @@
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	privateApis as blocksPrivateApis,
+	getBlockType,
+	unregisterBlockVariation,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,6 +19,9 @@ import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 import variations from './variations';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -25,7 +33,11 @@ export const settings = {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
-			textAlign: 'center',
+			style: {
+				typography: {
+					textAlign: 'center',
+				},
+			},
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
@@ -38,6 +50,10 @@ export const settings = {
 		// If the content is empty, fall back to the default label.
 		if ( context === 'list-view' && ( customName || hasContent ) ) {
 			return customName || content;
+		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
 		}
 
 		if ( context === 'accessibility' ) {
@@ -69,4 +85,35 @@ export const settings = {
 	variations,
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
+		{
+			id: 'content',
+			label: __( 'Content' ),
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
+		},
+	];
+	settings[ formKey ] = {
+		fields: [ 'content' ],
+	};
+}
+
+export const init = () => {
+	const block = initBlock( { name, metadata, settings } );
+
+	// Unregister heading level variations based on `levelOptions` attribute.
+	// This is for backwards compatibility, as extenders can now unregister the
+	// variation directly: `wp.blocks.unregisterBlockVariation( 'core/heading', 'h1' )`.
+	const levelOptions =
+		getBlockType( name )?.attributes?.levelOptions?.default;
+	if ( levelOptions ) {
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			if ( ! levelOptions.includes( level ) ) {
+				unregisterBlockVariation( name, `h${ level }` );
+			}
+		} );
+	}
+
+	return block;
+};

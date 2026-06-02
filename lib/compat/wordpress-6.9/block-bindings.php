@@ -18,6 +18,12 @@ add_filter(
 		if ( 'core/post-date' === $block_type && ! in_array( 'datetime', $attributes, true ) ) {
 			$attributes[] = 'datetime';
 		}
+		if (
+			in_array( $block_type, array( 'core/navigation-link', 'core/navigation-submenu' ), true ) &&
+			! in_array( 'url', $attributes, true )
+		) {
+			$attributes[] = 'url';
+		}
 		return $attributes;
 	},
 	10,
@@ -110,14 +116,17 @@ add_filter( 'render_block', 'gutenberg_block_bindings_render_block', 10, 3 );
  * @return array The list of block attributes that are supported by block bindings.
  */
 function gutenberg_get_block_bindings_supported_attributes( $block_type ) {
-	// List of block attributes supported by Block Bindings in WP 6.8.
+	/*
+	 * List of block attributes supported by Block Bindings in WP 6.8.
+	 * DO NOT MODIFY THIS ARRAY. It's a snapshot of what Core supports in 6.8.
+	 * Use the `block_bindings_supported_attributes` filter instead to add support
+	 * for new block attributes.
+	 */
 	$block_bindings_supported_attributes_6_8 = array(
-		'core/paragraph'          => array( 'content' ),
-		'core/heading'            => array( 'content' ),
-		'core/image'              => array( 'id', 'url', 'title', 'alt' ),
-		'core/button'             => array( 'url', 'text', 'linkTarget', 'rel' ),
-		'core/navigation-link'    => array( 'url' ),
-		'core/navigation-submenu' => array( 'url' ),
+		'core/paragraph' => array( 'content' ),
+		'core/heading'   => array( 'content' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
+		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
 	$supported_block_attributes =
@@ -202,14 +211,17 @@ function gutenberg_process_block_bindings( $instance ) {
 	$parsed_block        = $instance->parsed_block;
 	$computed_attributes = array();
 
-	// List of block attributes supported by Block Bindings in WP 6.8.
+	/*
+	 * List of block attributes supported by Block Bindings in WP 6.8.
+	 * DO NOT MODIFY THIS ARRAY. It's a snapshot of what Core supports in 6.8.
+	 * Use the `block_bindings_supported_attributes` filter instead to add support
+	 * for new block attributes.
+	 */
 	$block_bindings_supported_attributes_6_8 = array(
-		'core/paragraph'          => array( 'content' ),
-		'core/heading'            => array( 'content' ),
-		'core/image'              => array( 'id', 'url', 'title', 'alt' ),
-		'core/button'             => array( 'url', 'text', 'linkTarget', 'rel' ),
-		'core/navigation-link'    => array( 'url' ),
-		'core/navigation-submenu' => array( 'url' ),
+		'core/paragraph' => array( 'content' ),
+		'core/heading'   => array( 'content' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
+		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
 	$supported_block_attributes = gutenberg_get_block_bindings_supported_attributes( $block_type );
@@ -255,9 +267,7 @@ function gutenberg_process_block_bindings( $instance ) {
 		 */
 		foreach ( $supported_block_attributes as $attribute_name ) {
 			// Retain any non-pattern override bindings that might be present.
-			$updated_bindings[ $attribute_name ] = isset( $bindings[ $attribute_name ] )
-				? $bindings[ $attribute_name ]
-				: array( 'source' => 'core/pattern-overrides' );
+			$updated_bindings[ $attribute_name ] = $bindings[ $attribute_name ] ?? array( 'source' => 'core/pattern-overrides' );
 		}
 		$bindings = $updated_bindings;
 		/*

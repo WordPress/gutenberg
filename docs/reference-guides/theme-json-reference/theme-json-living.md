@@ -2,7 +2,7 @@
 
 > This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 6.6 or later, and the latest Gutenberg plugin.
 >
-> There are some related documents that you may be interested in: 
+> There are some related documents that you may be interested in:
 > - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification,
 > - the [theme.json v2](/docs/reference-guides/theme-json-reference/theme-json-v2.md) specification, and
 > - the [reference to migrate from older theme.json versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
@@ -15,7 +15,7 @@ This documentation was generated from the JSON schema for theme.json.
 
 The latest schema for version 3, including all the latest changes from the Gutenberg plugin, is available at <code>https://schemas.wp.org/trunk/theme.json</code>.
 
-Theme.json schemas for each WordPress version are available at <code>https://schemas.wp.org/wp/{{version}}/theme.json</code>.  
+Theme.json schemas for each WordPress version are available at <code>https://schemas.wp.org/wp/{{version}}/theme.json</code>.
 For example, a schema for WordPress 5.8 is available at <code>https://schemas.wp.org/wp/5.8/theme.json</code>.
 
 See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md#developing-with-themejson) for how to use the JSON schema in your editor.
@@ -46,7 +46,7 @@ Setting that enables the following UI tools:
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link, heading, button, caption
-- dimensions: aspectRatio, minHeight
+- dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -61,6 +61,7 @@ Settings related to background.
 | -------- | ----------- | ---- | ------- |
 | backgroundImage | Allow users to set a background image. | `boolean` | `false` |
 | backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` | `false` |
+| gradient | Allow users to set a gradient background. | `boolean` | `false` |
 
 ---
 
@@ -111,7 +112,11 @@ Settings related to dimensions.
 | aspectRatio | Allow users to set an aspect ratio. | `boolean` | `false` |
 | defaultAspectRatios | Allow users to choose aspect ratios from the default set of aspect ratios. | `boolean` | `true` |
 | aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
+| height | Allow users to set custom height. | `boolean` | `false` |
 | minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
+| minWidth | Allow users to set custom minimum width. | `boolean` | `false` |
+| width | Allow users to set custom width. | `boolean` | `false` |
+| dimensionSizes | Dimension size presets for dimension block supports. | `[ { name, slug, size } ]` |  |
 
 ---
 
@@ -190,6 +195,7 @@ Settings related to typography.
 | fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | `false` |
 | letterSpacing | Allow users to set custom letter spacing. | `boolean` | `true` |
 | lineHeight | Allow users to set custom line height. | `boolean` | `false` |
+| textIndent | Allow users to set custom line indent. | `boolean`, `string` | `"subsequent"` |
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
@@ -267,7 +273,10 @@ Dimensions styles.
 | Property | Description | Type |
 | -------- | ----------- | ---- |
 | aspectRatio | Sets the `aspect-ratio` CSS property. | `string`, `{ ref }` |
+| height | Sets the `height` CSS property. | `string`, `{ ref }` |
 | minHeight | Sets the `min-height` CSS property. | `string`, `{ ref }` |
+| minWidth | Sets the `min-width` CSS property. | `string`, `{ ref }` |
+| width | Sets the `width` CSS property. | `string`, `{ ref }` |
 
 ---
 
@@ -324,6 +333,7 @@ Typography styles.
 | fontWeight | Sets the `font-weight` CSS property. | `string`, `{ ref }` |
 | letterSpacing | Sets the `letter-spacing` CSS property. | `string`, `{ ref }` |
 | lineHeight | Sets the `line-height` CSS property. | `string`, `{ ref }` |
+| textIndent | Sets the `text-indent` CSS property. | `string`, `{ ref }` |
 | textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |

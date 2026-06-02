@@ -7,19 +7,22 @@ test.describe.skip( 'Write/Design mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
+
 	test.beforeEach( async ( { admin, page } ) => {
 		await page.addInitScript( () => {
 			window.__experimentalEditorWriteMode = true;
 		} );
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
+
 	test( 'Should prevent selecting intermediary blocks', async ( {
 		editor,
 		page,
@@ -176,6 +179,7 @@ test.describe.skip( 'Write/Design mode', () => {
 
 		await expect( nonContentBlock ).toBeHidden();
 	} );
+
 	test( 'prevents adding non-content blocks to content role containers', async ( {
 		editor,
 		page,
@@ -226,6 +230,7 @@ test.describe.skip( 'Write/Design mode', () => {
 			page.getByRole( 'option', { name: 'Group' } )
 		).toBeHidden();
 	} );
+
 	test( 'allows adding blocks to content role containers', async ( {
 		editor,
 		page,

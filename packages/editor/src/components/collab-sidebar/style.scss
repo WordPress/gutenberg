@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
 
@@ -8,11 +12,14 @@
 
 .editor-collab-sidebar {
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel {
-	padding: $grid-unit-20;
+	position: relative;
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel__thread {
@@ -22,20 +29,33 @@
 	border: $border-width solid $gray-300;
 	background-color: $gray-100;
 	overflow: hidden;
+	width: auto;
 
 	&.is-selected {
 		background-color: $white;
 		box-shadow: $elevation-medium;
+		z-index: 1;
 	}
 
 	&:focus {
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
 	}
-}
 
-.editor-collab-sidebar-panel__child-thread {
-	margin-top: 15px;
+	&.is-floating {
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		position: absolute;
+		margin-top: $grid-unit-20;
+		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas scroll.
+		transform: translateY(var(--canvas-scroll, 0));
+		will-change: transform;
+		// Keep the reply input reachable when a thread is taller than the viewport
+		// (e.g. many replies on short content where the canvas can't scroll).
+		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
+		overflow-y: auto;
+	}
 }
 
 .editor-collab-sidebar-panel__user-name {
@@ -55,7 +75,7 @@
 	color: $gray-700;
 }
 
-.editor-collab-sidebar-panel__user-comment {
+.editor-collab-sidebar-panel__note-content {
 	p:last-child {
 		margin-bottom: 0;
 	}
@@ -67,32 +87,10 @@
 	border-width: var(--wp-admin-border-width-focus);
 	border-style: solid;
 	padding: var(--wp-admin-border-width-focus);
+	background: $white;
 }
 
-.editor-collab-sidebar-panel__thread-overlay {
-	background-color: rgba(0, 0, 0, 0.7);
-	width: 100%;
-	height: 100%;
-	text-align: center;
-	position: absolute;
-	top: 0;
-	left: 0;
-	z-index: 1;
-	padding: 15px;
-	border-radius: $radius-large;
-	color: $white;
-
-	p {
-		margin-bottom: 15px;
-	}
-
-	button {
-		padding: 4px 10px;
-		color: $white;
-	}
-}
-
-.editor-collab-sidebar-panel__comment-status {
+.editor-collab-sidebar-panel__note-actions {
 	margin-left: auto;
 
 	button {
@@ -104,10 +102,6 @@
 			flex-shrink: 0;
 		}
 	}
-}
-
-.editor-collab-sidebar-panel__comment-dropdown-menu {
-	flex-shrink: 0;
 }
 
 .editor-collab-sidebar-panel__more-reply-separator {
@@ -123,10 +117,19 @@
 }
 
 .editor-collab-sidebar-panel__more-reply-button {
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
-.editor-collab-sidebar-panel__comment-form textarea {
+.editor-collab-sidebar-panel__deleted-block-notice {
+	font-weight: $font-weight-medium;
+	color: $gray-700;
+}
+
+.editor-collab-sidebar-panel__resolution-text {
+	font-style: italic;
+}
+
+.editor-collab-sidebar-panel__note-form textarea {
 	@include input-control;
 	// Vertical padding is to match the standard 40px control height when rows=1,
 	// in conjunction with the 20px line-height.
@@ -137,7 +140,7 @@
 }
 
 // Visually hidden until focused (skip link pattern)
-.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-note,
 .editor-collab-sidebar-panel__skip-to-block {
 	position: absolute;
 	top: -9999px;
@@ -154,7 +157,7 @@
 		right: $grid-unit-10;
 	}
 }
-.editor-collab-sidebar-panel__skip-to-comment:focus {
+.editor-collab-sidebar-panel__skip-to-note:focus {
 	top: $grid-unit-10;
 }
 .editor-collab-sidebar-panel__skip-to-block:focus {
@@ -162,78 +165,36 @@
 	bottom: $grid-unit-10;
 }
 
-// Comment avatar indicators.
-.comment-avatar-indicator {
-	position: relative;
-	padding: 4px;
-	min-width: auto;
-	background: transparent;
-	border: none;
-
-	&:hover::before {
-		background: rgba(0, 0, 0, 0.04);
-	}
-
-	&.has-unresolved {
-		.comment-avatar-stack {
-			&::after {
-				content: "";
-				position: absolute;
-				top: -2px;
-				right: -2px;
-				width: $grid-unit-10;
-				height: $grid-unit-10;
-				background: #d63638;
-				border-radius: $radius-round;
-				border: $border-width solid $white;
-				z-index: 10;
-			}
-		}
-	}
-}
-
-.comment-avatar-stack {
-	display: flex;
-	align-items: center;
-	position: relative;
-	height: $icon-size;
-}
-
-.comment-avatar {
+.editor-note-indicator__avatar {
 	width: $icon-size;
-	height: $icon-size;
 	border-radius: $radius-round;
-	border: 2px solid $white;
-	margin-left: -6px;
-	flex-shrink: 0;
+	margin-left: -12px;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
+	box-sizing: border-box;
 
 	&:first-child {
 		margin-left: 0;
-		border-color: #de6e55;
-	}
-
-	&:nth-child(2) {
-		border-color: #599637;
-	}
-
-	&:nth-child(3) {
-		border-color: #3858e9;
 	}
 }
 
-.comment-avatar-overflow {
-	width: fit-content;
-	height: $icon-size;
-	border-radius: 4rem;
-	padding: 0 4px;
-	background: #757575;
-	color: $white;
-	border: 2px solid $white;
-	margin-left: -6px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 10px;
-	font-weight: 600;
-	flex-shrink: 0;
+.editor-note-indicator__overflow {
+	font-weight: $font-weight-medium;
+}
+
+.show-icon-labels {
+	.editor-note-indicator {
+		width: auto;
+		// Hide the user avatars container when labels are set to display...
+		div {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			font-size: $helptext-font-size;
+		}
+	}
 }

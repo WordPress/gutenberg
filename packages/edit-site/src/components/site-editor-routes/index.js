@@ -10,6 +10,7 @@ import { useEffect } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { store as siteEditorStore } from '../../store';
 import { homeRoute } from './home';
+import { identityRoute } from './identity';
 import { stylesRoute } from './styles';
 import { navigationRoute } from './navigation';
 import { navigationItemRoute } from './navigation-item';
@@ -17,7 +18,7 @@ import { patternsRoute } from './patterns';
 import { patternItemRoute } from './pattern-item';
 import { templatePartItemRoute } from './template-part-item';
 import { templatesRoute } from './templates';
-import { templateItemRoute, staticTemplateItemRoute } from './template-item';
+import { templateItemRoute } from './template-item';
 import { pagesRoute } from './pages';
 import { pageItemRoute } from './page-item';
 import { stylebookRoute } from './stylebook';
@@ -27,13 +28,13 @@ const routes = [
 	pageItemRoute,
 	pagesRoute,
 	templateItemRoute,
-	staticTemplateItemRoute,
 	templatesRoute,
 	templatePartItemRoute,
 	patternItemRoute,
 	patternsRoute,
 	navigationItemRoute,
 	navigationRoute,
+	identityRoute,
 	stylesRoute,
 	homeRoute,
 	stylebookRoute,

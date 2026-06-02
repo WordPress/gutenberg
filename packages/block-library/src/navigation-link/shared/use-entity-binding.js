@@ -2,7 +2,52 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useBlockBindingsUtils } from '@wordpress/block-editor';
+import {
+	useBlockBindingsUtils,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Builds entity binding configuration for navigation link URLs.
+ * This function generates the structure used to bind navigation link URLs to their entity sources.
+ *
+ * Using a function instead of a constant allows for future enhancements where the binding
+ * might need dynamic data (e.g., entity ID, context-specific arguments).
+ *
+ * @param {('post-type'|'taxonomy')} kind - The kind of entity. Only 'post-type' and 'taxonomy' are supported.
+ * @return {Object} Entity binding configuration object
+ * @throws {Error} If kind is not 'post-type' or 'taxonomy'
+ */
+export function buildNavigationLinkEntityBinding( kind ) {
+	// Validate kind parameter exists.
+	if ( kind === undefined ) {
+		throw new Error(
+			'buildNavigationLinkEntityBinding requires a kind parameter. ' +
+				'Only "post-type" and "taxonomy" are supported.'
+		);
+	}
+
+	// Validate kind parameter value.
+	if ( kind !== 'post-type' && kind !== 'taxonomy' ) {
+		throw new Error(
+			`Invalid kind "${ kind }" provided to buildNavigationLinkEntityBinding. ` +
+				`Only 'post-type' and 'taxonomy' are supported.`
+		);
+	}
+
+	const source = kind === 'taxonomy' ? 'core/term-data' : 'core/post-data';
+
+	return {
+		url: {
+			source,
+			args: {
+				field: 'link',
+			},
+		},
+	};
+}
 
 /**
  * Shared hook for entity binding functionality in Navigation blocks.
@@ -17,33 +62,99 @@ import { useBlockBindingsUtils } from '@wordpress/block-editor';
  */
 export function useEntityBinding( { clientId, attributes } ) {
 	const { updateBlockBindings } = useBlockBindingsUtils( clientId );
-	const { metadata, id } = attributes;
+	const { metadata, id, kind, type } = attributes;
+	const blockEditingMode = useBlockEditingMode();
 
-	// Check if there's a URL binding with the core/entity source
-	const hasUrlBinding =
-		metadata?.bindings?.url?.source === 'core/entity' && !! id;
+	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
+	const expectedSource =
+		kind === 'post-type' ? 'core/post-data' : 'core/term-data';
+	const hasCorrectBinding =
+		hasUrlBinding && metadata?.bindings?.url?.source === expectedSource;
+
+	// Check if the bound entity is available (not deleted) and return the entity record.
+	const { isBoundEntityAvailable, entityRecord } = useSelect(
+		( select ) => {
+			// First check: metadata/binding must exist
+			if ( ! hasCorrectBinding || ! id ) {
+				return { isBoundEntityAvailable: false, entityRecord: null };
+			}
+
+			const isPostType = kind === 'post-type';
+			const isTaxonomy = kind === 'taxonomy';
+
+			// Only check entity availability for post types and taxonomies.
+			if ( ! isPostType && ! isTaxonomy ) {
+				return { isBoundEntityAvailable: false, entityRecord: null };
+			}
+
+			// Skip check in disabled contexts to avoid unnecessary requests.
+			if ( blockEditingMode === 'disabled' ) {
+				return { isBoundEntityAvailable: true, entityRecord: null };
+			}
+
+			// Second check: entity must exist
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+
+			// Use the correct entity type based on kind.
+			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+			// Convert 'tag' back to 'post_tag' for the API call
+			// (it was converted from 'post_tag' to 'tag' for storage in updateAttributes)
+			const typeForAPI = type === 'tag' ? 'post_tag' : type;
+			const record = getEntityRecord( entityType, typeForAPI, id );
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				entityType,
+				typeForAPI,
+				id,
+			] );
+
+			// If resolution has finished and entityRecord is undefined, the entity was deleted.
+			// Return true if entity exists, false if deleted.
+			const isAvailable = hasResolved ? record !== undefined : true;
+			return {
+				isBoundEntityAvailable: isAvailable,
+				entityRecord: record || null,
+			};
+		},
+		[ kind, type, id, hasCorrectBinding, blockEditingMode ]
+	);
 
 	const clearBinding = useCallback( () => {
-		// Only clear if there's actually a valid binding to clear
 		if ( hasUrlBinding ) {
-			// Remove the URL binding by setting it to undefined
 			updateBlockBindings( { url: undefined } );
 		}
-	}, [ hasUrlBinding, updateBlockBindings ] );
+	}, [ updateBlockBindings, hasUrlBinding ] );
 
-	const createBinding = useCallback( () => {
-		updateBlockBindings( {
-			url: {
-				source: 'core/entity',
-				args: {
-					key: 'url',
-				},
-			},
-		} );
-	}, [ updateBlockBindings ] );
+	const createBinding = useCallback(
+		( updatedAttributes ) => {
+			// Use updated attributes if provided, otherwise fall back to closure attributes.
+			// updatedAttributes needed to access the most up-to-date data when called synchronously.
+			const kindToUse = updatedAttributes?.kind ?? kind;
+
+			// Avoid creating binding if no kind is provided.
+			if ( ! kindToUse ) {
+				return;
+			}
+
+			try {
+				const binding = buildNavigationLinkEntityBinding( kindToUse );
+				updateBlockBindings( binding );
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'Failed to create entity binding:',
+					error.message
+				);
+				// Don't create binding if validation fails.
+			}
+		},
+		[ updateBlockBindings, kind ]
+	);
 
 	return {
-		hasUrlBinding,
+		hasUrlBinding: hasCorrectBinding,
+		isBoundEntityAvailable,
+		entityRecord,
 		clearBinding,
 		createBinding,
 	};

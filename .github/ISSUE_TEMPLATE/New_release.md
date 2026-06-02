@@ -5,7 +5,7 @@ about: A checklist for the Gutenberg plugin release process
 labels: Gutenberg Plugin, [Type] Project Management
 ---
 
-This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep the reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
+This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep a reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
 
 -   Gutenberg version to release: {VERSION_NUMBER} ([milestone](https://github.com/WordPress/gutenberg/milestone/{MILESTONE_ID}?closed=1))
 -   Release Manager (a.k.a. Release Lead):
@@ -30,6 +30,7 @@ This issue is to provide visibility on the progress of the release process of Gu
 -   [ ] [Update the created Draft Release accordingly](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#viewing-the-release-draft)
 -   [ ] [Curate the changelog](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#curating-the-release-changelog) before publishing
 -   [ ] [Publish Release](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#publishing-the-release)
+-   [ ] [Approve the npm publishing job](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#publishing-the-wordpress-packages-to-npm) in the Build Plugin Zip workflow _(ask in `#core-editor` if needed)_
 -   [ ] Announce in `#core-editor` channel that RC1 has been released and is ready for testing
 -   [ ] Ping any other relevant channels announcing that the RC is available
 -   [ ] Create Draft of Release post on Make Core blog _(initial draft in [Google doc](https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit))_

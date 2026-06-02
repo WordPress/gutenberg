@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/default-custom-properties";
 @use "@wordpress/base-styles/mixins" as *;
 @use "./components/block-icon/content.scss" as *;
 @use "./components/block-list/content.scss" as *;
@@ -13,7 +14,3 @@
 @use "./components/plain-text/content.scss" as *;
 @use "./components/rich-text/content.scss" as *;
 @use "./components/warning/content.scss" as *;
-
-// To do: ideally the iframe does not contain UI, but there's still the block
-// placeholders that will be moved to shadow DOM in the future.
-@include wordpress-admin-schemes();

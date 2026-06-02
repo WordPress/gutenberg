@@ -40,7 +40,7 @@ const TagsPanel = () => {
 					tagLabel
 				) }
 			</p>
-			<FlatTermSelector slug="post_tag" __nextHasNoMarginBottom />
+			<FlatTermSelector slug="post_tag" />
 		</PanelBody>
 	);
 };

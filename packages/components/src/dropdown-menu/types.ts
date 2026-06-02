@@ -58,7 +58,7 @@ type ToggleProps = Partial<
 		'label' | 'text'
 	>
 > & {
-	as?: React.ElementType | keyof JSX.IntrinsicElements;
+	as?: React.ElementType | keyof React.JSX.IntrinsicElements;
 	'data-toolbar-item'?: boolean;
 };
 

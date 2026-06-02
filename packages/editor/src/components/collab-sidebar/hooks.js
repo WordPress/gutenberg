@@ -2,11 +2,20 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useMemo,
+	useSyncExternalStore,
+} from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -14,17 +23,27 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { collabSidebarName } from './constants';
+import { FLOATING_NOTES_SIDEBAR } from './constants';
+import { unlock } from '../../lock-unlock';
+import { createBoardStore } from './board-store';
+import {
+	calculateNotePositions,
+	getNoteIdsFromMetadata,
+	addNoteIdToMetadata,
+	removeNoteIdFromMetadata,
+} from './utils';
 
-export function useBlockComments( postId ) {
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+
+export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
-		type: 'block_comment',
+		type: 'note',
 		status: 'all',
-		per_page: 100,
+		per_page: -1,
 	};
 
-	const { records: threads, totalPages } = useEntityRecords(
+	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
@@ -39,90 +58,94 @@ export function useBlockComments( postId ) {
 		};
 	}, [] );
 
-	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
-		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId =
-				getBlockAttributes( clientId )?.metadata?.commentId;
-			if ( commentId ) {
-				results[ clientId ] = commentId;
-			}
-			return results;
-		}, {} );
-
-		// Create a compare to store the references to all objects by id.
-		const compare = {};
-		const result = [];
-
-		const allComments = threads ?? [];
-
-		// Initialize each object with an empty `reply` array and map blockClientId.
-		allComments.forEach( ( item ) => {
-			const itemBlock = Object.keys( blocksWithComments ).find(
-				( key ) => blocksWithComments[ key ] === item.id
-			);
-
-			compare[ item.id ] = {
-				...item,
-				reply: [],
-				blockClientId: item.parent === 0 ? itemBlock : null,
-			};
-		} );
-
-		// Iterate over the data to build the tree structure.
-		allComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array.
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array.
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		if ( 0 === result?.length ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
+	// Process notes to build the tree structure.
+	const { notes, unresolvedNotes } = useMemo( () => {
+		if ( ! threads || threads.length === 0 ) {
+			return { notes: [], unresolvedNotes: [] };
 		}
 
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
+		// Single pass over clientIds builds the forward map and reverse lookup
+		// together. getNoteIdsFromMetadata returns numeric ids, matching the
+		// types returned by the comments REST endpoint.
+		const blocksWithNotes = {};
+		const clientIdByNoteId = new Map();
+		for ( const clientId of clientIds ) {
+			const metadata = getBlockAttributes( clientId )?.metadata;
+			const noteIds = getNoteIdsFromMetadata( metadata );
+			if ( noteIds.length > 0 ) {
+				blocksWithNotes[ clientId ] = noteIds;
+				for ( const noteId of noteIds ) {
+					clientIdByNoteId.set( noteId, clientId );
+				}
+			}
+		}
 
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
+		// Materialize threads; collect roots; replies linked in a second pass
+		// via unshift to invert order (matches prior reverse semantics).
+		const threadsById = new Map();
+		const rootThreads = [];
+		for ( const item of threads ) {
+			const thread = {
+				...item,
+				reply: [],
+				blockClientId:
+					item.parent === 0
+						? clientIdByNoteId.get( item.id ) ?? null
+						: null,
+			};
+			threadsById.set( item.id, thread );
+			if ( item.parent === 0 ) {
+				rootThreads.push( thread );
+			}
+		}
+		for ( const item of threads ) {
+			if ( item.parent !== 0 ) {
+				threadsById
+					.get( item.parent )
+					?.reply.unshift( threadsById.get( item.id ) );
+			}
+		}
+
+		if ( rootThreads.length === 0 ) {
+			return { notes: [], unresolvedNotes: [] };
+		}
+
+		// Single partition over notes-in-block-order. Each block can have
+		// multiple note IDs, so iterate the flattened list.
+		const unresolved = [];
+		const resolved = [];
+		for ( const noteIds of Object.values( blocksWithNotes ) ) {
+			for ( const noteId of noteIds ) {
+				const thread = threadsById.get( noteId );
+				if ( ! thread ) {
+					continue;
+				}
+				if ( thread.status === 'hold' ) {
+					unresolved.push( thread );
+				} else if ( thread.status === 'approved' ) {
+					resolved.push( thread );
+				}
+			}
+		}
+
+		// Orphans: root threads without a linked block. They only need to come last.
+		const orphans = rootThreads.filter(
+			( thread ) => ! thread.blockClientId
 		);
 
-		// Get comments by block order, first unresolved, then resolved.
-		const unresolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) => thread !== undefined && thread.status === 'hold'
-			);
-
-		const resolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status === 'approved'
-			);
-
-		// Combine unresolved comments in block order with resolved comments at the end.
-		const allSortedComments = [
-			...unresolvedSortedComments,
-			...resolvedSortedComments,
-		];
-
 		return {
-			resultComments: allSortedComments,
-			unresolvedSortedThreads: unresolvedSortedComments,
+			notes: [ ...unresolved, ...resolved, ...orphans ],
+			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
-	return { resultComments, unresolvedSortedThreads, totalPages };
+	return {
+		notes,
+		unresolvedNotes,
+	};
 }
 
-export function useBlockCommentsActions() {
+export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -150,35 +173,40 @@ export function useBlockCommentsActions() {
 					post: getCurrentPostId(),
 					content,
 					status: 'hold',
-					type: 'block_comment',
+					type: 'note',
 					parent: parent || 0,
 				},
 				{ throwOnError: true }
 			);
 
-			// If it's a main comment, update the block attributes with the comment id.
+			// If it's a top-level note, update the block attributes with the note id.
+			// Read-modify-write on metadata is racy under concurrent edits:
+			// two near-simultaneous adds against the same base will each write
+			// a 2-element array and the later write wins, dropping the other
+			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
 			if ( ! parent && savedRecord?.id ) {
 				const clientId = getSelectedBlockClientId();
+				if ( ! clientId ) {
+					return savedRecord;
+				}
 				const metadata = getBlockAttributes( clientId )?.metadata;
+				const updatedMetadata = addNoteIdToMetadata(
+					metadata,
+					savedRecord.id
+				);
 				updateBlockAttributes( clientId, {
-					metadata: {
-						...metadata,
-						commentId: savedRecord.id,
-					},
+					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
 			}
 
 			createNotice(
 				'snackbar',
-				parent
-					? __( 'Reply added successfully.' )
-					: __( 'Comment added successfully.' ),
+				parent ? __( 'Reply added.' ) : __( 'Note added.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
 				}
 			);
-
 			return savedRecord;
 		} catch ( error ) {
 			onError( error );
@@ -188,25 +216,58 @@ export function useBlockCommentsActions() {
 	const onEdit = async ( { id, content, status } ) => {
 		const messageType = status ? status : 'updated';
 		const messages = {
-			approved: __( 'Comment marked as resolved.' ),
-			hold: __( 'Comment reopened.' ),
-			updated: __( 'Comment updated.' ),
+			approved: __( 'Note marked as resolved.' ),
+			hold: __( 'Note reopened.' ),
+			updated: __( 'Note updated.' ),
 		};
 
 		try {
-			await saveEntityRecord(
-				'root',
-				'comment',
-				{
+			// For resolution or reopen actions, create a new note with metadata.
+			if ( status === 'approved' || status === 'hold' ) {
+				// First, update the thread status.
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id,
+						status,
+					},
+					{
+						throwOnError: true,
+					}
+				);
+
+				// Then create a new note with the metadata.
+				const newNoteData = {
+					post: getCurrentPostId(),
+					content: content || '', // Empty content for resolve, content for reopen.
+					type: 'note',
+					status,
+					parent: id,
+					meta: {
+						_wp_note_status:
+							status === 'approved' ? 'resolved' : 'reopen',
+					},
+				};
+
+				await saveEntityRecord( 'root', 'comment', newNoteData, {
+					throwOnError: true,
+				} );
+			} else {
+				const updateData = {
 					id,
 					content,
 					status,
-				},
-				{ throwOnError: true }
-			);
+				};
+
+				await saveEntityRecord( 'root', 'comment', updateData, {
+					throwOnError: true,
+				} );
+			}
+
 			createNotice(
 				'snackbar',
-				messages[ messageType ] ?? __( 'Comment updated.' ),
+				messages[ messageType ] ?? __( 'Note updated.' ),
 				{
 					type: 'snackbar',
 					isDismissible: true,
@@ -217,30 +278,30 @@ export function useBlockCommentsActions() {
 		}
 	};
 
-	const onDelete = async ( comment ) => {
+	const onDelete = async ( note ) => {
 		try {
-			await deleteEntityRecord(
-				'root',
-				'comment',
-				comment.id,
-				undefined,
-				{
-					throwOnError: true,
-				}
-			);
+			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
+				throwOnError: true,
+			} );
 
-			if ( ! comment.parent ) {
-				const clientId = getSelectedBlockClientId();
+			if ( ! note.parent ) {
+				// Use blockClientId if available, otherwise fall back to selected block.
+				const clientId =
+					note.blockClientId || getSelectedBlockClientId();
+				if ( ! clientId ) {
+					return;
+				}
 				const metadata = getBlockAttributes( clientId )?.metadata;
+				const updatedMetadata = removeNoteIdFromMetadata(
+					metadata,
+					note.id
+				);
 				updateBlockAttributes( clientId, {
-					metadata: {
-						...metadata,
-						commentId: undefined,
-					},
+					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
 			}
 
-			createNotice( 'snackbar', __( 'Comment deleted successfully.' ), {
+			createNotice( 'snackbar', __( 'Note deleted.' ), {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
@@ -259,16 +320,90 @@ export function useEnableFloatingSidebar( enabled = false ) {
 			return;
 		}
 
-		return registry.subscribe( () => {
-			const activeSidebar = registry
-				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core' );
+		const { getActiveComplementaryArea } =
+			registry.select( interfaceStore );
+		const { disableComplementaryArea, enableComplementaryArea } =
+			registry.dispatch( interfaceStore );
 
-			if ( ! activeSidebar ) {
-				registry
-					.dispatch( interfaceStore )
-					.enableComplementaryArea( 'core', collabSidebarName );
+		const unsubscribe = registry.subscribe( () => {
+			// Return `null` to indicate the user hid the complementary area.
+			if ( getActiveComplementaryArea( 'core' ) === null ) {
+				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
 			}
 		} );
+
+		return () => {
+			unsubscribe();
+			if (
+				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
+			) {
+				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+			}
+		};
 	}, [ enabled, registry ] );
+}
+
+export function useFloatingBoard( {
+	threads,
+	selectedNoteId,
+	isFloating,
+	sidebarRef,
+} ) {
+	const [ notePositions, setNotePositions ] = useState( {} );
+	const [ store ] = useState( createBoardStore );
+
+	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
+
+	// Notes are positioned in canvas content-space; CSS inherits
+	// `--canvas-scroll` to translate each thread in sync with the canvas.
+	useEffect( () => {
+		if ( ! isFloating || ! sidebarRef?.current ) {
+			return;
+		}
+
+		const panel = sidebarRef.current;
+		const blockEl = store.getFirstBlockElement();
+		// Climb to the block-list root so nested scroll containers
+		// (e.g. a Group with overflow:auto) don't shadow the canvas.
+		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
+		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
+
+		const applyScroll = () => {
+			panel.style.setProperty(
+				'--canvas-scroll',
+				`${ -( canvas?.scrollTop ?? 0 ) }px`
+			);
+		};
+
+		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
+		const rafId = window.requestAnimationFrame( () => {
+			const result = calculateNotePositions( {
+				threads,
+				selectedNoteId,
+				blockRects: store.getBlockRects(),
+				heights,
+				scrollTop: canvas?.scrollTop ?? 0,
+			} );
+
+			setNotePositions( result.positions );
+			applyScroll();
+		} );
+
+		// Root scrolling elements (documentElement/body) don't fire scroll
+		// on themselves; capture on the window catches them in either canvas.
+		const view = canvas?.ownerDocument?.defaultView;
+		const listenerOptions = { passive: true, capture: true };
+		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
+
+		return () => {
+			window.cancelAnimationFrame( rafId );
+			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
+		};
+	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
+
+	return {
+		notePositions,
+		registerThread: store.registerThread,
+		unregisterThread: store.unregisterThread,
+	};
 }

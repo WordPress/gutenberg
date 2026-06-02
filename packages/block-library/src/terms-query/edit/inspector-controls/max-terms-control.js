@@ -7,7 +7,6 @@ import { RangeControl } from '@wordpress/components';
 export default function MaxTermsControl( { value, onChange, ...props } ) {
 	return (
 		<RangeControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			value={ value }
 			min={ 0 }

@@ -34,7 +34,7 @@ const shouldSeverEntityLink = ( originalUrl, newUrl ) => {
 					? window.location.origin
 					: 'https://wordpress.org' );
 			return new URL( url, base );
-		} catch ( error ) {
+		} catch {
 			// If URL construction still fails, it's likely an invalid URL
 			// and we should sever the entity link
 			return null;
@@ -222,5 +222,6 @@ export const updateAttributes = (
 
 	return {
 		isEntityLink: !! finalId && finalKind !== 'custom',
+		attributes, // Return the computed attributes object
 	};
 };

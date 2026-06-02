@@ -37,33 +37,6 @@ export interface FilterByConfig {
 	isPrimary?: boolean;
 }
 
-export interface NormalizedFilterByConfig {
-	/**
-	 * The list of operators supported by the field.
-	 */
-	operators: Operator[];
-
-	/**
-	 * Whether it is a primary filter.
-	 *
-	 * A primary filter is always visible and is not listed in the "Add filter" component,
-	 * except for the list layout where it behaves like a secondary filter.
-	 */
-	isPrimary?: boolean;
-}
-
-interface FilterConfigForType {
-	/**
-	 * What operators are used by default.
-	 */
-	defaultOperators: Operator[];
-
-	/**
-	 * What operators are supported by the field.
-	 */
-	validOperators: Operator[];
-}
-
 export type Operator =
 	| 'is'
 	| 'isNot'
@@ -88,7 +61,7 @@ export type Operator =
 	| 'inThePast'
 	| 'over';
 
-export type FieldType =
+export type FieldTypeName =
 	| 'text'
 	| 'integer'
 	| 'number'
@@ -103,55 +76,58 @@ export type FieldType =
 	| 'url'
 	| 'array';
 
-/**
- * An abstract interface for Field based on the field type.
- */
-export type FieldTypeDefinition< Item > = {
-	/**
-	 * Callback used to sort the field.
-	 */
-	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-
-	/**
-	 * Callback used to validate the field.
-	 */
-	isValid: Rules< Item >;
-
-	/**
-	 * Callback used to render an edit control for the field or control name.
-	 */
-	Edit:
-		| ComponentType< DataFormControlProps< Item > >
-		| string
-		| EditConfig
-		| null;
-
-	/**
-	 * Callback used to render the field.
-	 */
-	render: ComponentType< DataViewRenderFieldProps< Item > >;
-
-	/**
-	 * The filter config for the field.
-	 */
-	filterBy: FilterConfigForType | false;
-
-	/**
-	 * Whether the field is readOnly.
-	 * If `true`, the value will be rendered using the `render` callback.
-	 */
-	readOnly?: boolean;
-
-	/**
-	 * Whether the field is sortable.
-	 */
-	enableSorting: boolean;
-};
-
 export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
-	custom?: ( item: Item, field: NormalizedField< Item > ) => null | string;
+	pattern?: string;
+	minLength?: number;
+	maxLength?: number;
+	min?: number | string;
+	max?: number | string;
+	custom?:
+		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
+		| ( (
+				item: Item,
+				field: NormalizedField< Item >
+		  ) => Promise< null | string > );
+};
+
+export type Validator< Item > = (
+	item: Item,
+	field: NormalizedField< Item >
+) => boolean;
+
+export type CustomValidator< Item > =
+	| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
+	| ( (
+			item: Item,
+			field: NormalizedField< Item >
+	  ) => Promise< null | string > );
+
+export type FilterOperator< Item > = (
+	item: Item,
+	field: NormalizedField< Item >,
+	filterValue: any
+) => boolean;
+
+export type FilterOperatorMap< Item > = Partial<
+	Record< Operator, FilterOperator< Item > >
+>;
+
+type NormalizedRule< Item, ConstraintType > = {
+	constraint: ConstraintType;
+	validate: Validator< Item >;
+};
+
+export type NormalizedRules< Item > = {
+	required?: NormalizedRule< Item, boolean >;
+	elements?: NormalizedRule< Item, boolean >;
+	pattern?: NormalizedRule< Item, string >;
+	minLength?: NormalizedRule< Item, number >;
+	maxLength?: NormalizedRule< Item, number >;
+	min?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
+	max?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
+	custom?: CustomValidator< Item >;
 };
 
 /**
@@ -181,10 +157,21 @@ export type EditConfigText = {
 };
 
 /**
- * Edit configuration for other control types (excluding 'text' and 'textarea').
+ * Edit configuration for datetime controls.
+ */
+export type EditConfigDatetime = {
+	control: 'datetime';
+	/**
+	 * Whether to render a compact version without the calendar widget.
+	 */
+	compact?: boolean;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldType, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'datetime' >;
 };
 
 /**
@@ -194,16 +181,14 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigDatetime
 	| EditConfigGeneric;
 
-/**
- * A dataview field for a specific property of a data type.
- */
 export type Field< Item > = {
 	/**
-	 * Type of the fields.
+	 * Type of the field.
 	 */
-	type?: FieldType;
+	type?: FieldTypeName;
 
 	/**
 	 * The unique identifier of the field.
@@ -224,7 +209,7 @@ export type Field< Item > = {
 	/**
 	 * A description of the field.
 	 */
-	description?: string;
+	description?: string | ReactElement;
 
 	/**
 	 * Placeholder for the field.
@@ -247,7 +232,12 @@ export type Field< Item > = {
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
-	 * Callback used to validate the field.
+	 * Validation config for the field.
+	 *
+	 * Range rules are normalized according to `type`:
+	 * - `'integer' | 'number'`: `min`/`max` accept `number`
+	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - all other field types ignore `min`/`max`
 	 */
 	isValid?: Rules< Item >;
 
@@ -255,6 +245,18 @@ export type Field< Item > = {
 	 * Callback used to decide if a field should be displayed.
 	 */
 	isVisible?: ( item: Item ) => boolean;
+
+	/**
+	 * Whether a field should be disabled.
+	 * Can be a boolean or a callback receiving the current item and field.
+	 * Defaults to false.
+	 */
+	isDisabled?:
+		| boolean
+		| ( ( args: {
+				item: Item;
+				field: NormalizedField< Item >;
+		  } ) => boolean );
 
 	/**
 	 * Whether the field is sortable.
@@ -275,6 +277,11 @@ export type Field< Item > = {
 	 * The list of options to pick from when using the field as a filter.
 	 */
 	elements?: Option[];
+
+	/**
+	 * Retrieval function for elements.
+	 */
+	getElements?: () => Promise< Option[] >;
 
 	/**
 	 * Filter config for the field.
@@ -298,21 +305,111 @@ export type Field< Item > = {
 	 * Used for editing operations to update field values.
 	 */
 	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
+
+	/**
+	 * Display format configuration for fields.
+	 */
+	format?: FormatDatetime | FormatDate | FormatNumber | FormatInteger;
+
+	/**
+	 * Callback used to format the value of the field for display.
+	 */
+	getValueFormatted?: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
 };
 
-export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
+/**
+ * Format for datetime fields:
+ *
+ * - datetime: the format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm").
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
+ *
+ * If not provided, defaults to WordPress date format settings.
+ */
+export type FormatDatetime = {
+	datetime?: string;
+	weekStartsOn?: DayNumber;
+};
+
+/**
+ * Format for date fields:
+ *
+ * - date: the format string (e.g., 'F j, Y' for 'March 10, 2023')
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
+ *
+ * If not provided, defaults to WordPress date format settings.
+ */
+export type FormatDate = {
+	date?: string;
+	weekStartsOn?: DayNumber;
+};
+export type DayNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+/**
+ * Format for number fields:
+ *
+ * - separatorThousand: character to use for thousand separators (e.g., ',')
+ * - separatorDecimal: character to use for decimal point (e.g., '.')
+ * - decimals: number of decimal places to display (e.g., 2)
+ *
+ * If not provided, defaults to ',' for thousands, '.' for decimal, 2 decimals.
+ */
+export type FormatNumber = {
+	separatorThousand?: string;
+	separatorDecimal?: string;
+	decimals?: number;
+};
+
+/**
+ * Format for integer fields:
+ *
+ * - separatorThousand: character to use for thousand separators (e.g., ',')
+ *
+ * If not provided, defaults to ',' for thousands.
+ */
+export type FormatInteger = {
+	separatorThousand?: string;
+};
+
+export type NormalizedField< Item > = Omit<
+	Field< Item >,
+	'Edit' | 'isValid'
+> & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
 	setValue: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
 	render: ComponentType< DataViewRenderFieldProps< Item > >;
 	Edit: ComponentType< DataFormControlProps< Item > > | null;
+	hasElements: boolean;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-	isValid: Rules< Item >;
+	isValid: NormalizedRules< Item >;
 	enableHiding: boolean;
 	enableSorting: boolean;
-	filterBy: NormalizedFilterByConfig | false;
+	filterBy: Required< FilterByConfig > | false;
+	filter: FilterOperatorMap< Item >;
 	readOnly: boolean;
+	isDisabled: ( args: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => boolean;
+	format:
+		| {}
+		| Required< FormatDate >
+		| Required< FormatInteger >
+		| Required< FormatNumber >;
+	getValueFormatted: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
 };
 
 /**
@@ -320,11 +417,51 @@ export type NormalizedField< Item > = Omit< Field< Item >, 'Edit' > & {
  */
 export type Fields< Item > = Field< Item >[];
 
+export type FieldValidity = {
+	required?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message?: string;
+	};
+	pattern?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	min?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	max?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	minLength?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	maxLength?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	elements?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	custom?: {
+		type: 'valid' | 'invalid' | 'validating';
+		message: string;
+	};
+	children?: Record< string, FieldValidity >;
+};
+
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
 	onChange: ( value: DeepPartial< Item > ) => void;
 	hideLabelFromVision?: boolean;
+	/**
+	 * Label the control as "optional" when _not_ required, instead of showing "required".
+	 */
+	markWhenOptional?: boolean;
 	/**
 	 * The currently selected filter operator for this field.
 	 *
@@ -332,12 +469,17 @@ export type DataFormControlProps< Item > = {
 	 */
 	operator?: Operator;
 	/**
+	 * Validity information for the field, if any.
+	 */
+	validity?: FieldValidity;
+	/**
 	 * Configuration object for the control.
 	 */
 	config?: {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		compact?: boolean;
 	};
 };
 

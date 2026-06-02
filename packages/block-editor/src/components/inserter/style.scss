@@ -85,13 +85,14 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__toggle.components-button {
 	display: inline-flex;
 	align-items: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	border: none;
 	outline: none;
 	padding: 0;
 	@media not ( prefers-reduced-motion ) {
 		transition: color 0.2s ease;
 	}
+
 }
 
 .block-editor-inserter__menu {
@@ -119,7 +120,18 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__search {
-	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
+	padding: $grid-unit-20;
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	background-color: $white;
+	border-bottom: 1px solid transparent;
+	@media not ( prefers-reduced-motion ) {
+		transition: border-bottom-color 0.1s linear;
+	}
+	&.is-scrolled {
+		border-bottom-color: $gray-200;
+	}
 }
 
 .block-editor-inserter__no-tab-container {
@@ -138,7 +150,7 @@ $block-inserter-tabs-height: 44px;
 
 	display: inline-flex;
 	align-items: center;
-	padding: $grid-unit-20 $grid-unit-20 0;
+	padding: 0 $grid-unit-20;
 }
 
 .block-editor-inserter__panel-content {
@@ -151,7 +163,7 @@ $block-inserter-tabs-height: 44px;
 	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
@@ -224,10 +236,14 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
 	flex-grow: 1;
-	padding: $grid-unit-20;
+	padding: 0 $grid-unit-20 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
+}
+
+.block-editor-inserter__media-tabs-container {
+	padding-top: $grid-unit-20;
 }
 
 .block-editor-inserter__category-tablist {
@@ -383,7 +399,7 @@ $block-inserter-tabs-height: 44px;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
-		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
+		padding: $grid-unit-30 $grid-unit-30 $grid-unit-30;
 		overflow-x: visible;
 		overflow-y: auto;
 
@@ -440,7 +456,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .components-heading.block-editor-inserter__patterns-category-panel-title {
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 }
 
 .block-editor-inserter__patterns-explore-button,
@@ -482,7 +498,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__media-list__list-item {
 	position: relative;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	margin-bottom: $grid-unit-30;
 
 	&.is-placeholder {

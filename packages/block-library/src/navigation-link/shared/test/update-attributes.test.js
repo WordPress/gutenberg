@@ -1153,6 +1153,7 @@ describe( 'updateAttributes', () => {
 
 				expect( result ).toEqual( {
 					isEntityLink: true,
+					attributes: expect.any( Object ),
 				} );
 			} );
 
@@ -1173,6 +1174,7 @@ describe( 'updateAttributes', () => {
 
 				expect( result ).toEqual( {
 					isEntityLink: false,
+					attributes: expect.any( Object ),
 				} );
 			} );
 
@@ -1190,6 +1192,7 @@ describe( 'updateAttributes', () => {
 
 				expect( result ).toEqual( {
 					isEntityLink: false,
+					attributes: expect.any( Object ),
 				} );
 			} );
 
@@ -1215,6 +1218,7 @@ describe( 'updateAttributes', () => {
 				// Should return false because the link was severed and converted to custom
 				expect( result ).toEqual( {
 					isEntityLink: false,
+					attributes: expect.any( Object ),
 				} );
 			} );
 
@@ -1240,6 +1244,7 @@ describe( 'updateAttributes', () => {
 				// Should return true because entity link is preserved
 				expect( result ).toEqual( {
 					isEntityLink: true,
+					attributes: expect.any( Object ),
 				} );
 			} );
 
@@ -1260,6 +1265,7 @@ describe( 'updateAttributes', () => {
 				// mailto links have kind: 'custom', so isEntityLink should be false
 				expect( result ).toEqual( {
 					isEntityLink: false,
+					attributes: expect.any( Object ),
 				} );
 			} );
 
@@ -1280,6 +1286,7 @@ describe( 'updateAttributes', () => {
 				// tel links have kind: 'custom', so isEntityLink should be false
 				expect( result ).toEqual( {
 					isEntityLink: false,
+					attributes: expect.any( Object ),
 				} );
 			} );
 
@@ -1300,6 +1307,7 @@ describe( 'updateAttributes', () => {
 
 				expect( result ).toEqual( {
 					isEntityLink: true,
+					attributes: expect.any( Object ),
 				} );
 			} );
 		} );

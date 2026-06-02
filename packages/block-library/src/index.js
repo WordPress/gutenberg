@@ -9,10 +9,16 @@ import {
 	registerBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import HtmlRenderer from './utils/html-renderer';
 
 /**
  * Internal dependencies
@@ -68,10 +74,12 @@ import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
+import * as icon from './icon';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as math from './math';
 import * as listItem from './list-item';
 import * as logInOut from './loginout';
 import * as mediaText from './media-text';
@@ -81,10 +89,13 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
+import * as navigationOverlayClose from './navigation-overlay-close';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
+import * as playlist from './playlist';
+import * as playlistTrack from './playlist-track';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
@@ -124,8 +135,13 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
+import * as tab from './tab';
+import * as tabPanel from './tab-panel';
+import * as tabPanels from './tab-panels';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
+import * as tabList from './tab-list';
+import * as tabs from './tabs';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -163,7 +179,6 @@ const getAllBlocks = () => {
 		accordionPanel,
 		archives,
 		audio,
-		breadcrumbs,
 		button,
 		buttons,
 		calendar,
@@ -178,6 +193,7 @@ const getAllBlocks = () => {
 		file,
 		group,
 		html,
+		math,
 		latestComments,
 		latestPosts,
 		mediaText,
@@ -250,18 +266,18 @@ const getAllBlocks = () => {
 		postCommentsForm,
 		tableOfContents,
 		homeLink,
+		icon,
 		logInOut,
+		navigationOverlayClose,
 		termCount,
 		termDescription,
 		termName,
+		termsQuery,
+		termTemplate,
 		queryTitle,
 		postAuthorBiography,
+		breadcrumbs,
 	];
-
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( termsQuery );
-		blocks.push( termTemplate );
-	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
@@ -270,22 +286,19 @@ const getAllBlocks = () => {
 		blocks.push( formSubmissionNotification );
 	}
 
-	// When in a WordPress context, conditionally
-	// add the classic block and TinyMCE editor
-	// under any of the following conditions:
-	//   - the current post contains a classic block
-	//   - the experiment to disable TinyMCE isn't active.
-	//   - a query argument specifies that TinyMCE should be loaded
-	if (
-		window?.wp?.oldEditor &&
-		( window?.wp?.needsClassicBlock ||
-			! window?.__experimentalDisableTinymce ||
-			!! new URLSearchParams( window?.location?.search ).get(
-				'requiresTinymce'
-			) )
-	) {
-		blocks.push( classic );
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( tab );
+		blocks.push( tabList );
+		blocks.push( tabs );
+		blocks.push( tabPanel );
+		blocks.push( tabPanels );
+		blocks.push( playlist );
+		blocks.push( playlistTrack );
 	}
+
+	// Always register the classic block. Inserter availability is controlled
+	// by the block's `supports.inserter` value in `freeform/init`.
+	blocks.push( classic );
 
 	return blocks.filter( Boolean );
 };
@@ -328,13 +341,21 @@ export const registerCoreBlocks = (
 			const bootstrappedBlockType = unlock(
 				select( blocksStore )
 			).getBootstrappedBlockType( blockName );
-			const bootstrappedApiVersion = bootstrappedBlockType.apiVersion;
 
 			registerBlockType( blockName, {
-				title: blockName,
-				...( bootstrappedApiVersion < 3 && { apiVersion: 3 } ),
+				// Use all metadata from PHP registration,
+				// but fall back title to block name if not provided,
+				// ensure minimum apiVersion 3 for block wrapper support,
+				// and override with a ServerSideRender-based edit function.
+				...bootstrappedBlockType,
+				title: bootstrappedBlockType?.title || blockName,
+				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+					apiVersion: 3,
+				} ),
+				// Inspector controls are rendered by the auto-register hook in block-editor
 				edit: function Edit( { attributes } ) {
-					const blockProps = useBlockProps();
+					const disabledRef = useDisabled();
+					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
@@ -359,11 +380,9 @@ export const registerCoreBlocks = (
 					}
 
 					return (
-						<div
-							{ ...blockProps }
-							dangerouslySetInnerHTML={ {
-								__html: content || '',
-							} }
+						<HtmlRenderer
+							wrapperProps={ blockProps }
+							html={ content }
 						/>
 					);
 				},

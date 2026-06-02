@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .button {
 	margin: $grid-unit-10 $grid-unit-05;
 	align-items: center;
@@ -115,6 +118,6 @@
 
 .helpDetailBadgeText {
 	color: $white;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	font-size: 12px;
 }

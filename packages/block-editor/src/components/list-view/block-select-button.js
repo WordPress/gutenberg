@@ -12,10 +12,18 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall, unseen } from '@wordpress/icons';
+import {
+	Icon,
+	lockSmall as lock,
+	pinSmall,
+	unseen,
+	symbol,
+} from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
-import { hasBlockSupport } from '@wordpress/blocks';
+
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -29,7 +37,7 @@ import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
@@ -46,6 +54,7 @@ function ListViewBlockSelectButton(
 		draggable,
 		isExpanded,
 		ariaDescribedBy,
+		visibilityLabel,
 	},
 	ref
 ) {
@@ -55,31 +64,15 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { canToggleBlockVisibility, isBlockHidden, isContentOnly } =
-		useSelect(
-			( select ) => {
-				const { getBlockName } = select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
-				return {
-					canToggleBlockVisibility: hasBlockSupport(
-						getBlockName( clientId ),
-						'blockVisibility',
-						true
-					),
-					isBlockHidden: _isBlockHidden( clientId ),
-					isContentOnly:
-						select( blockEditorStore ).getBlockEditingMode(
-							clientId
-						) === 'contentOnly',
-				};
-			},
-			[ clientId ]
-		);
-	const shouldShowLockIcon = isLocked && ! isContentOnly;
-	const shouldShowBlockVisibilityIcon =
-		canToggleBlockVisibility && isBlockHidden;
+	const hasPatternName = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
+			return !! getBlockAttributes( clientId )?.metadata?.patternName;
+		},
+		[ clientId ]
+	);
+
+	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -123,7 +116,7 @@ function ListViewBlockSelectButton(
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ blockInformation?.icon }
+				icon={ hasPatternName ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
@@ -138,9 +131,9 @@ function ListViewBlockSelectButton(
 				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Badge className="block-editor-list-view-block-select-button__anchor">
+						<WCBadge className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
-						</Badge>
+						</WCBadge>
 					</span>
 				) }
 				{ isSticky && (
@@ -165,10 +158,26 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ shouldShowBlockVisibilityIcon && (
-					<span className="block-editor-list-view-block-select-button__block-visibility">
-						<Icon icon={ unseen } />
-					</span>
+				{ !! visibilityLabel && (
+					// The tooltip below is a sighted-hover affordance for
+					// the (decorative) visibility icon. The same
+					// `visibilityLabel` is exposed to assistive technology
+					// via the row's `aria-describedby`, which references the
+					// hidden `AriaReferencedText` rendered by the parent
+					// `ListViewBlock`.
+					<Tooltip.Root>
+						<Tooltip.Trigger
+							render={
+								<span
+									className="block-editor-list-view-block-select-button__block-visibility"
+									aria-hidden="true"
+								>
+									<Icon icon={ unseen } />
+								</span>
+							}
+						/>
+						<Tooltip.Popup>{ visibilityLabel }</Tooltip.Popup>
+					</Tooltip.Root>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">

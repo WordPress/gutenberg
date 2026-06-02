@@ -217,7 +217,6 @@ function BlockPopoverInbetween( {
 		return null;
 	}
 
-	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
 	// bubbling focus event from the Inserter, due to the
 	// characteristics of click focusing of `button`s in
@@ -253,7 +252,6 @@ function BlockPopoverInbetween( {
 			</div>
 		</Popover>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
 export default BlockPopoverInbetween;
