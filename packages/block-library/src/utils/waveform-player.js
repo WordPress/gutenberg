@@ -12,11 +12,18 @@ import { initWaveformPlayer } from './waveform-utils';
 /**
  * Update a live waveform player's metadata elements in place.
  *
- * The title and artist are updated in place. The artwork element only exists
- * when the track had an image when the player was created, so its URL is
- * updated in place here; adding or removing an image (which creates or tears
- * down that element) is instead handled by recreating the player, keyed on
- * the `hasImage` dependency.
+ * The title element always exists, so the title is updated in place. The
+ * subtitle and artwork elements only exist when the track had an artist/image
+ * when the player was created, so their values are updated in place here;
+ * adding or removing an artist or image (which creates or tears down those
+ * elements) is instead handled by recreating the player, keyed on the
+ * `hasArtist` and `hasImage` dependencies.
+ *
+ * The library's only metadata API is `loadTrack()`, which re-fetches and
+ * re-decodes the audio and regenerates the waveform (resetting playback), so
+ * it's unsuitable for live metadata edits. We instead write to the title,
+ * subtitle, and artwork elements directly, which is what `loadTrack()` itself
+ * does internally for these fields.
  *
  * @param {Object} instance        - The waveform player instance.
  * @param {Object} metadata        - The track metadata.
@@ -69,11 +76,12 @@ export function WaveformPlayer( {
 	const metadataRef = useRef( { title, artist, image } );
 	const playerRef = useRef();
 
-	// Whether the player has an artwork element depends on whether an image
-	// was present when it was created. Recreate the player when the image is
-	// added or removed so that element is created or torn down; URL changes
-	// to an existing image are applied in place below.
+	// The artwork and subtitle elements only exist when an image/artist was
+	// present when the player was created. Recreate the player when either is
+	// added or removed so that element is created or torn down; value changes
+	// to an existing element are applied in place below.
 	const hasImage = !! image;
+	const hasArtist = !! artist;
 
 	// Keep the freshest metadata available to init() (which runs on a
 	// deferred timeout) and update the live player in place when metadata
@@ -129,7 +137,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, src, waveformStyle, hasImage ]
+		[ onEndedEvent, src, waveformStyle, hasImage, hasArtist ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;

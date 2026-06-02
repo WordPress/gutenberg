@@ -193,4 +193,52 @@ describe( 'WaveformPlayer', () => {
 		const secondPlayer = initWaveformPlayer.mock.results[ 1 ].value;
 		expect( secondPlayer.instance.artworkEl ).toBeNull();
 	} );
+
+	it( 'recreates the player to show an artist added to a track that had none', () => {
+		const { rerender } = render(
+			<WaveformPlayer { ...baseProps } artist="" />
+		);
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const firstPlayer = initWaveformPlayer.mock.results[ 0 ].value;
+		// No subtitle element exists when the track started without an artist.
+		expect( firstPlayer.instance.subtitleEl ).toBeNull();
+
+		rerender( <WaveformPlayer { ...baseProps } artist="New Artist" /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( firstPlayer.destroy ).toHaveBeenCalledTimes( 1 );
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+		const secondPlayer = initWaveformPlayer.mock.results[ 1 ].value;
+		expect( secondPlayer.instance.subtitleEl ).toHaveTextContent(
+			'New Artist'
+		);
+	} );
+
+	it( 'recreates the player when the artist is removed', () => {
+		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		const player = initWaveformPlayer.mock.results[ 0 ].value;
+
+		rerender( <WaveformPlayer { ...baseProps } artist="" /> );
+
+		act( () => {
+			jest.advanceTimersByTime( 100 );
+		} );
+
+		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
+		const secondPlayer = initWaveformPlayer.mock.results[ 1 ].value;
+		expect( secondPlayer.instance.subtitleEl ).toBeNull();
+	} );
 } );
