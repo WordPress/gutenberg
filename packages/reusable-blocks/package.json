@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/reusable-blocks",
-	"version": "5.46.0",
+	"version": "5.47.0",
 	"description": "Reusable blocks utilities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -64,8 +64,8 @@
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

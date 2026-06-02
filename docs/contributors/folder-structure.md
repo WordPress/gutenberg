@@ -59,11 +59,11 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .github/*
     │   Config of the different GitHub features (issues and PR templates, CI, owners).
     │
-    ├── bin/api-docs
+    ├── tools/api-docs
     │   Tool/script used to generate the API Docs.
     │
-    ├── bin/packages
-    │   Set of scripts used to build the WordPress packages.
+    ├── tools/build-scripts
+    │   Build orchestration scripts for the Gutenberg monorepo (@wordpress/build-scripts).
     │
     ├── tools/release
     │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.
@@ -83,8 +83,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── lib
     │   PHP Source code of the Gutenberg plugin.
     │
-    ├── lib/compact/wordpress-x.x
-    │   PHP code that was include in WordPress ont the WordPress X.X version.
+    ├── lib/compat/wordpress-x.x
+    │   PHP code that was included in WordPress on the WordPress X.X version.
     │   It is kept to ensure plugin compatibility with older WordPress versions.
     │
     ├── packages

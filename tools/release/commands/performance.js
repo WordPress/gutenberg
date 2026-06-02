@@ -516,9 +516,14 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	// Copy the head branch's script source maps next to the traces so the
-	// artifact is self-contained: downloaders can run
-	// `bin/resolve-trace-source-maps.js` directly without checking out the
-	// repo or running `npm run build`.
+	// artifact is self-contained: downloaders can run the following without
+	// checking out the repo or running `npm run build`:
+	//
+	//   node tools/build-scripts/packages/resolve-trace-source-maps.cjs
+	//
+	// Or via the workspace script:
+	//
+	//   npm run --workspace @wordpress/build-scripts resolve-trace-source-maps -- <trace> --build-dir <build-dir>
 	const headBranch = branches[ 0 ];
 	// @ts-ignore
 	const headBuildScriptsDir = path.join(

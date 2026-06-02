@@ -111,6 +111,45 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		jest.clearAllMocks();
 	} );
 
+	it( 'passes an onClose handler for returning focus when the media editor closes', async () => {
+		const cropButton = document.createElement( 'button' );
+		const otherButton = document.createElement( 'button' );
+		document.body.append( cropButton, otherButton );
+		const registry = createRegistry();
+		useRegistry.mockReturnValue( registry );
+		const setAttributes = jest.fn();
+		const openMediaEditorModal = jest.fn();
+		mockMediaEditorModalSetting( openMediaEditorModal );
+		const onClose = () => cropButton.focus();
+		const { result } = renderHook( () =>
+			useOpenImageMediaEditorModal( {
+				attributes: {
+					id: 1,
+					url: 'original.jpg',
+					alt: '',
+					caption: '',
+				},
+				setAttributes,
+				onClose,
+			} )
+		);
+
+		try {
+			await act( async () => {
+				await result.current();
+			} );
+			otherButton.focus();
+			expect( otherButton ).toHaveFocus();
+
+			openMediaEditorModal.mock.calls[ 0 ][ 0 ].onClose();
+
+			expect( cropButton ).toHaveFocus();
+		} finally {
+			cropButton.remove();
+			otherButton.remove();
+		}
+	} );
+
 	it( 'resolves fresh attachment metadata when the same attachment id has a stale cache', async () => {
 		const originalAttachment = {
 			id: 1,
@@ -187,6 +226,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		expect( openMediaEditorModal ).toHaveBeenCalledWith( {
 			id: 1,
 			onUpdate: expect.any( Function ),
+			onClose: undefined,
 		} );
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			alt: 'Updated alt',
@@ -229,6 +269,7 @@ describe( 'useOpenImageMediaEditorModal', () => {
 		expect( openMediaEditorModal ).toHaveBeenCalledWith( {
 			id: 1,
 			onUpdate: expect.any( Function ),
+			onClose: undefined,
 		} );
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			caption: 'Updated attachment caption',
