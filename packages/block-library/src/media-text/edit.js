@@ -7,8 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { useState, useRef } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentControl,
@@ -217,10 +217,24 @@ function MediaTextEdit( {
 	} = attributes;
 
 	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
-	// The aspect ratio and "Crop image to fill" are mutually exclusive: a set
-	// aspect ratio takes precedence and the fill styles are ignored for it.
+	// The aspect ratio and "Crop image to fill" are mutually exclusive, so
+	// applying an aspect ratio disables fill.
 	const hasAspectRatio = !! dimensionsProps.className;
+
+	useEffect( () => {
+		if ( imageFill && hasAspectRatio ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { imageFill: false } );
+		}
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		imageFill,
+		hasAspectRatio,
+		setAttributes,
+	] );
 
 	const [ featuredImage ] = useEntityProp(
 		'postType',
@@ -321,7 +335,7 @@ function MediaTextEdit( {
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill-element': imageFill && ! hasAspectRatio,
+		'is-image-fill-element': imageFill,
 	} );
 	const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 	const gridTemplateColumns =

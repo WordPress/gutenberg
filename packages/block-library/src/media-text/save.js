@@ -43,24 +43,17 @@ export default function save( { attributes } ) {
 
 	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 
-	// A set aspect ratio and "Crop image to fill" are mutually exclusive; the
-	// aspect ratio takes precedence and the fill styles are ignored.
-	const hasAspectRatio = !! dimensionsProps.className;
-
 	const imageClasses = clsx(
 		{
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 		},
-		dimensionsProps.className
+		! imageFill && dimensionsProps.className
 	);
 
-	let mediaStyles = {};
-	if ( hasAspectRatio ) {
-		mediaStyles = dimensionsProps.style;
-	} else if ( imageFill ) {
-		mediaStyles = imageFillStyles( mediaUrl, focalPoint );
-	}
+	const mediaStyles = imageFill
+		? imageFillStyles( mediaUrl, focalPoint )
+		: dimensionsProps.style;
 
 	let image = mediaUrl ? (
 		<img
@@ -92,7 +85,7 @@ export default function save( { attributes } ) {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill-element': imageFill && ! hasAspectRatio,
+		'is-image-fill-element': imageFill,
 	} );
 
 	let gridTemplateColumns;
