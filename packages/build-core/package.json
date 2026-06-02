@@ -1,0 +1,39 @@
+{
+	"name": "@wordpress/build-core",
+	"version": "0.1.0",
+	"description": "Shared build utilities for WordPress bundler integrations.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"build",
+		"bundler"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/build-core/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/build-core"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"lib"
+	],
+	"main": "./lib/index.cjs",
+	"exports": {
+		".": {
+			"require": "./lib/index.cjs",
+			"import": "./lib/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

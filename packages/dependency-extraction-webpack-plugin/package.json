@@ -38,6 +38,7 @@
 	},
 	"types": "lib/types.d.ts",
 	"dependencies": {
+		"@wordpress/build-core": "file:../build-core",
 		"json2php": "^0.0.7"
 	},
 	"devDependencies": {

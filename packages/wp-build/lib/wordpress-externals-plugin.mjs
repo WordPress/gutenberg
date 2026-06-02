@@ -3,13 +3,21 @@
  */
 import { writeFile, mkdir, readFile } from 'fs/promises';
 import path from 'path';
-import { camelCase } from 'change-case';
 import { createHash } from 'crypto';
+import buildCore from '@wordpress/build-core';
 
 /**
  * Internal dependencies
  */
 import { getPackageInfo } from './package-utils.mjs';
+
+const {
+	camelCasePackagePath,
+	getPackageExternalConfigs,
+	getVendorExternal,
+	isScriptModuleImport,
+	parsePackageRequest,
+} = buildCore;
 
 /**
  * Generate a content hash from file contents.
@@ -80,108 +88,27 @@ export function createWordpressExternalsPlugin(
 				const dependencies = new Set();
 				const moduleDependencies = new Map();
 
-				/**
-				 * Check if a package import is a script module.
-				 * A package is considered a script module if it has wpScriptModuleExports
-				 * and the specific import path (root or subpath) is declared in wpScriptModuleExports.
-				 *
-				 * @param {import('./package-utils.mjs').PackageJson} packageJson Package.json object.
-				 * @param {string|null}                               subpath     Subpath after package name, or null for root import.
-				 * @return {boolean} True if the import is a script module.
-				 */
-				function isScriptModuleImport( packageJson, subpath ) {
-					const { wpScriptModuleExports } = packageJson;
-
-					if ( ! wpScriptModuleExports ) {
-						return false;
-					}
-
-					// Root import: @wordpress/package-name
-					if ( ! subpath ) {
-						if ( typeof wpScriptModuleExports === 'string' ) {
-							return true;
-						}
-						if (
-							typeof wpScriptModuleExports === 'object' &&
-							wpScriptModuleExports[ '.' ]
-						) {
-							return true;
-						}
-						return false;
-					}
-
-					// Subpath import: @wordpress/package-name/subpath
-					if (
-						typeof wpScriptModuleExports === 'object' &&
-						wpScriptModuleExports[ `./${ subpath }` ]
-					) {
-						return true;
-					}
-
-					return false;
-				}
-
-				// Map of vendor packages to their global variables and handles
-				const vendorExternals = {
-					react: { global: 'React', handle: 'react' },
-					'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
-					'react-dom/client': {
-						global: 'ReactDOM',
-						handle: 'react-dom',
-					},
-					'react/jsx-runtime': {
-						global: 'ReactJSXRuntime',
-						handle: 'react-jsx-runtime',
-					},
-					'react/jsx-dev-runtime': {
-						global: 'ReactJSXRuntime',
-						handle: 'react-jsx-runtime',
-					},
-					moment: { global: 'moment', handle: 'moment' },
-					lodash: { global: 'lodash', handle: 'lodash' },
-					'lodash-es': { global: 'lodash', handle: 'lodash' },
-					jquery: { global: 'jQuery', handle: 'jquery' },
-				};
-
-				// Build list of package namespace configurations
-				const packageExternals = [
-					{
-						namespace: 'wordpress',
-						pattern: /^@wordpress\//,
-						globalName: 'wp',
-						handlePrefix: 'wp',
-					},
+				const vendorExternalRequests = [
+					'react',
+					'react-dom',
+					'react-dom/client',
+					'react/jsx-runtime',
+					'react/jsx-dev-runtime',
+					'moment',
+					'lodash',
+					'lodash-es',
+					'jquery',
 				];
 
-				// Add custom namespace if different from wordpress and scriptGlobal is not false
-				if (
-					packageNamespace &&
-					packageNamespace !== 'wordpress' &&
-					scriptGlobal !== false
-				) {
-					packageExternals.push( {
-						namespace: packageNamespace,
-						pattern: new RegExp( `^@${ packageNamespace }/` ),
-						globalName: scriptGlobal,
-						handlePrefix: handlePrefix || packageNamespace,
-					} );
-				}
+				const packageExternals = getPackageExternalConfigs( {
+					packageNamespace,
+					scriptGlobal,
+					externalNamespaces,
+					handlePrefix,
+				} );
 
-				// Add additional external namespaces from configuration
-				for ( const [ namespace, config ] of Object.entries(
-					externalNamespaces
-				) ) {
-					packageExternals.push( {
-						namespace,
-						pattern: new RegExp( `^@${ namespace }/` ),
-						globalName: config.global,
-						handlePrefix: config.handlePrefix || namespace,
-					} );
-				}
-
-				for ( const [ packageName, config ] of Object.entries(
-					vendorExternals
-				) ) {
+				for ( const packageName of vendorExternalRequests ) {
+					const config = getVendorExternal( packageName );
 					build.onResolve(
 						{
 							filter: new RegExp( `^${ packageName }$` ),
@@ -205,16 +132,8 @@ export function createWordpressExternalsPlugin(
 						{ filter: externalConfig.pattern },
 						/** @param {import('esbuild').OnResolveArgs} args */
 						( args ) => {
-							// Extract package name and subpath from import
-							// e.g., '@wordpress/blocks/sub/path' → packageName='@wordpress/blocks', subpath='sub/path'
-							const parts = args.path.split( '/' );
-							let packageName = args.path;
-							let subpath = null;
-							if ( parts.length > 2 ) {
-								packageName = parts.slice( 0, 2 ).join( '/' );
-								subpath = parts.slice( 2 ).join( '/' );
-							}
-							const shortName = parts[ 1 ];
+							const { packageName, shortName, subpath } =
+								parsePackageRequest( args.path );
 							const handle = `${ externalConfig.handlePrefix }-${ shortName }`;
 
 							const packageJson = getPackageInfo(
@@ -299,13 +218,11 @@ export function createWordpressExternalsPlugin(
 					/** @param {import('esbuild').OnLoadArgs} args */
 					( args ) => {
 						const globalName = args.pluginData.globalName;
-						// Extract package name after '@namespace/' prefix
-						// e.g., '@wordpress/blocks' or '@my-plugin/data'
-						const packagePath = args.path
-							.split( '/' )
-							.slice( 1 )
-							.join( '/' );
-						const camelCasedName = camelCase( packagePath );
+						const { packagePath } = parsePackageRequest(
+							args.path
+						);
+						const camelCasedName =
+							camelCasePackagePath( packagePath );
 
 						return {
 							contents: `module.exports = window.${ globalName }.${ camelCasedName };`,
