@@ -71,45 +71,27 @@ const config: Config = {
 				},
 				{
 					mode: 'corner-radius-none',
-					selectors: [
-						'[data-wpds-corner-radius="none"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="none"])',
-					],
+					selectors: [ '[data-wpds-corner-radius="none"]' ],
 				},
 				{
 					mode: 'corner-radius-sm',
-					selectors: [
-						'[data-wpds-corner-radius="sm"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="sm"])',
-					],
+					selectors: [ '[data-wpds-corner-radius="sm"]' ],
 				},
 				{
 					mode: 'corner-radius-md',
-					selectors: [
-						'[data-wpds-corner-radius="md"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="md"])',
-					],
+					selectors: [ '[data-wpds-corner-radius="md"]' ],
 				},
 				{
 					mode: 'corner-radius-lg',
-					selectors: [
-						'[data-wpds-corner-radius="lg"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="lg"])',
-					],
+					selectors: [ '[data-wpds-corner-radius="lg"]' ],
 				},
 				{
 					mode: 'corner-radius-xl',
-					selectors: [
-						'[data-wpds-corner-radius="xl"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="xl"])',
-					],
+					selectors: [ '[data-wpds-corner-radius="xl"]' ],
 				},
 				{
 					mode: 'corner-radius-2xl',
-					selectors: [
-						'[data-wpds-corner-radius="2xl"]',
-						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="2xl"])',
-					],
+					selectors: [ '[data-wpds-corner-radius="2xl"]' ],
 				},
 			],
 			legacyHex: true,
