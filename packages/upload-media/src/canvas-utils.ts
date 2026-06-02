@@ -3,6 +3,8 @@
  */
 import { getFileBasename } from './utils';
 import { parseHeic } from './heic-parser';
+import { ImageFile } from './image-file';
+import type { ImageSizeCrop } from './store/types';
 
 /**
  * Converts an image file to JPEG using the browser's native decoder and canvas.
@@ -252,4 +254,125 @@ function decodeHevcFrame(
 			reject( e );
 		} );
 	} );
+}
+
+/**
+ * Resizes an image to a sub-size using the browser's native decoder and canvas.
+ *
+ * This is a fallback for images that the bundled `wasm-vips` cannot process —
+ * notably high-bit-depth (10/12-bit) AVIF. The browser decodes these natively,
+ * so we draw the decoded bitmap onto an `OffscreenCanvas` at the target size and
+ * re-encode it.
+ *
+ * Because `OffscreenCanvas.convertToBlob()` cannot emit AVIF, the sub-size is
+ * written as JPEG, and because the canvas is 8-bit sRGB, high-bit-depth/HDR
+ * source images are flattened to 8-bit SDR. The original upload is unaffected;
+ * only the generated sub-size is converted.
+ *
+ * The returned filename mirrors `vipsResizeImage()`'s conventions so the
+ * sideload flow and the server register the sub-size under the right name.
+ *
+ * @param file         Source image file.
+ * @param resize       Resize options (width, height, crop).
+ * @param quality      JPEG quality (0-1). Default 0.82.
+ * @param addSuffix    Whether to add a `-WIDTHxHEIGHT` suffix (for thumbnails).
+ * @param scaledSuffix Whether to add a `-scaled` suffix (for threshold resizing).
+ * @return Resized ImageFile (JPEG) with dimension metadata.
+ */
+export async function canvasResizeImage(
+	file: File,
+	resize: ImageSizeCrop,
+	quality = 0.82,
+	addSuffix = false,
+	scaledSuffix = false
+): Promise< ImageFile > {
+	const bitmap = await createImageBitmap( file );
+
+	const originalWidth = bitmap.width;
+	const originalHeight = bitmap.height;
+
+	// Derive the target height from the aspect ratio when only a width is given.
+	const targetWidth = resize.width;
+	const targetHeight =
+		resize.height || ( originalHeight / originalWidth ) * resize.width;
+
+	let canvasWidth: number;
+	let canvasHeight: number;
+	// Source rectangle (defaults to the whole image for a soft resize).
+	let sx = 0;
+	let sy = 0;
+	let sWidth = originalWidth;
+	let sHeight = originalHeight;
+
+	if ( resize.crop ) {
+		// Hard crop: scale to cover the target box, then crop the overflow.
+		// Positional crop anchors are approximated as a centered crop.
+		canvasWidth = Math.round( targetWidth );
+		canvasHeight = Math.round( targetHeight );
+		const scale = Math.max(
+			canvasWidth / originalWidth,
+			canvasHeight / originalHeight
+		);
+		sWidth = Math.min( originalWidth, Math.round( canvasWidth / scale ) );
+		sHeight = Math.min(
+			originalHeight,
+			Math.round( canvasHeight / scale )
+		);
+		sx = Math.round( ( originalWidth - sWidth ) / 2 );
+		sy = Math.round( ( originalHeight - sHeight ) / 2 );
+	} else {
+		// Soft resize: fit within the box preserving aspect, never upscaling.
+		const scale = Math.min(
+			targetWidth / originalWidth,
+			targetHeight / originalHeight,
+			1
+		);
+		canvasWidth = Math.max( 1, Math.round( originalWidth * scale ) );
+		canvasHeight = Math.max( 1, Math.round( originalHeight * scale ) );
+	}
+
+	try {
+		const canvas = new OffscreenCanvas( canvasWidth, canvasHeight );
+		const ctx = canvas.getContext( '2d' );
+		if ( ! ctx ) {
+			throw new Error( 'Could not get canvas 2d context' );
+		}
+
+		ctx.drawImage(
+			bitmap,
+			sx,
+			sy,
+			sWidth,
+			sHeight,
+			0,
+			0,
+			canvasWidth,
+			canvasHeight
+		);
+
+		const blob = await canvas.convertToBlob( {
+			type: 'image/jpeg',
+			quality,
+		} );
+
+		const basename = getFileBasename( file.name );
+		const wasResized =
+			originalWidth > canvasWidth || originalHeight > canvasHeight;
+		let outName = `${ basename }.jpg`;
+		if ( wasResized && scaledSuffix ) {
+			outName = `${ basename }-scaled.jpg`;
+		} else if ( wasResized && addSuffix ) {
+			outName = `${ basename }-${ canvasWidth }x${ canvasHeight }.jpg`;
+		}
+
+		return new ImageFile(
+			new File( [ blob ], outName, { type: 'image/jpeg' } ),
+			canvasWidth,
+			canvasHeight,
+			originalWidth,
+			originalHeight
+		);
+	} finally {
+		bitmap.close();
+	}
 }

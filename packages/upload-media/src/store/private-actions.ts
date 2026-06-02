@@ -15,7 +15,8 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
  * Internal dependencies
  */
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, canvasResizeImage } from '../canvas-utils';
+import { isHighBitDepthAvif } from '../avif-utils';
 import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
@@ -890,15 +891,30 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
 		try {
-			const file = await vipsResizeImage(
-				item.id,
-				item.file,
-				args.resize,
-				false, // smartCrop
-				addSuffix,
-				item.abortController?.signal,
-				scaledSuffix
-			);
+			// High-bit-depth (10/12-bit) AVIF cannot be decoded by the bundled
+			// wasm-vips (its libaom is built without high-bit-depth support).
+			// The browser decodes these natively, so fall back to a canvas
+			// resize for them. The sub-size is written as 8-bit JPEG; the
+			// original AVIF upload is untouched.
+			// See https://github.com/WordPress/gutenberg/issues/78889
+			const settings = select.getSettings();
+			const file = ( await isHighBitDepthAvif( item.file ) )
+				? await canvasResizeImage(
+						item.file,
+						args.resize,
+						settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+						addSuffix,
+						scaledSuffix
+				  )
+				: await vipsResizeImage(
+						item.id,
+						item.file,
+						args.resize,
+						false, // smartCrop
+						addSuffix,
+						item.abortController?.signal,
+						scaledSuffix
+				  );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {

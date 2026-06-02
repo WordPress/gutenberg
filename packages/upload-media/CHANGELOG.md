@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+- Generate sub-sizes for high-bit-depth (10/12-bit) AVIF images using the browser's native decoder. The bundled `wasm-vips` cannot decode >8-bit AVIF, so these uploads previously failed with "File could not be uploaded". The original AVIF is preserved; sub-sizes fall back to JPEG. See [#78889](https://github.com/WordPress/gutenberg/issues/78889).
+
 ## 0.32.0 (2026-05-27)
 
 ### Bug Fix

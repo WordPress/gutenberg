@@ -270,6 +270,41 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.height ).toBe( 150 );
 	} );
 
+	// The bundled wasm-vips cannot decode high-bit-depth (10/12-bit) AVIF, as
+	// its libaom is built without high-bit-depth support. Without a fallback the
+	// upload fails entirely with "File could not be uploaded". The browser can
+	// decode these natively, so sub-sizes are generated via canvas (as JPEG).
+	// See https://github.com/WordPress/gutenberg/issues/78889
+	test( 'uploads a 10-bit HDR AVIF and generates sub-sizes via the browser', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1920x1080_e2e_test_image_10bit_hdr.avif'
+		);
+
+		// The original is preserved as a full-bit-depth AVIF.
+		expect( media.mime_type ).toBe( 'image/avif' );
+		expect( media.media_details.width ).toBe( 1920 );
+		expect( media.media_details.height ).toBe( 1080 );
+
+		// Sub-sizes are generated even though vips cannot decode the source.
+		const sizes = media.media_details.sizes;
+		expect( sizes.thumbnail ).toBeDefined();
+		expect( sizes.medium ).toBeDefined();
+		expect( sizes.large ).toBeDefined();
+
+		expect( sizes.thumbnail.width ).toBe( 150 );
+		expect( sizes.thumbnail.height ).toBe( 150 );
+
+		// Sub-sizes come from the browser/canvas fallback, which cannot encode
+		// AVIF, so they are written as JPEG.
+		expect( sizes.thumbnail.mime_type ).toBe( 'image/jpeg' );
+	} );
+
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,

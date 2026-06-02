@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { canvasConvertToJpeg } from '../canvas-utils';
+import { canvasConvertToJpeg, canvasResizeImage } from '../canvas-utils';
 
 describe( 'canvasConvertToJpeg', () => {
 	const originalCreateImageBitmap = global.createImageBitmap;
@@ -194,5 +194,110 @@ describe( 'canvasConvertToJpeg', () => {
 				( global as any ).ImageDecoder.isTypeSupported
 			).toHaveBeenCalledWith( 'image/heic' );
 		} );
+	} );
+} );
+
+describe( 'canvasResizeImage', () => {
+	const originalCreateImageBitmap = global.createImageBitmap;
+	const originalOffscreenCanvas = global.OffscreenCanvas;
+
+	let canvasSizes: Array< { width: number; height: number } >;
+	let drawArgs: number[][];
+
+	beforeEach( () => {
+		canvasSizes = [];
+		drawArgs = [];
+
+		const mockBitmap = { width: 1920, height: 1080, close: jest.fn() };
+		global.createImageBitmap = jest.fn().mockResolvedValue( mockBitmap );
+		global.OffscreenCanvas = jest
+			.fn()
+			.mockImplementation( ( width: number, height: number ) => {
+				canvasSizes.push( { width, height } );
+				return {
+					width,
+					height,
+					getContext: jest.fn().mockReturnValue( {
+						drawImage: jest.fn( ( ...args: number[] ) =>
+							drawArgs.push( args.slice( 1 ) )
+						),
+					} ),
+					convertToBlob: jest
+						.fn()
+						.mockResolvedValue(
+							new Blob( [ 'jpeg' ], { type: 'image/jpeg' } )
+						),
+				};
+			} );
+	} );
+
+	afterEach( () => {
+		if ( originalCreateImageBitmap ) {
+			global.createImageBitmap = originalCreateImageBitmap;
+		} else {
+			// @ts-ignore
+			delete global.createImageBitmap;
+		}
+		if ( originalOffscreenCanvas ) {
+			global.OffscreenCanvas = originalOffscreenCanvas;
+		} else {
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+		}
+	} );
+
+	it( 'soft-resizes within the box preserving aspect ratio (no upscale)', async () => {
+		const file = new File( [ 'avif' ], 'photo.avif', {
+			type: 'image/avif',
+		} );
+
+		const result = await canvasResizeImage(
+			file,
+			{ width: 300, height: 300 },
+			0.82,
+			true // addSuffix
+		);
+
+		// 1920x1080 fit within 300x300 -> 300x169.
+		expect( canvasSizes[ 0 ] ).toEqual( { width: 300, height: 169 } );
+		expect( result.width ).toBe( 300 );
+		expect( result.height ).toBe( 169 );
+		expect( result.originalWidth ).toBe( 1920 );
+		expect( result.type ).toBe( 'image/jpeg' );
+		expect( result.name ).toBe( 'photo-300x169.jpg' );
+	} );
+
+	it( 'hard-crops to the exact target dimensions', async () => {
+		const file = new File( [ 'avif' ], 'photo.avif', {
+			type: 'image/avif',
+		} );
+
+		const result = await canvasResizeImage(
+			file,
+			{ width: 150, height: 150, crop: true },
+			0.82,
+			true
+		);
+
+		expect( canvasSizes[ 0 ] ).toEqual( { width: 150, height: 150 } );
+		expect( result.width ).toBe( 150 );
+		expect( result.height ).toBe( 150 );
+		expect( result.name ).toBe( 'photo-150x150.jpg' );
+	} );
+
+	it( 'adds a -scaled suffix for threshold resizing', async () => {
+		const file = new File( [ 'avif' ], 'photo.avif', {
+			type: 'image/avif',
+		} );
+
+		const result = await canvasResizeImage(
+			file,
+			{ width: 1000, height: 1000 },
+			0.82,
+			false, // addSuffix
+			true // scaledSuffix
+		);
+
+		expect( result.name ).toBe( 'photo-scaled.jpg' );
 	} );
 } );
