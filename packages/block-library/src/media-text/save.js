@@ -41,8 +41,6 @@ export default function save( { attributes } ) {
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
 
-	// The `aspectRatio` dimensions support skips serialization, so its derived
-	// class and style are applied to the media instead of the block wrapper.
 	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 
 	const imageClasses = clsx(

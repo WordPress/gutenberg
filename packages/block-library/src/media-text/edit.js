@@ -215,8 +215,6 @@ function MediaTextEdit( {
 		useFeaturedImage,
 	} = attributes;
 
-	// The `aspectRatio` dimensions support skips serialization, so its derived
-	// class and style are applied to the media instead of the block wrapper.
 	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 
 	const [ featuredImage ] = useEntityProp(

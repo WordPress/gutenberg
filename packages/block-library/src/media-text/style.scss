@@ -16,8 +16,6 @@
 	}
 }
 
-// The `aspectRatio` dimensions support is applied to the media rather than the
-// wrapper, so the image is cropped to fill the resulting box.
 .wp-block-media-text__media img.has-aspect-ratio {
 	object-fit: cover;
 }
