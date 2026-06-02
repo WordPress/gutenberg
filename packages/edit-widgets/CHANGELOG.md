@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Enabled block patterns in the widgets editor by wiring the `selectBlockPatternsKey`, `reusableBlocksSelectKey`, `userPatternCategoriesSelectKey`, and `__experimentalBlockPatternCategories` settings into the block editor provider. Patterns containing blocks not allowed in widget areas (post, query, site, navigation, term) are still filtered out automatically.
+
 ## 6.47.0 (2026-05-27)
 
 ## 6.46.0 (2026-05-14)

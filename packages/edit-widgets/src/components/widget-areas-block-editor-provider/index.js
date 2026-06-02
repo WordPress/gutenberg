@@ -22,7 +22,12 @@ import { store as editWidgetsStore } from '../../store';
 import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 import { unlock } from '../../lock-unlock';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const {
+	ExperimentalBlockEditorProvider,
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
+} = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -41,6 +46,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		keepCaretInsideBlock,
 		pageOnFront,
 		pageForPosts,
+		restBlockPatternCategories,
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEntityRecords } =
 			select( coreStore );
@@ -69,9 +75,27 @@ export default function WidgetAreasBlockEditorProvider( {
 			),
 			pageOnFront: siteSettings?.page_on_front,
 			pageForPosts: siteSettings?.page_for_posts,
+			restBlockPatternCategories:
+				select( coreStore ).getBlockPatternCategories(),
 		};
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
+
+	const settingsBlockPatternCategories =
+		blockEditorSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
+		blockEditorSettings.__experimentalBlockPatternCategories; // WP 5.9
+
+	const blockPatternCategories = useMemo(
+		() =>
+			[
+				...( settingsBlockPatternCategories || [] ),
+				...( restBlockPatternCategories || [] ),
+			].filter(
+				( x, index, arr ) =>
+					index === arr.findIndex( ( y ) => x.name === y.name )
+			),
+		[ settingsBlockPatternCategories, restBlockPatternCategories ]
+	);
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
@@ -95,6 +119,25 @@ export default function WidgetAreasBlockEditorProvider( {
 			pageOnFront,
 			pageForPosts,
 			editorTool: 'edit',
+			[ selectBlockPatternsKey ]: ( select ) => {
+				const { getBlockPatterns, hasFinishedResolution } =
+					select( coreStore );
+				const patterns = getBlockPatterns();
+				return hasFinishedResolution( 'getBlockPatterns' )
+					? patterns
+					: undefined;
+			},
+			[ reusableBlocksSelectKey ]: ( select ) => {
+				const { getEntityRecords: getEntityRecordsForReusable } =
+					select( coreStore );
+				return getEntityRecordsForReusable( 'postType', 'wp_block', {
+					per_page: -1,
+				} );
+			},
+			[ userPatternCategoriesSelectKey ]: ( select ) => {
+				return select( coreStore ).getUserPatternCategories();
+			},
+			__experimentalBlockPatternCategories: blockPatternCategories,
 		};
 	}, [
 		hasUploadPermissions,
@@ -106,6 +149,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		setIsInserterOpened,
 		pageOnFront,
 		pageForPosts,
+		blockPatternCategories,
 	] );
 
 	const widgetAreaId = useLastSelectedWidgetArea();
