@@ -5,6 +5,7 @@
  * @package gutenberg
  */
 
+require_once __DIR__ . '/class-wp-sync-config.php';
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';

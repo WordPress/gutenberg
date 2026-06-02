@@ -5,6 +5,10 @@
  * @package gutenberg
  */
 
+if ( ! class_exists( 'WP_Sync_Config' ) ) {
+	require_once __DIR__ . '/class-wp-sync-config.php';
+}
+
 if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 
 	/**
@@ -89,7 +93,7 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 			}
 
 			$room        = $request['room'];
-			$parsed_room = is_string( $room ) ? $this->parse_room( $room ) : null;
+			$parsed_room = is_string( $room ) ? WP_Sync_Config::parse_room( $room ) : null;
 
 			if ( null === $parsed_room || ! $this->can_user_persist_crdt_doc( $parsed_room['entity_kind'], $parsed_room['entity_name'], $parsed_room['object_id'] ) ) {
 				return new WP_Error(
@@ -133,9 +137,18 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		 */
 		public function handle_request( WP_REST_Request $request ) {
 			$room        = $request['room'];
-			$parsed_room = is_string( $room ) ? $this->parse_room( $room ) : null;
+			$parsed_room = is_string( $room ) ? WP_Sync_Config::parse_room( $room ) : null;
 
-			if ( null === $parsed_room || ! $this->can_user_persist_crdt_doc( $parsed_room['entity_kind'], $parsed_room['entity_name'], $parsed_room['object_id'] ) ) {
+			$post_id = null;
+			if ( null !== $parsed_room ) {
+				$post_id = WP_Sync_Config::get_crdt_doc_persistence_post_id(
+					$parsed_room['entity_kind'],
+					$parsed_room['entity_name'],
+					$parsed_room['object_id']
+				);
+			}
+
+			if ( null === $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
 				return new WP_Error(
 					'rest_cannot_edit',
 					__( 'You do not have permission to persist this document.', 'gutenberg' ),
@@ -143,8 +156,7 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 				);
 			}
 
-			$post_id = (int) $parsed_room['object_id'];
-			$doc     = $request['doc'];
+			$doc = $request['doc'];
 
 			if ( get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) !== $doc ) {
 				$updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $doc );
@@ -166,37 +178,6 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		}
 
 		/**
-		 * Parses a sync room identifier into entity parts.
-		 *
-		 * @since 7.1.0
-		 *
-		 * @param string $room Room identifier.
-		 * @return array{entity_kind:string, entity_name:string, object_id:string|null}|null Parsed room, or null if invalid.
-		 */
-		private function parse_room( string $room ): ?array {
-			$type_parts = explode( '/', $room, 2 );
-			if ( 2 !== count( $type_parts ) || '' === $type_parts[0] || '' === $type_parts[1] ) {
-				return null;
-			}
-
-			$object_parts = explode( ':', $type_parts[1], 2 );
-			if ( '' === $object_parts[0] ) {
-				return null;
-			}
-
-			$object_id = $object_parts[1] ?? null;
-			if ( '' === $object_id ) {
-				return null;
-			}
-
-			return array(
-				'entity_kind' => $type_parts[0],
-				'entity_name' => $object_parts[0],
-				'object_id'   => $object_id,
-			);
-		}
-
-		/**
 		 * Checks if the current user can persist a CRDT document for an entity.
 		 *
 		 * @since 7.1.0
@@ -207,16 +188,8 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		 * @return bool True if the user can persist the CRDT document, otherwise false.
 		 */
 		private function can_user_persist_crdt_doc( string $entity_kind, string $entity_name, ?string $object_id ): bool {
-			if ( 'postType' !== $entity_kind || ! is_string( $object_id ) || ! ctype_digit( $object_id ) ) {
-				return false;
-			}
-
-			$post_id = (int) $object_id;
-			if ( $post_id <= 0 || get_post_type( $post_id ) !== $entity_name ) {
-				return false;
-			}
-
-			return current_user_can( 'edit_post', $post_id );
+			$post_id = WP_Sync_Config::get_crdt_doc_persistence_post_id( $entity_kind, $entity_name, $object_id );
+			return null !== $post_id && current_user_can( 'edit_post', $post_id );
 		}
 	}
 }
