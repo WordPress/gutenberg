@@ -11,8 +11,7 @@
 			"mediaWidth": 50,
 			"isStackedOnMobile": true,
 			"imageFill": true,
-			"useFeaturedImage": false,
-			"aspectRatio": "auto"
+			"useFeaturedImage": false
 		},
 		"innerBlocks": [
 			{

@@ -107,6 +107,7 @@ function PlaceholderContainer( {
 
 function MediaContainer( props, ref ) {
 	const {
+		dimensionsProps,
 		className,
 		commitWidthChange,
 		focalPoint,
@@ -149,10 +150,17 @@ function MediaContainer( props, ref ) {
 			left: enableResize && mediaPosition === 'right',
 		};
 
-		const positionStyles =
+		const imageFillStyle =
 			mediaType === 'image' && imageFill
 				? imageFillStyles( mediaUrl || featuredImageURL, focalPoint )
 				: {};
+
+		// When the image is set to fill, the `aspectRatio` dimensions support is
+		// ignored in favor of the focal point driven fill styles.
+		const mediaClassName = ! imageFill
+			? dimensionsProps.className
+			: undefined;
+		const mediaStyles = imageFill ? imageFillStyle : dimensionsProps.style;
 
 		const mediaTypeRenderers = {
 			image: () =>
@@ -161,7 +169,8 @@ function MediaContainer( props, ref ) {
 						ref={ refMedia }
 						src={ featuredImageURL }
 						alt={ featuredImageAlt }
-						style={ positionStyles }
+						className={ mediaClassName }
+						style={ mediaStyles }
 					/>
 				) : (
 					mediaUrl && (
@@ -169,7 +178,8 @@ function MediaContainer( props, ref ) {
 							ref={ refMedia }
 							src={ mediaUrl }
 							alt={ mediaAlt }
-							style={ positionStyles }
+							className={ mediaClassName }
+							style={ mediaStyles }
 						/>
 					)
 				),
@@ -213,7 +223,7 @@ function MediaContainer( props, ref ) {
 				{ ! featuredImageURL && useFeaturedImage && (
 					<Placeholder
 						className="wp-block-media-text--placeholder-image"
-						style={ positionStyles }
+						style={ imageFillStyle }
 						withIllustration
 					/>
 				) }

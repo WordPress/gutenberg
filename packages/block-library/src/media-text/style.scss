@@ -14,74 +14,12 @@
 	&.has-media-on-the-right {
 		grid-template-columns: 1fr 50%;
 	}
+}
 
-	// Aspect ratio styles.
-	&.has-aspect-ratio {
-		position: relative;
-		overflow: hidden;
-
-		.wp-block-media-text__media {
-			img {
-				object-fit: cover;
-			}
-		}
-	}
-
-	&.has-aspect-ratio-1-1 {
-		.wp-block-media-text__media {
-			img {
-				aspect-ratio: 1/1;
-			}
-		}
-	}
-
-	&.has-aspect-ratio-4-3 {
-		.wp-block-media-text__media {
-			img {
-				aspect-ratio: 4/3;
-			}
-		}
-	}
-
-	&.has-aspect-ratio-3-4 {
-		.wp-block-media-text__media {
-			img {
-				aspect-ratio: 3/4;
-			}
-		}
-	}
-
-	&.has-aspect-ratio-3-2 {
-		.wp-block-media-text__media {
-			img {
-				aspect-ratio: 3/2;
-			}
-		}
-	}
-
-	&.has-aspect-ratio-2-3 {
-		.wp-block-media-text__media {
-			img {
-				aspect-ratio: 2/3;
-			}
-		}
-	}
-
-	&.has-aspect-ratio-16-9 {
-		.wp-block-media-text__media {
-			img {
-				aspect-ratio: 16/9;
-			}
-		}
-	}
-
-	&.has-aspect-ratio-9-16 {
-		.wp-block-media-text__media {
-			img {
-				aspect-ratio: 9/16;
-			}
-		}
-	}
+// The `aspectRatio` dimensions support is applied to the media rather than the
+// wrapper, so the image is cropped to fill the resulting box.
+.wp-block-media-text__media img.has-aspect-ratio {
+	object-fit: cover;
 }
 
 .wp-block-media-text.is-vertically-aligned-top {

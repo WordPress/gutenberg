@@ -15,8 +15,7 @@
 				"x": 0.84,
 				"y": 0.84
 			},
-			"useFeaturedImage": false,
-			"aspectRatio": "auto"
+			"useFeaturedImage": false
 		},
 		"innerBlocks": [
 			{

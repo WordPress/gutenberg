@@ -6,7 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
+import {
+	useInnerBlocksProps,
+	useBlockProps,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -33,26 +37,32 @@ export default function save( { attributes } ) {
 		href,
 		linkTarget,
 		rel,
-		aspectRatio,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
 
-	const imageClasses = clsx( {
-		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
-		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
-	} );
+	// The `aspectRatio` dimensions support skips serialization, so its derived
+	// class and style are applied to the media instead of the block wrapper.
+	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 
-	const positionStyles = imageFill
+	const imageClasses = clsx(
+		{
+			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+		},
+		! imageFill && dimensionsProps.className
+	);
+
+	const mediaStyles = imageFill
 		? imageFillStyles( mediaUrl, focalPoint )
-		: {};
+		: dimensionsProps.style;
 
 	let image = mediaUrl ? (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
 			className={ imageClasses || null }
-			style={ positionStyles }
+			style={ mediaStyles }
 		/>
 	) : null;
 
@@ -78,9 +88,6 @@ export default function save( { attributes } ) {
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		'is-image-fill-element': imageFill,
-		'has-aspect-ratio': aspectRatio && aspectRatio !== 'auto',
-		[ `has-aspect-ratio-${ aspectRatio?.replace( ':', '-' ) }` ]:
-			aspectRatio && aspectRatio !== 'auto',
 	} );
 
 	let gridTemplateColumns;

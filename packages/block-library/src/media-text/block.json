@@ -93,10 +93,6 @@
 		"useFeaturedImage": {
 			"type": "boolean",
 			"default": false
-		},
-		"aspectRatio": {
-			"type": "string",
-			"default": "auto"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
@@ -104,6 +100,10 @@
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"dimensions": {
+			"aspectRatio": true,
+			"__experimentalSkipSerialization": [ "aspectRatio" ]
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
