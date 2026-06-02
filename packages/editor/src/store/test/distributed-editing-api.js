@@ -931,9 +931,9 @@ describe( 'distributed editing REST helpers', () => {
 		} );
 	} );
 
-	it( 'requests retry-save with native Yjs update evidence', async () => {
+	it( 'requests retry-save with native Automerge update evidence', async () => {
 		const proposedPostContent =
-			'<!-- wp:paragraph --><p>Yjs edited content.</p><!-- /wp:paragraph -->';
+			'<!-- wp:paragraph --><p>Automerge edited content.</p><!-- /wp:paragraph -->';
 
 		apiFetch.setFetchHandler( async ( options ) => {
 			expect( options.path ).toMatch(
@@ -944,8 +944,8 @@ describe( 'distributed editing REST helpers', () => {
 				client_base_version: '12',
 				accepted_proof_server_version: '12',
 				proposed_post_content: proposedPostContent,
-				yjs_client_update: {
-					format: 'native-yjs-php-update-v0',
+				automerge_client_update: {
+					format: 'native-automerge-php-v1',
 					operations: [
 						{
 							type: 'delete',
@@ -970,17 +970,17 @@ describe( 'distributed editing REST helpers', () => {
 				},
 			} );
 			expect(
-				options.data.yjs_client_update.post_content
+				options.data.automerge_client_update.post_content
 			).toBeUndefined();
 			expect(
-				options.data.yjs_client_update.postContent
+				options.data.automerge_client_update.postContent
 			).toBeUndefined();
 
 			return {
 				result: 'retry_save_applied',
 				retry_save_accepted: true,
-				yjs_update_applied: true,
-				yjs_encoding: 'native-yjs-php-update-v0',
+				automerge_update_applied: true,
+				automerge_encoding: 'native-automerge-php-v1',
 			};
 		} );
 
@@ -990,8 +990,8 @@ describe( 'distributed editing REST helpers', () => {
 				clientBaseVersion: '12',
 				acceptedProofServerVersion: '12',
 				proposedPostContent,
-				yjsClientUpdate: {
-					format: 'native-yjs-php-update-v0',
+				automergeClientUpdate: {
+					format: 'native-automerge-php-v1',
 					operations: [
 						{
 							type: 'delete',
@@ -1018,8 +1018,8 @@ describe( 'distributed editing REST helpers', () => {
 		).resolves.toEqual( {
 			result: 'retry_save_applied',
 			retry_save_accepted: true,
-			yjs_update_applied: true,
-			yjs_encoding: 'native-yjs-php-update-v0',
+			automerge_update_applied: true,
+			automerge_encoding: 'native-automerge-php-v1',
 		} );
 	} );
 

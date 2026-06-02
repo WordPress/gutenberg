@@ -207,8 +207,9 @@ const DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_SUPPORT_CHRONOLOGY_TEXT =
 const MAX_DISTRIBUTED_EDITING_ACTION_TRANSCRIPT_ITEMS = 10;
 
 const DISTRIBUTED_EDITING_SYNC_META_SCRIPT_SOURCE = `<script\\b(?=[^>]*(?:\\btype\\s*=\\s*["']wp/post-sync-meta["']|(?=[^>]*\\btype\\s*=\\s*["']application/json["'])(?=[^>]*\\bdata-wp-sync-meta\\s*=\\s*["']distributed-editing["'])))[^>]*>([\\s\\S]*?)<\\/script\\s*>`;
-const DISTRIBUTED_EDITING_YJS_BLOCKS_SCHEMA = 'de-rtc-yjs-blocks-v1';
-const DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT = 'native-yjs-blocks-v1';
+const DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_SCHEMA = 'de-rtc-automerge-v1';
+const DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_UPDATE_FORMAT =
+	'native-automerge-blocks-v1';
 
 /**
  * Stable reasons for browser unload protection.
@@ -19071,7 +19072,7 @@ function createDistributedEditingSyncMetaParseResult( {
 	}
 }
 
-export async function getDistributedEditingPostContentWithYjsSyncMeta( {
+export async function getDistributedEditingPostContentWithAutomergeSyncMeta( {
 	clientBaseContent,
 	proposedPostContent,
 	existingSyncMeta = null,
@@ -19085,14 +19086,14 @@ export async function getDistributedEditingPostContentWithYjsSyncMeta( {
 	if ( typeof base !== 'string' || typeof proposed !== 'string' ) {
 		return {
 			status: 'blocked',
-			reason: 'missing_yjs_content_pair',
+			reason: 'missing_automerge_content_pair',
 			postContent: proposedPostContent,
 			syncMeta: null,
 		};
 	}
 
 	const updateDescriptor =
-		await getDistributedEditingYjsClientUpdateDescriptor( {
+		await getDistributedEditingAutomergeClientUpdateDescriptor( {
 			clientBaseContent: base,
 			proposedPostContent: proposed,
 			actor,
@@ -19115,16 +19116,17 @@ export async function getDistributedEditingPostContentWithYjsSyncMeta( {
 		! Array.isArray( existingSyncMeta )
 			? existingSyncMeta
 			: {} ),
-		schema: DISTRIBUTED_EDITING_YJS_BLOCKS_SCHEMA,
+		schema: DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_SCHEMA,
 		version: clientBaseVersion || '0',
 		client_base_version: clientBaseVersion || '0',
-		pending_yjs_encoding: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
-		pending_yjs_update: encodeDistributedEditingBase64Json(
+		pending_automerge_encoding:
+			DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_UPDATE_FORMAT,
+		pending_automerge_update: encodeDistributedEditingBase64Json(
 			updateDescriptor.update
 		),
 	};
-	delete syncMeta.yjs_client_update;
-	delete syncMeta.yjs_update_role;
+	delete syncMeta.automerge_client_update;
+	delete syncMeta.automerge_update_role;
 
 	return {
 		status: 'ready',
@@ -19142,8 +19144,8 @@ function formatDistributedEditingSyncMetaBlock( syncMeta ) {
 	const json = JSON.stringify( syncMeta ).replace( /</g, '\\u003c' );
 
 	return (
-		'<!-- wp:sync-meta {"format":"yjs"} -->\n' +
-		'<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">' +
+		'<!-- wp:sync-meta {"format":"automerge"} -->\n' +
+		'<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">' +
 		json +
 		'</script>\n' +
 		'<!-- /wp:sync-meta -->'
@@ -19177,7 +19179,7 @@ function encodeDistributedEditingBase64Json( value ) {
 	return json;
 }
 
-export async function getDistributedEditingYjsClientUpdateDescriptor( {
+export async function getDistributedEditingAutomergeClientUpdateDescriptor( {
 	clientBaseContent,
 	proposedPostContent,
 	actor = 'editor',
@@ -19192,7 +19194,7 @@ export async function getDistributedEditingYjsClientUpdateDescriptor( {
 	if ( typeof base !== 'string' || typeof proposed !== 'string' ) {
 		return {
 			status: 'blocked',
-			reason: 'missing_yjs_content_pair',
+			reason: 'missing_automerge_content_pair',
 			update: null,
 		};
 	}
@@ -19210,11 +19212,12 @@ export async function getDistributedEditingYjsClientUpdateDescriptor( {
 		}
 	}
 
-	const operations = await getDistributedEditingYjsBlockNativeOperations( {
-		baseBlocks: baseBlocks.blocks,
-		proposedBlocks: proposedBlocks.blocks,
-		actor,
-	} );
+	const operations =
+		await getDistributedEditingAutomergeBlockNativeOperations( {
+			baseBlocks: baseBlocks.blocks,
+			proposedBlocks: proposedBlocks.blocks,
+			actor,
+		} );
 	const baseContentHash =
 		await getDistributedEditingPostContentSha256Hash( base );
 	const proposedContentHash =
@@ -19224,8 +19227,8 @@ export async function getDistributedEditingYjsClientUpdateDescriptor( {
 		status: 'ready',
 		reason: null,
 		update: {
-			format: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
-			schema: DISTRIBUTED_EDITING_YJS_BLOCKS_SCHEMA,
+			format: DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_UPDATE_FORMAT,
+			schema: DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_SCHEMA,
 			operations,
 			stateVector:
 				operations.length > 0 ? { [ actor ]: operations.length } : {},
@@ -19233,16 +19236,16 @@ export async function getDistributedEditingYjsClientUpdateDescriptor( {
 			proposedContentHash,
 			baseBlockCount: baseBlocks.blocks.length,
 			proposedBlockCount: proposedBlocks.blocks.length,
-			interop: await getDistributedEditingYjsInteropEvidence(),
+			interop: await getDistributedEditingAutomergeInteropEvidence(),
 		},
-		changeRange: getDistributedEditingYjsContentChangeDescriptor(
+		changeRange: getDistributedEditingAutomergeContentChangeDescriptor(
 			base,
 			proposed
 		).changeRange,
 	};
 }
 
-async function getDistributedEditingYjsBlockNativeOperations( {
+async function getDistributedEditingAutomergeBlockNativeOperations( {
 	baseBlocks,
 	proposedBlocks,
 	actor,
@@ -19286,7 +19289,7 @@ async function getDistributedEditingYjsBlockNativeOperations( {
 			if ( fromIndex !== -1 && fromIndex !== index ) {
 				await pushOperation( {
 					type: 'block.move',
-					yjsPrimitive: 'Y.Array.delete+insert',
+					automergePrimitive: 'Automerge.List.move',
 					fromPath: [ fromIndex ],
 					toPath: [ index ],
 					blockUid: `top:${ proposedHashes[ index ] }`,
@@ -19305,7 +19308,7 @@ async function getDistributedEditingYjsBlockNativeOperations( {
 			}
 
 			await pushOperation(
-				await getDistributedEditingYjsBlockUpdateOperation( {
+				await getDistributedEditingAutomergeBlockUpdateOperation( {
 					baseBlock: baseBlocks[ index ],
 					proposedBlock: proposedBlocks[ index ],
 					baseBlockHash: baseHashes[ index ],
@@ -19344,7 +19347,7 @@ async function getDistributedEditingYjsBlockNativeOperations( {
 	) {
 		await pushOperation( {
 			type: 'block.delete',
-			yjsPrimitive: 'Y.Array.delete',
+			automergePrimitive: 'Automerge.List.delete',
 			path: [ index ],
 			index,
 			blockUid: `top:${ baseHashes[ index ] }`,
@@ -19359,7 +19362,7 @@ async function getDistributedEditingYjsBlockNativeOperations( {
 	) {
 		await pushOperation( {
 			type: 'block.insert',
-			yjsPrimitive: 'Y.Array.insert',
+			automergePrimitive: 'Automerge.List.insert',
 			path: [ index ],
 			index,
 			blockUid: `top:${ proposedHashes[ index ] }`,
@@ -19374,7 +19377,7 @@ async function getDistributedEditingYjsBlockNativeOperations( {
 	return operations;
 }
 
-async function getDistributedEditingYjsBlockUpdateOperation( {
+async function getDistributedEditingAutomergeBlockUpdateOperation( {
 	baseBlock,
 	proposedBlock,
 	baseBlockHash,
@@ -19387,14 +19390,15 @@ async function getDistributedEditingYjsBlockUpdateOperation( {
 		getDistributedEditingBlockIdentitySerializedBlockName( proposedBlock );
 
 	if ( baseBlockName && baseBlockName === proposedBlockName ) {
-		const richTextChange = getDistributedEditingYjsRichTextBlockOperation( {
-			baseBlock,
-			proposedBlock,
-			path,
-			baseBlockHash,
-			proposedBlockHash,
-			blockName: baseBlockName,
-		} );
+		const richTextChange =
+			getDistributedEditingAutomergeRichTextBlockOperation( {
+				baseBlock,
+				proposedBlock,
+				path,
+				baseBlockHash,
+				proposedBlockHash,
+				blockName: baseBlockName,
+			} );
 
 		if ( richTextChange ) {
 			return richTextChange;
@@ -19402,13 +19406,13 @@ async function getDistributedEditingYjsBlockUpdateOperation( {
 
 		return {
 			type: 'block.update_serialized',
-			yjsPrimitive: 'Y.Map.set',
+			automergePrimitive: 'Automerge.Map.set',
 			path,
 			blockUid: `top:${ baseBlockHash }`,
 			blockName: baseBlockName,
 			baseBlockHash,
 			proposedBlockHash,
-			changeRange: getDistributedEditingYjsContentChangeDescriptor(
+			changeRange: getDistributedEditingAutomergeContentChangeDescriptor(
 				baseBlock,
 				proposedBlock
 			).changeRange,
@@ -19418,7 +19422,7 @@ async function getDistributedEditingYjsBlockUpdateOperation( {
 
 	return {
 		type: 'block.replace',
-		yjsPrimitive: 'Y.Map.set+Y.Array.insert',
+		automergePrimitive: 'Automerge.Map.set+Automerge.List.insert',
 		path,
 		blockUid: `top:${ proposedBlockHash }`,
 		baseBlockHash,
@@ -19429,7 +19433,7 @@ async function getDistributedEditingYjsBlockUpdateOperation( {
 	};
 }
 
-function getDistributedEditingYjsRichTextBlockOperation( {
+function getDistributedEditingAutomergeRichTextBlockOperation( {
 	baseBlock,
 	proposedBlock,
 	path,
@@ -19462,7 +19466,7 @@ function getDistributedEditingYjsRichTextBlockOperation( {
 
 	return {
 		type: 'block.rich_text_format',
-		yjsPrimitive: 'Y.Text.format',
+		automergePrimitive: 'Automerge.Text.mark',
 		path,
 		blockUid: `top:${ baseBlockHash }`,
 		blockName,
@@ -19476,7 +19480,10 @@ function getDistributedEditingYjsRichTextBlockOperation( {
 	};
 }
 
-function getDistributedEditingYjsContentChangeDescriptor( base, proposed ) {
+function getDistributedEditingAutomergeContentChangeDescriptor(
+	base,
+	proposed
+) {
 	let prefix = 0;
 	const baseLength = base.length;
 	const proposedLength = proposed.length;
@@ -19517,7 +19524,7 @@ function getDistributedEditingYjsContentChangeDescriptor( base, proposed ) {
 	};
 }
 
-function doDistributedEditingYjsChangeRangesOverlap( left, right ) {
+function doDistributedEditingAutomergeChangeRangesOverlap( left, right ) {
 	if ( ! left?.changed || ! right?.changed ) {
 		return false;
 	}
@@ -19543,10 +19550,10 @@ function doDistributedEditingYjsChangeRangesOverlap( left, right ) {
 }
 
 /**
- * Returns a Yjs-compatible text merge candidate for a stale local Save.
+ * Returns an Automerge-compatible text merge candidate for a stale local Save.
  *
  * WordPress is still the persistence authority. This mirrors the server's
- * native-yjs-php-v0 range guard so the editor can fetch the latest body, merge
+ * native-automerge-php-v1 range guard so the editor can fetch the latest body, merge
  * non-overlapping local edits into it, and resubmit against the current sync
  * version instead of surfacing a false conflict for same-block edits.
  *
@@ -19557,7 +19564,7 @@ function doDistributedEditingYjsChangeRangesOverlap( left, right ) {
  *
  * @return {Object} Merge candidate result.
  */
-export function getDistributedEditingYjsLocalMergeCandidate( {
+export function getDistributedEditingAutomergeLocalMergeCandidate( {
 	clientBaseContent,
 	serverContent,
 	localContent,
@@ -19579,18 +19586,18 @@ export function getDistributedEditingYjsLocalMergeCandidate( {
 	) {
 		return {
 			status: 'blocked',
-			reason: 'missing_yjs_content_pair',
+			reason: 'missing_automerge_content_pair',
 			hasCandidatePostContent: false,
 			candidatePostContent: null,
-			mergeStrategy: 'native_yjs_php_v0',
+			mergeStrategy: 'native_automerge_php_v1',
 		};
 	}
 
-	const serverChange = getDistributedEditingYjsContentChangeDescriptor(
+	const serverChange = getDistributedEditingAutomergeContentChangeDescriptor(
 		base,
 		server
 	);
-	const localChange = getDistributedEditingYjsContentChangeDescriptor(
+	const localChange = getDistributedEditingAutomergeContentChangeDescriptor(
 		base,
 		local
 	);
@@ -19601,7 +19608,7 @@ export function getDistributedEditingYjsLocalMergeCandidate( {
 			reason: null,
 			hasCandidatePostContent: true,
 			candidatePostContent: server,
-			mergeStrategy: 'native_yjs_php_v0',
+			mergeStrategy: 'native_automerge_php_v1',
 			serverChangeRange: serverChange.changeRange,
 			localChangeRange: localChange.changeRange,
 		};
@@ -19613,24 +19620,24 @@ export function getDistributedEditingYjsLocalMergeCandidate( {
 			reason: null,
 			hasCandidatePostContent: true,
 			candidatePostContent: local,
-			mergeStrategy: 'native_yjs_php_v0',
+			mergeStrategy: 'native_automerge_php_v1',
 			serverChangeRange: serverChange.changeRange,
 			localChangeRange: localChange.changeRange,
 		};
 	}
 
 	if (
-		doDistributedEditingYjsChangeRangesOverlap(
+		doDistributedEditingAutomergeChangeRangesOverlap(
 			serverChange.changeRange,
 			localChange.changeRange
 		)
 	) {
 		return {
 			status: 'manual_conflict_required',
-			reason: 'yjs_overlapping_change_ranges',
+			reason: 'automerge_overlapping_change_ranges',
 			hasCandidatePostContent: false,
 			candidatePostContent: null,
-			mergeStrategy: 'native_yjs_php_v0',
+			mergeStrategy: 'native_automerge_php_v1',
 			serverChangeRange: serverChange.changeRange,
 			localChangeRange: localChange.changeRange,
 		};
@@ -19651,37 +19658,76 @@ export function getDistributedEditingYjsLocalMergeCandidate( {
 		reason: null,
 		hasCandidatePostContent: true,
 		candidatePostContent,
-		mergeStrategy: 'native_yjs_php_v0',
+		mergeStrategy: 'native_automerge_php_v1',
 		serverChangeRange: serverChange.changeRange,
 		localChangeRange: localChange.changeRange,
 	};
 }
 
-async function getDistributedEditingYjsInteropEvidence() {
+async function getDistributedEditingAutomergeInteropEvidence() {
 	try {
-		const { Doc: YjsDoc, encodeStateAsUpdate: encodeYjsStateAsUpdate } =
-			await import( '@y/y' );
-		const doc = new YjsDoc();
-		const update = encodeYjsStateAsUpdate( doc );
+		const automerge =
+			await importDistributedEditingAutomergeWithoutInitWarning();
+		const doc = automerge.init();
+		const saved = automerge.save( doc );
+		const heads =
+			typeof automerge.getHeads === 'function'
+				? automerge.getHeads( doc )
+				: [];
 
 		return {
-			jsPackage: '@y/y',
-			jsPackageVersion: '14.0.0-rc.16',
-			jsBinaryUpdateBytes:
-				typeof update?.byteLength === 'number'
-					? update.byteLength
-					: update?.length ?? 0,
-			serverEncoding: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
+			jsPackage: '@automerge/automerge',
+			jsPackageVersion: '3.2.6',
+			jsDocumentBytes:
+				typeof saved?.byteLength === 'number'
+					? saved.byteLength
+					: saved?.length ?? 0,
+			jsHeads: heads,
+			serverEncoding: DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_UPDATE_FORMAT,
 			serverBinaryInteropStatus: 'pending',
 		};
 	} catch {
 		return {
-			jsPackage: '@y/y',
-			jsPackageVersion: '14.0.0-rc.16',
-			jsBinaryUpdateBytes: null,
-			serverEncoding: DISTRIBUTED_EDITING_YJS_BLOCKS_UPDATE_FORMAT,
+			jsPackage: '@automerge/automerge',
+			jsPackageVersion: '3.2.6',
+			jsDocumentBytes: null,
+			jsHeads: [],
+			serverEncoding: DISTRIBUTED_EDITING_AUTOMERGE_BLOCKS_UPDATE_FORMAT,
 			serverBinaryInteropStatus: 'unavailable',
 		};
+	}
+}
+
+async function importDistributedEditingAutomergeWithoutInitWarning() {
+	const consoleObject =
+		typeof globalThis !== 'undefined' ? globalThis.console : null;
+
+	if ( ! consoleObject || typeof consoleObject.warn !== 'function' ) {
+		return import( '@automerge/automerge' );
+	}
+
+	const originalWarn = consoleObject.warn;
+	consoleObject.warn = ( ...args ) => {
+		const message = args.length > 0 ? String( args[ 0 ] ) : '';
+
+		// Automerge 3.2.6's browser bundle initializes its embedded WASM with
+		// a deprecated upstream call. The warning is not caused by DE-RTC
+		// inputs, so keep Gutenberg's no-console-warning policy focused on our
+		// code while still allowing unrelated warnings through.
+		if (
+			message ===
+			'using deprecated parameters for `initSync()`; pass a single object instead'
+		) {
+			return;
+		}
+
+		originalWarn.apply( consoleObject, args );
+	};
+
+	try {
+		return await import( '@automerge/automerge' );
+	} finally {
+		consoleObject.warn = originalWarn;
 	}
 }
 

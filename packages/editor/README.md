@@ -796,6 +796,27 @@ _Returns_
 
 -   `Object`: Content-free action transcript support summary.
 
+### getDistributedEditingAutomergeClientUpdateDescriptor
+
+Undocumented declaration.
+
+### getDistributedEditingAutomergeLocalMergeCandidate
+
+Returns an Automerge-compatible text merge candidate for a stale local Save.
+
+WordPress is still the persistence authority. This mirrors the server's native-automerge-php-v1 range guard so the editor can fetch the latest body, merge non-overlapping local edits into it, and resubmit against the current sync version instead of surfacing a false conflict for same-block edits.
+
+_Parameters_
+
+-   _args_ `Object`: Merge inputs.
+-   _args.clientBaseContent_ `string`: Stripped content at the editor base version.
+-   _args.serverContent_ `string`: Stripped content fetched from WordPress.
+-   _args.localContent_ `string`: Stripped local editor content.
+
+_Returns_
+
+-   `Object`: Merge candidate result.
+
 ### getDistributedEditingBlockIdentityDistinctGapInsertionDescriptor
 
 Determines whether a newer server body and local proposed body both preserve the accepted block identity sequence while inserting blocks in distinct base gaps.
@@ -1113,7 +1134,7 @@ _Returns_
 
 -   `Promise<string|null>`: Lowercase hex SHA-256 hash, or null if unavailable.
 
-### getDistributedEditingPostContentWithYjsSyncMeta
+### getDistributedEditingPostContentWithAutomergeSyncMeta
 
 Undocumented declaration.
 
@@ -1839,27 +1860,6 @@ _Parameters_
 _Returns_
 
 -   `Object`: Unload-warning state.
-
-### getDistributedEditingYjsClientUpdateDescriptor
-
-Undocumented declaration.
-
-### getDistributedEditingYjsLocalMergeCandidate
-
-Returns a Yjs-compatible text merge candidate for a stale local Save.
-
-WordPress is still the persistence authority. This mirrors the server's native-yjs-php-v0 range guard so the editor can fetch the latest body, merge non-overlapping local edits into it, and resubmit against the current sync version instead of surfacing a false conflict for same-block edits.
-
-_Parameters_
-
--   _args_ `Object`: Merge inputs.
--   _args.clientBaseContent_ `string`: Stripped content at the editor base version.
--   _args.serverContent_ `string`: Stripped content fetched from WordPress.
--   _args.localContent_ `string`: Stripped local editor content.
-
-_Returns_
-
--   `Object`: Merge candidate result.
 
 ### getFontSize
 

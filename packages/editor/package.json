@@ -60,6 +60,7 @@
 		"build-module/bindings/**"
 	],
 	"dependencies": {
+		"@automerge/automerge": "3.2.6",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
@@ -104,7 +105,6 @@
 		"@wordpress/views": "file:../views",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
-		"@y/y": "14.0.0-rc.16",
 		"change-case": "^4.1.2",
 		"client-zip": "^2.4.5",
 		"clsx": "^2.1.1",

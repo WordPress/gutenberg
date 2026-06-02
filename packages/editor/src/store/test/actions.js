@@ -11930,7 +11930,7 @@ describe( 'Post actions', () => {
 				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html -->\n<script>alert("unsafe")</script>\n<!-- /wp:html -->';
 			const safeServerContent =
 				'<!-- wp:paragraph --><p>Safe author edit.</p><!-- /wp:paragraph --><!-- wp:html -->\n<div>Original HTML.</div>\n<!-- /wp:html -->';
-			const safeServerRawContent = `<!-- wp:sync-meta {"format":"yjs"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">{"schema":"de-rtc-yjs-v1","version":"302"}</script>\n<!-- /wp:sync-meta -->${ safeServerContent }`;
+			const safeServerRawContent = `<!-- wp:sync-meta {"format":"automerge"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"schema":"de-rtc-automerge-v1","version":"302"}</script>\n<!-- /wp:sync-meta -->${ safeServerContent }`;
 			const post = {
 				id: postId,
 				type: 'post',
@@ -13278,12 +13278,12 @@ describe( 'Post actions', () => {
 			const savedPostContent =
 				'<!-- wp:paragraph --><p>External repair saved.</p><!-- /wp:paragraph -->';
 			const baseSyncMeta = {
-				schema: 'de-rtc-yjs-v1',
+				schema: 'de-rtc-automerge-v1',
 				version: '7',
 				post_content_hash: 'base-hash',
 			};
 			const repairedSyncMeta = {
-				schema: 'de-rtc-yjs-v1',
+				schema: 'de-rtc-automerge-v1',
 				version: '8',
 				previous_version: '7',
 				post_content_hash: 'saved-hash',
@@ -13295,12 +13295,12 @@ describe( 'Post actions', () => {
 				id: postId,
 				type: 'post',
 				title: 'bar',
-				content: `${ basePostContent }<script type="wp/post-sync-meta" data-sync-meta-format="yjs">${ JSON.stringify(
+				content: `${ basePostContent }<script type="wp/post-sync-meta" data-sync-meta-format="automerge">${ JSON.stringify(
 					baseSyncMeta
 				) }</script>`,
 				status: 'draft',
 			};
-			const repairedRawContent = `${ savedPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="yjs">${ JSON.stringify(
+			const repairedRawContent = `${ savedPostContent }<script type="wp/post-sync-meta" data-sync-meta-format="automerge">${ JSON.stringify(
 				repairedSyncMeta
 			) }</script>`;
 			let normalSaveCalls = 0;
@@ -15863,7 +15863,7 @@ describe( 'Post actions', () => {
 			registry.dispatch( editorStore ).updateEditorSettings( {
 				distributedEditing: {
 					enabled: true,
-					yjsRawPostContentSave: false,
+					automergeRawPostContentSave: false,
 				},
 			} );
 			registry

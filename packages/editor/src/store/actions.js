@@ -63,14 +63,14 @@ import {
 	getDistributedEditingConflictingChangesComparisonActionStateForSessionState,
 	getDistributedEditingLocalUpdatesImportResult,
 	getDistributedEditingComparablePostContent,
-	getDistributedEditingPostContentWithYjsSyncMeta,
+	getDistributedEditingPostContentWithAutomergeSyncMeta,
 	getDistributedEditingPostContentFromResponse,
 	getDistributedEditingRawPostContentFromResponse,
 	getDistributedEditingPostContentSha256Hash,
 	getDistributedEditingBlockIdentityDistinctGapInsertionDescriptor,
 	getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor,
 	getDistributedEditingBlockIdentityRequestProofDescriptor,
-	getDistributedEditingYjsClientUpdateDescriptor,
+	getDistributedEditingAutomergeClientUpdateDescriptor,
 	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingServerVersionFromResponse,
@@ -106,7 +106,7 @@ import {
 	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_CHOICES,
 	DISTRIBUTED_EDITING_STALE_BASE_CONFLICT_RESOLUTION_STATUSES,
 	getDistributedEditingStaleBaseLocalRebaseResult,
-	getDistributedEditingYjsLocalMergeCandidate,
+	getDistributedEditingAutomergeLocalMergeCandidate,
 	getDistributedEditingSessionStateForStaleBaseLocalRebasePlan,
 	getDistributedEditingSessionStateForStaleBaseRejectionResult,
 	getDistributedEditingSessionStateForStaleBaseServerStateRefetchResult,
@@ -4348,14 +4348,14 @@ function getDistributedEditingSaveErrorDetail( error ) {
 	return data.detail || data.reason || null;
 }
 
-function isDistributedEditingYjsRawSaveRecoveryError( error ) {
+function isDistributedEditingAutomergeRawSaveRecoveryError( error ) {
 	const code = getDistributedEditingSaveErrorCode( error );
 	const detail = getDistributedEditingSaveErrorDetail( error );
 
 	return (
 		code === 'de_rtc_rebase_failed' ||
 		( code === 'de_rtc_sync_meta_tampered' &&
-			detail === 'yjs_client_update_materialization_mismatch' )
+			detail === 'automerge_client_update_materialization_mismatch' )
 	);
 }
 
@@ -4694,18 +4694,18 @@ export const __experimentalSyncDistributedEditingWithServer =
 					localContent,
 				}
 			);
-			const yjsMergeResult = mergeResult.hasCandidatePostContent
+			const automergeMergeResult = mergeResult.hasCandidatePostContent
 				? null
-				: getDistributedEditingYjsLocalMergeCandidate( {
+				: getDistributedEditingAutomergeLocalMergeCandidate( {
 						clientBaseContent,
 						serverContent,
 						localContent,
 				  } );
 			const selectedMergeResult =
 				mergeResult.hasCandidatePostContent ||
-				! yjsMergeResult?.hasCandidatePostContent
+				! automergeMergeResult?.hasCandidatePostContent
 					? mergeResult
-					: yjsMergeResult;
+					: automergeMergeResult;
 
 			if ( selectedMergeResult.hasCandidatePostContent ) {
 				clearDistributedEditingServerSyncNotices( registry );
@@ -4782,7 +4782,7 @@ export const __experimentalSyncDistributedEditingWithServer =
 
 			return {
 				status: 'server_sync_conflict',
-				reason: yjsMergeResult?.reason || mergeResult.reason,
+				reason: automergeMergeResult?.reason || mergeResult.reason,
 				serverVersion,
 				callsServerStateRefetchEndpoint: true,
 				callsNormalSavePost: false,
@@ -4872,7 +4872,7 @@ export const __experimentalImportDistributedEditingLocalUpdates =
 		return result;
 	};
 
-function shouldAttemptDistributedEditingYjsRawSaveRecovery( {
+function shouldAttemptDistributedEditingAutomergeRawSaveRecovery( {
 	select,
 	options = {},
 	error,
@@ -4883,14 +4883,14 @@ function shouldAttemptDistributedEditingYjsRawSaveRecovery( {
 	return Boolean(
 		! options.isAutosave &&
 			! options.isPreview &&
-			! options.__experimentalDistributedEditingYjsRawSaveRecoveryAttempted &&
+			! options.__experimentalDistributedEditingAutomergeRawSaveRecoveryAttempted &&
 			distributedEditingSettings.enabled &&
-			distributedEditingSettings.yjsRawPostContentSave !== false &&
-			isDistributedEditingYjsRawSaveRecoveryError( error )
+			distributedEditingSettings.automergeRawPostContentSave !== false &&
+			isDistributedEditingAutomergeRawSaveRecoveryError( error )
 	);
 }
 
-async function maybeRecoverDistributedEditingYjsRawSave( {
+async function maybeRecoverDistributedEditingAutomergeRawSave( {
 	select,
 	dispatch,
 	registry,
@@ -4898,7 +4898,7 @@ async function maybeRecoverDistributedEditingYjsRawSave( {
 	error,
 } ) {
 	if (
-		! shouldAttemptDistributedEditingYjsRawSaveRecovery( {
+		! shouldAttemptDistributedEditingAutomergeRawSaveRecovery( {
 			select,
 			options,
 			error,
@@ -4923,7 +4923,7 @@ async function maybeRecoverDistributedEditingYjsRawSave( {
 		showDistributedEditingSaveRecoveryFailedNotice( registry );
 
 		return {
-			status: 'yjs_raw_save_recovery_blocked',
+			status: 'automerge_raw_save_recovery_blocked',
 			reason: syncResult?.reason || syncResult?.status || null,
 			firstSaveErrorCode: getDistributedEditingSaveErrorCode( error ),
 			firstSaveErrorDetail: getDistributedEditingSaveErrorDetail( error ),
@@ -4945,19 +4945,19 @@ async function maybeRecoverDistributedEditingYjsRawSave( {
 	clearDistributedEditingSaveRecoveryNotices( registry );
 	const retryResult = await dispatch.savePost( {
 		...options,
-		__experimentalDistributedEditingYjsRawSaveRecoveryAttempted: true,
+		__experimentalDistributedEditingAutomergeRawSaveRecoveryAttempted: true,
 	} );
 
 	if (
 		retryResult &&
 		( retryResult.claimsSaved === false ||
-			retryResult.status === 'yjs_raw_save_recovery_retry_failed' )
+			retryResult.status === 'automerge_raw_save_recovery_retry_failed' )
 	) {
 		return retryResult;
 	}
 
 	return {
-		status: 'yjs_raw_save_recovered_after_refetch',
+		status: 'automerge_raw_save_recovered_after_refetch',
 		firstSaveErrorCode: getDistributedEditingSaveErrorCode( error ),
 		firstSaveErrorDetail: getDistributedEditingSaveErrorDetail( error ),
 		syncResult,
@@ -4976,7 +4976,7 @@ async function maybeRecoverDistributedEditingYjsRawSave( {
 	};
 }
 
-function shouldShowDistributedEditingYjsRawSaveRecoveryFailure( {
+function shouldShowDistributedEditingAutomergeRawSaveRecoveryFailure( {
 	select,
 	options = {},
 	error,
@@ -4987,9 +4987,9 @@ function shouldShowDistributedEditingYjsRawSaveRecoveryFailure( {
 	return Boolean(
 		! options.isAutosave &&
 			! options.isPreview &&
-			options.__experimentalDistributedEditingYjsRawSaveRecoveryAttempted &&
+			options.__experimentalDistributedEditingAutomergeRawSaveRecoveryAttempted &&
 			distributedEditingSettings.enabled &&
-			distributedEditingSettings.yjsRawPostContentSave !== false &&
+			distributedEditingSettings.automergeRawPostContentSave !== false &&
 			error
 	);
 }
@@ -6150,7 +6150,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			options.acceptedProofServerVersion ??
 			currentSessionState.serverVersion;
 		let blockIdentityRequestProof = options.blockIdentityRequestProof;
-		let yjsClientUpdate = options.yjsClientUpdate;
+		let automergeClientUpdate = options.automergeClientUpdate;
 
 		if (
 			blockIdentityRequestProof === undefined &&
@@ -6228,8 +6228,8 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		}
 
 		if (
-			yjsClientUpdate === undefined &&
-			options.prepareYjsClientUpdate !== false
+			automergeClientUpdate === undefined &&
+			options.prepareAutomergeClientUpdate !== false
 		) {
 			const currentPostContent =
 				getDistributedEditingPostRawContent( currentPost );
@@ -6237,31 +6237,34 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 				getDistributedEditingSyncMetaFromPostContent(
 					currentPostContent
 				) ?? currentSessionState.clientBaseSyncMeta;
-			const shouldPrepareYjsClientUpdate =
+			const shouldPrepareAutomergeClientUpdate =
 				currentSyncMeta &&
-				( currentSyncMeta.schema === 'de-rtc-yjs-v1' ||
-					currentSyncMeta.schema === 'de-rtc-yjs-blocks-v1' ||
-					currentSyncMeta.yjs_encoding ===
-						'native-yjs-php-update-v0' ||
-					currentSyncMeta.yjs_encoding === 'native-yjs-blocks-v1' ||
-					currentSyncMeta.yjs_update );
+				( currentSyncMeta.schema === 'de-rtc-automerge-v1' ||
+					currentSyncMeta.automerge_encoding ===
+						'native-automerge-php-v1' ||
+					currentSyncMeta.automerge_encoding ===
+						'native-automerge-blocks-v1' ||
+					currentSyncMeta.automerge_update );
 			const clientBaseContent =
-				options.yjsClientBaseContent ??
+				options.automergeClientBaseContent ??
 				currentSessionState.clientBaseContent ??
 				getDistributedEditingComparablePostContent(
 					currentPostContent
 				);
 
-			if ( shouldPrepareYjsClientUpdate ) {
-				const yjsClientUpdateDescriptor =
-					await getDistributedEditingYjsClientUpdateDescriptor( {
-						clientBaseContent,
-						proposedPostContent,
-						actor: `editor-${ postId || 'unknown' }`,
-					} );
+			if ( shouldPrepareAutomergeClientUpdate ) {
+				const automergeClientUpdateDescriptor =
+					await getDistributedEditingAutomergeClientUpdateDescriptor(
+						{
+							clientBaseContent,
+							proposedPostContent,
+							actor: `editor-${ postId || 'unknown' }`,
+						}
+					);
 
-				if ( yjsClientUpdateDescriptor.status === 'ready' ) {
-					yjsClientUpdate = yjsClientUpdateDescriptor.update;
+				if ( automergeClientUpdateDescriptor.status === 'ready' ) {
+					automergeClientUpdate =
+						automergeClientUpdateDescriptor.update;
 				}
 			}
 		}
@@ -6292,7 +6295,7 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			acceptedReviewApprovalProof,
 			acceptedFreshReviewConsumeValidation,
 			blockIdentityRequestProof,
-			yjsClientUpdate,
+			automergeClientUpdate,
 		};
 
 		dispatch.setDistributedEditingSessionState(
@@ -6832,16 +6835,15 @@ function isDistributedEditingStaleServerBlockIdentityRetrySaveRequestVersionElig
 	);
 }
 
-function isDistributedEditingYjsRetrySaveSyncMeta( syncMeta ) {
+function isDistributedEditingAutomergeRetrySaveSyncMeta( syncMeta ) {
 	return (
 		syncMeta &&
 		typeof syncMeta === 'object' &&
 		! Array.isArray( syncMeta ) &&
-		( syncMeta.schema === 'de-rtc-yjs-v1' ||
-			syncMeta.schema === 'de-rtc-yjs-blocks-v1' ||
-			syncMeta.yjs_encoding === 'native-yjs-php-update-v0' ||
-			syncMeta.yjs_encoding === 'native-yjs-blocks-v1' ||
-			syncMeta.yjs_update )
+		( syncMeta.schema === 'de-rtc-automerge-v1' ||
+			syncMeta.automerge_encoding === 'native-automerge-php-v1' ||
+			syncMeta.automerge_encoding === 'native-automerge-blocks-v1' ||
+			syncMeta.automerge_update )
 	);
 }
 
@@ -7240,7 +7242,8 @@ export const __experimentalMaybeSavePostWithDistributedEditingRetryPolicy =
 					acceptedProofCreatesRevision:
 						options.acceptedProofCreatesRevision,
 					acceptedProofClaimsSaved: options.acceptedProofClaimsSaved,
-					yjsClientBaseContent: options.yjsClientBaseContent,
+					automergeClientBaseContent:
+						options.automergeClientBaseContent,
 					acceptedReviewApprovalProof:
 						options.acceptedReviewApprovalProof ??
 						policy.request.acceptedReviewApprovalProof,
@@ -7615,15 +7618,15 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 						sessionState: currentSessionState,
 					}
 				);
-			const acceptedYjsSyncMeta =
+			const acceptedAutomergeSyncMeta =
 				currentSessionState.clientBaseSyncMeta ??
 				getDistributedEditingSyncMetaFromPostContent(
 					getDistributedEditingPostRawContent( currentPost )
 				);
 
 			if (
-				isDistributedEditingYjsRetrySaveSyncMeta(
-					acceptedYjsSyncMeta
+				isDistributedEditingAutomergeRetrySaveSyncMeta(
+					acceptedAutomergeSyncMeta
 				) &&
 				typeof blockIdentityProposedPostContent === 'string'
 			) {
@@ -7631,7 +7634,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 					await getDistributedEditingPostContentSha256Hash(
 						blockIdentityProposedPostContent
 					);
-				const yjsSessionState =
+				const automergeSessionState =
 					getDistributedEditingSessionStateWithActionTranscriptEvent(
 						{
 							...refetchedSessionState,
@@ -7644,7 +7647,9 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 					);
 				let didCallRetrySave = false;
 
-				dispatch.setDistributedEditingSessionState( yjsSessionState );
+				dispatch.setDistributedEditingSessionState(
+					automergeSessionState
+				);
 
 				try {
 					didCallRetrySave = true;
@@ -7659,7 +7664,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 								acceptedProofServerVersion: rebasedFromVersion,
 								rebasedFromVersion,
 								pendingChangeCount,
-								yjsClientBaseContent: clientBaseContent,
+								automergeClientBaseContent: clientBaseContent,
 								prepareBlockIdentityRequestProof: false,
 							}
 						);
@@ -7673,9 +7678,9 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 						status:
 							retrySaveSubmitted ||
 							retrySaveResult.status === 'retry_save_submitted'
-								? 'distributed_editing_normal_save_yjs_server_merge_retry_save_submitted'
+								? 'distributed_editing_normal_save_automerge_server_merge_retry_save_submitted'
 								: retrySaveResult.status,
-						yjsServerMergeCandidate: true,
+						automergeServerMergeCandidate: true,
 						allowsNormalSaveFallback: false,
 						callsServerStateRefetchEndpoint: true,
 						callsRetrySubmitEndpoint: false,
@@ -7697,7 +7702,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 						select.getDistributedEditingSessionState?.() || {};
 
 					return {
-						status: 'distributed_editing_normal_save_yjs_server_merge_retry_blocked',
+						status: 'distributed_editing_normal_save_automerge_server_merge_retry_blocked',
 						reason:
 							error?.code ||
 							sessionState.reasonCode ||
@@ -7705,7 +7710,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 							sessionState.retrySubmitProofReason ||
 							DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
 						error,
-						yjsServerMergeCandidate: true,
+						automergeServerMergeCandidate: true,
 						allowsNormalSaveFallback: false,
 						blocksNormalSavePost: true,
 						callsServerStateRefetchEndpoint: true,
@@ -7901,7 +7906,7 @@ export const __experimentalGuardDistributedEditingNormalSaveFreshness =
 								...options,
 								proposedPostContent,
 								proposedPostContentHash,
-								yjsClientBaseContent: serverContent,
+								automergeClientBaseContent: serverContent,
 								clientBaseVersion: serverVersion,
 								acceptedProofServerVersion: serverVersion,
 								rebasedFromVersion,
@@ -8144,7 +8149,7 @@ export const savePost =
 			! options.isAutosave &&
 			! options.isPreview &&
 			distributedEditingSettings.enabled &&
-			distributedEditingSettings.yjsRawPostContentSave !== false
+			distributedEditingSettings.automergeRawPostContentSave !== false
 		) {
 			const currentPost = select.getCurrentPost?.() || {};
 			const currentRawContent =
@@ -8155,8 +8160,8 @@ export const savePost =
 				getDistributedEditingSyncMetaFromPostContent(
 					currentRawContent
 				);
-			const yjsPostContent =
-				await getDistributedEditingPostContentWithYjsSyncMeta( {
+			const automergePostContent =
+				await getDistributedEditingPostContentWithAutomergeSyncMeta( {
 					clientBaseContent: currentRawContent,
 					proposedPostContent: content,
 					existingSyncMeta: currentPostSyncMeta || {
@@ -8164,13 +8169,13 @@ export const savePost =
 							currentSessionState.serverVersion ||
 							currentSessionState.clientBaseVersion ||
 							'0',
-						schema: 'de-rtc-yjs-blocks-v1',
+						schema: 'de-rtc-automerge-v1',
 					},
 					actor: `editor-${ currentPost.id || 'post' }`,
 				} );
 
-			if ( yjsPostContent.status === 'ready' ) {
-				contentForPersistence = yjsPostContent.postContent;
+			if ( automergePostContent.status === 'ready' ) {
+				contentForPersistence = automergePostContent.postContent;
 			}
 		}
 
@@ -8391,7 +8396,7 @@ export const savePost =
 
 		if ( error ) {
 			const recoveryResult =
-				await maybeRecoverDistributedEditingYjsRawSave( {
+				await maybeRecoverDistributedEditingAutomergeRawSave( {
 					select,
 					dispatch,
 					registry,
@@ -8404,7 +8409,7 @@ export const savePost =
 			}
 
 			if (
-				shouldShowDistributedEditingYjsRawSaveRecoveryFailure( {
+				shouldShowDistributedEditingAutomergeRawSaveRecoveryFailure( {
 					select,
 					options,
 					error,
@@ -8413,7 +8418,7 @@ export const savePost =
 				showDistributedEditingSaveRecoveryFailedNotice( registry );
 
 				return {
-					status: 'yjs_raw_save_recovery_retry_failed',
+					status: 'automerge_raw_save_recovery_retry_failed',
 					reason:
 						getDistributedEditingSaveErrorCode(
 							rawSaveError || error

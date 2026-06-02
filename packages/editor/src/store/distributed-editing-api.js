@@ -706,7 +706,7 @@ export function __experimentalRequestDistributedEditingHistoryPlan( {
  * @param {Object}  [args.acceptedReviewApprovalProof]           Hash-only review approval proof.
  * @param {Object}  [args.acceptedFreshReviewConsumeValidation]  Hash-only fresh-review consume validation evidence.
  * @param {Object}  [args.blockIdentityRequestProof]             Content-free block identity request proof.
- * @param {Object}  [args.yjsClientUpdate]                       Native PHP Yjs update evidence.
+ * @param {Object}  [args.automergeClientUpdate]                 Native PHP Automerge update evidence.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -726,7 +726,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 	acceptedReviewApprovalProof,
 	acceptedFreshReviewConsumeValidation,
 	blockIdentityRequestProof,
-	yjsClientUpdate,
+	automergeClientUpdate,
 } = {} ) {
 	const data = {
 		client_base_version: clientBaseVersion,
@@ -775,11 +775,13 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 		data.block_identity_request_proof = normalizedBlockIdentityRequestProof;
 	}
 
-	const normalizedYjsClientUpdate =
-		normalizeYjsClientUpdateForRetrySaveRequest( yjsClientUpdate );
+	const normalizedAutomergeClientUpdate =
+		normalizeAutomergeClientUpdateForRetrySaveRequest(
+			automergeClientUpdate
+		);
 
-	if ( normalizedYjsClientUpdate ) {
-		data.yjs_client_update = normalizedYjsClientUpdate;
+	if ( normalizedAutomergeClientUpdate ) {
+		data.automerge_client_update = normalizedAutomergeClientUpdate;
 	}
 
 	return apiFetch( {
@@ -792,7 +794,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 	} );
 }
 
-function normalizeYjsClientUpdateForRetrySaveRequest( update ) {
+function normalizeAutomergeClientUpdateForRetrySaveRequest( update ) {
 	if (
 		! update ||
 		typeof update !== 'object' ||
@@ -802,13 +804,19 @@ function normalizeYjsClientUpdateForRetrySaveRequest( update ) {
 		return null;
 	}
 
-	if ( update.format && update.format !== 'native-yjs-php-update-v0' ) {
+	const format = update.format || 'native-automerge-php-v1';
+
+	if (
+		! [ 'native-automerge-php-v1', 'native-automerge-blocks-v1' ].includes(
+			format
+		)
+	) {
 		return null;
 	}
 
 	const operations = Array.isArray( update.operations )
 		? update.operations
-				.map( normalizeYjsClientUpdateOperation )
+				.map( normalizeAutomergeClientUpdateOperation )
 				.filter( Boolean )
 		: null;
 
@@ -817,7 +825,7 @@ function normalizeYjsClientUpdateForRetrySaveRequest( update ) {
 	}
 
 	const normalized = {
-		format: 'native-yjs-php-update-v0',
+		format,
 		operations,
 		stateVector:
 			update.stateVector &&
@@ -826,6 +834,36 @@ function normalizeYjsClientUpdateForRetrySaveRequest( update ) {
 				? update.stateVector
 				: {},
 	};
+
+	if ( normalizeProofString( update.schema ) ) {
+		normalized.schema = normalizeProofString( update.schema );
+	}
+
+	for ( const [ sourceKey, targetKey ] of [
+		[ 'baseContentHash', 'baseContentHash' ],
+		[ 'proposedContentHash', 'proposedContentHash' ],
+		[ 'base_content_hash', 'baseContentHash' ],
+		[ 'proposed_content_hash', 'proposedContentHash' ],
+	] ) {
+		const value = normalizeProofString( update[ sourceKey ] );
+
+		if ( value ) {
+			normalized[ targetKey ] = value;
+		}
+	}
+
+	for ( const [ sourceKey, targetKey ] of [
+		[ 'baseBlockCount', 'baseBlockCount' ],
+		[ 'proposedBlockCount', 'proposedBlockCount' ],
+		[ 'base_block_count', 'baseBlockCount' ],
+		[ 'proposed_block_count', 'proposedBlockCount' ],
+	] ) {
+		const value = normalizeProofNonNegativeInteger( update[ sourceKey ] );
+
+		if ( value !== undefined ) {
+			normalized[ targetKey ] = value;
+		}
+	}
 
 	if (
 		update.interop &&
@@ -838,7 +876,104 @@ function normalizeYjsClientUpdateForRetrySaveRequest( update ) {
 	return normalized;
 }
 
-function normalizeYjsClientUpdateOperation( operation ) {
+function normalizeAutomergeClientOperationCommonFields( operation ) {
+	const normalized = {};
+
+	for ( const key of [
+		'actor',
+		'id',
+		'automergePrimitive',
+		'blockUid',
+		'blockHash',
+		'blockName',
+		'baseBlockHash',
+		'proposedBlockHash',
+		'baseBlockName',
+		'proposedBlockName',
+		'field',
+		'serializedBlock',
+	] ) {
+		const value = normalizeProofString( operation[ key ] );
+
+		if ( value !== undefined ) {
+			normalized[ key ] = value;
+		}
+	}
+
+	const sequence = normalizeProofNonNegativeInteger( operation.sequence );
+
+	if ( sequence !== undefined ) {
+		normalized.sequence = sequence;
+	}
+
+	for ( const key of [ 'path', 'fromPath', 'toPath' ] ) {
+		const value = normalizeProofIntegerPath( operation[ key ] );
+
+		if ( value ) {
+			normalized[ key ] = value;
+		}
+	}
+
+	const index = normalizeProofNonNegativeInteger( operation.index );
+
+	if ( index !== undefined ) {
+		normalized.index = index;
+	}
+
+	const changedTextIndexes = normalizeProofIntegerPath(
+		operation.changedTextIndexes
+	);
+
+	if ( changedTextIndexes ) {
+		normalized.changedTextIndexes = changedTextIndexes;
+	}
+
+	const changeRange = normalizeAutomergeClientChangeRange(
+		operation.changeRange
+	);
+
+	if ( changeRange ) {
+		normalized.changeRange = changeRange;
+	}
+
+	return normalized;
+}
+
+function normalizeAutomergeClientChangeRange( range ) {
+	if ( ! range || typeof range !== 'object' || Array.isArray( range ) ) {
+		return null;
+	}
+
+	const normalized = {};
+
+	for ( const key of [ 'start', 'end', 'deleteLength', 'insertLength' ] ) {
+		const value = normalizeProofNonNegativeInteger( range[ key ] );
+
+		if ( value !== undefined ) {
+			normalized[ key ] = value;
+		}
+	}
+
+	if ( 'changed' in range ) {
+		normalized.changed = Boolean( range.changed );
+	}
+
+	return Object.keys( normalized ).length ? normalized : null;
+}
+
+function normalizeProofIntegerPath( value ) {
+	if ( ! Array.isArray( value ) ) {
+		return null;
+	}
+
+	const normalized = value.map( normalizeProofNonNegativeInteger );
+
+	return normalized.every( ( item ) => item !== undefined )
+		? normalized
+		: null;
+}
+
+function normalizeAutomergeClientUpdateOperation( operation ) {
 	if (
 		! operation ||
 		typeof operation !== 'object' ||
@@ -902,6 +1037,23 @@ function normalizeYjsClientUpdateOperation( operation ) {
 			...( normalizeProofString( operation.id )
 				? { id: normalizeProofString( operation.id ) }
 				: {} ),
+		};
+	}
+
+	if (
+		[
+			'block.move',
+			'block.delete',
+			'block.insert',
+			'block.update_serialized',
+			'block.replace',
+			'block.rich_text_format',
+			'document.replace_unsupported',
+		].includes( operation.type )
+	) {
+		return {
+			type: operation.type,
+			...normalizeAutomergeClientOperationCommonFields( operation ),
 		};
 	}
 

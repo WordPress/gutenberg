@@ -88,10 +88,10 @@ import {
 	getDistributedEditingBlockIdentityDistinctGapInsertionDescriptor,
 	getDistributedEditingBlockIdentityRetainedEditsServerMergeDescriptor,
 	getDistributedEditingBlockIdentityRequestProofDescriptor,
-	getDistributedEditingPostContentWithYjsSyncMeta,
+	getDistributedEditingPostContentWithAutomergeSyncMeta,
 	getDistributedEditingSyncMetaFromPostContent,
-	getDistributedEditingYjsClientUpdateDescriptor,
-	getDistributedEditingYjsLocalMergeCandidate,
+	getDistributedEditingAutomergeClientUpdateDescriptor,
+	getDistributedEditingAutomergeLocalMergeCandidate,
 	getDistributedEditingReviewedBlockItemsForRetrySaveReviewApprovalProof,
 	getDistributedEditingReviewedBlockItemsForFreshReviewDecision,
 	getDistributedEditingPostContentSha256Hash,
@@ -233,40 +233,41 @@ describe( 'distributed editing session state', () => {
 		).toBe( false );
 	} );
 
-	it( 'parses top pseudo-block Yjs sync metadata without exposing it as post content', () => {
+	it( 'parses top pseudo-block Automerge sync metadata without exposing it as post content', () => {
 		const postContent =
-			'<!-- wp:sync-meta {"format":"yjs"} -->\n' +
-			'<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">{"version":"12","schema":"de-rtc-yjs-v1","yjs_encoding":"native-yjs-php-update-v0"}</script>\n' +
+			'<!-- wp:sync-meta {"format":"automerge"} -->\n' +
+			'<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"version":"12","schema":"de-rtc-automerge-v1","automerge_encoding":"native-automerge-php-v1"}</script>\n' +
 			'<!-- /wp:sync-meta --><!-- wp:paragraph --><p>Visible editor content.</p><!-- /wp:paragraph -->';
 
 		expect(
 			getDistributedEditingSyncMetaFromPostContent( postContent )
 		).toMatchObject( {
 			version: '12',
-			schema: 'de-rtc-yjs-v1',
-			yjs_encoding: 'native-yjs-php-update-v0',
+			schema: 'de-rtc-automerge-v1',
+			automerge_encoding: 'native-automerge-php-v1',
 		} );
 	} );
 
-	it( 'builds raw post content with a pending Yjs update in the sync-meta block', async () => {
+	it( 'builds raw post content with a pending Automerge update in the sync-meta block', async () => {
 		const clientBaseContent =
-			'<!-- wp:paragraph --><p>Yjs base content.</p><!-- /wp:paragraph -->';
+			'<!-- wp:paragraph --><p>Automerge base content.</p><!-- /wp:paragraph -->';
 		const proposedPostContent =
-			'<!-- wp:paragraph --><p>Yjs edited content.</p><!-- /wp:paragraph -->';
+			'<!-- wp:paragraph --><p>Automerge edited content.</p><!-- /wp:paragraph -->';
 
-		const result = await getDistributedEditingPostContentWithYjsSyncMeta( {
-			clientBaseContent,
-			proposedPostContent,
-			existingSyncMeta: {
-				version: '12',
-				schema: 'de-rtc-yjs-v1',
-			},
-			actor: 'editor-42',
-		} );
+		const result =
+			await getDistributedEditingPostContentWithAutomergeSyncMeta( {
+				clientBaseContent,
+				proposedPostContent,
+				existingSyncMeta: {
+					version: '12',
+					schema: 'de-rtc-automerge-v1',
+				},
+				actor: 'editor-42',
+			} );
 
 		expect( result.status ).toBe( 'ready' );
 		expect( result.postContent ).toContain(
-			'<!-- wp:sync-meta {"format":"yjs"} -->'
+			'<!-- wp:sync-meta {"format":"automerge"} -->'
 		);
 		expect( result.postContent ).toContain(
 			'data-wp-sync-meta="distributed-editing"'
@@ -276,17 +277,17 @@ describe( 'distributed editing session state', () => {
 		).toMatchObject( {
 			version: '12',
 			client_base_version: '12',
-			schema: 'de-rtc-yjs-blocks-v1',
-			pending_yjs_encoding: 'native-yjs-blocks-v1',
+			schema: 'de-rtc-automerge-v1',
+			pending_automerge_encoding: 'native-automerge-blocks-v1',
 		} );
 		expect( result.postContent ).toContain( proposedPostContent );
-		expect( result.postContent ).not.toContain( 'yjs_client_update' );
+		expect( result.postContent ).not.toContain( 'automerge_client_update' );
 	} );
 
 	it( 'canonicalizes explicit core block comments before comparing post content', () => {
 		const postContent =
-			'<!-- wp:core/sync-meta {"format":"yjs"} -->\n' +
-			'<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">{"version":"12","schema":"de-rtc-yjs-v1"}</script>\n' +
+			'<!-- wp:core/sync-meta {"format":"automerge"} -->\n' +
+			'<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"version":"12","schema":"de-rtc-automerge-v1"}</script>\n' +
 			'<!-- /wp:core/sync-meta -->' +
 			'<!-- wp:core/paragraph --><p>Visible editor content.</p><!-- /wp:core/paragraph -->';
 
@@ -297,16 +298,16 @@ describe( 'distributed editing session state', () => {
 		);
 	} );
 
-	it( 'builds native Yjs retry-save update evidence from a normal editor edit', async () => {
+	it( 'builds native Automerge retry-save update evidence from a normal editor edit', async () => {
 		ensureDistributedEditingTestCrypto();
 
 		const clientBaseContent =
-			'<!-- wp:paragraph --><p>Yjs base content.</p><!-- /wp:paragraph -->';
+			'<!-- wp:paragraph --><p>Automerge base content.</p><!-- /wp:paragraph -->';
 		const proposedPostContent =
-			'<!-- wp:paragraph --><p>Yjs edited content.</p><!-- /wp:paragraph -->';
+			'<!-- wp:paragraph --><p>Automerge edited content.</p><!-- /wp:paragraph -->';
 
 		await expect(
-			getDistributedEditingYjsClientUpdateDescriptor( {
+			getDistributedEditingAutomergeClientUpdateDescriptor( {
 				clientBaseContent,
 				proposedPostContent,
 				actor: 'editor-42',
@@ -314,12 +315,12 @@ describe( 'distributed editing session state', () => {
 		).resolves.toMatchObject( {
 			status: 'ready',
 			update: {
-				format: 'native-yjs-blocks-v1',
-				schema: 'de-rtc-yjs-blocks-v1',
+				format: 'native-automerge-blocks-v1',
+				schema: 'de-rtc-automerge-v1',
 				operations: [
 					{
 						type: 'block.update_serialized',
-						yjsPrimitive: 'Y.Map.set',
+						automergePrimitive: 'Automerge.Map.set',
 						path: [ 0 ],
 						blockName: 'core/paragraph',
 						actor: 'editor-42',
@@ -331,9 +332,9 @@ describe( 'distributed editing session state', () => {
 				baseBlockCount: 1,
 				proposedBlockCount: 1,
 				interop: {
-					jsPackage: '@y/y',
-					jsPackageVersion: '14.0.0-rc.16',
-					serverEncoding: 'native-yjs-blocks-v1',
+					jsPackage: '@automerge/automerge',
+					jsPackageVersion: '3.2.6',
+					serverEncoding: 'native-automerge-blocks-v1',
 				},
 			},
 			changeRange: {
@@ -342,7 +343,7 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
-	it( 'maps paragraph formatting changes to block-native Y.Text operations', async () => {
+	it( 'maps paragraph formatting changes to block-native Automerge.Text operations', async () => {
 		ensureDistributedEditingTestCrypto();
 
 		const clientBaseContent =
@@ -351,7 +352,7 @@ describe( 'distributed editing session state', () => {
 			'<!-- wp:paragraph --><p>This is <strong>bold</strong> and italicized.</p><!-- /wp:paragraph -->';
 
 		await expect(
-			getDistributedEditingYjsClientUpdateDescriptor( {
+			getDistributedEditingAutomergeClientUpdateDescriptor( {
 				clientBaseContent,
 				proposedPostContent,
 				actor: 'editor-42',
@@ -359,11 +360,11 @@ describe( 'distributed editing session state', () => {
 		).resolves.toMatchObject( {
 			status: 'ready',
 			update: {
-				format: 'native-yjs-blocks-v1',
+				format: 'native-automerge-blocks-v1',
 				operations: [
 					{
 						type: 'block.rich_text_format',
-						yjsPrimitive: 'Y.Text.format',
+						automergePrimitive: 'Automerge.Text.mark',
 						field: 'innerHTML',
 						path: [ 0 ],
 						blockName: 'core/paragraph',
@@ -374,7 +375,7 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
-	it( 'builds a Yjs local merge candidate for non-overlapping same-block stale edits', () => {
+	it( 'builds a Automerge local merge candidate for non-overlapping same-block stale edits', () => {
 		const clientBaseContent =
 			'<!-- wp:paragraph --><p>WordPress saves calmly.</p><!-- /wp:paragraph -->';
 		const serverContent =
@@ -383,7 +384,7 @@ describe( 'distributed editing session state', () => {
 			'<!-- wp:paragraph --><p>Reliable WordPress saves calmly.</p><!-- /wp:paragraph -->';
 
 		expect(
-			getDistributedEditingYjsLocalMergeCandidate( {
+			getDistributedEditingAutomergeLocalMergeCandidate( {
 				clientBaseContent,
 				serverContent,
 				localContent,
@@ -393,7 +394,7 @@ describe( 'distributed editing session state', () => {
 			hasCandidatePostContent: true,
 			candidatePostContent:
 				'<!-- wp:paragraph --><p>Reliable WordPress saves safely.</p><!-- /wp:paragraph -->',
-			mergeStrategy: 'native_yjs_php_v0',
+			mergeStrategy: 'native_automerge_php_v1',
 			serverChangeRange: {
 				changed: true,
 			},
@@ -403,7 +404,7 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
-	it( 'builds a Yjs local merge candidate for distinct inline formatting in the same paragraph', () => {
+	it( 'builds a Automerge local merge candidate for distinct inline formatting in the same paragraph', () => {
 		const clientBaseContent =
 			'<!-- wp:paragraph --><p>This is bold and italicized.</p><!-- /wp:paragraph -->';
 		const serverContent =
@@ -412,7 +413,7 @@ describe( 'distributed editing session state', () => {
 			'<!-- wp:paragraph --><p>This is bold and <em>italicized</em>.</p><!-- /wp:paragraph -->';
 
 		expect(
-			getDistributedEditingYjsLocalMergeCandidate( {
+			getDistributedEditingAutomergeLocalMergeCandidate( {
 				clientBaseContent,
 				serverContent,
 				localContent,
@@ -422,7 +423,7 @@ describe( 'distributed editing session state', () => {
 			hasCandidatePostContent: true,
 			candidatePostContent:
 				'<!-- wp:paragraph --><p>This is <strong>bold</strong> and <em>italicized</em>.</p><!-- /wp:paragraph -->',
-			mergeStrategy: 'native_yjs_php_v0',
+			mergeStrategy: 'native_automerge_php_v1',
 			serverChangeRange: {
 				changed: true,
 			},
@@ -432,7 +433,7 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
-	it( 'blocks a Yjs local merge candidate for overlapping same-block stale edits', () => {
+	it( 'blocks a Automerge local merge candidate for overlapping same-block stale edits', () => {
 		const clientBaseContent =
 			'<!-- wp:paragraph --><p>WordPress saves calmly.</p><!-- /wp:paragraph -->';
 		const serverContent =
@@ -441,16 +442,16 @@ describe( 'distributed editing session state', () => {
 			'<!-- wp:paragraph --><p>WordPress saves quickly.</p><!-- /wp:paragraph -->';
 
 		expect(
-			getDistributedEditingYjsLocalMergeCandidate( {
+			getDistributedEditingAutomergeLocalMergeCandidate( {
 				clientBaseContent,
 				serverContent,
 				localContent,
 			} )
 		).toMatchObject( {
 			status: 'manual_conflict_required',
-			reason: 'yjs_overlapping_change_ranges',
+			reason: 'automerge_overlapping_change_ranges',
 			hasCandidatePostContent: false,
-			mergeStrategy: 'native_yjs_php_v0',
+			mergeStrategy: 'native_automerge_php_v1',
 		} );
 	} );
 
@@ -4352,7 +4353,7 @@ describe( 'distributed editing session state', () => {
 	it( 'absorbs partial-safe retry-save content while keeping unsafe block review pending', () => {
 		const safeServerContent =
 			'<!-- wp:paragraph --><p>Demo content alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Duplicated content!</p><!-- /wp:paragraph --><!-- wp:html -->\n<div>Demo content beta.</div>\n<!-- /wp:html --><!-- wp:paragraph --><p>Demo content gamma.</p><!-- /wp:paragraph -->';
-		const safeServerRawContent = `<!-- wp:sync-meta {"format":"yjs"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">{"schema":"de-rtc-yjs-v1","version":"302"}</script>\n<!-- /wp:sync-meta -->${ safeServerContent }`;
+		const safeServerRawContent = `<!-- wp:sync-meta {"format":"automerge"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"schema":"de-rtc-automerge-v1","version":"302"}</script>\n<!-- /wp:sync-meta -->${ safeServerContent }`;
 		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
 			{
 				result: 'retry_save_partial_safe_merge',
@@ -4411,7 +4412,7 @@ describe( 'distributed editing session state', () => {
 			serverVersion: '302',
 			clientBaseContent: safeServerContent,
 			clientBaseSyncMeta: {
-				schema: 'de-rtc-yjs-v1',
+				schema: 'de-rtc-automerge-v1',
 				version: '302',
 			},
 			refetchedServerContent: safeServerContent,
@@ -4466,7 +4467,7 @@ describe( 'distributed editing session state', () => {
 	it( 'normalizes confirmed server-merged retry-save evidence as saved and content-free', () => {
 		const mergedContent =
 			'<!-- wp:paragraph --><p>Server edit.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Local edit.</p><!-- /wp:paragraph -->';
-		const mergedRawContent = `<!-- wp:sync-meta {"format":"yjs"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="yjs">{"schema":"de-rtc-yjs-blocks-v1","version":"52"}</script>\n<!-- /wp:sync-meta -->${ mergedContent }`;
+		const mergedRawContent = `<!-- wp:sync-meta {"format":"automerge"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"schema":"de-rtc-automerge-v1","version":"52"}</script>\n<!-- /wp:sync-meta -->${ mergedContent }`;
 		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
 			{
 				result: 'retry_save_server_merged',
@@ -4538,7 +4539,7 @@ describe( 'distributed editing session state', () => {
 			clientBaseVersion: '52',
 			clientBaseContent: mergedContent,
 			clientBaseSyncMeta: {
-				schema: 'de-rtc-yjs-blocks-v1',
+				schema: 'de-rtc-automerge-v1',
 				version: '52',
 			},
 			refetchedServerContent: null,

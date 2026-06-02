@@ -72,7 +72,8 @@ export default function DistributedEditingServerSyncButton() {
 
 		return {
 			isDistributedEditingEnabled: Boolean(
-				settings.enabled && settings.yjsRawPostContentSave !== false
+				settings.enabled &&
+					settings.automergeRawPostContentSave !== false
 			),
 			isDistributedEditingSaveInFlight: Boolean(
 				sessionState.saveButtonClickInFlight ||
