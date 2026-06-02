@@ -47,7 +47,7 @@ const packagePaths = glob( 'packages/*/package.json', { cwd: ROOT_DIR } )
  */
 function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
-		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
+		const readmePath = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
 		const packageJson = require(
 			join( ROOT_DIR, 'packages', folderName, 'package.json' )
 		);
@@ -56,7 +56,7 @@ function getPackageManifest( packageFolderNames ) {
 		manifest.push( {
 			title: packageJson.name,
 			slug: `packages-${ folderName }`,
-			markdown_source: path,
+			markdown_source: readmePath,
 			parent: 'packages',
 		} );
 

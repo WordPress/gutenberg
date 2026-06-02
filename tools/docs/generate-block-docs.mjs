@@ -185,7 +185,6 @@ function slugifyHeading( heading ) {
  */
 function validateDocAnchors( docPath, expectedAnchors, label ) {
 	if ( ! fs.existsSync( docPath ) ) {
-		// eslint-disable-next-line no-console
 		console.error( `✖  Cannot validate anchors: ${ docPath } not found.` );
 		process.exitCode = 1;
 		return;
@@ -200,7 +199,6 @@ function validateDocAnchors( docPath, expectedAnchors, label ) {
 
 	for ( const anchor of expectedAnchors ) {
 		if ( ! anchors.has( anchor ) ) {
-			// eslint-disable-next-line no-console
 			console.error(
 				`✖  Anchor "#${ anchor }" not found in ${ label }. ` +
 					`Update the corresponding map in generate-block-docs.mjs.`
@@ -915,9 +913,9 @@ function generateCategoryPageSection( category, blocks ) {
  * - File exists, has tokens → replace content between tokens.
  * - File exists, no tokens → append tokens at the end.
  *
- * @param {string} category  Category slug.
- * @param {string} label     Human-readable category label.
- * @param {string} section   Token-wrapped generated content.
+ * @param {string} category Category slug.
+ * @param {string} label    Human-readable category label.
+ * @param {string} section  Token-wrapped generated content.
  */
 function writeCategoryPage( category, label, section ) {
 	const filePath = path.join(
@@ -969,8 +967,7 @@ function generateDeprecatedNotice( dirs ) {
 	lines.push( '' );
 
 	dirs.forEach( ( blockDir ) => {
-		const { title, name, description, category = 'uncategorized' } =
-			readBlockJson( blockDir );
+		const { title, name, description } = readBlockJson( blockDir );
 		const replacement = description
 			.replace( 'This block is deprecated. ', '' )
 			.replace( 'This block is deprecated.', '' )
@@ -1060,7 +1057,6 @@ categoryNames.forEach( ( category ) => {
 // Update the deprecated-blocks notice in the core blocks README.
 writeDeprecatedNotice( deprecatedDirs );
 
-// eslint-disable-next-line no-console
 console.log(
 	`Generated ${ blockDirs.length } block READMEs + ${ deprecatedDirs.length } deprecated block READMEs + ${ categoryNames.length } category pages`
 );
