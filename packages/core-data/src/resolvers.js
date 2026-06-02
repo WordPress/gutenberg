@@ -251,6 +251,12 @@ export const getEntityRecord =
 						// persistence. As we add support for syncing additional entity,
 						// we'll need to revisit where persisted CRDT documents are stored.
 						persistCRDTDoc: () => {
+							if (
+								! entityConfig.syncConfig?.supportsPersistence
+							) {
+								return;
+							}
+
 							return resolveSelect
 								.getEditedEntityRecord( kind, name, key )
 								.then( async ( editedRecord ) => {
@@ -266,24 +272,9 @@ export const getEntityRecord =
 									const entityId =
 										editedRecord[ entityIdKey ];
 
-									if ( 'postType' === kind ) {
-										await saveCRDTDoc(
-											`${ kind }/${ name }`,
-											entityId
-										);
-										return;
-									}
-
-									// Trigger a minimal save to preserve the current behavior for
-									// non-post entities until persisted CRDT support becomes an
-									// explicit sync capability.
-									dispatch.saveEntityRecord(
-										kind,
-										name,
-										{
-											[ entityIdKey ]: entityId,
-										},
-										{ __unstableSkipSyncUpdate: true }
+									await saveCRDTDoc(
+										`${ kind }/${ name }`,
+										entityId
 									);
 								} );
 						},

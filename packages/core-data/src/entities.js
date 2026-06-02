@@ -409,6 +409,9 @@ async function loadPostTypeEntities() {
 		 * @type {import('@wordpress/sync').SyncConfig}
 		 */
 		entity.syncConfig = {
+			// Save a CRDT document with this entity
+			supportsPersistence: true,
+
 			/**
 			 * Apply changes from the local editor to the local CRDT document so
 			 * that those changes can be synced to other peers (via the provider).

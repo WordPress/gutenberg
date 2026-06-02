@@ -180,7 +180,7 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'persistCRDTDoc fetches edited record and does not save full entity record when the entity does not support meta', async () => {
+	it( 'persistCRDTDoc fetches edited post record and does not save when the entity does not support meta', async () => {
 		const ENTITY_RECORD = { id: 1, title: 'Test Record' };
 		const EDITED_RECORD = { id: 1, title: 'Edited Record' };
 		const ENTITY_RESPONSE = {
@@ -188,15 +188,16 @@ describe( 'getEntityRecord', () => {
 		};
 		const ENTITIES_WITH_SYNC = [
 			{
-				name: 'bar',
-				kind: 'foo',
-				baseURL: '/wp/v2/foo',
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {},
+				syncConfig: { supportsPersistence: true },
 			},
 		];
 
 		dispatch.saveEntityRecord = jest.fn();
+		syncManager.createPersistedCRDTDoc = jest.fn();
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -208,8 +209,8 @@ describe( 'getEntityRecord', () => {
 		triggerFetch.mockImplementation( () => ENTITY_RESPONSE );
 
 		await getEntityRecord(
-			'foo',
-			'bar',
+			'postType',
+			'post',
 			1
 		)( {
 			dispatch,
@@ -221,16 +222,16 @@ describe( 'getEntityRecord', () => {
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
 		// Call persistCRDTDoc and wait for the internal promise chain.
-		handlers.persistCRDTDoc();
-		await resolveSelectWithSync.getEditedEntityRecord();
+		await handlers.persistCRDTDoc();
 
 		// Should have fetched the full edited entity record.
 		expect(
 			resolveSelectWithSync.getEditedEntityRecord
-		).toHaveBeenCalledWith( 'foo', 'bar', 1 );
+		).toHaveBeenCalledWith( 'postType', 'post', 1 );
 
 		// Should not have called saveEntityRecord.
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
+		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
 	} );
 
 	it( 'persistCRDTDoc saves post CRDT docs through the sync endpoint', async () => {
@@ -251,7 +252,7 @@ describe( 'getEntityRecord', () => {
 				kind: 'postType',
 				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {},
+				syncConfig: { supportsPersistence: true },
 			},
 		];
 
@@ -321,7 +322,7 @@ describe( 'getEntityRecord', () => {
 				kind: 'postType',
 				baseURL: '/wp/v2/posts',
 				baseURLParams: { context: 'edit' },
-				syncConfig: {},
+				syncConfig: { supportsPersistence: true },
 			},
 		];
 
@@ -370,7 +371,7 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
-	it( 'persistCRDTDoc keeps the minimal entity save fallback for non-post entities', async () => {
+	it( 'persistCRDTDoc does not persist entities whose sync config does not support persistence', async () => {
 		const TERM_RECORD = { id: 1, name: 'Category', meta: {} };
 		const EDITED_RECORD = {
 			id: 1,
@@ -416,12 +417,10 @@ describe( 'getEntityRecord', () => {
 
 		await handlers.persistCRDTDoc();
 
-		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
-			'taxonomy',
-			'category',
-			{ id: 1 },
-			{ __unstableSkipSyncUpdate: true }
-		);
+		expect(
+			resolveSelectWithSync.getEditedEntityRecord
+		).not.toHaveBeenCalled();
+		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 		expect( syncManager.createPersistedCRDTDoc ).not.toHaveBeenCalled();
 	} );
 
