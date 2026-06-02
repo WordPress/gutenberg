@@ -196,10 +196,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 			}
 		);
 		wp_register_style( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $style_dependencies, $asset['version'] );
-		wp_add_inline_style(
-			'{{PAGE_SLUG}}-wp-admin-prerequisites',
-			{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_inline_styles()
-		);
 
 		// Build dependencies for {{PAGE_SLUG}}-wp-admin module
 		$boot_dependencies = array(
@@ -261,16 +257,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 	?>
-	<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container"></div>
-	<?php
-}
-
-/**
- * Get the inline styles for the page.
- */
-function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_inline_styles() {
-	ob_start();
-	?>
+	<style>
 		/* Critical styles to prevent layout shifts - inlined for immediate application */
 
 		#wpwrap {
@@ -320,10 +307,9 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_inline_styles() {
 				overflow-y: initial;
 			}
 		}
+	</style>
+	<div id="{{PAGE_SLUG}}-wp-admin-app" class="boot-layout-container"></div>
 	<?php
-	$styles  = ob_get_clean();
-	$styles .= "\n/*# sourceURL=" . rawurlencode( __FUNCTION__ ) . '*/';
-	return $styles;
 }
 
 // Hook the enqueue function to admin_enqueue_scripts
