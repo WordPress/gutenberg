@@ -306,7 +306,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 		}
 	}
 
-	$colors = block_core_page_list_build_css_colors( $attributes, $block->context );
+	$colors  = block_core_page_list_build_css_colors( $attributes, $block->context );
 	$classes = array_merge(
 		$colors['css_classes']
 	);

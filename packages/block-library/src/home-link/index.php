@@ -70,7 +70,7 @@ function block_core_home_link_build_css_colors( $context ) {
  * @return string The li wrapper attributes.
  */
 function block_core_home_link_build_li_wrapper_attributes( $context ) {
-	$colors = block_core_home_link_build_css_colors( $context );
+	$colors  = block_core_home_link_build_css_colors( $context );
 	$classes = array_merge(
 		$colors['css_classes']
 	);
