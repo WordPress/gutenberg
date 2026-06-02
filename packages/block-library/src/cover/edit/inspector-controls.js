@@ -99,6 +99,7 @@ export default function CoverInspectorControls( {
 	currentSettings,
 	updateDimRatio,
 	featuredImage,
+	bindingActive,
 } ) {
 	const {
 		useFeaturedImage,
@@ -223,7 +224,7 @@ export default function CoverInspectorControls( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ isImageBackground && (
+						{ isImageBackground && ! bindingActive && (
 							<>
 								<ToolsPanelItem
 									label={ __( 'Fixed background' ) }

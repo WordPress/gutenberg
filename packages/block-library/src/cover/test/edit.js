@@ -5,12 +5,34 @@ import { screen, fireEvent, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+import {
+	registerBlockBindingsSource,
+	unregisterBlockBindingsSource,
+} from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
 	initializeEditor,
 	selectBlock,
 } from 'test/integration/helpers/integration-test-editor';
+import { getMediaColor } from '../edit/color-utils';
+
+// Wrap `getMediaColor` so individual tests can intercept its calls / control
+// the timing of its async resolution. The default `mockImplementation`
+// delegates to the real implementation (preserving behaviour for every other
+// test in this file).
+jest.mock( '../edit/color-utils', () => {
+	const actual = jest.requireActual( '../edit/color-utils' );
+	return {
+		__esModule: true,
+		...actual,
+		getMediaColor: jest.fn( actual.getMediaColor ),
+	};
+} );
 
 const defaultSettings = {
 	__experimentalFeatures: {
@@ -468,6 +490,189 @@ describe( 'Cover block', () => {
 			} );
 			await userEvent.click( popupColorPicker );
 			expect( coverBlock ).not.toHaveClass( 'is-light' );
+		} );
+	} );
+
+	// Shared binding-source harness for the four binding describes below.
+	// Each describe gets a unique source name (so registrations cannot leak)
+	// and a `sourceState` bag tests can mutate before `setup()` to dial the
+	// resolved `id` / `url` returned by `getValues`.
+	function useBindingSource( name, defaultUrl, defaultId ) {
+		const sourceState = { url: defaultUrl, id: defaultId };
+		beforeEach( () => {
+			sourceState.url = defaultUrl;
+			sourceState.id = defaultId;
+			registerBlockBindingsSource( {
+				name,
+				label: name,
+				getValues: () => ( {
+					id: sourceState.id,
+					url: sourceState.url,
+				} ),
+				canUserEditValue: () => false,
+			} );
+		} );
+		afterEach( () => unregisterBlockBindingsSource( name ) );
+		return {
+			sourceState,
+			bindings: { id: { source: name }, url: { source: name } },
+		};
+	}
+
+	describe( 'Bindings rendering', () => {
+		const TEST_SOURCE = 'test/cover-binding-edit';
+		const TEST_RESOLVED_URL = 'http://localhost/bound-image.jpg';
+		const { bindings: boundBindings } = useBindingSource(
+			TEST_SOURCE,
+			TEST_RESOLVED_URL,
+			4242
+		);
+
+		test( 'force-renders an <img> for an active binding with a resolved URL, ignoring hasParallax / isRepeated', async () => {
+			// Framework resolves attributes.url before passing to Edit. Mimic
+			// here by setting attributes.url directly to the bound value.
+			await setup( {
+				url: TEST_RESOLVED_URL,
+				backgroundType: 'image',
+				hasParallax: true,
+				isRepeated: true,
+				metadata: { bindings: boundBindings },
+			} );
+
+			const boundImg = await screen.findByRole( 'img' );
+			expect( boundImg ).toHaveClass(
+				'wp-block-cover__image-background'
+			);
+			expect( boundImg ).toHaveAttribute( 'src', TEST_RESOLVED_URL );
+			// Force-img branch precludes the parallax/repeat <div> form.
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				document.querySelector( 'div.wp-block-cover__image-background' )
+			).not.toBeInTheDocument();
+		} );
+
+		test( 'leaves the embed-video render path engaged on a cover with bindings (binding is inert)', async () => {
+			await setup( {
+				url: 'https://example.com/video',
+				backgroundType: 'embed-video',
+				metadata: { bindings: boundBindings },
+			} );
+
+			const coverBlock = screen.getByLabelText( 'Block: Cover' );
+			// bindingActive forced false for embed-video → force-img skipped.
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				coverBlock.querySelector(
+					'img.wp-block-cover__image-background'
+				)
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'CoverEdit single observer', () => {
+		const TEST_SOURCE = 'test/cover-binding-observer';
+		const TEST_RESOLVED_URL = 'http://localhost/observer-image.jpg';
+		useBindingSource( TEST_SOURCE, TEST_RESOLVED_URL, 7777 );
+
+		beforeEach( () => {
+			// Default `getMediaColor` to the real implementation; individual
+			// tests can override via `mockImplementation`.
+			getMediaColor.mockReset();
+			getMediaColor.mockImplementation(
+				jest.requireActual( '../edit/color-utils' ).getMediaColor
+			);
+		} );
+
+		test( 'does not write any DC-2-prohibited attribute back to the block when a binding becomes active', async () => {
+			// Saved state: dimRatio=100, hasParallax=true, isRepeated=true,
+			// plus an active binding. Observer must NOT flip any of these.
+			// attributes.url is what the framework resolves to before reaching
+			// Edit; the test passes it directly.
+			await setup( {
+				url: TEST_RESOLVED_URL,
+				id: 1234,
+				backgroundType: 'image',
+				dimRatio: 100,
+				hasParallax: true,
+				isRepeated: true,
+				metadata: {
+					bindings: {
+						id: { source: TEST_SOURCE },
+						url: { source: TEST_SOURCE },
+					},
+				},
+			} );
+
+			await screen.findByRole( 'img' );
+			// Flush URL-resolved observer + any subsequent re-renders.
+			await act( async () => Promise.resolve() );
+			await act( async () => Promise.resolve() );
+
+			const coverBlock = screen.getByLabelText( 'Block: Cover' );
+			expect( coverBlock ).toHaveAttribute(
+				'data-url',
+				TEST_RESOLVED_URL
+			);
+			expect(
+				// eslint-disable-next-line testing-library/no-node-access
+				coverBlock.querySelector(
+					'img.wp-block-cover__image-background'
+				)
+			).toHaveAttribute( 'src', TEST_RESOLVED_URL );
+			expect( coverBlock ).toHaveClass( 'has-parallax' );
+			expect( coverBlock ).toHaveClass( 'is-repeated' );
+
+			// effectiveDimRatio=50 → dimRatioToClass(50) is null; assert the
+			// absence of -100 that the raw stored dimRatio would have caused.
+			// eslint-disable-next-line testing-library/no-node-access
+			const overlay = coverBlock.querySelector(
+				'.wp-block-cover__background'
+			);
+			expect( overlay ).toHaveClass( 'has-background-dim' );
+			expect( overlay ).not.toHaveClass( 'has-background-dim-100' );
+		} );
+
+		test( 'observer fires `getMediaColor` exactly once per dynamic media URL on mount', async () => {
+			// DC-1 precondition: a single mount fires the observer once for
+			// the resolved dynamic URL. Pending promise avoids "update not
+			// wrapped in act" warnings from the post-await flush.
+			const URL_A = TEST_RESOLVED_URL;
+			const pending = new Promise( () => {} );
+			getMediaColor.mockImplementation( ( url ) =>
+				url === URL_A ? pending : Promise.resolve( '#888888' )
+			);
+
+			await setup( {
+				url: URL_A,
+				backgroundType: 'image',
+				dimRatio: 70,
+				metadata: {
+					bindings: {
+						id: { source: TEST_SOURCE },
+						url: { source: TEST_SOURCE },
+					},
+				},
+			} );
+
+			// Filter to URL_A — harness may incidentally call with undefined.
+			expect(
+				getMediaColor.mock.calls.filter( ( [ u ] ) => u === URL_A )
+			).toHaveLength( 1 );
+		} );
+
+		test( 'observer ignores static media URLs handled by selection callbacks', async () => {
+			const URL_A = 'http://localhost/static-image.jpg';
+			getMediaColor.mockResolvedValue( '#888888' );
+
+			await setup( {
+				url: URL_A,
+				backgroundType: 'image',
+				dimRatio: 70,
+			} );
+
+			expect(
+				getMediaColor.mock.calls.filter( ( [ u ] ) => u === URL_A )
+			).toHaveLength( 0 );
 		} );
 	} );
 } );
