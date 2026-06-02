@@ -106,7 +106,7 @@
 		"docs:api-ref": "npm run --workspace @wordpress/docs-tools docs:api-ref --",
 		"docs:blocks": "npm run --workspace @wordpress/docs-tools docs:blocks --",
 		"docs:build": "npm-run-all docs:components docs:gen docs:blocks docs:api-ref docs:theme-ref",
-		"docs:check-api-docs-unstaged": "node ./tools/docs/are-api-docs-unstaged.js",
+		"docs:check-api-docs-unstaged": "npm run --workspace @wordpress/docs-tools docs:check-api-docs-unstaged --",
 		"docs:components": "npm run --workspace @wordpress/docs-tools docs:components --",
 		"docs:gen": "npm run --workspace @wordpress/docs-tools docs:gen --",
 		"docs:theme-ref": "npm run --workspace @wordpress/docs-tools docs:theme-ref --",
@@ -211,7 +211,7 @@
 			"npm run docs:api-ref",
 			"npm run docs:blocks",
 			"npm run docs:theme-ref",
-			"node ./tools/docs/are-api-docs-unstaged.js"
+			"npm run docs:check-api-docs-unstaged"
 		],
 		"packages/icons/src/library/*": [
 			"npm run -w packages/icons build"
