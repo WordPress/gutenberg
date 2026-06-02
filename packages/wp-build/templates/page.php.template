@@ -135,7 +135,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	}
 
 	/**
-	 * Fires for {{PAGE_SLUG}} page extensions to register routes and menu items.
+	 * Fires when the {{PAGE_SLUG}} page is initialized so extensions can register routes and menu items.
 	 */
 	do_action( '{{PAGE_SLUG}}_init' );
 

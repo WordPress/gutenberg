@@ -135,7 +135,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 	$build_constants = require __DIR__ . '/../../constants.php';
 
 	/**
-	 * Fires as the {{PAGE_SLUG}} screen is initialized.
+	 * Fires when the {{PAGE_SLUG}} admin page is initialized so extensions can register routes and menu items.
 	 */
 	do_action( '{{PAGE_SLUG}}-wp-admin_init' );
 
