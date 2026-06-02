@@ -1,1 +1,1 @@
-export { WidgetRender } from './widget-render';
+export { DashboardWidgetRender } from './widget-render';

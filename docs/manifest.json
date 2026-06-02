@@ -2238,12 +2238,6 @@
 		"parent": "data"
 	},
 	{
-		"title": "The NUX (New User Experience) Data",
-		"slug": "data-core-nux",
-		"markdown_source": "../docs/reference-guides/data/data-core-nux.md",
-		"parent": "data"
-	},
-	{
 		"title": "Preferences",
 		"slug": "data-core-preferences",
 		"markdown_source": "../docs/reference-guides/data/data-core-preferences.md",

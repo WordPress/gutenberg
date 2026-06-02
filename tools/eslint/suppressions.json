@@ -1660,7 +1660,7 @@
 			"count": 3
 		}
 	},
-	"routes/dashboard/widget-dashboard/components/widget-chrome/widget-chrome.tsx": {
+	"routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -1854,6 +1854,11 @@
 	"storybook/stories/playground/with-undo-redo/index.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
+		}
+	},
+	"widgets/events/components/location-picker/location-picker.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 5
 		}
 	},
 	"widgets/quick-draft/components/drafts-list/drafts-list.tsx": {
