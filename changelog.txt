@@ -1,5 +1,44 @@
 == Changelog ==
 
+= 23.3.0-rc.2 =
+
+## Changelog
+
+### Enhancements
+
+#### Block Library
+- Hide Cover overlay controls for viewport states. ([78763](https://github.com/WordPress/gutenberg/pull/78763))
+- Hide image dimension tools when a state is selected. ([78670](https://github.com/WordPress/gutenberg/pull/78670))
+
+#### Media
+- Image cropper: Round zoom control values and display as percentages. ([78757](https://github.com/WordPress/gutenberg/pull/78757))
+- Media Editor: Remove resize handles toggle from crop panel. ([78758](https://github.com/WordPress/gutenberg/pull/78758))
+
+### Bug Fixes
+
+#### Block Editor
+- Unset grid span defaults with viewport states enabled. ([78709](https://github.com/WordPress/gutenberg/pull/78709))
+
+### Accessibility
+
+#### Post Editor
+- Image Editor: Focus return after closing image crop modal. ([78711](https://github.com/WordPress/gutenberg/pull/78711))
+
+### Experiments
+
+#### Media
+- Media Editor Modal: Try placing the save and cancel buttons in the footer. ([78708](https://github.com/WordPress/gutenberg/pull/78708))
+
+### Tools
+
+#### Build Tooling
+- Update browserslist. ([78840](https://github.com/WordPress/gutenberg/pull/78840))
+
+#### Testing
+- e2e-test-utils-playwright: Add src to published NPM files. ([78847](https://github.com/WordPress/gutenberg/pull/78847))
+- Tests: Temporarily disable REST index output-format assertions pending Core fix. ([78788](https://github.com/WordPress/gutenberg/pull/78788))
+
+
 = 23.3.0-rc.1 =
 
 ## Changelog
