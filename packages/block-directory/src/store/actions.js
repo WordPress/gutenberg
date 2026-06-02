@@ -91,16 +91,20 @@ export const installBlockType =
 				'title',
 				'category',
 				'parent',
+				'ancestor',
 				'icon',
 				'description',
 				'keywords',
 				'attributes',
 				'provides_context',
 				'uses_context',
+				'selectors',
 				'supports',
 				'styles',
 				'example',
 				'variations',
+				'allowed_blocks',
+				'block_hooks',
 			];
 			await apiFetch( {
 				path: addQueryArgs( `/wp/v2/block-types/${ name }`, {

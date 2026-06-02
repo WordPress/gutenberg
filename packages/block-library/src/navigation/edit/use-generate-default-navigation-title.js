@@ -50,12 +50,12 @@ export default function useGenerateDefaultNavigationTitle( clientId ) {
 
 		const title = area
 			? sprintf(
-					// translators: %s: the name of a menu (e.g. Header navigation).
-					__( '%s navigation' ),
+					// translators: %s: the name of a menu (e.g. Header menu).
+					__( '%s menu' ),
 					area
 			  )
-			: // translators: 'navigation' as in website navigation.
-			  __( 'Navigation' );
+			: // translators: 'menu' as in website navigation menu.
+			  __( 'Menu' );
 
 		// Determine how many menus start with the automatic title.
 		const matchingMenuTitleCount = [

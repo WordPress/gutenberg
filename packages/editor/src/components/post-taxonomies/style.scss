@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-taxonomies__hierarchical-terms-list {
 	max-height: 14em;
 	overflow: auto;

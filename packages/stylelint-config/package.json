@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "23.7.0",
+	"version": "23.38.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -33,13 +33,26 @@
 		"stylistic.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./scss": "./scss.js",
+		"./scss-stylistic": "./scss-stylistic.js",
+		"./stylistic": "./stylistic.js",
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
 		"@stylistic/stylelint-plugin": "^3.0.1",
+		"@wordpress/theme": "file:../theme",
 		"stylelint-config-recommended": "^14.0.1",
 		"stylelint-config-recommended-scss": "^14.1.0"
 	},
+	"devDependencies": {
+		"stylelint": "^16.8.2",
+		"stylelint-scss": "^6.4.0"
+	},
 	"peerDependencies": {
-		"stylelint": "^16.8.2"
+		"stylelint": "^16.8.2",
+		"stylelint-scss": "^6.4.0"
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",

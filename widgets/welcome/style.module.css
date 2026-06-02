@@ -1,0 +1,33 @@
+.root {
+	container-type: size;
+	height: 100%;
+}
+
+.columns {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: var(--wpds-dimension-gap-2xl);
+	flex: 1;
+	align-items: center;
+	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
+	margin: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
+}
+
+@container (max-width: 420px) {
+	.columns {
+		padding: var(--wpds-dimension-padding-lg);
+		margin: 0;
+	}
+}
+
+@container (max-height: 320px) {
+	.columns {
+		padding: var(--wpds-dimension-padding-lg);
+		margin: 0;
+	}
+}
+
+.wide .columns {
+	padding: var(--wpds-dimension-padding-2xl);
+	margin: 0;
+}

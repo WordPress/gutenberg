@@ -75,7 +75,6 @@ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
-export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
 export { Divider as __experimentalDivider } from './divider';
@@ -219,6 +218,12 @@ export {
 	useSlot as __experimentalUseSlot,
 	useSlotFills as __experimentalUseSlotFills,
 } from './slot-fill';
+export type {
+	SlotKey,
+	SlotComponentProps,
+	FillComponentProps,
+	DistributiveOmit,
+} from './slot-fill/types';
 export { default as __experimentalStyleProvider } from './style-provider';
 export { ZStack as __experimentalZStack } from './z-stack';
 

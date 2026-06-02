@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
@@ -61,7 +62,7 @@ const variations = [
 	},
 	{
 		name: 'wp-privacy-form',
-		title: __( 'Experimental privacy request form' ),
+		title: __( 'Experimental Privacy Request Form' ),
 		keywords: [ 'GDPR' ],
 		description: __( 'A form to request data exports and/or deletion.' ),
 		attributes: {

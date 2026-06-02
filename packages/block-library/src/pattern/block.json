@@ -2,13 +2,14 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/pattern",
-	"title": "Pattern placeholder",
+	"title": "Pattern Placeholder",
 	"category": "theme",
 	"description": "Show a block pattern.",
 	"supports": {
 		"html": false,
 		"inserter": false,
 		"renaming": false,
+		"visibility": false,
 		"interactivity": {
 			"clientNavigation": true
 		}

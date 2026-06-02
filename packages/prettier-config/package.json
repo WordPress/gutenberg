@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/prettier-config",
-	"version": "4.15.0",
+	"version": "4.46.0",
 	"description": "WordPress Prettier shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,14 @@
 		"lib/index.js"
 	],
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
+	"devDependencies": {
+		"@types/node": "^20.19.39"
+	},
 	"peerDependencies": {
 		"prettier": ">=3"
 	},

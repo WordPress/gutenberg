@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/term-count",
+		"isValid": true,
+		"attributes": {
+			"bracketType": "round"
+		},
+		"innerBlocks": []
+	}
+]

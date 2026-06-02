@@ -22,9 +22,9 @@ import { store as editorStore } from '../../store';
  *   is focusing on editing page content and double clicks on a disabled
  *   template block.
  *
- * @param {Object}                                 props
- * @param {import('react').RefObject<HTMLElement>} props.contentRef Ref to the block
- *                                                                  editor iframe canvas.
+ * @param {Object}                       props
+ * @param {React.RefObject<HTMLElement>} props.contentRef Ref to the block
+ *                                                        editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
 	const { onNavigateToEntityRecord, templateId } = useSelect( ( select ) => {
@@ -94,7 +94,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			size="medium"
 		>
 			{ __(
-				'You’ve tried to select a block that is part of a template, which may be used on other posts and pages. Would you like to edit the template?'
+				'You’ve tried to select a block that is part of a template that may be used elsewhere on your site. Would you like to edit the template?'
 			) }
 		</ConfirmDialog>
 	);

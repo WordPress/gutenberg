@@ -46,9 +46,28 @@ const migrateWithLayout = ( attributes ) => {
 	return updatedAttributes;
 };
 
-const v6 = {
+const migrateOpenSubmenusOnClick = ( attributes ) => {
+	const { openSubmenusOnClick, ...restAttributes } = attributes;
+
+	// Don't migrate if openSubmenusOnClick doesn't exist
+	if ( openSubmenusOnClick === null || openSubmenusOnClick === undefined ) {
+		return attributes;
+	}
+
+	// Always remove openSubmenusOnClick
+	// If submenuVisibility already exists, keep it; otherwise set based on openSubmenusOnClick
+	return {
+		...restAttributes,
+		submenuVisibility:
+			restAttributes.submenuVisibility ??
+			( openSubmenusOnClick ? 'click' : 'hover' ),
+	};
+};
+
+// v7: Migrate openSubmenusOnClick to submenuVisibility
+const v7 = {
 	attributes: {
-		navigationMenuId: {
+		ref: {
 			type: 'number',
 		},
 		textColor: {
@@ -76,6 +95,115 @@ const v6 = {
 		openSubmenusOnClick: {
 			type: 'boolean',
 			default: false,
+		},
+		overlayMenu: {
+			type: 'string',
+			default: 'mobile',
+		},
+		icon: {
+			type: 'string',
+			default: 'handle',
+		},
+		hasIcon: {
+			type: 'boolean',
+			default: true,
+		},
+		__unstableLocation: {
+			type: 'string',
+		},
+		overlayBackgroundColor: {
+			type: 'string',
+		},
+		customOverlayBackgroundColor: {
+			type: 'string',
+		},
+		overlayTextColor: {
+			type: 'string',
+		},
+		customOverlayTextColor: {
+			type: 'string',
+		},
+		maxNestingLevel: {
+			type: 'number',
+			default: 5,
+		},
+		templateLock: {
+			type: [ 'string', 'boolean' ],
+			enum: [ 'all', 'insert', 'contentOnly', false ],
+		},
+	},
+	supports: {
+		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		inserter: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalTextTransform: true,
+			__experimentalFontFamily: true,
+			__experimentalLetterSpacing: true,
+			__experimentalTextDecoration: true,
+			__experimentalSkipSerialization: [ 'textDecoration' ],
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		spacing: {
+			blockGap: true,
+			units: [ 'px', 'em', 'rem', 'vh', 'vw' ],
+			__experimentalDefaultControls: {
+				blockGap: true,
+			},
+		},
+		layout: {
+			allowSwitching: false,
+			allowInheriting: false,
+			allowVerticalAlignment: false,
+			allowSizingOnChildren: true,
+			default: {
+				type: 'flex',
+			},
+		},
+		interactivity: true,
+		renaming: false,
+	},
+	save() {
+		return <InnerBlocks.Content />;
+	},
+	isEligible: ( { openSubmenusOnClick } ) =>
+		openSubmenusOnClick !== null && openSubmenusOnClick !== undefined,
+	migrate: migrateOpenSubmenusOnClick,
+};
+
+const v6 = {
+	attributes: {
+		navigationMenuId: {
+			type: 'number',
+		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
+		rgbTextColor: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		customBackgroundColor: {
+			type: 'string',
+		},
+		rgbBackgroundColor: {
+			type: 'string',
+		},
+		showSubmenuIcon: {
+			type: 'boolean',
+			default: true,
 		},
 		overlayMenu: {
 			type: 'string',
@@ -224,7 +352,11 @@ const v5 = {
 	},
 	isEligible: ( { itemsJustification, orientation } ) =>
 		!! itemsJustification || !! orientation,
-	migrate: compose( migrateIdToRef, migrateWithLayout ),
+	migrate: compose(
+		migrateIdToRef,
+		migrateWithLayout,
+		migrateOpenSubmenusOnClick
+	),
 };
 
 const v4 = {
@@ -307,7 +439,12 @@ const v4 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	migrate: compose( migrateIdToRef, migrateWithLayout, migrateFontFamily ),
+	migrate: compose(
+		migrateIdToRef,
+		migrateWithLayout,
+		migrateFontFamily,
+		migrateOpenSubmenusOnClick
+	),
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
 	},
@@ -349,6 +486,7 @@ const migrateTypographyPresets = function ( attributes ) {
 };
 
 const deprecated = [
+	v7,
 	v6,
 	v5,
 	v4,
@@ -430,7 +568,8 @@ const deprecated = [
 			migrateIdToRef,
 			migrateWithLayout,
 			migrateFontFamily,
-			migrateIsResponsive
+			migrateIsResponsive,
+			migrateOpenSubmenusOnClick
 		),
 		save() {
 			return <InnerBlocks.Content />;

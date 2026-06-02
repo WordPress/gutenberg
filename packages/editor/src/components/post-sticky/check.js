@@ -11,10 +11,10 @@ import { store as editorStore } from '../../store';
 /**
  * Wrapper component that renders its children only if post has a sticky action.
  *
- * @param {Object}             props          Props.
- * @param {React.ReactElement} props.children Children to be rendered.
+ * @param {Object}          props          Props.
+ * @param {React.ReactNode} props.children Children to be rendered.
  *
- * @return {React.ReactElement} The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
+ * @return {React.ReactNode} The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
  */
 export default function PostStickyCheck( { children } ) {
 	const { hasStickyAction, postType } = useSelect( ( select ) => {

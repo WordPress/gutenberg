@@ -5,6 +5,7 @@ import {
 	SelectControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
@@ -87,10 +88,9 @@ export default function ImageSizeControl( {
 	} );
 
 	return (
-		<>
+		<VStack className="block-editor-image-size-control" spacing="4">
 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
-					__nextHasNoMarginBottom
 					label={ __( 'Resolution' ) }
 					value={ slug }
 					options={ imageSizeOptions }
@@ -100,10 +100,9 @@ export default function ImageSizeControl( {
 				/>
 			) }
 			{ isResizable && (
-				<div className="block-editor-image-size-control">
-					<HStack align="baseline" spacing="3">
+				<>
+					<HStack align="baseline" spacing="4">
 						<NumberControl
-							className="block-editor-image-size-control__width"
 							label={ __( 'Width' ) }
 							value={ currentWidth }
 							min={ 1 }
@@ -113,7 +112,6 @@ export default function ImageSizeControl( {
 							size="__unstable-large"
 						/>
 						<NumberControl
-							className="block-editor-image-size-control__height"
 							label={ __( 'Height' ) }
 							value={ currentHeight }
 							min={ 1 }
@@ -130,7 +128,6 @@ export default function ImageSizeControl( {
 						value={ selectedValue }
 						isBlock
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					>
 						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
 							return (
@@ -138,7 +135,7 @@ export default function ImageSizeControl( {
 									key={ scale }
 									value={ scale }
 									label={ sprintf(
-										/* translators: Percentage value. */
+										/* translators: %d: Percentage value. */
 										__( '%d%%' ),
 										scale
 									) }
@@ -146,8 +143,8 @@ export default function ImageSizeControl( {
 							);
 						} ) }
 					</ToggleGroupControl>
-				</div>
+				</>
 			) }
-		</>
+		</VStack>
 	);
 }

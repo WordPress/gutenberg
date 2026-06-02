@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ForwardedRef, ReactChild, ReactNode } from 'react';
+import type { ForwardedRef, ReactElement, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ type ContextConnectOptions = {
  * @return The connected WordPressComponent
  */
 export function contextConnect<
-	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
+	C extends ( props: any, ref: ForwardedRef< any > ) => ReactNode,
 >(
 	Component: C &
 		AcceptsTwoArgs<
@@ -55,7 +55,7 @@ export function contextConnect<
  * @return The connected WordPressComponent
  */
 export function contextConnectWithoutRef< P >(
-	Component: ( props: P ) => JSX.Element | null,
+	Component: ( props: P ) => ReactNode,
 	namespace: string
 ) {
 	return _contextConnect( Component, namespace );
@@ -65,7 +65,7 @@ export function contextConnectWithoutRef< P >(
 // The hope is that we can improve render performance by removing functional
 // component wrappers.
 function _contextConnect<
-	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
+	C extends ( props: any, ref: ForwardedRef< any > ) => ReactNode,
 	O extends ContextConnectOptions,
 >(
 	Component: C,
@@ -114,7 +114,7 @@ function _contextConnect<
  * @return The connected namespaces.
  */
 export function getConnectNamespace(
-	Component: ReactChild | undefined | {}
+	Component: ReactElement | number | string | undefined | {}
 ): string[] {
 	if ( ! Component ) {
 		return [];

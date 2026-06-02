@@ -32,7 +32,8 @@ import {
 	getNavigationMenus,
 } from './menus';
 import { deleteAllPages, createPage } from './pages';
-import { resetPreferences } from './preferences';
+import { createRecord } from './records';
+import { resetPreferences, setPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
 import { deleteAllPatternCategories } from './patterns';
@@ -134,6 +135,10 @@ class RequestUtils {
 	getMaxBatchSize: typeof getMaxBatchSize = getMaxBatchSize.bind( this );
 	// .bind() drops the generic types. Re-casting it to keep the type signature.
 	batchRest: typeof batchRest = batchRest.bind( this ) as typeof batchRest;
+	// .bind() drops the generic types. Re-casting it to keep the type signature.
+	createRecord: typeof createRecord = createRecord.bind(
+		this
+	) as typeof createRecord;
 	/** @borrows getPluginsMap as this.getPluginsMap */
 	getPluginsMap: typeof getPluginsMap = getPluginsMap.bind( this );
 	/** @borrows activatePlugin as this.activatePlugin */
@@ -177,6 +182,8 @@ class RequestUtils {
 	createTemplate: typeof createTemplate = createTemplate.bind( this );
 	/** @borrows resetPreferences as this.resetPreferences */
 	resetPreferences: typeof resetPreferences = resetPreferences.bind( this );
+	/** @borrows setPreferences as this.setPreferences */
+	setPreferences: typeof setPreferences = setPreferences.bind( this );
 	/** @borrows listMedia as this.listMedia */
 	listMedia: typeof listMedia = listMedia.bind( this );
 	/** @borrows uploadMedia as this.uploadMedia */

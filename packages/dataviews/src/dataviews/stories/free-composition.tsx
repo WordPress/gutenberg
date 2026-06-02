@@ -1,0 +1,186 @@
+/**
+ * WordPress dependencies
+ */
+import {
+	useState,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
+import {
+	__experimentalHeading as Heading,
+	__experimentalText as WCText,
+	Button,
+} from '@wordpress/components';
+import { __, _n } from '@wordpress/i18n';
+import { Card, Stack } from '@wordpress/ui';
+
+/**
+ * Internal dependencies
+ */
+import DataViews from '../index';
+import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
+import type { View } from '../../types';
+import { actions, data, fields, type SpaceObject } from './fixtures';
+import { LAYOUT_TABLE } from '../../constants';
+
+/**
+ * Custom composition example
+ */
+function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
+	const moons = planets.reduce( ( sum, item ) => sum + item.satellites, 0 );
+
+	return (
+		<>
+			<Heading className="free-composition-heading" level={ 2 }>
+				{ __( 'Solar System numbers' ) }
+			</Heading>
+			<div className="free-composition-header">
+				<Stack direction="column" gap="lg">
+					<Stack direction="row" justify="start" gap="sm">
+						<DataViews.Search label={ __( 'Search content' ) } />
+						<DataViews.FiltersToggle />
+						<Stack
+							direction="row"
+							justify="end"
+							gap="sm"
+							style={ { flex: 1 } }
+						>
+							<DataViews.ViewConfig />
+							<DataViews.LayoutSwitcher />
+						</Stack>
+					</Stack>
+					<DataViews.FiltersToggled />
+					<Card.Root>
+						<Card.Content>
+							<Stack direction="column" gap="sm">
+								<WCText size={ 18 } as="p">
+									{ createInterpolateElement(
+										_n(
+											'<PlanetsNumber /> planet',
+											'<PlanetsNumber /> planets',
+											planets.length
+										),
+										{
+											PlanetsNumber: (
+												<strong>
+													{ planets.length }{ ' ' }
+												</strong>
+											),
+										}
+									) }
+								</WCText>
+
+								<WCText size={ 18 } as="p">
+									{ createInterpolateElement(
+										_n(
+											'<SatellitesNumber /> moon',
+											'<SatellitesNumber /> moons',
+											moons
+										),
+										{
+											SatellitesNumber: (
+												<strong>{ moons } </strong>
+											),
+										}
+									) }
+								</WCText>
+							</Stack>
+						</Card.Content>
+					</Card.Root>
+					<Card.Root style={ { width: '100%' } }>
+						<Card.Content>
+							<Stack
+								direction="row"
+								justify="space-between"
+								align="center"
+								gap="sm"
+							>
+								<DataViews.BulkActionToolbar />
+								<DataViews.Pagination />
+							</Stack>
+						</Card.Content>
+					</Card.Root>
+				</Stack>
+			</div>
+			<DataViews.Layout className="free-composition-dataviews-layout" />
+		</>
+	);
+}
+
+/**
+ * Demonstrates how to build a custom layout using DataViews sub-components.
+ *
+ * Instead of using the default DataViews UI, this story shows how to:
+ * - Use `<DataViews>` as a context provider (wrapping custom children)
+ * - Compose your own layout with built-in sub-components:
+ *   - `<DataViews.Search />` - Search input
+ *   - `<DataViews.FiltersToggle />` - Button to show/hide filters
+ *   - `<DataViews.FiltersToggled />` - The filter UI itself
+ *   - `<DataViews.Pagination />` - Page navigation
+ *   - `<DataViews.ViewConfig />` - View settings (columns, density, etc.)
+ *   - `<DataViews.LayoutSwitcher />` - Switch between table/grid/list views
+ *   - `<DataViews.BulkActionToolbar />` - Actions for selected items
+ *   - `<DataViews.Layout />` - The data display (table, grid, etc.)
+ *
+ * This pattern is useful when you need full control over the UI layout
+ * while still leveraging DataViews' data management and state handling.
+ */
+export const FreeCompositionComponent = () => {
+	const [ view, setView ] = useState< View >( {
+		type: LAYOUT_TABLE,
+		search: '',
+		page: 1,
+		perPage: 20,
+		layout: {
+			enableMoving: false,
+		},
+		filters: [],
+		fields: [ 'categories' ],
+		titleField: 'title',
+		descriptionField: 'description',
+		mediaField: 'image',
+	} );
+
+	const { data: processedData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+
+	const planets = processedData.filter( ( item ) =>
+		item.categories.includes( 'Planet' )
+	);
+
+	return (
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ processedData }
+			view={ view }
+			fields={ fields }
+			actions={ actions }
+			onChangeView={ setView }
+			defaultLayouts={ {
+				table: true,
+				grid: true,
+			} }
+			empty={
+				<Stack
+					direction="column"
+					gap="sm"
+					justify="space-around"
+					align="center"
+					className="free-composition-dataviews-empty"
+				>
+					<WCText size={ 18 } as="p">
+						No planets
+					</WCText>
+					<WCText variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</WCText>
+					<Button variant="secondary">Create new planet</Button>
+				</Stack>
+			}
+		>
+			<PlanetOverview planets={ planets } />
+		</DataViews>
+	);
+};
+
+export default FreeCompositionComponent;

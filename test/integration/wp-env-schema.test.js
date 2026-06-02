@@ -12,6 +12,7 @@ import wpEnvJsonFile from '../../.wp-env.json';
 describe( '.wp-env.json schema', () => {
 	const ajv = new Ajv( {
 		allowMatchingProperties: true,
+		allowUnionTypes: true,
 	} );
 
 	test( 'strictly adheres to the draft-07 meta schema', () => {

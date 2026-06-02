@@ -75,7 +75,7 @@ wp.blocks.registerBlockVariation(
 
 For scripts that need to run in the Block Editor, make sure you use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) function.
 
-Refer to [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md) for more information. You can also visit the [block-development-example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php) GitHub repository for more practical examples.
+Refer to [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md) for more information.
 
 <div class="callout callout-tip">
     Open your browser's dev tools and try running <code>wp.data.select('core/editor').getBlocks()</code> in the console when editing a post or when using the Site Editor. This command will return all available blocks.

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import FormTokenField from '../';
 
 const meta: Meta< typeof FormTokenField > = {
+	tags: [ 'manifest' ],
 	component: FormTokenField,
 	title: 'Components/Selection & Input/Common/FormTokenField',
 	id: 'components-formtokenfield',
@@ -24,12 +25,18 @@ const meta: Meta< typeof FormTokenField > = {
 		__experimentalValidateInput: {
 			control: false,
 		},
+		help: { control: 'text' },
 	},
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SearchableChipSelect` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -50,6 +57,7 @@ const DefaultTemplate: StoryFn< typeof FormTokenField > = ( { ...args } ) => {
 
 	return (
 		<FormTokenField
+			__next40pxDefaultSize
 			{ ...args }
 			value={ selectedContinents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
@@ -63,7 +71,6 @@ export const Default: StoryFn< typeof FormTokenField > = DefaultTemplate.bind(
 Default.args = {
 	label: 'Type a continent',
 	suggestions: continents,
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 };
 
@@ -91,6 +98,7 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
 
 	return (
 		<FormTokenField
+			__next40pxDefaultSize
 			{ ...args }
 			value={ selectedContinents }
 			suggestions={ availableContinents }
@@ -102,7 +110,6 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
 Async.args = {
 	label: 'Type a continent',
 	suggestions: continents,
-	__nextHasNoMarginBottom: true,
 	__next40pxDefaultSize: true,
 };
 
@@ -115,28 +122,36 @@ DropdownSelector.args = {
 };
 
 /**
- * The rendered output of each suggestion can be customized by passing a
- * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
- * and is subject to change.)
+ * The rendered content of each token can be customized by passing a
+ * render function to the `displayTransform` prop.
+ *
+ * Similarly, each suggestion can be customized by passing a
+ * render function to the `__experimentalRenderItem` prop. (This is still an
+ * experimental feature and is subject to change.)
  */
-export const WithCustomRenderItem: StoryFn< typeof FormTokenField > =
+export const WithCustomRenderedItems: StoryFn< typeof FormTokenField > =
 	DefaultTemplate.bind( {} );
-WithCustomRenderItem.args = {
+WithCustomRenderedItems.args = {
 	...Default.args,
+	displayTransform: ( token ) => `📍 ${ token }`,
 	__experimentalRenderItem: ( { item } ) => (
 		<div>{ `${ item } — a nice place to visit` }</div>
 	),
+	__experimentalExpandOnFocus: true,
 };
 
 /**
  * Only values for which the `__experimentalValidateInput` function returns
  * `true` will be tokenized. (This is still an experimental feature and is
  * subject to change.)
+ *
+ * In this example, the user can only add tokens that are already in the list.
  */
-export const WithValidatedInput: StoryFn< typeof FormTokenField > =
+export const ValidateNewTokens: StoryFn< typeof FormTokenField > =
 	DefaultTemplate.bind( {} );
-WithValidatedInput.args = {
+ValidateNewTokens.args = {
 	...Default.args,
 	__experimentalValidateInput: ( input: string ) =>
 		continents.includes( input ),
+	__experimentalExpandOnFocus: true,
 };

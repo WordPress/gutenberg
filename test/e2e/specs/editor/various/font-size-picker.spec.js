@@ -31,7 +31,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 
 			await page.keyboard.type( '23' );
 
@@ -54,7 +54,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 			await page.keyboard.type( '23' );
 
 			await expect.poll( editor.getEditedPostContent )
@@ -214,7 +214,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
@@ -299,7 +299,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
-			await page.click( 'role=spinbutton[name="Custom"i]' );
+			await page.click( 'role=spinbutton[name="Font size"i]' );
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 

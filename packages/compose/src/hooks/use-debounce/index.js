@@ -31,7 +31,7 @@ import { debounce } from '../../utils/debounce';
 export default function useDebounce( fn, wait, options ) {
 	const debounced = useMemoOne(
 		() => debounce( fn, wait ?? 0, options ),
-		[ fn, wait, options ]
+		[ fn, wait, options?.leading, options?.trailing, options?.maxWait ]
 	);
 	useEffect( () => () => debounced.cancel(), [ debounced ] );
 	return debounced;

@@ -80,9 +80,9 @@ The following configurable variables are used with the template files. Template 
 
 -   `pluginURI` (no default) – the home page of the plugin.
 -   `version` (default: `'0.1.0'`) – the current version number of the plugin.
--   `requiresAtLeast` (default: `'6.7'`) – the lowest WordPress version that the plugin will work on.
+-   `requiresAtLeast` (default: `'6.8'`) – the lowest WordPress version that the plugin will work on.
 -   `requiresPHP` (default: `'7.4'`) – the minimum required PHP version for use with this plugin.
--   `testedUpTo` (default: `'6.7'`) – the highest WordPress version that the plugin has been tested against.
+-   `testedUpTo` (default: `'6.8'`) – the highest WordPress version that the plugin has been tested against.
 -   `author` (default: `'The WordPress Contributors'`) – the name of the plugin author(s).
 -   `license` (default: `'GPL-2.0-or-later'`) – the short name of the plugin’s license.
 -   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`) – a link to the full text of the license.
@@ -171,4 +171,29 @@ This content is only rendered if `--variant primary` is passed.
 This content is only rendered if `--variant secondary` is passed.
 {{/isSecondaryVariant}}
 
+```
+
+Variants can also define their own files by defining `pluginTemplatesPath`, `blockTemplatesPath`, or `assetsPath`. If these are defined, they will override the paths defined by the project template. In the case that a variant doesn't need some of the files defined by the template, `null` can be passed to the appropriate variable to skip scaffolding those files.
+
+```js
+module.exports = {
+	defaultValues: {
+		slug: 'my-fantastic-block',
+		title: 'My fantastic block',
+		dashicon: 'palmtree',
+		version: '1.2.3',
+	},
+	variants: {
+		primary: {},
+		secondary: {
+			title: 'My fantastic block - secondary variant',
+			blockTemplatesPath: join(
+				__dirname,
+				'custom-path',
+				'block-templates'
+			),
+			assetsPath: null, // Will not scaffold any assets files even if defined by the main template.
+		},
+	},
+};
 ```

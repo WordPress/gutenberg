@@ -9,13 +9,12 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── CONTRIBUTING.md
     │
     ├── .editorconfig
-    ├── .eslintignore
-    ├── .eslintrc
+    ├── eslint.config.cjs
+    ├── eslint.config.strict.cjs
     ├── .jshintignore
-    ├── .eslintignore
     ├── .prettierrc.js
     ├── .stylelintignore
-    ├── .stylelintrc.json
+    ├── .stylelintrc.js
     ├── .markdownlintignore
     ├── .npmpackagejsonlintrc.json
     ├── phpcs.xml.dist
@@ -66,8 +65,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── bin/packages
     │   Set of scripts used to build the WordPress packages.
     │
-    ├── bin/plugin
-    │   Tool use to perform the Gutenberg plugin release and the npm releases as well.
+    ├── tools/release
+    │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.
     │
     ├── docs/tool
     │   Tool used to generate the Block editor handbook's markdown pages.
@@ -76,8 +75,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
     │
     ├── platform-docs
-    │   Documentation website targeted to non WordPress developers 
-    │   using Gutenberg in their own applications. 
+    │   Documentation website targeted to non WordPress developers
+    │   using Gutenberg in their own applications.
     │   Deployed on [https://wordpress.org/gutenberg-framework/](https://wordpress.org/gutenberg-framework/).
     │
     │
@@ -85,7 +84,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   PHP Source code of the Gutenberg plugin.
     │
     ├── lib/compact/wordpress-x.x
-    │   PHP code that was include in WordPress ont the WordPrexx X.X version.
+    │   PHP code that was include in WordPress ont the WordPress X.X version.
     │   It is kept to ensure plugin compatibility with older WordPress versions.
     │
     ├── packages
@@ -114,7 +113,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── packages/{packageName}/src/**/{ComponentName}/style.scss
     │   Style entry point for a given component.
     │
-    ├── packages/{packageName}/src/**/{ComponentName}/stories/*.js
+    ├── packages/{packageName}/src/**/{ComponentName}/stories/*.jsx
     │   Component Stories to load on the Gutenberg storybook.
     │
     ├── phpunit

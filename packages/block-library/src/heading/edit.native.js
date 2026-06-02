@@ -32,7 +32,14 @@ function HeadingEdit( {
 	style,
 	clientId,
 } ) {
-	const { textAlign, content, level, placeholder, anchor } = attributes;
+	const {
+		content,
+		level,
+		placeholder,
+		anchor,
+		style: attributesStyle,
+	} = attributes;
+	const textAlign = attributesStyle?.typography?.textAlign;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -100,7 +107,15 @@ function HeadingEdit( {
 				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
+						setAttributes( {
+							style: {
+								...attributesStyle,
+								typography: {
+									...attributesStyle?.typography,
+									textAlign: nextAlign,
+								},
+							},
+						} );
 					} }
 				/>
 			</BlockControls>

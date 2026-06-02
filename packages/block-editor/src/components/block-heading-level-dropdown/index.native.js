@@ -11,7 +11,7 @@ import HeadingLevelIcon from './heading-level-icon';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 
-/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {React.ComponentType} ComponentType */
 
 /**
  * HeadingLevelDropdown props.

@@ -114,6 +114,7 @@ const hasPostCSSConfig = () =>
 const getWebpackArgs = () => {
 	// Gets all args from CLI without those prefixed with `--webpack`.
 	let webpackArgs = getArgsFromCLI( [
+		'--blocks-manifest',
 		'--experimental-modules',
 		'--source-path',
 		'--webpack',
@@ -144,6 +145,10 @@ const getWebpackArgs = () => {
 
 	if ( hasArgInCLI( '--webpack-no-externals' ) ) {
 		process.env.WP_NO_EXTERNALS = true;
+	}
+
+	if ( hasArgInCLI( '--blocks-manifest' ) ) {
+		process.env.WP_BLOCKS_MANIFEST = true;
 	}
 
 	const hasWebpackOutputOption =
@@ -267,7 +272,7 @@ function getWebpackEntryPoints( buildType ) {
 				// at which point they are completely empty and therefore not valid JSON
 				try {
 					parsedBlockJson = JSON.parse( fileContents );
-				} catch ( error ) {
+				} catch {
 					warn(
 						`Not scanning "${ blockMetadataFile.replace(
 							fromProjectRoot( sep ),
@@ -397,7 +402,7 @@ function getPhpFilePaths( context, props ) {
 		let parsedBlockJson;
 		try {
 			parsedBlockJson = JSON.parse( readFileSync( blockMetadataFile ) );
-		} catch ( error ) {
+		} catch {
 			warn(
 				`Not scanning "${ blockMetadataFile.replace(
 					fromProjectRoot( sep ),

@@ -22,9 +22,11 @@ directive(
 		evaluate,
 	} ) => {
 		const entry = showChildren.find( ( { suffix } ) => suffix === null );
-		return evaluate( entry )
-			? element
-			: cloneElement( element, { children: null } );
+		let result = evaluate( entry );
+		if ( typeof result === 'function' ) {
+			result = result();
+		}
+		return result ? element : cloneElement( element, { children: null } );
 	},
 	{ priority: 9 }
 );
