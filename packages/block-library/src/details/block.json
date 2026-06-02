@@ -5,7 +5,14 @@
 	"title": "Details",
 	"category": "text",
 	"description": "Hide and show additional content.",
-	"keywords": [ "summary", "toggle", "disclosure" ],
+	"keywords": [
+		"summary",
+		"toggle",
+		"disclosure",
+		"accordion",
+		"faq",
+		"collapse"
+	],
 	"textdomain": "default",
 	"attributes": {
 		"showContent": {
@@ -26,8 +33,13 @@
 		},
 		"placeholder": {
 			"type": "string"
+		},
+		"useDynamicContent": {
+			"type": "boolean",
+			"default": false
 		}
 	},
+	"usesContext": [ "postId", "postType", "queryId" ],
 	"supports": {
 		"__experimentalOnEnter": true,
 		"align": [ "wide", "full" ],
@@ -76,6 +88,7 @@
 		},
 		"allowedBlocks": true
 	},
+	"render": "file:./index.php",
 	"editorStyle": "wp-block-details-editor",
 	"style": "wp-block-details"
 }

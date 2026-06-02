@@ -14,10 +14,13 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	privateApis as componentsPrivateApis,
+	Placeholder,
+	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,15 +39,63 @@ const TEMPLATE = [
 	],
 ];
 
-function DetailsEdit( { attributes, setAttributes, clientId } ) {
-	const { name, showContent, summary, allowedBlocks, placeholder } =
-		attributes;
+function DetailsEdit( { attributes, setAttributes, clientId, context } ) {
+	const {
+		name,
+		showContent,
+		summary,
+		allowedBlocks,
+		placeholder,
+		useDynamicContent,
+	} = attributes;
+
+	const { postId, postType, queryId } = context;
+
+	// Check if we're inside a query loop
+	const isInQueryLoop = !! queryId;
+
+	// Fetch post data when inside query loop and dynamic content is enabled
+	const { postTitle, postContent, isLoading } = useSelect(
+		( select ) => {
+			if ( ! isInQueryLoop || ! useDynamicContent || ! postId ) {
+				return {
+					postTitle: null,
+					postContent: null,
+					isLoading: false,
+				};
+			}
+
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+
+			const post = getEntityRecord( 'postType', postType, postId );
+
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				postType,
+				postId,
+			] );
+
+			return {
+				postTitle: post?.title?.rendered || post?.title?.raw || '',
+				postContent:
+					post?.content?.rendered || post?.content?.raw || '',
+				isLoading: ! hasResolved,
+			};
+		},
+		[ isInQueryLoop, useDynamicContent, postId, postType ]
+	);
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		__experimentalCaptureToolbars: true,
 		allowedBlocks,
+		// Lock inner blocks when using dynamic content
+		templateLock: useDynamicContent ? 'all' : false,
+		renderAppender: useDynamicContent ? false : undefined,
 	} );
+
 	const [ isOpen, setIsOpen ] = useState( showContent );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -69,6 +120,19 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 		}
 	};
 
+	// Show loading state when fetching dynamic content
+	if ( useDynamicContent && isLoading ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder>
+					<Spinner />
+				</Placeholder>
+			</div>
+		);
+	}
+
+	const isDynamicMode = useDynamicContent && isInQueryLoop;
+
 	return (
 		<>
 			<InspectorControls>
@@ -77,6 +141,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 					resetAll={ () => {
 						setAttributes( {
 							showContent: false,
+							useDynamicContent: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -101,6 +166,31 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 							}
 						/>
 					</ToolsPanelItem>
+					{ isInQueryLoop && (
+						<ToolsPanelItem
+							isShownByDefault
+							label={ __( 'Use dynamic content' ) }
+							hasValue={ () => useDynamicContent }
+							onDeselect={ () => {
+								setAttributes( {
+									useDynamicContent: false,
+								} );
+							} }
+						>
+							<ToggleControl
+								label={ __( 'Use dynamic content' ) }
+								help={ __(
+									'Use post title as summary and post content as details body.'
+								) }
+								checked={ useDynamicContent }
+								onChange={ () =>
+									setAttributes( {
+										useDynamicContent: ! useDynamicContent,
+									} )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
@@ -117,7 +207,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				/>
 			</InspectorControls>
 			<details
-				{ ...innerBlocksProps }
+				{ ...( isDynamicMode ? blockProps : innerBlocksProps ) }
 				open={ isOpen || hasSelectedInnerBlock }
 				onToggle={ ( event ) => setIsOpen( event.target.open ) }
 				name={ name || '' }
@@ -126,20 +216,39 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }
 					onKeyUp={ handleSummaryKeyUp }
 				>
-					<RichText
-						identifier="summary"
-						aria-label={ __(
-							'Write summary. Press Enter to expand or collapse the details.'
-						) }
-						placeholder={ placeholder || __( 'Write summary…' ) }
-						withoutInteractiveFormatting
-						value={ summary }
-						onChange={ ( newSummary ) =>
-							setAttributes( { summary: newSummary } )
-						}
-					/>
+					{ isDynamicMode && postTitle ? (
+						<span
+							dangerouslySetInnerHTML={ {
+								__html: postTitle,
+							} }
+						/>
+					) : (
+						<RichText
+							identifier="summary"
+							aria-label={ __(
+								'Write summary. Press Enter to expand or collapse the details.'
+							) }
+							placeholder={
+								placeholder || __( 'Write summary…' )
+							}
+							withoutInteractiveFormatting
+							value={ summary }
+							onChange={ ( newSummary ) =>
+								setAttributes( { summary: newSummary } )
+							}
+						/>
+					) }
 				</summary>
-				{ innerBlocksProps.children }
+				{ isDynamicMode && postContent ? (
+					<div
+						className="wp-block-details__content"
+						dangerouslySetInnerHTML={ {
+							__html: postContent,
+						} }
+					/>
+				) : (
+					innerBlocksProps.children
+				) }
 			</details>
 		</>
 	);

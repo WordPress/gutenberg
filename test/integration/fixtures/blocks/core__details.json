@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"showContent": false,
-			"summary": "Details Summary"
+			"summary": "Details Summary",
+			"useDynamicContent": false
 		},
 		"innerBlocks": [
 			{
