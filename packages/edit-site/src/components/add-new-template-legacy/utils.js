@@ -560,7 +560,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
  *                                   button is clicked. Receives an object
  *                                   with `{ postFormats }` where `postFormats`
  *                                   is the array of available format template
- *                                   objects.
+ *                                   objects to choose from.
  * @return {{ entryPoint: Object|null, availableFormats: Object[] }} An object
  *   with `entryPoint` (the grid button, or `null` if nothing to show) and
  *   `availableFormats` (the list of format templates that can still be created).
@@ -625,8 +625,8 @@ export function usePostFormatMenuItems( onClickMenuItem ) {
 			description: __(
 				'Displays a post format archive for themes that support post formats.'
 			),
-			onClick: ( template ) => {
-				onClickMenuItem( { postFormats: availableFormats, template } );
+			onClick: () => {
+				onClickMenuItem( { postFormats: availableFormats } );
 			},
 		};
 	}, [ availableFormats, onClickMenuItem ] );

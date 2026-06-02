@@ -585,13 +585,10 @@ export interface PostFormatEntryPoint {
  * @param onClickMenuItem Callback invoked when the entry-point button is
  *                        clicked. Receives an object with `{ postFormats }`
  *                        where `postFormats` is the array of available format
- *                        template objects.
+ *                        template objects to choose from.
  */
 export function usePostFormatMenuItems(
-	onClickMenuItem: ( data: {
-		postFormats: PostFormatMenuItem[];
-		template: any;
-	} ) => void
+	onClickMenuItem: ( data: { postFormats: PostFormatMenuItem[] } ) => void
 ): {
 	entryPoint: PostFormatEntryPoint | null;
 	availableFormats: PostFormatMenuItem[];
@@ -658,8 +655,8 @@ export function usePostFormatMenuItems(
 			description: __(
 				'Displays a post format archive for themes that support post formats.'
 			),
-			onClick: ( template: any ) => {
-				onClickMenuItem( { postFormats: availableFormats, template } );
+			onClick: () => {
+				onClickMenuItem( { postFormats: availableFormats } );
 			},
 		};
 	}, [ availableFormats, onClickMenuItem ] );
