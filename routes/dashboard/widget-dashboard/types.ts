@@ -145,16 +145,16 @@ interface BaseWidgetGridSettings {
 
 /**
  * 2D packed grid settings. Items declare explicit width and height
- * spans; rows can be uniform-sized or content-sized via `rowHeight`.
+ * spans; rows use a uniform track height via `rowHeight`.
  */
 export interface WidgetGridLayoutSettings extends BaseWidgetGridSettings {
 	model?: 'grid';
 
 	/**
-	 * Row height in pixels, or `'auto'` to let the tallest item in
-	 * each row size it.
+	 * Row height in pixels (`200` small, `300` medium, `400` large). Every
+	 * tile in a row fills the row vertically.
 	 */
-	rowHeight?: number | 'auto';
+	rowHeight?: number;
 }
 
 /**
