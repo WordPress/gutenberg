@@ -44,8 +44,10 @@ import {
 	usePostTypeMenuItems,
 	useAuthorMenuItem,
 	usePostTypeArchiveMenuItems,
+	usePostFormatMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
+import AddPostFormatTemplateModalContent from './add-post-format-template-modal-content';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -80,6 +82,7 @@ const TEMPLATE_ICONS = {
 	date: calendar,
 	tag,
 	attachment: media,
+	'taxonomy-post_format': archive,
 };
 
 function TemplateListItem( {
@@ -133,6 +136,7 @@ const modalContentMap = {
 	templatesList: 1,
 	customTemplate: 2,
 	customGenericTemplate: 3,
+	postFormats: 4,
 };
 
 function NewTemplateModal( { onClose } ) {
@@ -140,9 +144,13 @@ function NewTemplateModal( { onClose } ) {
 		modalContentMap.templatesList
 	);
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
+	const [ postFormats, setPostFormats ] = useState( [] );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
-	const missingTemplates = useMissingTemplates( setEntityForSuggestions, () =>
-		setModalContent( modalContentMap.customTemplate )
+	const missingTemplates = useMissingTemplates(
+		setEntityForSuggestions,
+		() => setModalContent( modalContentMap.customTemplate ),
+		setPostFormats,
+		() => setModalContent( modalContentMap.postFormats )
 	);
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -245,6 +253,8 @@ function NewTemplateModal( { onClose } ) {
 		);
 	} else if ( modalContent === modalContentMap.customGenericTemplate ) {
 		modalTitle = __( 'Create custom template' );
+	} else if ( modalContent === modalContentMap.postFormats ) {
+		modalTitle = __( 'Post Format Archives' );
 	}
 
 	return (
@@ -254,7 +264,8 @@ function NewTemplateModal( { onClose } ) {
 				'edit-site-add-new-template__modal_template_list':
 					modalContent === modalContentMap.templatesList,
 				'edit-site-custom-template-modal':
-					modalContent === modalContentMap.customTemplate,
+					modalContent === modalContentMap.customTemplate ||
+					modalContent === modalContentMap.postFormats,
 			} ) }
 			onRequestClose={ onModalClose }
 			overlayClassName={
@@ -336,6 +347,16 @@ function NewTemplateModal( { onClose } ) {
 					}
 				/>
 			) }
+			{ modalContent === modalContentMap.postFormats && (
+				<AddPostFormatTemplateModalContent
+					postFormats={ postFormats }
+					onSelect={ createTemplate }
+					onBack={ () =>
+						setModalContent( modalContentMap.templatesList )
+					}
+					containerRef={ containerRef }
+				/>
+			) }
 		</Modal>
 	);
 }
@@ -373,7 +394,12 @@ function NewTemplate() {
 	);
 }
 
-function useMissingTemplates( setEntityForSuggestions, onClick ) {
+function useMissingTemplates(
+	setEntityForSuggestions,
+	onClickCustomTemplate,
+	setPostFormats,
+	onClickPostFormats
+) {
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
@@ -385,7 +411,7 @@ function useMissingTemplates( setEntityForSuggestions, onClick ) {
 			! existingTemplateSlugs.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
-		onClick?.();
+		onClickCustomTemplate?.();
 		setEntityForSuggestions( _entityForSuggestions );
 	};
 	// We need to replace existing default template types with
@@ -428,9 +454,18 @@ function useMissingTemplates( setEntityForSuggestions, onClick ) {
 			DEFAULT_TEMPLATE_SLUGS.indexOf( template2.slug )
 		);
 	} );
+
+	const { entryPoint: postFormatEntryPoint } = usePostFormatMenuItems(
+		( { postFormats } ) => {
+			setPostFormats( postFormats );
+			onClickPostFormats?.();
+		}
+	);
+
 	const missingTemplates = [
 		...enhancedMissingDefaultTemplateTypes,
 		...usePostTypeArchiveMenuItems(),
+		...( postFormatEntryPoint ? [ postFormatEntryPoint ] : [] ),
 		...postTypesMenuItems,
 		...taxonomiesMenuItems,
 	];
