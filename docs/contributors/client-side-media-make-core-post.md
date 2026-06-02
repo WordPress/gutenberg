@@ -131,7 +131,7 @@ Client-side processing depends on `Document-Isolation-Policy` to enable `SharedA
 | Chrome | 137+ | Full support via Document-Isolation-Policy |
 | Edge | 137+ | Full support via Document-Isolation-Policy |
 | Firefox | — | Not supported (no Document-Isolation-Policy) — falls back to server-side |
-| Safari | — | Not supported for the WASM pipeline; HEIC canvas fallback still works |
+| Safari | — | Not supported (no Document-Isolation-Policy) — falls back to server-side. HEIC support works though as it does not require Document-Isolation-Policy) |
 
 On unsupported browsers WordPress falls back to server-side processing automatically. Users see no difference in behavior.
 
