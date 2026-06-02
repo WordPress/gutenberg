@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useEffect, useRef } from '@wordpress/element';
+import { useEvent, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,13 +32,18 @@ export function WaveformPlayer( {
 	waveformStyle,
 	onEnded,
 } ) {
-	// Store onEnded in a ref so it doesn't need to be a useRefEffect dependency.
+	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
 	// includes an unstable array), which would cause useRefEffect to destroy
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
-	const onEndedRef = useRef( onEnded );
-	onEndedRef.current = onEnded;
+	const onEndedEvent = useEvent( onEnded );
+	const metadataRef = useRef( { title, artist, image } );
+	const playerRef = useRef();
+
+	useEffect( () => {
+		metadataRef.current = { title, artist, image };
+	}, [ title, artist, image ] );
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -53,14 +58,14 @@ export function WaveformPlayer( {
 				if ( cancelled ) {
 					return;
 				}
-				const { destroy } = initWaveformPlayer( element, {
+				const player = initWaveformPlayer( element, {
 					src,
-					title,
-					artist,
-					image,
+					...metadataRef.current,
 					waveformStyle,
-					onEnded: () => onEndedRef.current?.(),
+					onEnded: () => onEndedEvent?.(),
 				} );
+				playerRef.current = player;
+				const { destroy } = player;
 				playerDestroy = destroy;
 			}
 
@@ -76,10 +81,11 @@ export function WaveformPlayer( {
 			return () => {
 				cancelled = true;
 				clearTimeout( timeoutId );
+				playerRef.current = undefined;
 				playerDestroy?.();
 			};
 		},
-		[ src, title, artist, image, waveformStyle ]
+		[ onEndedEvent, src, waveformStyle ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
