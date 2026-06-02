@@ -1715,21 +1715,6 @@ _Returns_
 
 -   `React.ReactNode`: The component.
 
-### UploadProgressSnackbar
-
-Manages a snackbar notice that shows media upload progress while uploads are in progress. It creates/updates a notice via the notices store so that it positions and stacks with every other snackbar in the editor.
-
-Reads from two sources to cover both upload paths:
-
--   `@wordpress/upload-media` store (client-side media processing path).
--   An editor-local tracker populated by the traditional `mediaUpload` wrapper (non-CSM path — e.g. Safari, or when a filter disables CSM).
-
-Only counts original user-uploaded files (items without a `parentId`), ignoring generated subsizes/thumbnails.
-
-_Returns_
-
--   `null`: This component renders nothing — it only manages a notice.
-
 ### URLInput
 
 > **Deprecated** since 5.3, use `wp.blockEditor.URLInput` instead.

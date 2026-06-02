@@ -23,7 +23,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	UnsavedChangesWarning,
-	UploadProgressSnackbar,
 	ErrorBoundary,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -49,7 +48,7 @@ import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useStyle } = unlock( editorPrivateApis );
+const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
