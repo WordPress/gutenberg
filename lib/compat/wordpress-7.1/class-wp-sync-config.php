@@ -45,6 +45,10 @@ if ( ! class_exists( 'WP_Sync_Config' ) ) {
 				return null;
 			}
 
+			if ( false !== strpos( $type_parts[1], '/' ) ) {
+				return null;
+			}
+
 			$object_parts = explode( ':', $type_parts[1], 2 );
 			if ( '' === $object_parts[0] ) {
 				return null;
