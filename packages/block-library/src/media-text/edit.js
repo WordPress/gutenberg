@@ -415,19 +415,18 @@ function MediaTextEdit( {
 							const newImageFill = ! imageFill;
 							// Enabling fill clears any aspect ratio, as the two
 							// settings are mutually exclusive.
-							const newStyle = cleanEmptyObject( {
-								...blockStyle,
-								dimensions: {
-									...blockStyle?.dimensions,
-									aspectRatio: undefined,
-								},
-							} );
+							const newStyle = newImageFill
+								? cleanEmptyObject( {
+										...blockStyle,
+										dimensions: {
+											...blockStyle?.dimensions,
+											aspectRatio: undefined,
+										},
+								  } )
+								: blockStyle;
 							setAttributes( {
 								imageFill: newImageFill,
-								...( newImageFill &&
-									hasAspectRatio && {
-										style: newStyle,
-									} ),
+								style: newStyle,
 							} );
 						} }
 					/>
