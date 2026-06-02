@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Enhancement
+### Enhancements
 
--   Enabled block patterns in the widgets editor by wiring the `selectBlockPatternsKey`, `reusableBlocksSelectKey`, `userPatternCategoriesSelectKey`, and `__experimentalBlockPatternCategories` settings into the block editor provider. Patterns containing blocks not allowed in widget areas (post, query, site, navigation, term) are still filtered out automatically.
+-   `WidgetAreasBlockEditorProvider`: Wire `selectBlockPatternsKey`, `reusableBlocksSelectKey`, `userPatternCategoriesSelectKey`, and `__experimentalBlockPatternCategories` into the block editor settings so patterns from themes, the Pattern Directory, and user categories are available in the widgets editor inserter. Patterns whose blocks are not allowed in widget areas (post, query, site, navigation, term) are still filtered out automatically ([#78884](https://github.com/WordPress/gutenberg/pull/78884)).
 
 ## 6.47.0 (2026-05-27)
 
