@@ -26,8 +26,7 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 const packagePaths = glob( 'packages/*/package.json', { cwd: ROOT_DIR } )
 	.filter(
 		// Ignore private packages.
-		( fileName ) =>
-			! require( join( ROOT_DIR, fileName ) ).private
+		( fileName ) => ! require( join( ROOT_DIR, fileName ) ).private
 	)
 	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
@@ -41,7 +40,6 @@ const packagePaths = glob( 'packages/*/package.json', { cwd: ROOT_DIR } )
 function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
-		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
 		const packageJson = require(
 			join( ROOT_DIR, 'packages', folderName, 'package.json' )
 		);
@@ -55,7 +53,13 @@ function getPackageManifest( packageFolderNames ) {
 		} );
 
 		// Next add any items in the docs/toc.json if found.
-		const tocFilePath = join( ROOT_DIR, 'packages', folderName, 'docs', 'toc.json' );
+		const tocFilePath = join(
+			ROOT_DIR,
+			'packages',
+			folderName,
+			'docs',
+			'toc.json'
+		);
 		if ( fs.existsSync( tocFilePath ) ) {
 			const toc = require( tocFilePath ).values();
 			manifest.push( ...toc );
@@ -108,7 +112,10 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			}
 		}
 		let title = pascalCase( slug );
-		const markdownSource = fs.readFileSync( join( ROOT_DIR, fileName ), 'utf8' );
+		const markdownSource = fs.readFileSync(
+			join( ROOT_DIR, fileName ),
+			'utf8'
+		);
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {
 			title = titleMarkdown[ 1 ];
