@@ -294,8 +294,8 @@ export function EventsList( {
 	) : undefined;
 
 	return (
-		<div className={ styles.root }>
-			<div className={ styles.listArea }>
+		<Stack className={ styles.root } direction="column">
+			<Stack className={ styles.listArea } direction="column">
 				<DataViews
 					data={ items }
 					fields={ fields }
@@ -312,7 +312,7 @@ export function EventsList( {
 				>
 					<DataViews.Layout />
 				</DataViews>
-			</div>
+			</Stack>
 			{ events.length > 0 && events.length <= 2 && (
 				<Text variant="body-sm" className={ styles.eventNone }>
 					{ createInterpolateElement(
@@ -325,6 +325,6 @@ export function EventsList( {
 					) }
 				</Text>
 			) }
-		</div>
+		</Stack>
 	);
 }
