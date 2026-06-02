@@ -746,6 +746,14 @@ Displays the next or previous post link that is adjacent to the current post. ([
 -	**Supports:** anchor, color (background, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight, textAlign), ~~html~~, ~~reusable~~
 -	**Attributes:** arrow, label, linkLabel, showTitle, taxonomy, type
 
+## Post Password Form
+
+Displays a password form for password-protected posts and pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-password-form))
+
+-	**Name:** core/post-password-form
+-	**Category:** theme
+-	**Supports:** color (background, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
+
 ## Post Template
 
 Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-template))
