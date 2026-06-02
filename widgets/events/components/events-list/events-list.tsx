@@ -233,10 +233,12 @@ function EventMeta( { item }: { item: EventListItem } ) {
 export function EventsList( {
 	events,
 	showEmptyState,
+	location,
 	isLoading = false,
 }: {
 	events: WPEvent[];
 	showEmptyState: boolean;
+	location?: string;
 	isLoading?: boolean;
 } ) {
 	const [ view, setView ] = useState< View >( INITIAL_VIEW );
@@ -273,14 +275,20 @@ export function EventsList( {
 	const organizeUrl = __(
 		'https://make.wordpress.org/community/organize-event-landing-page/'
 	);
+	const locationLabel = location?.trim();
+	const emptyTitle = () => {
+		if ( locationLabel ) {
+			/* translators: %s: selected location label. */
+			return sprintf( __( 'No events near %s' ), locationLabel );
+		}
+		return __( 'No events near you' );
+	};
 
 	const empty = showEmptyState ? (
 		<Stack align="center" justify="center" className={ styles.emptyState }>
 			<EmptyState.Root>
 				<EmptyState.Icon icon={ calendar } />
-				<EmptyState.Title>
-					{ __( 'No events near you' ) }
-				</EmptyState.Title>
+				<EmptyState.Title>{ emptyTitle() }</EmptyState.Title>
 				<EmptyState.Description>
 					{ createInterpolateElement(
 						__( '<a>Help organize the next one!</a>' ),

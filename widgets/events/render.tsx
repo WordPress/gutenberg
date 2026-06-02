@@ -35,11 +35,13 @@ function EventsListSection( {
 	loading,
 	error,
 	showEmptyState,
+	location,
 }: {
 	events: WPEvent[];
 	loading: boolean;
 	error: boolean;
 	showEmptyState: boolean;
+	location?: string;
 } ) {
 	if ( error ) {
 		return (
@@ -53,6 +55,7 @@ function EventsListSection( {
 		<EventsList
 			events={ events }
 			showEmptyState={ showEmptyState }
+			location={ location }
 			isLoading={ loading }
 		/>
 	);
@@ -165,6 +168,7 @@ export default function WordPressEvents( {
 					loading={ eventsLoading }
 					error={ eventsError }
 					showEmptyState
+					location={ locationLabel || activeLocation }
 				/>
 			) }
 			<div className={ styles.footer }>
