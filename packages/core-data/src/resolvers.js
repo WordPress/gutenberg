@@ -287,8 +287,10 @@ export const getEntityRecord =
 								);
 							}
 						},
-						onUndoStackChange: () => {
-							dispatch.__unstableNotifySyncUndoManagerChange();
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
 						},
 						restoreUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =

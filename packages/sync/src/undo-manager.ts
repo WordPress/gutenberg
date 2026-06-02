@@ -13,7 +13,12 @@ import type { HistoryRecord } from '@wordpress/undo-manager';
  */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
-import type { ObjectData, RecordHandlers, SyncUndoManager } from './types';
+import type {
+	ObjectData,
+	RecordHandlers,
+	SyncUndoManager,
+	SyncUndoStackState,
+} from './types';
 
 type UndoMetaHandlers = Pick<
 	RecordHandlers,
@@ -46,8 +51,15 @@ export function createUndoManager(): SyncUndoManager {
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
 	} );
 
+	const getUndoStackState = (): SyncUndoStackState => ( {
+		hasRedo: yUndoManager.canRedo(),
+		hasUndo: yUndoManager.canUndo(),
+	} );
+
 	const notifyUndoStackChange = ( ydoc: Y.Doc ): void => {
-		undoMetaHandlers.get( ydoc )?.onUndoStackChange?.();
+		undoMetaHandlers
+			.get( ydoc )
+			?.onUndoStackChange?.( getUndoStackState() );
 	};
 
 	yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
@@ -76,7 +88,7 @@ export function createUndoManager(): SyncUndoManager {
 
 	yUndoManager.on( 'stack-cleared', () => {
 		undoMetaHandlers.forEach( ( handlers ) => {
-			handlers.onUndoStackChange?.();
+			handlers.onUndoStackChange?.( getUndoStackState() );
 		} );
 	} );
 
