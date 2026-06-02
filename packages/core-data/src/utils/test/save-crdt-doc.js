@@ -12,6 +12,7 @@ import { saveCRDTDoc } from '../save-crdt-doc';
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../../sync', () => ( {
 	getSyncManager: jest.fn(),
+	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
 
 function createDeferred() {
@@ -38,8 +39,41 @@ describe( 'saveCRDTDoc', () => {
 		apiFetch.mockReset();
 		syncManager = {
 			createPersistedCRDTDoc: jest.fn(),
+			update: jest.fn(),
 		};
 		getSyncManager.mockReturnValue( syncManager );
+	} );
+
+	it( 'notifies the sync manager of a background CRDT snapshot after the sync save endpoint succeeds', async () => {
+		const fetch = createDeferred();
+		syncManager.createPersistedCRDTDoc.mockResolvedValue( 'doc' );
+		apiFetch.mockImplementation( () => fetch.promise );
+
+		const save = saveCRDTDoc( 'postType/post', 1 );
+
+		await flushPromises();
+
+		expect( syncManager.update ).not.toHaveBeenCalled();
+
+		fetch.resolve( {} );
+		await save;
+
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			1,
+			{},
+			'local-undo-ignored',
+			{ persistenceEvent: 'backgroundCRDTSnapshot' }
+		);
+	} );
+
+	it( 'does not mark the entity as saved when there is no serialized CRDT document', async () => {
+		syncManager.createPersistedCRDTDoc.mockResolvedValue( null );
+
+		await saveCRDTDoc( 'postType/post', 1 );
+
+		expect( apiFetch ).not.toHaveBeenCalled();
+		expect( syncManager.update ).not.toHaveBeenCalled();
 	} );
 
 	it( 'serializes save requests for the same room', async () => {

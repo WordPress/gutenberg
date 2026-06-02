@@ -56,6 +56,7 @@ describe( 'getEntityRecord', () => {
 
 		syncManager = {
 			load: jest.fn(),
+			update: jest.fn(),
 		};
 		getSyncManager.mockImplementation( () => syncManager );
 	} );
@@ -307,6 +308,13 @@ describe( 'getEntityRecord', () => {
 				doc: SERIALIZED_DOC,
 			},
 		} );
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			1,
+			{},
+			'local-undo-ignored',
+			{ persistenceEvent: 'backgroundCRDTSnapshot' }
+		);
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 
@@ -368,6 +376,13 @@ describe( 'getEntityRecord', () => {
 				doc: SERIALIZED_DOC,
 			},
 		} );
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			1,
+			{},
+			'local-undo-ignored',
+			{ persistenceEvent: 'backgroundCRDTSnapshot' }
+		);
 		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
 	} );
 

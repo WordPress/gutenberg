@@ -695,7 +695,7 @@ describe( 'SyncManager', () => {
 			const now = Date.now();
 
 			manager.update( 'post', '123', changes, 'local-editor', {
-				isSave: true,
+				persistenceEvent: 'userSave',
 			} );
 
 			// Wait a tick for yieldToEventLoop.
@@ -714,6 +714,46 @@ describe( 'SyncManager', () => {
 				now
 			);
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+		} );
+
+		it( 'does not update save metadata for background CRDT snapshots', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			jest.clearAllMocks();
+
+			const changes = { title: 'Updated Title' };
+
+			manager.update( 'post', '123', changes, 'local-editor', {
+				persistenceEvent: 'backgroundCRDTSnapshot',
+			} );
+
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
+				expect.any( Y.Doc ),
+				changes
+			);
+
+			const ydoc = capturedDoc as unknown as Y.Doc;
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( SAVED_AT_KEY ) ).toBeUndefined();
+			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 	} );
 

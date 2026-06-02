@@ -945,7 +945,7 @@ describe( 'saveEntityRecord', () => {
 					) {
 						liveSyncState.title = changes.title;
 					}
-					if ( options?.isSave ) {
+					if ( options?.persistenceEvent === 'userSave' ) {
 						liveSyncState.isSaved = true;
 					}
 				}
@@ -971,7 +971,7 @@ describe( 'saveEntityRecord', () => {
 			10,
 			{},
 			'local-undo-ignored',
-			{ isSave: true }
+			{ persistenceEvent: 'userSave' }
 		);
 		expect( liveSyncState ).toEqual( {
 			isSaved: true,
