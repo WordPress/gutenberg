@@ -16,9 +16,9 @@ Client-side media processing moves this work to the browser. Images are processe
 - **Reduced server load.** Image processing is offloaded to the user's device, freeing server CPU and memory for other tasks.
 - **Consistent, high-quality output with modern image support.** All users get the same libvips-powered processing regardless of whether the server has GD or Imagick, and regardless of which version is installed.
 - **Faster downloads for visitors.** libvips produces better-compressed output than GD or Imagick, so the generated images served to site visitors are smaller and load faster.
-- **iPhone photos just work.** HEIC images can be decoded in the browser and converted to JPEG before upload, even on hosts without server-side HEIC support. **Note**: HEIC decode relies on platform codecs and is supported in Chromium browsers (Chrome, Edge, Brave) on macOS and on Windows with HEVC support, and in Safari on macOS. Firefox is not supported.
+- **iPhone photos just work.** HEIC images can be decoded in the browser and converted to JPEG before upload, even on hosts without server-side HEIC support. **Note**: HEIC decode relies on platform codecs and is supported in Chromium browsers (Chrome, Edge, Brave) on macOS and on Windows with HEVC support, and in Safari on macOS. Firefox does not support in-browser HEIC decode. The full WASM pipeline (everything beyond HEIC) is Chromium-only — see [Browser compatibility and fallback](#browser-compatibility-and-fallback) below.
 - **AVIF without server-side AVIF support.** Hosts whose PHP image editor doesn't support AVIF can still accept AVIF uploads when client-side processing is active. The MIME-type check is bypassed for client-decoded uploads — see the security FAQ below for details.
-- **More resilient uploads.** Sub-size uploads are independent requests, so a network hiccup mid-upload doesn't lose the entire batch.
+- **More resilient uploads.** Sub-size uploads are independent requests, so a network hiccup mid-upload doesn't lose the entire batch. Failed requests are retried automatically with exponential backoff, so transient network errors recover without user intervention.
 
 ## What's included
 
@@ -27,7 +27,7 @@ Client-side media processing moves this work to the browser. Images are processe
 - **HEIC/HEIF support** — iPhone photos (`image/heic`, `image/heif`) are decoded in the browser via three fallback strategies (`createImageBitmap`, `HTMLImageElement` + `OffscreenCanvas`, and HEIC container parsing + WebCodecs `VideoDecoder`) and uploaded as JPEG. The original HEIC is kept as a companion file in `$metadata['original']` and removed when the attachment is deleted.
 - **AVIF end-to-end uploads** — `vips-heif.wasm` is bundled in the worker so AVIF can be decoded client-side, and the REST API accepts the upload on hosts without server-side AVIF support.
 - **Automatic format conversion** — The existing `image_editor_output_format` filter is respected client-side, enabling automatic conversion (e.g., JPEG to WebP) before upload.
-- **Cross-origin isolation via Document-Isolation-Policy** — WordPress sends `Document-Isolation-Policy: isolate-and-credentialless` on block editor screens for Chromium 137+. DIP provides per-document isolation without breaking other iframes on the page.
+- **A cross-origin-isolated editor** — To run the WASM pipeline, the editor needs `SharedArrayBuffer`, which browsers only expose to cross-origin-isolated documents. WordPress enables this with `Document-Isolation-Policy: isolate-and-credentialless` on block editor screens for Chromium 137+. Beyond media processing, this means `SharedArrayBuffer` and high-resolution timers are now available to any code running in the editor, so plugins can build their own multithreaded or WASM-backed features there. Because DIP is per-document, it provides this isolation without imposing the page-wide constraints of COOP/COEP. See [Cross-origin isolation impact](#cross-origin-isolation-impact) below for what extenders should watch for.
 - **Server-side hook compatibility** — `wp_generate_attachment_metadata` fires the same way as for a server-side upload: once with context `'create'` during the initial upload and again with `'update'` after `POST /wp/v2/media/{id}/finalize` runs. Plugins that hook into it (watermarking, CDN sync, etc.) continue to work, the same way they already handle the deferred-subsize pass on big-image uploads.
 - **Smart fallback** — Browsers that don't support the required features automatically fall back to server-side processing with no user-facing change.
 - **Image quality filter** — `editor.media.imageQuality` JavaScript filter to control client-side resize/crop quality (0–1, default 0.82).
@@ -131,29 +131,23 @@ Client-side processing depends on `Document-Isolation-Policy` to enable `SharedA
 | Chrome | 137+ | Full support via Document-Isolation-Policy |
 | Edge | 137+ | Full support via Document-Isolation-Policy |
 | Firefox | — | Not supported (no Document-Isolation-Policy) — falls back to server-side |
-| Safari | — | Not supported (no Document-Isolation-Policy) — falls back to server-side. HEIC support works though as it does not require Document-Isolation-Policy) |
+| Safari | — | Not supported (no Document-Isolation-Policy) — falls back to server-side. In-browser HEIC decode still works, since it does not require Document-Isolation-Policy. |
+
+Chrome and Edge have supported `Document-Isolation-Policy` since version 137 (released in mid-2025). As of this post's publication, current stable Chrome and Edge are well past that, so the overwhelming majority of Chromium users already meet the requirement. `Document-Isolation-Policy` is not yet tracked on caniuse; the most reliable place to check current and future browser support is the [Chrome Platform Status entry](https://chromestatus.com/feature/5141940204208128).
 
 On unsupported browsers WordPress falls back to server-side processing automatically. Users see no difference in behavior.
 
-## Feature detection thresholds
+## Feature detection and limitations
 
-In addition to API support, the client checks several runtime conditions before activating the WASM pipeline:
+Beyond browser support, the client checks several runtime conditions before activating the WASM pipeline. Failing any check causes a transparent fallback to server-side processing — there is no user-facing change.
 
 | Check | Threshold | Why |
 | --- | --- | --- |
+| Browser | Chromium 137+ | `Document-Isolation-Policy` (and therefore `SharedArrayBuffer`) is Chromium-only; Firefox and Safari fall back to server-side. In-browser HEIC decode still runs in Safari. |
 | Device memory | > 2 GB | WASM image processing can OOM on very low-memory devices. |
 | CPU cores | ≥ 2 | WASM image processing benefits from at least one core for the worker plus one for the UI thread. |
 | Network | not `2g`/`slow-2g`, no [`Save-Data` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Save-Data) | The ~13 MB worker download is gated to faster connections; `3g` is allowed. |
 | CSP `blob:` workers | must succeed | The worker is created from a blob URL; strict `worker-src` policies block it. |
-
-Failing any check causes a transparent fallback to server-side processing.
-
-## Known limitations
-
-- **Non-Chromium browsers**: Disabled by default because Firefox and Safari don't support `Document-Isolation-Policy`. The HEIC canvas fallback still runs in Safari.
-- **Low-memory devices**: Devices reporting 2 GB of RAM or less are excluded.
-- **2g / slow-2g / Save-Data**: Excluded because of the ~13 MB worker download.
-- **CSP restrictions**: Sites with `worker-src` directives that don't allow `blob:` fall back to server-side.
 
 ## Frequently asked questions
 
@@ -167,9 +161,11 @@ Client-side processing is a **performance optimization, not a trust boundary**. 
 
 The validation surface is preserved with one intentional exception: AVIF uploads from the client-side path bypass the server's `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so hosts whose PHP image editor doesn't support AVIF can still accept client-decoded AVIF files.
 
+The security risk of this exception is minimal. The check being relaxed is a capability gate, not a security control: `wp_prevent_unsupported_mime_type_uploads` blocks uploads the server's image library can't *process*, and exists so sites don't end up with images they can't generate thumbnails for. It is bypassed only when `generate_sub_sizes=false`, which is precisely the case where the browser has already produced every sub-size, so there's nothing for the server to process. Every other guard still applies: the uploader must have the `upload_files` capability, AVIF must be in the site's allowed MIME/extension list, and the file still passes WordPress's standard upload validation. The worst case is that a site stores a valid AVIF its server-side editor happens not to understand — the same situation as any other format the active image library doesn't support.
+
 ### What happens if the browser can't process the image?
 
-Server-side processing runs as before. The fallback is automatic and transparent to the user — no UI change, no error. The exact gating (browser features, device memory, CPU cores, network class, CSP) is described in "Feature detection thresholds" above.
+Server-side processing runs as before. The fallback is automatic and transparent to the user — no UI change, no error. The exact gating (browser features, device memory, CPU cores, network class, CSP) is described in "Feature detection and limitations" above.
 
 ### Will my plugin's `wp_generate_attachment_metadata` hooks still run?
 
