@@ -840,6 +840,11 @@
 			"count": 2
 		}
 	},
+	"packages/edit-site/src/components/add-new-template-legacy/add-post-format-template-modal-content.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
 	"packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -851,6 +856,11 @@
 		}
 	},
 	"packages/edit-site/src/components/add-new-template-legacy/index.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
+	"packages/edit-site/src/components/add-new-template/add-post-format-template-modal-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		}
@@ -1800,6 +1810,11 @@
 	"routes/taxonomy-edit/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
+		}
+	},
+	"routes/template-list/add-new-template/add-post-format-template-modal-content.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 2
 		}
 	},
 	"routes/template-list/add-new-template/add-custom-generic-template-modal-content.tsx": {
