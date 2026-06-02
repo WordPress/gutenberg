@@ -14,7 +14,7 @@
  * @return array The modified query vars.
  */
 function gutenberg_filter_query_block_exclude_current( $query, $block ) {
-	if ( isset( $block->context['query']['excludeCurrent'] ) && $block->context['query']['excludeCurrent'] ) {
+	if ( ! empty( $block->context['query']['excludeCurrent'] ) ) {
 		$current_post_id = get_the_ID();
 		if ( $current_post_id ) {
 			$query['post__not_in'][] = $current_post_id;
