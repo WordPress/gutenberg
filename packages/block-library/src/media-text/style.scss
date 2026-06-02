@@ -81,11 +81,10 @@
 		max-width: unset;
 		width: 100%;
 		vertical-align: middle;
-	}
 
-	img.has-aspect-ratio,
-	video.has-aspect-ratio {
-		object-fit: cover;
+		&.has-aspect-ratio {
+			object-fit: cover;
+		}
 	}
 }
 
