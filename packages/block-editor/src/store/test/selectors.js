@@ -4031,6 +4031,82 @@ describe( 'selectors', () => {
 				} )
 			);
 		} );
+
+		it( 'should use variation metadata for transformation items', () => {
+			registerBlockType( 'core/variation-transform-source', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Variation Transform Source',
+				edit: () => {},
+				save: () => {},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/variation-transform-target' ],
+							variationName: 'grid',
+							transform: () => {},
+						},
+					],
+				},
+			} );
+			registerBlockType( 'core/variation-transform-target', {
+				apiVersion: 3,
+				category: 'design',
+				title: 'Group',
+				icon: 'group',
+				edit: () => {},
+				save: () => {},
+				variations: [
+					{
+						name: 'grid',
+						title: 'Grid',
+						icon: 'grid',
+						attributes: { layout: { type: 'grid' } },
+						scope: [ 'transform' ],
+					},
+				],
+			} );
+
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
+					cache: {},
+					blockEditingModes: new Map(),
+				},
+				preferences: {
+					insertUsage: {
+						'core/variation-transform-target/grid': {
+							count: 10,
+							time: 1000,
+						},
+					},
+				},
+				blockListSettings: new Map(),
+				settings: {},
+			};
+			const blocks = [ { name: 'core/variation-transform-source' } ];
+
+			try {
+				const items = getBlockTransformItems( state, blocks );
+
+				expect( items ).toHaveLength( 1 );
+				expect( items[ 0 ] ).toMatchObject( {
+					id: 'core/variation-transform-target/grid',
+					name: 'core/variation-transform-target',
+					variationName: 'grid',
+					title: 'Grid',
+					icon: 'grid',
+					frecency: 2.5,
+				} );
+			} finally {
+				unregisterBlockType( 'core/variation-transform-source' );
+				unregisterBlockType( 'core/variation-transform-target' );
+			}
+		} );
 	} );
 
 	describe( 'isValidTemplate', () => {

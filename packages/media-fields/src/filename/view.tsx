@@ -37,11 +37,10 @@ export default function FileNameView( {
 		);
 	}
 
-	// The Tooltip exposes the full filename on hover when the cell is
-	// visually truncated by CSS (see `TRUNCATE_LENGTH` above). No extra AT
-	// plumbing is needed — the full filename is already in the DOM inside
-	// the `<span>`, so assistive technology reading the row gets the
-	// complete name.
+	// The full filename is always in the DOM, so assistive tech gets it
+	// regardless. The Tooltip aids mouse users where the cell visually clips
+	// (DataViews layouts); in a non-truncating context like the DataForm the
+	// name wraps in full, making it redundant but harmless.
 	return (
 		<Tooltip.Root>
 			<Tooltip.Trigger

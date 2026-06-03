@@ -12,30 +12,29 @@ dashboard today, a sidebar or an inspector tomorrow). `widget-primitives` sits b
 the build pipeline that produces widgets and the hosts that render them, so
 neither side has to know about the other:
 
-- **Contract.** It defines the widget type shape (`WidgetType`,
-  `WidgetTypeMetadata`, `WidgetName`) and the render contract
-  (`WidgetRenderProps`). Authors type their `widget.ts` / `render.tsx` against
-  these, and hosts consume the same types. Nothing re-exports them: every
-  consumer imports from `widget-primitives` directly, so the source of truth stays in
-  one place.
+- **Contract.** It defines the widget type shape (`WidgetType`, `WidgetName`)
+  and the render contract (`WidgetRenderProps`). Authors type their
+  `widget.ts` / `render.tsx` against these, and hosts consume the same types.
+  Nothing re-exports them: every consumer imports from `widget-primitives`
+  directly, so the source of truth stays in one place.
 - **Discovery.** `useWidgetTypes()` returns the `WidgetType[]` registered on the
   current page.
-- **Resolution.** `getLazyWidgetComponent()` resolves a widget's render module
-  to a cached `lazy()` component, so any host can mount a widget body under
-  Suspense.
+- **Rendering.** `<WidgetRender>` resolves a widget's render module via a
+  host-provided resolver and mounts the resulting component under the host's
+  Suspense boundary.
 
 ## Public API
 
+- `<WidgetRender>`: canonical entry point for any host that mounts a widget.
+  Resolves the widget's render module via a host-provided `resolveWidgetModule`
+  and mounts the resulting component with the standard `attributes` plus
+  `setAttributes` render contract. Suspense, error handling, and chrome are
+  host concerns and live outside the primitive.
 - `useWidgetTypes()` → `[ widgetTypes, isResolvingWidgetTypes ]`: the
   `WidgetType[]` available on the current page, plus a flag that is true while
   they are still resolving.
-- `getLazyWidgetComponent( renderModule, resolveWidgetModule )`: a cached
-  `lazy()` React component for a widget's render module.
-- Contract types: `WidgetType`, `WidgetTypeMetadata`, `WidgetName`,
-  `WidgetRenderProps`, `ResolveWidgetModule`.
-
-Anything not exported here (for example the internal `WidgetModule` shape) is an
-implementation detail and should not be imported from outside the kit.
+- Contract types: `WidgetType`, `WidgetName`, `WidgetRenderProps`,
+  `ResolveWidgetModule`.
 
 ## How discovery works
 
@@ -71,5 +70,4 @@ when to import; they do not register widgets.
 This module lives inside the dashboard route while its API stabilizes. Because
 both hosts and widget authors consume it, its destination is a top-level,
 private (unpublished) package, `@wordpress/widget-primitives`, in the same vein as
-`@wordpress/grid`. The current layout (`index.ts`, `types.ts`, `hooks/`,
-`tools/`) already matches that future shape.
+`@wordpress/grid`.

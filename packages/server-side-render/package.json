@@ -45,6 +45,7 @@
 	"wpScriptDefaultExport": true,
 	"types": "build-types/index.d.ts",
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
