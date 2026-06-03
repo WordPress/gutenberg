@@ -49,6 +49,7 @@
 		"@emotion/jest": "^11.14.2",
 		"@eslint/eslintrc": "^3.0.0",
 		"@testing-library/jest-dom": "6.9.1",
+		"@types/jquery": "3.5.34",
 		"@types/node": "^20.19.39",
 		"@types/prettier": "2.4.4",
 		"@types/react": "19.2.13",

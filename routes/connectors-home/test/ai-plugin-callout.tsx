@@ -13,6 +13,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { AiPluginCallout } from '../ai-plugin-callout';
+import { getRequiresFilesystemCredentials } from '../default-connectors';
+import { installPluginViaWpUpdates } from '../use-connector-plugin';
 
 jest.mock( '@wordpress/a11y', () => ( {
 	speak: jest.fn(),
@@ -93,6 +95,11 @@ jest.mock( '../default-connectors', () => ( {
 			},
 		},
 	} ) ),
+	getRequiresFilesystemCredentials: jest.fn( () => false ),
+} ) );
+
+jest.mock( '../use-connector-plugin', () => ( {
+	installPluginViaWpUpdates: jest.fn(),
 } ) );
 
 jest.mock( '../wp-logo-decoration', () => ( {
@@ -158,6 +165,15 @@ describe( 'AiPluginCallout', () => {
 				mapSelect( () => selectorStore )
 		);
 
+		( getRequiresFilesystemCredentials as jest.Mock ).mockReset();
+		( getRequiresFilesystemCredentials as jest.Mock ).mockReturnValue(
+			false
+		);
+		( installPluginViaWpUpdates as jest.Mock ).mockReset();
+		( installPluginViaWpUpdates as jest.Mock ).mockResolvedValue(
+			'installed'
+		);
+
 		mockSaveEntityRecord.mockReset();
 		mockSaveEntityRecord.mockResolvedValue( undefined );
 		mockCreateSuccessNotice.mockReset();
@@ -198,5 +214,63 @@ describe( 'AiPluginCallout', () => {
 				{ throwOnError: true }
 			);
 		} );
+
+		expect( installPluginViaWpUpdates ).not.toHaveBeenCalled();
+	} );
+
+	it( 'installs via wp.updates then activates when filesystem credentials are required', async () => {
+		const user = userEvent.setup();
+
+		storeState.plugin = undefined;
+		( getRequiresFilesystemCredentials as jest.Mock ).mockReturnValue(
+			true
+		);
+		( installPluginViaWpUpdates as jest.Mock ).mockResolvedValue(
+			'installed'
+		);
+
+		render( <AiPluginCallout /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Install the AI plugin' } )
+		);
+
+		await waitFor( () => {
+			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith( 'ai' );
+		} );
+
+		await waitFor( () => {
+			expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
+				'root',
+				'plugin',
+				{ plugin: 'ai/ai', status: 'active' },
+				{ throwOnError: true }
+			);
+		} );
+	} );
+
+	it( 'aborts silently when the filesystem credentials modal is canceled', async () => {
+		const user = userEvent.setup();
+
+		storeState.plugin = undefined;
+		( getRequiresFilesystemCredentials as jest.Mock ).mockReturnValue(
+			true
+		);
+		( installPluginViaWpUpdates as jest.Mock ).mockResolvedValue(
+			'canceled'
+		);
+
+		render( <AiPluginCallout /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Install the AI plugin' } )
+		);
+
+		await waitFor( () => {
+			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith( 'ai' );
+		} );
+
+		expect( mockSaveEntityRecord ).not.toHaveBeenCalled();
+		expect( mockCreateErrorNotice ).not.toHaveBeenCalled();
 	} );
 } );

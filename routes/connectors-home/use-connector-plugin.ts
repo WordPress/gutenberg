@@ -19,6 +19,103 @@ interface UseConnectorPluginOptions {
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
 	initialIsConnected?: boolean;
+	requiresFilesystemCredentials?: boolean;
+}
+
+interface WpUpdatesInstallPluginResponse {
+	slug: string;
+	plugin?: string;
+}
+
+interface WpUpdatesInstallPluginErrorResponse {
+	slug: string;
+	errorCode?: string;
+	errorMessage?: string;
+}
+
+interface WpUpdates {
+	installPlugin: ( args: { slug: string } ) => void;
+}
+
+type JQueryHandler = (
+	event: JQuery.TriggeredEvent,
+	response:
+		| WpUpdatesInstallPluginResponse
+		| WpUpdatesInstallPluginErrorResponse
+) => void;
+
+interface WpUpdatesGlobal {
+	wp?: {
+		updates?: WpUpdates;
+	};
+	jQuery?: JQueryStatic;
+}
+
+/**
+ * Outcome of an install routed through `wp.updates.installPlugin()`.
+ *
+ * `canceled` is a normal control-flow result (the user closed the
+ * filesystem credentials modal), not an error. Genuine install
+ * failures reject the promise instead.
+ */
+export type WpUpdatesInstallOutcome = 'installed' | 'canceled';
+
+export function installPluginViaWpUpdates(
+	slug: string
+): Promise< WpUpdatesInstallOutcome > {
+	return new Promise( ( resolve, reject ) => {
+		const w = window as unknown as WpUpdatesGlobal;
+		const jq = w.jQuery;
+		const updates = w.wp?.updates;
+		if ( ! jq || ! updates?.installPlugin ) {
+			reject( new Error( 'wp.updates.installPlugin is not available.' ) );
+			return;
+		}
+
+		// Handlers are registered with on()/off() (not one()) and filtered
+		// by slug. With one(), a concurrent install of a *different* plugin
+		// firing first would consume the one-shot handler and leave this
+		// promise pending forever. on() + explicit cleanup() only tears
+		// down once the matching slug's event arrives.
+		const cleanup = () => {
+			jq( document ).off( 'wp-plugin-install-success', onSuccess );
+			jq( document ).off( 'wp-plugin-install-error', onError );
+			jq( document ).off( 'credential-modal-cancel', onCancel );
+		};
+
+		const onSuccess: JQueryHandler = ( _event, response ) => {
+			if (
+				( response as WpUpdatesInstallPluginResponse ).slug !== slug
+			) {
+				return;
+			}
+			cleanup();
+			resolve( 'installed' );
+		};
+		const onError: JQueryHandler = ( _event, response ) => {
+			if (
+				( response as WpUpdatesInstallPluginErrorResponse ).slug !==
+				slug
+			) {
+				return;
+			}
+			cleanup();
+			const errResponse = response as WpUpdatesInstallPluginErrorResponse;
+			reject(
+				new Error( errResponse.errorMessage ?? 'Install failed.' )
+			);
+		};
+		const onCancel: JQueryHandler = () => {
+			cleanup();
+			resolve( 'canceled' );
+		};
+
+		jq( document ).on( 'wp-plugin-install-success', onSuccess );
+		jq( document ).on( 'wp-plugin-install-error', onError );
+		jq( document ).on( 'credential-modal-cancel', onCancel );
+
+		updates.installPlugin( { slug } );
+	} );
 }
 
 interface UseConnectorPluginReturn {
@@ -45,6 +142,7 @@ export function useConnectorPlugin( {
 	isActivated,
 	keySource = 'none',
 	initialIsConnected = false,
+	requiresFilesystemCredentials = false,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
@@ -168,12 +266,39 @@ export function useConnectorPlugin( {
 		}
 		setIsBusy( true );
 		try {
-			await saveEntityRecord(
-				'root',
-				'plugin',
-				{ slug: pluginSlug, status: 'active' },
-				{ throwOnError: true }
-			);
+			if ( requiresFilesystemCredentials ) {
+				// The REST plugin endpoint rejects installs up front when
+				// FS_METHOD is not 'direct' and credentials have not been
+				// stored. Route through wp.updates.installPlugin() so the
+				// standard "Connection Information" modal handles credential
+				// entry, then activate via REST.
+				const outcome = await installPluginViaWpUpdates( pluginSlug );
+				if ( outcome === 'canceled' ) {
+					// User closed the credentials modal; abort silently.
+					return;
+				}
+				if ( pluginBasename ) {
+					await saveEntityRecord(
+						'root',
+						'plugin',
+						{ plugin: pluginBasename, status: 'active' },
+						{ throwOnError: true }
+					);
+				}
+				// Refresh plugin entity so derived state reflects install.
+				invalidateResolution( 'getEntityRecord', [
+					'root',
+					'plugin',
+					pluginBasename,
+				] );
+			} else {
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ slug: pluginSlug, status: 'active' },
+					{ throwOnError: true }
+				);
+			}
 			setPluginStatusOverride( 'active' );
 			// Re-fetch settings since the new plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
