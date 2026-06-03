@@ -348,9 +348,7 @@ describe( 'Waveform utilities', () => {
 				value: 60,
 			} );
 
-			container.dispatchEvent(
-				new CustomEvent( 'waveformplayer:timeupdate' )
-			);
+			instance.options.onTimeUpdate( 60, 120, instance );
 
 			const currentMarker = container.querySelector(
 				'.wp-block-playlist__time-marker--current'
@@ -403,13 +401,14 @@ describe( 'Waveform utilities', () => {
 			const hoverMarker = container.querySelector(
 				'.wp-block-playlist__time-marker--hover'
 			);
-			const endMarker = container.querySelector(
-				'.wp-block-playlist__time-marker--end'
-			);
 
 			expect( hoverMarker ).toHaveClass( 'is-visible' );
 			expect( hoverMarker ).toHaveTextContent( '1:00' );
-			expect( endMarker ).toHaveTextContent( '2:00' );
+			expect(
+				container.querySelector(
+					'.wp-block-playlist__time-marker--end'
+				)
+			).toBeNull();
 		} );
 
 		it( 'should hide the hover marker on mouse leave', () => {
