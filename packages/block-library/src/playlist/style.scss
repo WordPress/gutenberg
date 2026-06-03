@@ -60,49 +60,22 @@ $waveform-player-height: 100px;
 	.wp-block-playlist__time-marker {
 		--wp-playlist-time-marker-label-offset: calc(-100% - 0.35rem);
 
-		position: absolute;
-		inset-block: 0;
-		width: 0;
 		color: currentColor;
-		opacity: 0;
 		pointer-events: none;
-		z-index: 6;
-
-		&.is-visible {
-			opacity: 1;
-		}
-
-		&::before {
-			content: "";
-			position: absolute;
-			inset-block: 0;
-			border-inline-start: 2px solid currentColor;
-			opacity: 0.55;
-		}
 	}
 
-	.wp-block-playlist__time-marker-label {
+	.wp-block-playlist__time-marker-label,
+	.wp-block-playlist__time-marker .waveform-marker-tooltip {
 		position: absolute;
 		inset-block-start: 0.35rem;
 		inset-inline-start: 0;
 		transform: translateX(var(--wp-playlist-time-marker-label-offset));
-		font-size: 0.75em;
-		line-height: 1;
-		white-space: nowrap;
-		text-shadow: 0 0 0.35em Canvas;
-		opacity: 0.75;
-	}
-
-	.wp-block-playlist__time-marker .waveform-marker-tooltip {
-		inset-block: 0 auto;
-		inset-inline-start: 0;
-		transform: translateX(var(--wp-playlist-time-marker-label-offset, calc(-100% - 0.35rem)));
 		padding: 0;
 		border-radius: 0;
 		background: transparent;
-		color: currentColor;
 		font-size: 0.75em;
 		line-height: 1;
+		white-space: nowrap;
 		text-shadow: 0 0 0.35em Canvas;
 		opacity: 0.75;
 	}
