@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#TODO](https://github.com/WordPress/gutenberg/pull/TODO)).
+-   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ## 0.14.0 (2026-05-27)
