@@ -36,13 +36,11 @@ function isValidWidgetModule( module: unknown ): module is WidgetModule {
  */
 const componentCache = new Map< string, LazyWidgetComponent >();
 
-/**
+/*
  * Resolve a widget render module to a `lazy()` React component, cached by
  * `renderModule` id. The first call for a given id builds the lazy wrapper
  * around the resolver; subsequent calls return the same instance so that
  * hosts and Suspense boundaries can rely on a stable component identity.
- * @param renderModule
- * @param resolveWidgetModule
  */
 export function getLazyWidgetComponent(
 	renderModule: string,
