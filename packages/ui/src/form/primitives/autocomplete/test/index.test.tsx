@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import * as Autocomplete from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
 
@@ -376,6 +376,130 @@ describe( 'Autocomplete', () => {
 			await user.hover( clearButton );
 
 			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'grouped items', () => {
+		const GROUPED_ITEMS = [
+			{
+				label: 'Group 1',
+				items: [
+					{ id: '1', value: 'Item 1' },
+					{ id: '2', value: 'Item 2' },
+				],
+			},
+			{
+				label: 'Group 2',
+				items: [ { id: '3', value: 'Item 3' } ],
+			},
+		];
+
+		function renderGrouped( {
+			groupRef,
+			groupLabelRef,
+		}: {
+			groupRef?: Ref< HTMLDivElement >;
+			groupLabelRef?: Ref< HTMLDivElement >;
+		} = {} ) {
+			return render(
+				<Autocomplete.Root items={ GROUPED_ITEMS }>
+					<Autocomplete.Input placeholder="Search" />
+					<Autocomplete.Popup>
+						<Autocomplete.List>
+							<Autocomplete.ListBody>
+								<Autocomplete.Collection>
+									{ ( group ) => (
+										<Autocomplete.Group
+											key={ group.label }
+											ref={
+												group.label === 'Group 1'
+													? groupRef
+													: undefined
+											}
+											items={ group.items }
+										>
+											<Autocomplete.GroupLabel
+												ref={
+													group.label === 'Group 1'
+														? groupLabelRef
+														: undefined
+												}
+											>
+												{ group.label }
+											</Autocomplete.GroupLabel>
+											<Autocomplete.Collection>
+												{ ( item ) => (
+													<Autocomplete.Item
+														key={ item.id }
+														value={ item }
+													>
+														{ item.value }
+													</Autocomplete.Item>
+												) }
+											</Autocomplete.Collection>
+										</Autocomplete.Group>
+									) }
+								</Autocomplete.Collection>
+							</Autocomplete.ListBody>
+						</Autocomplete.List>
+					</Autocomplete.Popup>
+				</Autocomplete.Root>
+			);
+		}
+
+		it( 'forwards refs', async () => {
+			const user = userEvent.setup();
+			const groupRef = createRef< HTMLDivElement >();
+			const groupLabelRef = createRef< HTMLDivElement >();
+
+			renderGrouped( { groupRef, groupLabelRef } );
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item' );
+
+			await waitFor( () => {
+				expect( groupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
+		} );
+
+		it( 'renders group labels and associates them with their items', async () => {
+			const user = userEvent.setup();
+
+			renderGrouped();
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item' );
+
+			const group1 = await screen.findByRole( 'group', {
+				name: 'Group 1',
+			} );
+			expect( group1 ).toBeVisible();
+
+			expect(
+				screen.getByRole( 'option', { name: 'Item 1' } )
+			).toBeVisible();
+			expect( group1 ).toContainElement(
+				screen.getByRole( 'option', { name: 'Item 1' } )
+			);
+			expect( group1 ).not.toContainElement(
+				screen.getByRole( 'option', { name: 'Item 3' } )
+			);
+		} );
+
+		it( 'hides groups whose items are all filtered out', async () => {
+			const user = userEvent.setup();
+
+			renderGrouped();
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item 3' );
+
+			await waitFor( () => {
+				expect(
+					screen.getByRole( 'group', { name: 'Group 2' } )
+				).toBeVisible();
+			} );
+			expect(
+				screen.queryByRole( 'group', { name: 'Group 1' } )
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );
