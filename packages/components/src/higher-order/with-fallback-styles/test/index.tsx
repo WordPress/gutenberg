@@ -9,35 +9,39 @@ import { render, screen } from '@testing-library/react';
 import withFallbackStyles from '..';
 
 describe( 'withFallbackStyles', () => {
-	const Wrapped = ( props: { fallbackTextColor?: string } ) => (
-		<div>{ props.fallbackTextColor ?? 'no-fallback' }</div>
+	const Wrapped = ( props: { fallbackColor?: string } ) => (
+		<div>{ props.fallbackColor ?? 'no-fallback' }</div>
 	);
 
-	it( 'passes the mapped fallback styles down to the wrapped component', () => {
-		const mapNodeToProps = jest.fn( () => ( {
-			fallbackTextColor: 'rgb(1, 2, 3)',
-		} ) );
-		const Component = withFallbackStyles( mapNodeToProps )( Wrapped );
-
-		render( <Component /> );
-
-		expect( mapNodeToProps ).toHaveBeenCalled();
-		expect( screen.getByText( 'rgb(1, 2, 3)' ) ).toBeInTheDocument();
-	} );
-
-	it( 'uses the provided node prop instead of the internal ref wrapper', () => {
-		const node = document.createElement( 'div' );
-		const mapNodeToProps = jest.fn( () => ( {
-			fallbackTextColor: 'rgb(4, 5, 6)',
+	it( 'derives the fallback styles from the provided node prop', () => {
+		const node = document.createElement( 'span' );
+		node.dataset.color = 'rgb(1, 2, 3)';
+		const mapNodeToProps = jest.fn( ( el: HTMLElement ) => ( {
+			fallbackColor: el.dataset.color,
 		} ) );
 		const Component = withFallbackStyles( mapNodeToProps )( Wrapped );
 
 		render( <Component node={ node } /> );
 
+		// The rendered value proves the actual node was read by mapNodeToProps.
 		expect( mapNodeToProps ).toHaveBeenCalledWith(
 			node,
 			expect.objectContaining( { node } )
 		);
-		expect( screen.getByText( 'rgb(4, 5, 6)' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'rgb(1, 2, 3)' ) ).toBeInTheDocument();
+	} );
+
+	it( 'derives the fallback styles from the internal wrapper node when no node prop is given', () => {
+		const mapNodeToProps = jest.fn( ( el: HTMLElement ) => ( {
+			fallbackColor: el.tagName.toLowerCase(),
+		} ) );
+		const Component = withFallbackStyles( mapNodeToProps )( Wrapped );
+
+		render( <Component /> );
+
+		// The HOC wraps in a <div>, so reading the node's tagName yields 'div'.
+		expect( mapNodeToProps ).toHaveBeenCalled();
+		expect( mapNodeToProps.mock.calls[ 0 ][ 0 ].tagName ).toBe( 'DIV' );
+		expect( screen.getByText( 'div' ) ).toBeInTheDocument();
 	} );
 } );
