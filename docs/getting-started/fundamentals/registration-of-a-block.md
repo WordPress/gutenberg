@@ -116,7 +116,7 @@ register_block_type( 'my-plugin/server-block', array(
 ) );
 ```
 
-In the editor these blocks are previewed by rendering the block on the server. If the block declares `postId` in its `uses_context`, the current post ID is forwarded to the server as the `post_id` query argument. The REST block renderer then sets up the global `$post` and calls `setup_postdata()` for that ID, so the `render_callback` can render content that depends on the post being edited via the global `$post` or template tags such as `get_the_ID()`:
+If the block declares `postId` in its `uses_context`, the editor passes the current post to the server when previewing the block, so the `render_callback` can use template tags like `get_the_ID()`. Note that `postId` is the only context forwarded this way.
 
 ```php
 register_block_type( 'my-plugin/server-block', array(
@@ -127,8 +127,6 @@ register_block_type( 'my-plugin/server-block', array(
 	),
 ) );
 ```
-
-Note that `postId` is the only block context automatically forwarded to the server for these blocks. Other context values declared in `uses_context` are available in the editor but are not sent to the `render_callback`.
 
 ## Registering a block with JavaScript (client-side)
 
