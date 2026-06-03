@@ -137,7 +137,7 @@ const { state, actions, callbacks } = store(
 			get commentLoginRequired() {
 				return (
 					state.selectedImageCommentsOpen &&
-					!! getConfig().commentRegistrationRequired
+					!! getConfig().commentLoginRequired
 				);
 			},
 			get commentFormVisible() {
@@ -331,21 +331,6 @@ const { state, actions, callbacks } = store(
 					post: state.selectedImage.attachmentId,
 					content,
 				};
-				const author = String(
-					formData.get( 'author' ) || ''
-				).trim();
-				const email = String( formData.get( 'email' ) || '' ).trim();
-				const url = String( formData.get( 'url' ) || '' ).trim();
-
-				if ( author ) {
-					payload.author_name = author;
-				}
-				if ( email ) {
-					payload.author_email = email;
-				}
-				if ( url ) {
-					payload.author_url = url;
-				}
 
 				callbacks.submitComment( payload, form );
 			} ),

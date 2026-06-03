@@ -210,7 +210,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 			'nextButtonText'              => esc_html_x( 'Next', 'next image in lightbox' ),
 			'commentEndpoint'             => rest_url( 'wp/v2/comments' ),
 			'commentNonce'                => wp_create_nonce( 'wp_rest' ),
-			'commentRegistrationRequired' => get_option( 'comment_registration' ) && ! is_user_logged_in(),
+			'commentLoginRequired'        => ! is_user_logged_in(),
 			'commentSubmittedText'        => __( 'Comment submitted.' ),
 			'commentSubmittingText'       => __( 'Submitting comment...' ),
 			'commentErrorText'            => __( 'Could not submit the comment. Please try again.' ),
@@ -335,22 +335,17 @@ function block_core_image_print_lightbox_overlay() {
 	$prev_button_text  = esc_attr_x( 'Previous', 'previous image in lightbox' );
 	$next_button_text  = esc_attr_x( 'Next', 'next image in lightbox' );
 	$comment_label     = esc_attr__( 'Comment' );
-	$name_label        = esc_attr__( 'Name' );
-	$email_label       = esc_attr__( 'Email' );
-	$url_label         = esc_attr__( 'Website' );
 	$submit_label      = esc_html__( 'Post Comment' );
 	$comment_icon      = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H9.44L5.3 18.53A.75.75 0 0 1 4 17.96V5.5Zm2.5-1A1 1 0 0 0 5.5 5.5v11.33l3.18-2.71a.75.75 0 0 1 .49-.18h8.33a1 1 0 0 0 1-1v-7.44a1 1 0 0 0-1-1h-11Z"></path></svg>';
 	$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 	$prev_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
 	$next_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
-	$required          = get_option( 'require_name_email' ) ? 'required' : '';
 	$login_url         = esc_url( wp_login_url( get_permalink() ) );
 	$login_message     = sprintf(
 		/* translators: %s: Login URL. */
 		wp_kses( __( 'You must be <a href="%s">logged in</a> to comment.' ), array( 'a' => array( 'href' => array() ) ) ),
 		$login_url
 	);
-	$commenter         = wp_get_current_commenter();
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
@@ -430,30 +425,6 @@ function block_core_image_print_lightbox_overlay() {
 					<div class="wp-lightbox-comments-list" hidden></div>
 					<p class="wp-lightbox-comments-login" data-wp-bind--hidden="!state.commentLoginRequired">{$login_message}</p>
 					<form data-wp-bind--hidden="state.commentLoginRequired" data-wp-on--submit="actions.submitComment">
-HTML;
-
-	if ( ! is_user_logged_in() ) {
-		$author = esc_attr( $commenter['comment_author'] );
-		$email  = esc_attr( $commenter['comment_author_email'] );
-		$url    = esc_attr( $commenter['comment_author_url'] );
-
-		echo <<<HTML
-						<label>
-							<span>{$name_label}</span>
-							<input name="author" type="text" autocomplete="name" value="{$author}" {$required}>
-						</label>
-						<label>
-							<span>{$email_label}</span>
-							<input name="email" type="email" autocomplete="email" value="{$email}" {$required}>
-						</label>
-						<label>
-							<span>{$url_label}</span>
-							<input name="url" type="url" autocomplete="url" value="{$url}">
-						</label>
-HTML;
-	}
-
-	echo <<<HTML
 						<label>
 							<span>{$comment_label}</span>
 							<textarea name="comment" required></textarea>
