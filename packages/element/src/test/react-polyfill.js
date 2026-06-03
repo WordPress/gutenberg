@@ -2,17 +2,13 @@
  * Internal dependencies
  */
 import { createElement } from '..';
-import {
-	render as renderPolyfill,
-	hydrate,
-	unmountComponentAtNode,
-} from '../react-polyfill';
+import { render, hydrate, unmountComponentAtNode } from '../react-polyfill';
 
-describe( 'render polyfill', () => {
+describe( 'render', () => {
 	it( 'should render into a container', () => {
 		const container = document.createElement( 'div' );
 
-		renderPolyfill( createElement( 'p', null, 'hello' ), container );
+		render( createElement( 'p', null, 'hello' ), container );
 
 		expect( container ).toHaveTextContent( 'hello' );
 		expect( console ).toHaveWarned();
@@ -21,8 +17,8 @@ describe( 'render polyfill', () => {
 	it( 'should update the container on subsequent renders', () => {
 		const container = document.createElement( 'div' );
 
-		renderPolyfill( createElement( 'p', null, 'hello' ), container );
-		renderPolyfill( createElement( 'p', null, 'world' ), container );
+		render( createElement( 'p', null, 'hello' ), container );
+		render( createElement( 'p', null, 'world' ), container );
 
 		expect( container ).toHaveTextContent( 'world' );
 	} );
@@ -31,25 +27,21 @@ describe( 'render polyfill', () => {
 		const container = document.createElement( 'div' );
 		const callback = jest.fn();
 
-		renderPolyfill(
-			createElement( 'p', null, 'hello' ),
-			container,
-			callback
-		);
+		render( createElement( 'p', null, 'hello' ), container, callback );
 
 		expect( callback ).toHaveBeenCalledTimes( 1 );
 		expect( container ).toHaveTextContent( 'hello' );
 	} );
 } );
 
-describe( 'hydrate polyfill', () => {
+describe( 'hydrate', () => {
 	it( 'should hydrate into a container with matching markup', () => {
 		const container = document.createElement( 'div' );
 		container.innerHTML = '<p>hello</p>';
 
 		hydrate( createElement( 'p', null, 'hello' ), container );
 
-		expect( container.querySelector( 'p' ) ).toHaveTextContent( 'hello' );
+		expect( container ).toHaveTextContent( 'hello' );
 		expect( console ).toHaveWarned();
 	} );
 
@@ -64,7 +56,7 @@ describe( 'hydrate polyfill', () => {
 	} );
 } );
 
-describe( 'unmountComponentAtNode polyfill', () => {
+describe( 'unmountComponentAtNode', () => {
 	it( 'should return false when the container has no root', () => {
 		const container = document.createElement( 'div' );
 
@@ -75,7 +67,7 @@ describe( 'unmountComponentAtNode polyfill', () => {
 	it( 'should unmount and return true when a root exists', () => {
 		const container = document.createElement( 'div' );
 
-		renderPolyfill( createElement( 'p', null, 'hello' ), container );
+		render( createElement( 'p', null, 'hello' ), container );
 		expect( container ).toHaveTextContent( 'hello' );
 
 		expect( unmountComponentAtNode( container ) ).toBe( true );
