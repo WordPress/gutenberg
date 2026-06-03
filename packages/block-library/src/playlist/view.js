@@ -105,6 +105,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		image: track.image,
 		autoPlay: shouldAutoPlay,
 		labels,
+		waveformStyle: context.waveformStyle,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
