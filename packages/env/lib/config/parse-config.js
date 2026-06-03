@@ -632,7 +632,7 @@ async function parseCoreSource( coreSource, options ) {
 			);
 		}
 
-		coreSource = `WordPress/WordPress#${ wpVersion }`;
+		coreSource = `https://wordpress.org/wordpress-${ wpVersion }.zip`;
 	}
 	return parseSourceString( coreSource, options );
 }
