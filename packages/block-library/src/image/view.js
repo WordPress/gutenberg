@@ -38,8 +38,9 @@ const touchStartEvent = {
 };
 
 const focusableSelectors = [
-	'.wp-lightbox-close-button',
-	'.wp-lightbox-navigation-button',
+	'.wp-lightbox-close-button:not([hidden])',
+	'.wp-lightbox-navigation-button:not([hidden])',
+	'.wp-lightbox-exif-button:not([hidden])',
 ];
 
 /**
@@ -71,6 +72,7 @@ const { state, actions, callbacks } = store(
 		state: {
 			selectedImageId: null,
 			selectedGalleryId: null,
+			exifVisible: false,
 			preloadTimers: new Map(),
 			preloadedImageIds: new Set(),
 			get galleryImages() {
@@ -170,6 +172,12 @@ const { state, actions, callbacks } = store(
 			get hasExif() {
 				return Object.values( state.selectedImageExif ).some( Boolean );
 			},
+			get isExifVisible() {
+				return state.hasExif && state.exifVisible;
+			},
+			get exifExpanded() {
+				return state.isExifVisible ? 'true' : 'false';
+			},
 			get exifCamera() {
 				return state.selectedImageExif.camera;
 			},
@@ -236,6 +244,7 @@ const { state, actions, callbacks } = store(
 				state.selectedImageId = imageId;
 				const { galleryId } = getContext( 'core/gallery' ) || {};
 				state.selectedGalleryId = galleryId || null;
+				state.exifVisible = false;
 				state.overlayEnabled = true;
 
 				// Computes the styles of the overlay for the animation.
@@ -261,15 +270,23 @@ const { state, actions, callbacks } = store(
 						// Resets the selected image and gallery ids.
 						state.selectedImageId = null;
 						state.selectedGalleryId = null;
+						state.exifVisible = false;
 					}, 450 );
 				}
 			},
+			toggleExif: withSyncEvent( ( event ) => {
+				event.preventDefault();
+				event.stopPropagation();
+				state.exifVisible = ! state.exifVisible;
+				callbacks.setOverlayStyles();
+			} ),
 			showPreviousImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
 				const nextIndex = state.hasPreviousImage
 					? state.selectedImageIndex - 1
 					: state.galleryImages.length - 1;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				state.exifVisible = false;
 				callbacks.setOverlayStyles();
 			} ),
 			showNextImage: withSyncEvent( ( event ) => {
@@ -278,6 +295,7 @@ const { state, actions, callbacks } = store(
 					? state.selectedImageIndex + 1
 					: 0;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				state.exifVisible = false;
 				callbacks.setOverlayStyles();
 			} ),
 			handleKeydown: withSyncEvent( ( event ) => {
@@ -570,8 +588,8 @@ const { state, actions, callbacks } = store(
 					horizontalPadding = state.hasNavigation ? 320 : 80;
 					verticalPadding = 80;
 				}
-				if ( state.hasExif ) {
-					verticalPadding = Math.max( verticalPadding, 160 );
+				if ( state.isExifVisible ) {
+					verticalPadding = Math.max( verticalPadding, 220 );
 				}
 
 				const targetMaxWidth = Math.min(

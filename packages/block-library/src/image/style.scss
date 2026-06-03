@@ -307,11 +307,49 @@
 		z-index: 2000001;
 	}
 
+	.wp-lightbox-exif-button {
+		position: absolute;
+		z-index: 3000002;
+		left: 50%;
+		bottom: calc(env(safe-area-inset-bottom) + 16px);
+		transform: translateX(-50%);
+		box-sizing: border-box;
+		width: 40px;
+		height: 40px;
+		padding: 4px;
+		cursor: pointer;
+		line-height: 0;
+
+		&[hidden] {
+			display: none;
+		}
+
+		&:hover,
+		&:focus,
+		&.active,
+		&:not(:hover):not(:active):not(.has-background) {
+			background: none;
+			border: none;
+		}
+
+		&:focus-visible {
+			outline: 3px auto currentColor;
+			outline-offset: 3px;
+		}
+
+		svg {
+			display: block;
+			width: 25px;
+			height: 24px;
+			margin: auto;
+		}
+	}
+
 	.wp-lightbox-exif {
 		position: absolute;
 		z-index: 3000001;
 		left: 50%;
-		bottom: calc(env(safe-area-inset-bottom) + 24px);
+		bottom: calc(env(safe-area-inset-bottom) + 72px);
 		transform: translateX(-50%);
 		box-sizing: border-box;
 		max-width: min(90vw, 720px);
