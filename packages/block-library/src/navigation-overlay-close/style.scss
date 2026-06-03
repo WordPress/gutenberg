@@ -7,7 +7,14 @@
 	border: none;
 	background: transparent;
 	cursor: pointer;
+	font-family: inherit;
+	font-size: inherit;
+	font-style: inherit;
+	font-weight: inherit;
+	letter-spacing: inherit;
+	line-height: inherit;
 	text-decoration: none;
+	text-transform: inherit;
 
 	&:focus {
 		outline-offset: 2px;
@@ -26,4 +33,3 @@
 		align-items: center;
 	}
 }
-
