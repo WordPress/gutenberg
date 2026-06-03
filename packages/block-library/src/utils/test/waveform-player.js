@@ -22,10 +22,11 @@ jest.mock( '../waveform-utils', () => ( {
  * Create a fake player instance that mimics the parts of the waveform
  * player instance the component manipulates.
  *
- * @param {Object} options Options passed to initWaveformPlayer.
+ * @param {Object}  options Options passed to initWaveformPlayer.
+ * @param {Element} element The element passed to initWaveformPlayer.
  * @return {Object} The fake player.
  */
-function createFakePlayer( options ) {
+function createFakePlayer( options, element ) {
 	const titleEl = document.createElement( 'span' );
 	titleEl.textContent = options.title ?? '';
 	// The subtitle and artwork elements only exist when the track had an
@@ -40,6 +41,15 @@ function createFakePlayer( options ) {
 		artworkEl = document.createElement( 'img' );
 		artworkEl.src = options.image;
 	}
+
+	element.append( titleEl );
+	if ( subtitleEl ) {
+		element.append( subtitleEl );
+	}
+	if ( artworkEl ) {
+		element.append( artworkEl );
+	}
+
 	return {
 		instance: { titleEl, subtitleEl, artworkEl },
 		destroy: jest.fn(),
@@ -50,7 +60,7 @@ describe( 'WaveformPlayer', () => {
 	beforeEach( () => {
 		jest.useFakeTimers();
 		initWaveformPlayer.mockImplementation( ( element, options ) =>
-			createFakePlayer( options )
+			createFakePlayer( options, element )
 		);
 	} );
 
@@ -194,7 +204,7 @@ describe( 'WaveformPlayer', () => {
 		expect( secondPlayer.instance.artworkEl ).toBeNull();
 	} );
 
-	it( 'recreates the player to show an artist added to a track that had none', () => {
+	it( 'updates the player in place to show an artist added to a track that had none', () => {
 		const { rerender } = render(
 			<WaveformPlayer { ...baseProps } artist="" />
 		);
@@ -204,24 +214,26 @@ describe( 'WaveformPlayer', () => {
 		} );
 
 		const firstPlayer = initWaveformPlayer.mock.results[ 0 ].value;
-		// No subtitle element exists when the track started without an artist.
-		expect( firstPlayer.instance.subtitleEl ).toBeNull();
+		// The editor seeds a hidden subtitle element so artist edits can
+		// update in place.
+		expect( firstPlayer.instance.subtitleEl ).toHaveTextContent( '' );
+		expect( firstPlayer.instance.subtitleEl ).toHaveStyle( {
+			display: 'none',
+		} );
 
 		rerender( <WaveformPlayer { ...baseProps } artist="New Artist" /> );
 
-		act( () => {
-			jest.advanceTimersByTime( 100 );
-		} );
-
-		expect( firstPlayer.destroy ).toHaveBeenCalledTimes( 1 );
-		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
-		const secondPlayer = initWaveformPlayer.mock.results[ 1 ].value;
-		expect( secondPlayer.instance.subtitleEl ).toHaveTextContent(
+		expect( firstPlayer.destroy ).not.toHaveBeenCalled();
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
+		expect( firstPlayer.instance.subtitleEl ).toHaveTextContent(
 			'New Artist'
 		);
+		expect( firstPlayer.instance.subtitleEl ).not.toHaveStyle( {
+			display: 'none',
+		} );
 	} );
 
-	it( 'recreates the player when the artist is removed', () => {
+	it( 'updates the player in place when the artist is removed', () => {
 		const { rerender } = render( <WaveformPlayer { ...baseProps } /> );
 
 		act( () => {
@@ -232,13 +244,11 @@ describe( 'WaveformPlayer', () => {
 
 		rerender( <WaveformPlayer { ...baseProps } artist="" /> );
 
-		act( () => {
-			jest.advanceTimersByTime( 100 );
+		expect( player.destroy ).not.toHaveBeenCalled();
+		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 1 );
+		expect( player.instance.subtitleEl ).toHaveTextContent( '' );
+		expect( player.instance.subtitleEl ).toHaveStyle( {
+			display: 'none',
 		} );
-
-		expect( player.destroy ).toHaveBeenCalledTimes( 1 );
-		expect( initWaveformPlayer ).toHaveBeenCalledTimes( 2 );
-		const secondPlayer = initWaveformPlayer.mock.results[ 1 ].value;
-		expect( secondPlayer.instance.subtitleEl ).toBeNull();
 	} );
 } );

@@ -9,15 +9,18 @@ import { useEvent, useRefEffect } from '@wordpress/compose';
  */
 import { initWaveformPlayer } from './waveform-utils';
 
+const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
+
 /**
  * Update a live waveform player's metadata elements in place.
  *
  * The title element always exists, so the title is updated in place. The
- * subtitle and artwork elements only exist when the track had an artist/image
- * when the player was created, so their values are updated in place here;
- * adding or removing an artist or image (which creates or tears down those
- * elements) is instead handled by recreating the player, keyed on the
- * `hasArtist` and `hasImage` dependencies.
+ * subtitle element is seeded during editor player creation, so it can be
+ * updated in place and hidden when the track has no artist. The artwork
+ * element only exists when the track had an image when the player was created,
+ * so its value is updated in place here; adding or removing an image (which
+ * creates or tears down that element) is instead handled by recreating the
+ * player, keyed on the `hasImage` dependency.
  *
  * The library's only metadata API is `loadTrack()`, which re-fetches and
  * re-decodes the audio and regenerates the waveform (resetting playback), so
@@ -76,12 +79,11 @@ export function WaveformPlayer( {
 	const metadataRef = useRef( { title, artist, image } );
 	const playerRef = useRef();
 
-	// The artwork and subtitle elements only exist when an image/artist was
-	// present when the player was created. Recreate the player when either is
-	// added or removed so that element is created or torn down; value changes
-	// to an existing element are applied in place below.
+	// The artwork element only exists when an image was present when the
+	// player was created. Recreate the player when one is added or removed so
+	// that element is created or torn down; value changes to an existing
+	// element are applied in place below.
 	const hasImage = !! image;
-	const hasArtist = !! artist;
 
 	// Keep the freshest metadata available to init() (which runs on a
 	// deferred timeout) and update the live player in place when metadata
@@ -114,9 +116,12 @@ export function WaveformPlayer( {
 					src,
 					...metadataRef.current,
 					waveformStyle,
+					artist:
+						metadataRef.current.artist || EMPTY_ARTIST_PLACEHOLDER,
 					onEnded: () => onEndedEvent?.(),
 				} );
 				playerRef.current = player;
+				updatePlayerMetadata( player.instance, metadataRef.current );
 				const { destroy } = player;
 				playerDestroy = destroy;
 			}
@@ -137,7 +142,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, src, waveformStyle, hasImage, hasArtist ]
+		[ onEndedEvent, src, waveformStyle, hasImage ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
