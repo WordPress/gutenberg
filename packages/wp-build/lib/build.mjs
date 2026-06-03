@@ -588,17 +588,9 @@ async function bundlePackage( packageName, options = {} ) {
 			// them in place; replacing the whole namespace with a shallow copy
 			// is the simplest way to materialize each value once.
 			//
-			// Seed the copy with a non-enumerable `__esModule` so webpack's
-			// `__webpack_require__.n` helper in external consumers (e.g.
-			// WooCommerce) still resolves `import X from '@wordpress/<package>'`
-			// to `.default` rather than the whole namespace. A plain
-			// `Object.assign({}, …)` would otherwise drop esbuild's
-			// non-enumerable `__esModule` marker. Non-enumerable matches the
-			// descriptor esbuild's `__toCommonJS` (and webpack's own
-			// `__webpack_require__.r`) emit, so it does not leak into
-			// `Object.keys`, spread, or downstream `Object.assign`. `writable`
-			// guards against a strict-mode write if a future esbuild ever
-			// emitted an enumerable `__esModule` for `Object.assign` to copy.
+			// Seed the copy with a non-enumerable `__esModule` flag so that
+			// bundlers treat it as an ESM module, triggering interop
+			// conventions for default exports.
 			footerParts.push(
 				`if(${ globalName }&&typeof ${ globalName }==='object'){${ globalName }=Object.assign(Object.defineProperty({},'__esModule',{value:true,writable:true}),${ globalName });}`
 			);
