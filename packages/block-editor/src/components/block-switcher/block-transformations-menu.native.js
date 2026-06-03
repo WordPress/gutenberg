@@ -56,19 +56,28 @@ const BlockTransformationsMenu = ( {
 		anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined;
 
 	function onPickerSelect( value ) {
+		const selectedItem = possibleTransformations.find(
+			( item ) => item.id === value
+		);
+		if ( ! selectedItem ) {
+			return;
+		}
 		replaceBlocks(
 			selectedBlockClientId,
-			switchToBlockType( selectedBlock, value )
+			switchToBlockType(
+				selectedBlock,
+				selectedItem.name,
+				selectedItem.variationName
+			)
 		);
-
-		const selectedItem = pickerOptions().find(
+		const selectedOption = pickerOptions().find(
 			( item ) => item.value === value
 		);
 		const successNotice = sprintf(
 			/* translators: 1: From block title, e.g. Paragraph. 2: To block title, e.g. Header. */
 			__( '%1$s transformed to %2$s' ),
 			blockTitle,
-			selectedItem.label
+			selectedOption?.label || selectedItem.title
 		);
 		createSuccessNotice( successNotice );
 	}

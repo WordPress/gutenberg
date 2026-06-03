@@ -13,6 +13,11 @@ import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpres
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { migrateLayout } from '../../utils/migrate-layout';
+import {
+	presetToRowHeight,
+	rowHeightToPreset,
+	type RowHeightPreset,
+} from '../../utils/row-height-presets';
 import type {
 	WidgetGridLayoutSettings,
 	WidgetGridModel,
@@ -22,8 +27,6 @@ import { LayoutModelEditField } from './layout-model-edit-field';
 
 const DEFAULT_FIXED_COLUMNS = 6;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
-const DEFAULT_ROW_HEIGHT = 200;
-const ROW_HEIGHT_AUTO = 'auto' as const;
 
 function getModel( item: WidgetGridSettings ): WidgetGridModel {
 	return item.model ?? 'grid';
@@ -31,19 +34,6 @@ function getModel( item: WidgetGridSettings ): WidgetGridModel {
 
 function isMasonry( item: WidgetGridSettings ): boolean {
 	return getModel( item ) === 'masonry';
-}
-
-function getRowHeight(
-	item: WidgetGridSettings
-): WidgetGridLayoutSettings[ 'rowHeight' ] {
-	if ( isMasonry( item ) ) {
-		return undefined;
-	}
-	return ( item as WidgetGridLayoutSettings ).rowHeight;
-}
-
-function isAutoRowHeight( item: WidgetGridSettings ): boolean {
-	return getRowHeight( item ) === ROW_HEIGHT_AUTO;
 }
 
 function StepperIntegerEdit( {
@@ -144,29 +134,27 @@ const fields: Field< WidgetGridSettings >[] = [
 		isVisible: ( item ) => item.minColumnWidth !== 0,
 	},
 	{
-		id: 'autoRowHeight',
-		type: 'boolean',
-		Edit: 'toggle',
-		label: __( 'Auto-fit row height to content' ),
-		getValue: ( { item } ) => isAutoRowHeight( item ),
+		id: 'rowHeight',
+		type: 'text',
+		Edit: 'toggleGroup',
+		label: __( 'Row height' ),
+		description: __( 'Height of each grid row.' ),
+		elements: [
+			{ value: 'small', label: __( 'Small' ) },
+			{ value: 'medium', label: __( 'Medium' ) },
+			{ value: 'large', label: __( 'Large' ) },
+		],
+		getValue: ( { item } ) => {
+			const rowHeight = ( item as WidgetGridLayoutSettings ).rowHeight;
+			if ( typeof rowHeight !== 'number' ) {
+				return 'medium';
+			}
+			return rowHeightToPreset( rowHeight );
+		},
 		setValue: ( { value } ) => ( {
-			rowHeight: value ? ROW_HEIGHT_AUTO : DEFAULT_ROW_HEIGHT,
+			rowHeight: presetToRowHeight( value as RowHeightPreset ),
 		} ),
 		isVisible: ( item ) => ! isMasonry( item ),
-	},
-	{
-		id: 'rowHeight',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Row height (px)' ),
-		description: __( 'Height of each row in the standard grid.' ),
-		isValid: { min: 100 },
-		getValue: ( { item } ) => {
-			const rh = getRowHeight( item );
-			return typeof rh === 'number' ? rh : undefined;
-		},
-		isVisible: ( item ) => ! isMasonry( item ),
-		isDisabled: ( { item } ) => isAutoRowHeight( item ),
 	},
 ];
 
@@ -177,7 +165,6 @@ const form: Form = {
 		'columns',
 		'adaptiveColumns',
 		'minColumnWidth',
-		'autoRowHeight',
 		'rowHeight',
 	],
 };
@@ -195,11 +182,11 @@ interface LayoutSettingsProps {
 }
 
 /**
- * Non-modal side drawer for grid-level settings (model, column
- * behavior, row height). Reads from and writes to the staging copy
- * in `useDashboardInternalContext`, so every edit shows up live
- * behind the drawer and is committed or rolled back by the drawer's
- * Save / Cancel buttons.
+ * Modal side drawer for grid-level settings (model, column behavior,
+ * row height). Reads from and writes to the staging copy in
+ * `useDashboardInternalContext`; edits preview through the backdrop
+ * and are committed or rolled back by the drawer's Save / Cancel
+ * buttons.
  *
  * Gap is intentionally absent: the spacing between tiles is a
  * design-system concern (theme / density / viewport tokens) and
@@ -211,11 +198,9 @@ interface LayoutSettingsProps {
  * an Escape press, or any path other than the explicit Cancel/Save
  * buttons is treated as Cancel. None of these exit customize mode.
  *
- * Settings and layout-editing are kept as separate flows on the
- * dashboard (the Layout settings entry that opens this drawer is
- * disabled while edit mode is on), so the drawer's commit never
- * publishes layout edits that the user is in the middle of staging
- * through the toolbar.
+ * Opened from the customize toolbar beside Add widget. Cancel and
+ * dismiss revert only grid settings so in-progress widget layout
+ * edits in the same customize session are preserved.
  *
  * @param {LayoutSettingsProps} props Layout settings props.
  * @return {React.ReactNode} The layout settings component.
@@ -259,7 +244,7 @@ export function LayoutSettings( {
 	);
 
 	const handleCancel = useCallback( () => {
-		cancelStaging( { exitEditMode: false } );
+		cancelStaging( { exitEditMode: false, revertLayout: false } );
 		onOpenChange( false );
 	}, [ cancelStaging, onOpenChange ] );
 
@@ -271,7 +256,7 @@ export function LayoutSettings( {
 	const handleOpenChange = useCallback(
 		( nextOpen: boolean ) => {
 			if ( ! nextOpen && open ) {
-				cancelStaging( { exitEditMode: false } );
+				cancelStaging( { exitEditMode: false, revertLayout: false } );
 			}
 			onOpenChange( nextOpen );
 		},
@@ -283,8 +268,6 @@ export function LayoutSettings( {
 			open={ open }
 			onOpenChange={ handleOpenChange }
 			swipeDirection="right"
-			modal={ false }
-			disablePointerDismissal
 		>
 			<Drawer.Popup size="medium" style={ { marginTop: '32px' } }>
 				<Drawer.Header>

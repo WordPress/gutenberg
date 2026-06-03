@@ -30,6 +30,7 @@
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
 ## 4.47.0 (2026-05-27)
 
 ## 4.46.0 (2026-05-14)
@@ -30,7 +38,7 @@
 
 ### Internal
 
-- TypeScript conversion
+-   TypeScript conversion
 
 ## 4.33.0 (2025-10-17)
 
