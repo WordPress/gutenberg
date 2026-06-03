@@ -34,13 +34,45 @@
 		flex: 1;
 	}
 
-	.media-editor__canvas {
+	// Canvas column: image fills the available height; in panel mode the
+	// fine-rotation ruler sits directly beneath it.
+	.media-editor__content {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		min-height: 0;
+		// Inset the canvas + fine-rotation ruler as one rounded grey panel
+		// with a horizontal-only gutter. The ruler is always a child here
+		// (never the footer), so the two share a container and the panel is
+		// fully rounded at every viewport.
+		margin: 0 $grid-unit-30;
+		border-radius: $radius-large;
+		overflow: hidden;
+	}
+
+	.media-editor__canvas-toolbar {
+		display: flex;
+		flex-shrink: 0;
+		justify-content: center;
+		// Share the canvas grey so the ruler strip blends into the same
+		// surface as the area around the image.
+		background: $gray-200;
+		padding: $grid-unit-10 $grid-unit-20;
+
+		.media-editor-fine-rotation {
+			flex: 0 1 360px;
+			min-width: 0;
+		}
+	}
+
+	.media-editor__canvas-area {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: $gray-100;
+		background: $gray-200;
 		overflow: auto;
-		height: 100%;
+		flex: 1;
+		min-height: 0;
 
 		.media-editor-preview {
 			height: 100%;
@@ -56,12 +88,42 @@
 
 	.media-editor__sidebar {
 		@include reset;
+
+		// Small left gutter so the tabs and panel content (and the zoom
+		// slider's thumb at its minimum) sit off the sidebar edge. Only in the
+		// column layout; below `medium` the sidebar is a full-width overlay and
+		// uses the panel's own gutter instead.
+		@include break-medium() {
+			padding-left: $grid-unit-10;
+		}
 	}
 
+	// Borderless controls panel: clear the InterfaceSkeleton sidebar's
+	// default top border, left box-shadow, and high-contrast outline so the
+	// panel sits flush with no divider lines.
+	// NOTE: overrides @wordpress/interface internals. The sidebar region has
+	// no className prop, so this targets `interface-interface-skeleton__sidebar`
+	// directly — update here if that class is renamed upstream.
+	.interface-interface-skeleton__sidebar {
+		border-top: 0;
+		box-shadow: none;
+		outline: 1px solid transparent;
+	}
+
+	// Below `medium` the sidebar is a full-width overlay, so the panel carries
+	// its own all-around gutter. From `medium` up it's the right-hand column
+	// and drops its left/bottom padding (the sidebar supplies the left gutter).
 	.media-editor__panel {
 		padding: $grid-unit-20;
+
+		@include break-medium() {
+			padding: $grid-unit-20 $grid-unit-30 0 0;
+		}
 	}
 
+	// NOTE: overrides @wordpress/components Panel/Button internals to align
+	// the sidebar header (tabs + close button). Targets their classes
+	// directly; update here if they are renamed upstream.
 	.components-panel__header.media-editor__sidebar-header {
 		padding-left: 0;
 		padding-right: $grid-unit-10;
