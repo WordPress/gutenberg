@@ -197,8 +197,6 @@ export default function ItemActions< Item >( {
 		};
 	}, [ actions, item ] );
 
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-
 	if ( isCompact ) {
 		return (
 			<CompactItemActions
@@ -220,15 +218,14 @@ export default function ItemActions< Item >( {
 				width: 'auto',
 			} }
 		>
-			<PrimaryActions
-				item={ item }
-				actions={ primaryActions }
-				registry={ registry }
-			/>
-			{ ( primaryActions.length < eligibleActions.length ||
-				// Since we hide primary actions on mobile, we need to show the menu
-				// there if there are any actions at all.
-				isMobileViewport ) && (
+			{ primaryActions.length < eligibleActions.length && (
+				<PrimaryActions
+					item={ item }
+					actions={ primaryActions }
+					registry={ registry }
+				/>
+			) }
+			{ eligibleActions.length > 0 && (
 				<CompactItemActions
 					item={ item }
 					actions={ eligibleActions }

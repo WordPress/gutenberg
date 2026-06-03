@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: Fix `CompactItemActions` (kebab menu) not rendering when all eligible actions are primary. When only primary actions exist, they are now accessible exclusively via the kebab menu rather than as unreachable inline buttons. ([#78845](https://github.com/WordPress/gutenberg/pull/78845)).
+
 ## 15.0.0 (2026-05-27)
 
 ### Breaking Changes
