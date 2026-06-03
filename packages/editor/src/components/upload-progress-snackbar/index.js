@@ -20,6 +20,32 @@ const NOTICE_ID = 'upload-progress';
 // How long the completion checkmark is shown before the snackbar dismisses.
 const COMPLETION_DISPLAY_MS = 3000;
 
+// Longest filename shown before it is middle-truncated. Long names (e.g. the
+// UUID-style names some sources produce) would otherwise stretch the snackbar.
+const MAX_FILENAME_LENGTH = 40;
+
+/**
+ * Middle-truncates a filename that exceeds `MAX_FILENAME_LENGTH`, keeping the
+ * start and the end (so the file extension stays visible).
+ *
+ * @param {string} filename The filename to truncate.
+ * @return {string} The original or middle-truncated filename.
+ */
+function truncateFilename( filename ) {
+	if ( filename.length <= MAX_FILENAME_LENGTH ) {
+		return filename;
+	}
+	const ellipsis = '…';
+	const visible = MAX_FILENAME_LENGTH - ellipsis.length;
+	const front = Math.ceil( visible / 2 );
+	const back = Math.floor( visible / 2 );
+	return (
+		filename.slice( 0, front ) +
+		ellipsis +
+		filename.slice( filename.length - back )
+	);
+}
+
 const UPLOAD_SPINNER = (
 	<span
 		className="editor-upload-progress-snackbar__spinner"
@@ -145,10 +171,11 @@ export default function UploadProgressSnackbar() {
 
 		// Prefer the CSM queue's first original filename, then fall back to
 		// the tracker's first pending filename.
-		const filename =
+		const filename = truncateFilename(
 			csmOriginals[ 0 ]?.sourceFile?.name ||
-			tracker?.pending[ 0 ] ||
-			__( 'Uploading' );
+				tracker?.pending[ 0 ] ||
+				__( 'Uploading' )
+		);
 
 		const content =
 			total === 1

@@ -164,6 +164,27 @@ describe( 'UploadProgressSnackbar', () => {
 		}
 	} );
 
+	it( 'middle-truncates a long filename while keeping the extension', () => {
+		const longName =
+			'a-really-long-uuid-like-filename-1234567890-abcdefghij.jpg';
+		mockQueue( [ makeItem( '1', longName ) ] );
+		render( <UploadProgressSnackbar /> );
+		const content = mockCreateNotice.mock.calls[ 0 ][ 1 ];
+		// Truncated: shorter than the original, marked with an ellipsis, and the
+		// extension is still visible.
+		expect( content ).toContain( '…' );
+		expect( content ).not.toContain( longName );
+		expect( content ).toMatch( /\.jpg$/ );
+	} );
+
+	it( 'does not truncate a short filename', () => {
+		mockQueue( [ makeItem( '1', 'photo.jpg' ) ] );
+		render( <UploadProgressSnackbar /> );
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toBe(
+			'Uploading — photo.jpg'
+		);
+	} );
+
 	it( 'includes a spinner icon on the in-progress notice', () => {
 		mockQueue( [ makeItem( '1', 'photo.jpg' ) ] );
 		render( <UploadProgressSnackbar /> );
