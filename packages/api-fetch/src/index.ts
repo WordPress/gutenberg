@@ -6,9 +6,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { lock } from './lock-unlock';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
-import createPreloadingMiddleware from './middlewares/preloading';
+import createPreloadingMiddleware, {
+	CLEAR as PRELOADING_CLEAR,
+	ENABLE_MULTI_USE as PRELOADING_ENABLE_MULTI_USE,
+} from './middlewares/preloading';
 import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
@@ -59,6 +63,18 @@ const middlewares: Array< APIFetchMiddleware > = [
  */
 function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
+}
+
+function enablePreloadMultiUse() {
+	for ( const middleware of middlewares ) {
+		( middleware as any )[ PRELOADING_ENABLE_MULTI_USE ]?.();
+	}
+}
+
+function clearPreloadedData() {
+	for ( const middleware of middlewares ) {
+		( middleware as any )[ PRELOADING_CLEAR ]?.();
+	}
 }
 
 const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
@@ -149,6 +165,7 @@ export interface ApiFetch {
 	fetchAllMiddleware: typeof fetchAllMiddleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
+	privateApis: object;
 }
 
 /**
@@ -196,6 +213,17 @@ const apiFetch: ApiFetch = ( options ) => {
 
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
+
+// Attached to the function (rather than a named export) because
+// `wpScriptDefaultExport: true` flattens this module to its default
+// export — `wp.apiFetch` is the function itself, so anything that
+// needs to be reachable from a consumer's `wp.apiFetch.X` lookup has
+// to live on the function.
+apiFetch.privateApis = {};
+lock( apiFetch.privateApis, {
+	enablePreloadMultiUse,
+	clearPreloadedData,
+} );
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;

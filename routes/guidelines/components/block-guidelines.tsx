@@ -231,7 +231,11 @@ export default function BlockGuidelines() {
 				</DataViews>
 			) }
 			<HStack>
-				<Button variant="primary" onClick={ openModal }>
+				<Button
+					variant="primary"
+					onClick={ openModal }
+					__next40pxDefaultSize
+				>
 					{ __( 'Add guidelines' ) }
 				</Button>
 			</HStack>

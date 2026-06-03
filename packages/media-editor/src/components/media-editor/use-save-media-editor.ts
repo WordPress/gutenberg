@@ -12,7 +12,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import type { Media } from '../media-editor-provider';
-import type { UseCropperStateReturn } from '../../image-editor';
+import type { MediaEditorController } from '../../state';
 import {
 	buildModifiers,
 	type Modifier,
@@ -44,7 +44,7 @@ export interface MediaEditorSaveResult {
 }
 
 interface UseSaveMediaEditorArgs {
-	cropper: UseCropperStateReturn;
+	cropper: MediaEditorController;
 	id: number;
 	isImage: boolean;
 	media?: Media | null;
@@ -56,8 +56,8 @@ interface UseSaveMediaEditorReturn {
 	save: () => Promise< void >;
 }
 
-function getCropModifiers( cropper: UseCropperStateReturn ): Modifier[] {
-	if ( ! cropper.isDirty || ! cropper.state.image ) {
+function getCropModifiers( cropper: MediaEditorController ): Modifier[] {
+	if ( ! cropper.isCropperDirty || ! cropper.state.image ) {
 		return [];
 	}
 	return buildModifiers( cropper.state, {

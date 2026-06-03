@@ -1032,10 +1032,14 @@ export const getDefaultTemplateId =
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 

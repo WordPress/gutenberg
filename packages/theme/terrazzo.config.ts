@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
-
-/**
- * Internal dependencies
- */
 import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
 import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
 import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
@@ -70,27 +63,6 @@ const config: Config = {
 			},
 			baseSelector: ':root',
 			modeSelectors: [
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'compact',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: 'comfortable',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.**' ],
-					mode: '.',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='default']",
-					],
-				},
 				{
 					mode: 'high-dpi',
 					selectors: [

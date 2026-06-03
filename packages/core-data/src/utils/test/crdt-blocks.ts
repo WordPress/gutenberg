@@ -196,6 +196,43 @@ describe( 'crdt-blocks', () => {
 			expect( content.toString() ).toBe( 'Updated content' );
 		} );
 
+		it( 'preserves the local clientId when an updated block arrives with a different clientId', () => {
+			// Simulates the Code Editor flow: the sender re-parses raw HTML on
+			// every keystroke, which mints a fresh clientId for every block.
+			// The Y.Doc's clientId should stay stable so remote peers don't
+			// remount the block (and any embed iframe within it).
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'stable-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'stable-id' );
+
+			const reparsedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'freshly-parsed-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, reparsedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'stable-id' );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
 		it( 'deletes blocks that are removed', () => {
 			const initialBlocks: Block[] = [
 				{

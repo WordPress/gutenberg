@@ -13,7 +13,7 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { createDashboardWidget } from '../../utils/create-dashboard-widget';
 import { WidgetPicker } from '../widget-picker';
-import type { WidgetType } from '../../types';
+import type { WidgetType } from '../../../widget-primitives';
 
 /**
  * Modal-based widget inserter. The dialog stays hidden until `inserterOpen`

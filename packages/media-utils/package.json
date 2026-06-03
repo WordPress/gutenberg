@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "5.46.0",
+	"version": "5.47.0",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -65,7 +65,7 @@
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

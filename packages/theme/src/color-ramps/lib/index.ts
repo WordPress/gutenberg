@@ -1,8 +1,4 @@
 import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
 import { clampToGamut, getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {

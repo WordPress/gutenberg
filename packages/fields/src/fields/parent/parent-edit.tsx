@@ -149,6 +149,7 @@ export function PageAttributesParent( {
 					// Perform a search by relevance when the field is changed.
 					search: fieldValue,
 					orderby: 'relevance',
+					search_columns: [ 'post_title' ],
 				} ),
 			};
 
