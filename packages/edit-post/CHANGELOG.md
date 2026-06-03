@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 8.47.0 (2026-05-27)
+
+## 8.46.0 (2026-05-14)
+
+## 8.45.0 (2026-04-29)
+
+### Enhancements
+
+- Use `--wpds-cursor-control` for interactive cursor styling. [#77360](https://github.com/WordPress/gutenberg/pull/77360)
+
+## 8.44.0 (2026-04-15)
+
+## 8.43.0 (2026-04-01)
+
+## 8.42.0 (2026-03-18)
+
+## 8.41.0 (2026-03-04)
+
+## 8.40.0 (2026-02-18)
+
+## 8.39.0 (2026-01-29)
+
+## 8.38.0 (2026-01-16)
+
+## 8.36.0 (2025-11-26)
+
+### Internal
+
+-   Adjusted `welcome-guide` styles to define the close-button hover state internally after refactoring in the shared `Guide` component.
+
+## 8.35.0 (2025-11-12)
+
+## 8.34.0 (2025-10-29)
+
+## 8.33.0 (2025-10-17)
+
+## 8.32.0 (2025-10-01)
+
+## 8.31.0 (2025-09-17)
+
+## 8.30.0 (2025-09-03)
+
 ## 8.29.0 (2025-08-20)
 
 ## 8.28.0 (2025-08-07)

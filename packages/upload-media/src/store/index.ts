@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, register, select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -36,7 +36,11 @@ export const store = createReduxStore( STORE_NAME, {
 	actions,
 } );
 
-register( store );
+// The upload-media package is bundled into multiple packages (block-editor, editor).
+// Guard against duplicate registration when both bundles are loaded on the same page.
+if ( ! select( store ) ) {
+	register( store );
+}
 // @ts-ignore
 unlock( store ).registerPrivateActions( privateActions );
 // @ts-ignore

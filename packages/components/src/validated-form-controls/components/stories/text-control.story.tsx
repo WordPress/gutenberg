@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -29,13 +29,10 @@ export default meta;
 
 export const Default: StoryObj< typeof ValidatedTextControl > = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( '' );
-		const [ customValidity, setCustomValidity ] =
+		const [ value, setValue ] =
 			useState<
-				React.ComponentProps<
-					typeof ValidatedTextControl
-				>[ 'customValidity' ]
-			>( undefined );
+				React.ComponentProps< typeof ValidatedTextControl >[ 'value' ]
+			>( '' );
 
 		return (
 			<ValidatedTextControl
@@ -45,17 +42,14 @@ export const Default: StoryObj< typeof ValidatedTextControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if ( v?.toString().toLowerCase() === 'error' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'The word "error" is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					value === 'error'
+						? {
+								type: 'invalid',
+								message: 'The word "error" is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

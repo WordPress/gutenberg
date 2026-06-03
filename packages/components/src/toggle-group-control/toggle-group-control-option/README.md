@@ -20,7 +20,6 @@ function Example() {
 			label="my label"
 			value="vertical"
 			isBlock
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 		>
 			<ToggleGroupControlOption

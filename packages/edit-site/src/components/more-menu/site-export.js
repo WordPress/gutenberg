@@ -49,7 +49,7 @@ export default function SiteExport() {
 			let error = {};
 			try {
 				error = await errorResponse.json();
-			} catch ( e ) {}
+			} catch {}
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message

@@ -28,7 +28,7 @@ test.describe( 'Container block without paragraph support', () => {
 			name: 'test/container-without-paragraph',
 		} );
 
-		await page
+		await editor.canvas
 			.getByRole( 'document', {
 				name: 'Block: Container without paragraph',
 			} )

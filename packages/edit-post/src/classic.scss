@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // Provide baseline auto margin for centering blocks.
 // Specificity is kept at this level as many classic themes output
 // rules like figure { margin: 0; } which would break centering.
@@ -11,8 +14,11 @@
 // Themes with theme.json can control this themselves.
 // For full-wide blocks, we compensate for the base padding.
 // These margins should match the padding value above.
-html :where(.editor-styles-wrapper) {
+.editor-styles-wrapper {
 	padding: 8px;
+}
+
+html :where(.editor-styles-wrapper) {
 	.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
 		margin-left: -8px;
 		margin-right: -8px;

@@ -1,4 +1,4 @@
-export type ValidatedControlProps< V > = {
+export type ValidatedControlProps = {
 	/**
 	 * Whether the control is required.
 	 * @default false
@@ -9,14 +9,6 @@ export type ValidatedControlProps< V > = {
 	 * @default false
 	 */
 	markWhenOptional?: boolean;
-	/**
-	 * Optional callback to run when the input should be validated. Use this to set
-	 * a `customValidity` as necessary.
-	 *
-	 * Always prefer using standard HTML attributes like `required` and `min`/`max` over
-	 * custom validators when possible, as they are simpler and have localized error messages built in.
-	 */
-	onValidate?: ( currentValue: V ) => void;
 	/**
 	 * Show a custom message based on the validation status.
 	 *

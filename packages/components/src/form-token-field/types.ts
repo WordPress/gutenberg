@@ -147,9 +147,12 @@ export interface FormTokenFieldProps
 	 */
 	__experimentalValidateInput?: ( token: string ) => boolean;
 	/**
-	 * If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+	 * Use the `help` prop instead. The `help` prop now defaults to the previous
+	 * how-to text; if you were passing `__experimentalShowHowTo={ false }` to
+	 * hide it, pass an empty string to `help` instead.
 	 *
-	 * @default true
+	 * @deprecated Use the `help` prop instead.
+	 * @ignore
 	 */
 	__experimentalShowHowTo?: boolean;
 	/**
@@ -181,6 +184,9 @@ export interface FormTokenFieldProps
 	/**
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
+	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+	 * @ignore
+	 *
 	 * @default false
 	 */
 	__nextHasNoMarginBottom?: boolean;
@@ -190,6 +196,17 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	tokenizeOnBlur?: boolean;
+	/**
+	 * Additional description for the control.
+	 *
+	 * Only use for meaningful description or instructions for the control. An
+	 * element containing the description will be programmatically associated to
+	 * the `FormTokenField` via `aria-describedby`.
+	 *
+	 * Defaults to a how-to message (e.g. _Separate with commas or the Enter key._);
+	 * pass an empty string to hide it.
+	 */
+	help?: ReactNode;
 }
 
 /**

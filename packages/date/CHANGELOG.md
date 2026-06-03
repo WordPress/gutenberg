@@ -2,6 +2,51 @@
 
 ## Unreleased
 
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+### Bug Fixes
+
+-   Fixed incorrect spacing for the time format. It was `g: i` (`14: 30`), and it's now `g:i` (`14:30`). ([#73924](https://github.com/WordPress/gutenberg/pull/73924))
+-   Fixed `timezone` argument handling to properly treat `0` numeric timezone values as a valid UTC offset (UTC+0). Previously, these were treated as if the `timezone` argument was not passed. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+
+## 5.37.0 (2025-12-23)
+
+## 5.36.0 (2025-11-26)
+
+### Bug Fixes
+
+-   Fixed incorrect TypeScript types for `TimezoneConfig`'s `offset` type (was incorrectly `string`, now `number`)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
 ### Enhancements
 
 -   Improved TypeScript definitions ([67573](https://github.com/WordPress/gutenberg/pull/67573))

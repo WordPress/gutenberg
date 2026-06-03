@@ -1,0 +1,87 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Introduction" />
+
+# WordPress Design System
+
+## What is a Design System?
+
+A design system is a collection of reusable components, design tokens, and guidelines that work together to create consistent, accessible user interfaces. It serves as a single source of truth that bridges design and development, ensuring cohesion across different parts of an application.
+
+Rather than building UI elements from scratch each time, a design system provides pre-built, themeable components built on a foundation of design tokens. Design tokens encode design decisions like colors, spacing, and typography and can be customized to match different contexts while maintaining consistency.
+
+## How is this different from existing components?
+
+While similar in scope to the existing [`@wordpress/components`](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package, there are key differences:
+
+-   **Cohesive by design**: Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
+-   **Flexible theming**: Built from the ground up to support customizable color schemes and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
+-   **Modern distribution**: Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
+-   **Composable architecture**: Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
+
+For more context on the motivations and goals behind this work, see the [Design System: Support for admin redesign](https://github.com/WordPress/gutenberg/issues/71196) overview issue.
+
+## What are the parts of the design system?
+
+Describing the parts of a design system can be challenging, because ideally every part of the application inherits and builds from the design system fundamentals in some way.
+
+In WordPress, when talking about the design system, we usually think of its scope including:
+
+- **Foundational packages** establish the fundamental components and theming behaviors. As a low-level implementation, they are meant to be highly flexible, but this flexibility can make them difficult to work with.
+- **Compositional packages** operate at a higher-level, providing developer conveniences for composing the foundational elements of the design system into common solutions. These components optimize for predictable user experiences, sometimes intentionally limiting configurability in service of consistency.
+
+### Foundational Packages
+
+The WordPress Design System consists of a few core packages:
+
+#### Theming (`@wordpress/theme`)
+
+The foundational layer that provides:
+
+-   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, shadows, and more.
+-   **Theme Provider**: A component that accepts seed values and automatically generates consistent, accessible color ramps and spacing scales.
+
+Explore the [Theme documentation](/story/design-system-theme-introduction--docs) to learn more about design tokens, the token architecture, and how to use `ThemeProvider`.
+
+#### Components (`@wordpress/ui`)
+
+A library of React UI components built on the theme foundation:
+
+-   **Consistent patterns**: All components follow a consistent set of technical design principles to ensure that their usage is easy to understand and predictable.
+-   **Token-driven styling**: Components use design tokens for all visual properties, ensuring they automatically adapt to theme changes.
+-   **Accessible by default**: Built with WordPress accessibility coding standards in mind, including semantic markup, keyboard navigation, and proper color contrast.
+
+Explore the [Components documentation](/story/design-system-components-introduction--docs) to learn more about the component library and usage patterns.
+
+#### Icons (`@wordpress/icons`)
+
+A curated library of SVG icons for use throughout WordPress interfaces:
+
+-   **Comprehensive coverage**: A broad set of icons spanning common editor and admin actions.
+-   **Composable**: Each icon is exported as a React component and can be rendered directly or through the `<Icon>` wrapper with adjustable size.
+-   **Consistent visual language**: Drawn to a shared style so icons feel coherent wherever they appear across WordPress.
+
+See the [`@wordpress/icons` README](https://github.com/WordPress/gutenberg/tree/trunk/packages/icons) for usage details.
+
+### Compositional Packages
+
+Higher-level compositional packages use the design system to provide solutions for common UI patterns:
+
+#### DataViews (`@wordpress/dataviews`)
+
+A set of components and utilities for displaying, filtering, and editing lists of data:
+
+-   **Multiple layouts**: Render the same dataset as a table, grid, or list, with built-in search, filters, sorting, and pagination.
+-   **Selection and editing**: `DataViewsPicker` optimizes the same experience for selecting items from a dataset, while `DataForm` handles creating and editing individual records.
+-   **Declarative fields**: Drive rendering and behavior through field definitions rather than bespoke markup for each column or form.
+
+See the [`@wordpress/dataviews` README](https://github.com/WordPress/gutenberg/tree/trunk/packages/dataviews) for API reference and usage guidance.
+
+#### Admin UI (`@wordpress/admin-ui`)
+
+High-level building blocks for consistent WordPress admin page layouts:
+
+-   **Page structure**: Abstractions for pages, sidebars, headers, and navigation that encode the expected shape of an admin screen.
+-   **Consistency by default**: Enforces a predictable admin experience across features without each team re-deriving the same layout patterns.
+
+See the [`@wordpress/admin-ui` README](https://github.com/WordPress/gutenberg/tree/trunk/packages/admin-ui) for API reference and usage guidance.

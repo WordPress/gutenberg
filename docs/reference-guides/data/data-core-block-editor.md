@@ -470,6 +470,7 @@ _Properties_
 
 -   _id_ `string`: Unique identifier for the item.
 -   _name_ `string`: The type of block to create.
+-   _variationName_ `?string`: The target block variation name.
 -   _title_ `string`: Title of the item, as it appears in the inserter.
 -   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
@@ -1160,18 +1161,6 @@ _Returns_
 
 -   `boolean`: True if multi-selecting, false if not.
 
-### isNavigationMode
-
-Returns whether the navigation mode is enabled.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `boolean`: Is navigation mode enabled.
-
 ### isSelectionEnabled
 
 Selector that returns if multi-selection is enabled or not.
@@ -1198,7 +1187,7 @@ _Returns_
 
 ### isUngroupable
 
-Indicates if a block is ungroupable. A block is ungroupable if it is a single grouping block with inner blocks. If a block has an `ungroup` transform, it is also ungroupable, without the requirement of being the default grouping block. Additionally a block can only be ungrouped if it has inner blocks and can be removed.
+Indicates if a block is ungroupable. A block is ungroupable if it is a single grouping block with inner blocks. If a block has an `ungroup` transform, it is also ungroupable, without the requirement of being the default grouping block. Additionally a block can only be ungrouped if it has inner blocks and can be removed. Section blocks are not ungroupable.
 
 _Parameters_
 
@@ -1285,6 +1274,7 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
+-   _timeout_ `number`: Duration in milliseconds to keep the highlight. Defaults to 150ms.
 
 ### hideInsertionPoint
 
@@ -1324,6 +1314,7 @@ _Parameters_
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+-   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
@@ -1619,7 +1610,7 @@ Returns an action object used in signalling that the block with the specified cl
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
--   _initialPosition_ `0|-1|null`: Optional initial position. Pass as -1 to reflect reverse selection.
+-   _initialPosition_ `0|-1|null`: Optional initial position. Pass -1 to reflect reverse selection or `null` to prevent focusing the block.
 
 _Returns_
 
@@ -1700,14 +1691,6 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
-
-### setNavigationMode
-
-Action that enables or disables the navigation mode.
-
-_Parameters_
-
--   _isNavigationMode_ `boolean`: Enable/Disable navigation mode.
 
 ### setTemplateValidity
 

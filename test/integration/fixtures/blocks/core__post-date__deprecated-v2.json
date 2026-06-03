@@ -10,7 +10,7 @@
 					"datetime": {
 						"source": "core/post-data",
 						"args": {
-							"key": "modified"
+							"field": "modified"
 						}
 					}
 				}

@@ -6,9 +6,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { lock } from './lock-unlock';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
-import createPreloadingMiddleware from './middlewares/preloading';
+import createPreloadingMiddleware, {
+	CLEAR as PRELOADING_CLEAR,
+	ENABLE_MULTI_USE as PRELOADING_ENABLE_MULTI_USE,
+} from './middlewares/preloading';
 import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
@@ -61,20 +65,17 @@ function registerMiddleware( middleware: APIFetchMiddleware ) {
 	middlewares.unshift( middleware );
 }
 
-/**
- * Checks the status of a response, throwing the Response as an error if
- * it is outside the 200 range.
- *
- * @param response
- * @return The response if the status is in the 200 range.
- */
-const checkStatus = ( response: Response ) => {
-	if ( response.status >= 200 && response.status < 300 ) {
-		return response;
+function enablePreloadMultiUse() {
+	for ( const middleware of middlewares ) {
+		( middleware as any )[ PRELOADING_ENABLE_MULTI_USE ]?.();
 	}
+}
 
-	throw response;
-};
+function clearPreloadedData() {
+	for ( const middleware of middlewares ) {
+		( middleware as any )[ PRELOADING_CLEAR ]?.();
+	}
+}
 
 const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
@@ -89,7 +90,7 @@ const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch(
+	const responsePromise = globalThis.fetch(
 		// Fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed.
 		url || path || window.location.href,
 		{
@@ -101,24 +102,38 @@ const defaultFetchHandler: FetchHandler = ( nextOptions ) => {
 	);
 
 	return responsePromise.then(
-		( value ) =>
-			Promise.resolve( value )
-				.then( checkStatus )
-				.catch( ( response ) => parseAndThrowError( response, parse ) )
-				.then( ( response ) =>
-					parseResponseAndNormalizeError( response, parse )
-				),
+		( response ) => {
+			// If the response is not 2xx, still parse the response body as JSON
+			// but throw the JSON as error.
+			if ( ! response.ok ) {
+				return parseAndThrowError( response, parse );
+			}
+
+			return parseResponseAndNormalizeError( response, parse );
+		},
 		( err ) => {
 			// Re-throw AbortError for the users to handle it themselves.
 			if ( err && err.name === 'AbortError' ) {
 				throw err;
 			}
 
-			// Otherwise, there is most likely no network connection.
-			// Unfortunately the message might depend on the browser.
+			// If the browser reports being offline, we'll just assume that
+			// this is why the request failed.
+			if ( ! globalThis.navigator.onLine ) {
+				throw {
+					code: 'offline_error',
+					message: __(
+						'Unable to connect. Please check your Internet connection.'
+					),
+				};
+			}
+
+			// Hard to diagnose further due to how Window.fetch reports errors.
 			throw {
 				code: 'fetch_error',
-				message: __( 'You are probably offline.' ),
+				message: __(
+					'Could not get a valid response from the server.'
+				),
 			};
 		}
 	);
@@ -136,7 +151,7 @@ function setFetchHandler( newFetchHandler: FetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
-interface apiFetch {
+export interface ApiFetch {
 	< T, Parse extends boolean = true >(
 		options: APIFetchOptions< Parse >
 	): Promise< Parse extends true ? T : Response >;
@@ -150,6 +165,7 @@ interface apiFetch {
 	fetchAllMiddleware: typeof fetchAllMiddleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
+	privateApis: object;
 }
 
 /**
@@ -158,7 +174,7 @@ interface apiFetch {
  * @param options The options for the fetch.
  * @return A promise representing the request processed via the registered middlewares.
  */
-const apiFetch: apiFetch = ( options ) => {
+const apiFetch: ApiFetch = ( options ) => {
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```
@@ -177,10 +193,17 @@ const apiFetch: apiFetch = ( options ) => {
 		}
 
 		// If the nonce is invalid, refresh it and try again.
-		return window
+		return globalThis
 			.fetch( apiFetch.nonceEndpoint! )
-			.then( checkStatus )
-			.then( ( data ) => data.text() )
+			.then( ( response ) => {
+				// If the nonce refresh fails, it means we failed to recover from the original
+				// `rest_cookie_invalid_nonce` error and that it's time to finally re-throw it.
+				if ( ! response.ok ) {
+					return Promise.reject( error );
+				}
+
+				return response.text();
+			} )
 			.then( ( text ) => {
 				apiFetch.nonceMiddleware!.nonce = text;
 				return apiFetch( options );
@@ -191,6 +214,17 @@ const apiFetch: apiFetch = ( options ) => {
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
 
+// Attached to the function (rather than a named export) because
+// `wpScriptDefaultExport: true` flattens this module to its default
+// export — `wp.apiFetch` is the function itself, so anything that
+// needs to be reachable from a consumer's `wp.apiFetch.X` lookup has
+// to live on the function.
+apiFetch.privateApis = {};
+lock( apiFetch.privateApis, {
+	enablePreloadMultiUse,
+	clearPreloadedData,
+} );
+
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
@@ -199,4 +233,4 @@ apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
 apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
 
 export default apiFetch;
-export * from './types';
+export type * from './types';

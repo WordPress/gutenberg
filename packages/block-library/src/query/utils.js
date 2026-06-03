@@ -434,31 +434,17 @@ export const usePatterns = ( clientId, name ) => {
 };
 
 /**
- * The object returned by useUnsupportedBlocks with info about the type of
- * unsupported blocks present inside the Query block.
- *
- * @typedef  {Object}  UnsupportedBlocksInfo
- * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
- * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
- * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
- */
-
-/**
- * Hook that returns an object with information about the unsupported blocks
- * present inside a Query Loop with the given `clientId`. The returned object
- * contains props that are true when a certain type of unsupported block is
- * present.
+ * Hook that, given a block clientId, determines if it has unsupported blocks or not.
  *
  * @param {string} clientId The block's client ID.
- * @return {UnsupportedBlocksInfo} The object containing the information.
+ * @return {boolean} True if there are any unsupported blocks.
  */
 export const useUnsupportedBlocks = ( clientId ) => {
 	return useSelect(
 		( select ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
-			const blocks = {};
-			getClientIdsOfDescendants( clientId ).forEach(
+			return getClientIdsOfDescendants( clientId ).some(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
 					/*
@@ -475,19 +461,13 @@ export const useUnsupportedBlocks = ( clientId ) => {
 							blockName,
 							'interactivity.clientNavigation'
 						);
-					const blockInteractivity =
-						blockSupportsInteractivity ||
-						blockSupportsInteractivityClientNavigation;
-					if ( ! blockInteractivity ) {
-						blocks.hasBlocksFromPlugins = true;
-					} else if ( blockName === 'core/post-content' ) {
-						blocks.hasPostContentBlock = true;
-					}
+
+					return (
+						! blockSupportsInteractivity &&
+						! blockSupportsInteractivityClientNavigation
+					);
 				}
 			);
-			blocks.hasUnsupportedBlocks =
-				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
-			return blocks;
 		},
 		[ clientId ]
 	);

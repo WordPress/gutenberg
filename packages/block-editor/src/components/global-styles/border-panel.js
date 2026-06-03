@@ -11,13 +11,14 @@ import {
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
@@ -146,16 +147,21 @@ export default function BorderPanel( {
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( settings );
 	const borderRadiusValues = useMemo( () => {
-		if ( typeof border?.radius !== 'object' ) {
-			return decodeValue( border?.radius );
+		if ( typeof inheritedValue?.border?.radius !== 'object' ) {
+			return decodeValue( inheritedValue?.border?.radius );
 		}
+
 		return {
-			topLeft: decodeValue( border?.radius?.topLeft ),
-			topRight: decodeValue( border?.radius?.topRight ),
-			bottomLeft: decodeValue( border?.radius?.bottomLeft ),
-			bottomRight: decodeValue( border?.radius?.bottomRight ),
+			topLeft: decodeValue( inheritedValue?.border?.radius?.topLeft ),
+			topRight: decodeValue( inheritedValue?.border?.radius?.topRight ),
+			bottomLeft: decodeValue(
+				inheritedValue?.border?.radius?.bottomLeft
+			),
+			bottomRight: decodeValue(
+				inheritedValue?.border?.radius?.bottomRight
+			),
 		};
-	}, [ border?.radius, decodeValue ] );
+	}, [ inheritedValue?.border?.radius, decodeValue ] );
 	const setBorderRadius = ( newBorderRadius ) =>
 		setBorder( { ...border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {

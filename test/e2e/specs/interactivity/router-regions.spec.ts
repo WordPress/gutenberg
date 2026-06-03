@@ -15,7 +15,7 @@ test.describe( 'Router regions', () => {
 			alias: 'router regions - page 2',
 			attributes: { page: 2 },
 		} );
-		await utils.addPostWithBlock( 'test/router-regions', {
+		const page1 = await utils.addPostWithBlock( 'test/router-regions', {
 			alias: 'router regions - page 1',
 			attributes: { page: 1, next },
 		} );
@@ -41,14 +41,30 @@ test.describe( 'Router regions', () => {
 				attachTo: '#regions-with-attach-to',
 			},
 		};
+		const region7 = {
+			type: 'section',
+			data: { id: 'region7', attachTo: 'body' },
+		};
+		const region8 = {
+			type: 'section',
+			data: { id: 'region8', attachTo: '#regions-with-attach-to' },
+		};
 
 		const pageAttachTo2 = await utils.addPostWithBlock(
 			'test/router-regions',
 			{
-				alias: 'router regions - page 2',
+				alias: 'router regions - page 2 - attachTo',
 				attributes: {
 					page: 'attachTo2',
-					regionsWithAttachTo: [ region3, region4, region5, region6 ],
+					next: page1,
+					regionsWithAttachTo: [
+						region3,
+						region4,
+						region5,
+						region6,
+						region7,
+						region8,
+					],
 					counter: 10,
 				},
 			}
@@ -56,7 +72,7 @@ test.describe( 'Router regions', () => {
 		const pageAttachTo1 = await utils.addPostWithBlock(
 			'test/router-regions',
 			{
-				alias: 'router regions - page 2',
+				alias: 'router regions - page 1 - attachTo',
 				attributes: {
 					page: 'attachTo1',
 					next: pageAttachTo2,
@@ -65,7 +81,7 @@ test.describe( 'Router regions', () => {
 			}
 		);
 		await utils.addPostWithBlock( 'test/router-regions', {
-			alias: 'router regions - page 1 - attachTo',
+			alias: 'router regions - main - attachTo',
 			attributes: { page: 1, next: pageAttachTo1 },
 		} );
 	} );
@@ -109,6 +125,7 @@ test.describe( 'Router regions', () => {
 
 	test( 'should preserve state across pages', async ( { page } ) => {
 		const counter = page.getByTestId( 'state-counter' );
+
 		await expect( counter ).toHaveText( '0' );
 
 		await counter.click( { clickCount: 3, delay: 50 } );
@@ -171,14 +188,37 @@ test.describe( 'Router regions', () => {
 		);
 	} );
 
-	test( 'should not take into account regions that are not in the topmost `data-wp-interactive`.', async ( {
+	test( 'should be updated when placed inside a `data-wp-interactive` element.', async ( {
 		page,
 	} ) => {
-		const invalidRegionText1 = page.getByTestId( 'invalid-region-text-1' );
-		const invalidRegionText2 = page.getByTestId( 'invalid-region-text-2' );
+		const [
+			validInsideInteractive,
+			validInsideRouterRegion,
+			invalidOutsideInteractive,
+		] = [
+			page.getByTestId( 'valid-inside-interactive' ),
+			page.getByTestId( 'valid-inside-router-region' ),
+			page.getByTestId( 'invalid-outside-interactive' ),
+		];
 
-		await expect( invalidRegionText1 ).toHaveText( 'content from page 1' );
-		await expect( invalidRegionText2 ).toHaveText( 'content from page 1' );
+		const [ validRegionText1, validRegionText2, invalidRegionText3 ] = [
+			validInsideInteractive.getByTestId( 'text-1' ),
+			validInsideRouterRegion.getByTestId( 'text-2' ),
+			invalidOutsideInteractive.getByTestId( 'text-3' ),
+		];
+		const [ counter1, counter2 ] = [
+			page.getByTestId( 'valid-inside-interactive-counter' ),
+			page.getByTestId( 'valid-inside-router-region-counter' ),
+		];
+
+		await expect( validRegionText1 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
+
+		await counter1.click();
+		await counter2.click();
+		await expect( counter1 ).toHaveText( '1' );
+		await expect( counter2 ).toHaveText( '1' );
 
 		await page.getByTestId( 'next' ).click();
 		// Waits until the navigation finishes so it doesn't read the text from
@@ -186,8 +226,14 @@ test.describe( 'Router regions', () => {
 		await expect( page ).toHaveTitle(
 			'router regions – page 2 – gutenberg'
 		);
-		await expect( invalidRegionText1 ).toHaveText( 'content from page 1' );
-		await expect( invalidRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText1 ).toHaveText( 'content from page 2' );
+		await expect( validRegionText2 ).toHaveText( 'content from page 2' );
+		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
+
+		await counter1.click();
+		await counter2.click();
+		await expect( counter1 ).toHaveText( '2' );
+		await expect( counter2 ).toHaveText( '2' );
 
 		await page.getByTestId( 'back' ).click();
 		// Waits until the navigation finishes so it doesn't read the text from
@@ -195,17 +241,21 @@ test.describe( 'Router regions', () => {
 		await expect( page ).toHaveTitle(
 			'router regions – page 1 – gutenberg'
 		);
-		await expect( invalidRegionText1 ).toHaveText( 'content from page 1' );
-		await expect( invalidRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText1 ).toHaveText( 'content from page 1' );
+		await expect( validRegionText2 ).toHaveText( 'content from page 1' );
+		await expect( invalidRegionText3 ).toHaveText( 'content from page 1' );
+
+		await counter1.click();
+		await counter2.click();
+		await expect( counter1 ).toHaveText( '3' );
+		await expect( counter2 ).toHaveText( '3' );
 	} );
 
 	test( 'should support router regions with the `attachTo` property.', async ( {
 		page,
 		interactivityUtils: utils,
 	} ) => {
-		await page.goto(
-			utils.getLink( 'router regions - page 1 - attachTo' )
-		);
+		await page.goto( utils.getLink( 'router regions - main - attachTo' ) );
 
 		const bodyLocator = page.locator( 'body' );
 		const regionsLocator = page.locator( '#regions-with-attach-to' );
@@ -334,5 +384,385 @@ test.describe( 'Router regions', () => {
 
 		// Region 6 has an init directive that should have been executed again.
 		await expect( initCount ).toHaveText( '2' );
+	} );
+
+	test( 'should support multiple regions with the `attachTo` property added at different times', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		await page.goto( utils.getLink( 'router regions - main - attachTo' ) );
+
+		const region7 = page.locator( 'body' ).getByTestId( 'region7' );
+		const region8 = page
+			.locator( '#regions-with-attach-to' )
+			.getByTestId( 'region8' );
+
+		// The text of this element is used to check a navigation is completed.
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Regions with `attachTo` should initially be hidden.
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		const regions: Record< string, Locator > = {
+			region7,
+			region8,
+		};
+
+		// Navigate to "Page attachTo 1".
+		await page.getByTestId( 'next' ).click();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Regions with `attachTo` should be hidden in "Page attachTo 1".
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		// Navigate to "Page attachTo 2".
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// Check that regions remains hydrated and interactive.
+		for ( const regionId in regions ) {
+			const region = regions[ regionId ];
+			await expect( region ).toBeVisible();
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+			const serverCounter = region.getByTestId( 'server-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			await expect( clientCounter ).toHaveText( '10' );
+			await expect( serverCounter ).toHaveText( '10' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '13' );
+		}
+
+		// Navigate back to "Page attachTo 1".
+		await page.goBack();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Regions with `attachTo` should be hidden in "Page attachTo 1".
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		// Navigate back to the initial page.
+		await page.goBack();
+
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Regions should be unmounted.
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		await page.goForward();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Regions should still be unmounted.
+		await expect( region7 ).toBeHidden();
+		await expect( region8 ).toBeHidden();
+
+		await page.goForward();
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// Regions should still be unmounted.
+		await expect( region7 ).toBeVisible();
+		await expect( region8 ).toBeVisible();
+	} );
+
+	test( 'should be preserved on first navigation without `data-wp-key`', async ( {
+		page,
+	} ) => {
+		const region1 = page.getByTestId( 'region-1' );
+		const region1Text = page.getByTestId( 'region-1-text' );
+		await expect( region1Text ).toHaveText( 'hydrated' );
+
+		// Adds a tag to know whether the counter element was replaced.
+		await region1.evaluate( ( ref ) => {
+			if ( ref instanceof HTMLElement ) {
+				ref.dataset.tag = 'region-1';
+			}
+		} );
+
+		// Navigate to the next page.
+		await page.getByTestId( 'next' ).click();
+		await expect( page ).toHaveTitle(
+			'router regions – page 2 – gutenberg'
+		);
+
+		// The region element should retain the same attributes when it doesn't change.
+		await expect( region1 ).toHaveAttribute( 'data-tag', 'region-1' );
+	} );
+
+	test( 'should be preserved on first navigation with `data-wp-key` and other directives', async ( {
+		page,
+	} ) => {
+		const region2 = page.getByTestId( 'region-2' );
+		const validInsideInteractive = page.getByTestId(
+			'valid-inside-interactive'
+		);
+		const validInsideRouterRegion = page.getByTestId(
+			'valid-inside-router-region'
+		);
+
+		// Add tags to know whether the region elements were replaced.
+		await region2.evaluate( ( el ) => {
+			el.dataset.tag = 'region-2';
+		} );
+		await validInsideInteractive.evaluate( ( el ) => {
+			el.dataset.tag = 'valid-inside-interactive';
+		} );
+		await validInsideRouterRegion.evaluate( ( el ) => {
+			el.dataset.tag = 'valid-inside-router-region';
+		} );
+
+		// Navigate to the next page.
+		await page.getByTestId( 'next' ).click();
+		await expect( page ).toHaveTitle(
+			'router regions – page 2 – gutenberg'
+		);
+
+		// Regions with `data-wp-key` and other directives should not be recreated.
+		await expect( region2 ).toHaveAttribute( 'data-tag', 'region-2' );
+		await expect( validInsideInteractive ).toHaveAttribute(
+			'data-tag',
+			'valid-inside-interactive'
+		);
+		await expect( validInsideRouterRegion ).toHaveAttribute(
+			'data-tag',
+			'valid-inside-router-region'
+		);
+	} );
+
+	test( 'should be preserved on first navigation with `data-wp-key` and `attachTo`', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		await page.goto(
+			utils.getLink( 'router regions - page 1 - attachTo' )
+		);
+
+		const bodyLocator = page.locator( 'body' );
+		const regionsLocator = page.locator( '#regions-with-attach-to' );
+
+		const region3 = bodyLocator.getByTestId( 'region3' );
+		const region4 = regionsLocator.getByTestId( 'region4' );
+		const region5 = bodyLocator.getByTestId( 'region5' );
+		const region6 = regionsLocator.getByTestId( 'region6' );
+
+		const regions: Record< string, Locator > = {
+			region3,
+			region4,
+			region5,
+			region6,
+		};
+
+		// The text of this element is used to check a navigation is completed.
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Navigate to "Page attachTo 1".
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Add tags to know whether the region elements were replaced.
+		for ( const regionId in regions ) {
+			const region = regions[ regionId ];
+			await region.evaluate( ( el, id ) => {
+				el.dataset.tag = id;
+			}, regionId );
+		}
+
+		// Navigate to "Page attachTo 2".
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// Regions with `data-wp-key` and other directives should not be recreated.
+		for ( const regionId in regions ) {
+			const region = regions[ regionId ];
+			await expect( region ).toHaveAttribute( 'data-tag', regionId );
+		}
+	} );
+
+	test( 'should not be duplicated after `navigate()` when they use `attachTo` and appeared in the initial page', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const bodyLocator = page.locator( 'body' );
+		const regionsLocator = page.locator( '#regions-with-attach-to' );
+
+		const regionsPage1: Record< string, Locator > = {
+			region3: bodyLocator.getByTestId( 'region3' ),
+			region4: regionsLocator.getByTestId( 'region4' ),
+			region5: bodyLocator.getByTestId( 'region5' ),
+			region6: regionsLocator.getByTestId( 'region6' ),
+		};
+
+		const regionsPage2: Record< string, Locator > = {
+			region7: bodyLocator.getByTestId( 'region7' ),
+			region8: regionsLocator.getByTestId( 'region8' ),
+		};
+
+		const allRegions: Record< string, Locator > = {
+			...regionsPage1,
+			...regionsPage2,
+		};
+
+		// The text of this element is used to check a navigation is completed.
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		// 1. Visit page 1 - attachTo using "goto".
+		await page.goto(
+			utils.getLink( 'router regions - page 1 - attachTo' )
+		);
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// 2. Ensure regions 3 to 6 are unique and interactive.
+		for ( const regionId in regionsPage1 ) {
+			const region = regionsPage1[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			await expect( clientCounter ).toHaveText( '0' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '3' );
+		}
+
+		// 3. Navigate to page 2 - attachTo.
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// 4. Ensure regions 3 to 6 are unique and still interactive.
+		for ( const regionId in regionsPage1 ) {
+			const region = regionsPage1[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			// Counter state is preserved from step 2.
+			await expect( clientCounter ).toHaveText( '3' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '6' );
+		}
+
+		// 5. Ensure regions 7 and 8 are visible, unique, and interactive.
+		for ( const regionId in regionsPage2 ) {
+			const region = regionsPage2[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			// Counter for page 2 regions starts at 10.
+			await expect( clientCounter ).toHaveText( '10' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '13' );
+		}
+
+		// 6. Navigate to page 1 (no regions with `attachTo`).
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// 7. Ensure all regions have been unmounted after navigation.
+		for ( const regionId in allRegions ) {
+			const region = allRegions[ regionId ];
+			await expect( region ).toBeHidden();
+		}
+
+		// 8. Navigate back to page 2 - attachTo.
+		await page.goBack();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// 9. Ensure all regions are there again, are interactive, and there are no duplications.
+		for ( const regionId in allRegions ) {
+			const region = allRegions[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			// After a full page reload, all counters start at 10 (server value).
+			await expect( clientCounter ).toHaveText( '10' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '13' );
+		}
+	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/76447.
+	test( 'should not reload the page when clicking a hash anchor link', async ( {
+		page,
+	} ) => {
+		const counter = page.getByTestId( 'state-counter' );
+
+		// Accumulate some in-memory state so a reload would be detectable.
+		await counter.click( { clickCount: 3, delay: 50 } );
+		await expect( counter ).toHaveText( '3' );
+
+		// Set up a listener for the `load` event before clicking. A full-page
+		// reload fires `load`; a same-document hash navigation does not.
+		const loadPromise = page
+			.waitForEvent( 'load', { timeout: 1000 } )
+			.then( () => 'reloaded' )
+			.catch( () => 'no-reload' );
+
+		// Click a plain hash anchor — this fires `popstate` with `state: null`.
+		await page.getByTestId( 'hash-link' ).click();
+
+		// The URL should now include the fragment.
+		await expect( page ).toHaveURL( /#hash-link-target$/ );
+
+		// A full-page reload should not have been triggered.
+		expect( await loadPromise ).toBe( 'no-reload' );
+
+		// In-memory state must be preserved.
+		await expect( counter ).toHaveText( '3' );
+	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/70500.
+	test( 'should update content on back/forward navigation after a page reload', async ( {
+		page,
+	} ) => {
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		// Start on page 1.
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Client-side navigate to page 2.
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page 2' );
+
+		// Reload the page.
+		await page.reload();
+		await expect( region1Ssr ).toHaveText( 'content from page 2' );
+
+		// Go back: content should update to page 1.
+		await page.goBack();
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Go forward: content should update back to page 2.
+		await page.goForward();
+		await expect( region1Ssr ).toHaveText( 'content from page 2' );
 	} );
 } );

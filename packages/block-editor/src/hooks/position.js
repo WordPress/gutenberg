@@ -268,10 +268,7 @@ export function PositionPanelPure( {
 		web:
 			options.length > 1 ? (
 				<InspectorControls group="position">
-					<BaseControl
-						__nextHasNoMarginBottom
-						help={ stickyHelpText }
-					>
+					<BaseControl help={ stickyHelpText }>
 						<CustomSelectControl
 							__next40pxDefaultSize
 							label={ __( 'Position' ) }

@@ -249,7 +249,7 @@ _Parameters_
 
 _Returns_
 
--   `ET.User< 'edit' >`: Current user object.
+-   `ET.User< 'view' >`: Current user object.
 
 ### getDefaultTemplateId
 
@@ -620,6 +620,24 @@ _Returns_
 
 -   `boolean`: Whether the entity record has edits or not.
 
+### hasEntityRecord
+
+Returns true if a record has been received for the given set of parameters, or false otherwise.
+
+Note: This action does not trigger a request for the entity record from the API if it's not available in the local state.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `EntityRecordKey`: Record's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query.
+
+_Returns_
+
+-   `boolean`: Whether an entity record has been received.
+
 ### hasEntityRecords
 
 Returns true if records have been received for the given set of parameters, or false otherwise.
@@ -660,6 +678,25 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether there is a next edit or not.
+
+### hasRevision
+
+Returns true if a revision has been received for the given set of parameters, or false otherwise.
+
+Note: This does not trigger a request for the revision from the API if it's not available in the local state.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revision you want to check.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query.
+
+_Returns_
+
+-   `boolean`: Whether a revision has been received.
 
 ### hasUndo
 
@@ -759,6 +796,20 @@ Returns an action object used in adding new entities.
 _Parameters_
 
 -   _entities_ `Array`: Entities received.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### clearEntityRecordEdits
+
+Action triggered to clear all edits from an entity record.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _recordId_ `number|string`: Record ID of the entity record.
 
 _Returns_
 

@@ -84,7 +84,7 @@ Let's check that everything is working as expected. Build and reload and then se
 
 Click the button and check the console.log for the "toggle format" message.
 
-If you do not see the button or message, double check you are building and loading the JavScript properly; and check the console.log for any errors.
+If you do not see the button or message, double check you are building and loading the JavaScript properly; and check the console.log for any errors.
 
 ### Step 3: Apply a format when clicked
 

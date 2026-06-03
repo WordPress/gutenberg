@@ -34,6 +34,8 @@ const { state } = store( 'directive-watch', {
 				? 'element is in the DOM'
 				: 'element is not in the DOM';
 		},
+		watch1: false,
+		watch2: false,
 	},
 	actions: {
 		toggle() {
@@ -58,6 +60,12 @@ const { state } = store( 'directive-watch', {
 		},
 		infiniteLoop: () => {
 			state.counter = state.counter + 1;
+		},
+		watch1: () => {
+			state.watch1 = true;
+		},
+		watch2: () => {
+			state.watch2 = true;
 		},
 	},
 } );

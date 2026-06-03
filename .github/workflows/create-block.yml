@@ -26,11 +26,22 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
+                event: ['${{ github.event_name }}']
                 node: ['20', '22', '24']
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+                exclude:
+                    # On PRs: Only test Node 20 on Ubuntu
+                    - event: 'pull_request'
+                      node: '22'
+                    - event: 'pull_request'
+                      node: '24'
+                    - event: 'pull_request'
+                      os: 'macos-15'
+                    - event: 'pull_request'
+                      os: 'windows-2025'
 
         steps:
-            - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -41,5 +52,4 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Create block
-              shell: bash
-              run: bash ./bin/test-create-block.sh
+              run: npm run test:create-block

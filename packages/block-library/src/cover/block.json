@@ -69,9 +69,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"allowedBlocks": {
-			"type": "array"
-		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
@@ -148,7 +145,8 @@
 		},
 		"filter": {
 			"duotone": true
-		}
+		},
+		"allowedBlocks": true
 	},
 	"selectors": {
 		"filter": {

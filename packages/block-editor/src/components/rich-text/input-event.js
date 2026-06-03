@@ -8,7 +8,7 @@ import { useEffect, useContext, useRef } from '@wordpress/element';
  */
 import { inputEventContext } from './';
 
-export function __unstableRichTextInputEvent( { inputType, onInput } ) {
+export function RichTextInputEvent( { inputType, onInput } ) {
 	const callbacks = useContext( inputEventContext );
 	const onInputRef = useRef();
 	onInputRef.current = onInput;

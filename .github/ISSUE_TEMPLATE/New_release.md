@@ -5,7 +5,7 @@ about: A checklist for the Gutenberg plugin release process
 labels: Gutenberg Plugin, [Type] Project Management
 ---
 
-This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep the reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
+This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep a reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
 
 -   Gutenberg version to release: {VERSION_NUMBER} ([milestone](https://github.com/WordPress/gutenberg/milestone/{MILESTONE_ID}?closed=1))
 -   Release Manager (a.k.a. Release Lead):
@@ -25,11 +25,12 @@ This issue is to provide visibility on the progress of the release process of Gu
 ### RC Day - {WEEKDAY}, {MONTH}, {DATE}
 
 -   [ ] Post a message in `#core-editor` channel to let folks know you are starting the RC release process
--   [ ] [Organize and Label PRs](https://developer.wordpress.org/block-editor/contributors/code/release/#organizing-and-labeling-milestone-prs) on the relevant milestone
--   [ ] Start the release process by triggering the `rc` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/#running-the-release-workflow)
--   [ ] [Update the created Draft Release accordingly](https://developer.wordpress.org/block-editor/contributors/code/release/#viewing-the-release-draft)
--   [ ] [Curate the changelog](https://developer.wordpress.org/block-editor/contributors/code/release/#curating-the-release-changelog) before publishing
--   [ ] [Publish Release](https://developer.wordpress.org/block-editor/contributors/code/release/#publishing-the-release)
+-   [ ] [Organize and Label PRs](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#organizing-and-labeling-milestone-prs) on the relevant milestone
+-   [ ] Start the release process by triggering the `rc` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#running-the-release-workflow)
+-   [ ] [Update the created Draft Release accordingly](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#viewing-the-release-draft)
+-   [ ] [Curate the changelog](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#curating-the-release-changelog) before publishing
+-   [ ] [Publish Release](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#publishing-the-release)
+-   [ ] [Approve the npm publishing job](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#publishing-the-wordpress-packages-to-npm) in the Build Plugin Zip workflow _(ask in `#core-editor` if needed)_
 -   [ ] Announce in `#core-editor` channel that RC1 has been released and is ready for testing
 -   [ ] Ping any other relevant channels announcing that the RC is available
 -   [ ] Create Draft of Release post on Make Core blog _(initial draft in [Google doc](https://docs.google.com/document/d/1D-MTOCmL9eMlP9TDTXqlzuKVOg_ghCPm9_whHFViqMk/edit))_
@@ -42,14 +43,14 @@ This issue is to provide visibility on the progress of the release process of Gu
 -   [ ] Get assets from [Design Team](https://make.wordpress.org/design/) for the post if required
 -   [ ] Reach out to Highlight Authors to draft sections (if necessary)
 
-### Release Day - {Weekday, Month, Date}
+### Release Day - {WEEKDAY}, {MONTH}, {DATE}
 
 -   [ ] Post a message in `#core-editor` channel to let folks know you are starting the release process
--   [ ] Start the release process by triggering the `stable` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/#running-the-release-workflow)
+-   [ ] Start the release process by triggering the `stable` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#running-the-release-workflow)
 -   [ ] Update the created Draft Release accordingly. Typically by copy/pasting the last RC release notes and add any changes/updates as needed.
--   [ ] [Publish Release](https://developer.wordpress.org/block-editor/contributors/code/release/#publishing-the-release)
+-   [ ] [Publish Release](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#publishing-the-release)
 -   [ ] Trigger the update to the plugin directory. _(Get approval from a member of [Gutenberg Release team](https://github.com/orgs/WordPress/teams/gutenberg-release/members) if necessary)_
 -   [ ] Announce in `#core-editor` channel that the plugin has been released
 -   [ ] Reach out to other contributors to help get the post reviewed
--   [ ] [Publish Release post](https://developer.wordpress.org/block-editor/contributors/code/release/#publishing-the-release-post) on Make Core blog
--   [ ] Post in the `#core-editor` channel [requesting a volunteer for the next Gutenberg release](https://developer.wordpress.org/block-editor/contributors/code/release/#call-for-volunteer-for-the-next-release).
+-   [ ] [Publish Release post](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#publishing-the-release-post) on Make Core blog
+-   [ ] Post in the `#core-editor` channel [requesting a volunteer for the next Gutenberg release](https://developer.wordpress.org/block-editor/contributors/code/release/plugin-release/#call-for-volunteer-for-the-next-release).

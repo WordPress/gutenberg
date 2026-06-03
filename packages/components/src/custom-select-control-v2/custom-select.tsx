@@ -12,14 +12,14 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '..';
+import { VisuallyHidden } from '../visually-hidden';
 import * as Styled from './styles';
 import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
-	_CustomSelectInternalProps,
+	CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
 import InputBase from '../input-control/input-base';
@@ -28,9 +28,10 @@ import BaseControl from '../base-control';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
+CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
-	value: CustomSelectButtonProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'defaultValue' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0
@@ -84,8 +85,8 @@ const CustomSelectButton = ( {
 	);
 };
 
-function _CustomSelect(
-	props: _CustomSelectInternalProps &
+function CustomSelect(
+	props: CustomSelectInternalProps &
 		_CustomSelectProps &
 		CustomSelectStore &
 		CustomSelectButtonSize
@@ -160,4 +161,4 @@ function _CustomSelect(
 	);
 }
 
-export default _CustomSelect;
+export default CustomSelect;

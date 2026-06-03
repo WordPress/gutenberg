@@ -11,7 +11,6 @@ import {
 	FlexItem,
 	Dropdown,
 	Composite,
-	Tooltip,
 } from '@wordpress/components';
 import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
@@ -20,6 +19,9 @@ import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
  * External dependencies
  */
 import clsx from 'clsx';
+
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -82,31 +84,39 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<Tooltip text={ label }>
-			<Composite.Item
-				role="option"
-				aria-label={ label }
-				aria-selected={ isActive }
-				className={ clsx( 'block-editor-global-styles__shadow__item', {
-					'is-active': isActive,
-				} ) }
+		<Tooltip.Root>
+			<Tooltip.Trigger
 				render={
-					<button
+					<Composite.Item
+						role="option"
+						aria-label={ label }
+						aria-selected={ isActive }
 						className={ clsx(
-							'block-editor-global-styles__shadow-indicator',
+							'block-editor-global-styles__shadow__item',
 							{
-								unset: type === 'unset',
+								'is-active': isActive,
 							}
 						) }
-						onClick={ onSelect }
-						style={ { boxShadow: shadow } }
-						aria-label={ label }
-					>
-						{ isActive && <Icon icon={ check } /> }
-					</button>
+						render={
+							<button
+								className={ clsx(
+									'block-editor-global-styles__shadow-indicator',
+									{
+										unset: type === 'unset',
+									}
+								) }
+								onClick={ onSelect }
+								style={ { boxShadow: shadow } }
+								aria-label={ label }
+							>
+								{ isActive && <Icon icon={ check } /> }
+							</button>
+						}
+					/>
 				}
 			/>
-		</Tooltip>
+			<Tooltip.Popup>{ label }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -136,7 +146,7 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
 }
 
 function renderShadowToggle( shadow, onShadowChange ) {
-	return ( { onToggle, isOpen } ) => {
+	return function ShadowToggle( { onToggle, isOpen } ) {
 		const shadowButtonRef = useRef( undefined );
 
 		const toggleProps = {
