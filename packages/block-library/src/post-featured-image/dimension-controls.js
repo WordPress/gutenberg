@@ -81,6 +81,10 @@ const DimensionControls = ( {
 		? stateDimensions.objectFit
 		: scale;
 	const displayScale = activeScale || DEFAULT_SCALE;
+	const selectedStyleStateKey = [
+		selectedStyleState?.viewport || 'default',
+		selectedStyleState?.pseudo || 'default',
+	].join( ':' );
 
 	const [ availableUnits, defaultRatios, themeRatios, showDefaultRatios ] =
 		useSettings(
@@ -135,11 +139,17 @@ const DimensionControls = ( {
 
 		setAttributes( dimensions );
 	};
-	const getResetDimensionAttributes = ( keys ) => ( {
+	const getResetDimensionAttributes = ( keys, nextStyle = style ) => ( {
 		style: hasSelectedStyleState
-			? resetStateDimensions( style, selectedStyleState, keys )
-			: resetDimensions( style, keys ),
+			? resetStateDimensions( nextStyle, selectedStyleState, keys )
+			: resetDimensions( nextStyle, keys ),
 	} );
+	const getResetAllFilter =
+		( defaultAttributes, keys ) =>
+		( attrs = {} ) => ( {
+			...( hasSelectedStyleState ? {} : defaultAttributes ),
+			...getResetDimensionAttributes( keys, attrs.style ),
+		} );
 
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
@@ -191,15 +201,16 @@ const DimensionControls = ( {
 	return (
 		<>
 			<ToolsPanelItem
+				key={ `aspect-ratio-${ selectedStyleStateKey }` }
 				hasValue={ () => !! activeAspectRatio }
 				label={ __( 'Aspect ratio' ) }
 				onDeselect={ () =>
 					setDimensionAttributes( { aspectRatio: undefined } )
 				}
-				resetAllFilter={ () => ( {
-					aspectRatio: undefined,
-					...getResetDimensionAttributes( [ 'aspectRatio' ] ),
-				} ) }
+				resetAllFilter={ getResetAllFilter(
+					{ aspectRatio: undefined },
+					[ 'aspectRatio' ]
+				) }
 				isShownByDefault
 				panelId={ clientId }
 			>
@@ -223,6 +234,7 @@ const DimensionControls = ( {
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem
+				key={ `height-${ selectedStyleStateKey }` }
 				className="single-column"
 				hasValue={ () => !! activeHeight }
 				label={ __( 'Height' ) }
@@ -234,10 +246,9 @@ const DimensionControls = ( {
 							: undefined,
 					} )
 				}
-				resetAllFilter={ () => ( {
-					height: undefined,
-					...getResetDimensionAttributes( [ 'height' ] ),
-				} ) }
+				resetAllFilter={ getResetAllFilter( { height: undefined }, [
+					'height',
+				] ) }
 				isShownByDefault
 				panelId={ clientId }
 			>
@@ -254,16 +265,16 @@ const DimensionControls = ( {
 				/>
 			</ToolsPanelItem>
 			<ToolsPanelItem
+				key={ `width-${ selectedStyleStateKey }` }
 				className="single-column"
 				hasValue={ () => !! activeWidth }
 				label={ __( 'Width' ) }
 				onDeselect={ () =>
 					setDimensionAttributes( { width: undefined } )
 				}
-				resetAllFilter={ () => ( {
-					width: undefined,
-					...getResetDimensionAttributes( [ 'width' ] ),
-				} ) }
+				resetAllFilter={ getResetAllFilter( { width: undefined }, [
+					'width',
+				] ) }
 				isShownByDefault
 				panelId={ clientId }
 			>
@@ -281,6 +292,7 @@ const DimensionControls = ( {
 			</ToolsPanelItem>
 			{ showScaleControl && (
 				<ToolsPanelItem
+					key={ `scale-${ selectedStyleStateKey }` }
 					hasValue={ () =>
 						!! activeScale && activeScale !== DEFAULT_SCALE
 					}
@@ -290,10 +302,10 @@ const DimensionControls = ( {
 							scale: DEFAULT_SCALE,
 						} )
 					}
-					resetAllFilter={ () => ( {
-						scale: DEFAULT_SCALE,
-						...getResetDimensionAttributes( [ 'objectFit' ] ),
-					} ) }
+					resetAllFilter={ getResetAllFilter(
+						{ scale: DEFAULT_SCALE },
+						[ 'objectFit' ]
+					) }
 					isShownByDefault
 					panelId={ clientId }
 				>

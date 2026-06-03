@@ -67,6 +67,7 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	getStateDimensions,
 	resetDimensions,
+	resetStateDimensions,
 	setStateDimensions,
 } from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
@@ -1071,20 +1072,34 @@ export default function Image( {
 			) }
 			<InspectorControls
 				group="dimensions"
-				resetAllFilter={ ( attrs ) => ( {
-					...attrs,
-					aspectRatio: undefined,
-					width: undefined,
-					height: undefined,
-					scale: undefined,
-					focalPoint: undefined,
-					style: resetDimensions( attrs.style, [
+				resetAllFilter={ ( attrs ) => {
+					const resetKeys = [
 						'aspectRatio',
 						'height',
 						'objectFit',
 						'width',
-					] ),
-				} ) }
+					];
+
+					if ( hasSelectedStyleState ) {
+						return {
+							style: resetStateDimensions(
+								attrs.style,
+								selectedStyleState,
+								resetKeys
+							),
+						};
+					}
+
+					return {
+						...attrs,
+						aspectRatio: undefined,
+						width: undefined,
+						height: undefined,
+						scale: undefined,
+						focalPoint: undefined,
+						style: resetDimensions( attrs.style, resetKeys ),
+					};
+				} }
 			>
 				{ dimensionsControl }
 				{ ! hasSelectedStyleState && url && scale && (

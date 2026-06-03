@@ -148,6 +148,10 @@ export default function CoverInspectorControls( {
 	);
 	const hasSelectedStyleState =
 		! isDefaultBlockStyleState( selectedStyleState );
+	const selectedStyleStateKey = [
+		selectedStyleState?.viewport || 'default',
+		selectedStyleState?.pseudo || 'default',
+	].join( ':' );
 	const stateDimensions = hasSelectedStyleState
 		? getStateDimensions( attributes.style, selectedStyleState )
 		: {};
@@ -260,21 +264,19 @@ export default function CoverInspectorControls( {
 		} );
 	};
 
-	const getResetMinHeightAttributes = () => {
+	const getResetMinHeightAttributes = ( attrs = attributes ) => {
 		if ( hasSelectedStyleState ) {
 			return {
-				style: resetStateDimensions(
-					attributes.style,
-					selectedStyleState,
-					[ 'minHeight' ]
-				),
+				style: resetStateDimensions( attrs.style, selectedStyleState, [
+					'minHeight',
+				] ),
 			};
 		}
 
 		return {
 			minHeight: undefined,
 			minHeightUnit: undefined,
-			style: resetDimensions( attributes.style, [ 'minHeight' ] ),
+			style: resetDimensions( attrs.style, [ 'minHeight' ] ),
 		};
 	};
 
@@ -478,6 +480,7 @@ export default function CoverInspectorControls( {
 			) }
 			<InspectorControls group="dimensions">
 				<ToolsPanelItem
+					key={ selectedStyleStateKey }
 					className="single-column"
 					hasValue={ () => !! activeMinHeight }
 					label={ __( 'Minimum height' ) }

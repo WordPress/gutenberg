@@ -49,7 +49,7 @@ import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
-import { resetDimensions } from '../utils/style-state';
+import { resetDimensions, resetStateDimensions } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const { isDefaultBlockStyleState, ResolutionTool } = unlock(
@@ -249,19 +249,33 @@ export default function PostFeaturedImageEdit( {
 			</InspectorControls>
 			<InspectorControls
 				group="dimensions"
-				resetAllFilter={ ( attrs ) => ( {
-					...attrs,
-					aspectRatio: undefined,
-					height: undefined,
-					scale: undefined,
-					width: undefined,
-					style: resetDimensions( attrs.style, [
+				resetAllFilter={ ( attrs ) => {
+					const resetKeys = [
 						'aspectRatio',
 						'height',
 						'objectFit',
 						'width',
-					] ),
-				} ) }
+					];
+
+					if ( hasSelectedStyleState ) {
+						return {
+							style: resetStateDimensions(
+								attrs.style,
+								selectedStyleState,
+								resetKeys
+							),
+						};
+					}
+
+					return {
+						...attrs,
+						aspectRatio: undefined,
+						height: undefined,
+						scale: undefined,
+						width: undefined,
+						style: resetDimensions( attrs.style, resetKeys ),
+					};
+				} }
 			>
 				<DimensionControls
 					clientId={ clientId }
