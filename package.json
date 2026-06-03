@@ -49,8 +49,6 @@
 		"@emotion/jest": "^11.14.2",
 		"@eslint/eslintrc": "^3.0.0",
 		"@testing-library/jest-dom": "6.9.1",
-		"@types/node": "^20.19.39",
-		"@types/prettier": "2.4.4",
 		"@types/react": "19.2.13",
 		"@types/react-dom": "19.2.3",
 		"@typescript/native-preview": "7.0.0-dev.20260423.1",
