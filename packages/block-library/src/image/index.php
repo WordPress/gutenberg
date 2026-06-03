@@ -197,10 +197,11 @@ function block_core_image_format_lightbox_exif_shutter_speed( $speed ) {
 		return '';
 	}
 
+	// Formats all numeric EXIF values with plain casting (rather than
+	// `number_format_i18n`) so the standard photographic notation is consistent
+	// across aperture, shutter speed, and focal length regardless of locale.
 	if ( $speed >= 1 ) {
-		$rounded  = round( $speed, 1 );
-		$decimals = floor( $rounded ) === $rounded ? 0 : 1;
-		return number_format_i18n( $rounded, $decimals ) . 's';
+		return (string) round( $speed, 1 ) . 's';
 	}
 
 	return '1/' . (string) round( 1 / $speed ) . 's';
@@ -421,6 +422,7 @@ function block_core_image_print_lightbox_overlay() {
 	$prev_button_text  = esc_attr_x( 'Previous', 'previous image in lightbox' );
 	$next_button_text  = esc_attr_x( 'Next', 'next image in lightbox' );
 	$exif_button_label = esc_attr__( 'Toggle photo metadata visibility' );
+	$exif_region_label = esc_attr__( 'Photo metadata' );
 	$camera_label      = esc_html__( 'Camera' );
 	$aperture_label    = esc_html__( 'Aperture' );
 	$shutter_label     = esc_html__( 'Shutter Speed' );
@@ -502,6 +504,7 @@ function block_core_image_print_lightbox_overlay() {
 					style="color:{$close_button_color}"
 					class="wp-lightbox-exif-button"
 					aria-label="{$exif_button_label}"
+					aria-controls="wp-lightbox-exif"
 					data-wp-bind--aria-expanded="state.exifExpanded"
 					data-wp-bind--hidden="!state.hasExif"
 					data-wp-class--active="state.isExifVisible"
@@ -512,7 +515,7 @@ function block_core_image_print_lightbox_overlay() {
 						<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12.5 2C7.007 2 2.549 6.48 2.549 12S7.007 22 12.5 22s9.951-4.48 9.951-10S17.993 2 12.5 2ZM4.539 12c0-4.41 3.572-8 7.961-8s7.961 3.59 7.961 8-3.572 8-7.961 8-7.961-3.59-7.961-8ZM11.505 7v2h1.99V7h-1.99Zm0 4v6h1.99v-6h-1.99Z"/>
 					</svg>
 				</button>
-				<div class="wp-lightbox-exif" style="color:{$close_button_color}" data-wp-bind--hidden="!state.isExifVisible" hidden>
+				<div id="wp-lightbox-exif" class="wp-lightbox-exif" style="color:{$close_button_color}" role="group" aria-label="{$exif_region_label}" data-wp-bind--hidden="!state.isExifVisible" hidden>
 					<ul>
 						<li data-wp-bind--hidden="!state.exifCamera" hidden>
 							<h5>{$camera_label}</h5>

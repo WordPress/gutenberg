@@ -416,15 +416,15 @@
 		overflow-x: hidden;
 		overflow-y: auto;
 
-		// Anchors the panel below the image and its toggle button, matching the
-		// image's width so the data lines up with the photo. `(100vh +
-		// container-height) / 2` is the image's bottom edge; the +72px clears the
-		// 40px toggle button (which sits 16px below the image) plus spacing.
+		// Anchors the panel below the image on the same row as the toggle button,
+		// matching the image's width so the data lines up with the photo. `(100vh
+		// + container-height) / 2` is the image's bottom edge.
 		.wp-lightbox-exif {
-			top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 72px);
+			top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 16px);
 			bottom: auto;
 			width: var(--wp--lightbox-container-width);
 			max-width: 100%;
+			padding-inline-end: 48px;
 			padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
 		}
 
