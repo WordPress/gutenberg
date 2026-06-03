@@ -47,7 +47,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	}
 
 	if ( empty( $attributes['datetime'] ) ) {
-		// If the `datetime` attribute is set but empty, it could because Block Bindings
+		// If the `datetime` attribute is set but empty, it could be because Block Bindings
 		// set it that way. This can happen e.g. if the block is bound to the
 		// post's last modified date, and the latter lies before the publish date.
 		// (See https://github.com/WordPress/gutenberg/pull/46839 where this logic was originally
@@ -95,7 +95,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
  *
  * @since 5.8.0
  */
-function register_block_core_postDate() {
+function register_block_core_post_date() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-date',
 		array(
