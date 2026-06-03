@@ -116,6 +116,18 @@ register_block_type( 'my-plugin/server-block', array(
 ) );
 ```
 
+In the editor these blocks are previewed by rendering the block on the server. If the block declares `postId` in its `uses_context`, the current post ID is forwarded to the server as the `post_id` query argument. The REST block renderer then sets up the global `$post` and calls `setup_postdata()` for that ID, so the `render_callback` can render content that depends on the post being edited via the global `$post` or template tags such as `get_the_ID()`:
+
+```php
+register_block_type( 'my-plugin/server-block', array(
+	'render_callback' => 'my_plugin_render_server_block',
+	'uses_context'    => array( 'postId' ),
+	'supports'        => array(
+		'autoRegister' => true,
+	),
+) );
+```
+
 ## Registering a block with JavaScript (client-side)
 
 When the block has already been registered on the server and unless using [PHP-only auto-registered blocks](#php-only-blocks-with-auto-registration), you only need to register the client-side settings in JavaScript using the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) method from the `@wordpress/blocks` package. You just need to make sure you use the same block name as defined in the block's `block.json` file. Here's an example:

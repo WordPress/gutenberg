@@ -353,12 +353,15 @@ export const registerCoreBlocks = (
 					apiVersion: 3,
 				} ),
 				// Inspector controls are rendered by the auto-register hook in block-editor
-				edit: function Edit( { attributes } ) {
+				edit: function Edit( { attributes, context } ) {
 					const disabledRef = useDisabled();
 					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
+						urlQueryArgs: context?.postId
+							? { post_id: context.postId }
+							: undefined,
 					} );
 
 					if ( status === 'loading' ) {
