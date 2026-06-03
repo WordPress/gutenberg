@@ -267,7 +267,11 @@ describe( 'Waveform utilities', () => {
 
 			const instance = {
 				audio,
-				options: {},
+				options: {
+					waveformColor: 'rgba(0, 0, 0, 0.3)',
+					progressColor: 'rgba(0, 0, 0, 0.6)',
+					buttonColor: '#000000',
+				},
 				renderMarkers: jest.fn( () => {
 					const markersContainer =
 						container.querySelector( '.waveform-markers' );
@@ -287,6 +291,7 @@ describe( 'Waveform utilities', () => {
 						markerElement.style.left = `${
 							( marker.time / audio.duration ) * 100
 						}%`;
+						markerElement.style.backgroundColor = marker.color;
 						markerElement.setAttribute(
 							'aria-label',
 							marker.label
@@ -322,19 +327,27 @@ describe( 'Waveform utilities', () => {
 
 			expect( currentMarker ).toHaveClass( 'is-visible' );
 			expect( currentMarker ).toHaveStyle( { left: '25%' } );
+			expect( currentMarker ).toHaveStyle( {
+				color: 'rgba(0, 0, 0, 0.3)',
+			} );
 			expect( currentMarker ).toHaveTextContent( '0:45' );
 			expect( endMarker ).toHaveClass( 'is-visible' );
 			expect( endMarker ).toHaveStyle( { left: '100%' } );
+			expect( endMarker ).toHaveStyle( {
+				color: 'rgba(0, 0, 0, 0.3)',
+			} );
 			expect( endMarker ).toHaveTextContent( '3:00' );
 			expect( instance.renderMarkers ).toHaveBeenCalled();
 			expect( instance.options.markers ).toEqual( [
 				expect.objectContaining( {
 					time: 45,
 					label: '0:45',
+					color: 'rgba(0, 0, 0, 0.3)',
 				} ),
 				expect.objectContaining( {
 					time: 180,
 					label: '3:00',
+					color: 'rgba(0, 0, 0, 0.3)',
 				} ),
 			] );
 		} );
@@ -380,6 +393,9 @@ describe( 'Waveform utilities', () => {
 			expect( waveformArea ).toHaveClass( 'is-hovering' );
 			expect( hoverMarker ).toHaveClass( 'is-visible' );
 			expect( hoverMarker ).toHaveStyle( { left: '50%' } );
+			expect( hoverMarker ).toHaveStyle( {
+				color: 'rgba(0, 0, 0, 0.3)',
+			} );
 			expect( hoverMarker ).toHaveTextContent( '1:00' );
 			expect( hoverRegion ).toHaveStyle( { width: '50%' } );
 		} );

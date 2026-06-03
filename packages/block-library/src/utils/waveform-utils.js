@@ -296,6 +296,7 @@ function decorateWaveformPlayerMarkers( markersContainer ) {
 			'wp-block-playlist__time-marker--current',
 			'is-visible'
 		);
+		currentMarker.style.color = currentMarker.style.backgroundColor;
 		currentMarker.style.setProperty(
 			'--wp-playlist-time-marker-label-offset',
 			parseFloat( currentMarker.style.left ) < 5
@@ -310,6 +311,7 @@ function decorateWaveformPlayerMarkers( markersContainer ) {
 			'wp-block-playlist__time-marker--end',
 			'is-visible'
 		);
+		endMarker.style.color = endMarker.style.backgroundColor;
 		endMarker.style.setProperty(
 			'--wp-playlist-time-marker-label-offset',
 			'calc(-100% - 0.35rem)'
@@ -360,7 +362,11 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 	};
 
 	const getMarkerColor = () => {
-		return instance.options.progressColor || instance.options.buttonColor;
+		return (
+			instance.options.waveformColor ||
+			instance.options.progressColor ||
+			instance.options.buttonColor
+		);
 	};
 
 	const updateWaveformPlayerMarkers = () => {
@@ -404,8 +410,11 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 			1
 		);
 
+		const markerColor = getMarkerColor();
 		waveformArea.classList.add( 'is-hovering' );
 		hoverRegion.style.width = `${ percent * 100 }%`;
+		hoverMarker.style.backgroundColor = markerColor;
+		hoverMarker.style.color = markerColor;
 		ensureHoverMarker();
 		setTimeMarker(
 			hoverMarker,
