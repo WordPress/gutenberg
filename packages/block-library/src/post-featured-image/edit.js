@@ -52,7 +52,6 @@ import { unlock } from '../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
-const DEFAULT_MEDIA_SIZE_SLUG = 'full';
 
 function FeaturedImageResolutionTool( { image, value, onChange } ) {
 	const { imageSizes } = useSelect( ( select ) => {
@@ -66,16 +65,41 @@ function FeaturedImageResolutionTool( { image, value, onChange } ) {
 		return null;
 	}
 
-	const imageSizeOptions = imageSizes
+	let imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
+	// Check if post-thumbnail size exists (either in imageSizes or image media_details)
+	const hasPostThumbnailSize =
+		imageSizes.some( ( { slug } ) => slug === 'post-thumbnail' ) ||
+		!! image?.media_details?.sizes?.[ 'post-thumbnail' ];
+
+	// Modify the available resolution options based on whether post-thumbnail size is available.
+	// See: https://github.com/WordPress/gutenberg/issues/70526
+	if ( hasPostThumbnailSize ) {
+		// If theme has post-thumbnail size:
+		// Default -> '', Thumbnail -> thumbnail, Medium -> medium, Full Size -> full
+		imageSizeOptions = [
+			{ value: '', label: __( 'Default' ) },
+			...imageSizeOptions,
+		];
+	} else {
+		// If theme does not have post-thumbnail size:
+		// Thumbnail -> thumbnail, Medium -> medium, Full Size -> ''
+		imageSizeOptions = imageSizeOptions.map( ( option ) => {
+			if ( option.value === 'full' ) {
+				return { ...option, value: '' };
+			}
+			return option;
+		} );
+	}
+
 	return (
 		<ResolutionTool
 			value={ value }
-			defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+			defaultValue=""
 			options={ imageSizeOptions }
 			onChange={ onChange }
 		/>
@@ -259,7 +283,7 @@ export default function PostFeaturedImageEdit( {
 								isLink: false,
 								linkTarget: '_self',
 								rel: '',
-								sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+								sizeSlug: undefined,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -349,9 +373,14 @@ export default function PostFeaturedImageEdit( {
 						{ !! media && (
 							<FeaturedImageResolutionTool
 								image={ media }
-								value={ sizeSlug }
+								value={ sizeSlug || '' }
 								onChange={ ( nextSizeSlug ) =>
-									setAttributes( { sizeSlug: nextSizeSlug } )
+									setAttributes( {
+										sizeSlug:
+											nextSizeSlug === ''
+												? undefined
+												: nextSizeSlug,
+									} )
 								}
 							/>
 						) }
