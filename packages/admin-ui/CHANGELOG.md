@@ -4,7 +4,7 @@
 
 ### Internal
 
--   Add private `getAdminThemeColors`, which returns the primary and background colors of the active WordPress admin color scheme (for seeding a `ThemeProvider`) ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
+-   Add `getAdminThemeColors`, which returns the primary and background colors of the active WordPress admin color scheme (for seeding a `ThemeProvider`) ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).
 
 ## 2.2.0 (2026-05-27)
 
