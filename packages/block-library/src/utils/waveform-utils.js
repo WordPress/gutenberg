@@ -261,6 +261,65 @@ function setTimeMarker( marker, percent, label ) {
 }
 
 /**
+ * Create marker data for WaveformPlayer's marker API.
+ *
+ * @param {number} currentTime - The current playback position.
+ * @param {number} duration    - The track duration.
+ * @param {string} color       - Marker color.
+ * @return {Array} WaveformPlayer marker objects.
+ */
+function createWaveformPlayerMarkers( currentTime, duration, color ) {
+	return [
+		{
+			time: clamp( currentTime, 0, duration ),
+			label: formatTime( currentTime ),
+			color,
+		},
+		{
+			time: duration,
+			label: formatTime( duration ),
+			color,
+		},
+	];
+}
+
+/**
+ * Add Playlist-specific marker classes after WaveformPlayer renders markers.
+ *
+ * @param {Element} markersContainer - WaveformPlayer markers container.
+ */
+function decorateWaveformPlayerMarkers( markersContainer ) {
+	const [ currentMarker, endMarker ] =
+		markersContainer.querySelectorAll( '.waveform-marker' );
+
+	if ( currentMarker ) {
+		currentMarker.classList.add(
+			'wp-block-playlist__time-marker',
+			'wp-block-playlist__time-marker--current',
+			'is-visible'
+		);
+		currentMarker.style.setProperty(
+			'--wp-playlist-time-marker-label-offset',
+			parseFloat( currentMarker.style.left ) < 5
+				? '0'
+				: 'calc(-100% - 0.35rem)'
+		);
+	}
+
+	if ( endMarker ) {
+		endMarker.classList.add(
+			'wp-block-playlist__time-marker',
+			'wp-block-playlist__time-marker--end',
+			'is-visible'
+		);
+		endMarker.style.setProperty(
+			'--wp-playlist-time-marker-label-offset',
+			'calc(-100% - 0.35rem)'
+		);
+	}
+}
+
+/**
  * Set up current, hover, and duration timestamp markers on the waveform.
  *
  * @param {Object}  instance  - The WaveformPlayer library instance.
@@ -281,11 +340,17 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 	hoverRegion.className = 'wp-block-playlist__waveform-hover-region';
 	waveformArea.prepend( hoverRegion );
 
-	const currentMarker = createTimeMarker( documentRef, 'current' );
 	const hoverMarker = createTimeMarker( documentRef, 'hover' );
-	const endMarker = createTimeMarker( documentRef, 'end' );
+	const fallbackCurrentMarker = createTimeMarker( documentRef, 'current' );
+	const fallbackEndMarker = createTimeMarker( documentRef, 'end' );
 
-	markersContainer.append( currentMarker, hoverMarker, endMarker );
+	markersContainer.append( hoverMarker );
+
+	const ensureHoverMarker = () => {
+		if ( ! hoverMarker.parentElement ) {
+			markersContainer.append( hoverMarker );
+		}
+	};
 
 	const getDuration = () => {
 		if ( hasDuration( instance.audio.duration ) ) {
@@ -298,32 +363,69 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 		return hasDuration( fallbackDuration ) ? fallbackDuration : null;
 	};
 
-	const updateCurrentMarker = () => {
+	const getMarkerColor = () => {
+		return instance.options.progressColor || instance.options.buttonColor;
+	};
+
+	const showFallbackMarkers = () => {
 		const durationSeconds = getDuration();
 
 		if ( ! durationSeconds ) {
-			currentMarker.classList.remove( 'is-visible' );
+			fallbackCurrentMarker.classList.remove( 'is-visible' );
+			fallbackEndMarker.classList.remove( 'is-visible' );
 			return;
+		}
+
+		if ( ! fallbackCurrentMarker.parentElement ) {
+			markersContainer.append( fallbackCurrentMarker );
+		}
+		if ( ! fallbackEndMarker.parentElement ) {
+			markersContainer.append( fallbackEndMarker );
 		}
 
 		setTimeMarker(
-			currentMarker,
+			fallbackCurrentMarker,
 			instance.audio.currentTime / durationSeconds,
 			formatTime( instance.audio.currentTime )
 		);
+		setTimeMarker( fallbackEndMarker, 1, formatTime( durationSeconds ) );
 	};
 
-	const updateDurationMarkers = () => {
+	const hideFallbackMarkers = () => {
+		fallbackCurrentMarker.classList.remove( 'is-visible' );
+		fallbackEndMarker.classList.remove( 'is-visible' );
+		fallbackCurrentMarker.remove();
+		fallbackEndMarker.remove();
+	};
+
+	const updateWaveformPlayerMarkers = () => {
 		const durationSeconds = getDuration();
 
 		if ( ! durationSeconds ) {
-			endMarker.classList.remove( 'is-visible' );
-			updateCurrentMarker();
+			instance.options.markers = [];
+			instance.renderMarkers();
+			ensureHoverMarker();
+			showFallbackMarkers();
 			return;
 		}
 
-		setTimeMarker( endMarker, 1, formatTime( durationSeconds ) );
-		updateCurrentMarker();
+		if ( ! hasDuration( instance.audio.duration ) ) {
+			instance.options.markers = [];
+			instance.renderMarkers();
+			ensureHoverMarker();
+			showFallbackMarkers();
+			return;
+		}
+
+		hideFallbackMarkers();
+		instance.options.markers = createWaveformPlayerMarkers(
+			instance.audio.currentTime,
+			durationSeconds,
+			getMarkerColor()
+		);
+		instance.renderMarkers();
+		ensureHoverMarker();
+		decorateWaveformPlayerMarkers( markersContainer );
 	};
 
 	const updateHoverMarker = ( event ) => {
@@ -342,6 +444,7 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 
 		waveformArea.classList.add( 'is-hovering' );
 		hoverRegion.style.width = `${ percent * 100 }%`;
+		ensureHoverMarker();
 		setTimeMarker(
 			hoverMarker,
 			percent,
@@ -357,40 +460,58 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 
 	waveformArea.addEventListener( 'mousemove', updateHoverMarker );
 	waveformArea.addEventListener( 'mouseleave', hideHoverMarker );
-	instance.audio.addEventListener( 'loadedmetadata', updateDurationMarkers );
-	instance.audio.addEventListener( 'durationchange', updateDurationMarkers );
-	instance.audio.addEventListener( 'timeupdate', updateCurrentMarker );
+	instance.audio.addEventListener(
+		'loadedmetadata',
+		updateWaveformPlayerMarkers
+	);
+	instance.audio.addEventListener(
+		'durationchange',
+		updateWaveformPlayerMarkers
+	);
+	instance.audio.addEventListener(
+		'timeupdate',
+		updateWaveformPlayerMarkers
+	);
 	container.addEventListener(
 		'waveformplayer:timeupdate',
-		updateCurrentMarker
+		updateWaveformPlayerMarkers
 	);
-	container.addEventListener( 'waveformplayer:ended', updateCurrentMarker );
+	container.addEventListener(
+		'waveformplayer:ended',
+		updateWaveformPlayerMarkers
+	);
 
-	updateDurationMarkers();
+	updateWaveformPlayerMarkers();
 
 	return () => {
 		waveformArea.removeEventListener( 'mousemove', updateHoverMarker );
 		waveformArea.removeEventListener( 'mouseleave', hideHoverMarker );
 		instance.audio.removeEventListener(
 			'loadedmetadata',
-			updateDurationMarkers
+			updateWaveformPlayerMarkers
 		);
 		instance.audio.removeEventListener(
 			'durationchange',
-			updateDurationMarkers
+			updateWaveformPlayerMarkers
 		);
-		instance.audio.removeEventListener( 'timeupdate', updateCurrentMarker );
+		instance.audio.removeEventListener(
+			'timeupdate',
+			updateWaveformPlayerMarkers
+		);
 		container.removeEventListener(
 			'waveformplayer:timeupdate',
-			updateCurrentMarker
+			updateWaveformPlayerMarkers
 		);
 		container.removeEventListener(
 			'waveformplayer:ended',
-			updateCurrentMarker
+			updateWaveformPlayerMarkers
 		);
-		currentMarker.remove();
+		markersContainer
+			.querySelectorAll( '.wp-block-playlist__time-marker' )
+			.forEach( ( marker ) => marker.remove() );
 		hoverMarker.remove();
-		endMarker.remove();
+		fallbackCurrentMarker.remove();
+		fallbackEndMarker.remove();
 		hoverRegion.remove();
 	};
 }

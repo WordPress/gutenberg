@@ -265,7 +265,42 @@ describe( 'Waveform utilities', () => {
 				value: currentTime,
 			} );
 
-			const instance = { audio, options: {} };
+			const instance = {
+				audio,
+				options: {},
+				renderMarkers: jest.fn( () => {
+					const markersContainer =
+						container.querySelector( '.waveform-markers' );
+					markersContainer.innerHTML = '';
+
+					if (
+						! Number.isFinite( audio.duration ) ||
+						audio.duration <= 0
+					) {
+						return;
+					}
+
+					instance.options.markers?.forEach( ( marker ) => {
+						const markerElement =
+							document.createElement( 'button' );
+						markerElement.className = 'waveform-marker';
+						markerElement.style.left = `${
+							( marker.time / audio.duration ) * 100
+						}%`;
+						markerElement.setAttribute(
+							'aria-label',
+							marker.label
+						);
+						markerElement.setAttribute( 'data-time', marker.time );
+
+						const tooltip = document.createElement( 'span' );
+						tooltip.className = 'waveform-marker-tooltip';
+						tooltip.textContent = marker.label;
+						markerElement.appendChild( tooltip );
+						markersContainer.appendChild( markerElement );
+					} );
+				} ),
+			};
 
 			return { audio, container, instance, waveformArea };
 		}
@@ -291,6 +326,17 @@ describe( 'Waveform utilities', () => {
 			expect( endMarker ).toHaveClass( 'is-visible' );
 			expect( endMarker ).toHaveStyle( { left: '100%' } );
 			expect( endMarker ).toHaveTextContent( '3:00' );
+			expect( instance.renderMarkers ).toHaveBeenCalled();
+			expect( instance.options.markers ).toEqual( [
+				expect.objectContaining( {
+					time: 45,
+					label: '0:45',
+				} ),
+				expect.objectContaining( {
+					time: 180,
+					label: '3:00',
+				} ),
+			] );
 		} );
 
 		it( 'should update the current marker on player timeupdate', () => {
