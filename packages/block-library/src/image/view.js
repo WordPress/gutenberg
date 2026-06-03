@@ -220,6 +220,20 @@ const { state, actions, callbacks } = store(
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
 			},
+			handleOverlayClick: withSyncEvent( ( event ) => {
+				// When navigation is present (i.e. gallery lightbox), clicking
+				// directly on the expanded image should not close the dialog.
+				if ( state.hasNavigation ) {
+					// In the lightbox, the image is wrapped in a figure.
+					const clickedImage =
+						event.target.tagName === 'IMG' ||
+						event.target.tagName === 'FIGURE';
+					if ( clickedImage ) {
+						return;
+					}
+				}
+				actions.hideLightbox();
+			} ),
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
 					state.overlayEnabled = false;
