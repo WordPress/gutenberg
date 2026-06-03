@@ -66,7 +66,9 @@ const DEFAULT_OUTPUT_QUALITY = 0.82;
 /**
  * Tracks parent item IDs whose source file is an UltraHDR JPEG so that
  * sub-size resize operations can route through libvips's uhdrload/uhdrsave
- * to preserve the gain map. Entries are cleared when the parent finalizes.
+ * to preserve the gain map. Entries are cleared in `removeItem` when the
+ * parent item leaves the queue, covering both successful completion and
+ * cancellation.
  */
 const ultraHdrItems = new Set< QueueItemId >();
 
@@ -514,6 +516,11 @@ export function removeItem( id: QueueItemId ) {
 		if ( ! item ) {
 			return;
 		}
+
+		// Clear any UltraHDR tracking for this item. removeItem runs on both
+		// successful completion and cancellation, so this prevents the set
+		// from growing unbounded over a long editing session.
+		ultraHdrItems.delete( id );
 
 		dispatch( {
 			type: Type.Remove,
@@ -1432,9 +1439,6 @@ export function finalizeItem( id: QueueItemId ) {
 				console.warn( 'Media finalization failed:', error );
 			}
 		}
-
-		// Clean up UltraHDR tracking — all sub-sizes are done by now.
-		ultraHdrItems.delete( id );
 
 		dispatch.finishOperation( id, updates );
 	};
