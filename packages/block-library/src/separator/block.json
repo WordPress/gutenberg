@@ -16,6 +16,11 @@
 			"type": "string",
 			"enum": [ "hr", "div" ],
 			"default": "hr"
+		},
+		"orientation": {
+			"type": "string",
+			"default": "horizontal",
+			"enum": [ "horizontal", "vertical" ]
 		}
 	},
 	"supports": {

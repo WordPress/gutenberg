@@ -3,3 +3,8 @@
 	padding-top: 0.1px;
 	padding-bottom: 0.1px;
 }
+
+.wp-block-separator.is-vertical {
+	// Minimum visible width in editor so it's clickable
+	min-width: 2px;
+}
