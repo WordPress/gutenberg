@@ -68,8 +68,7 @@ export interface UseDeferredCommitReturn {
  *
  * On blur or Enter, a user-edited numeric draft is clamped to the current
  * bounds and committed, the session ends, and `onCommitEnd` (typically
- * `settleCrop` or `commitHistory`) fires once. Escape restores the value
- * captured on focus.
+ * `settleCrop`) fires once. Escape restores the value captured on focus.
  *
  * @param args                Hook arguments.
  * @param args.value
@@ -259,9 +258,8 @@ export function useDeferredCommit( {
 		}
 		skipBlurCommitRef.current = false;
 		// Session end before commit end: `onCommitEnd` typically calls
-		// `settleCrop` → `commitHistory`, which needs the controller's
-		// history pause already released so the session flushes as one
-		// undo entry rather than landing inside a still-paused window.
+		// `settleCrop`, and the media editor's gesture boundary should be
+		// closed first so the session flushes as one undo entry.
 		endSession();
 		runCommitEnd();
 	};

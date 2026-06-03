@@ -11,9 +11,8 @@ import CropAdvancedPanel from '../crop-advanced-panel';
 const mockSetCropRect = jest.fn();
 const mockSetRotation = jest.fn();
 const mockSettleCrop = jest.fn();
-const mockCommitHistory = jest.fn();
-const mockPauseHistory = jest.fn();
-const mockResumeHistory = jest.fn();
+const mockBeginGesture = jest.fn();
+const mockEndGesture = jest.fn();
 const mockSetPreviewCropRect = jest.fn();
 const mockNormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
 const mockDefaultCropperState = {
@@ -117,14 +116,14 @@ function setMockCropperState( overrides: MockCropperStateOverrides = {} ) {
 	};
 }
 
-jest.mock( '../../../image-editor', () => ( {
-	useCropper: () => ( {
+jest.mock( '../../../state', () => ( {
+	useMediaEditor: () => ( {
 		state: mockCropperState,
 		setCropRect: mockSetCropRect,
 		setRotation: mockSetRotation,
 		settleCrop: mockSettleCrop,
-		commitHistory: mockCommitHistory,
-		pauseHistory: mockPauseHistory,
+		beginGesture: mockBeginGesture,
+		endGesture: mockEndGesture,
 	} ),
 } ) );
 
@@ -149,7 +148,6 @@ jest.mock( '../../../image-editor/react/components/cropper-provider', () => ( {
 describe( 'CropAdvancedPanel', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
-		mockPauseHistory.mockReturnValue( mockResumeHistory );
 		jest.useRealTimers();
 		setMockCropGeometry();
 		setMockCropperState();
@@ -310,6 +308,5 @@ describe( 'CropAdvancedPanel', () => {
 		fireEvent.blur( rotationInput );
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 30 );
-		expect( mockCommitHistory ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

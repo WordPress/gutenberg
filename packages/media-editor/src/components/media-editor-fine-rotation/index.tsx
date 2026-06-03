@@ -37,11 +37,7 @@ export default function MediaEditorFineRotation( {
 	const handleRotationSlider = ( value: number ) => {
 		onPlacementControlInteraction?.();
 		setRotation(
-			fineRotation.absoluteFromOffset(
-				state.rotation,
-				state.flip,
-				value
-			)
+			fineRotation.absoluteFromOffset( state.rotation, state.flip, value )
 		);
 	};
 

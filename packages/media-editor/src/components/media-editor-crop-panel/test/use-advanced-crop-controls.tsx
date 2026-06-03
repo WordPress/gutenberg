@@ -11,9 +11,8 @@ import { useAdvancedCropControls } from '../use-advanced-crop-controls';
 const mockSetCropRect = jest.fn();
 const mockSetRotation = jest.fn();
 const mockSettleCrop = jest.fn();
-const mockCommitHistory = jest.fn();
-const mockPauseHistory = jest.fn();
-const mockResumeHistory = jest.fn();
+const mockBeginGesture = jest.fn();
+const mockEndGesture = jest.fn();
 const mockSetPreviewCropRect = jest.fn();
 
 const defaultState = {
@@ -52,14 +51,14 @@ let mockCropperState = defaultState;
 let mockCropGeometry: typeof defaultGeometry | { isReady: false } =
 	defaultGeometry;
 
-jest.mock( '../../../image-editor', () => ( {
-	useCropper: () => ( {
+jest.mock( '../../../state', () => ( {
+	useMediaEditor: () => ( {
 		state: mockCropperState,
 		setCropRect: mockSetCropRect,
 		setRotation: mockSetRotation,
 		settleCrop: mockSettleCrop,
-		commitHistory: mockCommitHistory,
-		pauseHistory: mockPauseHistory,
+		beginGesture: mockBeginGesture,
+		endGesture: mockEndGesture,
 	} ),
 } ) );
 
@@ -74,7 +73,6 @@ jest.mock( '../../../image-editor/react/components/cropper-provider', () => ( {
 describe( 'useAdvancedCropControls', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
-		mockPauseHistory.mockReturnValue( mockResumeHistory );
 		mockCropperState = defaultState;
 		mockCropGeometry = defaultGeometry;
 	} );
@@ -190,7 +188,7 @@ describe( 'useAdvancedCropControls', () => {
 		expect( mockSettleCrop ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'applies fine rotation and flushes history on end', () => {
+	it( 'applies fine rotation', () => {
 		const { result } = renderHook( () =>
 			useAdvancedCropControls( { freeformCrop: true } )
 		);
@@ -202,7 +200,6 @@ describe( 'useAdvancedCropControls', () => {
 		act( () => result.current.fineRotation.onEditEnd() );
 
 		expect( mockSetRotation ).toHaveBeenCalledWith( 12.5 );
-		expect( mockCommitHistory ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'clamps fine rotation to the policy range', () => {
@@ -218,7 +215,7 @@ describe( 'useAdvancedCropControls', () => {
 		expect( mockSetRotation ).toHaveBeenCalledWith( 44.99 );
 	} );
 
-	it( 'exposes session start/end that pause and resume the controller history', () => {
+	it( 'exposes session start/end gesture boundaries', () => {
 		const { result } = renderHook( () =>
 			useAdvancedCropControls( { freeformCrop: true } )
 		);
@@ -227,10 +224,10 @@ describe( 'useAdvancedCropControls', () => {
 			throw new Error( 'expected controls to be ready' );
 		}
 		act( () => result.current.onSessionStart() );
-		expect( mockPauseHistory ).toHaveBeenCalledTimes( 1 );
-		expect( mockResumeHistory ).not.toHaveBeenCalled();
+		expect( mockBeginGesture ).toHaveBeenCalledTimes( 1 );
+		expect( mockEndGesture ).not.toHaveBeenCalled();
 
 		act( () => result.current.onSessionEnd() );
-		expect( mockResumeHistory ).toHaveBeenCalledTimes( 1 );
+		expect( mockEndGesture ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
