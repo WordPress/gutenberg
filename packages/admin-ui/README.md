@@ -68,7 +68,7 @@ Reads the active WordPress admin color scheme from the `admin-color-*` body clas
 
 _Returns_
 
--   `AdminThemeColors | undefined`: The primary and background colors for the active admin color scheme.
+-   `AdminThemeColors`: The primary and background colors for the active admin color scheme.
 
 ### NavigableRegion
 
