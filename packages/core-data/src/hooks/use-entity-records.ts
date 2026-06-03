@@ -11,7 +11,8 @@ import { useMemo } from '@wordpress/element';
  */
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
-import { Status } from './constants';
+import type { Status } from './constants';
+import { getResolutionStatus } from './utils';
 import { unlock } from '../lock-unlock';
 import { getNormalizedCommaSeparable } from '../utils';
 
@@ -120,20 +121,15 @@ export default function useEntityRecords< RecordType >(
 					records: EMPTY_ARRAY,
 					totalItems: null,
 					totalPages: null,
-					isResolving: false,
-					hasStarted: false,
-					hasResolved: false,
-					status: Status.idle,
+					...getResolutionStatus(),
 				};
 			}
 
 			const storeSelectors = select( coreStore );
-			const status: Status =
-				storeSelectors.getResolutionState( 'getEntityRecords', [
-					kind,
-					name,
-					queryArgs,
-				] )?.status ?? Status.idle;
+			const resolutionStatus = storeSelectors.getResolutionState(
+				'getEntityRecords',
+				[ kind, name, queryArgs ]
+			)?.status;
 
 			return {
 				records: storeSelectors.getEntityRecords(
@@ -151,11 +147,7 @@ export default function useEntityRecords< RecordType >(
 					name,
 					queryArgs
 				),
-				isResolving: status === Status.resolving,
-				hasStarted: status !== Status.idle,
-				hasResolved:
-					status === Status.finished || status === Status.error,
-				status,
+				...getResolutionStatus( resolutionStatus ),
 			};
 		},
 		[ kind, name, queryAsString, options.enabled ]

@@ -42,7 +42,7 @@ describe( 'useResourcePermissions', () => {
 			</RegistryProvider>
 		);
 		expect( data ).toEqual( {
-			status: 'idle',
+			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
 			canCreate: false,
@@ -51,7 +51,7 @@ describe( 'useResourcePermissions', () => {
 
 		await waitFor( () =>
 			expect( data ).toEqual( {
-				status: 'finished',
+				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
 				canCreate: true,
@@ -72,7 +72,7 @@ describe( 'useResourcePermissions', () => {
 			</RegistryProvider>
 		);
 		expect( data ).toEqual( {
-			status: 'idle',
+			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
 			canCreate: false,
@@ -83,7 +83,7 @@ describe( 'useResourcePermissions', () => {
 
 		await waitFor( () =>
 			expect( data ).toEqual( {
-				status: 'finished',
+				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
 				canCreate: true,
@@ -109,7 +109,7 @@ describe( 'useResourcePermissions', () => {
 			</RegistryProvider>
 		);
 		expect( data ).toEqual( {
-			status: 'idle',
+			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
 			canCreate: false,
@@ -118,7 +118,7 @@ describe( 'useResourcePermissions', () => {
 
 		await waitFor( () =>
 			expect( data ).toEqual( {
-				status: 'finished',
+				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
 				canCreate: true,
@@ -169,7 +169,7 @@ describe( 'useResourcePermissions', () => {
 
 		await waitFor( () =>
 			expect( data ).toEqual( {
-				status: 'finished',
+				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
 				canCreate: true,
@@ -200,7 +200,7 @@ describe( 'useResourcePermissions', () => {
 			</RegistryProvider>
 		);
 		expect( data ).toEqual( {
-			status: 'idle',
+			status: 'IDLE',
 			isResolving: false,
 			hasResolved: false,
 			canCreate: false,
@@ -211,7 +211,7 @@ describe( 'useResourcePermissions', () => {
 
 		await waitFor( () =>
 			expect( data ).toEqual( {
-				status: 'finished',
+				status: 'SUCCESS',
 				isResolving: false,
 				hasResolved: true,
 				canCreate: true,

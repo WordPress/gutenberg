@@ -7,7 +7,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import memoize from 'memize';
-import { Status } from './constants';
+import { getResolutionStatus } from './utils';
 
 export const META_SELECTORS = [
 	'getIsResolving',
@@ -113,16 +113,10 @@ const enrichSelectors = memoize( ( ( selectors ) => {
 						selectorName,
 						args
 					)?.status;
-					const status: Status = resolutionStatus ?? Status.idle;
 
 					return {
 						data,
-						status,
-						isResolving: status === Status.resolving,
-						hasStarted: status !== Status.idle,
-						hasResolved:
-							status === Status.finished ||
-							status === Status.error,
+						...getResolutionStatus( resolutionStatus ),
 					};
 				},
 		} );

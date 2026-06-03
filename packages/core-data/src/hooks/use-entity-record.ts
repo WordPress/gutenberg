@@ -9,7 +9,8 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as coreStore } from '../';
-import { Status } from './constants';
+import type { Status } from './constants';
+import { getResolutionStatus } from './utils';
 
 export interface EntityRecordResolution< RecordType > {
 	/** The requested entity record */
@@ -181,20 +182,15 @@ export default function useEntityRecord< RecordType >(
 					editedRecord: EMPTY_OBJECT,
 					hasEdits: false,
 					edits: EMPTY_OBJECT,
-					isResolving: false,
-					hasStarted: false,
-					hasResolved: false,
-					status: Status.idle,
+					...getResolutionStatus(),
 				};
 			}
 
 			const storeSelectors = select( coreStore );
-			const status: Status =
-				storeSelectors.getResolutionState( 'getEntityRecord', [
-					kind,
-					name,
-					recordId,
-				] )?.status ?? Status.idle;
+			const resolutionStatus = storeSelectors.getResolutionState(
+				'getEntityRecord',
+				[ kind, name, recordId ]
+			)?.status;
 
 			return {
 				record: ( storeSelectors.getEntityRecord(
@@ -202,11 +198,11 @@ export default function useEntityRecord< RecordType >(
 					name,
 					recordId
 				) ?? null ) as RecordType | null,
-				editedRecord: ( storeSelectors.getEditedEntityRecord(
+				editedRecord: storeSelectors.getEditedEntityRecord(
 					kind,
 					name,
 					recordId
-				) || EMPTY_OBJECT ) as Partial< RecordType >,
+				),
 				hasEdits: storeSelectors.hasEditsForEntityRecord(
 					kind,
 					name,
@@ -217,11 +213,7 @@ export default function useEntityRecord< RecordType >(
 					name,
 					recordId
 				),
-				isResolving: status === Status.resolving,
-				hasStarted: status !== Status.idle,
-				hasResolved:
-					status === Status.finished || status === Status.error,
-				status,
+				...getResolutionStatus( resolutionStatus ),
 			};
 		},
 		[ kind, name, recordId, options.enabled ]

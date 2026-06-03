@@ -128,7 +128,7 @@ describe( 'useQuerySelect', () => {
 			isResolving: false,
 			hasResolved: false,
 			hasStarted: false,
-			status: 'idle',
+			status: 'IDLE',
 		} );
 	} );
 
@@ -178,7 +178,7 @@ describe( 'useQuerySelect', () => {
 			isResolving: false,
 			hasResolved: false,
 			hasStarted: false,
-			status: 'idle',
+			status: 'IDLE',
 		} );
 
 		// Re-render, expect resolved data
@@ -194,7 +194,7 @@ describe( 'useQuerySelect', () => {
 				isResolving: false,
 				hasResolved: true,
 				hasStarted: true,
-				status: 'finished',
+				status: 'SUCCESS',
 			} )
 		);
 	} );

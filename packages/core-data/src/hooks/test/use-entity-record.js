@@ -46,7 +46,7 @@ describe( 'useEntityRecord', () => {
 
 		expect( data ).toEqual( {
 			edit: expect.any( Function ),
-			editedRecord: {},
+			editedRecord: false,
 			hasEdits: false,
 			edits: {},
 			record: null,
@@ -54,7 +54,7 @@ describe( 'useEntityRecord', () => {
 			hasResolved: false,
 			hasStarted: false,
 			isResolving: false,
-			status: 'idle',
+			status: 'IDLE',
 		} );
 
 		// Fetch request should have been issued
@@ -75,7 +75,7 @@ describe( 'useEntityRecord', () => {
 			hasResolved: true,
 			hasStarted: true,
 			isResolving: false,
-			status: 'finished',
+			status: 'SUCCESS',
 		} );
 	} );
 
@@ -105,7 +105,7 @@ describe( 'useEntityRecord', () => {
 				hasResolved: true,
 				hasStarted: true,
 				isResolving: false,
-				status: 'finished',
+				status: 'SUCCESS',
 			} )
 		);
 
@@ -161,7 +161,7 @@ describe( 'useEntityRecord', () => {
 			hasResolved: false,
 			hasStarted: false,
 			isResolving: false,
-			status: 'idle',
+			status: 'IDLE',
 		} );
 
 		// The same delay.
