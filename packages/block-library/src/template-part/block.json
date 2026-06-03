@@ -23,6 +23,7 @@
 	"supports": {
 		"align": true,
 		"html": false,
+		"layout": true,
 		"reusable": false,
 		"renaming": false,
 		"interactivity": {
