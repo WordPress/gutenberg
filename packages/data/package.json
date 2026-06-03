@@ -45,6 +45,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",

@@ -26,6 +26,7 @@ const VENDOR_SCRIPTS = [
 			'module.exports = {',
 			'  ...require("react-dom"),',
 			'  ...require("react-dom/client"),',
+			'  ...require("@wordpress/element/react-polyfill"),',
 			'};',
 		].join( '\n' ),
 	},
