@@ -302,6 +302,109 @@ test.describe( 'Client-side media processing', () => {
 		expect( fullMedia.media_details.original ).toMatch( /\.jxl$/ );
 	} );
 
+	test( 'flattens a high-bit-depth (HDR) JXL to JPEG sub-sizes but preserves the 16-bit original', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+		page,
+	} ) => {
+		// A genuine 16-bit (>8-bit, "HDR") JXL. CSM decodes it to JPEG with
+		// vips for upload, so the main attachment and every generated sub-size
+		// are 8-bit JPEG: the extra bit depth is NOT carried into sub-sizes
+		// (JPEG is 8-bit by definition). The full 16-bit fidelity survives only
+		// in the original .jxl, which is preserved byte-for-byte as a companion
+		// file (sideloaded like the HEIC original). This test guards both
+		// halves of that contract: the flattening and the lossless preservation.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'200x150_e2e_test_image_hdr.jxl'
+		);
+
+		// Main attachment is the 8-bit JPEG derivative.
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
+
+		// The generated sub-size is JPEG too — the >8-bit depth is dropped.
+		expect( media.media_details.sizes.thumbnail ).toBeDefined();
+		expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
+			'image/jpeg'
+		);
+
+		// The original 16-bit .jxl is preserved as the companion file.
+		const fullMedia = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ media.id }?context=edit`,
+		} );
+		expect( fullMedia.media_details.original ).toMatch( /\.jxl$/ );
+
+		// Strongest proof of bit-depth preservation: the stored original is
+		// byte-for-byte identical to the uploaded 16-bit fixture, so its full
+		// depth (and any other embedded fidelity) is intact.
+		const originalUrl = media.source_url.replace(
+			/[^/]+$/,
+			fullMedia.media_details.original
+		);
+		const storedOriginal = await (
+			await page.request.get( originalUrl )
+		).body();
+		const uploadedFixture = await fs.readFile(
+			path.join( ASSETS_DIR, '200x150_e2e_test_image_hdr.jxl' )
+		);
+		expect( Buffer.compare( storedOriginal, uploadedFixture ) ).toBe( 0 );
+	} );
+
+	test( 'flattens a gain-map JXL to JPEG sub-sizes but preserves the gain map in the original', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+		page,
+	} ) => {
+		// An 8-bit JXL carrying an ISO 21496-1 gain map (a `jhgm` ISO-BMFF box
+		// after the primary codestream — see .gen-jxl-fidelity-fixtures.mjs).
+		// vips decodes the primary image and discards the gain map, so the
+		// JPEG derivative and its sub-sizes have no gain map. The gain map is
+		// preserved only in the original .jxl companion, kept byte-for-byte.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'200x150_e2e_test_image_gainmap.jxl'
+		);
+
+		// Main attachment is the JPEG derivative without the gain map.
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
+
+		// The generated sub-size is JPEG too — no gain map carried through.
+		expect( media.media_details.sizes.thumbnail ).toBeDefined();
+		expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
+			'image/jpeg'
+		);
+
+		// The original gain-map .jxl is preserved as the companion file.
+		const fullMedia = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ media.id }?context=edit`,
+		} );
+		expect( fullMedia.media_details.original ).toMatch( /\.jxl$/ );
+
+		// Byte-for-byte identity proves the embedded gain map (the `jhgm` box)
+		// survives untouched in the stored original.
+		const originalUrl = media.source_url.replace(
+			/[^/]+$/,
+			fullMedia.media_details.original
+		);
+		const storedOriginal = await (
+			await page.request.get( originalUrl )
+		).body();
+		const uploadedFixture = await fs.readFile(
+			path.join( ASSETS_DIR, '200x150_e2e_test_image_gainmap.jxl' )
+		);
+		expect( Buffer.compare( storedOriginal, uploadedFixture ) ).toBe( 0 );
+	} );
+
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,
