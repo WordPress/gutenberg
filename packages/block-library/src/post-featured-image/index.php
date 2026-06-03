@@ -76,13 +76,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		 * Because the HTML API doesn't currently expose a way to extract
 		 * HTML substrings this is necessary as a workaround. Of note, this
 		 * is different than directly extracting the IMG tag:
-		 * - If there are duplicate attributes in the source there will only be one in the outpyt.
+		 * - If there are duplicate attributes in the source there will only be one in the output.
 		 * - If there are single-quoted or unquoted attributes they will be double-quoted in the output.
 		 * - If there are named character references in the attribute values they may be replaced with their direct code points. E.g. `&hellip;` becomes `…`.
 		 * In the future there will likely be a mechanism to copy snippets of HTML from
 		 * one document into another, via the HTML Processor's `get_outer_html()` or
 		 * equivalent. When that happens it would be appropriate to replace this custom
-		 * code with that canonical sode.
+		 * code with that canonical code.
 		 */
 		if ( $processor->next_tag( 'img' ) ) {
 			$tag_html = new WP_HTML_Tag_Processor( '<img>' );
@@ -119,7 +119,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
 		: '';
 	$width        = ! empty( $attributes['width'] )
-		? esc_attr( safecss_filter_artr( 'width:' . $attributes['width'] ) ) . ';'
+		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
 		: '';
 	$height       = ! empty( $attributes['height'] )
 		? esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';'
@@ -257,7 +257,7 @@ function get_block_core_post_featured_image_border_attributes( $attributes ) {
  * @since 5.8.0
  */
 function register_block_core_post_featured_image() {
-	register_block_type_from_metadaya(
+	register_block_type_from_metadata(
 		__DIR__ . '/post-featured-image',
 		array(
 			'render_callback' => 'render_block_core_post_featured_image',
