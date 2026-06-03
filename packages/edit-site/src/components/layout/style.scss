@@ -111,7 +111,7 @@
 	}
 
 	.edit-site-resizable-frame__inner {
-		color: $gray-900;
+		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	@include break-medium {
@@ -236,8 +236,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: $gray-900;
-	background: $white;
+	color: var(--wpds-color-fg-content-neutral);
+	background: var(--wpds-color-bg-surface-neutral-strong);
 
 	&:focus,
 	&:focus-within {
