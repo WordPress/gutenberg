@@ -598,6 +598,21 @@ const { state, actions, callbacks } = store(
 					withScope( () => callbacks.scrollOverlayTo( comments ) )
 				);
 			},
+			createCommentElement( comment ) {
+				const article = document.createElement( 'article' );
+				article.className = 'wp-lightbox-comment';
+
+				const meta = document.createElement( 'div' );
+				meta.className = 'wp-lightbox-comment-meta';
+				meta.textContent = comment.author_name || '';
+
+				const content = document.createElement( 'div' );
+				content.className = 'wp-lightbox-comment-content';
+				content.innerHTML = comment.content?.rendered || '';
+
+				article.append( meta, content );
+				return article;
+			},
 			renderComments( comments ) {
 				const list = document.querySelector(
 					'.wp-lightbox-comments-list'
@@ -611,20 +626,22 @@ const { state, actions, callbacks } = store(
 				list.hidden = comments.length === 0;
 
 				for ( const comment of comments ) {
-					const article = document.createElement( 'article' );
-					article.className = 'wp-lightbox-comment';
-
-					const meta = document.createElement( 'div' );
-					meta.className = 'wp-lightbox-comment-meta';
-					meta.textContent = comment.author_name || '';
-
-					const content = document.createElement( 'div' );
-					content.className = 'wp-lightbox-comment-content';
-					content.innerHTML = comment.content?.rendered || '';
-
-					article.append( meta, content );
-					list.append( article );
+					list.append( callbacks.createCommentElement( comment ) );
 				}
+			},
+			appendComment( comment ) {
+				const list = document.querySelector(
+					'.wp-lightbox-comments-list'
+				);
+
+				if ( ! list ) {
+					return;
+				}
+
+				const article = callbacks.createCommentElement( comment );
+				list.append( article );
+				list.hidden = false;
+				article.scrollIntoView( { block: 'nearest' } );
 			},
 			async loadComments( force = false ) {
 				const attachmentId = state.selectedImage?.attachmentId;
@@ -705,7 +722,12 @@ const { state, actions, callbacks } = store(
 
 					form.reset();
 					state.commentForm.message = getConfig().commentSubmittedText;
-					callbacks.loadComments( true );
+
+					// Render the newly created comment from the response rather
+					// than re-fetching: the REST list endpoint only returns
+					// approved comments, so a comment held for moderation would
+					// otherwise disappear from view for the author who posted it.
+					callbacks.appendComment( responseBody );
 				} catch ( error ) {
 					state.commentForm.message =
 						error.message || getConfig().commentErrorText;

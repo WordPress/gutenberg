@@ -1059,6 +1059,12 @@ test.describe( 'Image - lightbox comments', () => {
 		await expect(
 			page.locator( '.wp-lightbox-comments-message' )
 		).toHaveText( 'Comment submitted.' );
+
+		// The submitted comment is rendered from the response, so it appears
+		// immediately for the author even if it is held for moderation.
+		await expect(
+			page.locator( '.wp-lightbox-comment-content' )
+		).toContainText( 'Great shot!' );
 	} );
 } );
 
