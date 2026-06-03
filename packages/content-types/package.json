@@ -33,6 +33,7 @@
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
