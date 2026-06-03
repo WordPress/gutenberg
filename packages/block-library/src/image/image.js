@@ -10,6 +10,7 @@ import {
 	TextareaControl,
 	TextControl,
 	CheckboxControl,
+	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -296,6 +297,7 @@ export default function Image( {
 		linkTarget,
 		sizeSlug,
 		lightbox,
+		exif,
 		metadata,
 		isDecorative,
 	} = attributes;
@@ -551,6 +553,28 @@ export default function Image( {
 		}
 	}
 
+	function onSetExif( enable ) {
+		if ( enable && ! exifSetting?.enabled ) {
+			setAttributes( {
+				exif: { enabled: true },
+			} );
+		} else if ( ! enable && exifSetting?.enabled ) {
+			setAttributes( {
+				exif: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				exif: undefined,
+			} );
+		}
+	}
+
+	function resetExif() {
+		setAttributes( {
+			exif: undefined,
+		} );
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -670,6 +694,17 @@ export default function Image( {
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+
+	const [ exifSetting ] = useSettings( 'exif' );
+
+	const showExifSetting =
+		// If a block-level override is set, give users the option to remove it
+		// even if the EXIF UI is disabled in the settings.
+		( !! exif && exif?.enabled !== exifSetting?.enabled ) ||
+		exifSetting?.allowEditing;
+
+	const exifChecked =
+		!! exif?.enabled || ( ! exif && !! exifSetting?.enabled );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -1011,6 +1046,24 @@ export default function Image( {
 									onChange={ updateIsDecorative }
 									help={ __(
 										'Hidden from assistive technologies.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ lightboxChecked && showExifSetting && (
+							<ToolsPanelItem
+								label={ __( 'Show photo metadata' ) }
+								isShownByDefault
+								hasValue={ () => !! exif }
+								onDeselect={ resetExif }
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Show photo metadata' ) }
+									checked={ exifChecked }
+									onChange={ onSetExif }
+									help={ __(
+										'Display available EXIF data, such as camera and exposure, in the lightbox.'
 									) }
 								/>
 							</ToolsPanelItem>

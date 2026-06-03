@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Image: show EXIF metadata (camera, aperture, shutter speed, focal length, copyright) in the lightbox via a toggle ([#78892](https://github.com/WordPress/gutenberg/pull/78892)).
+-   Image: optionally show EXIF metadata (camera, aperture, shutter speed, focal length, copyright) in the lightbox, opt-in per image or site-wide via a `core/image.exif` theme.json setting ([#78892](https://github.com/WordPress/gutenberg/pull/78892)).
 
 ### Code Quality
 

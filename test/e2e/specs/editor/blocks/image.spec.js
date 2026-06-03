@@ -967,11 +967,11 @@ test.describe( 'Image - lightbox', () => {
 			await requestUtils.deactivatePlugin( 'lightbox-exif-metadata' );
 		} );
 
-		test( 'toggle reveals the photo metadata in the lightbox', async ( {
+		test( 'toggle reveals the photo metadata in the lightbox when enabled', async ( {
 			editor,
 			page,
 		} ) => {
-			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true},"exif":{"enabled":true}} -->
 			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
 			<!-- /wp:image -->` );
 
@@ -1002,6 +1002,29 @@ test.describe( 'Image - lightbox', () => {
 			await toggle.click();
 			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
 			await expect( panel ).toBeHidden();
+		} );
+
+		test( 'no metadata toggle appears when the option is off', async ( {
+			editor,
+			page,
+		} ) => {
+			// The image has EXIF metadata, but the display option is not enabled.
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image -->` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await page.locator( '.wp-lightbox-container img' ).click();
+
+			// The lightbox opens, but the metadata toggle stays hidden.
+			await expect(
+				page.locator( '.wp-lightbox-overlay .wp-block-image' ).first()
+			).toBeVisible();
+			await expect(
+				page.locator( '.wp-lightbox-exif-button' )
+			).toBeHidden();
 		} );
 	} );
 } );

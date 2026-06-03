@@ -388,6 +388,26 @@
 				}
 			}
 		},
+		"settingsExifProperties": {
+			"type": "object",
+			"properties": {
+				"exif": {
+					"description": "Settings related to displaying EXIF metadata in the image lightbox.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Defines whether EXIF metadata is shown in the lightbox.",
+							"type": "boolean"
+						},
+						"allowEditing": {
+							"description": "Defines whether to show the EXIF metadata UI in the block editor. If set to `false`, the user won't be able to change the EXIF setting in the block editor.",
+							"type": "boolean"
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsPositionProperties": {
 			"type": "object",
 			"properties": {
@@ -876,6 +896,7 @@
 				{ "$ref": "#/definitions/settingsDimensionsProperties" },
 				{ "$ref": "#/definitions/settingsLayoutProperties" },
 				{ "$ref": "#/definitions/settingsLightboxProperties" },
+				{ "$ref": "#/definitions/settingsExifProperties" },
 				{ "$ref": "#/definitions/settingsPositionProperties" },
 				{ "$ref": "#/definitions/settingsShadowProperties" },
 				{ "$ref": "#/definitions/settingsSpacingProperties" },
@@ -890,6 +911,7 @@
 				"border",
 				"color",
 				"dimensions",
+				"exif",
 				"layout",
 				"lightbox",
 				"position",

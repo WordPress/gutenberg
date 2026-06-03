@@ -49,6 +49,12 @@
 				"type": "boolean"
 			}
 		},
+		"exif": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
+		},
 		"title": {
 			"type": "string",
 			"source": "attribute",

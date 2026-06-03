@@ -167,6 +167,39 @@ function block_core_image_get_lightbox_settings( $block ) {
 }
 
 /**
+ * Returns the EXIF metadata display settings for the block.
+ *
+ * Mirrors the lightbox settings resolution: a per-block `exif` attribute
+ * overrides the `core/image` global settings, which fall back to the top-level
+ * global settings. EXIF metadata is only shown when this resolves to enabled
+ * and the lightbox itself is enabled.
+ *
+ * @since 6.9.0
+ *
+ * @param array $block Block data.
+ *
+ * @return array|null Filtered EXIF display settings.
+ */
+function block_core_image_get_exif_display_settings( $block ) {
+	// Gets the EXIF setting from the block attributes.
+	if ( isset( $block['attrs']['exif'] ) ) {
+		$exif_settings = $block['attrs']['exif'];
+	}
+
+	if ( ! isset( $exif_settings ) ) {
+		$exif_settings = wp_get_global_settings( array( 'exif' ), array( 'block_name' => 'core/image' ) );
+
+		// If not present in block-level settings, check the top-level global
+		// settings (see the matching note in the lightbox settings helper).
+		if ( isset( $exif_settings['exif'] ) ) {
+			$exif_settings = wp_get_global_settings( array( 'exif' ) );
+		}
+	}
+
+	return $exif_settings ?? null;
+}
+
+/**
  * Formats the shutter speed value for display.
  *
  * @since 6.9.0
@@ -317,7 +350,13 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		$img_srcset       = wp_get_attachment_image_srcset( $block['attrs']['id'], $srcset_size );
 		$img_width        = $img_metadata['width'] ?? 'none';
 		$img_height       = $img_metadata['height'] ?? 'none';
-		$img_exif         = block_core_image_get_lightbox_exif_data( $block['attrs']['id'] );
+
+		// Only expose EXIF metadata (and therefore the toggle button) when it is
+		// enabled via the block attribute or global settings.
+		$exif_settings = block_core_image_get_exif_display_settings( $block );
+		if ( isset( $exif_settings['enabled'] ) && true === $exif_settings['enabled'] ) {
+			$img_exif = block_core_image_get_lightbox_exif_data( $block['attrs']['id'] );
+		}
 	}
 
 	// Figure.
