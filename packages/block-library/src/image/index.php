@@ -496,28 +496,28 @@ function block_core_image_print_lightbox_overlay() {
 					</figure>
 				</div>
 				<div class="wp-lightbox-exif" style="color:{$close_button_color}" data-wp-bind--hidden="!state.hasExif" hidden>
-					<dl>
-						<div data-wp-bind--hidden="!state.exifCamera" hidden>
-							<dt>{$camera_label}</dt>
-							<dd data-wp-text="state.exifCamera"></dd>
-						</div>
-						<div data-wp-bind--hidden="!state.exifAperture" hidden>
-							<dt>{$aperture_label}</dt>
-							<dd data-wp-text="state.exifAperture"></dd>
-						</div>
-						<div data-wp-bind--hidden="!state.exifShutterSpeed" hidden>
-							<dt>{$shutter_label}</dt>
-							<dd data-wp-text="state.exifShutterSpeed"></dd>
-						</div>
-						<div data-wp-bind--hidden="!state.exifFocalLength" hidden>
-							<dt>{$focal_label}</dt>
-							<dd data-wp-text="state.exifFocalLength"></dd>
-						</div>
-						<div data-wp-bind--hidden="!state.exifCopyright" hidden>
-							<dt>{$copyright_label}</dt>
-							<dd data-wp-text="state.exifCopyright"></dd>
-						</div>
-					</dl>
+					<ul>
+						<li data-wp-bind--hidden="!state.exifCamera" hidden>
+							<h5>{$camera_label}</h5>
+							<span data-wp-text="state.exifCamera"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifAperture" hidden>
+							<h5>{$aperture_label}</h5>
+							<span data-wp-text="state.exifAperture"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifShutterSpeed" hidden>
+							<h5>{$shutter_label}</h5>
+							<span data-wp-text="state.exifShutterSpeed"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifFocalLength" hidden>
+							<h5>{$focal_label}</h5>
+							<span data-wp-text="state.exifFocalLength"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifCopyright" hidden>
+							<h5>{$copyright_label}</h5>
+							<span data-wp-text="state.exifCopyright"></span>
+						</li>
+					</ul>
 				</div>
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
