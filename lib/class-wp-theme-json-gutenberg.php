@@ -658,6 +658,7 @@ class WP_Theme_JSON_Gutenberg {
 		'cite'      => 'cite',
 		'select'    => 'select',
 		'textInput' => 'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])',
+		'summary'   => 'summary',
 	);
 
 	const __EXPERIMENTAL_ELEMENT_CLASS_NAMES = array(

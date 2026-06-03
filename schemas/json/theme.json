@@ -1982,6 +1982,9 @@
 				},
 				"textInput": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"summary": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
 				}
 			},
 			"additionalProperties": false

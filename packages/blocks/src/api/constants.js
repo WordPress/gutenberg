@@ -302,6 +302,7 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	select: 'select',
 	textInput:
 		'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])',
+	summary: '.wp-block-details summary',
 };
 
 // These paths may have three origins, custom, theme, and default,
