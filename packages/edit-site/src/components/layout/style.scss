@@ -135,7 +135,7 @@
 			}
 
 			.edit-site-layout:not(.is-full-canvas) & {
-				border-radius: $radius-large;
+				border-radius: var(--wpds-border-radius-xl);
 			}
 
 			&:hover {
@@ -271,7 +271,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	overflow: hidden;
 	box-shadow: $elevation-x-small;
 	@include break-medium() {
-		border-radius: 8px;
+		border-radius: var(--wpds-border-radius-xl);
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
 }

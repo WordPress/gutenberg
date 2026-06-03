@@ -44,7 +44,7 @@ export type Easing = 'subtle' | 'balanced' | 'expressive';
 /**
  * Size scale for border radius tokens.
  */
-export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg';
+export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /**
  * Size scale for border width tokens.

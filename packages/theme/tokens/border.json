@@ -18,6 +18,10 @@
 				"$value": { "value": 8, "unit": "px" },
 				"$description": "Large radius"
 			},
+			"xl": {
+				"$value": { "value": 12, "unit": "px" },
+				"$description": "Extra large radius for page and app shell surfaces"
+			},
 			"$extensions": {
 				"com.figma.scopes": [ "CORNER_RADIUS" ]
 			}

@@ -8,6 +8,7 @@ export default [
 	'--wpds-border-radius-sm',
 	'--wpds-border-radius-md',
 	'--wpds-border-radius-lg',
+	'--wpds-border-radius-xl',
 	'--wpds-border-width-xs',
 	'--wpds-border-width-sm',
 	'--wpds-border-width-md',

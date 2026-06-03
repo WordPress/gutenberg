@@ -110,7 +110,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							gridTemplateColumns: '200px 1fr',
 							minHeight: '500px',
 							color: 'var(--wpds-color-fg-content-neutral)',
-							borderRadius: 'var(--wpds-border-radius-lg)',
+							borderRadius: 'var(--wpds-border-radius-xl)',
 							border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
 							overflow: 'hidden',
 						} }

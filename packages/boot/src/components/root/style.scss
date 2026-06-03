@@ -111,7 +111,7 @@
 		position: static;
 		width: auto;
 		height: auto;
-		border-radius: 8px;
+		border-radius: var(--wpds-border-radius-xl);
 		margin: 0;
 
 		.boot-layout--single-page & {
@@ -167,7 +167,7 @@
 		position: static;
 		width: auto;
 		height: auto;
-		border-radius: 8px;
+		border-radius: var(--wpds-border-radius-xl);
 		z-index: auto;
 
 		.boot-layout--single-page & {

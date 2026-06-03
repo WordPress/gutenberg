@@ -125,17 +125,18 @@ The interactive state of the element. The default (no modifier) is the idle stat
 
 ### Border
 
-| Variable name               | Description                 |
-| --------------------------- | --------------------------- |
-| `--wpds-border-radius-xs`   | Extra small radius          |
-| `--wpds-border-radius-sm`   | Small radius                |
-| `--wpds-border-radius-md`   | Medium radius               |
-| `--wpds-border-radius-lg`   | Large radius                |
-| `--wpds-border-width-xs`    | Extra small width           |
-| `--wpds-border-width-sm`    | Small width                 |
-| `--wpds-border-width-md`    | Medium width                |
-| `--wpds-border-width-lg`    | Large width                 |
-| `--wpds-border-width-focus` | Border width for focus ring |
+| Variable name               | Description                                        |
+| --------------------------- | -------------------------------------------------- |
+| `--wpds-border-radius-xs`   | Extra small radius                                 |
+| `--wpds-border-radius-sm`   | Small radius                                       |
+| `--wpds-border-radius-md`   | Medium radius                                      |
+| `--wpds-border-radius-lg`   | Large radius                                       |
+| `--wpds-border-radius-xl`   | Extra large radius for page and app shell surfaces |
+| `--wpds-border-width-xs`    | Extra small width                                  |
+| `--wpds-border-width-sm`    | Small width                                        |
+| `--wpds-border-width-md`    | Medium width                                       |
+| `--wpds-border-width-lg`    | Large width                                        |
+| `--wpds-border-width-focus` | Border width for focus ring                        |
 
 ### Color
 
