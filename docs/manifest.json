@@ -600,6 +600,12 @@
 		"parent": "core-blocks-design"
 	},
 	{
+		"title": "Comment Author Avatar (deprecated)",
+		"slug": "core-block-comment-author-avatar",
+		"markdown_source": "../packages/block-library/src/comment-author-avatar/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
 		"title": "Comment Author Name",
 		"slug": "core-block-comment-author-name",
 		"markdown_source": "../packages/block-library/src/comment-author-name/README.md",
@@ -906,6 +912,18 @@
 		"parent": "core-blocks-theme"
 	},
 	{
+		"title": "Author (deprecated)",
+		"slug": "core-block-post-author",
+		"markdown_source": "../packages/block-library/src/post-author/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Comment (deprecated)",
+		"slug": "core-block-post-comment",
+		"markdown_source": "../packages/block-library/src/post-comment/README.md",
+		"parent": "core-blocks-theme"
+	},
+	{
 		"title": "Comments Count",
 		"slug": "core-block-post-comments-count",
 		"markdown_source": "../packages/block-library/src/post-comments-count/README.md",
@@ -1192,6 +1210,12 @@
 		"slug": "core-block-terms-query",
 		"markdown_source": "../packages/block-library/src/terms-query/README.md",
 		"parent": "core-blocks-theme"
+	},
+	{
+		"title": "Text Columns (deprecated)",
+		"slug": "core-block-text-columns",
+		"markdown_source": "../packages/block-library/src/text-columns/README.md",
+		"parent": "core-blocks-design"
 	},
 	{
 		"title": "Poetry",

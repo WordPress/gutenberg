@@ -9,10 +9,10 @@ This page lists the blocks included in the block-library package.
 <!-- START TOKEN(Deprecated blocks) -->
 **Deprecated blocks** — the following blocks are deprecated and should not be used in new content.
 
-- [Comment Author Avatar (deprecated)](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar/) (`core/comment-author-avatar`) — Please use the Avatar block instead.
-- [Author (deprecated)](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author/) (`core/post-author`) — Please use the Avatar block, the Author Name block, and the Author Biography block instead.
-- [Comment (deprecated)](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment/) (`core/post-comment`) — Please use the Comments block instead.
-- [Text Columns (deprecated)](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/text-columns/) (`core/text-columns`) — Please use the Columns block instead.
+- [Comment Author Avatar (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-avatar/) (`core/comment-author-avatar`) — Please use the Avatar block instead.
+- [Author (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author/) (`core/post-author`) — Please use the Avatar block, the Author Name block, and the Author Biography block instead.
+- [Comment (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comment/) (`core/post-comment`) — Please use the Comments block instead.
+- [Text Columns (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-text-columns/) (`core/text-columns`) — Please use the Columns block instead.
 
 <!-- END TOKEN(Deprecated blocks) -->
 

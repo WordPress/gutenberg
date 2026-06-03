@@ -971,13 +971,13 @@ function generateDeprecatedNotice( dirs ) {
 	lines.push( '' );
 
 	dirs.forEach( ( blockDir ) => {
-		const { title, name, description } = readBlockJson( blockDir );
+		const { title, name, description, category } = readBlockJson( blockDir );
 		const replacement = description
 			.replace( 'This block is deprecated. ', '' )
 			.replace( 'This block is deprecated.', '' )
 			.trim();
 		const note = replacement ? ` — ${ replacement }` : '';
-		const url = `${ SOURCE_URL_BASE }${ blockDir }/`;
+		const url = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ blockDir }/`;
 		lines.push( `- [${ title }](${ url }) (\`${ name }\`)${ note }` );
 	} );
 
