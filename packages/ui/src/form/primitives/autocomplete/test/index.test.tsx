@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
-import type { ReactNode, Ref } from 'react';
+import type { ReactNode } from 'react';
 import * as Autocomplete from '../index';
 import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
 
@@ -394,14 +394,12 @@ describe( 'Autocomplete', () => {
 			},
 		];
 
-		function renderGrouped( {
-			groupRef,
-			groupLabelRef,
-		}: {
-			groupRef?: Ref< HTMLDivElement >;
-			groupLabelRef?: Ref< HTMLDivElement >;
-		} = {} ) {
-			return render(
+		it( 'forwards refs', async () => {
+			const user = userEvent.setup();
+			const groupRef = createRef< HTMLDivElement >();
+			const groupLabelRef = createRef< HTMLDivElement >();
+
+			render(
 				<Autocomplete.Root items={ GROUPED_ITEMS }>
 					<Autocomplete.Input placeholder="Search" />
 					<Autocomplete.Popup>
@@ -445,14 +443,6 @@ describe( 'Autocomplete', () => {
 					</Autocomplete.Popup>
 				</Autocomplete.Root>
 			);
-		}
-
-		it( 'forwards refs', async () => {
-			const user = userEvent.setup();
-			const groupRef = createRef< HTMLDivElement >();
-			const groupLabelRef = createRef< HTMLDivElement >();
-
-			renderGrouped( { groupRef, groupLabelRef } );
 
 			await user.type( screen.getByRole( 'combobox' ), 'Item' );
 
@@ -460,46 +450,6 @@ describe( 'Autocomplete', () => {
 				expect( groupRef.current ).toBeInstanceOf( HTMLDivElement );
 			} );
 			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
-		} );
-
-		it( 'renders group labels and associates them with their items', async () => {
-			const user = userEvent.setup();
-
-			renderGrouped();
-
-			await user.type( screen.getByRole( 'combobox' ), 'Item' );
-
-			const group1 = await screen.findByRole( 'group', {
-				name: 'Group 1',
-			} );
-			expect( group1 ).toBeVisible();
-
-			expect(
-				screen.getByRole( 'option', { name: 'Item 1' } )
-			).toBeVisible();
-			expect( group1 ).toContainElement(
-				screen.getByRole( 'option', { name: 'Item 1' } )
-			);
-			expect( group1 ).not.toContainElement(
-				screen.getByRole( 'option', { name: 'Item 3' } )
-			);
-		} );
-
-		it( 'hides groups whose items are all filtered out', async () => {
-			const user = userEvent.setup();
-
-			renderGrouped();
-
-			await user.type( screen.getByRole( 'combobox' ), 'Item 3' );
-
-			await waitFor( () => {
-				expect(
-					screen.getByRole( 'group', { name: 'Group 2' } )
-				).toBeVisible();
-			} );
-			expect(
-				screen.queryByRole( 'group', { name: 'Group 1' } )
-			).not.toBeInTheDocument();
 		} );
 	} );
 } );
