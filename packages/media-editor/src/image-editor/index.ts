@@ -8,9 +8,17 @@
  */
 
 // React surface.
-export { useCropperReducer, buildCropperSetters } from './react/hooks';
+export {
+	useCropperReducer,
+	buildCropperSetters,
+	useCropGeometry,
+} from './react/hooks';
 export { Cropper, CropperProvider, useCropper } from './react/components';
-export type { CropperController, CropperSetters } from './react/hooks';
+export type {
+	CropperController,
+	CropperSetters,
+	UseCropGeometryReturn,
+} from './react/hooks';
 export type { CropperProps } from './react/components';
 
 // State and extension types.
@@ -38,6 +46,12 @@ export {
 	enforceContainment,
 	areCropperStatesEqual,
 	computeInscribedRect,
+	applyCropEdit,
+	clampCropPixelRectToBounds,
+	cropPixelRectToNormalizedRect,
+	getCropPixelRect,
+	validateCropPixelRectAgainstBounds,
+	fineRotation,
 	getSourceRegion,
 	getSourceRegionPercent,
 	applyOperationToState,
@@ -47,6 +61,12 @@ export {
 } from './core';
 export type {
 	AspectRatioPreset,
+	CropEditField,
+	CropPixelRect,
+	CropPixelRectBounds,
+	CropPixelRectCheck,
+	CropPixelRectInput,
+	CropPixelRectViolation,
 	SourceRegion,
 	SourceRegionPercent,
 } from './core';
