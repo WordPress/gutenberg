@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Image: show EXIF metadata (camera, aperture, shutter speed, focal length, copyright) in the lightbox via a toggle ([#78892](https://github.com/WordPress/gutenberg/pull/78892)).
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).

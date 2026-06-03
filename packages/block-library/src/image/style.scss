@@ -310,22 +310,19 @@
 	.wp-lightbox-exif-button {
 		position: absolute;
 		z-index: 3000002;
-		right: calc(env(safe-area-inset-right) + 16px);
-		// On small screens the navigation buttons sit in the bottom corners, so
-		// the toggle is stacked above the next button to avoid overlapping it.
-		bottom: calc(env(safe-area-inset-bottom) + 64px);
+		// Sits directly below the centered image, with its right edge aligned to
+		// the image's right edge. `(100vh + container-height) / 2` is the image's
+		// bottom edge; the horizontal translate aligns the button's right edge
+		// with the image's right edge (`100%` is the button's own width).
+		top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 16px);
+		left: 50%;
+		transform: translateX(calc(var(--wp--lightbox-container-width) / 2 - 100%));
 		box-sizing: border-box;
 		width: 40px;
 		height: 40px;
 		padding: 4px;
 		cursor: pointer;
 		line-height: 0;
-
-		// The navigation buttons move to the vertical center, freeing the
-		// bottom-right corner for the toggle.
-		@include break-large() {
-			bottom: calc(env(safe-area-inset-bottom) + 16px);
-		}
 
 		&[hidden] {
 			display: none;
@@ -364,7 +361,7 @@
 		font-family: "Helvetica Neue", sans-serif;
 		font-size: 12px;
 		line-height: 1.4;
-		text-align: center;
+		text-align: left;
 		cursor: default;
 		pointer-events: none;
 
@@ -375,7 +372,7 @@
 		ul {
 			display: flex;
 			flex-wrap: wrap;
-			justify-content: center;
+			justify-content: flex-start;
 			margin: 0;
 			padding: 0;
 			list-style: none;
@@ -412,37 +409,23 @@
 		}
 	}
 
-	// When the EXIF metadata panel is open, the image keeps its size and the
-	// panel is laid out below it. The overlay scrolls vertically instead of
-	// shrinking the image to fit both in the viewport.
+	// When the EXIF metadata panel is open, the image keeps its size and stays
+	// centered; the panel is positioned just below it and the overlay scrolls
+	// vertically to reveal it. This works for any image aspect ratio.
 	&.has-visible-exif {
-		--wp--lightbox-exif-image-top: 80px;
 		overflow-x: hidden;
 		overflow-y: auto;
 
-		// Anchors the image toward the top so the panel can sit below it.
-		.lightbox-image-container {
-			top: var(--wp--lightbox-exif-image-top);
-			transform: translateX(-50%);
-		}
-
-		// Pins the toggle button to the viewport so the panel can be dismissed
-		// without scrolling back to it.
-		.wp-lightbox-exif-button {
-			position: fixed;
-		}
-
-		// Lays the panel out in normal flow below the image so its height
-		// contributes to the overlay's scrollable area. `relative` (rather than
-		// `static`) keeps it in flow while preserving its z-index, so it paints
-		// above the scrim instead of behind it.
+		// Anchors the panel below the image and its toggle button, matching the
+		// image's width so the data lines up with the photo. `(100vh +
+		// container-height) / 2` is the image's bottom edge; the +72px clears the
+		// 40px toggle button (which sits 16px below the image) plus spacing.
 		.wp-lightbox-exif {
-			position: relative;
-			left: auto;
+			top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 72px);
 			bottom: auto;
-			transform: none;
-			margin: calc(var(--wp--lightbox-exif-image-top) + var(--wp--lightbox-container-height) + 24px) auto 0;
-			padding-bottom: calc(env(safe-area-inset-bottom) + 88px);
+			width: var(--wp--lightbox-container-width);
+			max-width: 100%;
+			padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
 		}
 
 		// Pins the background to the viewport so it covers the full scroll range

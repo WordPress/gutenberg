@@ -280,8 +280,31 @@ const { state, actions, callbacks } = store(
 			toggleExif: withSyncEvent( ( event ) => {
 				event.preventDefault();
 				event.stopPropagation();
-				state.exifVisible = ! state.exifVisible;
-				callbacks.setOverlayStyles();
+
+				// Closing: scroll back to the top before hiding the panel so the
+				// overlay returns to its non-scrolling state cleanly.
+				if ( state.isExifVisible ) {
+					const overlay =
+						document.querySelector( '.wp-lightbox-overlay' );
+					callbacks.scrollOverlayTo(
+						overlay,
+						withScope( () => {
+							state.exifVisible = false;
+						} )
+					);
+					return;
+				}
+
+				// Opening: reveal the panel, then smoothly scroll it into view on
+				// the next frame, once it has rendered below the image.
+				state.exifVisible = true;
+				window.requestAnimationFrame(
+					withScope( () =>
+						callbacks.scrollOverlayTo(
+							document.querySelector( '.wp-lightbox-exif' )
+						)
+					)
+				);
 			} ),
 			showPreviousImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
@@ -465,6 +488,78 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		callbacks: {
+			// Smoothly scrolls the overlay so `target` is brought into view.
+			// Passing the overlay itself scrolls back to the top.
+			scrollOverlayTo( target, onComplete ) {
+				const overlay =
+					document.querySelector( '.wp-lightbox-overlay' );
+				if ( ! overlay || ! target ) {
+					onComplete?.();
+					return;
+				}
+
+				const targetPosition = Math.min(
+					Math.max(
+						0,
+						target.offsetTop -
+							Math.max(
+								0,
+								window.innerHeight -
+									target.getBoundingClientRect().height -
+									32
+							)
+					),
+					overlay.scrollHeight - overlay.clientHeight
+				);
+
+				// Honors the user's reduced-motion preference by jumping straight
+				// to the target instead of animating, matching how the rest of the
+				// lightbox guards its motion.
+				if (
+					window.matchMedia( '(prefers-reduced-motion: reduce)' )
+						.matches
+				) {
+					overlay.scrollTop = targetPosition;
+					onComplete?.();
+					return;
+				}
+
+				const startTime = Date.now();
+				const duration = 300;
+				const originalPosition = overlay.scrollTop;
+				const distance = targetPosition - originalPosition;
+				let isScrolling = true;
+
+				function stopScroll() {
+					isScrolling = false;
+				}
+
+				function runScroll() {
+					const now = Date.now();
+					const progress = Math.min(
+						( now - startTime ) / duration,
+						1
+					);
+					const easedProgress =
+						progress < 0.5
+							? 2 * progress * progress
+							: 1 - Math.pow( -2 * progress + 2, 2 ) / 2;
+
+					overlay.scrollTop =
+						originalPosition + easedProgress * distance;
+
+					if ( progress < 1 && isScrolling ) {
+						window.requestAnimationFrame( runScroll );
+						return;
+					}
+
+					overlay.removeEventListener( 'wheel', stopScroll );
+					onComplete?.();
+				}
+
+				overlay.addEventListener( 'wheel', stopScroll );
+				runScroll();
+			},
 			setOverlayStyles() {
 				if ( ! state.overlayEnabled ) {
 					return;

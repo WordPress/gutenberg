@@ -248,7 +248,7 @@ function block_core_image_get_lightbox_exif_data( $attachment_id ) {
 		is_numeric( $image_meta['focal_length'] ) &&
 		(float) $image_meta['focal_length'] > 0
 	) {
-		$exif['focalLength'] = (string) (float) $image_meta['focal_length'] . 'mm';
+		$exif['focalLength'] = (string) round( (float) $image_meta['focal_length'], 1 ) . 'mm';
 	}
 
 	if ( ! empty( $image_meta['copyright'] ) && is_scalar( $image_meta['copyright'] ) ) {

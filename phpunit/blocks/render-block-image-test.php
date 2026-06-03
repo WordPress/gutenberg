@@ -147,7 +147,8 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 						'camera'        => 'Nikon D70',
 						'aperture'      => '2.80',
 						'shutter_speed' => '0.004',
-						'focal_length'  => '50.0',
+						// A long fractional focal length is rounded to one decimal.
+						'focal_length'  => '57.019002375297',
 						'copyright'     => 'Example Photographer',
 						'keywords'      => array( 'ignored' ),
 					),
@@ -164,7 +165,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 					'camera'       => 'Nikon D70',
 					'aperture'     => 'f/2.8',
 					'shutterSpeed' => '1/250s',
-					'focalLength'  => '50mm',
+					'focalLength'  => '57mm',
 					'copyright'    => 'Example Photographer',
 				),
 				$get_exif( $attachment_id )
