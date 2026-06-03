@@ -33,3 +33,14 @@ function gutenberg_site_editor_register_default_menu_items() {
 	gutenberg_register_site_editor_v2_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
 }
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_default_menu_items', 5 );
+
+/**
+ * Register media library menu item and route for the site editor page.
+ */
+function gutenberg_site_editor_register_media_menu_item_and_route() {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-dataviews-media-library' ) ) {
+		gutenberg_register_site_editor_v2_menu_item( 'media', __( 'Media', 'gutenberg' ), '/media', '' );
+		gutenberg_register_site_editor_v2_route( '/media' );
+	}
+}
+add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_media_menu_item_and_route', 5 );
