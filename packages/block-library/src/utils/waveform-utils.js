@@ -213,6 +213,16 @@ function clamp( value, min, max ) {
 }
 
 /**
+ * Convert a color to the same RGB color without transparency.
+ *
+ * @param {string} color - The source color.
+ * @return {string} The color with full alpha.
+ */
+function toOpaqueColor( color ) {
+	return colord( color ).alpha( 1 ).toRgbString();
+}
+
+/**
  * Create a positioned timestamp marker for the waveform.
  *
  * @param {Document} documentRef - Document used to create elements.
@@ -296,7 +306,9 @@ function decorateWaveformPlayerMarkers( markersContainer ) {
 			'wp-block-playlist__time-marker--current',
 			'is-visible'
 		);
-		currentMarker.style.color = currentMarker.style.backgroundColor;
+		currentMarker.style.color = toOpaqueColor(
+			currentMarker.style.backgroundColor
+		);
 		currentMarker.style.setProperty(
 			'--wp-playlist-time-marker-label-offset',
 			parseFloat( currentMarker.style.left ) < 5
@@ -311,7 +323,9 @@ function decorateWaveformPlayerMarkers( markersContainer ) {
 			'wp-block-playlist__time-marker--end',
 			'is-visible'
 		);
-		endMarker.style.color = endMarker.style.backgroundColor;
+		endMarker.style.color = toOpaqueColor(
+			endMarker.style.backgroundColor
+		);
 		endMarker.style.setProperty(
 			'--wp-playlist-time-marker-label-offset',
 			'calc(-100% - 0.35rem)'
@@ -414,7 +428,7 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 		waveformArea.classList.add( 'is-hovering' );
 		hoverRegion.style.width = `${ percent * 100 }%`;
 		hoverMarker.style.backgroundColor = markerColor;
-		hoverMarker.style.color = markerColor;
+		hoverMarker.style.color = toOpaqueColor( markerColor );
 		ensureHoverMarker();
 		setTimeMarker(
 			hoverMarker,

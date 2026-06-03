@@ -328,13 +328,13 @@ describe( 'Waveform utilities', () => {
 			expect( currentMarker ).toHaveClass( 'is-visible' );
 			expect( currentMarker ).toHaveStyle( { left: '25%' } );
 			expect( currentMarker ).toHaveStyle( {
-				color: 'rgba(0, 0, 0, 0.3)',
+				color: 'rgb(0, 0, 0)',
 			} );
 			expect( currentMarker ).toHaveTextContent( '0:45' );
 			expect( endMarker ).toHaveClass( 'is-visible' );
 			expect( endMarker ).toHaveStyle( { left: '100%' } );
 			expect( endMarker ).toHaveStyle( {
-				color: 'rgba(0, 0, 0, 0.3)',
+				color: 'rgb(0, 0, 0)',
 			} );
 			expect( endMarker ).toHaveTextContent( '3:00' );
 			expect( instance.renderMarkers ).toHaveBeenCalled();
@@ -394,7 +394,7 @@ describe( 'Waveform utilities', () => {
 			expect( hoverMarker ).toHaveClass( 'is-visible' );
 			expect( hoverMarker ).toHaveStyle( { left: '50%' } );
 			expect( hoverMarker ).toHaveStyle( {
-				color: 'rgba(0, 0, 0, 0.3)',
+				color: 'rgb(0, 0, 0)',
 			} );
 			expect( hoverMarker ).toHaveTextContent( '1:00' );
 			expect( hoverRegion ).toHaveStyle( { width: '50%' } );
