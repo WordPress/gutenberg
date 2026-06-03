@@ -74,6 +74,14 @@
 			"padding": true
 		}
 	},
+	"styles": [
+		{ "name": "bars", "label": "Bars", "isDefault": true },
+		{ "name": "mirror", "label": "Mirror" },
+		{ "name": "line", "label": "Line" },
+		{ "name": "blocks", "label": "Blocks" },
+		{ "name": "dots", "label": "Dots" },
+		{ "name": "seekbar", "label": "Seekbar" }
+	],
 	"editorStyle": "wp-block-playlist-editor",
 	"style": "wp-block-playlist"
 }

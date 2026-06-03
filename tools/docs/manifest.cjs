@@ -6,10 +6,12 @@
 const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
-const { join } = require( 'path' );
+const { join, resolve } = require( 'path' );
 
+const ROOT_DIR = resolve( __dirname, '../..' );
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+	cwd: ROOT_DIR,
 	// Don't expose documentation for mobile only and private components just yet.
 	ignore: [
 		'**/src/mobile/**/README.md',
@@ -21,11 +23,10 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/badge/README.md',
 	],
 } );
-const packagePaths = glob( 'packages/*/package.json' )
+const packagePaths = glob( 'packages/*/package.json', { cwd: ROOT_DIR } )
 	.filter(
 		// Ignore private packages.
-		( fileName ) =>
-			! require( join( __dirname, '..', '..', fileName ) ).private
+		( fileName ) => ! require( join( ROOT_DIR, fileName ) ).private
 	)
 	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 
@@ -39,16 +40,8 @@ const packagePaths = glob( 'packages/*/package.json' )
 function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
-		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
 		const packageJson = require(
-			join(
-				__dirname,
-				'..',
-				'..',
-				'packages',
-				folderName,
-				'package.json'
-			)
+			join( ROOT_DIR, 'packages', folderName, 'package.json' )
 		);
 
 		// First add any README files to the TOC
@@ -60,8 +53,15 @@ function getPackageManifest( packageFolderNames ) {
 		} );
 
 		// Next add any items in the docs/toc.json if found.
-		if ( fs.existsSync( join( __dirname, '..', tocPath ) ) ) {
-			const toc = require( join( __dirname, '..', tocPath ) ).values();
+		const tocFilePath = join(
+			ROOT_DIR,
+			'packages',
+			folderName,
+			'docs',
+			'toc.json'
+		);
+		if ( fs.existsSync( tocFilePath ) ) {
+			const toc = require( tocFilePath ).values();
 			manifest.push( ...toc );
 		}
 		return manifest;
@@ -112,7 +112,10 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			}
 		}
 		let title = pascalCase( slug );
-		const markdownSource = fs.readFileSync( fileName, 'utf8' );
+		const markdownSource = fs.readFileSync(
+			join( ROOT_DIR, fileName ),
+			'utf8'
+		);
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {
 			title = titleMarkdown[ 1 ];

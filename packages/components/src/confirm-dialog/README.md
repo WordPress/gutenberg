@@ -4,7 +4,7 @@
 This feature is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
+`ConfirmDialog` is built on top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
 
 The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key. It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay).
 

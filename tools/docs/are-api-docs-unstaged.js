@@ -3,18 +3,22 @@
 /**
  * External dependencies
  */
-const { extname } = require( 'path' );
+const { extname, join, resolve } = require( 'path' );
 const { readFile } = require( 'fs' ).promises;
 const execSync = require( 'child_process' ).execSync;
 const chalk = require( 'chalk' );
 
+const ROOT_DIR = resolve( __dirname, '../..' );
+
 const getUnstagedFiles = () =>
-	execSync( 'git diff --name-only', { encoding: 'utf8' } )
+	execSync( 'git diff --name-only', { encoding: 'utf8', cwd: ROOT_DIR } )
 		.split( '\n' )
 		.filter( Boolean );
 
 const fileHasToken = async ( file ) =>
-	( await readFile( file, 'utf8' ) ).includes( '<!-- START TOKEN' );
+	( await readFile( join( ROOT_DIR, file ), 'utf8' ) ).includes(
+		'<!-- START TOKEN'
+	);
 
 const getUnstagedReadmes = () =>
 	Promise.all(
