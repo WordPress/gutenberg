@@ -128,6 +128,8 @@ register_block_type( 'my-plugin/server-block', array(
 ) );
 ```
 
+Note that `postId` is the only block context automatically forwarded to the server for these blocks. Other context values declared in `uses_context` are available in the editor but are not sent to the `render_callback`.
+
 ## Registering a block with JavaScript (client-side)
 
 When the block has already been registered on the server and unless using [PHP-only auto-registered blocks](#php-only-blocks-with-auto-registration), you only need to register the client-side settings in JavaScript using the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) method from the `@wordpress/blocks` package. You just need to make sure you use the same block name as defined in the block's `block.json` file. Here's an example:
