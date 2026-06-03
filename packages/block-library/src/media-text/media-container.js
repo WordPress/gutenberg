@@ -72,6 +72,7 @@ function ToolbarEditButton( {
 
 function PlaceholderContainer( {
 	className,
+	dimensionsProps,
 	mediaUrl,
 	onSelectMedia,
 	toggleUseFeaturedImage,
@@ -94,7 +95,8 @@ function PlaceholderContainer( {
 			labels={ {
 				title: __( 'Media area' ),
 			} }
-			className={ className }
+			className={ clsx( className, dimensionsProps?.className ) }
+			style={ dimensionsProps?.style }
 			onSelect={ onSelectMedia }
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -235,8 +237,14 @@ function MediaContainer( props, ref ) {
 				{ ! useFeaturedImage && <PlaceholderContainer { ...props } /> }
 				{ ! featuredImageURL && useFeaturedImage && (
 					<Placeholder
-						className="wp-block-media-text--placeholder-image"
-						style={ imageFillStyle }
+						className={ clsx(
+							'wp-block-media-text--placeholder-image',
+							dimensionsProps.className
+						) }
+						style={ {
+							...imageFillStyle,
+							...dimensionsProps.style,
+						} }
 						withIllustration
 					/>
 				) }
