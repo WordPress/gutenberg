@@ -12,4 +12,22 @@ describe( 'getAdminThemeColors', () => {
 			bg: '#5b534d',
 		} );
 	} );
+
+	it( 'should fall back to the fresh scheme colors when no admin-color class is present', () => {
+		document.body.className = 'foo bar';
+
+		expect( getAdminThemeColors() ).toEqual( {
+			primary: '#3858e9',
+			bg: '#25292b',
+		} );
+	} );
+
+	it( 'should fall back to the default colors for an unknown scheme', () => {
+		document.body.className = 'admin-color-unknown';
+
+		expect( getAdminThemeColors() ).toEqual( {
+			primary: '#3858e9',
+			bg: '#25292b',
+		} );
+	} );
 } );
