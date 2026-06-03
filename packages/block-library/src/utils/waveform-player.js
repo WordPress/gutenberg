@@ -58,6 +58,7 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
  * @param {string}   props.title         - The track title.
  * @param {string}   props.artist        - The artist name.
  * @param {string}   props.image         - The artwork image URL.
+ * @param {string}   props.duration      - The formatted track duration.
  * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {Function} props.onEnded       - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
@@ -67,6 +68,7 @@ export function WaveformPlayer( {
 	title,
 	artist,
 	image,
+	duration,
 	waveformStyle,
 	onEnded,
 } ) {
@@ -115,6 +117,7 @@ export function WaveformPlayer( {
 				const player = initWaveformPlayer( element, {
 					src,
 					...metadataRef.current,
+					duration,
 					waveformStyle,
 					artist:
 						metadataRef.current.artist || EMPTY_ARTIST_PLACEHOLDER,
@@ -142,7 +145,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ onEndedEvent, src, waveformStyle, hasImage ]
+		[ onEndedEvent, src, duration, waveformStyle, hasImage ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;

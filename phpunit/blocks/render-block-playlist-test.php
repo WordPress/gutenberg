@@ -119,6 +119,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'album'    => 'Album One',
 					'src'      => 'http://example.com/song1.mp3',
 					'image'    => 'http://example.com/image1.jpg',
+					'length'   => '3:10',
 				),
 			)
 		);
@@ -259,6 +260,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$this->assertSame( 'Artist One', $tracks['track-1']['artist'] );
 		$this->assertSame( 'Album One', $tracks['track-1']['album'] );
 		$this->assertSame( 'http://example.com/image1.jpg', $tracks['track-1']['image'] );
+		$this->assertSame( '3:10', $tracks['track-1']['length'] );
 
 		$this->assertSame( 'http://example.com/song2.mp3', $tracks['track-2']['url'] );
 		$this->assertSame( 'Song Two', $tracks['track-2']['title'] );

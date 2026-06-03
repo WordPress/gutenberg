@@ -6,7 +6,11 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, logPlayError } from '../utils/waveform-utils';
+import {
+	initWaveformPlayer,
+	logPlayError,
+	parseTime,
+} from '../utils/waveform-utils';
 
 /**
  * Store player state for each element.
@@ -80,6 +84,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		existing.instance
 			.loadTrack( track.url, track.title, track.artist, {
 				artwork: track.image,
+				durationFallback: parseTime( track.length ),
 			} )
 			.then( () => {
 				existing.url = track.url;
@@ -103,6 +108,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		title: track.title,
 		artist: track.artist,
 		image: track.image,
+		duration: track.length,
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,

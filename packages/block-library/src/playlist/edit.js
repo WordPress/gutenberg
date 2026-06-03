@@ -398,6 +398,7 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
+						duration={ currentTrackData?.length }
 						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>

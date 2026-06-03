@@ -12,7 +12,10 @@ import '@testing-library/jest-dom';
  */
 import {
 	createWaveformContainer,
+	formatTime,
+	parseTime,
 	styleSvgIcons,
+	setupWaveformTimeMarkers,
 	setupPlayButtonAccessibility,
 	logPlayError,
 } from '../waveform-utils';
@@ -26,6 +29,36 @@ const basePlayerData = {
 };
 
 describe( 'Waveform utilities', () => {
+	describe( 'formatTime', () => {
+		it( 'should format seconds as m:ss', () => {
+			expect( formatTime( 0 ) ).toBe( '0:00' );
+			expect( formatTime( 9 ) ).toBe( '0:09' );
+			expect( formatTime( 75 ) ).toBe( '1:15' );
+			expect( formatTime( 600 ) ).toBe( '10:00' );
+		} );
+
+		it( 'should format invalid values as 0:00', () => {
+			expect( formatTime( Number.NaN ) ).toBe( '0:00' );
+			expect( formatTime( Infinity ) ).toBe( '0:00' );
+			expect( formatTime( -1 ) ).toBe( '0:00' );
+		} );
+	} );
+
+	describe( 'parseTime', () => {
+		it( 'should parse formatted time strings to seconds', () => {
+			expect( parseTime( '0:09' ) ).toBe( 9 );
+			expect( parseTime( '1:15' ) ).toBe( 75 );
+			expect( parseTime( '1:02:30' ) ).toBe( 3750 );
+		} );
+
+		it( 'should return null for invalid values', () => {
+			expect( parseTime() ).toBeNull();
+			expect( parseTime( '' ) ).toBeNull();
+			expect( parseTime( '75' ) ).toBeNull();
+			expect( parseTime( '1:bad' ) ).toBeNull();
+		} );
+	} );
+
 	describe( 'createWaveformContainer', () => {
 		it( 'should create a container with required data attributes', () => {
 			const container = createWaveformContainer( basePlayerData );
@@ -198,6 +231,180 @@ describe( 'Waveform utilities', () => {
 			styleSvgIcons( container, '#ffff00' );
 
 			expect( path ).toHaveStyle( { fill: '#000000' } );
+		} );
+	} );
+
+	describe( 'setupWaveformTimeMarkers', () => {
+		function createMarkerTestContext( {
+			duration = 120,
+			currentTime = 0,
+		} = {} ) {
+			const container = document.createElement( 'div' );
+			container.innerHTML = `
+				<div class="waveform-container">
+					<canvas></canvas>
+					<div class="waveform-markers"></div>
+				</div>
+			`;
+
+			const waveformArea = container.querySelector(
+				'.waveform-container'
+			);
+			waveformArea.getBoundingClientRect = jest.fn( () => ( {
+				left: 10,
+				width: 200,
+			} ) );
+
+			const audio = document.createElement( 'audio' );
+			Object.defineProperty( audio, 'duration', {
+				configurable: true,
+				value: duration,
+			} );
+			Object.defineProperty( audio, 'currentTime', {
+				configurable: true,
+				value: currentTime,
+			} );
+
+			const instance = { audio, options: {} };
+
+			return { audio, container, instance, waveformArea };
+		}
+
+		it( 'should show current and end time markers', () => {
+			const { container, instance } = createMarkerTestContext( {
+				duration: 180,
+				currentTime: 45,
+			} );
+
+			setupWaveformTimeMarkers( instance, container );
+
+			const currentMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--current'
+			);
+			const endMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--end'
+			);
+
+			expect( currentMarker ).toHaveClass( 'is-visible' );
+			expect( currentMarker ).toHaveStyle( { left: '25%' } );
+			expect( currentMarker ).toHaveTextContent( '0:45' );
+			expect( endMarker ).toHaveClass( 'is-visible' );
+			expect( endMarker ).toHaveStyle( { left: '100%' } );
+			expect( endMarker ).toHaveTextContent( '3:00' );
+		} );
+
+		it( 'should update the current marker on player timeupdate', () => {
+			const { audio, container, instance } = createMarkerTestContext();
+
+			setupWaveformTimeMarkers( instance, container );
+			Object.defineProperty( audio, 'currentTime', {
+				configurable: true,
+				value: 60,
+			} );
+
+			container.dispatchEvent(
+				new CustomEvent( 'waveformplayer:timeupdate' )
+			);
+
+			const currentMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--current'
+			);
+
+			expect( currentMarker ).toHaveStyle( { left: '50%' } );
+			expect( currentMarker ).toHaveTextContent( '1:00' );
+		} );
+
+		it( 'should update the hover marker on mouse move', () => {
+			const { container, instance, waveformArea } =
+				createMarkerTestContext();
+
+			setupWaveformTimeMarkers( instance, container );
+
+			waveformArea.dispatchEvent(
+				new window.MouseEvent( 'mousemove', {
+					clientX: 110,
+				} )
+			);
+
+			const hoverMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--hover'
+			);
+			const hoverRegion = container.querySelector(
+				'.wp-block-playlist__waveform-hover-region'
+			);
+
+			expect( waveformArea ).toHaveClass( 'is-hovering' );
+			expect( hoverMarker ).toHaveClass( 'is-visible' );
+			expect( hoverMarker ).toHaveStyle( { left: '50%' } );
+			expect( hoverMarker ).toHaveTextContent( '1:00' );
+			expect( hoverRegion ).toHaveStyle( { width: '50%' } );
+		} );
+
+		it( 'should use fallback duration for the hover marker', () => {
+			const { container, instance, waveformArea } =
+				createMarkerTestContext( {
+					duration: Number.NaN,
+				} );
+
+			setupWaveformTimeMarkers( instance, container, '2:00' );
+
+			waveformArea.dispatchEvent(
+				new window.MouseEvent( 'mousemove', {
+					clientX: 110,
+				} )
+			);
+
+			const hoverMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--hover'
+			);
+			const endMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--end'
+			);
+
+			expect( hoverMarker ).toHaveClass( 'is-visible' );
+			expect( hoverMarker ).toHaveTextContent( '1:00' );
+			expect( endMarker ).toHaveTextContent( '2:00' );
+		} );
+
+		it( 'should hide the hover marker on mouse leave', () => {
+			const { container, instance, waveformArea } =
+				createMarkerTestContext();
+
+			setupWaveformTimeMarkers( instance, container );
+
+			waveformArea.dispatchEvent(
+				new window.MouseEvent( 'mousemove', {
+					clientX: 110,
+				} )
+			);
+			waveformArea.dispatchEvent( new window.MouseEvent( 'mouseleave' ) );
+
+			const hoverMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--hover'
+			);
+			const hoverRegion = container.querySelector(
+				'.wp-block-playlist__waveform-hover-region'
+			);
+
+			expect( waveformArea ).not.toHaveClass( 'is-hovering' );
+			expect( hoverMarker ).not.toHaveClass( 'is-visible' );
+			expect( hoverRegion ).toHaveStyle( { width: '0' } );
+		} );
+
+		it( 'should remove marker elements on cleanup', () => {
+			const { container, instance } = createMarkerTestContext();
+
+			const cleanup = setupWaveformTimeMarkers( instance, container );
+			cleanup();
+
+			expect(
+				container.querySelector( '.wp-block-playlist__time-marker' )
+			).toBeNull();
+			expect(
+				container.querySelector(
+					'.wp-block-playlist__waveform-hover-region'
+				)
+			).toBeNull();
 		} );
 	} );
 

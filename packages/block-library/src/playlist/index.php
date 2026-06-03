@@ -45,6 +45,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$artist     = $track_attributes['artist'] ?? '';
 				$album      = $track_attributes['album'] ?? '';
 				$image      = $track_attributes['image'] ?? '';
+				$length     = $track_attributes['length'] ?? '';
 				$url        = $track_attributes['src'] ?? '';
 				$aria_label = $title;
 
@@ -67,6 +68,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
 					'image'     => esc_url( $image ),
+					'length'    => wp_strip_all_tags( $length ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 

@@ -16,6 +16,42 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
 const DEFAULT_WAVEFORM_HEIGHT = 100;
 
 /**
+ * Format a time in seconds to a "m:ss" string.
+ *
+ * @param {number} seconds - The time in seconds.
+ * @return {string} The formatted time string.
+ */
+export function formatTime( seconds ) {
+	const time = Number.isFinite( seconds ) && seconds > 0 ? seconds : 0;
+	const mins = Math.floor( time / 60 );
+	const secs = Math.floor( time % 60 );
+	return `${ mins }:${ String( secs ).padStart( 2, '0' ) }`;
+}
+
+/**
+ * Parse a formatted time string to seconds.
+ *
+ * @param {string} time - Formatted time string, such as "3:10" or "1:02:30".
+ * @return {number|null} Time in seconds, or null when invalid.
+ */
+export function parseTime( time ) {
+	if ( typeof time !== 'string' || ! time.includes( ':' ) ) {
+		return null;
+	}
+
+	const parts = time.split( ':' ).map( Number );
+	if (
+		parts.length < 2 ||
+		parts.length > 3 ||
+		parts.some( ( part ) => ! Number.isFinite( part ) || part < 0 )
+	) {
+		return null;
+	}
+
+	return parts.reduce( ( total, part ) => total * 60 + part, 0 );
+}
+
+/**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
  *
  * @param {Element} element - The element to get styles from.
@@ -155,6 +191,211 @@ export function logPlayError( error ) {
 }
 
 /**
+ * Check whether an audio duration can be used for marker positioning.
+ *
+ * @param {number} duration - The audio duration.
+ * @return {boolean} Whether the duration is usable.
+ */
+function hasDuration( duration ) {
+	return Number.isFinite( duration ) && duration > 0;
+}
+
+/**
+ * Clamp a number to the supplied range.
+ *
+ * @param {number} value - The value to clamp.
+ * @param {number} min   - The minimum value.
+ * @param {number} max   - The maximum value.
+ * @return {number} The clamped value.
+ */
+function clamp( value, min, max ) {
+	return Math.max( min, Math.min( max, value ) );
+}
+
+/**
+ * Create a positioned timestamp marker for the waveform.
+ *
+ * @param {Document} documentRef - Document used to create elements.
+ * @param {string}   type        - Marker type class suffix.
+ * @return {Element} The marker element.
+ */
+function createTimeMarker( documentRef, type ) {
+	const marker = documentRef.createElement( 'div' );
+	marker.className = `wp-block-playlist__time-marker wp-block-playlist__time-marker--${ type }`;
+	marker.setAttribute( 'aria-hidden', 'true' );
+
+	const label = documentRef.createElement( 'span' );
+	label.className = 'wp-block-playlist__time-marker-label';
+	marker.appendChild( label );
+
+	return marker;
+}
+
+/**
+ * Set a marker's position and label.
+ *
+ * @param {Element} marker  - The marker element.
+ * @param {number}  percent - Marker position between 0 and 1.
+ * @param {string}  label   - Marker label.
+ */
+function setTimeMarker( marker, percent, label ) {
+	const position = clamp( percent, 0, 1 );
+
+	marker.style.left = `${ position * 100 }%`;
+	marker.querySelector(
+		'.wp-block-playlist__time-marker-label'
+	).textContent = label;
+	marker.classList.add( 'is-visible' );
+
+	if ( position < 0.05 ) {
+		marker.style.setProperty(
+			'--wp-playlist-time-marker-label-offset',
+			'0'
+		);
+	} else {
+		marker.style.setProperty(
+			'--wp-playlist-time-marker-label-offset',
+			'calc(-100% - 0.35rem)'
+		);
+	}
+}
+
+/**
+ * Set up current, hover, and duration timestamp markers on the waveform.
+ *
+ * @param {Object}  instance  - The WaveformPlayer library instance.
+ * @param {Element} container - The waveform container element.
+ * @param {string}  duration  - Fallback formatted duration.
+ * @return {Function} Cleanup function to remove listeners and marker elements.
+ */
+export function setupWaveformTimeMarkers( instance, container, duration ) {
+	const waveformArea = container.querySelector( '.waveform-container' );
+	const markersContainer = container.querySelector( '.waveform-markers' );
+
+	if ( ! waveformArea || ! markersContainer || ! instance?.audio ) {
+		return () => {};
+	}
+
+	const documentRef = container.ownerDocument;
+	const hoverRegion = documentRef.createElement( 'div' );
+	hoverRegion.className = 'wp-block-playlist__waveform-hover-region';
+	waveformArea.prepend( hoverRegion );
+
+	const currentMarker = createTimeMarker( documentRef, 'current' );
+	const hoverMarker = createTimeMarker( documentRef, 'hover' );
+	const endMarker = createTimeMarker( documentRef, 'end' );
+
+	markersContainer.append( currentMarker, hoverMarker, endMarker );
+
+	const getDuration = () => {
+		if ( hasDuration( instance.audio.duration ) ) {
+			return instance.audio.duration;
+		}
+
+		const fallbackDuration =
+			instance.options.durationFallback ?? parseTime( duration );
+
+		return hasDuration( fallbackDuration ) ? fallbackDuration : null;
+	};
+
+	const updateCurrentMarker = () => {
+		const durationSeconds = getDuration();
+
+		if ( ! durationSeconds ) {
+			currentMarker.classList.remove( 'is-visible' );
+			return;
+		}
+
+		setTimeMarker(
+			currentMarker,
+			instance.audio.currentTime / durationSeconds,
+			formatTime( instance.audio.currentTime )
+		);
+	};
+
+	const updateDurationMarkers = () => {
+		const durationSeconds = getDuration();
+
+		if ( ! durationSeconds ) {
+			endMarker.classList.remove( 'is-visible' );
+			updateCurrentMarker();
+			return;
+		}
+
+		setTimeMarker( endMarker, 1, formatTime( durationSeconds ) );
+		updateCurrentMarker();
+	};
+
+	const updateHoverMarker = ( event ) => {
+		const durationSeconds = getDuration();
+
+		if ( ! durationSeconds ) {
+			return;
+		}
+
+		const rect = waveformArea.getBoundingClientRect();
+		const percent = clamp(
+			( event.clientX - rect.left ) / rect.width,
+			0,
+			1
+		);
+
+		waveformArea.classList.add( 'is-hovering' );
+		hoverRegion.style.width = `${ percent * 100 }%`;
+		setTimeMarker(
+			hoverMarker,
+			percent,
+			formatTime( durationSeconds * percent )
+		);
+	};
+
+	const hideHoverMarker = () => {
+		waveformArea.classList.remove( 'is-hovering' );
+		hoverMarker.classList.remove( 'is-visible' );
+		hoverRegion.style.width = '0';
+	};
+
+	waveformArea.addEventListener( 'mousemove', updateHoverMarker );
+	waveformArea.addEventListener( 'mouseleave', hideHoverMarker );
+	instance.audio.addEventListener( 'loadedmetadata', updateDurationMarkers );
+	instance.audio.addEventListener( 'durationchange', updateDurationMarkers );
+	instance.audio.addEventListener( 'timeupdate', updateCurrentMarker );
+	container.addEventListener(
+		'waveformplayer:timeupdate',
+		updateCurrentMarker
+	);
+	container.addEventListener( 'waveformplayer:ended', updateCurrentMarker );
+
+	updateDurationMarkers();
+
+	return () => {
+		waveformArea.removeEventListener( 'mousemove', updateHoverMarker );
+		waveformArea.removeEventListener( 'mouseleave', hideHoverMarker );
+		instance.audio.removeEventListener(
+			'loadedmetadata',
+			updateDurationMarkers
+		);
+		instance.audio.removeEventListener(
+			'durationchange',
+			updateDurationMarkers
+		);
+		instance.audio.removeEventListener( 'timeupdate', updateCurrentMarker );
+		container.removeEventListener(
+			'waveformplayer:timeupdate',
+			updateCurrentMarker
+		);
+		container.removeEventListener(
+			'waveformplayer:ended',
+			updateCurrentMarker
+		);
+		currentMarker.remove();
+		hoverMarker.remove();
+		endMarker.remove();
+		hoverRegion.remove();
+	};
+}
+
+/**
  * Initialize a WaveformPlayer instance on an element.
  *
  * This is the shared core logic used by both the React component (editor)
@@ -167,6 +408,7 @@ export function logPlayError( error ) {
  * @param {string}   options.artist        - The artist name.
  * @param {string}   options.image         - The artwork image URL.
  * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
+ * @param {string}   options.duration      - Fallback formatted duration.
  * @param {Function} options.onEnded       - Callback when track ends.
  * @param {Object}   options.labels        - Translated button labels.
  * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
@@ -174,7 +416,17 @@ export function logPlayError( error ) {
  */
 export function initWaveformPlayer(
 	element,
-	{ src, title, artist, image, autoPlay, onEnded, labels, waveformStyle }
+	{
+		src,
+		title,
+		artist,
+		image,
+		duration,
+		autoPlay,
+		onEnded,
+		labels,
+		waveformStyle,
+	}
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -195,6 +447,12 @@ export function initWaveformPlayer(
 
 	// Initialize the WaveformPlayer library.
 	const instance = new WaveformPlayerLib( container );
+	instance.options.durationFallback = parseTime( duration );
+	const cleanupTimeMarkers = setupWaveformTimeMarkers(
+		instance,
+		container,
+		duration
+	);
 
 	// Set up event handlers.
 	let cleanupAccessibility;
@@ -221,6 +479,7 @@ export function initWaveformPlayer(
 		container,
 		destroy: () => {
 			cleanupAccessibility?.();
+			cleanupTimeMarkers();
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready

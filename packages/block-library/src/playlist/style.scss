@@ -42,6 +42,57 @@ $waveform-player-height: 100px;
 		margin-bottom: 0;
 	}
 
+	.wp-block-playlist__waveform-hover-region {
+		position: absolute;
+		inset: 0 auto 0 0;
+		width: 0;
+		background: currentColor;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.12s ease;
+		z-index: 0;
+	}
+
+	.waveform-container.is-hovering .wp-block-playlist__waveform-hover-region {
+		opacity: 0.12;
+	}
+
+	.wp-block-playlist__time-marker {
+		--wp-playlist-time-marker-label-offset: -50%;
+
+		position: absolute;
+		inset-block: 0;
+		width: 0;
+		color: currentColor;
+		opacity: 0;
+		pointer-events: none;
+		z-index: 6;
+
+		&.is-visible {
+			opacity: 1;
+		}
+
+		&::before {
+			content: "";
+			position: absolute;
+			inset-block: 0;
+			border-inline-start: 2px solid currentColor;
+			opacity: 0.55;
+		}
+	}
+
+	.wp-block-playlist__time-marker-label {
+		position: absolute;
+		inset-block-start: 0.35rem;
+		inset-inline-start: 0;
+		transform: translateX(var(--wp-playlist-time-marker-label-offset));
+		font-size: 0.75em;
+		line-height: 1;
+		white-space: nowrap;
+		text-shadow: 0 0 0.35em Canvas;
+		opacity: 0.75;
+	}
+
 	.waveform-subtitle {
 		opacity: 0.7;
 	}
