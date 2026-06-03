@@ -5,7 +5,11 @@ import { SlotFillProvider } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityBlockEditor,
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -19,7 +23,6 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
-import { ALLOW_REUSABLE_BLOCKS } from '../../constants';
 import { unlock } from '../../lock-unlock';
 
 const {
@@ -31,8 +34,6 @@ const {
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
-const EMPTY_ARRAY = [];
-
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -41,14 +42,13 @@ export default function WidgetAreasBlockEditorProvider( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		hasUploadPermissions,
-		reusableBlocks,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
 		pageOnFront,
 		pageForPosts,
 		restBlockPatternCategories,
 	} = useSelect( ( select ) => {
-		const { canUser, getEntityRecord, getEntityRecords } =
+		const { canUser, getEntityRecord, getBlockPatternCategories } =
 			select( coreStore );
 		const siteSettings = canUser( 'read', {
 			kind: 'root',
@@ -62,9 +62,6 @@ export default function WidgetAreasBlockEditorProvider( {
 					kind: 'postType',
 					name: 'attachment',
 				} ) ?? true,
-			reusableBlocks: ALLOW_REUSABLE_BLOCKS
-				? getEntityRecords( 'postType', 'wp_block' )
-				: EMPTY_ARRAY,
 			isFixedToolbarActive: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'fixedToolbar'
@@ -75,8 +72,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			),
 			pageOnFront: siteSettings?.page_on_front,
 			pageForPosts: siteSettings?.page_for_posts,
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
+			restBlockPatternCategories: getBlockPatternCategories(),
 		};
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
@@ -110,7 +106,6 @@ export default function WidgetAreasBlockEditorProvider( {
 		}
 		return {
 			...blockEditorSettings,
-			__experimentalReusableBlocks: reusableBlocks,
 			hasFixedToolbar: isFixedToolbarActive || ! isLargeViewport,
 			keepCaretInsideBlock,
 			mediaUpload: mediaUploadBlockEditor,
@@ -119,6 +114,11 @@ export default function WidgetAreasBlockEditorProvider( {
 			pageOnFront,
 			pageForPosts,
 			editorTool: 'edit',
+			// Uses getBlockPatterns() rather than
+			// getBlockPatternsForPostType() since the widgets editor has
+			// no meaningful post type. Patterns with postTypes restrictions
+			// may surface here, but they are still filtered by
+			// __experimentalGetAllowedPatterns' block-type check.
 			[ selectBlockPatternsKey ]: ( select ) => {
 				const { getBlockPatterns, hasFinishedResolution } =
 					select( coreStore );
@@ -128,10 +128,13 @@ export default function WidgetAreasBlockEditorProvider( {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: ( select ) => {
+				const { RECEIVE_INTERMEDIATE_RESULTS } =
+					unlock( coreDataPrivateApis );
 				const { getEntityRecords: getEntityRecordsForReusable } =
 					select( coreStore );
 				return getEntityRecordsForReusable( 'postType', 'wp_block', {
 					per_page: -1,
+					[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 				} );
 			},
 			[ userPatternCategoriesSelectKey ]: ( select ) => {
@@ -145,7 +148,6 @@ export default function WidgetAreasBlockEditorProvider( {
 		isFixedToolbarActive,
 		isLargeViewport,
 		keepCaretInsideBlock,
-		reusableBlocks,
 		setIsInserterOpened,
 		pageOnFront,
 		pageForPosts,
