@@ -14,8 +14,8 @@ const SCOPE = 'core/dashboard';
 const KEY = 'dashboardLayout';
 
 /**
- * Identifier of a dashboard surface, structured as `<plugin>_<page>` to
- * mirror the underscore form produced by the wp-build pipeline (see
+ * Identifier of a dashboard, structured as `<plugin>_<page>` to mirror
+ * the underscore form produced by the wp-build pipeline (see
  * `{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}` in the page templates).
  */
 export type DashboardName = `${ string }_${ string }`;
@@ -27,9 +27,9 @@ export type DashboardName = `${ string }_${ string }`;
  * preferences store, and a reset action that fetches the dashboard's
  * registered default from the REST API and applies it locally.
  *
- * @param dashboardName Identifier of the dashboard surface as
- *                      produced by the build pipeline. Used as the
- *                      `{name}` segment of the default-layout route.
+ * @param dashboardName Identifier of the dashboard as produced by the
+ *                      build pipeline. Used as the `{name}` segment of
+ *                      the default-layout route.
  * @return Tuple `[ layout, setLayout, resetLayout ]`.
  */
 export function useDashboardLayout(

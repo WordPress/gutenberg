@@ -9,6 +9,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
+import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -21,8 +22,12 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { close, drawerRight, keyboard } from '@wordpress/icons';
-import { isAppleOS, isKeyboardEvent } from '@wordpress/keycodes';
+import { close, drawerRight, keyboard, redo, undo } from '@wordpress/icons';
+import {
+	displayShortcut,
+	isAppleOS,
+	isKeyboardEvent,
+} from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import {
@@ -32,7 +37,11 @@ import {
 	// No type declarations available for @wordpress/interface.
 	// @ts-expect-error
 } from '@wordpress/interface';
-import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+import type {
+	JSX,
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactNode,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -41,12 +50,13 @@ import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
-import MediaEditorToolbar from '../media-editor-toolbar';
+import MediaEditorFineRotation from '../media-editor-fine-rotation';
+import MediaEditorTransformControls from '../media-editor-transform-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { CropperProvider, useCropper } from '../../image-editor';
+import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
@@ -77,6 +87,18 @@ interface EditorTab {
 export interface MediaEditorFrameProps {
 	children: ReactNode;
 	headerActions: ReactNode;
+	footerActions: ReactNode;
+	/**
+	 * Footer layout selector. Frames apply this to the footer container
+	 * as a modifier class.
+	 *
+	 * - `wide`   — single row: History | Ruler | Transform | Cancel/Save.
+	 * - `medium` — two rows: ruler on top; History | Transform | Cancel/Save
+	 *              beneath.
+	 * - `narrow` — three rows: ruler; transform (centered); History |
+	 *              Cancel/Save.
+	 */
+	footerLayout: 'wide' | 'medium' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -110,6 +132,7 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 			className="media-editor__sidebar"
 			panelClassName="media-editor__sidebar-panel"
 			headerClassName="media-editor__sidebar-header"
+			closeLabel={ __( 'Close media panel' ) }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
 					<Tabs.TabList>
@@ -139,24 +162,17 @@ function MediaEditorSidebar( { tabs }: { tabs: EditorTab[] } ) {
 
 interface HeaderActionsProps {
 	isSaving: boolean;
-	hasMedia: boolean;
-	hasChanges: boolean;
 	isImage: boolean;
 	showCloseButton?: boolean;
 	onCancel: () => void;
-	onSave: () => void;
 }
 
 function HeaderActions( {
 	isSaving,
-	hasMedia,
-	hasChanges,
 	isImage,
 	showCloseButton = false,
 	onCancel,
-	onSave,
 }: HeaderActionsProps ) {
-	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Flex
@@ -174,25 +190,6 @@ function HeaderActions( {
 				/>
 			) }
 			<PinnedItems.Slot scope="media-editor" />
-			<Button
-				size="compact"
-				variant="tertiary"
-				onClick={ onCancel }
-				disabled={ isSaving }
-				accessibleWhenDisabled
-			>
-				{ __( 'Cancel' ) }
-			</Button>
-			<Button
-				size="compact"
-				variant="primary"
-				onClick={ onSave }
-				isBusy={ isSaving }
-				disabled={ saveDisabled }
-				accessibleWhenDisabled
-			>
-				{ __( 'Save' ) }
-			</Button>
 			{ showCloseButton && (
 				<Button
 					size="compact"
@@ -212,6 +209,132 @@ function HeaderActions( {
 	);
 }
 
+interface HistoryActionsProps {
+	isUndoRedoDisabled?: boolean;
+	onReset: () => void;
+}
+
+function HistoryActions( {
+	isUndoRedoDisabled = false,
+	onReset,
+}: HistoryActionsProps ) {
+	const {
+		reset,
+		isDirty,
+		hasUndo,
+		hasRedo,
+		undo: undoCrop,
+		redo: redoCrop,
+		beginGesture,
+		endGesture,
+	} = useMediaEditor();
+	const handleUndo = () => {
+		if ( isUndoRedoDisabled ) {
+			return;
+		}
+		undoCrop();
+	};
+	const handleRedo = () => {
+		if ( isUndoRedoDisabled ) {
+			return;
+		}
+		redoCrop();
+	};
+	const handleReset = () => {
+		beginGesture();
+		reset();
+		onReset();
+		endGesture();
+	};
+	return (
+		<Flex
+			className="media-editor__history-actions"
+			expanded={ false }
+			gap={ 2 }
+		>
+			<Button
+				size="compact"
+				icon={ undo }
+				label={ __( 'Undo' ) }
+				showTooltip
+				shortcut={ displayShortcut.primary( 'z' ) }
+				disabled={ isUndoRedoDisabled || ! hasUndo }
+				accessibleWhenDisabled
+				onClick={ handleUndo }
+			/>
+			<Button
+				size="compact"
+				icon={ redo }
+				label={ __( 'Redo' ) }
+				showTooltip
+				shortcut={
+					isAppleOS()
+						? displayShortcut.primaryShift( 'z' )
+						: displayShortcut.primary( 'y' )
+				}
+				disabled={ isUndoRedoDisabled || ! hasRedo }
+				accessibleWhenDisabled
+				onClick={ handleRedo }
+			/>
+			<Button
+				size="compact"
+				variant="tertiary"
+				disabled={ ! isDirty }
+				accessibleWhenDisabled
+				onClick={ handleReset }
+			>
+				{ __( 'Reset' ) }
+			</Button>
+		</Flex>
+	);
+}
+
+interface FooterActionsProps {
+	isSaving: boolean;
+	hasMedia: boolean;
+	hasChanges: boolean;
+	onCancel: () => void;
+	onSave: () => void;
+}
+
+function FooterActions( {
+	isSaving,
+	hasMedia,
+	hasChanges,
+	onCancel,
+	onSave,
+}: FooterActionsProps ) {
+	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
+	return (
+		<Flex
+			className="media-editor__footer-actions"
+			justify="flex-end"
+			expanded={ false }
+			gap={ 2 }
+		>
+			<Button
+				__next40pxDefaultSize
+				variant="tertiary"
+				onClick={ onCancel }
+				disabled={ isSaving }
+				accessibleWhenDisabled
+			>
+				{ __( 'Cancel' ) }
+			</Button>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ onSave }
+				isBusy={ isSaving }
+				disabled={ saveDisabled }
+				accessibleWhenDisabled
+			>
+				{ __( 'Save' ) }
+			</Button>
+		</Flex>
+	);
+}
+
 function MediaEditorContent( {
 	fields = [],
 	id,
@@ -224,7 +347,20 @@ function MediaEditorContent( {
 	showCloseButton = false,
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
-	const cropper = useCropper();
+	const cropper = useMediaEditor();
+	// Three footer layouts, picked from the viewport so DOM order matches
+	// visual order in all three (no `order` reshuffling needed):
+	//   wide   (≥ xlarge): single row.
+	//   medium (≥ medium): ruler on top; rest beneath.
+	//   narrow (< medium): ruler, then transform centered, then history/save.
+	const isWideViewport = useViewportMatch( 'xlarge' );
+	const isMediumViewport = useViewportMatch( 'medium' );
+	let footerLayout: 'wide' | 'medium' | 'narrow' = 'narrow';
+	if ( isWideViewport ) {
+		footerLayout = 'wide';
+	} else if ( isMediumViewport ) {
+		footerLayout = 'medium';
+	}
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -259,7 +395,7 @@ function MediaEditorContent( {
 		[ id ]
 	);
 
-	const hasChanges = cropper.isDirty || hasEdits;
+	const hasChanges = cropper.isCropperDirty || hasEdits;
 
 	const { clearEntityRecordEdits, editEntityRecord, invalidateResolution } =
 		useDispatch( coreStore );
@@ -269,8 +405,9 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef =
-		useRef< ReturnType< typeof setTimeout > >();
+	const placementControlTimerRef = useRef<
+		ReturnType< typeof setTimeout > | undefined
+	>( undefined );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -316,14 +453,8 @@ function MediaEditorContent( {
 		aspectRatioValue,
 		setAspectRatioValue,
 		aspectRatioOptions,
-		freeformCrop,
-		setFreeformCrop,
-		resolvedAspectRatio,
 		resetCropOptions,
 	} = useCropOptions( {
-		id,
-		isImage,
-		media,
 		aspectRatioPresets,
 	} );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
@@ -364,8 +495,6 @@ function MediaEditorContent( {
 						<MediaEditorCropPanel
 							aspectRatioValue={ aspectRatioValue }
 							onAspectRatioChange={ setAspectRatioValue }
-							freeformCrop={ freeformCrop }
-							onFreeformChange={ setFreeformCrop }
 							onPlacementControlInteraction={
 								signalPlacementControlInteraction
 							}
@@ -380,8 +509,6 @@ function MediaEditorContent( {
 		isImage,
 		aspectRatioValue,
 		setAspectRatioValue,
-		freeformCrop,
-		setFreeformCrop,
 		aspectRatioOptions,
 		signalPlacementControlInteraction,
 	] );
@@ -477,14 +604,11 @@ function MediaEditorContent( {
 									? __( 'Image editor' )
 									: __( 'Media preview' ),
 								sidebar: __( 'Media details' ),
-								footer: __( 'Image editing tools' ),
 							} }
 							content={
 								<div className="media-editor__canvas">
 									{ isImage ? (
 										<MediaEditorCanvas
-											aspectRatio={ resolvedAspectRatio }
-											freeformCrop={ freeformCrop }
 											focusOnMount
 											isPlacementActive={
 												isPlacementActive
@@ -500,19 +624,6 @@ function MediaEditorContent( {
 										<MediaPreview />
 									) }
 								</div>
-							}
-							footer={
-								isImage ? (
-									<MediaEditorToolbar
-										onReset={ resetCropOptions }
-										onPlacementControlInteraction={
-											signalPlacementControlInteraction
-										}
-										isUndoRedoDisabled={
-											isCropInteractionActive
-										}
-									/>
-								) : undefined
 							}
 							sidebar={
 								<ComplementaryArea.Slot scope="media-editor" />
@@ -541,19 +652,82 @@ function MediaEditorContent( {
 		</MediaEditorProvider>
 	);
 
+	const history = isImage ? (
+		<HistoryActions
+			isUndoRedoDisabled={ isCropInteractionActive }
+			onReset={ resetCropOptions }
+		/>
+	) : null;
+	const ruler = isImage ? (
+		<MediaEditorFineRotation
+			onPlacementControlInteraction={ signalPlacementControlInteraction }
+		/>
+	) : null;
+	const transform = isImage ? <MediaEditorTransformControls /> : null;
+	const actions = (
+		<FooterActions
+			isSaving={ isSaving }
+			hasMedia={ !! media }
+			hasChanges={ hasChanges }
+			onCancel={ handleRequestClose }
+			onSave={ saveMediaEditor }
+		/>
+	);
+
+	// One JSX tree per layout. DOM order matches visual order in all three.
+	// `.media-editor-modal__footer-toolbar` (wide only) groups ruler +
+	// transform with the centered cluster and divider that the wide layout
+	// has always had.
+	let footerActions: ReactNode;
+	if ( footerLayout === 'wide' ) {
+		footerActions = (
+			<>
+				{ history }
+				{ isImage && (
+					<div className="media-editor-modal__footer-toolbar">
+						{ ruler }
+						{ transform }
+					</div>
+				) }
+				{ actions }
+			</>
+		);
+	} else if ( footerLayout === 'medium' ) {
+		footerActions = (
+			<>
+				{ ruler }
+				<div className="media-editor-modal__footer-row">
+					{ history }
+					{ transform }
+					{ actions }
+				</div>
+			</>
+		);
+	} else {
+		footerActions = (
+			<>
+				{ ruler }
+				{ transform }
+				<div className="media-editor-modal__footer-row">
+					{ history }
+					{ actions }
+				</div>
+			</>
+		);
+	}
+
 	return renderFrame( {
 		children,
 		headerActions: (
 			<HeaderActions
 				isSaving={ isSaving }
-				hasMedia={ !! media }
-				hasChanges={ hasChanges }
 				isImage={ isImage }
 				showCloseButton={ showCloseButton }
 				onCancel={ handleRequestClose }
-				onSave={ saveMediaEditor }
 			/>
 		),
+		footerActions,
+		footerLayout,
 		onRequestClose: handleRequestClose,
 		onKeyDown: handleKeyDown,
 		shouldCloseOnClickOutside: ! hasChanges && ! isSaving,
@@ -565,9 +739,9 @@ function MediaEditorContent( {
 
 export function MediaEditor( props: MediaEditorProps ) {
 	return (
-		<CropperProvider key={ props.id }>
+		<MediaEditorStateProvider key={ props.id }>
 			<MediaEditorContent { ...props } />
-		</CropperProvider>
+		</MediaEditorStateProvider>
 	);
 }
 

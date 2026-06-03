@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 15.0.0 (2026-05-27)
+
+### Breaking Changes
+
+- Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
 ### Enhancements
 
 - DataViews: Lower the sticky footer z-index and isolate grid card stacking contexts. [#78315](https://github.com/WordPress/gutenberg/pull/78315)
@@ -17,10 +23,15 @@
 - DataViews: Restore the original 24px gap on the default-density grid (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataForms: Restore the original 24px minimum height on panel-layout fields (trigger, label, control) (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataViews: Restore the original 28px end-padding on resettable filter chips (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Fix wrapper height not resolving in flex layouts, enabling proper internal scrolling. [#76945](https://github.com/WordPress/gutenberg/pull/76945)
 
 ### Code Quality
 
 - DataViews: Migrate styles from `@wordpress/base-styles` SCSS variables to `@wordpress/theme` CSS custom properties (design tokens) where possible. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
+### Internal
+
+- DataViews: Migrate `Tooltip` consumers from `@wordpress/components` to the new compositional `Tooltip` in `@wordpress/ui`. [#78470](https://github.com/WordPress/gutenberg/pull/78470)
 
 ## 14.3.0 (2026-05-14)
 
