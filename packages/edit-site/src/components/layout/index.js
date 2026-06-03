@@ -55,7 +55,6 @@ const { ThemeProvider } = unlock( themePrivateApis );
 const ANIMATION_DURATION = 0.3;
 
 function Layout() {
-	const themeColors = getAdminThemeColors();
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
@@ -186,10 +185,7 @@ function Layout() {
 											areas.mobile?.type !==
 												areas.sidebar?.type ? (
 												<ThemeProvider
-													color={ {
-														...themeColors,
-														bg: '#ffffff',
-													} }
+													color={ { bg: '#ffffff' } }
 												>
 													<div className="edit-site-layout__mobile-content">
 														<ErrorBoundary>
@@ -224,12 +220,7 @@ function Layout() {
 									maxWidth: widths?.content,
 								} }
 							>
-								<ThemeProvider
-									color={ {
-										...themeColors,
-										bg: '#ffffff',
-									} }
-								>
+								<ThemeProvider color={ { bg: '#ffffff' } }>
 									<ErrorBoundary>
 										{ areas.content }
 									</ErrorBoundary>
@@ -244,12 +235,7 @@ function Layout() {
 								maxWidth: widths?.edit,
 							} }
 						>
-							<ThemeProvider
-								color={ {
-									...themeColors,
-									bg: '#ffffff',
-								} }
-							>
+							<ThemeProvider color={ { bg: '#ffffff' } }>
 								<ErrorBoundary>{ areas.edit }</ErrorBoundary>
 							</ThemeProvider>
 						</div>
@@ -292,10 +278,7 @@ function Layout() {
 											} }
 										>
 											<ThemeProvider
-												color={ {
-													...themeColors,
-													bg: '#ffffff',
-												} }
+												color={ { bg: '#ffffff' } }
 											>
 												{ areas.preview }
 											</ThemeProvider>
