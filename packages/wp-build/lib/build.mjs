@@ -585,37 +585,23 @@ async function bundlePackage( packageName, options = {} ) {
 		}
 		if ( globalName ) {
 			// esbuild marks the getters non-configurable, so we can't rewrite
-			// them in place; replacing the whole namespace with a shallow
-			// copy is the simplest way to materialize each value once.
-			if ( packageJson.wpScriptDefaultExport ) {
-				// The first footer has already unwrapped the global to the
-				// default value. We still copy here to materialize any getters
-				// the default value may carry; the plain `Object.assign({}, …)`
-				// also drops any non-enumerable `__esModule` flag the unwrapped
-				// default might inherit, which is correct — the global no
-				// longer represents an ES module namespace, so webpack's
-				// `__webpack_require__.n` should take the CJS branch and
-				// return the value directly.
-				footerParts.push(
-					`if(${ globalName }&&typeof ${ globalName }==='object'){${ globalName }=Object.assign({},${ globalName });}`
-				);
-			} else {
-				// esbuild's `__toCommonJS` helper marks the namespace with a
-				// non-enumerable `__esModule: true`. `Object.assign` only
-				// copies enumerable own properties, so we re-seed the target
-				// with that marker when present. Without it, webpack's
-				// `__webpack_require__.n` helper in external consumers (e.g.
-				// WooCommerce) takes the CJS branch and returns the whole
-				// namespace instead of `.default`, breaking
-				// `import X from '@wordpress/<package>'`. The target's
-				// `__esModule` is marked writable so a hypothetical future
-				// esbuild emit that makes the source's `__esModule`
-				// enumerable would not trip a strict-mode TypeError when
-				// `Object.assign` walks it.
-				footerParts.push(
-					`if(${ globalName }&&typeof ${ globalName }==='object'){${ globalName }=Object.assign(${ globalName }.__esModule?Object.defineProperty({},'__esModule',{value:true,writable:true}):{},${ globalName });}`
-				);
-			}
+			// them in place; replacing the whole namespace with a shallow copy
+			// is the simplest way to materialize each value once.
+			//
+			// Seed the copy with a non-enumerable `__esModule` so webpack's
+			// `__webpack_require__.n` helper in external consumers (e.g.
+			// WooCommerce) still resolves `import X from '@wordpress/<package>'`
+			// to `.default` rather than the whole namespace. A plain
+			// `Object.assign({}, …)` would otherwise drop esbuild's
+			// non-enumerable `__esModule` marker. Non-enumerable matches the
+			// descriptor esbuild's `__toCommonJS` (and webpack's own
+			// `__webpack_require__.r`) emit, so it does not leak into
+			// `Object.keys`, spread, or downstream `Object.assign`. `writable`
+			// guards against a strict-mode write if a future esbuild ever
+			// emitted an enumerable `__esModule` for `Object.assign` to copy.
+			footerParts.push(
+				`if(${ globalName }&&typeof ${ globalName }==='object'){${ globalName }=Object.assign(Object.defineProperty({},'__esModule',{value:true,writable:true}),${ globalName });}`
+			);
 		}
 		if ( footerParts.length ) {
 			baseConfig.footer = { js: footerParts.join( '' ) };
