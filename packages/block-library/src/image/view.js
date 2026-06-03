@@ -253,6 +253,9 @@ const { state, actions, callbacks } = store(
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
 					state.overlayEnabled = false;
+					// Re-centers the image before the closing animation runs so it
+					// zooms out from the center rather than its scrolled position.
+					state.exifVisible = false;
 
 					// Waits until the close animation has completed before allowing a
 					// user to scroll again. The duration of this animation is defined in
@@ -337,7 +340,10 @@ const { state, actions, callbacks } = store(
 				// perform a simple tap. This may be changed in the future if there is a
 				// better alternative to override or reset the scroll position during
 				// swipe actions.
-				if ( state.overlayEnabled ) {
+				//
+				// When the EXIF metadata panel is open the overlay scrolls
+				// vertically, so scrolling is allowed in that case.
+				if ( state.overlayEnabled && ! state.isExifVisible ) {
 					event.preventDefault();
 				}
 			} ),
@@ -587,9 +593,6 @@ const { state, actions, callbacks } = store(
 				if ( 960 < window.innerWidth ) {
 					horizontalPadding = state.hasNavigation ? 320 : 80;
 					verticalPadding = 80;
-				}
-				if ( state.isExifVisible ) {
-					verticalPadding = Math.max( verticalPadding, 220 );
 				}
 
 				const targetMaxWidth = Math.min(

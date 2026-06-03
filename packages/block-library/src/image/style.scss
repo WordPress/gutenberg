@@ -310,15 +310,22 @@
 	.wp-lightbox-exif-button {
 		position: absolute;
 		z-index: 3000002;
-		left: 50%;
-		bottom: calc(env(safe-area-inset-bottom) + 16px);
-		transform: translateX(-50%);
+		right: calc(env(safe-area-inset-right) + 16px);
+		// On small screens the navigation buttons sit in the bottom corners, so
+		// the toggle is stacked above the next button to avoid overlapping it.
+		bottom: calc(env(safe-area-inset-bottom) + 64px);
 		box-sizing: border-box;
 		width: 40px;
 		height: 40px;
 		padding: 4px;
 		cursor: pointer;
 		line-height: 0;
+
+		// The navigation buttons move to the vertical center, freeing the
+		// bottom-right corner for the toggle.
+		@include break-large() {
+			bottom: calc(env(safe-area-inset-bottom) + 16px);
+		}
 
 		&[hidden] {
 			display: none;
@@ -402,6 +409,48 @@
 
 		span {
 			line-height: 1.3;
+		}
+	}
+
+	// When the EXIF metadata panel is open, the image keeps its size and the
+	// panel is laid out below it. The overlay scrolls vertically instead of
+	// shrinking the image to fit both in the viewport.
+	&.has-visible-exif {
+		--wp--lightbox-exif-image-top: 80px;
+		overflow-x: hidden;
+		overflow-y: auto;
+
+		// Anchors the image toward the top so the panel can sit below it.
+		.lightbox-image-container {
+			top: var(--wp--lightbox-exif-image-top);
+			transform: translateX(-50%);
+		}
+
+		// Pins the toggle button to the viewport so the panel can be dismissed
+		// without scrolling back to it.
+		.wp-lightbox-exif-button {
+			position: fixed;
+		}
+
+		// Lays the panel out in normal flow below the image so its height
+		// contributes to the overlay's scrollable area. `relative` (rather than
+		// `static`) keeps it in flow while preserving its z-index, so it paints
+		// above the scrim instead of behind it.
+		.wp-lightbox-exif {
+			position: relative;
+			left: auto;
+			bottom: auto;
+			transform: none;
+			margin: calc(var(--wp--lightbox-exif-image-top) + var(--wp--lightbox-container-height) + 24px) auto 0;
+			padding-bottom: calc(env(safe-area-inset-bottom) + 88px);
+		}
+
+		// Pins the background to the viewport so it covers the full scroll range
+		// rather than only the first viewport height.
+		.scrim {
+			position: fixed;
+			top: 0;
+			left: 0;
 		}
 	}
 

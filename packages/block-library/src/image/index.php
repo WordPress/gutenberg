@@ -457,6 +457,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-bind--aria-label="state.ariaLabel"
 			data-wp-bind--aria-modal="state.ariaModal"
 			data-wp-class--active="state.overlayEnabled"
+			data-wp-class--has-visible-exif="state.isExifVisible"
 			data-wp-class--show-closing-animation="state.overlayOpened"
 			data-wp-watch---focus="callbacks.setOverlayFocus"
 			data-wp-watch---inert="callbacks.setInertElements"
