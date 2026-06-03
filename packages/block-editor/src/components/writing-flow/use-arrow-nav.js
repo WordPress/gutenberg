@@ -163,6 +163,50 @@ export function getClosestTabbable(
 	return focusableNodes.find( isTabCandidate );
 }
 
+/**
+ * Returns the first or last tabbable element within the container.
+ *
+ * Uses the same candidate criteria as getClosestTabbable.
+ *
+ * @param {Element} containerElement Element containing all blocks.
+ * @param {boolean} isReverse        True to return the first element, false
+ *                                   for the last.
+ *
+ * @return {?Element} First or last tabbable element, if one exists.
+ */
+export function getEdgeTabbable( containerElement, isReverse ) {
+	const focusableNodes = focus.focusable.find( containerElement );
+
+	if ( ! isReverse ) {
+		focusableNodes.reverse();
+	}
+
+	function isTabCandidate( node ) {
+		if (
+			node.contentEditable !== 'true' &&
+			getBlockClientId( node ) &&
+			focus.focusable
+				.find( node )
+				.filter( ( element ) => ! isFormElement( element ) ).length !==
+				0
+		) {
+			return false;
+		}
+
+		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
+			return false;
+		}
+
+		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	return focusableNodes.find( isTabCandidate );
+}
+
 export default function useArrowNav() {
 	const {
 		getMultiSelectedBlocksStartClientId,
@@ -278,6 +322,15 @@ export default function useArrowNav() {
 					node.contentEditable = true;
 					// Firefox doesn't automatically move focus.
 					node.focus();
+				}
+			} else if ( isVertical && metaKey && ! keepCaretInsideBlock ) {
+				// ⌘ + ↑/↓ on macOS should move the caret to the very
+				// start or end of the document, not just the current block.
+				const edgeTabbable = getEdgeTabbable( node, isReverse );
+
+				if ( edgeTabbable ) {
+					placeCaretAtVerticalEdge( edgeTabbable, isReverse );
+					event.preventDefault();
 				}
 			} else if (
 				isVertical &&
