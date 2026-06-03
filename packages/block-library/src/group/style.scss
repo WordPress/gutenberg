@@ -7,3 +7,13 @@
 :where(.wp-block-group.wp-block-group-is-layout-constrained) {
 	position: relative;
 }
+
+// When a background <img> is used (cover/contain, media library images), ensure
+// inner content paints above it. position:absolute on the <img> places it at
+// stacking level 8 (positioned, z-index:auto); normal-flow block-level siblings
+// are at level 3, so they'd be hidden behind the image without this rule.
+// Mirrors the wp-block-cover__inner-container pattern (position:relative; z-index:1).
+.wp-block-group > .wp-block__background-image ~ * {
+	position: relative;
+	z-index: 1;
+}

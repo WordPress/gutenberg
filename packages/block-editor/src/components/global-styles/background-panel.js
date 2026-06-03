@@ -2,17 +2,26 @@
  * WordPress dependencies
  */
 import {
+	FocalPointPicker,
+	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalUnitControl as UnitControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useCallback, Platform } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import BackgroundImageControl from '../background-image-control';
+import BackgroundImageControl, {
+	coordsToBackgroundPosition,
+	backgroundPositionToCoords,
+	backgroundSizeHelpText,
+} from '../background-image-control';
 import { ColorPanelDropdown } from './color-panel';
 import { useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
@@ -22,6 +31,8 @@ const DEFAULT_CONTROLS = {
 	backgroundImage: true,
 	gradient: true,
 };
+
+const DEFAULT_BACKGROUND_SIZE = 'cover';
 
 /**
  * Checks site settings to see if the requested feature's control may be used.
@@ -227,6 +238,117 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
+	const hasImage =
+		hasBackgroundImageValue( value ) ||
+		hasBackgroundImageValue( inheritedValue );
+
+	// Size control state — mirrors BackgroundSizeControls logic.
+	const sizeValue =
+		value?.background?.backgroundSize ||
+		inheritedValue?.background?.backgroundSize;
+	const repeatValue =
+		value?.background?.backgroundRepeat ||
+		inheritedValue?.background?.backgroundRepeat;
+	const positionValue =
+		value?.background?.backgroundPosition ||
+		inheritedValue?.background?.backgroundPosition;
+	const attachmentValue =
+		value?.background?.backgroundAttachment ||
+		inheritedValue?.background?.backgroundAttachment;
+	const imageUrl =
+		value?.background?.backgroundImage?.url ||
+		inheritedValue?.background?.backgroundImage?.url;
+	const isUploadedImage = value?.background?.backgroundImage?.id;
+
+	let currentSizeToggle =
+		! sizeValue && isUploadedImage
+			? defaultValues?.backgroundSize ?? DEFAULT_BACKGROUND_SIZE
+			: sizeValue || 'auto';
+	if ( ! [ 'cover', 'contain', 'auto' ].includes( currentSizeToggle ) ) {
+		currentSizeToggle = 'auto';
+	}
+
+	const repeatCheckedValue = ! (
+		repeatValue === 'no-repeat' ||
+		( currentSizeToggle === 'cover' && repeatValue === undefined )
+	);
+
+	const backgroundPositionValue =
+		! positionValue && isUploadedImage && 'contain' === sizeValue
+			? defaultValues?.backgroundPosition
+			: positionValue;
+
+	const updateBackgroundPosition = ( next ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'background', 'backgroundPosition' ],
+				coordsToBackgroundPosition( next )
+			)
+		);
+	};
+
+	const updateBackgroundSize = ( next ) => {
+		let nextRepeat = repeatValue;
+		let nextPosition = positionValue;
+
+		if ( next === 'contain' ) {
+			nextRepeat = 'no-repeat';
+			nextPosition = undefined;
+		}
+		if ( next === 'cover' ) {
+			nextRepeat = undefined;
+			nextPosition = undefined;
+		}
+		if (
+			( currentSizeToggle === 'cover' ||
+				currentSizeToggle === 'contain' ) &&
+			next === 'auto'
+		) {
+			nextRepeat = undefined;
+			if ( !! value?.background?.backgroundImage?.id ) {
+				nextPosition = '50% 0';
+			}
+		}
+		if ( ! next && currentSizeToggle === 'auto' ) {
+			next = 'auto';
+		}
+
+		onChange(
+			setImmutably( value, [ 'background' ], {
+				...value?.background,
+				backgroundPosition: nextPosition,
+				backgroundRepeat: nextRepeat,
+				backgroundSize: next,
+			} )
+		);
+	};
+
+	const toggleIsRepeated = () =>
+		onChange(
+			setImmutably(
+				value,
+				[ 'background', 'backgroundRepeat' ],
+				repeatCheckedValue === true ? 'no-repeat' : 'repeat'
+			)
+		);
+
+	const toggleScrollWithPage = () => {
+		const enablingFixed = attachmentValue !== 'fixed';
+		onChange(
+			setImmutably( value, [ 'background' ], {
+				...value?.background,
+				backgroundAttachment: enablingFixed ? 'fixed' : undefined,
+				// Clear focal point when enabling fixed, mirroring the Cover block's
+				// toggleParallax behavior. With background-attachment:fixed the position
+				// is viewport-relative, so the element-relative focal point no longer
+				// applies. The picker stays visible so the user can still set a position
+				// that will take effect when fixed falls back to scroll on mobile.
+				...( enablingFixed ? { backgroundPosition: undefined } : {} ),
+			} )
+		);
+	};
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -279,6 +401,146 @@ export default function BackgroundImagePanel( {
 					} }
 					panelId={ panelId }
 				/>
+			) }
+			{ showBackgroundImageControl && hasImage && (
+				<>
+					<ToolsPanelItem
+						label={ __( 'Focal point' ) }
+						isShownByDefault
+						hasValue={ () => !! positionValue }
+						onDeselect={ () =>
+							onChange(
+								setImmutably(
+									value,
+									[ 'background', 'backgroundPosition' ],
+									undefined
+								)
+							)
+						}
+						panelId={ panelId }
+					>
+						<FocalPointPicker
+							label={ __( 'Focal point' ) }
+							url={ imageUrl }
+							value={ backgroundPositionToCoords(
+								backgroundPositionValue
+							) }
+							onChange={ updateBackgroundPosition }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Fixed background' ) }
+						isShownByDefault
+						hasValue={ () => attachmentValue === 'fixed' }
+						onDeselect={ () =>
+							onChange(
+								setImmutably(
+									value,
+									[ 'background', 'backgroundAttachment' ],
+									undefined
+								)
+							)
+						}
+						panelId={ panelId }
+					>
+						<ToggleControl
+							label={ __( 'Fixed background' ) }
+							checked={ attachmentValue === 'fixed' }
+							onChange={ toggleScrollWithPage }
+						/>
+					</ToolsPanelItem>
+					{ settings?.background?.backgroundSize && (
+						<>
+							<ToolsPanelItem
+								label={ __( 'Size' ) }
+								isShownByDefault
+								hasValue={ () => !! sizeValue }
+								onDeselect={ () =>
+									updateBackgroundSize(
+										defaultValues?.backgroundSize ??
+											DEFAULT_BACKGROUND_SIZE
+									)
+								}
+								panelId={ panelId }
+							>
+								<ToggleGroupControl
+									size="__unstable-large"
+									label={ __( 'Size' ) }
+									value={ currentSizeToggle }
+									onChange={ updateBackgroundSize }
+									isBlock
+									help={ backgroundSizeHelpText(
+										sizeValue ||
+											defaultValues?.backgroundSize
+									) }
+								>
+									<ToggleGroupControlOption
+										key="cover"
+										value="cover"
+										label={ _x(
+											'Cover',
+											'Size option for background image control'
+										) }
+									/>
+									<ToggleGroupControlOption
+										key="contain"
+										value="contain"
+										label={ _x(
+											'Contain',
+											'Size option for background image control'
+										) }
+									/>
+									<ToggleGroupControlOption
+										key="tile"
+										value="auto"
+										label={ _x(
+											'Tile',
+											'Size option for background image control'
+										) }
+									/>
+								</ToggleGroupControl>
+								{ currentSizeToggle === 'auto' && (
+									<UnitControl
+										aria-label={ __(
+											'Background image width'
+										) }
+										onChange={ updateBackgroundSize }
+										value={ sizeValue }
+										size="__unstable-large"
+										__unstableInputWidth="100px"
+										min={ 0 }
+										placeholder={ __( 'Auto' ) }
+									/>
+								) }
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Repeat' ) }
+								isShownByDefault
+								hasValue={ () => repeatValue === 'repeat' }
+								onDeselect={ () =>
+									onChange(
+										setImmutably(
+											value,
+											[
+												'background',
+												'backgroundRepeat',
+											],
+											undefined
+										)
+									)
+								}
+								panelId={ panelId }
+							>
+								<ToggleControl
+									label={ __( 'Repeat' ) }
+									checked={ repeatCheckedValue }
+									onChange={ toggleIsRepeated }
+									disabled={ currentSizeToggle === 'cover' }
+								/>
+							</ToolsPanelItem>
+						</>
+					) }
+				</>
 			) }
 		</Wrapper>
 	);
