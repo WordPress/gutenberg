@@ -959,6 +959,109 @@ test.describe( 'Image - lightbox', () => {
 	} );
 } );
 
+test.describe( 'Image - lightbox comments', () => {
+	let uploadedMedia;
+
+	const lightboxImageBlock = ( media ) =>
+		`<!-- wp:image {"id":${ media.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+		<figure class="wp-block-image size-full"><img src="${ media.source_url }" alt="" class="wp-image-${ media.id }"/></figure>
+		<!-- /wp:image -->`;
+
+	async function setAttachmentCommentStatus( requestUtils, status ) {
+		await requestUtils.rest( {
+			method: 'POST',
+			path: `/wp/v2/media/${ uploadedMedia.id }`,
+			data: { comment_status: status },
+		} );
+	}
+
+	async function openLightbox( editor, page ) {
+		await editor.setContent( lightboxImageBlock( uploadedMedia ) );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		await page.locator( '.wp-lightbox-container img' ).click();
+		await expect(
+			page.locator( '.wp-lightbox-overlay.active' )
+		).toBeVisible();
+	}
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedMedia = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllComments();
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments();
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test( 'hides the comment button when the attachment has comments closed', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await setAttachmentCommentStatus( requestUtils, 'closed' );
+		await openLightbox( editor, page );
+
+		await expect(
+			page.locator( '.wp-lightbox-comment-button' )
+		).toBeHidden();
+	} );
+
+	test( 'shows existing comments when the attachment has comments open', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await setAttachmentCommentStatus( requestUtils, 'open' );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/comments',
+			data: {
+				post: uploadedMedia.id,
+				content: 'A wonderful photograph.',
+				status: 'approved',
+			},
+		} );
+
+		await openLightbox( editor, page );
+
+		const commentButton = page.locator( '.wp-lightbox-comment-button' );
+		await expect( commentButton ).toBeVisible();
+		await commentButton.click();
+
+		await expect(
+			page.locator( '.wp-lightbox-comment-content' )
+		).toContainText( 'A wonderful photograph.' );
+	} );
+
+	test( 'lets a logged-in visitor submit a comment', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await setAttachmentCommentStatus( requestUtils, 'open' );
+		await openLightbox( editor, page );
+
+		await page.locator( '.wp-lightbox-comment-button' ).click();
+
+		const form = page.locator( '.wp-lightbox-comments form' );
+		await form.locator( 'textarea[name="comment"]' ).fill( 'Great shot!' );
+		await form.getByRole( 'button', { name: 'Post Comment' } ).click();
+
+		await expect(
+			page.locator( '.wp-lightbox-comments-message' )
+		).toHaveText( 'Comment submitted.' );
+	} );
+} );
+
 // Added to prevent regressions of https://github.com/WordPress/gutenberg/pull/57040.
 test.describe( 'Image - Site editor', () => {
 	test.beforeAll( async ( { requestUtils } ) => {

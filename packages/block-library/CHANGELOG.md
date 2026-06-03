@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Image: Add a comments panel to the lightbox, letting visitors read comments on the image's attachment and (when logged in) post new ones.
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
