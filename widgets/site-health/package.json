@@ -10,5 +10,8 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/primitives": "file:../../packages/primitives",
 		"@wordpress/ui": "file:../../packages/ui"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.13"
 	}
 }
