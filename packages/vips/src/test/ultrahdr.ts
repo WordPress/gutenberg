@@ -170,6 +170,60 @@ describe( 'UltraHDR helpers', () => {
 			);
 		} );
 
+		it( 'preserves the gain map on a simple downscale without manually cropping it', async () => {
+			// A proportional downscale (no crop) relies on libvips's
+			// `thumbnail` to resize the attached gain map in lockstep, so the
+			// resize step must not crop it manually, and `writeToBuffer` must
+			// keep the gain map metadata.
+			const thumb = new MockImage();
+			thumb.width = 300;
+			thumb.height = 225;
+			thumb.pageHeight = 225;
+			thumb.gainmap = new MockImage();
+			mockThumbnailBuffer.mockImplementationOnce( () => thumb );
+
+			await resizeImage( 'itemId', new ArrayBuffer( 16 ), 'image/jpeg', {
+				width: 300,
+				height: 0,
+			} );
+
+			// No positional crop, so neither the image nor its gain map is
+			// cropped, and no gain map is re-attached manually.
+			expect( thumb.crop ).not.toHaveBeenCalled();
+			expect( mockSetImage ).not.toHaveBeenCalled();
+			// The gain map still survives via the keep flag on save.
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'icc|gainmap' } )
+			);
+		} );
+
+		it( 'preserves the gain map on a boolean (centre) crop without manually cropping it', async () => {
+			// A boolean crop is handled entirely by `thumbnail` (with its
+			// crop option), which updates the gain map automatically, so the
+			// resize step must not crop the gain map itself.
+			const thumb = new MockImage();
+			thumb.width = 150;
+			thumb.height = 150;
+			thumb.pageHeight = 150;
+			thumb.gainmap = new MockImage();
+			mockThumbnailBuffer.mockImplementationOnce( () => thumb );
+
+			await resizeImage( 'itemId', new ArrayBuffer( 16 ), 'image/jpeg', {
+				width: 150,
+				height: 150,
+				crop: true,
+			} );
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalled();
+			expect( thumb.crop ).not.toHaveBeenCalled();
+			expect( mockSetImage ).not.toHaveBeenCalled();
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.jpeg',
+				expect.objectContaining( { keep: 'icc|gainmap' } )
+			);
+		} );
+
 		it( 'skips gain-map crop when no gain map is present', async () => {
 			const thumb = new MockImage();
 			thumb.width = 200;

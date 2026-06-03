@@ -315,12 +315,25 @@ test.describe( 'Client-side media processing', () => {
 		expect( sizes.thumbnail ).toBeDefined();
 		expect( sizes.medium ).toBeDefined();
 
-		// The medium sub-size must still carry the embedded UltraHDR gain map.
-		// This proves the resize step routed through libvips's
+		// Every generated sub-size must still carry the embedded UltraHDR
+		// gain map. This proves the resize step routed through libvips's
 		// uhdrload/uhdrsave pipeline rather than the regular JPEG path
 		// (which would have stripped the gain map).
-		const probed = await probeUltraHdrUrl( sizes.medium.source_url );
-		expect( probed.hasGainmap ).toBe( true );
+		//
+		// `thumbnail` is a hard-cropped square (exercising the manual
+		// gain-map crop path) while `medium` is a proportional downscale
+		// (exercising libvips's automatic gain-map resize), so checking both
+		// covers both code paths end to end.
+		for ( const sizeName of [ 'thumbnail', 'medium' ] ) {
+			const size = sizes[ sizeName ];
+			const probed = await probeUltraHdrUrl( size.source_url );
+			expect( probed.hasGainmap ).toBe( true );
+			// The decoded base image must match the registered sub-size
+			// dimensions, confirming the gain map travels with a correctly
+			// resized/cropped image rather than a stale full-size one.
+			expect( probed.width ).toBe( size.width );
+			expect( probed.height ).toBe( size.height );
+		}
 	} );
 
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
