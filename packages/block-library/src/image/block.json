@@ -49,6 +49,12 @@
 				"type": "boolean"
 			}
 		},
+		"lightboxComments": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
+		},
 		"title": {
 			"type": "string",
 			"source": "attribute",

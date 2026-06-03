@@ -7942,6 +7942,38 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @covers WP_Theme_JSON_Gutenberg::sanitize
 	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
 	 */
+	public function test_sanitize_preserves_lightbox_comments_boolean_values() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'lightboxComments' => array(
+						'enabled'      => true,
+						'allowEditing' => false,
+					),
+					'blocks'           => array(
+						'core/image' => array(
+							'lightboxComments' => array(
+								'enabled'      => true,
+								'allowEditing' => false,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$settings = $theme_json->get_settings();
+		$this->assertTrue( $settings['lightboxComments']['enabled'] );
+		$this->assertFalse( $settings['lightboxComments']['allowEditing'] );
+		$this->assertTrue( $settings['blocks']['core/image']['lightboxComments']['enabled'] );
+		$this->assertFalse( $settings['blocks']['core/image']['lightboxComments']['allowEditing'] );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::sanitize
+	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 */
 	public function test_sanitize_removes_non_boolean_values_in_block_settings() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

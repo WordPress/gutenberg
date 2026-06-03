@@ -962,8 +962,10 @@ test.describe( 'Image - lightbox', () => {
 test.describe( 'Image - lightbox comments', () => {
 	let uploadedMedia;
 
-	const lightboxImageBlock = ( media ) =>
-		`<!-- wp:image {"id":${ media.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+	const lightboxImageBlock = ( media, { comments = true } = {} ) =>
+		`<!-- wp:image {"id":${ media.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}${
+			comments ? ',"lightboxComments":{"enabled":true}' : ''
+		}} -->
 		<figure class="wp-block-image size-full"><img src="${ media.source_url }" alt="" class="wp-image-${ media.id }"/></figure>
 		<!-- /wp:image -->`;
 
@@ -975,8 +977,12 @@ test.describe( 'Image - lightbox comments', () => {
 		} );
 	}
 
-	async function openLightbox( editor, page ) {
-		await editor.setContent( lightboxImageBlock( uploadedMedia ) );
+	async function openLightbox(
+		editor,
+		page,
+		content = lightboxImageBlock( uploadedMedia )
+	) {
+		await editor.setContent( content );
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 		await page.locator( '.wp-lightbox-container img' ).click();
@@ -1009,6 +1015,23 @@ test.describe( 'Image - lightbox comments', () => {
 	} ) => {
 		await setAttachmentCommentStatus( requestUtils, 'closed' );
 		await openLightbox( editor, page );
+
+		await expect(
+			page.locator( '.wp-lightbox-comment-button' )
+		).toBeHidden();
+	} );
+
+	test( 'hides the comment button when lightbox comments are not enabled', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await setAttachmentCommentStatus( requestUtils, 'open' );
+		await openLightbox(
+			editor,
+			page,
+			lightboxImageBlock( uploadedMedia, { comments: false } )
+		);
 
 		await expect(
 			page.locator( '.wp-lightbox-comment-button' )

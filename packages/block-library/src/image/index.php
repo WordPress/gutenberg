@@ -167,6 +167,37 @@ function block_core_image_get_lightbox_settings( $block ) {
 }
 
 /**
+ * Gets the lightbox comments settings for the block.
+ *
+ * Resolves the per-block attribute first, then the block-level and top-level
+ * `theme.json` settings, mirroring how the lightbox setting is resolved.
+ *
+ * @since 7.0.0
+ *
+ * @param array $block Block data.
+ *
+ * @return array|null Filtered lightbox comments settings.
+ */
+function block_core_image_get_lightbox_comments_settings( $block ) {
+	// Gets the lightbox comments setting from the block attributes.
+	if ( isset( $block['attrs']['lightboxComments'] ) ) {
+		$comments_settings = $block['attrs']['lightboxComments'];
+	}
+
+	if ( ! isset( $comments_settings ) ) {
+		$comments_settings = wp_get_global_settings( array( 'lightboxComments' ), array( 'block_name' => 'core/image' ) );
+
+		// If not present in block-level settings, the previous call returns the
+		// whole `theme.json` structure, so check for a top-level value instead.
+		if ( isset( $comments_settings['lightboxComments'] ) ) {
+			$comments_settings = wp_get_global_settings( array( 'lightboxComments' ) );
+		}
+	}
+
+	return $comments_settings ?? null;
+}
+
+/**
  * Adds the directives and layout needed for the lightbox behavior.
  *
  * @since 6.4.0
@@ -200,6 +231,12 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$img_height       = 'none';
 	$img_srcset       = false;
 	$attachment_id    = $block['attrs']['id'] ?? null;
+
+	// Comments are only shown when enabled via the per-block attribute or the
+	// `lightboxComments` theme.json setting, in addition to the attachment
+	// itself having comments open.
+	$comments_settings = block_core_image_get_lightbox_comments_settings( $block );
+	$comments_enabled  = isset( $comments_settings['enabled'] ) && true === $comments_settings['enabled'];
 
 	wp_interactivity_config(
 		'core/image',
@@ -255,7 +292,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 					'scaleAttr'              => $block['attrs']['scale'] ?? false,
 					'alt'                    => $alt,
 					'attachmentId'           => $attachment_id,
-					'commentsOpen'           => isset( $attachment_id ) && comments_open( $attachment_id ),
+					'commentsOpen'           => $comments_enabled && isset( $attachment_id ) && comments_open( $attachment_id ),
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',

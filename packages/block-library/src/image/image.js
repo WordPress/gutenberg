@@ -10,6 +10,7 @@ import {
 	TextareaControl,
 	TextControl,
 	CheckboxControl,
+	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -296,6 +297,7 @@ export default function Image( {
 		linkTarget,
 		sizeSlug,
 		lightbox,
+		lightboxComments,
 		metadata,
 		isDecorative,
 	} = attributes;
@@ -551,6 +553,22 @@ export default function Image( {
 		}
 	}
 
+	function onSetLightboxComments( enable ) {
+		if ( enable && ! lightboxCommentsSetting?.enabled ) {
+			setAttributes( {
+				lightboxComments: { enabled: true },
+			} );
+		} else if ( ! enable && lightboxCommentsSetting?.enabled ) {
+			setAttributes( {
+				lightboxComments: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightboxComments: undefined,
+			} );
+		}
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -671,6 +689,22 @@ export default function Image( {
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
+	const [ lightboxCommentsSetting ] = useSettings( 'lightboxComments' );
+
+	const showCommentsSetting =
+		// Comments only apply to the lightbox, so the toggle is only relevant
+		// when the lightbox is enabled for this image.
+		lightboxChecked &&
+		// If a block-level override is set, give users the option to remove it
+		// even when the comments UI is disabled in the settings.
+		( ( !! lightboxComments &&
+			lightboxComments?.enabled !== lightboxCommentsSetting?.enabled ) ||
+			lightboxCommentsSetting?.allowEditing );
+
+	const commentsChecked =
+		!! lightboxComments?.enabled ||
+		( ! lightboxComments && !! lightboxCommentsSetting?.enabled );
+
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const dimensionsControl =
@@ -727,6 +761,7 @@ export default function Image( {
 	const resetSettings = () => {
 		setAttributes( {
 			lightbox: undefined,
+			lightboxComments: undefined,
 		} );
 		updateImage( DEFAULT_MEDIA_SIZE_SLUG );
 	};
@@ -1059,19 +1094,44 @@ export default function Image( {
 					) }
 				</InspectorControls>
 			) }
-			{ !! imageSizeOptions.length && (
+			{ ( !! imageSizeOptions.length || showCommentsSetting ) && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ resetSettings }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						<ResolutionTool
-							value={ sizeSlug }
-							defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
-							onChange={ updateImage }
-							options={ imageSizeOptions }
-						/>
+						{ !! imageSizeOptions.length && (
+							<ResolutionTool
+								value={ sizeSlug }
+								defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+								onChange={ updateImage }
+								options={ imageSizeOptions }
+							/>
+						) }
+						{ showCommentsSetting && (
+							<ToolsPanelItem
+								label={ __( 'Comments' ) }
+								isShownByDefault
+								hasValue={ () => !! lightboxComments }
+								onDeselect={ () =>
+									setAttributes( {
+										lightboxComments: undefined,
+									} )
+								}
+								panelId={ clientId }
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Show comments' ) }
+									checked={ commentsChecked }
+									onChange={ onSetLightboxComments }
+									help={ __(
+										'Allow visitors to read and post comments on this image in the lightbox.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }

@@ -385,6 +385,21 @@
 						}
 					},
 					"additionalProperties": false
+				},
+				"lightboxComments": {
+					"description": "Settings related to comments in the lightbox.",
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"description": "Defines whether lightbox comments are enabled or not.",
+							"type": "boolean"
+						},
+						"allowEditing": {
+							"description": "Defines whether to show the lightbox comments UI in the block editor. If set to `false`, the user won't be able to change the lightbox comments settings in the block editor.",
+							"type": "boolean"
+						}
+					},
+					"additionalProperties": false
 				}
 			}
 		},
@@ -892,6 +907,7 @@
 				"dimensions",
 				"layout",
 				"lightbox",
+				"lightboxComments",
 				"position",
 				"shadow",
 				"spacing",
