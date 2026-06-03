@@ -62,17 +62,11 @@ $waveform-player-height: 100px;
 
 		color: currentColor;
 		pointer-events: none;
-
-		&.wp-block-playlist__time-marker--hover {
-			opacity: 0;
-		}
-
-		&.wp-block-playlist__time-marker--hover.is-visible {
-			opacity: 1;
-		}
 	}
 
+	.wp-block-playlist__time-marker-label,
 	.wp-block-playlist__time-marker .waveform-marker-tooltip {
+		position: absolute;
 		inset-block-start: 0.35rem;
 		inset-inline-start: 0;
 		transform: translateX(var(--wp-playlist-time-marker-label-offset));
