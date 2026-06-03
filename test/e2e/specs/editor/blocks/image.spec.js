@@ -998,6 +998,12 @@ test.describe( 'Image - lightbox', () => {
 			await expect( panel ).toContainText( '23mm' );
 			await expect( panel ).toContainText( 'Test Photographer' );
 
+			// Clicking within the panel must not close the lightbox, so the
+			// metadata stays readable (and selectable).
+			await panel.getByText( 'Test Photographer' ).click();
+			await expect( panel ).toBeVisible();
+			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
+
 			// Toggling again collapses the panel.
 			await toggle.click();
 			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );

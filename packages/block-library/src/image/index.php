@@ -554,7 +554,7 @@ function block_core_image_print_lightbox_overlay() {
 						<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12.5 2C7.007 2 2.549 6.48 2.549 12S7.007 22 12.5 22s9.951-4.48 9.951-10S17.993 2 12.5 2ZM4.539 12c0-4.41 3.572-8 7.961-8s7.961 3.59 7.961 8-3.572 8-7.961 8-7.961-3.59-7.961-8ZM11.505 7v2h1.99V7h-1.99Zm0 4v6h1.99v-6h-1.99Z"/>
 					</svg>
 				</button>
-				<div id="wp-lightbox-exif" class="wp-lightbox-exif" style="color:{$close_button_color}" role="group" aria-label="{$exif_region_label}" data-wp-bind--hidden="!state.isExifVisible" hidden>
+				<div id="wp-lightbox-exif" class="wp-lightbox-exif" style="color:{$close_button_color}" role="group" aria-label="{$exif_region_label}" data-wp-bind--hidden="!state.isExifVisible" data-wp-on--click="actions.handleExifClick" hidden>
 					<ul>
 						<li data-wp-bind--hidden="!state.exifCamera" hidden>
 							<h5>{$camera_label}</h5>

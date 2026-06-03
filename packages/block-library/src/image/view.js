@@ -306,6 +306,11 @@ const { state, actions, callbacks } = store(
 					)
 				);
 			} ),
+			// Keeps clicks (and text selection) within the metadata panel from
+			// bubbling to the overlay, which would otherwise close the lightbox.
+			handleExifClick: withSyncEvent( ( event ) => {
+				event.stopPropagation();
+			} ),
 			showPreviousImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
 				const nextIndex = state.hasPreviousImage
