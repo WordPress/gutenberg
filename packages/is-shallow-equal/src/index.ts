@@ -15,7 +15,10 @@ export type ComparableObject = Record< string, any >;
  *
  * @return Whether the two values are shallow equal.
  */
-export default function isShallowEqual( a: unknown, b: unknown ): boolean {
+const isShallowEqualBase = function isShallowEqual(
+	a: unknown,
+	b: unknown
+): boolean {
 	if ( a && b ) {
 		if ( a.constructor === Object && b.constructor === Object ) {
 			return isShallowEqualObjects( a, b );
@@ -25,8 +28,15 @@ export default function isShallowEqual( a: unknown, b: unknown ): boolean {
 	}
 
 	return a === b;
-}
+};
 
-// `isShallowEqual` is exported also as a named export because esbuild cannot
-// expose the default export from the `window.wp.isShallowEqual` global.
+// `wpScriptDefaultExport` exposes `window.wp.isShallowEqual` as the callable
+// default export. Attach the named helpers to preserve the existing global API.
+const isShallowEqual = Object.assign( isShallowEqualBase, {
+	isShallowEqual: isShallowEqualBase,
+	isShallowEqualObjects,
+	isShallowEqualArrays,
+} );
+
+export default isShallowEqual;
 export { isShallowEqual, isShallowEqualObjects, isShallowEqualArrays };

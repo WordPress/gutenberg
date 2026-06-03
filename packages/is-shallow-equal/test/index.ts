@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import {
+	default as defaultIsShallowEqual,
 	isShallowEqual,
 	isShallowEqualArrays,
 	isShallowEqualObjects,
@@ -153,6 +154,18 @@ describe( 'isShallowEqual', () => {
 		const b = a;
 
 		expect( isShallowEqual( a, b ) ).toBe( true );
+	} );
+
+	it( 'exposes named helpers on the default export', () => {
+		expect( defaultIsShallowEqual.isShallowEqual ).toBe(
+			defaultIsShallowEqual
+		);
+		expect( defaultIsShallowEqual.isShallowEqualArrays ).toBe(
+			isShallowEqualArrays
+		);
+		expect( defaultIsShallowEqual.isShallowEqualObjects ).toBe(
+			isShallowEqualObjects
+		);
 	} );
 } );
 

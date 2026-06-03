@@ -43,6 +43,7 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"wpScriptDefaultExport": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
