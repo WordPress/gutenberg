@@ -65,6 +65,7 @@ $waveform-player-height: 100px;
 
 		&.wp-block-playlist__time-marker--hover {
 			opacity: 0;
+			transition: opacity 0.12s ease;
 		}
 
 		&.wp-block-playlist__time-marker--hover.is-visible {
