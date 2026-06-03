@@ -4,7 +4,7 @@
 
 ### Enhancement
 
-- UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline. The standalone `open-ultrahdr` and `open-ultrahdr-wasm` dependencies have been removed; gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+- UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline, so gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 
 ## 0.32.0 (2026-05-27)
 
