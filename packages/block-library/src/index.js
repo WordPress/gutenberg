@@ -64,6 +64,7 @@ import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as details from './details';
 import * as embed from './embed';
+import * as featureComparisonTable from './feature-comparison-table';
 import * as file from './file';
 import * as form from './form';
 import * as formInput from './form-input';
@@ -190,6 +191,7 @@ const getAllBlocks = () => {
 		cover,
 		details,
 		embed,
+		featureComparisonTable,
 		file,
 		group,
 		html,

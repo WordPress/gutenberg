@@ -1,0 +1,72 @@
+/**
+ * Feature Comparison Table — editor-only styles
+ *
+ * These styles apply only inside the block editor. They provide visual
+ * feedback for selected cells/products and the inspector UI layout.
+ */
+
+.wp-block-feature-comparison-table {
+	// -------------------------------------------------------------------
+	// Selected state — cells and product headers
+	// -------------------------------------------------------------------
+
+	.fct-table {
+		.fct-cell,
+		.fct-product-header {
+			cursor: pointer;
+			transition: outline 0.1s ease;
+		}
+
+		.fct-cell.is-selected,
+		.fct-product-header.is-selected {
+			outline: 2px solid var(--wp-admin-theme-color, #007cba);
+			outline-offset: -2px;
+		}
+
+		.fct-cell:hover:not(.is-selected) {
+			background-color: rgba(0, 124, 186, 0.06);
+		}
+
+		.fct-product-header:hover:not(.is-selected) {
+			background-color: rgba(0, 124, 186, 0.06);
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Inspector Controls — list items (products, features, footnotes)
+	// -------------------------------------------------------------------
+
+	.fct-inspector-list-item {
+		border: 1px solid #e0e0e0;
+		border-radius: 2px;
+		margin-bottom: 6px;
+		padding: 6px 8px;
+		background: #fafafa;
+
+		&__title {
+			display: block;
+			font-size: 12px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			max-width: 130px;
+		}
+	}
+
+	// Product image preview in inspector.
+	.fct-product-image-preview {
+		img {
+			max-height: 80px;
+			width: auto;
+			display: block;
+			margin-bottom: 4px;
+		}
+	}
+
+	// Footnote number shown before the label in the footnotes panel.
+	.fct-footnote-number {
+		font-weight: 600;
+		margin-right: 4px;
+	}
+}
+
