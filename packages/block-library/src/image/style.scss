@@ -302,8 +302,9 @@
 
 	.wp-lightbox-comment-button {
 		position: absolute;
-		top: calc((100vh + var(--wp--lightbox-container-height)) / 2 - 48px);
-		left: calc((100vw + var(--wp--lightbox-container-width)) / 2 - 48px);
+		top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 8px);
+		left: 50%;
+		transform: translateX(-50%);
 		z-index: 3000001;
 		display: flex;
 		align-items: center;
@@ -317,9 +318,6 @@
 		border-radius: 4px;
 		box-shadow: 0 2px 8px rgb(0 0 0 / 16%);
 		cursor: pointer;
-		opacity: 0;
-		visibility: hidden;
-		transition: opacity 0.2s ease;
 
 		&[hidden] {
 			display: none;
@@ -335,16 +333,9 @@
 		}
 	}
 
-	.lightbox-image-container:hover + .wp-lightbox-comment-button,
-	.wp-lightbox-comment-button:hover,
-	.wp-lightbox-comment-button:focus {
-		opacity: 1;
-		visibility: visible;
-	}
-
 	.wp-lightbox-comments {
 		position: absolute;
-		top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 16px);
+		top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 64px);
 		left: 50%;
 		transform: translateX(-50%);
 		z-index: 3000001;
