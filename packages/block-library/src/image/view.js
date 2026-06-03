@@ -717,7 +717,11 @@ const { state, actions, callbacks } = store(
 					const responseBody = await response.json();
 
 					if ( ! response.ok ) {
-						throw new Error( responseBody.message );
+						// Surface the server's validation message when present,
+						// e.g. "Comment content cannot be empty".
+						state.commentForm.message =
+							responseBody.message || getConfig().commentErrorText;
+						return;
 					}
 
 					form.reset();
@@ -728,9 +732,10 @@ const { state, actions, callbacks } = store(
 					// approved comments, so a comment held for moderation would
 					// otherwise disappear from view for the author who posted it.
 					callbacks.appendComment( responseBody );
-				} catch ( error ) {
-					state.commentForm.message =
-						error.message || getConfig().commentErrorText;
+				} catch {
+					// Network failures or non-JSON responses fall back to the
+					// localized error text rather than a raw browser message.
+					state.commentForm.message = getConfig().commentErrorText;
 				} finally {
 					state.commentForm.isSubmitting = false;
 				}
