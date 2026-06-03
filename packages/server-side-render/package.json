@@ -34,6 +34,7 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
@@ -42,6 +43,7 @@
 	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
+	"types": "build-types/index.d.ts",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blocks": "file:../blocks",

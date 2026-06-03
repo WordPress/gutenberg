@@ -20,13 +20,14 @@ import {
  * Internal dependencies
  */
 import { computeGridModelChange } from '../utils/grid-model-change';
+import { normalizeGridSettings } from '../utils/normalize-grid-settings';
+import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
 import type {
-	ResolveWidgetModule,
 	WidgetGridModel,
 	WidgetGridSettings,
 	DashboardWidget,
-	WidgetType,
 } from '../types';
+import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits
@@ -42,7 +43,7 @@ const DEFAULT_GRID: WidgetGridSettings = {
 	model: 'grid',
 	columns: 12,
 	minColumnWidth: 140,
-	rowHeight: 140,
+	rowHeight: DEFAULT_ROW_HEIGHT,
 };
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
@@ -50,9 +51,10 @@ type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
 function resolveGridSettings(
 	settings: WidgetGridSettings
 ): GridSettingsWithColumns {
+	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
 	return {
-		...settings,
-		columns: settings.columns ?? DEFAULT_GRID.columns!,
+		...normalized,
+		columns: normalized.columns ?? DEFAULT_GRID.columns!,
 	};
 }
 
@@ -135,10 +137,16 @@ interface InternalDashboardContextValue {
 	commitGridModelChange: ( targetModel: WidgetGridModel ) => void;
 
 	/**
-	 * Reverts both staging slices. By default also exits edit mode; pass
-	 * `{ exitEditMode: false }` when dismissing the layout settings drawer.
+	 * Reverts staging slices. By default reverts both layout and grid
+	 * settings and exits edit mode. Pass `{ exitEditMode: false }` when
+	 * dismissing the layout settings drawer. Pass `{ revertLayout: false }`
+	 * to revert only grid settings (preserves in-progress widget layout
+	 * edits while customize mode is active).
 	 */
-	cancel: ( options?: { exitEditMode?: boolean } ) => void;
+	cancel: ( options?: {
+		exitEditMode?: boolean;
+		revertLayout?: boolean;
+	} ) => void;
 
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
@@ -227,18 +235,10 @@ interface ProviderProps {
  * `layout` and `gridSettings`; `commit` publishes whichever slice
  * differs from its committed prop, `cancel` reverts both.
  *
- * Two invariants the provider does not enforce on its own:
- *
- * - The shared commit assumes the two slices are not edited
- *   simultaneously. The bundled `Actions` keeps the layout-edit and
- *   settings-drawer flows mutually exclusive; consumers that compose
- *   a different surface must uphold the same invariant or accept the
- *   cross-publish.
- * - Staging re-syncs from the committed props on prop change.
- *   In-flight edits are dropped silently when an external update
- *   (cross-tab commit, reset, websocket push) lands. Consumers that
- *   cannot tolerate this loss should mediate the prop updates before
- *   forwarding them here.
+ * Staging re-syncs from the committed props on prop change. In-flight
+ * edits are dropped silently when an external update (cross-tab commit,
+ * reset, websocket push) lands. Consumers that cannot tolerate this
+ * loss should mediate the prop updates before forwarding them here.
  *
  * @param {ProviderProps} props Provider props
  * @return {React.ReactNode} The provider component.
@@ -267,11 +267,15 @@ export function WidgetDashboardProvider( {
 	}, [ committedLayout ] );
 
 	const [ stagingGridSettings, setStagingGridSettings ] =
-		useState< WidgetGridSettings >( committedGridSettings );
+		useState< WidgetGridSettings >( () =>
+			normalizeGridSettings( committedGridSettings, DEFAULT_ROW_HEIGHT )
+		);
 
 	// Same external-resync semantics as `stagingLayout`.
 	useEffect( () => {
-		setStagingGridSettings( committedGridSettings );
+		setStagingGridSettings(
+			normalizeGridSettings( committedGridSettings, DEFAULT_ROW_HEIGHT )
+		);
 	}, [ committedGridSettings ] );
 
 	const hasLayoutChanges = useMemo(
@@ -297,7 +301,12 @@ export function WidgetDashboardProvider( {
 			}
 
 			if ( hasGridSettingsChanges ) {
-				onGridSettingsChange?.( stagingGridSettings );
+				onGridSettingsChange?.(
+					normalizeGridSettings(
+						stagingGridSettings,
+						DEFAULT_ROW_HEIGHT
+					)
+				);
 			}
 
 			if ( options?.exitEditMode !== false ) {
@@ -316,8 +325,10 @@ export function WidgetDashboardProvider( {
 	);
 
 	const cancel = useCallback(
-		( options?: { exitEditMode?: boolean } ) => {
-			setStagingLayout( committedLayout );
+		( options?: { exitEditMode?: boolean; revertLayout?: boolean } ) => {
+			if ( options?.revertLayout !== false ) {
+				setStagingLayout( committedLayout );
+			}
 			setStagingGridSettings( committedGridSettings );
 			if ( options?.exitEditMode !== false ) {
 				onEditChange?.( false );
@@ -341,7 +352,9 @@ export function WidgetDashboardProvider( {
 			setStagingLayout( next.layout );
 			setStagingGridSettings( next.gridSettings );
 			onLayoutChange( canonicalize( next.layout ) );
-			onGridSettingsChange?.( next.gridSettings );
+			onGridSettingsChange?.(
+				normalizeGridSettings( next.gridSettings, DEFAULT_ROW_HEIGHT )
+			);
 			onEditChange?.( false );
 		},
 		[
