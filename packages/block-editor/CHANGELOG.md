@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
 ### Internal
 
 -   `ListView`: Compute the block visibility label once in `ListViewBlock` and pass it down to `ListViewBlockSelectButton`, removing a duplicated `useSelect`/`getBlockVisibilityLabel` call and clarifying that the label is exposed to assistive technology through the row's `aria-describedby` ([#78640](https://github.com/WordPress/gutenberg/pull/78640)).

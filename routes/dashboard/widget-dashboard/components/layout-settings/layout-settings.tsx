@@ -13,6 +13,11 @@ import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpres
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { migrateLayout } from '../../utils/migrate-layout';
+import {
+	presetToRowHeight,
+	rowHeightToPreset,
+	type RowHeightPreset,
+} from '../../utils/row-height-presets';
 import type {
 	WidgetGridLayoutSettings,
 	WidgetGridModel,
@@ -22,8 +27,6 @@ import { LayoutModelEditField } from './layout-model-edit-field';
 
 const DEFAULT_FIXED_COLUMNS = 6;
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
-const DEFAULT_ROW_HEIGHT = 200;
-const ROW_HEIGHT_AUTO = 'auto' as const;
 
 function getModel( item: WidgetGridSettings ): WidgetGridModel {
 	return item.model ?? 'grid';
@@ -31,19 +34,6 @@ function getModel( item: WidgetGridSettings ): WidgetGridModel {
 
 function isMasonry( item: WidgetGridSettings ): boolean {
 	return getModel( item ) === 'masonry';
-}
-
-function getRowHeight(
-	item: WidgetGridSettings
-): WidgetGridLayoutSettings[ 'rowHeight' ] {
-	if ( isMasonry( item ) ) {
-		return undefined;
-	}
-	return ( item as WidgetGridLayoutSettings ).rowHeight;
-}
-
-function isAutoRowHeight( item: WidgetGridSettings ): boolean {
-	return getRowHeight( item ) === ROW_HEIGHT_AUTO;
 }
 
 function StepperIntegerEdit( {
@@ -144,29 +134,27 @@ const fields: Field< WidgetGridSettings >[] = [
 		isVisible: ( item ) => item.minColumnWidth !== 0,
 	},
 	{
-		id: 'autoRowHeight',
-		type: 'boolean',
-		Edit: 'toggle',
-		label: __( 'Auto-fit row height to content' ),
-		getValue: ( { item } ) => isAutoRowHeight( item ),
+		id: 'rowHeight',
+		type: 'text',
+		Edit: 'toggleGroup',
+		label: __( 'Row height' ),
+		description: __( 'Height of each grid row.' ),
+		elements: [
+			{ value: 'small', label: __( 'Small' ) },
+			{ value: 'medium', label: __( 'Medium' ) },
+			{ value: 'large', label: __( 'Large' ) },
+		],
+		getValue: ( { item } ) => {
+			const rowHeight = ( item as WidgetGridLayoutSettings ).rowHeight;
+			if ( typeof rowHeight !== 'number' ) {
+				return 'medium';
+			}
+			return rowHeightToPreset( rowHeight );
+		},
 		setValue: ( { value } ) => ( {
-			rowHeight: value ? ROW_HEIGHT_AUTO : DEFAULT_ROW_HEIGHT,
+			rowHeight: presetToRowHeight( value as RowHeightPreset ),
 		} ),
 		isVisible: ( item ) => ! isMasonry( item ),
-	},
-	{
-		id: 'rowHeight',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Row height (px)' ),
-		description: __( 'Height of each row in the standard grid.' ),
-		isValid: { min: 100 },
-		getValue: ( { item } ) => {
-			const rh = getRowHeight( item );
-			return typeof rh === 'number' ? rh : undefined;
-		},
-		isVisible: ( item ) => ! isMasonry( item ),
-		isDisabled: ( { item } ) => isAutoRowHeight( item ),
 	},
 ];
 
@@ -177,7 +165,6 @@ const form: Form = {
 		'columns',
 		'adaptiveColumns',
 		'minColumnWidth',
-		'autoRowHeight',
 		'rowHeight',
 	],
 };

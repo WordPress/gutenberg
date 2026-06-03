@@ -24,7 +24,7 @@ import { Card, Icon, Stack, Notice, Text, VisuallyHidden } from '@wordpress/ui';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
-import { WidgetRender } from '../widget-render';
+import { DashboardWidgetRender } from '../widget-render';
 import styles from './dashboard-widget-chrome.module.css';
 import type { DashboardWidget } from '../../types';
 import type { WidgetType } from '../../../widget-primitives';
@@ -211,7 +211,10 @@ export const DashboardWidgetChrome = forwardRef<
 	const body = (
 		<WidgetErrorBoundary>
 			<Suspense fallback={ <LoadingOverlay /> }>
-				<WidgetRender widget={ widget } widgetType={ widgetType } />
+				<DashboardWidgetRender
+					widget={ widget }
+					widgetType={ widgetType }
+				/>
 			</Suspense>
 		</WidgetErrorBoundary>
 	);

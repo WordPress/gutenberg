@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
+
 ### Enhancements
 
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
