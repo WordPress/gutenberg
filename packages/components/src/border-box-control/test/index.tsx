@@ -255,7 +255,7 @@ describe( 'BorderBoxControl', () => {
 
 			// disableCustomColors = false → custom picker SHOULD appear
 			render(
-				<BorderBoxControl { ...props } disableCustomColors={ false } />
+				<TestBorderBoxControl { ...props } disableCustomColors={ false } />
 			);
 
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
