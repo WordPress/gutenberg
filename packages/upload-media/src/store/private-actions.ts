@@ -14,8 +14,14 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 /**
  * Internal dependencies
  */
-import { cloneFile, convertBlobToFile, renameFile } from '../utils';
-import { canvasConvertToJpeg, canvasResizeImage } from '../canvas-utils';
+import {
+	cloneFile,
+	convertBlobToFile,
+	getFileBasename,
+	getFileExtension,
+	renameFile,
+} from '../utils';
+import { canvasConvertToJpeg } from '../canvas-utils';
 import { isHighBitDepthAvif } from '../avif-utils';
 import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
@@ -672,12 +678,40 @@ export function prepareItem( id: QueueItemId ) {
 		const operations: Operation[] = [];
 		const settings = select.getSettings();
 		let heicJpeg: File | null = null;
+		let avifJpeg: File | null = null;
 
 		const isImage = file.type.startsWith( 'image/' );
 		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
 			file.type
 		);
 		const isHeic = HEIC_MIME_TYPES.includes( file.type );
+
+		// High-bit-depth (10/12-bit) AVIF cannot be decoded by the bundled
+		// wasm-vips (its libaom is built without high-bit-depth support), so
+		// sub-size generation would otherwise fail and abort the whole upload.
+		// The browser decodes these natively, so extract a JPEG copy up front
+		// and use it as the source for the standard thumbnail pipeline. The
+		// original AVIF is still uploaded untouched, preserving its full bit
+		// depth; only the generated sub-sizes are flattened to 8-bit JPEG.
+		// This mirrors the HEIC flow (decode once via canvas, then reuse the
+		// normal pipeline) rather than special-casing each sub-size resize.
+		// See https://github.com/WordPress/gutenberg/issues/78889
+		if (
+			isImage &&
+			isVipsSupported &&
+			( await isHighBitDepthAvif( file ) )
+		) {
+			try {
+				avifJpeg = await canvasConvertToJpeg(
+					file,
+					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+				);
+			} catch {
+				// The browser couldn't decode it either. Fall through and let
+				// vips attempt processing; it surfaces the standard
+				// transcoding error if it cannot.
+			}
+		}
 
 		// For images that can be processed by vips, upload the original and
 		// let generateThumbnails() handle threshold scaling as a sideload.
@@ -772,6 +806,11 @@ export function prepareItem( id: QueueItemId ) {
 			};
 		} else {
 			updates = {
+				// For high-bit-depth AVIF, generate sub-sizes from the
+				// browser-decoded JPEG copy instead of the original (which
+				// vips cannot decode). The original AVIF is still uploaded as
+				// item.file, so the attachment keeps its full bit depth.
+				...( avifJpeg ? { sourceFile: avifJpeg } : {} ),
 				additionalData: {
 					...item.additionalData,
 					generate_sub_sizes: false,
@@ -891,30 +930,15 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
 		try {
-			// High-bit-depth (10/12-bit) AVIF cannot be decoded by the bundled
-			// wasm-vips (its libaom is built without high-bit-depth support).
-			// The browser decodes these natively, so fall back to a canvas
-			// resize for them. The sub-size is written as 8-bit JPEG; the
-			// original AVIF upload is untouched.
-			// See https://github.com/WordPress/gutenberg/issues/78889
-			const settings = select.getSettings();
-			const file = ( await isHighBitDepthAvif( item.file ) )
-				? await canvasResizeImage(
-						item.file,
-						args.resize,
-						settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
-						addSuffix,
-						scaledSuffix
-				  )
-				: await vipsResizeImage(
-						item.id,
-						item.file,
-						args.resize,
-						false, // smartCrop
-						addSuffix,
-						item.abortController?.signal,
-						scaledSuffix
-				  );
+			const file = await vipsResizeImage(
+				item.id,
+				item.file,
+				args.resize,
+				false, // smartCrop
+				addSuffix,
+				item.abortController?.signal,
+				scaledSuffix
+			);
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -1181,8 +1205,24 @@ export function generateThumbnails( id: QueueItemId ) {
 				attachment.missing_image_sizes as string[];
 
 			const thumbnailSource = item.sourceFile;
-			const file = attachment.filename
-				? renameFile( thumbnailSource, attachment.filename )
+			// Sub-sizes normally reuse the server attachment's filename
+			// verbatim so their basename (and any sanitization or
+			// de-duplication the server applied) matches the original. When
+			// the thumbnail source is a different format than the uploaded
+			// original, swap in the source's extension instead: high-bit-depth
+			// AVIF keeps its original as AVIF but generates sub-sizes from a
+			// browser-decoded JPEG copy, so those must be named `.jpg`, not
+			// `.avif`. Same-format uploads (the common case) are unaffected.
+			const sourceExtension = getFileExtension( thumbnailSource.name );
+			const formatsDiffer = thumbnailSource.type !== item.file.type;
+			const thumbnailFilename =
+				attachment.filename && formatsDiffer && sourceExtension
+					? `${ getFileBasename(
+							attachment.filename
+					  ) }.${ sourceExtension }`
+					: attachment.filename;
+			const file = thumbnailFilename
+				? renameFile( thumbnailSource, thumbnailFilename )
 				: thumbnailSource;
 			const batchId = uuidv4();
 
@@ -1280,9 +1320,11 @@ export function generateThumbnails( id: QueueItemId ) {
 					bitmap.close();
 
 					if ( needsScaling ) {
-						// Rename sourceFile to match the server attachment filename.
-						const sourceForScaled = attachment.filename
-							? renameFile( thumbnailSource, attachment.filename )
+						// Rename sourceFile to match the server attachment
+						// filename (basename), keeping the source's extension
+						// as computed above.
+						const sourceForScaled = thumbnailFilename
+							? renameFile( thumbnailSource, thumbnailFilename )
 							: thumbnailSource;
 
 						// Add scaling to queue.

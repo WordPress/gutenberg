@@ -1361,6 +1361,68 @@ describe( 'actions', () => {
 				expect( scaledItems[ 0 ].file.name ).toBe( filename );
 			}
 		);
+		it( 'names sub-sizes with the source extension when the original is a different format (high-bit-depth AVIF)', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					thumbnail: { width: 150, height: 150 },
+					medium: { width: 300, height: 300 },
+				},
+			} );
+
+			// High-bit-depth AVIF: the original AVIF is uploaded as
+			// item.file, but its sub-sizes are generated from a
+			// browser-decoded JPEG copy held in item.sourceFile.
+			const avifFile = new File( [ 'avif' ], 'photo.avif', {
+				type: 'image/avif',
+			} );
+			const jpegSource = new File( [ 'jpeg' ], 'photo.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: avifFile,
+				operations: [ OperationType.ThumbnailGeneration ],
+			} );
+			const added = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			await unlock( registry.dispatch( uploadStore ) ).finishOperation(
+				added.id,
+				{
+					sourceFile: jpegSource,
+					attachment: {
+						id: 123,
+						filename: 'photo.avif',
+						missing_image_sizes: [ 'thumbnail', 'medium' ],
+					},
+				}
+			);
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const thumbnailItems = unlock( registry.select( uploadStore ) )
+				.getAllItems()
+				.filter(
+					( i ) =>
+						i.additionalData?.image_size === 'thumbnail' ||
+						i.additionalData?.image_size === 'medium'
+				);
+			expect( thumbnailItems ).toHaveLength( 2 );
+			for ( const sideload of thumbnailItems ) {
+				// Basename from the AVIF attachment, extension from the JPEG
+				// source, so the JPEG sub-sizes are named `.jpg`.
+				expect( sideload.file.name ).toBe( 'photo.jpg' );
+				expect( sideload.file.type ).toBe( 'image/jpeg' );
+			}
+		} );
 	} );
 
 	describe( 'prepareItem big image threshold', () => {
