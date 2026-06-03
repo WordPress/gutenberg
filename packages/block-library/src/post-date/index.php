@@ -47,7 +47,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	}
 
 	if ( empty( $attributes['datetime'] ) ) {
-		// If the `datetime` attribute is set but empty, it could be because Block Bindings
+		// If the `datetime` attribute is set but empty, it could because Block Bindings
 		// set it that way. This can happen e.g. if the block is bound to the
 		// post's last modified date, and the latter lies before the publish date.
 		// (See https://github.com/WordPress/gutenberg/pull/46839 where this logic was originally
@@ -84,7 +84,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	$time_tag = sprintf( '<time datetime="%1$s">%2$s</time>', $unformatted_date, $formatted_date );
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $block->context['postId'] ) ) {
-		$time_tag = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $block->context['postId'] ), $time_tag );
+		$time_tag = sprintf( '<a href="%1$s">%2$s</a>', esc_url( get_the_permalink( $block->context['postId'] ) ), $time_tag );
 	}
 
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $time_tag );
@@ -95,7 +95,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
  *
  * @since 5.8.0
  */
-function register_block_core_post_date() {
+function register_block_core_postDate() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-date',
 		array(
