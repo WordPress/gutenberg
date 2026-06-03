@@ -307,6 +307,12 @@
 		z-index: 2000001;
 	}
 
+	// When navigation controls are present, the image should not appear
+	// clickable since clicking it no longer closes the lightbox.
+	&.has-navigation .lightbox-image-container {
+		cursor: default;
+	}
+
 	.wp-block-image {
 		position: relative;
 		transform-origin: 0 0;
