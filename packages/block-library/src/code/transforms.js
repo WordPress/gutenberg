@@ -67,10 +67,23 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) => {
 				const { content } = attributes;
-				return createBlock( 'core/paragraph', {
-					...getTransformedAttributes( attributes, 'core/paragraph' ),
+				const transformedAttributes = getTransformedAttributes(
+					attributes,
+					'core/paragraph',
+					( { content: contentBinding } ) => ( {
+						content: contentBinding,
+					} )
+				);
+				const paragraphBlock = createBlock( 'core/paragraph', {
+					...attributes,
+					...transformedAttributes,
 					content,
 				} );
+				if ( transformedAttributes?.metadata ) {
+					paragraphBlock.attributes.metadata =
+						transformedAttributes.metadata;
+				}
+				return paragraphBlock;
 			},
 		},
 	],
