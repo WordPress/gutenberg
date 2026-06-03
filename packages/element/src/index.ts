@@ -5,4 +5,9 @@ export * from './utils';
 export { default as Platform } from './platform';
 export { default as renderToString } from './serialize';
 export { default as RawHTML } from './raw-html';
-export { default as findDOMNode } from './find-dom-node';
+export {
+	findDOMNode,
+	render,
+	hydrate,
+	unmountComponentAtNode,
+} from './react-polyfill';

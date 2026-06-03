@@ -14,10 +14,8 @@
 	}
 }
 
-.content-types-page {
-	padding: var(--wpds-dimension-padding-lg);
-}
-
 .content-types-tabs-wrapper {
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	padding-block-start: var(--wpds-dimension-padding-lg);
 	border-bottom: 1px solid $gray-100;
 }

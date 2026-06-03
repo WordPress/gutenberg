@@ -51,6 +51,7 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
