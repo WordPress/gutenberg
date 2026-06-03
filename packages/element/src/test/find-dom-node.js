@@ -1,6 +1,6 @@
 import { act, render } from '@testing-library/react';
 import { Component } from '..';
-import findDOMNodePolyfill from '../find-dom-node';
+import { findDOMNode as findDOMNodePolyfill } from '../react-polyfill';
 
 describe( 'findDOMNode', () => {
 	it( 'should return null when passed null', () => {
