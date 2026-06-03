@@ -61,6 +61,8 @@ function Layout() {
 	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 	const showDesktopSiteHub = ! hasAdminBarInEditor;
 	const showMobileSiteHub = ! hasAdminBarInEditor || routeKey !== 'home';
+	const hasMobileAreas =
+		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
@@ -113,7 +115,7 @@ function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					{ ( ! isMobileViewport || ! areas.mobile ) && (
+					{ ( ! isMobileViewport || ! hasMobileAreas ) && (
 						<NavigableRegion
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
@@ -167,7 +169,7 @@ function Layout() {
 
 					<SnackbarNotices className="edit-site-layout__snackbar" />
 
-					{ isMobileViewport && areas.mobile && (
+					{ isMobileViewport && hasMobileAreas && (
 						<div className="edit-site-layout__mobile">
 							<SidebarNavigationProvider>
 								{ canvas !== 'edit' ? (
@@ -181,21 +183,23 @@ function Layout() {
 											/>
 										) }
 										<SidebarContent routeKey={ routeKey }>
-											{ areas.content &&
-											areas.mobile?.type !==
-												areas.sidebar?.type ? (
+											{ areas.mobileContent ? (
 												<ThemeProvider
-													color={ { bg: '#ffffff' } }
+													color={ {
+														bg: '#ffffff',
+													} }
 												>
 													<div className="edit-site-layout__mobile-content">
 														<ErrorBoundary>
-															{ areas.mobile }
+															{
+																areas.mobileContent
+															}
 														</ErrorBoundary>
 													</div>
 												</ThemeProvider>
 											) : (
 												<ErrorBoundary>
-													{ areas.mobile }
+													{ areas.mobileSidebar }
 												</ErrorBoundary>
 											) }
 										</SidebarContent>
@@ -204,7 +208,7 @@ function Layout() {
 									</>
 								) : (
 									<ErrorBoundary>
-										{ areas.mobile }
+										{ areas.preview }
 									</ErrorBoundary>
 								) }
 							</SidebarNavigationProvider>

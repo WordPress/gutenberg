@@ -30,16 +30,6 @@ export const pageItemRoute = {
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
-		mobile( { siteData } ) {
-			if ( ! isThemeDataLoaded( siteData ) ) {
-				return <></>;
-			}
-			return siteData.currentTheme.is_block_theme ? (
-				<Editor />
-			) : (
-				<SidebarNavigationScreenUnsupported />
-			);
-		},
 		preview( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return null;

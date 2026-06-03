@@ -17,7 +17,6 @@ export const patternItemRoute = {
 					: undefined;
 			return <SidebarNavigationScreenPatterns backPath={ backPath } />;
 		},
-		mobile: <Editor />,
 		preview: <Editor />,
 	},
 };

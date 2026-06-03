@@ -9,7 +9,6 @@ export const templatePartItemRoute = {
 	path: '/wp_template_part/*postId',
 	areas: {
 		sidebar: <SidebarNavigationScreenPatterns backPath="/" />,
-		mobile: <Editor />,
 		preview: <Editor />,
 	},
 };
