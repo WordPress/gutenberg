@@ -16,6 +16,13 @@ const VENDOR_SCRIPTS = [
 		global: 'React',
 		handle: 'react',
 		dependencies: [ 'wp-polyfill' ],
+		contents: [
+			'module.exports = {',
+			'  ...require("react"),',
+			// Polyfill React 18 internals for older versions of `framer-motion`.
+			'  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: { ReactCurrentOwner: { current: null } },',
+			'};',
+		].join( '\n' ),
 	},
 	{
 		name: 'react-dom',
@@ -94,7 +101,7 @@ async function generateAssetFile( config ) {
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { name, global, handle, contents } = config;
+	const { name, global, handle, contents, dependencies } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -126,7 +133,9 @@ async function bundleVendorScript( config ) {
 		globalName: global,
 		target: 'esnext',
 		platform: 'browser',
-		plugins: [ reactExternalPlugin ],
+		plugins: dependencies?.includes( 'react' )
+			? [ reactExternalPlugin ]
+			: [],
 	};
 
 	if ( contents ) {
