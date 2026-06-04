@@ -14,21 +14,8 @@ jest.mock( '../../sync', () => ( {
 	getSyncManager: jest.fn(),
 } ) );
 
-function createDeferred() {
-	let resolve;
-	let reject;
-	const promise = new Promise( ( _resolve, _reject ) => {
-		resolve = _resolve;
-		reject = _reject;
-	} );
-
-	return { promise, resolve, reject };
-}
-
 async function flushPromises() {
-	for ( let index = 0; index < 5; index++ ) {
-		await Promise.resolve();
-	}
+	await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 }
 
 describe( 'saveCRDTDoc', () => {
@@ -43,7 +30,7 @@ describe( 'saveCRDTDoc', () => {
 	} );
 
 	it( 'saves the serialized CRDT document through the sync endpoint', async () => {
-		const fetch = createDeferred();
+		const fetch = Promise.withResolvers();
 		syncManager.createPersistedCRDTDoc.mockResolvedValue( 'doc' );
 		apiFetch.mockImplementation( () => fetch.promise );
 
@@ -73,7 +60,7 @@ describe( 'saveCRDTDoc', () => {
 	} );
 
 	it( 'serializes save requests for the same room', async () => {
-		const firstFetch = createDeferred();
+		const firstFetch = Promise.withResolvers();
 		syncManager.createPersistedCRDTDoc
 			.mockResolvedValueOnce( 'doc-1' )
 			.mockResolvedValueOnce( 'doc-2' );
@@ -116,7 +103,7 @@ describe( 'saveCRDTDoc', () => {
 	} );
 
 	it( 'does not serialize save requests for different rooms', async () => {
-		const firstFetch = createDeferred();
+		const firstFetch = Promise.withResolvers();
 		syncManager.createPersistedCRDTDoc.mockImplementation(
 			( objectType, objectId ) => Promise.resolve( `doc-${ objectId }` )
 		);
@@ -154,7 +141,7 @@ describe( 'saveCRDTDoc', () => {
 	} );
 
 	it( 'continues a same-room queue after a failed save', async () => {
-		const firstFetch = createDeferred();
+		const firstFetch = Promise.withResolvers();
 		syncManager.createPersistedCRDTDoc
 			.mockResolvedValueOnce( 'doc-1' )
 			.mockResolvedValueOnce( 'doc-2' );
