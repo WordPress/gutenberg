@@ -112,7 +112,6 @@ function VisualEditor( {
 		isPreview,
 		styles,
 		hasCanvasWidth,
-		canvasMinHeight,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
