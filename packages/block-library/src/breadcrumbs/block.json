@@ -26,6 +26,10 @@
 		"showOnHomePage": {
 			"type": "boolean",
 			"default": false
+		},
+		"showTrailingSeparator": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType", "templateSlug" ],
