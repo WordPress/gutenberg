@@ -54,6 +54,19 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `showArtists` → attribute `showArtists`
 - `currentTrack` → attribute `currentTrack`
 
+## Block Styles
+
+_Defined via the [`styles`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) property in block.json._
+
+| Style Name | Label | Default |
+|------------|-------|---------|
+| `bars` | Bars | Yes |
+| `mirror` | Mirror | No |
+| `line` | Line | No |
+| `blocks` | Blocks | No |
+| `dots` | Dots | No |
+| `seekbar` | Seekbar | No |
+
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
