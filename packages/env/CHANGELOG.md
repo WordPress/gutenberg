@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Use the versioned WordPress.org zip file for the default core source to speed up fresh environment creation while preserving version-based cache invalidation. ([#78942](https://github.com/WordPress/gutenberg/pull/78942))
 -   Use partial clones (`--filter=blob:none`) when downloading git sources and the PHPUnit test suite to reduce download size. ([#78918](https://github.com/WordPress/gutenberg/pull/78918))
 
 ### Bug Fixes
