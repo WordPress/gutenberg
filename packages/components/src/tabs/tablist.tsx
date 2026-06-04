@@ -133,7 +133,7 @@ export const TabList = forwardRef<
 		<StyledTabList
 			ref={ refs }
 			store={ store }
-			render={ ( props: React.HTMLAttributes< HTMLDivElement > ) => (
+			render={ ( props ) => (
 				<div
 					{ ...props }
 					// Fallback to -1 to prevent browsers from making the tablist
