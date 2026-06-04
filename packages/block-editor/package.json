@@ -61,6 +61,7 @@
 	],
 	"dependencies": {
 		"@react-spring/web": "^9.4.5",
+		"@types/react": "^19.2.13",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",

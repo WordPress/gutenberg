@@ -44,6 +44,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@base-ui/react": "^1.4.1",
+		"@types/react": "^19.2.13",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",

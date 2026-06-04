@@ -134,12 +134,7 @@ Creates a portal into which a component can be rendered.
 
 _Related_
 
--   <https://github.com/facebook/react/issues/10309#issuecomment-318433235>
-
-_Parameters_
-
--   _child_ `React.ReactElement`: Any renderable child, such as an element, string, or fragment.
--   _container_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/createPortal>
 
 ### createRef
 
@@ -179,9 +174,9 @@ _Parameters_
 
 Forces React to flush any updates inside the provided callback synchronously.
 
-_Parameters_
+_Related_
 
--   _callback_ `Function`: Callback to run synchronously.
+-   <https://react.dev/reference/react-dom/flushSync>
 
 ### forwardRef
 
@@ -198,6 +193,22 @@ _Returns_
 ### Fragment
 
 A component which renders its children without any wrapping element.
+
+### hydrate
+
+> **Deprecated** since WordPress 6.2.0. Use `hydrateRoot` instead.
+
+Hydrates a given element into the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/hydrate>
+
+_Parameters_
+
+-   _element_ `React.ReactNode`: Element to hydrate.
+-   _container_ `Element`: DOM node to hydrate.
+-   _callback_ `() => void`: Optional callback called after hydration.
 
 ### hydrateRoot
 
@@ -376,6 +387,22 @@ _Returns_
 
 -   Dangerously-rendering component.
 
+### render
+
+> **Deprecated** since WordPress 6.2.0. Use `createRoot` instead.
+
+Renders a given element into the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/render>
+
+_Parameters_
+
+-   _element_ `React.ReactNode`: Element to render.
+-   _container_ `Element`: DOM node into which to render.
+-   _callback_ `() => void`: Optional callback called after render.
+
 ### renderToString
 
 Serializes a React element to string.
@@ -414,6 +441,24 @@ _Parameters_
 _Returns_
 
 -   `ReactNode`: The updated children object.
+
+### unmountComponentAtNode
+
+> **Deprecated** since WordPress 6.2.0. Use `root.unmount()` instead.
+
+Removes any mounted element from the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/unmountComponentAtNode>
+
+_Parameters_
+
+-   _container_ `Element`: DOM node in which to unmount.
+
+_Returns_
+
+-   `boolean`: Whether the node was unmounted.
 
 ### use
 
