@@ -91,6 +91,8 @@ const meta: Meta< typeof Button > = {
 };
 ```
 
+Add search synonyms in `src/stories/component-synonyms.json` (keyed by the story file's `title`) so components are discoverable in Storybook sidebar search (e.g. searching `form` finds `Input`). The JSON file is the source of truth; `component-synonyms.ts` re-exports it for TypeScript consumers.
+
 ## `render` Prop and Ref Forwarding
 
 All `@wordpress/ui` components support a `render` prop (via the `ComponentProps` utility type) that lets consumers swap the underlying HTML element. This section codifies the two canonical implementation patterns, the rules for handling `render`, and common anti-patterns to avoid.

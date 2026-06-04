@@ -1,0 +1,128 @@
+{
+	"Design System/Components/AlertDialog": [
+		"confirm",
+		"dialog",
+		"modal",
+		"popup"
+	],
+	"Design System/Components/Badge": [ "chip", "label", "status", "tag" ],
+	"Design System/Components/Badge/Choosing intent": [
+		"chip",
+		"intent",
+		"label",
+		"status",
+		"tag"
+	],
+	"Design System/Components/Button": [ "action", "cta", "submit" ],
+	"Design System/Components/Card": [ "container", "panel", "surface" ],
+	"Design System/Components/Collapsible": [
+		"accordion",
+		"disclosure",
+		"expand"
+	],
+	"Design System/Components/CollapsibleCard": [
+		"accordion",
+		"card",
+		"expand"
+	],
+	"Design System/Components/Dialog": [ "modal", "overlay", "popup" ],
+	"Design System/Components/Drawer": [ "modal", "overlay", "panel", "sheet" ],
+	"Design System/Components/EmptyState": [
+		"blank",
+		"no results",
+		"placeholder"
+	],
+	"Design System/Components/Form/InputControl": [
+		"field",
+		"form",
+		"input",
+		"label",
+		"text"
+	],
+	"Design System/Components/Form/Primitives/Autocomplete": [
+		"combobox",
+		"field",
+		"form",
+		"search",
+		"typeahead"
+	],
+	"Design System/Components/Form/Primitives/Combobox": [
+		"autocomplete",
+		"dropdown",
+		"field",
+		"form",
+		"search",
+		"select"
+	],
+	"Design System/Components/Form/Primitives/Field": [
+		"field",
+		"form",
+		"label"
+	],
+	"Design System/Components/Form/Primitives/Fieldset": [
+		"field",
+		"form",
+		"group"
+	],
+	"Design System/Components/Form/Primitives/Input": [
+		"field",
+		"form",
+		"input",
+		"text",
+		"textbox",
+		"text field"
+	],
+	"Design System/Components/Form/Primitives/InputLayout": [
+		"affix",
+		"field",
+		"form",
+		"prefix",
+		"suffix"
+	],
+	"Design System/Components/Form/Primitives/Select": [
+		"dropdown",
+		"field",
+		"form",
+		"picker",
+		"select"
+	],
+	"Design System/Components/Form/Primitives/Textarea": [
+		"field",
+		"form",
+		"multiline",
+		"text",
+		"textarea"
+	],
+	"Design System/Components/Form/SelectControl": [
+		"dropdown",
+		"field",
+		"form",
+		"label",
+		"select"
+	],
+	"Design System/Components/Icon": [ "glyph", "symbol", "svg" ],
+	"Design System/Components/IconButton": [ "action", "button", "icon" ],
+	"Design System/Components/Link": [ "anchor", "hyperlink", "navigation" ],
+	"Design System/Components/Notice": [
+		"alert",
+		"banner",
+		"message",
+		"notification"
+	],
+	"Design System/Components/Popover": [
+		"dropdown",
+		"floating",
+		"overlay",
+		"popup"
+	],
+	"Design System/Components/Stack": [ "flex", "layout", "spacing" ],
+	"Design System/Components/Tabs": [ "navigation", "switcher", "tab" ],
+	"Design System/Components/Text": [ "label", "paragraph", "typography" ],
+	"Design System/Components/Tooltip": [ "help", "hint", "popup" ],
+	"Design System/Components/VisuallyHidden": [
+		"a11y",
+		"accessibility",
+		"hidden",
+		"screen reader"
+	]
+}

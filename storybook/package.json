@@ -43,7 +43,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build",
-		"storybook:dev": "storybook dev -c . -p 50240"
+		"storybook:build": "NODE_OPTIONS=--max-old-space-size=8192 storybook build -c . -o ./build && node ./scripts/patch-manager-search.mjs ./build",
+		"storybook:dev": "node ./scripts/patch-manager-search.mjs && storybook dev -c . -p 50240"
 	}
 }
