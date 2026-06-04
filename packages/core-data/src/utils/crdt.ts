@@ -28,6 +28,7 @@ import {
 	type Block,
 	deserializeBlockAttributes,
 	mergeCrdtBlocks,
+	type MergeCrdtBlocksOptions,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
 	type YBlock,
@@ -64,6 +65,10 @@ export type PostChanges = Partial< Post > & {
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
 };
+
+interface ApplyChangesToCRDTDocOptions {
+	baseRecord?: Partial< ObjectData >;
+}
 
 // A post record as represented in the CRDT document (Y.Map).
 export interface YPostRecord extends YMapRecord {
@@ -132,12 +137,15 @@ function defaultApplyChangesToCRDTDoc(
  * @param {CRDTDoc}     ydoc
  * @param {PostChanges} changes
  * @param {Set<string>} syncedProperties
+ * @param {Object}      options
+ * @param {ObjectData}  options.baseRecord
  * @return {void}
  */
 export function applyPostChangesToCRDTDoc(
 	ydoc: CRDTDoc,
 	changes: PostChanges,
-	syncedProperties: Set< string >
+	syncedProperties: Set< string >,
+	options: ApplyChangesToCRDTDocOptions = {}
 ): void {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
@@ -197,7 +205,21 @@ export function applyPostChangesToCRDTDoc(
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newValue, newCursorPosition );
+				const mergeOptions: MergeCrdtBlocksOptions = {};
+				const baseBlocks = (
+					options.baseRecord as PostChanges | undefined
+				 )?.blocks;
+
+				if ( Array.isArray( baseBlocks ) ) {
+					mergeOptions.baseBlocks = baseBlocks;
+				}
+
+				mergeCrdtBlocks(
+					currentBlocks,
+					newValue,
+					newCursorPosition,
+					mergeOptions
+				);
 				break;
 			}
 

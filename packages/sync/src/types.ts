@@ -119,6 +119,7 @@ export interface CollectionHandlers {
 }
 
 export interface SyncManagerUpdateOptions {
+	baseRecord?: Partial< ObjectData >;
 	isSave?: boolean;
 	isNewUndoLevel?: boolean;
 }
@@ -139,7 +140,8 @@ export interface RecordHandlers {
 export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
-		changes: Partial< ObjectData >
+		changes: Partial< ObjectData >,
+		options?: { baseRecord?: Partial< ObjectData > }
 	) => void;
 	createAwareness?: (
 		ydoc: Y.Doc,

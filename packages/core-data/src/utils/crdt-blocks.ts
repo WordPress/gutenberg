@@ -77,6 +77,10 @@ export type YBlockAttributes = Y.Map< Y.Text | unknown >;
  */
 export type MergeCursorPosition = WPBlockSelection | null;
 
+export interface MergeCrdtBlocksOptions {
+	baseBlocks?: Block[];
+}
+
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
 /**
@@ -155,6 +159,185 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 			innerBlocks: makeBlocksSerializable( innerBlocks ),
 		};
 	} );
+}
+
+function getBlockClientId( block: Block ): string | undefined {
+	return typeof block.clientId === 'string' && block.clientId
+		? block.clientId
+		: undefined;
+}
+
+function getClientIdsIfEveryBlockHasUniqueId(
+	blocks: Block[]
+): string[] | undefined {
+	const clientIds = blocks.map( getBlockClientId );
+
+	if ( clientIds.some( ( clientId ) => ! clientId ) ) {
+		return undefined;
+	}
+
+	const uniqueClientIds = new Set( clientIds );
+
+	return uniqueClientIds.size === clientIds.length
+		? ( clientIds as string[] )
+		: undefined;
+}
+
+function getBlocksByClientId( blocks: Block[] ): Map< string, Block > {
+	return new Map(
+		blocks.map( ( block ) => [
+			getBlockClientId( block ) as string,
+			block,
+		] )
+	);
+}
+
+function haveSharedClientId(
+	firstClientIds: string[],
+	secondClientIds: string[]
+): boolean {
+	const secondClientIdSet = new Set( secondClientIds );
+	return firstClientIds.some( ( clientId ) =>
+		secondClientIdSet.has( clientId )
+	);
+}
+
+function findBlockIndexByClientId( blocks: Block[], clientId: string ): number {
+	return blocks.findIndex(
+		( block ) => getBlockClientId( block ) === clientId
+	);
+}
+
+function getRemoteBlockInsertIndex(
+	currentBlocks: Block[],
+	currentIndex: number,
+	blocksToSync: Block[],
+	blockIdsToSync: Set< string >
+): number {
+	for ( let index = currentIndex - 1; index >= 0; index-- ) {
+		const previousClientId = getBlockClientId( currentBlocks[ index ] );
+
+		if ( previousClientId && blockIdsToSync.has( previousClientId ) ) {
+			const previousIndex = findBlockIndexByClientId(
+				blocksToSync,
+				previousClientId
+			);
+
+			return previousIndex === -1
+				? blocksToSync.length
+				: previousIndex + 1;
+		}
+	}
+
+	for (
+		let index = currentIndex + 1;
+		index < currentBlocks.length;
+		index++
+	) {
+		const nextClientId = getBlockClientId( currentBlocks[ index ] );
+
+		if ( nextClientId && blockIdsToSync.has( nextClientId ) ) {
+			const nextIndex = findBlockIndexByClientId(
+				blocksToSync,
+				nextClientId
+			);
+
+			return nextIndex === -1 ? blocksToSync.length : nextIndex;
+		}
+	}
+
+	return blocksToSync.length;
+}
+
+function reconcileBlockWithBase(
+	localBlock: Block,
+	currentBlock: Block,
+	baseBlock: Block
+): Block {
+	const innerBlocks = reconcileBlocksWithBase(
+		localBlock.innerBlocks ?? [],
+		currentBlock.innerBlocks ?? [],
+		baseBlock.innerBlocks ?? []
+	);
+
+	return innerBlocks === localBlock.innerBlocks
+		? localBlock
+		: { ...localBlock, innerBlocks };
+}
+
+function reconcileBlocksWithBase(
+	localBlocksToSync: Block[],
+	currentBlocks: Block[],
+	baseBlocks: Block[]
+): Block[] {
+	const localClientIds =
+		getClientIdsIfEveryBlockHasUniqueId( localBlocksToSync );
+	const currentClientIds =
+		getClientIdsIfEveryBlockHasUniqueId( currentBlocks );
+	const baseClientIds = getClientIdsIfEveryBlockHasUniqueId( baseBlocks );
+
+	if ( ! localClientIds || ! currentClientIds || ! baseClientIds ) {
+		return localBlocksToSync;
+	}
+
+	// Save/reload can regenerate editor client IDs while the CRDT document
+	// still has the old IDs. In that state, ID-based stale-delete rebasing
+	// would treat every local block as remotely deleted.
+	if (
+		baseClientIds.length > 0 &&
+		currentClientIds.length > 0 &&
+		! haveSharedClientId( baseClientIds, currentClientIds )
+	) {
+		return localBlocksToSync;
+	}
+
+	const currentBlocksByClientId = getBlocksByClientId( currentBlocks );
+	const baseBlocksByClientId = getBlocksByClientId( baseBlocks );
+	const localClientIdSet = new Set( localClientIds );
+	const baseClientIdSet = new Set( baseClientIds );
+	const blocksToSync: Block[] = [];
+	const blockIdsToSync = new Set< string >();
+
+	localBlocksToSync.forEach( ( localBlock ) => {
+		const clientId = getBlockClientId( localBlock ) as string;
+		const currentBlock = currentBlocksByClientId.get( clientId );
+		const baseBlock = baseBlocksByClientId.get( clientId );
+
+		if ( baseBlock && ! currentBlock ) {
+			return;
+		}
+
+		const blockToSync =
+			baseBlock && currentBlock
+				? reconcileBlockWithBase( localBlock, currentBlock, baseBlock )
+				: localBlock;
+
+		blocksToSync.push( blockToSync );
+		blockIdsToSync.add( clientId );
+	} );
+
+	currentBlocks.forEach( ( currentBlock, currentIndex ) => {
+		const clientId = getBlockClientId( currentBlock ) as string;
+
+		if (
+			baseClientIdSet.has( clientId ) ||
+			localClientIdSet.has( clientId ) ||
+			blockIdsToSync.has( clientId )
+		) {
+			return;
+		}
+
+		const insertIndex = getRemoteBlockInsertIndex(
+			currentBlocks,
+			currentIndex,
+			blocksToSync,
+			blockIdsToSync
+		);
+		blocksToSync.splice( insertIndex, 0, currentBlock );
+		blockIdsToSync.add( clientId );
+	} );
+
+	return blocksToSync;
 }
 
 /**
@@ -415,16 +598,19 @@ function createNewYBlock( block: Block ): YBlock {
  * Merge incoming block data into the local Y.Doc.
  * This function is called to sync local block changes to a shared Y.Doc.
  *
- * @param yblocks         The blocks in the local Y.Doc.
- * @param incomingBlocks  Gutenberg blocks being synced.
- * @param attributeCursor When provided, describes a selection cursor falling within a
- *                        RichText field associated with a specific block and attribute.
- *                        Derived from the changes that produced the blocks.
+ * @param yblocks            The blocks in the local Y.Doc.
+ * @param incomingBlocks     Gutenberg blocks being synced.
+ * @param attributeCursor    When provided, describes a selection cursor falling within a
+ *                           RichText field associated with a specific block and attribute.
+ *                           Derived from the changes that produced the blocks.
+ * @param options            Merge options.
+ * @param options.baseBlocks Pre-change block snapshot to rebase against.
  */
 export function mergeCrdtBlocks(
 	yblocks: YBlocks,
 	incomingBlocks: Block[],
-	attributeCursor: MergeCursorPosition
+	attributeCursor: MergeCursorPosition,
+	options: MergeCrdtBlocksOptions = {}
 ): void {
 	// Ensure we are working with serializable block data.
 	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
@@ -434,8 +620,18 @@ export function mergeCrdtBlocks(
 		);
 	}
 
-	const incomingBlocksToSync =
+	const localBlocksToSync =
 		serializableBlocksCache.get( incomingBlocks ) ?? [];
+	const baseBlocksToSync = options.baseBlocks
+		? makeBlocksSerializable( options.baseBlocks )
+		: undefined;
+	const incomingBlocksToSync = baseBlocksToSync
+		? reconcileBlocksWithBase(
+				localBlocksToSync,
+				yblocks.toJSON() as Block[],
+				baseBlocksToSync
+		  )
+		: localBlocksToSync;
 
 	// This is a rudimentary diff implementation similar to the y-prosemirror diffing
 	// approach.
