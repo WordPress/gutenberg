@@ -139,22 +139,11 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 			$room        = $request['room'];
 			$parsed_room = is_string( $room ) ? WP_Sync_Config::parse_room( $room ) : null;
 
-			$post_id = null;
-			if ( null !== $parsed_room ) {
-				$post_id = WP_Sync_Config::get_crdt_doc_persistence_post_id(
-					$parsed_room['entity_kind'],
-					$parsed_room['entity_name'],
-					$parsed_room['object_id']
-				);
-			}
-
-			if ( null === $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
-				return new WP_Error(
-					'rest_cannot_edit',
-					__( 'You do not have permission to persist this document.', 'gutenberg' ),
-					array( 'status' => rest_authorization_required_code() )
-				);
-			}
+			$post_id = WP_Sync_Config::get_crdt_doc_persistence_post_id(
+				$parsed_room['entity_kind'],
+				$parsed_room['entity_name'],
+				$parsed_room['object_id']
+			);
 
 			$doc = $request['doc'];
 
