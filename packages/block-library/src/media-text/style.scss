@@ -81,10 +81,7 @@
 		max-width: unset;
 		width: 100%;
 		vertical-align: middle;
-
-		&.has-aspect-ratio {
-			object-fit: cover;
-		}
+		object-fit: cover;
 	}
 }
 
