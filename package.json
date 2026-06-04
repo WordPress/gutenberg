@@ -27,20 +27,6 @@
 			"font-library",
 			"options-connectors",
 			{
-				"id": "site-editor-v2",
-				"init": [
-					"@wordpress/edit-site-init"
-				],
-				"experimental": true
-			},
-			{
-				"id": "media-editor",
-				"init": [
-					"@wordpress/edit-site-init"
-				],
-				"experimental": true
-			},
-			{
 				"id": "content-types",
 				"experimental": true
 			},
@@ -54,6 +40,20 @@
 			},
 			{
 				"id": "guidelines",
+				"experimental": true
+			},
+			{
+				"id": "media-editor",
+				"init": [
+					"@wordpress/edit-site-init"
+				],
+				"experimental": true
+			},
+			{
+				"id": "site-editor-v2",
+				"init": [
+					"@wordpress/edit-site-init"
+				],
 				"experimental": true
 			}
 		]
