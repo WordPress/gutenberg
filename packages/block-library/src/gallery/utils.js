@@ -16,6 +16,26 @@ import {
 } from '../image/constants';
 
 /**
+ * Returns the link destination to use when a Gallery block has no saved
+ * `linkTo` attribute yet.
+ *
+ * @param {string} mediaDefaultLink Media modal default link destination.
+ * @param {Object} lightboxSetting  Lightbox setting.
+ *
+ * @return {string} Default gallery link destination.
+ */
+export function getDefaultLinkDestination( mediaDefaultLink, lightboxSetting ) {
+	if (
+		window.__experimentalGalleryLightboxDefault &&
+		lightboxSetting?.allowEditing !== false
+	) {
+		return LINK_DESTINATION_LIGHTBOX;
+	}
+
+	return mediaDefaultLink || LINK_DESTINATION_NONE;
+}
+
+/**
  * Determines new href and linkDestination values for an Image block from the
  * supplied Gallery link destination, or falls back to the Image blocks link.
  *

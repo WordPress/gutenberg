@@ -49,7 +49,7 @@ import {
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
-import { getHrefAndDestination } from './utils';
+import { getDefaultLinkDestination, getHrefAndDestination } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
 	getUpdatedLinkTargetSettings,
@@ -142,6 +142,10 @@ export default function GalleryEdit( props ) {
 			'dimensions.aspectRatios.theme',
 			'dimensions.defaultAspectRatios'
 		);
+	const defaultLinkDestination = getDefaultLinkDestination(
+		window?.wp?.media?.view?.settings?.defaultProps?.link,
+		lightboxSetting
+	);
 
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
@@ -311,8 +315,10 @@ export default function GalleryEdit( props ) {
 			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination(
 				image,
-				linkTo,
-				imageAttributes?.linkDestination
+				linkTo || defaultLinkDestination,
+				imageAttributes?.linkDestination,
+				imageAttributes,
+				lightboxSetting
 			),
 			...newLinkTarget,
 			className: newClassName,
@@ -584,12 +590,10 @@ export default function GalleryEdit( props ) {
 		if ( ! linkTo ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				linkTo:
-					window?.wp?.media?.view?.settings?.defaultProps?.link ||
-					LINK_DESTINATION_NONE,
+				linkTo: defaultLinkDestination,
 			} );
 		}
-	}, [ linkTo ] );
+	}, [ linkTo, defaultLinkDestination ] );
 
 	const hasImages = !! images.length;
 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
