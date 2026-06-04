@@ -289,6 +289,11 @@ export const getEntityRecord =
 								);
 							}
 						},
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
+						},
 						restoreUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
 								meta.get( 'selectionHistory' );
