@@ -20,7 +20,7 @@ const VENDOR_SCRIPTS = [
 			'module.exports = {',
 			'  ...require("react"),',
 			// Polyfill React 18 internals for older versions of `framer-motion`.
-			'  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: { ReactCurrentOwner: { current: null } },',
+			// '  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: { ReactCurrentOwner: { current: null } },',
 			'};',
 		].join( '\n' ),
 	},
@@ -33,7 +33,7 @@ const VENDOR_SCRIPTS = [
 			'module.exports = {',
 			'  ...require("react-dom"),',
 			'  ...require("react-dom/client"),',
-			'  ...require("@wordpress/element/react-polyfill"),',
+			// '  ...require("@wordpress/element/react-polyfill"),',
 			'};',
 		].join( '\n' ),
 	},

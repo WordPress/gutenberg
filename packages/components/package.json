@@ -113,7 +113,7 @@
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
 		"@types/jest": "^29.5.14",
-		"@types/react-dom": "^19.2.3",
+		"@types/react-dom": "^18.3.1",
 		"@wordpress/jest-console": "file:../jest-console",
 		"snapshot-diff": "^0.10.0",
 		"storybook": "^10.2.8",

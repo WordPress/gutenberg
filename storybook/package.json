@@ -31,7 +31,7 @@
 		"@storybook/addon-docs": "^10.2.8",
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.2.8",
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@vitejs/plugin-react": "^5.1.2",
 		"@wordpress/theme": "file:../packages/theme",
 		"storybook": "^10.2.8",
