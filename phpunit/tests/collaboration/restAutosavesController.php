@@ -28,6 +28,7 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
+		update_option( 'wp_collaboration_enabled', 1 );
 		wp_set_current_user( self::$author_id );
 	}
 
@@ -105,8 +106,6 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	}
 
 	public function test_auto_draft_autosave_promotes_parent_post_when_collaboration_is_enabled() {
-		update_option( 'wp_collaboration_enabled', 1 );
-
 		$post_id = $this->create_auto_draft();
 		$title   = 'RTC autosaved title';
 		$content = '<!-- wp:paragraph --><p>RTC autosaved content</p><!-- /wp:paragraph -->';
@@ -121,8 +120,6 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	}
 
 	public function test_collaborator_auto_draft_autosave_promotes_parent_post_when_collaboration_is_enabled() {
-		update_option( 'wp_collaboration_enabled', 1 );
-
 		$post_id = $this->create_auto_draft();
 		$title   = 'RTC collaborator autosaved title';
 		$content = '<!-- wp:paragraph --><p>RTC collaborator autosaved content</p><!-- /wp:paragraph -->';
@@ -185,8 +182,6 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	}
 
 	public function test_auto_draft_promotion_does_not_overwrite_crdt_doc_meta() {
-		update_option( 'wp_collaboration_enabled', 1 );
-
 		$post_id       = $this->create_auto_draft();
 		$persisted_doc = 'persisted-auto-draft-crdt-doc';
 		$stale_doc     = 'stale-auto-draft-autosave-crdt-doc';
