@@ -1,4 +1,6 @@
-import deprecated from '@wordpress/deprecated';
+import { flushSync } from 'react-dom';
+import { createRoot, hydrateRoot } from 'react-dom/client';
+import type { Root } from 'react-dom/client';
 
 const internalsKey = '_reactInternals';
 
@@ -53,21 +55,7 @@ function findHostFiberImpl( fiber: any ): any {
 	return null;
 }
 
-/**
- * Finds the DOM node of a React component instance.
- *
- * @deprecated since WordPress 7.1.0. Use DOM refs instead.
- * @see https://react.dev/reference/react-dom/findDOMNode
- *
- * @param      instance Component's instance.
- */
-export default function findDOMNode( instance: any ): Element | Text | null {
-	deprecated( 'wp.element.findDOMNode', {
-		since: '7.1',
-		alternative: 'DOM refs',
-		link: 'https://react.dev/reference/react-dom/findDOMNode',
-	} );
-
+export function findDOMNode( instance: any ): Element | Text | null {
 	if ( instance === null || instance === undefined ) {
 		return null;
 	}
@@ -89,4 +77,57 @@ export default function findDOMNode( instance: any ): Element | Text | null {
 
 	const hostFiber = findHostFiber( fiber );
 	return hostFiber?.stateNode ?? null;
+}
+
+const roots = new WeakMap< Element, Root >();
+
+export function render(
+	element: React.ReactNode,
+	container: Element,
+	callback?: () => void
+): void {
+	let root = roots.get( container );
+	if ( ! root ) {
+		root = createRoot( container );
+		roots.set( container, root );
+	}
+
+	flushSync( () => {
+		root.render( element );
+	} );
+
+	if ( typeof callback === 'function' ) {
+		callback();
+	}
+}
+
+export function hydrate(
+	element: React.ReactNode,
+	container: Element,
+	callback?: () => void
+): void {
+	let root = roots.get( container );
+	if ( ! root ) {
+		root = hydrateRoot( container, element );
+		roots.set( container, root );
+	} else {
+		root.render( element );
+	}
+
+	if ( typeof callback === 'function' ) {
+		callback();
+	}
+}
+
+export function unmountComponentAtNode( container: Element ): boolean {
+	const root = roots.get( container );
+	if ( ! root ) {
+		return false;
+	}
+
+	flushSync( () => {
+		root.unmount();
+	} );
+	roots.delete( container );
+	return true;
 }

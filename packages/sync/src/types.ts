@@ -123,6 +123,11 @@ export interface SyncManagerUpdateOptions {
 	isNewUndoLevel?: boolean;
 }
 
+export interface SyncUndoStackState {
+	hasRedo: boolean;
+	hasUndo: boolean;
+}
+
 export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: (
@@ -134,6 +139,7 @@ export interface RecordHandlers {
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+	onUndoStackChange?: ( state: SyncUndoStackState ) => void;
 }
 
 export interface SyncConfig {
@@ -193,7 +199,10 @@ export interface SyncManager {
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 	addToScope: (
 		ymap: Y.Map< any >,
-		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
+		handlers: Pick<
+			RecordHandlers,
+			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoStackChange'
+		>
 	) => void;
 	stopCapturing: () => void;
 }

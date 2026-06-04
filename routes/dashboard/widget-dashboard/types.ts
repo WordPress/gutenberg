@@ -118,10 +118,18 @@ export interface WidgetContextValue {
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
- * Settings common to every grid model. `columns` and `minColumnWidth`
- * compose as a layered model at runtime: `columns` caps the count and
- * `minColumnWidth` enforces a per-tile width floor that can reduce the
- * count on narrow containers. See `@wordpress/grid` for the resolution.
+ * Maximum column count for the widget dashboard on wide containers.
+ * Not exposed in layout settings; container width steps the count down
+ * to two and one column at fixed breakpoints.
+ */
+export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
+
+/**
+ * Settings common to every grid model. Column count is resolved from
+ * the dashboard container width (see
+ * `utils/resolve-dashboard-column-count`). `columns` and `minColumnWidth`
+ * on this type remain for persisted payloads and `@wordpress/grid`
+ * compatibility; the dashboard ignores user-facing values for both.
  *
  * `spacing` is intentionally absent: the gap between tiles is
  * presentational and lives with the design-system theme/density, not
@@ -130,31 +138,30 @@ export type WidgetGridModel = 'grid' | 'masonry';
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Target column count (cap). When omitted alongside
-	 * `minColumnWidth`, the grid renders six columns.
+	 * Target column count (cap). The dashboard always uses
+	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}; persisted values are ignored.
 	 */
 	columns?: number;
 
 	/**
-	 * Per-tile minimum width in pixels. Acts as a floor that can
-	 * reduce the effective column count below `columns` on narrow
-	 * containers.
+	 * Per-tile minimum width in pixels. Unused by the dashboard; column
+	 * count is derived from container width instead.
 	 */
 	minColumnWidth?: number;
 }
 
 /**
  * 2D packed grid settings. Items declare explicit width and height
- * spans; rows can be uniform-sized or content-sized via `rowHeight`.
+ * spans; rows use a uniform track height via `rowHeight`.
  */
 export interface WidgetGridLayoutSettings extends BaseWidgetGridSettings {
 	model?: 'grid';
 
 	/**
-	 * Row height in pixels, or `'auto'` to let the tallest item in
-	 * each row size it.
+	 * Row height in pixels (`200` small, `300` medium, `400` large). Every
+	 * tile in a row fills the row vertically.
 	 */
-	rowHeight?: number | 'auto';
+	rowHeight?: number;
 }
 
 /**
