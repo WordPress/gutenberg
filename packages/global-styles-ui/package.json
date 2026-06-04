@@ -44,6 +44,7 @@
 	},
 	"react-native": "src/index",
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
@@ -60,6 +61,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.0",
 		"colord": "^2.7.0"

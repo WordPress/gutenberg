@@ -41,6 +41,7 @@
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/base-styles": "file:../base-styles",
@@ -62,6 +63,7 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/route": "file:../route",
 		"@wordpress/theme": "file:../theme",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"clsx": "^2.1.1"
 	},

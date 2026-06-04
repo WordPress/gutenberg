@@ -47,6 +47,7 @@
 		"build-style/**"
 	],
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
