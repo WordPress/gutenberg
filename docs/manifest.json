@@ -1560,6 +1560,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/build-core",
+		"slug": "packages-build-core",
+		"markdown_source": "../packages/build-core/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/commands",
 		"slug": "packages-commands",
 		"markdown_source": "../packages/commands/README.md",
