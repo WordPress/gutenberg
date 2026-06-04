@@ -18,7 +18,7 @@ export const DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING = 2;
 /**
  * Default automatic retry behavior for failed uploads.
  *
- * Three total attempts (initial + 2 retries) with exponential backoff:
+ * Four total attempts (initial + 3 retries) with exponential backoff:
  * ~1s, then ~2s, capped at 30s. The jitter factor adds randomness to
  * the delay so simultaneous failures do not retry in lockstep.
  */
