@@ -271,6 +271,7 @@ export default function ViewPickerActivity< Item >( {
 	const setsize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
 
 	const hasData = !! data?.length;
+	const isGrouped = !! ( groupField && dataByGroup );
 
 	const renderItem = ( item: Item ) => (
 		<PickerActivityItem
@@ -318,12 +319,17 @@ export default function ViewPickerActivity< Item >( {
 				aria-multiselectable={ isMultiselect }
 				aria-label={ itemListLabel }
 				aria-busy={ isLoading }
+				render={
+					isGrouped ? (
+						<Stack direction="column" gap="sm" />
+					) : undefined
+				}
 				className={ clsx(
 					'dataviews-view-picker-activity',
 					className
 				) }
 			>
-				{ groupField && dataByGroup
+				{ isGrouped && dataByGroup
 					? Array.from( dataByGroup.entries() ).map(
 							( [ groupName, groupItems ]: [
 								string,

@@ -191,8 +191,7 @@
 		font-size: var(--wpds-typography-font-size-lg);
 		font-weight: var(--wpds-typography-font-weight-medium);
 		color: var(--wpds-color-fg-content-neutral-weak);
-		// Align with the timeline column; the first item's top margin gives the gap.
-		margin: 0;
+		margin: 0 0 var(--wpds-dimension-gap-sm) 0;
 		padding: 0;
 		padding-inline-start: var(--wpds-dimension-padding-2xl);
 	}
