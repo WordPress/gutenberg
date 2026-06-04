@@ -998,10 +998,14 @@ test.describe( 'Image - lightbox', () => {
 			await expect( panel ).toContainText( '23mm' );
 			await expect( panel ).toContainText( 'Test Photographer' );
 
-			// Clicking within the panel must not close the lightbox, so the
-			// metadata stays readable (and selectable). The first item is used
-			// because it sits clear of the toggle button in the top corner.
-			await panel.getByText( 'Test Camera' ).click();
+			// Clicking within the panel must not close the lightbox; the panel
+			// stops click propagation so the metadata stays readable and
+			// selectable. A dispatched click is used instead of a pointer click
+			// because the toggle button overlaps the panel in some viewport
+			// sizes, which would block a real click. The bubbling click still
+			// reaches the overlay's close handler unless propagation is stopped,
+			// so this verifies that behavior.
+			await panel.getByText( 'Test Camera' ).dispatchEvent( 'click' );
 			await expect( panel ).toBeVisible();
 			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
 
