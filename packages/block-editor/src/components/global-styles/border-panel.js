@@ -40,10 +40,6 @@ export function useHasBorderPanelControls( settings ) {
 	return controls;
 }
 
-function useCustomSolids( settings ) {
-	return settings?.color?.custom;
-}
-
 function useHasBorderColorControl( settings ) {
 	return settings?.border?.color;
 }
@@ -109,7 +105,7 @@ export default function BorderPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
 	const colors = useColorsPerOrigin( settings );
-	const areCustomSolidsEnabled = useCustomSolids( settings );
+	const areCustomSolidsEnabled = settings?.color?.custom;
 	const decodeValue = useCallback(
 		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
 		[ settings ]
