@@ -95,8 +95,8 @@ function PlaceholderContainer( {
 			labels={ {
 				title: __( 'Media area' ),
 			} }
-			className={ clsx( className, dimensionsProps?.className ) }
-			style={ dimensionsProps?.style }
+			className={ clsx( className, dimensionsProps.className ) }
+			style={ dimensionsProps.style }
 			onSelect={ onSelectMedia }
 			onToggleFeaturedImage={ toggleUseFeaturedImage }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
