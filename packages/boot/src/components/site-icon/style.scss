@@ -7,7 +7,7 @@
 .boot-site-icon__icon {
 	width: variables.$grid-unit-40;
 	height: variables.$grid-unit-40;
-	fill: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	fill: var(--wpds-color-fg-content-neutral);
 }
 
 .boot-site-icon__image {
@@ -15,5 +15,5 @@
 	height: variables.$grid-unit-40;
 	object-fit: cover;
 	aspect-ratio: 1 / 1;
-	border-radius: var(--wpds-border-radius-md, 4px);
+	border-radius: var(--wpds-border-radius-md);
 }

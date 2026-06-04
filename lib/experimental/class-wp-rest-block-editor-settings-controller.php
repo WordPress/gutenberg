@@ -553,7 +553,15 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$registered     = array();
 			$reflection     = new ReflectionClass( $script_modules );
 			$property       = $reflection->getProperty( 'registered' );
-			$property->setAccessible( true );
+			/*
+			 * ReflectionProperty::setAccessible is:
+			 * - needed until 8.1.0, as property `registered` is private.
+			 * - redundant as of 8.1.0, which made non-public reflection accessible by default.
+			 * - deprecated as of 8.5.0.
+			 */
+			if ( PHP_VERSION_ID < 80100 ) {
+				$property->setAccessible( true );
+			}
 			$registered = $property->getValue( $script_modules );
 			$import_map = array();
 			foreach ( $registered as $id => $module ) {

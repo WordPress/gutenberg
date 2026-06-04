@@ -27,7 +27,6 @@ import { parseContent, serializeContent } from './utils';
 const { Tabs } = unlock( componentsPrivateApis );
 
 export default function HTMLEditModal( {
-	isOpen,
 	onRequestClose,
 	content,
 	setAttributes,
@@ -37,8 +36,6 @@ export default function HTMLEditModal( {
 	const [ editedHtml, setEditedHtml ] = useState( html );
 	const [ editedCss, setEditedCss ] = useState( css );
 	const [ editedJs, setEditedJs ] = useState( js );
-	const [ isDirty, setIsDirty ] = useState( false );
-	const [ showUnsavedWarning, setShowUnsavedWarning ] = useState( false );
 	const [ isFullscreen, setIsFullscreen ] = useState( false );
 
 	const isMobileViewport = useViewportMatch( 'small', '<' );
@@ -56,22 +53,6 @@ export default function HTMLEditModal( {
 	const hasRestrictedContent =
 		! canUserUseUnfilteredHTML && ( css.trim() || js.trim() );
 
-	if ( ! isOpen ) {
-		return null;
-	}
-
-	const handleHtmlChange = ( value ) => {
-		setEditedHtml( value );
-		setIsDirty( true );
-	};
-	const handleCssChange = ( value ) => {
-		setEditedCss( value );
-		setIsDirty( true );
-	};
-	const handleJsChange = ( value ) => {
-		setEditedJs( value );
-		setIsDirty( true );
-	};
 	const handleUpdate = () => {
 		// For users without unfiltered_html capability, strip CSS and JS content
 		// to prevent kses from leaving broken content
@@ -82,25 +63,6 @@ export default function HTMLEditModal( {
 				js: canUserUseUnfilteredHTML ? editedJs : '',
 			} ),
 		} );
-		setIsDirty( false );
-	};
-	const handleCancel = () => {
-		setIsDirty( false );
-		onRequestClose();
-	};
-	const handleRequestClose = () => {
-		if ( isDirty ) {
-			setShowUnsavedWarning( true );
-		} else {
-			onRequestClose();
-		}
-	};
-	const handleDiscardChanges = () => {
-		setShowUnsavedWarning( false );
-		onRequestClose();
-	};
-	const handleContinueEditing = () => {
-		setShowUnsavedWarning( false );
 	};
 	const handleUpdateAndClose = () => {
 		handleUpdate();
@@ -114,12 +76,11 @@ export default function HTMLEditModal( {
 		<>
 			<Modal
 				title={ __( 'Edit HTML' ) }
-				onRequestClose={ handleRequestClose }
+				onRequestClose={ onRequestClose }
 				className="block-library-html__modal"
 				size="large"
 				isDismissible={ false }
-				shouldCloseOnClickOutside={ ! isDirty }
-				shouldCloseOnEsc={ ! isDirty }
+				shouldCloseOnClickOutside={ false }
 				isFullScreen={ isFullscreen }
 				__experimentalHideHeader
 			>
@@ -183,7 +144,7 @@ export default function HTMLEditModal( {
 								>
 									<PlainText
 										value={ editedHtml }
-										onChange={ handleHtmlChange }
+										onChange={ setEditedHtml }
 										placeholder={ __( 'Write HTML…' ) }
 										aria-label={ __( 'HTML' ) }
 										className="block-library-html__modal-editor"
@@ -197,7 +158,7 @@ export default function HTMLEditModal( {
 									>
 										<PlainText
 											value={ editedCss }
-											onChange={ handleCssChange }
+											onChange={ setEditedCss }
 											placeholder={ __( 'Write CSS…' ) }
 											aria-label={ __( 'CSS' ) }
 											className="block-library-html__modal-editor"
@@ -212,7 +173,7 @@ export default function HTMLEditModal( {
 									>
 										<PlainText
 											value={ editedJs }
-											onChange={ handleJsChange }
+											onChange={ setEditedJs }
 											placeholder={ __(
 												'Write JavaScript…'
 											) }
@@ -241,7 +202,7 @@ export default function HTMLEditModal( {
 							<Button
 								__next40pxDefaultSize
 								variant="tertiary"
-								onClick={ handleCancel }
+								onClick={ onRequestClose }
 							>
 								{ __( 'Cancel' ) }
 							</Button>
@@ -256,43 +217,6 @@ export default function HTMLEditModal( {
 					</VStack>
 				</Tabs>
 			</Modal>
-
-			{ showUnsavedWarning && (
-				<Modal
-					title={ __( 'Unsaved changes' ) }
-					onRequestClose={ handleContinueEditing }
-					size="medium"
-				>
-					<p>
-						{ __(
-							'You have unsaved changes. What would you like to do?'
-						) }
-					</p>
-					<Flex direction="row" justify="flex-end" gap={ 2 }>
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ handleDiscardChanges }
-						>
-							{ __( 'Discard unsaved changes' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ handleContinueEditing }
-						>
-							{ __( 'Continue editing' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							onClick={ handleUpdateAndClose }
-						>
-							{ __( 'Update and close' ) }
-						</Button>
-					</Flex>
-				</Modal>
-			) }
 		</>
 	);
 }

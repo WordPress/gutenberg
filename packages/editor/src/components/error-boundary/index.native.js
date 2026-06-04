@@ -17,7 +17,7 @@ import {
 	withPreferredColorScheme,
 } from '@wordpress/compose';
 import { cautionFilled } from '@wordpress/icons';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -34,7 +34,7 @@ function getContent() {
 		// content serialization throughout the lifetime of a non-erroring
 		// application.
 		return select( editorStore ).getEditedPostContent();
-	} catch ( error ) {}
+	} catch {}
 }
 
 function CopyButton( {
@@ -140,7 +140,7 @@ class ErrorBoundary extends Component {
 				>
 					<View style={ styles[ 'error-boundary__container' ] }>
 						<View style={ iconContainerStyle }>
-							<Icon
+							<WCIcon
 								icon={ cautionFilled }
 								{ ...styles[ 'error-boundary__icon' ] }
 							/>

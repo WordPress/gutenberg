@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Internal
+
+-   Migrate `Tooltip` consumers from `@wordpress/components` to the new compositional `Tooltip` in `@wordpress/ui` ([#78691](https://github.com/WordPress/gutenberg/pull/78691)).
+
+## 0.39.0 (2026-05-27)
+
+## 0.38.0 (2026-05-14)
+
+## 0.37.0 (2026-04-29)
+
+## 0.36.0 (2026-04-15)
+
+## 0.35.0 (2026-04-01)
+
+## 0.34.0 (2026-03-18)
+
 ## 0.33.0 (2026-03-04)
 
 ## 0.32.0 (2026-02-18)

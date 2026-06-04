@@ -27,7 +27,7 @@ on:
             - 'webpack.config.js'
             # Changes to this workflow file should always verify the changes are successful.
             - '.github/workflows/bundle-size.yml'
-            - bin/packages
+            - tools/build-scripts/packages
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -56,13 +56,13 @@ jobs:
                   persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
                   cache: npm
 
-            - uses: preactjs/compressed-size-action@8518045ed95e94e971b83333085e1cb99aa18aa8 # v2.9.0
+            - uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2.9.1
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/scripts/**/*.min.js,build/styles/**/*.css,build/modules/**/*.min.js}'

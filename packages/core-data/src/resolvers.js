@@ -24,9 +24,11 @@ import {
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
+	normalizeQueryForResolution,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
+import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -179,6 +181,18 @@ export const getEntityRecord =
 							transientConfig.read( recordWithTransients );
 					} );
 
+				// Share the parsed blocks with `useEntityBlockEditor` so the
+				// editor doesn't re-parse the same `content` string.
+				if (
+					recordWithTransients.blocks &&
+					typeof recordWithTransients.content?.raw === 'string'
+				) {
+					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
+						content: recordWithTransients.content.raw,
+						blocks: recordWithTransients.blocks,
+					} );
+				}
+
 				// Load the entity record for syncing. Do not await promise.
 				void getSyncManager()?.load(
 					entityConfig.syncConfig,
@@ -229,22 +243,36 @@ export const getEntityRecord =
 								query
 							);
 						},
-						// Save the current entity record, whether or not it has unsaved
-						// edits. This is used to trigger a persisted CRDT document.
-						saveRecord: () => {
+						// Persist the CRDT document.
+						//
+						// TODO: Currently, persisted CRDT documents are stored in post meta.
+						// This effectively means that only post entities support CRDT
+						// persistence. As we add support for syncing additional entity,
+						// we'll need to revisit where persisted CRDT documents are stored.
+						persistCRDTDoc: () => {
 							resolveSelect
 								.getEditedEntityRecord( kind, name, key )
 								.then( ( editedRecord ) => {
-									// Don't trigger a save if the record is still an auto-draft.
-									const { status } = editedRecord;
-									if ( 'auto-draft' === status ) {
+									// Don't persist the CRDT document if the record is still an
+									// auto-draft or if the entity does not support meta.
+									const { meta, status } = editedRecord;
+									if ( 'auto-draft' === status || ! meta ) {
 										return;
 									}
 
+									// Trigger a minimal save to persist the CRDT document. The
+									// entity's pre-persist hooks will create the persisted CRDT
+									// document and apply it to the record's meta.
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
 									dispatch.saveEntityRecord(
 										kind,
 										name,
-										editedRecord
+										{
+											[ entityIdKey ]:
+												editedRecord[ entityIdKey ],
+										},
+										{ __unstableSkipSyncUpdate: true }
 									);
 								} );
 						},
@@ -350,18 +378,14 @@ export const getEntityRecords =
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 
 		function getResolutionsArgs( records, recordsQuery ) {
-			const queryArgs = Object.fromEntries(
-				Object.entries( recordsQuery ).filter( ( [ k, v ] ) => {
-					return [ 'context', '_fields' ].includes( k ) && !! v;
-				} )
-			);
+			const normalizedQuery = normalizeQueryForResolution( recordsQuery );
 			return records
 				.filter( ( record ) => record?.[ key ] )
 				.map( ( record ) => [
 					kind,
 					name,
 					record[ key ],
-					Object.keys( queryArgs ).length > 0 ? queryArgs : undefined,
+					normalizedQuery,
 				] );
 		}
 
@@ -573,7 +597,7 @@ export const getEntityRecords =
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
-		} catch ( e ) {
+		} catch {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
@@ -630,7 +654,7 @@ export const getEmbedPreview =
 				path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
 			} );
 			dispatch.receiveEmbedPreview( url, embedProxyResponse );
-		} catch ( error ) {
+		} catch {
 			// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
 			dispatch.receiveEmbedPreview( url, false );
 		}
@@ -701,7 +725,7 @@ export const canUser =
 				method: 'OPTIONS',
 				parse: false,
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if our OPTIONS request comes back with an API error (4xx or
 			// 5xx). The previously determined isAllowed value will remain in the store.
 			return;
@@ -986,11 +1010,12 @@ export const getDefaultTemplateId =
 		const id = window?.__experimentalTemplateActivate
 			? template?.wp_id || template?.id
 			: template?.id;
-		// Endpoint may return an empty object if no template is found.
-		if ( id ) {
-			template.id = id;
-			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, id );
+
+		registry.batch( () => {
+			dispatch.receiveDefaultTemplateId( query, id || '' );
+			// Endpoint may return an empty object if no template is found.
+			if ( id ) {
+				template.id = id;
 				dispatch.receiveEntityRecords(
 					'postType',
 					template.type,
@@ -1002,15 +1027,19 @@ export const getDefaultTemplateId =
 					template.type,
 					id,
 				] );
-			} );
-		}
+			}
+		} );
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 
@@ -1036,78 +1065,87 @@ export const getRevisions =
 			return;
 		}
 
-		if ( query._fields ) {
-			// If requesting specific fields, items and query association to said
-			// records are stored by ID reference. Thus, fields must always include
-			// the ID.
-			query = {
-				...query,
-				_fields: [
-					...new Set( [
-						...( getNormalizedCommaSeparable( query._fields ) ||
-							[] ),
-						entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
-					] ),
-				].join(),
-			};
-		}
-
-		const path = addQueryArgs(
-			entityConfig.getRevisionsUrl( recordKey ),
-			query
+		const rawQuery = { ...query };
+		const lock = await dispatch.__unstableAcquireStoreLock(
+			STORE_NAME,
+			[ 'entities', 'records', kind, name, recordKey, 'revisions' ],
+			{ exclusive: false }
 		);
 
-		let records, response;
-		const meta = {};
-		const isPaginated =
-			entityConfig.supportsPagination && query.per_page !== -1;
 		try {
-			response = await apiFetch( { path, parse: ! isPaginated } );
-		} catch ( error ) {
-			// Do nothing if our request comes back with an API error.
-			return;
-		}
-
-		if ( response ) {
-			if ( isPaginated ) {
-				records = Object.values( await response.json() );
-				meta.totalItems = parseInt(
-					response.headers.get( 'X-WP-Total' )
-				);
-			} else {
-				records = Object.values( response );
-			}
-
-			// If we request fields but the result doesn't contain the fields,
-			// explicitly set these fields as "undefined"
-			// that way we consider the query "fulfilled".
 			if ( query._fields ) {
-				records = records.map( ( record ) => {
-					query._fields.split( ',' ).forEach( ( field ) => {
-						if ( ! record.hasOwnProperty( field ) ) {
-							record[ field ] = undefined;
-						}
-					} );
-
-					return record;
-				} );
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
 			}
 
-			registry.batch( () => {
-				dispatch.receiveRevisions(
-					kind,
-					name,
-					recordKey,
-					records,
-					query,
-					false,
-					meta
-				);
+			const path = addQueryArgs(
+				entityConfig.getRevisionsUrl( recordKey ),
+				query
+			);
 
-				// When requesting all fields, the list of results can be used to
-				// resolve the `getRevision` selector in addition to `getRevisions`.
-				if ( ! query?._fields && ! query.context ) {
+			let records, response;
+			const meta = {};
+			const isPaginated =
+				entityConfig.supportsPagination && query.per_page !== -1;
+			try {
+				response = await apiFetch( { path, parse: ! isPaginated } );
+			} catch {
+				// Do nothing if our request comes back with an API error.
+				return;
+			}
+
+			if ( response ) {
+				if ( isPaginated ) {
+					records = Object.values( await response.json() );
+					meta.totalItems = parseInt(
+						response.headers.get( 'X-WP-Total' )
+					);
+				} else {
+					records = Object.values( response );
+				}
+
+				// If we request fields but the result doesn't contain the fields,
+				// explicitly set these fields as "undefined"
+				// that way we consider the query "fulfilled".
+				if ( query._fields ) {
+					records = records.map( ( record ) => {
+						query._fields.split( ',' ).forEach( ( field ) => {
+							if ( ! record.hasOwnProperty( field ) ) {
+								record[ field ] = undefined;
+							}
+						} );
+
+						return record;
+					} );
+				}
+
+				registry.batch( () => {
+					dispatch.receiveRevisions(
+						kind,
+						name,
+						recordKey,
+						records,
+						query,
+						false,
+						meta
+					);
+
+					// Mark individual getRevision resolutions as done so that
+					// subsequent getRevision calls skip redundant API fetches.
 					const key = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+					const normalizedQuery =
+						normalizeQueryForResolution( rawQuery );
 					const resolutionsArgs = records
 						.filter( ( record ) => record[ key ] )
 						.map( ( record ) => [
@@ -1115,14 +1153,17 @@ export const getRevisions =
 							name,
 							recordKey,
 							record[ key ],
+							normalizedQuery,
 						] );
 
 					dispatch.finishResolutions(
 						'getRevision',
 						resolutionsArgs
 					);
-				}
-			} );
+				} );
+			}
+		} finally {
+			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
 
@@ -1147,7 +1188,7 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
  */
 export const getRevision =
 	( kind, name, recordKey, revisionKey, query ) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -1172,21 +1213,52 @@ export const getRevision =
 				].join(),
 			};
 		}
-		const path = addQueryArgs(
-			entityConfig.getRevisionsUrl( recordKey, revisionKey ),
-			query
+
+		const lock = await dispatch.__unstableAcquireStoreLock(
+			STORE_NAME,
+			[
+				'entities',
+				'records',
+				kind,
+				name,
+				recordKey,
+				'revisions',
+				revisionKey,
+			],
+			{ exclusive: false }
 		);
 
-		let record;
 		try {
-			record = await apiFetch( { path } );
-		} catch ( error ) {
-			// Do nothing if our request comes back with an API error.
-			return;
-		}
+			if (
+				select.hasRevision( kind, name, recordKey, revisionKey, query )
+			) {
+				return;
+			}
 
-		if ( record ) {
-			dispatch.receiveRevisions( kind, name, recordKey, record, query );
+			const path = addQueryArgs(
+				entityConfig.getRevisionsUrl( recordKey, revisionKey ),
+				query
+			);
+
+			let record;
+			try {
+				record = await apiFetch( { path } );
+			} catch {
+				// Do nothing if our request comes back with an API error.
+				return;
+			}
+
+			if ( record ) {
+				dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					record,
+					query
+				);
+			}
+		} finally {
+			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
 
@@ -1208,7 +1280,7 @@ export const getRegisteredPostMeta =
 				path: `${ restNamespace }/${ restBase }/?context=edit`,
 				method: 'OPTIONS',
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if the request comes back with an API error.
 			return;
 		}
@@ -1271,4 +1343,19 @@ export const getEditorAssets =
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
+	};
+
+/**
+ * Requests view config for a given entity type from the REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getViewConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+		} );
+		dispatch.receiveViewConfig( kind, name, config );
 	};

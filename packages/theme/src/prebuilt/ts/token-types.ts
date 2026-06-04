@@ -14,6 +14,21 @@ export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
+ * Size scale for surface width tokens.
+ */
+export type SurfaceWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+
+/**
+ * Size scale for duration tokens.
+ */
+export type DurationSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+/**
+ * Easing curve variants.
+ */
+export type Easing = 'subtle' | 'balanced' | 'expressive';
+
+/**
  * Size scale for border radius tokens.
  */
 export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg';

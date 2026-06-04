@@ -90,7 +90,7 @@ const parseRegionAttribute = ( region: Element ) => {
 	try {
 		const { id, attachTo } = JSON.parse( value );
 		return { id, attachTo };
-	} catch ( e ) {
+	} catch {
 		return { id: value };
 	}
 };
@@ -169,7 +169,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
 		return await preparePage( url, dom );
-	} catch ( e ) {
+	} catch {
 		return false;
 	}
 };

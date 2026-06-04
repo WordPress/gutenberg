@@ -4,6 +4,7 @@
 import {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
+	isHeicCanvasSupported,
 	clearFeatureDetectionCache,
 } from '../feature-detection';
 
@@ -171,9 +172,9 @@ describe( 'feature-detection', () => {
 			expect( result.supported ).toBe( true );
 		} );
 
-		it( 'returns not supported when hardware concurrency is less than 4', () => {
+		it( 'returns not supported when hardware concurrency is less than 2', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 2,
+				value: 1,
 				configurable: true,
 			} );
 
@@ -183,9 +184,9 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'insufficient CPU cores' );
 		} );
 
-		it( 'returns supported when hardware concurrency is 4 or more', () => {
+		it( 'returns supported when hardware concurrency is 2 or more', () => {
 			Object.defineProperty( navigator, 'hardwareConcurrency', {
-				value: 4,
+				value: 2,
 				configurable: true,
 			} );
 
@@ -218,7 +219,7 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'too slow' );
 		} );
 
-		it( 'returns not supported when connection is 3g', () => {
+		it( 'returns supported when connection is 3g', () => {
 			Object.defineProperty( navigator, 'connection', {
 				value: { saveData: false, effectiveType: '3g' },
 				configurable: true,
@@ -226,8 +227,7 @@ describe( 'feature-detection', () => {
 
 			const result = detectClientSideMediaSupport();
 
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toContain( 'too slow' );
+			expect( result.supported ).toBe( true );
 		} );
 
 		it( 'returns not supported when connection is slow-2g', () => {
@@ -287,6 +287,67 @@ describe( 'feature-detection', () => {
 			global.WebAssembly = undefined;
 
 			expect( isClientSideMediaSupported() ).toBe( false );
+		} );
+	} );
+
+	describe( 'isHeicCanvasSupported', () => {
+		const originalCreateImageBitmap =
+			global.createImageBitmap as typeof createImageBitmap;
+		const originalOffscreenCanvas =
+			global.OffscreenCanvas as typeof OffscreenCanvas;
+
+		afterEach( () => {
+			// Restore globals after each test.
+			if ( originalCreateImageBitmap !== undefined ) {
+				global.createImageBitmap =
+					originalCreateImageBitmap as typeof createImageBitmap;
+			} else {
+				// @ts-ignore
+				delete global.createImageBitmap;
+			}
+			if ( originalOffscreenCanvas !== undefined ) {
+				global.OffscreenCanvas =
+					originalOffscreenCanvas as typeof OffscreenCanvas;
+			} else {
+				// @ts-ignore
+				delete global.OffscreenCanvas;
+			}
+		} );
+
+		it( 'returns true when both createImageBitmap and OffscreenCanvas are available', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( true );
+		} );
+
+		it( 'returns false when createImageBitmap is unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			global.OffscreenCanvas =
+				jest.fn() as unknown as typeof OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when OffscreenCanvas is unavailable', () => {
+			global.createImageBitmap =
+				jest.fn() as unknown as typeof createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
+		} );
+
+		it( 'returns false when both are unavailable', () => {
+			// @ts-ignore
+			delete global.createImageBitmap;
+			// @ts-ignore
+			delete global.OffscreenCanvas;
+
+			expect( isHeicCanvasSupported() ).toBe( false );
 		} );
 	} );
 

@@ -2,9 +2,33 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 7.47.0 (2026-05-27)
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+### Internal
+
+-   Remove redundant `createSelector` wrapper from `getQueriedItems`; the inner deep-equality cache already handles inlined query objects.
+
+## 7.44.0 (2026-04-15)
+
 ### Bug Fixes
 
--   `canUser` no longer returns `undefined` when the allow header is missing from the response.
+-   Fix `getEntityRecords` returning incomplete results for non-paginated entities by normalizing `per_page` in queries ([#76406](https://github.com/WordPress/gutenberg/pull/76406)).
+
+## 7.43.0 (2026-04-01)
+
+## 7.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   `canUser` no longer returns `undefined` when the allow header is missing from the response ([#76307](https://github.com/WordPress/gutenberg/pull/76307)).
 
 ## 7.41.0 (2026-03-04)
 

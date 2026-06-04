@@ -682,6 +682,18 @@
 		color: colors.$white;
 		background: var(--wp-admin-theme-color);
 	}
+
+	svg {
+		@media not (prefers-reduced-motion) {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		}
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
 }
 
 @mixin selected-block-outline($widthRatio: 1) {
@@ -689,6 +701,7 @@
 	outline-style: solid;
 	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
 	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	box-shadow: inset 0 0 0 calc((#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1))) + 0.5px) rgba(colors.$white, 0.7);
 }
 
 @mixin selected-block-focus($widthRatio: 1) {

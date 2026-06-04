@@ -111,6 +111,19 @@ export function buildPadInputStateReducer( pad: number ) {
 }
 
 /**
+ * Returns the number of days in a month.
+ *
+ * @param year  The year
+ * @param month The month, zero-indexed (0-11)
+ *
+ * @return The number of days in the month
+ */
+export const getDaysInMonth = ( year: number, month: number ) =>
+	// Take advantage of JavaScript's built-in date wrapping logic, where day 0
+	// of the next month is interpreted as the last day of the preceding month.
+	new Date( year, month + 1, 0 ).getDate();
+
+/**
  * Updates specific date fields in the configured timezone and returns a new
  * UTC date.
  *
@@ -138,6 +151,11 @@ export function setInConfiguredTimezone(
 		seconds: Number( formatDate( 's', date ) ),
 		...updates,
 	};
+
+	// Clamp the day to the last valid day of the month, to avoid producing
+	// invalid date strings (e.g. "2026-02-31").
+	const daysInMonth = getDaysInMonth( values.year, values.month );
+	values.date = Math.min( values.date, daysInMonth );
 
 	const year = String( values.year ).padStart( 4, '0' );
 	const month = String( values.month + 1 ).padStart( 2, '0' );

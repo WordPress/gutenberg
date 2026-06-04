@@ -297,7 +297,7 @@ export const HighLevelHelpText: Story = {
 				fields: [
 					{
 						id: 'accountForm',
-						label: 'Account Information',
+						label: 'Account information',
 						description:
 							'We collect this information to create your account and provide personalized services. Your data will be kept secure and used only for account management and service improvements.',
 						children: [ 'name', 'email', 'phone' ],

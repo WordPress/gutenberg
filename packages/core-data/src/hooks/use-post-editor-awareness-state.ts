@@ -2,36 +2,37 @@
  * External dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import type { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { getSyncManager } from '../sync';
+import { usePostContentBlocks } from '../awareness/block-lookup';
+import type { EditorStoreBlock } from '../awareness/block-lookup';
 import type {
 	PostEditorAwarenessState as ActiveCollaborator,
 	PostSaveEvent,
 	YDocDebugData,
 } from '../awareness/types';
-import type { SelectionState } from '../types';
+import type { SelectionState, ResolvedSelection } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
-
-interface ResolvedSelection {
-	textIndex: number | null;
-	localClientId: string | null;
-}
 
 interface AwarenessState {
 	activeCollaborators: ActiveCollaborator[];
-	resolveSelection: ( selection: SelectionState ) => ResolvedSelection;
+	resolveSelection: (
+		selection: SelectionState,
+		blocks: EditorStoreBlock[]
+	) => ResolvedSelection;
 	getDebugData: () => YDocDebugData;
 	isCurrentCollaboratorDisconnected: boolean;
 }
 
 const defaultResolvedSelection: ResolvedSelection = {
-	textIndex: null,
+	richTextOffset: null,
 	localClientId: null,
+	attributeKey: null,
 };
 
 const defaultState: AwarenessState = {
@@ -53,8 +54,10 @@ function getAwarenessState(
 
 	return {
 		activeCollaborators,
-		resolveSelection: ( selection: SelectionState ) =>
-			awareness.convertSelectionStateToAbsolute( selection ),
+		resolveSelection: (
+			selection: SelectionState,
+			blocks: EditorStoreBlock[]
+		) => awareness.convertSelectionStateToAbsolute( selection, blocks ),
 		getDebugData: () => awareness.getDebugData(),
 		isCurrentCollaboratorDisconnected:
 			activeCollaborators.find( ( collaborator ) => collaborator.isMe )
@@ -128,7 +131,13 @@ export function useResolvedSelection(
 	postId: number | null,
 	postType: string | null
 ): ( selection: SelectionState ) => ResolvedSelection {
-	return usePostEditorAwarenessState( postId, postType ).resolveSelection;
+	const blocks = usePostContentBlocks();
+	const awarenessState = usePostEditorAwarenessState( postId, postType );
+	return useCallback(
+		( selection: SelectionState ) =>
+			awarenessState.resolveSelection( selection, blocks ),
+		[ blocks, awarenessState ]
+	);
 }
 
 /**

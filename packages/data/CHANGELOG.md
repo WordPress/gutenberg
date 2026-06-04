@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 10.47.0 (2026-05-27)
+
+## 10.46.0 (2026-05-14)
+
+## 10.45.0 (2026-04-29)
+
+### New Features
+
+-   Export `keyedReducer` higher-order reducer helper, consolidating duplicated copies previously maintained in `@wordpress/core-data` and `@wordpress/notices` ([#77364](https://github.com/WordPress/gutenberg/pull/77364)).
+
+## 10.44.0 (2026-04-15)
+
+## 10.43.0 (2026-04-01)
+
+## 10.42.0 (2026-03-18)
+
 ## 10.41.0 (2026-03-04)
 
 ## 10.40.0 (2026-02-18)

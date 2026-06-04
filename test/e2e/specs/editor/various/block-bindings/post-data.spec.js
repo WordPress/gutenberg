@@ -19,6 +19,7 @@ test.describe( 'Post Data source', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
+
 	test.describe( 'Post Data bindings UI.', () => {
 		test( 'should not include post data fields in UI to connect attributes on non date blocks', async ( {
 			editor,

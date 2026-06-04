@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/router",
-	"version": "1.41.0",
+	"version": "1.47.0",
 	"description": "Router API for WordPress pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,6 +43,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
@@ -51,7 +52,7 @@
 		"route-recognizer": "^0.3.4"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0"
+		"react": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

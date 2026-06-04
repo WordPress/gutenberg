@@ -5,23 +5,24 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalItem as Item,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	ExternalLink,
 	FlexBlock,
 	Button,
 	TextControl,
 } from '@wordpress/components';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import type { ReactNode } from 'react';
+import type { ApiKeySource } from './types';
 
 export interface ConnectorItemProps {
 	className?: string;
-	icon?: ReactNode;
+	logo?: ReactNode;
 	name: string;
 	description: string;
 	actionArea?: ReactNode;
@@ -30,25 +31,31 @@ export interface ConnectorItemProps {
 
 export function ConnectorItem( {
 	className,
-	icon,
+	logo,
 	name,
 	description,
 	actionArea,
 	children,
 }: ConnectorItemProps ) {
+	const headingId = useId();
 	return (
 		<Item className={ className }>
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
 				<HStack alignment="center" spacing={ 4 } wrap>
-					{ icon }
+					{ logo }
 					<FlexBlock>
 						<VStack spacing={ 0 }>
-							<Text weight={ 600 } size={ 15 }>
+							<WCText
+								weight={ 600 }
+								size={ 15 }
+								id={ headingId }
+								as="h2"
+							>
 								{ name }
-							</Text>
-							<Text variant="muted" size={ 12 }>
+							</WCText>
+							<WCText variant="muted" size={ 12 }>
 								{ description }
-							</Text>
+							</WCText>
 						</VStack>
 					</FlexBlock>
 					{ actionArea }
@@ -59,7 +66,7 @@ export function ConnectorItem( {
 	);
 }
 
-export type ApiKeySource = 'env' | 'constant' | 'database' | 'none';
+export type { ApiKeySource } from './types';
 
 export interface DefaultConnectorSettingsProps {
 	onSave?: ( apiKey: string ) => void | Promise< void >;
@@ -135,7 +142,7 @@ export function DefaultConnectorSettings( {
 						sprintf(
 							/* translators: %s: Link to provider settings. */
 							__(
-								'Your API key is stored securely. You can reset it at %s'
+								'Your API key is stored securely. You can manage it at %s'
 							),
 							'<a></a>'
 						),
@@ -150,7 +157,11 @@ export function DefaultConnectorSettings( {
 				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {
-			return <span style={ { color: '#cc1818' } }>{ saveError }</span>;
+			return (
+				<span role="alert" className="connector-settings__error">
+					{ saveError }
+				</span>
+			);
 		}
 		return helpLink;
 	};
@@ -179,9 +190,9 @@ export function DefaultConnectorSettings( {
 			className="connector-settings"
 			style={
 				readOnly
-					? ( {
+					? {
 							'--wp-components-color-background': '#f0f0f0',
-					  } as React.CSSProperties )
+					  }
 					: undefined
 			}
 		>
@@ -201,9 +212,15 @@ export function DefaultConnectorSettings( {
 			/>
 			{ readOnly ? (
 				onRemove && (
-					<Button variant="link" isDestructive onClick={ onRemove }>
-						{ __( 'Remove and replace' ) }
-					</Button>
+					<HStack justify="flex-start">
+						<Button
+							variant="link"
+							isDestructive
+							onClick={ onRemove }
+						>
+							{ __( 'Remove and replace' ) }
+						</Button>
+					</HStack>
 				)
 			) : (
 				<HStack justify="flex-start">

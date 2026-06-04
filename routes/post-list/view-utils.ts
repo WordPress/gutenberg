@@ -5,7 +5,12 @@ import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Type } from '@wordpress/core-data';
-import type { View, Filter } from '@wordpress/dataviews';
+import type {
+	View,
+	Filter,
+	SupportedLayouts,
+	ViewTable,
+} from '@wordpress/dataviews';
 
 const DEFAULT_VIEW: View = {
 	type: 'table' as const,
@@ -19,18 +24,20 @@ const DEFAULT_VIEW: View = {
 	descriptionField: 'excerpt',
 };
 
-export const DEFAULT_LAYOUTS = {
-	table: {
-		layout: {
-			styles: {
-				author: {
-					align: 'start' as const,
-				},
+const DEFAULT_TABLE_LAYOUT: Omit< ViewTable, 'type' > = {
+	layout: {
+		styles: {
+			author: {
+				align: 'start',
 			},
 		},
 	},
-	grid: {},
-	list: {},
+};
+
+export const DEFAULT_LAYOUTS: SupportedLayouts = {
+	table: DEFAULT_TABLE_LAYOUT,
+	grid: true,
+	list: true,
 };
 
 export const DEFAULT_VIEWS: {
@@ -74,11 +81,11 @@ export function getActiveViewOverridesForTab(
 ): ActiveViewOverrides {
 	if ( slug === 'all' ) {
 		return {
-			...DEFAULT_LAYOUTS.table,
+			...DEFAULT_TABLE_LAYOUT,
 		};
 	}
 	return {
-		...DEFAULT_LAYOUTS.table,
+		...DEFAULT_TABLE_LAYOUT,
 		filters: [
 			{
 				field: 'status',

@@ -6,7 +6,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement, useMemo } from 'react';
 import { useStorybookApi } from 'storybook/manager-api';
 import { styled } from 'storybook/theming';
@@ -78,4 +77,7 @@ function Label( { item } ) {
 export default {
 	// Renders status icons for items tagged with `status-*`
 	renderLabel: ( item ) => createElement( Label, { item } ),
+
+	// Renders sections as collapsed by default
+	showRoots: false,
 };

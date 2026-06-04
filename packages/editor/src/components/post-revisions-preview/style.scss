@@ -35,7 +35,7 @@
 .revision-diff-markers {
 	position: relative;
 	flex-shrink: 0;
-	width: 12px;
+	width: max(16px, 1rem);
 	background: rgba(0, 0, 0, 0.05);
 
 	.revision-diff-marker {
@@ -44,19 +44,19 @@
 		min-height: 4px;
 		border: none;
 		padding: 0;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		transition: opacity 0.1s ease;
 
 		&.is-added {
-			background: #00a32a;
+			background: #008a20;
 		}
 
 		&.is-removed {
-			background: #d63638;
+			background: repeating-linear-gradient(45deg, #d63638, #d63638 6px, rgba(#d63638, 0.45) 6px, rgba(#d63638, 0.45) 8px);
 		}
 
 		&.is-modified {
-			background: #dba617;
+			background: repeating-linear-gradient(-45deg, #9a7000, #9a7000 6px, rgba(#9a7000, 0.45) 6px, rgba(#9a7000, 0.45) 8px);
 		}
 
 		&:hover {

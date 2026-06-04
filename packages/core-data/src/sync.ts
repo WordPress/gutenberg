@@ -12,6 +12,7 @@ import {
 import { unlock } from './lock-unlock';
 
 const {
+	ConnectionErrorCode,
 	createSyncManager,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
@@ -22,6 +23,7 @@ const {
 } = unlock( syncPrivateApis );
 
 export {
+	ConnectionErrorCode,
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
@@ -40,4 +42,13 @@ export function getSyncManager(): SyncManager | undefined {
 	syncManager = createSyncManager();
 
 	return syncManager;
+}
+
+/**
+ * Return whether a sync manager has already been created. Use this when you
+ * only want to interact with an existing sync manager (e.g. to tear it down),
+ * without `getSyncManager()` bootstrapping one if none exists.
+ */
+export function hasSyncManager(): boolean {
+	return Boolean( syncManager );
 }

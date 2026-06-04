@@ -3,18 +3,11 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-/**
- * External dependencies
- */
-const path = require( 'path' );
-
 test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			await requestUtils.activatePlugin(
-				'gutenberg-test-block-bindings'
-			),
+			requestUtils.activatePlugin( 'gutenberg-test-block-bindings' ),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -159,14 +152,8 @@ test.describe( 'Pattern Overrides', () => {
 			} );
 			// Ensure the first pattern is selected.
 			await patternBlocks.first().selectText();
-			await expect( paragraphs.first() ).not.toHaveAttribute(
-				'inert',
-				'true'
-			);
-			await expect( paragraphs.last() ).toHaveAttribute(
-				'inert',
-				'true'
-			);
+			await expect( paragraphs.first() ).not.toHaveAttribute( 'inert' );
+			await expect( paragraphs.last() ).toHaveAttribute( 'inert' );
 
 			await expect( paragraphs.first() ).toHaveText(
 				'This paragraph can be edited'
@@ -473,21 +460,11 @@ test.describe( 'Pattern Overrides', () => {
 				// are inert due to the 'click-through' behavior, that requires the
 				// pattern block be selected first before its inner blocks are selectable.
 				await editor.selectBlocks( groupBlock );
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
+				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -498,16 +475,13 @@ test.describe( 'Pattern Overrides', () => {
 				// of the pattern with bindings are editable, but unbound
 				// blocks are inert.
 				await expect( blockWithOverrides ).not.toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 				await expect( blockWithBindings ).not.toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -516,26 +490,16 @@ test.describe( 'Pattern Overrides', () => {
 
 				// In zoomed out only the pattern block is editable,
 				// as in this scenario it's a section.
-				await expect( patternBlock ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
 
 				// Ensure the pattern block is selected before checking the child blocks
 				// to ensure the click-through behavior isn't interfering.
 				await editor.selectBlocks( patternBlock );
 
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 
@@ -546,17 +510,10 @@ test.describe( 'Pattern Overrides', () => {
 
 			await test.step( 'Zoomed out - pattern nested in a section', async () => {
 				// None of the pattern is editable in zoomed out when nested in a section.
-				await expect( blockWithOverrides ).toHaveAttribute(
-					'inert',
-					'true'
-				);
-				await expect( blockWithBindings ).toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
-					'inert',
-					'true'
+					'inert'
 				);
 			} );
 		} );
@@ -622,11 +579,11 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'Block: Paragraph',
 			} );
 			await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
-			await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
+			await expect( headingBlock ).not.toHaveAttribute( 'inert' );
 			await expect( paragraphBlock ).toHaveText(
 				'Inner paragraph (edited)'
 			);
-			await expect( paragraphBlock ).toHaveAttribute( 'inert', 'true' );
+			await expect( paragraphBlock ).toHaveAttribute( 'inert' );
 
 			// Edit the outer pattern.
 			await editor.selectBlocks(
@@ -651,7 +608,7 @@ test.describe( 'Pattern Overrides', () => {
 					name: 'Block: Paragraph',
 				} ),
 				'The inner paragraph should be editable'
-			).not.toHaveAttribute( 'inert', 'true' );
+			).not.toHaveAttribute( 'inert' );
 
 			// Visit the post on the frontend.
 			await page.goto( `/?p=${ postId }` );
@@ -698,7 +655,11 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
 
 		// Check that the overrides remain.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -714,6 +675,7 @@ test.describe( 'Pattern Overrides', () => {
 
 	// See https://github.com/WordPress/gutenberg/pull/62014.
 	test( 'can convert a pattern block to regular blocks when the pattern supports overrides but not override values', async ( {
+		page,
 		admin,
 		requestUtils,
 		editor,
@@ -739,7 +701,11 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
 
 		// Check that the overrides remain.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -765,7 +731,7 @@ test.describe( 'Pattern Overrides', () => {
 			title: 'Button with target',
 			content: `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"${ buttonName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noopener nofollow">Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
 			status: 'publish',
@@ -829,10 +795,7 @@ test.describe( 'Pattern Overrides', () => {
 		const buttonLink = previewPage.getByRole( 'link', { name: 'Button' } );
 
 		await expect( buttonLink ).toHaveAttribute( 'target', '_blank' );
-		await expect( buttonLink ).toHaveAttribute(
-			'rel',
-			'noreferrer noopener'
-		);
+		await expect( buttonLink ).toHaveAttribute( 'rel', 'noopener' );
 
 		// Uncheck both checkboxes.
 		await editLinkButton.click();
@@ -921,8 +884,7 @@ test.describe( 'Pattern Overrides', () => {
 		await nonEditableButton.click();
 		const initialText = await nonEditableButton.textContent();
 		await page.keyboard.type( 'Edited' );
-		const finalText = await nonEditableButton.textContent();
-		expect( initialText ).toBe( finalText );
+		await expect( nonEditableButton ).toHaveText( initialText );
 
 		await nonEditableButton.click();
 		await editor.showBlockToolbar();
@@ -1117,10 +1079,7 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 	} ) => {
 		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
+		const TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
@@ -1177,10 +1136,7 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 	} ) => {
 		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
+		const TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
@@ -1233,17 +1189,11 @@ test.describe( 'Pattern Overrides', () => {
 		// Upload two images, one for the original pattern, one for the override.
 		const { id: originalImageId, source_url: originalImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-				)
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
-				)
+				'./assets/1024x768_e2e_test_image_size.jpeg'
 			);
 		const overrideName = 'test';
 
@@ -1302,17 +1252,11 @@ test.describe( 'Pattern Overrides', () => {
 		// Upload two images, one for the original pattern, one for the override.
 		const { id: originalImageId, source_url: originalImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-				)
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
-				)
+				'./assets/1024x768_e2e_test_image_size.jpeg'
 			);
 		const overrideName = 'test';
 
