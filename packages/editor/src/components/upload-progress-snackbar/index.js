@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
@@ -83,8 +83,13 @@ export default function UploadProgressSnackbar() {
 	);
 	const tracker = useTracker();
 
-	// CSM path: originals in the upload-media queue (subsizes excluded).
-	const csmOriginals = items.filter( ( item ) => ! item.parentId );
+	// CSM path: originals in the upload-media queue (subsizes excluded). Memoized
+	// so its reference is stable across renders where `items` is unchanged, since
+	// it's a dependency of the effect below.
+	const csmOriginals = useMemo(
+		() => items.filter( ( item ) => ! item.parentId ),
+		[ items ]
+	);
 	const csmRemaining = csmOriginals.length;
 
 	// Non-CSM path: files tracked by the editor's mediaUpload wrapper.
