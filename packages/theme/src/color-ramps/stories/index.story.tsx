@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
@@ -36,7 +29,6 @@ const meta: Meta< typeof ColorGen > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 

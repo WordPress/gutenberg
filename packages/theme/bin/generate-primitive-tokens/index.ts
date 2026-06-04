@@ -1,15 +1,7 @@
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { to, sRGB, getAll } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import '../../src/color-ramps/lib/register-color-spaces';
+import { ColorSpace, to, sRGB, getAll } from 'colorjs.io/fn';
 import {
 	DEFAULT_SEED_COLORS,
 	buildBgRamp,
@@ -30,6 +22,7 @@ const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
 const HEX_ROUNDING_PRECISION = 3;
 
 const transformColorStringToDTCGValue = ( color: string ) => {
+	ColorSpace.register( sRGB );
 	const parsed = to( color, sRGB );
 
 	return {

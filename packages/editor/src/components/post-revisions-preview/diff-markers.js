@@ -15,6 +15,8 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -32,10 +34,10 @@ const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 function collectDiffBlocks( blocks ) {
 	const result = [];
 	for ( const block of blocks ) {
-		if ( block.__revisionDiffStatus ) {
+		if ( block.__revisionDiffStatus?.status ) {
 			result.push( {
 				clientId: block.clientId,
-				status: block.__revisionDiffStatus,
+				status: block.__revisionDiffStatus.status,
 			} );
 		}
 		if ( block.innerBlocks?.length ) {
@@ -97,15 +99,22 @@ function DiffMarkerButton( { clientId, status, subscribe } ) {
 	}
 
 	return (
-		<button
-			className={ `revision-diff-marker is-${ status }` }
-			style={ {
-				top: `${ position.top }%`,
-				height: `${ Math.max( position.height, 0.5 ) }%`,
-			} }
-			onClick={ () => blockRef.current?.focus() }
-			aria-label={ STATUS_LABELS[ status ] }
-		/>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<button
+						className={ `revision-diff-marker is-${ status }` }
+						style={ {
+							top: `${ position.top }%`,
+							height: `${ Math.max( position.height, 0.5 ) }%`,
+						} }
+						onClick={ () => blockRef.current?.focus() }
+						aria-label={ STATUS_LABELS[ status ] }
+					/>
+				}
+			/>
+			<Tooltip.Popup>{ STATUS_LABELS[ status ] }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
 
@@ -145,7 +154,7 @@ export function useDiffMarkers() {
 			key="diff-markers"
 			className="revision-diff-markers"
 			role="navigation"
-			aria-label={ __( 'Diff markers' ) }
+			aria-label={ __( 'Document changes' ) }
 		>
 			{ isMounted &&
 				diffBlocks.map( ( { clientId, status } ) => (

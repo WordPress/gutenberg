@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { TaperChromaOptions } from './taper-chroma';
 
 export type Ramp = {

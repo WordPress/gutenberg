@@ -12,7 +12,12 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
-import { getRootMap } from './crdt-utils';
+import {
+	asRichTextOffset,
+	getRootMap,
+	getYTextByAttributeKey,
+	richTextOffsetToHtmlIndex,
+} from './crdt-utils';
 import type {
 	AbsoluteBlockIndexPath,
 	WPBlockSelection,
@@ -37,6 +42,16 @@ export enum SelectionType {
 }
 
 /**
+ * The direction of a text selection, indicating where the caret sits.
+ */
+export enum SelectionDirection {
+	/** The caret is at the end of the selection (default / left-to-right). */
+	Forward = 'f',
+	/** The caret is at the start of the selection (right-to-left). */
+	Backward = 'b',
+}
+
+/**
  * Converts WordPress block editor selection to a SelectionState.
  *
  * Uses getBlockPathForLocalClientId to locate blocks in the Yjs document by
@@ -44,16 +59,20 @@ export enum SelectionType {
  * differ between the block-editor store and the Yjs document (e.g. in "Show
  * Template" mode).
  *
- * @param selectionStart - The start position of the selection
- * @param selectionEnd   - The end position of the selection
- * @param yDoc           - The Yjs document
+ * @param selectionStart             - The start position of the selection
+ * @param selectionEnd               - The end position of the selection
+ * @param yDoc                       - The Yjs document
+ * @param options                    - Optional parameters
+ * @param options.selectionDirection - The direction of the selection (forward or backward)
  * @return The SelectionState
  */
 export function getSelectionState(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection,
-	yDoc: Y.Doc
+	yDoc: Y.Doc,
+	options?: { selectionDirection?: SelectionDirection }
 ): SelectionState {
+	const { selectionDirection } = options ?? {};
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
 	const yBlocks = ymap.get( 'blocks' );
 
@@ -122,6 +141,7 @@ export function getSelectionState(
 			type: SelectionType.SelectionInOneBlock,
 			cursorStartPosition,
 			cursorEndPosition,
+			selectionDirection,
 		};
 	}
 
@@ -137,6 +157,7 @@ export function getSelectionState(
 		type: SelectionType.SelectionInMultipleBlocks,
 		cursorStartPosition,
 		cursorEndPosition,
+		selectionDirection,
 	};
 }
 
@@ -162,7 +183,9 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey );
+	const currentYText = attributes
+		? getYTextByAttributeKey( attributes, selection.attributeKey )
+		: null;
 
 	// If the attribute is not a Y.Text, return null.
 	if ( ! ( currentYText instanceof Y.Text ) ) {
@@ -171,12 +194,16 @@ function getCursorPosition(
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,
-		selection.offset
+		richTextOffsetToHtmlIndex(
+			currentYText.toString(),
+			asRichTextOffset( selection.offset )
+		)
 	);
 
 	return {
 		relativePosition,
 		absoluteOffset: selection.offset,
+		attributeKey: selection.attributeKey,
 	};
 }
 
@@ -315,7 +342,9 @@ export function areSelectionsStatesEqual(
 				areCursorPositionsEqual(
 					selection1.cursorEndPosition,
 					( selection2 as SelectionInOneBlock ).cursorEndPosition
-				)
+				) &&
+				selection1.selectionDirection ===
+					( selection2 as SelectionInOneBlock ).selectionDirection
 			);
 
 		case SelectionType.SelectionInMultipleBlocks:
@@ -329,7 +358,10 @@ export function areSelectionsStatesEqual(
 					selection1.cursorEndPosition,
 					( selection2 as SelectionInMultipleBlocks )
 						.cursorEndPosition
-				)
+				) &&
+				selection1.selectionDirection ===
+					( selection2 as SelectionInMultipleBlocks )
+						.selectionDirection
 			);
 		case SelectionType.WholeBlock:
 			return Y.compareRelativePositions(

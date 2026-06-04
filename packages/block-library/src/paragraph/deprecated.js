@@ -114,6 +114,7 @@ const deprecated = [
 	{
 		supports: {
 			className: false,
+			color: true,
 			typography: {
 				fontSize: true,
 			},

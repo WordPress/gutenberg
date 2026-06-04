@@ -13,7 +13,7 @@ export default function FormPanelField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const layout = field.layout as NormalizedPanelLayout;
 
-	if ( layout.openAs === 'modal' ) {
+	if ( layout.openAs.type === 'modal' ) {
 		return (
 			<PanelModal
 				data={ data }

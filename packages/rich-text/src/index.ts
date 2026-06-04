@@ -26,7 +26,7 @@ export { createElement as __unstableCreateElement } from './create-element';
 export { privateApis } from './private-apis';
 export { useAnchorRef } from './hook/use-anchor-ref';
 export { useAnchor } from './hook/use-anchor';
-export { __unstableUseRichText } from './hook';
+export { useDeprecatedRichText as __unstableUseRichText } from './hook';
 
 // Remnant that is left in an abundance of caution to ensure there's no errors.
 export function __experimentalRichText() {}

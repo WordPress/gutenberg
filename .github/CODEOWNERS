@@ -15,7 +15,6 @@
 # Blocks
 /packages/block-library                         @ajitbohra @fabiankaegy
 /packages/block-library/src/gallery
-/packages/block-library/src/table-of-contents   @ZebulanStanphill
 
 # Duotone
 /lib/block-supports/duotone.php									@sgomes
@@ -34,7 +33,6 @@
 /packages/blocks
 /packages/edit-post
 /packages/editor
-/packages/editor/src/components/post-title @alexstine
 /packages/list-reusable-blocks
 /packages/shortcode
 /packages/block-directory
@@ -55,9 +53,8 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
-/bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra
-/docs/tool                                      @ajitbohra
+/bin                                            @ntwb @nerrad @ajitbohra @manzoorwanijk
+/tools                                          @manzoorwanijk
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
@@ -82,6 +79,7 @@
 # UI Components
 /packages/components                            @ajitbohra @WordPress/gutenberg-components
 /packages/compose                               @ajitbohra
+/packages/design-system-mcp                     @WordPress/gutenberg-components
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
 /packages/nux                                   @ajitbohra @peterwilsoncc

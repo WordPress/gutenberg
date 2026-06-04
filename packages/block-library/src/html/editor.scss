@@ -14,7 +14,14 @@
 
 // Modal styles
 .block-library-html__modal {
-	height: 100%;
+
+	// On medium and large screens, the modal component sets a max-height.
+	// We want the modal to be as tall as possible also when the content is short.
+	@include break-small() {
+		&:not(.is-full-screen) {
+			height: 9999rem;
+		}
+	}
 
 	.components-modal__children-container {
 		height: 100%;
@@ -22,12 +29,11 @@
 }
 
 .block-library-html__modal-tabs {
-	overflow-y: auto;
+	flex: 1;
 }
 
 .block-library-html__modal-content {
 	flex: 1;
-	min-height: 0;
 }
 
 .block-library-html__modal-tab {
@@ -71,7 +77,11 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: $grid-unit-20;
-	flex: 1;
 	min-height: 0;
+	overflow-y: auto;
+	flex: 1;
+
+	iframe {
+		height: 100%;
+	}
 }

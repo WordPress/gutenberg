@@ -14,8 +14,6 @@ import { Tabs } from './tabs';
 import { kebabCase, normalizeTextString } from './utils/strings';
 import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
-import Avatar from './avatar';
-import AvatarGroup from './avatar-group';
 import Badge from './badge';
 
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
@@ -36,8 +34,6 @@ import { ValidatedFormTokenField } from './validated-form-controls/components/fo
 export const privateApis = {};
 lock( privateApis, {
 	__experimentalPopoverLegacyPositionToPlacement,
-	Avatar,
-	AvatarGroup,
 	ComponentsContext,
 	Tabs,
 	Theme,

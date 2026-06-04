@@ -17,7 +17,10 @@
 .components-checkbox-control__label {
 	// Ensure label is aligned with checkbox along X axis
 	line-height: var(--checkbox-input-size);
-	cursor: pointer;
+
+	.components-checkbox-control:not(:has(:disabled)) & {
+		cursor: var(--wpds-cursor-control);
+	}
 }
 
 .components-checkbox-control__input[type="checkbox"] {
@@ -25,7 +28,6 @@
 	background: $white;
 	color: $gray-900;
 	clear: none;
-	cursor: pointer;
 	display: inline-block;
 	line-height: 0;
 	margin: 0 $grid-unit-05 0 0;
@@ -46,10 +48,13 @@
 		@include button-style-outset__focus(var(--wp-admin-theme-color));
 	}
 
-	&:checked,
-	&:indeterminate {
+	&:not(:disabled):is(:checked, :indeterminate) {
 		background: $components-color-accent;
 		border-color: $components-color-accent;
+	}
+
+	&:not(:disabled) {
+		cursor: var(--wpds-cursor-control);
 	}
 
 	&:checked::before {
@@ -73,7 +78,7 @@ svg.components-checkbox-control__indeterminate {
 	--checkmark-size: var(--checkbox-input-size);
 
 	fill: $white;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	position: absolute;
 	left: 50%;
 	top: 50%;
@@ -85,6 +90,13 @@ svg.components-checkbox-control__indeterminate {
 
 	@include break-small() {
 		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
+	}
+}
+
+.components-checkbox-control:has(:disabled) {
+	svg.components-checkbox-control__checked,
+	svg.components-checkbox-control__indeterminate {
+		fill: $components-color-gray-400;
 	}
 }
 

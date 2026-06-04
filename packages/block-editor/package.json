@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "15.14.0",
+	"version": "15.20.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -61,8 +61,8 @@
 	],
 	"dependencies": {
 		"@react-spring/web": "^9.4.5",
+		"@types/react": "^19.2.13",
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
@@ -94,6 +94,7 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/token-list": "file:../token-list",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
@@ -118,8 +119,8 @@
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0"
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
 	},
 	"publishConfig": {
 		"access": "public"

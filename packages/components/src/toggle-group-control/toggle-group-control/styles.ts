@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -99,9 +98,4 @@ export const toggleGroupControlSize = (
 export const block = css`
 	display: flex;
 	width: 100%;
-`;
-
-export const VisualLabelWrapper = styled.div`
-	// Makes the inline label be the correct height, equivalent to setting line-height: 0
-	display: flex;
 `;

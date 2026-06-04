@@ -65,13 +65,9 @@ test.describe( 'Change detection', () => {
 			).toBeDisabled(),
 		] );
 
-		// With RTC enabled, all autosaves target an autosave revision. Vary our
-		// expectation accordingly.
-		const isRTCEnabled = Boolean(
-			await page.evaluate( () => window._wpCollaborationEnabled )
-		);
-
-		expect( await changeDetectionUtils.getIsDirty() ).toBe( isRTCEnabled );
+		// New auto-drafts are promoted to drafts on first autosave, including
+		// when RTC is enabled, so the editor should no longer be dirty.
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 
 	test( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async ( {
@@ -500,6 +496,37 @@ test.describe( 'Change detection', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save draft' } )
 		).toBeEnabled();
+	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/76143.
+	test( 'should not be dirty after autosaving content changes for draft post', async ( {
+		page,
+		editor,
+		changeDetectionUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Paragraph' );
+
+		// Force autosave to occur immediately.
+		await Promise.all( [
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
+			expect(
+				page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'saved' } )
+			).toBeDisabled(),
+		] );
+
+		// New auto-drafts are promoted to drafts on first autosave, including
+		// when RTC is enabled, so content edits should be clean afterward.
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
 	} );
 } );
 

@@ -9,6 +9,11 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 
+/**
+ * Internal dependencies
+ */
+import type { ConnectionError } from './errors';
+
 /* globalThis */
 declare global {
 	interface Window {
@@ -56,25 +61,6 @@ export interface ProviderCreatorResult {
 }
 
 /**
- * Error codes for connection errors that can occur in sync providers.
- */
-export type ConnectionErrorCode =
-	| 'authentication-error'
-	| 'connection-expired'
-	| 'connection-limit-exceeded'
-	| 'unknown-error';
-
-/**
- * Sync connection error object.
- */
-export interface ConnectionError extends Error {
-	/**
-	 * Error code identifier for programmatic handling and default message lookup.
-	 */
-	code: ConnectionErrorCode;
-}
-
-/**
  * Current connection status of a sync provider.
  */
 export interface ConnectionStatusConnected {
@@ -87,10 +73,21 @@ export interface ConnectionStatusConnecting {
 
 export interface ConnectionStatusDisconnected {
 	status: 'disconnected';
+
 	/** Optional error information. */
 	error?: ConnectionError;
-	/** Milliseconds until the next automatic retry attempt. */
-	retryInMs?: number;
+
+	/** Whether the error condition is retryable via user action. */
+	canManuallyRetry?: boolean;
+
+	/** Number of consecutive poll failures since the last successful connection. */
+	consecutiveFailures?: number;
+
+	/** Whether the background retry schedule has been exhausted without a successful connection. */
+	backgroundRetriesFailed?: boolean;
+
+	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
+	willAutoRetryInMs?: number;
 }
 
 export type ConnectionStatus =
@@ -134,9 +131,9 @@ export interface RecordHandlers {
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	onStatusChange: OnStatusChangeCallback;
+	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	saveRecord: () => void;
 }
 
 export interface SyncConfig {
@@ -153,6 +150,10 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	shouldSync?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	) => boolean;
 }
 
 export interface SyncManager {
@@ -179,6 +180,7 @@ export interface SyncManager {
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
+	unloadAll: () => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID | null,

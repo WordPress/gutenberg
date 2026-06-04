@@ -19,8 +19,16 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
+import {
+	LOCAL_EDITOR_ORIGIN,
+	LOCAL_UNDO_IGNORED_ORIGIN,
+	getSyncManager,
+} from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+
+function addTitleToAutoDraft( record ) {
+	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
+}
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -96,12 +104,9 @@ export function receiveEntityRecords(
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
 	if ( kind === 'postType' ) {
-		records = ( Array.isArray( records ) ? records : [ records ] ).map(
-			( record ) =>
-				record.status === 'auto-draft'
-					? { ...record, title: '' }
-					: record
-		);
+		records = Array.isArray( records )
+			? records.map( addTitleToAutoDraft )
+			: addTitleToAutoDraft( records );
 	}
 	let action;
 	if ( query ) {
@@ -445,11 +450,18 @@ export const editEntityRecord =
 				? false
 				: ! options.isCached;
 
+			// Use an untracked origin for undoIgnore changes so the Yjs
+			// UndoManager does not capture them as undo levels, while
+			// still syncing them to the CRDT document and other peers.
+			const origin = options.undoIgnore
+				? LOCAL_UNDO_IGNORED_ORIGIN
+				: LOCAL_EDITOR_ORIGIN;
+
 			getSyncManager()?.update(
 				objectType,
 				objectId,
 				editsWithMerges,
-				LOCAL_EDITOR_ORIGIN,
+				origin,
 				{ isNewUndoLevel }
 			);
 		}
@@ -585,17 +597,15 @@ export const __unstableCreateUndoLevel =
  *                                                the exceptions. Defaults to false.
  */
 export const saveEntityRecord =
-	(
-		kind,
-		name,
-		record,
-		{
+	( kind, name, record, options = {} ) =>
+	async ( { select, resolveSelect, dispatch } ) => {
+		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
+			__unstableSkipSyncUpdate = false,
 			throwOnError = false,
-		} = {}
-	) =>
-	async ( { select, resolveSelect, dispatch } ) => {
+		} = options;
+
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -666,40 +676,25 @@ export const saveEntityRecord =
 					? select.getRawEntityRecord( kind, name, recordId )
 					: {};
 
+				// Most of this autosave logic is very specific to posts.
+				// This is fine for now as it is the only supported autosave,
+				// but ideally this should all be handled in the back end,
+				// so the client just sends and receives objects.
 				if ( isAutosave ) {
-					// Most of this autosave logic is very specific to posts.
-					// This is fine for now as it is the only supported autosave,
-					// but ideally this should all be handled in the back end,
-					// so the client just sends and receives objects.
-					const currentUser = select.getCurrentUser();
-					const currentUserId = currentUser
-						? currentUser.id
-						: undefined;
-					const autosavePost = await resolveSelect.getAutosave(
-						persistedRecord.type,
-						persistedRecord.id,
-						currentUserId
-					);
-					// Autosaves need all expected fields to be present.
-					// So we fallback to the previous autosave and then
-					// to the actual persisted entity if the edits don't
-					// have a value.
-					let data = {
-						...persistedRecord,
-						...autosavePost,
-						...record,
-					};
-					data = Object.keys( data ).reduce(
+					// Build the autosave payload from the persisted
+					// record and the incoming edits. The previous autosave
+					// is intentionally excluded to avoid stale values
+					// overriding reverted fields.
+					const merged = { ...persistedRecord, ...record };
+					const data = [
+						'title',
+						'excerpt',
+						'content',
+						'meta',
+					].reduce(
 						( acc, key ) => {
-							if (
-								[
-									'title',
-									'excerpt',
-									'content',
-									'meta',
-								].includes( key )
-							) {
-								acc[ key ] = data[ key ];
+							if ( key in merged ) {
+								acc[ key ] = merged[ key ];
 							}
 							return acc;
 						},
@@ -709,7 +704,7 @@ export const saveEntityRecord =
 							// because it can lead to unexpected results. An example would be to
 							// have a draft post and change the status to publish.
 							status:
-								data.status === 'auto-draft'
+								merged.status === 'auto-draft'
 									? 'draft'
 									: undefined,
 						}
@@ -733,9 +728,12 @@ export const saveEntityRecord =
 							( acc, key ) => {
 								// These properties are persisted in autosaves.
 								if (
-									[ 'title', 'excerpt', 'content' ].includes(
-										key
-									)
+									[
+										'title',
+										'excerpt',
+										'content',
+										'meta',
+									].includes( key )
 								) {
 									acc[ key ] = newRecord[ key ];
 								} else if ( key === 'status' ) {
@@ -793,11 +791,13 @@ export const saveEntityRecord =
 						edits
 					);
 					if ( entityConfig.syncConfig ) {
+						// Use an untracked origin so that the save
+						// response does not create undo levels.
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
-							updatedRecord,
-							LOCAL_EDITOR_ORIGIN,
+							__unstableSkipSyncUpdate ? {} : updatedRecord,
+							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);
 					}
@@ -1100,15 +1100,12 @@ export const receiveRevisions =
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
-		const key =
-			entityConfig && entityConfig?.revisionKey
-				? entityConfig.revisionKey
-				: DEFAULT_ENTITY_KEY;
+		const key = entityConfig?.revisionKey ?? DEFAULT_ENTITY_KEY;
 
 		dispatch( {
 			type: 'RECEIVE_ITEM_REVISIONS',
 			key,
-			items: Array.isArray( records ) ? records : [ records ],
+			items: records,
 			recordKey,
 			meta,
 			query,
@@ -1117,32 +1114,3 @@ export const receiveRevisions =
 			invalidateCache,
 		} );
 	};
-
-/**
- * Returns an action object used to set the sync connection status for an entity or collection.
- *
- * @param {string}             kind   Kind of the entity.
- * @param {string}             name   Name of the entity.
- * @param {number|string|null} key    The entity key, or null for collections.
- * @param {Object|null}        status The connection state object or null on unload.
- *
- * @return {Object} Action object.
- */
-export function setSyncConnectionStatus( kind, name, key, status ) {
-	if ( ! status ) {
-		return {
-			type: 'CLEAR_SYNC_CONNECTION_STATUS',
-			kind,
-			name,
-			key,
-		};
-	}
-
-	return {
-		type: 'SET_SYNC_CONNECTION_STATUS',
-		kind,
-		name,
-		key,
-		status,
-	};
-}

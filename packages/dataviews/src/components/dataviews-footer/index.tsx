@@ -31,14 +31,9 @@ export default function DataViewsFooter() {
 		actions = EMPTY_ARRAY,
 		isLoading,
 		hasInitiallyLoaded,
-		hasInfiniteScrollHandler,
 	} = useContext( DataViewsContext );
 
-	const isRefreshing =
-		!! isLoading &&
-		hasInitiallyLoaded &&
-		! hasInfiniteScrollHandler &&
-		!! data?.length;
+	const isRefreshing = !! isLoading && hasInitiallyLoaded && !! data?.length;
 
 	const isDelayedRefreshing = useDelayedLoading( !! isRefreshing );
 

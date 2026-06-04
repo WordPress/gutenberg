@@ -91,4 +91,49 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
 		$this->assertFalse( gutenberg_block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
 	}
+
+	/**
+	 * @covers ::block_core_navigation_set_overlay_image_fetch_priority
+	 */
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_adds_low_priority() {
+		$html   = '<div><img src="example.jpg" width="300" height="300" /></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
+		$tags   = new WP_HTML_Tag_Processor( $result );
+		$this->assertTrue( $tags->next_tag( 'IMG' ) );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
+		$this->assertNull( $tags->get_attribute( 'loading' ) );
+	}
+
+	/**
+	 * @covers ::block_core_navigation_set_overlay_image_fetch_priority
+	 */
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_overrides_high_priority() {
+		$html   = '<div><img src="example.jpg" fetchpriority="high" /></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
+		$tags   = new WP_HTML_Tag_Processor( $result );
+		$this->assertTrue( $tags->next_tag( 'IMG' ) );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
+	}
+
+	/**
+	 * @covers ::block_core_navigation_set_overlay_image_fetch_priority
+	 */
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_multiple_images() {
+		$html   = '<div><img src="a.jpg" /><img src="b.jpg" /></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
+		$tags   = new WP_HTML_Tag_Processor( $result );
+		$this->assertTrue( $tags->next_tag( 'IMG' ) );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
+		$this->assertTrue( $tags->next_tag( 'IMG' ) );
+		$this->assertSame( 'low', $tags->get_attribute( 'fetchpriority' ) );
+	}
+
+	/**
+	 * @covers ::block_core_navigation_set_overlay_image_fetch_priority
+	 */
+	public function test_block_core_navigation_set_overlay_image_fetch_priority_no_images() {
+		$html   = '<div><p>No images here</p></div>';
+		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
+		$this->assertSame( $html, $result );
+	}
 }
