@@ -37,19 +37,22 @@ jobs:
             fail-fast: false
             matrix:
                 package:
+                    # Bundled packages
+                    # Keep in sync with dependency-extraction-webpack-plugin
                     - admin-ui
-                    - components
                     - dataviews
                     - fields
                     - grid
                     - icons
                     - interface
-                    - private-apis
                     - style-runtime
                     - theme
                     - ui
                     - undo-manager
                     - views
+                    # Other packages
+                    - components
+                    - private-apis
                     - wp-build
         steps:
             - name: 'Get PR commit count'
