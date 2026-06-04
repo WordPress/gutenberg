@@ -35,12 +35,12 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 		const CRDT_DOC_META_KEY = '_crdt_document';
 
 		/**
-		 * Maximum total size (in bytes) of the request body.
+		 * Maximum length of the persisted CRDT document string.
 		 *
 		 * @since 7.1.0
 		 * @var int
 		 */
-		const MAX_BODY_SIZE = 16 * MB_IN_BYTES;
+		const MAX_DOC_LENGTH = 16 * MB_IN_BYTES;
 
 		/**
 		 * Registers REST API routes.
@@ -59,14 +59,13 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 					'methods'             => array( WP_REST_Server::CREATABLE ),
 					'callback'            => array( $this, 'handle_request' ),
 					'permission_callback' => array( $this, 'check_permissions' ),
-					'validate_callback'   => array( $this, 'validate_request' ),
 					'args'                => array(
 						'room' => array(
 							'required' => true,
 							'type'     => 'string',
 						),
 						'doc'  => array(
-							'maxLength' => self::MAX_BODY_SIZE,
+							'maxLength' => self::MAX_DOC_LENGTH,
 							'required'  => true,
 							'type'      => 'string',
 						),
@@ -100,27 +99,6 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 					'rest_cannot_edit',
 					__( 'You do not have permission to persist this document.', 'gutenberg' ),
 					array( 'status' => rest_authorization_required_code() )
-				);
-			}
-
-			return true;
-		}
-
-		/**
-		 * Validates that the request body does not exceed the maximum allowed size.
-		 *
-		 * @since 7.1.0
-		 *
-		 * @param WP_REST_Request $request The REST request.
-		 * @return true|WP_Error True if valid, WP_Error if the body is too large.
-		 */
-		public function validate_request( WP_REST_Request $request ) {
-			$body = $request->get_body();
-			if ( is_string( $body ) && strlen( $body ) > self::MAX_BODY_SIZE ) {
-				return new WP_Error(
-					'rest_sync_body_too_large',
-					__( 'Request body is too large.', 'gutenberg' ),
-					array( 'status' => 413 )
 				);
 			}
 

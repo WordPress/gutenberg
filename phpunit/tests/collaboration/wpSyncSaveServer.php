@@ -153,6 +153,17 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		$this->assertSame( 200, $response->get_status() );
 	}
 
+	public function test_save_rejects_crdt_doc_exceeding_max_length() {
+		wp_set_current_user( self::$editor_id );
+
+		$response = $this->dispatch_save(
+			$this->get_post_room(),
+			str_repeat( 'a', WP_Sync_Save_Server::MAX_DOC_LENGTH + 1 )
+		);
+
+		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
+	}
+
 	public function test_save_updates_crdt_doc_meta_without_touching_modified_date() {
 		wp_set_current_user( self::$editor_id );
 
