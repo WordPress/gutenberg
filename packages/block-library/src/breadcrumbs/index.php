@@ -183,8 +183,10 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$wrapper_classes = $attributes['showTrailingSeparator'] ? 'has-trailing-separator' : '';
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
+			'class'      => $wrapper_classes,
 			'style'      => '--separator: "' . addcslashes( $attributes['separator'], '\\"' ) . '";',
 			'aria-label' => __( 'Breadcrumbs' ),
 		)
