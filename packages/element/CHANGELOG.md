@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added polyfills for the `render`, `hydrate` and `unmountComponentAtNode` APIs that React 19 no longer ships.
+
 ## 7.0.0 (2026-05-27)
 
 ### Breaking Changes

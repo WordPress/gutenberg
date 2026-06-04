@@ -6,5 +6,8 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/ui": "file:../../packages/ui",
 		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"@types/react": "^19.2.13"
 	}
 }
