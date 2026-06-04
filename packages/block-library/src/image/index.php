@@ -239,12 +239,12 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		'nextButtonText'   => esc_html_x( 'Next', 'next image in lightbox' ),
 	);
 
-	// Lightbox comments are gated behind the `gutenberg-lightbox-comments`
+	// Lightbox comments are gated behind the `gutenberg-gallery-lightbox-default`
 	// experiment. When enabled, comments are only shown for an image that also
 	// turns them on via the per-block attribute or the `lightboxComments`
 	// theme.json setting, and whose attachment has comments open.
 	$comments_enabled = false;
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-lightbox-comments' ) ) {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-gallery-lightbox-default' ) ) {
 		$comments_settings = block_core_image_get_lightbox_comments_settings( $block );
 		$comments_enabled  = isset( $comments_settings['enabled'] ) && true === $comments_settings['enabled'];
 
@@ -395,10 +395,10 @@ function block_core_image_print_lightbox_overlay() {
 	}
 
 	// Lightbox comments markup is only output when the
-	// `gutenberg-lightbox-comments` experiment is enabled.
+	// `gutenberg-gallery-lightbox-default` experiment is enabled.
 	$comment_button   = '';
 	$comments_section = '';
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-lightbox-comments' ) ) {
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-gallery-lightbox-default' ) ) {
 		$comment_label = esc_attr__( 'Comment' );
 		$submit_label  = esc_html__( 'Post Comment' );
 		$comment_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H9.44L5.3 18.53A.75.75 0 0 1 4 17.96V5.5Zm2.5-1A1 1 0 0 0 5.5 5.5v11.33l3.18-2.71a.75.75 0 0 1 .49-.18h8.33a1 1 0 0 0 1-1v-7.44a1 1 0 0 0-1-1h-11Z"></path></svg>';

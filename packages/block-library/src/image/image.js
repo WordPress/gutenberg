@@ -692,9 +692,9 @@ export default function Image( {
 	const [ lightboxCommentsSetting ] = useSettings( 'lightboxComments' );
 
 	const showCommentsSetting =
-		// Lightbox comments are gated behind the `gutenberg-lightbox-comments`
+		// Lightbox comments are gated behind the `gutenberg-gallery-lightbox-default`
 		// experiment.
-		!! window.__experimentalLightboxComments &&
+		!! window.__experimentalGalleryLightboxDefault &&
 		// Comments only apply to the lightbox, so the toggle is only relevant
 		// when the lightbox is enabled for this image.
 		lightboxChecked &&

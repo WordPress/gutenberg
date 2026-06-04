@@ -993,7 +993,7 @@ test.describe( 'Image - lightbox comments', () => {
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-lightbox-comments',
+			'gutenberg-gallery-lightbox-default',
 		] );
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(

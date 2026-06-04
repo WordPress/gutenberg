@@ -56,9 +56,9 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
 				),
 				array(
-					'id'          => 'gutenberg-lightbox-comments',
-					'label'       => __( 'Image lightbox comments', 'gutenberg' ),
-					'description' => __( 'Enables an opt-in comments panel in the image lightbox, letting visitors read comments on an image and (when logged in) post new ones.', 'gutenberg' ),
+					'id'          => 'gutenberg-gallery-lightbox-default',
+					'label'       => __( 'Gallery lightbox default', 'gutenberg' ),
+					'description' => __( 'Sets newly created Gallery blocks to use the lightbox by default.', 'gutenberg' ),
 				),
 			),
 		),

@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Image: Add an opt-in comments panel to the lightbox, letting visitors read comments on the image's attachment and (when logged in) post new ones. Gated behind the `gutenberg-lightbox-comments` experiment, and controlled by the `lightboxComments` setting (theme.json default + `allowEditing`) and a per-block "Show comments" toggle, mirroring the lightbox setting.
+-   Image: Add an opt-in comments panel to the lightbox, letting visitors read comments on the image's attachment and (when logged in) post new ones. Gated behind the `gutenberg-gallery-lightbox-default` experiment, and controlled by the `lightboxComments` setting (theme.json default + `allowEditing`) and a per-block "Show comments" toggle, mirroring the lightbox setting.
 
 ### Code Quality
 
