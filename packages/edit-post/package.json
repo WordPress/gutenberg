@@ -83,6 +83,11 @@
 		"clsx": "^2.1.1",
 		"memize": "^2.1.0"
 	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1"
+	},
 	"peerDependencies": {
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"

@@ -141,7 +141,7 @@ describe( 'LinkPicker', () => {
 			);
 
 			const button = screen.getByRole( 'button' );
-			const image = within( button ).getByRole( 'img', { hidden: true } );
+			const image = within( button ).getByRole( 'presentation' );
 
 			expect( image ).toHaveAttribute(
 				'src',
