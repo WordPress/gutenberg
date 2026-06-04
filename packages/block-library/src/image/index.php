@@ -167,6 +167,23 @@ function block_core_image_get_lightbox_settings( $block ) {
 }
 
 /**
+ * Checks whether the experimental image lightbox EXIF metadata feature is enabled.
+ *
+ * The feature is currently behind a Gutenberg experiment. The experiments option
+ * is read directly so this (Core-synced) block file does not depend on the
+ * plugin-only `gutenberg_is_experiment_enabled()` helper; outside the plugin the
+ * option is absent and the feature stays disabled.
+ *
+ * @since 6.9.0
+ *
+ * @return bool True when the experiment is enabled.
+ */
+function block_core_image_is_lightbox_exif_enabled() {
+	$experiments = get_option( 'gutenberg-experiments' );
+	return is_array( $experiments ) && ! empty( $experiments['gutenberg-gallery-lightbox-default'] );
+}
+
+/**
  * Returns the EXIF metadata display settings for the block.
  *
  * Mirrors the lightbox settings resolution: a per-block `exif` attribute
@@ -351,11 +368,14 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		$img_width        = $img_metadata['width'] ?? 'none';
 		$img_height       = $img_metadata['height'] ?? 'none';
 
-		// Only expose EXIF metadata (and therefore the toggle button) when it is
-		// enabled via the block attribute or global settings.
-		$exif_settings = block_core_image_get_exif_display_settings( $block );
-		if ( isset( $exif_settings['enabled'] ) && true === $exif_settings['enabled'] ) {
-			$img_exif = block_core_image_get_lightbox_exif_data( $block['attrs']['id'] );
+		// Only expose EXIF metadata (and therefore the toggle button) when the
+		// experiment is enabled and it is turned on via the block attribute or
+		// global settings.
+		if ( block_core_image_is_lightbox_exif_enabled() ) {
+			$exif_settings = block_core_image_get_exif_display_settings( $block );
+			if ( isset( $exif_settings['enabled'] ) && true === $exif_settings['enabled'] ) {
+				$img_exif = block_core_image_get_lightbox_exif_data( $block['attrs']['id'] );
+			}
 		}
 	}
 
@@ -460,13 +480,6 @@ function block_core_image_print_lightbox_overlay() {
 	$close_button_text = esc_attr__( 'Close' );
 	$prev_button_text  = esc_attr_x( 'Previous', 'previous image in lightbox' );
 	$next_button_text  = esc_attr_x( 'Next', 'next image in lightbox' );
-	$exif_button_label = esc_attr__( 'Toggle photo metadata visibility' );
-	$exif_region_label = esc_attr__( 'Photo metadata' );
-	$camera_label      = esc_html__( 'Camera' );
-	$aperture_label    = esc_html__( 'Aperture' );
-	$shutter_label     = esc_html__( 'Shutter Speed' );
-	$focal_label       = esc_html__( 'Focal Length' );
-	$copyright_label   = esc_html__( 'Copyright' );
 	$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 	$prev_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
 	$next_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
@@ -484,6 +497,62 @@ function block_core_image_print_lightbox_overlay() {
 		if ( ! empty( $global_styles_color['text'] ) ) {
 			$close_button_color = esc_attr( $global_styles_color['text'] );
 		}
+	}
+
+	// The EXIF metadata toggle and panel are only rendered while the feature is
+	// behind an experiment. When disabled, no extra markup is emitted.
+	$exif_markup = '';
+	if ( block_core_image_is_lightbox_exif_enabled() ) {
+		$exif_button_label = esc_attr__( 'Toggle photo metadata visibility' );
+		$exif_region_label = esc_attr__( 'Photo metadata' );
+		$camera_label      = esc_html__( 'Camera' );
+		$aperture_label    = esc_html__( 'Aperture' );
+		$shutter_label     = esc_html__( 'Shutter Speed' );
+		$focal_label       = esc_html__( 'Focal Length' );
+		$copyright_label   = esc_html__( 'Copyright' );
+
+		$exif_markup = <<<HTML
+				<button
+					type="button"
+					style="color:{$close_button_color}"
+					class="wp-lightbox-exif-button"
+					aria-label="{$exif_button_label}"
+					aria-controls="wp-lightbox-exif"
+					data-wp-bind--aria-expanded="state.exifExpanded"
+					data-wp-bind--hidden="!state.hasExif"
+					data-wp-class--active="state.isExifVisible"
+					data-wp-on--click="actions.toggleExif"
+					hidden
+				>
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+						<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12.5 2C7.007 2 2.549 6.48 2.549 12S7.007 22 12.5 22s9.951-4.48 9.951-10S17.993 2 12.5 2ZM4.539 12c0-4.41 3.572-8 7.961-8s7.961 3.59 7.961 8-3.572 8-7.961 8-7.961-3.59-7.961-8ZM11.505 7v2h1.99V7h-1.99Zm0 4v6h1.99v-6h-1.99Z"/>
+					</svg>
+				</button>
+				<div id="wp-lightbox-exif" class="wp-lightbox-exif" style="color:{$close_button_color}" role="group" aria-label="{$exif_region_label}" data-wp-bind--hidden="!state.isExifVisible" data-wp-on--click="actions.handleExifClick" hidden>
+					<ul>
+						<li data-wp-bind--hidden="!state.exifCamera" hidden>
+							<h5>{$camera_label}</h5>
+							<span data-wp-text="state.exifCamera"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifAperture" hidden>
+							<h5>{$aperture_label}</h5>
+							<span data-wp-text="state.exifAperture"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifShutterSpeed" hidden>
+							<h5>{$shutter_label}</h5>
+							<span data-wp-text="state.exifShutterSpeed"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifFocalLength" hidden>
+							<h5>{$focal_label}</h5>
+							<span data-wp-text="state.exifFocalLength"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifCopyright" hidden>
+							<h5>{$copyright_label}</h5>
+							<span data-wp-text="state.exifCopyright"></span>
+						</li>
+					</ul>
+				</div>
+	HTML;
 	}
 
 	echo <<<HTML
@@ -538,46 +607,7 @@ function block_core_image_print_lightbox_overlay() {
 						>
 					</figure>
 				</div>
-				<button
-					type="button"
-					style="color:{$close_button_color}"
-					class="wp-lightbox-exif-button"
-					aria-label="{$exif_button_label}"
-					aria-controls="wp-lightbox-exif"
-					data-wp-bind--aria-expanded="state.exifExpanded"
-					data-wp-bind--hidden="!state.hasExif"
-					data-wp-class--active="state.isExifVisible"
-					data-wp-on--click="actions.toggleExif"
-					hidden
-				>
-					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-						<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12.5 2C7.007 2 2.549 6.48 2.549 12S7.007 22 12.5 22s9.951-4.48 9.951-10S17.993 2 12.5 2ZM4.539 12c0-4.41 3.572-8 7.961-8s7.961 3.59 7.961 8-3.572 8-7.961 8-7.961-3.59-7.961-8ZM11.505 7v2h1.99V7h-1.99Zm0 4v6h1.99v-6h-1.99Z"/>
-					</svg>
-				</button>
-				<div id="wp-lightbox-exif" class="wp-lightbox-exif" style="color:{$close_button_color}" role="group" aria-label="{$exif_region_label}" data-wp-bind--hidden="!state.isExifVisible" data-wp-on--click="actions.handleExifClick" hidden>
-					<ul>
-						<li data-wp-bind--hidden="!state.exifCamera" hidden>
-							<h5>{$camera_label}</h5>
-							<span data-wp-text="state.exifCamera"></span>
-						</li>
-						<li data-wp-bind--hidden="!state.exifAperture" hidden>
-							<h5>{$aperture_label}</h5>
-							<span data-wp-text="state.exifAperture"></span>
-						</li>
-						<li data-wp-bind--hidden="!state.exifShutterSpeed" hidden>
-							<h5>{$shutter_label}</h5>
-							<span data-wp-text="state.exifShutterSpeed"></span>
-						</li>
-						<li data-wp-bind--hidden="!state.exifFocalLength" hidden>
-							<h5>{$focal_label}</h5>
-							<span data-wp-text="state.exifFocalLength"></span>
-						</li>
-						<li data-wp-bind--hidden="!state.exifCopyright" hidden>
-							<h5>{$copyright_label}</h5>
-							<span data-wp-text="state.exifCopyright"></span>
-						</li>
-					</ul>
-				</div>
+				{$exif_markup}
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>

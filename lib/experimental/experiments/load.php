@@ -55,6 +55,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
 					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-gallery-lightbox-default',
+					'label'       => __( 'Gallery lightbox default', 'gutenberg' ),
+					'description' => __( 'Sets newly created Gallery blocks to use the lightbox by default.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

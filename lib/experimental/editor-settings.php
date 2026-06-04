@@ -39,6 +39,9 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-classic-block-deprecation' ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalClassicBlockDeprecation = true', 'before' );
 	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-gallery-lightbox-default' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalGalleryLightboxDefault = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );

@@ -31,3 +31,21 @@ function gutenberg_test_lightbox_exif_metadata( $data ) {
 	return $data;
 }
 add_filter( 'wp_get_attachment_metadata', 'gutenberg_test_lightbox_exif_metadata' );
+
+/**
+ * Enables the EXIF lightbox experiment while this test plugin is active, so the
+ * feature (which is otherwise behind a flag) is rendered on the front end and
+ * exposed in the editor.
+ *
+ * @param mixed $experiments The stored experiments option value.
+ * @return array Experiments with the EXIF lightbox flag enabled.
+ */
+function gutenberg_test_enable_lightbox_exif_experiment( $experiments ) {
+	if ( ! is_array( $experiments ) ) {
+		$experiments = array();
+	}
+	$experiments['gutenberg-gallery-lightbox-default'] = 1;
+	return $experiments;
+}
+add_filter( 'option_gutenberg-experiments', 'gutenberg_test_enable_lightbox_exif_experiment' );
+add_filter( 'default_option_gutenberg-experiments', 'gutenberg_test_enable_lightbox_exif_experiment' );

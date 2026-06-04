@@ -698,10 +698,12 @@ export default function Image( {
 	const [ exifSetting ] = useSettings( 'exif' );
 
 	const showExifSetting =
+		// The EXIF metadata UI is gated behind the lightbox experiment for now.
+		!! window.__experimentalGalleryLightboxDefault &&
 		// If a block-level override is set, give users the option to remove it
 		// even if the EXIF UI is disabled in the settings.
-		( !! exif && exif?.enabled !== exifSetting?.enabled ) ||
-		exifSetting?.allowEditing;
+		( ( !! exif && exif?.enabled !== exifSetting?.enabled ) ||
+			exifSetting?.allowEditing );
 
 	const exifChecked =
 		!! exif?.enabled || ( ! exif && !! exifSetting?.enabled );
