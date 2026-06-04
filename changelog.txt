@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 23.3.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Element: Add polyfills for render, hydrate, unmountComponentAtNode. ([78899](https://github.com/WordPress/gutenberg/pull/78899))
+- React: Add ReactCurrentOwner polyfill. ([78923](https://github.com/WordPress/gutenberg/pull/78923))
+- Revert "wp-build: Replace getter-based exports with data properties". ([78917](https://github.com/WordPress/gutenberg/pull/78917))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@gigitux @jsnajdr
+
+
 = 23.3.0 =
 
 ## Changelog
