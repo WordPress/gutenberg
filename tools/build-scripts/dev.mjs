@@ -3,7 +3,8 @@
 /**
  * External dependencies
  */
-import { execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
+import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
@@ -28,7 +29,6 @@ function exec( command, args = [], options = {} ) {
 		const childOptions = {
 			cwd: ROOT_DIR,
 			stdio: silent ? 'pipe' : 'inherit',
-			shell: true,
 			...spawnOptions,
 		};
 
@@ -89,7 +89,6 @@ function execAsync( command, args = [], options = {} ) {
 	return spawn( command, args, {
 		cwd: ROOT_DIR,
 		stdio: 'inherit',
-		shell: true,
 		...options,
 	} );
 }
@@ -146,7 +145,7 @@ async function dev() {
 
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
-		await exec( 'node', [
+		await exec( process.execPath, [
 			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
 		] );
 
@@ -162,7 +161,7 @@ async function dev() {
 		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
 		console.log( '\n✅ Checking type declaration files...' );
-		await exec( 'node', [
+		await exec( process.execPath, [
 			path.join(
 				__dirname,
 				'packages/check-build-type-declaration-files.cjs'
@@ -170,7 +169,7 @@ async function dev() {
 		] );
 
 		console.log( '\n📦 Building vendor files...' );
-		await exec( 'node', [
+		await exec( process.execPath, [
 			path.join( __dirname, 'packages/build-vendors.mjs' ),
 		] );
 
@@ -198,7 +197,6 @@ async function dev() {
 		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
 			cwd: ROOT_DIR,
 			stdio: [ 'inherit', 'pipe', 'inherit' ],
-			shell: true,
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
