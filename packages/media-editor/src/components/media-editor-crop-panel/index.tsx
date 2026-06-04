@@ -13,6 +13,7 @@ import {
 	useCropGestureHandlers,
 	CROP_CONTROL_ATTR,
 } from '../../hooks/use-crop-gesture-handlers';
+import MediaEditorTransformControls from '../media-editor-transform-controls';
 import { MAX_ZOOM } from '../../image-editor/core/constants';
 import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -41,6 +42,12 @@ export interface MediaEditorCropPanelProps {
 	onPlacementControlInteraction?: () => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
+	/**
+	 * When `true`, render the rotate/flip transform controls at the top of
+	 * the panel. Used on wide viewports where the footer no longer carries
+	 * them.
+	 */
+	showTransformControls?: boolean;
 }
 
 /**
@@ -51,12 +58,14 @@ export interface MediaEditorCropPanelProps {
  * @param props.onAspectRatioChange
  * @param props.onPlacementControlInteraction
  * @param props.aspectRatioOptions
+ * @param props.showTransformControls
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	onPlacementControlInteraction,
 	aspectRatioOptions,
+	showTransformControls = false,
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useMediaEditor();
 	const zoomGestureHandlers = useCropGestureHandlers();
@@ -76,6 +85,9 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
+			{ showTransformControls && (
+				<MediaEditorTransformControls withLabels />
+			) }
 			<SelectControl
 				__next40pxDefaultSize
 				label={ __( 'Aspect ratio' ) }

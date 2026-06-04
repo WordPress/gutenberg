@@ -80,6 +80,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",

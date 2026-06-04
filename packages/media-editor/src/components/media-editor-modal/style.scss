@@ -21,57 +21,35 @@
 	min-height: 0;
 }
 
-// Footer chrome — three layouts driven by `is-wide` / `is-medium` /
-// `is-narrow` modifier classes set from the media editor. Wide is a single
-// flex row; medium and narrow stack via `flex-direction: column`. Each
-// layout has its own JSX tree (not `order` reshuffling, which the project's
-// stylelint rule treats as an a11y red flag), so DOM order always matches
-// visual order.
+// Footer chrome — two layouts driven by `is-wide` / `is-narrow` modifier
+// classes set from the media editor at the sidebar-collapse breakpoint.
+// Wide is a single flex row (History | Cancel/Save); narrow stacks via
+// `flex-direction: column` (transform controls above the History |
+// Cancel/Save row). Each layout has its own JSX tree (not `order`
+// reshuffling, which the project's stylelint rule treats as an a11y red
+// flag), so DOM order always matches visual order.
 .media-editor-modal.components-modal__frame .media-editor-modal__footer {
 	flex-shrink: 0;
 	display: flex;
 	gap: $grid-unit-20;
-	padding: $grid-unit-10 $grid-unit-30;
-	border-top: $border-width solid $gray-300;
+	// Borderless: sections are demarcated by the inset canvas panel and
+	// spacing, not divider lines. 16px top / 32px sides / 24px bottom.
+	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
 	background: $white;
 
 	&.is-wide {
 		flex-direction: row;
 		align-items: center;
 
-		// Wide-only wrapper: ruler + transform controls are grouped
-		// together, centered between History and Cancel/Save with a
-		// divider rule between them — preserving the long-standing
-		// wide-desktop look.
-		.media-editor-modal__footer-toolbar {
-			flex: 1 1 0;
-			min-width: 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: $grid-unit-10;
-		}
-
-		.media-editor-fine-rotation {
-			flex: 1 1 280px;
-			min-width: 0;
-			max-width: 360px;
-		}
-
-		.media-editor-transform-controls {
-			border-left: $border-width solid $gray-300;
-			padding-left: $grid-unit-15;
-		}
-
-		// `margin-left: auto` guarantees right alignment whether or not
-		// History / the toolbar is rendered (handles non-image
-		// attachments where only `FooterActions` is present).
+		// Panel mode: the footer holds only History (left) and
+		// Cancel/Save (right). `margin-left: auto` pins the actions to the
+		// right edge whether or not History renders (e.g. non-image
+		// attachments show only `FooterActions`).
 		.media-editor__footer-actions {
 			margin-left: auto;
 		}
 	}
 
-	&.is-medium,
 	&.is-narrow {
 		flex-direction: column;
 	}
@@ -99,6 +77,16 @@
 	.media-editor__footer-actions {
 		margin-left: auto;
 	}
+}
+
+// Active (enabled) undo/redo icon buttons take the admin accent colour so
+// they read as live alongside the Reset/Cancel/Save actions. Disabled
+// buttons (rendered with `aria-disabled` via `accessibleWhenDisabled`)
+// keep the default muted icon colour.
+// NOTE: overrides @wordpress/components Button internals (`.components-button`,
+// `.has-icon`), scoped to our history-actions wrapper. Update if renamed.
+.media-editor__history-actions .components-button.has-icon:not([aria-disabled="true"]) {
+	color: var(--wp-admin-theme-color);
 }
 
 .media-editor-modal {

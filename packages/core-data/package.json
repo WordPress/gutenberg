@@ -49,6 +49,7 @@
 		"build-module/index.mjs"
 	],
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
