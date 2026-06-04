@@ -5,7 +5,9 @@
 		align-self: flex-end;
 		color: var(--wpds-color-fg-content-error);
 	}
+}
 
+@layer wp-ui-compositions {
 	/*
 	 * AlertDialog stacks an actions row and an optional error message in
 	 * its footer. Override the shared `.footer` row layout to a column so
@@ -18,9 +20,7 @@
 		justify-content: flex-start;
 		gap: var(--wpds-dimension-gap-md);
 	}
-}
 
-@layer wp-ui-compositions {
 	.irreversible-action {
 		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
 		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
