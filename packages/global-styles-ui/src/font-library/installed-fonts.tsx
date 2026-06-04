@@ -18,13 +18,7 @@ import {
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import type {
@@ -91,7 +85,9 @@ function InstalledFonts() {
 	const [ fontFamilies, setFontFamilies ] = useSetting<
 		Record< string, FontFamilyPreset[] > | undefined
 	>( 'typography.fontFamilies' );
-	const lastSelectedFontSlugRef = useRef< string | undefined >( undefined );
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
 
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] =
 		useState< boolean >( false );
@@ -224,18 +220,6 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected( libraryFontSelected );
 	}, [] );
 
-	useEffect( () => {
-		if ( ! libraryFontSelected && lastSelectedFontSlugRef.current ) {
-			const button = document.querySelector< HTMLElement >(
-				`[data-font-slug="${ lastSelectedFontSlugRef.current }"]`
-			);
-			if ( button ) {
-				button.focus();
-			}
-			lastSelectedFontSlugRef.current = undefined;
-		}
-	}, [ libraryFontSelected ] );
-
 	// Get activated fonts count.
 	const activeFontsCount = libraryFontSelected
 		? getFontFacesActivated(
@@ -347,6 +331,10 @@ function InstalledFonts() {
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
+														shouldFocus={
+															font.slug ===
+															lastSelectedFontSlug
+														}
 														onClick={ () => {
 															setNotice( null );
 															handleSetLibraryFontSelected(
@@ -388,6 +376,10 @@ function InstalledFonts() {
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
+														shouldFocus={
+															font.slug ===
+															lastSelectedFontSlug
+														}
 														onClick={ () => {
 															setNotice( null );
 															handleSetLibraryFontSelected(
@@ -425,8 +417,9 @@ function InstalledFonts() {
 									}
 									size="small"
 									onClick={ () => {
-										lastSelectedFontSlugRef.current =
-											libraryFontSelected?.slug;
+										setLastSelectedFontSlug(
+											libraryFontSelected?.slug
+										);
 										handleSetLibraryFontSelected(
 											undefined
 										);
