@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Revert React back to v18.
+### Breaking Changes
+
+- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 
 ### Code Quality
 
