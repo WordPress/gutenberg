@@ -120,7 +120,6 @@ function VisualEditor( {
 			getEditorSettings,
 			getRenderingMode,
 			getDeviceType,
-			getCanvasMinHeight,
 			getCanvasWidth,
 		} = unlock( select( editorStore ) );
 		const { getPostType, getEditedEntityRecord } = select( coreStore );
@@ -164,7 +163,6 @@ function VisualEditor( {
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
 			hasCanvasWidth: getCanvasWidth() !== undefined,
-			canvasMinHeight: getCanvasMinHeight(),
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
