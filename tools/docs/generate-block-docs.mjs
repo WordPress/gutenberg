@@ -438,10 +438,6 @@ function blockLink( blockName ) {
 		return `\`${ blockName }\``;
 	}
 
-	if ( isDeprecated( slug ) ) {
-		return `\`${ blockName }\``;
-	}
-
 	const { category = 'uncategorized' } = readBlockJson( slug );
 	const url = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ slug }/`;
 	return `[\`${ blockName }\`](${ url })`;
@@ -971,7 +967,8 @@ function generateDeprecatedNotice( dirs ) {
 	lines.push( '' );
 
 	dirs.forEach( ( blockDir ) => {
-		const { title, name, description, category } = readBlockJson( blockDir );
+		const { title, name, description, category } =
+			readBlockJson( blockDir );
 		const replacement = description
 			.replace( 'This block is deprecated. ', '' )
 			.replace( 'This block is deprecated.', '' )
