@@ -9,8 +9,9 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 import {
 	initWaveformPlayer,
 	logPlayError,
-	setupPlayButtonArtwork,
 	updateSeekControlLabel,
+	setupPlayButtonArtwork,
+	getNextShuffledTrack,
 } from '../utils/waveform-utils';
 
 /**
@@ -104,13 +105,11 @@ const { state } = store(
  */
 function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
-	const showPlayButtonArtwork = context.showPlayButtonArtwork === true;
-	const playerArtwork = showPlayButtonArtwork ? '' : track.image;
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
 		const shouldRecreatePlayer =
-			!! existing.instance.artworkEl !== !! playerArtwork;
+			!! existing.instance.artworkEl !== !! track.image;
 
 		if ( shouldRecreatePlayer ) {
 			existing.destroy?.();
@@ -119,8 +118,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			playlistPlayerState.set( context.playlistId, existing );
 			existing.instance
 				.loadTrack( track.url, track.title, track.artist, {
-					artwork: playerArtwork,
-					artworkAlt: playerArtwork ? track.imageAlt : '',
+					artwork: track.image,
 				} )
 				.then( () => {
 					existing.url = track.url;
@@ -132,12 +130,11 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 						existing.instance,
 						track.title || ref.dataset.labelSeek
 					);
-					if ( showPlayButtonArtwork ) {
-						setupPlayButtonArtwork(
-							existing.container,
-							track.image
-						);
-					}
+					setupPlayButtonArtwork(
+						existing.container,
+						existing.instance,
+						track.image
+					);
 					if ( shouldAutoPlay ) {
 						existing.instance.play()?.catch( logPlayError );
 					}
@@ -159,6 +156,18 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		repeat: ref.dataset.labelRepeat,
 	};
 
+	// Advance to the next shuffled track, recording it so no track repeats
+	// until every other track has played once.
+	const advanceShuffled = () => {
+		const { nextId, playedIds } = getNextShuffledTrack(
+			context.tracks,
+			context.currentId,
+			context.playedTracks
+		);
+		context.playedTracks = playedIds;
+		context.currentId = nextId;
+	};
+
 	// Initialize using the shared core.
 	const player = initWaveformPlayer( ref, {
 		src: track.url,
@@ -166,15 +175,18 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		artist: track.artist,
 		image: track.image,
 		imageAlt: track.imageAlt,
-		waveformColor: ref.dataset.waveformPlayerColor,
-		waveformGradient: ref.dataset.waveformPlayerGradient,
-		backgroundColor: ref.dataset.waveformPlayerBackgroundColor,
-		backgroundGradient: ref.dataset.waveformPlayerBackgroundGradient,
 		autoPlay: shouldAutoPlay,
 		labels,
 		waveformStyle: context.waveformStyle,
-		showPlayButtonArtwork,
 		onEnded: () => {
+			if ( context.isRepeating ) {
+				player.instance.play()?.catch( logPlayError );
+				return;
+			}
+			if ( context.isShuffled ) {
+				advanceShuffled();
+				return;
+			}
 			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
 				( trackId ) => trackId === context.currentId
@@ -184,6 +196,41 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 				context.currentId = nextTrack;
 			}
 		},
+		onPrev: () => {
+			const currentIndex = context.tracks.findIndex(
+				( uniqueId ) => uniqueId === context.currentId
+			);
+			const prevTrack =
+				context.tracks[ currentIndex - 1 ] ||
+				context.tracks[ context.tracks.length - 1 ];
+			if ( prevTrack ) {
+				context.currentId = prevTrack;
+			}
+		},
+		onNext: () => {
+			if ( context.isShuffled ) {
+				advanceShuffled();
+				return;
+			}
+			const currentIndex = context.tracks.findIndex(
+				( uniqueId ) => uniqueId === context.currentId
+			);
+			const nextTrack =
+				context.tracks[ currentIndex + 1 ] || context.tracks[ 0 ];
+			if ( nextTrack ) {
+				context.currentId = nextTrack;
+			}
+		},
+		onShuffleToggle: () => {
+			context.isShuffled = ! context.isShuffled;
+			// Start a fresh shuffle cycle whenever shuffle is toggled.
+			context.playedTracks = [];
+		},
+		onRepeatToggle: () => {
+			context.isRepeating = ! context.isRepeating;
+		},
+		isShuffled: context.isShuffled,
+		isRepeating: context.isRepeating,
 	} );
 	const setIsPlaying = ( isPlaying ) => {
 		context.isPlaying = isPlaying;
@@ -203,8 +250,8 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	// Store state for cleanup, including instance for loadTrack reuse.
 	const nextState = {
 		url: track.url,
-		instance: player.instance,
 		container: player.container,
+		instance: player.instance,
 		destroy,
 	};
 	playerState.set( ref, nextState );

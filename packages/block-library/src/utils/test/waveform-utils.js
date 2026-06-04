@@ -7,15 +7,15 @@ import '@testing-library/jest-dom';
  * Internal dependencies
  */
 import {
-	applyWaveformPlayerStyles,
 	createWaveformContainer,
-	getWaveformColors,
-	getWaveformGradientStops,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
-	setupPlayButtonArtwork,
 	updateSeekControlLabel,
+	setupPlayButtonArtwork,
 	logPlayError,
+	formatTime,
+	WAVEFORM_BUTTON_WIDTH,
+	getNextShuffledTrack,
 } from '../waveform-utils';
 
 // Base player data used across tests
@@ -103,237 +103,6 @@ describe( 'Waveform utilities', () => {
 			} );
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
-		} );
-
-		it( 'serializes gradient color arrays and direction attributes', () => {
-			const container = createWaveformContainer( {
-				...basePlayerData,
-				waveformColor: [
-					'rgba(255, 0, 0, 0.3)',
-					'rgba(0, 0, 255, 0.3)',
-				],
-				progressColor: [
-					'rgba(255, 0, 0, 0.6)',
-					'rgba(0, 0, 255, 0.6)',
-				],
-				waveformGradient: 'horizontal',
-			} );
-
-			expect( container ).toHaveAttribute(
-				'data-waveform-color',
-				'["rgba(255, 0, 0, 0.3)","rgba(0, 0, 255, 0.3)"]'
-			);
-			expect( container ).toHaveAttribute(
-				'data-progress-color',
-				'["rgba(255, 0, 0, 0.6)","rgba(0, 0, 255, 0.6)"]'
-			);
-			expect( container ).toHaveAttribute(
-				'data-waveform-gradient',
-				'horizontal'
-			);
-		} );
-	} );
-
-	describe( 'getWaveformColors', () => {
-		it( 'derives waveform colors from the computed text color', () => {
-			const element = document.createElement( 'div' );
-			element.style.color = '#336699';
-			document.body.appendChild( element );
-
-			const colors = getWaveformColors( element );
-
-			expect( colors ).toEqual( {
-				textColor: 'rgb(51, 102, 153)',
-				waveformColor: 'rgba(51, 102, 153, 0.3)',
-				progressColor: 'rgba(51, 102, 153, 0.6)',
-			} );
-
-			element.remove();
-		} );
-
-		it( 'uses explicit text and waveform color values when provided', () => {
-			const element = document.createElement( 'div' );
-
-			const colors = getWaveformColors( element, '#ff0000', '#0000ff' );
-
-			expect( colors ).toEqual( {
-				textColor: '#0000ff',
-				waveformColor: 'rgba(255, 0, 0, 0.3)',
-				progressColor: 'rgba(255, 0, 0, 0.6)',
-			} );
-		} );
-
-		it( 'uses gradient stops when a waveform gradient is provided', () => {
-			const element = document.createElement( 'div' );
-
-			const colors = getWaveformColors(
-				element,
-				undefined,
-				'#0000ff',
-				'linear-gradient(90deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
-			);
-
-			expect( colors ).toEqual( {
-				textColor: '#0000ff',
-				waveformColor: [
-					'rgba(255, 0, 0, 0.3)',
-					'rgba(0, 0, 255, 0.3)',
-				],
-				progressColor: [
-					'rgba(255, 0, 0, 0.6)',
-					'rgba(0, 0, 255, 0.6)',
-				],
-				waveformGradient: 'horizontal',
-			} );
-		} );
-
-		it( 'maps CSS gradient side-or-corner directions for waveform gradients', () => {
-			const element = document.createElement( 'div' );
-
-			expect(
-				getWaveformColors(
-					element,
-					undefined,
-					'#0000ff',
-					'linear-gradient(to right,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
-				).waveformGradient
-			).toBe( 'horizontal' );
-			expect(
-				getWaveformColors(
-					element,
-					undefined,
-					'#0000ff',
-					'linear-gradient(to bottom right,rgb(255,0,0) 0%,rgb(0,0,255) 100%)'
-				).waveformGradient
-			).toBe( 'diagonal' );
-		} );
-	} );
-
-	describe( 'getWaveformGradientStops', () => {
-		it( 'extracts color stops from a CSS gradient value', () => {
-			expect(
-				getWaveformGradientStops(
-					'linear-gradient(135deg,rgb(255,0,0) 0%,rgba(0,0,255,0.8) 100%)'
-				)
-			).toEqual( [ 'rgb(255,0,0)', 'rgba(0,0,255,0.8)' ] );
-		} );
-	} );
-
-	describe( 'applyWaveformPlayerStyles', () => {
-		it( 'applies the waveform background color', () => {
-			const container = document.createElement( 'div' );
-			const waveformContainer = document.createElement( 'div' );
-			waveformContainer.className = 'waveform-container';
-			container.appendChild( waveformContainer );
-
-			applyWaveformPlayerStyles( container, {
-				backgroundColor: '#ffeeaa',
-			} );
-
-			expect( waveformContainer ).toHaveStyle( {
-				backgroundColor: '#ffeeaa',
-			} );
-		} );
-
-		it( 'applies the waveform background gradient', () => {
-			const container = document.createElement( 'div' );
-			const waveformContainer = document.createElement( 'div' );
-			waveformContainer.className = 'waveform-container';
-			container.appendChild( waveformContainer );
-
-			applyWaveformPlayerStyles( container, {
-				backgroundGradient:
-					'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-
-			expect( waveformContainer ).toHaveStyle( {
-				background: 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-		} );
-
-		it( 'applies the waveform player text color variables', () => {
-			const container = document.createElement( 'div' );
-
-			applyWaveformPlayerStyles( container, {
-				textColor: '#0000ff',
-			} );
-
-			expect( container ).toHaveStyle( {
-				'--wfp-text-color': '#0000ff',
-				'--wfp-text-secondary-color': '#0000ff',
-			} );
-		} );
-
-		it( 'applies the waveform player play button color variable', () => {
-			const container = document.createElement( 'div' );
-
-			applyWaveformPlayerStyles( container, {
-				playButtonColor: '#ff0000',
-			} );
-
-			expect( container ).toHaveStyle( {
-				'--wfp-button-color': '#ff0000',
-			} );
-		} );
-
-		it( 'applies the waveform player play button gradient', () => {
-			const container = document.createElement( 'div' );
-			const playButton = document.createElement( 'button' );
-			playButton.className = 'waveform-btn';
-			container.appendChild( playButton );
-
-			applyWaveformPlayerStyles( container, {
-				playButtonGradient:
-					'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-
-			expect( playButton ).toHaveStyle( {
-				background: 'linear-gradient(90deg,#ff0000 0%,#0000ff 100%)',
-			} );
-			expect( container ).toHaveStyle( {
-				'--wfp-button-color': '#0000ff',
-			} );
-		} );
-
-		it( 'removes the waveform background color when cleared', () => {
-			const container = document.createElement( 'div' );
-			const waveformContainer = document.createElement( 'div' );
-			waveformContainer.className = 'waveform-container';
-			waveformContainer.style.backgroundColor = '#ffeeaa';
-			container.appendChild( waveformContainer );
-
-			applyWaveformPlayerStyles( container );
-
-			expect( waveformContainer ).not.toHaveStyle( {
-				backgroundColor: '#ffeeaa',
-			} );
-		} );
-
-		it( 'removes the waveform player text color variables when cleared', () => {
-			const container = document.createElement( 'div' );
-			container.style.setProperty( '--wfp-text-color', '#0000ff' );
-			container.style.setProperty(
-				'--wfp-text-secondary-color',
-				'#0000ff'
-			);
-
-			applyWaveformPlayerStyles( container );
-
-			expect( container ).not.toHaveStyle( {
-				'--wfp-text-color': '#0000ff',
-				'--wfp-text-secondary-color': '#0000ff',
-			} );
-		} );
-
-		it( 'removes the waveform player play button color variable when cleared', () => {
-			const container = document.createElement( 'div' );
-			container.style.setProperty( '--wfp-button-color', '#ff0000' );
-
-			applyWaveformPlayerStyles( container );
-
-			expect( container ).not.toHaveStyle( {
-				'--wfp-button-color': '#ff0000',
-			} );
 		} );
 	} );
 
@@ -558,7 +327,7 @@ describe( 'Waveform utilities', () => {
 	} );
 
 	describe( 'setupPlayButtonArtwork', () => {
-		it( 'should set artwork as the play button background', () => {
+		it( 'should move artwork into the play button', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn';
@@ -568,37 +337,20 @@ describe( 'Waveform utilities', () => {
 
 			setupPlayButtonArtwork(
 				container,
+				{ artworkEl },
 				'https://example.com/cover.jpg'
 			);
 
-			expect( container ).toHaveClass( 'has-play-button-artwork' );
-			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover.jpg")' );
-			expect( artworkEl.parentElement ).toBe( container );
-		} );
-
-		it( 'should escape artwork URLs for CSS usage', () => {
-			const container = document.createElement( 'div' );
-			const playBtn = document.createElement( 'button' );
-			playBtn.className = 'waveform-btn';
-			container.appendChild( playBtn );
-
-			setupPlayButtonArtwork(
-				container,
-				'https://example.com/cover "quoted".jpg'
+			expect( playBtn ).toHaveClass( 'has-artwork' );
+			expect( artworkEl ).toHaveClass(
+				'wp-block-playlist__play-button-artwork'
 			);
-
-			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
-				)
-			).toBe( 'url("https://example.com/cover \\"quoted\\".jpg")' );
+			expect( artworkEl ).toHaveAttribute( 'aria-hidden', 'true' );
+			expect( artworkEl ).toHaveAttribute( 'alt', '' );
+			expect( playBtn.firstChild ).toBe( artworkEl );
 		} );
 
-		it( 'should not modify play button icon paths', () => {
+		it( 'should force play button icon paths to white', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn';
@@ -617,66 +369,161 @@ describe( 'Waveform utilities', () => {
 
 			setupPlayButtonArtwork(
 				container,
+				{ artworkEl },
 				'https://example.com/cover.jpg'
 			);
 
-			expect( path ).not.toHaveStyle( { fill: '#ffffff' } );
+			expect( path ).toHaveStyle( { fill: '#ffffff' } );
 		} );
 
-		it( 'should set artwork state when play button is missing', () => {
+		it( 'should do nothing when play button is missing', () => {
 			const container = document.createElement( 'div' );
 			const artworkEl = document.createElement( 'img' );
 			container.appendChild( artworkEl );
 
-			expect( () => {
+			expect( () =>
 				setupPlayButtonArtwork(
 					container,
+					{ artworkEl },
 					'https://example.com/cover.jpg'
-				);
-			} ).not.toThrow();
-			expect( container ).toHaveClass( 'has-play-button-artwork' );
+				)
+			).not.toThrow();
 			expect( artworkEl.parentElement ).toBe( container );
 		} );
 
-		it( 'should set button artwork when artwork element is missing', () => {
+		it( 'should create button artwork when artwork element is missing', () => {
 			const container = document.createElement( 'div' );
 			const playBtn = document.createElement( 'button' );
 			playBtn.className = 'waveform-btn';
 			container.appendChild( playBtn );
 
-			expect( () => {
+			expect( () =>
 				setupPlayButtonArtwork(
 					container,
+					{},
 					'https://example.com/cover.jpg'
-				);
-			} ).not.toThrow();
-			expect( container ).toHaveClass( 'has-play-button-artwork' );
-			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
 				)
-			).toBe( 'url("https://example.com/cover.jpg")' );
+			).not.toThrow();
+			expect( playBtn ).toHaveClass( 'has-artwork' );
+			expect(
+				playBtn.querySelector(
+					'.wp-block-playlist__play-button-artwork'
+				)
+			).toHaveAttribute( 'src', 'https://example.com/cover.jpg' );
 		} );
 
-		it( 'should clear button artwork when artwork URL is empty', () => {
+		it( 'should remove existing button artwork when artwork URL is empty', () => {
 			const container = document.createElement( 'div' );
-			container.className = 'has-play-button-artwork';
-			container.style.setProperty(
-				'--wp--playlist--play-button-artwork',
-				'url("https://example.com/cover.jpg")'
-			);
 			const playBtn = document.createElement( 'button' );
-			playBtn.className = 'waveform-btn';
+			playBtn.className = 'waveform-btn has-artwork';
+			const artworkEl = document.createElement( 'img' );
+			artworkEl.className = 'wp-block-playlist__play-button-artwork';
+			playBtn.appendChild( artworkEl );
 			container.appendChild( playBtn );
 
-			setupPlayButtonArtwork( container, '' );
+			setupPlayButtonArtwork( container, { artworkEl }, '' );
 
-			expect( container ).not.toHaveClass( 'has-play-button-artwork' );
+			expect( playBtn ).not.toHaveClass( 'has-artwork' );
 			expect(
-				container.style.getPropertyValue(
-					'--wp--playlist--play-button-artwork'
+				playBtn.querySelector(
+					'.wp-block-playlist__play-button-artwork'
 				)
-			).toBe( '' );
+			).toBeNull();
+		} );
+	} );
+
+	describe( 'WAVEFORM_BUTTON_WIDTH', () => {
+		it( 'should be defined as 100', () => {
+			expect( typeof WAVEFORM_BUTTON_WIDTH ).toBe( 'number' );
+			expect( WAVEFORM_BUTTON_WIDTH ).toBe( 100 );
+		} );
+	} );
+
+	describe( 'formatTime', () => {
+		it( 'should format 0 seconds as 0:00', () => {
+			expect( formatTime( 0 ) ).toBe( '0:00' );
+		} );
+
+		it( 'should format seconds under a minute', () => {
+			expect( formatTime( 5 ) ).toBe( '0:05' );
+			expect( formatTime( 30 ) ).toBe( '0:30' );
+			expect( formatTime( 59 ) ).toBe( '0:59' );
+		} );
+
+		it( 'should format minutes and seconds', () => {
+			expect( formatTime( 60 ) ).toBe( '1:00' );
+			expect( formatTime( 90 ) ).toBe( '1:30' );
+			expect( formatTime( 125 ) ).toBe( '2:05' );
+		} );
+
+		it( 'should handle fractional seconds', () => {
+			expect( formatTime( 5.7 ) ).toBe( '0:05' );
+			expect( formatTime( 90.9 ) ).toBe( '1:30' );
+		} );
+
+		it( 'should handle large values', () => {
+			expect( formatTime( 3600 ) ).toBe( '60:00' );
+			expect( formatTime( 3661 ) ).toBe( '61:01' );
+		} );
+	} );
+
+	describe( 'getNextShuffledTrack', () => {
+		it( 'should never return the current track for a multi-track list', () => {
+			const ids = [ 'a', 'b', 'c', 'd' ];
+			let current = 'a';
+			let played = [];
+			for ( let i = 0; i < 100; i++ ) {
+				const result = getNextShuffledTrack( ids, current, played );
+				expect( result.nextId ).not.toBe( current );
+				current = result.nextId;
+				played = result.playedIds;
+			}
+		} );
+
+		it( 'should play every track once before any repeats', () => {
+			const ids = [ 'a', 'b', 'c', 'd' ];
+			let current = 'a';
+			let played = [ 'a' ];
+			const cycle = [ 'a' ];
+			// Advance three times to complete the first cycle of four tracks.
+			for ( let i = 0; i < 3; i++ ) {
+				const result = getNextShuffledTrack( ids, current, played );
+				cycle.push( result.nextId );
+				current = result.nextId;
+				played = result.playedIds;
+			}
+			// All four tracks appear exactly once in the completed cycle.
+			expect( [ ...cycle ].sort() ).toEqual( [ 'a', 'b', 'c', 'd' ] );
+		} );
+
+		it( 'should not repeat the just-played track across a cycle boundary', () => {
+			const ids = [ 'a', 'b', 'c' ];
+			// All three have played; current is the last one played.
+			const result = getNextShuffledTrack( ids, 'c', [ 'a', 'b', 'c' ] );
+			expect( result.nextId ).not.toBe( 'c' );
+			// New cycle starts fresh with just the chosen track.
+			expect( result.playedIds ).toEqual( [ result.nextId ] );
+		} );
+
+		it( 'should alternate deterministically for two tracks', () => {
+			const first = getNextShuffledTrack( [ 'a', 'b' ], 'a', [] );
+			expect( first.nextId ).toBe( 'b' );
+			expect( first.playedIds ).toEqual( [ 'a', 'b' ] );
+
+			const second = getNextShuffledTrack(
+				[ 'a', 'b' ],
+				'b',
+				first.playedIds
+			);
+			expect( second.nextId ).toBe( 'a' );
+			expect( second.playedIds ).toEqual( [ 'a' ] );
+		} );
+
+		it( 'should return the only track when the list has one entry', () => {
+			expect( getNextShuffledTrack( [ 'a' ], 'a', [] ) ).toEqual( {
+				nextId: 'a',
+				playedIds: [ 'a' ],
+			} );
 		} );
 	} );
 

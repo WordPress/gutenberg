@@ -1,6 +1,6 @@
 // WaveformPlayer library styles for the editor iframe.
 // The JS-imported CSS doesn't load in the iframe, so we import the library styles here.
-@import "../../node_modules/@arraypress/waveform-player/dist/waveform-player";
+@use "@arraypress/waveform-player/dist/waveform-player";
 
 .wp-block-playlist {
 	li.block-list-appender.block-list-appender {

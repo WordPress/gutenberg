@@ -8,81 +8,66 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	applyWaveformPlayerStyles,
-	initWaveformPlayer,
-	setupPlayButtonArtwork,
-	updateSeekControlLabel,
-} from './waveform-utils';
+import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
+
+const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
 
 /**
- * Update the metadata of a WaveformPlayer element to reflect current props.
+ * Update the DOM of a WaveformPlayer element to reflect current props.
  *
- * `loadTrack()` owns full track swaps, but it also resets the audio element.
- * This keeps same-source metadata edits lightweight in the editor.
+ * The @arraypress/waveform-player library currently offers no public method to
+ * do this, hence the workaround. Context:
  *
- * @param {Object}  player                - The waveform player.
- * @param {Object}  metadata              - The track metadata.
- * @param {string}  metadata.title        - The track title.
- * @param {string}  metadata.artist       - The artist name.
- * @param {string}  metadata.image        - The track image URL.
- * @param {string}  metadata.imageAlt     - The track image alt text.
- * @param {boolean} showPlayButtonArtwork - Whether to show artwork on the play button.
+ * - The title and artist elements are guaranteed to exist based on
+ *   `initWaveformPlayer` and implementation details of the library.
+ *
+ * - The image/artwork element may not exist if the track loaded upon init had
+ *   no defined artwork, but in these cases we create the entire WaveformPlayer
+ *   instance. See `hasImage`.
+ *
+ * @param {Object} instance          - The waveform player instance.
+ * @param {Object} metadata          - The track metadata.
+ * @param {string} metadata.title    - The track title.
+ * @param {string} metadata.artist   - The artist name.
+ * @param {string} metadata.image    - The artwork image URL.
+ * @param {string} metadata.imageAlt - The artwork image alt text.
  */
-function updatePlayerMetadata(
-	player,
-	{ title, artist, image, imageAlt },
-	showPlayButtonArtwork
-) {
-	const { instance, container } = player;
-	const playerArtwork = showPlayButtonArtwork ? undefined : image;
-
+function updatePlayerMetadata( instance, { title, artist, image, imageAlt } ) {
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
 	}
 	updateSeekControlLabel( instance, title || __( 'Seek' ) );
-
-	if ( typeof instance.syncArtist === 'function' ) {
-		instance.syncArtist( artist || '' );
-	} else if ( instance.artistEl ) {
+	if ( instance.artistEl ) {
 		instance.artistEl.textContent = artist ?? '';
 		instance.artistEl.style.display = artist ? '' : 'none';
 	}
-
-	if ( typeof instance.syncArtwork === 'function' ) {
-		instance.syncArtwork(
-			playerArtwork || null,
-			playerArtwork ? imageAlt || '' : ''
-		);
-	} else if ( instance.artworkEl && playerArtwork ) {
-		instance.artworkEl.src = playerArtwork;
+	if ( instance.artworkEl && image ) {
+		instance.artworkEl.src = image;
 		instance.artworkEl.alt = imageAlt || '';
-	}
-	if ( showPlayButtonArtwork ) {
-		setupPlayButtonArtwork( container, image );
 	}
 }
 
 /**
  * A reusable WaveformPlayer component for the block editor.
  *
- * Renders an audio waveform visualization with play/pause controls.
- * Automatically inherits colors from the parent block's text color.
+ * Renders an audio waveform with play/pause, a hover effect (the bar and
+ * progress colors brighten on hover and redraw), and prev/shuffle/repeat/next
+ * controls. Automatically inherits colors from the parent block's text color.
  *
- * @param {Object}   props                       - Component props.
- * @param {string}   props.src                   - The audio file URL.
- * @param {string}   props.title                 - The track title.
- * @param {string}   props.artist                - The artist name.
- * @param {string}   props.image                 - The track image URL.
- * @param {string}   props.imageAlt              - The track image alt text.
- * @param {string}   props.color                 - The waveform color.
- * @param {string}   props.gradient              - The waveform gradient.
- * @param {string}   props.backgroundColor       - The waveform background color.
- * @param {string}   props.backgroundGradient    - The waveform background gradient.
- * @param {string}   props.textColor             - The player text color.
- * @param {string}   props.waveformStyle         - Waveform style (bars, mirror, line, blocks, dots, seekbar).
- * @param {Function} props.onEnded               - Callback when the track finishes playing.
- * @param {boolean}  props.showPlayButtonArtwork - Whether to show artwork on the play button.
+ * @param {Object}   props                 - Component props.
+ * @param {string}   props.src             - The audio file URL.
+ * @param {string}   props.title           - The track title.
+ * @param {string}   props.artist          - The artist name.
+ * @param {string}   props.image           - The artwork image URL.
+ * @param {string}   props.imageAlt        - The artwork image alt text.
+ * @param {string}   props.waveformStyle   - Waveform style (bars, mirror, etc).
+ * @param {Function} props.onEnded         - Callback when the track finishes playing.
+ * @param {Function} props.onPrev          - Callback for previous track.
+ * @param {Function} props.onNext          - Callback for next track.
+ * @param {Function} props.onShuffleToggle - Callback for shuffle toggle.
+ * @param {Function} props.onRepeatToggle  - Callback for repeat toggle.
+ * @param {boolean}  props.isShuffled      - Whether shuffle is active.
+ * @param {boolean}  props.isRepeating     - Whether repeat is active.
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( {
@@ -91,14 +76,14 @@ export function WaveformPlayer( {
 	artist,
 	image,
 	imageAlt,
-	color,
-	gradient,
-	backgroundColor,
-	backgroundGradient,
-	textColor,
 	waveformStyle,
 	onEnded,
-	showPlayButtonArtwork = false,
+	onPrev,
+	onNext,
+	onShuffleToggle,
+	onRepeatToggle,
+	isShuffled,
+	isRepeating,
 } ) {
 	// Store onEnded in a stable callback so it doesn't need to be a useRefEffect dependency.
 	// The callback changes reference on every render (its dependency chain
@@ -110,6 +95,12 @@ export function WaveformPlayer( {
 	// Ref for the WaveformPlayer instance
 	const playerRef = useRef();
 
+	// Due to how WaveformPlayer is implemented, the artwork element within the
+	// player element only exists when an image was present when the player was
+	// created. Recreate the player when one is added or removed so that
+	// element is created or torn down.
+	const hasImage = !! image;
+
 	// WaveformPlayer needs an audio source on init, but the source may change
 	// throughout its lifetime.
 	const hasSrc = !! src;
@@ -117,47 +108,18 @@ export function WaveformPlayer( {
 	// Combined props ref for `initWaveformPlayer`, which is called
 	// asynchronously after this component mounts.
 	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
-	const stylesRef = useRef( {
-		color,
-		gradient,
-		backgroundColor,
-		backgroundGradient,
-		textColor,
-	} );
 	useEffect( () => {
 		metadataRef.current = { src, title, artist, image, imageAlt };
 	}, [ src, title, artist, image, imageAlt ] );
 
-	useEffect( () => {
-		stylesRef.current = {
-			color,
-			gradient,
-			backgroundColor,
-			backgroundGradient,
-			textColor,
-		};
-	}, [ color, gradient, backgroundColor, backgroundGradient, textColor ] );
-
-	useEffect( () => {
-		if ( playerRef.current?.container ) {
-			applyWaveformPlayerStyles( playerRef.current.container, {
-				backgroundColor,
-				backgroundGradient,
-				textColor,
-				playButtonColor: showPlayButtonArtwork ? undefined : color,
-				playButtonGradient: showPlayButtonArtwork
-					? undefined
-					: gradient,
-			} );
-		}
-	}, [
-		backgroundColor,
-		backgroundGradient,
-		color,
-		gradient,
-		showPlayButtonArtwork,
-		textColor,
-	] );
+	// Wrap callbacks and state reads in stable event handlers so the player
+	// isn't recreated when they change, while always seeing the latest value.
+	const onPrevEvent = useEvent( () => onPrev?.() );
+	const onNextEvent = useEvent( () => onNext?.() );
+	const onShuffleToggleEvent = useEvent( () => onShuffleToggle?.() );
+	const onRepeatToggleEvent = useEvent( () => onRepeatToggle?.() );
+	const getIsShuffled = useEvent( () => isShuffled );
+	const getIsRepeating = useEvent( () => isRepeating );
 
 	const ref = useRefEffect(
 		( element ) => {
@@ -172,30 +134,37 @@ export function WaveformPlayer( {
 				if ( cancelled ) {
 					return;
 				}
+
+				const metadata = metadataRef.current;
 				const player = initWaveformPlayer( element, {
-					src: metadataRef.current.src,
-					title: metadataRef.current.title,
-					artist: metadataRef.current.artist,
-					image: metadataRef.current.image,
-					imageAlt: metadataRef.current.imageAlt,
-					waveformColor: stylesRef.current.color,
-					waveformGradient: stylesRef.current.gradient,
-					backgroundColor: stylesRef.current.backgroundColor,
-					backgroundGradient: stylesRef.current.backgroundGradient,
-					textColor: stylesRef.current.textColor,
+					src,
+					...metadata,
 					waveformStyle,
 					labels: {
+						play: __( 'Play' ),
+						pause: __( 'Pause' ),
 						seek: __( 'Seek' ),
 						/* translators: %1$s: current audio time, %2$s: total audio duration. */
 						seekValueText: _x(
 							'%1$s of %2$s',
 							'audio current time of total duration'
 						),
+						previous: __( 'Previous track' ),
+						next: __( 'Next track' ),
+						shuffle: __( 'Shuffle' ),
+						repeat: __( 'Repeat' ),
 					},
-					onEnded: () => onEndedEvent?.(),
-					showPlayButtonArtwork,
+					artist: metadata.artist || EMPTY_ARTIST_PLACEHOLDER,
+					onEnded: onEndedEvent,
+					onPrev: onPrevEvent,
+					onNext: onNextEvent,
+					onShuffleToggle: onShuffleToggleEvent,
+					onRepeatToggle: onRepeatToggleEvent,
+					isShuffled: getIsShuffled(),
+					isRepeating: getIsRepeating(),
 				} );
 				playerRef.current = player;
+				updatePlayerMetadata( player.instance, metadata );
 				const { destroy } = player;
 				playerDestroy = destroy;
 			}
@@ -218,62 +187,23 @@ export function WaveformPlayer( {
 		},
 		[
 			onEndedEvent,
-			hasSrc,
+			onPrevEvent,
+			onNextEvent,
+			onShuffleToggleEvent,
+			onRepeatToggleEvent,
+			getIsShuffled,
+			getIsRepeating,
+			src,
 			waveformStyle,
-			color,
-			gradient,
-			textColor,
-			showPlayButtonArtwork,
+			hasImage,
 		]
 	);
 
-	useEffect( () => {
-		if ( playerRef.current?.instance ) {
-			const player = playerRef.current;
-			if ( player ) {
-				updatePlayerMetadata(
-					player,
-					{
-						title,
-						artist,
-						image,
-						imageAlt,
-					},
-					showPlayButtonArtwork
-				);
-			}
-		}
-	}, [ title, artist, image, imageAlt, showPlayButtonArtwork ] );
-
-	useEffect( () => {
-		if ( src && playerRef.current?.instance ) {
-			const wasPlaying = playerRef.current.instance.isPlaying;
-			const promise = playerRef.current.instance.loadTrack(
-				src,
-				metadataRef.current.title,
-				metadataRef.current.artist,
-				{
-					artwork: showPlayButtonArtwork
-						? undefined
-						: metadataRef.current.image,
-					artworkAlt: showPlayButtonArtwork
-						? ''
-						: metadataRef.current.imageAlt,
-				}
-			);
-			promise.then( () => {
-				if ( showPlayButtonArtwork && playerRef.current?.container ) {
-					setupPlayButtonArtwork(
-						playerRef.current.container,
-						metadataRef.current.image
-					);
-				}
-				if ( ! wasPlaying ) {
-					playerRef.current?.instance.pause();
-				}
-			} );
-		}
-	}, [ src, showPlayButtonArtwork ] );
-
-	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
+	return (
+		<div
+			ref={ ref }
+			className="wp-block-playlist__waveform-player"
+			data-waveform-style={ waveformStyle || 'bars' }
+		/>
+	);
 }
