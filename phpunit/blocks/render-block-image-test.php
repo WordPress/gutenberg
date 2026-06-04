@@ -12,12 +12,41 @@
  * @group blocks
  */
 class Tests_Blocks_Render_Image extends WP_UnitTestCase {
+	/**
+	 * Holds the `pre_option_gutenberg-experiments` override callback, if set.
+	 *
+	 * @var callable|null
+	 */
+	private $experiments_filter = null;
+
 	public function tear_down() {
+		if ( null !== $this->experiments_filter ) {
+			remove_filter( 'pre_option_gutenberg-experiments', $this->experiments_filter );
+			$this->experiments_filter = null;
+		}
+
 		if ( get_block_bindings_source( 'test/source' ) ) {
 			unregister_block_bindings_source( 'test/source' );
 		}
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Overrides the `gutenberg-experiments` option for the current test.
+	 *
+	 * The PHPUnit bootstrap registers a `pre_option_gutenberg-experiments`
+	 * filter (via `$GLOBALS['wp_tests_options']`) that short-circuits
+	 * `get_option()`, so `update_option()` has no effect. This adds a
+	 * later-running filter that returns the desired value instead.
+	 *
+	 * @param array $experiments Experiments option value.
+	 */
+	private function set_gutenberg_experiments( $experiments ) {
+		$this->experiments_filter = static function () use ( $experiments ) {
+			return $experiments;
+		};
+		add_filter( 'pre_option_gutenberg-experiments', $this->experiments_filter );
 	}
 
 	/**
@@ -177,7 +206,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 
 	public function test_should_add_exif_data_to_lightbox_interactivity_state() {
 		// The feature is behind an experiment, so enable it for this test.
-		update_option( 'gutenberg-experiments', array( 'gutenberg-gallery-lightbox-default' => 1 ) );
+		$this->set_gutenberg_experiments( array( 'gutenberg-gallery-lightbox-default' => 1 ) );
 
 		$file          = DIR_TESTDATA . '/images/canola.jpg';
 		$attachment_id = self::factory()->attachment->create_upload_object(
@@ -250,7 +279,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 	public function test_should_not_add_exif_data_to_lightbox_state_when_experiment_disabled() {
 		// The experiment is off, so EXIF data must not be exposed even though
 		// the lightbox and the EXIF setting are both enabled on the block.
-		update_option( 'gutenberg-experiments', array() );
+		$this->set_gutenberg_experiments( array() );
 
 		$file          = DIR_TESTDATA . '/images/canola.jpg';
 		$attachment_id = self::factory()->attachment->create_upload_object(
@@ -313,7 +342,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 	public function test_should_not_add_exif_data_to_lightbox_state_when_not_enabled() {
 		// Enable the experiment so this verifies the opt-in setting gate rather
 		// than the experiment gate.
-		update_option( 'gutenberg-experiments', array( 'gutenberg-gallery-lightbox-default' => 1 ) );
+		$this->set_gutenberg_experiments( array( 'gutenberg-gallery-lightbox-default' => 1 ) );
 
 		$file          = DIR_TESTDATA . '/images/canola.jpg';
 		$attachment_id = self::factory()->attachment->create_upload_object(

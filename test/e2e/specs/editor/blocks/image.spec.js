@@ -999,8 +999,9 @@ test.describe( 'Image - lightbox', () => {
 			await expect( panel ).toContainText( 'Test Photographer' );
 
 			// Clicking within the panel must not close the lightbox, so the
-			// metadata stays readable (and selectable).
-			await panel.getByText( 'Test Photographer' ).click();
+			// metadata stays readable (and selectable). The first item is used
+			// because it sits clear of the toggle button in the top corner.
+			await panel.getByText( 'Test Camera' ).click();
 			await expect( panel ).toBeVisible();
 			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
 

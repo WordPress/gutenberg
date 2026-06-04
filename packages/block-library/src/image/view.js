@@ -284,8 +284,9 @@ const { state, actions, callbacks } = store(
 				// Closing: scroll back to the top before hiding the panel so the
 				// overlay returns to its non-scrolling state cleanly.
 				if ( state.isExifVisible ) {
-					const overlay =
-						document.querySelector( '.wp-lightbox-overlay' );
+					const overlay = document.querySelector(
+						'.wp-lightbox-overlay'
+					);
 					callbacks.scrollOverlayTo(
 						overlay,
 						withScope( () => {
@@ -496,8 +497,9 @@ const { state, actions, callbacks } = store(
 			// Smoothly scrolls the overlay so `target` is brought into view.
 			// Passing the overlay itself scrolls back to the top.
 			scrollOverlayTo( target, onComplete ) {
-				const overlay =
-					document.querySelector( '.wp-lightbox-overlay' );
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
+				);
 				if ( ! overlay || ! target ) {
 					onComplete?.();
 					return;

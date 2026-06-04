@@ -1060,7 +1060,6 @@ export default function Image( {
 								onDeselect={ resetExif }
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Show photo metadata' ) }
 									checked={ exifChecked }
 									onChange={ onSetExif }
