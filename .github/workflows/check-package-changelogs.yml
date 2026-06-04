@@ -6,10 +6,20 @@ on:
         branches:
             - trunk
         paths:
+            - 'packages/admin-ui/**'
             - 'packages/components/**'
             - 'packages/dataviews/**'
-            - 'packages/ui/**'
+            - 'packages/fields/**'
+            - 'packages/grid/**'
+            - 'packages/icons/**'
+            - 'packages/interface/**'
+            - 'packages/private-apis/**'
+            - 'packages/style-runtime/**'
             - 'packages/theme/**'
+            - 'packages/ui/**'
+            - 'packages/undo-manager/**'
+            - 'packages/views/**'
+            - 'packages/wp-build/**'
             - '!packages/*/src/**/stories/**'
             - '!packages/*/src/**/test/**'
 
@@ -27,10 +37,20 @@ jobs:
             fail-fast: false
             matrix:
                 package:
+                    - admin-ui
                     - components
                     - dataviews
-                    - ui
+                    - fields
+                    - grid
+                    - icons
+                    - interface
+                    - private-apis
+                    - style-runtime
                     - theme
+                    - ui
+                    - undo-manager
+                    - views
+                    - wp-build
         steps:
             - name: 'Get PR commit count'
               env:
