@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Revert the getter-based export replacement in `@wordpress/build` to restore compatibility for affected Gutenberg 23.0 builds ([#78917](https://github.com/WordPress/gutenberg/pull/78917)).
+
 ## 0.15.0 (2026-05-27)
 
 ## 0.14.0 (2026-05-14)
