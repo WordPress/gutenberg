@@ -6,13 +6,13 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const util = require( 'util' );
 const got = require( 'got' );
+const AdmZip = require( 'adm-zip' );
 const SimpleGit = require( 'simple-git' );
 
 /**
  * Promisified dependencies
  */
 const pipeline = util.promisify( require( 'stream' ).pipeline );
-const extractZip = util.promisify( require( 'extract-zip' ) );
 const { rimraf } = require( 'rimraf' );
 
 /**
@@ -118,7 +118,12 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 
 	log( 'Extracting to temporary directory.' );
 	const tempDir = `${ source.path }.temp`;
-	await extractZip( zipName, { dir: tempDir } );
+	const zip = new AdmZip( zipName );
+	await util.promisify( zip.extractAllToAsync.bind( zip ) )(
+		tempDir,
+		/* overwrite */ true,
+		/* keepOriginalPermission */ false
+	);
 
 	const files = (
 		await Promise.all( [
