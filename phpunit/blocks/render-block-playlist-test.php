@@ -119,7 +119,6 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'album'    => 'Album One',
 					'src'      => 'http://example.com/song1.mp3',
 					'image'    => 'http://example.com/image1.jpg',
-					'length'   => '3:10',
 				),
 			)
 		);
@@ -231,6 +230,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'album'    => 'Album One',
 					'src'      => 'http://example.com/song1.mp3',
 					'image'    => 'http://example.com/image1.jpg',
+					'length'   => '3:10',
 				),
 				array(
 					'id'       => 2,
