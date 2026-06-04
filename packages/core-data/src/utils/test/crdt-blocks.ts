@@ -196,7 +196,40 @@ describe( 'crdt-blocks', () => {
 			expect( content.toString() ).toBe( 'Updated content' );
 		} );
 
-		it( 'preserves the local clientId when an updated block arrives with a different clientId', () => {
+		it( 'updates the clientId when an updated block arrives with a different clientId', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'initial-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'initial-id' );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'updated-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'updated-id' );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
+		it( 'preserves the local clientId when requested for reparsed content blocks', () => {
 			// Simulates the Code Editor flow: the sender re-parses raw HTML on
 			// every keystroke, which mints a fresh clientId for every block.
 			// The Y.Doc's clientId should stay stable so remote peers don't
@@ -222,7 +255,9 @@ describe( 'crdt-blocks', () => {
 				},
 			];
 
-			mergeCrdtBlocks( yblocks, reparsedBlocks, null );
+			mergeCrdtBlocks( yblocks, reparsedBlocks, null, {
+				preserveClientIds: true,
+			} );
 
 			expect( yblocks.length ).toBe( 1 );
 			const block = yblocks.get( 0 );
