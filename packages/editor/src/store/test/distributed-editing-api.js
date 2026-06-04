@@ -1023,6 +1023,88 @@ describe( 'distributed editing REST helpers', () => {
 		} );
 	} );
 
+	it( 'requests retry-save with block-native RichText content update evidence', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>The silver river meets the quiet forest.</p><!-- /wp:paragraph -->';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data.automerge_client_update ).toMatchObject( {
+				format: 'native-automerge-blocks-v1',
+				operations: [
+					{
+						type: 'block.rich_text_content',
+						automergePrimitive: 'Automerge.Text.splice',
+						path: [ 0 ],
+						blockName: 'core/paragraph',
+						actor: 'editor-42',
+						sequence: 0,
+						id: 'editor-42:0',
+						textSplice: {
+							changed: true,
+							start: 4,
+							deleteCount: 4,
+							insertText: 'silver',
+							insertCount: 6,
+							end: 8,
+							delta: 2,
+						},
+					},
+				],
+				stateVector: {
+					'editor-42': 1,
+				},
+			} );
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '12',
+				acceptedProofServerVersion: '12',
+				proposedPostContent,
+				automergeClientUpdate: {
+					format: 'native-automerge-blocks-v1',
+					schema: 'de-rtc-automerge-v1',
+					operations: [
+						{
+							type: 'block.rich_text_content',
+							automergePrimitive: 'Automerge.Text.splice',
+							path: [ 0 ],
+							blockName: 'core/paragraph',
+							actor: 'editor-42',
+							sequence: 0,
+							id: 'editor-42:0',
+							textSplice: {
+								changed: true,
+								start: 4,
+								deleteCount: 4,
+								insertText: 'silver',
+								insertCount: 6,
+								end: 8,
+								delta: 2,
+							},
+						},
+					],
+					stateVector: {
+						'editor-42': 1,
+					},
+				},
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+		} );
+	} );
+
 	it( 'omits retry-save block identity proof containing clientId evidence', async () => {
 		const proposedPostContent =
 			'<!-- wp:paragraph --><p>Retry-save inserted block.</p><!-- /wp:paragraph -->';

@@ -11062,12 +11062,17 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getAllByText( 'Load latest version' ) ).toHaveLength(
-			2
-		);
 		expect(
-			screen.getAllByText( 'Load the latest post before saving again.' )
+			screen.getAllByText( 'Save will check WordPress' )
 		).toHaveLength( 2 );
+		expect(
+			screen.getByText(
+				'Save will check the current WordPress copy before updating.'
+			)
+		).toBeVisible();
+		expect(
+			screen.getByText( 'Save will check WordPress before trying again.' )
+		).toBeVisible();
 
 		rerender(
 			<DistributedEditingStatusSurface
@@ -11075,10 +11080,10 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Save check rejected' ) ).toBeVisible();
+		expect( screen.getByText( 'Save not completed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
-				'WordPress could not verify this Save because the editing metadata changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
+				'WordPress could not verify this Save. Your changes remain in this editor.'
 			)
 		).toBeVisible();
 	} );

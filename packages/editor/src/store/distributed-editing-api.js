@@ -961,6 +961,38 @@ function normalizeAutomergeClientChangeRange( range ) {
 	return Object.keys( normalized ).length ? normalized : null;
 }
 
+function normalizeAutomergeClientTextSplice( splice ) {
+	if ( ! splice || typeof splice !== 'object' || Array.isArray( splice ) ) {
+		return null;
+	}
+
+	const normalized = {};
+
+	for ( const key of [ 'start', 'deleteCount', 'insertCount', 'end' ] ) {
+		const value = normalizeProofNonNegativeInteger( splice[ key ] );
+
+		if ( value !== undefined ) {
+			normalized[ key ] = value;
+		}
+	}
+
+	const delta = Number.isInteger( splice.delta ) ? splice.delta : undefined;
+
+	if ( delta !== undefined ) {
+		normalized.delta = delta;
+	}
+
+	if ( typeof splice.insertText === 'string' ) {
+		normalized.insertText = splice.insertText;
+	}
+
+	if ( 'changed' in splice ) {
+		normalized.changed = Boolean( splice.changed );
+	}
+
+	return Object.keys( normalized ).length ? normalized : null;
+}
+
 function normalizeProofIntegerPath( value ) {
 	if ( ! Array.isArray( value ) ) {
 		return null;
@@ -1048,12 +1080,18 @@ function normalizeAutomergeClientUpdateOperation( operation ) {
 			'block.update_serialized',
 			'block.replace',
 			'block.rich_text_format',
+			'block.rich_text_content',
 			'document.replace_unsupported',
 		].includes( operation.type )
 	) {
+		const textSplice = normalizeAutomergeClientTextSplice(
+			operation.textSplice
+		);
+
 		return {
 			type: operation.type,
 			...normalizeAutomergeClientOperationCommonFields( operation ),
+			...( textSplice ? { textSplice } : {} ),
 		};
 	}
 

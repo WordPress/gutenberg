@@ -413,6 +413,35 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'builds a Automerge local merge candidate for non-overlapping word edits in one paragraph', () => {
+		const clientBaseContent =
+			'<!-- wp:paragraph --><p>The blue river meets the quiet forest.</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>The silver river meets the quiet forest.</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>The blue river meets the green forest.</p><!-- /wp:paragraph -->';
+
+		expect(
+			getDistributedEditingAutomergeLocalMergeCandidate( {
+				clientBaseContent,
+				serverContent,
+				localContent,
+			} )
+		).toMatchObject( {
+			status: 'merged',
+			hasCandidatePostContent: true,
+			candidatePostContent:
+				'<!-- wp:paragraph --><p>The silver river meets the green forest.</p><!-- /wp:paragraph -->',
+			mergeStrategy: 'native_automerge_php_v1',
+			serverChangeRange: {
+				changed: true,
+			},
+			localChangeRange: {
+				changed: true,
+			},
+		} );
+	} );
+
 	it( 'builds a Automerge local merge candidate for distinct inline formatting in the same paragraph', () => {
 		const clientBaseContent =
 			'<!-- wp:paragraph --><p>This is bold and italicized.</p><!-- /wp:paragraph -->';
@@ -11943,6 +11972,38 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( result.candidatePostContent ).toBe(
 			'<!-- wp:paragraph --><p>Some <em>pretext</em> to a WordPress post.</p><!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'rebases non-overlapping word edits in one paragraph', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>The blue river meets the quiet forest.</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					refetchedServerState: true,
+					pendingChangeCount: 1,
+					canAttemptLocalRebase: true,
+				} ),
+			clientBaseContent: baseContent,
+			serverContent:
+				'<!-- wp:paragraph --><p>The silver river meets the quiet forest.</p><!-- /wp:paragraph -->',
+			localContent:
+				'<!-- wp:paragraph --><p>The blue river meets the green forest.</p><!-- /wp:paragraph -->',
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			hasCandidatePostContent: true,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+		} );
+		expect( result.candidatePostContent ).toBe(
+			'<!-- wp:paragraph --><p>The silver river meets the green forest.</p><!-- /wp:paragraph -->'
 		);
 	} );
 

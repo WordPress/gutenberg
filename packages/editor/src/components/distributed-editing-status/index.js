@@ -3909,7 +3909,7 @@ export default function DistributedEditingStatus( {
 							setActionStatus( {
 								status: 'warning',
 								message: __(
-									'Review is not available yet. Protected local changes remain in this editor session and can still be exported.'
+									'Review is not available yet. Protected local changes remain in this editor session.'
 								),
 							} );
 							return {
@@ -4713,7 +4713,7 @@ function getActionErrorMessage( actionKey ) {
 	switch ( actionKey ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
 			return __(
-				'Protected local changes could not be copied. They remain in this editor session and can still be exported after clipboard access is available.'
+				'Protected local changes could not be copied. They remain in this editor session.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __(
@@ -4729,11 +4729,11 @@ function getActionErrorMessage( actionKey ) {
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE:
 			return __(
-				'Latest post could not be loaded. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
+				'Latest post could not be loaded. Protected local changes remain in this editor session; keep this tab open before trying again.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REVIEW_REMOTE_CHANGES:
 			return __(
-				'Latest post could not be loaded for review. Protected local changes remain in this editor session and can still be exported; keep this tab open before trying again.'
+				'Latest post could not be loaded for review. Protected local changes remain in this editor session; keep this tab open before trying again.'
 			);
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.REBASE_LOCAL_UPDATES:
 			return __(
@@ -8696,6 +8696,8 @@ function getNoticeActions( item, onAction ) {
 	return item.actionKeys
 		.filter(
 			( actionKey ) =>
+				actionKey !==
+					DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES &&
 				! (
 					isRetrySaveReviewRequiredItem( item ) &&
 					[
@@ -8730,16 +8732,7 @@ function getActionLabel( actionKey, item ) {
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.ACCEPT_SERVER_STATE:
 			return null;
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES:
-			if ( isRetrySaveFreshReviewRetrySaveRejectedItem( item ) ) {
-				return __( 'Export for fresh review' );
-			}
-			if ( isRetrySaveFreshReviewRequiredItem( item ) ) {
-				return __( 'Export for fresh review' );
-			}
-			if ( isRetrySaveReviewRequiredItem( item ) ) {
-				return __( 'Export changes for review' );
-			}
-			return __( 'Export local changes' );
+			return null;
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT:
 			return __( 'Continue Save' );
 		case DISTRIBUTED_EDITING_NOTICE_ACTIONS.PREPARE_RETRY_SUBMIT_SAVE:
@@ -8777,12 +8770,12 @@ function getExportSuccessMessage( item ) {
 
 	if ( isRetrySaveReviewRequiredItem( item ) ) {
 		return __(
-			'Protected local changes exported for HTML review. Keep this copy until a user with unfiltered HTML permission can inspect it.'
+			'Protected local changes copied for HTML review. Keep this copy until a user with unfiltered HTML permission can inspect it.'
 		);
 	}
 
 	return __(
-		'Protected local changes exported. Keep this copy until WordPress confirms the update.'
+		'Protected local changes copied. Keep this copy until WordPress confirms the update.'
 	);
 }
 
@@ -9334,18 +9327,18 @@ function getLocalUpdatesImportReviewRequestMessage( descriptor ) {
 function getRefetchSuccessMessage( item ) {
 	if ( isRetrySaveFreshReviewRetrySaveItem( item ) ) {
 		return __(
-			'Latest post loaded for fresh-review Save. Protected local changes remain in this editor session and can still be exported before retrying.'
+			'Latest post loaded for fresh-review Save. Protected local changes remain in this editor session before retrying.'
 		);
 	}
 
 	if ( isRetrySaveReviewRequiredItem( item ) ) {
 		return __(
-			'Latest post loaded for HTML review. Protected local changes remain in this editor session and can still be exported before retrying.'
+			'Latest post loaded for HTML review. Protected local changes remain in this editor session before retrying.'
 		);
 	}
 
 	return __(
-		'Latest post loaded. Protected local changes remain in this editor session and can still be exported before retrying.'
+		'Latest post loaded. Protected local changes remain in this editor session before retrying.'
 	);
 }
 
@@ -9489,14 +9482,14 @@ function getNextStepDescriptor( nextStepAction ) {
 			return {
 				nextStepAction,
 				nextStepMessage: __(
-					'Export changes for review by someone with unfiltered HTML permission.'
+					'Ask someone with unfiltered HTML permission to review these changes.'
 				),
 			};
 		case 'export_fresh_review_for_html_review':
 			return {
 				nextStepAction,
 				nextStepMessage: __(
-					'Export a new review handoff for someone with unfiltered HTML permission.'
+					'Ask someone with unfiltered HTML permission to complete a fresh review.'
 				),
 			};
 		case 'wait_for_save_proof':
@@ -9510,14 +9503,14 @@ function getNextStepDescriptor( nextStepAction ) {
 			return {
 				nextStepAction,
 				nextStepMessage: __(
-					'Export local changes, then reload the editor.'
+					'Keep this tab open until WordPress can check the latest copy.'
 				),
 			};
 		case 'export_then_save':
 			return {
 				nextStepAction,
 				nextStepMessage: __(
-					'Export local changes, then try Save again.'
+					'Keep this tab open, then try Save again.'
 				),
 			};
 		case 'keep_tab_open':
@@ -9528,9 +9521,7 @@ function getNextStepDescriptor( nextStepAction ) {
 		case 'export_before_continuing':
 			return {
 				nextStepAction,
-				nextStepMessage: __(
-					'Export local changes before continuing.'
-				),
+				nextStepMessage: __( 'Keep this tab open before continuing.' ),
 			};
 	}
 
@@ -9652,7 +9643,7 @@ function getStaleBaseStatusText( descriptor ) {
 		return {
 			title: __( 'WordPress check incomplete' ),
 			message: __(
-				'The editor needs both the starting post and current WordPress copy before it can apply local changes. Export local changes before reloading.'
+				'The editor needs both the starting post and current WordPress copy before it can apply local changes. Keep this tab open while WordPress checks the post.'
 			),
 			remoteReviewContextMessage,
 			...saveNowContext,
@@ -9860,9 +9851,9 @@ function getRetrySaveStatusText( descriptor ) {
 			}
 
 			return {
-				title: __( 'Save check rejected' ),
+				title: __( 'Save not completed' ),
 				message: __(
-					'WordPress could not verify this Save because the editing metadata changed unexpectedly. Protected local changes are still exportable; export them before continuing.'
+					'WordPress could not verify this Save. Your changes remain in this editor.'
 				),
 			};
 		case DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_FEATURE_DISABLED:

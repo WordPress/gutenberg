@@ -20039,9 +20039,26 @@ function getRichTextSerializedBlockLocalRebaseCandidate( {
 	}
 
 	if ( serverTextChanged && localTextChanged ) {
+		const merged = mergeRichTextTextSpliceModels( {
+			base: baseRichText,
+			server: serverRichText,
+			serverSplice,
+			local: localRichText,
+			localSplice,
+		} );
+
+		if ( ! merged ) {
+			return {
+				status: 'manual_conflict_required',
+				reason: 'rich_text_plain_text_changed',
+			};
+		}
+
 		return {
-			status: 'manual_conflict_required',
-			reason: 'rich_text_plain_text_changed',
+			status: 'rebased',
+			candidateBlock: `${ base.open }${ formatRichTextModelHtml(
+				merged
+			) }${ base.close }`,
 		};
 	}
 
@@ -20400,6 +20417,182 @@ function mergeRichTextTextAndFormatModels( {
 	};
 }
 
+function mergeRichTextTextSpliceModels( {
+	base,
+	server,
+	serverSplice,
+	local,
+	localSplice,
+} ) {
+	if ( doRichTextTextSplicesConflict( serverSplice, localSplice ) ) {
+		return null;
+	}
+
+	const serverMarkChanged = getRetainedRichTextMarkChangedIndexes(
+		base,
+		server,
+		serverSplice
+	);
+	const localMarkChanged = getRetainedRichTextMarkChangedIndexes(
+		base,
+		local,
+		localSplice
+	);
+
+	if (
+		doRichTextChangedIndexesOverlap(
+			serverMarkChanged,
+			localMarkChanged
+		) ||
+		doRichTextChangedIndexesTouchSplice( serverMarkChanged, localSplice ) ||
+		doRichTextChangedIndexesTouchSplice( localMarkChanged, serverSplice )
+	) {
+		return null;
+	}
+
+	const sources = [];
+	const splices = [
+		{
+			kind: 'server',
+			model: server,
+			splice: serverSplice,
+		},
+		{
+			kind: 'local',
+			model: local,
+			splice: localSplice,
+		},
+	].sort(
+		( left, right ) =>
+			left.splice.start - right.splice.start ||
+			left.splice.end - right.splice.end
+	);
+	let cursor = 0;
+
+	for ( const entry of splices ) {
+		const { splice } = entry;
+
+		for ( ; cursor < splice.start; cursor++ ) {
+			sources.push( {
+				kind: 'base',
+				baseIndex: cursor,
+			} );
+		}
+
+		for ( let offset = 0; offset < splice.insertCount; offset++ ) {
+			sources.push( {
+				kind: entry.kind,
+				model: entry.model,
+				modelIndex: splice.start + offset,
+			} );
+		}
+
+		cursor = splice.end;
+	}
+
+	for ( ; cursor < base.text.length; cursor++ ) {
+		sources.push( {
+			kind: 'base',
+			baseIndex: cursor,
+		} );
+	}
+
+	const text = [];
+	const marks = [];
+
+	for ( const [ targetIndex, source ] of sources.entries() ) {
+		if ( source.kind === 'base' ) {
+			const { baseIndex } = source;
+			text.push( base.text[ baseIndex ] );
+
+			for ( const mark of [ 'strong', 'em' ] ) {
+				let marked = null;
+
+				if ( localMarkChanged.has( baseIndex ) ) {
+					marked = hasRichTextMarkAtTransformedIndex(
+						local,
+						mark,
+						baseIndex,
+						localSplice
+					);
+				} else if ( serverMarkChanged.has( baseIndex ) ) {
+					marked = hasRichTextMarkAtTransformedIndex(
+						server,
+						mark,
+						baseIndex,
+						serverSplice
+					);
+				} else {
+					marked = hasRichTextMarkAt( base, mark, baseIndex );
+				}
+
+				if ( marked === null ) {
+					return null;
+				}
+
+				if ( marked ) {
+					marks.push( {
+						type: mark,
+						start: targetIndex,
+						end: targetIndex + 1,
+					} );
+				}
+			}
+
+			continue;
+		}
+
+		if ( source.modelIndex >= source.model.text.length ) {
+			return null;
+		}
+
+		text.push( source.model.text[ source.modelIndex ] );
+
+		for ( const mark of [ 'strong', 'em' ] ) {
+			if ( hasRichTextMarkAt( source.model, mark, source.modelIndex ) ) {
+				marks.push( {
+					type: mark,
+					start: targetIndex,
+					end: targetIndex + 1,
+				} );
+			}
+		}
+	}
+
+	if ( text.length !== sources.length ) {
+		return null;
+	}
+
+	return {
+		text: text.join( '' ),
+		marks: coalesceRichTextMarks( marks ),
+	};
+}
+
+function doRichTextTextSplicesConflict( left, right ) {
+	if ( left.start < right.end && right.start < left.end ) {
+		return true;
+	}
+
+	return (
+		left.deleteCount === 0 &&
+		right.deleteCount === 0 &&
+		left.start === right.start &&
+		left.insertText !== '' &&
+		right.insertText !== ''
+	);
+}
+
+function doRichTextChangedIndexesTouchSplice( indexes, splice ) {
+	for ( const index of indexes ) {
+		if ( splice.start <= index && index < splice.end ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function mergeRichTextFormatModels( {
 	base,
 	server,
@@ -20442,6 +20635,16 @@ function hasRichTextMarkAt( model, mark, index ) {
 		( range ) =>
 			range.type === mark && range.start <= index && index < range.end
 	);
+}
+
+function hasRichTextMarkAtTransformedIndex( model, mark, baseIndex, splice ) {
+	const targetIndex = transformRichTextBaseIndex( baseIndex, splice );
+
+	if ( targetIndex === null ) {
+		return null;
+	}
+
+	return hasRichTextMarkAt( model, mark, targetIndex );
 }
 
 function coalesceRichTextMarks( marks ) {
