@@ -46,7 +46,9 @@ function truncateFilename( filename ) {
 	);
 }
 
-const UPLOAD_SPINNER = (
+// Exported so the Storybook story can render the exact icon markup the notice
+// uses, keeping the visual review faithful to what ships.
+export const UPLOAD_SPINNER = (
 	<span
 		className="editor-upload-progress-snackbar__spinner"
 		aria-hidden="true"
@@ -55,7 +57,7 @@ const UPLOAD_SPINNER = (
 	</span>
 );
 
-const UPLOAD_DONE = (
+export const UPLOAD_DONE = (
 	<span className="editor-upload-progress-snackbar__check" aria-hidden="true">
 		<WCIcon icon={ check } />
 	</span>
