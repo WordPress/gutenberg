@@ -28,13 +28,11 @@ const DEFAULT_CONFIG = {
 	multisite: false,
 	phpVersion: null,
 	coreSource: {
-		type: 'git',
-		url: 'https://github.com/WordPress/WordPress.git',
-		ref: '100.0.0',
-		path: '/cache/WordPress',
-		clonePath: '/cache/WordPress',
-		basename: 'WordPress',
-		testsPath: '/cache/tests-WordPress',
+		type: 'zip',
+		url: 'https://wordpress.org/wordpress-100.0.0.zip',
+		path: '/cache/wordpress-100',
+		basename: 'wordpress-100',
+		testsPath: '/cache/tests-wordpress-100',
 	},
 	pluginSources: [],
 	themeSources: [],
@@ -106,7 +104,7 @@ describe( 'parseConfig', () => {
 
 		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
-		expect( parsed.coreSource ).toMatchObject( { type: 'git' } );
+		expect( parsed.coreSource ).toMatchObject( { type: 'zip' } );
 		expect( parsed.themeSources ).toHaveLength( 0 );
 		expect( parsed.pluginSources ).toHaveLength( 1 );
 		expect( parsed.pluginSources[ 0 ] ).toMatchObject( { type: 'local' } );
@@ -117,7 +115,7 @@ describe( 'parseConfig', () => {
 
 		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
 
-		expect( parsed.coreSource ).toMatchObject( { type: 'git' } );
+		expect( parsed.coreSource ).toMatchObject( { type: 'zip' } );
 		expect( parsed.pluginSources ).toHaveLength( 0 );
 		expect( parsed.themeSources ).toHaveLength( 1 );
 		expect( parsed.themeSources[ 0 ] ).toMatchObject( { type: 'local' } );
