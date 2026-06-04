@@ -309,13 +309,13 @@ describe( 'WidgetDashboard staging layer', () => {
 			act( () => {
 				readProbe().mutateGridSettings( {
 					...initialSettings,
-					rowHeight: 240,
+					rowHeight: 300,
 				} );
 			} );
 
 			expect( onGridSettingsChange ).not.toHaveBeenCalled();
 			expect( readProbe().hasUncommittedChanges ).toBe( true );
-			expect( readProbe().gridSettings.rowHeight ).toBe( 240 );
+			expect( readProbe().gridSettings.rowHeight ).toBe( 300 );
 		} );
 
 		it( 'publishes both layout and settings on commit', () => {
