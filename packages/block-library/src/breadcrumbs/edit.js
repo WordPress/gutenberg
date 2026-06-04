@@ -37,6 +37,7 @@ export default function BreadcrumbEdit( {
 		showCurrentItem,
 		prefersTaxonomy,
 		showOnHomePage,
+		showTrailingSeparator,
 	} = attributes;
 	const {
 		post,
@@ -129,7 +130,10 @@ export default function BreadcrumbEdit( {
 		};
 	}, [ status ] );
 	const disabledRef = useDisabled();
-	const blockProps = useBlockProps( { ref: disabledRef } );
+	const blockProps = useBlockProps( {
+		ref: disabledRef,
+		className: showTrailingSeparator ? 'has-trailing-separator' : undefined,
+	} );
 
 	if ( isLoading ) {
 		return (
@@ -278,6 +282,26 @@ export default function BreadcrumbEdit( {
 									} );
 								}
 							} }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Show trailing separator' ) }
+						isShownByDefault
+						hasValue={ () => showTrailingSeparator }
+						onDeselect={ () =>
+							setAttributes( {
+								showTrailingSeparator: false,
+							} )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show trailing separator' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									showTrailingSeparator: value,
+								} )
+							}
+							checked={ showTrailingSeparator }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
