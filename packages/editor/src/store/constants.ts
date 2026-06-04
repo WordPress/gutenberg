@@ -55,7 +55,7 @@ export const DEVICE_TYPES: Record<
 	{
 		value: string;
 		label: string;
-		icon: JSX.Element;
+		icon: React.JSX.Element;
 		canvasWidth: number | undefined;
 	}
 > = {
