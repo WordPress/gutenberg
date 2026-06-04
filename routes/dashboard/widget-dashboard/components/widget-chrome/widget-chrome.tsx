@@ -160,7 +160,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 					ref={ ref }
 					className={ clsx( styles.widgetChrome, className ) }
 					aria-labelledby={ widgetType.title ? titleId : undefined }
-					inert={ editMode || undefined }
+					inert={ editMode ? 'true' : undefined }
 				>
 					{ isHeaderHidden ? (
 						<VisuallyHidden>{ header }</VisuallyHidden>
