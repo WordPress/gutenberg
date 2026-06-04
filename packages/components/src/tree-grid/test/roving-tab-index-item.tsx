@@ -26,6 +26,7 @@ describe( 'RovingTabIndexItem', () => {
 		expect( () =>
 			render( <RovingTabIndexItem as={ TestButton } /> )
 		).toThrow();
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'allows another component to be specified as the rendered component using the `as` prop', () => {

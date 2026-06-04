@@ -22,5 +22,10 @@
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/url": "file:../../packages/url"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1"
 	}
 }
