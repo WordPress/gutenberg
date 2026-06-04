@@ -32,6 +32,7 @@
 -   Focus ring utilities: Remove the shared outline transition so focus ring styles are not accidentally overridden by component transitions ([#78823](https://github.com/WordPress/gutenberg/pull/78823)).
 -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
 -   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
+-   Add `LinkButton` component ([#77098](https://github.com/WordPress/gutenberg/issues/77098)).
 
 ### Code Quality
 
