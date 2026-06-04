@@ -157,7 +157,7 @@ async function dev() {
 
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
-		await exec( 'node', [
+		await exec( process.execPath, [
 			path.join( __dirname, 'packages/generate-worker-placeholders.mjs' ),
 		] );
 
@@ -173,7 +173,7 @@ async function dev() {
 		console.log( `   ✔ Built TypeScript types (${ buildTime }ms)` );
 
 		console.log( '\n✅ Checking type declaration files...' );
-		await exec( 'node', [
+		await exec( process.execPath, [
 			path.join(
 				__dirname,
 				'packages/check-build-type-declaration-files.cjs'
@@ -181,7 +181,7 @@ async function dev() {
 		] );
 
 		console.log( '\n📦 Building vendor files...' );
-		await exec( 'node', [
+		await exec( process.execPath, [
 			path.join( __dirname, 'packages/build-vendors.mjs' ),
 		] );
 
