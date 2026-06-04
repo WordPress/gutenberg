@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   `AlertDialog`: Move the footer layout override into the `wp-ui-compositions` layer so it reliably overrides the shared chrome `.footer` regardless of stylesheet injection order.
+-   `AlertDialog`: Fix the footer collapsing to a row depending on stylesheet load order ([#78953](https://github.com/WordPress/gutenberg/pull/78953)).
 -   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
 
 ### Enhancements
