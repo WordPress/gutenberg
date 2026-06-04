@@ -164,6 +164,16 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		$this->assertSame( $modified, get_post_field( 'post_modified', self::$post_id ) );
 	}
 
+	public function test_save_allows_unchanged_crdt_doc_meta() {
+		wp_set_current_user( self::$editor_id );
+		update_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, 'serialized-crdt-doc' );
+
+		$response = $this->dispatch_save( $this->get_post_room(), 'serialized-crdt-doc' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'serialized-crdt-doc', get_post_meta( self::$post_id, WP_Sync_Save_Server::CRDT_DOC_META_KEY, true ) );
+	}
+
 	public function test_save_rejects_taxonomy_entity() {
 		wp_set_current_user( self::$editor_id );
 

@@ -158,15 +158,13 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 
 			$doc = $request['doc'];
 
-			if ( get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) !== $doc ) {
-				$updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $doc );
-				if ( false === $updated ) {
-					return new WP_Error(
-						'rest_crdt_save_failed',
-						__( 'Failed to save CRDT document.', 'gutenberg' ),
-						array( 'status' => 500 )
-					);
-				}
+			$updated = update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $doc );
+			if ( false === $updated && get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) !== $doc ) {
+				return new WP_Error(
+					'rest_crdt_save_failed',
+					__( 'Failed to save CRDT document.', 'gutenberg' ),
+					array( 'status' => 500 )
+				);
 			}
 
 			return new WP_REST_Response(
