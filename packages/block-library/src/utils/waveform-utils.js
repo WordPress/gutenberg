@@ -278,10 +278,11 @@ function setTimeMarker( marker, percent, label ) {
  * @return {Array} WaveformPlayer marker objects.
  */
 function createWaveformPlayerMarkers( currentTime, duration, color ) {
+	const clampedCurrentTime = clamp( currentTime, 0, duration );
 	return [
 		{
-			time: clamp( currentTime, 0, duration ),
-			label: formatTime( currentTime ),
+			time: clampedCurrentTime,
+			label: formatTime( clampedCurrentTime ),
 			color,
 		},
 		{

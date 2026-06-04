@@ -352,6 +352,22 @@ describe( 'Waveform utilities', () => {
 			] );
 		} );
 
+		it( 'should clamp the current marker label to the duration', () => {
+			const { container, instance } = createMarkerTestContext( {
+				duration: 180,
+				currentTime: 181,
+			} );
+
+			setupWaveformTimeMarkers( instance, container );
+
+			const currentMarker = container.querySelector(
+				'.wp-block-playlist__time-marker--current'
+			);
+
+			expect( currentMarker ).toHaveStyle( { left: '100%' } );
+			expect( currentMarker ).toHaveTextContent( '3:00' );
+		} );
+
 		it( 'should update the current marker on player timeupdate', () => {
 			const { audio, container, instance } = createMarkerTestContext();
 
