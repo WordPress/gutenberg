@@ -79,6 +79,8 @@
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
