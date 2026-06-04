@@ -47,7 +47,7 @@ import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorFineRotation from '../media-editor-fine-rotation';
-import MediaEditorTransformControls from '../media-editor-transform-controls';
+import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
@@ -661,7 +661,12 @@ function MediaEditorContent( {
 			onReset={ resetCropOptions }
 		/>
 	) : null;
-	const transform = isImage ? <MediaEditorTransformControls /> : null;
+	const imageControls = isImage ? (
+		<MediaEditorImageControls
+			showAspectRatioControl
+			aspectRatioPresets={ aspectRatioPresets }
+		/>
+	) : null;
 	const actions = (
 		<FooterActions
 			isSaving={ isSaving }
@@ -678,7 +683,7 @@ function MediaEditorContent( {
 	// matches visual order.
 	let footerActions: ReactNode;
 	if ( footerLayout === 'wide' ) {
-		// Sidebar is a column: transform controls live in the Crop panel, so
+		// Sidebar is a column: image controls live in the Crop panel, so
 		// the footer is just History + Cancel/Save.
 		footerActions = (
 			<>
@@ -687,10 +692,10 @@ function MediaEditorContent( {
 			</>
 		);
 	} else {
-		// Sidebar collapsed: the transform controls drop into the footer.
+		// Sidebar collapsed: the image controls drop into the footer.
 		footerActions = (
 			<>
-				{ transform }
+				{ imageControls }
 				<div className="media-editor-modal__footer-row">
 					{ history }
 					{ actions }

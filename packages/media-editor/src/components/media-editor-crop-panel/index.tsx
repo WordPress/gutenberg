@@ -13,7 +13,7 @@ import {
 	useCropGestureHandlers,
 	CROP_CONTROL_ATTR,
 } from '../../hooks/use-crop-gesture-handlers';
-import MediaEditorTransformControls from '../media-editor-transform-controls';
+import MediaEditorImageControls from '../media-editor-image-controls';
 import { MAX_ZOOM } from '../../image-editor/core/constants';
 import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -85,9 +85,7 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
-			{ showTransformControls && (
-				<MediaEditorTransformControls withLabels />
-			) }
+			{ showTransformControls && <MediaEditorImageControls withLabels /> }
 			<SelectControl
 				__next40pxDefaultSize
 				label={ __( 'Aspect ratio' ) }
