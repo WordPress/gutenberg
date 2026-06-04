@@ -1,8 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .wp-block-playlist-track {
-	// Only show border between tracks when block has a border specified.
-	border-bottom: var(--wp-block-playlist-border-width, 0) solid var(--wp-block-playlist-border-color, transparent);
 	padding: $grid-unit-10;
 
 	// Hover effect for tracks.
@@ -74,7 +72,6 @@
 		}
 
 		.wp-block-playlist-track__length {
-			flex-shrink: 0;
 			opacity: 0.7;
 		}
 	}
