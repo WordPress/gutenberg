@@ -6,7 +6,6 @@
 	"files": [],
 	"references": [
 		{ "path": "../style-runtime" },
-		{ "path": "./tsconfig.src.json" },
-		{ "path": "./tsconfig.bin.json" }
+		{ "path": "./tsconfig.src.json" }
 	]
 }

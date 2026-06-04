@@ -37,11 +37,15 @@ var searchItem = (item, ref) => ({
 const FUSE_KEYS_PATTERN =
 	/keys: \[\s*\{ name: "name", weight: 0\.7 \},\s*\{ name: "path", weight: 0\.3 \}\s*\]/;
 
+// Fuse.js requires key weights to sum to at most 1.
 const FUSE_KEYS_REPLACEMENT = `keys: [
-    { name: "name", weight: 0.7 },
-    { name: "path", weight: 0.3 },
-    { name: "synonyms", weight: 0.35 },
+    { name: "name", weight: 0.5 },
+    { name: "path", weight: 0.25 },
+    { name: "synonyms", weight: 0.25 },
   ]`;
+
+const FUSE_KEYS_WITH_SYNONYMS_PATTERN =
+	/keys: \[\s*\{ name: "name", weight: [\d.]+ \},\s*\{ name: "path", weight: [\d.]+ \},\s*\{ name: "synonyms", weight: [\d.]+ \},?\s*\]/;
 
 function patchRuntime( filePath ) {
 	let code;
@@ -53,6 +57,15 @@ function patchRuntime( filePath ) {
 	}
 
 	if ( code.includes( 'getDesignSystemSearchSynonyms' ) ) {
+		if ( FUSE_KEYS_WITH_SYNONYMS_PATTERN.test( code ) ) {
+			writeFileSync(
+				filePath,
+				code.replace(
+					FUSE_KEYS_WITH_SYNONYMS_PATTERN,
+					FUSE_KEYS_REPLACEMENT
+				)
+			);
+		}
 		return true;
 	}
 
