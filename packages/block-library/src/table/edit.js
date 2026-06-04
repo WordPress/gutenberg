@@ -56,6 +56,7 @@ import {
 	createTable,
 	updateSelectedCell,
 	getCellAttribute,
+	getFirstRow,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -292,10 +293,26 @@ function TableEdit( {
 			return;
 		}
 
-		const { sectionName, rowIndex } = selectedCell;
+		const { sectionName, rowIndex, columnIndex } = selectedCell;
+		const newAttributes = deleteRow( attributes, {
+			sectionName,
+			rowIndex,
+		} );
+		setAttributes( newAttributes );
 
-		setSelectedCell();
-		setAttributes( deleteRow( attributes, { sectionName, rowIndex } ) );
+		// Keep a cell selected so the table actions remain available without
+		// having to refocus a cell first.
+		const remainingRowCount = newAttributes[ sectionName ]?.length ?? 0;
+		if ( remainingRowCount === 0 ) {
+			setSelectedCell();
+			return;
+		}
+		setSelectedCell( {
+			sectionName,
+			rowIndex: Math.min( rowIndex, remainingRowCount - 1 ),
+			columnIndex: columnIndex ?? 0,
+			type: 'cell',
+		} );
 	}
 
 	/**
@@ -346,12 +363,24 @@ function TableEdit( {
 			return;
 		}
 
-		const { sectionName, columnIndex } = selectedCell;
+		const { sectionName, rowIndex, columnIndex } = selectedCell;
+		const newAttributes = deleteColumn( attributes, { columnIndex } );
+		setAttributes( newAttributes );
 
-		setSelectedCell();
-		setAttributes(
-			deleteColumn( attributes, { sectionName, columnIndex } )
-		);
+		// Keep a cell selected so the table actions remain available without
+		// having to refocus a cell first.
+		const remainingColumnCount =
+			getFirstRow( newAttributes )?.cells?.length ?? 0;
+		if ( remainingColumnCount === 0 ) {
+			setSelectedCell();
+			return;
+		}
+		setSelectedCell( {
+			sectionName: sectionName ?? 'body',
+			rowIndex: rowIndex ?? 0,
+			columnIndex: Math.min( columnIndex, remainingColumnCount - 1 ),
+			type: 'cell',
+		} );
 	}
 
 	useEffect( () => {

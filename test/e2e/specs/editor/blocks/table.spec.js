@@ -184,6 +184,39 @@ test.describe( 'Table', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'keeps table actions available after deleting a row or column', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/table' } );
+
+		// Create the default table.
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
+
+		// Focus a body cell so the table actions become available.
+		await editor.canvas
+			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			.click();
+
+		// Delete a row, then reopen the menu. The actions should remain
+		// enabled without having to refocus a cell first (see #28714).
+		await editor.clickBlockToolbarButton( 'Edit table' );
+		await page.click( 'role=menuitem[name="Delete row"i]' );
+		await editor.clickBlockToolbarButton( 'Edit table' );
+		await expect(
+			page.locator( 'role=menuitem[name="Delete row"i]' )
+		).toBeEnabled();
+
+		// Same expectation after deleting a column.
+		await page.click( 'role=menuitem[name="Delete column"i]' );
+		await editor.clickBlockToolbarButton( 'Edit table' );
+		await expect(
+			page.locator( 'role=menuitem[name="Delete column"i]' )
+		).toBeEnabled();
+	} );
+
 	test( 'allows columns to be aligned', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/table' } );
 
