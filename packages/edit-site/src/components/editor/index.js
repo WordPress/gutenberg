@@ -17,7 +17,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -148,7 +148,22 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const editorSettings = useSpecificEditorSettings();
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+	const { setDeviceType } = useDispatch( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	useEffect( () => {
+		if ( isLoading || ! isEditMode ) {
+			return;
+		}
+
+		const isFocusModeEditor =
+			postType === 'wp_template_part' || postType === 'wp_block';
+
+		if ( isFocusModeEditor ) {
+			setDeviceType( 'Desktop' );
+		}
+	}, [ isLoading, isEditMode, postType, postId, setDeviceType ] );
+
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
 			switch ( actionId ) {
