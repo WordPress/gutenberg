@@ -153,6 +153,10 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		pause: ref.dataset.labelPause,
 		seek: ref.dataset.labelSeek,
 		seekValueText: ref.dataset.labelSeekValue,
+		previous: ref.dataset.labelPrevious,
+		next: ref.dataset.labelNext,
+		shuffle: ref.dataset.labelShuffle,
+		repeat: ref.dataset.labelRepeat,
 	};
 
 	// Initialize using the shared core.
