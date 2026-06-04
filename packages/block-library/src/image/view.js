@@ -692,40 +692,47 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			async submitComment( payload, form ) {
+				// Read all config synchronously: `getConfig()` relies on the
+				// interactivity scope, which is lost after the first `await`
+				// below, so calling it afterwards would return an empty config.
+				const {
+					commentNonce,
+					commentEndpoint,
+					commentSubmittingText,
+					commentSubmittedText,
+					commentErrorText,
+				} = getConfig();
+
 				const headers = {
 					'Content-Type': 'application/json',
 				};
-				const { commentNonce } = getConfig();
 
 				if ( commentNonce ) {
 					headers[ 'X-WP-Nonce' ] = commentNonce;
 				}
 
 				state.commentForm.isSubmitting = true;
-				state.commentForm.message = getConfig().commentSubmittingText;
+				state.commentForm.message = commentSubmittingText;
 
 				try {
-					const response = await window.fetch(
-						getConfig().commentEndpoint,
-						{
-							method: 'POST',
-							credentials: 'same-origin',
-							headers,
-							body: JSON.stringify( payload ),
-						}
-					);
+					const response = await window.fetch( commentEndpoint, {
+						method: 'POST',
+						credentials: 'same-origin',
+						headers,
+						body: JSON.stringify( payload ),
+					} );
 					const responseBody = await response.json();
 
 					if ( ! response.ok ) {
 						// Surface the server's validation message when present,
 						// e.g. "Comment content cannot be empty".
 						state.commentForm.message =
-							responseBody.message || getConfig().commentErrorText;
+							responseBody.message || commentErrorText;
 						return;
 					}
 
 					form.reset();
-					state.commentForm.message = getConfig().commentSubmittedText;
+					state.commentForm.message = commentSubmittedText;
 
 					// Render the newly created comment from the response rather
 					// than re-fetching: the REST list endpoint only returns
@@ -735,7 +742,7 @@ const { state, actions, callbacks } = store(
 				} catch {
 					// Network failures or non-JSON responses fall back to the
 					// localized error text rather than a raw browser message.
-					state.commentForm.message = getConfig().commentErrorText;
+					state.commentForm.message = commentErrorText;
 				} finally {
 					state.commentForm.isSubmitting = false;
 				}

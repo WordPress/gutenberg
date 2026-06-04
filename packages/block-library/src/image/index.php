@@ -198,6 +198,23 @@ function block_core_image_get_lightbox_comments_settings( $block ) {
 }
 
 /**
+ * Checks whether the lightbox comments experiment is enabled.
+ *
+ * The image block also ships in WordPress Core, where the Gutenberg
+ * experiments option does not exist and the `gutenberg_is_experiment_enabled()`
+ * helper is unavailable. Reading the option directly keeps this core-safe: the
+ * option is absent in Core, so the feature stays disabled there.
+ *
+ * @since 7.0.0
+ *
+ * @return bool Whether the lightbox comments experiment is enabled.
+ */
+function block_core_image_is_lightbox_comments_experiment_enabled() {
+	$experiments = get_option( 'gutenberg-experiments', array() );
+	return is_array( $experiments ) && ! empty( $experiments['gutenberg-gallery-lightbox-default'] );
+}
+
+/**
  * Adds the directives and layout needed for the lightbox behavior.
  *
  * @since 6.4.0
@@ -244,7 +261,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	// turns them on via the per-block attribute or the `lightboxComments`
 	// theme.json setting, and whose attachment has comments open.
 	$comments_enabled = false;
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-gallery-lightbox-default' ) ) {
+	if ( block_core_image_is_lightbox_comments_experiment_enabled() ) {
 		$comments_settings = block_core_image_get_lightbox_comments_settings( $block );
 		$comments_enabled  = isset( $comments_settings['enabled'] ) && true === $comments_settings['enabled'];
 
@@ -398,7 +415,7 @@ function block_core_image_print_lightbox_overlay() {
 	// `gutenberg-gallery-lightbox-default` experiment is enabled.
 	$comment_button   = '';
 	$comments_section = '';
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-gallery-lightbox-default' ) ) {
+	if ( block_core_image_is_lightbox_comments_experiment_enabled() ) {
 		$comment_label = esc_attr__( 'Comment' );
 		$submit_label  = esc_html__( 'Post Comment' );
 		$comment_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H9.44L5.3 18.53A.75.75 0 0 1 4 17.96V5.5Zm2.5-1A1 1 0 0 0 5.5 5.5v11.33l3.18-2.71a.75.75 0 0 1 .49-.18h8.33a1 1 0 0 0 1-1v-7.44a1 1 0 0 0-1-1h-11Z"></path></svg>';
