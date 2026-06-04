@@ -4,6 +4,7 @@
 
 ### Documentation
 
+-   Storybook: Add search synonyms for `@wordpress/ui` design system components so sidebar search matches common terms (e.g. `modal` finds `Dialog`) ([#78951](https://github.com/WordPress/gutenberg/pull/78951)).
 -   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
 
 ## 34.0.0 (2026-05-27)
