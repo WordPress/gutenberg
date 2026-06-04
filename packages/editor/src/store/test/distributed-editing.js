@@ -319,11 +319,20 @@ describe( 'distributed editing session state', () => {
 				schema: 'de-rtc-automerge-v1',
 				operations: [
 					{
-						type: 'block.update_serialized',
-						automergePrimitive: 'Automerge.Map.set',
+						type: 'block.rich_text_content',
+						automergePrimitive: 'Automerge.Text.splice',
 						path: [ 0 ],
 						blockName: 'core/paragraph',
 						actor: 'editor-42',
+						textSplice: {
+							changed: true,
+							start: 10,
+							deleteCount: 4,
+							insertText: 'edited',
+							insertCount: 6,
+							end: 14,
+							delta: 2,
+						},
 					},
 				],
 				stateVector: {
@@ -430,6 +439,29 @@ describe( 'distributed editing session state', () => {
 			localChangeRange: {
 				changed: true,
 			},
+		} );
+	} );
+
+	it( 'builds a Automerge local merge candidate for paragraph text plus remote formatting', () => {
+		const clientBaseContent =
+			'<!-- wp:paragraph --><p>Some pretext to a post.</p><!-- /wp:paragraph -->';
+		const serverContent =
+			'<!-- wp:paragraph --><p>Some <em>pretext</em> to a post.</p><!-- /wp:paragraph -->';
+		const localContent =
+			'<!-- wp:paragraph --><p>Some pretext to a WordPress post.</p><!-- /wp:paragraph -->';
+
+		expect(
+			getDistributedEditingAutomergeLocalMergeCandidate( {
+				clientBaseContent,
+				serverContent,
+				localContent,
+			} )
+		).toMatchObject( {
+			status: 'merged',
+			hasCandidatePostContent: true,
+			candidatePostContent:
+				'<!-- wp:paragraph --><p>Some <em>pretext</em> to a WordPress post.</p><!-- /wp:paragraph -->',
+			mergeStrategy: 'native_automerge_php_v1',
 		} );
 	} );
 
@@ -4350,9 +4382,71 @@ describe( 'distributed editing session state', () => {
 		} );
 	} );
 
+	it( 'normalizes idempotent already-persisted retry-save responses as saved', () => {
+		const persistedContent =
+			'<!-- wp:paragraph --><p>Demo content alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Duplicated content!</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Demo content beta.</p><!-- /wp:paragraph -->';
+		const persistedRawContent = `<!-- wp:sync-meta {"format":"automerge"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"schema":"de-rtc-automerge-v1","version":"2"}</script>\n<!-- /wp:sync-meta -->${ persistedContent }`;
+		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
+			{
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+				retry_save_duplicate: true,
+				idempotent_no_write: true,
+				already_persisted: true,
+				previous_server_version: '1',
+				server_version: '2',
+				pending_change_count: 1,
+				claims_saved: true,
+				saves_post: false,
+				mutates_post_content: false,
+				creates_revision: false,
+				content: {
+					raw: persistedRawContent,
+				},
+			},
+			{
+				clientBaseVersion: '1',
+				serverVersion: '1',
+				pendingChangeCount: 1,
+				hasPendingChanges: true,
+				isAwaitingServerConfirmation: true,
+				saveButtonClickInFlight: true,
+				canExportLocalUpdates: true,
+			}
+		);
+
+		expect( normalized ).toMatchObject( {
+			disposition: DISTRIBUTED_EDITING_DISPOSITIONS.IDLE,
+			reasonCode: null,
+			clientBaseVersion: '2',
+			clientBaseContent: persistedContent,
+			serverVersion: '2',
+			pendingChangeCount: 0,
+			hasPendingChanges: false,
+			isAwaitingServerConfirmation: false,
+			saveButtonClickInFlight: false,
+			retrySaveStatus: DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED,
+			retrySaveAccepted: true,
+			retrySaveServerVersion: '2',
+			retrySavePreviousServerVersion: '1',
+			retrySaveSavesPost: false,
+			retrySaveMutatesPostContent: false,
+			retrySaveClaimsSaved: true,
+			retrySaveIdempotentNoWrite: true,
+			retrySaveAlreadyPersisted: true,
+			mustOfferLocalCopy: false,
+			canExportLocalUpdates: false,
+		} );
+		expect(
+			hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
+				normalized
+			)
+		).toBe( true );
+	} );
+
 	it( 'absorbs partial-safe retry-save content while keeping unsafe block review pending', () => {
 		const safeServerContent =
-			'<!-- wp:paragraph --><p>Demo content alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Duplicated content!</p><!-- /wp:paragraph --><!-- wp:html -->\n<div>Demo content beta.</div>\n<!-- /wp:html --><!-- wp:paragraph --><p>Demo content gamma.</p><!-- /wp:paragraph -->';
+			'<!-- wp:paragraph --><p>Demo content alpha.</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Duplicated content!</p><!-- /wp:paragraph --><!-- wp:html --><div>Demo content beta.</div><!-- /wp:html --><!-- wp:paragraph --><p>Demo content gamma.</p><!-- /wp:paragraph -->';
 		const safeServerRawContent = `<!-- wp:sync-meta {"format":"automerge"} -->\n<script type="application/json" data-wp-sync-meta="distributed-editing" data-sync-meta-format="automerge">{"schema":"de-rtc-automerge-v1","version":"302"}</script>\n<!-- /wp:sync-meta -->${ safeServerContent }`;
 		const normalized = getDistributedEditingSessionStateForRetrySaveResult(
 			{
@@ -4460,6 +4554,20 @@ describe( 'distributed editing session state', () => {
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.CONTINUE_GUARDED_RETRY_SAVE,
 			blocksNormalSavePost: true,
 			opensPrePublishReview: false,
+			requiresServerStateRefetch: false,
+		} );
+
+		const afterPresenceOrStatusRefresh =
+			normalizeDistributedEditingSessionState( {
+				...normalized,
+				isAwaitingServerConfirmation: true,
+				requiresManualConflictResolution: true,
+			} );
+
+		expect( afterPresenceOrStatusRefresh ).toMatchObject( {
+			isAwaitingServerConfirmation: false,
+			requiresManualConflictResolution: false,
+			refetchedServerState: true,
 			requiresServerStateRefetch: false,
 		} );
 	} );
@@ -11803,6 +11911,38 @@ describe( 'distributed editing session state', () => {
 		} );
 		expect( result.candidatePostContent ).toBe(
 			'<!-- wp:paragraph --><p>This is <strong>bold</strong> and <em>italicized</em>.</p><!-- /wp:paragraph -->'
+		);
+	} );
+
+	it( 'rebases local paragraph text insertion over remote inline formatting', () => {
+		const baseContent =
+			'<!-- wp:paragraph --><p>Some pretext to a post.</p><!-- /wp:paragraph -->';
+		const result = getDistributedEditingStaleBaseLocalRebaseResult( {
+			currentSessionState:
+				getDistributedEditingSessionStateForStaleBaseLocalRebasePlan( {
+					disposition:
+						DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION,
+					reasonCode:
+						DISTRIBUTED_EDITING_REASON_CODES.STALE_BASE_VERSION_REJECTED,
+					refetchedServerState: true,
+					pendingChangeCount: 1,
+					canAttemptLocalRebase: true,
+				} ),
+			clientBaseContent: baseContent,
+			serverContent:
+				'<!-- wp:paragraph --><p>Some <em>pretext</em> to a post.</p><!-- /wp:paragraph -->',
+			localContent:
+				'<!-- wp:paragraph --><p>Some pretext to a WordPress post.</p><!-- /wp:paragraph -->',
+		} );
+
+		expect( result ).toMatchObject( {
+			status: DISTRIBUTED_EDITING_LOCAL_REBASE_RESULT_STATUSES.REBASED,
+			hasCandidatePostContent: true,
+			readyToRetrySubmit: true,
+			requiresManualConflictResolution: false,
+		} );
+		expect( result.candidatePostContent ).toBe(
+			'<!-- wp:paragraph --><p>Some <em>pretext</em> to a WordPress post.</p><!-- /wp:paragraph -->'
 		);
 	} );
 

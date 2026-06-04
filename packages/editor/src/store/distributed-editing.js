@@ -1280,6 +1280,8 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	retrySaveMutatesPostContent: false,
 	retrySaveCreatesRevision: false,
 	retrySaveClaimsSaved: false,
+	retrySaveIdempotentNoWrite: false,
+	retrySaveAlreadyPersisted: false,
 	retrySaveRevisionCreated: false,
 	retrySaveCreatedRevisionIds: [],
 	retrySaveConfirmedMergedEdits: false,
@@ -1781,7 +1783,6 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		pendingChangeCount > 0 ||
 		( isStaleBaseRejection && ! hasExplicitPendingChangeCount );
 	const isPartialSafePendingReview =
-		sessionState.isAwaitingServerConfirmation === false &&
 		reasonCode ===
 			DISTRIBUTED_EDITING_REASON_CODES.DE_RTC_UNFILTERED_HTML_WOULD_CHANGE_CONTENT &&
 		sessionState.retrySaveStatus ===
@@ -1817,7 +1818,8 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			isStaleBaseRejection ) &&
 		! refetchedServerState;
 	const requiresManualConflictResolution = Boolean(
-		sessionState.requiresManualConflictResolution
+		sessionState.requiresManualConflictResolution &&
+			! isPartialSafePendingReview
 	);
 	const canAttemptLocalRebase =
 		Boolean( sessionState.canAttemptLocalRebase ) &&
@@ -2211,6 +2213,12 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			sessionState.retrySaveCreatesRevision
 		),
 		retrySaveClaimsSaved: Boolean( sessionState.retrySaveClaimsSaved ),
+		retrySaveIdempotentNoWrite: Boolean(
+			sessionState.retrySaveIdempotentNoWrite
+		),
+		retrySaveAlreadyPersisted: Boolean(
+			sessionState.retrySaveAlreadyPersisted
+		),
 		retrySaveRevisionCreated: Boolean(
 			sessionState.retrySaveRevisionCreated
 		),
@@ -10733,9 +10741,12 @@ export function hasDistributedEditingRetrySaveSavedStateEvidenceForSessionState(
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVED &&
 		normalized.retrySaveAccepted &&
 		normalized.retrySaveServerVersion !== null &&
-		normalized.retrySaveSavesPost &&
-		normalized.retrySaveMutatesPostContent &&
-		normalized.retrySaveClaimsSaved
+		( ( normalized.retrySaveSavesPost &&
+			normalized.retrySaveMutatesPostContent &&
+			normalized.retrySaveClaimsSaved ) ||
+			( normalized.retrySaveIdempotentNoWrite &&
+				normalized.retrySaveAlreadyPersisted &&
+				normalized.retrySaveClaimsSaved ) )
 	);
 }
 
@@ -14494,6 +14505,18 @@ export function getDistributedEditingSessionStateForRetrySaveResult(
 				responseData.claimsSaved ||
 				responseData.claims_saved
 		),
+		retrySaveIdempotentNoWrite: Boolean(
+			responseOrError.idempotentNoWrite ||
+				responseOrError.idempotent_no_write ||
+				responseData.idempotentNoWrite ||
+				responseData.idempotent_no_write
+		),
+		retrySaveAlreadyPersisted: Boolean(
+			responseOrError.alreadyPersisted ||
+				responseOrError.already_persisted ||
+				responseData.alreadyPersisted ||
+				responseData.already_persisted
+		),
 		retrySaveRevisionCreated: Boolean(
 			responseOrError.revisionCreated ||
 				responseOrError.revision_created ||
@@ -15129,11 +15152,18 @@ function hasRetrySaveResponseSavedStateEvidence( {
 	serverVersion,
 	retrySaveFlags,
 } ) {
+	const alreadyPersisted = Boolean(
+		retrySaveFlags.retrySaveIdempotentNoWrite &&
+			retrySaveFlags.retrySaveAlreadyPersisted &&
+			retrySaveFlags.retrySaveClaimsSaved
+	);
+
 	return Boolean(
 		serverVersion &&
-			retrySaveFlags.retrySaveSavesPost &&
-			retrySaveFlags.retrySaveMutatesPostContent &&
-			retrySaveFlags.retrySaveClaimsSaved
+			( alreadyPersisted ||
+				( retrySaveFlags.retrySaveSavesPost &&
+					retrySaveFlags.retrySaveMutatesPostContent &&
+					retrySaveFlags.retrySaveClaimsSaved ) )
 	);
 }
 
@@ -19456,12 +19486,26 @@ function getDistributedEditingAutomergeRichTextBlockOperation( {
 	const baseRichText = getRichTextFormatModel( base.html );
 	const proposedRichText = getRichTextFormatModel( proposed.html );
 
-	if (
-		! baseRichText ||
-		! proposedRichText ||
-		baseRichText.text !== proposedRichText.text
-	) {
+	if ( ! baseRichText || ! proposedRichText ) {
 		return null;
+	}
+
+	if ( baseRichText.text !== proposedRichText.text ) {
+		return {
+			type: 'block.rich_text_content',
+			automergePrimitive: 'Automerge.Text.splice',
+			path,
+			blockUid: `top:${ baseBlockHash }`,
+			blockName,
+			field: 'innerHTML',
+			baseBlockHash,
+			proposedBlockHash,
+			textSplice: getRichTextTextSplice(
+				baseRichText.text,
+				proposedRichText.text
+			),
+			serializedBlock: proposedBlock,
+		};
 	}
 
 	return {
@@ -19703,7 +19747,7 @@ async function importDistributedEditingAutomergeWithoutInitWarning() {
 		typeof globalThis !== 'undefined' ? globalThis.console : null;
 
 	if ( ! consoleObject || typeof consoleObject.warn !== 'function' ) {
-		return import( '@automerge/automerge' );
+		return importDistributedEditingAutomergeSlim();
 	}
 
 	const originalWarn = consoleObject.warn;
@@ -19725,10 +19769,27 @@ async function importDistributedEditingAutomergeWithoutInitWarning() {
 	};
 
 	try {
-		return await import( '@automerge/automerge' );
+		return await importDistributedEditingAutomergeSlim();
 	} finally {
 		consoleObject.warn = originalWarn;
 	}
+}
+
+let distributedEditingAutomergeSlim;
+
+async function importDistributedEditingAutomergeSlim() {
+	if ( distributedEditingAutomergeSlim ) {
+		return distributedEditingAutomergeSlim;
+	}
+
+	const automerge = await import( '@automerge/automerge/slim' );
+	const { automergeWasmBase64 } = await import(
+		'@automerge/automerge/automerge.wasm.base64'
+	);
+
+	await automerge.initializeBase64Wasm( automergeWasmBase64 );
+	distributedEditingAutomergeSlim = automerge;
+	return automerge;
 }
 
 function createLocalRebaseResult( {
@@ -19926,42 +19987,122 @@ function getRichTextSerializedBlockLocalRebaseCandidate( {
 	const serverRichText = getRichTextFormatModel( server.html );
 	const localRichText = getRichTextFormatModel( local.html );
 
-	if (
-		! baseRichText ||
-		! serverRichText ||
-		! localRichText ||
-		baseRichText.text !== serverRichText.text ||
-		baseRichText.text !== localRichText.text
-	) {
+	if ( ! baseRichText || ! serverRichText || ! localRichText ) {
 		return {
 			status: 'manual_conflict_required',
 			reason: 'rich_text_plain_text_changed',
 		};
 	}
 
-	const serverChanged = getRichTextChangedIndexes(
-		baseRichText,
-		serverRichText
+	const serverSplice = getRichTextTextSplice(
+		baseRichText.text,
+		serverRichText.text
 	);
-	const localChanged = getRichTextChangedIndexes(
-		baseRichText,
-		localRichText
+	const localSplice = getRichTextTextSplice(
+		baseRichText.text,
+		localRichText.text
 	);
+	const serverTextChanged = serverSplice.changed;
+	const localTextChanged = localSplice.changed;
 
-	if ( doRichTextChangedIndexesOverlap( serverChanged, localChanged ) ) {
+	if ( ! serverTextChanged && ! localTextChanged ) {
+		const serverChanged = getRichTextChangedIndexes(
+			baseRichText,
+			serverRichText
+		);
+		const localChanged = getRichTextChangedIndexes(
+			baseRichText,
+			localRichText
+		);
+
+		if ( doRichTextChangedIndexesOverlap( serverChanged, localChanged ) ) {
+			return {
+				status: 'manual_conflict_required',
+				reason: 'rich_text_format_ranges_overlap',
+			};
+		}
+
+		const merged = mergeRichTextFormatModels( {
+			base: baseRichText,
+			server: serverRichText,
+			serverChanged,
+			local: localRichText,
+			localChanged,
+		} );
+
 		return {
-			status: 'manual_conflict_required',
-			reason: 'rich_text_format_ranges_overlap',
+			status: 'rebased',
+			candidateBlock: `${ base.open }${ formatRichTextModelHtml(
+				merged
+			) }${ base.close }`,
 		};
 	}
 
-	const merged = mergeRichTextFormatModels( {
-		base: baseRichText,
-		server: serverRichText,
-		serverChanged,
-		local: localRichText,
-		localChanged,
-	} );
+	if ( serverTextChanged && localTextChanged ) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'rich_text_plain_text_changed',
+		};
+	}
+
+	let merged = null;
+
+	if ( serverTextChanged ) {
+		const localChanged = getRichTextChangedIndexes(
+			baseRichText,
+			localRichText
+		);
+		const serverChanged = getRetainedRichTextMarkChangedIndexes(
+			baseRichText,
+			serverRichText,
+			serverSplice
+		);
+
+		if ( doRichTextChangedIndexesOverlap( serverChanged, localChanged ) ) {
+			return {
+				status: 'manual_conflict_required',
+				reason: 'rich_text_format_ranges_overlap',
+			};
+		}
+
+		merged = mergeRichTextTextAndFormatModels( {
+			textChangedModel: serverRichText,
+			formatChangedModel: localRichText,
+			textSplice: serverSplice,
+			formatChangedIndexes: localChanged,
+		} );
+	} else {
+		const serverChanged = getRichTextChangedIndexes(
+			baseRichText,
+			serverRichText
+		);
+		const localChanged = getRetainedRichTextMarkChangedIndexes(
+			baseRichText,
+			localRichText,
+			localSplice
+		);
+
+		if ( doRichTextChangedIndexesOverlap( localChanged, serverChanged ) ) {
+			return {
+				status: 'manual_conflict_required',
+				reason: 'rich_text_format_ranges_overlap',
+			};
+		}
+
+		merged = mergeRichTextTextAndFormatModels( {
+			textChangedModel: localRichText,
+			formatChangedModel: serverRichText,
+			textSplice: localSplice,
+			formatChangedIndexes: serverChanged,
+		} );
+	}
+
+	if ( ! merged ) {
+		return {
+			status: 'manual_conflict_required',
+			reason: 'rich_text_plain_text_changed',
+		};
+	}
 
 	return {
 		status: 'rebased',
@@ -20099,6 +20240,164 @@ function doRichTextChangedIndexesOverlap( left, right ) {
 	}
 
 	return false;
+}
+
+function getRichTextTextSplice( baseText, nextText ) {
+	if ( baseText === nextText ) {
+		return {
+			changed: false,
+			start: 0,
+			deleteCount: 0,
+			insertText: '',
+			insertCount: 0,
+			end: 0,
+			delta: 0,
+		};
+	}
+
+	let prefix = 0;
+	while (
+		prefix < baseText.length &&
+		prefix < nextText.length &&
+		baseText[ prefix ] === nextText[ prefix ]
+	) {
+		prefix += 1;
+	}
+
+	let suffix = 0;
+	while (
+		suffix < baseText.length - prefix &&
+		suffix < nextText.length - prefix &&
+		baseText[ baseText.length - 1 - suffix ] ===
+			nextText[ nextText.length - 1 - suffix ]
+	) {
+		suffix += 1;
+	}
+
+	const deleteCount = baseText.length - prefix - suffix;
+	const insertText = nextText.slice( prefix, nextText.length - suffix );
+
+	return {
+		changed: true,
+		start: prefix,
+		deleteCount,
+		insertText,
+		insertCount: insertText.length,
+		end: prefix + deleteCount,
+		delta: insertText.length - deleteCount,
+	};
+}
+
+function transformRichTextBaseIndex( index, splice ) {
+	if ( ! splice.changed ) {
+		return index;
+	}
+
+	if ( index < splice.start ) {
+		return index;
+	}
+
+	if ( index >= splice.end ) {
+		return index + splice.delta;
+	}
+
+	return null;
+}
+
+function getRetainedRichTextMarkChangedIndexes( base, next, splice ) {
+	const changed = new Set();
+
+	for ( let index = 0; index < base.text.length; index++ ) {
+		const targetIndex = transformRichTextBaseIndex( index, splice );
+
+		if (
+			targetIndex === null ||
+			targetIndex < 0 ||
+			targetIndex >= next.text.length
+		) {
+			continue;
+		}
+
+		for ( const mark of [ 'strong', 'em' ] ) {
+			if (
+				hasRichTextMarkAt( base, mark, index ) !==
+				hasRichTextMarkAt( next, mark, targetIndex )
+			) {
+				changed.add( index );
+			}
+		}
+	}
+
+	return changed;
+}
+
+function mergeRichTextTextAndFormatModels( {
+	textChangedModel,
+	formatChangedModel,
+	textSplice,
+	formatChangedIndexes,
+} ) {
+	const marksByIndex = new Map();
+
+	for ( let index = 0; index < textChangedModel.text.length; index++ ) {
+		for ( const mark of [ 'strong', 'em' ] ) {
+			if ( hasRichTextMarkAt( textChangedModel, mark, index ) ) {
+				if ( ! marksByIndex.has( index ) ) {
+					marksByIndex.set( index, new Set() );
+				}
+				marksByIndex.get( index ).add( mark );
+			}
+		}
+	}
+
+	for ( const baseIndex of formatChangedIndexes ) {
+		const targetIndex = transformRichTextBaseIndex( baseIndex, textSplice );
+
+		if (
+			targetIndex === null ||
+			targetIndex < 0 ||
+			targetIndex >= textChangedModel.text.length
+		) {
+			return null;
+		}
+
+		if ( ! marksByIndex.has( targetIndex ) ) {
+			marksByIndex.set( targetIndex, new Set() );
+		}
+
+		for ( const mark of [ 'strong', 'em' ] ) {
+			if ( hasRichTextMarkAt( formatChangedModel, mark, baseIndex ) ) {
+				marksByIndex.get( targetIndex ).add( mark );
+			} else {
+				marksByIndex.get( targetIndex ).delete( mark );
+			}
+		}
+	}
+
+	const marks = [];
+
+	for ( let index = 0; index < textChangedModel.text.length; index++ ) {
+		const activeMarks = marksByIndex.get( index );
+
+		if ( ! activeMarks ) {
+			continue;
+		}
+
+		for ( const mark of [ 'strong', 'em' ] ) {
+			if ( activeMarks.has( mark ) ) {
+				marks.push( {
+					type: mark,
+					start: index,
+					end: index + 1,
+				} );
+			}
+		}
+	}
+
+	return {
+		text: textChangedModel.text,
+		marks: coalesceRichTextMarks( marks ),
+	};
 }
 
 function mergeRichTextFormatModels( {
