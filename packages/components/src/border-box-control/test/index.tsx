@@ -270,12 +270,10 @@ describe( 'BorderBoxControl', () => {
 			);
 		} );
 
-
-		it( 'should disable the custom color picker when colors.length is 0', async () => {
+		it( 'should render the color palette when colors is greater than 0', async () => {
 			const user = userEvent.setup();
-
-			// colors.length = 0 → custom picker should NOT appear
-			render( <TestBorderBoxControl { ...props } colors={ [] } disableCustomColors/> );
+			// colors is set to a non-empty array above, so the color palette should appear
+			render( <TestBorderBoxControl { ...props } /> );
 
 			const colorButton = screen.getByLabelText( toggleLabelRegex );
 			await user.click( colorButton );
@@ -283,12 +281,31 @@ describe( 'BorderBoxControl', () => {
 			// Wait to make sure the dropdown opens
 			await waitFor( () =>
 				expect(
-					screen.queryByRole( 'button', {
+					screen.getByRole( 'listbox', {
+						name: 'Custom color picker',
+					} )
+				).toBeVisible()
+			);
+		} );
+
+		it( 'should not render the color palette when colors is 0', async () => {
+			const user = userEvent.setup();
+			// colors is set to an empty array above, so the color palette should not appear
+			render( <TestBorderBoxControl { ...props } colors={ [] } /> );
+
+			const colorButton = screen.getByLabelText( toggleLabelRegex );
+			await user.click( colorButton );
+
+			// Wait to make sure the dropdown opens
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'listbox', {
 						name: 'Custom color picker',
 					} )
 				).not.toBeInTheDocument()
 			);
 		} );
+
 	} );
 
 	describe( 'Split view rendering', () => {
