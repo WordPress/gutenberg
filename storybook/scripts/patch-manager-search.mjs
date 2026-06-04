@@ -4,7 +4,9 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import DESIGN_SYSTEM_SYNONYMS from '../../packages/ui/src/stories/component-synonyms.json' with { type: 'json' };
+import { collectUiStorySynonyms } from './collect-ui-story-synonyms.mjs';
+
+const DESIGN_SYSTEM_SYNONYMS = collectUiStorySynonyms();
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 const storybookRoot = resolve( __dirname, '..' );
@@ -67,10 +69,7 @@ function patchRuntime( filePath ) {
 }
 
 const targets = [
-	join(
-		repoRoot,
-		'node_modules/storybook/dist/manager/runtime.js'
-	),
+	join( repoRoot, 'node_modules/storybook/dist/manager/runtime.js' ),
 	process.argv[ 2 ] && resolve( process.argv[ 2 ], 'sb-manager/runtime.js' ),
 ].filter( Boolean );
 

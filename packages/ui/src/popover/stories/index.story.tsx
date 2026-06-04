@@ -9,6 +9,7 @@ import { GenericIframe, useMeasure } from './utils';
 
 const meta: Meta< typeof Popover.Root > = {
 	title: 'Design System/Components/Popover',
+	synonyms: [ 'dropdown', 'floating', 'overlay', 'popup' ],
 	component: Popover.Root,
 	subcomponents: {
 		'Popover.Trigger': Popover.Trigger,

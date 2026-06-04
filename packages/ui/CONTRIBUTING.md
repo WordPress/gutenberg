@@ -91,7 +91,15 @@ const meta: Meta< typeof Button > = {
 };
 ```
 
-Add search synonyms in `src/stories/component-synonyms.json` (keyed by the story file's `title`) so components are discoverable in Storybook sidebar search (e.g. searching `form` finds `Input`). The JSON file is the source of truth; `component-synonyms.ts` re-exports it for TypeScript consumers.
+Add a `synonyms` array on the story meta so the component is discoverable in Storybook sidebar search (e.g. searching `form` finds `Input`):
+
+```ts
+const meta: Meta< typeof Input > = {
+	title: 'Design System/Components/Form/Primitives/Input',
+	synonyms: [ 'field', 'form', 'input', 'text', 'textbox' ],
+	component: Input,
+};
+```
 
 ## `render` Prop and Ref Forwarding
 

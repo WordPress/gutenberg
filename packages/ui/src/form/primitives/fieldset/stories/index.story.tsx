@@ -4,6 +4,7 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
 	title: 'Design System/Components/Form/Primitives/Fieldset',
+	synonyms: [ 'field', 'form', 'group' ],
 	component: Fieldset.Root,
 	subcomponents: {
 		'Fieldset.Legend': Fieldset.Legend,

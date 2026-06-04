@@ -5,6 +5,7 @@ import { Badge } from '../index';
 const meta: Meta< typeof Badge > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Badge',
+	synonyms: [ 'chip', 'label', 'status', 'tag' ],
 	component: Badge,
 	parameters: {
 		componentStatus: {

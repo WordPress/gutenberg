@@ -9,6 +9,7 @@ import { Text } from '../../text';
 
 const meta: Meta< typeof AlertDialog.Root > = {
 	title: 'Design System/Components/AlertDialog',
+	synonyms: [ 'confirm', 'dialog', 'modal', 'popup' ],
 	component: AlertDialog.Root,
 	subcomponents: {
 		'AlertDialog.Trigger': AlertDialog.Trigger,

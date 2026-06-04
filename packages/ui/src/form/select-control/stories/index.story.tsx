@@ -7,6 +7,7 @@ import {
 
 const meta: Meta< typeof SelectControl > = {
 	title: 'Design System/Components/Form/SelectControl',
+	synonyms: [ 'dropdown', 'field', 'form', 'label', 'select' ],
 	component: SelectControl,
 	subcomponents: {
 		'SelectControl.Item': SelectControl.Item,

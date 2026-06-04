@@ -8,4 +8,4 @@ View online at: https://wordpress.github.io/gutenberg/
 
 Run locally in your development environment running: `npm run storybook:dev` from the top-level Gutenberg directory.
 
-`@wordpress/ui` Storybook entries include search synonyms (see `packages/ui/src/stories/component-synonyms.json`). The dev/build scripts patch Storybook's manager so sidebar search matches those terms.
+`@wordpress/ui` story files can declare `synonyms` on their CSF meta. The dev/build scripts collect those terms and patch Storybook's manager so sidebar search matches them.

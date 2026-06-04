@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   Storybook: Add search synonyms for design system components so they are discoverable by common terms (e.g. `form` finds `Input`).
+-   Storybook: Add `synonyms` on component story meta so design system components are discoverable by common search terms (e.g. `form` finds `Input`).
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ## 0.14.0 (2026-05-27)

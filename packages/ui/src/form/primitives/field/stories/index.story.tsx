@@ -5,6 +5,7 @@ import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
+	synonyms: [ 'field', 'form', 'label' ],
 	component: Field.Root,
 	subcomponents: {
 		'Field.Item': Field.Item,

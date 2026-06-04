@@ -5,6 +5,7 @@ import { WithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
 	title: 'Design System/Components/Form/Primitives/Input',
+	synonyms: [ 'field', 'form', 'input', 'text', 'textbox', 'text field' ],
 	component: Input,
 	argTypes: {
 		defaultValue: { control: false },

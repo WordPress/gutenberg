@@ -27,6 +27,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 const meta: Meta< typeof Card.Root > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Card',
+	synonyms: [ 'container', 'panel', 'surface' ],
 	component: Card.Root,
 	subcomponents: {
 		'Card.Header': Card.Header,
