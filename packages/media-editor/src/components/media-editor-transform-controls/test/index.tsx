@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -53,5 +53,44 @@ describe( 'MediaEditorTransformControls', () => {
 		expect(
 			screen.getByRole( 'button', { name: 'Flip vertical' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'renders an aspect ratio dropdown in the flat toolbar when aspect ratio props are provided', () => {
+		const onAspectRatioChange = jest.fn();
+		setup( {
+			aspectRatioValue: '1',
+			onAspectRatioChange,
+			aspectRatioOptions: [
+				{ label: 'Free', value: 0 },
+				{ label: 'Original', value: -1 },
+				{ label: 'Square', value: 1 },
+			],
+		} );
+
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'Aspect ratio' } )
+		);
+		fireEvent.click(
+			screen.getByRole( 'menuitemradio', { name: 'Free' } )
+		);
+
+		expect( onAspectRatioChange ).toHaveBeenCalledWith( '0' );
+	} );
+
+	it( 'omits the aspect ratio dropdown from the labelled panel layout', () => {
+		setup( {
+			withLabels: true,
+			aspectRatioValue: '1',
+			onAspectRatioChange: jest.fn(),
+			aspectRatioOptions: [
+				{ label: 'Free', value: 0 },
+				{ label: 'Original', value: -1 },
+				{ label: 'Square', value: 1 },
+			],
+		} );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Aspect ratio' } )
+		).not.toBeInTheDocument();
 	} );
 } );

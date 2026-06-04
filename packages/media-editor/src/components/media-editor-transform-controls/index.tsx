@@ -1,9 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	aspectRatio as aspectRatioIcon,
+	check,
 	rotateLeft,
 	rotateRight,
 	flipHorizontal,
@@ -14,6 +21,7 @@ import {
  * Internal dependencies
  */
 import { useMediaEditor } from '../../state';
+import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorTransformControlsProps {
 	/**
@@ -23,6 +31,16 @@ export interface MediaEditorTransformControlsProps {
 	 * footer layout used at narrower widths.
 	 */
 	withLabels?: boolean;
+	/**
+	 * Selected aspect-ratio preset value. When provided with
+	 * `onAspectRatioChange` and `aspectRatioOptions`, the flat toolbar
+	 * includes an aspect-ratio dropdown.
+	 */
+	aspectRatioValue?: string;
+	/** Setter for the selected aspect-ratio preset value. */
+	onAspectRatioChange?: ( value: string ) => void;
+	/** Aspect-ratio presets to display in the dropdown. */
+	aspectRatioOptions?: AspectRatioPreset[];
 }
 
 /**
@@ -34,11 +52,22 @@ export interface MediaEditorTransformControlsProps {
  *
  * @param props
  * @param props.withLabels
+ * @param props.aspectRatioValue
+ * @param props.onAspectRatioChange
+ * @param props.aspectRatioOptions
  */
 export default function MediaEditorTransformControls( {
 	withLabels = false,
+	aspectRatioValue,
+	onAspectRatioChange,
+	aspectRatioOptions,
 }: MediaEditorTransformControlsProps ) {
 	const { state, setFlip, snapRotate90 } = useMediaEditor();
+	const hasAspectRatioControl =
+		! withLabels &&
+		aspectRatioValue !== undefined &&
+		onAspectRatioChange !== undefined &&
+		aspectRatioOptions !== undefined;
 
 	const rotateButtons = (
 		<>
@@ -90,6 +119,38 @@ export default function MediaEditorTransformControls( {
 		</>
 	);
 
+	const aspectRatioDropdown = hasAspectRatioControl ? (
+		<DropdownMenu
+			icon={ aspectRatioIcon }
+			label={ __( 'Aspect ratio' ) }
+			popoverProps={ { placement: 'top' } }
+			toggleProps={ { size: 'compact' } }
+		>
+			{ ( { onClose } ) => (
+				<MenuGroup label={ __( 'Aspect ratio' ) }>
+					{ aspectRatioOptions.map( ( preset ) => {
+						const value = preset.value.toString();
+						const isSelected = value === aspectRatioValue;
+						return (
+							<MenuItem
+								key={ value }
+								role="menuitemradio"
+								isSelected={ isSelected }
+								icon={ isSelected ? check : undefined }
+								onClick={ () => {
+									onAspectRatioChange( value );
+									onClose();
+								} }
+							>
+								{ preset.label }
+							</MenuItem>
+						);
+					} ) }
+				</MenuGroup>
+			) }
+		</DropdownMenu>
+	) : null;
+
 	if ( withLabels ) {
 		return (
 			<div className="media-editor-transform-controls is-stacked">
@@ -131,6 +192,7 @@ export default function MediaEditorTransformControls( {
 		<div className="media-editor-transform-controls">
 			{ rotateButtons }
 			{ flipButtons }
+			{ aspectRatioDropdown }
 		</div>
 	);
 }

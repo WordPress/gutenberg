@@ -666,7 +666,13 @@ function MediaEditorContent( {
 			onReset={ resetCropOptions }
 		/>
 	) : null;
-	const transform = isImage ? <MediaEditorTransformControls /> : null;
+	const transform = isImage ? (
+		<MediaEditorTransformControls
+			aspectRatioValue={ aspectRatioValue }
+			onAspectRatioChange={ setAspectRatioValue }
+			aspectRatioOptions={ aspectRatioOptions }
+		/>
+	) : null;
 	const actions = (
 		<FooterActions
 			isSaving={ isSaving }
