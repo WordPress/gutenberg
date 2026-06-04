@@ -32,7 +32,10 @@ interface ProbeApi {
 	mutate: ( next: DashboardWidget[] ) => void;
 	mutateGridSettings: ( next: WidgetGridSettings ) => void;
 	commit: ( options?: { exitEditMode?: boolean } ) => void;
-	cancel: ( options?: { exitEditMode?: boolean } ) => void;
+	cancel: ( options?: {
+		exitEditMode?: boolean;
+		revertLayout?: boolean;
+	} ) => void;
 }
 
 const probeRef: { current: ProbeApi | null } = { current: null };
@@ -400,6 +403,45 @@ describe( 'WidgetDashboard staging layer', () => {
 			expect( onLayoutChange ).toHaveBeenCalledTimes( 1 );
 			expect( onGridSettingsChange ).not.toHaveBeenCalled();
 		} );
+	} );
+
+	it( 'reverts only grid settings when cancel passes revertLayout: false', () => {
+		const onLayoutChange = jest.fn();
+		const onGridSettingsChange = jest.fn();
+		const initialSettings: WidgetGridSettings = {
+			model: 'grid',
+			minColumnWidth: 350,
+			rowHeight: 200,
+		};
+		render(
+			<Harness
+				layout={ initialLayout }
+				onLayoutChange={ onLayoutChange }
+				gridSettings={ initialSettings }
+				onGridSettingsChange={ onGridSettingsChange }
+			/>
+		);
+
+		act( () => {
+			readProbe().mutate( [ initialLayout[ 0 ] ] );
+			readProbe().mutateGridSettings( {
+				...initialSettings,
+				minColumnWidth: 420,
+			} );
+		} );
+
+		expect( readProbe().hasUncommittedChanges ).toBe( true );
+
+		act( () => {
+			readProbe().cancel( {
+				exitEditMode: false,
+				revertLayout: false,
+			} );
+		} );
+
+		expect( readProbe().hasUncommittedChanges ).toBe( true );
+		expect( readProbe().layout ).toHaveLength( 1 );
+		expect( readProbe().gridSettings.minColumnWidth ).toBe( 350 );
 	} );
 
 	it( 'stays in edit mode when commit or cancel passes exitEditMode: false', () => {

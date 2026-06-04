@@ -14,7 +14,12 @@ import { useServerSideRender } from './hook';
  * import ServerSideRender from '@wordpress/server-side-render';
  * ```
  */
-const ServerSideRenderCompat = ServerSideRenderWithPostId;
+const ServerSideRenderCompat =
+	ServerSideRenderWithPostId as typeof ServerSideRenderWithPostId & {
+		ServerSideRender: typeof ServerSideRenderWithPostId;
+		useServerSideRender: typeof useServerSideRender;
+	};
+
 ServerSideRenderCompat.ServerSideRender = ServerSideRenderWithPostId;
 ServerSideRenderCompat.useServerSideRender = useServerSideRender;
 

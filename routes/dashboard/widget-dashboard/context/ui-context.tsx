@@ -16,6 +16,8 @@ import {
 interface DashboardUIContextValue {
 	inserterOpen: boolean;
 	setInserterOpen: ( next: boolean ) => void;
+
+	/** Opened by the Layout settings button in the customize toolbar. */
 	layoutSettingsOpen: boolean;
 	setLayoutSettingsOpen: ( next: boolean ) => void;
 	resetDialogOpen: boolean;
@@ -52,7 +54,8 @@ const Context = createContext< DashboardUIContextValue | null >( null );
 
 /**
  * UI-state hook used by the inserter modal and any compound that needs to
- * open or close it (today: the "Add widget" trigger in `Actions`).
+ * open or close it (today: the "Add widget" and "Layout settings"
+ * triggers in `Actions`).
  *
  * Throws when called outside `WidgetDashboard` so misuse fails loudly during
  * development.

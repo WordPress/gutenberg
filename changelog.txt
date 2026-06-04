@@ -1,6 +1,27 @@
 == Changelog ==
 
-= 23.3.0-rc.1 =
+= 23.3.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Element: Add polyfills for render, hydrate, unmountComponentAtNode. ([78899](https://github.com/WordPress/gutenberg/pull/78899))
+- React: Add ReactCurrentOwner polyfill. ([78923](https://github.com/WordPress/gutenberg/pull/78923))
+- Revert "wp-build: Replace getter-based exports with data properties". ([78917](https://github.com/WordPress/gutenberg/pull/78917))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@gigitux @jsnajdr
+
+
+= 23.3.0 =
 
 ## Changelog
 
@@ -395,6 +416,45 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aagam-shah @adamsilverstein @aduth @alecgeatches @allilevine @andrewserong @chriszarate @chubes4 @ciampo @CookieDarb @danluu @DarkMatter-999 @desrosj @dhruvikpatel18 @dpmehta @ecairol @ellatrix @fushar @gziolo @himanshupathak95 @im3dabasia @Infinite-Null @ingeniumed @jameskoster @joshualip-plaudit @jsnajdr @juanfra @karmatosed @kushagra-goyal-14 @lschuyler @MaggieCabrera @Mamaduka @manzoorwanijk @Mayank-Tripathi32 @mirka @Mustafabharmal @ntsekouras @paulopmt1 @prasadkarmalkar @R1shabh-Gupta @ramonjd @Raxen001 @retrofox @rushikeshmore @scruffian @shrivastavanolo @simison @SteveJonesDev @t-hamano @taipeicoder @talldan @tellthemachines @tyxla @USERSATOSHI @westonruter @yuliyan @yyppsk
+
+
+
+## Changelog
+
+### Enhancements
+
+#### Block Library
+- Hide Cover overlay controls for viewport states. ([78763](https://github.com/WordPress/gutenberg/pull/78763))
+- Hide image dimension tools when a state is selected. ([78670](https://github.com/WordPress/gutenberg/pull/78670))
+
+#### Media
+- Image cropper: Round zoom control values and display as percentages. ([78757](https://github.com/WordPress/gutenberg/pull/78757))
+- Media Editor: Remove resize handles toggle from crop panel. ([78758](https://github.com/WordPress/gutenberg/pull/78758))
+
+### Bug Fixes
+
+#### Block Editor
+- Unset grid span defaults with viewport states enabled. ([78709](https://github.com/WordPress/gutenberg/pull/78709))
+
+### Accessibility
+
+#### Post Editor
+- Image Editor: Focus return after closing image crop modal. ([78711](https://github.com/WordPress/gutenberg/pull/78711))
+
+### Experiments
+
+#### Media
+- Media Editor Modal: Try placing the save and cancel buttons in the footer. ([78708](https://github.com/WordPress/gutenberg/pull/78708))
+
+### Tools
+
+#### Build Tooling
+- Update browserslist. ([78840](https://github.com/WordPress/gutenberg/pull/78840))
+
+#### Testing
+- e2e-test-utils-playwright: Add src to published NPM files. ([78847](https://github.com/WordPress/gutenberg/pull/78847))
+- Tests: Temporarily disable REST index output-format assertions pending Core fix. ([78788](https://github.com/WordPress/gutenberg/pull/78788))
+
 
 
 = 23.2.2 =

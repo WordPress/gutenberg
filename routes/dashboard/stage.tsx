@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
+import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
 
@@ -34,8 +35,26 @@ function Dashboard() {
 		[]
 	);
 
-	const customizeDashboardLabel = __( 'Customize Dashboard' );
-	const dashboardLabel = __( 'Dashboard' );
+	const greetingName = useSelect( ( select ) => {
+		const user = select( coreStore ).getCurrentUser();
+		if ( ! user ) {
+			return undefined;
+		}
+
+		const displayName = user.name?.trim();
+		if ( displayName ) {
+			return displayName;
+		}
+
+		if ( 'username' in user && typeof user.username === 'string' ) {
+			const username = user.username.trim();
+			if ( username ) {
+				return username;
+			}
+		}
+
+		return user.slug;
+	}, [] );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -46,7 +65,16 @@ function Dashboard() {
 		} );
 	};
 
-	const pageTitle = editMode ? customizeDashboardLabel : dashboardLabel;
+	let pageTitle: string = __( 'Dashboard' );
+	if ( editMode ) {
+		pageTitle = __( 'Customize Dashboard' );
+	} else if ( greetingName ) {
+		pageTitle = sprintf(
+			/* translators: %s: current user's display name. */
+			__( 'Howdy, %s' ),
+			greetingName
+		);
+	}
 
 	return (
 		<WidgetDashboard
