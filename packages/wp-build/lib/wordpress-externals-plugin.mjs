@@ -109,6 +109,9 @@ export function createWordpressExternalsPlugin(
 
 				for ( const packageName of vendorExternalRequests ) {
 					const config = getVendorExternal( packageName );
+					if ( ! config ) {
+						continue;
+					}
 					build.onResolve(
 						{
 							filter: new RegExp( `^${ packageName }$` ),

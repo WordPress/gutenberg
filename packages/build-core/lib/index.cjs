@@ -14,6 +14,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/views',
 ];
 
+/** @type {Record<string, { global: string, handle: string }>} */
 const VENDOR_EXTERNALS = {
 	'@babel/runtime/regenerator': {
 		global: 'regeneratorRuntime',
@@ -119,11 +120,11 @@ function parsePackageRequest( request ) {
 /**
  * Get the built-in package namespace configs.
  *
- * @param {Object}       options                    Options.
- * @param {string}       options.packageNamespace   Custom package namespace.
- * @param {string|false} options.scriptGlobal       Script global for the custom namespace.
- * @param {Object}       options.externalNamespaces Additional external namespace configs.
- * @param {string}       options.handlePrefix       Custom namespace handle prefix.
+ * @param {Object}       [options]                    Options.
+ * @param {string}       [options.packageNamespace]   Custom package namespace.
+ * @param {string|false} [options.scriptGlobal]       Script global for the custom namespace.
+ * @param {Object}       [options.externalNamespaces] Additional external namespace configs.
+ * @param {string}       [options.handlePrefix]       Custom namespace handle prefix.
  * @return {Array<{ namespace: string, pattern: RegExp, globalName: string, handlePrefix: string }>} External namespace configs.
  */
 function getPackageExternalConfigs( {
@@ -144,7 +145,7 @@ function getPackageExternalConfigs( {
 	if (
 		packageNamespace &&
 		packageNamespace !== 'wordpress' &&
-		scriptGlobal !== false
+		typeof scriptGlobal === 'string'
 	) {
 		packageExternals.push( {
 			namespace: packageNamespace,
@@ -171,8 +172,8 @@ function getPackageExternalConfigs( {
 /**
  * Check if a package import is a WordPress script module import.
  *
- * @param {Object}      packageJson Package metadata.
- * @param {string|null} subpath     Import subpath.
+ * @param {{ wpScriptModuleExports?: string | Record<string, unknown> }} packageJson Package metadata.
+ * @param {string|null}                                                  subpath     Import subpath.
  * @return {boolean} True if the import is a script module.
  */
 function isScriptModuleImport( packageJson, subpath ) {
@@ -185,11 +186,15 @@ function isScriptModuleImport( packageJson, subpath ) {
 	if ( ! subpath ) {
 		return (
 			typeof wpScriptModuleExports === 'string' ||
-			Boolean( wpScriptModuleExports[ '.' ] )
+			( typeof wpScriptModuleExports === 'object' &&
+				Boolean( wpScriptModuleExports[ '.' ] ) )
 		);
 	}
 
-	return Boolean( wpScriptModuleExports[ `./${ subpath }` ] );
+	return (
+		typeof wpScriptModuleExports === 'object' &&
+		Boolean( wpScriptModuleExports[ `./${ subpath }` ] )
+	);
 }
 
 /**
@@ -214,6 +219,8 @@ function defaultRequestToExternal( request ) {
 			camelCaseDash( request.substring( WORDPRESS_NAMESPACE.length ) ),
 		];
 	}
+
+	return undefined;
 }
 
 /**
@@ -240,6 +247,8 @@ function defaultRequestToExternalModule( request ) {
 			`Attempted to use WordPress script in a module: ${ request }, which is not supported yet.`
 		);
 	}
+
+	return undefined;
 }
 
 /**
@@ -270,6 +279,8 @@ function defaultRequestToHandle( request ) {
 	if ( request.startsWith( WORDPRESS_NAMESPACE ) ) {
 		return 'wp-' + request.substring( WORDPRESS_NAMESPACE.length );
 	}
+
+	return undefined;
 }
 
 module.exports = {
