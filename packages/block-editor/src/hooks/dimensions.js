@@ -25,6 +25,7 @@ import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import {
 	getStyleForState,
+	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
@@ -75,8 +76,8 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const selectedState = useBlockStyleState();
+	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
-	const isStateSelected = selectedState !== 'default';
 	const style = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled

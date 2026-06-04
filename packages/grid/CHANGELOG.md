@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
 ### Enhancements
 
 -   Clamp tile resize so width cannot shrink below a single column
@@ -14,13 +18,33 @@
     `GridOverlayRenderProps` now includes `rows` for uniform-row grids.
 -   Animate sibling tiles when layout reflows during drag or resize in
     edit mode (FLIP transform). Respects `prefers-reduced-motion`.
+-   Animate tile removal in edit mode: the removed tile scales down and
+    fades out while siblings reflow into place (FLIP). Respects
+    `prefers-reduced-motion`.
 -   Add `--wp-grid-placeholder-outline-style` and
     `--wp-grid-resize-preview-outline-style` CSS custom properties for
     the drag-placeholder outline (default `dashed`) and resize-preview
     border (default `solid`).
+-   Add `--wp-grid-drag-preview-radius` so consumers can round the
+    drag-preview functional frame without targeting package internals.
+-   Animate drag preview `box-shadow` from resting `xs` to `md` (same
+    motion tokens as scale) and apply static `md` when reduced motion
+    is requested, on the `.drag-preview-frame` wrapper (both surfaces).
+    Widget dashboard edit tiles use `xs` at rest and on hover so only
+    the drag preview elevates to `md`.
+    On drop, compose `@dnd-kit/core`'s default `DragOverlay` translation
+    with preview exit keyframes (via drop side effects). Split scale into
+    an inner `__lift` wrapper so drop translation does not fight the lift
+    transform.
+-   Defer placeholder fade and dashed outline until `data-wp-grid-dragging`
+    is set and the drag-preview enter animation completes (both surfaces).
 -   Set `data-wp-dashboard-grid-resizing` on the `DashboardGrid` root
     element while any tile resize gesture is active, so consumers can
     adjust styles when the pointer may still hover tiles ([#78234](https://github.com/WordPress/gutenberg/pull/78234)).
+-   Set `data-wp-grid-resizing` and `data-wp-grid-dragging` on grid
+    surface roots, and `data-wp-grid-item-resizing` on the active tile,
+    so interaction chrome (resize handles, actionable areas) can be
+    styled via CSS without per-tile props ([#78391](https://github.com/WordPress/gutenberg/pull/78391)).
 -   Add `--wp-grid-gap` so consumers can set tile spacing per surface
     without remapping design-system tokens (defaults to
     `--wpds-dimension-gap-xl`).
@@ -48,6 +72,7 @@
 -   Expose CSS custom properties for theming the lift scale,
     placeholder opacity, placeholder outline color, and placeholder
     radius (`--wp-grid-drag-preview-scale`,
+    `--wp-grid-drag-preview-radius`,
     `--wp-grid-placeholder-opacity`,
     `--wp-grid-placeholder-outline-color`,
     `--wp-grid-placeholder-radius`).

@@ -7,6 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
+import { getSyncManager, hasSyncManager } from './sync';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -163,6 +164,7 @@ export function receiveEditorAssets( assets ) {
 
 /**
  * Returns an action object used to set whether collaboration is supported.
+ * When set to false, also disconnects all sync entities.
  *
  * @param {boolean} supported Whether collaboration is supported.
  *
@@ -172,6 +174,9 @@ export const setCollaborationSupported =
 	( supported ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
+		if ( ! supported && hasSyncManager() ) {
+			getSyncManager().unloadAll();
+		}
 	};
 
 /**

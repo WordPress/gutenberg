@@ -29,7 +29,7 @@ export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
 		const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
 
 		if ( _isSpacer ) {
-			const childElement = child as ReactElement;
+			const childElement = child as ReactElement< typeof FlexItem >;
 			const _key = childElement.key || `hstack-${ index }`;
 
 			return <FlexItem isBlock key={ _key } { ...childElement.props } />;

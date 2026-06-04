@@ -19,7 +19,7 @@ import { getValueFromObjectPath } from './object';
 export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
-function splitSelectorList( selector: string ) {
+export function splitSelectorList( selector: string ) {
 	if ( ! selector.includes( ',' ) ) {
 		return [ selector ];
 	}

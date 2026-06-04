@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 0.32.0 (2026-05-27)
+
 ### Bug Fix
 
 - Fix `-scaled` suffix propagating to every sub-size filename when an image exceeds `big_image_size_threshold`. Threshold scaling now runs as a sideload after the original is uploaded, so sub-sizes inherit the un-suffixed basename — matching WordPress core's `wp_create_image_subsizes()` naming.

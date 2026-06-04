@@ -93,8 +93,8 @@ const getTransformCommands = () =>
 		}
 
 		// Simple block transformation based on the `Block Transforms` API.
-		function onBlockTransform( name ) {
-			const newBlocks = switchToBlockType( blocks, name );
+		function onBlockTransform( name, variationName ) {
+			const newBlocks = switchToBlockType( blocks, name, variationName );
 			replaceBlocks( clientIds, newBlocks );
 			selectForMultipleBlocks( newBlocks );
 		}
@@ -117,7 +117,7 @@ const getTransformCommands = () =>
 
 		const commands = possibleBlockTransformations.map(
 			( transformation ) => {
-				const { name, title, icon } = transformation;
+				const { id, name, title, icon, variationName } = transformation;
 				/*
 				 * Command menu uses Icon from @wordpress/icons, which expects a ReactElement
 				 * (cloneElement). Normalize to blockDefaultIcon to avoid crash. See #55668 / PR #55676.
@@ -132,13 +132,13 @@ const getTransformCommands = () =>
 				return {
 					name:
 						'core/block-editor/transform-to-' +
-						name.replace( '/', '-' ),
+						( id || name ).replace( /\//g, '-' ),
 					/* translators: %s: Block or block variation name. */
 					label: sprintf( __( 'Transform to %s' ), title ),
 					icon: blockIcon?.src,
 					category: 'command',
 					callback: ( { close } ) => {
-						onBlockTransform( name );
+						onBlockTransform( name, variationName );
 						close();
 					},
 				};

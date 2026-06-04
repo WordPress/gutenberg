@@ -57,6 +57,10 @@ const PlaylistEdit = ( {
 		showArtists,
 		currentTrack,
 	} = attributes;
+
+	// Extract the waveform style from the block style variation class.
+	const waveformStyle =
+		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -374,6 +378,7 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
+						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>

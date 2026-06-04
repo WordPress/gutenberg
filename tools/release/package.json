@@ -37,5 +37,10 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"cherry-pick": "node ./cherry-pick.mjs",
+		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs",
+		"log-performance-results": "node ./log-performance-results.js"
 	}
 }

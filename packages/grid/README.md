@@ -479,6 +479,7 @@ root itself via `style`). All values fall back to sensible defaults.
 |----------|---------|------------|
 | `--wp-grid-gap` | `var(--wpds-dimension-gap-xl)` | Gap between tiles on `DashboardGrid`, `DashboardLanes`, and the edit overlay. |
 | `--wp-grid-drag-preview-scale` | `1.05` | Lift scale of the drag-preview functional frame. Set to `1` to disable the lift. |
+| `--wp-grid-drag-preview-radius` | `0` | Border radius of the drag-preview functional frame so the lift shadow follows the consumer's tile shape. |
 | `--wp-grid-placeholder-opacity` | `0.4` | Opacity of the placeholder tile (the original item while a drag is in flight). |
 | `--wp-grid-placeholder-outline-style` | `dashed` | Outline style of the drag placeholder (for example `solid` or `dotted`). |
 | `--wp-grid-resize-preview-outline-style` | `solid` | Border style of the resize-preview overlay (for example `dashed` or `dotted`). |

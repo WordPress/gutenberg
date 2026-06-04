@@ -24,10 +24,14 @@
 		"./preview": "./preview.jsx"
 	},
 	"devDependencies": {
+		"@emotion/is-prop-valid": "^1.4.0",
+		"@emotion/react": "^11.14.0",
+		"@emotion/styled": "^11.14.1",
 		"@storybook/addon-a11y": "^10.2.8",
 		"@storybook/addon-docs": "^10.2.8",
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.2.8",
+		"@types/react": "^19.2.13",
 		"@vitejs/plugin-react": "^5.1.2",
 		"@wordpress/theme": "file:../packages/theme",
 		"storybook": "^10.2.8",

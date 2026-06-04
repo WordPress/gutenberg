@@ -2,11 +2,30 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Bug Fixes
+
+-   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
+
+### Enhancements
+
+-   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
+
+## 0.14.0 (2026-05-27)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
 ### New Features
 
 -   `Card`: `Card.FullBleed` now supports edge-bumping in additional positions ([#77856](https://github.com/WordPress/gutenberg/pull/77856)):
     -   As the **first child of `Card.Header`**, it extends flush to the card's top and side edges — ideal for hero images. Inter-sibling spacing is consumer-managed: compose `Card.Header` with `Stack` via the `render` prop to add a gap between the hero and following siblings (e.g. `Card.Title`).
     -   As the **sole child of `Card.Content`**, it extends flush to the card's side edges and additionally to the top edge when `Content` is the first card child, or the bottom edge when it is the last. This enables full-bleed content panels with or without a header above them.
+-   Add `Combobox` primitive ([#78399](https://github.com/WordPress/gutenberg/pull/78399)).
 
 ### Enhancements
 
@@ -16,7 +35,11 @@
 
 ### Bug Fixes
 
+-   `IconButton`: Default `focusableWhenDisabled` to `true`, matching `Button` ([#78526](https://github.com/WordPress/gutenberg/pull/78526)).
+-   `Button`: Do not show the interactive cursor when disabled ([#78479](https://github.com/WordPress/gutenberg/pull/78479)).
+-   `Button`: Fix disabled and hover styles for neutral minimal buttons with `aria-pressed="true"` ([#78635](https://github.com/WordPress/gutenberg/pull/78635)).
 -   `Autocomplete`: Fix the TypeScript prop types for the `Root` and `Value` primitives ([#78450](https://github.com/WordPress/gutenberg/pull/78450)).
+-   `Autocomplete`: Disable the clear button when the autocomplete is disabled, and hide it from assistive technologies ([#78520](https://github.com/WordPress/gutenberg/pull/78520)).
 -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
 -   Stretch the compat overlay slot to viewport size so portaled popups stop collapsing to their min-content width — most visible on long-text tooltips, which wrapped to one word per line ([#78441](https://github.com/WordPress/gutenberg/pull/78441)).
 

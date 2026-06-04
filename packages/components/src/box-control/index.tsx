@@ -221,5 +221,4 @@ function BoxControl( {
 	);
 }
 
-export { applyValueToSides } from './utils';
 export default BoxControl;
