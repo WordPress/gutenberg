@@ -515,13 +515,17 @@ const { state, actions, callbacks } = store(
 				state.comments.attachmentId = null;
 				state.comments.isLoading = false;
 				callbacks.renderComments( [] );
-				const overlay = document.querySelector( '.wp-lightbox-overlay' );
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
+				);
 				if ( overlay ) {
 					overlay.scrollTop = 0;
 				}
 			},
 			scrollOverlayTo( target, onComplete ) {
-				const overlay = document.querySelector( '.wp-lightbox-overlay' );
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
+				);
 				if ( ! overlay || ! target ) {
 					onComplete?.();
 					return;
@@ -577,9 +581,8 @@ const { state, actions, callbacks } = store(
 				runScroll();
 			},
 			toggleCommentForm() {
-				const overlay = document.querySelector( '.wp-lightbox-overlay' );
-				const comments = document.querySelector(
-					'.wp-lightbox-comments'
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
 				);
 
 				if ( state.commentForm.isVisible ) {
@@ -591,6 +594,10 @@ const { state, actions, callbacks } = store(
 					);
 					return;
 				}
+
+				const comments = document.querySelector(
+					'.wp-lightbox-comments'
+				);
 
 				state.commentForm.isVisible = true;
 				callbacks.loadComments();

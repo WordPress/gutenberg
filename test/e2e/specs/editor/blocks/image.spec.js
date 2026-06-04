@@ -963,10 +963,14 @@ test.describe( 'Image - lightbox comments', () => {
 	let uploadedMedia;
 
 	const lightboxImageBlock = ( media, { comments = true } = {} ) =>
-		`<!-- wp:image {"id":${ media.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}${
+		`<!-- wp:image {"id":${
+			media.id
+		},"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}${
 			comments ? ',"lightboxComments":{"enabled":true}' : ''
 		}} -->
-		<figure class="wp-block-image size-full"><img src="${ media.source_url }" alt="" class="wp-image-${ media.id }"/></figure>
+		<figure class="wp-block-image size-full"><img src="${
+			media.source_url
+		}" alt="" class="wp-image-${ media.id }"/></figure>
 		<!-- /wp:image -->`;
 
 	async function setAttachmentCommentStatus( requestUtils, status ) {

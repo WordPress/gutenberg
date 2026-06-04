@@ -1125,7 +1125,6 @@ export default function Image( {
 								panelId={ clientId }
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Show comments' ) }
 									checked={ commentsChecked }
 									onChange={ onSetLightboxComments }
