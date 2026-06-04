@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Route very large images, especially interlaced/progressive JPEGs, to server-side processing instead of attempting client-side processing that would exceed the 1 GiB wasm-vips memory cap and fail.
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
