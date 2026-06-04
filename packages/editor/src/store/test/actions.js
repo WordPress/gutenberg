@@ -12,8 +12,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 
-import * as actions from '../actions';
 import { store as editorStore } from '..';
+import * as actions from '../actions';
 import { unlock } from '../../lock-unlock';
 
 const postId = 44;
