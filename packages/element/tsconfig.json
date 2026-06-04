@@ -5,5 +5,5 @@
 		"noImplicitAny": false,
 		"strictNullChecks": false
 	},
-	"references": [ { "path": "../deprecated" }, { "path": "../escape-html" } ]
+	"references": [ { "path": "../escape-html" } ]
 }

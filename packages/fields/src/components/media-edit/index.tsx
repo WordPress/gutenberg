@@ -641,7 +641,9 @@ export default function MediaEdit< Item >( {
 	// reorders (same IDs), we fall back to the cached list to avoid a visual
 	// flash in compact mode. For replacements/uploads (new IDs not in cache),
 	// we let attachments be null as normal.
-	const stableAttachmentsRef = useRef< Attachment< 'view' >[] >( null );
+	const stableAttachmentsRef = useRef< Attachment< 'view' >[] | null >(
+		null
+	);
 	if ( attachments !== null ) {
 		stableAttachmentsRef.current = attachments;
 	}
