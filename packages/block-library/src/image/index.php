@@ -232,27 +232,31 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$img_srcset       = false;
 	$attachment_id    = $block['attrs']['id'] ?? null;
 
-	// Comments are only shown when enabled via the per-block attribute or the
-	// `lightboxComments` theme.json setting, in addition to the attachment
-	// itself having comments open.
-	$comments_settings = block_core_image_get_lightbox_comments_settings( $block );
-	$comments_enabled  = isset( $comments_settings['enabled'] ) && true === $comments_settings['enabled'];
-
-	wp_interactivity_config(
-		'core/image',
-		array(
-			'defaultAriaLabel'            => __( 'Enlarged image' ),
-			'closeButtonText'             => esc_html__( 'Close' ),
-			'prevButtonText'              => esc_html_x( 'Previous', 'previous image in lightbox' ),
-			'nextButtonText'              => esc_html_x( 'Next', 'next image in lightbox' ),
-			'commentEndpoint'             => rest_url( 'wp/v2/comments' ),
-			'commentNonce'                => wp_create_nonce( 'wp_rest' ),
-			'commentLoginRequired'        => ! is_user_logged_in(),
-			'commentSubmittedText'        => __( 'Comment submitted.' ),
-			'commentSubmittingText'       => __( 'Submitting comment...' ),
-			'commentErrorText'            => __( 'Could not submit the comment. Please try again.' ),
-		)
+	$lightbox_config = array(
+		'defaultAriaLabel' => __( 'Enlarged image' ),
+		'closeButtonText'  => esc_html__( 'Close' ),
+		'prevButtonText'   => esc_html_x( 'Previous', 'previous image in lightbox' ),
+		'nextButtonText'   => esc_html_x( 'Next', 'next image in lightbox' ),
 	);
+
+	// Lightbox comments are gated behind the `gutenberg-lightbox-comments`
+	// experiment. When enabled, comments are only shown for an image that also
+	// turns them on via the per-block attribute or the `lightboxComments`
+	// theme.json setting, and whose attachment has comments open.
+	$comments_enabled = false;
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-lightbox-comments' ) ) {
+		$comments_settings = block_core_image_get_lightbox_comments_settings( $block );
+		$comments_enabled  = isset( $comments_settings['enabled'] ) && true === $comments_settings['enabled'];
+
+		$lightbox_config['commentEndpoint']       = rest_url( 'wp/v2/comments' );
+		$lightbox_config['commentNonce']          = wp_create_nonce( 'wp_rest' );
+		$lightbox_config['commentLoginRequired']  = ! is_user_logged_in();
+		$lightbox_config['commentSubmittedText']  = __( 'Comment submitted.' );
+		$lightbox_config['commentSubmittingText'] = __( 'Submitting comment...' );
+		$lightbox_config['commentErrorText']      = __( 'Could not submit the comment. Please try again.' );
+	}
+
+	wp_interactivity_config( 'core/image', $lightbox_config );
 
 	if ( $alt ) {
 		/* translators: %s: Image alt text. */
@@ -371,19 +375,9 @@ function block_core_image_print_lightbox_overlay() {
 	$close_button_text = esc_attr__( 'Close' );
 	$prev_button_text  = esc_attr_x( 'Previous', 'previous image in lightbox' );
 	$next_button_text  = esc_attr_x( 'Next', 'next image in lightbox' );
-	$comment_label     = esc_attr__( 'Comment' );
-	$submit_label      = esc_html__( 'Post Comment' );
-	$comment_icon      = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H9.44L5.3 18.53A.75.75 0 0 1 4 17.96V5.5Zm2.5-1A1 1 0 0 0 5.5 5.5v11.33l3.18-2.71a.75.75 0 0 1 .49-.18h8.33a1 1 0 0 0 1-1v-7.44a1 1 0 0 0-1-1h-11Z"></path></svg>';
 	$close_button_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 	$prev_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>';
 	$next_button_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>';
-	global $wp;
-	$login_url         = esc_url( wp_login_url( home_url( $wp->request ) ) );
-	$login_message     = sprintf(
-		/* translators: %s: Login URL. */
-		wp_kses( __( 'You must be <a href="%s">logged in</a> to comment.' ), array( 'a' => array( 'href' => array() ) ) ),
-		$login_url
-	);
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
@@ -398,6 +392,45 @@ function block_core_image_print_lightbox_overlay() {
 		if ( ! empty( $global_styles_color['text'] ) ) {
 			$close_button_color = esc_attr( $global_styles_color['text'] );
 		}
+	}
+
+	// Lightbox comments markup is only output when the
+	// `gutenberg-lightbox-comments` experiment is enabled.
+	$comment_button   = '';
+	$comments_section = '';
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-lightbox-comments' ) ) {
+		$comment_label = esc_attr__( 'Comment' );
+		$submit_label  = esc_html__( 'Post Comment' );
+		$comment_icon  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H9.44L5.3 18.53A.75.75 0 0 1 4 17.96V5.5Zm2.5-1A1 1 0 0 0 5.5 5.5v11.33l3.18-2.71a.75.75 0 0 1 .49-.18h8.33a1 1 0 0 0 1-1v-7.44a1 1 0 0 0-1-1h-11Z"></path></svg>';
+
+		global $wp;
+		$login_url     = esc_url( wp_login_url( home_url( $wp->request ) ) );
+		$login_message = sprintf(
+			/* translators: %s: Login URL. */
+			wp_kses( __( 'You must be <a href="%s">logged in</a> to comment.' ), array( 'a' => array( 'href' => array() ) ) ),
+			$login_url
+		);
+
+		$comment_button = <<<HTML
+				<button type="button" class="wp-lightbox-comment-button" data-wp-bind--hidden="!state.selectedImageCommentsOpen" data-wp-bind--aria-expanded="state.commentFormVisible" data-wp-on--click="actions.toggleCommentForm" aria-label="{$comment_label}">
+					{$comment_icon}
+				</button>
+HTML;
+
+		$comments_section = <<<HTML
+				<section class="wp-lightbox-comments" data-wp-bind--hidden="!state.commentFormVisible" data-wp-on--click="actions.stopPropagation">
+					<div class="wp-lightbox-comments-list" hidden></div>
+					<p class="wp-lightbox-comments-login" data-wp-bind--hidden="!state.commentLoginRequired">{$login_message}</p>
+					<form data-wp-bind--hidden="state.commentLoginRequired" data-wp-on--submit="actions.submitComment">
+						<label>
+							<span>{$comment_label}</span>
+							<textarea name="comment" required></textarea>
+						</label>
+						<button type="submit" data-wp-bind--disabled="state.commentFormIsSubmitting">{$submit_label}</button>
+						<p class="wp-lightbox-comments-message" aria-live="polite" data-wp-text="state.commentFormMessage"></p>
+					</form>
+				</section>
+HTML;
 	}
 
 	echo <<<HTML
@@ -452,25 +485,12 @@ function block_core_image_print_lightbox_overlay() {
 						>
 					</figure>
 				</div>
-				<button type="button" class="wp-lightbox-comment-button" data-wp-bind--hidden="!state.selectedImageCommentsOpen" data-wp-bind--aria-expanded="state.commentFormVisible" data-wp-on--click="actions.toggleCommentForm" aria-label="{$comment_label}">
-					{$comment_icon}
-				</button>
+				{$comment_button}
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
 				</button>
-				<section class="wp-lightbox-comments" data-wp-bind--hidden="!state.commentFormVisible" data-wp-on--click="actions.stopPropagation">
-					<div class="wp-lightbox-comments-list" hidden></div>
-					<p class="wp-lightbox-comments-login" data-wp-bind--hidden="!state.commentLoginRequired">{$login_message}</p>
-					<form data-wp-bind--hidden="state.commentLoginRequired" data-wp-on--submit="actions.submitComment">
-						<label>
-							<span>{$comment_label}</span>
-							<textarea name="comment" required></textarea>
-						</label>
-						<button type="submit" data-wp-bind--disabled="state.commentFormIsSubmitting">{$submit_label}</button>
-						<p class="wp-lightbox-comments-message" aria-live="polite" data-wp-text="state.commentFormMessage"></p>
-					</form>
-				</section>
+				{$comments_section}
 				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
 				<div class="scrim" style="background-color: {$background_color}" aria-hidden="true"></div>
 		</div>

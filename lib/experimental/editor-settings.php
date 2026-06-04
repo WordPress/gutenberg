@@ -66,6 +66,11 @@ function gutenberg_enable_block_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-experiments' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockExperiments = true', 'before' );
 	}
+
+	// Image lightbox comments.
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-lightbox-comments' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalLightboxComments = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_block_experiments' );

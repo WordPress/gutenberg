@@ -992,6 +992,9 @@ test.describe( 'Image - lightbox comments', () => {
 	}
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-lightbox-comments',
+		] );
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(
 			'./assets/10x10_e2e_test_image_z9T8jK.png'
@@ -1006,6 +1009,7 @@ test.describe( 'Image - lightbox comments', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllComments();
 		await requestUtils.deleteAllMedia();
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test( 'hides the comment button when the attachment has comments closed', async ( {
