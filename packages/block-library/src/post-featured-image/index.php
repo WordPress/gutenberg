@@ -40,14 +40,22 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 
 	$extra_styles = '';
+	$has_width    = array_key_exists( 'width', $attributes ) && null !== $attributes['width'] && '' !== $attributes['width'];
+	$has_height   = array_key_exists( 'height', $attributes ) && null !== $attributes['height'] && '' !== $attributes['height'];
 
 	if ( ! empty( $attributes['aspectRatio'] ) ) {
 		$extra_styles .= esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';';
 		$extra_styles .= 'width:100%;';
 	}
 
-	if ( empty( $attributes['aspectRatio'] ) && ! empty( $attributes['height'] ) ) {
+	if ( $has_height ) {
 		$extra_styles .= esc_attr( safecss_filter_attr( 'height:' . $attributes['height'] ) ) . ';';
+	} elseif ( $has_width ) {
+		$extra_styles .= 'height:auto;';
+	}
+
+	if ( $has_width ) {
+		$extra_styles .= esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';';
 	}
 
 	if ( ! empty( $attributes['scale'] ) ) {
@@ -122,14 +130,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$width = ! empty( $attributes['width'] )
-		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'
-		: '';
-	if ( ! $width ) {
-		$wrapper_attributes = get_block_wrapper_attributes();
-	} else {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => $width ) );
-	}
+	$wrapper_attributes = get_block_wrapper_attributes();
 	return "<figure {$wrapper_attributes}>{$featured_image}</figure>";
 }
 

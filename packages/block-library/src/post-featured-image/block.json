@@ -98,12 +98,7 @@
 		}
 	},
 	"selectors": {
-		"dimensions": {
-			"root": ".wp-block-post-featured-image",
-			"aspectRatio": ".wp-block-post-featured-image img",
-			"height": ".wp-block-post-featured-image img",
-			"objectFit": ".wp-block-post-featured-image img"
-		},
+		"dimensions": ".wp-block-post-featured-image img",
 		"border": ".wp-block-post-featured-image img, .wp-block-post-featured-image .block-editor-media-placeholder, .wp-block-post-featured-image .wp-block-post-featured-image__overlay",
 		"shadow": ".wp-block-post-featured-image img, .wp-block-post-featured-image .components-placeholder",
 		"filter": {

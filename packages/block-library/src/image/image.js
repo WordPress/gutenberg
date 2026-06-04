@@ -65,10 +65,9 @@ import { Caption } from '../utils/caption';
 import { MediaControl } from '../utils/media-control';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
-	getStateDimensions,
-	resetDimensions,
-	resetStateDimensions,
-	setStateDimensions,
+	getActiveDimensionValue,
+	getDimensionResetAttributes,
+	getDimensionUpdateAttributes,
 } from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
 import {
@@ -696,32 +695,41 @@ export default function Image( {
 	);
 	const hasSelectedStyleState =
 		! isDefaultBlockStyleState( selectedStyleState );
-	const stateDimensions = hasSelectedStyleState
-		? getStateDimensions( attributes.style, selectedStyleState )
-		: {};
-	const activeWidth = hasSelectedStyleState ? stateDimensions.width : width;
-	const activeHeight = hasSelectedStyleState
-		? stateDimensions.height
-		: height;
-	const activeAspectRatio = hasSelectedStyleState
-		? stateDimensions.aspectRatio
-		: aspectRatio;
-	const activeScale = hasSelectedStyleState
-		? stateDimensions.objectFit
-		: scale;
+	const activeWidth = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'width',
+	} );
+	const activeHeight = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'height',
+	} );
+	const activeAspectRatio = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'aspectRatio',
+	} );
+	const activeScale = getActiveDimensionValue( {
+		attributes,
+		selectedState: selectedStyleState,
+		hasSelectedStyleState,
+		attributeKey: 'scale',
+		styleKey: 'objectFit',
+	} );
 	const setDimensionAttributes = ( nextDimensions ) => {
-		if ( hasSelectedStyleState ) {
-			setAttributes( {
-				style: setStateDimensions(
-					attributes.style,
-					selectedStyleState,
-					nextDimensions
-				),
-			} );
-			return;
-		}
-
-		setAttributes( nextDimensions );
+		setAttributes(
+			getDimensionUpdateAttributes( {
+				style: attributes.style,
+				selectedState: selectedStyleState,
+				hasSelectedStyleState,
+				nextDimensions,
+				dimensionKeyMap: { scale: 'objectFit' },
+			} )
+		);
 	};
 
 	const dimensionsControl =
@@ -733,9 +741,7 @@ export default function Image( {
 				onChange={ ( { aspectRatio: newAspectRatio } ) => {
 					setDimensionAttributes( {
 						aspectRatio: newAspectRatio,
-						...( hasSelectedStyleState
-							? { objectFit: 'cover' }
-							: { scale: 'cover' } ),
+						scale: 'cover',
 					} );
 				} }
 				defaultAspectRatio="auto"
@@ -764,9 +770,7 @@ export default function Image( {
 						width: ! newWidth && newHeight ? 'auto' : newWidth,
 						height: newHeight,
 						aspectRatio: newAspectRatio,
-						...( hasSelectedStyleState
-							? { objectFit: newScale }
-							: { scale: newScale } ),
+						scale: newScale,
 					} );
 				} }
 				defaultScale="cover"
@@ -1073,32 +1077,19 @@ export default function Image( {
 			<InspectorControls
 				group="dimensions"
 				resetAllFilter={ ( attrs ) => {
-					const resetKeys = [
-						'aspectRatio',
-						'height',
-						'objectFit',
-						'width',
-					];
-
-					if ( hasSelectedStyleState ) {
-						return {
-							style: resetStateDimensions(
-								attrs.style,
-								selectedStyleState,
-								resetKeys
-							),
-						};
-					}
-
-					return {
-						...attrs,
-						aspectRatio: undefined,
-						width: undefined,
-						height: undefined,
-						scale: undefined,
-						focalPoint: undefined,
-						style: resetDimensions( attrs.style, resetKeys ),
-					};
+					return getDimensionResetAttributes( {
+						attributes: attrs,
+						selectedState: selectedStyleState,
+						hasSelectedStyleState,
+						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+						defaultAttributes: {
+							aspectRatio: undefined,
+							width: undefined,
+							height: undefined,
+							scale: undefined,
+							focalPoint: undefined,
+						},
+					} );
 				} }
 			>
 				{ dimensionsControl }

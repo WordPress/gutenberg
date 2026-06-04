@@ -49,12 +49,15 @@ import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { unlock } from '../lock-unlock';
-import { resetDimensions, resetStateDimensions } from '../utils/style-state';
+import { getDimensionResetAttributes } from '../utils/style-state';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const { isDefaultBlockStyleState, ResolutionTool } = unlock(
 	blockEditorPrivateApis
 );
+
+const hasDimensionValue = ( value ) =>
+	value !== undefined && value !== null && value !== '';
 const DEFAULT_MEDIA_SIZE_SLUG = 'full';
 
 function FeaturedImageResolutionTool( { image, value, onChange } ) {
@@ -172,7 +175,6 @@ export default function PostFeaturedImageEdit( {
 		media?.source_url;
 
 	const blockProps = useBlockProps( {
-		style: { width },
 		className: clsx( {
 			'is-transient': temporaryURL,
 		} ),
@@ -191,8 +193,12 @@ export default function PostFeaturedImageEdit( {
 				withIllustration
 				style={ {
 					aspectRatio,
-					height: aspectRatio ? undefined : height,
-					width: !! aspectRatio && '100%',
+					height: hasDimensionValue( height )
+						? height
+						: hasDimensionValue( width ) && 'auto',
+					width: hasDimensionValue( width )
+						? width
+						: !! aspectRatio && '100%',
 					...borderProps.style,
 					...shadowProps.style,
 				} }
@@ -250,31 +256,18 @@ export default function PostFeaturedImageEdit( {
 			<InspectorControls
 				group="dimensions"
 				resetAllFilter={ ( attrs ) => {
-					const resetKeys = [
-						'aspectRatio',
-						'height',
-						'objectFit',
-						'width',
-					];
-
-					if ( hasSelectedStyleState ) {
-						return {
-							style: resetStateDimensions(
-								attrs.style,
-								selectedStyleState,
-								resetKeys
-							),
-						};
-					}
-
-					return {
-						...attrs,
-						aspectRatio: undefined,
-						height: undefined,
-						scale: undefined,
-						width: undefined,
-						style: resetDimensions( attrs.style, resetKeys ),
-					};
+					return getDimensionResetAttributes( {
+						attributes: attrs,
+						selectedState: selectedStyleState,
+						hasSelectedStyleState,
+						keys: [ 'aspectRatio', 'height', 'objectFit', 'width' ],
+						defaultAttributes: {
+							aspectRatio: undefined,
+							height: undefined,
+							scale: undefined,
+							width: undefined,
+						},
+					} );
 				} }
 			>
 				<DimensionControls
@@ -435,8 +428,10 @@ export default function PostFeaturedImageEdit( {
 		...borderProps.style,
 		...shadowProps.style,
 		aspectRatio,
-		height: aspectRatio ? undefined : height,
-		width: !! aspectRatio && '100%',
+		height: hasDimensionValue( height )
+			? height
+			: hasDimensionValue( width ) && 'auto',
+		width: hasDimensionValue( width ) ? width : !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
 	};
 
