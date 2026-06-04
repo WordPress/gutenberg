@@ -43,6 +43,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^19.2.13",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element"

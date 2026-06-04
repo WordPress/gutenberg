@@ -40,7 +40,7 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 	return sprintf(
 		'<a %1s href="%2s" target="%3s">%4s<span class="screen-reader-text">%5s</span></a>',
 		$wrapper_attributes,
-		get_the_permalink( $post_ID ),
+		esc_url( get_the_permalink( $post_ID ) ),
 		esc_attr( $attributes['linkTarget'] ),
 		$more_text,
 		$screen_reader_text

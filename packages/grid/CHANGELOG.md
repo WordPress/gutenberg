@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
 ### Enhancements
 
 -   Clamp tile resize so width cannot shrink below a single column

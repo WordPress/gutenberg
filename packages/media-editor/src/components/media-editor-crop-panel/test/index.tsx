@@ -99,4 +99,24 @@ describe( 'MediaEditorCropPanel', () => {
 		);
 		expect( controls.onPlacementControlInteraction ).toHaveBeenCalled();
 	} );
+
+	it( 'omits transform controls by default', () => {
+		setupCropPanel();
+
+		expect( screen.queryByText( 'Rotate' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Flip' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders rotate and flip controls when showTransformControls is set', () => {
+		setupCropPanel( { showTransformControls: true } );
+
+		expect( screen.getByText( 'Rotate' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Flip' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Rotate 90° clockwise' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Flip horizontal' } )
+		).toBeInTheDocument();
+	} );
 } );

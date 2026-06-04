@@ -90,15 +90,14 @@ export interface MediaEditorFrameProps {
 	footerActions: ReactNode;
 	/**
 	 * Footer layout selector. Frames apply this to the footer container
-	 * as a modifier class.
+	 * as a modifier class. Tracks the sidebar-collapse breakpoint (`medium`).
 	 *
-	 * - `wide`   — single row: History | Ruler | Transform | Cancel/Save.
-	 * - `medium` — two rows: ruler on top; History | Transform | Cancel/Save
-	 *              beneath.
-	 * - `narrow` — three rows: ruler; transform (centered); History |
-	 *              Cancel/Save.
+	 * - `wide`   — sidebar is a column; footer is a single row of History |
+	 *              Cancel/Save (transform controls live in the Crop panel).
+	 * - `narrow` — sidebar collapsed; transform controls sit above a
+	 *              History | Cancel/Save row.
 	 */
-	footerLayout: 'wide' | 'medium' | 'narrow';
+	footerLayout: 'wide' | 'narrow';
 	onRequestClose: () => void;
 	onKeyDown: ( event: ReactKeyboardEvent< HTMLElement > ) => void;
 	shouldCloseOnClickOutside: boolean;
@@ -254,6 +253,15 @@ function HistoryActions( {
 		>
 			<Button
 				size="compact"
+				variant="tertiary"
+				disabled={ ! isDirty }
+				accessibleWhenDisabled
+				onClick={ handleReset }
+			>
+				{ __( 'Reset' ) }
+			</Button>
+			<Button
+				size="compact"
 				icon={ undo }
 				label={ __( 'Undo' ) }
 				showTooltip
@@ -276,15 +284,6 @@ function HistoryActions( {
 				accessibleWhenDisabled
 				onClick={ handleRedo }
 			/>
-			<Button
-				size="compact"
-				variant="tertiary"
-				disabled={ ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
 		</Flex>
 	);
 }
@@ -348,19 +347,13 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
-	// Three footer layouts, picked from the viewport so DOM order matches
-	// visual order in all three (no `order` reshuffling needed):
-	//   wide   (≥ xlarge): single row.
-	//   medium (≥ medium): ruler on top; rest beneath.
-	//   narrow (< medium): ruler, then transform centered, then history/save.
-	const isWideViewport = useViewportMatch( 'xlarge' );
-	const isMediumViewport = useViewportMatch( 'medium' );
-	let footerLayout: 'wide' | 'medium' | 'narrow' = 'narrow';
-	if ( isWideViewport ) {
-		footerLayout = 'wide';
-	} else if ( isMediumViewport ) {
-		footerLayout = 'medium';
-	}
+	// The sidebar is a side column from the `medium` breakpoint up and
+	// collapses below it. Track that single breakpoint: in "panel mode"
+	// (≥ medium) the rotate/flip controls live in the Crop panel and the
+	// footer is just History + Cancel/Save; below it the controls drop into
+	// the footer. (The fine-rotation ruler always sits under the canvas.)
+	const isPanelLayout = useViewportMatch( 'medium' );
+	const footerLayout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -499,6 +492,7 @@ function MediaEditorContent( {
 								signalPlacementControlInteraction
 							}
 							aspectRatioOptions={ aspectRatioOptions }
+							showTransformControls={ isPanelLayout }
 						/>
 					</Stack>
 				),
@@ -511,6 +505,7 @@ function MediaEditorContent( {
 		setAspectRatioValue,
 		aspectRatioOptions,
 		signalPlacementControlInteraction,
+		isPanelLayout,
 	] );
 
 	const handleChange = ( updates: Partial< Media > ) => {
@@ -581,6 +576,12 @@ function MediaEditorContent( {
 		/>
 	);
 
+	const ruler = isImage ? (
+		<MediaEditorFineRotation
+			onPlacementControlInteraction={ signalPlacementControlInteraction }
+		/>
+	) : null;
+
 	const children = (
 		<MediaEditorProvider
 			value={ media ?? undefined }
@@ -606,22 +607,29 @@ function MediaEditorContent( {
 								sidebar: __( 'Media details' ),
 							} }
 							content={
-								<div className="media-editor__canvas">
-									{ isImage ? (
-										<MediaEditorCanvas
-											focusOnMount
-											isPlacementActive={
-												isPlacementActive
-											}
-											onGestureStart={
-												handleCanvasGestureStart
-											}
-											onGestureEnd={
-												handleCanvasGestureEnd
-											}
-										/>
-									) : (
-										<MediaPreview />
+								<div className="media-editor__content">
+									<div className="media-editor__canvas-area">
+										{ isImage ? (
+											<MediaEditorCanvas
+												focusOnMount
+												isPlacementActive={
+													isPlacementActive
+												}
+												onGestureStart={
+													handleCanvasGestureStart
+												}
+												onGestureEnd={
+													handleCanvasGestureEnd
+												}
+											/>
+										) : (
+											<MediaPreview />
+										) }
+									</div>
+									{ isImage && (
+										<div className="media-editor__canvas-toolbar">
+											{ ruler }
+										</div>
 									) }
 								</div>
 							}
@@ -658,11 +666,6 @@ function MediaEditorContent( {
 			onReset={ resetCropOptions }
 		/>
 	) : null;
-	const ruler = isImage ? (
-		<MediaEditorFineRotation
-			onPlacementControlInteraction={ signalPlacementControlInteraction }
-		/>
-	) : null;
 	const transform = isImage ? <MediaEditorTransformControls /> : null;
 	const actions = (
 		<FooterActions
@@ -674,39 +677,24 @@ function MediaEditorContent( {
 		/>
 	);
 
-	// One JSX tree per layout. DOM order matches visual order in all three.
-	// `.media-editor-modal__footer-toolbar` (wide only) groups ruler +
-	// transform with the centered cluster and divider that the wide layout
-	// has always had.
+	// The fine-rotation ruler always lives under the canvas (in
+	// `media-editor__content`), never the footer, so it stays constrained to
+	// the canvas column at every viewport. One JSX tree per layout; DOM order
+	// matches visual order.
 	let footerActions: ReactNode;
 	if ( footerLayout === 'wide' ) {
+		// Sidebar is a column: transform controls live in the Crop panel, so
+		// the footer is just History + Cancel/Save.
 		footerActions = (
 			<>
 				{ history }
-				{ isImage && (
-					<div className="media-editor-modal__footer-toolbar">
-						{ ruler }
-						{ transform }
-					</div>
-				) }
 				{ actions }
 			</>
 		);
-	} else if ( footerLayout === 'medium' ) {
-		footerActions = (
-			<>
-				{ ruler }
-				<div className="media-editor-modal__footer-row">
-					{ history }
-					{ transform }
-					{ actions }
-				</div>
-			</>
-		);
 	} else {
+		// Sidebar collapsed: the transform controls drop into the footer.
 		footerActions = (
 			<>
-				{ ruler }
 				{ transform }
 				<div className="media-editor-modal__footer-row">
 					{ history }
