@@ -207,9 +207,11 @@ function Layout() {
 										<SavePanel />
 									</>
 								) : (
-									<ErrorBoundary>
-										{ areas.preview }
-									</ErrorBoundary>
+									<ThemeProvider color={ { bg: '#ffffff' } }>
+										<ErrorBoundary>
+											{ areas.preview }
+										</ErrorBoundary>
+									</ThemeProvider>
 								) }
 							</SidebarNavigationProvider>
 						</div>
