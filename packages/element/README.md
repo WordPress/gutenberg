@@ -301,12 +301,6 @@ _Related_
 
 -   <https://react.dev/reference/react-dom/render>
 
-_Parameters_
-
--   _element_ `React.ReactNode`: Element to render.
--   _container_ `Element`: DOM node into which to render.
--   _callback_ `() => void`: Optional callback called after render.
-
 ### renderToString
 
 Serializes a React element to string.
