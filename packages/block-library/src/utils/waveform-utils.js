@@ -233,6 +233,7 @@ function createTimeMarker( documentRef, type ) {
 	const marker = documentRef.createElement( 'button' );
 	marker.className = `waveform-marker wp-block-playlist__time-marker wp-block-playlist__time-marker--${ type }`;
 	marker.setAttribute( 'aria-hidden', 'true' );
+	marker.tabIndex = -1;
 
 	const label = documentRef.createElement( 'span' );
 	label.className = 'waveform-marker-tooltip';
