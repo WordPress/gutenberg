@@ -4,7 +4,7 @@
 
 ### Bug Fix
 
--   Route very large images, especially interlaced/progressive JPEGs, to server-side processing instead of attempting client-side processing that would exceed the 1 GiB wasm-vips memory cap and fail.
+-   Route very large images, especially interlaced/progressive JPEGs, to server-side processing instead of attempting client-side processing that would exceed the 1 GiB wasm-vips memory cap and fail. [#78949](https://github.com/WordPress/gutenberg/pull/78949).
 
 ### Code Quality
 
