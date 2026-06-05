@@ -115,3 +115,15 @@ p.p {
 	border-radius: var(--_gcd-a-border-radius, 0);
 	transition: var(--_gcd-a-transition, none);
 }
+
+/* Anchor elements styled as buttons (`LinkButton`). Separate from `.a` because
+   button foreground colors differ from link colors. */
+.link-button,
+.link-button:is(:hover, :focus, :active, :visited) {
+	outline: var(--_gcd-link-button-outline, 0 solid transparent);
+	color: var(--_gcd-link-button-color, inherit);
+	box-shadow: var(--_gcd-link-button-box-shadow, none);
+	border-radius: var(--_gcd-link-button-border-radius, 0);
+	transition: var(--_gcd-link-button-transition, none);
+	text-decoration: var(--_gcd-link-button-text-decoration, none);
+}

@@ -6,6 +6,7 @@ import buttonStyles from '../button/style.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.css';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
+import styles from './style.module.css';
 
 /**
  * A link that looks like a `Button`. Prefer `Link` for navigation unless
@@ -30,7 +31,8 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 		ref
 	) {
 		const mergedClassName = clsx(
-			defenseStyles.a,
+			defenseStyles[ 'link-button' ],
+			styles[ 'link-button' ],
 			resetStyles[ 'box-sizing' ],
 			focusStyles[ 'outset-ring--focus-except-active' ],
 			variant !== 'unstyled' && buttonStyles.button,

@@ -1,0 +1,24 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.link-button {
+		/* Bridge `Button` foreground tokens into the unlayered `.link-button`
+		   global CSS defense. */
+		--_gcd-link-button-color: var(--wp-ui-button-foreground-color);
+		--_gcd-link-button-text-decoration: none;
+
+		&:visited {
+			--_gcd-link-button-color: var(--wp-ui-button-foreground-color);
+		}
+
+		&:not([data-disabled]):is(:hover, :active, :focus) {
+			--_gcd-link-button-color:
+ var(--wp-ui-button-foreground-color-active);
+		}
+
+		&[data-disabled] {
+			--_gcd-link-button-color:
+ var(--wp-ui-button-foreground-color-disabled);
+		}
+	}
+}
