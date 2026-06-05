@@ -6,19 +6,19 @@
 
 -   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 
-### Enhancements
+### Code Quality
 
--   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+-   `Drawer`: Remove an obsolete CSS workaround for [`mui/base-ui#4622`](https://github.com/mui/base-ui/issues/4622), fixed upstream in `@base-ui/react@1.4.1` ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
 
 ### Bug Fixes
 
 -   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
 -   `Tabs`: `onValueChange` now fires for automatic tab selection — when `Tabs` itself picks a tab without a consumer-supplied value (initial uncontrolled mount with no `defaultValue`, fallback to the first enabled tab when the first tab is disabled, or fallback when the currently selected tab is removed or becomes disabled) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
 
-### Code Quality
+### Enhancements
 
--   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
--   `Drawer`: Remove an obsolete CSS workaround for [`mui/base-ui#4622`](https://github.com/mui/base-ui/issues/4622), fixed upstream in `@base-ui/react@1.4.1` ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
+-   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ### Internal
 
