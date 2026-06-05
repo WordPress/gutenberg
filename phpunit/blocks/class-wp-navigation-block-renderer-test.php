@@ -9,6 +9,38 @@
 class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 	/**
+	 * Test that the inner Navigation list is not treated as a duplicate block wrapper.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_inner_blocks_html
+	 */
+	public function test_inner_list_only_has_container_class() {
+		$output = do_blocks(
+			'<!-- wp:navigation {"fontSize":"x-large","layout":{"orientation":"vertical","justifyContent":"center","flexWrap":"nowrap"}} -->
+			<!-- wp:navigation-link {"label":"Sample Page","url":"/sample-page"} /-->
+			<!-- /wp:navigation -->'
+		);
+
+		$tags = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue( $tags->next_tag( 'NAV' ) );
+		$this->assertTrue( $tags->has_class( 'wp-block-navigation' ) );
+		$this->assertTrue( $tags->has_class( 'has-x-large-font-size' ) );
+		$this->assertTrue( $tags->has_class( 'items-justified-center' ) );
+		$this->assertTrue( $tags->has_class( 'is-vertical' ) );
+		$this->assertTrue( $tags->has_class( 'no-wrap' ) );
+
+		$this->assertTrue( $tags->next_tag( 'UL' ) );
+		$this->assertSame( 'wp-block-navigation__container', $tags->get_attribute( 'class' ) );
+		$this->assertFalse( $tags->has_class( 'wp-block-navigation' ) );
+		$this->assertFalse( $tags->has_class( 'has-x-large-font-size' ) );
+		$this->assertFalse( $tags->has_class( 'items-justified-center' ) );
+		$this->assertFalse( $tags->has_class( 'is-vertical' ) );
+		$this->assertFalse( $tags->has_class( 'no-wrap' ) );
+		$this->assertNull( $tags->get_attribute( 'style' ) );
+	}
+
+	/**
 	 * Test that navigation links are wrapped in list items to preserve accessible markup
 	 *
 	 * @group navigation-renderer
@@ -37,8 +69,8 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 			// Block markup for WP 6.9 (space before wp-block-navigation-item class)
 			// TODO: Remove the second expected markup after WP 6.9 support is dropped and the old markup is no longer generated.
 			$expected = '<li class=" wp-block-navigation-item wp-block-navigation-link"><a class="wp-block-navigation-item__content"  href="/hello-world"><span class="wp-block-navigation-item__label">Sample Page</span></a></li>';
-			$this->assertEquals( $expected, $result );
 		}
+		$this->assertEquals( $expected, $result );
 	}
 
 	/**
