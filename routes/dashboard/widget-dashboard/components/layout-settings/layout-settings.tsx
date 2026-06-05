@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
-import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
@@ -18,15 +17,13 @@ import {
 	rowHeightToPreset,
 	type RowHeightPreset,
 } from '../../utils/row-height-presets';
-import type {
-	WidgetGridLayoutSettings,
-	WidgetGridModel,
-	WidgetGridSettings,
+import {
+	WIDGET_DASHBOARD_COLUMN_COUNT,
+	type WidgetGridLayoutSettings,
+	type WidgetGridModel,
+	type WidgetGridSettings,
 } from '../../types';
 import { LayoutModelEditField } from './layout-model-edit-field';
-
-const DEFAULT_FIXED_COLUMNS = 6;
-const DEFAULT_MIN_COLUMN_WIDTH = 350;
 
 function getModel( item: WidgetGridSettings ): WidgetGridModel {
 	return item.model ?? 'grid';
@@ -34,45 +31,6 @@ function getModel( item: WidgetGridSettings ): WidgetGridModel {
 
 function isMasonry( item: WidgetGridSettings ): boolean {
 	return getModel( item ) === 'masonry';
-}
-
-function StepperIntegerEdit( {
-	data,
-	field,
-	onChange,
-}: DataFormControlProps< WidgetGridSettings > ) {
-	const { label, description, getValue, setValue, isValid } = field;
-	const value = getValue( { item: data } );
-	const disabled = field.isDisabled( { item: data, field } );
-	const min =
-		typeof isValid.min?.constraint === 'number'
-			? isValid.min.constraint
-			: undefined;
-	const max =
-		typeof isValid.max?.constraint === 'number'
-			? isValid.max.constraint
-			: undefined;
-
-	return (
-		<NumberControl
-			__next40pxDefaultSize
-			label={ label }
-			help={ description }
-			value={ value ?? '' }
-			min={ min }
-			max={ max }
-			step={ 1 }
-			spinControls="custom"
-			disabled={ disabled }
-			onChange={ ( next ) => {
-				const parsed =
-					next === '' || next === undefined
-						? undefined
-						: Number( next );
-				onChange( setValue( { item: data, value: parsed } ) );
-			} }
-		/>
-	);
 }
 
 const fields: Field< WidgetGridSettings >[] = [
@@ -89,49 +47,6 @@ const fields: Field< WidgetGridSettings >[] = [
 			{ value: 'masonry', label: __( 'Masonry' ) },
 		],
 		getValue: ( { item } ) => getModel( item ),
-	},
-	{
-		id: 'columns',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Columns' ),
-		description: __(
-			'How many columns to show when the dashboard has enough space.'
-		),
-		isValid: { min: 1, max: 12 },
-	},
-	{
-		id: 'adaptiveColumns',
-		type: 'boolean',
-		Edit: 'toggle',
-		label: __( 'Adjust on narrow screens' ),
-		description: __(
-			'Show fewer columns when the dashboard gets too narrow to keep tiles readable.'
-		),
-		getValue: ( { item } ) => item.minColumnWidth !== 0,
-		setValue: ( { item, value } ) => {
-			if ( ! value ) {
-				return { minColumnWidth: 0 };
-			}
-			const previous = item.minColumnWidth;
-			return {
-				minColumnWidth:
-					previous && previous > 0
-						? previous
-						: DEFAULT_MIN_COLUMN_WIDTH,
-			};
-		},
-	},
-	{
-		id: 'minColumnWidth',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Minimum tile width' ),
-		description: __(
-			'The smallest tile width before a column is removed.'
-		),
-		isValid: { min: 48, max: 600 },
-		isVisible: ( item ) => item.minColumnWidth !== 0,
 	},
 	{
 		id: 'rowHeight',
@@ -160,13 +75,7 @@ const fields: Field< WidgetGridSettings >[] = [
 
 const form: Form = {
 	layout: { type: 'regular', labelPosition: 'top' },
-	fields: [
-		'model',
-		'columns',
-		'adaptiveColumns',
-		'minColumnWidth',
-		'rowHeight',
-	],
+	fields: [ 'model', 'rowHeight' ],
 };
 
 interface LayoutSettingsProps {
@@ -182,8 +91,8 @@ interface LayoutSettingsProps {
 }
 
 /**
- * Modal side drawer for grid-level settings (model, column behavior,
- * row height). Reads from and writes to the staging copy in
+ * Modal side drawer for grid-level settings (model, row height).
+ * Reads from and writes to the staging copy in
  * `useDashboardInternalContext`; edits preview through the backdrop
  * and are committed or rolled back by the drawer's Save / Cancel
  * buttons.
@@ -230,7 +139,7 @@ export function LayoutSettings( {
 					layout,
 					currentModel,
 					nextModel,
-					{ columns: gridSettings.columns ?? DEFAULT_FIXED_COLUMNS }
+					{ columns: WIDGET_DASHBOARD_COLUMN_COUNT }
 				);
 				onLayoutChange( migrated );
 			}
