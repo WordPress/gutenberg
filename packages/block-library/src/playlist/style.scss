@@ -22,6 +22,11 @@ $waveform-player-height: 100px;
 		gap: 0;
 	}
 
+	.waveform-container:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+
 	// WaveformPlayer button styling.
 	.waveform-btn {
 		border-radius: 0;

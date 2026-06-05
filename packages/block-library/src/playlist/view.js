@@ -6,7 +6,11 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, logPlayError } from '../utils/waveform-utils';
+import {
+	initWaveformPlayer,
+	logPlayError,
+	updateSeekControlLabel,
+} from '../utils/waveform-utils';
 
 /**
  * Store player state for each element.
@@ -83,6 +87,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			} )
 			.then( () => {
 				existing.url = track.url;
+				updateSeekControlLabel( existing.instance, track.title );
 				if ( shouldAutoPlay ) {
 					existing.instance.play()?.catch( logPlayError );
 				}
@@ -95,6 +100,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const labels = {
 		play: ref.dataset.labelPlay,
 		pause: ref.dataset.labelPause,
+		seek: ref.dataset.labelSeek,
 	};
 
 	// Initialize using the shared core.

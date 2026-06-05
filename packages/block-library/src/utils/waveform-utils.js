@@ -14,6 +14,8 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
+const SEEK_STEP_SECONDS = 5;
+const SEEK_LARGE_STEP_SECONDS = 10;
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -139,6 +141,162 @@ export function setupPlayButtonAccessibility(
 }
 
 /**
+ * Format a duration in seconds as a human-readable timestamp.
+ *
+ * @param {number} seconds - Time in seconds.
+ * @return {string} Formatted timestamp.
+ */
+function formatTimestamp( seconds ) {
+	const normalizedSeconds = Math.max( 0, Math.floor( seconds || 0 ) );
+	const hours = Math.floor( normalizedSeconds / 3600 );
+	const minutes = Math.floor( ( normalizedSeconds % 3600 ) / 60 );
+	const remainingSeconds = normalizedSeconds % 60;
+	const paddedSeconds = String( remainingSeconds ).padStart( 2, '0' );
+
+	if ( hours ) {
+		return `${ hours }:${ String( minutes ).padStart(
+			2,
+			'0'
+		) }:${ paddedSeconds }`;
+	}
+
+	return `${ minutes }:${ paddedSeconds }`;
+}
+
+/**
+ * Get a finite audio time value.
+ *
+ * @param {number} value - Time value.
+ * @return {number} The normalized time value.
+ */
+function getFiniteTime( value ) {
+	return Number.isFinite( value ) ? Math.max( 0, value ) : 0;
+}
+
+/**
+ * Set up waveform seek control accessibility.
+ *
+ * @param {Element} container - The waveform player container element.
+ * @param {Object}  instance  - The WaveformPlayer instance.
+ * @param {Object}  options   - Accessibility options.
+ * @param {string}  options.label - Accessible label for the seek control.
+ * @return {Function|undefined} Cleanup function.
+ */
+export function setupSeekControlAccessibility(
+	container,
+	instance,
+	{ label = 'Seek' } = {}
+) {
+	const seekControl = container.querySelector( '.waveform-container' );
+	const { audio } = instance;
+
+	if ( ! seekControl || ! audio ) {
+		return;
+	}
+
+	const updateSeekControl = () => {
+		const duration = getFiniteTime( audio.duration );
+		const currentTime = Math.min(
+			getFiniteTime( audio.currentTime ),
+			duration
+		);
+
+		seekControl.setAttribute( 'aria-valuemax', String( duration ) );
+		seekControl.setAttribute( 'aria-valuenow', String( currentTime ) );
+		seekControl.setAttribute(
+			'aria-valuetext',
+			`${ formatTimestamp( currentTime ) } of ${ formatTimestamp(
+				duration
+			) }`
+		);
+	};
+
+	seekControl.setAttribute( 'tabindex', '0' );
+	seekControl.setAttribute( 'role', 'slider' );
+	seekControl.setAttribute( 'aria-label', label || 'Seek' );
+	seekControl.setAttribute( 'aria-valuemin', '0' );
+	updateSeekControl();
+
+	const originalOnTimeUpdate = instance.options.onTimeUpdate;
+	const onTimeUpdate = ( currentTime, duration, player ) => {
+		updateSeekControl();
+		originalOnTimeUpdate?.( currentTime, duration, player );
+	};
+	instance.options.onTimeUpdate = onTimeUpdate;
+
+	const seekTo = ( seconds ) => {
+		instance.seekTo(
+			Math.max( 0, Math.min( getFiniteTime( audio.duration ), seconds ) )
+		);
+		updateSeekControl();
+	};
+
+	const onKeyDown = ( event ) => {
+		const currentTime = getFiniteTime( audio.currentTime );
+		const duration = getFiniteTime( audio.duration );
+		const actions = {
+			ArrowLeft: () => seekTo( currentTime - SEEK_STEP_SECONDS ),
+			ArrowDown: () => seekTo( currentTime - SEEK_STEP_SECONDS ),
+			ArrowRight: () => seekTo( currentTime + SEEK_STEP_SECONDS ),
+			ArrowUp: () => seekTo( currentTime + SEEK_STEP_SECONDS ),
+			PageDown: () => seekTo( currentTime - SEEK_LARGE_STEP_SECONDS ),
+			PageUp: () => seekTo( currentTime + SEEK_LARGE_STEP_SECONDS ),
+			Home: () => seekTo( 0 ),
+			End: () => seekTo( duration ),
+		};
+
+		if ( ! actions[ event.key ] ) {
+			return;
+		}
+
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		actions[ event.key ]();
+	};
+
+	const onContainerClick = ( event ) => {
+		container.setAttribute( 'tabindex', '-1' );
+
+		if ( ! seekControl.contains( event.target ) ) {
+			return;
+		}
+
+		seekControl.focus();
+	};
+
+	seekControl.addEventListener( 'keydown', onKeyDown, true );
+	container.addEventListener( 'click', onContainerClick );
+	audio.addEventListener( 'durationchange', updateSeekControl );
+	audio.addEventListener( 'loadedmetadata', updateSeekControl );
+
+	return () => {
+		seekControl.removeEventListener( 'keydown', onKeyDown, true );
+		container.removeEventListener( 'click', onContainerClick );
+		audio.removeEventListener( 'durationchange', updateSeekControl );
+		audio.removeEventListener( 'loadedmetadata', updateSeekControl );
+		if ( instance.options.onTimeUpdate === onTimeUpdate ) {
+			instance.options.onTimeUpdate = originalOnTimeUpdate;
+		}
+	};
+}
+
+/**
+ * Update the waveform seek control label.
+ *
+ * @param {Object} instance - The WaveformPlayer instance.
+ * @param {string} label    - Accessible label for the seek control.
+ */
+export function updateSeekControlLabel( instance, label ) {
+	const seekControl = instance?.container?.querySelector(
+		'.waveform-container'
+	);
+
+	if ( seekControl ) {
+		seekControl.setAttribute( 'aria-label', label || 'Seek' );
+	}
+}
+
+/**
  * Log play errors, filtering out expected AbortError.
  *
  * @param {Error} error - The error from play().
@@ -197,11 +355,16 @@ export function initWaveformPlayer(
 	const instance = new WaveformPlayerLib( container );
 
 	// Set up event handlers.
-	let cleanupAccessibility;
+	const cleanupSeekControlAccessibility = setupSeekControlAccessibility(
+		container,
+		instance,
+		{ label: labels?.seek || title || 'Seek' }
+	);
+	let cleanupPlayButtonAccessibility;
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
-			cleanupAccessibility = setupPlayButtonAccessibility(
+			cleanupPlayButtonAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels
 			);
@@ -220,7 +383,8 @@ export function initWaveformPlayer(
 		instance,
 		container,
 		destroy: () => {
-			cleanupAccessibility?.();
+			cleanupPlayButtonAccessibility?.();
+			cleanupSeekControlAccessibility?.();
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready
