@@ -34,6 +34,7 @@
 		"@types/react": "^18.3.27",
 		"@vitejs/plugin-react": "^5.1.2",
 		"@wordpress/theme": "file:../packages/theme",
+		"react-docgen-typescript": "^2.2.2",
 		"storybook": "^10.2.8",
 		"storybook-addon-tag-badges": "^3.0.4",
 		"terser": "^5.37.0",
