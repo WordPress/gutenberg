@@ -13,11 +13,7 @@ import {
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
-import {
-	logPerformanceTiming,
-	passThru,
-	yieldToEventLoop,
-} from './performance';
+import { logPerformanceTiming, passThru } from './performance';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -186,6 +182,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			persistCRDTDoc: debugWrap( handlers.persistCRDTDoc ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
+
+			onUndoStackChange: handlers.onUndoStackChange
+				? debugWrap( handlers.onUndoStackChange )
+				: undefined,
 		};
 
 		const ydoc = createYjsDoc( { objectType } );
@@ -261,10 +261,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			undoManager = createUndoManager();
 		}
 
-		const { addUndoMeta, restoreUndoMeta } = handlers;
+		const { addUndoMeta, onUndoStackChange, restoreUndoMeta } = handlers;
 		undoManager.addToScope( recordMap, {
 			addUndoMeta,
 			restoreUndoMeta,
+			onUndoStackChange,
 		} );
 
 		// Declare with let before using it in unload closure.
@@ -717,21 +718,16 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 */
-	async function createPersistedCRDTDoc(
+	function createPersistedCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): Promise< string | null > {
+	): string | null {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
 		if ( ! entityState?.ydoc ) {
 			return null;
 		}
-
-		// Y.Doc updates are deferred via yieldToEventLoop. Await a promise that
-		// resolves on the next tick of the event loop so pending updates are flushed
-		// before we serialize the document.
-		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}
@@ -754,6 +750,6 @@ export function createSyncManager( debug = false ): SyncManager {
 		},
 		unload: debugWrap( unloadEntity ),
 		unloadAll: debugWrap( unloadAll ),
-		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
+		update: debugWrap( updateCRDTDoc ),
 	};
 }

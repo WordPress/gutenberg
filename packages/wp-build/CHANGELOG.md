@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead ([#78493](https://github.com/WordPress/gutenberg/pull/78493)).
+-   Revert the getter-based export replacement in `@wordpress/build` to restore compatibility for affected Gutenberg 23.0 builds ([#78917](https://github.com/WordPress/gutenberg/pull/78917)).
 
 ## 0.15.0 (2026-05-27)
 

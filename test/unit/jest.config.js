@@ -4,6 +4,15 @@
 const path = require( 'path' );
 const glob = require( 'glob' ).sync;
 
+/*
+ * Resolve the directory of `@wordpress/jest-preset-default` from this
+ * workspace's `node_modules`. Jest's `preset` option expects a directory
+ * containing a `jest-preset.js` or `jest-preset.json` file.
+ */
+const jestPresetDefaultDir = path.dirname(
+	require.resolve( '@wordpress/jest-preset-default/jest-preset.js' )
+);
+
 /**
  * Path to root project directory.
  */
@@ -37,7 +46,7 @@ module.exports = {
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
-	preset: '@wordpress/jest-preset-default',
+	preset: jestPresetDefaultDir,
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
@@ -70,16 +79,16 @@ module.exports = {
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
-		'@emotion/jest/serializer',
-		'snapshot-diff/serializer',
+		require.resolve( '@emotion/jest/serializer' ),
+		require.resolve( 'snapshot-diff/serializer' ),
 	],
 	snapshotFormat: {
 		escapeString: false,
 		printBasicPrototype: false,
 	},
 	watchPlugins: [
-		'jest-watch-typeahead/filename',
-		'jest-watch-typeahead/testname',
+		require.resolve( 'jest-watch-typeahead/filename' ),
+		require.resolve( 'jest-watch-typeahead/testname' ),
 	],
 	reporters: [
 		'default',

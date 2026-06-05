@@ -29,9 +29,9 @@ let origin = null;
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
-	/** @type {React.RefObject<HTMLElement| null>} */
+	/** @type {React.MutableRefObject<null | HTMLElement>} */
 	const ref = useRef( null );
-	/** @type {React.RefObject<Element | null>} */
+	/** @type {React.MutableRefObject<null | Element>} */
 	const focusedBeforeMount = useRef( null );
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {

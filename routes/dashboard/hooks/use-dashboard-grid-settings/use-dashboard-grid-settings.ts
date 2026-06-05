@@ -13,6 +13,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import type { WidgetGridSettings } from '../../widget-dashboard/types';
+import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../widget-dashboard/types';
 import { normalizeGridSettings } from '../../widget-dashboard/utils/normalize-grid-settings';
 import { DEFAULT_ROW_HEIGHT } from '../../widget-dashboard/utils/row-height-presets';
 
@@ -28,8 +29,7 @@ const KEY = 'dashboardGridSettings';
  */
 const DEFAULT_GRID_SETTINGS: WidgetGridSettings = {
 	model: 'grid',
-	columns: 12,
-	minColumnWidth: 140,
+	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
 	rowHeight: DEFAULT_ROW_HEIGHT,
 };
 

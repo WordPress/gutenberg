@@ -55,7 +55,7 @@ function isFocusNormalizedButton( eventTarget ) {
  */
 
 /**
- * @typedef {React.RefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
+ * @typedef {React.MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
  */
 
 /**
@@ -88,7 +88,7 @@ export default function useFocusOutside( onFocusOutside ) {
 	const preventBlurCheck = useRef( false );
 
 	/**
-	 * @type {React.RefObject<number | undefined>}
+	 * @type {React.MutableRefObject<number | undefined>}
 	 */
 	const blurCheckTimeoutId = useRef();
 
