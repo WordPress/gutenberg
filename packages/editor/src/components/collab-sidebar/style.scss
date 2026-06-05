@@ -57,13 +57,12 @@
 		overflow-y: auto;
 	}
 
-	&:not(.is-selected) {
-		.editor-collab-sidebar-panel__user-name,
-		.editor-collab-sidebar-panel__user-time {
-			color: $gray-800;
-		}
+	.editor-collab-sidebar-panel__user-name,
+	.editor-collab-sidebar-panel__user-time {
+		color: $gray-800;
 	}
 }
+
 
 .editor-collab-sidebar-panel__user-name {
 	font-size: 12px;
@@ -129,7 +128,7 @@
 
 .editor-collab-sidebar-panel__deleted-block-notice {
 	font-weight: $font-weight-medium;
-	color: $gray-700;
+	color: $gray-800;
 }
 
 .editor-collab-sidebar-panel__resolution-text {
