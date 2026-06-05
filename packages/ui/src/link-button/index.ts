@@ -6,7 +6,8 @@ export type { LinkButtonProps, LinkButtonIconProps } from './types';
 ButtonIcon.displayName = 'LinkButton.Icon';
 
 /**
- * A link that looks like a `Button`, for navigation actions.
+ * A link that looks like a `Button`. Prefer `Link` for navigation unless
+ * button prominence is intentional.
  */
 export const LinkButton = Object.assign( _LinkButton, {
 	/**

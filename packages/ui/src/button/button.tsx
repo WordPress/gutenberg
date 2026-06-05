@@ -11,6 +11,8 @@ import defenseStyles from '../utils/css/global-css-defense.module.css';
 
 /**
  * A versatile button component with multiple variants, tones, and sizes.
+ *
+ * @see {@link https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs When to use Button, Link, or LinkButton}
  */
 export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 	function Button(

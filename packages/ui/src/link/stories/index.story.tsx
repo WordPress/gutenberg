@@ -12,6 +12,12 @@ const meta: Meta< typeof Link > = {
 			status: 'recommended',
 			whereUsed: 'global',
 		},
+		docs: {
+			description: {
+				component:
+					'See [Usage Guidelines](?path=/docs/design-system-components-button-usage-guidelines--docs) for when to use `Button`, `Link`, or `LinkButton`.',
+			},
+		},
 	},
 };
 export default meta;
