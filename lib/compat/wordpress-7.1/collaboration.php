@@ -99,6 +99,13 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 				'type'              => 'string',
 			)
 		);
+
+		// Linked entities must support custom-fields so that the _crdt_document
+		// meta can be persisted via the REST API.
+		add_post_type_support( 'wp_navigation', 'custom-fields' );
+		add_post_type_support( 'wp_template', 'custom-fields' );
+		add_post_type_support( 'wp_template_part', 'custom-fields' );
+		add_post_type_support( 'wp_global_styles', 'custom-fields' );
 	}
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
