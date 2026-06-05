@@ -316,13 +316,27 @@ function applyResizeAndCrop<
 		return cropped;
 	}
 
+	// Scale the crop rect to the gain map's resolution. `crop` expects integer
+	// pixel coordinates, so round here rather than relying on an implicit
+	// float-to-int conversion, and clamp to the gain map bounds so the rect
+	// never extends past its edges.
 	const hscale = gainmap.width / image.width;
 	const vscale = gainmap.height / image.height;
+	const gainmapLeft = Math.round( left * hscale );
+	const gainmapTop = Math.round( top * vscale );
+	const gainmapWidth = Math.min(
+		Math.round( cropWidth * hscale ),
+		gainmap.width - gainmapLeft
+	);
+	const gainmapHeight = Math.min(
+		Math.round( cropHeight * vscale ),
+		gainmap.height - gainmapTop
+	);
 	const newGainmap = gainmap.crop(
-		left * hscale,
-		top * vscale,
-		cropWidth * hscale,
-		cropHeight * vscale
+		gainmapLeft,
+		gainmapTop,
+		gainmapWidth,
+		gainmapHeight
 	);
 
 	// setImage mutates, so produce a unique copy first.
