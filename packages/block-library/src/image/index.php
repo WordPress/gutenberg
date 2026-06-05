@@ -167,6 +167,149 @@ function block_core_image_get_lightbox_settings( $block ) {
 }
 
 /**
+ * Checks whether the experimental image lightbox EXIF metadata feature is enabled.
+ *
+ * The feature is currently behind a Gutenberg experiment. The experiments option
+ * is read directly so this (Core-synced) block file does not depend on the
+ * plugin-only `gutenberg_is_experiment_enabled()` helper; outside the plugin the
+ * option is absent and the feature stays disabled.
+ *
+ * @since 6.9.0
+ *
+ * @return bool True when the experiment is enabled.
+ */
+function block_core_image_is_lightbox_exif_enabled() {
+	$experiments = get_option( 'gutenberg-experiments' );
+	return is_array( $experiments ) && ! empty( $experiments['gutenberg-gallery-lightbox-default'] );
+}
+
+/**
+ * Returns the EXIF metadata display settings for the block.
+ *
+ * Mirrors the lightbox settings resolution: a per-block `exif` attribute
+ * overrides the `core/image` global settings, which fall back to the top-level
+ * global settings. EXIF metadata is only shown when this resolves to enabled
+ * and the lightbox itself is enabled.
+ *
+ * @since 6.9.0
+ *
+ * @param array $block Block data.
+ *
+ * @return array|null Filtered EXIF display settings.
+ */
+function block_core_image_get_exif_display_settings( $block ) {
+	// Gets the EXIF setting from the block attributes.
+	if ( isset( $block['attrs']['exif'] ) ) {
+		$exif_settings = $block['attrs']['exif'];
+	}
+
+	if ( ! isset( $exif_settings ) ) {
+		$exif_settings = wp_get_global_settings( array( 'exif' ), array( 'block_name' => 'core/image' ) );
+
+		// If not present in block-level settings, check the top-level global
+		// settings (see the matching note in the lightbox settings helper).
+		if ( isset( $exif_settings['exif'] ) ) {
+			$exif_settings = wp_get_global_settings( array( 'exif' ) );
+		}
+	}
+
+	return $exif_settings ?? null;
+}
+
+/**
+ * Formats the shutter speed value for display.
+ *
+ * @since 6.9.0
+ *
+ * @param string|int|float $speed Shutter speed value.
+ *
+ * @return string Formatted shutter speed value.
+ */
+function block_core_image_format_lightbox_exif_shutter_speed( $speed ) {
+	if ( is_string( $speed ) && str_contains( $speed, '/' ) ) {
+		$parts = array_map( 'trim', explode( '/', $speed, 2 ) );
+		if (
+			2 === count( $parts ) &&
+			is_numeric( $parts[0] ) &&
+			is_numeric( $parts[1] ) &&
+			(float) $parts[1] > 0
+		) {
+			$speed = (float) $parts[0] / (float) $parts[1];
+		}
+	}
+
+	if ( ! is_numeric( $speed ) ) {
+		return '';
+	}
+
+	$speed = (float) $speed;
+	if ( $speed <= 0 ) {
+		return '';
+	}
+
+	// Formats all numeric EXIF values with plain casting (rather than
+	// `number_format_i18n`) so the standard photographic notation is consistent
+	// across aperture, shutter speed, and focal length regardless of locale.
+	if ( $speed >= 1 ) {
+		return (string) round( $speed, 1 ) . 's';
+	}
+
+	return '1/' . (string) round( 1 / $speed ) . 's';
+}
+
+/**
+ * Returns formatted EXIF data for display in the lightbox.
+ *
+ * @since 6.9.0
+ *
+ * @param int $attachment_id Attachment ID.
+ *
+ * @return array Formatted EXIF data.
+ */
+function block_core_image_get_lightbox_exif_data( $attachment_id ) {
+	$metadata = wp_get_attachment_metadata( $attachment_id );
+	if ( empty( $metadata['image_meta'] ) || ! is_array( $metadata['image_meta'] ) ) {
+		return array();
+	}
+
+	$image_meta = $metadata['image_meta'];
+	$exif       = array();
+
+	if ( ! empty( $image_meta['camera'] ) && is_scalar( $image_meta['camera'] ) ) {
+		$exif['camera'] = trim( wp_strip_all_tags( (string) $image_meta['camera'] ) );
+	}
+
+	if (
+		! empty( $image_meta['aperture'] ) &&
+		is_numeric( $image_meta['aperture'] ) &&
+		(float) $image_meta['aperture'] > 0
+	) {
+		$exif['aperture'] = 'f/' . (string) (float) $image_meta['aperture'];
+	}
+
+	if ( ! empty( $image_meta['shutter_speed'] ) ) {
+		$shutter_speed = block_core_image_format_lightbox_exif_shutter_speed( $image_meta['shutter_speed'] );
+		if ( $shutter_speed ) {
+			$exif['shutterSpeed'] = $shutter_speed;
+		}
+	}
+
+	if (
+		! empty( $image_meta['focal_length'] ) &&
+		is_numeric( $image_meta['focal_length'] ) &&
+		(float) $image_meta['focal_length'] > 0
+	) {
+		$exif['focalLength'] = (string) round( (float) $image_meta['focal_length'], 1 ) . 'mm';
+	}
+
+	if ( ! empty( $image_meta['copyright'] ) && is_scalar( $image_meta['copyright'] ) ) {
+		$exif['copyright'] = trim( wp_strip_all_tags( (string) $image_meta['copyright'] ) );
+	}
+
+	return array_filter( $exif, 'strlen' );
+}
+
+/**
  * Adds the directives and layout needed for the lightbox behavior.
  *
  * @since 6.4.0
@@ -199,6 +342,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$img_width        = 'none';
 	$img_height       = 'none';
 	$img_srcset       = false;
+	$img_exif         = array();
 
 	wp_interactivity_config(
 		'core/image',
@@ -223,6 +367,16 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 		$img_srcset       = wp_get_attachment_image_srcset( $block['attrs']['id'], $srcset_size );
 		$img_width        = $img_metadata['width'] ?? 'none';
 		$img_height       = $img_metadata['height'] ?? 'none';
+
+		// Only expose EXIF metadata (and therefore the toggle button) when the
+		// experiment is enabled and it is turned on via the block attribute or
+		// global settings.
+		if ( block_core_image_is_lightbox_exif_enabled() ) {
+			$exif_settings = block_core_image_get_exif_display_settings( $block );
+			if ( isset( $exif_settings['enabled'] ) && true === $exif_settings['enabled'] ) {
+				$img_exif = block_core_image_get_lightbox_exif_data( $block['attrs']['id'] );
+			}
+		}
 	}
 
 	// Figure.
@@ -247,6 +401,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 					'targetHeight'           => $img_height,
 					'scaleAttr'              => $block['attrs']['scale'] ?? false,
 					'alt'                    => $alt,
+					'exif'                   => $img_exif,
 					'galleryId'              => $block_instance->context['galleryId'] ?? null,
 					'customAriaLabel'        => $custom_aria_label ?? null,
 					'navigationButtonType'   => $block_instance->context['navigationButtonType'] ?? 'icon',
@@ -344,6 +499,62 @@ function block_core_image_print_lightbox_overlay() {
 		}
 	}
 
+	// The EXIF metadata toggle and panel are only rendered while the feature is
+	// behind an experiment. When disabled, no extra markup is emitted.
+	$exif_markup = '';
+	if ( block_core_image_is_lightbox_exif_enabled() ) {
+		$exif_button_label = esc_attr__( 'Toggle photo metadata visibility' );
+		$exif_region_label = esc_attr__( 'Photo metadata' );
+		$camera_label      = esc_html__( 'Camera' );
+		$aperture_label    = esc_html__( 'Aperture' );
+		$shutter_label     = esc_html__( 'Shutter Speed' );
+		$focal_label       = esc_html__( 'Focal Length' );
+		$copyright_label   = esc_html__( 'Copyright' );
+
+		$exif_markup = <<<HTML
+				<button
+					type="button"
+					style="color:{$close_button_color}"
+					class="wp-lightbox-exif-button"
+					aria-label="{$exif_button_label}"
+					aria-controls="wp-lightbox-exif"
+					data-wp-bind--aria-expanded="state.exifExpanded"
+					data-wp-bind--hidden="!state.hasExif"
+					data-wp-class--active="state.isExifVisible"
+					data-wp-on--click="actions.toggleExif"
+					hidden
+				>
+					<svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+						<path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M12.5 2C7.007 2 2.549 6.48 2.549 12S7.007 22 12.5 22s9.951-4.48 9.951-10S17.993 2 12.5 2ZM4.539 12c0-4.41 3.572-8 7.961-8s7.961 3.59 7.961 8-3.572 8-7.961 8-7.961-3.59-7.961-8ZM11.505 7v2h1.99V7h-1.99Zm0 4v6h1.99v-6h-1.99Z"/>
+					</svg>
+				</button>
+				<div id="wp-lightbox-exif" class="wp-lightbox-exif" style="color:{$close_button_color}" role="group" aria-label="{$exif_region_label}" data-wp-bind--hidden="!state.isExifVisible" data-wp-on--click="actions.handleExifClick" hidden>
+					<ul>
+						<li data-wp-bind--hidden="!state.exifCamera" hidden>
+							<h5>{$camera_label}</h5>
+							<span data-wp-text="state.exifCamera"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifAperture" hidden>
+							<h5>{$aperture_label}</h5>
+							<span data-wp-text="state.exifAperture"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifShutterSpeed" hidden>
+							<h5>{$shutter_label}</h5>
+							<span data-wp-text="state.exifShutterSpeed"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifFocalLength" hidden>
+							<h5>{$focal_label}</h5>
+							<span data-wp-text="state.exifFocalLength"></span>
+						</li>
+						<li data-wp-bind--hidden="!state.exifCopyright" hidden>
+							<h5>{$copyright_label}</h5>
+							<span data-wp-text="state.exifCopyright"></span>
+						</li>
+					</ul>
+				</div>
+	HTML;
+	}
+
 	echo <<<HTML
 		<div
 			class="wp-lightbox-overlay zoom"
@@ -356,6 +567,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-bind--aria-label="state.ariaLabel"
 			data-wp-bind--aria-modal="state.ariaModal"
 			data-wp-class--active="state.overlayEnabled"
+			data-wp-class--has-visible-exif="state.isExifVisible"
 			data-wp-class--show-closing-animation="state.overlayOpened"
 			data-wp-watch---focus="callbacks.setOverlayFocus"
 			data-wp-watch---inert="callbacks.setInertElements"
@@ -395,6 +607,7 @@ function block_core_image_print_lightbox_overlay() {
 						>
 					</figure>
 				</div>
+				{$exif_markup}
 				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-navigation-button wp-lightbox-navigation-button-next" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-label="state.nextButtonAriaLabel">
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$next_button_text}</span>
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>

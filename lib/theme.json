@@ -346,6 +346,9 @@
 			"core/image": {
 				"lightbox": {
 					"allowEditing": true
+				},
+				"exif": {
+					"allowEditing": true
 				}
 			},
 			"core/icon": {

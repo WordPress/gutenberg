@@ -12,12 +12,41 @@
  * @group blocks
  */
 class Tests_Blocks_Render_Image extends WP_UnitTestCase {
+	/**
+	 * Holds the `pre_option_gutenberg-experiments` override callback, if set.
+	 *
+	 * @var callable|null
+	 */
+	private $experiments_filter = null;
+
 	public function tear_down() {
+		if ( null !== $this->experiments_filter ) {
+			remove_filter( 'pre_option_gutenberg-experiments', $this->experiments_filter );
+			$this->experiments_filter = null;
+		}
+
 		if ( get_block_bindings_source( 'test/source' ) ) {
 			unregister_block_bindings_source( 'test/source' );
 		}
 
 		parent::tear_down();
+	}
+
+	/**
+	 * Overrides the `gutenberg-experiments` option for the current test.
+	 *
+	 * The PHPUnit bootstrap registers a `pre_option_gutenberg-experiments`
+	 * filter (via `$GLOBALS['wp_tests_options']`) that short-circuits
+	 * `get_option()`, so `update_option()` has no effect. This adds a
+	 * later-running filter that returns the desired value instead.
+	 *
+	 * @param array $experiments Experiments option value.
+	 */
+	private function set_gutenberg_experiments( $experiments ) {
+		$this->experiments_filter = static function () use ( $experiments ) {
+			return $experiments;
+		};
+		add_filter( 'pre_option_gutenberg-experiments', $this->experiments_filter );
 	}
 
 	/**
@@ -125,5 +154,250 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 
 		$rendered_block = gutenberg_render_block_core_image( $attributes, $content, $block );
 		$this->assertSame( '<figure class="wp-block-image"><img src="canola.jpg"/></figure>', $rendered_block );
+	}
+
+	public function test_should_format_lightbox_exif_data_from_attachment_metadata() {
+		$file          = DIR_TESTDATA . '/images/canola.jpg';
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			$file,
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		try {
+			wp_update_attachment_metadata(
+				$attachment_id,
+				array(
+					'width'      => 1024,
+					'height'     => 768,
+					'image_meta' => array(
+						'camera'        => 'Nikon D70',
+						'aperture'      => '2.80',
+						'shutter_speed' => '0.004',
+						// A long fractional focal length is rounded to one decimal.
+						'focal_length'  => '57.019002375297',
+						'copyright'     => 'Example Photographer',
+						'keywords'      => array( 'ignored' ),
+					),
+				)
+			);
+
+			$get_exif = function_exists( 'gutenberg_block_core_image_get_lightbox_exif_data' )
+				? 'gutenberg_block_core_image_get_lightbox_exif_data'
+				: 'block_core_image_get_lightbox_exif_data';
+
+			$this->assertTrue( function_exists( $get_exif ) );
+			$this->assertSame(
+				array(
+					'camera'       => 'Nikon D70',
+					'aperture'     => 'f/2.8',
+					'shutterSpeed' => '1/250s',
+					'focalLength'  => '57mm',
+					'copyright'    => 'Example Photographer',
+				),
+				$get_exif( $attachment_id )
+			);
+		} finally {
+			wp_delete_attachment( $attachment_id, true );
+		}
+	}
+
+	public function test_should_add_exif_data_to_lightbox_interactivity_state() {
+		// The feature is behind an experiment, so enable it for this test.
+		$this->set_gutenberg_experiments( array( 'gutenberg-gallery-lightbox-default' => 1 ) );
+
+		$file          = DIR_TESTDATA . '/images/canola.jpg';
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			$file,
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		try {
+			wp_update_attachment_metadata(
+				$attachment_id,
+				array(
+					'width'      => 1024,
+					'height'     => 768,
+					'image_meta' => array(
+						'camera'        => 'Nikon D70',
+						'aperture'      => '2.8',
+						'shutter_speed' => '0.004',
+						'focal_length'  => '50',
+					),
+				)
+			);
+
+			$parsed_block = array(
+				'blockName' => 'core/image',
+				'attrs'     => array(
+					'id'              => $attachment_id,
+					'lightbox'        => array(
+						'enabled' => true,
+					),
+					// EXIF display is opt-in, so it must be enabled explicitly.
+					'exif'            => array(
+						'enabled' => true,
+					),
+					'linkDestination' => 'none',
+				),
+			);
+			$block   = new WP_Block( $parsed_block );
+			$content = sprintf(
+				'<figure class="wp-block-image"><img class="wp-image-%d" src="%s" alt="A camera"/></figure>',
+				$attachment_id,
+				esc_url( wp_get_attachment_url( $attachment_id ) )
+			);
+
+			$render_lightbox = function_exists( 'gutenberg_block_core_image_render_lightbox' )
+				? 'gutenberg_block_core_image_render_lightbox'
+				: 'block_core_image_render_lightbox';
+
+			$this->assertTrue( function_exists( $render_lightbox ) );
+			$rendered_block = $render_lightbox( $content, $parsed_block, $block );
+			$this->assertSame( 1, preg_match( '/data-wp-key="([^"]+)"/', $rendered_block, $matches ) );
+
+			$state = wp_interactivity_state( 'core/image' );
+			$this->assertSame(
+				array(
+					'camera'       => 'Nikon D70',
+					'aperture'     => 'f/2.8',
+					'shutterSpeed' => '1/250s',
+					'focalLength'  => '50mm',
+				),
+				$state['metadata'][ $matches[1] ]['exif']
+			);
+		} finally {
+			wp_delete_attachment( $attachment_id, true );
+		}
+	}
+
+	public function test_should_not_add_exif_data_to_lightbox_state_when_experiment_disabled() {
+		// The experiment is off, so EXIF data must not be exposed even though
+		// the lightbox and the EXIF setting are both enabled on the block.
+		$this->set_gutenberg_experiments( array() );
+
+		$file          = DIR_TESTDATA . '/images/canola.jpg';
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			$file,
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		try {
+			wp_update_attachment_metadata(
+				$attachment_id,
+				array(
+					'width'      => 1024,
+					'height'     => 768,
+					'image_meta' => array(
+						'camera'        => 'Nikon D70',
+						'aperture'      => '2.8',
+						'shutter_speed' => '0.004',
+						'focal_length'  => '50',
+					),
+				)
+			);
+
+			$parsed_block = array(
+				'blockName' => 'core/image',
+				'attrs'     => array(
+					'id'              => $attachment_id,
+					'lightbox'        => array(
+						'enabled' => true,
+					),
+					'exif'            => array(
+						'enabled' => true,
+					),
+					'linkDestination' => 'none',
+				),
+			);
+			$block        = new WP_Block( $parsed_block );
+			$content      = sprintf(
+				'<figure class="wp-block-image"><img class="wp-image-%d" src="%s" alt="A camera"/></figure>',
+				$attachment_id,
+				esc_url( wp_get_attachment_url( $attachment_id ) )
+			);
+
+			$render_lightbox = function_exists( 'gutenberg_block_core_image_render_lightbox' )
+				? 'gutenberg_block_core_image_render_lightbox'
+				: 'block_core_image_render_lightbox';
+
+			$rendered_block = $render_lightbox( $content, $parsed_block, $block );
+			$this->assertSame( 1, preg_match( '/data-wp-key="([^"]+)"/', $rendered_block, $matches ) );
+
+			$state = wp_interactivity_state( 'core/image' );
+			$this->assertSame( array(), $state['metadata'][ $matches[1] ]['exif'] );
+		} finally {
+			wp_delete_attachment( $attachment_id, true );
+		}
+	}
+
+	public function test_should_not_add_exif_data_to_lightbox_state_when_not_enabled() {
+		// Enable the experiment so this verifies the opt-in setting gate rather
+		// than the experiment gate.
+		$this->set_gutenberg_experiments( array( 'gutenberg-gallery-lightbox-default' => 1 ) );
+
+		$file          = DIR_TESTDATA . '/images/canola.jpg';
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			$file,
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		try {
+			wp_update_attachment_metadata(
+				$attachment_id,
+				array(
+					'width'      => 1024,
+					'height'     => 768,
+					'image_meta' => array(
+						'camera'        => 'Nikon D70',
+						'aperture'      => '2.8',
+						'shutter_speed' => '0.004',
+						'focal_length'  => '50',
+					),
+				)
+			);
+
+			// The lightbox is enabled, but EXIF display is not, so no metadata
+			// should be exposed (and therefore no toggle on the front end).
+			$parsed_block = array(
+				'blockName' => 'core/image',
+				'attrs'     => array(
+					'id'              => $attachment_id,
+					'lightbox'        => array(
+						'enabled' => true,
+					),
+					'linkDestination' => 'none',
+				),
+			);
+			$block        = new WP_Block( $parsed_block );
+			$content      = sprintf(
+				'<figure class="wp-block-image"><img class="wp-image-%d" src="%s" alt="A camera"/></figure>',
+				$attachment_id,
+				esc_url( wp_get_attachment_url( $attachment_id ) )
+			);
+
+			$render_lightbox = function_exists( 'gutenberg_block_core_image_render_lightbox' )
+				? 'gutenberg_block_core_image_render_lightbox'
+				: 'block_core_image_render_lightbox';
+
+			$rendered_block = $render_lightbox( $content, $parsed_block, $block );
+			$this->assertSame( 1, preg_match( '/data-wp-key="([^"]+)"/', $rendered_block, $matches ) );
+
+			$state = wp_interactivity_state( 'core/image' );
+			$this->assertSame( array(), $state['metadata'][ $matches[1] ]['exif'] );
+		} finally {
+			wp_delete_attachment( $attachment_id, true );
+		}
 	}
 }

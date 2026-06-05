@@ -144,6 +144,17 @@ Settings related to the lightbox.
 
 ---
 
+### exif
+
+Settings related to displaying EXIF metadata in the image lightbox.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| enabled | Defines whether EXIF metadata is shown in the lightbox. | `boolean` |  |
+| allowEditing | Defines whether to show the EXIF metadata UI in the block editor. If set to `false`, the user won't be able to change the EXIF setting in the block editor. | `boolean` |  |
+
+---
+
 ### position
 
 Settings related to position.

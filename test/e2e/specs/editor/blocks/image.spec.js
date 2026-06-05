@@ -957,6 +957,87 @@ test.describe( 'Image - lightbox', () => {
 			expect( margin ).toBe( '0px' );
 		} );
 	} );
+
+	test.describe( 'EXIF metadata', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin( 'lightbox-exif-metadata' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin( 'lightbox-exif-metadata' );
+		} );
+
+		test( 'toggle reveals the photo metadata in the lightbox when enabled', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true},"exif":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image -->` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await page.locator( '.wp-lightbox-container img' ).click();
+
+			const toggle = page.locator( '.wp-lightbox-exif-button' );
+			const panel = page.locator( '#wp-lightbox-exif' );
+
+			// The toggle is exposed and the panel starts collapsed.
+			await expect( toggle ).toBeVisible();
+			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( panel ).toBeHidden();
+
+			// Opening the panel reveals the formatted metadata.
+			await toggle.click();
+			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( panel ).toBeVisible();
+			await expect( panel ).toContainText( 'Test Camera' );
+			await expect( panel ).toContainText( 'f/2.8' );
+			await expect( panel ).toContainText( '1/250s' );
+			await expect( panel ).toContainText( '23mm' );
+			await expect( panel ).toContainText( 'Test Photographer' );
+
+			// Clicking within the panel must not close the lightbox; the panel
+			// stops click propagation so the metadata stays readable and
+			// selectable. A dispatched click is used instead of a pointer click
+			// because the toggle button overlaps the panel in some viewport
+			// sizes, which would block a real click. The bubbling click still
+			// reaches the overlay's close handler unless propagation is stopped,
+			// so this verifies that behavior.
+			await panel.getByText( 'Test Camera' ).dispatchEvent( 'click' );
+			await expect( panel ).toBeVisible();
+			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			// Toggling again collapses the panel.
+			await toggle.click();
+			await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+			await expect( panel ).toBeHidden();
+		} );
+
+		test( 'no metadata toggle appears when the option is off', async ( {
+			editor,
+			page,
+		} ) => {
+			// The image has EXIF metadata, but the display option is not enabled.
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image -->` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			await page.locator( '.wp-lightbox-container img' ).click();
+
+			// The lightbox opens, but the metadata toggle stays hidden.
+			await expect(
+				page.locator( '.wp-lightbox-overlay .wp-block-image' ).first()
+			).toBeVisible();
+			await expect(
+				page.locator( '.wp-lightbox-exif-button' )
+			).toBeHidden();
+		} );
+	} );
 } );
 
 // Added to prevent regressions of https://github.com/WordPress/gutenberg/pull/57040.

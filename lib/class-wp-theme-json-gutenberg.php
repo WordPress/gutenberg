@@ -446,6 +446,10 @@ class WP_Theme_JSON_Gutenberg {
 			'enabled'      => true,
 			'allowEditing' => true,
 		),
+		'exif'                          => array(
+			'enabled'      => true,
+			'allowEditing' => true,
+		),
 		'position'                      => array(
 			'fixed'  => null,
 			'sticky' => null,

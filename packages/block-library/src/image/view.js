@@ -38,8 +38,9 @@ const touchStartEvent = {
 };
 
 const focusableSelectors = [
-	'.wp-lightbox-close-button',
-	'.wp-lightbox-navigation-button',
+	'.wp-lightbox-close-button:not([hidden])',
+	'.wp-lightbox-navigation-button:not([hidden])',
+	'.wp-lightbox-exif-button:not([hidden])',
 ];
 
 /**
@@ -71,6 +72,7 @@ const { state, actions, callbacks } = store(
 		state: {
 			selectedImageId: null,
 			selectedGalleryId: null,
+			exifVisible: false,
 			preloadTimers: new Map(),
 			preloadedImageIds: new Set(),
 			get galleryImages() {
@@ -164,6 +166,33 @@ const { state, actions, callbacks } = store(
 			get enlargedSrcset() {
 				return getImageSrcset( state.selectedImage );
 			},
+			get selectedImageExif() {
+				return state.selectedImage?.exif || {};
+			},
+			get hasExif() {
+				return Object.values( state.selectedImageExif ).some( Boolean );
+			},
+			get isExifVisible() {
+				return state.hasExif && state.exifVisible;
+			},
+			get exifExpanded() {
+				return state.isExifVisible ? 'true' : 'false';
+			},
+			get exifCamera() {
+				return state.selectedImageExif.camera;
+			},
+			get exifAperture() {
+				return state.selectedImageExif.aperture;
+			},
+			get exifShutterSpeed() {
+				return state.selectedImageExif.shutterSpeed;
+			},
+			get exifFocalLength() {
+				return state.selectedImageExif.focalLength;
+			},
+			get exifCopyright() {
+				return state.selectedImageExif.copyright;
+			},
 			get figureStyles() {
 				return (
 					state.overlayOpened &&
@@ -215,6 +244,7 @@ const { state, actions, callbacks } = store(
 				state.selectedImageId = imageId;
 				const { galleryId } = getContext( 'core/gallery' ) || {};
 				state.selectedGalleryId = galleryId || null;
+				state.exifVisible = false;
 				state.overlayEnabled = true;
 
 				// Computes the styles of the overlay for the animation.
@@ -223,6 +253,9 @@ const { state, actions, callbacks } = store(
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
 					state.overlayEnabled = false;
+					// Re-centers the image before the closing animation runs so it
+					// zooms out from the center rather than its scrolled position.
+					state.exifVisible = false;
 
 					// Waits until the close animation has completed before allowing a
 					// user to scroll again. The duration of this animation is defined in
@@ -240,15 +273,52 @@ const { state, actions, callbacks } = store(
 						// Resets the selected image and gallery ids.
 						state.selectedImageId = null;
 						state.selectedGalleryId = null;
+						state.exifVisible = false;
 					}, 450 );
 				}
 			},
+			toggleExif: withSyncEvent( ( event ) => {
+				event.preventDefault();
+				event.stopPropagation();
+
+				// Closing: scroll back to the top before hiding the panel so the
+				// overlay returns to its non-scrolling state cleanly.
+				if ( state.isExifVisible ) {
+					const overlay = document.querySelector(
+						'.wp-lightbox-overlay'
+					);
+					callbacks.scrollOverlayTo(
+						overlay,
+						withScope( () => {
+							state.exifVisible = false;
+						} )
+					);
+					return;
+				}
+
+				// Opening: reveal the panel, then smoothly scroll it into view on
+				// the next frame, once it has rendered below the image.
+				state.exifVisible = true;
+				window.requestAnimationFrame(
+					withScope( () =>
+						callbacks.scrollOverlayTo(
+							document.querySelector( '.wp-lightbox-exif' )
+						)
+					)
+				);
+			} ),
+			// Keeps clicks (and text selection) within the metadata panel from
+			// bubbling to the overlay, which would otherwise close the lightbox.
+			handleExifClick: withSyncEvent( ( event ) => {
+				event.stopPropagation();
+			} ),
 			showPreviousImage: withSyncEvent( ( event ) => {
 				event.stopPropagation();
 				const nextIndex = state.hasPreviousImage
 					? state.selectedImageIndex - 1
 					: state.galleryImages.length - 1;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				state.exifVisible = false;
 				callbacks.setOverlayStyles();
 			} ),
 			showNextImage: withSyncEvent( ( event ) => {
@@ -257,6 +327,7 @@ const { state, actions, callbacks } = store(
 					? state.selectedImageIndex + 1
 					: 0;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				state.exifVisible = false;
 				callbacks.setOverlayStyles();
 			} ),
 			handleKeydown: withSyncEvent( ( event ) => {
@@ -298,7 +369,10 @@ const { state, actions, callbacks } = store(
 				// perform a simple tap. This may be changed in the future if there is a
 				// better alternative to override or reset the scroll position during
 				// swipe actions.
-				if ( state.overlayEnabled ) {
+				//
+				// When the EXIF metadata panel is open the overlay scrolls
+				// vertically, so scrolling is allowed in that case.
+				if ( state.overlayEnabled && ! state.isExifVisible ) {
 					event.preventDefault();
 				}
 			} ),
@@ -420,6 +494,79 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		callbacks: {
+			// Smoothly scrolls the overlay so `target` is brought into view.
+			// Passing the overlay itself scrolls back to the top.
+			scrollOverlayTo( target, onComplete ) {
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
+				);
+				if ( ! overlay || ! target ) {
+					onComplete?.();
+					return;
+				}
+
+				const targetPosition = Math.min(
+					Math.max(
+						0,
+						target.offsetTop -
+							Math.max(
+								0,
+								window.innerHeight -
+									target.getBoundingClientRect().height -
+									32
+							)
+					),
+					overlay.scrollHeight - overlay.clientHeight
+				);
+
+				// Honors the user's reduced-motion preference by jumping straight
+				// to the target instead of animating, matching how the rest of the
+				// lightbox guards its motion.
+				if (
+					window.matchMedia( '(prefers-reduced-motion: reduce)' )
+						.matches
+				) {
+					overlay.scrollTop = targetPosition;
+					onComplete?.();
+					return;
+				}
+
+				const startTime = Date.now();
+				const duration = 300;
+				const originalPosition = overlay.scrollTop;
+				const distance = targetPosition - originalPosition;
+				let isScrolling = true;
+
+				function stopScroll() {
+					isScrolling = false;
+				}
+
+				function runScroll() {
+					const now = Date.now();
+					const progress = Math.min(
+						( now - startTime ) / duration,
+						1
+					);
+					const easedProgress =
+						progress < 0.5
+							? 2 * progress * progress
+							: 1 - Math.pow( -2 * progress + 2, 2 ) / 2;
+
+					overlay.scrollTop =
+						originalPosition + easedProgress * distance;
+
+					if ( progress < 1 && isScrolling ) {
+						window.requestAnimationFrame( runScroll );
+						return;
+					}
+
+					overlay.removeEventListener( 'wheel', stopScroll );
+					onComplete?.();
+				}
+
+				overlay.addEventListener( 'wheel', stopScroll );
+				runScroll();
+			},
 			setOverlayStyles() {
 				if ( ! state.overlayEnabled ) {
 					return;
