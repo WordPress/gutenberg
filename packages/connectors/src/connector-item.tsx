@@ -6,13 +6,15 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalItem as Item,
 	__experimentalText as WCText,
+	__experimentalInputControl as InputControl,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	ExternalLink,
 	FlexBlock,
 	Button,
-	TextControl,
 } from '@wordpress/components';
 import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { seen, unseen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -102,6 +104,7 @@ export function DefaultConnectorSettings( {
 	const [ apiKey, setApiKey ] = useState( initialValue );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ saveError, setSaveError ] = useState< string | null >( null );
+	const [ isKeyVisible, setIsKeyVisible ] = useState( false );
 
 	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
 
@@ -196,21 +199,37 @@ export function DefaultConnectorSettings( {
 					: undefined
 			}
 		>
-			<TextControl
+			<InputControl
 				__next40pxDefaultSize
 				label={ __( 'API Key' ) }
-				type="password"
+				type={ isKeyVisible ? 'text' : 'password' }
 				value={ apiKey }
 				onChange={ ( value ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );
-						setApiKey( value );
+						setApiKey( value ?? '' );
 					}
 				} }
 				placeholder={ __( 'Enter your API key' ) }
 				disabled={ readOnly || isSaving }
 				autoComplete="off"
 				help={ getHelp() }
+				suffix={
+					<InputControlSuffixWrapper variant="control">
+						<Button
+							size="small"
+							icon={ isKeyVisible ? unseen : seen }
+							onClick={ () => setIsKeyVisible( ( v ) => ! v ) }
+							label={
+								isKeyVisible
+									? __( 'Hide API key' )
+									: __( 'Show API key' )
+							}
+							disabled={ readOnly || isSaving }
+							accessibleWhenDisabled
+						/>
+					</InputControlSuffixWrapper>
+				}
 			/>
 			{ readOnly ? (
 				onRemove && (
