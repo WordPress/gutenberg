@@ -94,6 +94,10 @@ export function WaveformPlayer( {
 
 	// Ref for the WaveformPlayer instance
 	const playerRef = useRef();
+	// Remembers which control had keyboard focus when the player is torn down,
+	// so the rebuilt player (the editor recreates it on track change) can
+	// restore focus to the same control.
+	const restoreFocusRef = useRef( null );
 
 	// Due to how WaveformPlayer is implemented, the artwork element within the
 	// player element only exists when an image was present when the player was
@@ -135,6 +139,8 @@ export function WaveformPlayer( {
 					return;
 				}
 
+				const focusControl = restoreFocusRef.current;
+				restoreFocusRef.current = null;
 				const metadata = metadataRef.current;
 				const player = initWaveformPlayer( element, {
 					src,
@@ -162,6 +168,7 @@ export function WaveformPlayer( {
 					onRepeatToggle: onRepeatToggleEvent,
 					isShuffled: getIsShuffled(),
 					isRepeating: getIsRepeating(),
+					focusControl,
 				} );
 				playerRef.current = player;
 				updatePlayerMetadata( player.instance, metadata );
@@ -181,6 +188,30 @@ export function WaveformPlayer( {
 			return () => {
 				cancelled = true;
 				clearTimeout( timeoutId );
+				// If a control had keyboard focus, remember which one so the
+				// rebuilt player can restore it.
+				const active = element.ownerDocument.activeElement;
+				if ( active && element.contains( active ) ) {
+					if ( active.classList.contains( 'waveform-btn' ) ) {
+						restoreFocusRef.current = 'play';
+					} else if (
+						active.classList.contains(
+							'wp-block-playlist__control-btn'
+						)
+					) {
+						const controls = [
+							...element.querySelectorAll(
+								'.wp-block-playlist__control-btn'
+							),
+						];
+						restoreFocusRef.current = [
+							'prev',
+							'shuffle',
+							'repeat',
+							'next',
+						][ controls.indexOf( active ) ];
+					}
+				}
 				playerRef.current = undefined;
 				playerDestroy?.();
 			};

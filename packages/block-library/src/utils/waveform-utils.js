@@ -633,6 +633,7 @@ function setupPlaylistControls(
  * @param {Function} options.onRepeatToggle  - Callback for repeat toggle.
  * @param {boolean}  options.isShuffled      - Initial shuffle state.
  * @param {boolean}  options.isRepeating     - Initial repeat state.
+ * @param {string}   options.focusControl    - Control to focus once ready ('play', 'prev', 'shuffle', 'repeat', or 'next'); used to restore keyboard focus after the editor rebuilds the player.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
@@ -653,6 +654,7 @@ export function initWaveformPlayer(
 		onRepeatToggle,
 		isShuffled,
 		isRepeating,
+		focusControl,
 	}
 ) {
 	// Get colors from computed styles.
@@ -713,6 +715,19 @@ export function initWaveformPlayer(
 					labels
 				);
 				cleanupControls = controls.cleanup;
+			}
+
+			// Restore keyboard focus to the control that triggered a rebuild
+			// (the editor recreates the player when the track changes).
+			if ( focusControl ) {
+				if ( focusControl === 'play' ) {
+					container.querySelector( '.waveform-btn' )?.focus();
+				} else {
+					const order = [ 'prev', 'shuffle', 'repeat', 'next' ];
+					container
+						.querySelectorAll( '.wp-block-playlist__control-btn' )
+						[ order.indexOf( focusControl ) ]?.focus();
+				}
 			}
 
 			if ( autoPlay ) {
