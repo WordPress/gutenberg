@@ -132,7 +132,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 				</div>
 				<ThemeProvider
 					color={ { primary, background } }
-					cornerRadius={ { preset: cornerRadiusPreset } }
+					cornerRadius={ cornerRadiusPreset }
 					isRoot
 				>
 					<div

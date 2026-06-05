@@ -38,7 +38,7 @@ export const ThemeProvider = ( {
 	children,
 	color = {},
 	cursor,
-	cornerRadius = {},
+	cornerRadius,
 	isRoot = false,
 }: ThemeProviderProps ) => {
 	const instanceId = useId();
@@ -49,7 +49,7 @@ export const ThemeProvider = ( {
 		cornerRadius,
 	} );
 
-	const cornerRadiusPreset = resolvedSettings.cornerRadius?.preset ?? 'sm';
+	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'sm';
 
 	const contextValue = useMemo(
 		() => ( {

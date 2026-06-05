@@ -44,9 +44,7 @@ export function WithDesignSystemTheme(
 		<ThemeProvider
 			color={ color }
 			cursor={ cursorControl ? { control: cursorControl } : undefined }
-			cornerRadius={
-				cornerRadiusPreset ? { preset: cornerRadiusPreset } : undefined
-			}
+			cornerRadius={ cornerRadiusPreset }
 			isRoot
 		>
 			<div

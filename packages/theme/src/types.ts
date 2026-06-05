@@ -40,22 +40,17 @@ export interface ThemeProviderSettings {
 	};
 
 	/**
-	 * The set of corner radius options to apply to the theme.
+	 * Overall roundness preset for the theme subtree: `none` (sharp corners),
+	 * `sm` (small), `md` (medium), `lg` (large), `xl` (extra large), or
+	 * `2xl` (2x extra large).
+	 *
+	 * Not the same as the individual `--wpds-border-radius-*` token sizes
+	 * (which are also named xs–lg).
+	 *
+	 * By default, it inherits from the parent `ThemeProvider`,
+	 * and falls back to the prebuilt default (`sm`).
 	 */
-	cornerRadius?: {
-		/**
-		 * Overall roundness preset for the theme subtree: `none` (sharp corners),
-		 * `sm` (small), `md` (medium), `lg` (large), `xl` (extra large), or
-		 * `2xl` (2x extra large).
-		 *
-		 * Not the same as the individual `--wpds-border-radius-*` token sizes
-		 * (which are also named xs–lg).
-		 *
-		 * By default, it inherits from the parent `ThemeProvider`,
-		 * and falls back to the prebuilt default (`sm`).
-		 */
-		preset?: CornerRadiusPreset;
-	};
+	cornerRadius?: CornerRadiusPreset;
 }
 
 export interface ThemeProviderProps extends ThemeProviderSettings {
