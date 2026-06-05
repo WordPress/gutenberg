@@ -336,30 +336,20 @@ function getHoverColor( color, alphaBoost = 0.2 ) {
  * @param {string}  progressColor - The original progress bar color.
  * @return {Function} Cleanup function to remove listeners.
  */
-function setupWaveformHover(
-	instance,
-	container,
-	waveformColor,
-	progressColor
-) {
+function setupWaveformHover( instance, container, colorState ) {
 	const waveformArea = container.querySelector( '.waveform-container' );
 	if ( ! waveformArea ) {
 		return () => {};
 	}
 
-	const hoverWaveformColor = getHoverColor( waveformColor );
-	const hoverProgressColor = getHoverColor( progressColor );
-
 	const onMouseEnter = () => {
-		instance.options.waveformColor = hoverWaveformColor;
-		instance.options.progressColor = hoverProgressColor;
-		instance.drawWaveform();
+		colorState.isHovering = true;
+		applyPlayerColors( instance, container, colorState );
 	};
 
 	const onMouseLeave = () => {
-		instance.options.waveformColor = waveformColor;
-		instance.options.progressColor = progressColor;
-		instance.drawWaveform();
+		colorState.isHovering = false;
+		applyPlayerColors( instance, container, colorState );
 	};
 
 	waveformArea.addEventListener( 'mouseenter', onMouseEnter );
@@ -369,6 +359,82 @@ function setupWaveformHover(
 		waveformArea.removeEventListener( 'mouseenter', onMouseEnter );
 		waveformArea.removeEventListener( 'mouseleave', onMouseLeave );
 	};
+}
+
+/**
+ * Apply the current color state to a live waveform player.
+ *
+ * @param {Object}  instance   - The WaveformPlayer library instance.
+ * @param {Element} container  - The waveform player container element.
+ * @param {Object}  colorState - Current base and hover color values.
+ */
+function applyPlayerColors( instance, container, colorState ) {
+	const { textColor, waveformColor, progressColor, isHovering } = colorState;
+	const appliedWaveformColor = isHovering
+		? getHoverColor( waveformColor )
+		: waveformColor;
+	const appliedProgressColor = isHovering
+		? getHoverColor( progressColor )
+		: progressColor;
+
+	instance.options.waveformColor = appliedWaveformColor;
+	instance.options.progressColor = appliedProgressColor;
+	instance.options.buttonColor = textColor;
+	instance.options.textColor = textColor;
+	instance.options.textSecondaryColor = textColor;
+
+	container.dataset.waveformColor = waveformColor;
+	container.dataset.progressColor = progressColor;
+	container.dataset.buttonColor = textColor;
+	container.dataset.textColor = textColor;
+	container.dataset.textSecondaryColor = textColor;
+	container.style.setProperty(
+		'--wp-playlist-active-icon-color',
+		colord( textColor ).isDark() ? '#ffffff' : '#000000'
+	);
+
+	const playBtn = container.querySelector( '.waveform-btn' );
+	if ( playBtn ) {
+		playBtn.style.borderColor = textColor;
+		playBtn.style.color = textColor;
+		if ( ! playBtn.classList.contains( 'has-artwork' ) ) {
+			styleSvgIcons( playBtn, textColor );
+		}
+	}
+
+	instance.drawWaveform();
+}
+
+/**
+ * Refresh a live waveform player after inherited block colors change.
+ *
+ * @param {Object}  player  - Object returned by initWaveformPlayer.
+ * @param {Element} element - The element that inherits the block text color.
+ * @return {boolean} Whether the player colors changed.
+ */
+export function refreshWaveformPlayerColors( player, element ) {
+	if ( ! player?.instance || ! player?.container || ! player?.colorState ) {
+		return false;
+	}
+
+	const { textColor, waveformColor, progressColor } =
+		getWaveformColors( element );
+	const { colorState } = player;
+
+	if (
+		textColor === colorState.textColor &&
+		waveformColor === colorState.waveformColor &&
+		progressColor === colorState.progressColor
+	) {
+		return false;
+	}
+
+	colorState.textColor = textColor;
+	colorState.waveformColor = waveformColor;
+	colorState.progressColor = progressColor;
+	applyPlayerColors( player.instance, player.container, colorState );
+
+	return true;
 }
 
 // SVG markup for the playlist control icons. They are decorative (the parent
@@ -621,6 +687,12 @@ export function initWaveformPlayer(
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
 		getWaveformColors( element );
+	const colorState = {
+		textColor,
+		waveformColor,
+		progressColor,
+		isHovering: false,
+	};
 
 	// Create the waveform container.
 	const container = createWaveformContainer( {
@@ -652,14 +724,7 @@ export function initWaveformPlayer(
 	let cleanupMetadata;
 	const handlers = {
 		ready: () => {
-			styleSvgIcons( container, textColor );
-			// Expose a contrasting color so the active (toggled-on) control
-			// state can invert: a text-color background with a legible icon,
-			// adapting to the block's text color (white on dark, black on light).
-			container.style.setProperty(
-				'--wp-playlist-active-icon-color',
-				colord( textColor ).isDark() ? '#ffffff' : '#000000'
-			);
+			applyPlayerColors( instance, container, colorState );
 			setupPlayButtonArtwork( container, instance, image );
 			cleanupMetadata = setupPlaylistMetadata( container, instance );
 			cleanupAccessibility = setupPlayButtonAccessibility(
@@ -669,8 +734,7 @@ export function initWaveformPlayer(
 			cleanupHover = setupWaveformHover(
 				instance,
 				container,
-				waveformColor,
-				progressColor
+				colorState
 			);
 
 			// Set up playlist controls if callbacks are provided.
@@ -712,6 +776,7 @@ export function initWaveformPlayer(
 	return {
 		instance,
 		container,
+		colorState,
 		destroy: () => {
 			cleanupAccessibility?.();
 			cleanupHover?.();

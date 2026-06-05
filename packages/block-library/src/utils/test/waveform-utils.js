@@ -14,6 +14,7 @@ import {
 	setupPlayButtonArtwork,
 	logPlayError,
 	getNextShuffledTrack,
+	refreshWaveformPlayerColors,
 } from '../waveform-utils';
 
 // Base player data used across tests
@@ -427,6 +428,86 @@ describe( 'Waveform utilities', () => {
 					'.wp-block-playlist__play-button-artwork'
 				)
 			).toBeNull();
+		} );
+	} );
+
+	describe( 'refreshWaveformPlayerColors', () => {
+		function createPlayerForColorRefresh() {
+			const element = document.createElement( 'div' );
+			element.style.color = 'rgb(10, 20, 30)';
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			const svg = document.createElementNS(
+				'http://www.w3.org/2000/svg',
+				'svg'
+			);
+			const path = document.createElementNS(
+				'http://www.w3.org/2000/svg',
+				'path'
+			);
+			svg.appendChild( path );
+			playBtn.appendChild( svg );
+			container.appendChild( playBtn );
+			element.appendChild( container );
+			document.body.appendChild( element );
+
+			const player = {
+				container,
+				colorState: {
+					textColor: 'rgb(0, 0, 0)',
+					waveformColor: 'rgba(0, 0, 0, 0.3)',
+					progressColor: 'rgba(0, 0, 0, 0.6)',
+					isHovering: false,
+				},
+				instance: {
+					options: {},
+					drawWaveform: jest.fn(),
+				},
+			};
+
+			return { element, player, playBtn };
+		}
+
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'updates cached colors and redraws the player', () => {
+			const { element, player, playBtn } = createPlayerForColorRefresh();
+
+			expect( refreshWaveformPlayerColors( player, element ) ).toBe(
+				true
+			);
+
+			expect( player.colorState ).toMatchObject( {
+				textColor: 'rgb(10, 20, 30)',
+				waveformColor: 'rgba(10, 20, 30, 0.3)',
+				progressColor: 'rgba(10, 20, 30, 0.6)',
+			} );
+			expect( player.instance.options ).toMatchObject( {
+				waveformColor: 'rgba(10, 20, 30, 0.3)',
+				progressColor: 'rgba(10, 20, 30, 0.6)',
+				buttonColor: 'rgb(10, 20, 30)',
+			} );
+			expect( player.container ).toHaveAttribute(
+				'data-button-color',
+				'rgb(10, 20, 30)'
+			);
+			expect( playBtn ).toHaveStyle( { color: 'rgb(10, 20, 30)' } );
+			expect( player.instance.drawWaveform ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'does not redraw when colors are unchanged', () => {
+			const { element, player } = createPlayerForColorRefresh();
+
+			refreshWaveformPlayerColors( player, element );
+			player.instance.drawWaveform.mockClear();
+
+			expect( refreshWaveformPlayerColors( player, element ) ).toBe(
+				false
+			);
+			expect( player.instance.drawWaveform ).not.toHaveBeenCalled();
 		} );
 	} );
 

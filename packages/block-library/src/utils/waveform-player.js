@@ -8,7 +8,11 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
+import {
+	initWaveformPlayer,
+	refreshWaveformPlayerColors,
+	updateSeekControlLabel,
+} from './waveform-utils';
 
 const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
 
@@ -91,8 +95,7 @@ export function WaveformPlayer( {
 	// and recreate the entire player on every re-render, making it disappear
 	// during editor resizes.
 	const onEndedEvent = useEvent( onEnded );
-
-	// Ref for the WaveformPlayer instance
+	const elementRef = useRef();
 	const playerRef = useRef();
 	// Remembers which control had keyboard focus when the player is torn down,
 	// so the rebuilt player (the editor recreates it on track change) can
@@ -114,7 +117,29 @@ export function WaveformPlayer( {
 	const metadataRef = useRef( { src, title, artist, image, imageAlt } );
 	useEffect( () => {
 		metadataRef.current = { src, title, artist, image, imageAlt };
+
+		const instance = playerRef.current?.instance;
+		if ( instance ) {
+			updatePlayerMetadata( instance, {
+				title,
+				artist,
+				image,
+				imageAlt,
+			} );
+		}
 	}, [ src, title, artist, image, imageAlt ] );
+
+	// The block color controls update the parent figure's classes/styles, not
+	// this player component's props. Refresh the canvas colors after each
+	// editor render so the live player follows inherited color changes.
+	useEffect( () => {
+		if ( elementRef.current && playerRef.current ) {
+			refreshWaveformPlayerColors(
+				playerRef.current,
+				elementRef.current
+			);
+		}
+	} );
 
 	// Wrap callbacks and state reads in stable event handlers so the player
 	// isn't recreated when they change, while always seeing the latest value.
@@ -127,8 +152,12 @@ export function WaveformPlayer( {
 
 	const ref = useRefEffect(
 		( element ) => {
+			elementRef.current = element;
+
 			if ( ! hasSrc ) {
-				return;
+				return () => {
+					elementRef.current = undefined;
+				};
 			}
 
 			let cancelled = false;
@@ -213,6 +242,7 @@ export function WaveformPlayer( {
 					}
 				}
 				playerRef.current = undefined;
+				elementRef.current = undefined;
 				playerDestroy?.();
 			};
 		},
