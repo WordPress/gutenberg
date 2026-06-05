@@ -14,6 +14,8 @@ import {
 	createWaveformContainer,
 	styleSvgIcons,
 	setupPlayButtonAccessibility,
+	setupSeekControlAccessibility,
+	updateSeekControlLabel,
 	logPlayError,
 } from '../waveform-utils';
 
@@ -198,6 +200,159 @@ describe( 'Waveform utilities', () => {
 			styleSvgIcons( container, '#ffff00' );
 
 			expect( path ).toHaveStyle( { fill: '#000000' } );
+		} );
+	} );
+
+	describe( 'setupSeekControlAccessibility', () => {
+		function createSeekControlFixture( {
+			duration = 180,
+			currentTime = 45,
+		} = {} ) {
+			const container = document.createElement( 'div' );
+			const seekControl = document.createElement( 'div' );
+			const audio = document.createElement( 'audio' );
+
+			seekControl.className = 'waveform-container';
+			container.appendChild( seekControl );
+			document.body.appendChild( container );
+
+			Object.defineProperty( audio, 'duration', {
+				configurable: true,
+				writable: true,
+				value: duration,
+			} );
+			Object.defineProperty( audio, 'currentTime', {
+				configurable: true,
+				writable: true,
+				value: currentTime,
+			} );
+
+			const instance = {
+				audio,
+				container,
+				options: {},
+				seekTo: jest.fn(),
+			};
+
+			return { audio, container, instance, seekControl };
+		}
+
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'sets slider semantics and current time attributes', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture();
+
+			setupSeekControlAccessibility( container, instance, {
+				label: 'My Song',
+			} );
+
+			expect( seekControl ).toHaveAttribute( 'tabindex', '0' );
+			expect( seekControl ).toHaveAttribute( 'role', 'slider' );
+			expect( seekControl ).toHaveAttribute(
+				'aria-label',
+				'My Song'
+			);
+			expect( seekControl ).toHaveAttribute( 'aria-valuemin', '0' );
+			expect( seekControl ).toHaveAttribute( 'aria-valuemax', '180' );
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '45' );
+			expect( seekControl ).toHaveAttribute(
+				'aria-valuetext',
+				'0:45 of 3:00'
+			);
+		} );
+
+		it( 'keeps aria value attributes in sync on time and duration changes', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 0,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			audio.duration = 90;
+			audio.currentTime = 30;
+			audio.dispatchEvent( new Event( 'durationchange' ) );
+
+			expect( seekControl ).toHaveAttribute( 'aria-valuemax', '90' );
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '30' );
+			expect( seekControl ).toHaveAttribute(
+				'aria-valuetext',
+				'0:30 of 1:30'
+			);
+
+			audio.currentTime = 45;
+			instance.options.onTimeUpdate( 45, 90, instance );
+
+			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '45' );
+			expect( seekControl ).toHaveAttribute(
+				'aria-valuetext',
+				'0:45 of 1:30'
+			);
+		} );
+
+		it( 'seeks exactly once on arrow keydown', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			container.addEventListener( 'keydown', () => {
+				instance.seekTo( 20 );
+			} );
+			seekControl.focus();
+			seekControl.dispatchEvent(
+				new KeyboardEvent( 'keydown', {
+					key: 'ArrowRight',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+
+			expect( instance.seekTo ).toHaveBeenCalledTimes( 1 );
+			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
+		} );
+
+		it( 'uses vertical arrows for slider seeking instead of volume changes', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( {
+					duration: 60,
+					currentTime: 10,
+				} );
+			instance.setVolume = jest.fn();
+
+			setupSeekControlAccessibility( container, instance );
+
+			seekControl.dispatchEvent(
+				new KeyboardEvent( 'keydown', {
+					key: 'ArrowUp',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+
+			expect( instance.seekTo ).toHaveBeenCalledTimes( 1 );
+			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
+			expect( instance.setVolume ).not.toHaveBeenCalled();
+		} );
+
+		it( 'updates the seek control label', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture();
+
+			setupSeekControlAccessibility( container, instance );
+			updateSeekControlLabel( instance, 'Updated Song' );
+
+			expect( seekControl ).toHaveAttribute(
+				'aria-label',
+				'Updated Song'
+			);
 		} );
 	} );
 

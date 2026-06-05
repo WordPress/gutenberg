@@ -3,11 +3,12 @@
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { useEvent, useRefEffect } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer } from './waveform-utils';
+import { initWaveformPlayer, updateSeekControlLabel } from './waveform-utils';
 
 const EMPTY_ARTIST_PLACEHOLDER = '\u00a0';
 
@@ -38,6 +39,7 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
 	}
+	updateSeekControlLabel( instance, title );
 	if ( instance.subtitleEl ) {
 		instance.subtitleEl.textContent = artist ?? '';
 		instance.subtitleEl.style.display = artist ? '' : 'none';
@@ -118,6 +120,9 @@ export function WaveformPlayer( {
 					waveformStyle,
 					artist:
 						metadataRef.current.artist || EMPTY_ARTIST_PLACEHOLDER,
+					labels: {
+						seek: __( 'Seek' ),
+					},
 					onEnded: () => onEndedEvent?.(),
 				} );
 				playerRef.current = player;
