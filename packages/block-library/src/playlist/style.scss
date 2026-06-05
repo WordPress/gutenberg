@@ -108,14 +108,18 @@ $waveform-player-height: 120px;
 		border: none;
 		background: none;
 		color: currentColor;
-		opacity: 0.5;
+		border-radius: 4px;
+		opacity: 0.45;
 		cursor: pointer;
 
 		&:hover {
 			opacity: 0.8;
 		}
 
+		// Toggled-on state (shuffle/repeat): full opacity plus a filled
+		// background so the active state reads clearly at a glance.
 		&.is-active {
+			background-color: color-mix(in srgb, currentColor 16%, transparent);
 			opacity: 1;
 		}
 
