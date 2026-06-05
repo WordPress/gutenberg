@@ -95,7 +95,9 @@ import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
 import * as playlist from './playlist';
+import * as playlistTracklist from './playlist-tracklist';
 import * as playlistTrack from './playlist-track';
+import * as playlistWaveform from './playlist-waveform';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
@@ -293,6 +295,8 @@ const getAllBlocks = () => {
 		blocks.push( tabPanel );
 		blocks.push( tabPanels );
 		blocks.push( playlist );
+		blocks.push( playlistWaveform );
+		blocks.push( playlistTracklist );
 		blocks.push( playlistTrack );
 	}
 

@@ -17,11 +17,9 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	InspectorControls,
-	InnerBlocks,
 } from '@wordpress/block-editor';
 import {
 	ToggleControl,
-	Disabled,
 	SelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -37,10 +35,23 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { WaveformPlayer } from '../utils/waveform-player';
 import { getTrackAttributes } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
+const PLAYLIST_TEMPLATE = [
+	[ 'core/playlist-waveform' ],
+	[ 'core/playlist-tracklist' ],
+];
+
+const getTrackBlocks = ( innerBlocks ) => {
+	const tracklist = innerBlocks.find(
+		( block ) => block.name === 'core/playlist-tracklist'
+	);
+	return (
+		tracklist?.innerBlocks ??
+		innerBlocks.filter( ( block ) => block.name === 'core/playlist-track' )
+	);
+};
 
 const PlaylistEdit = ( {
 	attributes,
@@ -59,9 +70,6 @@ const PlaylistEdit = ( {
 		currentTrack,
 	} = attributes;
 
-	// Extract the waveform style from the block style variation class.
-	const waveformStyle =
-		attributes.className?.match( /is-style-([\w-]+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -72,15 +80,78 @@ const PlaylistEdit = ( {
 	}
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const { innerBlockTracks } = useSelect(
+	const { innerBlocks, innerBlockTracks, tracklistClientId } = useSelect(
 		( select ) => {
 			const { getBlock: _getBlock } = select( blockEditorStore );
+			const block = _getBlock( clientId );
+			const playlistInnerBlocks = block?.innerBlocks ?? [];
+			const tracklistBlock = playlistInnerBlocks.find(
+				( innerBlock ) =>
+					innerBlock.name === 'core/playlist-tracklist'
+			);
 			return {
-				innerBlockTracks: _getBlock( clientId )?.innerBlocks ?? [],
+				innerBlocks: playlistInnerBlocks,
+				innerBlockTracks: getTrackBlocks( playlistInnerBlocks ),
+				tracklistClientId: tracklistBlock?.clientId,
 			};
 		},
 		[ clientId ]
 	);
+
+	// Reuse an existing waveform block when present so its style variation is
+	// preserved; otherwise create one, migrating any is-style-* class from the
+	// playlist (older markup stored the waveform style on the playlist itself).
+	const resolveWaveformBlock = useCallback(
+		( existingWaveform ) =>
+			existingWaveform ??
+			createBlock( 'core/playlist-waveform', {
+				className: attributes.className?.match(
+					/is-style-[\w-]+/
+				)?.[ 0 ],
+			} ),
+		[ attributes.className ]
+	);
+
+	// Keep the playlist structure normalized. Older playlist markup had track
+	// blocks directly inside the playlist; new markup stores them in a
+	// dedicated tracklist child so the waveform can be styled independently.
+	useEffect( () => {
+		if ( innerBlocks.length === 0 ) {
+			return;
+		}
+
+		const waveformBlock = innerBlocks.find(
+			( block ) => block.name === 'core/playlist-waveform'
+		);
+		const tracklistBlock = innerBlocks.find(
+			( block ) => block.name === 'core/playlist-tracklist'
+		);
+		const directTrackBlocks = innerBlocks.filter(
+			( block ) => block.name === 'core/playlist-track'
+		);
+
+		if (
+			waveformBlock &&
+			tracklistBlock &&
+			directTrackBlocks.length === 0
+		) {
+			return;
+		}
+
+		const normalizedTrackBlocks = [
+			...( tracklistBlock?.innerBlocks ?? [] ),
+			...directTrackBlocks,
+		];
+
+		replaceInnerBlocks( clientId, [
+			resolveWaveformBlock( waveformBlock ),
+			createBlock(
+				'core/playlist-tracklist',
+				tracklistBlock?.attributes ?? {},
+				normalizedTrackBlocks
+			),
+		] );
+	}, [ clientId, innerBlocks, replaceInnerBlocks, resolveWaveformBlock ] );
 
 	// Ensure that each inner block has a unique ID,
 	// even if a track is duplicated.
@@ -102,9 +173,14 @@ const PlaylistEdit = ( {
 			return block;
 		} );
 		if ( hasDuplicates ) {
-			replaceInnerBlocks( clientId, updatedBlocks );
+			replaceInnerBlocks( tracklistClientId ?? clientId, updatedBlocks );
 		}
-	}, [ innerBlockTracks, clientId, replaceInnerBlocks ] );
+	}, [
+		innerBlockTracks,
+		clientId,
+		replaceInnerBlocks,
+		tracklistClientId,
+	] );
 
 	// Create a list of tracks from the inner blocks,
 	// but skip blocks that do not have a uniqueId attribute, such as the media placeholder.
@@ -158,32 +234,23 @@ const PlaylistEdit = ( {
 			const newBlocks = trackList.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
 			);
-			// Replace the inner blocks with the new tracks.
-			replaceInnerBlocks( clientId, newBlocks );
+			const existingWaveform = innerBlocks.find(
+				( block ) => block.name === 'core/playlist-waveform'
+			);
+			replaceInnerBlocks( clientId, [
+				resolveWaveformBlock( existingWaveform ),
+				createBlock( 'core/playlist-tracklist', {}, newBlocks ),
+			] );
 		},
 		[
 			__unstableMarkNextChangeAsNotPersistent,
 			setAttributes,
 			replaceInnerBlocks,
 			clientId,
+			innerBlocks,
+			resolveWaveformBlock,
 		]
 	);
-
-	// Get current track data by finding the track with matching uniqueId.
-	const currentTrackData = tracks.find(
-		( track ) => track.uniqueId === currentTrack
-	);
-
-	// Handle track end - advance to next track or loop to first.
-	const onTrackEnded = useCallback( () => {
-		const currentIndex = tracks.findIndex(
-			( track ) => track.uniqueId === currentTrack
-		);
-		const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
-		if ( nextTrack?.uniqueId ) {
-			setAttributes( { currentTrack: nextTrack.uniqueId } );
-		}
-	}, [ currentTrack, tracks, setAttributes ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -197,7 +264,7 @@ const PlaylistEdit = ( {
 				return titleB.localeCompare( titleA );
 			} );
 			const firstUniqueId = sortedBlocks[ 0 ]?.attributes?.uniqueId;
-			replaceInnerBlocks( clientId, sortedBlocks );
+			replaceInnerBlocks( tracklistClientId ?? clientId, sortedBlocks );
 			setAttributes( {
 				order: trackOrder,
 				currentTrack:
@@ -212,6 +279,7 @@ const PlaylistEdit = ( {
 			innerBlockTracks,
 			replaceInnerBlocks,
 			setAttributes,
+			tracklistClientId,
 		]
 	);
 
@@ -221,18 +289,17 @@ const PlaylistEdit = ( {
 		};
 	}
 
-	const hasSelectedChild = useSelect(
-		( select ) =>
-			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
-		[ clientId ]
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			allowedBlocks: [
+				'core/playlist-waveform',
+				'core/playlist-tracklist',
+			],
+			template: PLAYLIST_TEMPLATE,
+			templateLock: 'all',
+		}
 	);
-
-	const hasAnySelected = isSelected || hasSelectedChild;
-
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		__experimentalAppenderTagName: 'li',
-		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
-	} );
 
 	if ( tracks.length === 0 ) {
 		return (
@@ -392,28 +459,7 @@ const PlaylistEdit = ( {
 				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
-				<Disabled isDisabled={ ! isSelected }>
-					<WaveformPlayer
-						src={ currentTrackData?.src }
-						title={ currentTrackData?.title }
-						artist={ currentTrackData?.artist }
-						image={ currentTrackData?.image }
-						waveformStyle={ waveformStyle }
-						onEnded={ onTrackEnded }
-					/>
-				</Disabled>
-				{ showTracklist && (
-					<ol
-						className={ clsx( 'wp-block-playlist__tracklist', {
-							'wp-block-playlist__tracklist-show-numbers':
-								showNumbers,
-							'wp-block-playlist__tracklist-length-is-hidden':
-								! showTrackLength,
-						} ) }
-					>
-						{ innerBlocksProps.children }
-					</ol>
-				) }
+				<div { ...innerBlocksProps } />
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

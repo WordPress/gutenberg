@@ -33,14 +33,30 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 *
 	 * @param array  $playlist_attrs Attributes for the playlist block.
 	 * @param array  $tracks         Array of track attribute arrays.
+	 * @param array  $waveform_attrs Optional attributes for the waveform block.
 	 * @return string Block markup.
 	 */
-	private function build_playlist_markup( $playlist_attrs, $tracks = array() ) {
+	private function build_playlist_markup( $playlist_attrs, $tracks = array(), $waveform_attrs = null ) {
 		$attrs_json   = wp_json_encode( (object) $playlist_attrs );
 		$track_markup = '';
 		foreach ( $tracks as $track ) {
 			$track_json    = wp_json_encode( $track );
 			$track_markup .= '<!-- wp:playlist-track ' . $track_json . ' /-->';
+		}
+
+		if ( is_array( $waveform_attrs ) ) {
+			$waveform_json = wp_json_encode( (object) $waveform_attrs );
+
+			return '<!-- wp:playlist ' . $attrs_json . ' -->'
+				. '<figure class="wp-block-playlist">'
+				. '<!-- wp:playlist-waveform ' . $waveform_json . ' /-->'
+				. '<!-- wp:playlist-tracklist -->'
+				. '<ol class="wp-block-playlist__tracklist">'
+				. $track_markup
+				. '</ol>'
+				. '<!-- /wp:playlist-tracklist -->'
+				. '</figure>'
+				. '<!-- /wp:playlist -->';
 		}
 
 		return '<!-- wp:playlist ' . $attrs_json . ' -->'
@@ -160,11 +176,11 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	/**
 	 * @covers ::render_block_core_playlist
 	 */
-	public function test_waveform_style_extracted_from_single_word_style_class() {
+	public function test_waveform_style_extracted_from_waveform_inner_block() {
 		$markup = $this->build_playlist_markup(
 			array(
 				'currentTrack' => 'track-1',
-				'className'    => 'is-style-mirror',
+				'className'    => 'is-style-playlist-compact',
 			),
 			array(
 				array(
@@ -173,7 +189,8 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'title'    => 'Song One',
 					'src'      => 'http://example.com/song1.mp3',
 				),
-			)
+			),
+			array( 'className' => 'is-style-mirror' )
 		);
 
 		$output = do_blocks( $markup );
@@ -195,7 +212,34 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$markup = $this->build_playlist_markup(
 			array(
 				'currentTrack' => 'track-1',
-				'className'    => 'is-style-thin-line',
+			),
+			array(
+				array(
+					'id'       => 1,
+					'uniqueId' => 'track-1',
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+				),
+			),
+			array( 'className' => 'is-style-thin-line' )
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'thin-line', $context['waveformStyle'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 */
+	public function test_waveform_style_falls_back_to_parent_style_for_legacy_markup() {
+		$markup = $this->build_playlist_markup(
+			array(
+				'currentTrack' => 'track-1',
+				'className'    => 'is-style-mirror',
 			),
 			array(
 				array(
@@ -212,7 +256,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$p->next_tag( 'figure' );
 
 		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
-		$this->assertSame( 'thin-line', $context['waveformStyle'] );
+		$this->assertSame( 'mirror', $context['waveformStyle'] );
 	}
 
 	/**
