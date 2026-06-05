@@ -32,6 +32,19 @@ export const BLANK_RECORD: PostTypeFormData = {
 		hierarchical: false,
 		has_archive: false,
 		show_in_rest: true,
+		exclude_from_search: false,
+		show_in_nav_menus: true,
+		show_ui: true,
+		show_in_menu: true,
+		show_in_admin_bar: true,
+		can_export: true,
+		query_var: true,
+		rewrite: {
+			slug: '',
+			with_front: true,
+			feeds: false,
+			pages: true,
+		},
 	},
 };
 
@@ -204,6 +217,22 @@ export function toFormData( row: PostTypeRecord ): PostTypeFormData {
 			hierarchical: config.hierarchical ?? false,
 			has_archive: config.has_archive ?? false,
 			show_in_rest: config.show_in_rest ?? true,
+			exclude_from_search: config.exclude_from_search ?? false,
+			show_in_nav_menus: config.show_in_nav_menus ?? true,
+			show_ui: config.show_ui ?? true,
+			show_in_menu: config.show_in_menu ?? true,
+			show_in_admin_bar: config.show_in_admin_bar ?? true,
+			can_export: config.can_export ?? true,
+			query_var: config.query_var ?? true,
+			rewrite: {
+				slug: config.rewrite?.slug ?? '',
+				with_front: config.rewrite?.with_front ?? true,
+				feeds: config.rewrite?.feeds ?? false,
+				pages: config.rewrite?.pages ?? true,
+				...( config.rewrite?.ep_mask !== undefined
+					? { ep_mask: config.rewrite.ep_mask }
+					: {} ),
+			},
 		},
 		count: row.count,
 	};
@@ -220,6 +249,17 @@ export function serializeForSave( data: PostTypeFormData ) {
 	);
 
 	const description = config.description.trim();
+	const rewrite: Record< string, unknown > = {};
+	if ( config.rewrite.slug.trim() !== '' ) {
+		rewrite.slug = config.rewrite.slug.trim();
+	}
+	rewrite.with_front = config.rewrite.with_front;
+	rewrite.feeds = config.rewrite.feeds;
+	rewrite.pages = config.rewrite.pages;
+	if ( config.rewrite.ep_mask !== undefined ) {
+		rewrite.ep_mask = config.rewrite.ep_mask;
+	}
+
 	return {
 		...( data.id !== undefined ? { id: data.id } : {} ),
 		slug: data.slug,
@@ -233,6 +273,14 @@ export function serializeForSave( data: PostTypeFormData ) {
 			hierarchical: config.hierarchical,
 			has_archive: config.has_archive,
 			show_in_rest: config.show_in_rest,
+			exclude_from_search: config.exclude_from_search,
+			show_in_nav_menus: config.show_in_nav_menus,
+			show_ui: config.show_ui,
+			show_in_menu: config.show_in_menu,
+			show_in_admin_bar: config.show_in_admin_bar,
+			can_export: config.can_export,
+			query_var: config.query_var,
+			rewrite,
 			...( description !== '' ? { description } : {} ),
 		},
 	};

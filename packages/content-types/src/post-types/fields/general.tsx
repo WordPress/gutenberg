@@ -262,6 +262,36 @@ export function useTaxonomiesField(): Field< PostTypeFormData > {
 	}, [ publicTaxonomies ] );
 }
 
+export const excludeFromSearchField = createBooleanField(
+	'exclude_from_search',
+	__( 'Exclude from search' ),
+	{
+		description: __(
+			'Whether to exclude posts of this type from front-end search results.'
+		),
+	}
+);
+
+export const canExportField = createBooleanField(
+	'can_export',
+	__( 'Can export' ),
+	{
+		description: __(
+			'Whether to allow this post type to be exported via the WordPress built-in export tool.'
+		),
+	}
+);
+
+export const queryVarField = createBooleanField(
+	'query_var',
+	__( 'Query var' ),
+	{
+		description: __(
+			'Whether front-end queries using ?post_type=… can return posts of this type.'
+		),
+	}
+);
+
 // The minimal form used by the quick-edit modal.
 export const defaultForm: Form = {
 	layout: { type: 'regular' },
@@ -290,6 +320,9 @@ export const generalForm: Form = {
 		'hierarchical',
 		'has_archive',
 		'show_in_rest',
+		'exclude_from_search',
+		'can_export',
+		'query_var',
 		'status',
 	],
 };

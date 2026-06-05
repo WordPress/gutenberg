@@ -27,8 +27,10 @@ import {
 	allItemsField,
 	archivesField,
 	attributesField,
+	canExportField,
 	descriptionField,
 	editItemField,
+	excludeFromSearchField,
 	featuredImageField,
 	filterItemsListField,
 	generalForm,
@@ -45,10 +47,21 @@ import {
 	notFoundInTrashField,
 	parentItemColonField,
 	publicField,
+	queryVarField,
+	rewriteEpMaskField,
+	rewriteFeedsField,
+	rewritePagesField,
+	rewriteSlugField,
+	rewriteWithFrontField,
+	rewriteFormFields,
 	removeFeaturedImageField,
 	searchItemsField,
 	setFeaturedImageField,
 	showInRestField,
+	showInAdminBarField,
+	showInMenuField,
+	showInNavMenusField,
+	showUiField,
 	supportsField,
 	uploadedToThisItemField,
 	useFeaturedImageField,
@@ -56,6 +69,7 @@ import {
 	useTaxonomiesField,
 	viewItemField,
 	viewItemsField,
+	visibilityFormFields,
 } from './fields';
 import {
 	pluralLabelField,
@@ -158,7 +172,21 @@ function PostTypePage( {
 				hierarchicalField,
 				hasArchiveField,
 				showInRestField,
+				excludeFromSearchField,
+				canExportField,
+				queryVarField,
 				statusField,
+				// Visibility
+				showInNavMenusField,
+				showUiField,
+				showInMenuField,
+				showInAdminBarField,
+				// Rewrite
+				rewriteSlugField,
+				rewriteWithFrontField,
+				rewriteFeedsField,
+				rewritePagesField,
+				rewriteEpMaskField,
 				// Labels
 				labelsActionsField,
 				menuNameField,
@@ -204,6 +232,32 @@ function PostTypePage( {
 						isOpened: true,
 					},
 					children: generalForm.fields,
+				},
+				{
+					id: 'visibility',
+					label: __( 'Visibility' ),
+					description: __(
+						'Controls which areas of the admin and front end this post type appears in.'
+					),
+					layout: {
+						type: 'card',
+						isCollapsible: true,
+						isOpened: false,
+					},
+					children: visibilityFormFields,
+				},
+				{
+					id: 'rewrite',
+					label: __( 'Rewrite' ),
+					description: __(
+						'Customize the permalink structure for this post type.'
+					),
+					layout: {
+						type: 'card',
+						isCollapsible: true,
+						isOpened: false,
+					},
+					children: rewriteFormFields,
 				},
 				{
 					id: 'labels',

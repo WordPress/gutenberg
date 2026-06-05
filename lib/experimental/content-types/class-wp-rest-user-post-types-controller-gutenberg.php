@@ -112,12 +112,33 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			'type'                 => 'object',
 			'additionalProperties' => false,
 			'properties'           => array(
-				'public'       => array( 'type' => 'boolean' ),
-				'hierarchical' => array( 'type' => 'boolean' ),
-				'has_archive'  => array( 'type' => 'boolean' ),
-				'show_in_rest' => array( 'type' => 'boolean' ),
+				'public'              => array( 'type' => 'boolean' ),
+				'hierarchical'        => array( 'type' => 'boolean' ),
+				'has_archive'         => array( 'type' => 'boolean' ),
+				'show_in_rest'        => array( 'type' => 'boolean' ),
+				'exclude_from_search' => array( 'type' => 'boolean' ),
+				'show_in_nav_menus'   => array( 'type' => 'boolean' ),
+				'show_ui'             => array( 'type' => 'boolean' ),
+				'show_in_menu'        => array( 'type' => 'boolean' ),
+				'show_in_admin_bar'   => array( 'type' => 'boolean' ),
+				'can_export'          => array( 'type' => 'boolean' ),
+				'query_var'           => array( 'type' => 'boolean' ),
+				'rewrite'             => array(
+					'type'                 => 'object',
+					'additionalProperties' => false,
+					'properties'           => array(
+						'slug'       => array(
+							'type'      => 'string',
+							'maxLength' => 200,
+						),
+						'with_front' => array( 'type' => 'boolean' ),
+						'feeds'      => array( 'type' => 'boolean' ),
+						'pages'      => array( 'type' => 'boolean' ),
+						'ep_mask'    => array( 'type' => 'integer' ),
+					),
+				),
 				// Caps payload size; well above any reasonable description.
-				'description'  => array(
+				'description'         => array(
 					'type'      => 'string',
 					'maxLength' => 1000,
 				),

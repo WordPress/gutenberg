@@ -69,6 +69,20 @@ export interface StoredConfig {
 	hierarchical?: boolean;
 	has_archive?: boolean;
 	show_in_rest?: boolean;
+	exclude_from_search?: boolean;
+	show_in_nav_menus?: boolean;
+	show_ui?: boolean;
+	show_in_menu?: boolean;
+	show_in_admin_bar?: boolean;
+	can_export?: boolean;
+	query_var?: boolean;
+	rewrite?: {
+		slug?: string;
+		with_front?: boolean;
+		feeds?: boolean;
+		pages?: boolean;
+		ep_mask?: number;
+	};
 }
 
 import type { ContentType } from '../types';
@@ -85,6 +99,20 @@ export interface PostTypeFormData extends ContentType {
 		taxonomies: string[];
 		supports: SupportFeature[];
 		has_archive: boolean;
+		exclude_from_search: boolean;
+		show_in_nav_menus: boolean;
+		show_ui: boolean;
+		show_in_menu: boolean;
+		show_in_admin_bar: boolean;
+		can_export: boolean;
+		query_var: boolean;
+		rewrite: {
+			slug: string;
+			with_front: boolean;
+			feeds: boolean;
+			pages: boolean;
+			ep_mask?: number;
+		};
 	};
 	count?: number;
 }

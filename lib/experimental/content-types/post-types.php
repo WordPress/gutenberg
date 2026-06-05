@@ -251,6 +251,34 @@ function gutenberg_build_user_post_type_args( WP_Post $record ) {
 		$args['description'] = (string) $config['description'];
 	}
 
+	// Optional visibility overrides — when absent WordPress derives each from
+	// `public` (or `show_ui` for `show_in_menu`), so only pass them when the
+	// stored config explicitly sets a value.
+	foreach ( array( 'exclude_from_search', 'show_in_nav_menus', 'show_ui', 'show_in_menu', 'show_in_admin_bar', 'can_export', 'query_var' ) as $flag ) {
+		if ( isset( $config[ $flag ] ) ) {
+			$args[ $flag ] = (bool) $config[ $flag ];
+		}
+	}
+
+	// Rewrite options — only pass the keys the caller explicitly stored.
+	if ( isset( $config['rewrite'] ) && is_array( $config['rewrite'] ) ) {
+		$rewrite = array();
+		if ( isset( $config['rewrite']['slug'] ) && '' !== (string) $config['rewrite']['slug'] ) {
+			$rewrite['slug'] = (string) $config['rewrite']['slug'];
+		}
+		foreach ( array( 'with_front', 'feeds', 'pages' ) as $bool_key ) {
+			if ( isset( $config['rewrite'][ $bool_key ] ) ) {
+				$rewrite[ $bool_key ] = (bool) $config['rewrite'][ $bool_key ];
+			}
+		}
+		if ( isset( $config['rewrite']['ep_mask'] ) ) {
+			$rewrite['ep_mask'] = (int) $config['rewrite']['ep_mask'];
+		}
+		if ( ! empty( $rewrite ) ) {
+			$args['rewrite'] = $rewrite;
+		}
+	}
+
 	// `taxonomies` here is the inverse of the taxonomy record's `object_type`:
 	// it lists the taxonomies attached to this post type. Only existing
 	// taxonomies are passed through so we never reference unregistered slugs.
