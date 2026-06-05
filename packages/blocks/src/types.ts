@@ -156,6 +156,11 @@ export interface BlockTransform<
 > {
 	type: 'block' | 'enter' | 'files' | 'prefix' | 'raw' | 'shortcode';
 	blocks?: string[];
+	/**
+	 * The target block variation name for block transforms that produce a
+	 * variation of the transformed block type.
+	 */
+	variationName?: string;
 	priority?: number;
 	isMultiBlock?: boolean;
 	isMatch?: (

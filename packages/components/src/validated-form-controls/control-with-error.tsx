@@ -60,12 +60,7 @@ type ValidityTarget =
 	| HTMLSelectElement
 	| HTMLTextAreaElement;
 
-function UnforwardedControlWithError<
-	C extends React.ReactElement< {
-		label: React.ReactNode;
-		required: boolean;
-	} >,
->(
+function UnforwardedControlWithError< C extends React.ReactElement >(
 	{
 		required,
 		markWhenOptional,

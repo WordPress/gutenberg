@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import path from 'path';
+import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
@@ -10,12 +11,23 @@ const ROOT_DIR = path.resolve( __dirname, '../../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 
+// Resolve vendor packages from this workspace, instead of root.
+const WORKSPACE_DIR = path.resolve( __dirname, '..' );
+const require = createRequire( path.join( WORKSPACE_DIR, 'package.json' ) );
+
 const VENDOR_SCRIPTS = [
 	{
 		name: 'react',
 		global: 'React',
 		handle: 'react',
 		dependencies: [ 'wp-polyfill' ],
+		contents: [
+			'module.exports = {',
+			'  ...require("react"),',
+			// Polyfill React 18 internals for older versions of `framer-motion`.
+			// '  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: { ReactCurrentOwner: { current: null } },',
+			'};',
+		].join( '\n' ),
 	},
 	{
 		name: 'react-dom',
@@ -26,6 +38,7 @@ const VENDOR_SCRIPTS = [
 			'module.exports = {',
 			'  ...require("react-dom"),',
 			'  ...require("react-dom/client"),',
+			// '  ...require("@wordpress/element/react-polyfill"),',
 			'};',
 		].join( '\n' ),
 	},
@@ -44,12 +57,7 @@ const VENDOR_SCRIPTS = [
  * @return {Promise<string>} The package version string.
  */
 async function getPackageVersion( packageName ) {
-	const packageJsonPath = path.join(
-		ROOT_DIR,
-		'node_modules',
-		packageName,
-		'package.json'
-	);
+	const packageJsonPath = require.resolve( `${ packageName }/package.json` );
 	const packageJson = JSON.parse(
 		await readFile( packageJsonPath, 'utf-8' )
 	);
@@ -93,7 +101,7 @@ async function generateAssetFile( config ) {
  * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
 async function bundleVendorScript( config ) {
-	const { name, global, handle, contents } = config;
+	const { name, global, handle, contents, dependencies } = config;
 
 	// Plugin that externalizes the `react` package.
 	const reactExternalPlugin = {
@@ -125,13 +133,17 @@ async function bundleVendorScript( config ) {
 		globalName: global,
 		target: 'esnext',
 		platform: 'browser',
-		plugins: [ reactExternalPlugin ],
+		// Resolve imports from this workspace's dependencies.
+		absWorkingDir: WORKSPACE_DIR,
+		plugins: dependencies?.includes( 'react' )
+			? [ reactExternalPlugin ]
+			: [],
 	};
 
 	if ( contents ) {
 		esbuildOptions.stdin = {
 			contents,
-			resolveDir: ROOT_DIR,
+			resolveDir: WORKSPACE_DIR,
 			loader: 'js',
 		};
 	} else {

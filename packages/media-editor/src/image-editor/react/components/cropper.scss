@@ -1,6 +1,9 @@
-// Handle touch target size — used both for the handle ::before hit area and
-// for the inner canvas inset (half the touch target on each side so the full
-// reach extends to the crop edge).
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Handle touch target size — used for the handle ::before hit area. The
+// inner canvas inset must stay at least half this (22px) so the handles'
+// reach isn't clipped by the root.
 $handle-touch-target-size: 44px;
 
 .wp-media-editor-image-editor {
@@ -15,12 +18,13 @@ $handle-touch-target-size: 44px;
 	// Inner gutter for resize handles. Handles use negative offsets and a
 	// touch target that extends past the crop edge; the root clips overflow
 	// (required for the dimming overlay's box-shadow trick), so a flush
-	// handle would be clipped. The inner `__canvas` wrapper is inset by half
-	// the touch target, reserving reach room on all sides while keeping the
-	// root as the clipping boundary.
+	// handle would be clipped. The inner `__canvas` wrapper is inset to
+	// reserve reach room on all sides while keeping the root as the clipping
+	// boundary. `$grid-unit-30` (24px) ≥ half the 44px touch target, so the
+	// handles still clear the edge.
 	&__canvas {
 		position: absolute;
-		inset: calc($handle-touch-target-size / 2);
+		inset: $grid-unit-30;
 
 		// Suppress the browser's default focus ring — the crop rectangle
 		// border provides the custom keyboard-focus indicator instead.
@@ -56,15 +60,16 @@ $handle-touch-target-size: 44px;
 	&__dimming {
 		position: absolute;
 		pointer-events: none;
-		/* Large shadow spread dims everything outside the crop area.
-		   Darker at rest for clear crop framing, lighter during drag
-		   so the user can see where they're panning. */
-		box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+		/* Large shadow spread washes everything outside the crop area
+		   toward the canvas grey ($gray-200). Slightly stronger at rest
+		   for clear crop framing, lighter during drag so the user can see
+		   where they're panning. */
+		box-shadow: 0 0 0 9999px rgba($gray-200, 0.6);
 		transition: box-shadow 0.15s ease;
 	}
 
 	&--dragging &__dimming {
-		box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+		box-shadow: 0 0 0 9999px rgba($gray-200, 0.4);
 	}
 
 	&__grid {
@@ -122,7 +127,9 @@ $handle-touch-target-size: 44px;
 
 	&__stencil-rect {
 		position: absolute;
-		border: 1px solid rgba(255, 255, 255, 0.7);
+		// Dark crop outline, matching the sidebar control/heading text so
+		// the crop boundary stays legible against the light grey wash.
+		border: 1px solid $gray-900;
 		box-sizing: border-box;
 		pointer-events: none;
 		transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -152,8 +159,10 @@ $handle-touch-target-size: 44px;
 		position: absolute;
 		width: 12px;
 		height: 12px;
-		background: rgba(255, 255, 255, 0.6);
-		border: 1px solid rgba(255, 255, 255, 0.9);
+		// Solid white fill with an accent-blue border so the handles read
+		// clearly against the light grey wash.
+		background: $white;
+		border: 1px solid var(--wp-admin-theme-color, #007cba);
 		border-radius: 50%;
 		box-sizing: border-box;
 		pointer-events: auto;
@@ -163,8 +172,8 @@ $handle-touch-target-size: 44px;
 			outline: none;
 		}
 
-		// Double ring (white inner + theme-color outer) for legibility
-		// over the dark dimming overlay. Gated on the JS-controlled
+		// Double ring (white inner + theme-color outer) for a clear
+		// keyboard-focus state on the handle. Gated on the JS-controlled
 		// keyboard-active class so that mouse interactions after a
 		// keyboard session — e.g., clicking a handle to start a drag —
 		// don't leave the active ring stuck on the handle.

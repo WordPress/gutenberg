@@ -100,7 +100,7 @@ interface RoomState {
 interface WPRestError {
 	code?: string;
 	message?: string;
-	data: { status: number };
+	data: { status: number; rooms?: string[] };
 }
 
 /**
@@ -143,44 +143,12 @@ function isProtocolMismatchError( error: unknown ): error is WPRestError {
 }
 
 /**
- * Try to identify which room caused a forbidden error by checking if any
- * room name from the request appears in the error message. The WordPress
- * REST API includes the room name in per-entity permission errors (e.g.
- * "You do not have permission to sync this entity: postType/post:123.").
- * Room names are never translated, so substring matching is reliable.
- *
- * Returns the room name if found, or null for generic auth failures
- * (e.g. "not logged in") where no specific room is identified.
- *
- * @param error The forbidden error, narrowed via isForbiddenError.
- * @param rooms The room names from the request payload.
- */
-function identifyForbiddenRoom(
-	error: WPRestError,
-	rooms: string[]
-): string | null {
-	const message = typeof error.message === 'string' ? error.message : '';
-
-	// Sort rooms by length descending so the longest match wins. Room names
-	// embed numeric IDs (e.g. "postType/post:1", "postType/post:10"), and a
-	// shorter name can be a substring of a longer one. Without sorting, the
-	// iteration order is the room registration order, so a 403 referencing
-	// "postType/post:10" could incorrectly match "postType/post:1" first.
-	const sortedRooms = [ ...rooms ].sort( ( a, b ) => b.length - a.length );
-
-	for ( const room of sortedRooms ) {
-		if ( message.includes( room ) ) {
-			return room;
-		}
-	}
-
-	return null;
-}
-
-/**
  * Handle a 403 from the sync endpoint. Silently unregisters the affected
- * rooms, and restores pending updates for the remaining rooms so they retry on
- * the next poll cycle.
+ * rooms listed in the error data, and restores pending updates for the
+ * remaining rooms so they retry on the next poll cycle.
+ *
+ * If the error does not include room details, it is treated as a generic auth
+ * failure and all rooms are unregistered.
  *
  * @param error          The forbidden error, narrowed via isForbiddenError.
  * @param requestedRooms The rooms that were in the failing request.
@@ -189,31 +157,34 @@ function handleForbiddenError(
 	error: WPRestError,
 	requestedRooms: SyncPayload[ 'rooms' ]
 ): void {
-	const forbiddenRoom = identifyForbiddenRoom(
-		error,
-		requestedRooms.map( ( r ) => r.room )
+	const requestedRoomNames = new Set(
+		requestedRooms.map( ( room ) => room.room )
 	);
+	const forbiddenRooms = Array.isArray( error.data.rooms )
+		? error.data.rooms.filter( ( room ) => requestedRoomNames.has( room ) )
+		: [];
 
-	if ( forbiddenRoom ) {
-		// A specific room was denied — unregister only that room.
-		const state = roomStates.get( forbiddenRoom );
-		if ( state ) {
-			state.log(
-				'Permission denied, unregistering room',
-				{ error },
-				'error',
-				true // force
-			);
-			unregisterRoom( forbiddenRoom, { sendDisconnectSignal: false } );
+	if ( forbiddenRooms.length > 0 ) {
+		for ( const room of forbiddenRooms ) {
+			const state = roomStates.get( room );
+			if ( state ) {
+				state.log(
+					'Permission denied, unregistering room',
+					{ error },
+					'error',
+					true // force
+				);
+				unregisterRoom( room, { sendDisconnectSignal: false } );
+			}
 		}
 
 		// Restore updates for remaining rooms so they can be retried on
 		// the next poll cycle.
 		for ( const room of requestedRooms ) {
-			if (
-				room.room === forbiddenRoom ||
-				! roomStates.has( room.room )
-			) {
+			if ( forbiddenRooms.includes( room.room ) ) {
+				continue;
+			}
+			if ( ! roomStates.has( room.room ) ) {
 				continue;
 			}
 			const remainingState = roomStates.get( room.room )!;

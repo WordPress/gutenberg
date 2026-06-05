@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Tooltip as WCTooltip } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getFilename } from '@wordpress/url';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
+
 /**
  * Internal dependencies
  */
@@ -35,16 +37,20 @@ export default function FileNameView( {
 		);
 	}
 
-	// `tabIndex={-1}` keeps the Tooltip anchor out of the keyboard tab order:
-	// Ariakit's `useFocusable` (via TooltipAnchor) preserves an explicit
-	// `tabIndex` on non-natively-focusable elements rather than defaulting it
-	// to `0`. Hover-only reveal is intentional — the full filename text is
-	// already in the DOM for assistive technology reading the row.
+	// The full filename is always in the DOM, so assistive tech gets it
+	// regardless. The Tooltip aids mouse users where the cell visually clips
+	// (DataViews layouts); in a non-truncating context like the DataForm the
+	// name wraps in full, making it redundant but harmless.
 	return (
-		<WCTooltip text={ fileName }>
-			<span className="dataviews-media-field__filename" tabIndex={ -1 }>
-				{ fileName }
-			</span>
-		</WCTooltip>
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<span className="dataviews-media-field__filename">
+						{ fileName }
+					</span>
+				}
+			/>
+			<Tooltip.Popup>{ fileName }</Tooltip.Popup>
+		</Tooltip.Root>
 	);
 }
