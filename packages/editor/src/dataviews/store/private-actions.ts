@@ -167,6 +167,25 @@ const ORDERED_MEDIA_FIELDS = [
 	descriptionField,
 ];
 
+/**
+ * Maps server-provided action IDs to their client-side implementations.
+ */
+const ACTION_MAP: Record< string, Action< any > > = {
+	'view-post': viewPost,
+	'view-post-revisions': viewPostRevisions,
+	'duplicate-post': duplicatePost,
+	'duplicate-pattern': duplicatePattern,
+	'duplicate-template-part': duplicateTemplatePart,
+	'order-pages': reorderPage,
+	'export-pattern': exportPattern,
+	'permanently-delete': permanentlyDeletePost,
+	restore: restorePost,
+	'move-to-trash': trashPost,
+	'rename-post': renamePost,
+	'reset-post': resetPost,
+	'delete-post': deletePost,
+};
+
 export const registerPostTypeSchema =
 	( postType: string ) =>
 	async ( { registry }: { registry: any } ) => {
@@ -183,16 +202,15 @@ export const registerPostTypeSchema =
 			postType
 		);
 
+		// Fetch view config (includes server-provided action IDs).
+		const viewConfig = await unlock(
+			registry.resolveSelect( coreStore )
+		).getViewConfig( 'postType', postType );
+
 		const postTypeConfig = ( await registry
 			.resolveSelect( coreStore )
 			.getPostType( postType ) ) as PostType;
 
-		const canCreate = await registry
-			.resolveSelect( coreStore )
-			.canUser( 'create', {
-				kind: 'postType',
-				name: postType,
-			} );
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
@@ -200,56 +218,30 @@ export const registerPostTypeSchema =
 			.select( editorStore )
 			.getEditorSettings();
 
-		let canDuplicate =
-			! [ 'wp_block', 'wp_template_part' ].includes(
-				postTypeConfig.slug
-			) &&
-			canCreate &&
-			duplicatePost;
-
-		// @ts-ignore
-		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
-			// Outside Gutenberg, disable duplication except for wp_template.
-			if ( 'wp_template' !== postTypeConfig.slug ) {
-				canDuplicate = undefined;
-			}
-		}
-
-		// When template activation experiment is disabled, templates cannot be duplicated.
-		// @ts-ignore
-		if (
-			postTypeConfig.slug === 'wp_template' &&
-			! window?.__experimentalTemplateActivate
-		) {
-			canDuplicate = undefined;
-		}
-
-		const actions = [
-			postTypeConfig.viewable ? viewPost : undefined,
-			!! postTypeConfig.supports?.revisions
-				? viewPostRevisions
-				: undefined,
-			// @ts-ignore
-			canDuplicate,
-			postTypeConfig.slug === 'wp_template_part' &&
-			canCreate &&
-			currentTheme?.is_block_theme
-				? duplicateTemplatePart
-				: undefined,
-			canCreate && postTypeConfig.slug === 'wp_block'
-				? duplicatePattern
-				: undefined,
-			postTypeConfig.supports?.title ? renamePost : undefined,
-			postTypeConfig.supports?.[ 'page-attributes' ]
-				? reorderPage
-				: undefined,
-			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
-			restorePost,
-			resetPost,
-			deletePost,
-			trashPost,
-			permanentlyDeletePost,
-		].filter( Boolean );
+		// Map server-provided action IDs to client implementations.
+		const actions = ( viewConfig?.actions ?? [] )
+			.map( ( id: string ) => {
+				// @ts-ignore
+				if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+					// Outside Gutenberg, disable duplication except for wp_template.
+					if (
+						id === 'duplicate-post' &&
+						postTypeConfig.slug !== 'wp_template'
+					) {
+						return undefined;
+					}
+				}
+				// When template activation experiment is disabled, templates cannot be duplicated.
+				if (
+					id === 'duplicate-post' &&
+					postTypeConfig.slug === 'wp_template' &&
+					! window?.__experimentalTemplateActivate
+				) {
+					return undefined;
+				}
+				return ACTION_MAP[ id ];
+			} )
+			.filter( Boolean );
 
 		// Handle attachment post type separately with media-specific fields
 		let fields;
