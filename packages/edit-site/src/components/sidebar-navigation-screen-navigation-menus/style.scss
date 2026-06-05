@@ -39,14 +39,14 @@
 		}
 	}
 
-	.list-view-appender .block-editor-inserter__toggle {
+	.block-editor-inserter__toggle {
 		background: var(--wpds-color-bg-interactive-brand-strong);
 		color: var(--wpds-color-fg-interactive-brand-strong);
 
 		&:hover,
 		&:focus {
 			background: var(--wpds-color-bg-interactive-brand-strong-active);
-			color: var(--wpds-color-fg-interactive-brand-strong);
+			color: var(--wpds-color-fg-interactive-brand-strong-active);
 		}
 	}
 }
