@@ -576,11 +576,17 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				);
 				await expect( navigationBlock ).toBeVisible();
 
-				// The deprecation runs in the editor in memory, transforming the block
-				// But the database is NOT updated automatically - requires an edit + save
-				const contentInEditor = await editor.getEditedPostContent();
-				// Raw content still shows legacy attribute since no save happened yet
-				expect( contentInEditor ).toContain( 'openSubmenusOnClick' );
+				// The deprecation runs in the editor in memory, but the database is
+				// NOT updated automatically - it requires an edit + save.
+				const unsavedPost = await requestUtils.rest( {
+					path: `/wp/v2/posts/${ postId }`,
+					params: {
+						context: 'edit',
+					},
+				} );
+				expect( unsavedPost.content.raw ).toContain(
+					'openSubmenusOnClick'
+				);
 
 				// Make an edit to trigger save capability
 				// This causes the migrated block attributes to be persisted on save
