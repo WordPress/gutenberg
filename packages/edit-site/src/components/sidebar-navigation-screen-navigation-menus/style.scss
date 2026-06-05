@@ -38,6 +38,17 @@
 			color: var(--wpds-color-fg-interactive-neutral-active);
 		}
 	}
+
+	.list-view-appender .block-editor-inserter__toggle {
+		background: var(--wpds-color-bg-interactive-brand-strong);
+		color: var(--wpds-color-fg-interactive-brand-strong);
+
+		&:hover,
+		&:focus {
+			background: var(--wpds-color-bg-interactive-brand-strong-active);
+			color: var(--wpds-color-fg-interactive-brand-strong);
+		}
+	}
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__loading.components-spinner {
