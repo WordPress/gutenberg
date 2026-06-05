@@ -124,6 +124,9 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		},
 	} );
 
+	// Label the seek control with the track title, mirroring the editor.
+	updateSeekControlLabel( player.instance, track.title );
+
 	// Store state for cleanup, including instance for loadTrack reuse.
 	playerState.set( ref, {
 		url: track.url,
