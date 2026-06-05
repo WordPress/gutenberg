@@ -77,10 +77,6 @@ $waveform-player-height: 120px;
 		margin-bottom: 0;
 	}
 
-	.waveform-body {
-		row-gap: 0;
-	}
-
 	.wp-block-playlist__footer {
 		display: flex;
 		align-items: flex-start;
@@ -140,7 +136,6 @@ $waveform-player-height: 120px;
 		flex: 1 1 auto;
 		flex-direction: column;
 		justify-content: center;
-		margin-block-start: 7px;
 		// Keep the track name from sitting too close to the controls.
 		margin-inline-start: 12px;
 		min-width: 0;
