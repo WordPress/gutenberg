@@ -115,16 +115,22 @@ $waveform-player-height: 120px;
 			opacity: 0.8;
 		}
 
-		// Toggled-on state (shuffle/repeat): full opacity plus a filled
-		// background so the active state reads clearly at a glance.
+		// Toggled-on state (shuffle/repeat): invert to a solid text-color
+		// background with a contrasting icon so it reads clearly at a glance.
+		// --wp-playlist-active-icon-color is set in JS to contrast the block's
+		// text color (white on dark text, black on light text).
 		&.is-active {
-			background-color: color-mix(in srgb, currentColor 16%, transparent);
+			background-color: currentColor;
 			opacity: 1;
+
+			svg path {
+				fill: var( --wp-playlist-active-icon-color, #fff );
+			}
 		}
 
 		svg {
-			width: 28px;
-			height: 28px;
+			width: 24px;
+			height: 24px;
 		}
 	}
 

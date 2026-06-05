@@ -692,6 +692,13 @@ export function initWaveformPlayer(
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
+			// Expose a contrasting color so the active (toggled-on) control
+			// state can invert: a text-color background with a legible icon,
+			// adapting to the block's text color (white on dark, black on light).
+			container.style.setProperty(
+				'--wp-playlist-active-icon-color',
+				colord( textColor ).isDark() ? '#ffffff' : '#000000'
+			);
 			setupPlayButtonArtwork( container, instance, image );
 			cleanupMetadata = setupPlaylistMetadata( container, instance );
 			cleanupAccessibility = setupPlayButtonAccessibility(
