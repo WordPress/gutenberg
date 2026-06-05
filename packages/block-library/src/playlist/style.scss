@@ -93,15 +93,15 @@ $waveform-player-height: 100px;
 		display: flex;
 		align-self: flex-start;
 		align-items: flex-start;
-		// Size to the buttons so they keep their width.
-		flex: 0 0 auto;
+		// Span the play button width and push the outer buttons to its edges.
+		flex: 0 0 $waveform-player-height;
+		justify-content: space-between;
 	}
 
 	.wp-block-playlist__control-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 36px;
 		height: 44px;
 		padding: 0;
 		border: none;
