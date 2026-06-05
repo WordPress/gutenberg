@@ -1311,7 +1311,7 @@ async function transpilePackage( packageName ) {
 	const emotionPlugin = babel( {
 		filter: /\.[jt]sx?$/,
 		config: {
-			plugins: [ '@emotion/babel-plugin' ],
+			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
 		},
 	} );
 	const externalizeAllExceptCssPlugin = {

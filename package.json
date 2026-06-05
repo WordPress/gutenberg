@@ -62,8 +62,6 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@babel/core": "7.25.7",
-		"@emotion/babel-plugin": "11.13.5",
 		"@eslint/eslintrc": "^3.0.0",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
@@ -71,8 +69,6 @@
 		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/release-tools": "file:./tools/release",
 		"@wordpress/vips": "file:./packages/vips",
-		"babel-loader": "9.2.1",
-		"babel-plugin-inline-json-import": "0.3.2",
 		"concurrently": "3.5.0",
 		"cross-env": "7.0.3",
 		"eslint": "^10.0.0",
