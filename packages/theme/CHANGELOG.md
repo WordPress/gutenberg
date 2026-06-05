@@ -11,7 +11,7 @@
 ### New Features
 
 -   Add `--wpds-dimension-size-*` design tokens for element sizing ([#76545](https://github.com/WordPress/gutenberg/pull/76545)).
--   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `sm`, `md`, `lg`, `xl`, `2xl`) via prebuilt design token modes.
+-   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `sm`, `md`, `lg`, `xl`, `2xl`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
 
 ### Code Quality
 
