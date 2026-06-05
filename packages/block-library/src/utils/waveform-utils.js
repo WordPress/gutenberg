@@ -310,74 +310,17 @@ export function logPlayError( error ) {
 }
 
 /**
- * Compute a hover color by increasing the alpha channel.
- *
- * @param {string} color      - The original rgba color string.
- * @param {number} alphaBoost - The amount to increase alpha by.
- * @return {string} The adjusted color as an rgba string.
- */
-function getHoverColor( color, alphaBoost = 0.2 ) {
-	const parsed = colord( color );
-	if ( ! parsed.isValid() ) {
-		return color;
-	}
-	const { r, g, b, a } = parsed.toRgb();
-	const newAlpha = Math.min( a + alphaBoost, 1 );
-	return colord( { r, g, b, a: newAlpha } ).toRgbString();
-}
-
-/**
- * Set up hover effect on the waveform bars area.
- * On mouseenter, increases bar color intensity; on mouseleave, restores.
- *
- * @param {Object}  instance   - The WaveformPlayer library instance.
- * @param {Element} container  - The waveform container element.
- * @param {Object}  colorState - Current base and hover color values.
- * @return {Function} Cleanup function to remove listeners.
- */
-function setupWaveformHover( instance, container, colorState ) {
-	const waveformArea = container.querySelector( '.waveform-container' );
-	if ( ! waveformArea ) {
-		return () => {};
-	}
-
-	const onMouseEnter = () => {
-		colorState.isHovering = true;
-		applyPlayerColors( instance, container, colorState );
-	};
-
-	const onMouseLeave = () => {
-		colorState.isHovering = false;
-		applyPlayerColors( instance, container, colorState );
-	};
-
-	waveformArea.addEventListener( 'mouseenter', onMouseEnter );
-	waveformArea.addEventListener( 'mouseleave', onMouseLeave );
-
-	return () => {
-		waveformArea.removeEventListener( 'mouseenter', onMouseEnter );
-		waveformArea.removeEventListener( 'mouseleave', onMouseLeave );
-	};
-}
-
-/**
  * Apply the current color state to a live waveform player.
  *
  * @param {Object}  instance   - The WaveformPlayer library instance.
  * @param {Element} container  - The waveform player container element.
- * @param {Object}  colorState - Current base and hover color values.
+ * @param {Object}  colorState - Current color values.
  */
 function applyPlayerColors( instance, container, colorState ) {
-	const { textColor, waveformColor, progressColor, isHovering } = colorState;
-	const appliedWaveformColor = isHovering
-		? getHoverColor( waveformColor )
-		: waveformColor;
-	const appliedProgressColor = isHovering
-		? getHoverColor( progressColor )
-		: progressColor;
+	const { textColor, waveformColor, progressColor } = colorState;
 
-	instance.options.waveformColor = appliedWaveformColor;
-	instance.options.progressColor = appliedProgressColor;
+	instance.options.waveformColor = waveformColor;
+	instance.options.progressColor = progressColor;
 	instance.options.buttonColor = textColor;
 	instance.options.textColor = textColor;
 	instance.options.textSecondaryColor = textColor;
@@ -690,7 +633,6 @@ export function initWaveformPlayer(
 		textColor,
 		waveformColor,
 		progressColor,
-		isHovering: false,
 	};
 
 	// Create the waveform container.
@@ -718,7 +660,6 @@ export function initWaveformPlayer(
 
 	// Set up event handlers.
 	let cleanupAccessibility;
-	let cleanupHover;
 	let cleanupControls;
 	let cleanupMetadata;
 	const handlers = {
@@ -729,11 +670,6 @@ export function initWaveformPlayer(
 			cleanupAccessibility = setupPlayButtonAccessibility(
 				container,
 				labels
-			);
-			cleanupHover = setupWaveformHover(
-				instance,
-				container,
-				colorState
 			);
 
 			// Set up playlist controls if callbacks are provided.
@@ -778,7 +714,6 @@ export function initWaveformPlayer(
 		colorState,
 		destroy: () => {
 			cleanupAccessibility?.();
-			cleanupHover?.();
 			cleanupControls?.();
 			cleanupMetadata?.();
 			container.removeEventListener(

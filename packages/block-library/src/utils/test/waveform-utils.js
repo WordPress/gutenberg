@@ -458,7 +458,6 @@ describe( 'Waveform utilities', () => {
 					textColor: 'rgb(0, 0, 0)',
 					waveformColor: 'rgba(0, 0, 0, 0.3)',
 					progressColor: 'rgba(0, 0, 0, 0.6)',
-					isHovering: false,
 				},
 				instance: {
 					options: {},
