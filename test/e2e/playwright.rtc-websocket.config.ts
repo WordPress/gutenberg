@@ -38,6 +38,9 @@ if ( Array.isArray( baseConfig.testIgnore ) ) {
 } else if ( baseConfig.testIgnore ) {
 	baseTestIgnore.push( baseConfig.testIgnore );
 }
+const testIgnore = baseTestIgnore.filter(
+	( ignore ) => ignore !== '**/specs/editor/collaboration/websocket-only/**'
+);
 
 const config = defineConfig( {
 	...baseConfig,
@@ -48,10 +51,7 @@ const config = defineConfig( {
 	// errors that surface via the polling pipeline) live under
 	// `http-only/` and are excluded here.
 	testMatch: '**/specs/editor/collaboration/**/collaboration-*.spec.ts',
-	testIgnore: [
-		...baseTestIgnore,
-		'**/specs/editor/collaboration/http-only/**',
-	],
+	testIgnore: [ ...testIgnore, '**/specs/editor/collaboration/http-only/**' ],
 	webServer: [
 		...baseWebServer,
 		{

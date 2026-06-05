@@ -567,4 +567,124 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.width ).toBe( 768 );
 		expect( media.media_details.height ).toBe( 1024 );
 	} );
+
+	test( 'recovers from a transient upload failure via automatic retry', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// Abort only the first attempt to create the attachment, then let
+		// the automatic retry through. A network-level abort surfaces from
+		// apiFetch as the retryable "Could not get a valid response" error.
+		let createAttempts = 0;
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				createAttempts += 1;
+				if ( createAttempts === 1 ) {
+					await route.abort( 'failed' );
+					return;
+				}
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		// Despite the first attempt failing, the automatic retry should
+		// recover the upload and resolve the block to a server URL. The
+		// generous timeout covers the retry backoff plus re-processing.
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 60_000,
+		} );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+		const media = await mediaProcessingUtils.getMediaDetails(
+			requestUtils,
+			imageId
+		);
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+
+		// The first attempt failed, so the upload only succeeded because a
+		// retry ran — there must be at least two create attempts.
+		expect( createAttempts ).toBeGreaterThanOrEqual( 2 );
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'surfaces an error after exhausting upload retries', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Read the configured retry budget from the store so the attempt
+		// count assertion tracks the default instead of hardcoding it.
+		const maxRetryAttempts = await page.evaluate(
+			() =>
+				window.wp.data.select( 'core/upload-media' ).getSettings().retry
+					.maxRetryAttempts
+		);
+
+		// Abort every attempt to create the attachment so the retry budget
+		// is fully spent.
+		let createAttempts = 0;
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				createAttempts += 1;
+				await route.abort( 'failed' );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		// Once the initial attempt plus the full retry budget are spent, the
+		// failure surfaces as an error snackbar carrying the underlying
+		// fetch error message. The timeout covers the exponential backoff
+		// between attempts (~1s + ~2s + ~4s with the defaults).
+		const errorSnackbar = page
+			.locator( '.components-snackbar' )
+			.filter( { hasText: /could not get a valid response/i } );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 60_000 } );
+
+		// Initial attempt plus the configured number of retries.
+		expect( createAttempts ).toBe( maxRetryAttempts + 1 );
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
 } );
