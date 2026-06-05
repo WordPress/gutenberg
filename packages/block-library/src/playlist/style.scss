@@ -93,15 +93,16 @@ $waveform-player-height: 100px;
 		display: flex;
 		align-self: flex-start;
 		align-items: flex-start;
-		flex: 0 0 $waveform-player-height;
+		// Size to the buttons so they keep their width.
+		flex: 0 0 auto;
 	}
 
 	.wp-block-playlist__control-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: calc( $waveform-player-height / 4 );
-		height: 40px;
+		width: 36px;
+		height: 44px;
 		padding: 0;
 		border: none;
 		background: none;
@@ -130,6 +131,8 @@ $waveform-player-height: 100px;
 		flex-direction: column;
 		justify-content: center;
 		margin-block-start: 7px;
+		// Keep the track name from sitting too close to the controls.
+		margin-inline-start: 12px;
 		min-width: 0;
 
 		.waveform-info,
