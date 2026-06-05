@@ -172,9 +172,11 @@ $navigation-icon-size: 24px;
 
 		// Hide until hover or focus within.
 		opacity: 0;
+
 		@media not (prefers-reduced-motion) {
 			transition: opacity 0.1s linear;
 		}
+
 		visibility: hidden;
 
 		// Don't take up space when the menu is collapsed.
@@ -183,8 +185,8 @@ $navigation-icon-size: 24px;
 		overflow: hidden; // Overflow is necessary to set, otherwise submenu items will take up space.
 
 		// Submenu items.
-		> .wp-block-navigation-item {
-			> .wp-block-navigation-item__content {
+		>.wp-block-navigation-item {
+			>.wp-block-navigation-item__content {
 				display: flex;
 				flex-grow: 1;
 				padding: 0.5em 1em;
@@ -251,15 +253,16 @@ $navigation-icon-size: 24px;
 	// Show submenus on hover unless they open on click.
 	// Restricted to true-hover devices to prevent sticky touch-hover on mobile.
 	@media (hover: hover) {
-		&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
+		&:not(.open-on-click):hover>.wp-block-navigation__submenu-container {
 			@include show-submenu;
 			min-width: 200px;
 		}
 	}
+
 	// Keep submenus open when focus is within.
-	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
+	&:not(.open-on-click):not(.open-on-hover-click):focus-within>.wp-block-navigation__submenu-container,
 	// Show submenus on click.
-	.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
+	.wp-block-navigation-submenu__toggle[aria-expanded="true"]~.wp-block-navigation__submenu-container {
 		@include show-submenu;
 		min-width: 200px;
 	}
@@ -301,12 +304,12 @@ $navigation-icon-size: 24px;
 			}
 		}
 
-		> .wp-block-navigation-item__content,
-		.wp-block-navigation__submenu-container > .wp-block-navigation-item > .wp-block-navigation-item__content {
+		>.wp-block-navigation-item__content,
+		.wp-block-navigation__submenu-container>.wp-block-navigation-item>.wp-block-navigation-item__content {
 			flex-grow: 0;
 		}
 
-		> .wp-block-navigation__submenu-container {
+		>.wp-block-navigation__submenu-container {
 			@include show-submenu;
 			flex-basis: 100%;
 			position: static;
@@ -318,9 +321,7 @@ $navigation-icon-size: 24px;
 }
 
 // Submenu indentation when there's a background.
-.wp-block-navigation.has-background
-.has-child
-.wp-block-navigation__submenu-container {
+.wp-block-navigation.has-background .has-child .wp-block-navigation__submenu-container {
 	left: 0;
 	top: 100%;
 
@@ -367,8 +368,9 @@ button.wp-block-navigation-item__content {
 
 	// Rotate submenu icon when open.
 	&[aria-expanded="true"] {
-		+ .wp-block-navigation__submenu-icon > svg,
-		> svg {
+
+		+.wp-block-navigation__submenu-icon>svg,
+		>svg {
 			transform: rotate(180deg);
 		}
 	}
@@ -382,11 +384,12 @@ button.wp-block-navigation-item__content {
 	padding-left: 0; // Remove the browser default padding.
 	padding-right: 0.6em + 0.25em; // Same size as icon plus margin.
 
-	+ .wp-block-navigation__submenu-icon {
+	+.wp-block-navigation__submenu-icon {
 		margin-left: -0.6em;
 		pointer-events: none; // Make the icon inert to allow click on the button.
 	}
 }
+
 // Remove the browser default padding on the button element used in the navigation link submenu.
 .wp-block-navigation-item.open-on-click button.wp-block-navigation-item__content:not(.wp-block-navigation-submenu__toggle) {
 	padding: 0;
@@ -439,10 +442,11 @@ button.wp-block-navigation-item__content {
 // When justified space-between, open submenus leftward for last menu item.
 // When justified right, open all submenus leftwards.
 // This needs high specificity.
-.wp-block-navigation.items-justified-space-between .wp-block-page-list > .has-child:last-child,
-.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-.wp-block-navigation.items-justified-right .wp-block-page-list > .has-child,
+.wp-block-navigation.items-justified-space-between .wp-block-page-list>.has-child:last-child,
+.wp-block-navigation.items-justified-space-between>.wp-block-navigation__container>.has-child:last-child,
+.wp-block-navigation.items-justified-right .wp-block-page-list>.has-child,
 .wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
+
 	// First submenu.
 	.wp-block-navigation__submenu-container {
 		left: auto;
@@ -454,6 +458,7 @@ button.wp-block-navigation-item__content {
 			left: -1px; // Border width.
 			right: -1px;
 		}
+
 		@include break-medium {
 			.wp-block-navigation__submenu-container {
 				left: auto;
@@ -495,6 +500,10 @@ button.wp-block-navigation-item__content {
 	justify-content: var(--navigation-layout-justify, initial);
 	align-items: var(--navigation-layout-align, initial);
 
+	// Inherit colors from the nav block `<nav>` element.
+	color: inherit;
+	background-color: inherit;
+
 	// Reset the default list styles
 	list-style: none;
 	margin: 0;
@@ -522,11 +531,13 @@ button.wp-block-navigation-item__content {
 		opacity: 0;
 		transform: translateY(0.5em);
 	}
+
 	to {
 		opacity: 1;
 		transform: translateY(0);
 	}
 }
+
 .wp-block-navigation__responsive-container {
 	display: none;
 	position: fixed;
@@ -698,7 +709,7 @@ button.wp-block-navigation-item__content {
 		// container so no extra wrapper markup is needed.
 		&.is-menu-open {
 			.wp-block-navigation__responsive-container-content {
-				> *:not(.wp-block-navigation__overlay-container) {
+				>*:not(.wp-block-navigation__overlay-container) {
 					display: none;
 				}
 
@@ -735,6 +746,7 @@ button.wp-block-navigation-item__content {
 		}
 
 		&.is-menu-open {
+
 			// Override breakpoint-inherited submenu rules.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
@@ -745,13 +757,11 @@ button.wp-block-navigation-item__content {
 
 // Default menu background and font color.
 // Don't apply default colors when custom overlay is present.
-.wp-block-navigation:not(.has-background)
-.wp-block-navigation__responsive-container.is-menu-open:not(.disable-default-overlay) {
+.wp-block-navigation:not(.has-background) .wp-block-navigation__responsive-container.is-menu-open:not(.disable-default-overlay) {
 	background-color: #fff;
 }
 
-.wp-block-navigation:not(.has-text-color)
-.wp-block-navigation__responsive-container.is-menu-open:not(.disable-default-overlay) {
+.wp-block-navigation:not(.has-text-color) .wp-block-navigation__responsive-container.is-menu-open:not(.disable-default-overlay) {
 	color: #000;
 }
 
