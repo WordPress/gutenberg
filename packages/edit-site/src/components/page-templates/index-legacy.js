@@ -106,7 +106,10 @@ export default function PageTemplates() {
 				elements: authors,
 			},
 		];
-		// TODO: we need to also evaulate the other local fields..
+		// TODO: Only `description` and `title` are sourced from the shared
+		// `@wordpress/fields` registry so far. The remaining local fields
+		// (e.g. `previewField`, `authorField`) should also be evaluated for
+		// migration to the shared registry.
 		return [
 			...__fields,
 			...( postFields || [] ).filter( ( field ) =>
