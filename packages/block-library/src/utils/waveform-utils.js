@@ -204,6 +204,31 @@ export function setupSeekControlAccessibility(
 		return;
 	}
 
+	// Position overlays. The playhead marks the current position while the
+	// slider has keyboard focus; the hover indicator previews the spot a click
+	// would seek to. Visibility is driven by CSS (`:focus-visible` and the
+	// `is-seek-hovering` class) — here we only build and position them.
+	const createOverlay = ( className ) => {
+		const bar = document.createElement( 'div' );
+		bar.className = className;
+		bar.setAttribute( 'aria-hidden', 'true' );
+		const tooltip = document.createElement( 'span' );
+		tooltip.className = 'waveform-seek-tooltip';
+		bar.appendChild( tooltip );
+		seekControl.appendChild( bar );
+		return { bar, tooltip };
+	};
+	const playhead = createOverlay( 'waveform-seek-playhead' );
+	const hover = createOverlay( 'waveform-seek-hover' );
+
+	const positionOverlay = ( overlay, seconds, duration ) => {
+		const ratio = duration
+			? Math.min( 1, Math.max( 0, seconds ) / duration )
+			: 0;
+		overlay.bar.style.left = `${ ratio * 100 }%`;
+		overlay.tooltip.textContent = formatTimestamp( seconds );
+	};
+
 	const updateSeekControl = () => {
 		const duration = getFiniteTime( audio.duration );
 		const currentTime = Math.min(
@@ -219,6 +244,8 @@ export function setupSeekControlAccessibility(
 				duration
 			) }`
 		);
+
+		positionOverlay( playhead, currentTime, duration );
 	};
 
 	seekControl.setAttribute( 'tabindex', '0' );
@@ -274,16 +301,51 @@ export function setupSeekControlAccessibility(
 		seekControl.focus();
 	};
 
+	// The library focuses the outer wrapper on click and can leave it in the
+	// tab order. Redirect any focus that lands on the wrapper itself onto the
+	// accessible slider so keyboard users always operate the seek control.
+	const onContainerFocusIn = ( event ) => {
+		if ( event.target === container ) {
+			seekControl.focus();
+		}
+	};
+
+	const onPointerMove = ( event ) => {
+		const rect = seekControl.getBoundingClientRect();
+		if ( ! rect.width ) {
+			return;
+		}
+		const duration = getFiniteTime( audio.duration );
+		const ratio = Math.min(
+			1,
+			Math.max( 0, ( event.clientX - rect.left ) / rect.width )
+		);
+		positionOverlay( hover, ratio * duration, duration );
+		seekControl.classList.add( 'is-seek-hovering' );
+	};
+
+	const onPointerLeave = () => {
+		seekControl.classList.remove( 'is-seek-hovering' );
+	};
+
 	seekControl.addEventListener( 'keydown', onKeyDown, true );
 	container.addEventListener( 'click', onContainerClick );
+	container.addEventListener( 'focusin', onContainerFocusIn );
+	seekControl.addEventListener( 'pointermove', onPointerMove );
+	seekControl.addEventListener( 'pointerleave', onPointerLeave );
 	audio.addEventListener( 'durationchange', updateSeekControl );
 	audio.addEventListener( 'loadedmetadata', updateSeekControl );
 
 	return () => {
 		seekControl.removeEventListener( 'keydown', onKeyDown, true );
 		container.removeEventListener( 'click', onContainerClick );
+		container.removeEventListener( 'focusin', onContainerFocusIn );
+		seekControl.removeEventListener( 'pointermove', onPointerMove );
+		seekControl.removeEventListener( 'pointerleave', onPointerLeave );
 		audio.removeEventListener( 'durationchange', updateSeekControl );
 		audio.removeEventListener( 'loadedmetadata', updateSeekControl );
+		playhead.bar.remove();
+		hover.bar.remove();
 		if ( instance.options.onTimeUpdate === onTimeUpdate ) {
 			instance.options.onTimeUpdate = originalOnTimeUpdate;
 		}

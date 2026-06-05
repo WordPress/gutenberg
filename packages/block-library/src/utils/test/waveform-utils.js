@@ -356,6 +356,101 @@ describe( 'Waveform utilities', () => {
 				'Updated Song'
 			);
 		} );
+
+		it( 'redirects focus from the player wrapper to the slider', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture();
+
+			setupSeekControlAccessibility( container, instance );
+
+			// The library focuses the outer wrapper on click; focus must land
+			// on the accessible slider instead.
+			container.dispatchEvent(
+				new window.FocusEvent( 'focusin', { bubbles: true } )
+			);
+
+			expect( seekControl ).toHaveFocus();
+		} );
+
+		it( 'renders a focus playhead at the current position with a timestamp', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 45 } );
+
+			setupSeekControlAccessibility( container, instance );
+
+			const playhead = seekControl.querySelector(
+				'.waveform-seek-playhead'
+			);
+			expect( playhead ).not.toBeNull();
+			expect( playhead ).toHaveStyle( { left: '25%' } );
+			expect( playhead ).toHaveTextContent( '0:45' );
+		} );
+
+		it( 'moves the playhead as the current time changes', () => {
+			const { audio, container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 45 } );
+
+			setupSeekControlAccessibility( container, instance );
+
+			audio.currentTime = 90;
+			instance.options.onTimeUpdate( 90, 180, instance );
+
+			const playhead = seekControl.querySelector(
+				'.waveform-seek-playhead'
+			);
+			expect( playhead ).toHaveStyle( { left: '50%' } );
+			expect( playhead ).toHaveTextContent( '1:30' );
+		} );
+
+		it( 'shows a hover indicator and timestamp at the pointed position', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture( { duration: 180, currentTime: 0 } );
+			seekControl.getBoundingClientRect = () => ( {
+				left: 0,
+				width: 200,
+				top: 0,
+				right: 200,
+				bottom: 100,
+				height: 100,
+			} );
+
+			setupSeekControlAccessibility( container, instance );
+
+			seekControl.dispatchEvent(
+				new window.MouseEvent( 'pointermove', {
+					bubbles: true,
+					clientX: 100,
+				} )
+			);
+
+			const hover = seekControl.querySelector( '.waveform-seek-hover' );
+			expect( seekControl ).toHaveClass( 'is-seek-hovering' );
+			expect( hover ).toHaveStyle( { left: '50%' } );
+			expect( hover ).toHaveTextContent( '1:30' );
+
+			seekControl.dispatchEvent(
+				new window.MouseEvent( 'pointerleave', { bubbles: true } )
+			);
+			expect( seekControl ).not.toHaveClass( 'is-seek-hovering' );
+		} );
+
+		it( 'removes seek overlays on cleanup', () => {
+			const { container, instance, seekControl } =
+				createSeekControlFixture();
+
+			const cleanup = setupSeekControlAccessibility(
+				container,
+				instance
+			);
+			cleanup();
+
+			expect(
+				seekControl.querySelector( '.waveform-seek-playhead' )
+			).toBeNull();
+			expect(
+				seekControl.querySelector( '.waveform-seek-hover' )
+			).toBeNull();
+		} );
 	} );
 
 	describe( 'setupPlayButtonAccessibility', () => {
