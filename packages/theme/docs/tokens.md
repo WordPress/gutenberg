@@ -125,18 +125,18 @@ The interactive state of the element. The default (no modifier) is the idle stat
 
 ### Border
 
-| Variable name               | Description                 |
-| --------------------------- | --------------------------- |
-| `--wpds-border-radius-xs`   | Extra small radius          |
-| `--wpds-border-radius-sm`   | Small radius                |
-| `--wpds-border-radius-md`   | Medium radius               |
-| `--wpds-border-radius-lg`   | Large radius                |
-| `--wpds-border-radius-xl`   | Extra large radius          |
-| `--wpds-border-width-xs`    | Extra small width           |
-| `--wpds-border-width-sm`    | Small width                 |
-| `--wpds-border-width-md`    | Medium width                |
-| `--wpds-border-width-lg`    | Large width                 |
-| `--wpds-border-width-focus` | Border width for focus ring |
+| Variable name               | Description                                                   |
+| --------------------------- | ------------------------------------------------------------- |
+| `--wpds-border-radius-xs`   | Buttons and other elements nested inside controls.            |
+| `--wpds-border-radius-sm`   | Standalone buttons, inputs, and compact controls.             |
+| `--wpds-border-radius-md`   | Menus, popovers, and other small portaled overlays.           |
+| `--wpds-border-radius-lg`   | Cards, dialogs, notices, and other larger content containers. |
+| `--wpds-border-radius-xl`   | Page and app shell surfaces.                                  |
+| `--wpds-border-width-xs`    | Extra small width                                             |
+| `--wpds-border-width-sm`    | Small width                                                   |
+| `--wpds-border-width-md`    | Medium width                                                  |
+| `--wpds-border-width-lg`    | Large width                                                   |
+| `--wpds-border-width-focus` | Border width for focus ring                                   |
 
 ### Color
 

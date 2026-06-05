@@ -3,15 +3,15 @@
  * ------------------------------------------- */
 
 :root {
-	/* Extra small radius */
+	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 1px;
-	/* Small radius */
+	/* Standalone buttons, inputs, and compact controls. */
 	--wpds-border-radius-sm: 2px;
-	/* Medium radius */
+	/* Menus, popovers, and other small portaled overlays. */
 	--wpds-border-radius-md: 4px;
-	/* Large radius */
+	/* Cards, dialogs, notices, and other larger content containers. */
 	--wpds-border-radius-lg: 8px;
-	/* Extra large radius */
+	/* Page and app shell surfaces. */
 	--wpds-border-radius-xl: 12px;
 	/* Extra small width */
 	--wpds-border-width-xs: 1px;
