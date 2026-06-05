@@ -3,6 +3,20 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const BOOK_TEMPLATE_QUOTE_CONTENT = `<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`;
+
+async function getBookTemplateContent( editor ) {
+	await expect
+		.poll( editor.getEditedPostContent )
+		.toContain( BOOK_TEMPLATE_QUOTE_CONTENT );
+
+	return editor.getEditedPostContent();
+}
+
 test.describe( 'Post type templates', () => {
 	test.describe( 'Using a CPT with a predefined template', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
@@ -24,14 +38,14 @@ test.describe( 'Post type templates', () => {
 		test( 'Should add a custom post types with a predefined template', async ( {
 			editor,
 		} ) => {
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await getBookTemplateContent( editor ) ).toMatchSnapshot();
 		} );
 
 		test( 'Should respect user edits to not re-apply template after save (single block removal)', async ( {
 			page,
 			editor,
 		} ) => {
-			const beforeContent = await editor.getEditedPostContent();
+			const beforeContent = await getBookTemplateContent( editor );
 
 			// Remove a block from the template to verify that it's not
 			// re-added after saving and reloading the editor.
@@ -59,6 +73,8 @@ test.describe( 'Post type templates', () => {
 			pageUtils,
 			editor,
 		} ) => {
+			await getBookTemplateContent( editor );
+
 			// Remove all blocks from the template to verify that they're not
 			// re-added after saving and reloading the editor.
 			await editor.canvas
