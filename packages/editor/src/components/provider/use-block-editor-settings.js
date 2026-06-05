@@ -30,7 +30,7 @@ import { default as mediaFinalize } from '../../utils/media-finalize';
 import { default as mediaDelete } from '../../utils/media-delete';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useGlobalStylesContext } from '../global-styles-provider';
+import { useGlobalStyles } from '../global-styles';
 
 const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
@@ -237,7 +237,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	const { merged: mergedGlobalStyles } = useGlobalStylesContext();
+	const { merged: mergedGlobalStyles } = useGlobalStyles();
 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 
@@ -351,10 +351,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			[ openMediaEditorModalKey ]: window?.__experimentalMediaEditorModal
-				? ( { id, onUpdate } ) =>
-						openMediaEditorModal( { id, onUpdate } )
-				: undefined,
+			[ openMediaEditorModalKey ]: ( { id, onUpdate, onClose } ) =>
+				openMediaEditorModal( { id, onUpdate, onClose } ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
 				? mediaUploadOnSuccess

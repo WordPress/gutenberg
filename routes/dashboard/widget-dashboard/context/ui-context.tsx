@@ -17,6 +17,12 @@ interface DashboardUIContextValue {
 	inserterOpen: boolean;
 	setInserterOpen: ( next: boolean ) => void;
 
+	/** Opened by the Layout settings button in the customize toolbar. */
+	layoutSettingsOpen: boolean;
+	setLayoutSettingsOpen: ( next: boolean ) => void;
+	resetDialogOpen: boolean;
+	setResetDialogOpen: ( next: boolean ) => void;
+
 	/**
 	 * `uuid` of the instance whose settings drawer is open, or `null`
 	 * when no settings drawer is showing. The per-instance gear in the
@@ -48,7 +54,8 @@ const Context = createContext< DashboardUIContextValue | null >( null );
 
 /**
  * UI-state hook used by the inserter modal and any compound that needs to
- * open or close it (today: the "Add widget" trigger in `Actions`).
+ * open or close it (today: the "Add widget" and "Layout settings"
+ * triggers in `Actions`).
  *
  * Throws when called outside `WidgetDashboard` so misuse fails loudly during
  * development.
@@ -76,6 +83,8 @@ interface ProviderProps {
  */
 export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 	const [ inserterOpen, setInserterOpen ] = useState( false );
+	const [ layoutSettingsOpen, setLayoutSettingsOpen ] = useState( false );
+	const [ resetDialogOpen, setResetDialogOpen ] = useState( false );
 	const [ settingsWidgetUuid, setSettingsWidgetUuid ] = useState<
 		string | null
 	>( null );
@@ -88,6 +97,10 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 		() => ( {
 			inserterOpen,
 			setInserterOpen,
+			layoutSettingsOpen,
+			setLayoutSettingsOpen,
+			resetDialogOpen,
+			setResetDialogOpen,
 			settingsWidgetUuid,
 			setSettingsWidgetUuid,
 			settingsDrawerSide,
@@ -97,6 +110,8 @@ export function WidgetDashboardUIProvider( { children }: ProviderProps ) {
 		} ),
 		[
 			inserterOpen,
+			layoutSettingsOpen,
+			resetDialogOpen,
 			settingsWidgetUuid,
 			settingsDrawerSide,
 			settingsDrawerInset,

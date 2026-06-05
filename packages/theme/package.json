@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.13.0",
+	"version": "0.14.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -80,6 +80,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",

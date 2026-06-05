@@ -116,6 +116,48 @@ export function isContainerInsertableToInContentOnlyMode(
 	);
 }
 
+function getClientIdWithClientIdsTreeUnmemoized( state, clientId ) {
+	return {
+		clientId,
+		innerBlocks: getClientIdsTreeUnmemoized( state, clientId ),
+	};
+}
+
+function getClientIdsTreeUnmemoized( state, rootClientId = '' ) {
+	return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
+		getClientIdWithClientIdsTreeUnmemoized( state, clientId )
+	);
+}
+
+/**
+ * Returns a stripped down block object containing only its client ID,
+ * and its inner blocks' client IDs.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Client ID of the block to get.
+ *
+ * @return {Object} Client IDs of the post blocks.
+ */
+export const getClientIdWithClientIdsTree = createSelector(
+	getClientIdWithClientIdsTreeUnmemoized,
+	( state ) => [ state.blocks.order ]
+);
+
+/**
+ * Returns the block tree represented in the block-editor store from the
+ * given root, consisting of stripped down block objects containing only
+ * their client IDs, and their inner blocks' client IDs.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Client IDs of the post blocks.
+ */
+export const getClientIdsTree = createSelector(
+	getClientIdsTreeUnmemoized,
+	( state ) => [ state.blocks.order ]
+);
+
 function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
@@ -1077,6 +1119,23 @@ export function getSelectedBlockStyleState( state, clientId ) {
 	}
 
 	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
+}
+
+/**
+ * Returns whether a non-default style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a non-default block style state is selected.
+ */
+export function hasSelectedStyleState( state, clientId ) {
+	const selectedState = getSelectedBlockStyleState( state, clientId );
+
+	return (
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
+		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
+	);
 }
 
 /**

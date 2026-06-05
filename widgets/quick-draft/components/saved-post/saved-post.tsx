@@ -5,7 +5,7 @@ import { createInterpolateElement } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-import { Button, EmptyState, Link, Stack } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
+import { Button, EmptyState, Link, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -61,9 +61,7 @@ export function SavedPost( {
 							<Link
 								href={ editUrl }
 								openInNewTab
-								style={ {
-									color: 'var(--wpds-color-fg-interactive-brand-strong)',
-								} }
+								className={ styles.continueLink }
 							/>
 						}
 					>

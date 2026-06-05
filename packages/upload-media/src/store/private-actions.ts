@@ -59,12 +59,14 @@ import type {
 	UpdateSettingsAction,
 } from './types';
 import { ItemStatus, OperationType, Type } from './types';
-import type { cancelItem } from './actions';
+import type { cancelItem, executeRetry } from './actions';
+import { clearRetryTimer } from './utils/retry';
 
 const DEFAULT_OUTPUT_QUALITY = 0.82;
 
 type ActionCreators = {
 	cancelItem: typeof cancelItem;
+	executeRetry: typeof executeRetry;
 	addItem: typeof addItem;
 	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
@@ -472,7 +474,14 @@ export function resumeQueue() {
 		} );
 
 		for ( const item of select.getAllItems() ) {
-			dispatch.processItem( item.id );
+			// Items left in PendingRetry while paused had their timers
+			// cleared when the timer fired during pause. Re-trigger the
+			// retry now that the queue is active again.
+			if ( item.status === ItemStatus.PendingRetry ) {
+				dispatch.executeRetry( item.id );
+			} else {
+				dispatch.processItem( item.id );
+			}
 		}
 	};
 }
@@ -502,6 +511,9 @@ export function removeItem( id: QueueItemId ) {
 		if ( ! item ) {
 			return;
 		}
+
+		// Clear any pending retry timer for this item.
+		clearRetryTimer( id );
 
 		dispatch( {
 			type: Type.Remove,
