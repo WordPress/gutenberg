@@ -205,7 +205,7 @@ describe( 'BorderControl', () => {
 		it( 'should not render custom color picker when opted out of', async () => {
 			const user = userEvent.setup();
 			// Even when colors are provided, if `disableCustomColors` is true, the custom color picker should not be rendered.
-			const props = createProps( { colors: colors, disableCustomColors: true } );
+			const props = createProps( { disableCustomColors: true } );
 			render( <TestBorderControl { ...props } /> );
 
 			const toggleButton = screen.getByLabelText( toggleLabelRegex );
