@@ -121,6 +121,8 @@ const percent = getSourceRegionPercent( controller.state, imageSize );
 ## Validate Pixel Crop Edits
 
 Use pixel geometry helpers when manual controls or automation need to validate a crop rectangle before committing it.
+`useCropGeometry()` reads from `CropperProvider`, so call it from a component
+rendered inside that provider.
 
 ```ts
 import {
