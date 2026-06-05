@@ -344,10 +344,11 @@ test.describe( 'Autosave', () => {
 
 		// Only remote autosave notice should be applied.
 		await expect(
-			page.locator( '.components-notice__content' )
-		).toContainText(
-			'There is an autosave of this post that is more recent than the version below.'
-		);
+			page.locator( '.components-notice__content', {
+				hasText:
+					'There is an autosave of this post that is more recent than the version below.',
+			} )
+		).toBeVisible();
 	} );
 
 	test.skip( 'should clear sessionStorage upon user logout', async ( {
