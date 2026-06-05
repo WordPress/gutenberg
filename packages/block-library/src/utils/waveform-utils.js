@@ -330,10 +330,9 @@ function getHoverColor( color, alphaBoost = 0.2 ) {
  * Set up hover effect on the waveform bars area.
  * On mouseenter, increases bar color intensity; on mouseleave, restores.
  *
- * @param {Object}  instance      - The WaveformPlayer library instance.
- * @param {Element} container     - The waveform container element.
- * @param {string}  waveformColor - The original waveform bar color.
- * @param {string}  progressColor - The original progress bar color.
+ * @param {Object}  instance   - The WaveformPlayer library instance.
+ * @param {Element} container  - The waveform container element.
+ * @param {Object}  colorState - Current base and hover color values.
  * @return {Function} Cleanup function to remove listeners.
  */
 function setupWaveformHover( instance, container, colorState ) {

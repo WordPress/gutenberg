@@ -166,7 +166,7 @@ describe( 'WaveformPlayer', () => {
 		expect( player.destroy ).not.toHaveBeenCalled();
 		expect( refreshWaveformPlayerColors ).toHaveBeenCalledWith(
 			player,
-			expect.any( global.HTMLElement )
+			expect.any( window.HTMLElement )
 		);
 	} );
 
