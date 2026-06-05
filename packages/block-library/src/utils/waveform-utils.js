@@ -308,6 +308,10 @@ function decorateWaveformPlayerMarkers( markersContainer ) {
 			'wp-block-playlist__time-marker--current',
 			'is-visible'
 		);
+		// These markers are decorative time labels, so keep them out of the
+		// tab order and hidden from assistive technology.
+		currentMarker.tabIndex = -1;
+		currentMarker.setAttribute( 'aria-hidden', 'true' );
 		currentMarker.style.color = toOpaqueColor(
 			currentMarker.style.backgroundColor
 		);
@@ -325,6 +329,8 @@ function decorateWaveformPlayerMarkers( markersContainer ) {
 			'wp-block-playlist__time-marker--end',
 			'is-visible'
 		);
+		endMarker.tabIndex = -1;
+		endMarker.setAttribute( 'aria-hidden', 'true' );
 		endMarker.style.color = toOpaqueColor(
 			endMarker.style.backgroundColor
 		);

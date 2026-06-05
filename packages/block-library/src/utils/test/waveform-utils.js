@@ -332,6 +332,12 @@ describe( 'Waveform utilities', () => {
 			} );
 			expect( currentMarker ).toHaveTextContent( '0:45' );
 			expect( endMarker ).toHaveClass( 'is-visible' );
+			// Decorative markers must stay out of the tab order and hidden
+			// from assistive technology.
+			expect( currentMarker ).toHaveAttribute( 'tabindex', '-1' );
+			expect( currentMarker ).toHaveAttribute( 'aria-hidden', 'true' );
+			expect( endMarker ).toHaveAttribute( 'tabindex', '-1' );
+			expect( endMarker ).toHaveAttribute( 'aria-hidden', 'true' );
 			expect( endMarker ).toHaveStyle( { left: '100%' } );
 			expect( endMarker ).toHaveStyle( {
 				color: 'rgb(0, 0, 0)',
