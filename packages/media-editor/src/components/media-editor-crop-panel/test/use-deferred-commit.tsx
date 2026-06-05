@@ -159,6 +159,30 @@ describe( 'useDeferredCommit', () => {
 		expect( onCommit ).not.toHaveBeenCalled();
 	} );
 
+	it( 'clears deferred previews once when Enter triggers blur', () => {
+		const onCommit = jest.fn();
+		const onPreview = jest.fn();
+		const { result } = renderHook( () =>
+			useDeferredCommit( {
+				value: 100,
+				range: RANGE,
+				commitStep: 1,
+				commitOnChange: false,
+				onCommit,
+				onPreview,
+			} )
+		);
+
+		act( () => result.current.onFocus() );
+		act( () => result.current.onChange( '250' ) );
+		act( () => result.current.onKeyDown( fakeKeyboardEvent( 'Enter' ) ) );
+		act( () => result.current.onBlur() );
+
+		expect( onPreview ).toHaveBeenCalledWith( 250 );
+		expect( onPreview ).toHaveBeenCalledWith( null );
+		expect( onPreview ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	it( 'cancels deferred previews when value changes externally during focus', async () => {
 		const onCommit = jest.fn();
 		const onPreview = jest.fn();

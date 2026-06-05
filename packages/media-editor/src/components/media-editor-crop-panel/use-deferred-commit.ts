@@ -250,11 +250,12 @@ export function useDeferredCommit( {
 
 	const onBlur = () => {
 		setFocused( false );
-		if ( ! skipBlurCommitRef.current ) {
+		const shouldSkipBlurCommit = skipBlurCommitRef.current;
+		if ( ! shouldSkipBlurCommit ) {
 			completeDraft();
-		}
-		if ( ! commitOnChange ) {
-			onPreview?.( null );
+			if ( ! commitOnChange ) {
+				onPreview?.( null );
+			}
 		}
 		skipBlurCommitRef.current = false;
 		// Session end before commit end: `onCommitEnd` typically calls
