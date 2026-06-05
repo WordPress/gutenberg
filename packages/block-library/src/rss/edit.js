@@ -44,6 +44,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		displayAuthor,
 		displayDate,
 		displayExcerpt,
+		displayFeaturedImage,
 		excerptLength,
 		feedURL,
 		itemsToShow,
@@ -154,6 +155,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 							displayAuthor: false,
 							displayDate: false,
 							displayExcerpt: false,
+							displayFeaturedImage: false,
 							excerptLength: 55,
 							columns: 2,
 							openInNewTab: false,
@@ -181,6 +183,24 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 					</ToolsPanelItem>
 
 					<ToolsPanelItem
+						label={ __( 'Display featured image' ) }
+						hasValue={ () => !! displayFeaturedImage }
+						onDeselect={ () =>
+							setAttributes( { displayFeaturedImage: false } )
+						}
+						isShownByDefault
+					>
+						<ToggleControl
+							__next40pxDefaultSize
+							label={ __( 'Display featured image' ) }
+							checked={ displayFeaturedImage }
+							onChange={ toggleAttribute(
+								'displayFeaturedImage'
+							) }
+						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
 						label={ __( 'Display author' ) }
 						hasValue={ () => !! displayAuthor }
 						onDeselect={ () =>
@@ -189,6 +209,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
+							__next40pxDefaultSize
 							label={ __( 'Display author' ) }
 							checked={ displayAuthor }
 							onChange={ toggleAttribute( 'displayAuthor' ) }
@@ -204,6 +225,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
+							__next40pxDefaultSize
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
 							onChange={ toggleAttribute( 'displayDate' ) }
@@ -219,6 +241,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
+							__next40pxDefaultSize
 							label={ __( 'Display excerpt' ) }
 							checked={ displayExcerpt }
 							onChange={ toggleAttribute( 'displayExcerpt' ) }
@@ -278,6 +301,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 						isShownByDefault
 					>
 						<ToggleControl
+							__next40pxDefaultSize
 							label={ __( 'Open links in new tab' ) }
 							checked={ openInNewTab }
 							onChange={ ( value ) =>

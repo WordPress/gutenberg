@@ -16,7 +16,7 @@
  */
 function render_block_core_rss( $attributes ) {
 	if ( in_array( untrailingslashit( $attributes['feedURL'] ), array( site_url(), home_url() ), true ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'Adding an RSS feed to this site’s homepage is not supported, as it could lead to a loop that slows down your site. Try using another block, like the <strong>Latest Posts</strong> block, to list posts from the site.' ) . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'Adding an RSS feed to this site\'s homepage is not supported, as it could lead to a loop that slows down your site. Try using another block, like the <strong>Latest Posts</strong> block, to list posts from the site.' ) . '</div></div>';
 	}
 
 	$rss = fetch_feed( $attributes['feedURL'] );
@@ -104,7 +104,45 @@ function render_block_core_rss( $attributes ) {
 			$excerpt = '<div class="wp-block-rss__item-excerpt">' . esc_html( $excerpt ) . '</div>';
 		}
 
-		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date_markup}{$author}{$excerpt}</li>";
+		// Build featured image markup if the attribute is enabled.
+		$featured_image = '';
+		if ( ! empty( $attributes['displayFeaturedImage'] ) ) {
+			$image_url = '';
+
+			$enclosure = $item->get_enclosure();
+			if ( $enclosure ) {
+				$mime_type = (string) $enclosure->get_type();
+				$medium    = (string) $enclosure->get_medium();
+				if ( 'image' === $medium || str_starts_with( $mime_type, 'image/' ) ) {
+					$image_url = $enclosure->get_link();
+				}
+			}
+
+			if ( empty( $image_url ) ) {
+				$thumbnail = $item->get_thumbnail();
+				if ( ! empty( $thumbnail ) ) {
+					$image_url = $thumbnail;
+				}
+			}
+
+			if ( empty( $image_url ) ) {
+				$content = $item->get_content();
+				if ( ! empty( $content ) ) {
+					if ( preg_match( '/<img[^>]+src=[\'"]([^\'"]+)[\'"][^>]*>/i', $content, $matches ) ) {
+						$image_url = $matches[1];
+					}
+				}
+			}
+
+			if ( ! empty( $image_url ) ) {
+				$featured_image = sprintf(
+					'<div class="wp-block-rss__item-featured-image"><img src="%s" alt="" /></div>',
+					esc_url( $image_url )
+				);
+			}
+		}
+
+		$list_items .= "<li class='wp-block-rss__item'>{$featured_image}{$title}{$date_markup}{$author}{$excerpt}</li>";
 	}
 
 	$classnames = array();
@@ -122,6 +160,9 @@ function render_block_core_rss( $attributes ) {
 	}
 	if ( $attributes['displayExcerpt'] ) {
 		$classnames[] = 'has-excerpts';
+	}
+	if ( ! empty( $attributes['displayFeaturedImage'] ) ) {
+		$classnames[] = 'has-images';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );

@@ -47,6 +47,10 @@
 		},
 		"rel": {
 			"type": "string"
+		},
+		"displayFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
