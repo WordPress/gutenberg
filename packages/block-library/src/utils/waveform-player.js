@@ -96,10 +96,6 @@ export function WaveformPlayer( {
 	const onEndedEvent = useEvent( onEnded );
 	const elementRef = useRef();
 	const playerRef = useRef();
-	// Remembers which skip control had keyboard focus when a track change
-	// rebuilds the player, so keyboard focus stays on the control that
-	// triggered the change.
-	const restoreFocusRef = useRef( null );
 
 	// Due to how WaveformPlayer is implemented, the artwork element within the
 	// player element only exists when an image was present when the player was
@@ -167,8 +163,6 @@ export function WaveformPlayer( {
 					return;
 				}
 
-				const focusControl = restoreFocusRef.current;
-				restoreFocusRef.current = null;
 				const metadata = metadataRef.current;
 				const player = initWaveformPlayer( element, {
 					src,
@@ -196,7 +190,6 @@ export function WaveformPlayer( {
 					onRepeatToggle: onRepeatToggleEvent,
 					isShuffled: getIsShuffled(),
 					isRepeating: getIsRepeating(),
-					focusControl,
 				} );
 				playerRef.current = player;
 				updatePlayerMetadata( player.instance, metadata );
@@ -216,30 +209,6 @@ export function WaveformPlayer( {
 			return () => {
 				cancelled = true;
 				clearTimeout( timeoutId );
-				// Prev/next change the track URL, which rebuilds the player.
-				// Preserve focus only for the skip control that triggered it.
-				const active = element.ownerDocument.activeElement;
-				if ( active && element.contains( active ) ) {
-					if (
-						active.classList.contains(
-							'wp-block-playlist__control-btn'
-						)
-					) {
-						const controls = [
-							...element.querySelectorAll(
-								'.wp-block-playlist__control-btn'
-							),
-						];
-						const controlIndex = controls.indexOf( active );
-						if ( controlIndex === 0 ) {
-							restoreFocusRef.current = 'prev';
-						} else if ( controlIndex === 3 ) {
-							restoreFocusRef.current = 'next';
-						} else {
-							restoreFocusRef.current = null;
-						}
-					}
-				}
 				playerRef.current = undefined;
 				elementRef.current = undefined;
 				playerDestroy?.();
