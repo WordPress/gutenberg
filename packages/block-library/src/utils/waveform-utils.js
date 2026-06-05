@@ -188,20 +188,15 @@ export function setupPlayButtonAccessibility(
 	container.addEventListener( 'waveformplayer:ended', onPause );
 
 	// The library's container has tabindex="0" and focuses itself on click,
-	// stealing focus from the play button. Since the library owns this button's
-	// click handler, restore focus on the next frame rather than stopping the
-	// event, so keyboard focus isn't lost when toggling play/pause.
-	const view = container.ownerDocument.defaultView;
-	let refocusFrame;
-	const onPlayBtnClick = () => {
-		refocusFrame = view.requestAnimationFrame( () => playBtn.focus() );
-	};
+	// which would steal keyboard focus from the play button. The library owns
+	// the play button's click handler, so add our own listener to stop the
+	// click bubbling to the container — focus stays on the play button.
+	// stopPropagation (not stopImmediatePropagation) leaves the library's own
+	// click handler on the same element intact.
+	const onPlayBtnClick = ( event ) => event.stopPropagation();
 	playBtn.addEventListener( 'click', onPlayBtnClick );
 
 	return () => {
-		if ( refocusFrame ) {
-			view.cancelAnimationFrame( refocusFrame );
-		}
 		playBtn.removeEventListener( 'click', onPlayBtnClick );
 		container.removeEventListener( 'waveformplayer:play', onPlay );
 		container.removeEventListener( 'waveformplayer:pause', onPause );
@@ -690,9 +685,9 @@ export function initWaveformPlayer(
 			// Restore keyboard focus to the control that triggered a rebuild
 			// (the editor recreates the player when the track changes).
 			if ( focusControl === 'prev' || focusControl === 'next' ) {
-				container.querySelectorAll( '.wp-block-playlist__control-btn' )[
-					focusControl === 'prev' ? 0 : 3
-				]?.focus();
+				container
+					.querySelectorAll( '.wp-block-playlist__control-btn' )
+					[ focusControl === 'prev' ? 0 : 3 ]?.focus();
 			}
 
 			if ( autoPlay ) {

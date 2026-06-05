@@ -324,6 +324,45 @@ describe( 'Waveform utilities', () => {
 				setupPlayButtonAccessibility( container )
 			).not.toThrow();
 		} );
+
+		it( 'stops play button clicks from bubbling to the container', () => {
+			// The library focuses the container on any click that reaches it,
+			// stealing focus from the play button. The click must not bubble.
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const containerClick = jest.fn();
+			container.addEventListener( 'click', containerClick );
+
+			setupPlayButtonAccessibility( container );
+			playBtn.dispatchEvent(
+				new window.MouseEvent( 'click', { bubbles: true } )
+			);
+
+			expect( containerClick ).not.toHaveBeenCalled();
+		} );
+
+		it( 'cleanup removes the play button click handler', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const containerClick = jest.fn();
+			container.addEventListener( 'click', containerClick );
+
+			const cleanup = setupPlayButtonAccessibility( container );
+			cleanup();
+
+			// After cleanup, the click is no longer stopped and reaches the container.
+			playBtn.dispatchEvent(
+				new window.MouseEvent( 'click', { bubbles: true } )
+			);
+
+			expect( containerClick ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	describe( 'setupPlayButtonArtwork', () => {
