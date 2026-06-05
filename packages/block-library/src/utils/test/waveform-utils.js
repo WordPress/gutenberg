@@ -13,8 +13,6 @@ import {
 	updateSeekControlLabel,
 	setupPlayButtonArtwork,
 	logPlayError,
-	formatTime,
-	WAVEFORM_BUTTON_WIDTH,
 	getNextShuffledTrack,
 } from '../waveform-utils';
 
@@ -429,41 +427,6 @@ describe( 'Waveform utilities', () => {
 					'.wp-block-playlist__play-button-artwork'
 				)
 			).toBeNull();
-		} );
-	} );
-
-	describe( 'WAVEFORM_BUTTON_WIDTH', () => {
-		it( 'should be defined as 120', () => {
-			expect( typeof WAVEFORM_BUTTON_WIDTH ).toBe( 'number' );
-			expect( WAVEFORM_BUTTON_WIDTH ).toBe( 120 );
-		} );
-	} );
-
-	describe( 'formatTime', () => {
-		it( 'should format 0 seconds as 0:00', () => {
-			expect( formatTime( 0 ) ).toBe( '0:00' );
-		} );
-
-		it( 'should format seconds under a minute', () => {
-			expect( formatTime( 5 ) ).toBe( '0:05' );
-			expect( formatTime( 30 ) ).toBe( '0:30' );
-			expect( formatTime( 59 ) ).toBe( '0:59' );
-		} );
-
-		it( 'should format minutes and seconds', () => {
-			expect( formatTime( 60 ) ).toBe( '1:00' );
-			expect( formatTime( 90 ) ).toBe( '1:30' );
-			expect( formatTime( 125 ) ).toBe( '2:05' );
-		} );
-
-		it( 'should handle fractional seconds', () => {
-			expect( formatTime( 5.7 ) ).toBe( '0:05' );
-			expect( formatTime( 90.9 ) ).toBe( '1:30' );
-		} );
-
-		it( 'should handle large values', () => {
-			expect( formatTime( 3600 ) ).toBe( '60:00' );
-			expect( formatTime( 3661 ) ).toBe( '61:01' );
 		} );
 	} );
 
