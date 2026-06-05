@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
+import { SECOND_USER } from './fixtures/collaboration-utils';
 
 type Editor = import('@wordpress/e2e-test-utils-playwright').Editor;
 type Page = import('@playwright/test').Page;
@@ -16,6 +17,28 @@ async function getTableBodyCellContents( editor: Editor ) {
 		.evaluateAll( ( cells ) =>
 			cells.map( ( cell ) => cell.textContent?.trim() )
 		);
+}
+
+async function waitForTableRowSyncIds( page: Page ) {
+	await page.waitForFunction( () => {
+		const blocks = window.wp?.data
+			?.select( 'core/block-editor' )
+			.getBlocks();
+		const table = blocks?.find(
+			( block: { name: string } ) => block.name === 'core/table'
+		);
+		const rows = table?.attributes?.body;
+
+		return (
+			Array.isArray( rows ) &&
+			rows.length === 3 &&
+			rows.every( ( row ) =>
+				Object.getOwnPropertySymbols( row ).some(
+					( symbol ) => symbol.description === 'wpSyncArrayElementId'
+				)
+			)
+		);
+	} );
 }
 
 async function editTableCell( {
@@ -70,7 +93,20 @@ test.describe( 'Collaboration - duplicate table rows', () => {
 			date_gmt: new Date().toISOString(),
 		} );
 
-		await collaborationUtils.openCollaborativeSession( post.id );
+		await collaborationUtils.openPost( post.id );
+		await expect
+			.poll( () => getTableBodyCellContents( editor ), {
+				timeout: 10_000,
+			} )
+			.toEqual( [ 'anchor', 'same', 'same' ] );
+		await collaborationUtils.waitForEntityReadyAndSaveSettled( page );
+		await expect
+			.poll( () => collaborationUtils.getCrdtDocument( page ), {
+				timeout: 10_000,
+			} )
+			.not.toBeNull();
+		await collaborationUtils.joinUser( post.id, SECOND_USER );
+		await collaborationUtils.waitForMutualDiscovery();
 		const { editor2, page2 } = collaborationUtils;
 
 		await expect
@@ -83,6 +119,10 @@ test.describe( 'Collaboration - duplicate table rows', () => {
 				timeout: 10_000,
 			} )
 			.toEqual( [ 'anchor', 'same', 'same' ] );
+		await Promise.all( [
+			waitForTableRowSyncIds( page ),
+			waitForTableRowSyncIds( page2 ),
+		] );
 
 		await Promise.all( [
 			editTableCell( {

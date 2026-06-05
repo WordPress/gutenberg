@@ -58,7 +58,11 @@ jest.mock( '@wordpress/blocks', () => {
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
+import {
+	__unstableSerializeAndClean,
+	parse,
+	type Block as WPBlock,
+} from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
@@ -1149,7 +1153,7 @@ describe( 'crdt', () => {
 			const editedRecord = {
 				title: 'CRDT Title',
 				status: 'draft',
-				content: { raw: 'serialized:1', rendered: 'serialized:1' },
+				content: { raw: 'serialized:1\n', rendered: 'serialized:1' },
 				blocks: [],
 			} as unknown as Post;
 
@@ -1169,7 +1173,7 @@ describe( 'crdt', () => {
 			const editedRecord = {
 				title: 'Locally defaulted title',
 				status: 'auto-draft',
-				content: { raw: 'serialized:1', rendered: 'serialized:1' },
+				content: { raw: 'serialized:1\n', rendered: 'serialized:1' },
 				blocks: [],
 			} as unknown as Post;
 
@@ -1185,6 +1189,101 @@ describe( 'crdt', () => {
 			expect( changes.title ).toBeUndefined();
 			expect( changes.status ).toBeUndefined();
 			expect( changes.date ).toBeUndefined();
+		} );
+
+		it( 'hydrates runtime block changes from persisted table rows with internal IDs', () => {
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ createTableBlock( [ 'anchor', 'same' ] ) ] },
+				defaultSyncedProperties
+			);
+			(
+				__unstableSerializeAndClean as jest.MockedFunction<
+					typeof __unstableSerializeAndClean
+				>
+			 ).mockImplementationOnce( ( blocks: unknown[] ) => {
+				const rows =
+					( blocks?.[ 0 ] as Block | undefined )?.attributes?.body ??
+					[];
+				const hasPersistedId = (
+					rows as Array< Record< string, unknown > >
+				 ).some( ( row ) =>
+					Object.prototype.hasOwnProperty.call(
+						row,
+						'__unstableSyncId'
+					)
+				);
+
+				return hasPersistedId
+					? 'serialized-with-internal-id'
+					: `serialized:${ blocks?.length ?? 0 }`;
+			} );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'serialized:1', rendered: 'serialized:1' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
+		} );
+
+		it( 'hydrates runtime block changes when normalized serialized content matches', () => {
+			const serializedWithDefaultAttribute =
+				'<!-- wp:table {"hasFixedLayout":false} -->\n<table></table>\n<!-- /wp:table -->';
+			const serializedWithoutDefaultAttribute =
+				'<!-- wp:table -->\n<table></table>\n<!-- /wp:table -->';
+			const normalizedSerializedContent = 'normalized-table-content';
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ createTableBlock( [ 'same' ] ) ] },
+				defaultSyncedProperties
+			);
+			(
+				__unstableSerializeAndClean as jest.MockedFunction<
+					typeof __unstableSerializeAndClean
+				>
+			 )
+				.mockImplementationOnce( () => serializedWithDefaultAttribute )
+				.mockImplementationOnce( () => normalizedSerializedContent )
+				.mockImplementationOnce( () => normalizedSerializedContent );
+			( parse as jest.MockedFunction< typeof parse > )
+				.mockImplementationOnce( () => [
+					createTableBlock( [ 'same' ] ),
+				] )
+				.mockImplementationOnce( () => [
+					createTableBlock( [ 'same' ] ),
+				] );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: {
+					raw: serializedWithoutDefaultAttribute,
+					rendered: serializedWithoutDefaultAttribute,
+				},
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
 		} );
 
 		it( 'does not hydrate runtime block changes over different visible content', () => {
@@ -1341,10 +1440,11 @@ function addBlockToDoc(
 	return ytext;
 }
 
-function createTableBlock( values: string[] ): Block {
+function createTableBlock( values: string[] ): Block & WPBlock {
 	return {
 		name: 'core/table',
 		clientId: 'table',
+		isValid: true,
 		attributes: {
 			body: values.map( ( value ) => ( {
 				cells: [

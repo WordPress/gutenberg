@@ -389,15 +389,20 @@ export function getPostChangesFromCRDTDoc(
 			switch ( key ) {
 				case 'blocks': {
 					const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
-					const serializedBlocks =
-						__unstableSerializeAndClean( blocksJson );
+					const blocksForSerialization =
+						deserializeBlockAttributes( blocksJson );
+					const serializedBlocks = __unstableSerializeAndClean(
+						blocksForSerialization as WPBlock[]
+					);
 					const currentContent = getRawValue( editedRecord.content );
 
 					if ( options.runtimeBlockChangesOnly ) {
 						return (
-							undefined !== currentContent &&
-							'' !== serializedBlocks &&
-							serializedBlocks === currentContent
+							'' !== serializedBlocks.trim() &&
+							isSameSerializedContent(
+								serializedBlocks,
+								currentContent
+							)
 						);
 					}
 
@@ -422,7 +427,10 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						return serializedBlocks.trim() !== currentContent;
+						return ! isSameSerializedContent(
+							serializedBlocks,
+							currentContent
+						);
 					}
 
 					return true;
@@ -524,7 +532,10 @@ export function getPostChangesFromCRDTDoc(
 		);
 		if (
 			! options.runtimeBlockChangesOnly &&
-			serializedBlocks !== getRawValue( editedRecord.content )
+			! isSameSerializedContent(
+				serializedBlocks,
+				getRawValue( editedRecord.content )
+			)
 		) {
 			changes.content = () => serializedBlocks;
 		}
@@ -602,6 +613,37 @@ function getRawValue( value?: unknown ): string | undefined {
 	}
 
 	return undefined;
+}
+
+function isSameSerializedContent(
+	serializedContent: string,
+	currentContent: string | undefined
+): boolean {
+	if ( undefined === currentContent ) {
+		return false;
+	}
+
+	if ( serializedContent.trim() === currentContent.trim() ) {
+		return true;
+	}
+
+	const normalizedSerializedContent =
+		normalizeSerializedContent( serializedContent );
+	const normalizedCurrentContent =
+		normalizeSerializedContent( currentContent );
+
+	return (
+		undefined !== normalizedSerializedContent &&
+		normalizedSerializedContent === normalizedCurrentContent
+	);
+}
+
+function normalizeSerializedContent( content: string ): string | undefined {
+	const blocks = parse( content );
+	if ( 0 === blocks.length && '' !== content.trim() ) {
+		return undefined;
+	}
+	return __unstableSerializeAndClean( blocks ).trim();
 }
 
 function haveValuesChanged< ValueType >(
