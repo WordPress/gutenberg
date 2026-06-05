@@ -180,6 +180,14 @@ Posts per page field for SiteSettings.
 
 Undocumented declaration.
 
+### readOnlyDescriptionField
+
+Read-only description field for theme-provided templates, which can't be edited. Shares the display config with `descriptionField` but renders as read-only and is only visible when a description exists.
+
+_Type_
+
+-   `Field< Template >`
+
 ### renamePost
 
 Rename action for PostWithPermissions.

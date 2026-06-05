@@ -42,6 +42,7 @@ import {
 	postContentInfoField,
 	stickyField,
 	descriptionField,
+	readOnlyDescriptionField,
 	postsPerPageField,
 	siteDiscussionField,
 	blogTitleField,
@@ -307,6 +308,8 @@ export const registerPostTypeSchema =
 				// it with `Gutenberg_REST_View_Config_Controller_7_1`.
 				postTypeConfig.slug === 'wp_template' && blogTitleField,
 				postTypeConfig.slug === 'wp_template' && descriptionField,
+				postTypeConfig.slug === 'wp_template' &&
+					readOnlyDescriptionField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,

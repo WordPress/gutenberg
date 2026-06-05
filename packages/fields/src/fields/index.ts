@@ -18,7 +18,10 @@ export { default as lastEditedDateField } from './date/last-edited';
 export { default as authorField } from './author';
 export { default as notesField } from './notes';
 export { default as excerptField } from './excerpt';
-export { default as descriptionField } from './description';
+export {
+	default as descriptionField,
+	readOnlyDescriptionField,
+} from './description';
 export { default as formatField } from './format';
 export { default as postContentInfoField } from './post-content-info';
 export { default as stickyField } from './sticky';
