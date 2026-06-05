@@ -7,22 +7,35 @@ import { unlock } from '../../lock-unlock';
 const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
-const THEME_PRIMARY_COLORS = new Map< string, string >( [
-	[ 'light', '#0085ba' ],
-	[ 'modern', '#3858e9' ],
-	[ 'blue', '#096484' ],
-	[ 'coffee', '#46403c' ],
-	[ 'ectoplasm', '#523f6d' ],
-	[ 'midnight', '#e14d43' ],
-	[ 'ocean', '#627c83' ],
-	[ 'sunrise', '#dd823b' ],
-] );
+/**
+ * Get a CSS custom property value from the body element.
+ *
+ * @param propertyName The CSS custom property name (e.g., '--wp-admin-color-highlight').
+ * @return The property value or undefined if not set.
+ */
+function getCSSCustomProperty( propertyName: string ): string | undefined {
+	const value = getComputedStyle( document.body )
+		.getPropertyValue( propertyName )
+		.trim();
+	return value || undefined;
+}
 
+/**
+ * Get the admin theme primary color from Core's CSS custom properties.
+ *
+ * @return The highlight color or undefined.
+ */
 export function getAdminThemePrimaryColor(): string | undefined {
-	const theme =
-		document.body.className.match( /admin-color-([a-z]+)/ )?.[ 1 ];
+	return getCSSCustomProperty( '--wp-admin-color-highlight' );
+}
 
-	return theme && THEME_PRIMARY_COLORS.get( theme );
+/**
+ * Get the admin theme background color from Core's CSS custom properties.
+ *
+ * @return The menu background color or undefined.
+ */
+export function getAdminThemeBgColor(): string | undefined {
+	return getCSSCustomProperty( '--wp-admin-color-menu-background' );
 }
 
 export function UserThemeProvider( {
@@ -30,6 +43,9 @@ export function UserThemeProvider( {
 	...restProps
 }: React.ComponentProps< typeof ThemeProvider > ) {
 	const primary = getAdminThemePrimaryColor();
+	const bg = getAdminThemeBgColor();
 
-	return <ThemeProvider { ...restProps } color={ { primary, ...color } } />;
+	return (
+		<ThemeProvider { ...restProps } color={ { primary, bg, ...color } } />
+	);
 }

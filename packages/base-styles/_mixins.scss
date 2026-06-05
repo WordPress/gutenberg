@@ -513,6 +513,15 @@
 	}
 }
 
+// Focus style width.
+// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
+@mixin admin-border-width-focus() {
+	--wp-admin-border-width-focus: 2px;
+	@media ( -webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+		--wp-admin-border-width-focus: 1.5px;
+	}
+}
+
 @mixin admin-scheme($color-primary) {
 	// Define RGB equivalents for use in rgba function.
 	// Hexadecimal css vars do not work in the rgba function.
@@ -524,45 +533,20 @@
 	--wp-admin-theme-color-darker-20: #{color.adjust($color-primary, $lightness: -10%)};
 	--wp-admin-theme-color-darker-20--rgb: #{functions.hex-to-rgb(color.adjust($color-primary, $lightness: -10%))};
 
-	// Focus style width.
-	// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
-	--wp-admin-border-width-focus: 2px;
-	@media ( -webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-		--wp-admin-border-width-focus: 1.5px;
-	}
+	@include admin-border-width-focus();
 }
 
+// Using Core's CSS custom properties as the source of truth.
 @mixin wordpress-admin-schemes() {
-	body.admin-color-light {
-		@include admin-scheme(#0085ba);
-	}
+	body {
+		--wp-admin-theme-color: var(--wp-admin-color-highlight);
+		--wp-admin-theme-color--rgb: var(--wp-admin-color-highlight--rgb);
+		--wp-admin-theme-color-darker-10: var(--wp-admin-color-highlight-darker-10);
+		--wp-admin-theme-color-darker-10--rgb: var(--wp-admin-color-highlight-darker-10--rgb);
+		--wp-admin-theme-color-darker-20: var(--wp-admin-color-highlight-darker-20);
+		--wp-admin-theme-color-darker-20--rgb: var(--wp-admin-color-highlight-darker-20--rgb);
 
-	body.admin-color-modern {
-		@include admin-scheme(#3858e9);
-	}
-
-	body.admin-color-blue {
-		@include admin-scheme(#096484);
-	}
-
-	body.admin-color-coffee {
-		@include admin-scheme(#46403c);
-	}
-
-	body.admin-color-ectoplasm {
-		@include admin-scheme(#523f6d);
-	}
-
-	body.admin-color-midnight {
-		@include admin-scheme(#e14d43);
-	}
-
-	body.admin-color-ocean {
-		@include admin-scheme(#627c83);
-	}
-
-	body.admin-color-sunrise {
-		@include admin-scheme(#dd823b);
+		@include admin-border-width-focus();
 	}
 }
 
