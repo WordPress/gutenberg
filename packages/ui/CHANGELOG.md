@@ -9,7 +9,6 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
--   `Drawer`: Remove an obsolete CSS workaround for [`mui/base-ui#4622`](https://github.com/mui/base-ui/issues/4622), fixed upstream in `@base-ui/react@1.4.1` ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
 
 ### Bug Fixes
 
