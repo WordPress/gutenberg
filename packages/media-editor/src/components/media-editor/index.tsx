@@ -343,12 +343,14 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
-	// The sidebar is a side column from the `medium` breakpoint up and
-	// collapses below it. Track that single breakpoint: in "panel mode"
-	// (≥ medium) the rotate/flip controls live in the Crop panel and the
-	// footer is just History + Cancel/Save; below it the controls drop into
-	// the footer. (The fine-rotation ruler always sits under the canvas.)
-	const isPanelLayout = useViewportMatch( 'medium' );
+	// The sidebar is a side column from the `small` breakpoint up and collapses
+	// to an overlay below it — mirroring InterfaceSkeleton's behaviour, shifted
+	// from `medium` to `small` (see the matching CSS overrides in style.scss).
+	// Track that single breakpoint: in "panel mode" (≥ small) the
+	// rotate/flip/zoom controls live in the Crop panel and the footer is just
+	// History + Cancel/Save; below it the controls drop into the footer. (The
+	// fine-rotation ruler always sits under the canvas.)
+	const isPanelLayout = useViewportMatch( 'small' );
 	const footerLayout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
 
 	const { media, hasEdits } = useSelect(
@@ -483,9 +485,6 @@ function MediaEditorContent( {
 						<MediaEditorCropPanel
 							aspectRatioValue={ aspectRatioValue }
 							onAspectRatioChange={ setAspectRatioValue }
-							onPlacementControlInteraction={
-								signalPlacementControlInteraction
-							}
 							aspectRatioOptions={ aspectRatioOptions }
 							showTransformControls={ isPanelLayout }
 						/>
@@ -499,7 +498,6 @@ function MediaEditorContent( {
 		aspectRatioValue,
 		setAspectRatioValue,
 		aspectRatioOptions,
-		signalPlacementControlInteraction,
 		isPanelLayout,
 	] );
 

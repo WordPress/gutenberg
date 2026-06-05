@@ -7,13 +7,19 @@
 	align-items: center;
 	gap: $grid-unit-10;
 
-	// Stacked layout used inside the Crop panel on wide viewports: the
-	// Rotate and Flip groups sit side by side (rotate left, flip right)
-	// above the zoom and aspect-ratio controls.
+	// Stacked layout used inside the Crop panel on wide viewports: the Rotate
+	// and Flip groups sit side by side (rotate left, flip right) in a row, with
+	// the Zoom group beneath them. The aspect-ratio select renders separately
+	// below in the Crop panel.
 	&.is-stacked {
-		flex-direction: row;
+		flex-direction: column;
 		align-items: flex-start;
 		gap: $grid-unit-30;
+	}
+
+	&__transforms {
+		display: flex;
+		gap: $grid-unit-60;
 	}
 
 	&__group {

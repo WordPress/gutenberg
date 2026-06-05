@@ -1,33 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { RangeControl, SelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useMediaEditor } from '../../state';
-import {
-	useCropGestureHandlers,
-	CROP_CONTROL_ATTR,
-} from '../../hooks/use-crop-gesture-handlers';
+import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
-import { MAX_ZOOM } from '../../image-editor/core/constants';
-import { getMinZoom } from '../../image-editor/core/containment';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
-
-const ZOOM_PERCENTAGE_SCALE = 100;
-const MAX_ZOOM_PERCENTAGE = MAX_ZOOM * ZOOM_PERCENTAGE_SCALE;
-
-function getZoomPercentageForDisplay( zoom: number ): number {
-	return Math.round( zoom * ZOOM_PERCENTAGE_SCALE );
-}
-
-function getMinZoomPercentageForDisplay( zoom: number ): number {
-	return Math.ceil( zoom * ZOOM_PERCENTAGE_SCALE );
-}
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -38,12 +21,10 @@ export interface MediaEditorCropPanelProps {
 	aspectRatioValue: string;
 	/** Setter for the aspect-ratio preset value. */
 	onAspectRatioChange: ( value: string ) => void;
-	/** Signal that a placement-oriented control is being adjusted. */
-	onPlacementControlInteraction?: () => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
 	/**
-	 * When `true`, render the rotate/flip transform controls at the top of
+	 * When `true`, render the rotate/flip/zoom image controls at the top of
 	 * the panel. Used on wide viewports where the footer no longer carries
 	 * them.
 	 */
@@ -51,28 +32,21 @@ export interface MediaEditorCropPanelProps {
 }
 
 /**
- * Sidebar panel for crop-shape controls. The tactile verbs (rotate, flip)
- * live in the bottom toolbar instead.
+ * Sidebar panel for crop controls. Renders the aspect-ratio selector, plus the
+ * rotate/flip and zoom controls on wide viewports (these move to the footer
+ * toolbar when the sidebar collapses).
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
- * @param props.onPlacementControlInteraction
  * @param props.aspectRatioOptions
  * @param props.showTransformControls
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
-	onPlacementControlInteraction,
 	aspectRatioOptions,
 	showTransformControls = false,
 }: MediaEditorCropPanelProps ) {
-	const { state, setZoom } = useMediaEditor();
-	const zoomGestureHandlers = useCropGestureHandlers();
-	const minZoom = getMinZoom( state );
-	const zoomPercentage = getZoomPercentageForDisplay( state.zoom );
-	const minZoomPercentage = getMinZoomPercentageForDisplay( minZoom );
-
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -96,36 +70,6 @@ export default function MediaEditorCropPanel( {
 					value: preset.value.toString(),
 				} ) ) }
 			/>
-			<div role="presentation" { ...zoomGestureHandlers }>
-				<RangeControl
-					__next40pxDefaultSize
-					label={ __( 'Zoom (%)' ) }
-					min={ minZoomPercentage }
-					max={ MAX_ZOOM_PERCENTAGE }
-					step={ 1 }
-					shiftStep={ 10 }
-					value={ zoomPercentage }
-					onChange={ ( value ) => {
-						onPlacementControlInteraction?.();
-						setZoom(
-							typeof value === 'number'
-								? value / ZOOM_PERCENTAGE_SCALE
-								: minZoom
-						);
-					} }
-					renderTooltipContent={ ( value ) => {
-						const percentage =
-							typeof value === 'number'
-								? value
-								: minZoomPercentage;
-						return sprintf(
-							/* translators: %d: zoom level as a percentage. */
-							__( '%d%%' ),
-							Math.round( percentage )
-						);
-					} }
-				/>
-			</div>
 		</Stack>
 	);
 }

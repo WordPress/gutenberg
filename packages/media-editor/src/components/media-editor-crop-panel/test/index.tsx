@@ -8,7 +8,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
-import { MediaEditorStateProvider, useMediaEditor } from '../../../state';
+import { MediaEditorStateProvider } from '../../../state';
 import type { CropperState } from '../../../image-editor';
 
 function setupCropPanel(
@@ -29,31 +29,13 @@ function setupCropPanel(
 	render(
 		<MediaEditorStateProvider initialCropperState={ initialCropperState }>
 			<MediaEditorCropPanel { ...props } />
-			<CurrentZoomValue />
 		</MediaEditorStateProvider>
 	);
 
 	return props;
 }
 
-function CurrentZoomValue() {
-	const { state } = useMediaEditor();
-
-	return <output data-testid="current-zoom">{ state.zoom }</output>;
-}
-
 describe( 'MediaEditorCropPanel', () => {
-	it( 'renders crop shape controls before zoom controls', () => {
-		setupCropPanel();
-
-		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
-		const zoom = screen.getByRole( 'slider', { name: 'Zoom (%)' } );
-
-		expect( aspectRatio.compareDocumentPosition( zoom ) ).toBe(
-			Node.DOCUMENT_POSITION_FOLLOWING
-		);
-	} );
-
 	it( 'passes selected aspect ratio changes to the caller', () => {
 		const controls = setupCropPanel( {
 			aspectRatioValue: '1',
@@ -69,54 +51,36 @@ describe( 'MediaEditorCropPanel', () => {
 		).toBe( '0' );
 	} );
 
-	it( 'displays zoom as a percentage without changing cropper state', () => {
-		setupCropPanel( {}, { zoom: 3.749999999999999 } );
-
-		const zoomInput = screen.getByRole( 'spinbutton', {
-			name: 'Zoom (%)',
-		} );
-
-		expect( zoomInput ).toHaveValue( 375 );
-		expect( screen.getByTestId( 'current-zoom' ) ).toHaveTextContent(
-			'3.749999999999999'
-		);
-	} );
-
-	it( 'converts percentage input back to the cropper zoom multiplier', () => {
-		const controls = setupCropPanel( {
-			onPlacementControlInteraction: jest.fn(),
-		} );
-
-		fireEvent.change(
-			screen.getByRole( 'spinbutton', { name: 'Zoom (%)' } ),
-			{
-				target: { value: '250' },
-			}
-		);
-
-		expect( screen.getByTestId( 'current-zoom' ) ).toHaveTextContent(
-			'2.5'
-		);
-		expect( controls.onPlacementControlInteraction ).toHaveBeenCalled();
-	} );
-
-	it( 'omits transform controls by default', () => {
+	it( 'omits the image controls by default', () => {
 		setupCropPanel();
 
 		expect( screen.queryByText( 'Rotate' ) ).not.toBeInTheDocument();
 		expect( screen.queryByText( 'Flip' ) ).not.toBeInTheDocument();
+		expect( screen.queryByText( 'Zoom' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'renders rotate and flip controls when showTransformControls is set', () => {
+	it( 'renders rotate, flip and zoom controls when showTransformControls is set', () => {
 		setupCropPanel( { showTransformControls: true } );
 
 		expect( screen.getByText( 'Rotate' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'Flip' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Zoom' ) ).toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', { name: 'Rotate 90° clockwise' } )
 		).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'button', { name: 'Flip horizontal' } )
+			screen.getByRole( 'button', { name: 'Zoom in' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'renders the image controls above the aspect-ratio selector', () => {
+		setupCropPanel( { showTransformControls: true } );
+
+		const rotate = screen.getByText( 'Rotate' );
+		const aspectRatio = screen.getByLabelText( 'Aspect ratio' );
+
+		expect( rotate.compareDocumentPosition( aspectRatio ) ).toBe(
+			Node.DOCUMENT_POSITION_FOLLOWING
+		);
 	} );
 } );
