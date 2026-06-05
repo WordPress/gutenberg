@@ -87,7 +87,10 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			} )
 			.then( () => {
 				existing.url = track.url;
-				updateSeekControlLabel( existing.instance, track.title );
+				updateSeekControlLabel(
+					existing.instance,
+					track.title || ref.dataset.labelSeek
+				);
 				if ( shouldAutoPlay ) {
 					existing.instance.play()?.catch( logPlayError );
 				}
@@ -125,7 +128,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	} );
 
 	// Label the seek control with the track title, mirroring the editor.
-	updateSeekControlLabel( player.instance, track.title );
+	updateSeekControlLabel( player.instance, track.title || labels.seek );
 
 	// Store state for cleanup, including instance for loadTrack reuse.
 	playerState.set( ref, {

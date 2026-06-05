@@ -147,7 +147,9 @@ export function setupPlayButtonAccessibility(
  * @return {string} Formatted timestamp.
  */
 function formatTimestamp( seconds ) {
-	const normalizedSeconds = Math.max( 0, Math.floor( seconds || 0 ) );
+	// Round rather than floor: media durations are often fractional (e.g.
+	// 11.999s), and flooring would announce them as one second short.
+	const normalizedSeconds = Math.max( 0, Math.round( seconds || 0 ) );
 	const hours = Math.floor( normalizedSeconds / 3600 );
 	const minutes = Math.floor( ( normalizedSeconds % 3600 ) / 60 );
 	const remainingSeconds = normalizedSeconds % 60;

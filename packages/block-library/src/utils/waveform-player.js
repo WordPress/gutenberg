@@ -39,7 +39,7 @@ function updatePlayerMetadata( instance, { title, artist, image } ) {
 	if ( instance.titleEl ) {
 		instance.titleEl.textContent = title ?? '';
 	}
-	updateSeekControlLabel( instance, title );
+	updateSeekControlLabel( instance, title || __( 'Seek' ) );
 	if ( instance.subtitleEl ) {
 		instance.subtitleEl.textContent = artist ?? '';
 		instance.subtitleEl.style.display = artist ? '' : 'none';
