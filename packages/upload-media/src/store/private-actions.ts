@@ -832,26 +832,12 @@ export function detectUltraHdr( id: QueueItemId ) {
 			// If UltraHDR detection fails, continue with regular upload.
 		}
 
+		// Track the item so downstream resize operations preserve the gain
+		// map and skip format transcoding. The original file is uploaded
+		// unmodified — UltraHDR JPEGs are already backwards compatible (SDR
+		// displays use the embedded base image).
 		if ( info ) {
 			ultraHdrItems.add( id );
-
-			// Mark attachment metadata with UltraHDR info. The original file
-			// is uploaded unmodified — UltraHDR JPEGs are already backwards
-			// compatible (SDR displays use the embedded base image).
-			const existingMeta = Array.isArray( item.attachment?.meta )
-				? {}
-				: item.attachment?.meta || {};
-			dispatch.finishOperation( id, {
-				attachment: {
-					...item.attachment,
-					meta: {
-						...existingMeta,
-						ultrahdr: true,
-						hdr_capacity: info.hdrCapacity,
-					},
-				},
-			} );
-			return;
 		}
 
 		dispatch.finishOperation( id, {} );

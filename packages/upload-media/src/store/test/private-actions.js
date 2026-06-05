@@ -439,7 +439,7 @@ describe( 'private actions', () => {
 			jest.clearAllMocks();
 		} );
 
-		it( 'tags the attachment when the buffer is UltraHDR', async () => {
+		it( 'probes the file and finishes the operation when UltraHDR', async () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( {
 				width: 1024,
 				height: 768,
@@ -453,18 +453,14 @@ describe( 'private actions', () => {
 			const thunk = detectUltraHdr( 'test-id' );
 			await thunk( { select, dispatch } );
 
+			// The thunk only probes and tracks the item (tracking is verified
+			// via the generateThumbnails routing tests); the upload itself is
+			// untouched, so it finishes with no attachment updates.
 			expect( vipsGetUltraHdrInfo ).toHaveBeenCalledTimes( 1 );
-			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
-				attachment: {
-					meta: {
-						ultrahdr: true,
-						hdr_capacity: 3,
-					},
-				},
-			} );
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
-		it( 'finishes with no metadata when buffer is not UltraHDR', async () => {
+		it( 'finishes cleanly when buffer is not UltraHDR', async () => {
 			vipsGetUltraHdrInfo.mockResolvedValue( null );
 			const finishOperation = jest.fn();
 			const select = { getItem: () => makeItem() };
@@ -489,34 +485,6 @@ describe( 'private actions', () => {
 
 			// Probe failure must not cancel the upload — pass-through finish.
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
-		} );
-
-		it( 'normalizes meta when attachment.meta is an array', async () => {
-			vipsGetUltraHdrInfo.mockResolvedValue( {
-				width: 800,
-				height: 600,
-				hdrCapacity: 2,
-			} );
-			const finishOperation = jest.fn();
-			// WP REST sometimes returns `meta: []` for empty meta;
-			// the thunk must spread an object, not the array.
-			const item = {
-				file: new File( [ 'fake' ], 'photo.jpg', {
-					type: 'image/jpeg',
-				} ),
-				attachment: { meta: [] },
-			};
-			const select = { getItem: () => item };
-			const dispatch = { finishOperation };
-
-			const thunk = detectUltraHdr( 'test-id' );
-			await thunk( { select, dispatch } );
-
-			const call = finishOperation.mock.calls[ 0 ];
-			expect( call[ 1 ].attachment.meta ).toEqual( {
-				ultrahdr: true,
-				hdr_capacity: 2,
-			} );
 		} );
 
 		it( 'returns early when item is not found', async () => {
