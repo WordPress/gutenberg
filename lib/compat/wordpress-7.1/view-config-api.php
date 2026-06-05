@@ -87,7 +87,16 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	 *     @type string $all_items_title The localized "all items" title for the entity.
 	 * }
 	 */
-	return apply_filters(
+	/**
+	 * Filters the view configuration for a given entity.
+	 *
+	 * Because this filter is intended to be used by third parties, a callback may
+	 * accidentally return a non-array value, drop one of the expected top-level
+	 * keys, or add unexpected ones. Normalize the result back to an array and
+	 * re-merge it with the defaults so consumers can always rely on exactly the
+	 * documented top-level keys being present.
+	 */
+	$filtered_config = apply_filters(
 		"get_entity_view_config_{$kind}_{$name}",
 		$config,
 		array(
@@ -96,6 +105,15 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 			'all_items_title' => $all_items_title,
 		)
 	);
+
+	if ( ! is_array( $filtered_config ) ) {
+		$filtered_config = array();
+	}
+
+	// Backfill any dropped keys with their defaults, then discard any keys the
+	// filter introduced that are not part of the documented configuration shape.
+	$filtered_config = array_merge( $config, $filtered_config );
+	return array_intersect_key( $filtered_config, $config );
 }
 
 /**
