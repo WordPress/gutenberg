@@ -200,7 +200,22 @@ export function setupPlayButtonAccessibility(
 	container.addEventListener( 'waveformplayer:pause', onPause );
 	container.addEventListener( 'waveformplayer:ended', onPause );
 
+	// The library's container has tabindex="0" and focuses itself on click,
+	// stealing focus from the play button. Since the library owns this button's
+	// click handler, restore focus on the next frame rather than stopping the
+	// event, so keyboard focus isn't lost when toggling play/pause.
+	const view = container.ownerDocument.defaultView;
+	let refocusFrame;
+	const onPlayBtnClick = () => {
+		refocusFrame = view.requestAnimationFrame( () => playBtn.focus() );
+	};
+	playBtn.addEventListener( 'click', onPlayBtnClick );
+
 	return () => {
+		if ( refocusFrame ) {
+			view.cancelAnimationFrame( refocusFrame );
+		}
+		playBtn.removeEventListener( 'click', onPlayBtnClick );
 		container.removeEventListener( 'waveformplayer:play', onPlay );
 		container.removeEventListener( 'waveformplayer:pause', onPause );
 		container.removeEventListener( 'waveformplayer:ended', onPause );
@@ -553,16 +568,27 @@ function setupPlaylistControls(
 	controlsDiv.appendChild( repeatBtn );
 	controlsDiv.appendChild( nextBtn );
 
-	const onPrevClick = () => onPrev?.();
-	const onShuffleClick = () => {
+	// The library's container has tabindex="0" and focuses itself on click,
+	// which would steal keyboard focus from these controls. Stop the click
+	// from bubbling to it so focus stays on the button that was activated.
+	const onPrevClick = ( event ) => {
+		event.stopPropagation();
+		onPrev?.();
+	};
+	const onShuffleClick = ( event ) => {
+		event.stopPropagation();
 		shuffleBtn.classList.toggle( 'is-active' );
 		onShuffleToggle?.();
 	};
-	const onRepeatClick = () => {
+	const onRepeatClick = ( event ) => {
+		event.stopPropagation();
 		repeatBtn.classList.toggle( 'is-active' );
 		onRepeatToggle?.();
 	};
-	const onNextClick = () => onNext?.();
+	const onNextClick = ( event ) => {
+		event.stopPropagation();
+		onNext?.();
+	};
 
 	prevBtn.addEventListener( 'click', onPrevClick );
 	shuffleBtn.addEventListener( 'click', onShuffleClick );
