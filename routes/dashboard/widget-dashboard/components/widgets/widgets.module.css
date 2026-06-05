@@ -1,4 +1,7 @@
 .grid {
+	/* stylelint-disable-next-line property-no-unknown -- container queries for the dashboard grid surface */
+	container-type: inline-size;
+	container-name: widget-dashboard;
 	width: 100%;
 	/* Placeholder and drag-preview radii: match `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
 	--wp-grid-placeholder-radius: var(--wpds-border-radius-lg);

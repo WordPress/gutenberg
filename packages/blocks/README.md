@@ -280,7 +280,7 @@ _Parameters_
 
 _Returns_
 
--   `BlockType[]`: Block types that the blocks argument can be transformed to.
+-   `BlockTypeWithTransformMetadata[]`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -826,6 +826,7 @@ _Parameters_
 
 -   _blocks_ `Block[] | Block`: Blocks array or block object.
 -   _name_ `string`: Block name.
+-   _variationName_ `string`: Optional target block variation name.
 
 _Returns_
 

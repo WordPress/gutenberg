@@ -2,11 +2,20 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
 ## 14.47.0 (2026-05-27)
 
 ### Enhancements
 
 -   Editor: Add padding around inline notices in the editor content area and distraction-free header.
+-   Editor: Pause the client-side media upload queue while the browser is offline and resume it automatically when connectivity returns ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
 -   The Media Editor modal is now mounted unconditionally and the `openMediaEditorModal` setting is always provided to the block editor. Previously both were gated behind the `gutenberg-media-editor-modal` experiment, which has been removed.
 
 ### Bug Fixes

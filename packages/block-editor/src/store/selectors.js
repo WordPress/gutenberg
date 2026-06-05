@@ -2294,6 +2294,19 @@ const buildBlockTypeItem =
 		};
 	};
 
+const buildBlockVariationItem = ( state, item ) => ( variation ) => {
+	const variationId = `${ item.id }/${ variation.name }`;
+	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
+	return {
+		...item,
+		id: variationId,
+		icon: variation.icon || item.icon,
+		title: variation.title || item.title,
+		frecency: calculateFrecency( time, count ),
+		variationName: variation.name,
+	};
+};
+
 /**
  * Determines the items that appear in the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
@@ -2474,20 +2487,21 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
  *
  * Items are returned ordered descendingly by their 'frecency'.
  *
- * @param    {Object}          state        Editor state.
- * @param    {Object|Object[]} blocks       Block object or array objects.
- * @param    {?string}         rootClientId Optional root client ID of block list.
+ * @param    {Object}          state         Editor state.
+ * @param    {Object|Object[]} blocks        Block object or array objects.
+ * @param    {?string}         rootClientId  Optional root client ID of block list.
  *
  * @return {WPEditorTransformItem[]} Items that appear in inserter.
  *
  * @typedef {Object} WPEditorTransformItem
- * @property {string}          id           Unique identifier for the item.
- * @property {string}          name         The type of block to create.
- * @property {string}          title        Title of the item, as it appears in the inserter.
- * @property {string}          icon         Dashicon for the item, as it appears in the inserter.
- * @property {boolean}         isDisabled   Whether or not the user should be prevented from inserting
- *                                          this item.
- * @property {number}          frecency     Heuristic that combines frequency and recency.
+ * @property {string}          id            Unique identifier for the item.
+ * @property {string}          name          The type of block to create.
+ * @property {?string}         variationName The target block variation name.
+ * @property {string}          title         Title of the item, as it appears in the inserter.
+ * @property {string}          icon          Dashicon for the item, as it appears in the inserter.
+ * @property {boolean}         isDisabled    Whether or not the user should be prevented from inserting
+ *                                           this item.
+ * @property {number}          frecency      Heuristic that combines frequency and recency.
  */
 export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 	createSelector(
@@ -2517,14 +2531,37 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 			const possibleTransforms = getPossibleBlockTransformations(
 				normalizedBlocks
 			).reduce( ( accumulator, block ) => {
-				if ( itemsByName[ block?.name ] ) {
-					accumulator.push( itemsByName[ block.name ] );
+				const item = itemsByName[ block?.name ];
+
+				if ( ! item ) {
+					return accumulator;
 				}
+
+				const { variationName } = block;
+
+				if ( ! variationName ) {
+					accumulator.push( item );
+					return accumulator;
+				}
+
+				const variation = getBlockVariations(
+					item.name,
+					'transform'
+				)?.find( ( { name } ) => name === variationName );
+
+				if ( ! variation ) {
+					accumulator.push( item );
+					return accumulator;
+				}
+
+				accumulator.push(
+					buildBlockVariationItem( state, item )( variation )
+				);
 				return accumulator;
 			}, [] );
 			return orderBy(
 				possibleTransforms,
-				( block ) => itemsByName[ block.name ].frecency,
+				( block ) => block.frecency,
 				'desc'
 			);
 		},
@@ -2891,6 +2928,25 @@ export function getSettings( state ) {
  */
 export function isLastBlockChangePersistent( state ) {
 	return state.blocks.isPersistentChange;
+}
+
+/**
+ * Returns how the most recent block change interacts with undo history.
+ *
+ * - `persistent` changes create a new undo level.
+ * - `merge` changes do not create a new undo level, but may merge into the
+ *    prior stack item history.
+ * - `ignore` changes should never be captured by undo history.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {'persistent'|'merge'|'ignore'} Block change history behavior.
+ */
+export function __unstableGetLastBlockChangeHistoryMode( state ) {
+	if ( state.blocks.lastBlockChangeHistoryMode ) {
+		return state.blocks.lastBlockChangeHistoryMode;
+	}
+	return state.blocks.isPersistentChange === false ? 'merge' : 'persistent';
 }
 
 /**

@@ -295,6 +295,13 @@ function gutenberg_set_up_cross_origin_isolation() {
 		return;
 	}
 
+	// Skip when rendering the classic-theme home route, which shows the site
+	// preview in an iframe and must reach its `contentDocument` to neutralize
+	// interactive elements — DIP would block that.
+	if ( 'site-editor' === $screen->id && ! wp_is_block_theme() && ( ! isset( $_GET['p'] ) || '/' === $_GET['p'] ) ) {
+		return;
+	}
+
 	// Skip when a third-party page builder overrides the block editor.
 	// DIP isolates the document into its own agent cluster,
 	// which blocks same-origin iframe access that these editors rely on.

@@ -34,6 +34,7 @@ describe( 'TreeGridCell', () => {
 				</TreeGridCell>
 			)
 		).toThrow();
+		expect( console ).toHaveErrored();
 	} );
 
 	it( 'uses a child render function to render children', () => {

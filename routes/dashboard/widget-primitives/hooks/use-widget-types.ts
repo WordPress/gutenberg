@@ -43,11 +43,9 @@ interface WidgetModuleRecord {
 }
 
 /**
- * Tuple of `[ widgetTypes, isResolvingWidgetTypes ]`.
- *
- * The boolean is true while widget-module records or their metadata imports
- * have not finished resolving. Layout instances must not be treated as missing
- * until it is false.
+ * `isResolvingWidgetTypes` is true while widget-module records or their
+ * metadata imports have not finished resolving. Layout instances must not
+ * be treated as missing until it is false.
  */
 export type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
