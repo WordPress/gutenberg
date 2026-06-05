@@ -510,11 +510,13 @@ function setupPlaylistControls(
 	controlsDiv.className = 'wp-block-playlist__controls';
 
 	const prevBtn = doc.createElement( 'button' );
+	prevBtn.type = 'button';
 	prevBtn.className = 'wp-block-playlist__control-btn';
 	prevBtn.setAttribute( 'aria-label', previousLabel );
 	prevBtn.appendChild( createSvgIcon( doc, ICON_PREV ) );
 
 	const shuffleBtn = doc.createElement( 'button' );
+	shuffleBtn.type = 'button';
 	shuffleBtn.className = 'wp-block-playlist__control-btn';
 	shuffleBtn.setAttribute( 'aria-label', shuffleLabel );
 	if ( isShuffled ) {
@@ -523,6 +525,7 @@ function setupPlaylistControls(
 	shuffleBtn.appendChild( createSvgIcon( doc, ICON_SHUFFLE ) );
 
 	const repeatBtn = doc.createElement( 'button' );
+	repeatBtn.type = 'button';
 	repeatBtn.className = 'wp-block-playlist__control-btn';
 	repeatBtn.setAttribute( 'aria-label', repeatLabel );
 	if ( isRepeating ) {
@@ -531,6 +534,7 @@ function setupPlaylistControls(
 	repeatBtn.appendChild( createSvgIcon( doc, ICON_REPEAT ) );
 
 	const nextBtn = doc.createElement( 'button' );
+	nextBtn.type = 'button';
 	nextBtn.className = 'wp-block-playlist__control-btn';
 	nextBtn.setAttribute( 'aria-label', nextLabel );
 	nextBtn.appendChild( createSvgIcon( doc, ICON_NEXT ) );
