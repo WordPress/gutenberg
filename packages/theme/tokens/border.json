@@ -2,6 +2,7 @@
 	"wpds-border": {
 		"$type": "dimension",
 		"radius": {
+			"$description": "Border radius scale for elegant hierarchical nesting. Outer surfaces use larger steps; nested elements use smaller ones so concentric corners stay visually harmonious.",
 			"xs": {
 				"$value": { "value": 1, "unit": "px" },
 				"$description": "Extra small radius"
