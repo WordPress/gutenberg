@@ -421,8 +421,9 @@ describe( 'Waveform utilities', () => {
 				createMarkerTestContext( {
 					duration: Number.NaN,
 				} );
+			instance.options.durationFallback = 120;
 
-			setupWaveformTimeMarkers( instance, container, '2:00' );
+			setupWaveformTimeMarkers( instance, container );
 
 			waveformArea.dispatchEvent(
 				new window.MouseEvent( 'mousemove', {

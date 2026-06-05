@@ -340,10 +340,9 @@ function decorateWaveformPlayerMarkers( markersContainer ) {
  *
  * @param {Object}  instance  - The WaveformPlayer library instance.
  * @param {Element} container - The waveform container element.
- * @param {string}  duration  - Fallback formatted duration.
  * @return {Function} Cleanup function to remove listeners and marker elements.
  */
-export function setupWaveformTimeMarkers( instance, container, duration ) {
+export function setupWaveformTimeMarkers( instance, container ) {
 	const waveformArea = container.querySelector( '.waveform-container' );
 	const markersContainer = container.querySelector( '.waveform-markers' );
 
@@ -371,8 +370,7 @@ export function setupWaveformTimeMarkers( instance, container, duration ) {
 			return instance.audio.duration;
 		}
 
-		const fallbackDuration =
-			instance.options.durationFallback ?? parseTime( duration );
+		const fallbackDuration = instance.options.durationFallback;
 
 		return hasDuration( fallbackDuration ) ? fallbackDuration : null;
 	};
@@ -545,11 +543,7 @@ export function initWaveformPlayer(
 	// Initialize the WaveformPlayer library.
 	const instance = new WaveformPlayerLib( container );
 	instance.options.durationFallback = parseTime( duration );
-	const cleanupTimeMarkers = setupWaveformTimeMarkers(
-		instance,
-		container,
-		duration
-	);
+	const cleanupTimeMarkers = setupWaveformTimeMarkers( instance, container );
 
 	// Set up event handlers.
 	let cleanupAccessibility;

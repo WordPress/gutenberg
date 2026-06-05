@@ -81,10 +81,13 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 
 	// If a player already exists, load the new track without recreating.
 	if ( existing?.instance ) {
+		// Set directly rather than via loadTrack(), whose mergeOptions skips
+		// null values and so would leave a stale fallback when the new track
+		// has no length.
+		existing.instance.options.durationFallback = parseTime( track.length );
 		existing.instance
 			.loadTrack( track.url, track.title, track.artist, {
 				artwork: track.image,
-				durationFallback: parseTime( track.length ),
 			} )
 			.then( () => {
 				existing.url = track.url;
