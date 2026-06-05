@@ -141,7 +141,7 @@ export default function IncludeControl( {
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }
 			onChange={ onTermChange }
-			__experimentalShowHowTo={ false }
+			help=""
 			{ ...props }
 		/>
 	);

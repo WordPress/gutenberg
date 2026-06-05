@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/router",
-	"version": "1.43.0",
+	"version": "1.47.0",
 	"description": "Router API for WordPress pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,6 +43,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",

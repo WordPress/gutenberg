@@ -38,8 +38,11 @@ const test = base.extend< Fixtures >( {
 	collaborationEnabled: [
 		async ( { requestUtils }, use ) => {
 			await setCollaboration( requestUtils, true );
-			await use( true );
-			await setCollaboration( requestUtils, false );
+			try {
+				await use( true );
+			} finally {
+				await setCollaboration( requestUtils, false );
+			}
 		},
 		{ auto: true },
 	],

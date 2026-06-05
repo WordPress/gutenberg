@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Breaking Changes
+- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+-   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
+
+## 0.14.0 (2026-05-27)
+
+### Breaking Changes
+
+-   The `color.primary` and `color.bg` props on `ThemeProvider` now require an sRGB-parseable string (hex, `rgb(...)`, or CSS named color). Other CSS color formats like `hsl(...)`, `oklch(...)`, and `lab(...)` are no longer supported ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
+
+### Documentation
+
+-   Add ["Design System/Tokens/Introduction" page](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs) to Storybook ([#78449](https://github.com/WordPress/gutenberg/pull/78449)).
+-   Add "How to pick a token" and "Naming pattern" guidance to [the design system tokens reference documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) ([#78438](https://github.com/WordPress/gutenberg/pull/78438)).
+
+### Internal
+
+-   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
+
+## 0.13.0 (2026-05-14)
+
+### New Features
+
+-   Add `--wpds-motion-duration-*` and `--wpds-motion-easing-*` design tokens for standardizing animation timing across components. Easing tokens use intent-based names: `subtle`, `balanced`, and `expressive` ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
+
+## 0.12.0 (2026-04-29)
+
+## 0.11.0 (2026-04-15)
+
 ### Breaking changes
 
 -   Renamed typography tokens from `--wpds-font-*` to `--wpds-typography-*`. Sub-groups that correspond to CSS `font-*` properties retain the `font-` prefix; `line-height` does not. To migrate:

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useRef, useState } from '@wordpress/element';
-import { SlotFillProvider, Slot } from '@wordpress/components';
 import { close, info } from '@wordpress/icons';
-import { Popover, VisuallyHidden } from '../..';
+import * as Popover from '../';
+import { VisuallyHidden } from '../../visually-hidden';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
 import { GenericIframe, useMeasure } from './utils';
@@ -12,6 +12,8 @@ const meta: Meta< typeof Popover.Root > = {
 	component: Popover.Root,
 	subcomponents: {
 		'Popover.Trigger': Popover.Trigger,
+		'Popover.Portal': Popover.Portal,
+		'Popover.Positioner': Popover.Positioner,
 		'Popover.Popup': Popover.Popup,
 		'Popover.Arrow': Popover.Arrow,
 		'Popover.Title': Popover.Title,
@@ -20,6 +22,13 @@ const meta: Meta< typeof Popover.Root > = {
 	},
 	argTypes: {
 		children: { control: false },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -79,7 +88,7 @@ export const NoArrow: Story = {
 };
 
 /**
- * All combinations of `side` and `align` props on `Popover.Popup`.
+ * All combinations of `side` and `align` props on `Popover.Positioner`.
  *
  * Each row shows a side (`top`, `right`, `bottom`, `left`), and each column
  * shows an alignment (`start`, `center`, `end`).
@@ -107,12 +116,16 @@ export const Positioning: Story = {
 								{ side } / { align }
 							</Popover.Trigger>
 							<Popover.Popup
-								side={ side }
-								align={ align }
-								collisionAvoidance={ {
-									side: 'none',
-									align: 'none',
-								} }
+								positioner={
+									<Popover.Positioner
+										side={ side }
+										align={ align }
+										collisionAvoidance={ {
+											side: 'none',
+											align: 'none',
+										} }
+									/>
+								}
 							>
 								<VisuallyHidden render={ <Popover.Title /> }>
 									{ side } / { align }
@@ -407,16 +420,21 @@ export const OverlayPlacement: Story = {
 					</Popover.Trigger>
 					<Popover.Popup
 						ref={ popupRef }
-						side="bottom"
-						align="center"
-						sideOffset={
-							-1 *
-							( popupSize.height / 2 + triggerSize.height / 2 )
+						positioner={
+							<Popover.Positioner
+								side="bottom"
+								align="center"
+								sideOffset={
+									-1 *
+									( popupSize.height / 2 +
+										triggerSize.height / 2 )
+								}
+								collisionAvoidance={ {
+									side: 'none',
+									align: 'none',
+								} }
+							/>
 						}
-						collisionAvoidance={ {
-							side: 'none',
-							align: 'none',
-						} }
 					>
 						<Popover.Title
 							style={ {
@@ -442,10 +460,11 @@ export const OverlayPlacement: Story = {
 };
 
 /**
- * To render the popup inline (without a portal), create a local ref to a
- * `<span>` with `display: contents` and pass it as the `container` prop.
- * The popup will render inside the span rather than being portaled to
- * `document.body`, while retaining all positioning behavior.
+ * To keep the floating layer **in page flow** next to surrounding layout,
+ * create a local ref to a `<span>` with `display: contents` and pass
+ * `portal={ <Popover.Portal container={ ref } /> }`. The popup still uses a
+ * portal, but the portal **mounts** into that subtree instead of
+ * `document.body`, while retaining positioning behavior.
  *
  * **Note:** `backdrop` will not cover the full viewport in this mode.
  */
@@ -462,7 +481,11 @@ export const Inline: Story = {
 						ref={ inlineContainerRef }
 						style={ { display: 'contents' } }
 					/>
-					<Popover.Popup container={ inlineContainerRef }>
+					<Popover.Popup
+						portal={
+							<Popover.Portal container={ inlineContainerRef } />
+						}
+					>
 						<Popover.Arrow />
 						<Popover.Title
 							style={ {
@@ -472,8 +495,10 @@ export const Inline: Story = {
 							Inline Popover
 						</Popover.Title>
 						<Popover.Description>
-							This popup is rendered in place — no portal is used.
-							Inspect the DOM to see it lives inside its parent.
+							This example still uses `Popover.Portal`, but the
+							portal `container` is the in-tree span above, so the
+							portal node mounts inside the wrapper instead of
+							`document.body`.
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>
@@ -522,8 +547,12 @@ export const CollisionAvoidance: Story = {
 					<Popover.Root defaultOpen>
 						<Popover.Trigger>Flip (default)</Popover.Trigger>
 						<Popover.Popup
-							side="top"
-							collisionBoundary={ boundary ?? undefined }
+							positioner={
+								<Popover.Positioner
+									side="top"
+									collisionBoundary={ boundary ?? undefined }
+								/>
+							}
 						>
 							<Popover.Title
 								style={ {
@@ -542,12 +571,16 @@ export const CollisionAvoidance: Story = {
 					<Popover.Root defaultOpen>
 						<Popover.Trigger>No collision</Popover.Trigger>
 						<Popover.Popup
-							side="top"
-							collisionBoundary={ boundary ?? undefined }
-							collisionAvoidance={ {
-								side: 'none',
-								align: 'none',
-							} }
+							positioner={
+								<Popover.Positioner
+									side="top"
+									collisionBoundary={ boundary ?? undefined }
+									collisionAvoidance={ {
+										side: 'none',
+										align: 'none',
+									} }
+								/>
+							}
 						>
 							<Popover.Title
 								style={ {
@@ -571,8 +604,8 @@ export const CollisionAvoidance: Story = {
 
 /**
  * When the popover's trigger lives inside an iframe but the popover should
- * render in the parent document, pass a parent-document element to the
- * `container` prop on `Popover.Popup`.
+ * render in the parent document, pass a parent-document element through
+ * `portal={ <Popover.Portal container={ ... } /> }` on `Popover.Popup`.
  *
  * This technique is used in Gutenberg where the block editor canvas is an
  * iframe but toolbars and menus must appear outside it.
@@ -623,11 +656,19 @@ export const CrossIframe: Story = {
 									Popover&apos;s anchor (inside iframe)
 								</Popover.Trigger>
 								<Popover.Popup
-									container={
-										portalContainerRef as React.RefObject< HTMLElement >
+									portal={
+										<Popover.Portal
+											container={
+												portalContainerRef as React.RefObject< HTMLElement >
+											}
+										/>
 									}
-									collisionBoundary={
-										iframeBoundary ?? undefined
+									positioner={
+										<Popover.Positioner
+											collisionBoundary={
+												iframeBoundary ?? undefined
+											}
+										/>
 									}
 								>
 									<Popover.Arrow />
@@ -656,101 +697,20 @@ export const CrossIframe: Story = {
 };
 
 /**
- * Same cross-iframe scenario, but using `SlotFillProvider` and `Slot` from
- * `@wordpress/components` as the render target.
- *
- * The `Slot` renders a `div` in the parent document, and its forwarded ref
- * is passed to `Popover.Popup`'s `container` prop so the popup portals into
- * the slot element. This mirrors the legacy Popover's `WithSlotOutsideIframe`
- * pattern.
- */
-export const CrossIframeWithSlotFill: Story = {
-	name: 'Cross-Iframe (SlotFill)',
-	args: { defaultOpen: true },
-	argTypes: { defaultOpen: { control: false } },
-	render: function Render( { children: _children, ...args } ) {
-		const slotRef = useRef< HTMLDivElement >( null );
-		const [ iframeBoundary, setIframeBoundary ] =
-			useState< HTMLIFrameElement | null >( null );
-
-		return (
-			<SlotFillProvider>
-				<Slot
-					name="popover-container"
-					bubblesVirtually
-					ref={ slotRef }
-				/>
-				<GenericIframe
-					ref={ setIframeBoundary }
-					style={ {
-						width: '100%',
-						height: 400,
-						border: 0,
-						outline: '1px solid purple',
-					} }
-				>
-					<div
-						style={ {
-							height: '200vh',
-							paddingTop: '10vh',
-						} }
-					>
-						<div
-							style={ {
-								maxWidth: 200,
-								marginTop: 100,
-								marginInline: 'auto',
-							} }
-						>
-							<Popover.Root { ...args }>
-								<Popover.Trigger
-									style={ {
-										padding: 8,
-										background: 'salmon',
-									} }
-								>
-									Popover&apos;s anchor (inside iframe)
-								</Popover.Trigger>
-								<Popover.Popup
-									container={
-										slotRef as React.RefObject< HTMLElement >
-									}
-									collisionBoundary={
-										iframeBoundary ?? undefined
-									}
-								>
-									<Popover.Arrow />
-									<Popover.Title
-										style={ {
-											marginBottom:
-												'var(--wpds-dimension-gap-xs)',
-										} }
-									>
-										Cross-Iframe (SlotFill)
-									</Popover.Title>
-									<Popover.Description>
-										This popup renders in the parent
-										document via a `Slot` from
-										`@wordpress/components`.
-									</Popover.Description>
-								</Popover.Popup>
-							</Popover.Root>
-						</div>
-					</div>
-				</GenericIframe>
-			</SlotFillProvider>
-		);
-	},
-};
-
-/**
  * Popovers in Gutenberg are managed with explicit z-index values, which can
- * create situations where a popover renders below another popover, when you
- * want it to be rendered above.
+ * create situations where a popover renders below another popover when you
+ * want it above.
  *
- * The `--wp-ui-popover-z-index` CSS variable, available on the
- * `Popover.Popup` component, is an escape hatch that can be used to override
- * the z-index of a given popover on a case-by-case basis.
+ * The `--wp-ui-popover-z-index` CSS variable controls the z-index of the
+ * popover's positioner (and its optional backdrop). Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   popover in the page), or
+ * - **Per instance**, by passing a `Popover.Portal` with a `style` (or
+ *   `className`) to `Popover.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
@@ -758,7 +718,13 @@ export const WithCustomZIndex: Story = {
 		children: (
 			<>
 				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
+				<Popover.Popup
+					portal={
+						<Popover.Portal
+							style={ { '--wp-ui-popover-z-index': '9999' } }
+						/>
+					}
+				>
 					<Popover.Arrow />
 					<Popover.Title
 						style={ {
@@ -768,8 +734,9 @@ export const WithCustomZIndex: Story = {
 						Custom z-index
 					</Popover.Title>
 					<Popover.Description>
-						This popover&apos;s positioner has z-index: 9999 via the
-						`--wp-ui-popover-z-index` CSS custom property.
+						This popover renders at `z-index: 9999` via the
+						`--wp-ui-popover-z-index` CSS custom property, set on
+						`Popover.Portal` through the `portal` prop.
 					</Popover.Description>
 				</Popover.Popup>
 			</>
@@ -778,9 +745,9 @@ export const WithCustomZIndex: Story = {
 };
 
 /**
- * Use the `anchor` prop on `Popover.Popup` to position the popover against an
- * arbitrary element instead of the built-in trigger. Base UI accepts four
- * anchor types:
+ * Pass an `anchor` to `Popover.Positioner` (via `Popover.Popup`'s `positioner`
+ * slot) to position the popover against an arbitrary element instead of the
+ * built-in trigger. `anchor` accepts four types:
  *
  * 1. **Element** — a direct DOM element reference.
  * 2. **VirtualElement** — an object with a `getBoundingClientRect()` method.
@@ -814,7 +781,7 @@ export const Anchor: Story = {
 			textAlign: 'center' as const,
 		};
 
-		const popupProps = {
+		const sharedPositionerProps = {
 			collisionAvoidance: {
 				side: 'none' as const,
 				align: 'none' as const,
@@ -837,8 +804,12 @@ export const Anchor: Story = {
 					</div>
 					<Popover.Root open>
 						<Popover.Popup
-							anchor={ elementAnchor ?? undefined }
-							{ ...popupProps }
+							positioner={
+								<Popover.Positioner
+									anchor={ elementAnchor ?? undefined }
+									{ ...sharedPositionerProps }
+								/>
+							}
 						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Element anchor
@@ -858,8 +829,12 @@ export const Anchor: Story = {
 					</div>
 					<Popover.Root open>
 						<Popover.Popup
-							anchor={ virtualAnchor }
-							{ ...popupProps }
+							positioner={
+								<Popover.Positioner
+									anchor={ virtualAnchor }
+									{ ...sharedPositionerProps }
+								/>
+							}
 						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Virtual anchor
@@ -878,7 +853,14 @@ export const Anchor: Story = {
 						RefObject anchor
 					</div>
 					<Popover.Root open>
-						<Popover.Popup anchor={ refAnchor } { ...popupProps }>
+						<Popover.Popup
+							positioner={
+								<Popover.Positioner
+									anchor={ refAnchor }
+									{ ...sharedPositionerProps }
+								/>
+							}
+						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Ref anchor
 							</VisuallyHidden>
@@ -897,8 +879,12 @@ export const Anchor: Story = {
 					</div>
 					<Popover.Root open>
 						<Popover.Popup
-							anchor={ () => callbackTarget.current }
-							{ ...popupProps }
+							positioner={
+								<Popover.Positioner
+									anchor={ () => callbackTarget.current }
+									{ ...sharedPositionerProps }
+								/>
+							}
 						>
 							<VisuallyHidden render={ <Popover.Title /> }>
 								Callback anchor
@@ -953,13 +939,12 @@ export const ToolbarVariant: Story = {
 };
 
 /**
- * Base UI's Positioner exposes `--available-height` and
- * `--available-width` CSS variables representing the space
- * between the anchor and the viewport edge. Apply them as `max-height` /
- * `max-width` via the `style` prop (which targets the positioner) to
- * constrain the popup size. Then add `overflow: auto` on an inner wrapper
- * so scrolling happens inside the popup content area — this replaces the
- * legacy Popover's `resize` prop.
+ * `Popover.Positioner` exposes `--available-height` and `--available-width`
+ * CSS variables representing the space between the anchor and the viewport
+ * edge. These cascade down to `Popover.Popup`, where applying them as
+ * `max-height` / `max-width` via the `style` prop constrains the popup size.
+ * Then add `overflow: auto` on an inner wrapper so scrolling happens inside
+ * the popup content area — this replaces the legacy Popover's `resize` prop.
  *
  * Open the popover and resize or scroll the container to see the popup shrink
  * to fit.
@@ -981,7 +966,7 @@ export const ViewportConstrainedSize: Story = {
 				<Popover.Root { ...args }>
 					<Popover.Trigger>Show Content</Popover.Trigger>
 					<Popover.Popup
-						side="bottom"
+						positioner={ <Popover.Positioner side="bottom" /> }
 						style={ {
 							maxHeight: 'var(--available-height, 300px)',
 							maxWidth: 'var(--available-width, 300px)',

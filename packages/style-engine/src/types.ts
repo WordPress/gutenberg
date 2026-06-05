@@ -51,6 +51,7 @@ export interface Style {
 		aspectRatio?: CSSProperties[ 'aspectRatio' ];
 		height?: CSSProperties[ 'height' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
+		minWidth?: CSSProperties[ 'minWidth' ];
 		width?: CSSProperties[ 'width' ];
 	};
 	spacing?: {

@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+### Internal
+
+-   `ListView`: Compute the block visibility label once in `ListViewBlock` and pass it down to `ListViewBlockSelectButton`, removing a duplicated `useSelect`/`getBlockVisibilityLabel` call and clarifying that the label is exposed to assistive technology through the row's `aria-describedby` ([#78640](https://github.com/WordPress/gutenberg/pull/78640)).
+
+## 15.20.0 (2026-05-27)
+
+### Bug Fixes
+
+-   `ColorPanel`: Theme CSS custom-property gradients are now decoded to their preset slug and persisted as a `gradient` block attribute rather than as a raw `style.color.gradient` value ([#78328](https://github.com/WordPress/gutenberg/pull/78328)).
+
+### Internal
+
+-   Remove legacy `Notice` overrides in block placeholder notices and media replace flow error UI ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 15.19.0 (2026-05-14)
+
+### Enhancements
+
+-   `BlockManager`: Add stacking context isolation to category list ([#77759](https://github.com/WordPress/gutenberg/pull/77759)).
+
+### Bug Fixes
+
+-   `ColorPanel`: Fix incorrect color selection and text↔link sync with duplicate-value palette entries. Slug-based selection is now threaded through the color panel so that two palette entries sharing the same hex value but different slugs are treated as distinct choices. The text↔link sync condition now compares raw stored references instead of decoded hex values; the previous decoded comparison incorrectly conflated entries that shared a hex value ([#78048](https://github.com/WordPress/gutenberg/pull/78048)).
+
+## 15.18.0 (2026-04-29)
+
+### Enhancements
+
+-   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77354](https://github.com/WordPress/gutenberg/pull/77354)).
+
+## 15.17.0 (2026-04-15)
+
 ## 15.16.0 (2026-04-01)
 
 ## 15.15.0 (2026-03-18)

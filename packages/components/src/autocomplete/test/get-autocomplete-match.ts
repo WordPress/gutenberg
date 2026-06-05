@@ -14,17 +14,23 @@ const createCompleter = (
 	...overrides,
 } );
 
+const defaultOptions = {
+	matchCount: 1,
+	isBackspacing: false,
+	getTextAfterSelection: () => '',
+};
+
 describe( 'getAutocompleteMatch', () => {
 	it( 'should return null for empty text content', () => {
 		const completers = [ createCompleter() ];
 		expect(
-			getAutocompleteMatch( '', completers, 0, false, () => '' )
+			getAutocompleteMatch( '', completers, defaultOptions )
 		).toBeNull();
 	} );
 
 	it( 'should return null when no completers are provided', () => {
 		expect(
-			getAutocompleteMatch( 'some text /', [], 0, false, () => '' )
+			getAutocompleteMatch( 'some text /', [], defaultOptions )
 		).toBeNull();
 	} );
 
@@ -34,9 +40,7 @@ describe( 'getAutocompleteMatch', () => {
 			getAutocompleteMatch(
 				'no trigger here',
 				completers,
-				1,
-				false,
-				() => ''
+				defaultOptions
 			)
 		).toBeNull();
 	} );
@@ -46,9 +50,7 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'some text /query',
 			completers,
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result ).toEqual( {
 			completer: completers[ 0 ],
@@ -61,9 +63,7 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'hello @',
 			completers,
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result ).toEqual( {
 			completer: completers[ 0 ],
@@ -83,9 +83,7 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'/command some text @user',
 			[ slashCompleter, atCompleter ],
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result?.completer.name ).toBe( 'at' );
 	} );
@@ -94,47 +92,35 @@ describe( 'getAutocompleteMatch', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		const longText = '/' + 'a'.repeat( 51 );
 		expect(
-			getAutocompleteMatch( longText, completers, 1, false, () => '' )
+			getAutocompleteMatch( longText, completers, defaultOptions )
 		).toBeNull();
 	} );
 
 	it( 'should match when text after trigger is exactly 50 chars', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		const text = '/' + 'a'.repeat( 50 );
-		const result = getAutocompleteMatch(
-			text,
-			completers,
-			1,
-			false,
-			() => ''
-		);
+		const result = getAutocompleteMatch( text, completers, defaultOptions );
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'a'.repeat( 50 ) );
 	} );
 
 	it( 'should return null on mismatch with multiple words and no backspacing', () => {
 		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
-		// 4 words from trigger, mismatch (filteredOptionsLength=0), not backspacing
+		// 4 words from trigger, mismatch (matchCount=0), not backspacing
 		expect(
-			getAutocompleteMatch(
-				'text @one two three four',
-				completers,
-				0,
-				false,
-				() => ''
-			)
+			getAutocompleteMatch( 'text @one two three four', completers, {
+				...defaultOptions,
+				matchCount: 0,
+			} )
 		).toBeNull();
 	} );
 
 	it( 'should still match on mismatch when there is only one trigger word', () => {
 		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
-		const result = getAutocompleteMatch(
-			'text @xyz',
-			completers,
-			0,
-			false,
-			() => ''
-		);
+		const result = getAutocompleteMatch( 'text @xyz', completers, {
+			...defaultOptions,
+			matchCount: 0,
+		} );
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'xyz' );
 	} );
@@ -144,9 +130,11 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'text @one two three',
 			completers,
-			0,
-			true,
-			() => ''
+			{
+				...defaultOptions,
+				matchCount: 0,
+				isBackspacing: true,
+			}
 		);
 		expect( result ).not.toBeNull();
 	} );
@@ -154,27 +142,25 @@ describe( 'getAutocompleteMatch', () => {
 	it( 'should NOT match while backspacing if more than 3 words from trigger', () => {
 		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
 		expect(
-			getAutocompleteMatch(
-				'text @one two three four',
-				completers,
-				0,
-				true,
-				() => ''
-			)
+			getAutocompleteMatch( 'text @one two three four', completers, {
+				...defaultOptions,
+				matchCount: 0,
+				isBackspacing: true,
+			} )
 		).toBeNull();
 	} );
 
 	it( 'should return null when text after trigger starts with whitespace', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		expect(
-			getAutocompleteMatch( '/ query', completers, 1, false, () => '' )
+			getAutocompleteMatch( '/ query', completers, defaultOptions )
 		).toBeNull();
 	} );
 
 	it( 'should return null when text after trigger ends with multiple spaces', () => {
 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
 		expect(
-			getAutocompleteMatch( '/query  ', completers, 1, false, () => '' )
+			getAutocompleteMatch( '/query  ', completers, defaultOptions )
 		).toBeNull();
 	} );
 
@@ -186,7 +172,7 @@ describe( 'getAutocompleteMatch', () => {
 			} ),
 		];
 		expect(
-			getAutocompleteMatch( 'text @user', completers, 1, false, () => '' )
+			getAutocompleteMatch( 'text @user', completers, defaultOptions )
 		).toBeNull();
 	} );
 
@@ -198,13 +184,10 @@ describe( 'getAutocompleteMatch', () => {
 				allowContext,
 			} ),
 		];
-		getAutocompleteMatch(
-			'before @user',
-			completers,
-			1,
-			false,
-			() => 'after'
-		);
+		getAutocompleteMatch( 'before @user', completers, {
+			...defaultOptions,
+			getTextAfterSelection: () => 'after',
+		} );
 		expect( allowContext ).toHaveBeenCalledWith( 'before ', 'after' );
 	} );
 
@@ -213,9 +196,7 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'text @café',
 			completers,
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'cafe' );
@@ -233,9 +214,7 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'@@user',
 			[ singleAt, doubleAt ],
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result?.completer.name ).toBe( 'double' );
 		expect( result?.filterValue ).toBe( 'user' );
@@ -253,9 +232,7 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'hello @user',
 			[ singleAt, doubleAt ],
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result?.completer.name ).toBe( 'single' );
 		expect( result?.filterValue ).toBe( 'user' );
@@ -266,9 +243,7 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'text $$query',
 			completers,
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'query' );
@@ -279,12 +254,61 @@ describe( 'getAutocompleteMatch', () => {
 		const result = getAutocompleteMatch(
 			'/hello world',
 			completers,
-			1,
-			false,
-			() => ''
+			defaultOptions
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'hello world' );
+	} );
+
+	describe( 'lastCompletion suppression', () => {
+		it( 'should suppress match when text equals last completion value', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			expect(
+				getAutocompleteMatch( '@user', completers, {
+					...defaultOptions,
+					lastCompletion: {
+						name: completers[ 0 ].name,
+						value: 'user',
+					},
+				} )
+			).toBeNull();
+		} );
+
+		it( 'should suppress match ignoring trailing whitespace', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			expect(
+				getAutocompleteMatch( '@user ', completers, {
+					...defaultOptions,
+					lastCompletion: {
+						name: completers[ 0 ].name,
+						value: 'user',
+					},
+				} )
+			).toBeNull();
+		} );
+
+		it( 'should NOT suppress match when completer name differs', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			const result = getAutocompleteMatch( '@user', completers, {
+				...defaultOptions,
+				lastCompletion: { name: 'other', value: 'user' },
+			} );
+			expect( result ).not.toBeNull();
+			expect( result?.filterValue ).toBe( 'user' );
+		} );
+
+		it( 'should NOT suppress match when text diverges from last completion', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			const result = getAutocompleteMatch( '@user2', completers, {
+				...defaultOptions,
+				lastCompletion: {
+					name: completers[ 0 ].name,
+					value: 'user',
+				},
+			} );
+			expect( result ).not.toBeNull();
+			expect( result?.filterValue ).toBe( 'user2' );
+		} );
 	} );
 
 	it.each( [
@@ -327,9 +351,7 @@ describe( 'getAutocompleteMatch', () => {
 			const result = getAutocompleteMatch(
 				text,
 				completers,
-				1,
-				false,
-				() => ''
+				defaultOptions
 			);
 			expect( result ).not.toBeNull();
 			expect( result?.filterValue ).toBe( expected );

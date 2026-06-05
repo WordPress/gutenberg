@@ -16,16 +16,16 @@ test.describe( 'Font Library', () => {
 			);
 		} );
 
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.deactivatePlugin(
-				'gutenberg-test-delete-installed-fonts'
-			);
-		} );
-
 		test.beforeEach( async ( { admin } ) => {
 			await admin.visitAdminPage(
 				'admin.php',
 				'page=font-library-wp-admin'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-delete-installed-fonts'
 			);
 		} );
 

@@ -23,6 +23,24 @@ describe( 'ColorPalette: Utils', () => {
 			] );
 			expect( result ).toBe( 'Blue' );
 		} );
+
+		test( 'should prefer selectedSlug over color matching when duplicate colors exist', () => {
+			const result = extractColorNameFromCurrentValue(
+				'#000',
+				[
+					{
+						name: 'Dark Background',
+						slug: 'dark-background',
+						color: '#000',
+					},
+					{ name: 'Dark Text', slug: 'dark-text', color: '#000' },
+				],
+				false,
+				'dark-text'
+			);
+
+			expect( result ).toBe( 'Dark Text' );
+		} );
 	} );
 
 	describe( 'normalizeColorValue', () => {

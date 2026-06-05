@@ -7,7 +7,7 @@ import { View, TouchableHighlight, Text } from 'react-native';
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { Icon } from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -78,7 +78,10 @@ function MenuItem( {
 					] }
 				>
 					{ blockIsNew && (
-						<Icon icon={ sparkles } style={ styles.newIndicator } />
+						<WCIcon
+							icon={ sparkles }
+							style={ styles.newIndicator }
+						/>
 					) }
 					<View style={ modalIconStyle }>
 						<BlockIcon

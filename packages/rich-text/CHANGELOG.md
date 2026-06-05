@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 7.47.0 (2026-05-27)
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+## 7.44.0 (2026-04-15)
+
 ## 7.43.0 (2026-04-01)
 
 ## 7.42.0 (2026-03-18)

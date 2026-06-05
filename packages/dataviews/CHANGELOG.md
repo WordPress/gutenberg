@@ -2,10 +2,67 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+
 ### Enhancements
 
+-   DataViewsPicker: Add a new `pickerActivity` layout that renders selectable items as a vertical activity timeline. [#78941](https://github.com/WordPress/gutenberg/pull/78941)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 15.0.0 (2026-05-27)
+
+### Breaking Changes
+
+- Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+
+### Enhancements
+
+- DataViews: Lower the sticky footer z-index and isolate grid card stacking contexts. [#78315](https://github.com/WordPress/gutenberg/pull/78315)
+- DataViews: Refresh filter chip styling to align with `Button`. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForms: Increase the minimum width of the panel layout popover from 256px to 320px so option labels have more room. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
+### Bug Fixes
+
+- DataViewsPicker: Fix first-click row selection in the table layout being swallowed by Ariakit's focus shift, which also scrolled the active row under the sticky header. [#78423](https://github.com/WordPress/gutenberg/pull/78423)
+- DataViews: Restore the `padding` rule on grid item titles that was lost when the wrapping element's class was renamed. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 16px padding on the first/last table header cells (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 4px gap inside table header buttons (had drifted to 8px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 24px gap on the default-density grid (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForms: Restore the original 24px minimum height on panel-layout fields (trigger, label, control) (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 28px end-padding on resettable filter chips (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Fix wrapper height not resolving in flex layouts, enabling proper internal scrolling. [#76945](https://github.com/WordPress/gutenberg/pull/76945)
+
+### Code Quality
+
+- DataViews: Migrate styles from `@wordpress/base-styles` SCSS variables to `@wordpress/theme` CSS custom properties (design tokens) where possible. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+
+### Internal
+
+- DataViews: Migrate `Tooltip` consumers from `@wordpress/components` to the new compositional `Tooltip` in `@wordpress/ui`. [#78470](https://github.com/WordPress/gutenberg/pull/78470)
+
+## 14.3.0 (2026-05-14)
+
+## 14.2.0 (2026-04-29)
+
+### Enhancements
+
+- DataForm: Render field `description` as help text in the `array` control.[#77554](https://github.com/WordPress/gutenberg/pull/77554)
+
+## 14.1.0 (2026-04-15)
+
+### Enhancements
+
+- DataForm: Add `min`/`max` date range validation support for `date` and `datetime` fields. [#77201](https://github.com/WordPress/gutenberg/pull/77201)
 - DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
+- `DataViews`, `DataForm`: Use `--wpds-cursor-control` for interactive cursor styling. [#77259](https://github.com/WordPress/gutenberg/pull/77259)
 - DataViews/DataViewsPicker: simplify `defaultLayouts` property. [#77232](https://github.com/WordPress/gutenberg/pull/77232)
+- DataForm: Show tooltip in edit button in `panel` layout. [#77024](https://github.com/WordPress/gutenberg/pull/77024)
+- DataViewsPicker: Add `onReset` prop to support view reset functionality. [#77288](https://github.com/WordPress/gutenberg/pull/77288)
 
 ### Bug Fixes
 

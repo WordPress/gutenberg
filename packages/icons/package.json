@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "12.1.0",
+	"version": "13.2.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,6 +44,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
 		"@wordpress/primitives": "file:../primitives",
 		"change-case": "4.1.2"

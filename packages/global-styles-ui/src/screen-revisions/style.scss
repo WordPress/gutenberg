@@ -14,7 +14,7 @@
 
 .global-styles-ui-screen-revisions__revision-item {
 	position: relative;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	display: flex;
 	flex-direction: column;
 

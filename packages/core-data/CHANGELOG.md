@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 7.47.0 (2026-05-27)
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+### Internal
+
+-   Remove redundant `createSelector` wrapper from `getQueriedItems`; the inner deep-equality cache already handles inlined query objects.
+
+## 7.44.0 (2026-04-15)
+
 ### Bug Fixes
 
 -   Fix `getEntityRecords` returning incomplete results for non-paginated entities by normalizing `per_page` in queries ([#76406](https://github.com/WordPress/gutenberg/pull/76406)).

@@ -11,16 +11,18 @@ test.describe( 'Template Activate', () => {
 		// Enable the template activation feature.
 		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
+
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		// Disable the template activation experiment.
 		await requestUtils.setGutenbergExperiments( [] );
-	} );
-	test.beforeEach( async ( { admin, requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await admin.visitSiteEditor( { postType: 'wp_template' } );
 	} );
 
 	test( 'should duplicate and activate', async ( {

@@ -1,6 +1,26 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
 @layer wp-ui-components {
+	/*
+	 * Style overrides for the outer wrapper rendered by `CollapsibleCard.Header`
+	 * (defaults to `<div>`, but consumers can opt into a heading level via
+	 * `render={ <h2 /> }` etc.). Combined with `defenseStyles.heading` so that,
+	 * when the wrapper renders as an h1–h6, the unlayered defense class beats
+	 * wp-admin's bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually
+	 * transparent so UA and host stylesheets don't bleed into the inner
+	 * trigger.
+	 */
+	.heading-wrapper {
+		--_gcd-heading-color: inherit;
+		--_gcd-heading-font-size: inherit;
+		--_gcd-heading-font-weight: inherit;
+		--_gcd-heading-margin: 0;
+
+		/* Properties not covered by the defense file. */
+		font-family: inherit;
+		line-height: inherit;
+	}
+
 	.header-content {
 		flex: 1;
 		min-width: 0;
@@ -28,7 +48,7 @@
 	}
 
 	.header-trigger {
-		@media not (prefers-reduced-motion) {
+		@media not ( prefers-reduced-motion ) {
 			transition: rotate 0.15s ease-out;
 		}
 	}
@@ -44,8 +64,17 @@
 
 	.content {
 		height: var(--collapsible-panel-height);
-		overflow: hidden;
 		margin-block-start: var(--wp-ui-card-header-content-margin);
+
+		/* Clip while collapsed or transitioning so the panel collapses
+		   cleanly. The `overflowVisible` class is set once the open
+		   transition has settled, dropping the clip so descendant
+		   focus rings aren't cut off. */
+		overflow: hidden;
+
+		&.overflowVisible {
+			overflow: visible;
+		}
 
 		&[hidden]:not([hidden="until-found"]) {
 			display: none;
@@ -56,15 +85,18 @@
 			height: 0;
 		}
 
-		@media not (prefers-reduced-motion) {
+		@media not ( prefers-reduced-motion ) {
 			transition: all 150ms ease-out;
 		}
 	}
-
 }
 
 @layer wp-ui-compositions {
 	.content-inner {
+		/* Card.Content's `.header + .content` selector doesn't match here
+		   because Collapsible.Panel sits between Card.Header and Card.Content.
+		   Re-apply the zero top padding manually so the header/content gap
+		   matches Card. */
 		padding-block-start: 0;
 	}
 

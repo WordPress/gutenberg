@@ -16,7 +16,35 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
+import { buildRevisionsPageQuery } from './private-selectors';
+import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
+
+const DEVICE_TYPE_BY_VIEWPORT_STATE = {
+	mobile: 'Mobile',
+	tablet: 'Tablet',
+};
+
+/**
+ * Updates the editor preview device in response to a block-editor viewport
+ * state signal.
+ *
+ * @param {Object}  options                   Viewport state change options.
+ * @param {string}  options.viewport          Selected viewport state.
+ * @param {boolean} options.showStateOnCanvas Whether canvas preview is enabled.
+ */
+export const updateDeviceTypeForViewportState =
+	( { viewport = 'default', showStateOnCanvas = true } = {} ) =>
+	( { dispatch, registry } ) => {
+		if ( ! showStateOnCanvas ) {
+			return;
+		}
+
+		dispatch.setDeviceType(
+			DEVICE_TYPE_BY_VIEWPORT_STATE[ viewport ] ?? 'Desktop'
+		);
+		unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
+	};
 
 /**
  * Returns an action object used to set which template is currently being used/edited.
@@ -576,19 +604,6 @@ export function resetStylesNavigation() {
 }
 
 /**
- * Set the minimum height of the canvas.
- *
- * @param {number} minHeight
- * @return {Object} Action object.
- */
-export function setCanvasMinHeight( minHeight ) {
-	return {
-		type: 'SET_CANVAS_MIN_HEIGHT',
-		minHeight,
-	};
-}
-
-/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *
@@ -601,6 +616,39 @@ export function setCurrentRevisionId( revisionId ) {
 		revisionId,
 	};
 }
+
+/**
+ * Set the current revisions page number and select the newest
+ * revision on that page once it loads.
+ *
+ * @param {number} page The page number.
+ */
+export const setRevisionPage =
+	( page ) =>
+	async ( { dispatch, select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		const revisions = await registry
+			.resolveSelect( coreStore )
+			.getRevisions(
+				'postType',
+				postType,
+				postId,
+				buildRevisionsPageQuery( revisionKey, page )
+			);
+
+		registry.batch( () => {
+			dispatch( { type: 'SET_REVISION_PAGE', page } );
+			if ( revisions?.length ) {
+				dispatch.setCurrentRevisionId( revisions[ 0 ][ revisionKey ] );
+			}
+		} );
+	};
 
 /**
  * Set whether the revision diff highlighting is shown.
