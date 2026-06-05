@@ -446,6 +446,23 @@ async function loadPostTypeEntities() {
 				),
 
 			/**
+			 * Extract load-time CRDT changes that can safely be written into the
+			 * local editor state without treating the initial CRDT seed as the
+			 * source of truth for server-provided default/template content.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+			 * @param {import('@wordpress/sync').ObjectData} editedRecord
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getHydrationChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+				getPostChangesFromCRDTDoc(
+					crdtDoc,
+					editedRecord,
+					syncedProperties,
+					{ runtimeBlockChangesOnly: true }
+				),
+
+			/**
 			 * Extract changes from a CRDT document that can be used to update the
 			 * local editor state.
 			 *

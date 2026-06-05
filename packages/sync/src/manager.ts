@@ -643,7 +643,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		}
 
 		const { handlers, syncConfig, ydoc } = entityState;
-		const changes = syncConfig.getChangesFromCRDTDoc(
+		const getHydrationChanges =
+			syncConfig.getHydrationChangesFromCRDTDoc ??
+			syncConfig.getChangesFromCRDTDoc;
+		const changes = getHydrationChanges(
 			ydoc,
 			await handlers.getEditedRecord()
 		);

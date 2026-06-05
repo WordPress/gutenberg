@@ -1143,6 +1143,73 @@ describe( 'crdt', () => {
 			expect( typeof changes.content ).toBe( 'function' );
 		} );
 
+		it( 'does not inject a content function when block serialization already matches current content', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'serialized:1', rendered: 'serialized:1' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
+		} );
+
+		it( 'hydrates runtime block changes without overwriting matching visible content', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'Locally defaulted title',
+				status: 'auto-draft',
+				content: { raw: 'serialized:1', rendered: 'serialized:1' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
+			expect( changes.title ).toBeUndefined();
+			expect( changes.status ).toBeUndefined();
+			expect( changes.date ).toBeUndefined();
+		} );
+
+		it( 'does not hydrate runtime block changes over different visible content', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'Locally defaulted title',
+				status: 'auto-draft',
+				content: {
+					raw: 'Server-provided default content',
+					rendered: 'Server-provided default content',
+				},
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes ).toEqual( {} );
+		} );
+
 		it( 'injected content function captures the synced blocks and ignores its caller-supplied argument', () => {
 			addBlockToDoc( map, 'block-1', 'Hello world' );
 

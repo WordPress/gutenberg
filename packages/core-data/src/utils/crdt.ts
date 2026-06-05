@@ -65,6 +65,10 @@ export type PostChanges = Partial< Post > & {
 	title?: Post[ 'title' ] | string;
 };
 
+interface GetPostChangesFromCRDTDocOptions {
+	runtimeBlockChangesOnly?: boolean;
+}
+
 // A post record as represented in the CRDT document (Y.Map).
 export interface YPostRecord extends YMapRecord {
 	author: number;
@@ -357,12 +361,14 @@ function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
  * @param {CRDTDoc}     ydoc
  * @param {Post}        editedRecord
  * @param {Set<string>} syncedProperties
+ * @param {Object}      options
  * @return {Partial<PostChanges>} The changes that should be applied to the local record.
  */
 export function getPostChangesFromCRDTDoc(
 	ydoc: CRDTDoc,
 	editedRecord: Post,
-	syncedProperties: Set< string >
+	syncedProperties: Set< string >,
+	options: GetPostChangesFromCRDTDocOptions = {}
 ): PostChanges {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 
@@ -376,8 +382,24 @@ export function getPostChangesFromCRDTDoc(
 
 			const currentValue = editedRecord[ key ];
 
+			if ( options.runtimeBlockChangesOnly && key !== 'blocks' ) {
+				return false;
+			}
+
 			switch ( key ) {
 				case 'blocks': {
+					const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+					const serializedBlocks =
+						__unstableSerializeAndClean( blocksJson );
+					const currentContent = getRawValue( editedRecord.content );
+
+					if ( options.runtimeBlockChangesOnly ) {
+						return (
+							undefined !== currentContent &&
+							serializedBlocks === currentContent
+						);
+					}
+
 					// When we are passed a persisted CRDT document, make a special
 					// comparison of the content and blocks.
 					//
@@ -399,12 +421,7 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
-
-						return (
-							__unstableSerializeAndClean( blocksJson ).trim() !==
-							getRawValue( editedRecord.content )
-						);
+						return serializedBlocks.trim() !== currentContent;
 					}
 
 					return true;
@@ -501,8 +518,15 @@ export function getPostChangesFromCRDTDoc(
 	// from content).
 	if ( changes.blocks && ! changes.content ) {
 		const capturedBlocks = changes.blocks;
-		changes.content = () =>
-			__unstableSerializeAndClean( capturedBlocks as WPBlock[] );
+		const serializedBlocks = __unstableSerializeAndClean(
+			capturedBlocks as WPBlock[]
+		);
+		if (
+			! options.runtimeBlockChangesOnly &&
+			serializedBlocks !== getRawValue( editedRecord.content )
+		) {
+			changes.content = () => serializedBlocks;
+		}
 	}
 
 	// Meta changes must be merged with the edited record since not all meta

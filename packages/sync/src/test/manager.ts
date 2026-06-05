@@ -374,6 +374,40 @@ describe( 'SyncManager', () => {
 				);
 			} );
 
+			it( 'uses a custom hydration diff when provided', async () => {
+				mockSyncConfig.applyChangesToCRDTDoc = jest.fn(
+					( ydoc: CRDTDoc ) => {
+						const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+						ymap.set( 'title', 'Normalized Title' );
+						ymap.set( 'runtimeOnly', 'Runtime Value' );
+					}
+				);
+				mockSyncConfig.getHydrationChangesFromCRDTDoc = jest.fn(
+					() => ( {
+						runtimeOnly: 'Runtime Value',
+					} )
+				);
+
+				const manager = createSyncManager();
+
+				await manager.load(
+					mockSyncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+
+				expect(
+					mockSyncConfig.getHydrationChangesFromCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+				expect( mockHandlers.editRecord ).toHaveBeenCalledWith(
+					{ runtimeOnly: 'Runtime Value' },
+					{ undoIgnore: true }
+				);
+			} );
+
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
 				mockSyncConfig = {
 					...mockSyncConfig,
