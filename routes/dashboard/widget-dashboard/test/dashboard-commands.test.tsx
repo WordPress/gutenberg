@@ -16,7 +16,8 @@ import { store as commandsStore } from '@wordpress/commands';
  */
 import { WidgetDashboard } from '../widget-dashboard';
 import { DASHBOARD_COMMAND_CONTEXT } from '../components/dashboard-commands';
-import type { DashboardWidget, WidgetType } from '../types';
+import type { DashboardWidget } from '../types';
+import type { WidgetType } from '../../widget-primitives';
 
 const widgetTypes: WidgetType[] = [];
 
@@ -88,9 +89,7 @@ function Harness( {
 			onEditChange={ setEditMode }
 			onLayoutReset={ withLayoutReset ? async () => {} : undefined }
 			gridSettings={
-				withGridSettings
-					? { model: gridModel, columns: 6, minColumnWidth: 350 }
-					: undefined
+				withGridSettings ? { model: gridModel, columns: 6 } : undefined
 			}
 			onGridSettingsChange={ withGridSettings ? () => {} : undefined }
 		>

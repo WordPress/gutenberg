@@ -1,18 +1,16 @@
 /**
- * Widget type definitions for the dashboard engine.
+ * Dashboard-specific types: `DashboardWidget`, grid settings, and the
+ * `WidgetDashboard` prop bag.
  *
- * The widget identity types (`WidgetName`, `WidgetTypeMetadata`,
- * `WidgetType`) live in `routes/dashboard/widget-types/types` and are
- * re-exported here so dashboard internals can pull every type they need
- * from a single module. The local declarations below cover the
- * dashboard-specific surface area: `DashboardWidget`, render props,
- * module resolver, grid settings, and the `WidgetDashboard` prop bag.
+ * The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`,
+ * `ResolveWidgetModule`) live in `widget-primitives` and are imported from there
+ * directly; this module does not re-export them.
  */
 
 /**
  * External dependencies
  */
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -27,11 +25,9 @@ import type {
  */
 import type {
 	WidgetName,
-	WidgetTypeMetadata,
 	WidgetType,
-} from '../widget-types/types';
-
-export type { WidgetName, WidgetTypeMetadata, WidgetType };
+	ResolveWidgetModule,
+} from '../widget-primitives';
 
 export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
 export type MasonryTilePlacement = Omit< DashboardLanesLayoutItem, 'key' >;
@@ -88,22 +84,6 @@ export interface DashboardWidget< Item = unknown > {
 }
 
 /**
- * Props passed to every widget render component.
- */
-export interface WidgetRenderProps< Item = unknown > {
-	/**
-	 * Widget attributes configured by the user.
-	 */
-	attributes: Item;
-
-	/**
-	 * Update the attributes of this instance. Fires `onLayoutChange` on the
-	 * dashboard with the updated layout.
-	 */
-	setAttributes?: ( next: Partial< Item > ) => void;
-}
-
-/**
  * Identity of a widget within the rendering tree. Returned by
  * `useWidgetContext()`; `null` when called outside a widget render subtree.
  */
@@ -125,22 +105,6 @@ export interface WidgetContextValue {
 }
 
 /**
- * Widget render module shape returned by the module resolver.
- */
-export interface WidgetModule {
-	default: ComponentType< WidgetRenderProps< unknown > >;
-}
-
-/**
- * Resolver hook: maps a `WidgetType.renderModule` id to a React component.
- * Defaults to a dynamic `import()`; override for tests, Storybook, or to load
- * from a non-URL source.
- */
-export type ResolveWidgetModule = (
-	moduleId: string
-) => Promise< WidgetModule >;
-
-/**
  * Identifier for the active grid model. Drives which `@wordpress/grid`
  * surface the dashboard mounts and which per-model settings the
  * `WidgetGridSettings` union admits.
@@ -154,10 +118,18 @@ export type ResolveWidgetModule = (
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
- * Settings common to every grid model. `columns` and `minColumnWidth`
- * compose as a layered model at runtime: `columns` caps the count and
- * `minColumnWidth` enforces a per-tile width floor that can reduce the
- * count on narrow containers. See `@wordpress/grid` for the resolution.
+ * Maximum column count for the widget dashboard on wide containers.
+ * Not exposed in layout settings; container width steps the count down
+ * to two and one column at fixed breakpoints.
+ */
+export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
+
+/**
+ * Settings common to every grid model. Column count is resolved from
+ * the dashboard container width (see
+ * `utils/resolve-dashboard-column-count`). `columns` and `minColumnWidth`
+ * on this type remain for persisted payloads and `@wordpress/grid`
+ * compatibility; the dashboard ignores user-facing values for both.
  *
  * `spacing` is intentionally absent: the gap between tiles is
  * presentational and lives with the design-system theme/density, not
@@ -166,31 +138,30 @@ export type WidgetGridModel = 'grid' | 'masonry';
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Target column count (cap). When omitted alongside
-	 * `minColumnWidth`, the grid renders six columns.
+	 * Target column count (cap). The dashboard always uses
+	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}; persisted values are ignored.
 	 */
 	columns?: number;
 
 	/**
-	 * Per-tile minimum width in pixels. Acts as a floor that can
-	 * reduce the effective column count below `columns` on narrow
-	 * containers.
+	 * Per-tile minimum width in pixels. Unused by the dashboard; column
+	 * count is derived from container width instead.
 	 */
 	minColumnWidth?: number;
 }
 
 /**
  * 2D packed grid settings. Items declare explicit width and height
- * spans; rows can be uniform-sized or content-sized via `rowHeight`.
+ * spans; rows use a uniform track height via `rowHeight`.
  */
 export interface WidgetGridLayoutSettings extends BaseWidgetGridSettings {
 	model?: 'grid';
 
 	/**
-	 * Row height in pixels, or `'auto'` to let the tallest item in
-	 * each row size it.
+	 * Row height in pixels (`200` small, `300` medium, `400` large). Every
+	 * tile in a row fills the row vertically.
 	 */
-	rowHeight?: number | 'auto';
+	rowHeight?: number;
 }
 
 /**
@@ -284,7 +255,7 @@ export interface WidgetDashboardProps {
 	 * Called when the user commits in-progress grid-settings edits via
 	 * the Done action. The dashboard maintains a staging copy of
 	 * settings internally; mutations stay local until commit. When
-	 * omitted, the `Layout settings` entry in the more-actions menu is
+	 * omitted, the `Layout settings` button in the customize toolbar is
 	 * hidden, since there is nowhere to persist the change.
 	 */
 	onGridSettingsChange?: ( gridSettings: WidgetGridSettings ) => void;

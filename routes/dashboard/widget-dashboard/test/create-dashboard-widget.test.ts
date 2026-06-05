@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { createDashboardWidget } from '../utils/create-dashboard-widget';
-import type { WidgetType } from '../types';
+import type { WidgetType } from '../../widget-primitives';
 
 const baseType: WidgetType = {
 	apiVersion: 1,
