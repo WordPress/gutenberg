@@ -113,9 +113,10 @@ $waveform-player-height: 120px;
 
 		// Toggled-on state (shuffle/repeat): invert to a solid text-color
 		// background with a contrasting icon so it reads clearly at a glance.
+		// aria-pressed is the single source of truth for the toggle state.
 		// --wp-playlist-active-icon-color is set in JS to contrast the block's
 		// text color (white on dark text, black on light text).
-		&.is-active {
+		&[aria-pressed="true"] {
 			background-color: currentColor;
 			opacity: 1;
 

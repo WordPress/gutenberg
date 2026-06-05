@@ -482,7 +482,7 @@ function setupPlaylistMetadata( container, instance ) {
  * @param {string}   labels.repeat             - Label for the repeat button.
  * @return {Object} Object with a cleanup function.
  */
-function setupPlaylistControls(
+export function setupPlaylistControls(
 	container,
 	{ onPrev, onNext, onShuffleToggle, onRepeatToggle },
 	isShuffled = false,
@@ -505,14 +505,17 @@ function setupPlaylistControls(
 	prevBtn.setAttribute( 'title', previousLabel );
 	prevBtn.innerHTML = ICON_PREV;
 
+	// Shuffle and repeat are toggle buttons, so they carry aria-pressed as the
+	// single source of truth for their on/off state — it both exposes the state
+	// to assistive technology and drives the toggled-on styling (see the
+	// [aria-pressed="true"] rule in style.scss). Prev/next are momentary
+	// actions and get no aria-pressed.
 	const shuffleBtn = doc.createElement( 'button' );
 	shuffleBtn.type = 'button';
 	shuffleBtn.className = 'wp-block-playlist__control-btn';
 	shuffleBtn.setAttribute( 'aria-label', shuffleLabel );
 	shuffleBtn.setAttribute( 'title', shuffleLabel );
-	if ( isShuffled ) {
-		shuffleBtn.classList.add( 'is-active' );
-	}
+	shuffleBtn.setAttribute( 'aria-pressed', String( isShuffled ) );
 	shuffleBtn.innerHTML = ICON_SHUFFLE;
 
 	const repeatBtn = doc.createElement( 'button' );
@@ -520,9 +523,7 @@ function setupPlaylistControls(
 	repeatBtn.className = 'wp-block-playlist__control-btn';
 	repeatBtn.setAttribute( 'aria-label', repeatLabel );
 	repeatBtn.setAttribute( 'title', repeatLabel );
-	if ( isRepeating ) {
-		repeatBtn.classList.add( 'is-active' );
-	}
+	repeatBtn.setAttribute( 'aria-pressed', String( isRepeating ) );
 	repeatBtn.innerHTML = ICON_REPEAT;
 
 	const nextBtn = doc.createElement( 'button' );
@@ -546,12 +547,14 @@ function setupPlaylistControls(
 	};
 	const onShuffleClick = ( event ) => {
 		event.stopPropagation();
-		shuffleBtn.classList.toggle( 'is-active' );
+		const pressed = shuffleBtn.getAttribute( 'aria-pressed' ) !== 'true';
+		shuffleBtn.setAttribute( 'aria-pressed', String( pressed ) );
 		onShuffleToggle?.();
 	};
 	const onRepeatClick = ( event ) => {
 		event.stopPropagation();
-		repeatBtn.classList.toggle( 'is-active' );
+		const pressed = repeatBtn.getAttribute( 'aria-pressed' ) !== 'true';
+		repeatBtn.setAttribute( 'aria-pressed', String( pressed ) );
 		onRepeatToggle?.();
 	};
 	const onNextClick = ( event ) => {

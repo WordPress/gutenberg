@@ -15,6 +15,7 @@ import {
 	logPlayError,
 	getNextShuffledTrack,
 	refreshWaveformPlayerColors,
+	setupPlaylistControls,
 } from '../waveform-utils';
 
 // Base player data used across tests
@@ -567,6 +568,79 @@ describe( 'Waveform utilities', () => {
 				nextId: 'a',
 				playedIds: [ 'a' ],
 			} );
+		} );
+	} );
+
+	describe( 'setupPlaylistControls', () => {
+		const createContainer = () => {
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			return container;
+		};
+
+		afterEach( () => {
+			document.body.innerHTML = '';
+		} );
+
+		it( 'sets aria-pressed on shuffle and repeat to match initial state', () => {
+			const container = createContainer();
+			setupPlaylistControls( container, {}, true, false );
+
+			expect(
+				container.querySelector( '[aria-label="Shuffle"]' )
+			).toHaveAttribute( 'aria-pressed', 'true' );
+			expect(
+				container.querySelector( '[aria-label="Repeat"]' )
+			).toHaveAttribute( 'aria-pressed', 'false' );
+		} );
+
+		it( 'does not put aria-pressed on the prev/next action buttons', () => {
+			const container = createContainer();
+			setupPlaylistControls( container, {} );
+
+			expect(
+				container.querySelector( '[aria-label="Previous track"]' )
+			).not.toHaveAttribute( 'aria-pressed' );
+			expect(
+				container.querySelector( '[aria-label="Next track"]' )
+			).not.toHaveAttribute( 'aria-pressed' );
+		} );
+
+		it( 'toggles aria-pressed on shuffle click without using an is-active class', () => {
+			const container = createContainer();
+			const onShuffleToggle = jest.fn();
+			setupPlaylistControls( container, { onShuffleToggle } );
+
+			const shuffleBtn = container.querySelector(
+				'[aria-label="Shuffle"]'
+			);
+			expect( shuffleBtn ).toHaveAttribute( 'aria-pressed', 'false' );
+
+			shuffleBtn.click();
+			expect( shuffleBtn ).toHaveAttribute( 'aria-pressed', 'true' );
+			expect( onShuffleToggle ).toHaveBeenCalledTimes( 1 );
+
+			shuffleBtn.click();
+			expect( shuffleBtn ).toHaveAttribute( 'aria-pressed', 'false' );
+			expect( onShuffleToggle ).toHaveBeenCalledTimes( 2 );
+
+			// aria-pressed is the single source of truth; no is-active class.
+			expect( shuffleBtn ).not.toHaveClass( 'is-active' );
+		} );
+
+		it( 'toggles the repeat button aria-pressed independently', () => {
+			const container = createContainer();
+			const onRepeatToggle = jest.fn();
+			setupPlaylistControls( container, { onRepeatToggle }, false, true );
+
+			const repeatBtn = container.querySelector(
+				'[aria-label="Repeat"]'
+			);
+			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'true' );
+
+			repeatBtn.click();
+			expect( repeatBtn ).toHaveAttribute( 'aria-pressed', 'false' );
+			expect( onRepeatToggle ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
