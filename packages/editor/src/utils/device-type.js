@@ -4,6 +4,19 @@
 import { DEVICE_TYPES } from '../store/constants';
 
 /**
+ * Maps a device preview type to its corresponding viewport style state. Used
+ * when Responsive editing is enabled so the device preview drives which
+ * viewport block style edits are applied to.
+ *
+ * @type {Object}
+ */
+export const VIEWPORT_STATE_BY_DEVICE_TYPE = {
+	Desktop: 'default',
+	Tablet: 'tablet',
+	Mobile: 'mobile',
+};
+
+/**
  * Gets the most appropriate device type based on the canvas width.
  *
  * @param {number} canvasWidth The canvas width in pixels.

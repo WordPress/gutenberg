@@ -17,34 +17,22 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
  */
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
-import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
-const DEVICE_TYPE_BY_VIEWPORT_STATE = {
-	mobile: 'Mobile',
-	tablet: 'Tablet',
-};
-
 /**
- * Updates the editor preview device in response to a block-editor viewport
- * state signal.
+ * Sets whether Responsive editing is enabled. When enabled, the device preview
+ * also drives which viewport block style edits are applied to. Session-only.
  *
- * @param {Object}  options                   Viewport state change options.
- * @param {string}  options.viewport          Selected viewport state.
- * @param {boolean} options.showStateOnCanvas Whether canvas preview is enabled.
+ * @param {boolean} enabled Whether Responsive editing is enabled.
+ *
+ * @return {Object} Action object.
  */
-export const updateDeviceTypeForViewportState =
-	( { viewport = 'default', showStateOnCanvas = true } = {} ) =>
-	( { dispatch, registry } ) => {
-		if ( ! showStateOnCanvas ) {
-			return;
-		}
-
-		dispatch.setDeviceType(
-			DEVICE_TYPE_BY_VIEWPORT_STATE[ viewport ] ?? 'Desktop'
-		);
-		unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
+export function setResponsiveEditing( enabled ) {
+	return {
+		type: 'SET_RESPONSIVE_EDITING',
+		enabled,
 	};
+}
 
 /**
  * Returns an action object used to set which template is currently being used/edited.

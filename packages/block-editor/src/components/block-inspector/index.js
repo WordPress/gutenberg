@@ -44,9 +44,8 @@ import { unlock } from '../../lock-unlock';
 import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
-	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
-import { onViewportStateChangeKey } from '../../store/private-keys';
+import { isResponsiveEditingKey } from '../../store/private-keys';
 
 function StyleInspectorSlots( {
 	blockName,
@@ -141,7 +140,7 @@ function BlockInspector() {
 		blockEditingMode,
 		selectedBlockStyleState,
 		showStateOnCanvas,
-		onViewportStateChange,
+		isResponsiveEditing,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -194,8 +193,8 @@ function BlockInspector() {
 			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
 				_renderedBlockClientId
 			),
-			onViewportStateChange:
-				blockEditorSettings?.[ onViewportStateChangeKey ],
+			isResponsiveEditing:
+				blockEditorSettings?.[ isResponsiveEditingKey ] ?? false,
 		};
 	}, [] );
 
@@ -264,9 +263,13 @@ function BlockInspector() {
 		useBlockInspectorAnimationSettings( blockType );
 
 	const hasSelectedBlocks = selectedBlockCount > 1;
-	const isBlockStyleStateSelected = ! isDefaultBlockStyleState(
-		selectedBlockStyleState
-	);
+	// The viewport state is global (driven by the device preview), so only treat
+	// it as selected for blocks that actually support viewport styles. Pseudo
+	// states are only ever set for blocks that support them.
+	const isBlockStyleStateSelected =
+		( !! blockType?.attributes?.style &&
+			hasViewportBlockStyleState( selectedBlockStyleState ) ) ||
+		hasPseudoBlockStyleState( selectedBlockStyleState );
 
 	if ( hasSelectedBlocks && ! isSectionBlockInSelection ) {
 		return (
@@ -337,7 +340,7 @@ function BlockInspector() {
 				blockEditingMode={ blockEditingMode }
 				selectedBlockStyleState={ selectedBlockStyleState }
 				showStateOnCanvas={ showStateOnCanvas }
-				onViewportStateChange={ onViewportStateChange }
+				isResponsiveEditing={ isResponsiveEditing }
 				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
@@ -393,11 +396,18 @@ const BlockInspectorSingleBlock = ( {
 	blockEditingMode,
 	selectedBlockStyleState,
 	showStateOnCanvas,
-	onViewportStateChange,
+	isResponsiveEditing,
 	isBlockStyleStateSelected,
 } ) => {
 	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
+	// The device badge is shown for style-supporting blocks while Responsive
+	// editing is enabled; the "Show state on canvas" toggle only applies to
+	// pseudo states.
+	const hasPseudoState = hasPseudoBlockStyleState( selectedBlockStyleState );
+	const showDeviceBadge =
+		isResponsiveEditing && !! getBlockType( blockName )?.attributes?.style;
+	const showStyleStateInfo = hasPseudoState || showDeviceBadge;
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
@@ -422,23 +432,9 @@ const BlockInspectorSingleBlock = ( {
 			renderedBlockClientId,
 			nextSelectedBlockStyleState
 		);
-
-		if ( value.viewport ) {
-			onViewportStateChange?.( {
-				viewport: nextSelectedBlockStyleState.viewport,
-				showStateOnCanvas,
-			} );
-		}
 	};
 	const onShowStateOnCanvasChange = ( value ) => {
 		setSelectedBlockStyleStateCanvasPreview( renderedBlockClientId, value );
-
-		if ( value ) {
-			onViewportStateChange?.( {
-				viewport: selectedBlockStyleState.viewport,
-				showStateOnCanvas: value,
-			} );
-		}
 	};
 
 	return (
@@ -468,16 +464,19 @@ const BlockInspectorSingleBlock = ( {
 					)
 				}
 			/>
-			{ blockEditingMode === 'default' && isBlockStyleStateSelected && (
+			{ blockEditingMode === 'default' && showStyleStateInfo && (
 				<Spacer paddingX={ 4 } paddingY={ 2 }>
-					<ToggleControl
-						label={ __( 'Show state on canvas' ) }
-						checked={ showStateOnCanvas }
-						onChange={ onShowStateOnCanvasChange }
-					/>
+					{ hasPseudoState && (
+						<ToggleControl
+							label={ __( 'Show state on canvas' ) }
+							checked={ showStateOnCanvas }
+							onChange={ onShowStateOnCanvasChange }
+						/>
+					) }
 					<BlockStateBadges
 						name={ blockName }
 						value={ selectedBlockStyleState }
+						isResponsiveEditing={ isResponsiveEditing }
 					/>
 				</Spacer>
 			) }

@@ -64,36 +64,29 @@ const getMethod = ( options ) =>
 	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
 
 describe( 'Post actions', () => {
-	describe( 'updateDeviceTypeForViewportState', () => {
-		it( 'updates the editor device type for a viewport state', () => {
+	describe( 'setResponsiveEditing', () => {
+		it( 'enables and disables Responsive editing', () => {
 			const registry = createRegistryWithStores();
 
-			unlock(
-				registry.dispatch( editorStore )
-			).updateDeviceTypeForViewportState( {
-				viewport: 'mobile',
-				showStateOnCanvas: true,
-			} );
+			expect(
+				unlock( registry.select( editorStore ) ).isResponsiveEditing()
+			).toBe( false );
 
-			expect( registry.select( editorStore ).getDeviceType() ).toBe(
-				'Mobile'
+			unlock( registry.dispatch( editorStore ) ).setResponsiveEditing(
+				true
 			);
-		} );
 
-		it( 'keeps the editor device type when canvas preview is disabled', () => {
-			const registry = createRegistryWithStores();
-			registry.dispatch( editorStore ).setDeviceType( 'Tablet' );
+			expect(
+				unlock( registry.select( editorStore ) ).isResponsiveEditing()
+			).toBe( true );
 
-			unlock(
-				registry.dispatch( editorStore )
-			).updateDeviceTypeForViewportState( {
-				viewport: 'mobile',
-				showStateOnCanvas: false,
-			} );
-
-			expect( registry.select( editorStore ).getDeviceType() ).toBe(
-				'Tablet'
+			unlock( registry.dispatch( editorStore ) ).setResponsiveEditing(
+				false
 			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).isResponsiveEditing()
+			).toBe( false );
 		} );
 	} );
 

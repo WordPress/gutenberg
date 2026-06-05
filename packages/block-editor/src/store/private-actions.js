@@ -561,3 +561,19 @@ export function setSelectedBlockStyleStateCanvasPreview( clientId, value ) {
 		value,
 	};
 }
+
+/**
+ * Sets the globally selected viewport style state. When set to a value other
+ * than 'default', block style edits in the inspector apply to that viewport.
+ * Driven by the editor's device preview while Responsive editing is enabled.
+ *
+ * @param {string} viewport The selected viewport state (e.g. 'default', 'tablet', 'mobile').
+ *
+ * @return {Object} Action object.
+ */
+export function setStyleStateViewport( viewport ) {
+	return {
+		type: 'SET_STYLE_STATE_VIEWPORT',
+		viewport,
+	};
+}

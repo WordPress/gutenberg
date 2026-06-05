@@ -28,7 +28,10 @@ import { VisuallyHidden } from '@wordpress/ui';
  */
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
-import { getDeviceTypeByCanvasWidth } from '../../utils/device-type';
+import {
+	getDeviceTypeByCanvasWidth,
+	VIEWPORT_STATE_BY_DEVICE_TYPE,
+} from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
@@ -40,12 +43,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 		isTemplateHidden,
 		templateId,
+		isResponsiveEditing,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
 			getCurrentTemplateId,
 			getRenderingMode,
 			getCanvasWidth,
+			isResponsiveEditing: _isResponsiveEditing,
 		} = unlock( select( editorStore ) );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
@@ -58,16 +63,41 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			templateId: getCurrentTemplateId(),
+			isResponsiveEditing: _isResponsiveEditing(),
 		};
 	}, [] );
-	const { setDeviceType, setRenderingMode, setDefaultRenderingMode } = unlock(
-		useDispatch( editorStore )
+	const {
+		setDeviceType,
+		setRenderingMode,
+		setDefaultRenderingMode,
+		setResponsiveEditing,
+	} = unlock( useDispatch( editorStore ) );
+	const { resetZoomLevel, setStyleStateViewport } = unlock(
+		useDispatch( blockEditorStore )
 	);
-	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 
 	const handleDevicePreviewChange = ( newDeviceType ) => {
 		setDeviceType( newDeviceType );
 		resetZoomLevel();
+
+		// While Responsive editing is enabled, the device preview also drives
+		// which viewport block style edits are applied to.
+		if ( isResponsiveEditing ) {
+			setStyleStateViewport(
+				VIEWPORT_STATE_BY_DEVICE_TYPE[ newDeviceType ] ?? 'default'
+			);
+		}
+	};
+
+	const handleResponsiveEditingChange = () => {
+		const newIsResponsiveEditing = ! isResponsiveEditing;
+		setResponsiveEditing( newIsResponsiveEditing );
+		setStyleStateViewport(
+			newIsResponsiveEditing
+				? VIEWPORT_STATE_BY_DEVICE_TYPE[ deviceTypeByCanvasWidth ] ??
+						'default'
+				: 'default'
+		);
 	};
 
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -163,6 +193,16 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							</MenuItem>
 						</MenuGroup>
 					) }
+					<MenuGroup>
+						<MenuItem
+							icon={ isResponsiveEditing ? check : undefined }
+							isSelected={ isResponsiveEditing }
+							role="menuitemcheckbox"
+							onClick={ handleResponsiveEditingChange }
+						>
+							{ __( 'Responsive editing' ) }
+						</MenuItem>
+					</MenuGroup>
 					{ ! isTemplate && !! templateId && (
 						<MenuGroup>
 							<MenuItem
