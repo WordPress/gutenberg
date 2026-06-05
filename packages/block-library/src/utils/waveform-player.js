@@ -96,9 +96,9 @@ export function WaveformPlayer( {
 	const onEndedEvent = useEvent( onEnded );
 	const elementRef = useRef();
 	const playerRef = useRef();
-	// Remembers which control had keyboard focus when the player is torn down,
-	// so the rebuilt player (the editor recreates it on track change) can
-	// restore focus to the same control.
+	// Remembers which skip control had keyboard focus when a track change
+	// rebuilds the player, so keyboard focus stays on the control that
+	// triggered the change.
 	const restoreFocusRef = useRef( null );
 
 	// Due to how WaveformPlayer is implemented, the artwork element within the
@@ -216,13 +216,11 @@ export function WaveformPlayer( {
 			return () => {
 				cancelled = true;
 				clearTimeout( timeoutId );
-				// If a control had keyboard focus, remember which one so the
-				// rebuilt player can restore it.
+				// Prev/next change the track URL, which rebuilds the player.
+				// Preserve focus only for the skip control that triggered it.
 				const active = element.ownerDocument.activeElement;
 				if ( active && element.contains( active ) ) {
-					if ( active.classList.contains( 'waveform-btn' ) ) {
-						restoreFocusRef.current = 'play';
-					} else if (
+					if (
 						active.classList.contains(
 							'wp-block-playlist__control-btn'
 						)
@@ -232,12 +230,14 @@ export function WaveformPlayer( {
 								'.wp-block-playlist__control-btn'
 							),
 						];
-						restoreFocusRef.current = [
-							'prev',
-							'shuffle',
-							'repeat',
-							'next',
-						][ controls.indexOf( active ) ];
+						const controlIndex = controls.indexOf( active );
+						if ( controlIndex === 0 ) {
+							restoreFocusRef.current = 'prev';
+						} else if ( controlIndex === 3 ) {
+							restoreFocusRef.current = 'next';
+						} else {
+							restoreFocusRef.current = null;
+						}
 					}
 				}
 				playerRef.current = undefined;
