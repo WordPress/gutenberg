@@ -79,6 +79,45 @@ const BLOCK_REMOVAL_RULES = [
 			}
 		},
 	},
+	{
+		// Dialog blocks.
+		// Warn when removing critical dialog components.
+		postTypes: [
+			'post',
+			'page',
+			'wp_template',
+			'wp_template_part',
+			'wp_block',
+		],
+		callback( removedBlocks ) {
+			// Check if the parent dialog block is being removed
+			const isDialogBeingRemoved = removedBlocks.some(
+				( { name } ) => name === 'core/dialog'
+			);
+
+			// Check for dialog-trigger removal
+			const removedDialogTriggers = removedBlocks.filter(
+				( { name } ) => name === 'core/dialog-trigger'
+			);
+
+			// Only warn if dialog-trigger is removed but its parent dialog is not.
+			// If the entire dialog is being removed, no warning is needed.
+			if ( removedDialogTriggers.length && ! isDialogBeingRemoved ) {
+				return {
+					description: __(
+						'The Dialog Trigger block provides the clickable element that opens the dialog.'
+					),
+					warning: __(
+						'Without it, visitors will have no way to open the dialog.'
+					),
+					subtext: __(
+						'You can also activate a dialog by adding dialog anchor ID to the end of the URL (e.g. example.com#my-dialog) if you need the dialog to open without a trigger.'
+					),
+					requireConfirmation: true,
+				};
+			}
+		},
+	},
 ];
 
 export default function BlockRemovalWarnings() {

@@ -63,6 +63,9 @@ import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as details from './details';
+import * as dialog from './dialog';
+import * as dialogContent from './dialog-content';
+import * as dialogTrigger from './dialog-trigger';
 import * as embed from './embed';
 import * as file from './file';
 import * as form from './form';
@@ -287,6 +290,9 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( dialog );
+		blocks.push( dialogContent );
+		blocks.push( dialogTrigger );
 		blocks.push( tab );
 		blocks.push( tabList );
 		blocks.push( tabs );

@@ -1,0 +1,137 @@
+.wp-block-dialog-content {
+	border: inherit;
+	background: inherit;
+	padding: inherit;
+	z-index: 10;
+	min-width: 320px;
+	max-width: 90vw;
+	width: fit-content;
+	transform-origin: center center;
+
+	// Default hidden state for animation
+	visibility: hidden;
+	opacity: 0;
+
+	@media (max-width: 480px) {
+		min-width: unset;
+		max-width: 95vw;
+		max-height: 90vh;
+	}
+
+	&.has-border-color {
+		border-style: solid;
+	}
+
+	// Default background color and padding for dialog element.
+	&:not(.has-background) {
+		background-color: var(--wp--style--dialog-background-color, #fff);
+	}
+	padding-top: var(--wp--preset--spacing--30);
+	padding-bottom: var(--wp--preset--spacing--30);
+	padding-left: var(--wp--preset--spacing--30);
+	padding-right: var(--wp--preset--spacing--30);
+
+	// Open state with fade-in animation
+	&[open].active {
+		visibility: visible;
+		@media not (prefers-reduced-motion) {
+			animation: turn-on-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
+		}
+		@media (prefers-reduced-motion) {
+			opacity: 1;
+		}
+	}
+
+	// Closing animation - keep visible while fading out
+	&[open].show-closing-animation:not(.active) {
+		visibility: visible;
+		@media not (prefers-reduced-motion) {
+			animation: turn-off-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
+		}
+		@media (prefers-reduced-motion) {
+			opacity: 0;
+		}
+	}
+
+	&::backdrop {
+		cursor: default;
+		background-color: var(--wp--style--dialog-backdrop-color, rgba(0, 0, 0, 0.5));
+		opacity: 0;
+
+		@media not (prefers-reduced-motion) {
+			animation: backdrop-fade-in var(--wp--style--dialog-animation-duration, 400ms) forwards;
+		}
+		@media (prefers-reduced-motion) {
+			opacity: 0.5;
+		}
+	}
+
+	&.show-closing-animation:not(.active)::backdrop {
+		@media not (prefers-reduced-motion) {
+			animation: backdrop-fade-out var(--wp--style--dialog-animation-duration, 400ms) forwards;
+		}
+	}
+
+	&__inner {
+		margin-block-start: 0 !important;
+		& > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+			width: 100vw;
+		}
+		& > *:first-child {
+			margin-top: 0;
+		}
+	}
+	&__close-button {
+		appearance: none;
+		background: none;
+		border: none;
+		padding: 10px;
+		float: right;
+		cursor: pointer;
+		position: relative;
+		z-index: 1;
+	}
+}
+
+// Dialog keyframes: scale + fade for the dialog element, pure fade for the backdrop
+@keyframes backdrop-fade-in {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes backdrop-fade-out {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+// Dialog element keyframes (adapted from image block lightbox)
+@keyframes turn-on-visibility {
+	0% {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes turn-off-visibility {
+	0% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+}
+

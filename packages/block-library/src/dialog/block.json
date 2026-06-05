@@ -1,0 +1,43 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/dialog",
+	"version": "1.0.0",
+	"title": "Dialog",
+	"description": "Adds a button that opens a modal dialog to display content without leaving the page.",
+	"category": "media",
+	"keywords": [ "dialog", "modal", "popup" ],
+	"__experimental": true,
+	"allowedBlocks": [ "core/dialog-trigger", "core/dialog-content" ],
+	"attributes": {
+		"editorIsDialogOpen": {
+			"type": "boolean",
+			"role": "local",
+			"default": false
+		},
+		"editorIsDialogLocked": {
+			"type": "boolean",
+			"role": "local",
+			"default": false
+		},
+		"dialogLabel": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"html": false,
+		"align": [ "full", "wide", "left", "right", "center" ],
+		"interactivity": true
+	},
+	"providesContext": {
+		"core/dialog-isDialogOpen": "editorIsDialogOpen",
+		"core/dialog-isDialogLocked": "editorIsDialogLocked",
+		"core/dialog-label": "dialogLabel"
+	},
+	"usesContext": [ "core/dialog-id" ],
+	"textdomain": "dialog",
+	"editorScript": "file:./index.js",
+	"viewScriptModule": "@wordpress/block-library/dialog/view"
+}

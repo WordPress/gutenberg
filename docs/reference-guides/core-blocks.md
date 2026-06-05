@@ -305,6 +305,39 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 -	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** name, placeholder, showContent, summary
 
+## Dialog
+
+Adds a button that opens a modal dialog to display content without leaving the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog))
+
+-	**Name:** core/dialog
+-	**Experimental:** true
+-	**Category:** media
+-	**Allowed Blocks:** core/dialog-trigger, core/dialog-content
+-	**Supports:** align (center, full, left, right, wide), anchor, interactivity, ~~html~~
+-	**Attributes:** dialogLabel, editorIsDialogOpen
+
+## Dialog Content
+
+Displays content in a modal dialog that appears on top of the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-content))
+
+-	**Name:** core/dialog-content
+-	**Experimental:** true
+-	**Category:** media
+-	**Parent:** core/dialog
+-	**Supports:** animations, color (background, button, enableContrastChecker, heading, link, text), interactivity, layout (allowEditing, ~~allowJustification~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
+-	**Attributes:** animationDuration, backdropColor, customBackdropColor
+
+## Trigger Button
+
+The trigger button that opens the dialog. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-trigger))
+
+-	**Name:** core/dialog-trigger
+-	**Experimental:** true
+-	**Category:** media
+-	**Parent:** core/dialog
+-	**Allowed Blocks:** core/buttons, core/button, core/paragraph, core/heading, core/image, core/group
+-	**Supports:** interactivity, spacing (margin, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~reusable~~
+
 ## Embed
 
 Add a block that displays content pulled from other sites, like Twitter or YouTube. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/embed))

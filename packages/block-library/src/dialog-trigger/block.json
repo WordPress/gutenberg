@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/dialog-trigger",
+	"version": "1.0.0",
+	"title": "Trigger Button",
+	"description": "The trigger button that opens the dialog.",
+	"category": "media",
+	"__experimental": true,
+	"attributes": {},
+	"allowedBlocks": [ "core/buttons" ],
+	"supports": {
+		"html": false,
+		"align": false,
+		"inserter": false,
+		"reusable": false,
+		"spacing": {
+			"margin": [ "top", "bottom" ]
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"__experimentalFontFamily": true
+			}
+		},
+		"interactivity": true
+	},
+	"usesContext": [ "core/dialog-id", "core/dialog-isDialogOpen", "core/dialog-isDialogLocked" ],
+	"parent": [ "core/dialog" ],
+	"textdomain": "dialog-trigger",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}
