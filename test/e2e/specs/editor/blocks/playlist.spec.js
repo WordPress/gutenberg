@@ -41,7 +41,12 @@ test.describe( 'Playlist block', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 
-		audioPath = path.join( os.tmpdir(), 'playlist-e2e-test.wav' );
+		// Unique per worker process so parallel runs don't collide on the
+		// same temp file during upload/cleanup.
+		audioPath = path.join(
+			os.tmpdir(),
+			`playlist-e2e-test-${ process.pid }-${ Date.now() }.wav`
+		);
 		await fs.writeFile( audioPath, createWavBuffer() );
 		uploadedMedia = await requestUtils.uploadMedia( audioPath );
 	} );
