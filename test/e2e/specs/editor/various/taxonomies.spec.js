@@ -7,6 +7,16 @@ function generateRandomNumber() {
 	return Math.round( 1 + Math.random() * ( Number.MAX_SAFE_INTEGER - 1 ) );
 }
 
+async function openPanel( page, name ) {
+	const panelToggle = page.getByRole( 'button', {
+		name,
+	} );
+
+	if ( ( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false' ) {
+		await panelToggle.click();
+	}
+}
+
 test.describe( 'Taxonomies', () => {
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
@@ -18,15 +28,7 @@ test.describe( 'Taxonomies', () => {
 		page,
 	} ) => {
 		// Open the Document -> Categories panel.
-		const panelToggle = page.getByRole( 'button', {
-			name: 'Categories',
-		} );
-
-		if (
-			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await panelToggle.click();
-		}
+		await openPanel( page, 'Categories' );
 
 		await page
 			.getByRole( 'button', {
@@ -66,15 +68,7 @@ test.describe( 'Taxonomies', () => {
 		page,
 	} ) => {
 		// Open the Document -> Tags panel.
-		const panelToggle = page.getByRole( 'button', {
-			name: 'Tags',
-		} );
-
-		if (
-			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await panelToggle.click();
-		}
+		await openPanel( page, 'Tags' );
 
 		const tagName = 'tag-' + generateRandomNumber();
 		const tags = page.locator( '.components-form-token-field__token-text' );
@@ -91,6 +85,7 @@ test.describe( 'Taxonomies', () => {
 		await editor.publishPost();
 		await page.reload();
 
+		await openPanel( page, 'Tags' );
 		await expect( tags ).toHaveCount( 1 );
 		await expect( tags ).toContainText( tagName );
 	} );
@@ -101,15 +96,7 @@ test.describe( 'Taxonomies', () => {
 		page,
 	} ) => {
 		// Open the Document -> Tags panel.
-		const panelToggle = page.getByRole( 'button', {
-			name: 'Tags',
-		} );
-
-		if (
-			( await panelToggle.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await panelToggle.click();
-		}
+		await openPanel( page, 'Tags' );
 
 		const tagName = "tag'-" + generateRandomNumber();
 		const tags = page.locator( '.components-form-token-field__token-text' );
@@ -126,6 +113,7 @@ test.describe( 'Taxonomies', () => {
 		await editor.publishPost();
 		await page.reload();
 
+		await openPanel( page, 'Tags' );
 		await expect( tags ).toHaveCount( 1 );
 		await expect( tags ).toContainText( tagName );
 	} );

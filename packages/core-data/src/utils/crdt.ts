@@ -396,6 +396,7 @@ export function getPostChangesFromCRDTDoc(
 					if ( options.runtimeBlockChangesOnly ) {
 						return (
 							undefined !== currentContent &&
+							'' !== serializedBlocks &&
 							serializedBlocks === currentContent
 						);
 					}

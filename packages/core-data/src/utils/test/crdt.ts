@@ -1210,6 +1210,26 @@ describe( 'crdt', () => {
 			expect( changes ).toEqual( {} );
 		} );
 
+		it( 'does not hydrate empty runtime block changes before default content is applied', () => {
+			map.set( 'blocks', new Y.Array< YBlock >() );
+
+			const editedRecord = {
+				title: 'Locally defaulted title',
+				status: 'auto-draft',
+				content: { raw: '', rendered: '' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes ).toEqual( {} );
+		} );
+
 		it( 'injected content function captures the synced blocks and ignores its caller-supplied argument', () => {
 			addBlockToDoc( map, 'block-1', 'Hello world' );
 
