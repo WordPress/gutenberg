@@ -113,7 +113,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
  * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_postType_page( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_page( $config, $entity ) {
 	$config['default_layouts'] = array(
 		'table' => array(
 			'layout' => array(
@@ -300,7 +300,7 @@ function _gutenberg_get_entity_view_config_postType_page( $config, $entity ) {
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_config_postType_page', 10, 2 );
+add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_config_post_type_page', 10, 2 );
 
 /**
  * Provides the view configuration for the `post` post type.
@@ -317,7 +317,7 @@ add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_
  * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_postType_post( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_post( $config, $entity ) {
 	$config['form'] = array(
 		'layout' => array( 'type' => 'panel' ),
 		'fields' => array(
@@ -383,7 +383,7 @@ function _gutenberg_get_entity_view_config_postType_post( $config, $entity ) {
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_config_postType_post', 10, 2 );
+add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_config_post_type_post', 10, 2 );
 
 /**
  * Provides the view configuration for the `wp_block` post type.
@@ -400,7 +400,7 @@ add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_
  * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_postType_wp_block( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_wp_block( $config, $entity ) {
 	$config['default_layouts'] = array(
 		'table' => array(
 			'layout' => array(
@@ -479,7 +479,7 @@ function _gutenberg_get_entity_view_config_postType_wp_block( $config, $entity )
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_view_config_postType_wp_block', 10, 2 );
+add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_view_config_post_type_wp_block', 10, 2 );
 
 /**
  * Provides the view configuration for the `wp_template_part` post type.
@@ -496,7 +496,7 @@ add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_v
  * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_postType_wp_template_part( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config, $entity ) {
 	$config['default_layouts'] = array(
 		'table' => array(
 			'layout' => array(
@@ -567,7 +567,7 @@ function _gutenberg_get_entity_view_config_postType_wp_template_part( $config, $
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_entity_view_config_postType_wp_template_part', 10, 2 );
+add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_entity_view_config_post_type_wp_template_part', 10, 2 );
 
 /**
  * Provides the view configuration for the `wp_template` post type.
@@ -584,7 +584,7 @@ add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_
  * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_postType_wp_template( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_wp_template( $config, $entity ) {
 	$config['default_view'] = array(
 		'type'             => 'grid',
 		'perPage'          => 20,
@@ -748,4 +748,4 @@ function _gutenberg_get_entity_view_config_postType_wp_template( $config, $entit
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_postType_wp_template', 10, 2 );
+add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 2 );
