@@ -4,7 +4,7 @@
 import type { Field } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { __experimentalText as Text } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -21,18 +21,7 @@ const descriptionField: Field< Template > = {
 	},
 	render: ( { item } ) => {
 		const { description } = item;
-		return (
-			description && (
-				<Text
-					className="fields-controls__description"
-					align="left"
-					numberOfLines={ 4 }
-					truncate={ false }
-				>
-					{ decodeEntities( description ) }
-				</Text>
-			)
-		);
+		return description && <Text>{ decodeEntities( description ) }</Text>;
 	},
 	Edit: {
 		control: 'textarea',

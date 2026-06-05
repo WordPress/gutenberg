@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalText as Text } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
 
@@ -15,7 +15,7 @@ export default function LastEditedDateView( { item }: { item: BasePost } ) {
 		return null;
 	}
 	return (
-		<Text variant="muted">
+		<Text>
 			{ sprintf(
 				// translators: %s: Human-readable time difference, e.g. "2 days ago".
 				__( 'Last edited %s.' ),
