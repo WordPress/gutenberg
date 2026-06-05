@@ -2,8 +2,8 @@
  * One-shot generator for the UltraHDR e2e fixture.
  *
  * Regenerate with:
- *   cd test/e2e/assets
- *   node .gen-ultrahdr-fixture.mjs 1024x768_e2e_test_image_ultrahdr.jpeg
+ *   cd test/e2e/bin
+ *   node gen-ultrahdr-fixture.mjs ../assets/1024x768_e2e_test_image_ultrahdr.jpeg
  *
  * Synthesizes a small UltraHDR JPEG (ISO 21496-1 gain map) using wasm-vips's
  * encoder so we don't need to vendor a binary asset from a third-party source.
@@ -11,13 +11,13 @@
  * Run manually (not part of CI). `wasm-vips` resolves through the workspace
  * via `@wordpress/vips`; console output is the script's user interface.
  */
-/* eslint-disable import/no-extraneous-dependencies, no-console */
+/* eslint-disable import/no-extraneous-dependencies */
 import Vips from 'wasm-vips';
 import fs from 'node:fs';
 
 const out = process.argv[ 2 ];
 if ( ! out ) {
-	console.error( 'Usage: node .gen-ultrahdr-fixture.mjs <output.jpeg>' );
+	console.error( 'Usage: node gen-ultrahdr-fixture.mjs <output.jpeg>' );
 	process.exit( 1 );
 }
 
@@ -73,4 +73,4 @@ try {
 	console.error( vips.error || vips.Error?.message || '(no extra detail)' );
 	process.exit( 1 );
 }
-/* eslint-enable import/no-extraneous-dependencies, no-console */
+/* eslint-enable import/no-extraneous-dependencies */
