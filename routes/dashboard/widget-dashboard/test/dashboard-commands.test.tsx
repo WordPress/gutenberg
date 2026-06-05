@@ -89,9 +89,7 @@ function Harness( {
 			onEditChange={ setEditMode }
 			onLayoutReset={ withLayoutReset ? async () => {} : undefined }
 			gridSettings={
-				withGridSettings
-					? { model: gridModel, columns: 6, minColumnWidth: 350 }
-					: undefined
+				withGridSettings ? { model: gridModel, columns: 6 } : undefined
 			}
 			onGridSettingsChange={ withGridSettings ? () => {} : undefined }
 		>

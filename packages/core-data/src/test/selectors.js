@@ -24,7 +24,55 @@ import {
 	getRevisions,
 	getRevision,
 	hasRevision,
+	hasUndo,
+	hasRedo,
 } from '../selectors';
+import { getSyncManager } from '../sync';
+
+jest.mock( '../sync', () => ( {
+	getSyncManager: jest.fn(),
+} ) );
+
+describe( 'hasUndo/hasRedo', () => {
+	afterEach( () => {
+		getSyncManager.mockReset();
+	} );
+
+	it( 'reads undo availability from core-data state when a sync undo manager is available', () => {
+		const undoManager = {
+			hasUndo: jest.fn( () => false ),
+			hasRedo: jest.fn( () => false ),
+		};
+		getSyncManager.mockReturnValue( { undoManager } );
+
+		const state = deepFreeze( {
+			syncUndoManagerState: {
+				hasRedo: true,
+				hasUndo: true,
+			},
+		} );
+
+		expect( hasUndo( state ) ).toBe( true );
+		expect( hasRedo( state ) ).toBe( true );
+		expect( undoManager.hasUndo ).not.toHaveBeenCalled();
+		expect( undoManager.hasRedo ).not.toHaveBeenCalled();
+	} );
+
+	it( 'falls back to the default undo manager when no sync undo manager is available', () => {
+		const undoManager = {
+			hasUndo: jest.fn( () => true ),
+			hasRedo: jest.fn( () => false ),
+		};
+		getSyncManager.mockReturnValue( undefined );
+
+		const state = { undoManager };
+
+		expect( hasUndo( state ) ).toBe( true );
+		expect( hasRedo( state ) ).toBe( false );
+		expect( undoManager.hasUndo ).toHaveBeenCalled();
+		expect( undoManager.hasRedo ).toHaveBeenCalled();
+	} );
+} );
 
 describe( 'getEntityRecord', () => {
 	describe( 'normalizing Post ID passed as recordKey', () => {
