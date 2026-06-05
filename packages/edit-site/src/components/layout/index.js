@@ -53,6 +53,7 @@ const { useStyle } = unlock( editorPrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
+const CONTENT_BACKGROUND = '#ffffff';
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
@@ -186,7 +187,7 @@ function Layout() {
 											{ areas.mobileContent ? (
 												<ThemeProvider
 													color={ {
-														bg: '#ffffff',
+														bg: CONTENT_BACKGROUND,
 													} }
 												>
 													<div className="edit-site-layout__mobile-content">
@@ -207,7 +208,9 @@ function Layout() {
 										<SavePanel />
 									</>
 								) : (
-									<ThemeProvider color={ { bg: '#ffffff' } }>
+									<ThemeProvider
+										color={ { bg: CONTENT_BACKGROUND } }
+									>
 										<ErrorBoundary>
 											{ areas.preview }
 										</ErrorBoundary>
@@ -226,7 +229,9 @@ function Layout() {
 									maxWidth: widths?.content,
 								} }
 							>
-								<ThemeProvider color={ { bg: '#ffffff' } }>
+								<ThemeProvider
+									color={ { bg: CONTENT_BACKGROUND } }
+								>
 									<ErrorBoundary>
 										{ areas.content }
 									</ErrorBoundary>
@@ -241,7 +246,7 @@ function Layout() {
 								maxWidth: widths?.edit,
 							} }
 						>
-							<ThemeProvider color={ { bg: '#ffffff' } }>
+							<ThemeProvider color={ { bg: CONTENT_BACKGROUND } }>
 								<ErrorBoundary>{ areas.edit }</ErrorBoundary>
 							</ThemeProvider>
 						</div>
@@ -284,7 +289,9 @@ function Layout() {
 											} }
 										>
 											<ThemeProvider
-												color={ { bg: '#ffffff' } }
+												color={ {
+													bg: CONTENT_BACKGROUND,
+												} }
 											>
 												{ areas.preview }
 											</ThemeProvider>
