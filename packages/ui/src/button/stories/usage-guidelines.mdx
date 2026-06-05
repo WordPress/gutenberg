@@ -14,7 +14,7 @@ only on how it should look.
 | --- | --- | --- | --- |
 | Change something on the current page | [Button](?path=/docs/design-system-components-button--docs) | `<button>` | Save, Delete, Open dialog, Toggle |
 | Navigate to another page or URL | [Link](?path=/docs/design-system-components-link--docs) | `<a>` | “Learn more”, docs links, external references |
-| Navigate, but only when button prominence is intentional | [LinkButton](?path=/docs/design-system-components-link-button--docs) | `<a>` | Standalone CTAs where `Link` does not fit the layout |
+| Navigate with button styling | [LinkButton](?path=/docs/design-system-components-link-button--docs) | `<a>` | Standalone CTAs, card actions |
 
 ## Use `Button` for actions
 
@@ -58,21 +58,11 @@ typography from `Text` on a standalone link.
 See [Link](?path=/docs/design-system-components-link--docs) for `tone`,
 `variant`, and `openInNewTab`.
 
-## Consider `LinkButton` only after `Button` and `Link`
+## Use `LinkButton` for navigation with button styling
 
-Start with `Button` or `Link`. Use `LinkButton` only when you have ruled both
-out and still need a button-shaped navigation control.
-
-Ask:
-
-1. **Is this an action on the current page?** Use `Button`.
-2. **Is this navigation to a URL?** Prefer `Link` — it better communicates what
-   the user should expect.
-3. **Do you genuinely need button prominence?** Only then consider `LinkButton`.
-
-`LinkButton` can make navigation look like a primary action. That visual weight
-is appropriate only when it matches the intent and when `Link` would not give
-users enough context about where they are going.
+Use `LinkButton` when the destination is a **URL** and the control should
+**look like a `Button`** — for example, standalone calls to action, card
+footers, or notice actions where button weight fits the layout.
 
 `LinkButton` shares `Button` visual props (`variant`, `tone`, `size`, `disabled`)
 but renders an `<a>` like `Link`. It does **not** support `loading`,
@@ -85,7 +75,12 @@ Do **not** use `Button` with `render={ <a href="…" /> }` and `nativeButton={
 false }` for new code when `LinkButton` fits; `LinkButton` is the supported
 pattern for button-styled links.
 
-<Canvas of={ UsageGuidelinesStories.ConsiderLinkBeforeLinkButton } />
+<Canvas of={ UsageGuidelinesStories.UseLinkButtonForNavigation } />
+
+> **Note:** Prefer `Link` for navigation when possible. Its underline and link
+> styling communicate where the user is going more clearly than a button-shaped
+> control. Reach for `LinkButton` only when you have considered `Button` and
+> `Link` and still need button prominence.
 
 See [LinkButton](?path=/docs/design-system-components-link-button--docs) for API
 details and examples.

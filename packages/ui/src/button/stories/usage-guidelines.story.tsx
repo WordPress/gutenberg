@@ -54,7 +54,7 @@ export const UseLinkForInlineNavigation: Story = {
 						</Link>
 					),
 					ExternalLink: (
-						<Link href="https://example.com" openInNewTab>
+						<Link href="https://make.wordpress.org/" openInNewTab>
 							open an external reference
 						</Link>
 					),
@@ -65,43 +65,36 @@ export const UseLinkForInlineNavigation: Story = {
 };
 
 /**
- * Prefer `Link` for navigation — its underline and link styling set clearer
- * expectations than a button-shaped control. Reach for `LinkButton` only when
- * you have considered `Button` and `Link` and still need button prominence.
+ * Use `LinkButton` when navigation should look like a `Button`, such as
+ * standalone calls to action that require an `href`.
+ *
+ * Note: Prefer `Link` for navigation when possible. Its underline and link
+ * styling set clearer expectations than a button-shaped control.
  */
-export const ConsiderLinkBeforeLinkButton: Story = {
+export const UseLinkButtonForNavigation: Story = {
 	render: () => (
-		<Stack direction="column" gap="lg">
-			<Stack direction="column" gap="xs">
-				<Text variant="heading-sm">Prefer `Link` for navigation</Text>
-				<Text variant="body-md" render={ <p /> }>
-					{ createInterpolateElement(
-						'To learn more, see the <DocumentationLink />. A text link signals navigation and matches what users should expect.',
-						{
-							DocumentationLink: (
-								<Link href="https://wordpress.org/documentation/">
-									documentation
-								</Link>
-							),
-						}
-					) }
-				</Text>
-			</Stack>
-			<Stack direction="column" gap="xs">
-				<Text variant="heading-sm">
-					Use `LinkButton` only when button prominence is intentional
-				</Text>
-				<Text variant="body-md" render={ <p /> }>
-					If surrounding copy is not enough context, a standalone call
-					to action may justify button styling — but ask first whether
-					`Link` would communicate the destination more clearly.
-				</Text>
-				<div>
-					<LinkButton href="https://example.com">
-						Get started
-					</LinkButton>
-				</div>
-			</Stack>
+		<Stack direction="column" gap="md">
+			<Text variant="body-md" render={ <p /> }>
+				Standalone navigation calls to action can use `LinkButton` when
+				button styling matches the surrounding UI.
+			</Text>
+			<div>
+				<LinkButton href="https://make.wordpress.org/">
+					Get started
+				</LinkButton>
+			</div>
+			<Text variant="body-md" render={ <p /> }>
+				{ createInterpolateElement(
+					'Note: Prefer <LinkComponent /> for navigation when possible — its underline and link styling communicate where the user is going more clearly than a button-shaped control.',
+					{
+						LinkComponent: (
+							<Link href="https://wordpress.org/documentation/">
+								Link
+							</Link>
+						),
+					}
+				) }
+			</Text>
 		</Stack>
 	),
 };
