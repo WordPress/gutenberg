@@ -491,7 +491,7 @@ function setupPlaylistMetadata( container, instance ) {
  * @param {string}   labels.next               - Label for the next-track button.
  * @param {string}   labels.shuffle            - Label for the shuffle button.
  * @param {string}   labels.repeat             - Label for the repeat button.
- * @return {Object} Object with setShuffled function and cleanup function.
+ * @return {Object} Object with a cleanup function.
  */
 function setupPlaylistControls(
 	container,
@@ -560,12 +560,6 @@ function setupPlaylistControls(
 	footerDiv.prepend( controlsDiv );
 
 	return {
-		setShuffled: ( shuffled ) => {
-			shuffleBtn.classList.toggle( 'is-active', shuffled );
-		},
-		setRepeating: ( repeating ) => {
-			repeatBtn.classList.toggle( 'is-active', repeating );
-		},
 		cleanup: () => {
 			prevBtn.removeEventListener( 'click', onPrevClick );
 			shuffleBtn.removeEventListener( 'click', onShuffleClick );
