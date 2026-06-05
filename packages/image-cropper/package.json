@@ -44,7 +44,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
@@ -53,8 +53,8 @@
 		"react-easy-crop": "^5.4.2"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

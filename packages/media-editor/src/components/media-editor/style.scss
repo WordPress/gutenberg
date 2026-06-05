@@ -91,9 +91,9 @@
 
 		// Small left gutter so the tabs and panel content (and the zoom
 		// slider's thumb at its minimum) sit off the sidebar edge. Only in the
-		// column layout; below `medium` the sidebar is a full-width overlay and
+		// column layout; below `small` the sidebar is a full-width overlay and
 		// uses the panel's own gutter instead.
-		@include break-medium() {
+		@include break-small() {
 			padding-left: $grid-unit-10;
 		}
 	}
@@ -110,13 +110,13 @@
 		outline: 1px solid transparent;
 	}
 
-	// Below `medium` the sidebar is a full-width overlay, so the panel carries
-	// its own all-around gutter. From `medium` up it's the right-hand column
-	// and drops its left/bottom padding (the sidebar supplies the left gutter).
+	// Below `small` the sidebar is a full-width overlay, so the panel carries
+	// its own all-around gutter. From `small` up it's the right-hand column and
+	// drops its left/bottom padding (the sidebar supplies the left gutter).
 	.media-editor__panel {
 		padding: $grid-unit-20;
 
-		@include break-medium() {
+		@include break-small() {
 			padding: $grid-unit-20 $grid-unit-30 0 0;
 		}
 	}
@@ -131,30 +131,38 @@
 		.components-button.has-icon {
 			padding: 0;
 
-			@include break-medium() {
+			@include break-small() {
 				display: flex;
 			}
 		}
 	}
 
-	// Below the medium breakpoint the `ComplementaryArea` switches to its
-	// full-screen "mobile" mode and stretches the panel to `100vw`, set
-	// inline on both the animated fill wrapper and the panel itself. The
-	// media editor runs inside a modal that, between the small and medium
-	// breakpoints, is inset from the viewport edges — so `100vw` is wider
-	// than the dialog, spilling the sidebar past its right edge and over the
-	// canvas. Pin the sidebar to the modal by filling its container instead
-	// of the viewport, and override the two inline `100vw` declarations
-	// (`!important` is the only way to beat an inline style). The whole
-	// override is scoped to this breakpoint so the desktop sidebar width is
-	// untouched.
-	@media (max-width: #{ (breakpoints.$break-medium - 1) }) {
-		// The skeleton sidebar wrapper is always present — it's just empty
-		// when the panel is closed (the default at this breakpoint). Only
-		// give it a definite width while the panel is open (`__fill` is
-		// rendered), otherwise the empty, white, absolutely-positioned
-		// wrapper would cover the canvas. When the panel is open it would
-		// otherwise shrink-wrap to nothing, since `__fill` below is `100%`.
+	// `ComplementaryArea`'s "mobile" mode is hard-coded to the `medium`
+	// breakpoint: below 782px it renders an animated fill wrapper and writes
+	// `width: 100vw` inline on both it and the inner panel. We want the sidebar
+	// to mirror InterfaceSkeleton's column/overlay collapse but shifted to
+	// `small`, so we override that inline width by breakpoint (`!important` is
+	// the only way to beat an inline style). `:has(__fill)` scopes the changes
+	// to when the panel is actually open: the skeleton sidebar wrapper is always
+	// present (empty when closed), so touching it unconditionally would paint an
+	// empty box over the canvas.
+
+	// Column (>= small): pull the open panel back in-flow at the sidebar width,
+	// so the controls sit beside the canvas down to 600px.
+	@include break-small() {
+		.interface-interface-skeleton__sidebar:has(.interface-complementary-area__fill) {
+			position: relative !important;
+		}
+
+		.interface-complementary-area__fill,
+		.interface-complementary-area {
+			width: $sidebar-width !important;
+		}
+	}
+
+	// Overlay (< small): the open panel fills the modal width (it would
+	// otherwise shrink-wrap, since the inline `100vw` is overridden below).
+	@media (max-width: #{ (breakpoints.$break-small - 1) }) {
 		.interface-interface-skeleton__sidebar:has(.interface-complementary-area__fill) {
 			width: 100%;
 		}

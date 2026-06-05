@@ -317,7 +317,8 @@ function mergeContentWithoutBlocks(
 	mergeCrdtBlocks(
 		currentBlocks,
 		parse( rawContent ) as Block[],
-		cursorPosition
+		cursorPosition,
+		{ preserveClientIds: true }
 	);
 }
 

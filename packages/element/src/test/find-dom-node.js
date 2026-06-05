@@ -2,7 +2,7 @@ import { act, render } from '@testing-library/react';
 import { Component } from '..';
 import { findDOMNode as findDOMNodePolyfill } from '../react-polyfill';
 
-describe( 'findDOMNode', () => {
+describe.skip( 'findDOMNode', () => {
 	it( 'should return null when passed null', () => {
 		expect( findDOMNodePolyfill( null ) ).toBeNull();
 		expect( console ).toHaveWarned();

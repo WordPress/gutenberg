@@ -43,7 +43,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
@@ -52,7 +52,7 @@
 		"route-recognizer": "^0.3.4"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

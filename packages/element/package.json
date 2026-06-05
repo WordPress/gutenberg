@@ -46,14 +46,14 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^19.2.13",
-		"@types/react-dom": "^19.2.3",
+		"@types/react": "^18.3.27",
+		"@types/react-dom": "^18.3.1",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/escape-html": "file:../escape-html",
 		"change-case": "^4.1.2",
 		"is-plain-object": "^5.0.0",
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react": "^18.3.0",
+		"react-dom": "^18.3.0"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
