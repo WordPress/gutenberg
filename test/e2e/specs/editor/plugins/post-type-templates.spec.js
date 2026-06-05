@@ -17,12 +17,37 @@ async function getBookTemplateContent( editor ) {
 	return editor.getEditedPostContent();
 }
 
+async function waitForRestPath( requestUtils, path ) {
+	await expect
+		.poll( async () => {
+			try {
+				await requestUtils.rest( { path } );
+				return true;
+			} catch {
+				return false;
+			}
+		} )
+		.toBe( true );
+}
+
+async function waitForDefaultPostFormat( requestUtils, format ) {
+	await expect
+		.poll( async () => {
+			const settings = await requestUtils.rest( {
+				path: '/wp/v2/settings',
+			} );
+			return settings.default_post_format;
+		} )
+		.toBe( format );
+}
+
 test.describe( 'Post type templates', () => {
 	test.describe( 'Using a CPT with a predefined template', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin(
 				'gutenberg-test-plugin-templates'
 			);
+			await waitForRestPath( requestUtils, '/wp/v2/types/book' );
 		} );
 
 		test.beforeEach( async ( { admin } ) => {
@@ -100,6 +125,7 @@ test.describe( 'Post type templates', () => {
 			await requestUtils.updateSiteSettings( {
 				default_post_format: 'image',
 			} );
+			await waitForDefaultPostFormat( requestUtils, 'image' );
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {

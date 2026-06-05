@@ -44,4 +44,22 @@ export async function createNewPost(
 		welcomeGuide: options.showWelcomeGuide ?? false,
 		fullscreenMode: options.fullscreenMode ?? false,
 	} );
+
+	await this.page.waitForFunction( () => {
+		const editor = window.wp?.data?.select( 'core/editor' ) as
+			| {
+					__unstableIsEditorReady?: () => boolean;
+			  }
+			| undefined;
+
+		return editor?.__unstableIsEditorReady?.();
+	} );
+
+	const titleLocator = this.editor.canvas.getByRole( 'textbox', {
+		name: 'Add title',
+	} );
+
+	if ( await titleLocator.isVisible().catch( () => false ) ) {
+		await titleLocator.focus();
+	}
 }
