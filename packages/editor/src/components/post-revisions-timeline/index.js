@@ -6,13 +6,16 @@ import { diffWords } from 'diff/lib/diff/word';
 /**
  * WordPress dependencies
  */
+import { Button, Dropdown } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { info } from '@wordpress/icons';
 import { authorField } from '@wordpress/fields';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -189,12 +192,46 @@ export default function PostRevisionsTimeline() {
 						return null;
 					}
 					return (
-						<>
+						<Stack
+							className="editor-post-revisions-timeline__details"
+							direction="row"
+							gap="sm"
+							justify="flex-start"
+							align="center"
+						>
 							<PostContentInformationUI
 								postContent={ postContent }
 							/>
-							<RevisionDiffEntries entries={ diffEntries } />
-						</>
+							{ diffEntries && (
+								<Dropdown
+									popoverProps={ {
+										placement: 'bottom-start',
+									} }
+									renderToggle={ ( { isOpen, onToggle } ) => (
+										<Button
+											size="small"
+											icon={ info }
+											label={ __(
+												'View changed fields'
+											) }
+											aria-expanded={ isOpen }
+											onClick={ ( event ) => {
+												// Stop the row's selection toggle from firing.
+												event.stopPropagation();
+												onToggle();
+											} }
+										/>
+									) }
+									renderContent={ () => (
+										<div className="editor-post-revisions-timeline__diff">
+											<RevisionDiffEntries
+												entries={ diffEntries }
+											/>
+										</div>
+									) }
+								/>
+							) }
+						</Stack>
 					);
 				},
 				enableSorting: false,

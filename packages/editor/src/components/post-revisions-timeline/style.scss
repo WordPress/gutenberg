@@ -1,7 +1,15 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-revisions-timeline {
 	.editor-post-revisions-timeline__revision-date {
 		text-transform: uppercase;
 		font-weight: 600;
 		font-size: 12px;
 	}
+}
+
+.editor-post-revisions-timeline__diff {
+	min-width: 280px;
+	max-width: 360px;
+	padding: $grid-unit-15;
 }
