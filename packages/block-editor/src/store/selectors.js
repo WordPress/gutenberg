@@ -2931,6 +2931,25 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
+ * Returns how the most recent block change interacts with undo history.
+ *
+ * - `persistent` changes create a new undo level.
+ * - `merge` changes do not create a new undo level, but may merge into the
+ *    prior stack item history.
+ * - `ignore` changes should never be captured by undo history.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {'persistent'|'merge'|'ignore'} Block change history behavior.
+ */
+export function __unstableGetLastBlockChangeHistoryMode( state ) {
+	if ( state.blocks.lastBlockChangeHistoryMode ) {
+		return state.blocks.lastBlockChangeHistoryMode;
+	}
+	return state.blocks.isPersistentChange === false ? 'merge' : 'persistent';
+}
+
+/**
  * Returns the block list settings for an array of blocks, if any exist.
  *
  * @param {Object} state     Editor state.
