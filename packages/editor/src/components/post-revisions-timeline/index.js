@@ -212,10 +212,14 @@ export default function PostRevisionsTimeline() {
 
 	const onChangeSelection = useCallback(
 		( newSelection ) => {
-			const selectedId = newSelection[ newSelection.length - 1 ];
-			if ( selectedId ) {
-				setCurrentRevisionId( Number( selectedId ) );
+			// Revisions mode always keeps one revision selected. Clicking the
+			// active revision yields an empty selection, which we ignore so the
+			// timeline never ends up with nothing selected.
+			if ( newSelection.length === 0 ) {
+				return;
 			}
+			const selectedId = newSelection[ newSelection.length - 1 ];
+			setCurrentRevisionId( Number( selectedId ) );
 		},
 		[ setCurrentRevisionId ]
 	);
