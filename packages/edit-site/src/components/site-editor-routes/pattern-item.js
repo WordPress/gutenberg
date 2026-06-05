@@ -17,6 +17,7 @@ export const patternItemRoute = {
 					: undefined;
 			return <SidebarNavigationScreenPatterns backPath={ backPath } />;
 		},
+		// Also rendered on mobile, where this route is only reached at canvas=edit.
 		preview: <Editor />,
 	},
 };

@@ -17,6 +17,7 @@ const areas = {
 			<SidebarNavigationScreenUnsupported />
 		);
 	},
+	// Also rendered on mobile, where this route is only reached at canvas=edit.
 	preview( { siteData } ) {
 		if ( ! isThemeDataLoaded( siteData ) ) {
 			return null;
