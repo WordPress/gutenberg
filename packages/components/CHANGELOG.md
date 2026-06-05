@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers.
+-   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
 
 ## 34.0.0 (2026-05-27)
 
