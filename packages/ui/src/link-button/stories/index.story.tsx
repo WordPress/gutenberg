@@ -97,13 +97,12 @@ export const AllTonesAndVariants: Story = {
 		<div
 			style={ {
 				display: 'grid',
-				gridTemplateColumns: 'max-content repeat(2, max-content)',
+				gridTemplateColumns: 'max-content max-content',
 				color: 'var(--wpds-color-fg-content-neutral)',
 			} }
 		>
 			<div></div>
 			<div style={ { textAlign: 'center' } }>Resting</div>
-			<div style={ { textAlign: 'center' } }>Disabled</div>
 			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) => (
 				<Fragment key={ tone }>
 					{ (
@@ -130,20 +129,6 @@ export const AllTonesAndVariants: Story = {
 									{ ...args }
 									tone={ tone }
 									variant={ variant }
-								/>
-							</div>
-							<div
-								style={ {
-									padding: '0.5rem 1rem',
-									display: 'flex',
-									alignItems: 'center',
-								} }
-							>
-								<LinkButton
-									{ ...args }
-									tone={ tone }
-									variant={ variant }
-									disabled
 								/>
 							</div>
 						</Fragment>

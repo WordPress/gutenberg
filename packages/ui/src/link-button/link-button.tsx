@@ -21,11 +21,8 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 			variant = 'solid',
 			size = 'default',
 			className,
-			disabled,
 			children,
 			render,
-			onClick,
-			onKeyDown,
 			...props
 		},
 		ref
@@ -48,28 +45,6 @@ export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
 			ref,
 			props: mergeProps< 'a' >( props, {
 				className: mergedClassName,
-				...( disabled && {
-					'aria-disabled': true,
-					'data-disabled': '',
-					tabIndex: -1,
-				} ),
-				onClick( event ) {
-					if ( disabled ) {
-						event.preventDefault();
-						return;
-					}
-					onClick?.( event );
-				},
-				onKeyDown( event ) {
-					if (
-						disabled &&
-						( event.key === 'Enter' || event.key === ' ' )
-					) {
-						event.preventDefault();
-						return;
-					}
-					onKeyDown?.( event );
-				},
 				children,
 			} ),
 		} );

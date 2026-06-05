@@ -11,14 +11,10 @@
 			--_gcd-link-button-color: var(--wp-ui-button-foreground-color);
 		}
 
-		&:not([data-disabled]):is(:hover, :active, :focus) {
-			--_gcd-link-button-color:
- var(--wp-ui-button-foreground-color-active);
-		}
-
-		&[data-disabled] {
-			--_gcd-link-button-color:
- var(--wp-ui-button-foreground-color-disabled);
+		&:is(:hover, :active, :focus) {
+			--_gcd-link-button-color: var(
+				--wp-ui-button-foreground-color-active
+			);
 		}
 	}
 }

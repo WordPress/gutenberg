@@ -3,7 +3,7 @@ import { type ComponentProps } from '../utils/types';
 
 type LinkButtonVisualProps = Pick<
 	ButtonProps,
-	'variant' | 'tone' | 'size' | 'disabled' | 'children'
+	'variant' | 'tone' | 'size' | 'children'
 >;
 
 export interface LinkButtonProps
