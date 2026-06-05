@@ -176,9 +176,9 @@ function getFiniteTime( value ) {
 /**
  * Set up waveform seek control accessibility.
  *
- * @param {Element} container - The waveform player container element.
- * @param {Object}  instance  - The WaveformPlayer instance.
- * @param {Object}  options   - Accessibility options.
+ * @param {Element} container     - The waveform player container element.
+ * @param {Object}  instance      - The WaveformPlayer instance.
+ * @param {Object}  options       - Accessibility options.
  * @param {string}  options.label - Accessible label for the seek control.
  * @return {Function|undefined} Cleanup function.
  */
