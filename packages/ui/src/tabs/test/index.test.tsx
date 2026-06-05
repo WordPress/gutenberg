@@ -1836,9 +1836,7 @@ describe( 'Tabs', () => {
 									name: 'Alpha',
 								} )
 							).toBeVisible();
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// No tab should be selected i.e. it doesn't fall back to first tab.
 							expect(
 								screen.queryByRole( 'tab', { selected: true } )
@@ -1868,9 +1866,7 @@ describe( 'Tabs', () => {
 									name: 'Alpha',
 								} )
 							).toBeVisible();
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// Gamma becomes selected again.
 							expect(
 								screen.getByRole( 'tab', {
@@ -1896,9 +1892,7 @@ describe( 'Tabs', () => {
 								'alpha',
 								expect.anything()
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							expect( mockOnValueChange ).not.toHaveBeenCalled();
 						}
 					} );
@@ -1971,9 +1965,7 @@ describe( 'Tabs', () => {
 									name: 'Beta',
 								} )
 							).toBeVisible();
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// No tab should be selected i.e. it doesn't fall back to gamma,
 							// even if it matches the `defaultValue` prop.
 							expect(
@@ -2005,9 +1997,7 @@ describe( 'Tabs', () => {
 									name: 'Beta',
 								} )
 							).toBeVisible();
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							expect(
 								screen.getByRole( 'tab', {
 									selected: true,
@@ -2033,9 +2023,7 @@ describe( 'Tabs', () => {
 								'beta',
 								expect.anything()
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// Only the user click on alpha is observed.
 							expect( mockOnValueChange ).toHaveBeenCalledTimes(
 								1
@@ -2071,9 +2059,7 @@ describe( 'Tabs', () => {
 							await waitForComponentToBeInitializedWithSelectedTab(
 								'Alpha'
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// No initially selected tabs or tabpanels, since the `value`
 							// prop is not matching any known tabs.
 							await waitForComponentToBeInitializedWithSelectedTab(
@@ -2092,9 +2078,7 @@ describe( 'Tabs', () => {
 								'alpha',
 								expect.anything()
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							expect( mockOnValueChange ).not.toHaveBeenCalled();
 						}
 
@@ -2119,9 +2103,7 @@ describe( 'Tabs', () => {
 									name: 'Alpha',
 								} )
 							).toBeVisible();
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// Delta becomes selected
 							expect(
 								screen.getByRole( 'tab', {
@@ -2143,9 +2125,7 @@ describe( 'Tabs', () => {
 							expect( mockOnValueChange ).toHaveBeenCalledTimes(
 								1
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							expect( mockOnValueChange ).not.toHaveBeenCalled();
 						}
 					} );
@@ -2210,9 +2190,7 @@ describe( 'Tabs', () => {
 								'alpha',
 								expect.anything()
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// Beta continues to be selected and focused,
 							// even if it is disabled.
 							expect(
@@ -2249,9 +2227,7 @@ describe( 'Tabs', () => {
 							expect( mockOnValueChange ).toHaveBeenCalledTimes(
 								1
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// Beta continues to be selected and focused.
 							expect(
 								screen.getByRole( 'tab', {
@@ -2336,9 +2312,7 @@ describe( 'Tabs', () => {
 									name: 'Alpha',
 								} )
 							).toBeVisible();
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// Beta continues to be selected, even if it is disabled.
 							expect(
 								screen.getByRole( 'tab', {
@@ -2369,9 +2343,7 @@ describe( 'Tabs', () => {
 									name: 'Alpha',
 								} )
 							).toBeVisible();
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							// Beta continues to be selected and focused.
 							expect(
 								screen.getByRole( 'tab', {
@@ -2399,9 +2371,7 @@ describe( 'Tabs', () => {
 								'alpha',
 								expect.anything()
 							);
-						}
-
-						if ( mode === 'Controlled' ) {
+						} else if ( mode === 'Controlled' ) {
 							expect( mockOnValueChange ).toHaveBeenCalledTimes(
 								1
 							);
