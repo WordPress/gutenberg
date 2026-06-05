@@ -44,7 +44,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/i18n": "file:../i18n"
 	},
 	"publishConfig": {

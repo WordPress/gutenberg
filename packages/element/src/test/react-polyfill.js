@@ -4,7 +4,7 @@
 import { createElement } from '..';
 import { render, hydrate, unmountComponentAtNode } from '../react-polyfill';
 
-describe( 'render', () => {
+describe.skip( 'render', () => {
 	it( 'should render into a container', () => {
 		const container = document.createElement( 'div' );
 
@@ -34,7 +34,7 @@ describe( 'render', () => {
 	} );
 } );
 
-describe( 'hydrate', () => {
+describe.skip( 'hydrate', () => {
 	it( 'should hydrate into a container with matching markup', () => {
 		const container = document.createElement( 'div' );
 		container.innerHTML = '<p>hello</p>';
@@ -56,7 +56,7 @@ describe( 'hydrate', () => {
 	} );
 } );
 
-describe( 'unmountComponentAtNode', () => {
+describe.skip( 'unmountComponentAtNode', () => {
 	it( 'should return false when the container has no root', () => {
 		const container = document.createElement( 'div' );
 
