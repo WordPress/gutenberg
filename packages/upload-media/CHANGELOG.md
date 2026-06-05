@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Enhancement
+
+- Automatically retry failed uploads with exponential backoff for transient (network/server) errors. Retry behavior is configurable via the `retry` store setting; non-transient failures and child sideloads are not retried. The upload queue can also be paused and resumed, allowing uploads to halt while the browser is offline and continue on reconnect ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 0.32.0 (2026-05-27)
+
+### Bug Fix
+
+- Fix `-scaled` suffix propagating to every sub-size filename when an image exceeds `big_image_size_threshold`. Threshold scaling now runs as a sideload after the original is uploaded, so sub-sizes inherit the un-suffixed basename — matching WordPress core's `wp_create_image_subsizes()` naming.
+- Propagate the post-finalize attachment from `mediaFinalize` back to the queue so the block markup picks up the `-scaled` URL. Without this, oversized client-side uploads kept the unscaled original's URL in the block, and `wp_calculate_image_srcset()` could not match the `src` to any entry in `$image_meta['sizes']` — so the front-end `<img>` shipped without `srcset`.
+
+## 0.31.0 (2026-05-14)
+
 ## 0.30.0 (2026-04-29)
 
 ### Enhancement

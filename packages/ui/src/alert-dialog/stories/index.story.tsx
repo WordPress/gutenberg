@@ -19,6 +19,13 @@ const meta: Meta< typeof AlertDialog.Root > = {
 		onConfirm: { action: fn() },
 		onOpenChange: { action: fn() },
 	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
+	},
 };
 export default meta;
 

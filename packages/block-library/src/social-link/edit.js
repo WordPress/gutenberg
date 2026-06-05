@@ -19,7 +19,7 @@ import {
 } from '@wordpress/block-editor';
 import { useState, useRef, createInterpolateElement } from '@wordpress/element';
 import {
-	Icon,
+	Icon as WCIcon,
 	Button,
 	Dropdown,
 	TextControl,
@@ -277,7 +277,7 @@ const SocialLinkEdit = ( {
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<button aria-haspopup="dialog" { ...blockProps } role="button">
-					<Icon icon={ icon } />
+					<WCIcon icon={ icon } />
 					<span
 						className={ clsx( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,

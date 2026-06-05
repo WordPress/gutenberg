@@ -19,7 +19,7 @@ export default function GuidelineAccordion( {
 }: GuidelineAccordionProps ) {
 	return (
 		<CollapsibleCard.Root>
-			<CollapsibleCard.Header>
+			<CollapsibleCard.Header render={ <h2 /> }>
 				<VStack spacing={ 1 }>
 					<Card.Title>{ title }</Card.Title>
 					<CollapsibleCard.HeaderDescription>

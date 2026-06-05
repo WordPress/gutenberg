@@ -24,55 +24,29 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	CropperState,
+	HandlePosition,
 	StencilProps,
 	Size,
 	NormalizedRect,
 } from '../../core/types';
-import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
-import { getImageFit } from '../../core/camera';
-import { getImageCropBounds } from '../../core/containment';
+import type { CropperController } from '../hooks/use-cropper-reducer';
+import { getImageFit, getRotatedBBox } from '../../core/camera';
+import { getImageCropBounds, getMinZoom } from '../../core/containment';
+import { MIN_CROP_PIXELS } from '../../core/constants';
+import { computeInscribedRect } from '../../core/crop-rect';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
+import { DimensionsOverlay } from './overlays/dimensions-overlay';
+import { getSourceRegion } from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
-
-// Largest rect of the given pixel aspect ratio that fits inside the visual
-// bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
-// rect (1×1) if `aspectRatio` is unset or non-positive.
-function computeInscribedRect(
-	aspectRatio: number | undefined,
-	visualSize: Size
-): NormalizedRect {
-	let w = 1;
-	let h = 1;
-	if ( aspectRatio && aspectRatio > 0 && visualSize.width > 0 ) {
-		// normalizedRatio = w/h in normalized space that produces the
-		// desired pixel aspect ratio.
-		// pixelW = w * visualW, pixelH = h * visualH
-		// pixelW / pixelH = aspectRatio
-		// => w / h = aspectRatio * visualH / visualW
-		const normalizedRatio =
-			( aspectRatio * visualSize.height ) / visualSize.width;
-		if ( normalizedRatio <= 1 ) {
-			w = normalizedRatio;
-		} else {
-			h = 1 / normalizedRatio;
-		}
-	}
-	return {
-		x: ( 1 - w ) / 2,
-		y: ( 1 - h ) / 2,
-		width: w,
-		height: h,
-	};
-}
 
 /**
  * Props for the Cropper component.
@@ -80,8 +54,8 @@ function computeInscribedRect(
 export interface CropperProps {
 	/** Image source URL. */
 	src: string;
-	/** The full state/setter object from `useCropperState`. */
-	controller: UseCropperStateReturn;
+	/** The cropper controller from `useCropperReducer` or a composite store. */
+	controller: CropperController;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
 	/** Show the rule-of-thirds grid overlay, or only during interactions. */
@@ -90,7 +64,9 @@ export interface CropperProps {
 	isPlacementActive?: boolean;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
-	/** Minimum zoom level. */
+	/** Show the live output dimensions tooltip during a resize. */
+	showDimensions?: boolean;
+	/** Minimum zoom level override. Defaults to the coverage-aware minimum. */
 	minZoom?: number;
 	/** Maximum zoom level. */
 	maxZoom?: number;
@@ -137,12 +113,13 @@ export interface CropperProps {
  *
  * @param root0                   Component props implementing CropperProps.
  * @param root0.src               Image source URL.
- * @param root0.controller        The full state/setter object from `useCropperState`.
+ * @param root0.controller        The cropper controller from `useCropperReducer` or a composite store.
  * @param root0.stencil           Custom stencil component.
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
  * @param root0.showDimming       Show dimming overlay outside crop.
- * @param root0.minZoom           Minimum zoom level.
+ * @param root0.showDimensions    Show live dimensions tooltip during resize.
+ * @param root0.minZoom           Minimum zoom level override.
  * @param root0.maxZoom           Maximum zoom level.
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
@@ -162,6 +139,7 @@ function CropperInner(
 		showGrid = false,
 		isPlacementActive = false,
 		showDimming = true,
+		showDimensions = true,
 		minZoom,
 		maxZoom,
 		aspectRatio,
@@ -175,7 +153,14 @@ function CropperInner(
 	}: CropperProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
-	const { state, setImage, setCropRect, settleCrop } = controller;
+	const {
+		state,
+		setImage,
+		setCropRect,
+		settleCrop,
+		setVisualSize,
+		adjustCropRectForViewport,
+	} = controller;
 	const {
 		viewport: viewportState,
 		setViewportPan,
@@ -202,18 +187,20 @@ function CropperInner(
 
 	const handleCropAreaFocus = useCallback(
 		( event: React.FocusEvent< HTMLDivElement > ) => {
-			if ( event.target === event.currentTarget ) {
+			const target = event.target as HTMLElement;
+			if ( target === event.currentTarget ) {
 				setIsCropAreaFocused( true );
-				// Show the outline only when focus arrived via keyboard
-				// navigation. relatedTarget is null for pointer-initiated and
-				// cross-window focus, so it reliably excludes those cases
-				// without needing a separate ref or flag.
-				if (
-					event.relatedTarget !== null &&
-					event.currentTarget.matches( ':focus-visible' )
-				) {
-					setIsFocusVisible( true );
-				}
+			}
+			// Show the outline only when focus arrived via keyboard
+			// navigation. relatedTarget is null for pointer-initiated and
+			// cross-window focus, so it reliably excludes those cases
+			// without needing a separate ref or flag. Applies to focus
+			// arriving on the canvas itself or on a descendant handle.
+			if (
+				event.relatedTarget !== null &&
+				target.matches( ':focus-visible' )
+			) {
+				setIsFocusVisible( true );
 			}
 		},
 		[]
@@ -223,6 +210,15 @@ function CropperInner(
 		( event: React.FocusEvent< HTMLDivElement > ) => {
 			if ( event.target === event.currentTarget ) {
 				setIsCropAreaFocused( false );
+			}
+			// Reset keyboard-active styling only when focus leaves the
+			// cropper entirely. Moves between the canvas and a handle (or
+			// between handles) keep the keyboard-active state intact.
+			if (
+				! event.currentTarget.contains(
+					event.relatedTarget as Node | null
+				)
+			) {
 				setIsFocusVisible( false );
 			}
 		},
@@ -272,9 +268,47 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// In fixed-crop mode, auto-size the crop rect only when a fixed aspect
-	// ratio is selected. With "Free" selected, turning freeform handles off
-	// should preserve the user's current unconstrained crop.
+	// Per-axis minimum crop size in normalized space, expressing a
+	// pixel floor on the captured source region. cropRect is normalized
+	// in the viewport's snap-rotation bbox; the captured source-pixel
+	// width is `cropRect.width * bbox.width / zoom`, so the normalized
+	// floor scales with `zoom` to keep the source-pixel floor constant.
+	// Without this, SETTLE_CROP zooms in proportional to the shrink and
+	// successive drags can crop arbitrarily small.
+	const minCropSize: Size | undefined = useMemo( () => {
+		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		return {
+			width: Math.min( 1, ( MIN_CROP_PIXELS * state.zoom ) / bbox.width ),
+			height: Math.min(
+				1,
+				( MIN_CROP_PIXELS * state.zoom ) / bbox.height
+			),
+		};
+	}, [ naturalWidth, naturalHeight, state.rotation, state.zoom ] );
+
+	// Report the rendered image size to the controller. Composite
+	// controllers need it to compute aspect-ratio reshapes from the
+	// reducer (the dropdown dispatches without DOM access); pure
+	// controllers ignore it.
+	useEffect( () => {
+		setVisualSize( visualSize );
+	}, [ visualSize, setVisualSize ] );
+
+	// In fixed-crop mode, auto-size the crop rect only when a fixed
+	// aspect ratio is selected. With "Free" selected, turning freeform
+	// handles off should preserve the user's current unconstrained
+	// crop. Uses `adjustCropRectForViewport` so window-resize-driven
+	// reshapes don't create undo entries (composite controller); the
+	// dedup at lines below avoids redundant dispatches when the
+	// reducer has already updated the cropRect for an aspect change.
 	useEffect( () => {
 		if (
 			freeformCrop ||
@@ -295,11 +329,20 @@ function CropperInner(
 		) {
 			return;
 		}
-		setCropRect( rect );
-	}, [ freeformCrop, aspectRatio, visualSize, setCropRect, state.cropRect ] );
+		adjustCropRectForViewport( rect );
+	}, [
+		freeformCrop,
+		aspectRatio,
+		visualSize,
+		adjustCropRectForViewport,
+		state.cropRect,
+	] );
 
-	// In freeform mode, when aspectRatio changes, reshape the crop to the
-	// largest inscribed rect of the new ratio.
+	// In freeform mode, when aspectRatio changes, reshape the crop to
+	// the largest inscribed rect of the new ratio. Bails out when the
+	// cropRect already matches the inscribed rect — composite stores
+	// reshape atomically inside the reducer, so this effect is a
+	// no-op there.
 	const prevAspectRatioRef = useRef( aspectRatio );
 	useEffect( () => {
 		if ( prevAspectRatioRef.current === aspectRatio ) {
@@ -316,8 +359,24 @@ function CropperInner(
 		) {
 			return;
 		}
-		setCropRect( computeInscribedRect( aspectRatio, visualSize ) );
-	}, [ aspectRatio, freeformCrop, visualSize, setCropRect ] );
+		const rect = computeInscribedRect( aspectRatio, visualSize );
+		const current = state.cropRect;
+		if (
+			Math.abs( current.x - rect.x ) < CROP_RECT_EPSILON &&
+			Math.abs( current.y - rect.y ) < CROP_RECT_EPSILON &&
+			Math.abs( current.width - rect.width ) < CROP_RECT_EPSILON &&
+			Math.abs( current.height - rect.height ) < CROP_RECT_EPSILON
+		) {
+			return;
+		}
+		adjustCropRectForViewport( rect );
+	}, [
+		aspectRatio,
+		freeformCrop,
+		visualSize,
+		adjustCropRectForViewport,
+		state.cropRect,
+	] );
 
 	// Compute the crop handle bounds from the actual image footprint.
 	// Depends on the full state object because getImageCropBounds reads
@@ -330,9 +389,17 @@ function CropperInner(
 		}
 		return getImageCropBounds( state, elementSize, visualSize );
 	}, [ state, elementSize, visualSize ] );
+	const effectiveMinZoom =
+		minZoom !== undefined ? minZoom : getMinZoom( state );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 	const isSettlingRef = useRef( false );
+	// Direction of the handle the user is currently resizing — pointer or
+	// keyboard. `null` outside of an active resize. Drives the live
+	// dimensions tooltip overlay.
+	const [ activeHandle, setActiveHandle ] = useState< HandlePosition | null >(
+		null
+	);
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -342,7 +409,7 @@ function CropperInner(
 		isZooming,
 		isPlacementActive: isInteractionPlacementActive,
 	} = useInteraction( state, controller, canvasSize, visualSize, {
-		minZoom,
+		minZoom: effectiveMinZoom,
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,
@@ -351,27 +418,31 @@ function CropperInner(
 	// Compose focus-visibility tracking into the canvas event handlers.
 	// Kept as a spread rather than explicit props to avoid triggering
 	// jsx-a11y/no-noninteractive-element-interactions on role="group".
+	//
+	// The pointer/key tracking lives in the capture phase so it runs
+	// before any child handler — handles call stopPropagation in their
+	// own onPointerDown / onKeyDown, which would otherwise prevent the
+	// keyboard-active state from updating when the user interacts with
+	// a handle directly.
 	const canvasHandlers = {
 		...handlers,
-		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
-			handlers.onPointerDown?.( event );
-			// Called after handlers so it lands last in the React batch —
-			// el.focus() inside the handler fires onFocus, which may
-			// otherwise set isFocusVisible back to true.
+		onPointerDownCapture: () => {
 			setIsFocusVisible( false );
 		},
-		onKeyDown: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
-			// Guard against keydowns bubbling up from child handles
-			// (e.g. Tab between handles, unhandled keys). Modifier-only
-			// keypresses are excluded — they precede another key rather
-			// than indicating deliberate keyboard interaction on their own.
+		onKeyDownCapture: ( event: React.KeyboardEvent< HTMLDivElement > ) => {
+			// Modifier-only keypresses precede another key rather than
+			// indicating deliberate keyboard interaction on their own.
 			if (
-				event.target === event.currentTarget &&
 				! [ 'Shift', 'Control', 'Alt', 'Meta' ].includes( event.key )
 			) {
 				setIsFocusVisible( true );
 			}
-			handlers.onKeyDown?.( event );
+		},
+		onPointerDown: ( event: React.PointerEvent< HTMLDivElement > ) => {
+			handlers.onPointerDown?.( event );
+			// Re-assert false after handlers run — el.focus() inside the
+			// handler fires onFocus, which may otherwise set it back to true.
+			setIsFocusVisible( false );
 		},
 	};
 
@@ -485,6 +556,20 @@ function CropperInner(
 		isInteractiveGrid &&
 		( isInteractionPlacementActive || isResizing || isPlacementActive );
 
+	// Output crop size in source pixels — drives the live tooltip
+	// overlay. Only computed during pointer drags, so the per-frame
+	// state churn during pan/zoom doesn't pay for it.
+	const outputSize = useMemo( () => {
+		if ( ! showDimensions || ! activeHandle || ! state.image ) {
+			return null;
+		}
+		const region = getSourceRegion( state, {
+			width: state.image.naturalWidth,
+			height: state.image.naturalHeight,
+		} );
+		return { width: region.width, height: region.height };
+	}, [ showDimensions, activeHandle, state ] );
+
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
 	 * arrow keys pan the image rather than resize.
@@ -496,18 +581,22 @@ function CropperInner(
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
-	const handleResizeStart = useCallback( () => {
-		isResizingRef.current = true;
-		setIsResizing( true );
-		// Clear any in-flight settle so transitions don't apply during the
-		// new drag (rapid successive resizes would otherwise inherit the
-		// previous settle animation).
-		clearTimeout( settleTimerRef.current );
-		isSettlingRef.current = false;
-		setSettling( false );
-		resetViewport();
-		onGestureStart?.();
-	}, [ onGestureStart, resetViewport ] );
+	const handleResizeStart = useCallback(
+		( handle?: HandlePosition ) => {
+			isResizingRef.current = true;
+			setIsResizing( true );
+			setActiveHandle( handle ?? null );
+			// Clear any in-flight settle so transitions don't apply during the
+			// new drag (rapid successive resizes would otherwise inherit the
+			// previous settle animation).
+			clearTimeout( settleTimerRef.current );
+			isSettlingRef.current = false;
+			setSettling( false );
+			resetViewport();
+			onGestureStart?.();
+		},
+		[ onGestureStart, resetViewport ]
+	);
 
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height)
@@ -516,6 +605,7 @@ function CropperInner(
 	const handleResizeEnd = useCallback( () => {
 		isResizingRef.current = false;
 		setIsResizing( false );
+		setActiveHandle( null );
 		isSettlingRef.current = true;
 		setSettling( true );
 		// Reset viewport pan first so it transitions back to zero in sync
@@ -622,10 +712,12 @@ function CropperInner(
 						'wp-media-editor-image-editor__canvas--show-grid',
 					settling &&
 						'wp-media-editor-image-editor__canvas--settling',
-					// Show the keyboard focus outline only when the canvas
-					// itself (not a child handle) has keyboard focus.
+					// Marks the cropper as in keyboard-interaction mode.
+					// CSS uses :focus on the canvas to show the stencil
+					// outline and :focus on a handle to show its ring,
+					// so the class applies whenever any cropper element
+					// has keyboard focus.
 					isFocusVisible &&
-						isCropAreaFocused &&
 						'wp-media-editor-image-editor__canvas--focus-visible'
 				) }
 				tabIndex={ 0 }
@@ -691,6 +783,7 @@ function CropperInner(
 						freeformCrop={ freeformCrop }
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
+						minCropSize={ minCropSize }
 					/>
 
 					{ /* Rule-of-thirds grid */ }
@@ -699,6 +792,18 @@ function CropperInner(
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
 							imageSize={ visualSize }
+						/>
+					) }
+
+					{ /* Live dimensions tooltip pinned to the dragged handle. */ }
+					{ activeHandle && outputSize && (
+						<DimensionsOverlay
+							cropRect={ state.cropRect }
+							containerSize={ canvasSize }
+							imageSize={ visualSize }
+							activeHandle={ activeHandle }
+							outputWidth={ outputSize.width }
+							outputHeight={ outputSize.height }
 						/>
 					) }
 				</div>

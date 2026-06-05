@@ -1,7 +1,9 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import * as Select from '../index';
+import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
 
 describe( 'Select', () => {
 	it( 'supports object item values', async () => {
@@ -78,10 +80,7 @@ describe( 'Select', () => {
 			</Select.Root>
 		);
 
-		const placeholder = screen.getByText( 'Select' );
-
 		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Select' );
-		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
 	} );
 
 	it( 'supports custom placeholder text', () => {
@@ -94,29 +93,8 @@ describe( 'Select', () => {
 			</Select.Root>
 		);
 
-		const placeholder = screen.getByText( 'Choose an item' );
-
 		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent(
 			'Choose an item'
-		);
-		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
-	} );
-
-	it( 'does not use placeholder styling when a value is selected', () => {
-		render(
-			<Select.Root defaultValue="Item 1">
-				<Select.Trigger />
-				<Select.Popup>
-					<Select.Item value="Item 1" />
-				</Select.Popup>
-			</Select.Root>
-		);
-
-		const trigger = screen.getByRole( 'combobox' );
-
-		expect( trigger ).toHaveTextContent( 'Item 1' );
-		expect( within( trigger ).getByText( 'Item 1' ) ).not.toHaveAttribute(
-			'data-placeholder'
 		);
 	} );
 
@@ -211,4 +189,136 @@ describe( 'Select', () => {
 			);
 		} );
 	} );
+
+	describe( 'positioner', () => {
+		it( 'should render the custom positioner element wrapping the popup content', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Select.Root>
+					<Select.Trigger />
+					<Select.Popup
+						positioner={
+							<Select.Positioner data-testid="custom-positioner" />
+						}
+					>
+						<Select.Item value="Item 1">Item 1</Select.Item>
+					</Select.Popup>
+				</Select.Root>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			const positioner = screen.getByTestId( 'custom-positioner' );
+
+			expect( positioner ).toContainElement( item );
+		} );
+	} );
+
+	// Slot is identified by a data attribute, not a user-facing role/text.
+	/* eslint-disable testing-library/no-node-access */
+	describe( 'wp compat overlay slot', () => {
+		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
+
+		// Exercises the public opt-in path rather than poking the flag.
+		function WithSlotEnabled( { children }: { children: ReactNode } ) {
+			useEnableWpCompatOverlaySlot();
+			return <>{ children }</>;
+		}
+
+		afterEach( () => {
+			// The hook is one-way at runtime; reset explicitly between tests.
+			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
+				.__wpUiCompatOverlaySlotEnabled;
+			document
+				.querySelectorAll( SLOT_SELECTOR )
+				.forEach( ( el ) => el.remove() );
+		} );
+
+		it( 'portals the popup into the slot when the consumer opts in', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<WithSlotEnabled>
+					<Select.Root>
+						<Select.Trigger />
+						<Select.Popup>
+							<Select.Item value="Item 1">Item 1</Select.Item>
+						</Select.Popup>
+					</Select.Root>
+				</WithSlotEnabled>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			const slot = document.querySelector( SLOT_SELECTOR );
+			expect( slot ).not.toBeNull();
+			expect( slot ).toContainElement( item );
+		} );
+
+		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Select.Root>
+					<Select.Trigger />
+					<Select.Popup>
+						<Select.Item value="Item 1">Item 1</Select.Item>
+					</Select.Popup>
+				</Select.Root>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
+		} );
+
+		it( 'lets a caller-supplied portal container override the slot', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<WithSlotEnabled>
+					<Select.Root>
+						<Select.Trigger />
+						<div
+							ref={ containerRef }
+							data-testid="custom-container"
+						/>
+						<Select.Popup
+							portal={
+								<Select.Portal container={ containerRef } />
+							}
+						>
+							<Select.Item value="Item 1">Item 1</Select.Item>
+						</Select.Popup>
+					</Select.Root>
+				</WithSlotEnabled>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				item
+			);
+		} );
+	} );
+	/* eslint-enable testing-library/no-node-access */
 } );

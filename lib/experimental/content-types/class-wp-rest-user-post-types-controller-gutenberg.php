@@ -177,6 +177,13 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			)
 		);
 
+		$schema['properties']['count'] = array(
+			'description' => __( 'Number of posts of this post type, matching the count shown in the admin list table\'s "All" view.', 'gutenberg' ),
+			'type'        => 'integer',
+			'context'     => array( 'view', 'edit' ),
+			'readonly'    => true,
+		);
+
 		$this->schema = $schema;
 		return $this->add_additional_fields_schema( $this->schema );
 	}
@@ -229,6 +236,15 @@ class WP_REST_User_Post_Types_Controller_Gutenberg extends WP_REST_Posts_Control
 			// `type: 'object'`. PHP encodes empty associative arrays as `[]`
 			// in JSON, so cast empties to stdClass.
 			$data['config'] = empty( $config ) ? new stdClass() : $config;
+		}
+
+		if ( rest_is_field_included( 'count', $fields ) && 'publish' === $item->post_status ) {
+			$num_posts = wp_count_posts( $item->post_name, 'readable' );
+			$total     = array_sum( (array) $num_posts );
+			foreach ( get_post_stati( array( 'show_in_admin_all_list' => false ) ) as $state ) {
+				$total -= isset( $num_posts->$state ) ? (int) $num_posts->$state : 0;
+			}
+			$data['count'] = $total;
 		}
 
 		$response->set_data( $data );

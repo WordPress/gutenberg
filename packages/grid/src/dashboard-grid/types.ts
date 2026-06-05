@@ -3,9 +3,11 @@
  */
 import type {
 	DragPreviewRenderProps,
+	GridOverlayRenderProps,
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from '../shared/types';
+import type { ResizeSnapSize } from '../shared/resize-snap';
 
 /**
  * Dashboard grid layout item definition.
@@ -73,13 +75,20 @@ export type GridItemProps = {
 
 	/**
 	 * Whether any tile in the grid is currently being dragged or
-	 * resized. When true, the item mutes its `actionableArea` with
-	 * `inert` so pointer hovers over buttons in other tiles do not
-	 * steal the in-progress gesture.
+	 * resized. Drives the drag activator cursor.
 	 *
 	 * @default false
 	 */
 	interacting?: boolean;
+
+	/**
+	 * Whether a tile drag is in progress. Mutes each tile's
+	 * `actionableArea` with `inert` so hovers on other tiles' controls
+	 * do not steal the gesture.
+	 *
+	 * @default false
+	 */
+	dragging?: boolean;
 
 	/**
 	 * The content to be displayed within the grid item.
@@ -89,17 +98,37 @@ export type GridItemProps = {
 	/**
 	 * Content rendered above the draggable area that stays interactive
 	 * in edit mode, typically action buttons, menus, or links. While
-	 * any tile in the grid is being dragged or resized, this content
-	 * is set `inert` so hovers on other tiles can't steal the gesture.
+	 * a tile drag is in progress, this content is set `inert` so hovers
+	 * on other tiles can't steal the gesture. During resize, visibility
+	 * is controlled by grid-level CSS hooks.
 	 */
 	actionableArea?: React.ReactNode;
 
 	/**
 	 * Callback fired while the item is being resized. Receives the
 	 * item's `key` plus the cursor offset from the gesture start in
-	 * pixels; the grid converts the offset to column/row spans.
+	 * pixels. The grid derives snapped spans from the delta and passes
+	 * them back through `resizeSnapPreview`.
 	 */
 	onResize: ( id: string, delta: ResizeDelta ) => void;
+
+	/**
+	 * Snapped grid size in pixels for the resize-preview outline. The
+	 * tile content resizes continuously with the cursor; this outline
+	 * shows the span the layout will commit to on release.
+	 */
+	resizeSnapPreview?: ResizeSnapSize | null;
+
+	/**
+	 * Minimum tile width while resizing, in pixels (one column track).
+	 */
+	minResizeWidthPx: number;
+
+	/**
+	 * Minimum tile height while resizing, in pixels (one row track).
+	 * Omitted when vertical resize is disabled.
+	 */
+	minResizeHeightPx?: number;
 
 	/**
 	 * Callback fired when the resize gesture ends.
@@ -114,11 +143,19 @@ export type GridItemProps = {
 };
 
 /**
- * Props shared by fixed and responsive DashboardGrid variants. Extends
- * the standard div props so consumers can pass `id`, `aria-*`, `data-*`,
- * event handlers, etc., directly on the grid root.
+ * Props for `DashboardGrid`. Extends the standard div props so consumers
+ * can pass `id`, `aria-*`, `data-*`, event handlers, etc., directly on
+ * the grid root.
+ *
+ * `columns` and `minColumnWidth` compose as a layered model:
+ * - `columns` alone: fixed N columns; each tile scales with the container.
+ * - `minColumnWidth` alone: column count derives from container width,
+ *   floored by the per-tile minimum, down to 1 column.
+ * - Both together: `columns` caps the count, `minColumnWidth` enforces a
+ *   per-tile width floor that can reduce the count below the cap on
+ *   narrow containers ("up to N columns, but never narrower than W px").
  */
-interface BaseDashboardGridProps
+export interface DashboardGridProps
 	extends Omit<
 		React.ComponentPropsWithoutRef< 'div' >,
 		'children' | 'className' | 'style'
@@ -144,17 +181,11 @@ interface BaseDashboardGridProps
 	/**
 	 * Inline styles applied to the grid root. Merged underneath the
 	 * grid's own layout styles, so the layout (`gridTemplateColumns`,
-	 * `gridAutoRows`, `gap`) always wins.
+	 * `gridAutoRows`) always wins. The gap between tiles is owned by
+	 * the design-system gap token and is not configurable per
+	 * instance; override it via a theme or density change.
 	 */
 	style?: React.CSSProperties;
-
-	/**
-	 * Grid gap multiplier size (e.g., a spacing of 2 results in a gap
-	 * of 8px, it's multiplied by 4).
-	 *
-	 * @default 2
-	 */
-	spacing?: number;
 
 	/**
 	 * Height of each row in pixels, or `'auto'` to let the tallest
@@ -209,30 +240,36 @@ interface BaseDashboardGridProps
 	 * properties documented in the README.
 	 */
 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
-}
 
-interface FixedDashboardGridProps extends BaseDashboardGridProps {
 	/**
-	 * Total number of columns in the grid.
+	 * Override the default edit-mode overlay (row-marker tiles per
+	 * column) with a custom component. The grid supplies the resolved
+	 * column count, row height, and row count; the consumer is
+	 * responsible for the visual.
 	 *
-	 * @default 6
+	 * The overlay only renders when `editMode` is true. When omitted,
+	 * the package's default visual is used.
 	 */
-	columns: number;
+	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 
-	minColumnWidth?: never;
-}
-
-interface ResponsiveDashboardGridProps extends BaseDashboardGridProps {
 	/**
-	 * Minimum width in pixels per column. Enables responsive mode:
-	 * the column count is derived from container width, down to a
-	 * minimum of 1 column. Mutually exclusive with `columns`.
+	 * Target column count (cap). When set alone, the grid renders this
+	 * many columns and tiles scale with the container.
+	 *
+	 * Composes with `minColumnWidth`: if both are set, the effective
+	 * column count is `min( columns, fitsAtMinWidth )`. When omitted
+	 * but `minColumnWidth` is set, the count is uncapped and derives
+	 * purely from the container width. When both are omitted, the
+	 * grid renders six columns.
+	 */
+	columns?: number;
+
+	/**
+	 * Per-tile minimum width in pixels. The effective column count is
+	 * derived from container width, floored by this value, down to 1.
+	 *
+	 * Composes with `columns`: when both are set, this acts as a floor
+	 * that can reduce the count below `columns` on narrow containers.
 	 */
 	minColumnWidth?: number;
-
-	columns?: never;
 }
-
-export type DashboardGridProps =
-	| FixedDashboardGridProps
-	| ResponsiveDashboardGridProps;

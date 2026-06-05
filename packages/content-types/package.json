@@ -33,6 +33,7 @@
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/admin-ui": "file:../admin-ui",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
@@ -43,11 +44,13 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/route": "file:../route",
 		"@wordpress/ui": "file:../ui",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"@wordpress/views": "file:../views"
 	},
 	"publishConfig": {
 		"access": "public"
