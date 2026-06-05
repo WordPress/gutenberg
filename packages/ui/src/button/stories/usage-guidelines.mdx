@@ -1,4 +1,4 @@
-import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
 import * as UsageGuidelinesStories from './usage-guidelines.story';
 
 <Meta of={ UsageGuidelinesStories } />
@@ -10,11 +10,13 @@ only on how it should look.
 
 ## Quick reference
 
+<Markdown>{`
 | Goal | Component | Element | Examples |
 | --- | --- | --- | --- |
-| Change something on the current page | [Button](?path=/docs/design-system-components-button--docs) | `<button>` | Save, Delete, Open dialog, Toggle |
-| Navigate to another page or URL | [Link](?path=/docs/design-system-components-link--docs) | `<a>` | “Learn more”, docs links, external references |
-| Navigate with button styling | [LinkButton](?path=/docs/design-system-components-link-button--docs) | `<a>` | Standalone CTAs, card actions |
+| Change something on the current page | [Button](?path=/docs/design-system-components-button--docs) | \`<button>\` | Save, Delete, Open dialog, Toggle |
+| Navigate to another page or URL | [Link](?path=/docs/design-system-components-link--docs) | \`<a>\` | "Learn more", docs links, external references |
+| Navigate with button styling | [LinkButton](?path=/docs/design-system-components-link-button--docs) | \`<a>\` | Standalone CTAs, card actions |
+`}</Markdown>
 
 ## Use `Button` for actions
 
