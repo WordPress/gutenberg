@@ -176,6 +176,14 @@ function getFiniteTime( value ) {
 /**
  * Set up waveform seek control accessibility.
  *
+ * This is a shim over `@arraypress/waveform-player`, which does not expose the
+ * waveform as a keyboard-operable slider with ARIA semantics. We add the
+ * `slider` role and value attributes, make it focusable, and handle the seek
+ * keys ourselves, suppressing the library's own keydown handler so seeking
+ * doesn't fire twice. Once the library exposes this natively, this can be
+ * reduced to just localizing the accessible name.
+ * See https://github.com/arraypress/waveform-player/issues/8.
+ *
  * @param {Element} container     - The waveform player container element.
  * @param {Object}  instance      - The WaveformPlayer instance.
  * @param {Object}  options       - Accessibility options.
