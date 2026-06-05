@@ -37,7 +37,7 @@ describe( 'Waveform utilities', () => {
 				'data-url',
 				'https://example.com/song.mp3'
 			);
-			expect( container ).toHaveAttribute( 'data-height', '100' );
+			expect( container ).toHaveAttribute( 'data-height', '120' );
 			expect( container ).toHaveAttribute(
 				'data-waveform-style',
 				'bars'
@@ -433,9 +433,9 @@ describe( 'Waveform utilities', () => {
 	} );
 
 	describe( 'WAVEFORM_BUTTON_WIDTH', () => {
-		it( 'should be defined as 100', () => {
+		it( 'should be defined as 120', () => {
 			expect( typeof WAVEFORM_BUTTON_WIDTH ).toBe( 'number' );
-			expect( WAVEFORM_BUTTON_WIDTH ).toBe( 100 );
+			expect( WAVEFORM_BUTTON_WIDTH ).toBe( 120 );
 		} );
 	} );
 

@@ -13,9 +13,9 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  * Configuration constants.
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
-const DEFAULT_WAVEFORM_HEIGHT = 100;
+const DEFAULT_WAVEFORM_HEIGHT = 120;
 const DEFAULT_SEEK_LABEL = 'Seek';
-export const WAVEFORM_BUTTON_WIDTH = 100;
+export const WAVEFORM_BUTTON_WIDTH = 120;
 
 /**
  * Format a time in seconds to a "m:ss" string.

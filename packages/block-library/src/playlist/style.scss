@@ -1,7 +1,7 @@
 @use '@arraypress/waveform-player/dist/waveform-player';
 
 // Waveform player dimensions.
-$waveform-player-height: 100px;
+$waveform-player-height: 120px;
 
 .wp-block-playlist {
 	// Main waveform player container.
@@ -102,6 +102,7 @@ $waveform-player-height: 100px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		width: 28px;
 		height: 44px;
 		padding: 0;
 		border: none;
