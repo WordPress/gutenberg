@@ -199,6 +199,7 @@ export function DefaultConnectorSettings( {
 			<TextControl
 				__next40pxDefaultSize
 				label={ __( 'API Key' ) }
+				type="password"
 				value={ apiKey }
 				onChange={ ( value ) => {
 					if ( ! readOnly ) {
