@@ -12,9 +12,7 @@
 		}
 
 		&:is(:hover, :active, :focus) {
-			--_gcd-link-button-color: var(
-				--wp-ui-button-foreground-color-active
-			);
+			--_gcd-link-button-color: var(--wp-ui-button-foreground-color-active);
 		}
 	}
 }
