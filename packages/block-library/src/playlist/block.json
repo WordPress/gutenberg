@@ -8,7 +8,7 @@
 	"description": "Embed a simple playlist.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",
-	"allowedBlocks": [ "core/playlist-track" ],
+	"allowedBlocks": [ "core/playlist-waveform", "core/playlist-tracklist" ],
 	"attributes": {
 		"currentTrack": {
 			"type": "string"
@@ -46,7 +46,10 @@
 		}
 	},
 	"providesContext": {
+		"showTracklist": "showTracklist",
 		"showArtists": "showArtists",
+		"showNumbers": "showNumbers",
+		"showTrackLength": "showTrackLength",
 		"currentTrack": "currentTrack"
 	},
 	"supports": {
@@ -78,14 +81,6 @@
 			"padding": true
 		}
 	},
-	"styles": [
-		{ "name": "bars", "label": "Bars", "isDefault": true },
-		{ "name": "mirror", "label": "Mirror" },
-		{ "name": "line", "label": "Line" },
-		{ "name": "blocks", "label": "Blocks" },
-		{ "name": "dots", "label": "Dots" },
-		{ "name": "seekbar", "label": "Seekbar" }
-	],
 	"editorStyle": "wp-block-playlist-editor",
 	"style": "wp-block-playlist"
 }

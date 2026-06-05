@@ -5,7 +5,7 @@
 	"name": "core/playlist-track",
 	"title": "Playlist track",
 	"category": "media",
-	"parent": [ "core/playlist" ],
+	"parent": [ "core/playlist-tracklist" ],
 	"description": "Playlist track.",
 	"keywords": [ "music", "sound" ],
 	"textdomain": "default",

@@ -625,9 +625,20 @@ Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/t
 -	**Name:** core/playlist
 -	**Experimental:** true
 -	**Category:** media
--	**Allowed Blocks:** core/playlist-track
+-	**Allowed Blocks:** core/playlist-waveform, core/playlist-tracklist
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
 -	**Attributes:** caption, currentTrack, order, showArtists, showImages, showNumbers, showTrackLength, showTracklist, type
+
+## Playlist tracklist
+
+Playlist tracklist. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist-tracklist))
+
+-	**Name:** core/playlist-tracklist
+-	**Experimental:** true
+-	**Category:** media
+-	**Parent:** core/playlist
+-	**Allowed Blocks:** core/playlist-track
+-	**Supports:** ~~html~~, ~~reusable~~
 
 ## Playlist track
 
@@ -636,9 +647,19 @@ Playlist track. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pack
 -	**Name:** core/playlist-track
 -	**Experimental:** true
 -	**Category:** media
--	**Parent:** core/playlist
+-	**Parent:** core/playlist-tracklist
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
 -	**Attributes:** album, artist, blob, id, image, length, src, title, type, uniqueId
+
+## Playlist waveform
+
+Playlist waveform. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist-waveform))
+
+-	**Name:** core/playlist-waveform
+-	**Experimental:** true
+-	**Category:** media
+-	**Parent:** core/playlist
+-	**Supports:** ~~html~~, ~~reusable~~
 
 ## Author (deprecated)
 

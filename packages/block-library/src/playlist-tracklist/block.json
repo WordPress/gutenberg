@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/playlist-tracklist",
+	"title": "Playlist tracklist",
+	"category": "media",
+	"parent": [ "core/playlist" ],
+	"description": "Playlist tracklist.",
+	"keywords": [ "music", "sound" ],
+	"textdomain": "default",
+	"allowedBlocks": [ "core/playlist-track" ],
+	"usesContext": [
+		"showTracklist",
+		"showArtists",
+		"showNumbers",
+		"showTrackLength"
+	],
+	"supports": {
+		"html": false,
+		"reusable": false
+	},
+	"style": "wp-block-playlist"
+}

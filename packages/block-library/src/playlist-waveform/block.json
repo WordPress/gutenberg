@@ -1,0 +1,26 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/playlist-waveform",
+	"title": "Playlist waveform",
+	"category": "media",
+	"parent": [ "core/playlist" ],
+	"description": "Playlist waveform.",
+	"keywords": [ "music", "sound" ],
+	"textdomain": "default",
+	"usesContext": [ "currentTrack" ],
+	"supports": {
+		"html": false,
+		"reusable": false
+	},
+	"styles": [
+		{ "name": "bars", "label": "Bars", "isDefault": true },
+		{ "name": "mirror", "label": "Mirror" },
+		{ "name": "line", "label": "Line" },
+		{ "name": "blocks", "label": "Blocks" },
+		{ "name": "dots", "label": "Dots" },
+		{ "name": "seekbar", "label": "Seekbar" }
+	],
+	"style": "wp-block-playlist"
+}
