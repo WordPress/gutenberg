@@ -41,6 +41,26 @@ const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
 	blockEditorPrivateApis
 );
 
+const BACKGROUND_POSITION_UNITS = [
+	{ value: '%', label: '%', default: 50 },
+	{ value: 'px', label: 'px', default: 0 },
+	{ value: 'em', label: 'em', default: 0 },
+	{ value: 'rem', label: 'rem', default: 0 },
+	{ value: 'vw', label: 'vw', default: 0 },
+	{ value: 'vh', label: 'vh', default: 0 },
+];
+
+const parseBackgroundPosition = ( value ) => {
+	if ( ! value ) {
+		return { x: undefined, y: undefined };
+	}
+	const parts = value.split( ' ' ).filter( Boolean );
+	return {
+		x: parts[ 0 ] ?? undefined,
+		y: parts.length > 1 ? parts[ 1 ] : parts[ 0 ],
+	};
+};
+
 function CoverHeightInput( {
 	onChange,
 	onUnitChange,
@@ -105,6 +125,7 @@ export default function CoverInspectorControls( {
 		id,
 		dimRatio,
 		focalPoint,
+		customPosition,
 		hasParallax,
 		isRepeated,
 		minHeight,
@@ -191,6 +212,38 @@ export default function CoverInspectorControls( {
 
 	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
+	// Effective CSS position string: customPosition takes precedence over focalPoint.
+	const effectivePositionStr =
+		customPosition ??
+		( focalPoint ? mediaPosition( focalPoint ) : undefined );
+	const { x: posX, y: posY } = parseBackgroundPosition(
+		effectivePositionStr ?? ''
+	);
+	const positionXValue = posX ?? '50%';
+	const positionYValue = posY ?? '50%';
+
+	const updateBackgroundPositionX = ( next ) => {
+		if ( next === undefined ) {
+			setAttributes( { customPosition: undefined } );
+			return;
+		}
+		setAttributes( {
+			customPosition: `${ next } ${ positionYValue }`,
+			focalPoint: undefined,
+		} );
+	};
+
+	const updateBackgroundPositionY = ( next ) => {
+		if ( next === undefined ) {
+			setAttributes( { customPosition: undefined } );
+			return;
+		}
+		setAttributes( {
+			customPosition: `${ positionXValue } ${ next }`,
+			focalPoint: undefined,
+		} );
+	};
+
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
 			? [ mediaElement.current.style, 'objectPosition' ]
@@ -215,6 +268,7 @@ export default function CoverInspectorControls( {
 							setAttributes( {
 								hasParallax: false,
 								focalPoint: undefined,
+								customPosition: undefined,
 								isRepeated: false,
 								alt: '',
 								poster: undefined,
@@ -265,15 +319,19 @@ export default function CoverInspectorControls( {
 							<ToolsPanelItem
 								label={ __( 'Focal point' ) }
 								isShownByDefault
-								hasValue={ () => !! focalPoint }
+								hasValue={ () =>
+									!! focalPoint || !! customPosition
+								}
 								onDeselect={ () =>
 									setAttributes( {
 										focalPoint: undefined,
+										customPosition: undefined,
 									} )
 								}
 							>
 								<FocalPointPicker
 									label={ __( 'Focal point' ) }
+									__experimentalHideControls
 									url={ url }
 									value={ focalPoint }
 									onDragStart={ imperativeFocalPointPreview }
@@ -281,9 +339,31 @@ export default function CoverInspectorControls( {
 									onChange={ ( newFocalPoint ) =>
 										setAttributes( {
 											focalPoint: newFocalPoint,
+											customPosition: undefined,
 										} )
 									}
 								/>
+								<div
+									style={ {
+										display: 'flex',
+										gap: '8px',
+									} }
+								>
+									<UnitControl
+										__next40pxDefaultSize
+										label={ __( 'X position' ) }
+										value={ positionXValue }
+										onChange={ updateBackgroundPositionX }
+										units={ BACKGROUND_POSITION_UNITS }
+									/>
+									<UnitControl
+										__next40pxDefaultSize
+										label={ __( 'Y position' ) }
+										value={ positionYValue }
+										onChange={ updateBackgroundPositionY }
+										units={ BACKGROUND_POSITION_UNITS }
+									/>
+								</div>
 							</ToolsPanelItem>
 						) }
 						{ isVideoBackground && (

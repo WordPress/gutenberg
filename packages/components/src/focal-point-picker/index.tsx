@@ -94,6 +94,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
 export function FocalPointPicker( {
 	// Prevent passing to internal component.
 	__nextHasNoMarginBottom: _,
+	__experimentalHideControls = false,
 	autoPlay = true,
 	className,
 	help,
@@ -284,13 +285,15 @@ export function FocalPointPicker( {
 					/>
 				</MediaContainer>
 			</MediaWrapper>
-			<Controls
-				hasHelpText={ !! help }
-				point={ { x, y } }
-				onChange={ ( value ) => {
-					onChange?.( getFinalValue( value ) );
-				} }
-			/>
+			{ ! __experimentalHideControls && (
+				<Controls
+					hasHelpText={ !! help }
+					point={ { x, y } }
+					onChange={ ( value ) => {
+						onChange?.( getFinalValue( value ) );
+					} }
+				/>
+			) }
 			{ !! help && <StyledHelp>{ help }</StyledHelp> }
 		</Container>
 	);

@@ -28,6 +28,14 @@ export type FocalPointPickerProps = Pick<
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
+	 * If true, the built-in X/Y position text inputs are not rendered.
+	 * Useful when replacing them with custom controls (e.g. ones that
+	 * support additional CSS units beyond percentages).
+	 *
+	 * @default false
+	 */
+	__experimentalHideControls?: boolean;
+	/**
 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
 	 *
 	 * @default true

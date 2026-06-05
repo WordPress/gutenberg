@@ -50,6 +50,9 @@
 		"focalPoint": {
 			"type": "object"
 		},
+		"customPosition": {
+			"type": "string"
+		},
 		"minHeight": {
 			"type": "number"
 		},

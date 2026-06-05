@@ -102,6 +102,7 @@ function CoverEdit( {
 		useFeaturedImage,
 		dimRatio,
 		focalPoint,
+		customPosition,
 		hasParallax,
 		isDark,
 		isRepeated,
@@ -445,13 +446,13 @@ function CoverEdit( {
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
 
-	const backgroundPosition = mediaPosition( focalPoint );
+	const backgroundPosition = customPosition ?? mediaPosition( focalPoint );
 
 	const bgStyle = { backgroundColor: overlayColor.color };
 	const mediaStyle = {
 		objectPosition:
-			focalPoint && isImgElement
-				? mediaPosition( focalPoint )
+			( focalPoint || customPosition ) && isImgElement
+				? customPosition ?? mediaPosition( focalPoint )
 				: undefined,
 	};
 
