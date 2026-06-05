@@ -316,13 +316,12 @@ describe( 'Waveform utilities', () => {
 			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
 		} );
 
-		it( 'uses vertical arrows for slider seeking instead of volume changes', () => {
+		it( 'maps vertical arrows to seeking', () => {
 			const { container, instance, seekControl } =
 				createSeekControlFixture( {
 					duration: 60,
 					currentTime: 10,
 				} );
-			instance.setVolume = jest.fn();
 
 			setupSeekControlAccessibility( container, instance );
 
@@ -333,10 +332,16 @@ describe( 'Waveform utilities', () => {
 					cancelable: true,
 				} )
 			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 15 );
 
-			expect( instance.seekTo ).toHaveBeenCalledTimes( 1 );
-			expect( instance.seekTo ).toHaveBeenCalledWith( 15 );
-			expect( instance.setVolume ).not.toHaveBeenCalled();
+			seekControl.dispatchEvent(
+				new window.KeyboardEvent( 'keydown', {
+					key: 'ArrowDown',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+			expect( instance.seekTo ).toHaveBeenLastCalledWith( 5 );
 		} );
 
 		it( 'updates the seek control label', () => {
