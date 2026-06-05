@@ -371,43 +371,17 @@ function setupWaveformHover(
 	};
 }
 
-// SVG paths for playlist control icons (24x24 viewBox).
-const ICON_PREV = 'M6 6h2v12H6zm3.5 6l8.5 6V6z';
-const ICON_NEXT = 'M6 18l8.5-6L6 6v12zm10-12v12h2V6z';
+// SVG markup for the playlist control icons. They are decorative (the parent
+// control button carries the aria-label), hence aria-hidden + focusable="false"
+// to match the @wordpress/primitives SVG default. The icon size comes from CSS.
+const ICON_PREV =
+	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 6h2v12H6zm3.5 6l8.5 6V6z" /></svg>';
+const ICON_NEXT =
+	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 18l8.5-6L6 6v12zm10-12v12h2V6z" /></svg>';
 const ICON_SHUFFLE =
-	'M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z';
+	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" /></svg>';
 const ICON_REPEAT =
-	'M17 2l4 4-4 4V7H7a3 3 0 0 0-3 3v1H2v-1a5 5 0 0 1 5-5h10V2zM7 22l-4-4 4-4v3h10a3 3 0 0 0 3-3v-1h2v1a5 5 0 0 1-5 5H7v3z';
-
-/**
- * Create an SVG icon element.
- *
- * @param {Document} ownerDocument - The document used to create the nodes.
- * @param {string}   pathD         - The SVG path d attribute.
- * @return {SVGElement} The SVG element.
- */
-function createSvgIcon( ownerDocument, pathD ) {
-	const svg = ownerDocument.createElementNS(
-		'http://www.w3.org/2000/svg',
-		'svg'
-	);
-	svg.setAttribute( 'viewBox', '0 0 24 24' );
-	svg.setAttribute( 'width', '16' );
-	svg.setAttribute( 'height', '16' );
-	// Decorative icon: the parent control button carries the aria-label.
-	// Matches the @wordpress/primitives SVG default (aria-hidden +
-	// focusable="false").
-	svg.setAttribute( 'aria-hidden', 'true' );
-	svg.setAttribute( 'focusable', 'false' );
-	const path = ownerDocument.createElementNS(
-		'http://www.w3.org/2000/svg',
-		'path'
-	);
-	path.setAttribute( 'fill', 'currentColor' );
-	path.setAttribute( 'd', pathD );
-	svg.appendChild( path );
-	return svg;
-}
+	'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17 2l4 4-4 4V7H7a3 3 0 0 0-3 3v1H2v-1a5 5 0 0 1 5-5h10V2zM7 22l-4-4 4-4v3h10a3 3 0 0 0 3-3v-1h2v1a5 5 0 0 1-5 5H7v3z" /></svg>';
 
 /**
  * Get or create the row displayed below the waveform.
@@ -521,7 +495,7 @@ function setupPlaylistControls(
 	prevBtn.className = 'wp-block-playlist__control-btn';
 	prevBtn.setAttribute( 'aria-label', previousLabel );
 	prevBtn.setAttribute( 'title', previousLabel );
-	prevBtn.appendChild( createSvgIcon( doc, ICON_PREV ) );
+	prevBtn.innerHTML = ICON_PREV;
 
 	const shuffleBtn = doc.createElement( 'button' );
 	shuffleBtn.type = 'button';
@@ -531,7 +505,7 @@ function setupPlaylistControls(
 	if ( isShuffled ) {
 		shuffleBtn.classList.add( 'is-active' );
 	}
-	shuffleBtn.appendChild( createSvgIcon( doc, ICON_SHUFFLE ) );
+	shuffleBtn.innerHTML = ICON_SHUFFLE;
 
 	const repeatBtn = doc.createElement( 'button' );
 	repeatBtn.type = 'button';
@@ -541,14 +515,14 @@ function setupPlaylistControls(
 	if ( isRepeating ) {
 		repeatBtn.classList.add( 'is-active' );
 	}
-	repeatBtn.appendChild( createSvgIcon( doc, ICON_REPEAT ) );
+	repeatBtn.innerHTML = ICON_REPEAT;
 
 	const nextBtn = doc.createElement( 'button' );
 	nextBtn.type = 'button';
 	nextBtn.className = 'wp-block-playlist__control-btn';
 	nextBtn.setAttribute( 'aria-label', nextLabel );
 	nextBtn.setAttribute( 'title', nextLabel );
-	nextBtn.appendChild( createSvgIcon( doc, ICON_NEXT ) );
+	nextBtn.innerHTML = ICON_NEXT;
 
 	controlsDiv.appendChild( prevBtn );
 	controlsDiv.appendChild( shuffleBtn );
