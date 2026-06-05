@@ -98,6 +98,20 @@ const PlaylistEdit = ( {
 		[ clientId ]
 	);
 
+	// Reuse an existing waveform block when present so its style variation is
+	// preserved; otherwise create one, migrating any is-style-* class from the
+	// playlist (older markup stored the waveform style on the playlist itself).
+	const resolveWaveformBlock = useCallback(
+		( existingWaveform ) =>
+			existingWaveform ??
+			createBlock( 'core/playlist-waveform', {
+				className: attributes.className?.match(
+					/is-style-[\w-]+/
+				)?.[ 0 ],
+			} ),
+		[ attributes.className ]
+	);
+
 	// Keep the playlist structure normalized. Older playlist markup had track
 	// blocks directly inside the playlist; new markup stores them in a
 	// dedicated tracklist child so the waveform can be styled independently.
@@ -130,14 +144,14 @@ const PlaylistEdit = ( {
 		];
 
 		replaceInnerBlocks( clientId, [
-			waveformBlock ?? createBlock( 'core/playlist-waveform' ),
+			resolveWaveformBlock( waveformBlock ),
 			createBlock(
 				'core/playlist-tracklist',
 				tracklistBlock?.attributes ?? {},
 				normalizedTrackBlocks
 			),
 		] );
-	}, [ clientId, innerBlocks, replaceInnerBlocks ] );
+	}, [ clientId, innerBlocks, replaceInnerBlocks, resolveWaveformBlock ] );
 
 	// Ensure that each inner block has a unique ID,
 	// even if a track is duplicated.
@@ -220,8 +234,11 @@ const PlaylistEdit = ( {
 			const newBlocks = trackList.map( ( track ) =>
 				createBlock( 'core/playlist-track', track )
 			);
+			const existingWaveform = innerBlocks.find(
+				( block ) => block.name === 'core/playlist-waveform'
+			);
 			replaceInnerBlocks( clientId, [
-				createBlock( 'core/playlist-waveform' ),
+				resolveWaveformBlock( existingWaveform ),
 				createBlock( 'core/playlist-tracklist', {}, newBlocks ),
 			] );
 		},
@@ -230,6 +247,8 @@ const PlaylistEdit = ( {
 			setAttributes,
 			replaceInnerBlocks,
 			clientId,
+			innerBlocks,
+			resolveWaveformBlock,
 		]
 	);
 

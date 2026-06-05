@@ -206,11 +206,13 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 			data-label-pause="' . $label_pause . '"
 		></div></div>';
 
-	// Add the HTML for the current track inside the figure.
+	// Add the HTML for the current track inside the figure. The opening tag is
+	// matched and used as a literal search string so that user-provided class
+	// names containing characters such as `$` are not treated as backreferences.
 	$figure = null;
 	preg_match( '/<figure[^>]*>/', $content, $figure );
 	if ( ! empty( $figure[0] ) ) {
-		$content = preg_replace( '/(<figure[^>]*>)/', '$1' . $html, $content, 1 );
+		$content = str_replace( $figure[0], $figure[0] . $html, $content );
 	}
 
 	$content = block_core_playlist_update_tracklist_classes( $content, $attributes );
