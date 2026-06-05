@@ -176,6 +176,61 @@ describe( 'BorderControl', () => {
 			expect( dashedButton ).not.toBeInTheDocument();
 			expect( dottedButton ).not.toBeInTheDocument();
 		} );
+
+		it( 'should not render ColorPalette if colors is empty and disableCustomColors is true', async () => {
+			const user = userEvent.setup();
+			const props = createProps( { colors: [], disableCustomColors: true } );
+			render( <TestBorderControl { ...props } /> );
+
+			const toggleButton = screen.getByLabelText( toggleLabelRegex );
+			await user.click( toggleButton );
+
+			// Wait for the popover to appear by checking for the style picker.
+			await waitFor( () =>
+				expect( screen.getByText( 'Style' ) ).toBeInTheDocument()
+			);
+			// The ColorPalette contains both the custom color picker button and the listbox of color options, so neither should be rendered when there are no colors and custom colors are disabled.
+			expect(
+				screen.queryByRole( 'button', {
+					name: /^Custom color picker/,
+				} )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: 'Custom color picker',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should not render custom color picker when opted out of', async () => {
+			const user = userEvent.setup();
+			// Even when colors are provided, if `disableCustomColors` is true, the custom color picker should not be rendered.
+			const props = createProps( { colors: colors, disableCustomColors: true } );
+			render( <TestBorderControl { ...props } /> );
+
+			const toggleButton = screen.getByLabelText( toggleLabelRegex );
+			await user.click( toggleButton );
+
+			// Wait for the popover to appear by checking for the style picker.
+			await waitFor( () =>
+				expect( screen.getByText( 'Style' ) ).toBeInTheDocument()
+			);
+
+			// Color swatches should still render.
+			const circularOptionPicker = screen.getByRole( 'listbox', {
+				name: 'Custom color picker',
+			} );
+			const colorSwatchButtons =
+				within( circularOptionPicker ).getAllByRole( 'option' );
+			expect( colorSwatchButtons.length ).toEqual( colors.length );
+
+			// But the custom color picker button should not.
+			expect(
+				screen.queryByRole( 'button', {
+					name: /^Custom color picker/,
+				} )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'color and style picker aria labels', () => {
