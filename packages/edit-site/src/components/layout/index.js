@@ -20,7 +20,7 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
 import {
 	UnsavedChangesWarning,
 	ErrorBoundary,
@@ -301,7 +301,7 @@ function Layout() {
 }
 
 export default function LayoutWithGlobalStylesProvider( props ) {
-	const themeColors = getAdminThemeColors();
+	const themeColors = useMemo( getAdminThemeColors, [] );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onPluginAreaError( name ) {
 		createErrorNotice(

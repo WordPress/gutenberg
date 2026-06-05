@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { privateApis as themePrivateApis } from '@wordpress/theme';
 
@@ -42,7 +43,7 @@ export default function RootSinglePage() {
 
 	useRouteTitle();
 
-	const themeColors = getAdminThemeColors();
+	const themeColors = useMemo( getAdminThemeColors, [] );
 
 	return (
 		<SlotFillProvider>

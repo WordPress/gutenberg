@@ -16,7 +16,7 @@ import {
 	SlotFillProvider,
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 // eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
@@ -60,7 +60,7 @@ export default function Root() {
 		setIsMobileSidebarOpen( false );
 	}, [ location.pathname, isMobileViewport ] );
 
-	const themeColors = getAdminThemeColors();
+	const themeColors = useMemo( getAdminThemeColors, [] );
 
 	return (
 		<SlotFillProvider>
