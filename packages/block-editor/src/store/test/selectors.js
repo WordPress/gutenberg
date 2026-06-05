@@ -5237,4 +5237,281 @@ describe( 'getBlockEditingMode', () => {
 			).toBe( 'contentOnly' );
 		} );
 	} );
+
+	describe( '__unstableIsSelectionMergeable', () => {
+		const { __unstableIsSelectionMergeable } = selectors;
+
+		// Builds block state for a nested list:
+		//   core/list (list-1)
+		//     core/list-item (parent-item)  ← "list 1"
+		//       core/list (nested-list)
+		//         core/list-item (child-item)  ← "nested"
+		function buildNestedListState( {
+			anchorClientId,
+			anchorAttributeKey,
+			anchorOffset,
+			focusClientId,
+			focusAttributeKey,
+			focusOffset,
+		} ) {
+			return {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							'list-1': { clientId: 'list-1', name: 'core/list' },
+							'parent-item': {
+								clientId: 'parent-item',
+								name: 'core/list-item',
+							},
+							'nested-list': {
+								clientId: 'nested-list',
+								name: 'core/list',
+							},
+							'child-item': {
+								clientId: 'child-item',
+								name: 'core/list-item',
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							'list-1': {},
+							'parent-item': { content: 'list 1' },
+							'nested-list': {},
+							'child-item': { content: 'nested' },
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'list-1' ],
+							'list-1': [ 'parent-item' ],
+							'parent-item': [ 'nested-list' ],
+							'nested-list': [ 'child-item' ],
+							'child-item': [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							'list-1': '',
+							'parent-item': 'list-1',
+							'nested-list': 'parent-item',
+							'child-item': 'nested-list',
+						} )
+					),
+					tree: new Map(
+						Object.entries( {
+							'child-item': {
+								clientId: 'child-item',
+								name: 'core/list-item',
+								attributes: { content: 'nested' },
+								innerBlocks: [],
+							},
+							'nested-list': {
+								clientId: 'nested-list',
+								name: 'core/list',
+								attributes: {},
+								innerBlocks: [],
+							},
+							'parent-item': {
+								clientId: 'parent-item',
+								name: 'core/list-item',
+								attributes: { content: 'list 1' },
+								innerBlocks: [],
+							},
+							'list-1': {
+								clientId: 'list-1',
+								name: 'core/list',
+								attributes: {},
+								innerBlocks: [],
+							},
+						} )
+					),
+					controlledInnerBlocks: new Set(),
+					cache: {
+						'list-1': {},
+						'parent-item': {},
+						'nested-list': {},
+						'child-item': {},
+					},
+				},
+				selection: {
+					selectionStart: {
+						clientId: anchorClientId,
+						attributeKey: anchorAttributeKey,
+						offset: anchorOffset,
+					},
+					selectionEnd: {
+						clientId: focusClientId,
+						attributeKey: focusAttributeKey,
+						offset: focusOffset,
+					},
+				},
+			};
+		}
+
+		beforeEach( () => {
+			registerBlockType( 'core/list-item', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'List Item',
+				attributes: {
+					content: { type: 'string' },
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content: attributes.content + attributesToMerge.content,
+					};
+				},
+			} );
+
+			registerBlockType( 'core/list', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'List',
+				attributes: {},
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/list-item' );
+			unregisterBlockType( 'core/list' );
+		} );
+
+		it( 'returns true when anchor is ancestor of focus (parent list-item selecting into child list-item)', () => {
+			const state = buildNestedListState( {
+				anchorClientId: 'parent-item',
+				anchorAttributeKey: 'content',
+				anchorOffset: 2,
+				focusClientId: 'child-item',
+				focusAttributeKey: 'content',
+				focusOffset: 4,
+			} );
+
+			expect( __unstableIsSelectionMergeable( state, false ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when focus is ancestor of anchor (child list-item selecting back into parent list-item)', () => {
+			const state = buildNestedListState( {
+				anchorClientId: 'child-item',
+				anchorAttributeKey: 'content',
+				anchorOffset: 4,
+				focusClientId: 'parent-item',
+				focusAttributeKey: 'content',
+				focusOffset: 2,
+			} );
+
+			expect( __unstableIsSelectionMergeable( state, false ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns false when the anchor block type has no merge function', () => {
+			// Temporarily re-register core/list-item without a merge function.
+			unregisterBlockType( 'core/list-item' );
+			registerBlockType( 'core/list-item', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'List Item (no merge)',
+				attributes: {
+					content: { type: 'string' },
+				},
+				// No merge function.
+			} );
+
+			const state = buildNestedListState( {
+				anchorClientId: 'parent-item',
+				anchorAttributeKey: 'content',
+				anchorOffset: 0,
+				focusClientId: 'child-item',
+				focusAttributeKey: 'content',
+				focusOffset: 3,
+			} );
+
+			expect( __unstableIsSelectionMergeable( state, false ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns false when the two blocks are in completely different branch (not ancestor/descendant)', () => {
+			// Build a flat two-list-item state where neither is a parent of the other.
+			const state = {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							'list-a': {
+								clientId: 'list-a',
+								name: 'core/list',
+							},
+							'item-a': {
+								clientId: 'item-a',
+								name: 'core/list-item',
+							},
+							'list-b': {
+								clientId: 'list-b',
+								name: 'core/list',
+							},
+							'item-b': {
+								clientId: 'item-b',
+								name: 'core/list-item',
+							},
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							'list-a': {},
+							'item-a': { content: 'A' },
+							'list-b': {},
+							'item-b': { content: 'B' },
+						} )
+					),
+					order: new Map(
+						Object.entries( {
+							'': [ 'list-a', 'list-b' ],
+							'list-a': [ 'item-a' ],
+							'item-a': [],
+							'list-b': [ 'item-b' ],
+							'item-b': [],
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							'list-a': '',
+							'item-a': 'list-a',
+							'list-b': '',
+							'item-b': 'list-b',
+						} )
+					),
+					tree: new Map(),
+					controlledInnerBlocks: new Set(),
+					cache: {
+						'list-a': {},
+						'item-a': {},
+						'list-b': {},
+						'item-b': {},
+					},
+				},
+				selection: {
+					selectionStart: {
+						clientId: 'item-a',
+						attributeKey: 'content',
+						offset: 0,
+					},
+					selectionEnd: {
+						clientId: 'item-b',
+						attributeKey: 'content',
+						offset: 1,
+					},
+				},
+			};
+
+			expect( __unstableIsSelectionMergeable( state, false ) ).toBe(
+				false
+			);
+		} );
+	} );
 } );

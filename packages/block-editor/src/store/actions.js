@@ -689,6 +689,40 @@ export const synchronizeTemplate =
 	};
 
 /**
+ * Removes a block (by clientId) from a nested innerBlocks structure. If
+ * removing the block leaves its immediate parent container empty, the empty
+ * container is also removed. Siblings of the removed block are preserved.
+ *
+ * @param {Array}  innerBlocks      The innerBlocks array to process.
+ * @param {string} clientIdToRemove The clientId of the block to remove.
+ * @return {Array} Updated innerBlocks with the specified block removed.
+ */
+function removeFromInnerBlocks( innerBlocks, clientIdToRemove ) {
+	const result = [];
+	for ( const block of innerBlocks ) {
+		if ( block.clientId === clientIdToRemove ) {
+			continue;
+		}
+		const newInnerBlocks = removeFromInnerBlocks(
+			block.innerBlocks || [],
+			clientIdToRemove
+		);
+		const didRemove =
+			newInnerBlocks.length < ( block.innerBlocks || [] ).length;
+		// If this container became empty after removal, drop it too.
+		if ( didRemove && newInnerBlocks.length === 0 ) {
+			continue;
+		}
+		result.push(
+			newInnerBlocks === block.innerBlocks
+				? block
+				: { ...block, innerBlocks: newInnerBlocks }
+		);
+	}
+	return result;
+}
+
+/**
  * Delete the current selection.
  *
  * @param {boolean} isForward
@@ -720,25 +754,56 @@ export const __unstableDeleteSelection =
 			selectionFocus.clientId
 		);
 
-		// It's not mergeable if the selection doesn't start and end in the same
-		// block list. Maybe in the future it should be allowed.
+		// Allow cross-level selections when one block is an ancestor of the
+		// other (e.g. parent list-item + nested list-item). In that case the
+		// outer block is the merge target and we remove the nested structure.
+		let isCrossLevel = false;
+		let outerSelection, innerSelection;
+
 		if ( anchorRootClientId !== focusRootClientId ) {
-			return;
+			const anchorParents = select.getBlockParents(
+				selectionAnchor.clientId
+			);
+			const focusParents = select.getBlockParents(
+				selectionFocus.clientId
+			);
+
+			if ( focusParents.includes( selectionAnchor.clientId ) ) {
+				isCrossLevel = true;
+				outerSelection = selectionAnchor;
+				innerSelection = selectionFocus;
+			} else if ( anchorParents.includes( selectionFocus.clientId ) ) {
+				isCrossLevel = true;
+				outerSelection = selectionFocus;
+				innerSelection = selectionAnchor;
+			}
+
+			// It's not mergeable if the selection doesn't start and end in
+			// the same block list. Maybe in the future it should be allowed.
+			if ( ! isCrossLevel ) {
+				return;
+			}
 		}
 
-		const blockOrder = select.getBlockOrder( anchorRootClientId );
-		const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
-		const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
-
-		// Reassign selection start and end based on order.
 		let selectionStart, selectionEnd;
 
-		if ( anchorIndex > focusIndex ) {
-			selectionStart = selectionFocus;
-			selectionEnd = selectionAnchor;
+		if ( isCrossLevel ) {
+			// For cross-level, the outer (ancestor) block is always the merge
+			// target. Order: outer block's content start, inner block's content end.
+			selectionStart = outerSelection;
+			selectionEnd = innerSelection;
 		} else {
-			selectionStart = selectionAnchor;
-			selectionEnd = selectionFocus;
+			const blockOrder = select.getBlockOrder( anchorRootClientId );
+			const anchorIndex = blockOrder.indexOf( selectionAnchor.clientId );
+			const focusIndex = blockOrder.indexOf( selectionFocus.clientId );
+
+			if ( anchorIndex > focusIndex ) {
+				selectionStart = selectionFocus;
+				selectionEnd = selectionAnchor;
+			} else {
+				selectionStart = selectionAnchor;
+				selectionEnd = selectionFocus;
+			}
 		}
 
 		const targetSelection = isForward ? selectionEnd : selectionStart;
@@ -813,6 +878,15 @@ export const __unstableDeleteSelection =
 		updatedAttributes[ newAttributeKey ] = newHtml;
 
 		const selectedBlockClientIds = select.getSelectedBlockClientIds();
+
+		// For cross-level selections getSelectedBlockClientIds() returns an
+		// empty or incomplete list because the two blocks share no common
+		// block-order list. Instead, replace the outer (ancestor) block and
+		// strip its innerBlocks so the nested content is removed.
+		const blocksToReplace = isCrossLevel
+			? [ outerSelection.clientId ]
+			: selectedBlockClientIds;
+
 		const replacement = [
 			...( isForward ? blocksWithTheSameType : [] ),
 			{
@@ -822,6 +896,17 @@ export const __unstableDeleteSelection =
 					...targetBlock.attributes,
 					...updatedAttributes,
 				},
+				// For cross-level merges, surgically remove only the selected
+				// inner block (and its container if it becomes empty). Sibling
+				// blocks that were not part of the selection are preserved.
+				...( isCrossLevel
+					? {
+							innerBlocks: removeFromInnerBlocks(
+								targetBlock.innerBlocks || [],
+								innerSelection.clientId
+							),
+					  }
+					: {} ),
 			},
 			...( isForward ? [] : blocksWithTheSameType ),
 		];
@@ -835,7 +920,7 @@ export const __unstableDeleteSelection =
 			);
 
 			dispatch.replaceBlocks(
-				selectedBlockClientIds,
+				blocksToReplace,
 				replacement,
 				0, // If we don't pass the `indexToSelect` it will default to the last block.
 				select.getSelectedBlocksInitialCaretPosition()

@@ -1467,4 +1467,348 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
+
+	describe( '__unstableDeleteSelection', () => {
+		const { __unstableDeleteSelection } = actions;
+
+		beforeEach( () => {
+			registerBlockType( 'core/list-item', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'List Item',
+				attributes: {
+					content: { type: 'string' },
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content: attributes.content + attributesToMerge.content,
+					};
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/list-item' );
+		} );
+
+		it( 'does nothing when anchor and focus are in the same block', () => {
+			const select = {
+				getSelectionStart: () => ( {
+					clientId: 'item-a',
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+				getSelectionEnd: () => ( {
+					clientId: 'item-a',
+					attributeKey: 'content',
+					offset: 3,
+				} ),
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				selectionChange: jest.fn(),
+				replaceBlocks: jest.fn(),
+			} );
+			const registry = { batch: ( cb ) => cb() };
+
+			__unstableDeleteSelection( false )( {
+				select,
+				dispatch,
+				registry,
+			} );
+
+			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does nothing when cross-root blocks are not ancestor/descendant of each other', () => {
+			const select = {
+				getSelectionStart: () => ( {
+					clientId: 'item-a',
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+				getSelectionEnd: () => ( {
+					clientId: 'item-b',
+					attributeKey: 'content',
+					offset: 3,
+				} ),
+				getBlockRootClientId: ( clientId ) =>
+					clientId === 'item-a' ? 'list-a' : 'list-b',
+				getBlockParents: ( clientId ) =>
+					clientId === 'item-a' ? [ 'list-a' ] : [ 'list-b' ],
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				selectionChange: jest.fn(),
+				replaceBlocks: jest.fn(),
+			} );
+			const registry = { batch: ( cb ) => cb() };
+
+			__unstableDeleteSelection( false )( {
+				select,
+				dispatch,
+				registry,
+			} );
+
+			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
+		} );
+
+		it( 'merges cross-level parent→child selection by replacing the outer block', () => {
+			const parentBlock = deepFreeze( {
+				clientId: 'parent-item',
+				name: 'core/list-item',
+				attributes: { content: 'list 1' },
+				// Nested list has only one child so it will be emptied and removed.
+				innerBlocks: [
+					{
+						clientId: 'nested-list',
+						name: 'core/list',
+						attributes: {},
+						innerBlocks: [
+							{
+								clientId: 'child-item',
+								name: 'core/list-item',
+								attributes: { content: 'nested' },
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+			const childBlock = deepFreeze( {
+				clientId: 'child-item',
+				name: 'core/list-item',
+				attributes: { content: 'nested' },
+				innerBlocks: [],
+			} );
+
+			// Simulate: anchor at offset 4 in parent ("list"), focus at offset 6 in child ("nested").
+			const select = {
+				getSelectionStart: () => ( {
+					clientId: 'parent-item',
+					attributeKey: 'content',
+					offset: 4,
+				} ),
+				getSelectionEnd: () => ( {
+					clientId: 'child-item',
+					attributeKey: 'content',
+					offset: 6,
+				} ),
+				getBlockRootClientId: ( clientId ) =>
+					clientId === 'parent-item' ? 'list-1' : 'nested-list',
+				getBlockParents: ( clientId ) =>
+					clientId === 'child-item'
+						? [ 'list-1', 'parent-item', 'nested-list' ]
+						: [ 'list-1' ],
+				getBlockOrder: () => [ 'parent-item' ],
+				getBlock: ( clientId ) =>
+					clientId === 'parent-item' ? parentBlock : childBlock,
+				getSelectedBlockClientIds: () => [],
+				getSelectedBlocksInitialCaretPosition: () => 0,
+			};
+
+			const dispatch = Object.assign( jest.fn(), {
+				selectionChange: jest.fn(),
+				replaceBlocks: jest.fn(),
+			} );
+			const registry = { batch: ( cb ) => cb() };
+
+			__unstableDeleteSelection( false )( {
+				select,
+				dispatch,
+				registry,
+			} );
+
+			// replaceBlocks should have been called with the outer (parent) block's clientId.
+			// The nested list had only one child, so it is empty after removal and is dropped.
+			expect( dispatch.replaceBlocks ).toHaveBeenCalledWith(
+				[ 'parent-item' ],
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						clientId: 'parent-item',
+						name: 'core/list-item',
+						innerBlocks: [],
+					} ),
+				] ),
+				0,
+				0
+			);
+		} );
+
+		it( 'merges cross-level child→parent selection (selection started from child side)', () => {
+			const parentBlock = deepFreeze( {
+				clientId: 'parent-item',
+				name: 'core/list-item',
+				attributes: { content: 'list 1' },
+				innerBlocks: [
+					{
+						clientId: 'nested-list',
+						name: 'core/list',
+						attributes: {},
+						innerBlocks: [
+							{
+								clientId: 'child-item',
+								name: 'core/list-item',
+								attributes: { content: 'nested' },
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+			const childBlock = deepFreeze( {
+				clientId: 'child-item',
+				name: 'core/list-item',
+				attributes: { content: 'nested' },
+				innerBlocks: [],
+			} );
+
+			// Anchor is child, focus is parent (user selected from child upward).
+			const select = {
+				getSelectionStart: () => ( {
+					clientId: 'child-item',
+					attributeKey: 'content',
+					offset: 3,
+				} ),
+				getSelectionEnd: () => ( {
+					clientId: 'parent-item',
+					attributeKey: 'content',
+					offset: 2,
+				} ),
+				getBlockRootClientId: ( clientId ) =>
+					clientId === 'parent-item' ? 'list-1' : 'nested-list',
+				getBlockParents: ( clientId ) =>
+					clientId === 'child-item'
+						? [ 'list-1', 'parent-item', 'nested-list' ]
+						: [ 'list-1' ],
+				getBlockOrder: () => [ 'parent-item' ],
+				getBlock: ( clientId ) =>
+					clientId === 'parent-item' ? parentBlock : childBlock,
+				getSelectedBlockClientIds: () => [],
+				getSelectedBlocksInitialCaretPosition: () => 0,
+			};
+
+			const dispatch = Object.assign( jest.fn(), {
+				selectionChange: jest.fn(),
+				replaceBlocks: jest.fn(),
+			} );
+			const registry = { batch: ( cb ) => cb() };
+
+			__unstableDeleteSelection( false )( {
+				select,
+				dispatch,
+				registry,
+			} );
+
+			// Should replace the outer (parent) block even though anchor was child.
+			expect( dispatch.replaceBlocks ).toHaveBeenCalledWith(
+				[ 'parent-item' ],
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						clientId: 'parent-item',
+						name: 'core/list-item',
+						innerBlocks: [],
+					} ),
+				] ),
+				0,
+				0
+			);
+		} );
+
+		it( 'preserves sibling children when only one child is selected for deletion', () => {
+			const siblingBlock = deepFreeze( {
+				clientId: 'child-item-2',
+				name: 'core/list-item',
+				attributes: { content: 'sublist 2' },
+				innerBlocks: [],
+			} );
+			const parentBlock = deepFreeze( {
+				clientId: 'parent-item',
+				name: 'core/list-item',
+				attributes: { content: 'list 1' },
+				// Two children: child-item-1 (selected for deletion) and child-item-2 (sibling, keep).
+				innerBlocks: [
+					{
+						clientId: 'nested-list',
+						name: 'core/list',
+						attributes: {},
+						innerBlocks: [
+							{
+								clientId: 'child-item-1',
+								name: 'core/list-item',
+								attributes: { content: 'sublist 1' },
+								innerBlocks: [],
+							},
+							siblingBlock,
+						],
+					},
+				],
+			} );
+			const childBlock = deepFreeze( {
+				clientId: 'child-item-1',
+				name: 'core/list-item',
+				attributes: { content: 'sublist 1' },
+				innerBlocks: [],
+			} );
+
+			const select = {
+				getSelectionStart: () => ( {
+					clientId: 'parent-item',
+					attributeKey: 'content',
+					offset: 4,
+				} ),
+				getSelectionEnd: () => ( {
+					clientId: 'child-item-1',
+					attributeKey: 'content',
+					offset: 7,
+				} ),
+				getBlockRootClientId: ( clientId ) =>
+					clientId === 'parent-item' ? 'list-1' : 'nested-list',
+				getBlockParents: ( clientId ) =>
+					clientId === 'child-item-1'
+						? [ 'list-1', 'parent-item', 'nested-list' ]
+						: [ 'list-1' ],
+				getBlockOrder: () => [ 'parent-item' ],
+				getBlock: ( clientId ) =>
+					clientId === 'parent-item' ? parentBlock : childBlock,
+				getSelectedBlockClientIds: () => [],
+				getSelectedBlocksInitialCaretPosition: () => 0,
+			};
+
+			const dispatch = Object.assign( jest.fn(), {
+				selectionChange: jest.fn(),
+				replaceBlocks: jest.fn(),
+			} );
+			const registry = { batch: ( cb ) => cb() };
+
+			__unstableDeleteSelection( false )( {
+				select,
+				dispatch,
+				registry,
+			} );
+
+			// The nested list still has child-item-2, so it should be preserved.
+			expect( dispatch.replaceBlocks ).toHaveBeenCalledWith(
+				[ 'parent-item' ],
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						clientId: 'parent-item',
+						name: 'core/list-item',
+						// nested-list kept because child-item-2 remains.
+						innerBlocks: [
+							expect.objectContaining( {
+								clientId: 'nested-list',
+								innerBlocks: [
+									expect.objectContaining( {
+										clientId: 'child-item-2',
+									} ),
+								],
+							} ),
+						],
+					} ),
+				] ),
+				0,
+				0
+			);
+		} );
+	} );
 } );

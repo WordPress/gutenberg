@@ -267,6 +267,59 @@ export default function useSelectionObserver() {
 					];
 					const depth = findDepth( startPath, endPath );
 
+					// When one block is an ancestor of the other (its path
+					// ends before the divergence point), treat this as a
+					// cross-level RichText selection so the merge/delete path
+					// can handle it (e.g. parent list-item + nested list-item).
+					if (
+						depth >= startPath.length ||
+						depth >= endPath.length
+					) {
+						const richTextElementStart =
+							getRichTextElement( startNode );
+						const richTextElementEnd =
+							getRichTextElement( endNode );
+
+						if ( richTextElementStart && richTextElementEnd ) {
+							const range = selection.getRangeAt( 0 );
+							const richTextDataStart = create( {
+								element: richTextElementStart,
+								range,
+								__unstableIsEditableTree: true,
+							} );
+							const richTextDataEnd = create( {
+								element: richTextElementEnd,
+								range,
+								__unstableIsEditableTree: true,
+							} );
+							selectionChange( {
+								start: {
+									clientId: startClientId,
+									attributeKey:
+										richTextElementStart.dataset
+											.wpBlockAttributeKey,
+									offset:
+										richTextDataStart.start ??
+										richTextDataStart.end,
+								},
+								end: {
+									clientId: endClientId,
+									attributeKey:
+										richTextElementEnd.dataset
+											.wpBlockAttributeKey,
+									offset:
+										richTextDataEnd.start ??
+										richTextDataEnd.end,
+								},
+							} );
+						} else if ( depth >= startPath.length ) {
+							multiSelect( startClientId, startClientId );
+						} else {
+							multiSelect( endClientId, endClientId );
+						}
+						return;
+					}
+
 					if (
 						startPath[ depth ] !== startClientId ||
 						endPath[ depth ] !== endClientId

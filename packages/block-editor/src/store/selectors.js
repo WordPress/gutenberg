@@ -1097,9 +1097,49 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	);
 
 	// It's not mergeable if the selection doesn't start and end in the same
-	// block list. Maybe in the future it should be allowed.
+	// block list. Allow cross-level selections when one block is an ancestor
+	// of the other (e.g. parent list-item + nested list-item).
 	if ( anchorRootClientId !== focusRootClientId ) {
-		return false;
+		const anchorParents = getBlockParents(
+			state,
+			selectionAnchor.clientId
+		);
+		const focusParents = getBlockParents( state, selectionFocus.clientId );
+		const isCrossLevel =
+			focusParents.includes( selectionAnchor.clientId ) ||
+			anchorParents.includes( selectionFocus.clientId );
+
+		if ( ! isCrossLevel ) {
+			return false;
+		}
+
+		// For cross-level, the "target" is always the outer/ancestor block.
+		const outerClientId = focusParents.includes( selectionAnchor.clientId )
+			? selectionAnchor.clientId
+			: selectionFocus.clientId;
+		const innerClientId =
+			outerClientId === selectionAnchor.clientId
+				? selectionFocus.clientId
+				: selectionAnchor.clientId;
+
+		const targetBlockName = getBlockName( state, outerClientId );
+		const targetBlockType = getBlockType( targetBlockName );
+
+		if ( ! targetBlockType.merge ) {
+			return false;
+		}
+
+		const blockToMerge = getBlock( state, innerClientId );
+
+		if ( blockToMerge.name === targetBlockName ) {
+			return true;
+		}
+
+		const blocksToMerge = switchToBlockType(
+			blockToMerge,
+			targetBlockName
+		);
+		return !! ( blocksToMerge && blocksToMerge.length );
 	}
 
 	const blockOrder = getBlockOrder( state, anchorRootClientId );
