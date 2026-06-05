@@ -308,16 +308,9 @@ add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_
  * @param array $config {
  *     The view configuration for the entity.
  * }
- * @param array $entity {
- *     The entity the configuration is built for.
- *
- *     @type string $kind            The entity kind.
- *     @type string $name            The entity name.
- *     @type string $all_items_title The localized "all items" title for the entity.
- * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_post_type_post( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_post( $config ) {
 	$config['form'] = array(
 		'layout' => array( 'type' => 'panel' ),
 		'fields' => array(
@@ -383,7 +376,7 @@ function _gutenberg_get_entity_view_config_post_type_post( $config, $entity ) {
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_config_post_type_post', 10, 2 );
+add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_config_post_type_post', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_block` post type.
@@ -391,16 +384,9 @@ add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_
  * @param array $config {
  *     The view configuration for the entity.
  * }
- * @param array $entity {
- *     The entity the configuration is built for.
- *
- *     @type string $kind            The entity kind.
- *     @type string $name            The entity name.
- *     @type string $all_items_title The localized "all items" title for the entity.
- * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_block( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 	$config['default_layouts'] = array(
 		'table' => array(
 			'layout' => array(
@@ -479,7 +465,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config, $entity 
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_view_config_post_type_wp_block', 10, 2 );
+add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_view_config_post_type_wp_block', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_template_part` post type.
@@ -487,16 +473,9 @@ add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_v
  * @param array $config {
  *     The view configuration for the entity.
  * }
- * @param array $entity {
- *     The entity the configuration is built for.
- *
- *     @type string $kind            The entity kind.
- *     @type string $name            The entity name.
- *     @type string $all_items_title The localized "all items" title for the entity.
- * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config ) {
 	$config['default_layouts'] = array(
 		'table' => array(
 			'layout' => array(
@@ -567,7 +546,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config, 
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_entity_view_config_post_type_wp_template_part', 10, 2 );
+add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_entity_view_config_post_type_wp_template_part', 10, 1 );
 
 /**
  * Provides the view configuration for the `wp_template` post type.
@@ -575,16 +554,9 @@ add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_
  * @param array $config {
  *     The view configuration for the entity.
  * }
- * @param array $entity {
- *     The entity the configuration is built for.
- *
- *     @type string $kind            The entity kind.
- *     @type string $name            The entity name.
- *     @type string $all_items_title The localized "all items" title for the entity.
- * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_template( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 	$config['default_view'] = array(
 		'type'             => 'grid',
 		'perPage'          => 20,
@@ -748,4 +720,4 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config, $enti
 
 	return $config;
 }
-add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 2 );
+add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 1 );
