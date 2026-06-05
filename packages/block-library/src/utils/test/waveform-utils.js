@@ -251,10 +251,7 @@ describe( 'Waveform utilities', () => {
 
 			expect( seekControl ).toHaveAttribute( 'tabindex', '0' );
 			expect( seekControl ).toHaveAttribute( 'role', 'slider' );
-			expect( seekControl ).toHaveAttribute(
-				'aria-label',
-				'My Song'
-			);
+			expect( seekControl ).toHaveAttribute( 'aria-label', 'My Song' );
 			expect( seekControl ).toHaveAttribute( 'aria-valuemin', '0' );
 			expect( seekControl ).toHaveAttribute( 'aria-valuemax', '180' );
 			expect( seekControl ).toHaveAttribute( 'aria-valuenow', '45' );
@@ -308,7 +305,7 @@ describe( 'Waveform utilities', () => {
 			} );
 			seekControl.focus();
 			seekControl.dispatchEvent(
-				new KeyboardEvent( 'keydown', {
+				new window.KeyboardEvent( 'keydown', {
 					key: 'ArrowRight',
 					bubbles: true,
 					cancelable: true,
@@ -330,7 +327,7 @@ describe( 'Waveform utilities', () => {
 			setupSeekControlAccessibility( container, instance );
 
 			seekControl.dispatchEvent(
-				new KeyboardEvent( 'keydown', {
+				new window.KeyboardEvent( 'keydown', {
 					key: 'ArrowUp',
 					bubbles: true,
 					cancelable: true,
