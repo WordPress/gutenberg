@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 23.3.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Data Layer
+- Revert React 19 upgrade. ([78940](https://github.com/WordPress/gutenberg/pull/78940))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@jsnajdr
+
+
 = 23.3.1 =
 
 

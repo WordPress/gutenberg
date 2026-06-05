@@ -55,6 +55,7 @@ const PlaylistEdit = ( {
 		showNumbers,
 		showImages,
 		showArtists,
+		showTrackLength,
 		currentTrack,
 	} = attributes;
 
@@ -280,6 +281,7 @@ const PlaylistEdit = ( {
 							showTracklist: true,
 							showArtists: true,
 							showNumbers: true,
+							showTrackLength: true,
 							showImages: true,
 							order: 'asc',
 						} );
@@ -336,6 +338,24 @@ const PlaylistEdit = ( {
 									checked={ showNumbers }
 								/>
 							</ToolsPanelItem>
+							<ToolsPanelItem
+								label={ __( 'Show track length in Tracklist' ) }
+								isShownByDefault
+								hasValue={ () => showTrackLength !== true }
+								onDeselect={ () =>
+									setAttributes( { showTrackLength: true } )
+								}
+							>
+								<ToggleControl
+									label={ __(
+										'Show track length in Tracklist'
+									) }
+									onChange={ toggleAttribute(
+										'showTrackLength'
+									) }
+									checked={ showTrackLength }
+								/>
+							</ToolsPanelItem>
 						</>
 					) }
 					<ToolsPanelItem
@@ -387,6 +407,8 @@ const PlaylistEdit = ( {
 						className={ clsx( 'wp-block-playlist__tracklist', {
 							'wp-block-playlist__tracklist-show-numbers':
 								showNumbers,
+							'wp-block-playlist__tracklist-length-is-hidden':
+								! showTrackLength,
 						} ) }
 					>
 						{ innerBlocksProps.children }

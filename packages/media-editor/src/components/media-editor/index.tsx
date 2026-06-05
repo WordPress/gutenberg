@@ -37,11 +37,7 @@ import {
 	// No type declarations available for @wordpress/interface.
 	// @ts-expect-error
 } from '@wordpress/interface';
-import type {
-	JSX,
-	KeyboardEvent as ReactKeyboardEvent,
-	ReactNode,
-} from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -51,7 +47,7 @@ import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
 import MediaEditorFineRotation from '../media-editor-fine-rotation';
-import MediaEditorTransformControls from '../media-editor-transform-controls';
+import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
@@ -347,12 +343,14 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const cropper = useMediaEditor();
-	// The sidebar is a side column from the `medium` breakpoint up and
-	// collapses below it. Track that single breakpoint: in "panel mode"
-	// (≥ medium) the rotate/flip controls live in the Crop panel and the
-	// footer is just History + Cancel/Save; below it the controls drop into
-	// the footer. (The fine-rotation ruler always sits under the canvas.)
-	const isPanelLayout = useViewportMatch( 'medium' );
+	// The sidebar is a side column from the `small` breakpoint up and collapses
+	// to an overlay below it — mirroring InterfaceSkeleton's behaviour, shifted
+	// from `medium` to `small` (see the matching CSS overrides in style.scss).
+	// Track that single breakpoint: in "panel mode" (≥ small) the
+	// rotate/flip/zoom controls live in the Crop panel and the footer is just
+	// History + Cancel/Save; below it the controls drop into the footer. (The
+	// fine-rotation ruler always sits under the canvas.)
+	const isPanelLayout = useViewportMatch( 'small' );
 	const footerLayout: 'wide' | 'narrow' = isPanelLayout ? 'wide' : 'narrow';
 
 	const { media, hasEdits } = useSelect(
@@ -398,9 +396,8 @@ function MediaEditorContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const placementControlTimerRef = useRef<
-		ReturnType< typeof setTimeout > | undefined
-	>( undefined );
+	const placementControlTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -488,9 +485,6 @@ function MediaEditorContent( {
 						<MediaEditorCropPanel
 							aspectRatioValue={ aspectRatioValue }
 							onAspectRatioChange={ setAspectRatioValue }
-							onPlacementControlInteraction={
-								signalPlacementControlInteraction
-							}
 							aspectRatioOptions={ aspectRatioOptions }
 							showTransformControls={ isPanelLayout }
 						/>
@@ -504,7 +498,6 @@ function MediaEditorContent( {
 		aspectRatioValue,
 		setAspectRatioValue,
 		aspectRatioOptions,
-		signalPlacementControlInteraction,
 		isPanelLayout,
 	] );
 
@@ -666,7 +659,12 @@ function MediaEditorContent( {
 			onReset={ resetCropOptions }
 		/>
 	) : null;
-	const transform = isImage ? <MediaEditorTransformControls /> : null;
+	const imageControls = isImage ? (
+		<MediaEditorImageControls
+			showAspectRatioControl
+			aspectRatioPresets={ aspectRatioPresets }
+		/>
+	) : null;
 	const actions = (
 		<FooterActions
 			isSaving={ isSaving }
@@ -683,7 +681,7 @@ function MediaEditorContent( {
 	// matches visual order.
 	let footerActions: ReactNode;
 	if ( footerLayout === 'wide' ) {
-		// Sidebar is a column: transform controls live in the Crop panel, so
+		// Sidebar is a column: image controls live in the Crop panel, so
 		// the footer is just History + Cancel/Save.
 		footerActions = (
 			<>
@@ -692,10 +690,10 @@ function MediaEditorContent( {
 			</>
 		);
 	} else {
-		// Sidebar collapsed: the transform controls drop into the footer.
+		// Sidebar collapsed: the image controls drop into the footer.
 		footerActions = (
 			<>
-				{ transform }
+				{ imageControls }
 				<div className="media-editor-modal__footer-row">
 					{ history }
 					{ actions }

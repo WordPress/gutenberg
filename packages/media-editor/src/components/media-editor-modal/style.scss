@@ -24,7 +24,7 @@
 // Footer chrome — two layouts driven by `is-wide` / `is-narrow` modifier
 // classes set from the media editor at the sidebar-collapse breakpoint.
 // Wide is a single flex row (History | Cancel/Save); narrow stacks via
-// `flex-direction: column` (transform controls above the History |
+// `flex-direction: column` (image controls above the History |
 // Cancel/Save row). Each layout has its own JSX tree (not `order`
 // reshuffling, which the project's stylelint rule treats as an a11y red
 // flag), so DOM order always matches visual order.
@@ -54,16 +54,16 @@
 		flex-direction: column;
 	}
 
-	// Narrow only: transform cluster sits on its own row, centered.
-	&.is-narrow > .media-editor-transform-controls {
+	// Narrow only: image controls sit on their own row, centered.
+	&.is-narrow > .media-editor-image-controls {
 		align-self: center;
 	}
 }
 
-// Secondary row used by medium (History + Transform + Cancel/Save) and
-// narrow (History + Cancel/Save). `margin-left: auto` on the transform
+// Secondary row used by medium (History + Image controls + Cancel/Save) and
+// narrow (History + Cancel/Save). `margin-left: auto` on the image controls
 // cluster and on Cancel/Save splits any free space — History gets the
-// left edge, Cancel/Save the right edge, and the transform cluster (when
+// left edge, Cancel/Save the right edge, and the image controls (when
 // present, i.e. medium only) approximately centers. Exact centering only
 // holds when History and Cancel/Save have matching widths; in practice
 // they're close enough that the offset is imperceptible.
@@ -73,7 +73,7 @@
 	align-items: center;
 	gap: $grid-unit-20;
 
-	.media-editor-transform-controls,
+	.media-editor-image-controls,
 	.media-editor__footer-actions {
 		margin-left: auto;
 	}

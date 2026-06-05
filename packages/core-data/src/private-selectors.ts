@@ -21,18 +21,6 @@ const EMPTY_OBJECT = {};
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
  *
- * Known Issue: Every-time state.undoManager changes, the getUndoManager
- * private selector is called (if used within useSelect and things like that)
- * which ensures the UI is always properly reactive. But, it's not the case with
- * the custom "sync" undo manager.
- *
- * Assumption: When an undo/redo is created, other parts of the core-data state
- * are likely changing simultaneously, which will trigger the selectors again.
- *
- * This issue is acceptable based on the assumption above.
- *
- * @see https://github.com/WordPress/gutenberg/pull/72407/files#r2580214235 for more details.
- *
  * @param state State tree.
  *
  * @return The undo manager.

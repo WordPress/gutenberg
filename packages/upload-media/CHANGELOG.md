@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+- Automatically retry failed uploads with exponential backoff for transient (network/server) errors. Retry behavior is configurable via the `retry` store setting; non-transient failures and child sideloads are not retried. The upload queue can also be paused and resumed, allowing uploads to halt while the browser is offline and continue on reconnect ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+
 ### Bug Fix
 
 -   Route very large images, especially interlaced/progressive JPEGs, to server-side processing instead of attempting client-side processing that would exceed the 1 GiB wasm-vips memory cap and fail. [#78949](https://github.com/WordPress/gutenberg/pull/78949).

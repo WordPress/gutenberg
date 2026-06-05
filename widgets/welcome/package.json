@@ -9,11 +9,8 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/primitives": "file:../../packages/primitives",
 		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/primitives": "file:../../packages/primitives",
 		"clsx": "^2.1.1"
-	},
-	"devDependencies": {
-		"@types/react": "^19.2.13"
 	}
 }
