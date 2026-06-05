@@ -540,8 +540,9 @@ export function initWaveformPlayer(
 	} );
 	element.appendChild( container );
 
-	// Initialize the WaveformPlayer library.
-	const instance = new WaveformPlayerLib( container );
+	// Initialize the WaveformPlayer library. The played/total time is hidden
+	// because the waveform timestamp markers already show this information.
+	const instance = new WaveformPlayerLib( container, { showTime: false } );
 	instance.options.durationFallback = parseTime( duration );
 	const cleanupTimeMarkers = setupWaveformTimeMarkers( instance, container );
 
