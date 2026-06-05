@@ -66,6 +66,7 @@ function useAutosaveNotice() {
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( editorStore );
+	const id = 'wpEditorAutosaveRestore';
 
 	useEffect( () => {
 		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
@@ -98,10 +99,9 @@ function useAutosaveNotice() {
 		}
 
 		if ( hasRemoteAutosave ) {
+			removeNotice( id );
 			return;
 		}
-
-		const id = 'wpEditorAutosaveRestore';
 
 		createWarningNotice(
 			__(
@@ -125,7 +125,7 @@ function useAutosaveNotice() {
 				],
 			}
 		);
-	}, [ isEditedPostNew, postId ] );
+	}, [ isEditedPostNew, postId, hasRemoteAutosave ] );
 }
 
 /**

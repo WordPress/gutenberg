@@ -3,6 +3,11 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const LOCAL_AUTOSAVE_NOTICE =
+	'The backup of this post in your browser is different from the version below.';
+const REMOTE_AUTOSAVE_NOTICE =
+	'There is an autosave of this post that is more recent than the version below.';
+
 test.describe( 'Autosave', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
@@ -76,9 +81,7 @@ test.describe( 'Autosave', () => {
 
 		await expect(
 			page.locator( '.components-notice__content' )
-		).toContainText(
-			'The backup of this post in your browser is different from the version below.'
-		);
+		).toContainText( LOCAL_AUTOSAVE_NOTICE );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
@@ -124,9 +127,7 @@ test.describe( 'Autosave', () => {
 		await page.reload();
 		await expect(
 			page.locator( '.components-notice__content' )
-		).toContainText(
-			'The backup of this post in your browser is different from the version below.'
-		);
+		).toContainText( LOCAL_AUTOSAVE_NOTICE );
 
 		await admin.createNewPost();
 		await expect(
@@ -343,12 +344,17 @@ test.describe( 'Autosave', () => {
 		}
 
 		// Only remote autosave notice should be applied.
+		const notices = page.locator( '.components-notice__content' );
 		await expect(
-			page.locator( '.components-notice__content', {
-				hasText:
-					'There is an autosave of this post that is more recent than the version below.',
+			notices.filter( {
+				hasText: REMOTE_AUTOSAVE_NOTICE,
 			} )
 		).toBeVisible();
+		await expect(
+			notices.filter( {
+				hasText: LOCAL_AUTOSAVE_NOTICE,
+			} )
+		).toHaveCount( 0 );
 	} );
 
 	test.skip( 'should clear sessionStorage upon user logout', async ( {

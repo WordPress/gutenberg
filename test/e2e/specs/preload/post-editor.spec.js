@@ -12,6 +12,9 @@ test.describe( 'Preload', () => {
 	let postId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Panel state is persisted across editor tests. Keep panel-driven
+		// taxonomy requests out of this startup preload assertion.
+		await requestUtils.setPreferences( 'core', { openPanels: [] } );
 		const post = await requestUtils.createPost( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -67,13 +70,13 @@ test.describe( 'Preload', () => {
 		// should escape before mount — they're detached promise chains
 		// off `receiveEntityRecords`. They may also complete after the mount
 		// boundary on faster runs, so assert that no other requests escape.
-		const allowedRequestsUntilMount = [
+		const collabStartupRequests = [
 			`POST /wp/v2/posts/${ postId }`,
 			'POST /wp-sync/v1/updates',
 		];
 		expect(
 			Array.from( new Set( requestsUntilMount ) ).every( ( request ) =>
-				allowedRequestsUntilMount.includes( request )
+				collabStartupRequests.includes( request )
 			)
 		).toBe( true );
 		// Every preloaded path should be consumed by the kickoff.
@@ -84,20 +87,24 @@ test.describe( 'Preload', () => {
 		// fires twice within the captured window; the duplicate count
 		// isn't stable across runs, so this assertion deduplicates.
 		// To do: these should all be removed or preloaded.
-		const optionalRequests = [
-			`POST /wp/v2/posts/${ postId }`,
-			'POST /wp-sync/v1/updates',
-			'GET /wp/v2/tags?context=view&per_page=10&orderby=count&order=desc&hide_empty=true&_fields=id%2Cname%2Ccount',
+		const requiredRequests = [
+			`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
+			'POST /wp/v2/users/me',
+		].sort();
+		const allowedRequests = [
+			...requiredRequests,
+			...collabStartupRequests,
 		];
+		const capturedRequests = Array.from( new Set( requests ) );
 		expect(
-			Array.from( new Set( requests ) )
-				.filter( ( request ) => ! optionalRequests.includes( request ) )
+			capturedRequests
+				.filter( ( request ) => ! allowedRequests.includes( request ) )
 				.sort()
-		).toEqual(
-			[
-				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
-				'POST /wp/v2/users/me',
-			].sort()
-		);
+		).toEqual( [] );
+		expect(
+			capturedRequests
+				.filter( ( request ) => requiredRequests.includes( request ) )
+				.sort()
+		).toEqual( requiredRequests );
 	} );
 } );
