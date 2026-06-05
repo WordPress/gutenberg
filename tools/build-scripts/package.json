@@ -31,6 +31,8 @@
 		"cross-spawn": "^7.0.6",
 		"esbuild": "^0.27.2",
 		"fast-glob": "^3.2.7",
+		"react": "^18.3.0",
+		"react-dom": "^18.3.0",
 		"source-map": "^0.6.1"
 	},
 	"publishConfig": {

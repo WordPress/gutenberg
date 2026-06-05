@@ -40,6 +40,7 @@
 		"@wordpress/route": "file:../packages/route",
 		"@wordpress/theme": "file:../packages/theme",
 		"@wordpress/ui": "file:../packages/ui",
+		"react-docgen-typescript": "^2.2.2",
 		"storybook": "^10.2.8",
 		"storybook-addon-tag-badges": "^3.0.4",
 		"terser": "^5.37.0",
