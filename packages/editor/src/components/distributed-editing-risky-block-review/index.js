@@ -26,12 +26,17 @@ import { store as editorStore } from '../../store';
 import {
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_ITEM_STATUSES,
 	DISTRIBUTED_EDITING_RISKY_BLOCK_REVIEW_STATUSES,
+	getDistributedEditingSyncMetaFromPostContent,
 } from '../../store/distributed-editing';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 
 const FILTER_NAME = 'core/editor/distributed-editing-risky-block-review';
 const RISKY_BLOCK_WASH = 'inset 0 0 0 9999px rgba(34, 113, 177, 0.08)';
 const RISKY_BLOCK_MARKER = 'inset 4px 0 0 #2271b1';
+const AUTHORSHIP_FOCUS_DIMMED_STYLE = {
+	opacity: 0.2,
+	transition: 'opacity 0.1s linear',
+};
 const PENDING_GHOST_BLOCK_LIST_PREVIEW_STYLE = {
 	background: 'rgba(34, 113, 177, 0.045)',
 	border: '1px dashed rgba(34, 113, 177, 0.36)',
@@ -170,6 +175,49 @@ export function getDistributedEditingRiskyBlockReviewWrapperProps(
 }
 
 /**
+ * Returns wrapper props for authorship focus dimming.
+ *
+ * This mirrors Gutenberg Spotlight mode's simple opacity treatment while keeping
+ * DE-RTC focus scoped to server-authored attribution metadata.
+ *
+ * @param {Object} wrapperProps Existing BlockListBlock wrapper props.
+ * @param {Object} focusState   Authorship focus state for the block.
+ *
+ * @return {Object} Enhanced wrapper props.
+ */
+export function getDistributedEditingAuthorshipFocusWrapperProps(
+	wrapperProps = {},
+	focusState = {}
+) {
+	if ( ! focusState.active ) {
+		return wrapperProps;
+	}
+
+	const shouldDim = focusState.status === 'dimmed';
+
+	return {
+		...wrapperProps,
+		className: clsx(
+			wrapperProps.className,
+			'has-distributed-editing-authorship-focus',
+			shouldDim && 'has-distributed-editing-authorship-focus--dimmed',
+			focusState.status === 'focused' &&
+				'has-distributed-editing-authorship-focus--focused',
+			focusState.status === 'mixed' &&
+				'has-distributed-editing-authorship-focus--mixed'
+		),
+		'data-distributed-editing-authorship-focus': focusState.status,
+		'data-distributed-editing-authorship-focus-block-path':
+			focusState.blockPathKey || '',
+		'data-distributed-editing-authorship-focus-active': 'true',
+		style: {
+			...wrapperProps.style,
+			...( shouldDim ? AUTHORSHIP_FOCUS_DIMMED_STYLE : {} ),
+		},
+	};
+}
+
+/**
  * Returns inert pending-edit ghosts that should be rendered next to a block.
  *
  * Ghosts represent another editor's unsaved local changes. The preview uses
@@ -244,6 +292,7 @@ export function getDistributedEditingPendingGhostEntriesForBlockPath(
 			ghosts[ placement ].push( {
 				...item,
 				displayName,
+				attributionKey: entry.attributionKey || '',
 				presenceUpdatedAtGmt:
 					item.presenceUpdatedAtGmt ||
 					item.presence_updated_at_gmt ||
@@ -373,12 +422,18 @@ function getDistributedEditingPendingGhostPlacementForBlockPath(
 function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 	return function WithDistributedEditingRiskyBlockReviewAnnotations( props ) {
 		const [ mountedAtMs ] = useState( () => Date.now() );
-		const { pendingGhostsJson, reviewItem } = useSelect(
+		const {
+			authorshipFocus,
+			authorshipFocusAttributionKey,
+			pendingGhostsJson,
+			reviewItem,
+		} = useSelect(
 			( select ) => {
 				const editorSelect = select( editorStore );
 				const {
 					getDistributedEditingRiskyBlockReviewState,
 					getDistributedEditingSessionState,
+					getCurrentPost,
 				} = editorSelect;
 				const reviewState =
 					getDistributedEditingRiskyBlockReviewState?.() || {};
@@ -390,6 +445,22 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 					);
 				const sessionState =
 					getDistributedEditingSessionState?.() || {};
+				const currentPost = getCurrentPost?.() || {};
+				const currentPostRawContent =
+					currentPost?.content?.raw || currentPost?.content_raw || '';
+				const currentPostSyncMeta =
+					getDistributedEditingSyncMetaFromPostContent(
+						currentPostRawContent
+					);
+				const syncMeta =
+					sessionState.clientBaseSyncMeta || currentPostSyncMeta;
+				const blockAuthorshipFocus =
+					getDistributedEditingAuthorshipFocusForBlockPath( {
+						syncMeta,
+						blockPath: blockContext.blockPath,
+						activeAttributionKey:
+							sessionState.authorshipFocusAttributionKey,
+					} );
 				const rosterEntries = Array.isArray(
 					sessionState.presenceRosterEntries
 				)
@@ -422,6 +493,9 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 				}
 
 				return {
+					authorshipFocus: blockAuthorshipFocus,
+					authorshipFocusAttributionKey:
+						sessionState.authorshipFocusAttributionKey || null,
 					pendingGhostsJson: JSON.stringify( pendingGhosts ),
 					reviewItem: nextReviewItem,
 				};
@@ -444,17 +518,24 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 				return EMPTY_PENDING_GHOSTS;
 			}
 		}, [ pendingGhostsJson ] );
-		const wrapperProps = reviewItem
+		const reviewWrapperProps = reviewItem
 			? getDistributedEditingRiskyBlockReviewWrapperProps(
 					props.wrapperProps,
 					reviewItem
 			  )
 			: props.wrapperProps;
+		const wrapperProps = getDistributedEditingAuthorshipFocusWrapperProps(
+			reviewWrapperProps,
+			authorshipFocus
+		);
 
 		return (
 			<>
 				{ pendingGhosts.before.map( ( ghost ) => (
 					<DistributedEditingPendingGhostBlockListPreview
+						authorshipFocusAttributionKey={
+							authorshipFocusAttributionKey
+						}
 						ghost={ ghost }
 						key={ ghost.key }
 					/>
@@ -476,6 +557,9 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 				) }
 				{ pendingGhosts.after.map( ( ghost ) => (
 					<DistributedEditingPendingGhostBlockListPreview
+						authorshipFocusAttributionKey={
+							authorshipFocusAttributionKey
+						}
 						ghost={ ghost }
 						key={ ghost.key }
 					/>
@@ -485,7 +569,10 @@ function withDistributedEditingRiskyBlockReviewAnnotations( BlockListBlock ) {
 	};
 }
 
-export function DistributedEditingPendingGhostBlockListPreview( { ghost } ) {
+export function DistributedEditingPendingGhostBlockListPreview( {
+	authorshipFocusAttributionKey,
+	ghost,
+} ) {
 	const [ isCalloutOpen, setIsCalloutOpen ] = useState( false );
 	const previewText = getDistributedEditingPendingGhostPreviewText( ghost );
 	const previewBlocks = useMemo(
@@ -516,6 +603,11 @@ export function DistributedEditingPendingGhostBlockListPreview( { ghost } ) {
 	);
 	const changeLabel =
 		getDistributedEditingPendingGhostChangeLabel( changeKind );
+	const isDimmedByAuthorshipFocus = Boolean(
+		authorshipFocusAttributionKey &&
+			ghost.attributionKey &&
+			ghost.attributionKey !== authorshipFocusAttributionKey
+	);
 	let previewContent = (
 		<div className="editor-distributed-editing-risky-block-review__pending-ghost-placeholder">
 			{ previewText }
@@ -557,6 +649,9 @@ export function DistributedEditingPendingGhostBlockListPreview( { ghost } ) {
 			data-distributed-editing-pending-ghost-placement="block-list"
 			data-distributed-editing-pending-ghost-raw-content="false"
 			data-distributed-editing-pending-ghost-visual-treatment="subtle-wash-border"
+			data-distributed-editing-pending-ghost-authorship-focus={
+				isDimmedByAuthorshipFocus ? 'dimmed' : 'visible'
+			}
 			onBlur={ ( event ) => {
 				if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
 					setIsCalloutOpen( false );
@@ -570,6 +665,9 @@ export function DistributedEditingPendingGhostBlockListPreview( { ghost } ) {
 				...PENDING_GHOST_BLOCK_LIST_PREVIEW_STYLE,
 				...( isCalloutOpen
 					? PENDING_GHOST_BLOCK_LIST_PREVIEW_ACTIVE_STYLE
+					: {} ),
+				...( isDimmedByAuthorshipFocus
+					? AUTHORSHIP_FOCUS_DIMMED_STYLE
 					: {} ),
 			} }
 			tabIndex="0"
@@ -672,6 +770,131 @@ function getDistributedEditingBlockPathsMatch( firstPath, secondPath ) {
 		firstPath.length === secondPath.length &&
 		firstPath.every( ( value, index ) => value === secondPath[ index ] )
 	);
+}
+
+export function getDistributedEditingAuthorshipFocusForBlockPath( {
+	syncMeta,
+	blockPath,
+	activeAttributionKey,
+} = {} ) {
+	const attributionKey =
+		typeof activeAttributionKey === 'string'
+			? activeAttributionKey.trim()
+			: '';
+	const normalizedBlockPath =
+		getDistributedEditingNormalizedBlockPath( blockPath );
+	const blockPathKey = normalizedBlockPath.join( '.' );
+
+	if ( ! attributionKey || normalizedBlockPath.length === 0 ) {
+		return {
+			active: false,
+			status: 'inactive',
+			blockPathKey,
+		};
+	}
+
+	const blockAuthorship = getDistributedEditingAuthorshipBlockEntry(
+		syncMeta?.authorship,
+		normalizedBlockPath
+	);
+
+	if ( ! blockAuthorship ) {
+		return {
+			active: true,
+			status: 'dimmed',
+			blockPathKey,
+		};
+	}
+
+	const blockAttributionKey =
+		blockAuthorship.attributionKey || blockAuthorship.attribution_key || '';
+	const richTextRanges =
+		getDistributedEditingAuthorshipRichTextRanges( blockAuthorship );
+	const hasOtherRange = richTextRanges.some(
+		( range ) => range.attributionKey !== attributionKey
+	);
+
+	if ( blockAttributionKey === attributionKey && ! hasOtherRange ) {
+		return {
+			active: true,
+			status: 'focused',
+			blockPathKey,
+		};
+	}
+
+	const hasFocusedRange = richTextRanges.some(
+		( range ) => range.attributionKey === attributionKey
+	);
+
+	if ( blockAttributionKey === attributionKey || hasFocusedRange ) {
+		return {
+			active: true,
+			status: 'mixed',
+			blockPathKey,
+		};
+	}
+
+	return {
+		active: true,
+		status: 'dimmed',
+		blockPathKey,
+	};
+}
+
+export function getDistributedEditingAuthorshipBlockEntry(
+	authorship = {},
+	blockPath = []
+) {
+	const pathKey =
+		getDistributedEditingNormalizedBlockPath( blockPath ).join( '.' );
+
+	if ( ! pathKey || ! Array.isArray( authorship?.blocks ) ) {
+		return null;
+	}
+
+	return (
+		authorship.blocks.find( ( block ) => {
+			const blockPathValue =
+				block?.path || block?.blockPath || block?.block_path;
+
+			return (
+				getDistributedEditingNormalizedBlockPath( blockPathValue ).join(
+					'.'
+				) === pathKey
+			);
+		} ) || null
+	);
+}
+
+export function getDistributedEditingAuthorshipRichTextRanges(
+	blockAuthorship = {}
+) {
+	const richText =
+		blockAuthorship.richText ||
+		blockAuthorship.rich_text ||
+		blockAuthorship.richTextAttribution ||
+		blockAuthorship.rich_text_attribution ||
+		{};
+	const ranges = Array.isArray( richText.ranges ) ? richText.ranges : [];
+
+	return ranges
+		.map( ( range ) => ( {
+			start: Number( range?.start ),
+			end: Number( range?.end ),
+			attributionKey:
+				typeof range?.attributionKey === 'string'
+					? range.attributionKey
+					: range?.attribution_key || '',
+			changeKind: range?.changeKind || range?.change_kind || 'unknown',
+		} ) )
+		.filter(
+			( range ) =>
+				Number.isInteger( range.start ) &&
+				Number.isInteger( range.end ) &&
+				range.start >= 0 &&
+				range.end > range.start &&
+				range.attributionKey
+		);
 }
 
 addFilter(

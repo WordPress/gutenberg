@@ -1129,6 +1129,11 @@ export const DEFAULT_DISTRIBUTED_EDITING_SESSION_STATE = Object.freeze( {
 	presenceDocumentStateConfirmedStateHash: null,
 	presenceDocumentStateConfirmedAtGmt: null,
 	presenceDocumentStatePublishedKey: null,
+	presenceHeartbeatAttributionKey: null,
+	authorshipFocusAttributionKey: null,
+	authorshipFocusPresenceEntryKey: null,
+	authorshipFocusDisplayName: null,
+	authorshipFocusActive: false,
 	presenceStorageReadinessRecheckStatus:
 		DISTRIBUTED_EDITING_PRESENCE_STORAGE_READINESS_RECHECK_STATUSES.NONE,
 	presenceStorageReadinessRecheckReason: null,
@@ -1789,10 +1794,22 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.REJECTED_UNFILTERED_HTML_REVIEW_REQUIRED &&
 		Boolean( sessionState.refetchedServerState ) &&
 		! Boolean( sessionState.requiresServerStateRefetch );
-	const isAwaitingServerConfirmation = isPartialSafePendingReview
-		? false
-		: Boolean( sessionState.isAwaitingServerConfirmation ) ||
-		  hasPendingChanges;
+	const hasExplicitAwaitingServerConfirmation =
+		sessionState.isAwaitingServerConfirmation !== undefined &&
+		sessionState.isAwaitingServerConfirmation !== null;
+	let isAwaitingServerConfirmation =
+		sessionState.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING || hasPendingChanges;
+
+	if ( hasExplicitAwaitingServerConfirmation ) {
+		isAwaitingServerConfirmation = Boolean(
+			sessionState.isAwaitingServerConfirmation
+		);
+	}
+
+	if ( isPartialSafePendingReview ) {
+		isAwaitingServerConfirmation = false;
+	}
 	const saveButtonClickInFlight = Boolean(
 		sessionState.saveButtonClickInFlight
 	);
@@ -2123,6 +2140,21 @@ export function normalizeDistributedEditingSessionState( sessionState = {} ) {
 		...normalizeDistributedEditingPresenceHeartbeatFields( sessionState ),
 		...normalizeDistributedEditingPresenceRepeatedRefreshRuntimeFields(
 			sessionState
+		),
+		presenceHeartbeatAttributionKey: normalizeNullableString(
+			sessionState.presenceHeartbeatAttributionKey
+		),
+		authorshipFocusAttributionKey: normalizeNullableString(
+			sessionState.authorshipFocusAttributionKey
+		),
+		authorshipFocusPresenceEntryKey: normalizeNullableString(
+			sessionState.authorshipFocusPresenceEntryKey
+		),
+		authorshipFocusDisplayName: normalizeNullableString(
+			sessionState.authorshipFocusDisplayName
+		),
+		authorshipFocusActive: Boolean(
+			sessionState.authorshipFocusAttributionKey
 		),
 		...normalizeDistributedEditingPresenceStartupPolicyFields(
 			sessionState
@@ -3141,6 +3173,22 @@ function normalizeDistributedEditingPresenceRosterEntry( entry, index ) {
 		sessionStartedAtGmt,
 		sessionDurationSeconds,
 		presenceUpdatedAtGmt,
+		attributionKey: normalizeNullableString(
+			getFirstDefined(
+				source.attributionKey,
+				source.attribution_key,
+				source.authorshipAttributionKey,
+				source.authorship_attribution_key
+			)
+		),
+		authorshipFocusAvailable: Boolean(
+			getFirstDefined(
+				source.authorshipFocusAvailable,
+				source.authorship_focus_available,
+				source.attributionKey,
+				source.attribution_key
+			)
+		),
 		permissionsAvailable,
 		permissions: {
 			canEdit: Boolean(
@@ -5222,6 +5270,18 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 					responseData.document_state?.presenceUpdatedAtGmt,
 					responseData.document_state?.presence_updated_at_gmt
 				),
+				attributionKey: getFirstDefined(
+					responseOrError.attributionKey,
+					responseOrError.attribution_key,
+					responseData.attributionKey,
+					responseData.attribution_key
+				),
+				authorshipFocusAvailable: getFirstDefined(
+					responseOrError.authorshipFocusAvailable,
+					responseOrError.authorship_focus_available,
+					responseData.authorshipFocusAvailable,
+					responseData.authorship_focus_available
+				),
 				documentState: getFirstDefined(
 					responseOrError.documentState,
 					responseOrError.document_state,
@@ -5363,6 +5423,8 @@ export function getDistributedEditingSessionStateForPresenceHeartbeatResult(
 			shouldDowngradeLocalRosterEntry,
 		presenceHeartbeatLocalRosterEntryVisible: localRosterEntryVisible,
 		presenceHeartbeatLocalRosterEntryFreshness: localRosterEntryFreshness,
+		presenceHeartbeatAttributionKey:
+			localHeartbeatEntryDetails.attributionKey,
 		presenceHeartbeatRepeatedRefreshOptional: Boolean(
 			getFirstDefined(
 				responseOrError.repeatedRefreshOptional,
@@ -10574,7 +10636,10 @@ export function getDistributedEditingNoticeDescriptorsForSessionState(
 		normalized.isAwaitingServerConfirmation &&
 		! normalized.requiresServerStateAcceptance &&
 		normalized.disposition !==
-			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION
+			DISTRIBUTED_EDITING_DISPOSITIONS.REJECTED_STALE_BASE_VERSION &&
+		normalized.retrySaveStatus ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.NONE &&
+		! hasRetrySaveHandoffBlock
 	) {
 		descriptors.push(
 			createNoticeDescriptor( normalized, {
@@ -13784,6 +13849,9 @@ export function getDistributedEditingSessionStateForRetrySaveHandoff(
 		status ===
 		DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED
 	) {
+		const isRetrySaveInProgress =
+			reason ===
+			DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SAVE_IN_PROGRESS;
 		const pendingChangeCount =
 			normalizeCount( handoff.pendingChangeCount ) ||
 			normalizeCount( policy.request?.pendingChangeCount ) ||
@@ -13799,7 +13867,7 @@ export function getDistributedEditingSessionStateForRetrySaveHandoff(
 				normalized.hasPendingChanges ||
 				Boolean( policy.protectsLocalChanges ) ||
 				pendingChangeCount > 0,
-			isAwaitingServerConfirmation: true,
+			isAwaitingServerConfirmation: isRetrySaveInProgress,
 			requiresServerStateRefetch:
 				normalized.requiresServerStateRefetch ||
 				Boolean( policy.requiresServerStateRefetch ) ||

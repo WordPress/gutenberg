@@ -18,6 +18,9 @@ import DistributedEditingRiskyBlockReviewPrePublishPanel, {
 	DistributedEditingRiskyBlockReviewListViewMarker,
 	DistributedEditingRiskyBlockReviewPanel,
 	DistributedEditingRiskyBlockReviewStatusChrome,
+	getDistributedEditingAuthorshipFocusForBlockPath,
+	getDistributedEditingAuthorshipFocusWrapperProps,
+	getDistributedEditingAuthorshipRichTextRanges,
 	getDistributedEditingPendingGhostEntriesForBlockPath,
 	getDistributedEditingRiskyBlockReviewWrapperProps,
 	shouldRenderDistributedEditingRiskyBlockReview,
@@ -237,6 +240,157 @@ describe( 'getDistributedEditingRiskyBlockReviewWrapperProps', () => {
 		expect( wrapperProps.style.boxShadow ).toContain(
 			'rgba(34, 113, 177, 0.08)'
 		);
+	} );
+} );
+
+describe( 'Distributed Editing authorship focus', () => {
+	const syncMeta = {
+		authorship: {
+			schema: 'de-rtc-authorship-v1',
+			contentFree: true,
+			blocks: [
+				{
+					path: [ 0 ],
+					blockName: 'core/paragraph',
+					serializedBlockHash:
+						'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+					attributionKey: 'presence:author-a',
+				},
+				{
+					path: [ 1 ],
+					blockName: 'core/paragraph',
+					serializedBlockHash:
+						'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+					attributionKey: null,
+					richText: {
+						field: 'innerHTML',
+						ranges: [
+							{
+								start: 0,
+								end: 4,
+								attributionKey: 'presence:author-a',
+								changeKind: 'text_insert',
+							},
+							{
+								start: 5,
+								end: 11,
+								attributionKey: 'presence:author-b',
+								changeKind: 'format_change',
+							},
+						],
+						rawContentIncluded: false,
+					},
+				},
+				{
+					path: [ 2 ],
+					blockName: 'core/paragraph',
+					serializedBlockHash:
+						'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc',
+					attributionKey: 'presence:author-b',
+				},
+			],
+			rawContentIncluded: false,
+			rawSessionKeyIncluded: false,
+		},
+	};
+
+	it( 'classifies whole-block, mixed RichText, and dimmed focus states', () => {
+		expect(
+			getDistributedEditingAuthorshipFocusForBlockPath( {
+				syncMeta,
+				blockPath: [ 0 ],
+				activeAttributionKey: 'presence:author-a',
+			} )
+		).toMatchObject( {
+			active: true,
+			status: 'focused',
+			blockPathKey: '0',
+		} );
+		expect(
+			getDistributedEditingAuthorshipFocusForBlockPath( {
+				syncMeta,
+				blockPath: [ 1 ],
+				activeAttributionKey: 'presence:author-a',
+			} )
+		).toMatchObject( {
+			active: true,
+			status: 'mixed',
+			blockPathKey: '1',
+		} );
+		expect(
+			getDistributedEditingAuthorshipFocusForBlockPath( {
+				syncMeta,
+				blockPath: [ 2 ],
+				activeAttributionKey: 'presence:author-a',
+			} )
+		).toMatchObject( {
+			active: true,
+			status: 'dimmed',
+			blockPathKey: '2',
+		} );
+		expect(
+			getDistributedEditingAuthorshipFocusForBlockPath( {
+				syncMeta,
+				blockPath: [ 0 ],
+				activeAttributionKey: '',
+			} )
+		).toMatchObject( {
+			active: false,
+			status: 'inactive',
+		} );
+	} );
+
+	it( 'adds Spotlight-style dimming props without exposing raw content', () => {
+		const wrapperProps = getDistributedEditingAuthorshipFocusWrapperProps(
+			{
+				className: 'wp-block',
+				style: {
+					color: 'inherit',
+				},
+			},
+			{
+				active: true,
+				status: 'dimmed',
+				blockPathKey: '2',
+			}
+		);
+
+		expect( wrapperProps ).toMatchObject( {
+			'data-distributed-editing-authorship-focus': 'dimmed',
+			'data-distributed-editing-authorship-focus-block-path': '2',
+			'data-distributed-editing-authorship-focus-active': 'true',
+		} );
+		expect( wrapperProps.className ).toContain(
+			'has-distributed-editing-authorship-focus--dimmed'
+		);
+		expect( wrapperProps.style ).toMatchObject( {
+			color: 'inherit',
+			opacity: 0.2,
+		} );
+		expect( JSON.stringify( wrapperProps ) ).not.toMatch(
+			/rawContent|session_key|userId/
+		);
+	} );
+
+	it( 'normalizes RichText authorship ranges as content-free spans', () => {
+		expect(
+			getDistributedEditingAuthorshipRichTextRanges(
+				syncMeta.authorship.blocks[ 1 ]
+			)
+		).toEqual( [
+			{
+				start: 0,
+				end: 4,
+				attributionKey: 'presence:author-a',
+				changeKind: 'text_insert',
+			},
+			{
+				start: 5,
+				end: 11,
+				attributionKey: 'presence:author-b',
+				changeKind: 'format_change',
+			},
+		] );
 	} );
 } );
 
@@ -597,6 +751,32 @@ describe( 'DistributedEditingPendingGhostBlockListPreview', () => {
 				'distributed-editing-pending-ghost-safe-html-preview'
 			)
 		).toBeInTheDocument();
+	} );
+
+	it( 'dims pending ghosts from other sessions during authorship focus', () => {
+		render(
+			<DistributedEditingPendingGhostBlockListPreview
+				authorshipFocusAttributionKey="presence:focused-author"
+				ghost={ {
+					attributionKey: 'presence:other-author',
+					blockName: 'core/paragraph',
+					changeKind: 'modified_block',
+					displayName: 'Other Author',
+					key: 'other-modified-paragraph',
+					safePreviewText: 'Other pending paragraph',
+				} }
+			/>
+		);
+
+		const ghost = screen.getByRole( 'note', {
+			name: 'Pending edit by Other Author in core/paragraph',
+		} );
+
+		expect( ghost ).toHaveAttribute(
+			'data-distributed-editing-pending-ghost-authorship-focus',
+			'dimmed'
+		);
+		expect( ghost ).toHaveStyle( { opacity: '0.2' } );
 	} );
 } );
 

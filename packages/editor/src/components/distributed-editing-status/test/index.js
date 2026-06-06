@@ -918,7 +918,7 @@ describe( 'DistributedEditingStatus', () => {
 				name: 'Distributed editing status',
 			} )
 		).toBeVisible();
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 		expect(
 			screen.getByText( '1 local change is awaiting confirmation.' )
 		).toBeVisible();
@@ -2462,12 +2462,11 @@ describe( 'DistributedEditingStatus', () => {
 				'Use the editor Save button to ask WordPress to update the post. This conflict choice has not changed the WordPress post yet.'
 			)
 		).not.toBeInTheDocument();
-		expect( screen.getByText( 'Saved' ) ).toBeVisible();
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'WordPress saved your changes. Ready for new edits.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'mounts a content-free action transcript status entry', () => {
@@ -2742,7 +2741,7 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-placement',
 			'editor-interface-notices'
 		);
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 		expect(
 			screen.queryByRole( 'region', {
 				name: 'Distributed editing enabled status',
@@ -3178,14 +3177,11 @@ describe( 'DistributedEditingStatus', () => {
 			const shell = screen.getByRole( 'region', {
 				name: 'Distributed editing enabled status',
 			} );
-			const status = screen.getByRole( 'region', {
-				name: 'Distributed editing status',
-			} );
-			const confirmedSaveText = within( status ).getByText( 'Saved' );
-			// eslint-disable-next-line testing-library/no-node-access
-			const confirmedStatusItem = confirmedSaveText.closest(
-				'[data-distributed-editing-confirmed-save-status-evidence-retained]'
-			);
+			expect(
+				screen.queryByRole( 'region', {
+					name: 'Distributed editing status',
+				} )
+			).not.toBeInTheDocument();
 			expect( shell ).toHaveAttribute(
 				'data-distributed-editing-save-state',
 				'retry_save_confirmed'
@@ -3201,10 +3197,6 @@ describe( 'DistributedEditingStatus', () => {
 			expect( shell ).toHaveAttribute(
 				'data-distributed-editing-confirmed-save-shell-quieted',
 				'false'
-			);
-			expect( confirmedStatusItem ).toHaveAttribute(
-				'data-distributed-editing-confirmed-save-merged-edits',
-				'true'
 			);
 			expect(
 				within( shell ).getByText( 'Merged by WordPress' )
@@ -3222,10 +3214,10 @@ describe( 'DistributedEditingStatus', () => {
 				within( shell ).queryByText( 'Show Save evidence' )
 			).not.toBeInTheDocument();
 			expect(
-				within( status ).getByText(
+				screen.queryByText(
 					'WordPress saved the merged edits. Ready for new edits.'
 				)
-			).toBeVisible();
+			).not.toBeInTheDocument();
 
 			act( () => {
 				jest.advanceTimersByTime( 1000 );
@@ -3250,18 +3242,10 @@ describe( 'DistributedEditingStatus', () => {
 				within( shell ).getByText( 'Ready for new edits.' )
 			).toBeVisible();
 			expect(
-				within( status ).getByText(
+				screen.queryByText(
 					"Merged edits saved. Your changes and the other editor's non-conflicting changes are now in WordPress. Open details for version and revision evidence."
 				)
-			).toBeVisible();
-			expect( confirmedStatusItem ).toHaveAttribute(
-				'data-distributed-editing-confirmed-save-status-quieted',
-				'true'
-			);
-			expect( confirmedStatusItem ).toHaveAttribute(
-				'data-distributed-editing-confirmed-save-merged-edits',
-				'true'
-			);
+			).not.toBeInTheDocument();
 		} finally {
 			jest.useRealTimers();
 
@@ -7729,7 +7713,7 @@ describe( 'DistributedEditingStatus', () => {
 		expect(
 			screen.queryByText( 'Save checks WordPress before updating.' )
 		).not.toBeInTheDocument();
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 	} );
 
 	it( 'summarizes review-required Save state in the enabled editor shell', () => {
@@ -8076,11 +8060,13 @@ describe( 'DistributedEditingStatus', () => {
 			'data-distributed-editing-placement',
 			'editor-interface-notices'
 		);
-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
+		expect( screen.getAllByText( 'Saving' ).length ).toBeGreaterThan( 0 );
 		expect(
 			screen.getAllByText( 'WordPress is saving your changes.' ).length
 		).toBeGreaterThan( 0 );
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect(
+			screen.queryByText( 'Changes pending' )
+		).not.toBeInTheDocument();
 		expect(
 			screen.getAllByText( 'WordPress is saving your changes.' ).length
 		).toBeGreaterThan( 0 );
@@ -8099,7 +8085,7 @@ describe( 'DistributedEditingStatus', () => {
 		).not.toHaveBeenCalled();
 	} );
 
-	it( 'renders already-confirmed retry-save state from production editor chrome without recovery actions and then quiets evidence', () => {
+	it( 'keeps already-confirmed retry-save state out of production notice chrome', () => {
 		const originalConfirmedSaveStatusHoldMs =
 			globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs;
 		globalThis.__experimentalDistributedEditingConfirmedSaveStatusHoldMs = 1000;
@@ -8125,32 +8111,15 @@ describe( 'DistributedEditingStatus', () => {
 			render( <DistributedEditingStatusChrome /> );
 
 			expect(
-				screen.getByRole( 'region', {
+				screen.queryByRole( 'region', {
 					name: 'Distributed editing status',
 				} )
-			).toHaveAttribute(
-				'data-distributed-editing-placement',
-				'editor-interface-notices'
-			);
-			expect( screen.getByText( 'Saved' ) ).toBeVisible();
+			).not.toBeInTheDocument();
 			expect(
-				screen.getAllByText(
+				screen.queryByText(
 					'WordPress saved your changes. Ready for new edits.'
 				)
-			).toHaveLength( 1 );
-			const confirmedSaveText = screen.getByText( 'Saved' );
-			// eslint-disable-next-line testing-library/no-node-access
-			const confirmedStatusItem = confirmedSaveText.closest(
-				'[data-distributed-editing-confirmed-save-status-evidence-retained]'
-			);
-			expect( confirmedStatusItem ).toHaveAttribute(
-				'data-distributed-editing-confirmed-save-status-evidence-retained',
-				'true'
-			);
-			expect( confirmedStatusItem ).toHaveAttribute(
-				'data-distributed-editing-confirmed-save-status-quieted',
-				'false'
-			);
+			).not.toBeInTheDocument();
 			expect(
 				screen.queryByText(
 					'WordPress confirmed the update. Open details for version and revision evidence.'
@@ -8174,26 +8143,11 @@ describe( 'DistributedEditingStatus', () => {
 				jest.advanceTimersByTime( 1000 );
 			} );
 
-			expect( confirmedStatusItem ).toHaveAttribute(
-				'data-distributed-editing-confirmed-save-status-evidence-retained',
-				'true'
-			);
-			expect( confirmedStatusItem ).toHaveAttribute(
-				'data-distributed-editing-confirmed-save-status-quieted',
-				'true'
-			);
-			expect( screen.getByText( 'Saved' ) ).toBeVisible();
-			expect( screen.getByText( 'Show Save evidence' ) ).toBeVisible();
-			// eslint-disable-next-line testing-library/no-node-access
-			const evidenceDetails = confirmedStatusItem.querySelector(
-				'[data-distributed-editing-confirmed-save-status-details="retained"]'
-			);
-			expect( evidenceDetails ).not.toHaveAttribute( 'open' );
 			expect(
-				screen.getAllByText(
+				screen.queryByText(
 					'WordPress saved your changes. Ready for new edits.'
 				)
-			).toHaveLength( 2 );
+			).not.toBeInTheDocument();
 		} finally {
 			jest.useRealTimers();
 
@@ -9310,7 +9264,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 				name: 'Distributed editing status',
 			} )
 		).toBeVisible();
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 		expect(
 			screen.getByText( '2 local changes are awaiting confirmation.' )
 		).toBeVisible();
@@ -9794,7 +9748,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'These changes are ready. Continue Save before updating the post; local changes remain pending.'
@@ -9823,7 +9777,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'Admin-reviewed changes are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
@@ -9848,7 +9802,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'Protected recovery changes are ready for WordPress Save. They remain protected and exportable until WordPress confirms the update.'
@@ -10959,7 +10913,7 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Changes pending' ) ).toBeVisible();
+		expect( screen.getByText( 'Save needed' ) ).toBeVisible();
 		expect(
 			screen.getByText(
 				'Save is prepared for WordPress. Local changes remain pending until Save finishes.'
@@ -11006,12 +10960,16 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Saved' ) ).toBeVisible();
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'WordPress saved your changes. Ready for new edits.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).not.toBeInTheDocument();
 
 		rerender(
 			<DistributedEditingStatusSurface
@@ -11019,12 +10977,16 @@ describe( 'DistributedEditingStatusSurface', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Saved' ) ).toBeVisible();
 		expect(
-			screen.getByText(
+			screen.queryByText(
 				'WordPress saved the merged edits. Ready for new edits.'
 			)
-		).toBeVisible();
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'region', {
+				name: 'Distributed editing status',
+			} )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'renders guarded retry-save stale and tampered rejection states', () => {

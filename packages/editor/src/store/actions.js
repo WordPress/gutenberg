@@ -6149,6 +6149,11 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 		const requestAcceptedProofServerVersion =
 			options.acceptedProofServerVersion ??
 			currentSessionState.serverVersion;
+		const requestSessionKey =
+			options.sessionKey ||
+			( currentSessionState.presenceHeartbeatAttributionKey
+				? getDistributedEditingPresenceSessionKey()
+				: null );
 		let blockIdentityRequestProof = options.blockIdentityRequestProof;
 		let automergeClientUpdate = options.automergeClientUpdate;
 
@@ -6296,6 +6301,11 @@ export const __experimentalSaveDistributedEditingRetryAfterProof =
 			acceptedFreshReviewConsumeValidation,
 			blockIdentityRequestProof,
 			automergeClientUpdate,
+			...( requestSessionKey
+				? {
+						sessionKey: requestSessionKey,
+				  }
+				: {} ),
 		};
 
 		dispatch.setDistributedEditingSessionState(

@@ -707,6 +707,7 @@ export function __experimentalRequestDistributedEditingHistoryPlan( {
  * @param {Object}  [args.acceptedFreshReviewConsumeValidation]  Hash-only fresh-review consume validation evidence.
  * @param {Object}  [args.blockIdentityRequestProof]             Content-free block identity request proof.
  * @param {Object}  [args.automergeClientUpdate]                 Native PHP Automerge update evidence.
+ * @param {string}  [args.sessionKey]                            Opaque editor session key for server-owned authorship attribution.
  *
  * @return {Promise<Object>} REST response or error.
  */
@@ -727,6 +728,7 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 	acceptedFreshReviewConsumeValidation,
 	blockIdentityRequestProof,
 	automergeClientUpdate,
+	sessionKey,
 } = {} ) {
 	const data = {
 		client_base_version: clientBaseVersion,
@@ -782,6 +784,10 @@ export function __experimentalRequestDistributedEditingRetrySave( {
 
 	if ( normalizedAutomergeClientUpdate ) {
 		data.automerge_client_update = normalizedAutomergeClientUpdate;
+	}
+
+	if ( typeof sessionKey === 'string' && sessionKey.trim() ) {
+		data.session_key = sessionKey.trim();
 	}
 
 	return apiFetch( {

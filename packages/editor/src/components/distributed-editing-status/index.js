@@ -1457,8 +1457,11 @@ export function DistributedEditingStatusSurface( {
 	onAction,
 	placement = 'standalone-status-surface',
 } ) {
-	const statusItems =
-		getDistributedEditingStatusSurfaceItems( noticeDescriptors );
+	const statusItems = getDistributedEditingStatusSurfaceItems(
+		noticeDescriptors
+	).filter(
+		( item ) => ! shouldSuppressConfirmedRetrySaveStatusNotice( item )
+	);
 	const confirmedSaveStatusItems = statusItems.filter(
 		isConfirmedRetrySaveStatusItem
 	);
@@ -5527,6 +5530,7 @@ export function DistributedEditingPresenceRoster( {
 		__experimentalRefreshDistributedEditingPresenceSnapshot,
 		__experimentalRefreshDistributedEditingPresenceStorageReadiness,
 		__experimentalSendDistributedEditingPresenceHeartbeat,
+		updateDistributedEditingSessionState,
 	} = distributedEditingDispatch;
 	const [ commandStatus, setCommandStatus ] = useState( 'idle' );
 	const [ heartbeatCommandStatus, setHeartbeatCommandStatus ] =
@@ -5573,6 +5577,35 @@ export function DistributedEditingPresenceRoster( {
 	const startupHeartbeatRuntimeSentRef = useRef( false );
 	const startupSnapshotRuntimeKeyRef = useRef( null );
 	const startupSnapshotRuntimeSentRef = useRef( false );
+	const setAuthorshipFocusEntry = useCallback(
+		( entry ) => {
+			updateDistributedEditingSessionState?.( {
+				authorshipFocusAttributionKey: entry?.attributionKey || null,
+				authorshipFocusPresenceEntryKey: entry?.key || null,
+				authorshipFocusDisplayName:
+					entry?.displayName ||
+					getPresenceRosterEntryDisplayName( entry ) ||
+					null,
+				authorshipFocusActive: Boolean( entry?.attributionKey ),
+			} );
+		},
+		[ updateDistributedEditingSessionState ]
+	);
+	const clearAuthorshipFocusEntry = useCallback(
+		( options = {} ) => {
+			if ( pinnedPresenceEntryKey && ! options.force ) {
+				return;
+			}
+
+			updateDistributedEditingSessionState?.( {
+				authorshipFocusAttributionKey: null,
+				authorshipFocusPresenceEntryKey: null,
+				authorshipFocusDisplayName: null,
+				authorshipFocusActive: false,
+			} );
+		},
+		[ pinnedPresenceEntryKey, updateDistributedEditingSessionState ]
+	);
 	const presenceEditorContentState = useSelect( ( select ) => {
 		const { getCurrentPost, getEditedPostContent } = select( editorStore );
 		const currentPost = getCurrentPost?.() || {};
@@ -7072,6 +7105,9 @@ export function DistributedEditingPresenceRoster( {
 								data-distributed-editing-presence-row-tooltip-pinned={ formatDataBoolean(
 									isPinned
 								) }
+								data-distributed-editing-presence-row-authorship-focus-available={ formatDataBoolean(
+									Boolean( entry.authorshipFocusAvailable )
+								) }
 								data-distributed-editing-presence-row-treatment="compact-status-badge"
 								data-distributed-editing-presence-row-visual-treatment="subtle-status-stripe"
 								data-distributed-editing-presence-row-visual-treatment-color-only="false"
@@ -7079,6 +7115,9 @@ export function DistributedEditingPresenceRoster( {
 								key={ entry.key }
 								onMouseEnter={ () => {
 									setHoveredPresenceEntryKey( entry.key );
+									if ( ! pinnedPresenceEntryKey ) {
+										setAuthorshipFocusEntry( entry );
+									}
 								} }
 								onMouseLeave={ () => {
 									if (
@@ -7090,6 +7129,7 @@ export function DistributedEditingPresenceRoster( {
 													? null
 													: currentKey
 										);
+										clearAuthorshipFocusEntry();
 									}
 								} }
 							>
@@ -7113,12 +7153,17 @@ export function DistributedEditingPresenceRoster( {
 									data-distributed-editing-presence-avatar-button="true"
 									onClick={ ( event ) => {
 										event.preventDefault();
-										setPinnedPresenceEntryKey(
-											( currentKey ) =>
-												currentKey === entry.key
-													? null
-													: entry.key
-										);
+										if ( isPinned ) {
+											setPinnedPresenceEntryKey( null );
+											clearAuthorshipFocusEntry( {
+												force: true,
+											} );
+										} else {
+											setPinnedPresenceEntryKey(
+												entry.key
+											);
+											setAuthorshipFocusEntry( entry );
+										}
 										setHoveredPresenceEntryKey( null );
 									} }
 									onBlur={ () => {
@@ -7131,10 +7176,14 @@ export function DistributedEditingPresenceRoster( {
 														? null
 														: currentKey
 											);
+											clearAuthorshipFocusEntry();
 										}
 									} }
 									onFocus={ () => {
 										setHoveredPresenceEntryKey( entry.key );
+										if ( ! pinnedPresenceEntryKey ) {
+											setAuthorshipFocusEntry( entry );
+										}
 									} }
 									type="button"
 								>
@@ -8305,6 +8354,15 @@ function getDistributedEditingStatusSurfaceItem( descriptor ) {
 				freshReviewLifecycleAction:
 					descriptor.freshReviewLifecycleAction ||
 					descriptor.freshReviewDecisionLifecycleAction,
+				actionTranscriptItemCount: descriptor.actionTranscriptItemCount,
+				actionTranscriptLatestEventType:
+					descriptor.actionTranscriptLatestEventType,
+				actionTranscriptLatestEventSource:
+					descriptor.actionTranscriptLatestEventSource,
+				actionTranscriptEntriesRedacted:
+					descriptor.actionTranscriptEntriesRedacted,
+				actionTranscriptSupportReport:
+					descriptor.actionTranscriptSupportReport,
 			};
 		case DISTRIBUTED_EDITING_NOTICE_KINDS.LOCAL_UPDATES_IMPORT_BLOCKED:
 			return {
@@ -8431,6 +8489,14 @@ function isConfirmedRetrySaveStatusItem( item ) {
 	);
 }
 
+function shouldSuppressConfirmedRetrySaveStatusNotice( item ) {
+	return (
+		isConfirmedRetrySaveStatusItem( item ) &&
+		! item?.actionTranscriptLatestEventType &&
+		! isRetrySaveFreshReviewRetrySaveItem( item )
+	);
+}
+
 function getQuietedConfirmedSaveStatusMessage( item ) {
 	if ( isRetrySaveFreshReviewRetrySaveItem( item ) ) {
 		return __(
@@ -8518,6 +8584,16 @@ function getPendingChangesMessage( descriptor ) {
 }
 
 function getPendingChangesStatusText( descriptor ) {
+	if (
+		descriptor.retrySaveStatus ===
+		DISTRIBUTED_EDITING_RETRY_SAVE_STATUSES.SAVING
+	) {
+		return {
+			title: __( 'Saving' ),
+			message: getPendingChangesMessage( descriptor ),
+		};
+	}
+
 	if ( isConflictResolutionProofAccepted( descriptor ) ) {
 		const savePrepared =
 			descriptor.retrySubmitSaveStatus ===
@@ -8550,7 +8626,7 @@ function getPendingChangesStatusText( descriptor ) {
 	}
 
 	return {
-		title: __( 'Changes pending' ),
+		title: __( 'Save needed' ),
 		message: getPendingChangesMessage( descriptor ),
 	};
 }

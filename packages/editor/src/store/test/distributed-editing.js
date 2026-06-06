@@ -10104,7 +10104,7 @@ describe( 'distributed editing session state', () => {
 			reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.SERVER_STATE_REFETCH_REQUIRED,
 			source: 'retry_save',
 			label: 'Save',
-			statusText: 'WordPress will get the latest post before saving.',
+			statusText: 'WordPress will check the current post before saving.',
 			clickAction:
 				DISTRIBUTED_EDITING_SAVE_POLICY_ACTIONS.REFETCH_SERVER_STATE,
 			requiresServerStateRefetch: true,
@@ -10119,10 +10119,9 @@ describe( 'distributed editing session state', () => {
 			authoritativePostState:
 				DISTRIBUTED_EDITING_SAVE_AUTHORITY_STATES.SERVER_REFRESH_REQUIRED_BEFORE_UPDATE,
 			saveStateSummaryText:
-				'Getting the latest post only refreshes server state; protected local changes stay in this editor until a later Save is confirmed.',
+				'Save will check WordPress before updating; protected local changes stay in this editor until Save is confirmed.',
 			actionKeys: [
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 			],
 			shouldCallNormalSavePost: false,
 			shouldCallRetrySaveEndpoint: false,
@@ -10145,7 +10144,6 @@ describe( 'distributed editing session state', () => {
 			saveButtonSource: 'retry_save',
 			saveButtonActionKeys: [
 				DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
-				DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 			],
 			claimsSaved: false,
 		} );
@@ -10738,7 +10736,7 @@ describe( 'distributed editing session state', () => {
 
 		expect( sessionState ).toMatchObject( {
 			hasPendingChanges: true,
-			isAwaitingServerConfirmation: true,
+			isAwaitingServerConfirmation: false,
 			requiresServerStateRefetch: true,
 			mustOfferLocalCopy: true,
 			canExportLocalUpdates: true,
@@ -10763,6 +10761,65 @@ describe( 'distributed editing session state', () => {
 						DISTRIBUTED_EDITING_NOTICE_ACTIONS.EXPORT_LOCAL_UPDATES,
 						DISTRIBUTED_EDITING_NOTICE_ACTIONS.REFETCH_SERVER_STATE,
 					],
+				} ),
+			] )
+		);
+		expect( notices ).not.toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES,
+				} ),
+			] )
+		);
+	} );
+
+	it( 'does not present a blocked retry-save policy as awaiting WordPress confirmation', () => {
+		const sessionState =
+			getDistributedEditingSessionStateForRetrySaveHandoff(
+				{
+					clientBaseVersion: '4',
+					serverVersion: '4',
+					pendingChangeCount: 1,
+					hasPendingChanges: true,
+				},
+				{
+					status: DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					reason: DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+					policy: {
+						protectsLocalChanges: true,
+						requiresServerStateRefetch: false,
+					},
+				}
+			);
+		const notices =
+			getDistributedEditingNoticeDescriptorsForSessionState(
+				sessionState
+			);
+
+		expect( sessionState ).toMatchObject( {
+			hasPendingChanges: true,
+			isAwaitingServerConfirmation: false,
+			requiresServerStateRefetch: false,
+			retrySaveHandoffStatus:
+				DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+			retrySaveHandoffReason:
+				DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+		} );
+		expect( notices ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.RETRY_SAVE,
+					retrySaveHandoffStatus:
+						DISTRIBUTED_EDITING_RETRY_SAVE_HANDOFF_STATUSES.RETRY_SAVE_BLOCKED,
+					retrySaveHandoffReason:
+						DISTRIBUTED_EDITING_RETRY_SAVE_POLICY_REASONS.RETRY_SUBMIT_PROOF_NOT_ACCEPTED,
+				} ),
+			] )
+		);
+		expect( notices ).not.toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					kind: DISTRIBUTED_EDITING_NOTICE_KINDS.PENDING_CHANGES,
 				} ),
 			] )
 		);

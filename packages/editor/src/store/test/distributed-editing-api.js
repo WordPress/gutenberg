@@ -1023,6 +1023,47 @@ describe( 'distributed editing REST helpers', () => {
 		} );
 	} );
 
+	it( 'requests retry-save with an opaque session key for authorship attribution', async () => {
+		const proposedPostContent =
+			'<!-- wp:paragraph --><p>Session-attributed edit.</p><!-- /wp:paragraph -->';
+
+		apiFetch.setFetchHandler( async ( options ) => {
+			expect( options.path ).toMatch(
+				/^\/wp\/v2\/posts\/42\/distributed-editing\/retry-save/
+			);
+			expect( options.method ).toBe( 'POST' );
+			expect( options.data ).toMatchObject( {
+				client_base_version: '12',
+				accepted_proof_server_version: '12',
+				proposed_post_content: proposedPostContent,
+				session_key: 'turn-authorship-focus-session',
+			} );
+			expect( JSON.stringify( options.data ) ).not.toMatch(
+				/rawSessionKey|userId|email|login/
+			);
+
+			return {
+				result: 'retry_save_applied',
+				retry_save_accepted: true,
+				attribution_key: 'presence:abc123def456abc123def456',
+			};
+		} );
+
+		await expect(
+			__experimentalRequestDistributedEditingRetrySave( {
+				postId: 42,
+				clientBaseVersion: '12',
+				acceptedProofServerVersion: '12',
+				proposedPostContent,
+				sessionKey: 'turn-authorship-focus-session',
+			} )
+		).resolves.toEqual( {
+			result: 'retry_save_applied',
+			retry_save_accepted: true,
+			attribution_key: 'presence:abc123def456abc123def456',
+		} );
+	} );
+
 	it( 'requests retry-save with block-native RichText content update evidence', async () => {
 		const proposedPostContent =
 			'<!-- wp:paragraph --><p>The silver river meets the quiet forest.</p><!-- /wp:paragraph -->';
