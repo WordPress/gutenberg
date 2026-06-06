@@ -125,6 +125,85 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that background-image reset is added when a state sets a solid background-color.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_background_resets
+	 */
+	public function test_adds_background_image_reset_for_solid_background_color() {
+		$actual = gutenberg_get_state_declarations_with_background_resets(
+			array(
+				'background-color' => '#ff0000 !important',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'background-color' => '#ff0000 !important',
+				'background-image' => 'none !important',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that background-image reset is not added when the state also sets a legacy gradient.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_background_resets
+	 */
+	public function test_no_background_image_reset_when_state_sets_legacy_gradient() {
+		$actual = gutenberg_get_state_declarations_with_background_resets(
+			array(
+				'background-color' => '#ff0000 !important',
+				'background'       => 'linear-gradient(135deg, #ff0000, #0000ff) !important',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'background-color' => '#ff0000 !important',
+				'background'       => 'linear-gradient(135deg, #ff0000, #0000ff) !important',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that background-image reset is not added when the state also sets a modern gradient.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_background_resets
+	 */
+	public function test_no_background_image_reset_when_state_sets_modern_gradient() {
+		$actual = gutenberg_get_state_declarations_with_background_resets(
+			array(
+				'background-color' => '#ff0000 !important',
+				'background-image' => 'linear-gradient(135deg, #ff0000, #0000ff) !important',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'background-color' => '#ff0000 !important',
+				'background-image' => 'linear-gradient(135deg, #ff0000, #0000ff) !important',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that declarations without background-color are returned unchanged.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_background_resets
+	 */
+	public function test_no_background_reset_when_no_background_color() {
+		$input  = array(
+			'color' => '#ff0000 !important',
+		);
+		$actual = gutenberg_get_state_declarations_with_background_resets( $input );
+
+		$this->assertSame( $input, $actual );
+	}
+
+	/**
 	 * Tests that fallback dimension styles are added for aspect ratio.
 	 *
 	 * @covers ::gutenberg_get_state_style_with_fallback_dimension_styles
