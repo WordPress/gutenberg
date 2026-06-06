@@ -19,3 +19,63 @@
 		display: block;
 	}
 }
+
+// Inline display layout.
+.wp-block-categories-inline {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0;
+
+	.wp-block-categories__inline-item {
+		display: inline;
+	}
+
+	.wp-block-categories__inline-delimiter {
+		margin: 0 0.25em;
+	}
+}
+
+// Tag style block style (pill/chip style).
+:root :where(.wp-block-categories.is-style-tag) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5ch;
+
+	a {
+		display: inline-block;
+		padding: 0.25em 0.75em;
+		border: 1px solid currentColor;
+		border-radius: 2px;
+		text-decoration: none;
+		transition: transform 0.15s ease-in-out;
+
+		&:hover,
+		&:focus {
+			transform: translateY(-2px);
+		}
+	}
+
+	span {
+		margin-left: 0.5em;
+	}
+}
+
+// Tag style for inline layout.
+:root :where(.wp-block-categories-inline.is-style-tag) {
+	gap: 0.5ch;
+
+	.wp-block-categories__inline-item a {
+		display: inline-block;
+		padding: 0.25em 0.75em;
+		border: 1px solid currentColor;
+		border-radius: 2px;
+		text-decoration: none;
+		transition: transform 0.15s ease-in-out;
+
+		&:hover,
+		&:focus {
+			transform: translateY(-2px);
+		}
+	}
+}

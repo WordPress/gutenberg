@@ -36,7 +36,9 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$args['parent'] = 0;
 	}
 
-	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
+	$display_layout = isset( $attributes['displayLayout'] ) ? $attributes['displayLayout'] : 'list';
+
+	if ( 'dropdown' === $display_layout ) {
 		$id                       = 'wp-block-categories-' . $block_id;
 		$args['id']               = $id;
 		$args['name']             = $taxonomy->query_var;
@@ -65,6 +67,59 @@ function render_block_core_categories( $attributes, $content, $block ) {
 				$items_markup,
 				1
 			);
+		}
+	} elseif ( 'inline' === $display_layout ) {
+		$args['show_option_none'] = $taxonomy->labels->no_terms;
+		$args['title_li']         = '';
+		$args['style']            = 'none';
+
+		$delimiter = isset( $attributes['delimiter'] ) ? $attributes['delimiter'] : 'comma';
+		$delimiter_chars = array(
+			'comma' => ', ',
+			'dot'   => ' · ',
+			'pipe'  => ' | ',
+			'slash' => ' / ',
+		);
+		
+		if ( 'custom' === $delimiter ) {
+			$custom_delimiter = isset( $attributes['customDelimiter'] ) ? $attributes['customDelimiter'] : '';
+			$delimiter_char = $custom_delimiter ? $custom_delimiter : ', ';
+		} else {
+			$delimiter_char = isset( $delimiter_chars[ $delimiter ] ) ? $delimiter_chars[ $delimiter ] : ', ';
+		}
+
+		$categories = get_categories( $args );
+		$items_markup = '';
+
+		if ( ! empty( $categories ) ) {
+			$items = array();
+			foreach ( $categories as $category ) {
+				$link = get_term_link( $category );
+				if ( is_wp_error( $link ) ) {
+					continue;
+				}
+				$item = '<span class="wp-block-categories__inline-item"><a href="' . esc_url( $link ) . '">' . esc_html( $category->name ) . '</a>';
+				if ( ! empty( $attributes['showPostCounts'] ) ) {
+					$item .= ' (' . esc_html( $category->count ) . ')';
+				}
+				$item .= '</span>';
+				$items[] = $item;
+			}
+			$delimiter_markup = '<span class="wp-block-categories__inline-delimiter" aria-hidden="true">' . esc_html( trim( $delimiter_char ) ) . '</span>';
+			$items_markup = implode( $delimiter_markup, $items );
+		} else {
+			$items_markup = esc_html( $taxonomy->labels->no_terms );
+		}
+
+		$wrapper_markup = '<div %1$s>%2$s</div>';
+		$type           = 'inline';
+
+		if ( ! empty( $block->context['enhancedPagination'] ) ) {
+			$p = new WP_HTML_Tag_Processor( $items_markup );
+			while ( $p->next_tag( 'a' ) ) {
+				$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
+			}
+			$items_markup = $p->get_updated_html();
 		}
 	} else {
 		$args['show_option_none'] = $taxonomy->labels->no_terms;
