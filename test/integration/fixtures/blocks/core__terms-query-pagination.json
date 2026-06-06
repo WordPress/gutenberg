@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/terms-query-pagination",
+		"isValid": true,
+		"attributes": {
+			"paginationArrow": "none",
+			"showLabel": true
+		},
+		"innerBlocks": []
+	}
+]

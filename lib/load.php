@@ -131,6 +131,7 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/admin-bar-in-editor/load.php';
