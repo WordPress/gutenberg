@@ -120,7 +120,7 @@ make disabled elements still accessible via keyboard.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -245,7 +245,7 @@ The contents of the menu item's prefix, such as an icon.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -329,14 +329,14 @@ The radio item's name.
 
 ##### `onChange`
 
- - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement, Element>) => void>`
+ - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement>) => void>`
  - Required: No
 
 A function that is called when the checkbox's checked state changes.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -427,14 +427,14 @@ The checkbox menu item's name.
 
 ##### `onChange`
 
- - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement>`
+ - Type: `ChangeEventHandler<HTMLInputElement>`
  - Required: No
 
 A function that is called when the checkbox's checked state changes.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
@@ -575,7 +575,7 @@ The contents of the menu item's prefix, such as an icon.
 
 ##### `render`
 
- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
  - Required: No
 
 Allows the component to be rendered as a different HTML element or React
