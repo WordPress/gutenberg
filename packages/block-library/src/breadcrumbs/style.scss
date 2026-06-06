@@ -27,4 +27,10 @@
 	span {
 		color: inherit;
 	}
+
+	&.has-trailing-separator li:last-child::after {
+		content: var(--separator, "/") / "";
+		margin: 0 0.5em;
+		opacity: 0.7;
+	}
 }
