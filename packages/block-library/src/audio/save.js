@@ -8,11 +8,13 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { autoplay, caption, loop, preload, src } = attributes;
+	const { autoplay, caption, loop, preload, src, transcript } = attributes;
+
+	const displayCaption = ! RichText.isEmpty( caption );
 
 	return (
-		src && (
-			<figure { ...useBlockProps.save() }>
+		<figure { ...useBlockProps.save() }>
+			{ src && (
 				<audio
 					controls="controls"
 					src={ src }
@@ -20,16 +22,21 @@ export default function save( { attributes } ) {
 					loop={ loop }
 					preload={ preload }
 				/>
-				{ ! RichText.isEmpty( caption ) && (
-					<RichText.Content
-						tagName="figcaption"
-						value={ caption }
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-					/>
-				) }
-			</figure>
-		)
+			) }
+			{ displayCaption && (
+				<RichText.Content
+					tagName="figcaption"
+					value={ caption }
+					className={ __experimentalGetElementClassName( 'caption' ) }
+				/>
+			) }
+			{ ! RichText.isEmpty( transcript ) && (
+				<RichText.Content
+					tagName="p"
+					className="wp-block-audio__transcript-text"
+					value={ transcript }
+				/>
+			) }
+		</figure>
 	);
 }
