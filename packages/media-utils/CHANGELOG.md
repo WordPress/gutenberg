@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
--   `MediaUpload`: Fix `allowedTypes` being ignored when `gallery` prop is `true` ([#53619](https://github.com/WordPress/gutenberg/issues/53619)).
+-   `MediaUpload`: Fix `allowedTypes` being ignored when `gallery` prop is `true` ([#78257](https://github.com/WordPress/gutenberg/pull/78257)).
 
 ## 5.51.0 (2026-07-14)
 
