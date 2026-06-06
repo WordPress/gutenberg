@@ -6,6 +6,10 @@
 
 - Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 
+### Enhancements
+
+-   DataViewsPicker: Add a new `pickerActivity` layout that renders selectable items as a vertical activity timeline. [#78941](https://github.com/WordPress/gutenberg/pull/78941)
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).

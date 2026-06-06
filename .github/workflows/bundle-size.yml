@@ -64,6 +64,7 @@ jobs:
 
             - uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2.9.1
               with:
+                  omit-unchanged: true
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'
                   pattern: '{build/scripts/**/*.min.js,build/styles/**/*.css,build/modules/**/*.min.js}'
                   clean-script: 'distclean'

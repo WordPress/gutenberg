@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import path from 'path';
+import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
@@ -9,6 +10,10 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
+
+// Resolve vendor packages from this workspace, instead of root.
+const WORKSPACE_DIR = path.resolve( __dirname, '..' );
+const require = createRequire( path.join( WORKSPACE_DIR, 'package.json' ) );
 
 const VENDOR_SCRIPTS = [
 	{
@@ -52,12 +57,7 @@ const VENDOR_SCRIPTS = [
  * @return {Promise<string>} The package version string.
  */
 async function getPackageVersion( packageName ) {
-	const packageJsonPath = path.join(
-		ROOT_DIR,
-		'node_modules',
-		packageName,
-		'package.json'
-	);
+	const packageJsonPath = require.resolve( `${ packageName }/package.json` );
 	const packageJson = JSON.parse(
 		await readFile( packageJsonPath, 'utf-8' )
 	);
@@ -133,6 +133,8 @@ async function bundleVendorScript( config ) {
 		globalName: global,
 		target: 'esnext',
 		platform: 'browser',
+		// Resolve imports from this workspace's dependencies.
+		absWorkingDir: WORKSPACE_DIR,
 		plugins: dependencies?.includes( 'react' )
 			? [ reactExternalPlugin ]
 			: [],
@@ -141,7 +143,7 @@ async function bundleVendorScript( config ) {
 	if ( contents ) {
 		esbuildOptions.stdin = {
 			contents,
-			resolveDir: ROOT_DIR,
+			resolveDir: WORKSPACE_DIR,
 			loader: 'js',
 		};
 	} else {
