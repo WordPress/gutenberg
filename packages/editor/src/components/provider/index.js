@@ -469,7 +469,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									</>
 								) }
 							</SuggestionOverlayProvider>
-
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>
