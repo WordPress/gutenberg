@@ -24,9 +24,9 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
-import { useGlobalStylesContext } from '../global-styles-provider';
+import { useGlobalStyles } from '../global-styles';
 import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
-import { getNoteIdsFromMetadata } from './utils';
+import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -78,63 +78,19 @@ function NotesSidebar( { postId } ) {
 			( unresolvedNotes.length > 0 || selectedNote !== undefined )
 	);
 
-	useShortcut(
-		'core/editor/new-note',
-		( event ) => {
-			event.preventDefault();
-			openTheSidebar();
-		},
-		{
-			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
-		}
-	);
-
-	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStylesContext();
-	const backgroundColor = GlobalStyles?.styles?.color?.background;
-
-	// Find threads for the selected block. Blocks can carry multiple note IDs,
-	// so gather all matching threads and surface the most relevant one
-	// (first unresolved, else first) for UI interactions like avatars.
-	const currentThreads =
-		blockNoteIds.length > 0
-			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
-			: [];
-	const currentThread =
-		currentThreads.find( ( thread ) => thread.status === 'hold' ) ??
-		currentThreads[ 0 ] ??
-		null;
-
-	async function openTheSidebar( {
-		addNewNote = false,
-		clientId: explicitClientId,
-	} = {} ) {
-		// `AddNoteMenuItem` (a slot fill rendered per block in the List
-		// View row menus) passes the row's clientId, which may differ
-		// from the canvas selection. Fall back to the canvas selection
-		// for the keyboard shortcut and avatar indicator paths.
-		const targetClientId = explicitClientId ?? clientId;
+	async function focusNote( {
+		targetClientId,
+		noteId: targetNoteId,
+		isApproved,
+	} ) {
 		if ( ! targetClientId ) {
 			return;
 		}
 
-		// Look up threads for the target block directly so the List View
-		// path resolves the right notes even when the canvas selection
-		// is somewhere else.
-		const targetThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
-		);
-		const targetThread =
-			targetThreads.find( ( thread ) => thread.status === 'hold' ) ??
-			targetThreads[ 0 ] ??
-			null;
-
 		const prevArea = await getActiveComplementaryArea( 'core' );
-		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
-
-		if ( targetThread?.status === 'approved' && ! addNewNote ) {
+		if ( isApproved ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
-		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
+		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
 			enableComplementaryArea(
 				'core',
 				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
@@ -147,18 +103,56 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		// When addNewNote is true, always open the new note form.
-		// Otherwise, select the existing thread or open new.
-		const shouldAddNew = addNewNote || ! targetThread;
 		// A special case for the List View, where block selection isn't
 		// required to trigger the action. The action is a no-op when the
 		// block is already selected.
 		selectBlock( targetClientId, null );
 		toggleBlockSpotlight( targetClientId, true );
-		selectNote( shouldAddNew ? 'new' : targetThread.id, {
-			focus: true,
+		selectNote( targetNoteId, { focus: true } );
+	}
+
+	function openNoteForBlock( targetClientId ) {
+		// A block can carry multiple threads; surface the most relevant.
+		const blockThreads = notes.filter(
+			( thread ) => thread.blockClientId === targetClientId
+		);
+		const target = pickPrimaryNote( blockThreads );
+		return focusNote( {
+			targetClientId,
+			noteId: target?.id ?? 'new',
+			isApproved: target?.status === 'approved',
 		} );
 	}
+
+	function addNewNoteForBlock( targetClientId ) {
+		return focusNote( {
+			targetClientId,
+			noteId: 'new',
+			isApproved: false,
+		} );
+	}
+
+	useShortcut(
+		'core/editor/new-note',
+		( event ) => {
+			event.preventDefault();
+			addNewNoteForBlock( clientId );
+		},
+		{
+			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
+		}
+	);
+
+	// Get the global styles to set the background color of the sidebar.
+	const { merged: GlobalStyles } = useGlobalStyles();
+	const backgroundColor = GlobalStyles?.styles?.color?.background;
+
+	// Surface one thread for the avatar indicator.
+	const currentThreads =
+		blockNoteIds.length > 0
+			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
+			: [];
+	const currentThread = pickPrimaryNote( currentThreads );
 
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
@@ -169,15 +163,12 @@ function NotesSidebar( { postId } ) {
 			{ !! currentThread && (
 				<NoteAvatarIndicator
 					note={ currentThread }
-					onClick={ () => openTheSidebar() }
+					onClick={ () => openNoteForBlock( clientId ) }
 				/>
 			) }
 			<AddNoteMenuItem
 				onClick={ ( menuClientId ) =>
-					openTheSidebar( {
-						addNewNote: true,
-						clientId: menuClientId,
-					} )
+					addNewNoteForBlock( menuClientId )
 				}
 			/>
 			{ showAllNotesSidebar && (

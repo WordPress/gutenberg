@@ -15,7 +15,11 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread, getNoteIdsFromMetadata } from './utils';
+import {
+	focusNoteThread,
+	getNoteIdsFromMetadata,
+	pickPrimaryNote,
+} from './utils';
 import { useFloatingBoard, useNoteActions } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
@@ -50,10 +54,6 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			};
 		},
 		[]
-	);
-	const blockNoteIds = useMemo(
-		() => getNoteIdsFromMetadata( { noteId } ),
-		[ noteId ]
 	);
 	const { selectedNote, noteFocused } = useSelect( ( select ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
@@ -132,43 +132,28 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
-	// Pick the most relevant thread for the selected block: first
-	// unresolved, else first matching. Derived outside the effect so the
-	// effect body stays minimal.
+	// Pick the most relevant thread for the selected block. Derived outside
+	// the effect so the effect body stays minimal.
 	const targetNoteId = useMemo( () => {
-		if ( blockNoteIds.length === 0 ) {
-			return undefined;
-		}
-		const unresolved = notes.find(
-			( thread ) =>
-				blockNoteIds.includes( thread.id ) && thread.status === 'hold'
+		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
+		const blockThreads = notes.filter( ( t ) =>
+			blockNoteIds.includes( t.id )
 		);
-		const first = notes.find( ( thread ) =>
-			blockNoteIds.includes( thread.id )
-		);
-		return unresolved?.id ?? first?.id;
-	}, [ blockNoteIds, notes ] );
+		return pickPrimaryNote( blockThreads )?.id;
+	}, [ noteId, notes ] );
 
-	// Auto-select the related note thread when the block context changes
-	// (block selection or note metadata). Read selectedNote via a ref so
-	// that an explicit user collapse — selectNote( undefined ) — doesn't
-	// retrigger the effect and immediately re-select the same thread.
-	const selectedNoteRef = useRef( selectedNote );
+	// Sync the selected note to the new block's primary thread when the
+	// block context changes. The ref tracks the previous block id so the
+	// effect only fires on block transitions, leaving in-block note changes
+	// (Escape, Cancel, "new" form) alone.
+	const prevBlockIdRef = useRef( selectedBlockClientId );
 	useEffect( () => {
-		selectedNoteRef.current = selectedNote;
-	}, [ selectedNote ] );
-	useEffect( () => {
-		const current = selectedNoteRef.current;
-		// Don't clobber an in-progress new note form.
-		if ( current === 'new' ) {
+		if ( prevBlockIdRef.current === selectedBlockClientId ) {
 			return;
 		}
-		// Preserve an explicit thread pick on the same block.
-		if ( typeof current === 'number' && blockNoteIds.includes( current ) ) {
-			return;
-		}
+		prevBlockIdRef.current = selectedBlockClientId;
 		selectNote( targetNoteId );
-	}, [ targetNoteId, blockNoteIds, selectNote ] );
+	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {

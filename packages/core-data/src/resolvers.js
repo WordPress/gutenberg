@@ -28,6 +28,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
+import { parsedBlocksCache, getCacheKey } from './parsed-blocks-cache';
 
 /**
  * Requests authors from the REST API.
@@ -180,6 +181,18 @@ export const getEntityRecord =
 							transientConfig.read( recordWithTransients );
 					} );
 
+				// Share the parsed blocks with `useEntityBlockEditor` so the
+				// editor doesn't re-parse the same `content` string.
+				if (
+					recordWithTransients.blocks &&
+					typeof recordWithTransients.content?.raw === 'string'
+				) {
+					parsedBlocksCache.set( getCacheKey( kind, name, key ), {
+						content: recordWithTransients.content.raw,
+						blocks: recordWithTransients.blocks,
+					} );
+				}
+
 				// Load the entity record for syncing. Do not await promise.
 				void getSyncManager()?.load(
 					entityConfig.syncConfig,
@@ -247,13 +260,19 @@ export const getEntityRecord =
 										return;
 									}
 
-									// Trigger a save to persist the CRDT document. The entity's
-									// pre-persist hooks will create the persisted CRDT document
-									// and apply it to the record's meta.
+									// Trigger a minimal save to persist the CRDT document. The
+									// entity's pre-persist hooks will create the persisted CRDT
+									// document and apply it to the record's meta.
+									const entityIdKey =
+										entityConfig.key || DEFAULT_ENTITY_KEY;
 									dispatch.saveEntityRecord(
 										kind,
 										name,
-										editedRecord
+										{
+											[ entityIdKey ]:
+												editedRecord[ entityIdKey ],
+										},
+										{ __unstableSkipSyncUpdate: true }
 									);
 								} );
 						},
@@ -267,6 +286,11 @@ export const getEntityRecord =
 									selectionHistory
 								);
 							}
+						},
+						onUndoStackChange: ( undoState ) => {
+							dispatch.__unstableNotifySyncUndoManagerChange(
+								undoState
+							);
 						},
 						restoreUndoMeta: ( ydoc, meta ) => {
 							const selectionHistory =
@@ -1013,10 +1037,14 @@ export const getDefaultTemplateId =
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
+	// Only invalidate on real saves; `persistedEdits` is absent on
+	// initial fetches so the kickoff's own site read doesn't wipe
+	// the just-resolved template id.
 	return (
 		action.type === 'RECEIVE_ITEMS' &&
 		action.kind === 'root' &&
-		action.name === 'site'
+		action.name === 'site' &&
+		!! action.persistedEdits
 	);
 };
 

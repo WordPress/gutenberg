@@ -64,19 +64,18 @@ export function useNoteThreads( postId ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
-		// Single pass over clientIds: build clientId->noteIds map AND reverse lookup.
-		// Blocks can carry multiple note IDs in their metadata, so the forward map
-		// stores arrays and the reverse map links each note back to its block.
+		// Single pass over clientIds builds the forward map and reverse lookup
+		// together. getNoteIdsFromMetadata returns numeric ids, matching the
+		// types returned by the comments REST endpoint.
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
 			if ( noteIds.length > 0 ) {
-				const keys = noteIds.map( ( id ) => String( id ) );
-				blocksWithNotes[ clientId ] = keys;
-				for ( const key of keys ) {
-					clientIdByNoteId.set( key, clientId );
+				blocksWithNotes[ clientId ] = noteIds;
+				for ( const noteId of noteIds ) {
+					clientIdByNoteId.set( noteId, clientId );
 				}
 			}
 		}
@@ -91,7 +90,7 @@ export function useNoteThreads( postId ) {
 				reply: [],
 				blockClientId:
 					item.parent === 0
-						? clientIdByNoteId.get( String( item.id ) ) ?? null
+						? clientIdByNoteId.get( item.id ) ?? null
 						: null,
 			};
 			threadsById.set( item.id, thread );
@@ -117,9 +116,7 @@ export function useNoteThreads( postId ) {
 		const resolved = [];
 		for ( const noteIds of Object.values( blocksWithNotes ) ) {
 			for ( const noteId of noteIds ) {
-				const thread =
-					threadsById.get( Number( noteId ) ) ??
-					threadsById.get( noteId );
+				const thread = threadsById.get( noteId );
 				if ( ! thread ) {
 					continue;
 				}

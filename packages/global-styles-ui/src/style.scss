@@ -73,6 +73,8 @@
 .global-styles-ui-header {
 	// Need to override the too specific bottom margin for complementary areas.
 	margin-bottom: 0 !important;
+	// Ensure header text is centred with the back button.
+	line-height: 1.9 !important;
 }
 
 .global-styles-ui-subtitle {
@@ -186,27 +188,23 @@
 	flex-direction: column;
 	margin: 16px;
 
-	.components-v-stack {
+	.block-editor-global-styles-advanced-panel {
 		flex: 1 1 auto;
+	}
 
-		.block-editor-global-styles-advanced-panel__custom-css-input {
+	.block-editor-global-styles-advanced-panel__custom-css-input {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+
+		.components-base-control__field {
 			flex: 1 1 auto;
 			display: flex;
 			flex-direction: column;
+		}
 
-			.components-base-control__field {
-				flex: 1 1 auto;
-				display: flex;
-				flex-direction: column;
-
-				.components-textarea-control__input {
-					flex: 1 1 auto;
-					// CSS input is always LTR regardless of language.
-
-					/*rtl:ignore*/
-					direction: ltr;
-				}
-			}
+		textarea {
+			flex: 1 1 auto;
 		}
 	}
 }

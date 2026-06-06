@@ -280,7 +280,7 @@ _Parameters_
 
 _Returns_
 
--   `BlockType[]`: Block types that the blocks argument can be transformed to.
+-   `BlockTypeWithTransformMetadata[]`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -504,10 +504,18 @@ Undocumented declaration.
 
 Converts an HTML string to known blocks.
 
+_Usage_
+
+```js
+import { rawHandler } from '@wordpress/blocks';
+
+const blocks = rawHandler( { HTML: '<p>Hello</p><p>World</p>' } );
+```
+
 _Parameters_
 
--   _$1_ `{ HTML?: string; }`:
--   _$1.HTML_ `string`: The HTML to convert.
+-   _options_ `{ HTML?: string; }`: Options.
+-   _options.HTML_ `string`: The HTML to convert.
 
 _Returns_
 
@@ -607,7 +615,31 @@ _Parameters_
 
 ### registerBlockType
 
-Undocumented declaration.
+Registers a new block provided a unique name and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
+
+For more in-depth information on registering a custom block see the [Create a block tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
+
+_Usage_
+
+```js
+import { __ } from '@wordpress/i18n';
+import { registerBlockType } from '@wordpress/blocks';
+
+registerBlockType( 'namespace/block-name', {
+	title: __( 'My First Block' ),
+	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
+	save: () => <div>Hello from the saved content!</div>,
+} );
+```
+
+_Parameters_
+
+-   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
+-   _settings_ `Partial< SettingsBlockConfiguration< Attributes > >`: Block settings.
+
+_Returns_
+
+-   `BlockType | undefined`: The block, if it has been successfully registered; otherwise `undefined`.
 
 ### registerBlockVariation
 
@@ -794,6 +826,7 @@ _Parameters_
 
 -   _blocks_ `Block[] | Block`: Blocks array or block object.
 -   _name_ `string`: Block name.
+-   _variationName_ `string`: Optional target block variation name.
 
 _Returns_
 

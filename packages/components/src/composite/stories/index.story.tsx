@@ -49,7 +49,7 @@ const meta: Meta< typeof Composite > = {
 			canvas: { sourceState: 'shown' },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

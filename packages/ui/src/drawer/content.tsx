@@ -1,3 +1,4 @@
+import { mergeProps, useRender } from '@base-ui/react';
 import { Drawer as _Drawer } from '@base-ui/react/drawer';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
@@ -28,25 +29,36 @@ import type { ContentProps } from './types';
  * the popup (gated by the scroll edge on vertical drawers).
  */
 const Content = forwardRef< HTMLDivElement, ContentProps >(
-	function DrawerContent( { className, children, onScroll, ...props }, ref ) {
+	function DrawerContent(
+		{ className, render, children, onScroll, ...props },
+		ref
+	) {
 		const { ref: scrollStateRef, onScroll: scrollStateOnScroll } =
 			useOverlayScrollStateAttributes< HTMLDivElement >( onScroll );
 		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
 
-		return (
-			<div
-				ref={ mergedRef }
-				className={ clsx(
+		const element = useRender( {
+			defaultTagName: 'div',
+			render,
+			ref: mergedRef,
+			props: mergeProps< 'div' >( props, {
+				className: clsx(
 					styles.content,
 					focusStyles[ 'outset-ring--focus-visible' ],
 					className
-				) }
-				onScroll={ scrollStateOnScroll }
-				{ ...props }
-			>
-				<_Drawer.Content>{ children }</_Drawer.Content>
-			</div>
-		);
+				),
+				onScroll: scrollStateOnScroll,
+				// `_Drawer.Content` carries the `[data-drawer-content]`
+				// marker that Base UI's swipe-dismiss logic uses to skip
+				// mouse-drag swipes started inside the body, preserving
+				// text selection. It must sit *inside* the scroll
+				// container so the popup's edge padding gutter falls
+				// outside the marker and stays mouse-draggable.
+				children: <_Drawer.Content>{ children }</_Drawer.Content>,
+			} ),
+		} );
+
+		return element;
 	}
 );
 

@@ -6,6 +6,7 @@ import {
 	addNoteIdToMetadata,
 	removeNoteIdFromMetadata,
 	calculateNotePositions,
+	pickPrimaryNote,
 } from '../utils';
 
 function makeRect( top ) {
@@ -42,10 +43,14 @@ describe( 'getNoteIdsFromMetadata', () => {
 		expect( getNoteIdsFromMetadata( { noteId: 42 } ) ).toEqual( [ 42 ] );
 	} );
 
-	it( 'handles string noteId (legacy format)', () => {
-		expect( getNoteIdsFromMetadata( { noteId: '42' } ) ).toEqual( [
-			'42',
-		] );
+	it( 'coerces a string-typed legacy noteId to a number', () => {
+		expect( getNoteIdsFromMetadata( { noteId: '42' } ) ).toEqual( [ 42 ] );
+	} );
+
+	it( 'drops non-numeric and non-positive ids', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, 'abc', -3, 2 ] } )
+		).toEqual( [ 1, 2 ] );
 	} );
 
 	it( 'returns array from array noteId', () => {
@@ -70,6 +75,21 @@ describe( 'getNoteIdsFromMetadata', () => {
 		expect(
 			getNoteIdsFromMetadata( { noteId: [ null, undefined, 0, '' ] } )
 		).toEqual( [] );
+	} );
+
+	it( 'deduplicates repeated ids while preserving first occurrence order', () => {
+		expect( getNoteIdsFromMetadata( { noteId: [ 1, 1, 1 ] } ) ).toEqual( [
+			1,
+		] );
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, 2, 1, 3, 2 ] } )
+		).toEqual( [ 1, 2, 3 ] );
+	} );
+
+	it( 'deduplicates across numeric and string-typed duplicates', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, '1', 2, '2' ] } )
+		).toEqual( [ 1, 2 ] );
 	} );
 } );
 
@@ -192,6 +212,107 @@ describe( 'removeNoteIdFromMetadata', () => {
 	it( 'removes a string id when stored as a number in the array', () => {
 		const result = removeNoteIdFromMetadata( { noteId: [ 1, 2, 3 ] }, '2' );
 		expect( result.noteId ).toEqual( [ 1, 3 ] );
+	} );
+} );
+
+describe( 'note id order preservation', () => {
+	// The collab sidebar relies on insertion order: the first id in the
+	// metadata array is treated as the first (block-aligned) note, with
+	// subsequent notes stacking below. These tests pin that contract.
+	// See https://github.com/WordPress/gutenberg/issues/75145#issuecomment-4361104794
+
+	it( 'preserves insertion order across multiple sequential adds', () => {
+		let metadata = {};
+		metadata = addNoteIdToMetadata( metadata, 5 );
+		metadata = addNoteIdToMetadata( metadata, 3 );
+		metadata = addNoteIdToMetadata( metadata, 7 );
+		metadata = addNoteIdToMetadata( metadata, 1 );
+		expect( metadata.noteId ).toEqual( [ 5, 3, 7, 1 ] );
+	} );
+
+	it( 'does not sort or reorder ids when adding', () => {
+		// A naive implementation might sort numerically; this confirms it
+		// preserves the order the user added notes in.
+		const result = addNoteIdToMetadata( { noteId: [ 10, 2, 30 ] }, 4 );
+		expect( result.noteId ).toEqual( [ 10, 2, 30, 4 ] );
+	} );
+
+	it( 'keeps the first id first after appending more notes', () => {
+		let metadata = addNoteIdToMetadata( {}, 42 );
+		metadata = addNoteIdToMetadata( metadata, 99 );
+		metadata = addNoteIdToMetadata( metadata, 7 );
+		const ids = getNoteIdsFromMetadata( metadata );
+		expect( ids[ 0 ] ).toBe( 42 );
+	} );
+
+	it( 'preserves order of remaining ids after removing one from the middle', () => {
+		const result = removeNoteIdFromMetadata(
+			{ noteId: [ 1, 2, 3, 4, 5 ] },
+			3
+		);
+		expect( result.noteId ).toEqual( [ 1, 2, 4, 5 ] );
+	} );
+
+	it( 'preserves remaining ids in order after removing the first id', () => {
+		const result = removeNoteIdFromMetadata(
+			{ noteId: [ 1, 2, 3, 4 ] },
+			1
+		);
+		expect( result.noteId ).toEqual( [ 2, 3, 4 ] );
+	} );
+
+	it( 'preserves remaining ids in order after removing the last id', () => {
+		const result = removeNoteIdFromMetadata(
+			{ noteId: [ 1, 2, 3, 4 ] },
+			4
+		);
+		expect( result.noteId ).toEqual( [ 1, 2, 3 ] );
+	} );
+
+	it( 'preserves order across an interleaved sequence of adds and removes', () => {
+		let metadata = {};
+		metadata = addNoteIdToMetadata( metadata, 10 );
+		metadata = addNoteIdToMetadata( metadata, 20 );
+		metadata = addNoteIdToMetadata( metadata, 30 );
+		metadata = removeNoteIdFromMetadata( metadata, 20 );
+		metadata = addNoteIdToMetadata( metadata, 40 );
+		expect( metadata.noteId ).toEqual( [ 10, 30, 40 ] );
+	} );
+
+	it( 'preserves array order through a getNoteIdsFromMetadata round-trip', () => {
+		const ids = [ 9, 4, 7, 2, 11 ];
+		expect( getNoteIdsFromMetadata( { noteId: ids } ) ).toEqual( ids );
+	} );
+
+	it( 'keeps the legacy scalar id as the first id when migrating to an array', () => {
+		// When a legacy single-note post gains a second note, the original
+		// note must remain the block-aligned (first) note.
+		const result = addNoteIdToMetadata( { noteId: 42 }, 99 );
+		expect( result.noteId ).toEqual( [ 42, 99 ] );
+		expect( result.noteId[ 0 ] ).toBe( 42 );
+	} );
+} );
+
+describe( 'pickPrimaryNote', () => {
+	it( 'returns null for an empty list', () => {
+		expect( pickPrimaryNote( [] ) ).toBeNull();
+	} );
+
+	it( 'returns the first unresolved thread when one exists', () => {
+		const threads = [
+			{ id: 1, status: 'approved' },
+			{ id: 2, status: 'hold' },
+			{ id: 3, status: 'hold' },
+		];
+		expect( pickPrimaryNote( threads ) ).toBe( threads[ 1 ] );
+	} );
+
+	it( 'falls back to the first thread when none are unresolved', () => {
+		const threads = [
+			{ id: 1, status: 'approved' },
+			{ id: 2, status: 'approved' },
+		];
+		expect( pickPrimaryNote( threads ) ).toBe( threads[ 0 ] );
 	} );
 } );
 

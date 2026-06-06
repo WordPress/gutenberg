@@ -93,7 +93,7 @@ The argument of the callback is an object containing the following properties:
 
 ### onMediaUploadStateReset
 
-Callback called when the media upload is reset
+Callback called when the media upload is reset.
 
 -   Type: `Function`
 -   Required: No

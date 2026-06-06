@@ -76,8 +76,10 @@ function InlineEditButton( {
 				onClick={ handleClick }
 			>
 				{ editedContentOnlySection
-					? __( 'Exit pattern' )
-					: __( 'Edit pattern' ) }
+					? /* translators: Button label to leave pattern editing mode. */
+					  __( 'Exit pattern' )
+					: /* translators: Button label to enter pattern editing mode. */
+					  __( 'Edit pattern' ) }
 			</Button>
 		</VStack>
 	);

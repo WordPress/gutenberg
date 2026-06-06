@@ -50,6 +50,7 @@
 	 * inline-block so the link underline stays scoped to the text. */
 
 	.link-icon {
+		line-height: 1;
 		display: inline-block;
 		margin-inline-start: var(--wpds-dimension-padding-xs);
 		font-weight: var(--wpds-typography-font-weight-regular);

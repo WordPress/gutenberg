@@ -1,0 +1,46 @@
+{
+	"name": "@wordpress/release-tools",
+	"version": "0.0.0",
+	"description": "CLI tools for Gutenberg plugin release management, changelog generation, and npm publishing.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"release"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/release",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/release"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"bin": {
+		"release-cli": "./cli.js"
+	},
+	"dependencies": {
+		"@inquirer/prompts": "^7.2.0",
+		"@octokit/rest": "^16.26.0",
+		"chalk": "^4.1.1",
+		"commander": "^9.2.0",
+		"execa": "^4.0.2",
+		"fast-glob": "^3.2.7",
+		"node-fetch": "^2.7.0",
+		"rimraf": "^5.0.10",
+		"semver": "^7.5.4",
+		"simple-git": "^3.24.0",
+		"sprintf-js": "^1.1.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"cherry-pick": "node ./cherry-pick.mjs",
+		"generate-php-sync-issue": "node ./generate-php-sync-issue.mjs",
+		"log-performance-results": "node ./log-performance-results.js"
+	}
+}
