@@ -274,6 +274,19 @@ Every component stylesheet must include the layer definition at the top and wrap
 -   **`wp-ui-compositions`** - Internal compositions that extend base components
 -   **`wp-ui-overrides`** - Last-resort styles to override default rules
 
+A rule that overrides a primitive defined in another stylesheet (e.g. a shared class from `overlay-chrome.module.css`) must live in a **higher** layer than that primitive — typically `wp-ui-compositions`. Placing both in the same layer leaves the conflict to be resolved by `<style>` injection order, which is not deterministic and can flip when an unrelated component lazy-loads (its own copy of the shared stylesheet re-orders the tags). The layer hierarchy is what guarantees the override wins.
+
+When the override also `composes` the primitive it extends, keep the override in `wp-ui-compositions` (the `composes` does not change its layer) and let `composes` bind the two classes together so the base can never be applied without the override:
+
+```css
+@layer wp-ui-compositions {
+	.footer-column {
+		composes: footer from "../utils/css/overlay-chrome.module.css";
+		flex-direction: column;
+	}
+}
+```
+
 ### Custom Properties and State Styles
 
 When components expose CSS custom properties (variables) for theming or composition, care must be taken to separate **configurable values** from **state handling**. Getting this wrong can silently break styles when components are composed across CSS layers.

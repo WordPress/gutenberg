@@ -72,6 +72,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	} else {
 		await git.clone( source.url, source.clonePath, {
 			'--depth': '1',
+			'--filter': 'blob:none',
 			'--no-single-branch': null,
 		} );
 		await git.cwd( source.clonePath );

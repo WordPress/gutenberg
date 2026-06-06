@@ -45,7 +45,7 @@
 		"src/**/*.module.css"
 	],
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
@@ -55,8 +55,12 @@
 		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1"
 	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2"
+	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

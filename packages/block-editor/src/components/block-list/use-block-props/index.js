@@ -185,7 +185,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? true : undefined,
+		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: clsx(
 			'block-editor-block-list__block',
 			{

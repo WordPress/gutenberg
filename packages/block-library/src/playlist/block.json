@@ -37,6 +37,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"showTrackLength": {
+			"type": "boolean",
+			"default": true
+		},
 		"caption": {
 			"type": "string"
 		}

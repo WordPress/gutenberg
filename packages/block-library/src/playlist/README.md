@@ -29,6 +29,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `showImages` | `boolean` | `true` | — |
 | `showArtists` | `boolean` | `true` | — |
 | `showNumbers` | `boolean` | `true` | — |
+| `showTrackLength` | `boolean` | `true` | — |
 | `caption` | `string` | — | — |
 
 ## Supports
@@ -72,7 +73,7 @@ _Defined via the [`styles`](https://developer.wordpress.org/block-editor/referen
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:playlist {"type":"audio","order":"asc","showTracklist":true,"showImages":true,"showArtists":true,"showNumbers":true} -->
+<!-- wp:playlist {"type":"audio","order":"asc","showTracklist":true,"showImages":true,"showArtists":true,"showNumbers":true,"showTrackLength":true} -->
 <!-- Content... -->
 <!-- /wp:playlist -->
 ```
