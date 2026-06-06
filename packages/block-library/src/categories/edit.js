@@ -42,6 +42,7 @@ export default function CategoriesEdit( {
 		showEmpty,
 		label,
 		showLabel,
+		disableInlineScript,
 		taxonomy: taxonomySlug,
 	},
 	setAttributes,
@@ -220,6 +221,7 @@ export default function CategoriesEdit( {
 							showOnlyTopLevel: false,
 							showEmpty: false,
 							showLabel: true,
+							disableInlineScript: false,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -279,6 +281,27 @@ export default function CategoriesEdit( {
 								label={ __( 'Show label' ) }
 								checked={ showLabel }
 								onChange={ toggleAttribute( 'showLabel' ) }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ displayAsDropdown && (
+						<ToolsPanelItem
+							hasValue={ () => !! disableInlineScript }
+							label={ __( 'Disable inline script' ) }
+							isShownByDefault
+							onDeselect={ () =>
+								setAttributes( {
+									disableInlineScript: false,
+								} )
+							}
+						>
+							<ToggleControl
+								className="wp-block-categories__indentation"
+								label={ __( 'Disable inline script' ) }
+								checked={ disableInlineScript }
+								onChange={ toggleAttribute(
+									'disableInlineScript'
+								) }
 							/>
 						</ToolsPanelItem>
 					) }
