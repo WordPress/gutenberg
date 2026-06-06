@@ -365,6 +365,7 @@ describe( 'insertRow', () => {
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 					],
 				},
@@ -408,6 +409,7 @@ describe( 'insertColumn', () => {
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 						{
 							content: 'test',
@@ -482,6 +484,7 @@ describe( 'insertColumn', () => {
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 					],
 				},
@@ -519,6 +522,7 @@ describe( 'insertColumn', () => {
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 						{
 							content: '',
@@ -584,6 +588,7 @@ describe( 'insertColumn', () => {
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 					],
 				},
@@ -968,6 +973,7 @@ describe( 'toggleSection', () => {
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 					],
 				},
@@ -1009,14 +1015,17 @@ describe( 'toggleSection', () => {
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 						{
 							content: '',
 							tag: 'th',
+							scope: 'col',
 						},
 					],
 				},

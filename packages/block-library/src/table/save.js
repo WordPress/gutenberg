@@ -15,7 +15,8 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { hasFixedLayout, head, body, foot, caption } = attributes;
+	const { hasFixedLayout, head, body, foot, caption, captionSide } =
+		attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 	if ( isEmpty ) {
@@ -30,6 +31,11 @@ export default function save( { attributes } ) {
 	} );
 
 	const hasCaption = ! RichText.isEmpty( caption );
+
+	// Add caption position class to figure
+	const figureClasses = clsx( {
+		'has-caption-top': hasCaption && captionSide === 'top',
+	} );
 
 	const Section = ( { type, rows } ) => {
 		if ( ! rows.length ) {
@@ -85,22 +91,28 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<figure { ...useBlockProps.save() }>
+		<figure
+			{ ...useBlockProps.save( {
+				className: figureClasses,
+			} ) }
+		>
 			<table
 				className={ classes === '' ? undefined : classes }
 				style={ { ...colorProps.style, ...borderProps.style } }
 			>
+				{ hasCaption && (
+					<RichText.Content
+						tagName="caption"
+						value={ caption }
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+					/>
+				) }
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />
 			</table>
-			{ hasCaption && (
-				<RichText.Content
-					tagName="figcaption"
-					value={ caption }
-					className={ __experimentalGetElementClassName( 'caption' ) }
-				/>
-			) }
 		</figure>
 	);
 }

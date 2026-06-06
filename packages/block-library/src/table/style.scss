@@ -40,6 +40,16 @@
 		}
 	}
 
+	// Caption position
+	// Default is bottom to match figure conventions in WordPress
+	table caption {
+		caption-side: bottom;
+	}
+
+	&.has-caption-top table caption {
+		caption-side: top;
+	}
+
 	&.alignleft,
 	&.aligncenter,
 	&.alignright {

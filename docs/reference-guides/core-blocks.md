@@ -1038,7 +1038,7 @@ Create structured content in rows and columns to display information. ([Source](
 -	**Name:** core/table
 -	**Category:** text
 -	**Supports:** align, anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** body, caption, foot, hasFixedLayout, head
+-	**Attributes:** body, caption, captionSide, foot, hasFixedLayout, head
 
 ## Table of Contents
 
