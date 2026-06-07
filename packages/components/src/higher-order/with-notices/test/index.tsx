@@ -33,6 +33,14 @@ function noticesFrom( list: string[] ) {
 	return list.map( ( item ) => ( { id: item, content: item } ) );
 }
 
+function isComponentLike( object: any ) {
+	return typeof object === 'function';
+}
+
+function isForwardRefLike( { render: renderMethod }: any ) {
+	return typeof renderMethod === 'function';
+}
+
 const content = 'Base content';
 
 const BaseComponent = ( {
@@ -71,6 +79,16 @@ const TestNoticeOperations = withNotices(
 		);
 	} )
 );
+
+describe( 'withNotices return type', () => {
+	it( 'should be a component given a component', () => {
+		expect( isComponentLike( TestComponent ) ).toBe( true );
+	} );
+
+	it( 'should be a forwardRef given a forwardRef', () => {
+		expect( isForwardRefLike( TestNoticeOperations ) ).toBe( true );
+	} );
+} );
 
 describe( 'withNotices operations', () => {
 	function setup( props: any = {} ) {

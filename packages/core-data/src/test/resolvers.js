@@ -50,6 +50,7 @@ describe( 'getEntityRecord', () => {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
+			__unstableNotifySyncUndoManagerChange: jest.fn(),
 			receiveUserPermissions: jest.fn(),
 			finishResolutions: jest.fn(),
 		} );
@@ -173,12 +174,54 @@ describe( 'getEntityRecord', () => {
 				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				onUndoStackChange: expect.any( Function ),
 				onStatusChange: expect.any( Function ),
 				persistCRDTDoc: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 				restoreUndoMeta: expect.any( Function ),
 			}
 		);
+	} );
+
+	it( 'notifies core-data when the sync undo manager stack changes', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post' };
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn(),
+		};
+
+		triggerFetch.mockImplementation( () => POST_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		handlers.onUndoStackChange( { hasRedo: false, hasUndo: true } );
+
+		expect(
+			dispatch.__unstableNotifySyncUndoManagerChange
+		).toHaveBeenCalledWith( { hasRedo: false, hasUndo: true } );
 	} );
 
 	it( 'persistCRDTDoc fetches edited record and does not save full entity record when the entity does not support meta', async () => {
@@ -507,6 +550,7 @@ describe( 'getEntityRecord', () => {
 				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				onUndoStackChange: expect.any( Function ),
 				onStatusChange: expect.any( Function ),
 				persistCRDTDoc: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
