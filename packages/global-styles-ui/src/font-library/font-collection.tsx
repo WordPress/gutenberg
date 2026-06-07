@@ -76,6 +76,9 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ selectedFont, setSelectedFont ] = useState< FontFamily | null >(
 		null
 	);
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
 	const [ notice, setNotice ] = useState< {
 		type: 'success' | 'error' | 'info';
 		message: string;
@@ -361,6 +364,11 @@ function FontCollection( { slug }: { slug: string } ) {
 													font.font_family_settings
 												}
 												navigatorPath="/fontFamily"
+												shouldFocus={
+													font.font_family_settings
+														.slug ===
+													lastSelectedFontSlug
+												}
 												onClick={ () => {
 													setSelectedFont(
 														font.font_family_settings
@@ -382,6 +390,9 @@ function FontCollection( { slug }: { slug: string } ) {
 									}
 									size="small"
 									onClick={ () => {
+										setLastSelectedFontSlug(
+											selectedFont?.slug
+										);
 										setSelectedFont( null );
 										setNotice( null );
 									} }
