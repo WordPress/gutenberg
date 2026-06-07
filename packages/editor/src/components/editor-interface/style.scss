@@ -13,8 +13,19 @@
 	padding: var(--wpds-dimension-padding-md);
 }
 
+.editor-collab-sidebar-layout {
+	display: flex;
+	flex-direction: row;
+	flex: 1 0 auto;
+}
+
 .editor-visual-editor {
 	flex: 1 0 auto;
+}
+
+.editor-collab-sidebar-layout .editor-collab-sidebar {
+	width: 280px;
+	flex-shrink: 0;
 }
 
 .editor-notices__dismissible,

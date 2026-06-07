@@ -232,21 +232,23 @@ export default function EditorInterface( {
 									<BlockToolbar hideDragHandle />
 								) }
 							{ ( isPreviewMode || mode === 'visual' ) && (
-								<VisualEditor
-									contentRef={ contentRef }
-									disableIframe={ disableIframe }
-									// We should auto-focus the canvas (title) on load.
-									// eslint-disable-next-line jsx-a11y/no-autofocus
-									autoFocus={ autoFocus }
-									iframeProps={ iframeProps }
-								/>
+								<div className="editor-collab-sidebar-layout">
+									<VisualEditor
+										contentRef={ contentRef }
+										disableIframe={ disableIframe }
+										// We should auto-focus the canvas (title) on load.
+										// eslint-disable-next-line jsx-a11y/no-autofocus
+										autoFocus={ autoFocus }
+										iframeProps={ iframeProps }
+									/>
+									<CollabSidebarSlot />
+								</div>
 							) }
 							{ children }
 							<CollaboratorsOverlay
 								postId={ postId }
 								postType={ postType }
 							/>
-							<CollabSidebarSlot />
 						</>
 					) }
 				</>

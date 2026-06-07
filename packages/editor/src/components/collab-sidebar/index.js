@@ -82,8 +82,7 @@ function NotesSidebar( { postId } ) {
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar =
-		notes.length > 0 || ! showFloatingSidebar;
+	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
 
 	const shouldShowFloatingNotes =
 		showFloatingSidebar &&
@@ -206,14 +205,7 @@ function NotesSidebar( { postId } ) {
 							role="region"
 							aria-label={ __( 'Collab panel' ) }
 							className="editor-collab-sidebar"
-							style={ {
-								position: 'absolute',
-								right: 0,
-								top: 0,
-								width: '280px',
-								zIndex: 20,
-								backgroundColor,
-							} }
+							style={ { backgroundColor } }
 						>
 							<Notes
 								notes={ unresolvedNotes }
