@@ -75,6 +75,8 @@ function ScaledBlockPreview( {
 			} }
 		>
 			<Iframe
+				inlineStyles
+				skipScripts
 				contentRef={ useRefEffect( ( bodyElement ) => {
 					const {
 						ownerDocument: { documentElement },
