@@ -23,6 +23,7 @@
 	"devDependencies": {
 		"@playwright/test": "^1.58.2",
 		"@storybook/react-vite": "^10.1.11",
+		"@types/node": "^20.19.39",
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/storybook": "file:../../storybook",
 		"storybook": "^10.1.11"

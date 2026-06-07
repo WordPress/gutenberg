@@ -249,6 +249,7 @@ function TemplatePartList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			headingLevel={ 2 }
 			subTitle={ postTypeObject.labels?.description }
 			className="template-part-page"
 			actions={

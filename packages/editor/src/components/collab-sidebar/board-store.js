@@ -45,7 +45,6 @@ export function createBoardStore() {
 
 		registerThread( id, blockEl, floatingEl ) {
 			blockRefs.set( id, blockEl );
-
 			const prev = floatingRefs.get( id );
 			if ( prev && prev !== floatingEl ) {
 				observer.unobserve( prev );
@@ -56,7 +55,6 @@ export function createBoardStore() {
 				idByElement.set( floatingEl, id );
 				observer.observe( floatingEl );
 			}
-
 			emit();
 		},
 
@@ -78,6 +76,10 @@ export function createBoardStore() {
 					el ? [ [ id, el.getBoundingClientRect() ] ] : []
 				)
 			);
+		},
+
+		getFirstBlockElement() {
+			return blockRefs.values().next().value ?? null;
 		},
 	};
 }

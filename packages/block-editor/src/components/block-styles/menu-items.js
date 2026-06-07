@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem, __experimentalText as Text } from '@wordpress/components';
+import { MenuItem, __experimentalText as WCText } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 
 const noop = () => {};
@@ -29,14 +29,14 @@ export default function BlockStylesMenuItems( {
 						onMouseEnter={ () => onHoverStyle( style ) }
 						onMouseLeave={ () => onHoverStyle( null ) }
 					>
-						<Text
+						<WCText
 							as="span"
 							limit={ 18 }
 							ellipsizeMode="tail"
 							truncate
 						>
 							{ menuItemText }
-						</Text>
+						</WCText>
 					</MenuItem>
 				);
 			} ) }

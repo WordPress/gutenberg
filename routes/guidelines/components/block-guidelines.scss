@@ -1,8 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .block-guidelines {
-	margin-top: $grid-unit-30;
-
 	.block-guidelines__icon {
 		display: flex;
 		align-items: center;
@@ -17,13 +15,11 @@
 	}
 
 	.dataviews-wrapper {
-		margin-right: -$grid-unit-30;
-		margin-left: -$grid-unit-30;
+		margin-inline: -$grid-unit-30;
 	}
 
 	.dataviews-search {
-		margin-right: $grid-unit-30;
-		margin-left: $grid-unit-30;
+		margin-inline: $grid-unit-30;
 	}
 }
 

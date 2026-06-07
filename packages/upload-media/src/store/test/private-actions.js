@@ -6,48 +6,23 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import {
-	getTranscodeImageOperation,
-	finalizeItem,
-	generateThumbnails,
-} from '../private-actions';
+import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
 import { OperationType } from '../types';
-import { vipsHasTransparency, vipsBatchResizeImage } from '../utils';
+import { vipsHasTransparency } from '../utils';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
 	createBlobURL: jest.fn( () => 'blob:mock-url' ),
 	revokeBlobURL: jest.fn(),
-	isBlobURL: jest.fn( () => false ),
 } ) );
 
 // Mock vips utilities
 jest.mock( '../utils', () => ( {
 	vipsHasTransparency: jest.fn(),
-	vipsBatchResizeImage: jest.fn( ( _id, _file, outputType, configs ) =>
-		Promise.resolve(
-			configs.map( ( c ) => ( {
-				name: c.name,
-				file: new File(
-					[ 'batch-resized' ],
-					`converted-${ c.resize.width }x${ c.resize.height }.${
-						outputType.split( '/' )[ 1 ]
-					}`,
-					{ type: outputType }
-				),
-			} ) )
-		)
-	),
 } ) );
 
 describe( 'private actions', () => {
 	describe( 'getTranscodeImageOperation', () => {
-		const mockSettings = {
-			jpegInterlaced: false,
-			pngInterlaced: false,
-			gifInterlaced: false,
-		};
-
 		beforeEach( () => {
 			jest.clearAllMocks();
 		} );
@@ -60,7 +35,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/webp',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -81,7 +56,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/unknown',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -97,7 +72,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -115,7 +90,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -142,7 +117,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -157,7 +132,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/webp',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -180,7 +155,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				{ ...mockSettings, jpegInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -201,7 +176,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/png',
-				{ ...mockSettings, pngInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -222,7 +197,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/gif',
-				{ ...mockSettings, gifInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -243,7 +218,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/avif',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -264,134 +239,53 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
 		} );
 	} );
 
-	describe( 'generateThumbnails - batch resize with copyMemory()', () => {
-		let addSideloadItem;
-		let finishOperation;
-		let dispatch;
-
-		function makeSelect( {
-			sourceType = 'image/avif',
-			outputMimeType = 'image/jpeg',
-			filename = 'photo.avif',
-		} = {} ) {
-			const sourceFile = new File( [ 'test' ], filename, {
-				type: sourceType,
-			} );
-			return {
-				getItem: () => ( {
-					id: 'item-1',
-					file: sourceFile,
-					sourceFile,
-					attachment: {
-						id: 42,
-						filename,
-						missing_image_sizes: [ 'thumbnail', 'medium' ],
-					},
-				} ),
-				getSettings: () => ( {
-					allImageSizes: {
-						thumbnail: { width: 150, height: 150, crop: true },
-						medium: { width: 300, height: 300, crop: false },
-					},
-					imageOutputFormats: outputMimeType
-						? { [ sourceType ]: outputMimeType }
-						: {},
-					jpegInterlaced: false,
-					pngInterlaced: false,
-					gifInterlaced: false,
-				} ),
-			};
-		}
-
-		beforeEach( () => {
-			jest.clearAllMocks();
-			addSideloadItem = jest.fn();
-			finishOperation = jest.fn();
-			dispatch = { addSideloadItem, finishOperation };
-		} );
-
-		it( 'should use batch resize with output format when transcoding', async () => {
-			const select = makeSelect( {
-				sourceType: 'image/avif',
-				outputMimeType: 'image/jpeg',
-			} );
-
-			const thunk = generateThumbnails( 'item-1' );
-			await thunk( { select, dispatch } );
-
-			expect( vipsBatchResizeImage ).toHaveBeenCalledWith(
-				'item-1',
-				expect.any( File ),
-				'image/jpeg',
-				expect.arrayContaining( [
-					expect.objectContaining( { name: 'thumbnail' } ),
-					expect.objectContaining( { name: 'medium' } ),
-				] ),
-				false
-			);
-			// Sideload items should only have Upload operation.
-			const thumbnailCall = addSideloadItem.mock.calls.find(
-				( call ) => call[ 0 ].additionalData?.image_size === 'thumbnail'
-			);
-			expect( thumbnailCall ).toBeDefined();
-			expect( thumbnailCall[ 0 ].operations ).toEqual( [
-				OperationType.Upload,
-			] );
-		} );
-
-		it( 'should use source format for batch resize when no transcoding', async () => {
-			const select = makeSelect( {
-				sourceType: 'image/jpeg',
-				outputMimeType: undefined,
-				filename: 'photo.jpg',
-			} );
-
-			const thunk = generateThumbnails( 'item-1' );
-			await thunk( { select, dispatch } );
-
-			expect( vipsBatchResizeImage ).toHaveBeenCalledWith(
-				'item-1',
-				expect.any( File ),
-				'image/jpeg',
-				expect.any( Array ),
-				false
-			);
-		} );
-
-		it( 'should fall back to per-thumbnail processing when batch resize fails', async () => {
-			vipsBatchResizeImage.mockRejectedValueOnce( new Error( 'OOM' ) );
-			const select = makeSelect( {
-				sourceType: 'image/avif',
-				outputMimeType: 'image/jpeg',
-			} );
-
-			const thunk = generateThumbnails( 'item-1' );
-			await thunk( { select, dispatch } );
-
-			expect( console ).toHaveWarned();
-
-			// Should still create sideload items with ResizeCrop + TranscodeImage operations.
-			const thumbnailCall = addSideloadItem.mock.calls.find(
-				( call ) => call[ 0 ].additionalData?.image_size === 'thumbnail'
-			);
-			expect( thumbnailCall ).toBeDefined();
-			expect( thumbnailCall[ 0 ].operations ).toEqual(
-				expect.arrayContaining( [
-					expect.arrayContaining( [ OperationType.ResizeCrop ] ),
-				] )
-			);
-		} );
-	} );
-
 	describe( 'finalizeItem', () => {
-		it( 'should call mediaFinalize with the attachment ID', async () => {
+		const mockSubSizes = [
+			{
+				image_size: 'thumbnail',
+				width: 150,
+				height: 150,
+				file: 'image-150x150.jpg',
+				mime_type: 'image/jpeg',
+				filesize: 5000,
+			},
+			{
+				image_size: 'medium',
+				width: 300,
+				height: 200,
+				file: 'image-300x200.jpg',
+				mime_type: 'image/jpeg',
+				filesize: 15000,
+			},
+		];
+
+		it( 'should call mediaFinalize with the attachment ID and sub-sizes', async () => {
+			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+					subSizes: mockSubSizes,
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'should pass empty array when no sub-sizes accumulated', async () => {
 			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
 			const finishOperation = jest.fn();
 			const select = {
@@ -405,7 +299,7 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
@@ -443,6 +337,44 @@ describe( 'private actions', () => {
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
+		it( 'should forward the finalized attachment to finishOperation', async () => {
+			// Regression: after PR #78038, CSM uploads the original file rather
+			// than a pre-scaled copy, so the upload response carries the URL of
+			// the un-scaled original. The scaled-sideload step later updates
+			// _wp_attached_file server-side, and finalize returns the
+			// up-to-date attachment. The queue's stored attachment must be
+			// merged with that response so onChange propagates the scaled URL
+			// to the block — otherwise wp_calculate_image_srcset() cannot
+			// match the src to a known size and no srcset is rendered.
+			const updatedAttachment = {
+				id: 42,
+				url: 'https://example.com/wp-content/uploads/image-scaled.jpg',
+			};
+			const mediaFinalize = jest
+				.fn()
+				.mockResolvedValue( updatedAttachment );
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					attachment: {
+						id: 42,
+						url: 'https://example.com/wp-content/uploads/image.jpg',
+					},
+					subSizes: mockSubSizes,
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
+				attachment: updatedAttachment,
+			} );
+		} );
+
 		it( 'should handle mediaFinalize errors gracefully', async () => {
 			const mediaFinalize = jest
 				.fn()
@@ -454,6 +386,7 @@ describe( 'private actions', () => {
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
+					subSizes: mockSubSizes,
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
@@ -462,7 +395,7 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
 				expect.any( Error )

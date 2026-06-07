@@ -232,7 +232,7 @@ The following selectors are available on the object returned by `wp.data.select(
 
 #### get
 
-Returns a boolean indicating whether a prefer is active for a particular scope.
+Returns a boolean indicating whether a preference is active for a particular scope.
 
 _Parameters_
 
