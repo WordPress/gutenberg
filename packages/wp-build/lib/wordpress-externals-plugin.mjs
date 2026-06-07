@@ -201,8 +201,9 @@ export function createWordpressExternalsPlugin(
 					);
 				}
 
-				// Externalize internal packages by exact name. Must precede the
-				// namespace pattern below so internal names win over the wildcard.
+				// Externalize imports of internal packages by their exact `name`. They are
+				// matched by name rather than by scope, since a package's scope may also hold
+				// unrelated third-party packages that scope matching would externalize too.
 				if ( internalPackageNames.size > 0 ) {
 					// Longest-first: avoids `@org/block` shadowing `@org/block-editor`.
 					const namesSorted = Array.from( internalPackageNames ).sort(
