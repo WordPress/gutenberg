@@ -2037,6 +2037,54 @@ async function generateWidgetsPhp( widgets, replacements ) {
 }
 
 /**
+ * Module-level state for template regeneration in watch mode.
+ * Populated by buildAll() and consumed by regeneratePhpRegistrationFiles().
+ */
+let lastBuildState = {
+	modules: [],
+	scripts: [],
+	styles: [],
+	widgets: [],
+	activeRoutes: [],
+	pageData: [],
+	phpReplacements: null,
+};
+
+/**
+ * Regenerate all PHP registration files from cached build state.
+ * Used in watch mode when template files change.
+ */
+async function regeneratePhpRegistrationFiles() {
+	const {
+		modules,
+		scripts,
+		styles,
+		widgets,
+		activeRoutes,
+		pageData,
+		phpReplacements,
+	} = lastBuildState;
+	if ( ! phpReplacements ) {
+		console.log(
+			'⚠️  No cached build state; skipping template regeneration.'
+		);
+		return;
+	}
+	await Promise.all( [
+		generateMainBuildPhp( phpReplacements ),
+		generateModuleRegistrationPhp( modules, phpReplacements ),
+		generateScriptRegistrationPhp( scripts, phpReplacements ),
+		generateStyleRegistrationPhp( styles, phpReplacements ),
+		generateConstantsPhp( phpReplacements ),
+		generateRoutesRegistry( activeRoutes, phpReplacements ),
+		generateRoutesPhp( activeRoutes, phpReplacements ),
+		generateWidgetRegistry( widgets, phpReplacements ),
+		generateWidgetsPhp( widgets, phpReplacements ),
+		generatePagesPhp( pageData, phpReplacements ),
+	] );
+}
+
+/**
  * Main build function.
  *
  * @param {string?} baseUrlExpression
@@ -2182,6 +2230,18 @@ async function buildAll( baseUrlExpression ) {
 		ROOT_DIR,
 		baseUrlExpression
 	);
+
+	// Cache build state for template regeneration in watch mode.
+	lastBuildState = {
+		modules,
+		scripts,
+		styles,
+		widgets,
+		activeRoutes,
+		pageData,
+		phpReplacements,
+	};
+
 	await Promise.all( [
 		generateMainBuildPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
@@ -2367,6 +2427,19 @@ async function watchMode() {
 			} else if ( item.startsWith( 'widget:' ) ) {
 				const widgetDirName = item.slice( 7 ); // Remove 'widget:' prefix
 				await rebuildWidget( widgetDirName );
+			} else if ( item === 'templates' ) {
+				try {
+					const startTime = Date.now();
+					await regeneratePhpRegistrationFiles();
+					const buildTime = Date.now() - startTime;
+					console.log(
+						`✅ PHP templates regenerated (${ buildTime }ms)`
+					);
+				} catch ( error ) {
+					console.log(
+						`❌ PHP template regeneration - Error: ${ error.message }`
+					);
+				}
 			} else {
 				await rebuildPackage( item );
 			}
@@ -2545,6 +2618,54 @@ async function watchMode() {
 		widgetWatcher.on( 'add', handleWidgetFileChange );
 		widgetWatcher.on( 'unlink', handleWidgetFileChange );
 	}
+
+	// Watch PHP template files so changes trigger PHP file regeneration.
+	const templateWatchPath = path.join(
+		PACKAGES_DIR,
+		'wp-build',
+		'templates'
+	);
+	const templateWatcher = chokidar.watch( templateWatchPath, {
+		persistent: true,
+		ignoreInitial: true,
+		useFsEvents: true,
+		awaitWriteFinish: {
+			stabilityThreshold: 100,
+			pollInterval: 50,
+		},
+	} );
+
+	templateWatcher.on( 'error', ( error ) => {
+		console.error( '❌ Template watcher error:', error );
+	} );
+
+	const handleTemplateFileChange = async ( filename ) => {
+		console.log(
+			`📝 Template changed: ${ path.relative( ROOT_DIR, filename ) }`
+		);
+
+		if ( isRebuilding ) {
+			needsRebuild.add( 'templates' );
+			return;
+		}
+
+		isRebuilding = true;
+		try {
+			const startTime = Date.now();
+			await regeneratePhpRegistrationFiles();
+			const buildTime = Date.now() - startTime;
+			console.log( `✅ PHP templates regenerated (${ buildTime }ms)` );
+		} catch ( error ) {
+			console.log(
+				`❌ PHP template regeneration - Error: ${ error.message }`
+			);
+		}
+		await processNextRebuild();
+	};
+
+	templateWatcher.on( 'change', handleTemplateFileChange );
+	templateWatcher.on( 'add', handleTemplateFileChange );
+	templateWatcher.on( 'unlink', handleTemplateFileChange );
 }
 
 /**
