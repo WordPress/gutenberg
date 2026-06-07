@@ -65,8 +65,11 @@ export function advance( count ) {
 }
 
 /**
- * Clears the tracker. Called on terminal states when the count bookkeeping
- * can't guarantee `completed` will reach `total` (e.g. component teardown).
+ * Resets the tracker to its empty state.
+ *
+ * Test-only helper: `state` is a module-level singleton, so tests call this in
+ * `beforeEach` to isolate cases from one another. Not used in production -
+ * `advance` clears the state on its own once every file in a batch finishes.
  */
 export function reset() {
 	if ( state === null ) {
