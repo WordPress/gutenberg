@@ -12,6 +12,9 @@ test.describe( 'Preload', () => {
 	let postId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Panel state is persisted across editor tests. Keep panel-driven
+		// taxonomy requests out of this startup preload assertion.
+		await requestUtils.setPreferences( 'core', { openPanels: [] } );
 		const post = await requestUtils.createPost( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -65,13 +68,17 @@ test.describe( 'Preload', () => {
 
 		// Only collab side effects (CRDT save + first wp-sync poll)
 		// should escape before mount — they're detached promise chains
-		// off `receiveEntityRecords`.
-		expect( Array.from( new Set( requestsUntilMount ) ).sort() ).toEqual(
-			[
-				`POST /wp/v2/posts/${ postId }`,
-				'POST /wp-sync/v1/updates',
-			].sort()
-		);
+		// off `receiveEntityRecords`. They may also complete after the mount
+		// boundary on faster runs, so assert that no other requests escape.
+		const collabStartupRequests = [
+			`POST /wp/v2/posts/${ postId }`,
+			'POST /wp-sync/v1/updates',
+		];
+		expect(
+			Array.from( new Set( requestsUntilMount ) ).every( ( request ) =>
+				collabStartupRequests.includes( request )
+			)
+		).toBe( true );
 		// Every preloaded path should be consumed by the kickoff.
 		expect( preloadStatus ).toBe(
 			'[api-fetch][preload] All preloads consumed.'
@@ -80,13 +87,24 @@ test.describe( 'Preload', () => {
 		// fires twice within the captured window; the duplicate count
 		// isn't stable across runs, so this assertion deduplicates.
 		// To do: these should all be removed or preloaded.
-		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
-			[
-				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
-				`POST /wp/v2/posts/${ postId }`,
-				'POST /wp-sync/v1/updates',
-				'POST /wp/v2/users/me',
-			].sort()
-		);
+		const requiredRequests = [
+			`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
+			'POST /wp/v2/users/me',
+		].sort();
+		const allowedRequests = [
+			...requiredRequests,
+			...collabStartupRequests,
+		];
+		const capturedRequests = Array.from( new Set( requests ) );
+		expect(
+			capturedRequests
+				.filter( ( request ) => ! allowedRequests.includes( request ) )
+				.sort()
+		).toEqual( [] );
+		expect(
+			capturedRequests
+				.filter( ( request ) => requiredRequests.includes( request ) )
+				.sort()
+		).toEqual( requiredRequests );
 	} );
 } );

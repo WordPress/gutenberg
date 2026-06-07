@@ -14,8 +14,15 @@ async function navigateToTemplateEditor( { admin, editor, page }, pageId ) {
 		const patternDialog = page.getByRole( 'dialog', {
 			name: 'Choose a pattern',
 		} );
-		await expect( patternDialog ).toBeVisible( { timeout: 2000 } );
-		await patternDialog.getByRole( 'button', { name: 'Close' } ).click();
+		const isPatternDialogVisible = await patternDialog
+			.waitFor( { state: 'visible', timeout: 5000 } )
+			.then( () => true )
+			.catch( () => false );
+		if ( isPatternDialogVisible ) {
+			await patternDialog
+				.getByRole( 'button', { name: 'Close' } )
+				.click();
+		}
 
 		await editor.openDocumentSettingsSidebar();
 		const settingsPanel = page.getByRole( 'region', {

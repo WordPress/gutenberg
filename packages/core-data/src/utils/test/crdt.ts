@@ -58,7 +58,11 @@ jest.mock( '@wordpress/blocks', () => {
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
+import {
+	__unstableSerializeAndClean,
+	parse,
+	type Block as WPBlock,
+} from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
@@ -286,6 +290,59 @@ describe( 'crdt', () => {
 			expect( ( map.get( 'blocks' ) as YBlocks ).toJSON() ).toEqual(
 				changes.blocks
 			);
+		} );
+
+		it( 'converges duplicate table row edit/delete through the post changes wrapper', () => {
+			const docB = new Y.Doc();
+
+			try {
+				applyPostChangesToCRDTDoc(
+					doc,
+					{
+						blocks: [
+							createTableBlock( [ 'anchor', 'same', 'same' ] ),
+						],
+					},
+					defaultSyncedProperties
+				);
+				Y.applyUpdate( docB, Y.encodeStateAsUpdate( doc ) );
+
+				const stateVectorA = Y.encodeStateVector( doc );
+				const stateVectorB = Y.encodeStateVector( docB );
+				const runtimeBlocksA = getRuntimeBlocksFromDoc( doc );
+				const runtimeBlocksB = getRuntimeBlocksFromDoc( docB );
+
+				getRuntimeTableBody( runtimeBlocksA )[ 2 ].cells[ 0 ].content =
+					'edited-second-duplicate';
+				getRuntimeTableBody( runtimeBlocksB ).splice( 1, 1 );
+
+				applyPostChangesToCRDTDoc(
+					doc,
+					{ blocks: runtimeBlocksA },
+					defaultSyncedProperties
+				);
+				applyPostChangesToCRDTDoc(
+					docB,
+					{ blocks: runtimeBlocksB },
+					defaultSyncedProperties
+				);
+
+				const updateA = Y.encodeStateAsUpdate( doc, stateVectorB );
+				const updateB = Y.encodeStateAsUpdate( docB, stateVectorA );
+				Y.applyUpdate( doc, updateB );
+				Y.applyUpdate( docB, updateA );
+
+				expect( getTableBodyCellContentsFromDoc( doc ) ).toEqual( [
+					'anchor',
+					'edited-second-duplicate',
+				] );
+				expect( getTableBodyCellContentsFromDoc( docB ) ).toEqual( [
+					'anchor',
+					'edited-second-duplicate',
+				] );
+			} finally {
+				docB.destroy();
+			}
 		} );
 
 		it( 'initializes blocks as Y.Array when not present', () => {
@@ -1090,6 +1147,188 @@ describe( 'crdt', () => {
 			expect( typeof changes.content ).toBe( 'function' );
 		} );
 
+		it( 'does not inject a content function when block serialization already matches current content', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'serialized:1\n', rendered: 'serialized:1' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
+		} );
+
+		it( 'hydrates runtime block changes without overwriting matching visible content', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'Locally defaulted title',
+				status: 'auto-draft',
+				content: { raw: 'serialized:1\n', rendered: 'serialized:1' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
+			expect( changes.title ).toBeUndefined();
+			expect( changes.status ).toBeUndefined();
+			expect( changes.date ).toBeUndefined();
+		} );
+
+		it( 'hydrates runtime block changes from persisted table rows with internal IDs', () => {
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ createTableBlock( [ 'anchor', 'same' ] ) ] },
+				defaultSyncedProperties
+			);
+			(
+				__unstableSerializeAndClean as jest.MockedFunction<
+					typeof __unstableSerializeAndClean
+				>
+			 ).mockImplementationOnce( ( blocks: unknown[] ) => {
+				const rows =
+					( blocks?.[ 0 ] as Block | undefined )?.attributes?.body ??
+					[];
+				const hasPersistedId = (
+					rows as Array< Record< string, unknown > >
+				 ).some( ( row ) =>
+					Object.prototype.hasOwnProperty.call(
+						row,
+						'__unstableSyncId'
+					)
+				);
+
+				return hasPersistedId
+					? 'serialized-with-internal-id'
+					: `serialized:${ blocks?.length ?? 0 }`;
+			} );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: { raw: 'serialized:1', rendered: 'serialized:1' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
+		} );
+
+		it( 'hydrates runtime block changes when normalized serialized content matches', () => {
+			const serializedWithDefaultAttribute =
+				'<!-- wp:table {"hasFixedLayout":false} -->\n<table></table>\n<!-- /wp:table -->';
+			const serializedWithoutDefaultAttribute =
+				'<!-- wp:table -->\n<table></table>\n<!-- /wp:table -->';
+			const normalizedSerializedContent = 'normalized-table-content';
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ blocks: [ createTableBlock( [ 'same' ] ) ] },
+				defaultSyncedProperties
+			);
+			(
+				__unstableSerializeAndClean as jest.MockedFunction<
+					typeof __unstableSerializeAndClean
+				>
+			 )
+				.mockImplementationOnce( () => serializedWithDefaultAttribute )
+				.mockImplementationOnce( () => normalizedSerializedContent )
+				.mockImplementationOnce( () => normalizedSerializedContent );
+			( parse as jest.MockedFunction< typeof parse > )
+				.mockImplementationOnce( () => [
+					createTableBlock( [ 'same' ] ),
+				] )
+				.mockImplementationOnce( () => [
+					createTableBlock( [ 'same' ] ),
+				] );
+
+			const editedRecord = {
+				title: 'CRDT Title',
+				status: 'draft',
+				content: {
+					raw: serializedWithoutDefaultAttribute,
+					rendered: serializedWithoutDefaultAttribute,
+				},
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes.blocks ).toBeDefined();
+			expect( changes.content ).toBeUndefined();
+		} );
+
+		it( 'does not hydrate runtime block changes over different visible content', () => {
+			addBlockToDoc( map, 'block-1', 'Hello world' );
+
+			const editedRecord = {
+				title: 'Locally defaulted title',
+				status: 'auto-draft',
+				content: {
+					raw: 'Server-provided default content',
+					rendered: 'Server-provided default content',
+				},
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes ).toEqual( {} );
+		} );
+
+		it( 'does not hydrate empty runtime block changes before default content is applied', () => {
+			map.set( 'blocks', new Y.Array< YBlock >() );
+
+			const editedRecord = {
+				title: 'Locally defaulted title',
+				status: 'auto-draft',
+				content: { raw: '', rendered: '' },
+				blocks: [],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties,
+				{ runtimeBlockChangesOnly: true }
+			);
+
+			expect( changes ).toEqual( {} );
+		} );
+
 		it( 'injected content function captures the synced blocks and ignores its caller-supplied argument', () => {
 			addBlockToDoc( map, 'block-1', 'Hello world' );
 
@@ -1199,4 +1438,49 @@ function addBlockToDoc(
 	( blocks as YBlocks ).push( [ block ] );
 
 	return ytext;
+}
+
+function createTableBlock( values: string[] ): Block & WPBlock {
+	return {
+		name: 'core/table',
+		clientId: 'table',
+		isValid: true,
+		attributes: {
+			body: values.map( ( value ) => ( {
+				cells: [
+					{
+						content: value,
+						tag: 'td',
+					},
+				],
+			} ) ),
+		},
+		innerBlocks: [],
+	};
+}
+
+function getRuntimeBlocksFromDoc( ydoc: Y.Doc ): Block[] {
+	return getPostChangesFromCRDTDoc(
+		ydoc,
+		{ blocks: [] } as unknown as Post,
+		defaultSyncedProperties
+	).blocks as Block[];
+}
+
+function getRuntimeTableBody( blocks: Block[] ) {
+	return blocks[ 0 ].attributes.body as Array< {
+		cells: Array< Record< string, unknown > >;
+	} >;
+}
+
+function getCellContentText( content: unknown ) {
+	return typeof content === 'object' && content && 'valueOf' in content
+		? String( content.valueOf() )
+		: content;
+}
+
+function getTableBodyCellContentsFromDoc( ydoc: Y.Doc ) {
+	return getRuntimeTableBody( getRuntimeBlocksFromDoc( ydoc ) ).map(
+		( row ) => getCellContentText( row.cells[ 0 ].content )
+	);
 }

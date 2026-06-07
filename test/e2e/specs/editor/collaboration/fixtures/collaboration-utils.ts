@@ -165,11 +165,9 @@ export default class CollaborationUtils {
 	async waitForMutualDiscovery( { timeout }: { timeout?: number } = {} ) {
 		const pages = this.allPages;
 		const resolvedTimeout = timeout ?? 10000 + pages.length * 2500;
+		const roomName = await this.getCurrentPostRoomName( this.primaryPage );
 
 		if ( USE_TEST_WS_PROVIDER ) {
-			const roomName = await this.getCurrentPostRoomName(
-				this.primaryPage
-			);
 			await Promise.all(
 				pages.map( ( pg ) =>
 					this.waitForTestWebSocketAwarenessPeerCount(
@@ -193,11 +191,12 @@ export default class CollaborationUtils {
 
 		await Promise.all(
 			pages.map( ( pg ) =>
-				pg
-					.getByRole( 'button', {
-						name: /Collaborators list/,
-					} )
-					.waitFor( { timeout: resolvedTimeout } )
+				this.waitForAwarenessPeerCount(
+					pg,
+					pages.length,
+					resolvedTimeout,
+					roomName
+				)
 			)
 		);
 		await Promise.all(
@@ -228,6 +227,58 @@ export default class CollaborationUtils {
 		);
 	}
 
+	/**
+	 * Wait until the sync transport reports the expected number of clients in
+	 * the requested room's awareness payload.
+	 *
+	 * Some repros exercise lower-level sync behavior before the rendered
+	 * collaborator presence UI has enough display metadata to show the
+	 * "Collaborators list" button. The transport-level awareness count is the
+	 * synchronization gate these repros actually need.
+	 *
+	 * @param page              The Playwright page to wait on.
+	 * @param expectedPeerCount Expected number of awareness clients.
+	 * @param timeout           Maximum wait time in ms.
+	 * @param roomName          Optional room name to require.
+	 */
+	async waitForAwarenessPeerCount(
+		page: Page,
+		expectedPeerCount: number,
+		timeout: number,
+		roomName?: string
+	) {
+		await page.waitForResponse(
+			async ( response ) => {
+				if (
+					! response.url().includes( 'wp-sync' ) ||
+					response.status() !== 200
+				) {
+					return false;
+				}
+
+				const body = await response.json().catch( () => null );
+				return (
+					body?.rooms?.some(
+						( room: {
+							room?: string;
+							awareness?: Record< string, unknown >;
+						} ) =>
+							( ! roomName || room.room === roomName ) &&
+							room.awareness &&
+							Object.keys( room.awareness ).length >=
+								expectedPeerCount
+					) ?? false
+				);
+			},
+			{ timeout }
+		);
+	}
+
+	/**
+	 * Return the collaboration room name for the current post.
+	 *
+	 * @param page The Playwright page to read from.
+	 */
 	async getCurrentPostRoomName( page: Page ): Promise< string > {
 		const postId = await page.evaluate(
 			() =>

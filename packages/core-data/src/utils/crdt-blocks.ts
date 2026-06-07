@@ -81,6 +81,8 @@ interface MergeCrdtBlocksOptions {
  */
 export type MergeCursorPosition = WPBlockSelection | null;
 
+const ARRAY_ELEMENT_ID_KEY = '__unstableSyncId';
+const ARRAY_ELEMENT_ID_SYMBOL = Symbol( 'wpSyncArrayElementId' );
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
 /**
@@ -104,10 +106,20 @@ function serializeAttributeValue( value: unknown ): unknown {
 	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
 	if ( value && typeof value === 'object' ) {
 		const result: Record< string, unknown > = {};
+		const arrayElementId = getArrayElementId( value );
 
 		for ( const [ k, v ] of Object.entries( value ) ) {
+			if ( k === ARRAY_ELEMENT_ID_KEY ) {
+				continue;
+			}
+
 			result[ k ] = serializeAttributeValue( v );
 		}
+
+		if ( arrayElementId ) {
+			result[ ARRAY_ELEMENT_ID_KEY ] = arrayElementId;
+		}
+
 		return result;
 	}
 
@@ -188,14 +200,23 @@ function deserializeAttributeValue(
 	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
 	if ( value && typeof value === 'object' ) {
 		const result: Record< string, unknown > = {};
+		const arrayElementId = getArrayElementId( value );
 
 		for ( const [ key, innerValue ] of Object.entries(
 			value as Record< string, unknown >
 		) ) {
+			if ( key === ARRAY_ELEMENT_ID_KEY ) {
+				continue;
+			}
+
 			result[ key ] = deserializeAttributeValue(
 				schema?.query?.[ key ],
 				innerValue
 			);
+		}
+
+		if ( arrayElementId ) {
+			defineArrayElementId( result, arrayElementId );
 		}
 
 		return result;
@@ -367,12 +388,15 @@ function createYMapFromQuery(
 		return new Y.Map();
 	}
 
-	const entries: [ string, unknown ][] = Object.entries( obj ).map(
-		( [ key, val ] ): [ string, unknown ] => {
+	const arrayElementId = getArrayElementId( obj ) ?? uuidv4();
+	const entries: [ string, unknown ][] = Object.entries( obj )
+		.filter( ( [ key ] ) => key !== ARRAY_ELEMENT_ID_KEY )
+		.map( ( [ key, val ] ): [ string, unknown ] => {
 			const subSchema = query[ key ];
 			return [ key, createYValueFromSchema( subSchema, val ) ];
-		}
-	);
+		} );
+
+	entries.push( [ ARRAY_ELEMENT_ID_KEY, arrayElementId ] );
 
 	return new Y.Map( entries );
 }
@@ -692,10 +716,124 @@ function areArrayElementsEqual(
 	yElement: unknown
 ): boolean {
 	if ( yElement instanceof Y.Map && isRecord( newElement ) ) {
-		return fastDeepEqual( newElement, yElement.toJSON() );
+		return fastDeepEqual(
+			stripArrayElementIds( newElement ),
+			stripArrayElementIds( yElement.toJSON() )
+		);
 	}
 
-	return fastDeepEqual( newElement, yElement );
+	return fastDeepEqual(
+		stripArrayElementIds( newElement ),
+		stripArrayElementIds( yElement )
+	);
+}
+
+function getArrayElementId( value: unknown ): string | undefined {
+	if ( value instanceof Y.Map ) {
+		const id = value.get( ARRAY_ELEMENT_ID_KEY );
+		return typeof id === 'string' ? id : undefined;
+	}
+
+	if ( isRecord( value ) ) {
+		const id = value[ ARRAY_ELEMENT_ID_KEY ];
+		if ( typeof id === 'string' ) {
+			return id;
+		}
+
+		const symbolId = ( value as Record< symbol, unknown > )[
+			ARRAY_ELEMENT_ID_SYMBOL
+		];
+		return typeof symbolId === 'string' ? symbolId : undefined;
+	}
+
+	return undefined;
+}
+
+function defineArrayElementId(
+	value: Record< string, unknown >,
+	id: string
+): void {
+	Object.defineProperty( value, ARRAY_ELEMENT_ID_SYMBOL, {
+		configurable: true,
+		enumerable: true,
+		value: id,
+	} );
+}
+
+function stripArrayElementIds( value: unknown ): unknown {
+	if ( Array.isArray( value ) ) {
+		return value.map( stripArrayElementIds );
+	}
+
+	if ( isRecord( value ) ) {
+		return Object.fromEntries(
+			Object.entries( value )
+				.filter( ( [ key ] ) => key !== ARRAY_ELEMENT_ID_KEY )
+				.map( ( [ key, innerValue ] ) => [
+					key,
+					stripArrayElementIds( innerValue ),
+				] )
+		);
+	}
+
+	return value;
+}
+
+function mergeYArrayByElementIds(
+	yArray: Y.Array< unknown >,
+	newValue: unknown[],
+	query: Record< string, BlockAttributeSchema >,
+	cursorPosition: MergeCursorPosition,
+	cursorScope: RichTextCursorScope
+): boolean {
+	if ( ! newValue.some( getArrayElementId ) ) {
+		return false;
+	}
+
+	let index = 0;
+
+	for ( const newElement of newValue ) {
+		const newId = getArrayElementId( newElement );
+		let currentIndex = -1;
+
+		if ( newId ) {
+			for ( let i = index; i < yArray.length; i++ ) {
+				if ( getArrayElementId( yArray.get( i ) ) === newId ) {
+					currentIndex = i;
+					break;
+				}
+			}
+		}
+
+		if ( currentIndex > index ) {
+			yArray.delete( index, currentIndex - index );
+		}
+
+		if ( currentIndex >= index ) {
+			const currentElement = yArray.get( index );
+			if ( currentElement instanceof Y.Map && isRecord( newElement ) ) {
+				mergeYMapValues(
+					currentElement,
+					newElement,
+					query,
+					cursorPosition,
+					cursorScope
+				);
+			}
+		} else {
+			yArray.insert( index, [
+				createYMapFromQuery( query, newElement ),
+			] );
+		}
+
+		index++;
+	}
+
+	if ( yArray.length > index ) {
+		yArray.delete( index, yArray.length - index );
+	}
+
+	return true;
 }
 
 /**
@@ -725,6 +863,19 @@ function mergeYArray(
 	}
 
 	const query = schema.query;
+
+	if (
+		mergeYArrayByElementIds(
+			yArray,
+			newValue,
+			query,
+			cursorPosition,
+			cursorScope
+		)
+	) {
+		return;
+	}
+
 	const numOfCommonEntries = Math.min( newValue.length, yArray.length );
 
 	let left = 0;
@@ -909,7 +1060,7 @@ function mergeYMapValues(
 
 	// Delete properties absent from the incoming object.
 	for ( const key of yMap.keys() ) {
-		if ( ! Object.hasOwn( newObj, key ) ) {
+		if ( key !== ARRAY_ELEMENT_ID_KEY && ! Object.hasOwn( newObj, key ) ) {
 			yMap.delete( key );
 		}
 	}

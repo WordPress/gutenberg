@@ -155,6 +155,10 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
+	getHydrationChangesFromCRDTDoc?: (
+		ydoc: Y.Doc,
+		editedRecord: ObjectData
+	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
 	shouldSync?: (
 		objectType: ObjectType,

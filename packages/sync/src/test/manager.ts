@@ -68,7 +68,14 @@ describe( 'SyncManager', () => {
 		mockGetProviderCreators.mockReturnValue( [ mockProviderCreator ] );
 
 		mockSyncConfig = {
-			applyChangesToCRDTDoc: jest.fn(),
+			applyChangesToCRDTDoc: jest.fn(
+				( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+					const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						ymap.set( key, value );
+					} );
+				}
+			),
 			getChangesFromCRDTDoc: jest.fn(
 				( ydoc: CRDTDoc, editedRecord: ObjectData ) => {
 					const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
@@ -325,14 +332,79 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// getChangesFromCRDTDoc should not be called since there was no persisted doc.
+				// The live CRDT doc is read back after initialization so normalized
+				// runtime values can be reflected into the edited record.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).not.toHaveBeenCalled();
+				).toHaveBeenCalledTimes( 1 );
+				expect(
+					mockSyncConfig.getChangesFromCRDTDoc
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
+
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
 
 				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
 					1
+				);
+			} );
+
+			it( 'hydrates normalized CRDT changes when no persisted CRDT doc exists', async () => {
+				mockSyncConfig.applyChangesToCRDTDoc = jest.fn(
+					( ydoc: CRDTDoc ) => {
+						const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+						ymap.set( 'title', 'Normalized Title' );
+					}
+				);
+
+				const manager = createSyncManager();
+
+				await manager.load(
+					mockSyncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+
+				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+				expect( mockHandlers.editRecord ).toHaveBeenCalledWith(
+					{ title: 'Normalized Title' },
+					{ undoIgnore: true }
+				);
+			} );
+
+			it( 'uses a custom hydration diff when provided', async () => {
+				mockSyncConfig.applyChangesToCRDTDoc = jest.fn(
+					( ydoc: CRDTDoc ) => {
+						const ymap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+						ymap.set( 'title', 'Normalized Title' );
+						ymap.set( 'runtimeOnly', 'Runtime Value' );
+					}
+				);
+				mockSyncConfig.getHydrationChangesFromCRDTDoc = jest.fn(
+					() => ( {
+						runtimeOnly: 'Runtime Value',
+					} )
+				);
+
+				const manager = createSyncManager();
+
+				await manager.load(
+					mockSyncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+
+				expect(
+					mockSyncConfig.getHydrationChangesFromCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+				expect( mockHandlers.editRecord ).toHaveBeenCalledWith(
+					{ runtimeOnly: 'Runtime Value' },
+					{ undoIgnore: true }
 				);
 			} );
 
@@ -359,13 +431,17 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// getChangesFromCRDTDoc should be called with the persisted doc and record.
+				// getChangesFromCRDTDoc should be called with the persisted doc
+				// and then with the live target doc for runtime hydration.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledTimes( 1 );
+				).toHaveBeenCalledTimes( 2 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
+				).toHaveBeenNthCalledWith( 1, expect.any( Y.Doc ), mockRecord );
+				expect(
+					mockSyncConfig.getChangesFromCRDTDoc
+				).toHaveBeenNthCalledWith( 2, expect.any( Y.Doc ), mockRecord );
 
 				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
@@ -405,13 +481,19 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), expectedChanges );
 
-				// getChangesFromCRDTDoc should be called with the persisted doc and record.
+				// getChangesFromCRDTDoc should be called with the persisted doc
+				// and then with the live target doc for runtime hydration.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledTimes( 1 );
+				).toHaveBeenCalledTimes( 2 );
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
+				).toHaveBeenNthCalledWith( 1, expect.any( Y.Doc ), mockRecord );
+				expect(
+					mockSyncConfig.getChangesFromCRDTDoc
+				).toHaveBeenNthCalledWith( 2, expect.any( Y.Doc ), mockRecord );
+
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
 
 				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
@@ -953,7 +1035,7 @@ describe( 'SyncManager', () => {
 			const remoteDoc = new Y.Doc();
 			remoteDoc
 				.getMap( CRDT_RECORD_MAP_KEY )
-				.set( 'title', 'Title from remote peer' );
+				.set( 'remoteOnly', 'Value from remote peer' );
 			Y.applyUpdateV2(
 				capturedDoc as unknown as Y.Doc,
 				Y.encodeStateAsUpdateV2( remoteDoc )
@@ -965,7 +1047,7 @@ describe( 'SyncManager', () => {
 
 			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
 			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-				title: 'Title from remote peer',
+				remoteOnly: 'Value from remote peer',
 			} );
 		} );
 
