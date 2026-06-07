@@ -73,10 +73,11 @@ function NotesSidebar( { postId } ) {
 
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
-	const isOtherSidebarOpen = useSelect( ( select ) => {
-		const activeArea =
-			select( interfaceStore ).getActiveComplementaryArea( 'core' );
-		return !! activeArea && activeArea !== FLOATING_NOTES_SIDEBAR;
+	const isNotesSidebarOpen = useSelect( ( select ) => {
+		return (
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			ALL_NOTES_SIDEBAR
+		);
 	}, [] );
 
 	// Only enable the floating sidebar for large viewports.
@@ -199,7 +200,7 @@ function NotesSidebar( { postId } ) {
 			) }
 			{ isLargeViewport &&
 				shouldShowFloatingNotes &&
-				! isOtherSidebarOpen && (
+				! isNotesSidebarOpen && (
 					<CollabSidebarFill>
 						<div
 							role="region"
