@@ -36,13 +36,13 @@
 	gap: $grid-unit-20;
 
 	.dataviews-wrapper {
-		margin-right: -$grid-unit-30;
-		margin-left: -$grid-unit-30;
+		margin-inline: -$grid-unit-30;
 	}
 }
 
 .guidelines__revision-history-back {
 	align-self: flex-start;
+	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
 	margin-left: -$grid-unit-20;
 	font-weight: 500;
 	color: $gray-900;
@@ -54,6 +54,7 @@
 }
 
 .guidelines__revision-description {
+	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
 	padding-left: $grid-unit-10;
 }
 

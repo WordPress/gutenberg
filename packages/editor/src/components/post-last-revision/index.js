@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, __, _n } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { backup } from '@wordpress/icons';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -16,11 +17,16 @@ import { unlock } from '../../lock-unlock';
 
 function usePostLastRevisionInfo() {
 	return useSelect( ( select ) => {
-		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
-			select( editorStore );
+		const {
+			getCurrentPostLastRevisionId,
+			getCurrentPostRevisionsCount,
+			getEditorSettings,
+		} = select( editorStore );
 		return {
 			lastRevisionId: getCurrentPostLastRevisionId(),
 			revisionsCount: getCurrentPostRevisionsCount(),
+			disableVisualRevisions:
+				!! getEditorSettings().disableVisualRevisions,
 		};
 	}, [] );
 }
@@ -31,14 +37,23 @@ function usePostLastRevisionInfo() {
  * @return {React.ReactNode} The rendered component.
  */
 function PostLastRevision() {
-	const { lastRevisionId, revisionsCount } = usePostLastRevisionInfo();
+	const { lastRevisionId, revisionsCount, disableVisualRevisions } =
+		usePostLastRevisionInfo();
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+
+	const buttonProps = disableVisualRevisions
+		? {
+				href: addQueryArgs( 'revision.php', {
+					revision: lastRevisionId,
+				} ),
+		  }
+		: { onClick: () => setCurrentRevisionId( lastRevisionId ) };
 
 	return (
 		<PostLastRevisionCheck>
 			<Button
 				__next40pxDefaultSize
-				onClick={ () => setCurrentRevisionId( lastRevisionId ) }
+				{ ...buttonProps }
 				className="editor-post-last-revision__title"
 				icon={ backup }
 				iconPosition="right"
@@ -53,16 +68,34 @@ function PostLastRevision() {
 }
 
 export function PrivatePostLastRevision() {
-	const { lastRevisionId, revisionsCount } = usePostLastRevisionInfo();
+	const { lastRevisionId, revisionsCount, disableVisualRevisions } =
+		usePostLastRevisionInfo();
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+
+	const buttonProps = disableVisualRevisions
+		? {
+				href: addQueryArgs( 'revision.php', {
+					revision: lastRevisionId,
+				} ),
+		  }
+		: { onClick: () => setCurrentRevisionId( lastRevisionId ) };
 
 	return (
 		<PostLastRevisionCheck>
 			<PostPanelRow label={ __( 'Revisions' ) }>
 				<Button
-					onClick={ () => setCurrentRevisionId( lastRevisionId ) }
+					{ ...buttonProps }
 					className="editor-private-post-last-revision__button"
 					text={ revisionsCount }
+					aria-label={ sprintf(
+						/* translators: %d: number of revisions. */
+						_n(
+							'Open revisions screen: %d revision',
+							'Open revisions screen: %d revisions',
+							revisionsCount
+						),
+						revisionsCount
+					) }
 					variant="tertiary"
 					size="compact"
 				/>

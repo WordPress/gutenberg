@@ -377,4 +377,48 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 		$this->assertFalse( $result );
 	}
+
+	/**
+	 * Test that shortcodes inside a Navigation Overlay template part are expanded
+	 * rather than output as raw shortcode tokens.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/77510
+	 */
+	public function test_shortcode_block_in_navigation_overlay_is_rendered() {
+		add_shortcode(
+			'gb_test_overlay_shortcode',
+			static function () {
+				return 'Hello, World!';
+			}
+		);
+
+		$current_theme = get_stylesheet();
+		$slug          = 'test-overlay-with-shortcode';
+
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Overlay With Shortcode',
+				'post_name'    => $slug,
+				'post_content' => '<!-- wp:shortcode -->[gb_test_overlay_shortcode]<!-- /wp:shortcode -->',
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+
+		$output = do_blocks(
+			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->'
+		);
+
+		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
+		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
+	}
 }

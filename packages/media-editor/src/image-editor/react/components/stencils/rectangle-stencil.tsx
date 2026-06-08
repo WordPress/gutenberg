@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -20,6 +26,7 @@ import {
 	type CropBounds,
 	type ResizeDragState,
 } from '../../../core/stencil-math';
+import { VISUALLY_HIDDEN_STYLE } from '../../visually-hidden-style';
 
 /**
  * Corner handle positions only — used when aspect ratio is locked.
@@ -96,6 +103,7 @@ type RectangleStencilProps = StencilProps;
  * @param props.stencilTransition CSS transition string for settle animation.
  * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
  * @param props.onEscape          Called when Escape is pressed on a resize handle.
+ * @param props.minCropSize       Minimum crop rect dimension in normalized space, per axis.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -110,6 +118,7 @@ export function RectangleStencil( {
 	stencilTransition,
 	cropBounds,
 	onEscape,
+	minCropSize,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -127,6 +136,7 @@ export function RectangleStencil( {
 	);
 	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
 	const keyboardResizeActiveRef = useRef( false );
+	const resizeHandleDescriptionId = useId();
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
 
 	// Clear the pending keyboard settle timer on unmount so it can't
@@ -280,7 +290,7 @@ export function RectangleStencil( {
 			el.addEventListener( 'pointerup', onEnd );
 			el.addEventListener( 'lostpointercapture', onEnd );
 
-			onResizeStart?.();
+			onResizeStart?.( handle );
 			// Cancel any pending keyboard settle so it can't fire onResizeEnd
 			// mid-drag if the user switches from keyboard to pointer within
 			// the settle window.
@@ -300,8 +310,15 @@ export function RectangleStencil( {
 			clientX: number,
 			clientY: number
 		): NormalizedRect =>
-			computeFreeResizeRect( drag, clientX, clientY, imageSize, bounds ),
-		[ imageSize, bounds ]
+			computeFreeResizeRect(
+				drag,
+				clientX,
+				clientY,
+				imageSize,
+				bounds,
+				minCropSize
+			),
+		[ imageSize, bounds, minCropSize ]
 	);
 
 	/**
@@ -320,9 +337,10 @@ export function RectangleStencil( {
 				clientY,
 				imageSize,
 				bounds,
-				normalizedRatio
+				normalizedRatio,
+				minCropSize
 			),
-		[ imageSize, bounds, normalizedRatio ]
+		[ imageSize, bounds, normalizedRatio, minCropSize ]
 	);
 
 	/**
@@ -340,9 +358,10 @@ export function RectangleStencil( {
 				clientX,
 				clientY,
 				imageSize,
-				bounds
+				bounds,
+				minCropSize
 			),
-		[ imageSize, bounds ]
+		[ imageSize, bounds, minCropSize ]
 	);
 
 	latestHandlersRef.current = {
@@ -384,7 +403,7 @@ export function RectangleStencil( {
 
 			if ( ! keyboardResizeActiveRef.current ) {
 				keyboardResizeActiveRef.current = true;
-				onResizeStart?.();
+				onResizeStart?.( handle );
 			}
 
 			const scheduleKeyboardResizeEnd = () => {
@@ -477,6 +496,16 @@ export function RectangleStencil( {
 				transition: stencilTransition,
 			} }
 		>
+			{ freeformCrop && (
+				<div
+					id={ resizeHandleDescriptionId }
+					style={ VISUALLY_HIDDEN_STYLE }
+				>
+					{ __(
+						'Use arrow keys to resize the crop area. Hold Shift for larger steps.'
+					) }
+				</div>
+			) }
 			{ /* The crop rectangle border. pointer-events: none is set in
 				   CSS so clicks pass through to the container for panning. */ }
 			<div
@@ -506,6 +535,7 @@ export function RectangleStencil( {
 						onTouchStart={ ( event ) => event.stopPropagation() }
 						onKeyDown={ ( event ) => handleKeyDown( pos, event ) }
 						aria-label={ getHandleLabel( pos ) }
+						aria-describedby={ resizeHandleDescriptionId }
 					/>
 				) ) }
 		</div>

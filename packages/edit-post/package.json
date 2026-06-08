@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "8.45.0",
+	"version": "8.47.0",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -82,6 +82,11 @@
 		"@wordpress/widgets": "file:../widgets",
 		"clsx": "^2.1.1",
 		"memize": "^2.1.0"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

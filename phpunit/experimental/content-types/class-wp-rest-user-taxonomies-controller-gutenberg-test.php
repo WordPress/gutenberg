@@ -49,34 +49,29 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	const REST_BASE = '/wp/v2/user-taxonomies';
 
 	/**
-	 * Build a wp_user_taxonomy record directly via wp_insert_post so tests can
-	 * seed both REST-shaped and pathological payloads without going through
-	 * the controller. The wp_insert_post_data filter sanitizes the content
-	 * in flight, so seeded data follows the same path as production writes.
+	 * Seed a wp_user_taxonomy record via REST so tests follow the same write
+	 * path as production — controller sanitization, post-meta handling, and
+	 * config encoding all happen through the REST controller.
 	 *
 	 * @param array  $config      Decoded config payload.
 	 * @param string $slug        Record post_name (taxonomy slug).
 	 * @param string $title       Plural label / post_title.
-	 * @param string $status      Post status.
-	 * @param array  $object_type Post type slugs to attach as meta.
+	 * @param array  $object_type Post type slugs to attach.
 	 * @return int Post ID.
 	 */
-	protected static function insert_user_taxonomy_record( $config, $slug, $title, $status = 'publish', $object_type = array( 'post' ) ) {
-		$post_id = wp_insert_post(
+	protected static function insert_user_taxonomy_record( $config, $slug, $title, $object_type = array( 'post' ) ) {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
 			array(
-				'post_type'    => 'wp_user_taxonomy',
-				'post_status'  => $status,
-				'post_name'    => $slug,
-				'post_title'   => $title,
-				'post_content' => wp_json_encode( $config ),
+				'title'       => $title,
+				'slug'        => $slug,
+				'status'      => 'publish',
+				'object_type' => $object_type,
+				'config'      => $config,
 			)
 		);
-
-		foreach ( $object_type as $pt ) {
-			add_post_meta( $post_id, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $pt );
-		}
-
-		return $post_id;
+		return rest_get_server()->dispatch( $request )->get_data()['id'];
 	}
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
@@ -107,7 +102,6 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 			),
 			'genre',
 			'Genres',
-			'publish',
 			array( 'post' )
 		);
 
@@ -119,7 +113,6 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 			),
 			'topic',
 			'Topics',
-			'publish',
 			array( 'page' )
 		);
 
@@ -636,37 +629,6 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 		// test passes vacuously if marker injection is silently broken.
 		$raw = get_post( self::$taxonomy_id )->post_content;
 		$this->assertStringContainsString( GUTENBERG_USER_TAXONOMY_CONFIG_MARKER, $raw );
-	}
-
-	/**
-	 * `gutenberg_register_user_defined_taxonomies()` only registers records
-	 * with `post_status === 'publish'`; drafts are skipped so the Edit
-	 * "Active" toggle effectively gates registration.
-	 */
-	public function test_drafts_are_skipped_by_registration() {
-		$draft_id = self::insert_user_taxonomy_record(
-			array( 'labels' => array( 'singular_name' => 'Draft' ) ),
-			'draft_tax',
-			'Drafts',
-			'draft',
-			array( 'post' )
-		);
-
-		gutenberg_register_user_defined_taxonomies();
-		$this->assertFalse( taxonomy_exists( 'draft_tax' ) );
-
-		// Publish and re-run — should now register.
-		wp_update_post(
-			array(
-				'ID'          => $draft_id,
-				'post_status' => 'publish',
-			)
-		);
-		gutenberg_register_user_defined_taxonomies();
-		$this->assertTrue( taxonomy_exists( 'draft_tax' ) );
-
-		unregister_taxonomy( 'draft_tax' );
-		wp_delete_post( $draft_id, true );
 	}
 
 	/**

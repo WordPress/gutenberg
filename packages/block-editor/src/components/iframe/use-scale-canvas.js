@@ -312,8 +312,14 @@ export function useScaleCanvas( {
 	 * changes due to the container resizing.
 	 */
 	useEffect( () => {
-		const trigger =
-			iframeDocument && previousIsZoomedOut.current !== isZoomedOut;
+		// Wait for the iframe document so a zoom out state that is already
+		// active on mount (e.g. when the canvas is remounted on a viewport
+		// change) is still detected as a transition.
+		if ( ! iframeDocument ) {
+			return;
+		}
+
+		const trigger = previousIsZoomedOut.current !== isZoomedOut;
 
 		previousIsZoomedOut.current = isZoomedOut;
 

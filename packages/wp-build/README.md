@@ -52,6 +52,13 @@ or via npm script:
 }
 ```
 
+### Testing Generated Styles
+
+Generated CSS module output skips automatic style injection when `NODE_ENV` is
+`test`. Node-based DOM implementations such as jsdom do not reliably support
+modern CSS features, so tests that need actual styles in the DOM should
+run in a browser environment.
+
 ## Package Configuration
 
 Configure your `package.json` with the following optional fields:
@@ -277,9 +284,10 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with optional init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "experimental": true }` - Page with optional init modules
   - **`id`** (required): The page slug used in WordPress admin URLs
   - **`init`** (optional): Array of script module IDs to execute during page initialization
+  - **`experimental`** (optional, default `false`): When `true`, the page is excluded from WordPress Core builds (`IS_WORDPRESS_CORE=true`), along with any route that belongs only to experimental pages.
 
 **Generated Files:**
 
@@ -466,6 +474,8 @@ Each page ID must match one of the pages defined in `wpPlugin.pages` in your roo
 
 Multi-page routes are useful for shared functionality across different admin pages, such as settings routes accessible from both a main page and a dedicated settings page.
 
+Routes inherit their experimental status from their pages: a route is excluded from WordPress Core builds only when every page it belongs to is marked `"experimental": true` in `wpPlugin.pages`.
+
 ### Components
 
 **stage.tsx** - Main content (required):
@@ -542,6 +552,7 @@ widgets/
     widget.ts       # Runtime schema entry point (optional)
     render.tsx      # UI component entry point (optional)
     render.scss     # Optional styles (bundled inline when imported from render.tsx)
+    package.json    # Optional npm dependencies manifest
 ```
 
 ### Why two entries?
@@ -580,6 +591,7 @@ Rule of thumb: anything expressible as plain JSON goes in `widget.json`. Anythin
 Exports a default object that describes the widget's runtime contract: typed attributes, translated labels, example data. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
 
 ```ts
+import { wordpress } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 type HelloWorldAttributes = {
@@ -590,6 +602,7 @@ type HelloWorldAttributes = {
 const widget = {
 	name: 'my-plugin/hello-world',
 	title: __( 'Hello World', 'my-plugin' ),
+	icon: wordpress,
 	attributes: [
 		{
 			id: 'greeting',

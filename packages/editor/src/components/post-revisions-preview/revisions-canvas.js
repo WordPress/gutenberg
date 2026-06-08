@@ -58,14 +58,20 @@ const REVISION_REMOVED_FILTER_SVG = `
 const REVISION_DIFF_STYLES = `
 	.is-revision-added {
 		box-shadow: inset 0 0 0 9999px color-mix(in srgb, currentColor 5%, #00a32a 15%), 0 0 0 4px color-mix(in srgb, currentColor 5%, #00a32a 15%);
+		outline: 3px solid #00a32a;
+		outline-offset: 2px;
 	}
 	.is-revision-removed,
 	.revision-diff-removed {
 		text-decoration: line-through;
 		filter: url(#revision-removed-filter);
 	}
+	.is-revision-removed {
+		outline: 3px dashed #d63638;
+		outline-offset: 2px;
+	}
 	.is-revision-modified {
-		outline: 2px solid color-mix(in srgb, currentColor 30%, #dba617 70%) !important;
+		outline: 3px dotted #9a7000 !important;
 		outline-offset: 2px;
 	}
 	.revision-diff-added {
