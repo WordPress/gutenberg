@@ -49,7 +49,7 @@ import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useStyle } = unlock( editorPrivateApis );
+const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
@@ -169,6 +169,7 @@ function Layout() {
 					) }
 
 					<SnackbarNotices className="edit-site-layout__snackbar" />
+					<UploadProgressSnackbar />
 
 					{ isMobileViewport && hasMobileAreas && (
 						<div className="edit-site-layout__mobile">

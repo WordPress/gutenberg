@@ -97,12 +97,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		);
 
 		const footerElement = (
-			<div
-				className={ clsx(
-					overlayChromeStyles.footer,
-					alertDialogStyles[ 'footer-column' ]
-				) }
-			>
+			<div className={ alertDialogStyles[ 'footer-column' ] }>
 				<Stack
 					direction="row"
 					gap="sm"

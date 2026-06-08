@@ -13,6 +13,6 @@
 		"@wordpress/url": "file:../../packages/url"
 	},
 	"devDependencies": {
-		"@types/react": "^19.2.13"
+		"@types/react": "^18.3.27"
 	}
 }

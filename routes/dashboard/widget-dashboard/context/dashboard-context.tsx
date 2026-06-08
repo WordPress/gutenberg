@@ -27,6 +27,7 @@ import type {
 	WidgetGridSettings,
 	DashboardWidget,
 } from '../types';
+import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
 import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
 
 /*
@@ -35,14 +36,10 @@ import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
  *
- * `widgets.tsx` also applies a hard-coded floor when `minColumnWidth`
- * resolves to `undefined`, to keep legibility intact for stored settings
- * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
 	model: 'grid',
-	columns: 12,
-	minColumnWidth: 140,
+	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
 	rowHeight: DEFAULT_ROW_HEIGHT,
 };
 
@@ -54,7 +51,7 @@ function resolveGridSettings(
 	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
 	return {
 		...normalized,
-		columns: normalized.columns ?? DEFAULT_GRID.columns!,
+		columns: WIDGET_DASHBOARD_COLUMN_COUNT,
 	};
 }
 

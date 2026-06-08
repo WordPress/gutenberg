@@ -43,13 +43,13 @@
 	"wpScript": true,
 	"types": "build-types/index.d.ts",
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/keycodes": "file:../keycodes"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

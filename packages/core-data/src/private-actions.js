@@ -198,6 +198,24 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
+ * Returns an action object used to notify core-data that the sync undo manager
+ * state changed outside of the core-data reducer, e.g. The Yjs UndoManager
+ * captured an undo level.
+ *
+ * @param {Object}  state         The sync undo stack state.
+ * @param {boolean} state.hasRedo Whether there are changes to redo.
+ * @param {boolean} state.hasUndo Whether there are changes to undo.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableNotifySyncUndoManagerChange( state ) {
+	return {
+		type: 'SYNC_UNDO_MANAGER_CHANGE',
+		...state,
+	};
+}
+
+/**
  * Returns an action object used to set the sync connection status for an entity or collection.
  *
  * @param {string}             kind   Kind of the entity.

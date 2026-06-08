@@ -45,7 +45,7 @@
 	"wpScriptDefaultExport": true,
 	"types": "build-types/index.d.ts",
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -57,8 +57,8 @@
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
