@@ -41,6 +41,8 @@ const GUTENBERG_DASHBOARD_NAME = 'gutenberg_dashboard';
  * The JS side stays oblivious: a default and a user-saved layout
  * look identical at the preferences-store boundary.
  *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
  * @param mixed  $value    The pre-fetched value, or null to let the
  *                         meta API resolve normally.
  * @param int    $user_id  User ID.

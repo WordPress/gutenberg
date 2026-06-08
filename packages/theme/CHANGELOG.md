@@ -10,6 +10,10 @@
 - Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
 
+### Enhancements
+
+-   Increase the contrast target of `stroke1` from `2.6` to `2.9` so that, on the default scale, it lands between `gray100` and `gray200`. This regenerates `stroke1` for every ramp and updates the values of `--wpds-color-stroke-surface-{brand,error,info,success,warning,neutral-weak}` and `--wpds-color-bg-track-neutral-weak` ([#77599](https://github.com/WordPress/gutenberg/pull/77599)).
+
 ## 0.14.0 (2026-05-27)
 
 ### Breaking Changes
