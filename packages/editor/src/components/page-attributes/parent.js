@@ -45,7 +45,7 @@ function getTitle( post ) {
 		return fallback;
 	}
 
-	// Safely strip HTML without triggering asset downloads
+	// Safely strip HTML.
 	let plainText = '';
 	if ( typeof window !== 'undefined' && window.DOMParser ) {
 		const parser = new window.DOMParser();

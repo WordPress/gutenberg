@@ -40,7 +40,6 @@ export function sanitizeAndStripHtml( html: string ): string {
 		const doc = parser.parseFromString( html, 'text/html' );
 		plainText = doc.body.textContent || '';
 	} else {
-		// Safe SSR fallback
 		plainText = html.replace( /<[^>]*>/g, '' );
 	}
 
@@ -55,7 +54,7 @@ export function smartTruncate(
 		return text;
 	}
 
-	// Slice to max length, then find the last space to avoid cutting words in half
+	// Slice to max length, then find the last space to avoid cutting words in half.
 	const trimmed = text.slice( 0, maxLength + 1 );
 	const lastSpaceIndex = trimmed.lastIndexOf( ' ' );
 
@@ -63,7 +62,7 @@ export function smartTruncate(
 		return `${ trimmed.slice( 0, lastSpaceIndex ) }…`;
 	}
 
-	// Fallback for extremely long contiguous strings without spaces
+	// Fallback for extremely long contiguous strings without spaces.
 	return `${ text.slice( 0, maxLength ) }…`;
 }
 

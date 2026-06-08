@@ -13,6 +13,9 @@ import { getPostTitleWithFallbackSnippet } from '../utils/get-post-title-with-fa
 export default function MediaAttachedToView( {
 	item,
 }: DataViewRenderFieldProps< MediaItem > ) {
+	// Store the displayed title in state, as the embedded post may be loaded
+	// asynchronously. This ensures that the title remains stable after it
+	// is updated by the user, and while it is re-fetched from the server.
 	const [ attachedPostTitle, setAttachedPostTitle ] = useState<
 		string | null
 	>( null );
