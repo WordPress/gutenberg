@@ -53,7 +53,7 @@ const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
-const CONTENT_BACKGROUND = '#ffffff';
+const CONTENT_COLOR = { bg: '#ffffff' };
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
@@ -187,9 +187,7 @@ function Layout() {
 										<SidebarContent routeKey={ routeKey }>
 											{ areas.mobileContent ? (
 												<ThemeProvider
-													color={ {
-														bg: CONTENT_BACKGROUND,
-													} }
+													color={ CONTENT_COLOR }
 												>
 													<div className="edit-site-layout__mobile-content">
 														<ErrorBoundary>
@@ -209,9 +207,7 @@ function Layout() {
 										<SavePanel />
 									</>
 								) : (
-									<ThemeProvider
-										color={ { bg: CONTENT_BACKGROUND } }
-									>
+									<ThemeProvider color={ CONTENT_COLOR }>
 										<ErrorBoundary>
 											{ areas.preview }
 										</ErrorBoundary>
@@ -230,9 +226,7 @@ function Layout() {
 									maxWidth: widths?.content,
 								} }
 							>
-								<ThemeProvider
-									color={ { bg: CONTENT_BACKGROUND } }
-								>
+								<ThemeProvider color={ CONTENT_COLOR }>
 									<ErrorBoundary>
 										{ areas.content }
 									</ErrorBoundary>
@@ -247,7 +241,7 @@ function Layout() {
 								maxWidth: widths?.edit,
 							} }
 						>
-							<ThemeProvider color={ { bg: CONTENT_BACKGROUND } }>
+							<ThemeProvider color={ CONTENT_COLOR }>
 								<ErrorBoundary>{ areas.edit }</ErrorBoundary>
 							</ThemeProvider>
 						</div>
@@ -290,9 +284,7 @@ function Layout() {
 											} }
 										>
 											<ThemeProvider
-												color={ {
-													bg: CONTENT_BACKGROUND,
-												} }
+												color={ CONTENT_COLOR }
 											>
 												{ areas.preview }
 											</ThemeProvider>
