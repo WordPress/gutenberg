@@ -343,6 +343,8 @@ describe( 'diffRevisionContent', () => {
 		// The other block appears as removed + added (showing the reorder).
 		// We intentionally don't pair identical blocks as "modified" since
 		// there's no actual content change - just a position change.
+		// (Pre-v8, LCS matched the other block. Both are equally-valid
+		// choices for a pure swap.)
 		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 			{
 				name: 'core/paragraph',
@@ -515,24 +517,31 @@ describe( 'diffRevisionContent', () => {
 			} ),
 		] );
 		const blocks = diffRevisionContent( current, previous );
-		const normalized = normalizeBlockTree( blocks );
 
-		expect( normalized ).toHaveLength( 3 );
-		expect( normalized[ 0 ].attributes.__revisionDiffStatus?.status ).toBe(
-			'modified'
-		);
-		expect( normalized[ 1 ].attributes.content ).toBe(
-			'Stays one anchor sentence'
-		);
-		expect(
-			normalized[ 1 ].attributes.__revisionDiffStatus
-		).toBeUndefined();
-		expect( normalized[ 2 ].attributes.content ).toBe(
-			'Stays two anchor sentence'
-		);
-		expect(
-			normalized[ 2 ].attributes.__revisionDiffStatus
-		).toBeUndefined();
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'Original tail content sentence<ins title="Added" class="revision-diff-added"> rewritten</ins>',
+					__revisionDiffStatus: { status: 'modified' },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Stays one anchor sentence',
+					__revisionDiffStatus: undefined,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Stays two anchor sentence',
+					__revisionDiffStatus: undefined,
+				},
+			},
+		] );
 	} );
 
 	describe( 'inner blocks', () => {

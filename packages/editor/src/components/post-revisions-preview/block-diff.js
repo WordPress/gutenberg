@@ -330,12 +330,8 @@ function pairSimilarBlocks( blocks ) {
 function diffRawBlocks( currentRaw, previousRaw ) {
 	// Strip whitespace-only freeform pseudo-blocks before LCS — see
 	// `isWhitespaceRawBlock` for why.
-	const currentBlocks = currentRaw.filter(
-		( b ) => ! isWhitespaceRawBlock( b )
-	);
-	const previousBlocks = previousRaw.filter(
-		( b ) => ! isWhitespaceRawBlock( b )
-	);
+	currentRaw = currentRaw.filter( ( b ) => ! isWhitespaceRawBlock( b ) );
+	previousRaw = previousRaw.filter( ( b ) => ! isWhitespaceRawBlock( b ) );
 
 	const createBlockSignature = ( rawBlock ) =>
 		JSON.stringify( {
@@ -347,8 +343,8 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 				( c ) => c !== null && c.trim() !== ''
 			),
 		} );
-	const currentSigs = currentBlocks.map( createBlockSignature );
-	const previousSigs = previousBlocks.map( createBlockSignature );
+	const currentSigs = currentRaw.map( createBlockSignature );
+	const previousSigs = previousRaw.map( createBlockSignature );
 
 	const diff = diffArrays( previousSigs, currentSigs );
 
@@ -360,22 +356,22 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 		if ( part.added ) {
 			for ( let i = 0; i < part.count; i++ ) {
 				result.push( {
-					...currentBlocks[ currIdx++ ],
+					...currentRaw[ currIdx++ ],
 					__revisionDiffStatus: { status: 'added' },
 				} );
 			}
 		} else if ( part.removed ) {
 			for ( let i = 0; i < part.count; i++ ) {
 				result.push( {
-					...previousBlocks[ prevIdx++ ],
+					...previousRaw[ prevIdx++ ],
 					__revisionDiffStatus: { status: 'removed' },
 				} );
 			}
 		} else {
 			// Matched blocks - recursively diff their innerBlocks.
 			for ( let i = 0; i < part.count; i++ ) {
-				const currBlock = currentBlocks[ currIdx++ ];
-				const prevBlock = previousBlocks[ prevIdx++ ];
+				const currBlock = currentRaw[ currIdx++ ];
+				const prevBlock = previousRaw[ prevIdx++ ];
 
 				// Recursively diff inner blocks.
 				const diffedInnerBlocks = diffRawBlocks(
