@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { BasePost } from '../../types';
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitleWithFallbackSnippet } from '../../actions/utils';
 import PageTitleView from './view';
 
 const pageTitleField: Field< BasePost > = {
@@ -16,7 +16,7 @@ const pageTitleField: Field< BasePost > = {
 	id: 'title',
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),
-	getValue: ( { item } ) => getItemTitle( item ),
+	getValue: ( { item } ) => getItemTitleWithFallbackSnippet( item ),
 	render: PageTitleView,
 	enableHiding: false,
 	enableGlobalSearch: true,

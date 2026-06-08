@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type { CommonPost } from '../../types';
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitleWithFallbackSnippet } from '../../actions/utils';
 import TitleView from './view';
 
 const titleField: Field< CommonPost > = {
@@ -16,7 +16,7 @@ const titleField: Field< CommonPost > = {
 	id: 'title',
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),
-	getValue: ( { item } ) => getItemTitle( item ),
+	getValue: ( { item } ) => getItemTitleWithFallbackSnippet( item ),
 	render: TitleView,
 	enableHiding: true,
 	enableGlobalSearch: true,
