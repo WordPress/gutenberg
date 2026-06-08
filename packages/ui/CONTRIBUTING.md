@@ -280,13 +280,17 @@ All sub-layers are nested within the top-level `wp-ui` layer:
 
 A rule that overrides a primitive defined in another stylesheet (e.g. a shared class from `overlay-chrome.module.css`) must live in a **higher** layer than that primitive — typically `wp-ui-compositions`. Placing both in the same layer leaves the conflict to be resolved by `<style>` injection order, which is not deterministic and can flip when an unrelated component lazy-loads (its own copy of the shared stylesheet re-orders the tags). The layer hierarchy is what guarantees the override wins.
 
-When the override also `composes` the primitive it extends, keep the override in `wp-ui-compositions` (the `composes` does not change its layer) and let `composes` bind the two classes together so the base can never be applied without the override:
+When the override also `composes` the primitive it extends, keep the override in `wp-ui.compositions` (the `composes` does not change its layer) and let `composes` bind the two classes together so the base can never be applied without the override:
 
 ```css
-@layer wp-ui-compositions {
-	.footer-column {
-		composes: footer from "../utils/css/overlay-chrome.module.css";
-		flex-direction: column;
+@layer wp-ui {
+	/* ... */
+
+	@layer compositions {
+		.footer-column {
+			composes: footer from '../utils/css/overlay-chrome.module.css';
+			flex-direction: column;
+		}
 	}
 }
 ```
