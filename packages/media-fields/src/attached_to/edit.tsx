@@ -16,7 +16,7 @@ import type { DataFormControlProps } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import type { MediaItem } from '../types';
-import { getRenderedContent } from '../utils/get-rendered-content';
+import { getPostTitleWithFallbackSnippet } from '../utils/get-post-title-with-fallback-snippet';
 
 export type SearchResult = {
 	/**
@@ -45,13 +45,12 @@ export default function MediaAttachedToEdit( {
 	data,
 	onChange,
 }: DataFormControlProps< MediaItem > ) {
+	const embeddedPost = data._embedded?.[ 'wp:attached-to' ]?.[ 0 ];
 	const defaultPost =
-		!! data.post && !! data?._embedded?.[ 'wp:attached-to' ]?.[ 0 ]
+		!! data.post && !! embeddedPost
 			? [
 					{
-						label: getRenderedContent(
-							data._embedded?.[ 'wp:attached-to' ]?.[ 0 ]?.title
-						),
+						label: getPostTitleWithFallbackSnippet( embeddedPost ),
 						value: data.post.toString(),
 					},
 			  ]
