@@ -276,6 +276,11 @@ function UnforwardedColorPalette(
 		ariaLabelledby
 	);
 
+	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty circular option picker.
+	if ( disableCustomColors && colors.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
 			{ ! disableCustomColors && (
