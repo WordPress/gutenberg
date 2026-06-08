@@ -45,6 +45,14 @@ const baseView = {
 
 const DAY_IN_MILLISECONDS = 86400000;
 
+function getDisplayDate( value ) {
+	const dateNowInMs = getDate( null ).getTime();
+	const date = getDate( value ?? null );
+	return dateNowInMs - date.getTime() > DAY_IN_MILLISECONDS
+		? dateI18n( getSettings().formats.datetimeAbbreviated, date )
+		: humanTimeDiff( date );
+}
+
 function stringifyValue( value ) {
 	if ( value === null || value === undefined ) {
 		return '';
@@ -143,26 +151,18 @@ export default function PostRevisionsTimeline() {
 			{
 				id: 'date',
 				label: __( 'Date' ),
-				render: ( { item, field } ) => {
-					const dateNowInMs = getDate( null ).getTime();
-					const _value = field.getValue( { item } );
-					const date = getDate( _value ?? null );
-					const displayDate =
-						dateNowInMs - date.getTime() > DAY_IN_MILLISECONDS
-							? dateI18n(
-									getSettings().formats.datetimeAbbreviated,
-									date
-							  )
-							: humanTimeDiff( date );
-					return (
-						<Text
-							variant="heading-sm"
-							render={ <time dateTime={ _value } /> }
-						>
-							{ displayDate }
-						</Text>
-					);
-				},
+				// Return the humanized label the row renders so the picker
+				// option's accessible name announces e.g. "5 minutes ago"
+				// instead of the raw ISO timestamp.
+				getValue: ( { item } ) => getDisplayDate( item.date ),
+				render: ( { item } ) => (
+					<Text
+						variant="heading-sm"
+						render={ <time dateTime={ item.date } /> }
+					>
+						{ getDisplayDate( item.date ) }
+					</Text>
+				),
 				enableSorting: false,
 				enableHiding: false,
 			},
