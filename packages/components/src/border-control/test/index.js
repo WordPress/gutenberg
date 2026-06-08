@@ -179,16 +179,17 @@ describe( 'BorderControl', () => {
 
 		it( 'should not render ColorPalette if colors is empty and disableCustomColors is true', async () => {
 			const user = userEvent.setup();
-			const props = createProps( { colors: [], disableCustomColors: true } );
+			const props = createProps( {
+				colors: [],
+				disableCustomColors: true,
+			} );
 			render( <TestBorderControl { ...props } /> );
 
 			const toggleButton = screen.getByLabelText( toggleLabelRegex );
 			await user.click( toggleButton );
 
 			// Wait for the popover to appear by checking for the style picker.
-			await waitFor( () =>
-				expect( screen.getByText( 'Style' ) ).toBeInTheDocument()
-			);
+			expect( await screen.findByText( 'Style' ) ).toBeInTheDocument();
 			// The ColorPalette contains both the custom color picker button and the listbox of color options, so neither should be rendered when there are no colors and custom colors are disabled.
 			expect(
 				screen.queryByRole( 'button', {
@@ -212,9 +213,7 @@ describe( 'BorderControl', () => {
 			await user.click( toggleButton );
 
 			// Wait for the popover to appear by checking for the style picker.
-			await waitFor( () =>
-				expect( screen.getByText( 'Style' ) ).toBeInTheDocument()
-			);
+			expect( await screen.findByText( 'Style' ) ).toBeInTheDocument();
 
 			// Color swatches should still render.
 			const circularOptionPicker = screen.getByRole( 'listbox', {
