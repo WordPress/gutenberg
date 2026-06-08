@@ -32,7 +32,7 @@
 		"@wordpress/rich-text": "file:../../packages/rich-text",
 		"ajv": "^8.17.1",
 		"fast-glob": "^3.2.7",
-		"react": "^18.3.0"
+		"react": "^18.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

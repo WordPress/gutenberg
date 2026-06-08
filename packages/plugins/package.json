@@ -50,7 +50,7 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"memize": "^2.0.1"
+		"memize": "^2.1.0"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",

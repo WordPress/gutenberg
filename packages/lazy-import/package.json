@@ -31,12 +31,12 @@
 	"dependencies": {
 		"execa": "^4.0.2",
 		"npm-package-arg": "^8.1.5",
-		"semver": "^7.3.5"
+		"semver": "^7.5.4"
 	},
 	"devDependencies": {
 		"@types/node": "^20.19.39",
-		"@types/npm-package-arg": "6.1.1",
-		"@types/semver": "7.3.8"
+		"@types/npm-package-arg": "^6.1.1",
+		"@types/semver": "^7.3.8"
 	},
 	"publishConfig": {
 		"access": "public"

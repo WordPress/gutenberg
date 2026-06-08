@@ -52,7 +52,7 @@
 		"tannin": "^1.2.0"
 	},
 	"devDependencies": {
-		"benchmark": "2.1.4"
+		"benchmark": "^2.1.4"
 	},
 	"publishConfig": {
 		"access": "public"

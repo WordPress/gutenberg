@@ -38,7 +38,7 @@
 	},
 	"types": "lib/types.d.ts",
 	"dependencies": {
-		"json2php": "^0.0.7"
+		"json2php": "^0.0.9"
 	},
 	"devDependencies": {
 		"atob": "^2.1.2",
