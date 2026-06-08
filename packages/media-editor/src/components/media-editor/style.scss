@@ -48,6 +48,11 @@
 		margin: 0 $grid-unit-30;
 		border-radius: $radius-large;
 		overflow: hidden;
+		@include break-small() {
+			// Compensate for the left gutter in the sidebar panel
+			// so the modal padding is uniform (24px).
+			margin-right: $grid-unit-30 - $grid-unit-10;
+		}
 	}
 
 	.media-editor__canvas-toolbar {
@@ -98,6 +103,10 @@
 		}
 	}
 
+	.media-editor__sidebar-panel {
+		padding-bottom: $grid-unit-30;
+	}
+
 	// Borderless controls panel: clear the InterfaceSkeleton sidebar's
 	// default top border, left box-shadow, and high-contrast outline so the
 	// panel sits flush with no divider lines.
@@ -127,6 +136,7 @@
 	.components-panel__header.media-editor__sidebar-header {
 		padding-left: 0;
 		padding-right: $grid-unit-10;
+		margin-right: $grid-unit-30;
 
 		.components-button.has-icon {
 			padding: 0;
