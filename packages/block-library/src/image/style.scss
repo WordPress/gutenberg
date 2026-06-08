@@ -210,6 +210,11 @@
 	visibility: hidden;
 	cursor: zoom-out;
 
+	&.show-comments {
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
+
 	.wp-lightbox-close-button {
 		font-family: inherit;
 		position: absolute;
@@ -295,6 +300,137 @@
 		vertical-align: middle;
 	}
 
+	.wp-lightbox-comment-button {
+		position: absolute;
+		top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 8px);
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 3000001;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		color: #1e1e1e;
+		background: rgb(255 255 255 / 92%);
+		border: 1px solid rgb(0 0 0 / 12%);
+		border-radius: 4px;
+		box-shadow: 0 2px 8px rgb(0 0 0 / 16%);
+		cursor: pointer;
+
+		&[hidden] {
+			display: none;
+		}
+
+		&:hover,
+		&:focus {
+			background: #fff;
+		}
+
+		svg {
+			fill: currentColor;
+		}
+	}
+
+	.wp-lightbox-comments {
+		position: absolute;
+		top: calc((100vh + var(--wp--lightbox-container-height)) / 2 + 64px);
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 3000001;
+		width: var(--wp--lightbox-container-width);
+		color: #1e1e1e;
+		cursor: auto;
+
+		&[hidden] {
+			display: none;
+		}
+
+		.wp-lightbox-comments-list {
+			display: grid;
+			gap: 16px;
+			margin: 0 0 16px;
+		}
+
+		.wp-lightbox-comment {
+			display: grid;
+			gap: 4px;
+			margin: 0;
+		}
+
+		.wp-lightbox-comment-meta {
+			font-size: 13px;
+			font-weight: 600;
+			line-height: 1.4;
+		}
+
+		.wp-lightbox-comment-content {
+			font-size: 13px;
+			line-height: 1.5;
+
+			> :first-child {
+				margin-top: 0;
+			}
+
+			> :last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		form {
+			display: grid;
+			gap: 12px;
+			margin: 0;
+		}
+
+		label {
+			display: grid;
+			gap: 4px;
+			margin: 0;
+			font-size: 13px;
+			line-height: 1.4;
+		}
+
+		input,
+		textarea {
+			width: 100%;
+			padding: 8px;
+			box-sizing: border-box;
+			font: inherit;
+			color: #1e1e1e;
+			background: #fff;
+			border: 1px solid rgb(0 0 0 / 24%);
+			border-radius: 2px;
+		}
+
+		textarea {
+			min-height: 96px;
+			resize: vertical;
+		}
+
+		button[type="submit"] {
+			justify-self: start;
+			padding: 8px 12px;
+			color: #fff;
+			background: #1e1e1e;
+			border-radius: 2px;
+			cursor: pointer;
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: default;
+			}
+		}
+
+		.wp-lightbox-comments-login,
+		.wp-lightbox-comments-message {
+			margin: 0;
+			font-size: 13px;
+			line-height: 1.4;
+		}
+	}
+
 	.lightbox-image-container {
 		position: absolute;
 		overflow: hidden;
@@ -331,7 +467,7 @@
 		}
 	}
 
-	button {
+	button:not(.wp-lightbox-comment-button):not([type="submit"]) {
 		border: none;
 		background: none;
 	}
@@ -339,7 +475,9 @@
 	.scrim {
 		width: 100%;
 		height: 100%;
-		position: absolute;
+		position: fixed;
+		top: 0;
+		left: 0;
 		z-index: 2000000;
 		background-color: rgb(255, 255, 255);
 		opacity: 0.9;

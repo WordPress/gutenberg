@@ -40,6 +40,11 @@ const touchStartEvent = {
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
 	'.wp-lightbox-navigation-button',
+	'.wp-lightbox-comment-button',
+	'.wp-lightbox-comments a',
+	'.wp-lightbox-comments input',
+	'.wp-lightbox-comments textarea',
+	'.wp-lightbox-comments button',
 ];
 
 /**
@@ -71,6 +76,15 @@ const { state, actions, callbacks } = store(
 		state: {
 			selectedImageId: null,
 			selectedGalleryId: null,
+			commentForm: {
+				isVisible: false,
+				isSubmitting: false,
+				message: '',
+			},
+			comments: {
+				attachmentId: null,
+				isLoading: false,
+			},
 			preloadTimers: new Map(),
 			preloadedImageIds: new Set(),
 			get galleryImages() {
@@ -116,6 +130,27 @@ const { state, actions, callbacks } = store(
 			get thisImage() {
 				const { imageId } = getContext();
 				return state.metadata[ imageId ];
+			},
+			get selectedImageCommentsOpen() {
+				return !! state.selectedImage?.commentsOpen;
+			},
+			get commentLoginRequired() {
+				return (
+					state.selectedImageCommentsOpen &&
+					!! getConfig().commentLoginRequired
+				);
+			},
+			get commentFormVisible() {
+				return (
+					state.selectedImageCommentsOpen &&
+					state.commentForm.isVisible
+				);
+			},
+			get commentFormIsSubmitting() {
+				return state.commentForm.isSubmitting;
+			},
+			get commentFormMessage() {
+				return state.commentForm.message;
 			},
 			get hasNavigation() {
 				return state.galleryImages.length > 1;
@@ -216,6 +251,7 @@ const { state, actions, callbacks } = store(
 				const { galleryId } = getContext( 'core/gallery' ) || {};
 				state.selectedGalleryId = galleryId || null;
 				state.overlayEnabled = true;
+				callbacks.resetCommentForm();
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
@@ -240,6 +276,7 @@ const { state, actions, callbacks } = store(
 						// Resets the selected image and gallery ids.
 						state.selectedImageId = null;
 						state.selectedGalleryId = null;
+						callbacks.resetCommentForm();
 					}, 450 );
 				}
 			},
@@ -249,6 +286,7 @@ const { state, actions, callbacks } = store(
 					? state.selectedImageIndex - 1
 					: state.galleryImages.length - 1;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				callbacks.resetCommentForm();
 				callbacks.setOverlayStyles();
 			} ),
 			showNextImage: withSyncEvent( ( event ) => {
@@ -257,7 +295,44 @@ const { state, actions, callbacks } = store(
 					? state.selectedImageIndex + 1
 					: 0;
 				state.selectedImageId = state.galleryImages[ nextIndex ];
+				callbacks.resetCommentForm();
 				callbacks.setOverlayStyles();
+			} ),
+			stopPropagation: withSyncEvent( ( event ) => {
+				event.stopPropagation();
+			} ),
+			toggleCommentForm: withSyncEvent( ( event ) => {
+				event.preventDefault();
+				event.stopPropagation();
+				callbacks.toggleCommentForm();
+			} ),
+			submitComment: withSyncEvent( ( event ) => {
+				event.preventDefault();
+				event.stopPropagation();
+
+				if (
+					state.commentForm.isSubmitting ||
+					! state.selectedImage?.attachmentId
+				) {
+					return;
+				}
+
+				const form = event.currentTarget;
+				const formData = new window.FormData( form );
+				const content = String(
+					formData.get( 'comment' ) || ''
+				).trim();
+
+				if ( ! content ) {
+					return;
+				}
+
+				const payload = {
+					post: state.selectedImage.attachmentId,
+					content,
+				};
+
+				callbacks.submitComment( payload, form );
 			} ),
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
@@ -271,7 +346,14 @@ const { state, actions, callbacks } = store(
 						// Traps focus within the overlay.
 						const focusableElements = Array.from(
 							document.querySelectorAll( focusableSelectors )
+						).filter(
+							( element ) =>
+								! element.disabled &&
+								! element.closest( '[hidden]' )
 						);
+						if ( focusableElements.length === 0 ) {
+							return;
+						}
 						const firstFocusableElement = focusableElements[ 0 ];
 						const lastFocusableElement =
 							focusableElements[ focusableElements.length - 1 ];
@@ -292,6 +374,12 @@ const { state, actions, callbacks } = store(
 				}
 			} ),
 			handleTouchMove: withSyncEvent( ( event ) => {
+				if (
+					state.commentFormVisible &&
+					event.target?.closest?.( '.wp-lightbox-comments' )
+				) {
+					return;
+				}
 				// On mobile devices, prevents triggering the scroll event because
 				// otherwise the page jumps around when it resets the scroll position.
 				// This also means that closing the lightbox requires that a user
@@ -420,6 +508,252 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		callbacks: {
+			resetCommentForm() {
+				state.commentForm.isVisible = false;
+				state.commentForm.message = '';
+				state.commentForm.isSubmitting = false;
+				state.comments.attachmentId = null;
+				state.comments.isLoading = false;
+				callbacks.renderComments( [] );
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
+				);
+				if ( overlay ) {
+					overlay.scrollTop = 0;
+				}
+			},
+			scrollOverlayTo( target, onComplete ) {
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
+				);
+				if ( ! overlay || ! target ) {
+					onComplete?.();
+					return;
+				}
+
+				const startTime = Date.now();
+				const duration = 300;
+				const originalPosition = overlay.scrollTop;
+				const targetPosition = Math.min(
+					Math.max(
+						0,
+						target.offsetTop -
+							Math.max(
+								0,
+								window.innerHeight -
+									target.getBoundingClientRect().height -
+									32
+							)
+					),
+					overlay.scrollHeight - overlay.clientHeight
+				);
+				const distance = targetPosition - originalPosition;
+				let isScrolling = true;
+
+				function stopScroll() {
+					isScrolling = false;
+				}
+
+				function runScroll() {
+					const now = Date.now();
+					const progress = Math.min(
+						( now - startTime ) / duration,
+						1
+					);
+					const easedProgress =
+						progress < 0.5
+							? 2 * progress * progress
+							: 1 - Math.pow( -2 * progress + 2, 2 ) / 2;
+
+					overlay.scrollTop =
+						originalPosition + easedProgress * distance;
+
+					if ( progress < 1 && isScrolling ) {
+						window.requestAnimationFrame( runScroll );
+						return;
+					}
+
+					overlay.removeEventListener( 'wheel', stopScroll );
+					onComplete?.();
+				}
+
+				overlay.addEventListener( 'wheel', stopScroll );
+				runScroll();
+			},
+			toggleCommentForm() {
+				const overlay = document.querySelector(
+					'.wp-lightbox-overlay'
+				);
+
+				if ( state.commentForm.isVisible ) {
+					callbacks.scrollOverlayTo(
+						overlay,
+						withScope( () => {
+							state.commentForm.isVisible = false;
+						} )
+					);
+					return;
+				}
+
+				const comments = document.querySelector(
+					'.wp-lightbox-comments'
+				);
+
+				state.commentForm.isVisible = true;
+				callbacks.loadComments();
+				window.requestAnimationFrame(
+					withScope( () => callbacks.scrollOverlayTo( comments ) )
+				);
+			},
+			createCommentElement( comment ) {
+				const article = document.createElement( 'article' );
+				article.className = 'wp-lightbox-comment';
+
+				const meta = document.createElement( 'div' );
+				meta.className = 'wp-lightbox-comment-meta';
+				meta.textContent = comment.author_name || '';
+
+				const content = document.createElement( 'div' );
+				content.className = 'wp-lightbox-comment-content';
+				content.innerHTML = comment.content?.rendered || '';
+
+				article.append( meta, content );
+				return article;
+			},
+			renderComments( comments ) {
+				const list = document.querySelector(
+					'.wp-lightbox-comments-list'
+				);
+
+				if ( ! list ) {
+					return;
+				}
+
+				list.replaceChildren();
+				list.hidden = comments.length === 0;
+
+				for ( const comment of comments ) {
+					list.append( callbacks.createCommentElement( comment ) );
+				}
+			},
+			appendComment( comment ) {
+				const list = document.querySelector(
+					'.wp-lightbox-comments-list'
+				);
+
+				if ( ! list ) {
+					return;
+				}
+
+				const article = callbacks.createCommentElement( comment );
+				list.append( article );
+				list.hidden = false;
+				article.scrollIntoView( { block: 'nearest' } );
+			},
+			async loadComments( force = false ) {
+				const attachmentId = state.selectedImage?.attachmentId;
+
+				if (
+					! attachmentId ||
+					state.comments.isLoading ||
+					( ! force && state.comments.attachmentId === attachmentId )
+				) {
+					return;
+				}
+
+				state.comments.isLoading = true;
+
+				try {
+					const url = new URL( getConfig().commentEndpoint );
+					url.searchParams.set( 'post', attachmentId );
+					url.searchParams.set( 'orderby', 'date' );
+					url.searchParams.set( 'order', 'asc' );
+					url.searchParams.set( 'per_page', '100' );
+
+					const response = await window.fetch( url, {
+						credentials: 'same-origin',
+					} );
+
+					if ( ! response.ok ) {
+						throw new Error();
+					}
+
+					const comments = await response.json();
+					callbacks.renderComments( comments );
+					state.comments.attachmentId = attachmentId;
+					if ( state.commentForm.isVisible ) {
+						window.requestAnimationFrame(
+							withScope( () =>
+								callbacks.scrollOverlayTo(
+									document.querySelector(
+										'.wp-lightbox-comments'
+									)
+								)
+							)
+						);
+					}
+				} catch {
+					callbacks.renderComments( [] );
+				} finally {
+					state.comments.isLoading = false;
+				}
+			},
+			async submitComment( payload, form ) {
+				// Read all config synchronously: `getConfig()` relies on the
+				// interactivity scope, which is lost after the first `await`
+				// below, so calling it afterwards would return an empty config.
+				const {
+					commentNonce,
+					commentEndpoint,
+					commentSubmittingText,
+					commentSubmittedText,
+					commentErrorText,
+				} = getConfig();
+
+				const headers = {
+					'Content-Type': 'application/json',
+				};
+
+				if ( commentNonce ) {
+					headers[ 'X-WP-Nonce' ] = commentNonce;
+				}
+
+				state.commentForm.isSubmitting = true;
+				state.commentForm.message = commentSubmittingText;
+
+				try {
+					const response = await window.fetch( commentEndpoint, {
+						method: 'POST',
+						credentials: 'same-origin',
+						headers,
+						body: JSON.stringify( payload ),
+					} );
+					const responseBody = await response.json();
+
+					if ( ! response.ok ) {
+						// Surface the server's validation message when present,
+						// e.g. "Comment content cannot be empty".
+						state.commentForm.message =
+							responseBody.message || commentErrorText;
+						return;
+					}
+
+					form.reset();
+					state.commentForm.message = commentSubmittedText;
+
+					// Render the newly created comment from the response rather
+					// than re-fetching: the REST list endpoint only returns
+					// approved comments, so a comment held for moderation would
+					// otherwise disappear from view for the author who posted it.
+					callbacks.appendComment( responseBody );
+				} catch {
+					// Network failures or non-JSON responses fall back to the
+					// localized error text rather than a raw browser message.
+					state.commentForm.message = commentErrorText;
+				} finally {
+					state.commentForm.isSubmitting = false;
+				}
+			},
 			setOverlayStyles() {
 				if ( ! state.overlayEnabled ) {
 					return;
@@ -549,7 +883,6 @@ const { state, actions, callbacks } = store(
 					horizontalPadding = state.hasNavigation ? 320 : 80;
 					verticalPadding = 80;
 				}
-
 				const targetMaxWidth = Math.min(
 					window.innerWidth - horizontalPadding,
 					containerWidth

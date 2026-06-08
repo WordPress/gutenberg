@@ -391,6 +391,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added type markers to the schema for boolean values.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
 	 *              `typography.textIndent` properties.
+	 * @since 7.0.0 Added `lightboxComments`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -444,6 +445,10 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'lightbox'                      => array(
 			'enabled'      => true,
+			'allowEditing' => true,
+		),
+		'lightboxComments'              => array(
+			'enabled'      => false,
 			'allowEditing' => true,
 		),
 		'position'                      => array(
