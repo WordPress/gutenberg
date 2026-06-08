@@ -8,7 +8,7 @@ const babelJest = require( 'babel-jest' );
 const babelJestInterop = babelJest.__esModule ? babelJest.default : babelJest;
 
 const babelJestTransformer = babelJestInterop.createTransformer( {
-	presets: [ '@wordpress/babel-preset-default' ],
+	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
 } );
 
 module.exports = {

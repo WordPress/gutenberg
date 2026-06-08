@@ -186,6 +186,11 @@ const DataViewsPickerContent = ( {
 				fields={ fields }
 				onChangeView={ setView }
 				config={ { perPageSizes } }
+				defaultLayouts={ {
+					pickerGrid: true,
+					pickerTable: true,
+					pickerActivity: true,
+				} }
 				itemListLabel="Galactic Bodies"
 			/>
 		</>

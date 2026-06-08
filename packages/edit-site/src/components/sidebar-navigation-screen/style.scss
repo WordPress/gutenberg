@@ -23,7 +23,7 @@
 	padding: 0 $grid-unit-20;
 
 	.components-text {
-		color: $gray-400;
+		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	.components-heading {
@@ -34,7 +34,7 @@
 .edit-site-sidebar-navigation-screen__title-icon {
 	position: sticky;
 	top: 0;
-	background: $gray-900;
+	background: var(--wpds-color-bg-surface-neutral-weak);
 	padding-top: $grid-unit-60;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
@@ -95,11 +95,11 @@
 .edit-site-sidebar-navigation-screen__footer {
 	position: sticky;
 	bottom: 0;
-	background-color: $gray-900;
+	background-color: var(--wpds-color-bg-surface-neutral-weak);
 	gap: 0;
 	padding: $grid-unit-10 $grid-unit-20;
 	margin: $grid-unit-20 0 0;
-	border-top: 1px solid $gray-800;
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	.edit-site-sidebar-navigation-screen-details-footer {
 		margin-left: -$grid-unit-20;
@@ -116,20 +116,20 @@
 .edit-site-sidebar-navigation-screen__input-control {
 	width: 100%;
 	.components-input-control__container {
-		background: $gray-800;
+		background: var(--wpds-color-bg-interactive-neutral-weak);
 
 		.components-button {
-			color: $gray-200 !important;
+			color: var(--wpds-color-fg-interactive-neutral) !important;
 		}
 	}
 	.components-input-control__input {
-		color: $gray-200 !important;
-		background: $gray-800 !important;
+		color: var(--wpds-color-fg-interactive-neutral) !important;
+		background: var(--wpds-color-bg-interactive-neutral-weak) !important;
 	}
 	.components-input-control__backdrop {
 		border: 4px !important;
 	}
 	.components-base-control__help {
-		color: $gray-600;
+		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 }

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress. The snackbar shows a spinner during uploads and a checkmark briefly when all uploads complete.
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
