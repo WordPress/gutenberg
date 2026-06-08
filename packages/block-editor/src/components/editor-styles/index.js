@@ -62,6 +62,22 @@ function useDarkThemeBodyClassName( styles, scope ) {
 			} else {
 				body.classList.add( 'is-dark-theme' );
 			}
+
+			// Expose the resolved body background color to the host document as a
+			// CSS custom property. This allows elements that live outside the
+			// iframe (e.g. pinned editor notices) to adopt the same background and
+			// appear visually integrated with the canvas.
+			const hostDocument =
+				defaultView?.frameElement?.ownerDocument ?? ownerDocument;
+			const editorEl = hostDocument?.querySelector(
+				'.editor-editor-interface'
+			);
+			if ( editorEl ) {
+				editorEl.style.setProperty(
+					'--wp-editor-body-background',
+					backgroundColor
+				);
+			}
 		},
 		[ styles, scope ]
 	);
