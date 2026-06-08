@@ -284,9 +284,10 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with optional init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "experimental": true }` - Page with optional init modules
   - **`id`** (required): The page slug used in WordPress admin URLs
   - **`init`** (optional): Array of script module IDs to execute during page initialization
+  - **`experimental`** (optional, default `false`): When `true`, the page is excluded from WordPress Core builds (`IS_WORDPRESS_CORE=true`), along with any route that belongs only to experimental pages.
 
 **Generated Files:**
 
@@ -473,6 +474,8 @@ Each page ID must match one of the pages defined in `wpPlugin.pages` in your roo
 
 Multi-page routes are useful for shared functionality across different admin pages, such as settings routes accessible from both a main page and a dedicated settings page.
 
+Routes inherit their experimental status from their pages: a route is excluded from WordPress Core builds only when every page it belongs to is marked `"experimental": true` in `wpPlugin.pages`.
+
 ### Components
 
 **stage.tsx** - Main content (required):
@@ -549,6 +552,7 @@ widgets/
     widget.ts       # Runtime schema entry point (optional)
     render.tsx      # UI component entry point (optional)
     render.scss     # Optional styles (bundled inline when imported from render.tsx)
+    package.json    # Optional npm dependencies manifest
 ```
 
 ### Why two entries?

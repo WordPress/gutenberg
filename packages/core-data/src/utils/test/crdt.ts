@@ -46,6 +46,9 @@ jest.mock( '@wordpress/blocks', () => {
 				},
 			},
 		],
+		// Mocked so tests can control what the Code Editor sync path "parses"
+		// from raw content without needing real block-type registration.
+		parse: jest.fn( () => [] ),
 		__unstableSerializeAndClean: jest.fn(
 			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
 		),
@@ -55,6 +58,7 @@ jest.mock( '@wordpress/blocks', () => {
 /**
  * WordPress dependencies
  */
+import { parse } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
@@ -295,7 +299,7 @@ describe( 'crdt', () => {
 			expect( blocks ).toBeInstanceOf( Y.Array );
 		} );
 
-		it( 'sets blocks to undefined when blocks value is undefined', () => {
+		it( 'sets blocks to undefined when blocks value is undefined and no content is provided', () => {
 			// First, set some blocks.
 			map.set( 'blocks', new Y.Array< YBlock >() );
 
@@ -308,6 +312,86 @@ describe( 'crdt', () => {
 			// The key should still exist, but the value should be undefined.
 			expect( map.has( 'blocks' ) ).toBe( true );
 			expect( map.get( 'blocks' ) ).toBeUndefined();
+		} );
+
+		it( 'parses content into blocks when blocks=undefined is paired with new content', () => {
+			// Pre-populate the Y.Doc with two stable blocks. Simulates the
+			// state after the initial sync: peers share the same blocks Y.Array
+			// with stable clientIds on every YBlock.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					blocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'Hello' },
+							innerBlocks: [],
+							clientId: 'stable-first',
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: 'World' },
+							innerBlocks: [],
+							clientId: 'stable-second',
+						},
+					],
+				} as PostChanges,
+				defaultSyncedProperties
+			);
+
+			// The Code Editor flow: dispatch `{ content, blocks: undefined }`
+			// when the user types. The new HTML edits the second paragraph
+			// only. `parse()` is mocked to return blocks with freshly minted
+			// clientIds — the sync layer must not let those overwrite the
+			// stable clientIds already in the Y.Array.
+			( parse as jest.Mock ).mockReturnValueOnce( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Hello' },
+					innerBlocks: [],
+					clientId: 'fresh-first',
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'World!' },
+					innerBlocks: [],
+					clientId: 'fresh-second',
+				},
+			] );
+
+			applyPostChangesToCRDTDoc(
+				doc,
+				{
+					content:
+						'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->' +
+						'<!-- wp:paragraph --><p>World!</p><!-- /wp:paragraph -->',
+					blocks: undefined,
+				} as PostChanges,
+				defaultSyncedProperties
+			);
+
+			const yblocks = map.get( 'blocks' );
+			expect( yblocks ).toBeInstanceOf( Y.Array );
+			const blocksArray = yblocks as YBlocks;
+			expect( blocksArray.length ).toBe( 2 );
+
+			// Both clientIds must be preserved: the unchanged first block via
+			// the left-right diff sweep, the edited second block via the
+			// explicit clientId-skip in the update loop.
+			expect( blocksArray.get( 0 ).get( 'clientId' ) ).toBe(
+				'stable-first'
+			);
+			expect( blocksArray.get( 1 ).get( 'clientId' ) ).toBe(
+				'stable-second'
+			);
+
+			// The second block's content reflects the edit.
+			const updatedContent = (
+				blocksArray
+					.get( 1 )
+					.get( 'attributes' ) as unknown as YMapWrap< YBlockRecord >
+			 ).get( 'content' ) as Y.Text;
+			expect( updatedContent.toString() ).toBe( 'World!' );
 		} );
 
 		it( 'syncs content as Y.Text', () => {

@@ -136,7 +136,11 @@ function hasKnownAttachmentMetadata( attachment ) {
 	return hasKnownAlt && hasKnownCaption;
 }
 
-export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
+export function useOpenImageMediaEditorModal( {
+	attributes,
+	setAttributes,
+	onClose,
+} ) {
 	// Keep this hook private to the Image block and pass the block attributes
 	// object so the callsite stays compact. Destructure only the attributes
 	// currently used for metadata sync; add more here if the sync policy grows.
@@ -342,11 +346,13 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 		openMediaEditorModal( {
 			id,
 			onUpdate: handleMediaUpdate,
+			onClose,
 		} );
 	}, [
 		getCachedAttachmentRecord,
 		handleMediaUpdate,
 		id,
+		onClose,
 		openMediaEditorModal,
 		resolveAttachmentRecord,
 	] );

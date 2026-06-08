@@ -13,6 +13,7 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
 import { GRID_ITEM_DATA_KEY } from '../shared/grid-item-key';
 import ResizeHandle from '../shared/resize-handle';
 import { clampResizeDelta, type ResizeSnapSize } from '../shared/resize-snap';
@@ -41,6 +42,7 @@ export function GridItem( {
 	disabled = false,
 	verticalResizable = true,
 	interacting = false,
+	dragging = false,
 	children,
 	actionableArea = null,
 	onResize,
@@ -144,13 +146,18 @@ export function GridItem( {
 			className={ itemClassName }
 			style={ style }
 			{ ...{ [ GRID_ITEM_DATA_KEY ]: item.key } }
+			data-wp-grid-item-resizing={ isResizing || undefined }
 		>
 			{ actionableArea ? (
 				<div
-					style={ { display: 'contents' } }
-					{ ...( interacting ? { inert: '' } : {} ) }
+					className={ actionableAreaStyles[ 'actionable-area-slot' ] }
 				>
-					{ actionableArea }
+					<div
+						style={ { display: 'contents' } }
+						{ ...( dragging ? { inert: '' } : {} ) }
+					>
+						{ actionableArea }
+					</div>
 				</div>
 			) : null }
 
