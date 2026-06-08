@@ -23,6 +23,7 @@
 ### Internal
 
 -   Remove legacy `Notice` overrides in block placeholder notices and media replace flow error UI ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+-   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
 
 ## 15.19.0 (2026-05-14)
 

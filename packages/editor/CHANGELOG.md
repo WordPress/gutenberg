@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress. The snackbar shows a spinner during uploads and a checkmark briefly when all uploads complete.
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
@@ -22,6 +26,10 @@
 
 -   `mediaFinalize` now returns the post-finalize attachment (transformed from the REST response), so the upload-media queue can refresh the in-flight attachment URL. Required for the front-end `srcset` to render on client-side-media uploads that exceeded the big-image threshold.
 -   Template actions panel: Fix the keyboard activation of the "Change template" preview so it only opens the swap modal on <kbd>Enter</kbd> / <kbd>Space</kbd> ([#78641](https://github.com/WordPress/gutenberg/pull/78641)).
+
+### Internal
+
+-   Updated `diff` dependency from `^4.0.2` to `^8.0.3` ([#77992](https://github.com/WordPress/gutenberg/pull/77992)).
 
 ## 14.46.0 (2026-05-14)
 
