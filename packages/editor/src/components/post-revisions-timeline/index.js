@@ -14,9 +14,9 @@ import { diffWordsWithSpace } from 'diff';
 import { Button, Dropdown } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { DataViewsPicker } from '@wordpress/dataviews';
+import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 import { authorField } from '@wordpress/fields';
@@ -30,9 +30,18 @@ import { unlock } from '../../lock-unlock';
 import { PostContentInformationUI } from '../post-content-information';
 import { RevisionDiffEntries } from '../revision-diff-panel';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 const EMPTY_ARRAY = [];
 const defaultLayouts = { pickerActivity: true };
+const baseView = {
+	type: 'pickerActivity',
+	titleField: 'date',
+	descriptionField: 'details',
+	fields: [ 'author' ],
+	layout: { density: 'compact' },
+	page: 1,
+	perPage: PAGE_SIZE,
+};
 
 const DAY_IN_MILLISECONDS = 86400000;
 
@@ -79,83 +88,52 @@ function computeDiffEntries( revision, previousRevision ) {
 }
 
 export default function PostRevisionsTimeline() {
-	const [ currentPage, setCurrentPage ] = useState( 1 );
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
+	const [ view, setView ] = useState( baseView );
 
 	const {
 		revisions,
-		revisionsCount,
 		revisionKey,
 		currentRevisionId,
-		isLoading,
 		postContent,
 		diffEntries,
-	} = useSelect(
-		( select ) => {
-			const { getCurrentPostId, getCurrentPostType } =
-				select( editorStore );
-			const { getCurrentPostRevisionsCount } = select( editorStore );
-			const {
-				getCurrentRevisionId: _getCurrentRevisionId,
-				getCurrentRevision,
-				getPreviousRevision,
-			} = unlock( select( editorStore ) );
-			const { getRevisions, getEntityConfig, isResolving } =
-				select( coreStore );
+	} = useSelect( ( select ) => {
+		const { getCurrentPostType } = select( editorStore );
+		const {
+			getCurrentRevisionId: _getCurrentRevisionId,
+			getCurrentRevision,
+			getPreviousRevision,
+			getRevisionPage,
+			getPageRevisions,
+		} = unlock( select( editorStore ) );
+		const { getEntityConfig } = select( coreStore );
 
-			const _postType = getCurrentPostType();
-			const _postId = getCurrentPostId();
-			const entityConfig = getEntityConfig( 'postType', _postType );
-			const _revisionKey = entityConfig?.revisionKey || 'id';
-			const _currentRevisionId = _getCurrentRevisionId();
+		const _postType = getCurrentPostType();
+		const entityConfig = getEntityConfig( 'postType', _postType );
+		const _revisionKey = entityConfig?.revisionKey || 'id';
+		const _currentRevisionId = _getCurrentRevisionId();
 
-			const revisionsQuery = {
-				per_page: PAGE_SIZE,
-				page: currentPage,
-				orderby: 'date',
-				order: 'desc',
-				_fields: `${ _revisionKey },date,author`,
-			};
-			const query = [ 'postType', _postType, _postId, revisionsQuery ];
-			const _revisions = getRevisions( ...query );
+		const currentRevision = _currentRevisionId
+			? getCurrentRevision()
+			: undefined;
+		const previousRevision = _currentRevisionId
+			? getPreviousRevision()
+			: undefined;
 
-			const currentRevision = _currentRevisionId
-				? getCurrentRevision()
-				: undefined;
-			const previousRevision = _currentRevisionId
-				? getPreviousRevision()
-				: undefined;
+		return {
+			// Same desc-ordered window the header slider renders (warm cache).
+			revisions: getPageRevisions( getRevisionPage() ),
+			revisionKey: _revisionKey,
+			currentRevisionId: _currentRevisionId,
+			postContent: currentRevision?.content?.raw,
+			diffEntries: computeDiffEntries(
+				currentRevision,
+				previousRevision
+			),
+		};
+	}, [] );
 
-			return {
-				revisions: _revisions,
-				revisionsCount: getCurrentPostRevisionsCount(),
-				revisionKey: _revisionKey,
-				currentRevisionId: _currentRevisionId,
-				isLoading: isResolving( 'getRevisions', query ),
-				postContent: currentRevision?.content?.raw,
-				diffEntries: computeDiffEntries(
-					currentRevision,
-					previousRevision
-				),
-			};
-		},
-		[ currentPage ]
-	);
-
-	const totalPages = Math.ceil( revisionsCount / PAGE_SIZE );
-
-	const view = useMemo(
-		() => ( {
-			type: 'pickerActivity',
-			titleField: 'date',
-			descriptionField: 'details',
-			fields: [ 'author' ],
-			layout: { density: 'compact' },
-			page: currentPage,
-			perPage: PAGE_SIZE,
-		} ),
-		[ currentPage ]
-	);
+	const isLoading = ! revisions;
 
 	const fields = useMemo(
 		() => [
@@ -246,6 +224,28 @@ export default function PostRevisionsTimeline() {
 		[ revisionKey, currentRevisionId, postContent, diffEntries ]
 	);
 
+	const { data: shownRevisions, paginationInfo } = useMemo(
+		() => filterSortAndPaginate( revisions || EMPTY_ARRAY, view, fields ),
+		[ revisions, view, fields ]
+	);
+
+	// Keep the selected revision visible: when it changes (e.g. the slider
+	// scrubs), jump to the client-side page that contains it. Keyed on the
+	// selection/data, not view.page, so manual paging stays free browsing.
+	useEffect( () => {
+		if ( ! currentRevisionId || ! revisions ) {
+			return;
+		}
+		const index = revisions.findIndex(
+			( r ) => String( r[ revisionKey ] ) === String( currentRevisionId )
+		);
+		if ( index < 0 ) {
+			return;
+		}
+		const page = Math.floor( index / view.perPage ) + 1;
+		setView( ( v ) => ( v.page === page ? v : { ...v, page } ) );
+	}, [ currentRevisionId, revisions, revisionKey, view.perPage ] );
+
 	const selection = useMemo(
 		() =>
 			currentRevisionId ? [ String( currentRevisionId ) ] : EMPTY_ARRAY,
@@ -266,15 +266,6 @@ export default function PostRevisionsTimeline() {
 		[ setCurrentRevisionId ]
 	);
 
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.page !== currentPage ) {
-				setCurrentPage( newView.page );
-			}
-		},
-		[ currentPage ]
-	);
-
 	const getItemId = useCallback(
 		( item ) => String( item[ revisionKey ] ),
 		[ revisionKey ]
@@ -283,14 +274,11 @@ export default function PostRevisionsTimeline() {
 	return (
 		<DataViewsPicker
 			view={ view }
-			onChangeView={ onChangeView }
+			onChangeView={ setView }
 			fields={ fields }
-			data={ revisions || EMPTY_ARRAY }
+			data={ shownRevisions }
 			isLoading={ isLoading }
-			paginationInfo={ {
-				totalItems: revisionsCount,
-				totalPages,
-			} }
+			paginationInfo={ paginationInfo }
 			defaultLayouts={ defaultLayouts }
 			getItemId={ getItemId }
 			selection={ selection }
