@@ -4,6 +4,7 @@ import { Stack } from '../../stack';
 
 const meta: Meta< typeof Badge > = {
 	title: 'Design System/Components/Badge/Choosing intent',
+	synonyms: [ 'chip', 'intent', 'label', 'status', 'tag' ],
 	component: Badge,
 	decorators: [
 		( Story ) => (

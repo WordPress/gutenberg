@@ -3,6 +3,7 @@ import { Textarea } from '../index';
 
 const meta: Meta< typeof Textarea > = {
 	title: 'Design System/Components/Form/Primitives/Textarea',
+	synonyms: [ 'field', 'form', 'multiline', 'text', 'textarea' ],
 	component: Textarea,
 	parameters: {
 		componentStatus: {

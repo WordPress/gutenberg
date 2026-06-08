@@ -13,6 +13,7 @@ import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta = {
 	title: 'Design System/Components/Tooltip/Usage Guidelines',
+	synonyms: [ 'guidelines', 'help', 'hint' ],
 	parameters: {
 		controls: { disable: true },
 		componentStatus: {

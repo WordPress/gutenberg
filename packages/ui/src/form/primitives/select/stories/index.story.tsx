@@ -3,6 +3,7 @@ import * as Select from '../';
 
 const meta: Meta< typeof Select.Root > = {
 	title: 'Design System/Components/Form/Primitives/Select',
+	synonyms: [ 'dropdown', 'field', 'form', 'picker', 'select' ],
 	component: Select.Root,
 	subcomponents: {
 		'Select.Trigger': Select.Trigger,

@@ -5,6 +5,7 @@ import { Stack } from '../../stack';
 const meta: Meta< typeof Text > = {
 	tags: [ 'manifest' ],
 	title: 'Design System/Components/Text',
+	synonyms: [ 'label', 'paragraph', 'typography' ],
 	component: Text,
 	parameters: {
 		componentStatus: {

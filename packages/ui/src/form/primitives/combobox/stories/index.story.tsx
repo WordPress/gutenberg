@@ -5,6 +5,14 @@ import { ITEMS, type FixtureItem } from './fixtures';
 
 const meta: Meta< typeof Combobox.Root > = {
 	title: 'Design System/Components/Form/Primitives/Combobox',
+	synonyms: [
+		'autocomplete',
+		'dropdown',
+		'field',
+		'form',
+		'search',
+		'select',
+	],
 	component: Combobox.Root,
 	subcomponents: {
 		'Combobox.Trigger': Combobox.Trigger,

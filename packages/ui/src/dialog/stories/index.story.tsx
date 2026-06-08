@@ -7,6 +7,7 @@ import * as Dialog from '../index';
 
 const meta: Meta< typeof Dialog.Root > = {
 	title: 'Design System/Components/Dialog',
+	synonyms: [ 'modal', 'overlay', 'popup' ],
 	component: Dialog.Root,
 	subcomponents: {
 		'Dialog.Trigger': Dialog.Trigger,

@@ -16,6 +16,7 @@ import {
 
 const meta: Meta< typeof InputControl > = {
 	title: 'Design System/Components/Form/InputControl',
+	synonyms: [ 'field', 'form', 'input', 'label', 'text' ],
 	component: InputControl,
 	argTypes: {
 		defaultValue: { control: false },

@@ -5,6 +5,7 @@ import * as Tooltip from '../';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
+	synonyms: [ 'help', 'hint', 'popup' ],
 	component: Tooltip.Root,
 	subcomponents: {
 		'Tooltip.Provider': Tooltip.Provider,

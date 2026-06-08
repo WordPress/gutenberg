@@ -10,6 +10,7 @@ import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
 
 const meta: Meta< typeof Autocomplete.Root > = {
 	title: 'Design System/Components/Form/Primitives/Autocomplete',
+	synonyms: [ 'combobox', 'field', 'form', 'search', 'typeahead' ],
 	component: Autocomplete.Root,
 	subcomponents: {
 		'Autocomplete.Portal': Autocomplete.Portal,

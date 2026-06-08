@@ -15,6 +15,7 @@ import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof IconButton > = {
 	title: 'Design System/Components/IconButton',
+	synonyms: [ 'action', 'button', 'icon' ],
 	component: IconButton,
 	argTypes: {
 		'aria-pressed': {

@@ -91,6 +91,16 @@ const meta: Meta< typeof Button > = {
 };
 ```
 
+Add a `synonyms` array on the story meta so the component is discoverable in Storybook sidebar search (e.g. searching `form` finds `Input`):
+
+```ts
+const meta: Meta< typeof Input > = {
+	title: 'Design System/Components/Form/Primitives/Input',
+	synonyms: [ 'field', 'form', 'input', 'text', 'textbox' ],
+	component: Input,
+};
+```
+
 ## `render` Prop and Ref Forwarding
 
 All `@wordpress/ui` components support a `render` prop (via the `ComponentProps` utility type) that lets consumers swap the underlying HTML element. This section codifies the two canonical implementation patterns, the rules for handling `render`, and common anti-patterns to avoid.

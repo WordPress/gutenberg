@@ -5,6 +5,7 @@ import { IconButton } from '../../../../icon-button';
 
 const meta: Meta< typeof InputLayout > = {
 	title: 'Design System/Components/Form/Primitives/InputLayout',
+	synonyms: [ 'affix', 'field', 'form', 'prefix', 'suffix' ],
 	component: InputLayout,
 	subcomponents: {
 		'InputLayout.Slot': InputLayout.Slot,
