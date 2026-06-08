@@ -9,6 +9,10 @@
 	"description": "Display multiple images in a rich gallery.",
 	"keywords": [ "images", "photos" ],
 	"textdomain": "default",
+	"styles": [
+		{ "name": "default", "label": "Default", "isDefault": true },
+		{ "name": "masonry", "label": "Masonry" }
+	],
 	"attributes": {
 		"images": {
 			"type": "array",

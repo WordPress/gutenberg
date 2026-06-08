@@ -160,6 +160,12 @@ export default function GalleryEdit( props ) {
 		aspectRatio,
 	} = attributes;
 
+	// The Masonry style variation replaces the flex layout with CSS columns,
+	// where the shared `imageCrop` and `aspectRatio` options cannot be honoured
+	// without breaking the column flow. Hide those controls when the variation
+	// is active and show a notice pointing users at the Default style.
+	const isMasonry = !! attributes.className?.includes( 'is-style-masonry' );
+
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
@@ -744,20 +750,35 @@ export default function GalleryEdit( props ) {
 								/>
 							</ToolsPanelItem>
 						) }
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Crop images to fit' ) }
-							hasValue={ () => ! imageCrop }
-							onDeselect={ () =>
-								setAttributes( { imageCrop: true } )
-							}
-						>
-							<ToggleControl
+						{ isMasonry && (
+							<ToolsPanelItem
+								isShownByDefault
+								label={ __( 'Layout notice' ) }
+								hasValue={ () => false }
+							>
+								<p className="wp-block-gallery__masonry-notice">
+									{ __(
+										'The Masonry style manages image cropping and aspect ratio automatically. Switch to the Default style to change these options.'
+									) }
+								</p>
+							</ToolsPanelItem>
+						) }
+						{ ! isMasonry && (
+							<ToolsPanelItem
+								isShownByDefault
 								label={ __( 'Crop images to fit' ) }
-								checked={ !! imageCrop }
-								onChange={ toggleImageCrop }
-							/>
-						</ToolsPanelItem>
+								hasValue={ () => ! imageCrop }
+								onDeselect={ () =>
+									setAttributes( { imageCrop: true } )
+								}
+							>
+								<ToggleControl
+									label={ __( 'Crop images to fit' ) }
+									checked={ !! imageCrop }
+									onChange={ toggleImageCrop }
+								/>
+							</ToolsPanelItem>
+						) }
 						<ToolsPanelItem
 							isShownByDefault
 							label={ __( 'Randomize order' ) }
@@ -786,7 +807,7 @@ export default function GalleryEdit( props ) {
 								/>
 							</ToolsPanelItem>
 						) }
-						{ aspectRatioOptions.length > 1 && (
+						{ ! isMasonry && aspectRatioOptions.length > 1 && (
 							<ToolsPanelItem
 								hasValue={ () =>
 									!! aspectRatio && aspectRatio !== 'auto'

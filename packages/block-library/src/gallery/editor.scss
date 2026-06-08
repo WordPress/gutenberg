@@ -59,6 +59,15 @@
 	}
 }
 
+// Inline notice shown in the Settings panel when the Masonry style variation
+// is active, explaining why the crop and aspect-ratio controls are hidden.
+.wp-block-gallery__masonry-notice {
+	margin: 0;
+	color: $gray-700;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
 /**
  * Deprecated css past this point. This can be removed once all galleries are migrated
  * to V2.

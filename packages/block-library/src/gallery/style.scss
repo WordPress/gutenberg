@@ -193,4 +193,57 @@ figure.wp-block-gallery.has-nested-images {
 	&.aligncenter {
 		justify-content: center;
 	}
+
+	// Masonry block style variation (#28247).
+	// Uses CSS columns so images flow top-to-bottom and keep their natural
+	// aspect ratios. Images keep the same figure markup used by the default
+	// flex layout so gallery features (caption, lightbox, linkTo, random
+	// order, resolution) continue to work unchanged.
+	&.is-style-masonry {
+		display: block;
+		column-gap: var(--wp--style--unstable-gallery-gap, #{$grid-unit-20});
+		column-count: 2;
+
+		// Map the columns attribute onto CSS column-count.
+		&.columns-1 {
+			column-count: 1;
+		}
+
+		@include break-small {
+			column-count: 3;
+
+			@for $i from 2 through 8 {
+				&.columns-#{ $i } {
+					column-count: $i;
+				}
+			}
+
+			&.columns-default {
+				column-count: 3;
+			}
+		}
+
+		// Each image spans its column; masonry relies on natural heights.
+		// `break-inside: avoid` keeps the figure together when columns
+		// reflow. The `aspect-ratio` override neutralises the gallery's
+		// shared aspect-ratio option, which applies an inline style to each
+		// figure and would otherwise force every tile to the same shape.
+		figure.wp-block-image:not(#individual-image) {
+			width: 100%;
+			margin: 0 0 var(--wp--style--unstable-gallery-gap, #{$grid-unit-20});
+			break-inside: avoid;
+			display: block;
+			aspect-ratio: auto !important;
+
+			// The `is-cropped` rules above force a fixed height and
+			// `object-fit: cover` on the image. That collapses masonry into
+			// a grid, so neutralise them here — `!important` is required
+			// because `is-cropped` sets the same properties.
+			a,
+			img {
+				height: auto !important;
+				object-fit: initial !important;
+			}
+		}
+	}
 }
