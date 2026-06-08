@@ -53,7 +53,7 @@ const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
 const { ThemeProvider } = unlock( themePrivateApis );
 
 const ANIMATION_DURATION = 0.3;
-const CONTENT_COLOR = { bg: '#ffffff' };
+const CONTENT_COLOR = { background: '#ffffff' };
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();

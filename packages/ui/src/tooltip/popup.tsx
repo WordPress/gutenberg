@@ -27,10 +27,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 		 *   - create new semantic tokens as needed (aliasing either the
 		 *     "inverted bg" or "perma-dark bg" private tokens) and have
 		 *     Tooltip.Popup use them;
-		 *   - remove the hardcoded `bg` setting from the `ThemeProvider`
+		 *   - remove the hardcoded `background` setting from the `ThemeProvider`
 		 *     below
 		 */
-		<ThemeProvider color={ { bg: '#1e1e1e' } }>
+		<ThemeProvider color={ { background: '#1e1e1e' } }>
 			<_Tooltip.Popup
 				ref={ ref }
 				className={ clsx( styles.popup, className ) }

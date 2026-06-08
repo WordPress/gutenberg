@@ -175,26 +175,28 @@ export function useThemeProviderStyles( {
 		color.primary ??
 		inheritedSettings.color?.primary ??
 		DEFAULT_SEED_COLORS.primary;
-	const bg =
-		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const background =
+		color.background ??
+		inheritedSettings.color?.background ??
+		DEFAULT_SEED_COLORS.bg;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 
 	const resolvedSettings = useMemo(
 		() => ( {
 			color: {
 				primary,
-				bg,
+				background,
 			},
 			cursor: cursorControl ? { control: cursorControl } : undefined,
 		} ),
-		[ primary, bg, cursorControl ]
+		[ primary, background, cursorControl ]
 	);
 
 	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
-			bg,
+			bg: background,
 			primary,
 		};
 
@@ -216,7 +218,7 @@ export function useThemeProviderStyles( {
 			primary: seeds.primary,
 			computedColorRamps,
 		} );
-	}, [ primary, bg ] );
+	}, [ primary, background ] );
 
 	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {
