@@ -151,6 +151,40 @@
 				}
 			}
 		},
+		"size": {
+			"5xs": {
+				"$value": "{wpds-dimension.primitive.space.10}",
+				"$description": "Notification indicators"
+			},
+			"4xs": {
+				"$value": "{wpds-dimension.primitive.space.20}",
+				"$description": "Visual size for small interactive elements like resize handles"
+			},
+			"3xs": {
+				"$value": "{wpds-dimension.primitive.space.30}",
+				"$description": "Small markers"
+			},
+			"2xs": {
+				"$value": "{wpds-dimension.primitive.space.40}",
+				"$description": "For small controls like checkboxes and radios, or small decorative icons"
+			},
+			"xs": {
+				"$value": "{wpds-dimension.primitive.space.50}",
+				"$description": "For medium sized icons"
+			},
+			"sm": {
+				"$value": "{wpds-dimension.primitive.space.60}",
+				"$description": "For icons and small buttons"
+			},
+			"md": {
+				"$value": "{wpds-dimension.primitive.space.70}",
+				"$description": "For medium-sized buttons and inputs"
+			},
+			"lg": {
+				"$value": "{wpds-dimension.primitive.space.80}",
+				"$description": "Default size for buttons and inputs"
+			}
+		},
 		"surface-width": {
 			"xs": {
 				"$value": { "value": 240, "unit": "px" },

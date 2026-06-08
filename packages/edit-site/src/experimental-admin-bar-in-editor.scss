@@ -56,7 +56,9 @@ body.has-admin-bar-in-editor {
 
 	&.is-fullscreen-mode {
 		.is-entity-save-view-open .interface-interface-skeleton__actions:focus,
-		.is-entity-save-view-open .interface-interface-skeleton__actions:focus-within {
+		.is-entity-save-view-open .interface-interface-skeleton__actions:focus-within,
+		.edit-site-layout__actions.is-entity-save-view-open:focus,
+		.edit-site-layout__actions.is-entity-save-view-open:focus-within {
 			top: var(--wp-admin--admin-bar--height, 0);
 		}
 

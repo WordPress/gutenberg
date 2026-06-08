@@ -14,6 +14,10 @@
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
 
+### Documentation
+
+-   Include DataViews components in [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) documented components ([#78960](https://github.com/WordPress/gutenberg/pull/78960)).
+
 ## 15.0.0 (2026-05-27)
 
 ### Breaking Changes

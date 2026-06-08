@@ -57,6 +57,20 @@ _Parameters_
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
 
+### getUltraHdrInfo
+
+Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
+
+Returns dimensions and HDR headroom on success, or `null` if the buffer is not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported format).
+
+_Parameters_
+
+-   _buffer_ `ArrayBuffer`: Image buffer.
+
+_Returns_
+
+-   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+
 ### hasTransparency
 
 Determines whether an image has an alpha channel.
@@ -72,6 +86,8 @@ _Returns_
 ### resizeImage
 
 Resizes an image using vips.
+
+UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
 
 _Parameters_
 
@@ -146,6 +162,20 @@ _Parameters_
 -   _quality_ Desired quality.
 -   _interlaced_ Whether to use interlaced/progressive mode. Only used if the outputType supports it.
 
+### vipsGetUltraHdrInfo
+
+Probes a JPEG to determine whether it is an UltraHDR image with an embedded gain map.
+
+Returns dimensions and HDR headroom on success, or `null` if the buffer is not a valid UltraHDR JPEG (no gain map, decode failure, or unsupported format).
+
+_Parameters_
+
+-   _buffer_ `ArrayBuffer`: Image buffer.
+
+_Returns_
+
+-   `Promise< UltraHdrInfo | null >`: UltraHDR info, or null when the buffer is not UltraHDR.
+
 ### vipsHasTransparency
 
 Determines whether an image has an alpha channel.
@@ -161,6 +191,8 @@ _Returns_
 ### vipsResizeImage
 
 Resizes an image using vips.
+
+UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*` has higher priority than `jpegload*`, so `newFromBuffer`/`thumbnailBuffer` decode the gain map alongside the base image, and `jpegsave*` delegates to `uhdrsave*` on output when a gain map is attached.
 
 _Parameters_
 
