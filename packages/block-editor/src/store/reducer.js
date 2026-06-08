@@ -420,23 +420,16 @@ const withBlockTree =
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 	let nextHistoryMode;
-	let nextIsCombinedOperation;
 
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 
-		const didInsertBlocks =
-			( action.type === 'INSERT_BLOCKS' ||
-				action.type === 'REPLACE_BLOCKS' ||
-				action.type === 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN' ) &&
-			!! action.blocks?.length;
 		const isNotPersistentMarker =
 			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 		const isCombinedOperationMarker =
 			action.type === 'MARK_NEXT_CHANGE_AS_COMBINED_OPERATION';
 		const hasMarker = isNotPersistentMarker || isCombinedOperationMarker;
 		const pendingHistoryMode = nextHistoryMode;
-		const pendingIsCombinedOperation = nextIsCombinedOperation;
 
 		// Ensure MARK_NEXT_CHANGE_AS_COMBINED_OPERATION doesn't consume an existing
 		// MARK_NEXT_CHANGE_AS_NOT_PERSISTENT marker.
@@ -448,15 +441,6 @@ function withPersistentBlockChange( reducer ) {
 			// pending history mode for the next operation. The final combined
 			// operation should keep the intended history flag.
 			nextHistoryMode = pendingHistoryMode;
-		}
-
-		// Also ensure MARK_NEXT_CHANGE_AS_NOT_PERSISTENT does not consume an
-		// existing MARK_NEXT_CHANGE_AS_COMBINED_OPERATION marker.
-		nextIsCombinedOperation = false;
-		if ( isCombinedOperationMarker ) {
-			nextIsCombinedOperation = true;
-		} else if ( isNotPersistentMarker ) {
-			nextIsCombinedOperation = pendingIsCombinedOperation;
 		}
 
 		const isExplicitPersistentChange =
@@ -481,26 +465,86 @@ function withPersistentBlockChange( reducer ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
+		if ( pendingHistoryMode === 'ignore' ) {
+			return {
+				...nextState,
+				isPersistentChange,
+				lastBlockChangeHistoryMode: 'ignore',
+			};
+		}
+
+		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
+		return { ...blockChange, isPersistentChange };
+	};
+}
+
+/**
+ * Higher-order reducer intended to augment the blocks reducer with transient
+ * metadata used by deferred block sync.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+function withDeferredBlockSync( reducer ) {
+	let nextIsCombinedOperation;
+
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+
+		const isNotPersistentMarker =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+		const isCombinedOperationMarker =
+			action.type === 'MARK_NEXT_CHANGE_AS_COMBINED_OPERATION';
+		const pendingIsCombinedOperation = nextIsCombinedOperation;
+
+		// Ensure MARK_NEXT_CHANGE_AS_NOT_PERSISTENT does not consume an
+		// existing MARK_NEXT_CHANGE_AS_COMBINED_OPERATION marker.
+		nextIsCombinedOperation = false;
+		if ( isCombinedOperationMarker ) {
+			nextIsCombinedOperation = true;
+		} else if ( isNotPersistentMarker ) {
+			nextIsCombinedOperation = pendingIsCombinedOperation;
+		}
+
+		if ( state === nextState ) {
+			return state;
+		}
+
+		const didInsertBlocks =
+			( action.type === 'INSERT_BLOCKS' ||
+				action.type === 'REPLACE_BLOCKS' ||
+				action.type === 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN' ) &&
+			!! action.blocks?.length;
+
+		const hasBlockSyncMetadata =
+			nextState.isLastBlockChangeCombinedOperation !== undefined ||
+			nextState.didLastBlockChangeInsertBlocks !== undefined;
+		if (
+			! pendingIsCombinedOperation &&
+			! didInsertBlocks &&
+			! hasBlockSyncMetadata
+		) {
+			return nextState;
+		}
+
 		// Clear transient metadata from the previous block change. The current
 		// change adds back only the markers that apply to it below.
 		const {
-			lastBlockChangeHistoryMode,
 			isLastBlockChangeCombinedOperation,
 			didLastBlockChangeInsertBlocks,
 			...blockChange
 		} = nextState;
 
-		if ( pendingHistoryMode === 'ignore' ) {
-			blockChange.lastBlockChangeHistoryMode = 'ignore';
-		}
 		if ( pendingIsCombinedOperation ) {
 			blockChange.isLastBlockChangeCombinedOperation = true;
 		}
+
 		if ( didInsertBlocks ) {
 			blockChange.didLastBlockChangeInsertBlocks = true;
 		}
 
-		return { ...blockChange, isPersistentChange };
+		return blockChange;
 	};
 }
 
@@ -819,6 +863,7 @@ export const blocks = pipe(
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
 	withPersistentBlockChange,
+	withDeferredBlockSync,
 	withIgnoredBlockChange,
 	withResetControlledBlocks
 )( {
