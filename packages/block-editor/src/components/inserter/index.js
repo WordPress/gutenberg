@@ -175,15 +175,18 @@ const UnforwardedInserter = (
 			let _blockLabelToInsert;
 			if ( _blockTypeToInsert ) {
 				const attributes = _blockToInsert?.attributes ?? {};
-				const label = getBlockLabel( _blockTypeToInsert, attributes );
-				const variation =
-					label === _blockTypeToInsert.title
-						? getActiveBlockVariation(
-								_blockTypeToInsert.name,
-								attributes
-						  )
-						: null;
-				_blockLabelToInsert = variation?.title || label;
+				_blockLabelToInsert = getBlockLabel(
+					_blockTypeToInsert,
+					attributes
+				);
+
+				if ( _blockLabelToInsert === _blockTypeToInsert.title ) {
+					_blockLabelToInsert =
+						getActiveBlockVariation(
+							_blockTypeToInsert.name,
+							attributes
+						)?.title || _blockLabelToInsert;
+				}
 			}
 
 			return {
