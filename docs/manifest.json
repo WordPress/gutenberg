@@ -1146,12 +1146,6 @@
 		"parent": "core-blocks-design"
 	},
 	{
-		"title": "Tab",
-		"slug": "core-block-tab",
-		"markdown_source": "../packages/block-library/src/tab/README.md",
-		"parent": "core-blocks-design"
-	},
-	{
 		"title": "Table of Contents",
 		"slug": "core-block-table-of-contents",
 		"markdown_source": "../packages/block-library/src/table-of-contents/README.md",
