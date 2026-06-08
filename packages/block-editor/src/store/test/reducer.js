@@ -2236,6 +2236,52 @@ describe( 'state', () => {
 					expect( subsequentState.isPersistentChange ).toBe( true );
 				} );
 
+				it( 'should flag ignored history for an explicitly marked not persistent change', () => {
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					original = blocks( original, {
+						type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+						history: 'ignore',
+					} );
+
+					const nextState = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( nextState.isPersistentChange ).toBe( false );
+					expect( nextState.lastBlockChangeHistoryMode ).toBe(
+						'ignore'
+					);
+
+					// A subsequent change should clear the ignored history.
+					const subsequentState = blocks( nextState, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							other: true,
+						},
+					} );
+
+					expect( subsequentState.isPersistentChange ).toBe( true );
+					expect(
+						subsequentState.lastBlockChangeHistoryMode
+					).toBeUndefined();
+				} );
+
 				it( 'should retain reference for same state, same persistence', () => {
 					const original = deepFreeze(
 						blocks( undefined, {

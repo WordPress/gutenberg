@@ -21,6 +21,7 @@ const stories = [
 	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',

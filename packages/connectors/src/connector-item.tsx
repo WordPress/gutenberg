@@ -208,6 +208,7 @@ export function DefaultConnectorSettings( {
 				} }
 				placeholder={ __( 'Enter your API key' ) }
 				disabled={ readOnly || isSaving }
+				autoComplete="off"
 				help={ getHelp() }
 			/>
 			{ readOnly ? (

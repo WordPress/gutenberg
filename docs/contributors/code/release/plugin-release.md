@@ -415,7 +415,7 @@ The minor release should only contain the _specific commits_ required. To do thi
 If an RC already exists for a new version, you <strong>need</strong> to cherry-pick the same commits in the respective release branch, as they will not be included automatically. E.g.: If you're about to release a new minor release for 12.5 and just cherry-picked into <code>release/12.5</code>, but 12.6.0-rc.1 is already out, then you need to cherry-pick the same commits into the <code>release/12.6</code> branch, or they won't be included in subsequent releases for 12.6! Usually it's best to coordinate this process with the release coordinator for the next release.
 </div>
 
-The cherry-picking process can be automated with the [`npm run cherry-pick`](/docs/contributors/code/auto-cherry-picking.md) script, but be sure to use the `Backport to Gutenberg Minor Release` label when running the script.
+The cherry-picking process can be automated with the [`npm run other:cherry-pick`](/docs/contributors/code/auto-cherry-picking.md) script, but be sure to use the `Backport to Gutenberg Minor Release` label when running the script.
 
 You must also ensure that all PRs being included are assigned to the GitHub Milestone on which the minor release is based. Bear in mind, that when PRs are _merged_ they are automatically assigned a milestone for the next _stable_ release. Therefore you will need to go back through each PR in GitHub and re-assign the Milestone.
 

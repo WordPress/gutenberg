@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/default-custom-properties";
@@ -62,7 +61,7 @@ body.js.site-editor-php {
 }
 
 body.js.site-editor-php {
-	background: $gray-900;
+	background: var(--wpds-color-bg-surface-neutral-weak);
 }
 
 .edit-site {
