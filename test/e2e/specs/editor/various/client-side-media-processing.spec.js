@@ -12,6 +12,31 @@ const { v4: uuid } = require( 'uuid' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
+ * Probes a remote JPEG for an embedded UltraHDR gain map.
+ *
+ * Loaded lazily so the wasm-vips runtime (~10MB) only instantiates when an
+ * UltraHDR test actually runs.
+ *
+ * @param {string} url Image URL to fetch.
+ * @return {Promise<{ width: number, height: number, hasGainmap: boolean }>} Probe result.
+ */
+async function probeUltraHdrUrl( url ) {
+	const { default: Vips } = await import( 'wasm-vips' );
+	const vips = await Vips( {} );
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error( `Failed to fetch ${ url }: ${ response.status }` );
+	}
+	const bytes = new Uint8Array( await response.arrayBuffer() );
+	const image = vips.Image.uhdrloadBuffer( bytes );
+	return {
+		width: image.width,
+		height: image.pageHeight,
+		hasGainmap: !! image.gainmap,
+	};
+}
+
+/**
  * @typedef {import('@playwright/test').Page} Page
  */
 
@@ -268,6 +293,47 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.mime_type ).toBe( 'image/avif' );
 		expect( media.media_details.width ).toBe( 200 );
 		expect( media.media_details.height ).toBe( 150 );
+	} );
+
+	test( 'preserves UltraHDR gain map through sub-size resize', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_ultrahdr.jpeg'
+		);
+
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.media_details.width ).toBe( 1024 );
+		expect( media.media_details.height ).toBe( 768 );
+
+		// Default sub-sizes must be generated.
+		const sizes = media.media_details.sizes;
+		expect( sizes.thumbnail ).toBeDefined();
+		expect( sizes.medium ).toBeDefined();
+
+		// Every generated sub-size must still carry the embedded UltraHDR
+		// gain map. This proves the resize step routed through libvips's
+		// uhdrload/uhdrsave pipeline rather than the regular JPEG path
+		// (which would have stripped the gain map).
+		//
+		// `thumbnail` is a hard-cropped square (exercising the manual
+		// gain-map crop path) while `medium` is a proportional downscale
+		// (exercising libvips's automatic gain-map resize), so checking both
+		// covers both code paths end to end.
+		for ( const sizeName of [ 'thumbnail', 'medium' ] ) {
+			const size = sizes[ sizeName ];
+			const probed = await probeUltraHdrUrl( size.source_url );
+			expect( probed.hasGainmap ).toBe( true );
+			// The decoded base image must match the registered sub-size
+			// dimensions, confirming the gain map travels with a correctly
+			// resized/cropped image rather than a stale full-size one.
+			expect( probed.width ).toBe( size.width );
+			expect( probed.height ).toBe( size.height );
+		}
 	} );
 
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {

@@ -21,6 +21,7 @@ import EmptyComponent from './empty';
 import './style.css';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataViews',
 	component: DataViews,
 	args: {

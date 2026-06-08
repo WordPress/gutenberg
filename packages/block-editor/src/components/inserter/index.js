@@ -11,6 +11,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { forwardRef } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
 
 /**
@@ -21,16 +22,18 @@ import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 import { getAppenderLabel } from './get-appender-label';
 
-function InserterToggle( {
-	onToggle,
-	disabled,
-	isOpen,
-	blockTitle,
-	hasSingleBlockType,
-	appenderLabel,
-	toggleProps = {},
-	ref,
-} ) {
+const UnforwardedInserterToggle = (
+	{
+		onToggle,
+		disabled,
+		isOpen,
+		blockTitle,
+		hasSingleBlockType,
+		appenderLabel,
+		toggleProps = {},
+	},
+	ref
+) => {
 	const {
 		as: Wrapper = Button,
 		label: labelProp,
@@ -78,26 +81,30 @@ function InserterToggle( {
 			{ ...rest }
 		/>
 	);
-}
+};
 
-function Inserter( {
-	clientId,
-	rootClientId,
-	disabled,
-	isAppender,
-	position,
-	selectBlockOnInsert,
-	shouldDirectInsert = true,
-	showInserterHelpPanel,
-	// This prop is experimental to give some time for the quick inserter to mature
-	// Feel free to make them stable after a few releases.
-	__experimentalIsQuick: isQuick,
-	onSelectOrClose,
-	onToggle,
-	renderToggle: renderToggleProp,
-	toggleProps,
-	ref,
-} ) {
+const InserterToggle = forwardRef( UnforwardedInserterToggle );
+
+const UnforwardedInserter = (
+	{
+		clientId,
+		rootClientId,
+		disabled,
+		isAppender,
+		position,
+		selectBlockOnInsert,
+		shouldDirectInsert = true,
+		showInserterHelpPanel,
+		// This prop is experimental to give some time for the quick inserter to mature
+		// Feel free to make them stable after a few releases.
+		__experimentalIsQuick: isQuick,
+		onSelectOrClose,
+		onToggle,
+		renderToggle: renderToggleProp,
+		toggleProps,
+	},
+	ref
+) => {
 	const {
 		hasItems,
 		hasSingleBlockType,
@@ -349,6 +356,8 @@ function Inserter( {
 			onClose={ onSelectOrClose }
 		/>
 	);
-}
+};
+
+const Inserter = forwardRef( UnforwardedInserter );
 
 export default Inserter;

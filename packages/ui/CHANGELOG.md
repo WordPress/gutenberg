@@ -18,6 +18,7 @@
 
 ### Enhancements
 
+-   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ### Internal
