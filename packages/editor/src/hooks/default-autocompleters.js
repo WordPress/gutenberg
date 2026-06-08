@@ -6,11 +6,11 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { userAutocompleter } from '../components';
+import { linkAutocompleter, userAutocompleter } from '../components';
 
 function setDefaultCompleters( completers = [] ) {
 	// Provide copies so filters may directly modify them.
-	completers.push( { ...userAutocompleter } );
+	completers.push( { ...linkAutocompleter }, { ...userAutocompleter } );
 
 	return completers;
 }

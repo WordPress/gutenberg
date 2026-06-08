@@ -26,7 +26,7 @@ function parseUnit( cssUnit ) {
 function calculate( expression ) {
 	try {
 		return Function( `'use strict'; return (${ expression })` )();
-	} catch ( err ) {
+	} catch {
 		return null;
 	}
 }

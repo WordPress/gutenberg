@@ -10,12 +10,19 @@
  * The list of core modules allowed to opt-in to the private APIs.
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
+	'@wordpress/admin-ui',
+	'@wordpress/api-fetch',
 	'@wordpress/block-directory',
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
+	'@wordpress/boot',
 	'@wordpress/commands',
+	'@wordpress/compose',
+	'@wordpress/connectors',
+	'@wordpress/workflows',
 	'@wordpress/components',
+	'@wordpress/content-types',
 	'@wordpress/core-commands',
 	'@wordpress/core-data',
 	'@wordpress/customize-widgets',
@@ -24,22 +31,28 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/edit-site',
 	'@wordpress/edit-widgets',
 	'@wordpress/editor',
+	'@wordpress/font-list-route',
 	'@wordpress/format-library',
 	'@wordpress/patterns',
 	'@wordpress/preferences',
 	'@wordpress/reusable-blocks',
+	'@wordpress/rich-text',
+	'@wordpress/route',
 	'@wordpress/router',
+	'@wordpress/routes',
+	'@wordpress/storybook',
+	'@wordpress/sync',
+	'@wordpress/theme',
 	'@wordpress/dataviews',
 	'@wordpress/fields',
+	'@wordpress/lazy-editor',
+	'@wordpress/media-editor',
 	'@wordpress/media-utils',
 	'@wordpress/upload-media',
+	'@wordpress/global-styles-ui',
+	'@wordpress/ui',
+	'@wordpress/views',
 ];
-
-/**
- * A list of core modules that already opted-in to
- * the privateApis package.
- */
-const registeredPrivateApis: Array< string > = [];
 
 /*
  * Warning for theme and plugin developers.
@@ -57,9 +70,6 @@ const registeredPrivateApis: Array< string > = [];
  */
 const requiredConsent =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
-
-// The safety measure is meant for WordPress core where IS_WORDPRESS_CORE is set to true.
-const allowReRegistration = globalThis.IS_WORDPRESS_CORE ? false : true;
 
 /**
  * Called by a @wordpress package wishing to opt-in to accessing or exposing
@@ -82,21 +92,6 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'your product will inevitably break on one of the next WordPress releases.'
 		);
 	}
-	if (
-		! allowReRegistration &&
-		registeredPrivateApis.includes( moduleName )
-	) {
-		// This check doesn't play well with Story Books / Hot Module Reloading
-		// and isn't included in the Gutenberg plugin. It only matters in the
-		// WordPress core release.
-		throw new Error(
-			`You tried to opt-in to unstable APIs as module "${ moduleName }" which is already registered. ` +
-				'This feature is only for JavaScript modules shipped with WordPress core. ' +
-				'Please do not use it in plugins and themes as the unstable APIs will be removed ' +
-				'without a warning. If you ignore this error and depend on unstable features, ' +
-				'your product will inevitably break on one of the next WordPress releases.'
-		);
-	}
 	if ( consent !== requiredConsent ) {
 		throw new Error(
 			`You tried to opt-in to unstable APIs without confirming you know the consequences. ` +
@@ -106,7 +101,6 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 				'your product will inevitably break on the next WordPress release.'
 		);
 	}
-	registeredPrivateApis.push( moduleName );
 
 	return {
 		lock,
@@ -215,14 +209,5 @@ export function allowCoreModule( name: string ) {
 export function resetAllowedCoreModules() {
 	while ( CORE_MODULES_USING_PRIVATE_APIS.length ) {
 		CORE_MODULES_USING_PRIVATE_APIS.pop();
-	}
-}
-/**
- * Private function to allow the unit tests to reset
- * the list of registered private apis.
- */
-export function resetRegisteredPrivateApis() {
-	while ( registeredPrivateApis.length ) {
-		registeredPrivateApis.pop();
 	}
 }

@@ -221,6 +221,22 @@
  * Styles that are reused verbatim in a few places
  */
 
+@mixin snackbar-container() {
+	position: fixed;
+	bottom: 24px;
+	left: 0;
+	right: 0;
+	padding-inline: 16px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	.components-snackbar {
+		margin-inline: auto;
+	}
+}
+
 // These are additional styles for all captions, when the theme opts in to block styles.
 @mixin caption-style() {
 	margin-top: 0.5em;
@@ -283,15 +299,7 @@
 	}
 
 	// Use opacity to work in various editor styles.
-	&::-webkit-input-placeholder {
-		color: colors.$dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: colors.$dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
+	&::placeholder {
 		color: colors.$dark-gray-placeholder;
 	}
 }
@@ -313,11 +321,6 @@
 	&:checked {
 		background: var(--wp-admin-theme-color);
 		border-color: var(--wp-admin-theme-color);
-
-		// Hide default checkbox styles in IE.
-		&::-ms-check {
-			opacity: 0;
-		}
 	}
 
 	&:checked::before,
@@ -531,7 +534,7 @@
 
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
-		@include admin-scheme(#0085ba);
+		@include admin-scheme(#007cba);
 	}
 
 	body.admin-color-modern {
@@ -539,27 +542,27 @@
 	}
 
 	body.admin-color-blue {
-		@include admin-scheme(#096484);
+		@include admin-scheme(#437aa8);
 	}
 
 	body.admin-color-coffee {
-		@include admin-scheme(#46403c);
+		@include admin-scheme(#916745);
 	}
 
 	body.admin-color-ectoplasm {
-		@include admin-scheme(#523f6d);
+		@include admin-scheme(#646c3e);
 	}
 
 	body.admin-color-midnight {
-		@include admin-scheme(#e14d43);
+		@include admin-scheme(#cf4339);
 	}
 
 	body.admin-color-ocean {
-		@include admin-scheme(#627c83);
+		@include admin-scheme(#567958);
 	}
 
 	body.admin-color-sunrise {
-		@include admin-scheme(#dd823b);
+		@include admin-scheme(#ad631e);
 	}
 }
 
@@ -664,11 +667,41 @@
 	}
 }
 
+@mixin inserter-toggle() {
+	// Basic look
+	background: colors.$gray-900;
+	color: colors.$white;
+	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
+	min-width: variables.$button-size-small;
+	height: variables.$button-size-small;
+
+	&:hover {
+		color: colors.$white;
+		background: var(--wp-admin-theme-color);
+	}
+
+	svg {
+		@media not (prefers-reduced-motion) {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+		}
+	}
+
+	&.is-pressed {
+		svg {
+			transform: rotate(45deg);
+		}
+	}
+}
+
 @mixin selected-block-outline($widthRatio: 1) {
 	outline-color: var(--wp-admin-theme-color);
 	outline-style: solid;
 	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
 	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	box-shadow: inset 0 0 0 calc((#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1))) + 0.5px) rgba(colors.$white, 0.7);
 }
 
 @mixin selected-block-focus($widthRatio: 1) {
@@ -680,4 +713,21 @@
 	bottom: 0;
 	left: 0;
 	@include selected-block-outline($widthRatio);
+}
+
+/**
+ * Creates a checkerboard pattern background to indicate transparency.
+ * @param {String} $size - The size of the squares in the checkerboard pattern. Default is 12px.
+ */
+@mixin checkerboard-background($size: 12px) {
+	// The background image creates a checkerboard pattern. Ignore rtlcss to
+	// make it work both in LTR and RTL.
+	// See https://github.com/WordPress/gutenberg/pull/42510
+	/*rtl:begin:ignore*/
+	background-image:
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200),
+		repeating-linear-gradient(45deg, colors.$gray-200 25%, transparent 25%, transparent 75%, colors.$gray-200 75%, colors.$gray-200);
+	background-position: 0 0, $size $size;
+	/*rtl:end:ignore*/
+	background-size: calc(2 * $size) calc(2 * $size);
 }

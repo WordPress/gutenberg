@@ -7,18 +7,24 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import { uploadMedia } from '@wordpress/media-utils';
+import { isClientSideMediaSupported } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import {
+	addFiles as trackStart,
+	advance as trackAdvance,
+} from '../../components/upload-progress-snackbar/tracker';
 
 const noop = () => {};
 
 /**
  * Upload a media file when the file upload button is activated.
- * Wrapper around mediaUpload() that injects the current post ID.
+ * Wrapper around uploadMedia() that injects the current post ID.
  *
  * @param {Object}   $0                   Parameters object passed to the function.
  * @param {?Object}  $0.additionalData    Additional data to include in the request.
@@ -40,6 +46,7 @@ export default function mediaUpload( {
 	onSuccess,
 	multiple = true,
 } ) {
+	const { receiveEntityRecords } = dispatch( coreDataStore );
 	const { getCurrentPost, getEditorSettings } = select( editorStore );
 	const {
 		lockPostAutosaving,
@@ -49,8 +56,9 @@ export default function mediaUpload( {
 	} = dispatch( editorStore );
 
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
+	const isClientSideMediaActive =
+		window.__clientSideMediaProcessing && isClientSideMediaSupported();
 	const lockKey = `image-upload-${ uuid() }`;
-	let imageIsUploading = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 	const currentPost = getCurrentPost();
@@ -59,29 +67,70 @@ export default function mediaUpload( {
 		typeof currentPost?.id === 'number'
 			? currentPost.id
 			: currentPost?.wp_id;
-	const setSaveLock = () => {
-		lockPostSaving( lockKey );
-		lockPostAutosaving( lockKey );
-		imageIsUploading = true;
-	};
-
-	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
-		imageIsUploading = false;
 	};
+
+	// Lock saving immediately when the upload starts.
+	// When client-side media processing is enabled, save locking
+	// is handled by useUploadSaveLock in the editor provider.
+	if ( ! isClientSideMediaActive ) {
+		lockPostSaving( lockKey );
+		lockPostAutosaving( lockKey );
+	}
+
+	const postData = currentPostId ? { post: currentPostId } : {};
+
+	// Track this batch for the upload progress snackbar. Only applies to the
+	// non-CSM path — when CSM is enabled, the block-editor provider intercepts
+	// mediaUpload and dispatches to the upload-media store, so this wrapper is
+	// not called.
+	if ( ! isClientSideMediaActive ) {
+		const trackingFiles = Array.from( filesList ).map(
+			( f ) => f?.name || ''
+		);
+		trackStart( trackingFiles );
+	}
+	let lastCompletedCount = 0;
 
 	uploadMedia( {
 		allowedTypes,
 		filesList,
-		onFileChange: ( file ) => {
-			if ( ! imageIsUploading ) {
-				setSaveLock();
-			} else {
+		onFileChange: ( files ) => {
+			onFileChange?.( files );
+
+			// Files are initially received by `onFileChange` as a blob.
+			// After that the function is called again with the file as an entity.
+			// For core-data, we only care about receiving/invalidating entities.
+			const entityFiles = files.filter( ( _file ) => _file?.id );
+			if ( entityFiles?.length ) {
+				const invalidateCache = true;
+				receiveEntityRecords(
+					'postType',
+					'attachment',
+					entityFiles,
+					undefined,
+					invalidateCache
+				);
+			}
+
+			// Unlock saving once all files have been uploaded (all have IDs).
+			if (
+				! isClientSideMediaActive &&
+				entityFiles.length === files.length
+			) {
 				clearSaveLock();
 			}
-			onFileChange?.( file );
+
+			// Advance the snackbar tracker for newly-completed files.
+			if ( ! isClientSideMediaActive ) {
+				const completedCount = entityFiles.length;
+				if ( completedCount > lastCompletedCount ) {
+					trackAdvance( completedCount - lastCompletedCount );
+					lastCompletedCount = completedCount;
+				}
+			}
 		},
 		onSuccess,
 		additionalData: {
@@ -90,7 +139,11 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			clearSaveLock();
+			if ( ! isClientSideMediaActive ) {
+				clearSaveLock();
+				// Failed files still count as "done" for the snackbar.
+				trackAdvance( 1 );
+			}
 			onError( message );
 		},
 		wpAllowedMimeTypes,

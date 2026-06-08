@@ -10,6 +10,7 @@
 			"style": false,
 			"width": false
 		},
+		"background": { "gradient": true },
 		"color": {
 			"background": true,
 			"button": true,
@@ -308,6 +309,7 @@
 			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
+			"textIndent": "subsequent",
 			"textTransform": true,
 			"writingMode": false
 		},
@@ -315,11 +317,40 @@
 			"core/button": {
 				"border": {
 					"radius": true
+				},
+				"dimensions": {
+					"dimensionSizes": [
+						{
+							"name": "25%",
+							"slug": "25",
+							"size": "25%"
+						},
+						{
+							"name": "50%",
+							"slug": "50",
+							"size": "50%"
+						},
+						{
+							"name": "75%",
+							"slug": "75",
+							"size": "75%"
+						},
+						{
+							"name": "100%",
+							"slug": "100",
+							"size": "100%"
+						}
+					]
 				}
 			},
 			"core/image": {
 				"lightbox": {
 					"allowEditing": true
+				}
+			},
+			"core/icon": {
+				"dimensions": {
+					"width": true
 				}
 			},
 			"core/pullquote": {
@@ -357,6 +388,11 @@
 					}
 				}
 			},
+			"core/icon": {
+				"dimensions": {
+					"width": "24px"
+				}
+			},
 			"core/site-logo": {
 				"variations": {
 					"rounded": {
@@ -384,16 +420,15 @@
 				"typography": {
 					"fontSize": "inherit",
 					"fontFamily": "inherit",
+					"fontStyle": "inherit",
+					"fontWeight": "inherit",
+					"letterSpacing": "inherit",
+					"textTransform": "inherit",
 					"lineHeight": "inherit",
 					"textDecoration": "none"
 				},
 				"border": {
 					"width": "0"
-				}
-			},
-			"link": {
-				"typography": {
-					"textDecoration": "underline"
 				}
 			}
 		},

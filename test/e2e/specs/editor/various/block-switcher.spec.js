@@ -17,7 +17,7 @@ test.describe( 'Block Switcher', () => {
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		const blockSwitcher = page
@@ -64,7 +64,7 @@ test.describe( 'Block Switcher', () => {
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		const blockSwitcher = page
@@ -103,7 +103,7 @@ test.describe( 'Block Switcher', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 		const button = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Paragraph' } );
+			.getByRole( 'button', { name: 'Paragraph', exact: true } );
 		await expect( button ).toBeEnabled();
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );

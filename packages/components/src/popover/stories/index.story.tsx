@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -33,11 +33,11 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Popover.Slot': Popover.Slot,
 	},
 	argTypes: {
@@ -56,6 +56,10 @@ const meta: Meta< typeof Popover > = {
 	},
 	parameters: {
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -90,7 +94,7 @@ export const Default: StoryObj< typeof Popover > = {
 	decorators: [
 		( Story ) => {
 			const [ isVisible, setIsVisible ] = useState( false );
-			const buttonRef = useRef< HTMLButtonElement | undefined >();
+			const buttonRef = useRef< HTMLButtonElement >( undefined );
 			const toggleVisible = ( event: React.MouseEvent ) => {
 				if ( buttonRef.current && event.target !== buttonRef.current ) {
 					return;
@@ -115,6 +119,7 @@ export const Default: StoryObj< typeof Popover > = {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ toggleVisible }
 						ref={ buttonRef }
@@ -210,6 +215,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 				<div style={ { padding: '20px' } }>
 					<div>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							onClick={ increase }
 							style={ {
@@ -219,7 +225,11 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 							Increase Size
 						</Button>
 
-						<Button variant="primary" onClick={ decrease }>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ decrease }
+						>
 							Decrease Size
 						</Button>
 					</div>
@@ -303,6 +313,7 @@ export const WithCloseHandlers: StoryObj< typeof Popover > = {
 				} }
 			>
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ toggleVisible }
 					ref={ buttonRef }

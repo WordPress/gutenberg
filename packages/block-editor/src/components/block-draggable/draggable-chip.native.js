@@ -32,7 +32,7 @@ const shadowStyle = {
  *
  * @param {Object} props        Component props.
  * @param {Object} [props.icon] Block icon.
- * @return {JSX.Element} Chip component.
+ * @return {React.JSX.Element} Chip component.
  */
 export default function BlockDraggableChip( { icon } ) {
 	const containerStyle = usePreferredColorSchemeStyle(

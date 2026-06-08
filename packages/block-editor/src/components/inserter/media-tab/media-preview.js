@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Tooltip,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
@@ -28,6 +27,9 @@ import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
 import { getFilename } from '@wordpress/url';
 
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
+
 /**
  * Internal dependencies
  */
@@ -37,7 +39,7 @@ import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const MEDIA_OPTIONS_POPOVER_PROPS = {
-	position: 'bottom left',
+	placement: 'bottom-end',
 	className:
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
@@ -261,27 +263,34 @@ export function MediaPreview( { media, onClick, category } ) {
 							onMouseEnter={ onMouseEnter }
 							onMouseLeave={ onMouseLeave }
 						>
-							<Tooltip text={ title }>
-								<Composite.Item
+							<Tooltip.Root>
+								<Tooltip.Trigger
 									render={
-										<div
-											aria-label={ title }
-											role="option"
-											className="block-editor-inserter__media-list__item"
-										/>
-									}
-									onClick={ () => onMediaInsert( block ) }
-								>
-									<div className="block-editor-inserter__media-list__item-preview">
-										{ preview }
-										{ isInserting && (
-											<div className="block-editor-inserter__media-list__item-preview-spinner">
-												<Spinner />
+										<Composite.Item
+											render={
+												<div
+													aria-label={ title }
+													role="option"
+													className="block-editor-inserter__media-list__item"
+												/>
+											}
+											onClick={ () =>
+												onMediaInsert( block )
+											}
+										>
+											<div className="block-editor-inserter__media-list__item-preview">
+												{ preview }
+												{ isInserting && (
+													<div className="block-editor-inserter__media-list__item-preview-spinner">
+														<Spinner />
+													</div>
+												) }
 											</div>
-										) }
-									</div>
-								</Composite.Item>
-							</Tooltip>
+										</Composite.Item>
+									}
+								/>
+								<Tooltip.Popup>{ title }</Tooltip.Popup>
+							</Tooltip.Root>
 							{ ! isInserting && (
 								<MediaPreviewOptions
 									category={ category }

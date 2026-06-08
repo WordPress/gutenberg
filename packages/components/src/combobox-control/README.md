@@ -35,7 +35,6 @@ function MyComboboxControl() {
 	return (
 		<ComboboxControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -92,7 +91,7 @@ Function called when the control's search input value changes. The argument cont
 
 #### onChange
 
-Function called with the selected value changes.
+Function called when the selected value changes.
 
 -   Type: `( value: string | null | undefined ) => void`
 -   Required: No
@@ -141,14 +140,6 @@ Start opting into the larger default height that will become the default size in
 - Type: `Boolean`
 - Required: No
 - Default: `false`
-
-#### __nextHasNoMarginBottom
-
-Start opting into the new margin-free styles that will become the default in a future version.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
 
 ## Related components
 

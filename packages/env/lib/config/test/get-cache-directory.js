@@ -1,5 +1,5 @@
 'use strict';
-/* eslint-disable jest/no-conditional-expect */
+
 /**
  * External dependencies
  */
@@ -54,4 +54,3 @@ describe( 'getCacheDirectory', () => {
 		expect( parsed ).toEqual( '/home/test/wp-env' );
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

@@ -19,10 +19,12 @@ function render_block_core_form_input( $attributes, $content ) {
 		$visibility_permissions = $attributes['visibilityPermissions'];
 	}
 
-	if ( 'logged-in' === $visibility_permissions && ! is_user_logged_in() ) {
+	$user_logged_in = is_user_logged_in();
+
+	if ( 'logged-in' === $visibility_permissions && ! $user_logged_in ) {
 		return '';
 	}
-	if ( 'logged-out' === $visibility_permissions && is_user_logged_in() ) {
+	if ( 'logged-out' === $visibility_permissions && $user_logged_in ) {
 		return '';
 	}
 	return $content;

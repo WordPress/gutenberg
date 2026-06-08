@@ -7,7 +7,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-	__experimentalVStack as VStack,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -27,7 +27,7 @@ import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { BlockControls, JustifyContentControl } from '../components';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 export default {
@@ -37,6 +37,8 @@ export default {
 		layout,
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
+		clientId,
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
 		const {
@@ -70,87 +72,143 @@ export default {
 		const units = useCustomUnits( {
 			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const resetContentSize = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					contentSize: resetLayout?.contentSize,
+				} )
+			);
+		const resetWideSize = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					wideSize: resetLayout?.wideSize,
+				} )
+			);
+		const resetJustification = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					justifyContent: resetLayout?.justifyContent,
+				} )
+			);
+		const hasContentSizeValue = () => hasLayoutValue( 'contentSize' );
+		const hasWideSizeValue = () => hasLayoutValue( 'wideSize' );
+		const hasJustificationValue = () =>
+			hasLayoutValue( 'justifyContent', 'center' );
+
 		return (
-			<VStack
-				spacing={ 4 }
-				className="block-editor-hooks__layout-constrained"
-			>
+			<>
 				{ allowCustomContentAndWideSize && (
 					<>
-						<UnitControl
-							__next40pxDefaultSize
+						<ToolsPanelItem
 							label={ __( 'Content width' ) }
-							labelPosition="top"
-							value={ contentSize || wideSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									contentSize: nextWidth,
-								} );
-							} }
-							units={ units }
-							prefix={
-								<InputControlPrefixWrapper variant="icon">
-									<Icon icon={ alignNone } />
-								</InputControlPrefixWrapper>
-							}
-						/>
-						<UnitControl
-							__next40pxDefaultSize
+							hasValue={ hasContentSizeValue }
+							onDeselect={ resetContentSize }
+							panelId={ clientId }
+						>
+							<UnitControl
+								__next40pxDefaultSize
+								label={ __( 'Content width' ) }
+								labelPosition="top"
+								value={ contentSize || wideSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange(
+										cleanEmptyObject( {
+											...layout,
+											contentSize:
+												nextWidth !== ''
+													? nextWidth
+													: undefined,
+										} )
+									);
+								} }
+								units={ units }
+								prefix={
+									<InputControlPrefixWrapper variant="icon">
+										<Icon icon={ alignNone } />
+									</InputControlPrefixWrapper>
+								}
+							/>
+						</ToolsPanelItem>
+						<ToolsPanelItem
 							label={ __( 'Wide width' ) }
-							labelPosition="top"
-							value={ wideSize || contentSize || '' }
-							onChange={ ( nextWidth ) => {
-								nextWidth =
-									0 > parseFloat( nextWidth )
-										? '0'
-										: nextWidth;
-								onChange( {
-									...layout,
-									wideSize: nextWidth,
-								} );
-							} }
-							units={ units }
-							prefix={
-								<InputControlPrefixWrapper variant="icon">
-									<Icon icon={ stretchWide } />
-								</InputControlPrefixWrapper>
-							}
-						/>
-						<p className="block-editor-hooks__layout-constrained-helptext">
-							{ __(
-								'Customize the width for all elements that are assigned to the center or wide columns.'
-							) }
-						</p>
+							hasValue={ hasWideSizeValue }
+							onDeselect={ resetWideSize }
+							panelId={ clientId }
+						>
+							<UnitControl
+								__next40pxDefaultSize
+								label={ __( 'Wide width' ) }
+								labelPosition="top"
+								value={ wideSize || contentSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange(
+										cleanEmptyObject( {
+											...layout,
+											wideSize:
+												nextWidth !== ''
+													? nextWidth
+													: undefined,
+										} )
+									);
+								} }
+								units={ units }
+								prefix={
+									<InputControlPrefixWrapper variant="icon">
+										<Icon icon={ stretchWide } />
+									</InputControlPrefixWrapper>
+								}
+							/>
+							<p className="block-editor-hooks__layout-constrained-helptext">
+								{ __(
+									'Customize the width for all elements that are assigned to the center or wide columns.'
+								) }
+							</p>
+						</ToolsPanelItem>
 					</>
 				) }
 				{ allowJustification && (
-					<ToggleGroupControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+					<ToolsPanelItem
 						label={ __( 'Justification' ) }
-						value={ justifyContent }
-						onChange={ onJustificationChange }
+						hasValue={ hasJustificationValue }
+						onDeselect={ resetJustification }
+						panelId={ clientId }
 					>
-						{ justificationOptions.map(
-							( { value, icon, label } ) => {
-								return (
-									<ToggleGroupControlOptionIcon
-										key={ value }
-										value={ value }
-										icon={ icon }
-										label={ label }
-									/>
-								);
-							}
-						) }
-					</ToggleGroupControl>
+						<ToggleGroupControl
+							__next40pxDefaultSize
+							label={ __( 'Justification' ) }
+							value={ justifyContent }
+							onChange={ onJustificationChange }
+						>
+							{ justificationOptions.map(
+								( { value, icon, label } ) => {
+									return (
+										<ToggleGroupControlOptionIcon
+											key={ value }
+											value={ value }
+											icon={ icon }
+											label={ label }
+										/>
+									);
+								}
+							) }
+						</ToggleGroupControl>
+					</ToolsPanelItem>
 				) }
-			</VStack>
+			</>
 		);
 	},
 	toolBarControls: function DefaultLayoutToolbarControls( {
@@ -175,13 +233,26 @@ export default {
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
 		layout = {},
+		viewportOverrides,
 		style,
 		blockName,
 		hasBlockGapSupport,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const { contentSize, wideSize, justifyContent } = layout;
+		const hasViewportOverrides = viewportOverrides !== undefined;
+		const effectiveLayout = hasViewportOverrides
+			? { ...layout, ...viewportOverrides }
+			: layout;
+		const hasViewportOverride = ( key ) =>
+			Object.hasOwn( viewportOverrides || {}, key );
+		const { contentSize, wideSize, justifyContent } = effectiveLayout;
 		const blockGapStyleValue = getGapCSSValue( style?.spacing?.blockGap );
+		const hasBlockGapOverride =
+			! hasViewportOverrides ||
+			Object.hasOwn( style?.spacing || {}, 'blockGap' );
+		const hasBlockSpacingOverride =
+			! hasViewportOverrides ||
+			Object.hasOwn( style?.spacing || {}, 'padding' );
 
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.
@@ -200,16 +271,29 @@ export default {
 		const marginRight =
 			justifyContent === 'right' ? '0 !important' : 'auto !important';
 
+		const hasJustificationOverride =
+			hasViewportOverrides && hasViewportOverride( 'justifyContent' );
+		const shouldOutputConstrainedSizes =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'contentSize' ) ||
+			hasViewportOverride( 'wideSize' );
+		const constrainedSizeDeclarations = [
+			`max-width: ${ contentSize ?? wideSize }`,
+		];
+		if ( ! hasViewportOverrides || hasJustificationOverride ) {
+			constrainedSizeDeclarations.push(
+				`margin-left: ${ marginLeft }`,
+				`margin-right: ${ marginRight }`
+			);
+		}
 		let output =
-			!! contentSize || !! wideSize
+			shouldOutputConstrainedSizes && ( !! contentSize || !! wideSize )
 				? `
-					${ appendSelectors(
-						selector,
-						'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-					) } {
-						max-width: ${ contentSize ?? wideSize };
-						margin-left: ${ marginLeft };
-						margin-right: ${ marginRight };
+						${ appendSelectors(
+							selector,
+							'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
+						) } {
+						${ constrainedSizeDeclarations.join( '; ' ) };
 					}
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideSize ?? contentSize };
@@ -217,25 +301,33 @@ export default {
 					${ appendSelectors( selector, '> .alignfull' ) } {
 						max-width: none;
 					}
-				`
+					`
 				: '';
 
-		if ( justifyContent === 'left' ) {
+		if ( hasJustificationOverride && ! shouldOutputConstrainedSizes ) {
 			output += `${ appendSelectors(
 				selector,
 				'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
 			) }
+				{ margin-left: ${ marginLeft }; margin-right: ${ marginRight }; }`;
+		} else if ( ! hasViewportOverrides ) {
+			if ( justifyContent === 'left' ) {
+				output += `${ appendSelectors(
+					selector,
+					'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
+				) }
 			{ margin-left: ${ marginLeft }; }`;
-		} else if ( justifyContent === 'right' ) {
-			output += `${ appendSelectors(
-				selector,
-				'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-			) }
+			} else if ( justifyContent === 'right' ) {
+				output += `${ appendSelectors(
+					selector,
+					'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
+				) }
 			{ margin-right: ${ marginRight }; }`;
+			}
 		}
 
 		// If there is custom padding, add negative margins for alignfull blocks.
-		if ( style?.spacing?.padding ) {
+		if ( hasBlockSpacingOverride && style?.spacing?.padding ) {
 			// The style object might be storing a preset so we need to make sure we get a usable value.
 			const paddingValues = getCSSRules( style );
 			paddingValues.forEach( ( rule ) => {
@@ -264,7 +356,7 @@ export default {
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
-		if ( hasBlockGapSupport && blockGapValue ) {
+		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {
 			output += getBlockGapCSS(
 				selector,
 				layoutDefinitions,

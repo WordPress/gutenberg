@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalText as Text } from '@wordpress/components';
+import { __experimentalText as WCText } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -22,7 +22,7 @@ const AVERAGE_READING_RATE = 189;
 
 // This component renders the wordcount and reading time for the post.
 export default function PostContentInformation() {
-	const { postContent } = useSelect( ( select ) => {
+	const postContent = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType, getCurrentPostId } =
 			select( editorStore );
 		const { canUser } = select( coreStore );
@@ -41,12 +41,12 @@ export default function PostContentInformation() {
 			! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
 				postType
 			);
-		return {
-			postContent:
-				showPostContentInfo && getEditedPostAttribute( 'content' ),
-		};
+		return showPostContentInfo && getEditedPostAttribute( 'content' );
 	}, [] );
+	return <PostContentInformationUI postContent={ postContent } />;
+}
 
+export function PostContentInformationUI( { postContent } ) {
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
 	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
@@ -76,14 +76,14 @@ export default function PostContentInformation() {
 			  );
 	return (
 		<div className="editor-post-content-information">
-			<Text>
+			<WCText>
 				{ sprintf(
 					/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
 					__( '%1$s, %2$s read time.' ),
 					wordsCountText,
 					minutesText
 				) }
-			</Text>
+			</WCText>
 		</div>
 	);
 }

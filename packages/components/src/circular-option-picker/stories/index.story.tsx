@@ -1,11 +1,11 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -21,13 +21,9 @@ const meta: Meta< typeof CircularOptionPicker > = {
 	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.Option': CircularOptionPicker.Option,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.DropdownLinkAction':
 			CircularOptionPicker.DropdownLinkAction,
 	},
@@ -37,11 +33,15 @@ const meta: Meta< typeof CircularOptionPicker > = {
 		children: { control: { type: 'text' } },
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Mostly intended for internal use.',
 		},
 	},
 	decorators: [
@@ -152,7 +152,7 @@ WithDropdownLinkAction.args = {
 	actions: (
 		<CircularOptionPicker.DropdownLinkAction
 			dropdownProps={ {
-				popoverProps: { position: 'top right' },
+				popoverProps: { placement: 'top-end' },
 				renderContent: () => (
 					<div>This is an example of a DropdownLinkAction.</div>
 				),

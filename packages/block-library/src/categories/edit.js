@@ -11,7 +11,6 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
-	VisuallyHidden,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -25,6 +24,9 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 import { useEntityRecords } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
+import { VisuallyHidden } from '@wordpress/ui';
+import { store as noticeStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -44,12 +46,14 @@ export default function CategoriesEdit( {
 	},
 	setAttributes,
 	className,
+	clientId,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 
 	const { records: allTaxonomies, isResolvingTaxonomies } = useEntityRecords(
 		'root',
-		'taxonomy'
+		'taxonomy',
+		{ per_page: -1 }
 	);
 
 	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
@@ -69,6 +73,15 @@ export default function CategoriesEdit( {
 		taxonomySlug,
 		query
 	);
+
+	const { createWarningNotice } = useDispatch( noticeStore );
+	const showRedirectionPreventedNotice = ( event ) => {
+		event.preventDefault();
+		createWarningNotice( __( 'Links are disabled in the editor.' ), {
+			id: `block-library/core/categories/redirection-prevented/${ clientId }`,
+			type: 'snackbar',
+		} );
+	};
 
 	const getCategoriesList = ( parentId ) => {
 		if ( ! categories?.length ) {
@@ -99,7 +112,7 @@ export default function CategoriesEdit( {
 		const { id, link, count, name } = category;
 		return (
 			<li key={ id } className={ `cat-item cat-item-${ id }` }>
-				<a href={ link } target="_blank" rel="noreferrer noopener">
+				<a href={ link } onClick={ showRedirectionPreventedNotice }>
 					{ renderCategoryName( name ) }
 				</a>
 				{ showPostCounts && ` (${ count })` }
@@ -133,7 +146,8 @@ export default function CategoriesEdit( {
 						}
 					/>
 				) : (
-					<VisuallyHidden as="label" htmlFor={ selectId }>
+					// eslint-disable-next-line jsx-a11y/label-has-associated-control
+					<VisuallyHidden render={ <label htmlFor={ selectId } /> }>
 						{ label ? label : taxonomy?.name }
 					</VisuallyHidden>
 				) }
@@ -176,12 +190,16 @@ export default function CategoriesEdit( {
 			? 'ul'
 			: 'div';
 
-	const classes = clsx( className, {
-		'wp-block-categories-list':
-			!! categories?.length && ! displayAsDropdown && ! isResolving,
-		'wp-block-categories-dropdown':
-			!! categories?.length && displayAsDropdown && ! isResolving,
-	} );
+	const classes = clsx(
+		className,
+		`wp-block-categories-taxonomy-${ taxonomySlug }`,
+		{
+			'wp-block-categories-list':
+				!! categories?.length && ! displayAsDropdown && ! isResolving,
+			'wp-block-categories-dropdown':
+				!! categories?.length && displayAsDropdown && ! isResolving,
+		}
+	);
 
 	const blockProps = useBlockProps( {
 		className: classes,
@@ -218,7 +236,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<SelectControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Taxonomy' ) }
 								options={ taxonomies.map( ( t ) => ( {
@@ -243,7 +260,6 @@ export default function CategoriesEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display as dropdown' ) }
 							checked={ displayAsDropdown }
 							onChange={ toggleAttribute( 'displayAsDropdown' ) }
@@ -259,7 +275,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								className="wp-block-categories__indentation"
 								label={ __( 'Show label' ) }
 								checked={ showLabel }
@@ -276,7 +291,6 @@ export default function CategoriesEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show post counts' ) }
 							checked={ showPostCounts }
 							onChange={ toggleAttribute( 'showPostCounts' ) }
@@ -292,7 +306,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show only top level terms' ) }
 								checked={ showOnlyTopLevel }
 								onChange={ toggleAttribute(
@@ -310,7 +323,6 @@ export default function CategoriesEdit( {
 						isShownByDefault
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show empty terms' ) }
 							checked={ showEmpty }
 							onChange={ toggleAttribute( 'showEmpty' ) }
@@ -326,7 +338,6 @@ export default function CategoriesEdit( {
 							isShownByDefault
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Show hierarchy' ) }
 								checked={ showHierarchy }
 								onChange={ toggleAttribute( 'showHierarchy' ) }

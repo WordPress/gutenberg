@@ -9,15 +9,15 @@ test.describe( 'Search', () => {
 		await admin.createNewPost();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMenus();
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPosts(),
 			requestUtils.deleteAllMenus(),
 		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMenus();
 	} );
 
 	test( 'should auto-configure itself to sensible defaults when inserted into a Navigation block', async ( {
@@ -39,12 +39,16 @@ test.describe( 'Search', () => {
 			},
 		} );
 
-		const navBlockInserter = editor.canvas.getByRole( 'button', {
-			name: 'Add block',
-		} );
+		const navBlockInserter = editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.getByRole( 'button', { name: 'Add page' } );
 		await navBlockInserter.click();
 
-		await page.getByRole( 'button', { name: 'Add block' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Add block' } )
+			.filter( { hasText: 'Add block' } )
+			.first()
+			.click();
 
 		// Click on the Search block option.
 		await page.getByRole( 'option', { name: 'Search' } ).click();

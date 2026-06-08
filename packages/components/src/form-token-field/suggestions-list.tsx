@@ -65,7 +65,9 @@ export function SuggestionsList<
 	};
 
 	const computeSuggestionMatch = ( suggestion: T ) => {
-		const matchText = displayTransform( match ).toLocaleLowerCase();
+		const matchText = displayTransform( match )
+			.normalize( 'NFKC' )
+			.toLocaleLowerCase();
 		if ( matchText.length === 0 ) {
 			return null;
 		}

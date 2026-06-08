@@ -68,7 +68,6 @@ function useControlledState( currentState, options = defaultOptions ) {
 		fallback
 	);
 
-	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {(nextState: T) => void} */
 	const setState = useCallback(
 		( nextState ) => {
@@ -78,7 +77,6 @@ function useControlledState( currentState, options = defaultOptions ) {
 		},
 		[ hasCurrentState ]
 	);
-	/* eslint-enable jsdoc/no-undefined-types */
 
 	return [ state, setState ];
 }

@@ -70,7 +70,14 @@ const html = `
 			<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 		</div>`;
 
-const { actions } = store( 'directive-context-navigate', {
+const { actions, state } = store( 'directive-context-navigate', {
+	state: {
+		get navigationCount() {
+			const { __navigationCount } = state;
+			return isNaN( __navigationCount ) ? 0 : __navigationCount;
+		},
+		__navigationCount: NaN,
+	},
 	actions: {
 		toggleText() {
 			const ctx = getContext();
@@ -97,6 +104,15 @@ const { actions } = store( 'directive-context-navigate', {
 			yield actions.navigate();
 			const ctx = getContext();
 			ctx.newText = 'changed from async action';
+		},
+	},
+	callbacks: {
+		updateNavigationCount() {
+			const { state: routerState } = store( 'core/router' );
+			if ( routerState.url && isNaN( state.__navigationCount ) ) {
+				state.__navigationCount = 0;
+			}
+			state.__navigationCount++;
 		},
 	},
 } );

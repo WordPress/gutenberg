@@ -166,6 +166,14 @@
 	<button data-testid="async navigate" data-wp-on--click="actions.asyncNavigate">Async Navigate</button>
 </div>
 
+<!-- Count of succesfull client-side navigations -->
+<div
+	data-testid="navigation count"
+	data-wp-interactive="directive-context-navigate"
+	data-wp-watch="callbacks.updateNavigationCount"
+	data-wp-text="state.navigationCount"
+></div>
+
 <div
 	data-wp-interactive='{"namespace": "directive-context-non-default"}'
 	data-wp-context--non-default='{ "text": "non default" }'
@@ -230,6 +238,26 @@
 		<span
 			data-testid="child"
 			data-wp-text="directive-context/child::context.prop"
+		></span>
+	</div>
+</div>
+
+<div
+	data-wp-interactive="directive-context/multiple"
+	data-wp-context='{ "prop": "parent", "parent": true }'
+>
+	<div
+		data-wp-context='{ "prop": "default", "default": true }'
+		data-wp-context---id1='{ "prop": "id1", "id1": true }'
+		data-wp-context---id2='other-namespace::{ "prop": true }'
+	>
+		<span
+			data-testid="multiple context in the same element"
+			data-wp-bind--data-test-prop="context.prop"
+			data-wp-bind--data-test-parent="context.parent"
+			data-wp-bind--data-test-default="context.default"
+			data-wp-bind--data-test-id1="context.id1"
+			data-wp-bind--data-test-other="other-namespace::context.prop"
 		></span>
 	</div>
 </div>

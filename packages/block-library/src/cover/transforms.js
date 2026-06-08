@@ -37,7 +37,11 @@ const transforms = {
 						createBlock( 'core/paragraph', {
 							content: caption,
 							fontSize: 'large',
-							align: 'center',
+							style: {
+								typography: {
+									textAlign: 'center',
+								},
+							},
 						} ),
 					]
 				),
@@ -60,7 +64,11 @@ const transforms = {
 						createBlock( 'core/paragraph', {
 							content: caption,
 							fontSize: 'large',
-							align: 'center',
+							style: {
+								typography: {
+									textAlign: 'center',
+								},
+							},
 						} ),
 					]
 				),

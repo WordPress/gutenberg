@@ -36,7 +36,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 									icon={ moreVertical }
 									label={ __( 'More options' ) }
 									popoverProps={ {
-										position: 'bottom left',
+										placement: 'bottom-end',
 										className:
 											'block-editor-warning__dropdown',
 									} }

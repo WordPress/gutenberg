@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 $actions-height: 92px;
 
 .editor-start-template-options__modal {
@@ -12,7 +16,8 @@ $actions-height: 92px;
 		padding-left: $grid-unit-40;
 		padding-right: $grid-unit-40;
 		border-top: 1px solid $gray-300;
-		z-index: z-index(".editor-start-template-options__modal__actions");
+		// Ensure modal footer actions appear above the modal's scrolling content.
+		z-index: 1;
 	}
 
 	.block-editor-block-patterns-list {
