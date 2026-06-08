@@ -118,7 +118,7 @@ const UnforwardedInserter = (
 		hasSingleBlockType,
 		blockTitle,
 		allowedBlockType,
-		blockTypeToInsert,
+		blockLabelToInsert,
 		blockToInsert,
 		appenderLabel,
 		targetRootClientId,
@@ -131,7 +131,11 @@ const UnforwardedInserter = (
 				getDirectInsertBlock,
 				getBlockListSettings,
 			} = select( blockEditorStore );
-			const { getBlockVariations, getBlockType } = select( blocksStore );
+			const {
+				getActiveBlockVariation,
+				getBlockVariations,
+				getBlockType,
+			} = select( blocksStore );
 
 			const _targetRootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
@@ -168,13 +172,26 @@ const UnforwardedInserter = (
 			const _blockTypeToInsert = _blockToInsert
 				? getBlockType( _blockToInsert.name )
 				: _allowedBlockType;
+			let _blockLabelToInsert;
+			if ( _blockTypeToInsert ) {
+				const attributes = _blockToInsert?.attributes ?? {};
+				const label = getBlockLabel( _blockTypeToInsert, attributes );
+				const variation =
+					label === _blockTypeToInsert.title
+						? getActiveBlockVariation(
+								_blockTypeToInsert.name,
+								attributes
+						  )
+						: null;
+				_blockLabelToInsert = variation?.title || label;
+			}
 
 			return {
 				hasItems: hasInserterItems( _targetRootClientId ),
 				hasSingleBlockType: _hasSingleBlockType,
 				blockTitle: _allowedBlockType ? _allowedBlockType.title : '',
 				allowedBlockType: _allowedBlockType,
-				blockTypeToInsert: _blockTypeToInsert,
+				blockLabelToInsert: _blockLabelToInsert,
 				blockToInsert: _blockToInsert,
 				appenderLabel: getAppenderLabel(
 					directInsertBlock,
@@ -285,14 +302,11 @@ const UnforwardedInserter = (
 
 		onSelectOrClose?.( newBlock );
 
-		const blockLabel = blockTypeToInsert
-			? getBlockLabel( blockTypeToInsert, newBlock.attributes )
-			: allowedBlockType?.title;
-		if ( blockLabel ) {
+		if ( blockLabelToInsert ) {
 			const message = sprintf(
 				// translators: %s: the name of the block that has been added
 				__( '%s block added' ),
-				blockLabel
+				blockLabelToInsert
 			);
 			speak( message );
 		}
