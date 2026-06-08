@@ -33,7 +33,10 @@ describe( 'getMinCropPixels — operable on-screen floor', () => {
 
 	it( 'crosses over from usability floor to hard floor at displayScale = MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS', () => {
 		const crossover = MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS;
-		expect( getMinCropPixels( crossover ) ).toBeCloseTo( MIN_CROP_PIXELS, 5 );
+		expect( getMinCropPixels( crossover ) ).toBeCloseTo(
+			MIN_CROP_PIXELS,
+			5
+		);
 		// Just below the crossover, the usability term exceeds the hard floor.
 		expect( getMinCropPixels( crossover * 0.99 ) ).toBeGreaterThan(
 			MIN_CROP_PIXELS
