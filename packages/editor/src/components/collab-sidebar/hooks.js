@@ -35,6 +35,38 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
+function contentHasNoteId( content, noteId ) {
+	return new RegExp(
+		`"noteId"\\s*:\\s*(?:\\[[^\\]]*\\b${ noteId }\\b|${ noteId }\\b)`
+	).test( content );
+}
+
+function waitForSerializedNoteId( registry, noteId ) {
+	return new Promise( ( resolve ) => {
+		const selectEditor = () => registry.select( editorStore );
+		const isSerialized = () =>
+			contentHasNoteId( selectEditor().getEditedPostContent(), noteId );
+		let unsubscribe = () => {};
+		const finish = () => {
+			unsubscribe();
+			resolve();
+		};
+
+		if ( isSerialized() ) {
+			resolve();
+			return;
+		}
+
+		const timeout = setTimeout( finish, 1000 );
+		unsubscribe = registry.subscribe( () => {
+			if ( isSerialized() ) {
+				clearTimeout( timeout );
+				finish();
+			}
+		} );
+	} );
+}
+
 export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
@@ -146,8 +178,10 @@ export function useNoteThreads( postId ) {
 }
 
 export function useNoteActions() {
+	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	const { savePost } = useDispatch( editorStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const { getBlockAttributes, getSelectedBlockClientId } =
 		useSelect( blockEditorStore );
@@ -197,6 +231,8 @@ export function useNoteActions() {
 				updateBlockAttributes( clientId, {
 					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
+				await waitForSerializedNoteId( registry, savedRecord.id );
+				await savePost();
 			}
 
 			createNotice(
