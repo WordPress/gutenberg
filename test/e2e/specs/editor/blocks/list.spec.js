@@ -1661,6 +1661,7 @@ test.describe( 'List (@firefox)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
+						attributes: { content: 'a‸d' },
 						innerBlocks: [],
 					},
 				],
@@ -1731,6 +1732,7 @@ test.describe( 'List (@firefox)', () => {
 
 				await page.keyboard.press( key );
 
+				await page.keyboard.type( '‸' );
 				await expect.poll( editor.getBlocks ).toMatchObject( end );
 			} );
 		}
