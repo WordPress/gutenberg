@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getSettings } from '@wordpress/date';
 import type { Field } from '@wordpress/dataviews';
 
 /**
@@ -16,9 +15,6 @@ const dateAddedField: Partial< Field< MediaItem > > = {
 	label: __( 'Date added' ),
 	filterBy: {
 		operators: [ 'before', 'after' ],
-	},
-	format: {
-		datetime: getSettings().formats.datetimeAbbreviated,
 	},
 	readOnly: true,
 };

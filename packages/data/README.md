@@ -613,9 +613,9 @@ _Returns_
 
 ### RegistryConsumer
 
-A custom react Context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
+A custom React context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
 
-You can read more about the react context api here: <https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context>
+You can read more about the React context API here: <https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context>
 
 _Usage_
 
@@ -646,7 +646,7 @@ const App = ( { props } ) => {
 
 A custom Context provider for exposing the provided `registry` to children components via a consumer.
 
-See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for example.
+See <a href="#registryconsumer">RegistryConsumer</a> documentation for example.
 
 ### resolveSelect
 
@@ -790,11 +790,11 @@ _Returns_
 
 ### useRegistry
 
-A custom react hook exposing the registry context for use.
+A custom React hook exposing the registry context for use.
 
-This exposes the `registry` value provided via the <a href="#RegistryProvider">Registry Provider</a> to a component implementing this hook.
+This exposes the `registry` value provided via the <a href="#registryprovider">Registry Provider</a> to a component implementing this hook.
 
-It acts similarly to the `useContext` react hook.
+It acts similarly to the `useContext` React hook.
 
 Note: Generally speaking, `useRegistry` is a low level hook that in most cases won't be needed for implementation. Most interactions with the `@wordpress/data` API can be performed via the `useSelect` hook, or the `withSelect` and `withDispatch` higher order components.
 
@@ -821,7 +821,7 @@ const ParentProvidingRegistry = ( props ) => {
 
 _Returns_
 
--   `DataRegistry`: A custom react hook exposing the registry context value.
+-   `DataRegistry`: A custom React hook exposing the registry context value.
 
 ### useSelect
 

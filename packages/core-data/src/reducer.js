@@ -460,6 +460,22 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
+// Stores a snapshot of the sync undo manager's undo/redo availability so
+// core-data selectors can react to undo stack changes.
+export function syncUndoManagerState(
+	state = { hasRedo: false, hasUndo: false },
+	action
+) {
+	switch ( action.type ) {
+		case 'SYNC_UNDO_MANAGER_CHANGE':
+			return {
+				hasRedo: action.hasRedo,
+				hasUndo: action.hasUndo,
+			};
+	}
+	return state;
+}
+
 export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -750,6 +766,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
+	syncUndoManagerState,
 	undoManager,
 	embedPreviews,
 	userPermissions,

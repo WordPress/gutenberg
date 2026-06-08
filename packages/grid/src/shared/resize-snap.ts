@@ -1,3 +1,5 @@
+import type { ResizeDelta } from './types';
+
 /**
  * Pixel dimensions for the snapped resize preview outline.
  */
@@ -6,6 +8,33 @@ export type ResizeSnapSize = {
 	/** When `null`, the preview spans the item's content height (lanes). */
 	heightPx: number | null;
 };
+
+/**
+ * Clamps a resize delta so the tile cannot shrink below the given
+ * minimum width (and height when provided).
+ *
+ * @param delta              Cursor offset from the gesture start in pixels.
+ * @param initialSize        Size captured at gesture start.
+ * @param initialSize.width  Initial width in pixels.
+ * @param initialSize.height Initial height in pixels.
+ * @param minSize            Minimum tile size in pixels.
+ * @param minSize.width      Minimum width in pixels.
+ * @param minSize.height     Minimum height in pixels, when vertical resize applies.
+ */
+export function clampResizeDelta(
+	delta: ResizeDelta,
+	initialSize: { width: number; height: number },
+	minSize: { width: number; height?: number }
+): ResizeDelta {
+	const maxShrinkWidth = initialSize.width - minSize.width;
+	const width = Math.max( delta.width, -maxShrinkWidth );
+	if ( minSize.height === undefined ) {
+		return { ...delta, width };
+	}
+	const maxShrinkHeight = initialSize.height - minSize.height;
+	const height = Math.max( delta.height, -maxShrinkHeight );
+	return { width, height };
+}
 
 /**
  * Converts grid spans to pixel width/height for the resize-preview

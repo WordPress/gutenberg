@@ -7,16 +7,16 @@ import { createContext, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import {
-	useCropperState,
-	type UseCropperStateReturn,
-} from '../hooks/use-cropper-state';
+	useCropperReducer,
+	type CropperController,
+} from '../hooks/use-cropper-reducer';
 import type { CropperState } from '../../core/types';
 
 /**
  * The context value type for the CropperProvider.
- * Contains the full return value of useCropperState.
+ * Contains the cropper controller from useCropperReducer.
  */
-type CropperContextValue = UseCropperStateReturn | null;
+type CropperContextValue = CropperController | null;
 
 const CropperContext = createContext< CropperContextValue >( null );
 
@@ -31,12 +31,16 @@ interface CropperProviderProps {
 }
 
 /**
- * Convenience context provider that wraps useCropperState.
+ * Convenience context provider that wraps `useCropperReducer`.
  *
- * Provides the full cropper state and action creators to all
- * descendant components via React context.
+ * Provides the pure cropper controller (state + setters, NO undo
+ * history) to all descendant components via React context.
  *
- * @param props              Provider props.
+ * History is a higher-layer concern owned by composite stores
+ * (see `useMediaEditorState` in media-editor/state for the media
+ * editor's composite controller with undo/redo).
+ *
+ * @param props
  * @param props.initialState
  * @param props.children
  * @return The provider element wrapping children.
@@ -45,7 +49,7 @@ export function CropperProvider( {
 	initialState,
 	children,
 }: CropperProviderProps ) {
-	const cropperReturn = useCropperState( initialState );
+	const cropperReturn = useCropperReducer( initialState );
 
 	return (
 		<CropperContext.Provider value={ cropperReturn }>
@@ -60,9 +64,9 @@ export function CropperProvider( {
  * Must be used within a CropperProvider. Throws if used outside
  * of the provider tree.
  *
- * @return The cropper state and action creators.
+ * @return The cropper controller.
  */
-export function useCropper(): UseCropperStateReturn {
+export function useCropper(): CropperController {
 	const context = useContext( CropperContext );
 
 	if ( ! context ) {
