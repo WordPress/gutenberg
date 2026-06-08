@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -22,7 +27,7 @@ store(
 	'core/query',
 	{
 		actions: {
-			*navigate( event ) {
+			navigate: withSyncEvent( function* ( event ) {
 				const ctx = getContext();
 				const { ref } = getElement();
 				const queryRef = ref.closest(
@@ -42,7 +47,7 @@ store(
 					const firstAnchor = `.wp-block-post-template a[href]`;
 					queryRef.querySelector( firstAnchor )?.focus();
 				}
-			},
+			} ),
 			*prefetch() {
 				const { ref } = getElement();
 				if ( isValidLink( ref ) ) {

@@ -2,72 +2,22 @@
 /**
  * External dependencies
  */
-const util = require( 'util' );
-const SimpleGit = require( 'simple-git' );
 const fs = require( 'fs' );
-const got = require( 'got' );
 const path = require( 'path' );
+const util = require( 'util' );
+const got = require( 'got' );
+const AdmZip = require( 'adm-zip' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * Promisified dependencies
  */
 const pipeline = util.promisify( require( 'stream' ).pipeline );
-const extractZip = util.promisify( require( 'extract-zip' ) );
 const { rimraf } = require( 'rimraf' );
 
 /**
- * @typedef {import('./config').WPConfig} WPConfig
  * @typedef {import('./config').WPSource} WPSource
  */
-
-/**
- * Download each source for each environment. If the same source is used in
- * multiple environments, it will only be downloaded once.
- *
- * @param {WPConfig} config  The wp-env configuration object.
- * @param {Object}   spinner The spinner object to show progress.
- * @return {Promise} Returns a promise which resolves when the downloads finish.
- */
-module.exports = function downloadSources( config, spinner ) {
-	const progresses = {};
-	const getProgressSetter = ( id ) => ( progress ) => {
-		progresses[ id ] = progress;
-		spinner.text =
-			'Downloading WordPress.\n' +
-			Object.entries( progresses )
-				.map(
-					( [ key, value ] ) =>
-						`  - ${ key }: ${ ( value * 100 ).toFixed( 0 ) }/100%`
-				)
-				.join( '\n' );
-	};
-
-	// Will contain a unique array of sources to download.
-	const sources = [];
-	const addedSources = {};
-	const addSource = ( source ) => {
-		if ( source && source.url && ! addedSources[ source.url ] ) {
-			sources.push( source );
-			addedSources[ source.url ] = true;
-		}
-	};
-
-	for ( const env of Object.values( config.env ) ) {
-		env.pluginSources.forEach( addSource );
-		env.themeSources.forEach( addSource );
-		Object.values( env.mappings ).forEach( addSource );
-		addSource( env.coreSource );
-	}
-
-	return Promise.all(
-		sources.map( ( source ) =>
-			downloadSource( source, {
-				onProgress: getProgressSetter( source.basename ),
-				spinner,
-			} )
-		)
-	);
-};
 
 /**
  * Downloads the given source if necessary. The specific action taken depends
@@ -122,6 +72,7 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	} else {
 		await git.clone( source.url, source.clonePath, {
 			'--depth': '1',
+			'--filter': 'blob:none',
 			'--no-single-branch': null,
 		} );
 		await git.cwd( source.clonePath );
@@ -168,7 +119,12 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 
 	log( 'Extracting to temporary directory.' );
 	const tempDir = `${ source.path }.temp`;
-	await extractZip( zipName, { dir: tempDir } );
+	const zip = new AdmZip( zipName );
+	await util.promisify( zip.extractAllToAsync.bind( zip ) )(
+		tempDir,
+		/* overwrite */ true,
+		/* keepOriginalPermission */ false
+	);
 
 	const files = (
 		await Promise.all( [
@@ -204,3 +160,9 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 
 	onProgress( 1 );
 }
+
+module.exports = {
+	downloadSource,
+	downloadGitSource,
+	downloadZipSource,
+};

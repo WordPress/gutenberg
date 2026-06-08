@@ -15,7 +15,7 @@ import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
 import {
 	useCallback,
@@ -27,7 +27,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
 
@@ -50,8 +50,11 @@ import {
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
+import usePasteStyles from '../use-paste-styles';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -77,8 +80,8 @@ function ListViewBlock( {
 	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
-
-	const { isLocked, canEdit, canMove } = useBlockLock( clientId );
+	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
+	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
 		isSelected && selectedClientIds[ 0 ] === clientId;
@@ -94,8 +97,13 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		setOpenedBlockSettingsMenu,
+		showViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
+
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
+	);
 
 	const {
 		canInsertBlockType,
@@ -104,7 +112,10 @@ function ListViewBlock( {
 		getBlockRootClientId,
 		getBlockOrder,
 		getBlockParents,
+		getBlockEditingMode,
 		getBlocksByClientId,
+		canEditBlock,
+		canMoveBlock,
 		canRemoveBlocks,
 		isGroupable,
 	} = useSelect( blockEditorStore );
@@ -112,10 +123,13 @@ function ListViewBlock( {
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
+	const pasteStyles = usePasteStyles();
+
 	const { block, blockName, allowRightClickOverrides } = useSelect(
 		( select ) => {
-			const { getBlock, getBlockName, getSettings } =
-				select( blockEditorStore );
+			const { getBlock, getBlockName, getSettings } = unlock(
+				select( blockEditorStore )
+			);
 
 			return {
 				block: getBlock( clientId ),
@@ -126,6 +140,7 @@ function ListViewBlock( {
 		},
 		[ clientId ]
 	);
+	const { canRename } = useBlockRename( blockName );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -233,6 +248,13 @@ function ListViewBlock( {
 			}
 
 			updateFocusAndSelection( blockToFocus, shouldUpdateSelection );
+		} else if ( isMatch( 'core/block-editor/paste-styles', event ) ) {
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+
+			pasteStyles( blocks );
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			event.preventDefault();
 
@@ -275,7 +297,6 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
 			event.preventDefault();
@@ -285,7 +306,6 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			event.preventDefault();
@@ -345,24 +365,62 @@ function ListViewBlock( {
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
 				// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-				setOpenedBlockSettingsMenu( undefined );
 				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
+			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			event.preventDefault();
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const blocks = getBlocksByClientId( blocksToUpdate );
+			const supportsBlockVisibility = blocks.every( ( _block ) =>
+				hasBlockSupport( _block.name, 'visibility', true )
+			);
+
+			if ( ! supportsBlockVisibility ) {
+				return;
+			}
+
+			// Don't allow visibility toggle for blocks that
+			// are not in the default editing mode.
+			if (
+				blocksToUpdate.some(
+					( id ) => getBlockEditingMode( id ) !== 'default'
+				)
+			) {
+				return;
+			}
+
+			// Open the visibility breakpoints modal.
+			showViewportModal( blocksToUpdate );
+		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const isContentOnly =
+				getBlockEditingMode( blocksToUpdate[ 0 ] ) === 'contentOnly';
+			if ( blocksToUpdate.length === 1 && canRename && ! isContentOnly ) {
+				event.preventDefault();
+				setIsRenameModalOpen( true );
 			}
 		}
 	}
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
-		toggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, true );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
-		toggleBlockHighlight( clientId, false );
-	}, [ clientId, setIsHovered, toggleBlockHighlight ] );
+		debouncedToggleBlockHighlight( clientId, false );
+	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			selectBlock( event, clientId );
+			// For keyboard activation (Enter/Space on a link), transfer focus
+			// to the canvas with the caret at the end of the block.
+			// For mouse clicks, keep focus in the list view so that subsequent
+			// keyboard operations (arrow navigation, copy/paste) still work.
+			const isKeyboardActivation = event?.detail === 0;
+			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
 		[ clientId, selectBlock ]
@@ -396,6 +454,11 @@ function ListViewBlock( {
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
 		( event ) => {
+			const { ownerDocument } = settingsRef?.current || {};
+			if ( ! ownerDocument || ! ownerDocument.hasFocus() ) {
+				return;
+			}
+
 			if ( showBlockActions && allowRightClickOverrides ) {
 				settingsRef.current?.click();
 				// Ensure the position of the settings dropdown is at the cursor.
@@ -470,6 +533,11 @@ function ListViewBlock( {
 		isLocked
 	);
 
+	// Determine label based on where block is hidden (not when/current viewport)
+	const blockVisibilityDescription = getBlockVisibilityLabel(
+		block?.attributes?.metadata?.blockVisibility
+	);
+
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = clsx(
@@ -498,7 +566,7 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': blockInformation?.isSynced,
-		'is-draggable': canMove,
+		'is-draggable': canMoveBlock,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
 		'is-displacement-down': displacement === 'down',
@@ -533,7 +601,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
-			data-expanded={ canEdit ? isExpanded : undefined }
+			data-expanded={ canEditBlock ? isExpanded : undefined }
 			ref={ rowRef }
 		>
 			<TreeGridCell
@@ -559,14 +627,16 @@ function ListViewBlock( {
 								currentlyEditingBlockInCanvas ? 0 : tabIndex
 							}
 							onFocus={ onFocus }
-							isExpanded={ canEdit ? isExpanded : undefined }
+							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
+							visibilityLabel={ blockVisibilityDescription }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
 								blockPositionDescription,
 								blockPropertiesDescription,
+								blockVisibilityDescription,
 							]
 								.filter( Boolean )
 								.join( ' ' ) }
@@ -627,6 +697,7 @@ function ListViewBlock( {
 								tabIndex,
 								onClick: clearSettingsAnchorRect,
 								onFocus,
+								size: 'small',
 							} }
 							disableOpenOnArrowDown
 							expand={ expand }
@@ -635,9 +706,20 @@ function ListViewBlock( {
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}
+							isContentOnlyListView={
+								!! rootClientId &&
+								getBlockEditingMode( rootClientId ) ===
+									'contentOnly'
+							}
 						/>
 					) }
 				</TreeGridCell>
+			) }
+			{ isRenameModalOpen && (
+				<BlockRenameModal
+					clientId={ clientId }
+					onClose={ () => setIsRenameModalOpen( false ) }
+				/>
 			) }
 		</ListViewLeaf>
 	);

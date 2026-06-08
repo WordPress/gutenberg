@@ -18,7 +18,7 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 
-/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
+/** @typedef {React.SyntheticEvent} SyntheticEvent */
 /** @typedef {import('./types').WPDropOperation} WPDropOperation */
 
 /**
@@ -46,7 +46,7 @@ export function parseDropEvent( event ) {
 			result,
 			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
 		);
-	} catch ( err ) {
+	} catch {
 		return result;
 	}
 

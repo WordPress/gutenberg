@@ -1,0 +1,9 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.boot-save-button {
+	width: 100%;
+}
+
+.boot-save-button__shortcut:not(:first-child) {
+	margin-left: $grid-unit-10;
+}

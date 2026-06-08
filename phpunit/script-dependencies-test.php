@@ -4,7 +4,13 @@
  * @group script-dependencies
  */
 class Test_Script_Dependencies extends WP_UnitTestCase {
-	public $bundled_scripts = array( 'wp-upload-media' );
+	/**
+	 * The `wp-fileds` was accidintally bundled in WP 6.7, but removed later.
+	 * It's is listed here to avoid breaking previous WP version tests.
+	 *
+	 * @var array
+	 */
+	public $bundled_scripts = array( 'wp-upload-media', 'wp-fields' );
 
 	/**
 	 * Tests for accidental `wp-polyfill` script dependents.
@@ -31,16 +37,6 @@ class Test_Script_Dependencies extends WP_UnitTestCase {
 		// If the list update is intentional, please add a comment explaining why.
 		$expected = array(
 			'react',
-			'wp-blob',
-			'wp-block-editor',
-			'wp-block-library',
-			'wp-blocks',
-			'wp-edit-site',
-			'wp-core-data',
-			'wp-editor',
-			'wp-router',
-			'wp-url',
-			'wp-widgets',
 		);
 
 		$this->assertEqualSets( $expected, $dependents );

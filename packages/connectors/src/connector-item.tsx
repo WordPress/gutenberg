@@ -1,0 +1,242 @@
+/**
+ * WordPress dependencies
+ */
+import {
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalItem as Item,
+	__experimentalText as WCText,
+	ExternalLink,
+	FlexBlock,
+	Button,
+	TextControl,
+} from '@wordpress/components';
+import { createInterpolateElement, useId, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import type { ReactNode } from 'react';
+import type { ApiKeySource } from './types';
+
+export interface ConnectorItemProps {
+	className?: string;
+	logo?: ReactNode;
+	name: string;
+	description: string;
+	actionArea?: ReactNode;
+	children?: ReactNode;
+}
+
+export function ConnectorItem( {
+	className,
+	logo,
+	name,
+	description,
+	actionArea,
+	children,
+}: ConnectorItemProps ) {
+	const headingId = useId();
+	return (
+		<Item className={ className }>
+			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
+				<HStack alignment="center" spacing={ 4 } wrap>
+					{ logo }
+					<FlexBlock>
+						<VStack spacing={ 0 }>
+							<WCText
+								weight={ 600 }
+								size={ 15 }
+								id={ headingId }
+								as="h2"
+							>
+								{ name }
+							</WCText>
+							<WCText variant="muted" size={ 12 }>
+								{ description }
+							</WCText>
+						</VStack>
+					</FlexBlock>
+					{ actionArea }
+				</HStack>
+				{ children }
+			</VStack>
+		</Item>
+	);
+}
+
+export type { ApiKeySource } from './types';
+
+export interface DefaultConnectorSettingsProps {
+	onSave?: ( apiKey: string ) => void | Promise< void >;
+	onRemove?: () => void;
+	initialValue?: string;
+	helpUrl?: string;
+	helpLabel?: string;
+	readOnly?: boolean;
+	keySource?: ApiKeySource;
+}
+
+/**
+ * Default settings form for connectors.
+ *
+ * @param props              - Component props.
+ * @param props.onSave       - Callback invoked with the API key when the user saves.
+ * @param props.onRemove     - Callback invoked when the user removes the connector.
+ * @param props.initialValue - Initial value for the API key field.
+ * @param props.helpUrl      - URL to documentation for obtaining an API key.
+ * @param props.helpLabel    - Custom label for the help link. Defaults to the URL without protocol.
+ * @param props.readOnly     - Whether the form is in read-only mode.
+ * @param props.keySource    - The source of the API key: 'env', 'constant', 'database', or 'none'.
+ */
+export function DefaultConnectorSettings( {
+	onSave,
+	onRemove,
+	initialValue = '',
+	helpUrl,
+	helpLabel,
+	readOnly = false,
+	keySource,
+}: DefaultConnectorSettingsProps ) {
+	const [ apiKey, setApiKey ] = useState( initialValue );
+	const [ isSaving, setIsSaving ] = useState( false );
+	const [ saveError, setSaveError ] = useState< string | null >( null );
+
+	const helpLinkLabel = helpLabel || helpUrl?.replace( /^https?:\/\//, '' );
+
+	const helpLink = helpUrl
+		? createInterpolateElement(
+				sprintf(
+					/* translators: %s: Link to provider settings. */
+					__( 'Get your API key at %s' ),
+					'<a></a>'
+				),
+				{
+					a: (
+						<ExternalLink href={ helpUrl }>
+							{ helpLinkLabel }
+						</ExternalLink>
+					),
+				}
+		  )
+		: undefined;
+
+	const isExternallyConfigured =
+		keySource === 'env' || keySource === 'constant';
+
+	const getHelp = () => {
+		if ( isExternallyConfigured ) {
+			if ( keySource === 'env' ) {
+				return __(
+					'This API key is configured using an environment variable.'
+				);
+			}
+			if ( keySource === 'constant' ) {
+				return __( 'This API key is configured as a constant.' );
+			}
+		}
+		if ( readOnly ) {
+			return helpUrl
+				? createInterpolateElement(
+						sprintf(
+							/* translators: %s: Link to provider settings. */
+							__(
+								'Your API key is stored securely. You can manage it at %s'
+							),
+							'<a></a>'
+						),
+						{
+							a: (
+								<ExternalLink href={ helpUrl }>
+									{ helpLinkLabel }
+								</ExternalLink>
+							),
+						}
+				  )
+				: __( 'Your API key is stored securely.' );
+		}
+		if ( saveError ) {
+			return (
+				<span role="alert" className="connector-settings__error">
+					{ saveError }
+				</span>
+			);
+		}
+		return helpLink;
+	};
+
+	const handleSave = async () => {
+		setSaveError( null );
+		setIsSaving( true );
+		try {
+			await onSave?.( apiKey );
+		} catch ( error ) {
+			setSaveError(
+				error instanceof Error
+					? error.message
+					: __(
+							'It was not possible to connect to the provider using this key.'
+					  )
+			);
+		} finally {
+			setIsSaving( false );
+		}
+	};
+
+	return (
+		<VStack
+			spacing={ 4 }
+			className="connector-settings"
+			style={
+				readOnly
+					? {
+							'--wp-components-color-background': '#f0f0f0',
+					  }
+					: undefined
+			}
+		>
+			<TextControl
+				__next40pxDefaultSize
+				label={ __( 'API Key' ) }
+				value={ apiKey }
+				onChange={ ( value ) => {
+					if ( ! readOnly ) {
+						setSaveError( null );
+						setApiKey( value );
+					}
+				} }
+				placeholder={ __( 'Enter your API key' ) }
+				disabled={ readOnly || isSaving }
+				autoComplete="off"
+				help={ getHelp() }
+			/>
+			{ readOnly ? (
+				onRemove && (
+					<HStack justify="flex-start">
+						<Button
+							variant="link"
+							isDestructive
+							onClick={ onRemove }
+						>
+							{ __( 'Remove and replace' ) }
+						</Button>
+					</HStack>
+				)
+			) : (
+				<HStack justify="flex-start">
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						disabled={ ! apiKey || isSaving }
+						accessibleWhenDisabled
+						isBusy={ isSaving }
+						onClick={ handleSave }
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</HStack>
+			) }
+		</VStack>
+	);
+}

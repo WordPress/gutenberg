@@ -9,19 +9,37 @@ import { __ } from '@wordpress/i18n';
 import Editor from '../editor';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
+import { isThemeDataLoaded } from './utils';
 
 export const pageItemRoute = {
 	name: 'page-item',
 	path: '/page/:postId',
 	areas: {
-		sidebar: (
-			<SidebarNavigationScreen
-				title={ __( 'Pages' ) }
-				backPath="/"
-				content={ <DataViewsSidebarContent postType="page" /> }
-			/>
-		),
-		mobile: <Editor />,
-		preview: <Editor />,
+		sidebar( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
+				<SidebarNavigationScreen
+					title={ __( 'Pages' ) }
+					backPath="/"
+					content={ <DataViewsSidebarContent postType="page" /> }
+				/>
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+		// Also rendered on mobile, where this route is only reached at canvas=edit.
+		preview( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
+				<Editor />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
 	},
 };

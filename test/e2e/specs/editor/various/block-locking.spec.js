@@ -133,7 +133,7 @@ test.describe( 'Block Locking', () => {
 		).toBeVisible();
 
 		await paragraph.click();
-		await pageUtils.pressKeys( 'primaryShift+Backspace' );
+		await pageUtils.pressKeys( 'access+z' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{

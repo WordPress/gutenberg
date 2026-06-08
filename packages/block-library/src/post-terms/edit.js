@@ -1,15 +1,8 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
-	AlignmentToolbar,
 	InspectorControls,
-	BlockControls,
 	useBlockProps,
 	useBlockDisplayInformation,
 	RichText,
@@ -44,7 +37,7 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, textAlign, separator, prefix, suffix } = attributes;
+	const { term, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
 
 	const selectedTerm = useSelect(
@@ -65,26 +58,14 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			[ `taxonomy-${ term }` ]: term,
-		} ),
+		className: term && `taxonomy-${ term }`,
 	} );
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Separator' ) }
 					value={ separator || '' }

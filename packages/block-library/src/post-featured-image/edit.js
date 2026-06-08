@@ -15,6 +15,7 @@ import {
 	Button,
 	Spinner,
 	TextControl,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -30,7 +31,12 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useMemo, useEffect, useState } from '@wordpress/element';
+import {
+	useMemo,
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -131,14 +137,16 @@ export default function PostFeaturedImageEdit( {
 		return imageId;
 	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
-	const { media, postType, postPermalink } = useSelect(
+	const { media, postType, postPermalink, hasSelectedStyleState } = useSelect(
 		( select ) => {
-			const { getMedia, getPostType, getEditedEntityRecord } =
+			const { getEntityRecord, getPostType, getEditedEntityRecord } =
 				select( coreStore );
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
 			return {
 				media:
 					featuredImage &&
-					getMedia( featuredImage, {
+					getEntityRecord( 'postType', 'attachment', featuredImage, {
 						context: 'view',
 					} ),
 				postType: postTypeSlug && getPostType( postTypeSlug ),
@@ -147,9 +155,10 @@ export default function PostFeaturedImageEdit( {
 					postTypeSlug,
 					postId
 				)?.link,
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
 			};
 		},
-		[ featuredImage, postTypeSlug, postId ]
+		[ clientId, featuredImage, postTypeSlug, postId ]
 	);
 
 	const mediaUrl =
@@ -196,6 +205,17 @@ export default function PostFeaturedImageEdit( {
 		}
 	};
 
+	// On reset image
+	const onResetImage = () => {
+		setAttributes( {
+			isLink: false,
+			linkTarget: '_self',
+			rel: '',
+			sizeSlug: undefined,
+		} );
+		setFeaturedImage( 0 );
+	};
+
 	// Reset temporary url when media is available.
 	useEffect( () => {
 		if ( mediaUrl && temporaryURL ) {
@@ -220,46 +240,31 @@ export default function PostFeaturedImageEdit( {
 					clientId={ clientId }
 				/>
 			</InspectorControls>
-			<InspectorControls group="dimensions">
-				<DimensionControls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					media={ media }
-				/>
-			</InspectorControls>
-			<InspectorControls>
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setAttributes( {
-							isLink: false,
-							linkTarget: '_self',
-							rel: '',
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					<ToolsPanelItem
-						label={
-							postType?.labels.singular_name
-								? sprintf(
-										// translators: %s: Name of the post type e.g: "post".
-										__( 'Link to %s' ),
-										postType.labels.singular_name
-								  )
-								: __( 'Link to post' )
-						}
-						isShownByDefault
-						hasValue={ () => !! isLink }
-						onDeselect={ () =>
+			{ ! hasSelectedStyleState && (
+				<InspectorControls group="dimensions">
+					<DimensionControls
+						clientId={ clientId }
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						media={ media }
+					/>
+				</InspectorControls>
+			) }
+			{ ( featuredImage || isDescendentOfQueryLoop || ! postId ) && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
 							setAttributes( {
 								isLink: false,
-							} )
-						}
+								linkTarget: '_self',
+								rel: '',
+								sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
 					>
-						<ToggleControl
-							__nextHasNoMarginBottom
+						<ToolsPanelItem
 							label={
 								postType?.labels.singular_name
 									? sprintf(
@@ -269,66 +274,90 @@ export default function PostFeaturedImageEdit( {
 									  )
 									: __( 'Link to post' )
 							}
-							onChange={ () =>
-								setAttributes( { isLink: ! isLink } )
-							}
-							checked={ isLink }
-						/>
-					</ToolsPanelItem>
-					{ isLink && (
-						<ToolsPanelItem
-							label={ __( 'Open in new tab' ) }
 							isShownByDefault
-							hasValue={ () => '_self' !== linkTarget }
+							hasValue={ () => !! isLink }
 							onDeselect={ () =>
 								setAttributes( {
-									linkTarget: '_self',
+									isLink: false,
 								} )
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
+								label={ __( 'Make image a link' ) }
+								onChange={ () =>
+									setAttributes( { isLink: ! isLink } )
+								}
+								checked={ isLink }
+							/>
+						</ToolsPanelItem>
+
+						{ isLink && (
+							<ToolsPanelItem
 								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
+								isShownByDefault
+								hasValue={ () => '_self' !== linkTarget }
+								onDeselect={ () =>
 									setAttributes( {
-										linkTarget: value ? '_blank' : '_self',
+										linkTarget: '_self',
 									} )
 								}
-								checked={ linkTarget === '_blank' }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ isLink && (
-						<ToolsPanelItem
-							label={ __( 'Link rel' ) }
-							isShownByDefault
-							hasValue={ () => !! rel }
-							onDeselect={ () =>
-								setAttributes( {
-									rel: '',
-								} )
-							}
-						>
-							<TextControl
-								__next40pxDefaultSize
-								__nextHasNoMarginBottom
-								label={ __( 'Link rel' ) }
-								value={ rel }
-								onChange={ ( newRel ) =>
-									setAttributes( { rel: newRel } )
+							>
+								<ToggleControl
+									label={ __( 'Open in new tab' ) }
+									onChange={ ( value ) =>
+										setAttributes( {
+											linkTarget: value
+												? '_blank'
+												: '_self',
+										} )
+									}
+									checked={ linkTarget === '_blank' }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ isLink && (
+							<ToolsPanelItem
+								label={ __( 'Link relation' ) }
+								isShownByDefault
+								hasValue={ () => !! rel }
+								onDeselect={ () =>
+									setAttributes( {
+										rel: '',
+									} )
+								}
+							>
+								<TextControl
+									__next40pxDefaultSize
+									label={ __( 'Link relation' ) }
+									help={ createInterpolateElement(
+										__(
+											'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+										),
+										{
+											a: (
+												<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+											),
+										}
+									) }
+									value={ rel }
+									onChange={ ( newRel ) =>
+										setAttributes( { rel: newRel } )
+									}
+								/>
+							</ToolsPanelItem>
+						) }
+						{ !! media && (
+							<FeaturedImageResolutionTool
+								image={ media }
+								value={ sizeSlug }
+								onChange={ ( nextSizeSlug ) =>
+									setAttributes( { sizeSlug: nextSizeSlug } )
 								}
 							/>
-						</ToolsPanelItem>
-					) }
-					<FeaturedImageResolutionTool
-						image={ media }
-						value={ sizeSlug }
-						onChange={ ( nextSizeSlug ) =>
-							setAttributes( { sizeSlug: nextSizeSlug } )
-						}
-					/>
-				</ToolsPanel>
-			</InspectorControls>
+						) }
+					</ToolsPanel>
+				</InspectorControls>
+			) }
 		</>
 	);
 
@@ -450,7 +479,7 @@ export default function PostFeaturedImageEdit( {
 						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
-						onReset={ () => setFeaturedImage( 0 ) }
+						onReset={ onResetImage }
 					/>
 				</BlockControls>
 			) }

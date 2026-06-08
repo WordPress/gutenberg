@@ -30,7 +30,7 @@ test.describe( 'Taxonomies', () => {
 
 		await page
 			.getByRole( 'button', {
-				name: 'Add New Category',
+				name: 'Add Category',
 				expanded: false,
 			} )
 			.click();

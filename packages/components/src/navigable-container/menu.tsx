@@ -96,5 +96,6 @@ export function UnforwardedNavigableMenu(
  *  ```
  */
 export const NavigableMenu = forwardRef( UnforwardedNavigableMenu );
+NavigableMenu.displayName = 'NavigableMenu';
 
 export default NavigableMenu;

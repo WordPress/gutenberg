@@ -85,7 +85,10 @@ export default function InserterSidebar() {
 				showMostUsedBlocks={ showMostUsedBlocks }
 				showInserterHelpPanel
 				shouldFocusBlock={ isMobileViewport }
-				rootClientId={ blockSectionRootClientId }
+				rootClientId={
+					blockSectionRootClientId ?? inserter.rootClientId
+				}
+				__experimentalInsertionIndex={ inserter.insertionIndex }
 				onSelect={ inserter.onSelect }
 				__experimentalInitialTab={ inserter.tab }
 				__experimentalInitialCategory={ inserter.category }

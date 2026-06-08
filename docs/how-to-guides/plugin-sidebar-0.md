@@ -42,7 +42,7 @@ Add the following code to a JavaScript file called `plugin-sidebar.js` and save 
 } )( window.wp, window.React );
 ```
 
-For this code to work, those utilities need to be available in the browser, so you must specify `wp-plugins`, `wp-edit-post`, and `react` as dependencies of your script.
+For this code to work, those utilities need to be available in the browser, so you must specify `wp-plugins`, `wp-editor`, and `react` as dependencies of your script.
 
 Here is the PHP code to register your script and specify the dependencies:
 

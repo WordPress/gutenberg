@@ -101,7 +101,6 @@ export default function SidebarNavigationScreen( {
 					) }
 					<Heading
 						className="edit-site-sidebar-navigation-screen__title"
-						color={ '#e0e0e0' /* $gray-200 */ }
 						level={ 1 }
 						size={ 20 }
 					>
@@ -122,9 +121,9 @@ export default function SidebarNavigationScreen( {
 				</HStack>
 				<div className="edit-site-sidebar-navigation-screen__content">
 					{ description && (
-						<p className="edit-site-sidebar-navigation-screen__description">
+						<div className="edit-site-sidebar-navigation-screen__description">
 							{ description }
-						</p>
+						</div>
 					) }
 					{ content }
 				</div>

@@ -53,6 +53,7 @@ const {
 	updateBlockListSettings,
 	updateSettings,
 	validateBlocksToTemplate,
+	__unstableMarkNextChangeAsNotPersistent,
 	registerInserterMediaCategory,
 	setBlockEditingMode,
 	unsetBlockEditingMode,
@@ -60,6 +61,7 @@ const {
 
 describe( 'actions', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			content: {},
 		},
@@ -89,7 +91,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
 			} );
 		} );
 
@@ -101,7 +103,19 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
-				uniqueByBlock: false,
+				options: { uniqueByBlock: false },
+			} );
+		} );
+
+		it( 'should fold boolean uniqueByBlock option into an object', () => {
+			const clientId = 'myclientid';
+			const attributes = {};
+			const result = updateBlockAttributes( clientId, attributes, true );
+			expect( result ).toEqual( {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ clientId ],
+				attributes,
+				options: { uniqueByBlock: true },
 			} );
 		} );
 	} );
@@ -801,6 +815,26 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( '__unstableMarkNextChangeAsNotPersistent', () => {
+		it( 'should use merge history by default', () => {
+			expect( __unstableMarkNextChangeAsNotPersistent() ).toEqual( {
+				type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+				history: 'merge',
+			} );
+		} );
+
+		it( 'should allow ignoring history for the next change', () => {
+			expect(
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} )
+			).toEqual( {
+				type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+				history: 'ignore',
+			} );
+		} );
+	} );
+
 	describe( 'mergeBlocks', () => {
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
@@ -808,8 +842,16 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should only focus the blockA if the blockA has no merge function', () => {
-			registerBlockType( 'core/test-block', defaultBlockSettings );
+		it( 'should only focus the blockA if the blockA has no merge function and the content of blockB is modified', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'string',
+						role: 'content',
+					},
+				},
+			} );
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
@@ -817,14 +859,20 @@ describe( 'actions', () => {
 			const blockB = deepFreeze( {
 				clientId: 'ribs',
 				name: 'core/test-block',
+				attributes: {
+					content: 'Updated content',
+				},
 			} );
 
 			const select = {
 				getBlock: ( clientId ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getBlockEditingMode: () => 'default',
+				isBlockSelected: () => false,
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				selectBlock: jest.fn(),
+				removeBlock: jest.fn(),
 			} );
 
 			mergeBlocks(
@@ -837,6 +885,7 @@ describe( 'actions', () => {
 
 		it( 'should merge the blocks if blocks of the same type', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -873,6 +922,7 @@ describe( 'actions', () => {
 					attributeKey: 'content',
 					offset: 0,
 				} ),
+				getBlockEditingMode: () => 'default',
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
@@ -906,6 +956,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks have different types without transformation', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -943,6 +994,7 @@ describe( 'actions', () => {
 					attributeKey: 'content',
 					offset: 0,
 				} ),
+				getBlockEditingMode: () => 'default',
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
@@ -958,6 +1010,7 @@ describe( 'actions', () => {
 
 		it( 'should transform and merge the blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -976,6 +1029,7 @@ describe( 'actions', () => {
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block-2', {
+				apiVersion: 3,
 				attributes: {
 					content2: {
 						type: 'string',
@@ -1019,6 +1073,7 @@ describe( 'actions', () => {
 					attributeKey: 'content2',
 					offset: 0,
 				} ),
+				getBlockEditingMode: () => 'default',
 			};
 			const dispatch = Object.assign( jest.fn(), {
 				replaceBlocks: jest.fn(),
@@ -1048,6 +1103,126 @@ describe( 'actions', () => {
 				],
 				0
 			);
+		} );
+
+		it( 'should not merge the blocks if blockB editing mode is `disabled`', () => {
+			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const modes = {
+				chicken: 'default',
+				ribs: 'disabled',
+			};
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+				getBlockEditingMode: ( clientId ) => modes[ clientId ],
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				replaceBlocks: jest.fn(),
+				selectionChange: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
+			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should not merge the blocks if blockA editing mode is `disabled`', () => {
+			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const modes = {
+				chicken: 'disabled',
+				ribs: 'default',
+			};
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+				getBlockEditingMode: ( clientId ) => modes[ clientId ],
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				replaceBlocks: jest.fn(),
+				selectionChange: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
+			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
 		} );
 	} );
 

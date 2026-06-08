@@ -7,6 +7,10 @@ The package defines an Interactivity API store with the `core/router` namespace,
 The `@wordpress/interactivity-router` package was [introduced in WordPress Core in v6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/). This means this package is already bundled in Core in any version of WordPress higher than v6.5.
 
 <div class="callout callout-info">
+    For a comprehensive guide on how client-side navigation works, including getting started, block compatibility, and advanced use cases, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/">Client-Side Navigation guide</a>. To learn how to ensure your blocks are compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility guide</a>.
+</div>
+
+<div class="callout callout-info">
     Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/">Interactivity API Reference docs in the Block Editor handbook</a> to learn more about the Interactivity API.
 </div>
 
@@ -17,12 +21,13 @@ The package is intended to be imported dynamically in the `view.js` files of int
 ```js
 /* view.js */
 
-import { store } from '@wordpress/interactivity';
+import { store, withSyncEvent } from '@wordpress/interactivity';
 
 // This is how you would typically use the navigate() action in your block.
 store( 'my-namespace/myblock', {
 	actions: {
-		*goToPage( e ) {
+		// The withSyncEvent() utility needs to be used because preventDefault() requires synchronous event access.
+		goToPage: withSyncEvent( function* ( e ) {
 			e.preventDefault();
 
 			// We import the package dynamically to reduce the initial JS bundle size.
@@ -31,7 +36,7 @@ store( 'my-namespace/myblock', {
 				'@wordpress/interactivity-router'
 			);
 			yield actions.navigate( e.target.href );
-		},
+		} ),
 	},
 } );
 ```
@@ -44,15 +49,6 @@ When loaded, this package [adds the following state and actions](https://github.
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
-			texts: {
-				loading: '',
-				loaded: '',
-			},
-			message: '',
-		},
 	},
 	actions: {
 		*navigate(href, options) {...},
@@ -69,18 +65,44 @@ const { state, actions } = store( 'core/router', {
 
 #### `data-wp-router-region`
 
-It defines a region that is updated on navigation. It requires a unique ID as the value and can only be used in root interactive elements, i.e., elements with `data-wp-interactive` that are not nested inside other elements with `data-wp-interactive`.
+It defines a region that is updated on navigation. It requires a unique ID as the value and must be used alongside `data-wp-interactive` to receive the proper namespace. Router regions can be placed anywhere within interactive regions, including nested interactive elements.
+
+<div class="callout callout-warning">
+When adding <code>data-wp-router-region</code> to a child element inside a parent with <code>data-wp-interactive</code>, always include <code>data-wp-interactive</code> on the child element as well. This is required for the router region to function correctly.
+</div>
+
+The value can be a string with the region ID, or a JSON object containing the `id` and an optional `attachTo` property.
 
 Example:
 
 ```html
 <div data-wp-interactive="myblock" data-wp-router-region="main-list">
-  <ul>
-     <li><a href="/post-1">Post 1</a></li>
-     <li><a href="/post-2">Post 2</a></li>
-     <li><a href="/post-3">Post 3</a></li>
-  </ul>
-  <a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
+	<ul>
+		<li><a href="/post-1">Post 1</a></li>
+		<li><a href="/post-2">Post 2</a></li>
+		<li><a href="/post-3">Post 3</a></li>
+	</ul>
+	<a data-wp-on--click="actions.navigate" href="/page/2">Page 2</a>
+</div>
+```
+
+The `attachTo` property is a CSS selector that points to the parent element where the new router region should be rendered. This is useful for regions that may not exist on the initial page but are present on subsequent pages, like a modal or an overlay.
+
+When navigating between pages:
+
+-   If a region exists on both the current and the new page, its content is updated. `attachTo` is ignored in this case.
+-   If a region without `attachTo` exists on the new page but not on the current one, it is not added to the DOM.
+-   If a region with `attachTo` exists on the new page but not on the current one, it is created and appended to the parent element specified in `attachTo`.
+-   If a region exists on the current page but not on the new one, it is removed from the DOM. `attachTo` is ignored in this case.
+
+Example with `attachTo`:
+
+```html
+<div
+	data-wp-interactive="myblock"
+	data-wp-router-region='{ "id": "myblock/overlay", "attachTo": "body" }'
+>
+	I'm in a new region!
 </div>
 ```
 
@@ -128,7 +150,6 @@ prefetch( url: string, options: PrefetchOptions = {} )
 ### State
 
 `state.url` is a reactive property synchronized with the current URL.
-Properties under `state.navigation` are meant for loading bar animations.
 
 ## Installation
 

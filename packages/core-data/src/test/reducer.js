@@ -7,34 +7,14 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	terms,
 	entities,
 	embedPreviews,
 	userPermissions,
 	autosaves,
 	currentUser,
+	syncUndoManagerState,
+	undoManager,
 } from '../reducer';
-
-describe( 'terms()', () => {
-	it( 'returns an empty object by default', () => {
-		const state = terms( undefined, {} );
-
-		expect( state ).toEqual( {} );
-	} );
-
-	it( 'returns with received terms', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'RECEIVE_TERMS',
-			taxonomy: 'categories',
-			terms: [ { id: 1 } ],
-		} );
-
-		expect( state ).toEqual( {
-			categories: [ { id: 1 } ],
-		} );
-	} );
-} );
 
 describe( 'entities', () => {
 	// See also unit tests at `queried-data/test/reducer.js`, which are more
@@ -551,5 +531,47 @@ describe( 'currentUser', () => {
 		);
 
 		expect( state ).toEqual( currentUserData );
+	} );
+} );
+
+describe( 'undoManager', () => {
+	it( 'returns the same reference for unrelated actions', () => {
+		const originalState = undoManager( undefined, {} );
+		const state = undoManager( originalState, {
+			type: 'UNRELATED',
+		} );
+
+		expect( state ).toBe( originalState );
+	} );
+} );
+
+describe( 'syncUndoManagerState', () => {
+	it( 'stores sync undo manager availability', () => {
+		const state = syncUndoManagerState( undefined, {
+			type: 'SYNC_UNDO_MANAGER_CHANGE',
+			hasRedo: false,
+			hasUndo: true,
+		} );
+
+		expect( state ).toEqual( {
+			hasRedo: false,
+			hasUndo: true,
+		} );
+	} );
+
+	it( 'updates sync undo manager availability', () => {
+		const state = syncUndoManagerState(
+			{ hasRedo: false, hasUndo: true },
+			{
+				type: 'SYNC_UNDO_MANAGER_CHANGE',
+				hasRedo: true,
+				hasUndo: false,
+			}
+		);
+
+		expect( state ).toEqual( {
+			hasRedo: true,
+			hasUndo: false,
+		} );
 	} );
 } );

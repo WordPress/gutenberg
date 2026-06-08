@@ -20,10 +20,16 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     compute-stable-branches:
         name: Compute current and next stable release branches
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         if: ${{ github.event_name == 'workflow_dispatch' }}
         outputs:
             current_stable_branch: ${{ steps.get_branches.outputs.current_stable_branch }}
@@ -36,19 +42,22 @@ jobs:
                   curl \
                     -H "Accept: application/vnd.github.v3+json" \
                     -o latest.json \
-                    "https://api.github.com/repos/${{ github.repository }}/releases/latest"
-                  LATEST_STABLE_TAG=$(jq --raw-output '.tag_name' latest.json)
-                  IFS='.' read LATEST_STABLE_MAJOR LATEST_STABLE_MINOR LATEST_STABLE_PATCH <<< "${LATEST_STABLE_TAG#v}"
-                  echo "current_stable_branch=release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}" >> $GITHUB_OUTPUT
-                  if [[ ${LATEST_STABLE_MINOR} == "9" ]]; then
-                    echo "next_stable_branch=release/$((LATEST_STABLE_MAJOR + 1)).0" >> $GITHUB_OUTPUT
+                    "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/latest"
+                  LATEST_STABLE_TAG="$(jq --raw-output '.tag_name' latest.json)"
+                  # shellcheck disable=SC2034
+                  IFS='.' read -r LATEST_STABLE_MAJOR LATEST_STABLE_MINOR LATEST_STABLE_PATCH <<< "${LATEST_STABLE_TAG#v}"
+                  echo "current_stable_branch=release/${LATEST_STABLE_MAJOR}.${LATEST_STABLE_MINOR}" >> "$GITHUB_OUTPUT"
+                  if [[ "${LATEST_STABLE_MINOR}" == "9" ]]; then
+                    echo "next_stable_branch=release/$((LATEST_STABLE_MAJOR + 1)).0" >> "$GITHUB_OUTPUT"
                   else
-                    echo "next_stable_branch=release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))" >> $GITHUB_OUTPUT
+                    echo "next_stable_branch=release/${LATEST_STABLE_MAJOR}.$((LATEST_STABLE_MINOR + 1))" >> "$GITHUB_OUTPUT"
                   fi
 
     bump-version:
         name: Bump version
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: write
         needs: compute-stable-branches
         if: |
             github.event_name == 'workflow_dispatch' && (
@@ -72,35 +81,38 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: true
 
             - name: Compute old and new version
               id: get_version
+              env:
+                  VERSION: ${{ github.event.inputs.version }}
               run: |
-                  OLD_VERSION=$(jq --raw-output '.version' package.json)
-                  echo "old_version=${OLD_VERSION}" >> $GITHUB_OUTPUT
-                  if [[ ${{ github.event.inputs.version }} == 'stable' ]]; then
-                    NEW_VERSION=$(npx semver $OLD_VERSION -i patch)
+                  OLD_VERSION="$(jq --raw-output '.version' package.json)"
+                  echo "old_version=${OLD_VERSION}" >> "$GITHUB_OUTPUT"
+                  if [[ "$VERSION" == 'stable' ]]; then
+                    NEW_VERSION="$(npx semver "$OLD_VERSION" -i patch)"
                   else
-                    if [[ $OLD_VERSION == *"rc"* ]]; then
-                      NEW_VERSION=$(npx semver $OLD_VERSION -i prerelease)
+                    if [[ "$OLD_VERSION" == *"rc"* ]]; then
+                      NEW_VERSION="$(npx semver "$OLD_VERSION" -i prerelease)"
                     else
                       # WordPress version guidelines: If minor is 9, bump major instead.
                       IFS='.' read -r -a OLD_VERSION_ARRAY <<< "$OLD_VERSION"
                       if [[ ${OLD_VERSION_ARRAY[1]} == "9" ]]; then
-                        NEW_VERSION="$(npx semver $OLD_VERSION -i major)-rc.1"
+                        NEW_VERSION="$(npx semver "$OLD_VERSION" -i major)-rc.1"
                       else
-                        NEW_VERSION="$(npx semver $OLD_VERSION -i minor)-rc.1"
+                        NEW_VERSION="$(npx semver "$OLD_VERSION" -i minor)-rc.1"
                       fi
                     fi
                   fi
-                  echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+                  echo "new_version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
                   IFS='.' read -r -a NEW_VERSION_ARRAY <<< "$NEW_VERSION"
                   RELEASE_BRANCH="release/${NEW_VERSION_ARRAY[0]}.${NEW_VERSION_ARRAY[1]}"
-                  echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
+                  echo "release_branch=${RELEASE_BRANCH}" >> "$GITHUB_OUTPUT"
 
             - name: Configure git user name and email
               run: |
@@ -111,31 +123,41 @@ jobs:
               if: |
                   github.event.inputs.version == 'rc' &&
                   ! contains( steps.get_version.outputs.old_version, 'rc' )
-              run: git checkout -b "${{ steps.get_version.outputs.release_branch }}"
+              env:
+                  TARGET_BRANCH: ${{ steps.get_version.outputs.release_branch }}
+              run: git checkout -b "$TARGET_BRANCH"
 
             - name: Switch to release branch
               if: |
                   github.event.inputs.version == 'stable' ||
                   contains( steps.get_version.outputs.old_version, 'rc' )
+              env:
+                  TARGET_BRANCH: ${{ steps.get_version.outputs.release_branch }}
               run: |
-                  git fetch --depth=1 origin "${{ steps.get_version.outputs.release_branch }}"
-                  git checkout "${{ steps.get_version.outputs.release_branch }}"
+                  git fetch --depth=1 origin "$TARGET_BRANCH"
+                  git checkout "$TARGET_BRANCH"
 
             - name: Update plugin version
               env:
                   VERSION: ${{ steps.get_version.outputs.new_version }}
+                  OLD_VERSION: ${{ steps.get_version.outputs.old_version }}
               run: |
-                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version' package.json) > package.json
-                  cat <<< $(jq --tab --arg version "${VERSION}" '.version = $version | .packages[""].version = $version' package-lock.json) > package-lock.json
-                  sed -i "s/${{ steps.get_version.outputs.old_version }}/${VERSION}/g" gutenberg.php
+                  jq --tab --arg version "${VERSION}" '.version = $version' package.json > package.json.tmp
+                  mv package.json.tmp package.json
+                  jq --tab --arg version "${VERSION}" '.version = $version | .packages[""].version = $version' package-lock.json > package-lock.json.tmp
+                  mv package-lock.json.tmp package-lock.json
+                  sed -i "s/${OLD_VERSION}/${VERSION}/g" gutenberg.php
 
             - name: Commit the version bump to the release branch
               id: commit_version_bump_to_release_branch
+              env:
+                  TARGET_BRANCH: ${{ steps.get_version.outputs.release_branch }}
+                  VERSION: ${{ steps.get_version.outputs.new_version }}
               run: |
                   git add gutenberg.php package.json package-lock.json
-                  git commit -m "Bump plugin version to ${{ steps.get_version.outputs.new_version }}"
-                  git push --set-upstream origin "${{ steps.get_version.outputs.release_branch }}"
-                  echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
+                  git commit -m "Bump plugin version to ${VERSION}"
+                  git push --set-upstream origin "$TARGET_BRANCH"
+                  echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> "$GITHUB_OUTPUT"
 
             - name: Fetch trunk
               if: ${{ github.ref != 'refs/heads/trunk' }}
@@ -143,19 +165,24 @@ jobs:
 
             - name: Cherry-pick the version bump commit to trunk
               id: commit_version_bump_to_trunk
+              env:
+                  TARGET_BRANCH: ${{ steps.get_version.outputs.release_branch }}
+                  OLD_VERSION: ${{ steps.get_version.outputs.old_version }}
               run: |
                   git checkout trunk
                   git pull
-                  TRUNK_VERSION=$(jq --raw-output '.version' package.json)
-                  if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
-                    git cherry-pick "${{ steps.get_version.outputs.release_branch }}"
+                  TRUNK_VERSION="$(jq --raw-output '.version' package.json)"
+                  if [[ "$OLD_VERSION" == "$TRUNK_VERSION" ]]; then
+                    git cherry-pick "$TARGET_BRANCH"
                     git push
-                    echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> $GITHUB_OUTPUT
+                    echo "version_bump_commit=$(git rev-parse --verify --short HEAD)" >> "$GITHUB_OUTPUT"
                   fi
 
     build:
-        name: Build Release Artifact
-        runs-on: ubuntu-latest
+        name: ${{ matrix.IS_GUTENBERG_PLUGIN && 'Build Release Artifact' || 'Build assets for wordpress-develop' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         needs: bump-version
         if: |
             always() && (
@@ -163,36 +190,43 @@ jobs:
               github.event_name == 'workflow_dispatch' ||
               github.repository == 'WordPress/gutenberg'
             )
-        outputs:
-            job_status: ${{ job.status }}
+        strategy:
+            matrix:
+                IS_GUTENBERG_PLUGIN: [true, false]
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
-                  cache: npm
+
+            - name: Configure build for wordpress-develop
+              if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+              run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
 
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
               env:
                   NO_CHECKS: 'true'
+                  IS_GUTENBERG_PLUGIN: ${{ matrix.IS_GUTENBERG_PLUGIN }}
+                  IS_WORDPRESS_CORE: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
 
             - name: Upload artifact
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
-                  name: gutenberg-plugin
+                  name: gutenberg-${{ ! matrix.IS_GUTENBERG_PLUGIN && 'wordpress-develop' || 'plugin' }}
                   path: ./gutenberg.zip
 
             - name: Build release notes draft
-              if: ${{ needs.bump-version.outputs.new_version }}
+              if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
               env:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
               run: |
@@ -200,7 +234,7 @@ jobs:
                   MILESTONE="Gutenberg ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
                   npm run other:changelog -- --milestone="$MILESTONE" --unreleased > release-notes.txt
                   sed -ie '1,6d' release-notes.txt
-                  if [[ ${{ needs.bump-version.outputs.new_version }} != *"rc"* ]]; then
+                  if [[ "${VERSION}" != *"rc"* ]]; then
                     # Include previous RCs' release notes, if any
                     CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
                     RC_REGEX="=\s${VERSION}(-rc\.[0-9]+)?\s="
@@ -208,29 +242,125 @@ jobs:
                   fi
 
             - name: Upload release notes artifact
-              if: ${{ needs.bump-version.outputs.new_version }}
-              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
               with:
                   name: release-notes
                   path: ./release-notes.txt
 
+    # Publishes the built plugin zip file to the GitHub Container registry.
+    publish-to-container-registry:
+        name: Publish to GitHub Container Registry
+        runs-on: 'ubuntu-24.04'
+        needs: ['bump-version', 'build']
+        permissions:
+            contents: read
+            packages: write
+        if: |
+            always() &&
+            needs.build.result == 'success' &&
+            github.repository == 'WordPress/gutenberg' &&
+            (
+              github.event_name == 'push' ||
+              github.event_name == 'workflow_dispatch' ||
+              (
+                github.event_name == 'pull_request' &&
+                github.event.pull_request.head.repo.full_name == github.repository
+              )
+            )
+
+        steps:
+            - name: Download build artifact
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: gutenberg-wordpress-develop
+
+            - name: Unzip zip artifact
+              run: unzip gutenberg.zip && rm gutenberg.zip
+
+            # Noting the hash helps keep track of the commit the zip was built from.
+            # For pull_request events, github.sha is the ephemeral merge commit; use the PR head SHA instead
+            # so the recorded value points to a real, branch-reachable commit.
+            - name: Add a file for tracking the SHA value used.
+              env:
+                  SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+              run: echo "$SOURCE_SHA" > .gutenberg-hash
+
+            - name: Recompress as a .gz file
+              run: tar -czf ${{ runner.temp }}/gutenberg.tar.gz . && mv ${{ runner.temp }}/gutenberg.tar.gz .
+
+            - name: Login to GitHub Container Registry
+              uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            # OCI Registry As Storage (ORAS) provides a way to push and pull non-image, generic artifacts (.gz files,
+            # for example) to container registries such as GitHub Container Registry.
+            - name: Setup ORAS
+              uses: oras-project/setup-oras@38de303aac69abb66f3e6255b7198bff35f323e3 # v2.0.0
+
+            # The owner/repository is hard-coded because capital letters are not allowed when publishing to GitHub
+            # Container Registry. The organization name is WordPress, so ${{ github.repository }} causes an error.
+            # See https://github.com/orgs/community/discussions/27086 for more info.
+            - name: Push built plugin .tar.gz file to GitHub Container Registry
+              env:
+                  SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+              run: |
+                  oras push "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${SOURCE_SHA}" \
+                  "gutenberg.tar.gz:application/gzip" \
+                  --annotation "org.opencontainers.image.description=Gutenberg plugin build for commit ${SOURCE_SHA}" \
+                  --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+                  --annotation "org.opencontainers.image.revision=${SOURCE_SHA}"
+
+            # Compute the mutable tag from the event. GitHub Actions expressions can't do string replacement,
+            # so the branch-name-to-tag conversion (release/19.5 -> release-19.5) must happen in bash.
+            - name: Determine mutable tag
+              id: mutable_tag
+              env:
+                  EVENT_NAME: ${{ github.event_name }}
+                  GITHUB_REF: ${{ github.ref }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
+              run: |
+                  if [[ "$EVENT_NAME" == "pull_request" ]]; then
+                      TAG="pr-${PR_NUMBER}"
+                  else
+                      BRANCH="${GITHUB_REF#refs/heads/}"
+                      TAG="${BRANCH//\//-}"
+                  fi
+                  TAG="$(echo "$TAG" | tr '[:upper:]' '[:lower:]')"
+                  echo "value=${TAG}" >> "$GITHUB_OUTPUT"
+
+            # Add a mutable tag alongside the SHA tag so developers can pull "the latest build for this stream"
+            # (e.g. :trunk, :pr-12345, :release-19.5) without needing to update a pinned SHA.
+            - name: Add mutable tag for the built plugin
+              env:
+                  SOURCE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+                  MUTABLE_TAG: ${{ steps.mutable_tag.outputs.value }}
+              run: |
+                  oras tag "ghcr.io/wordpress/gutenberg/gutenberg-wp-develop-build:${SOURCE_SHA}" "${MUTABLE_TAG}"
+
     revert-version-bump:
         name: Revert version bump if build failed
         needs: [bump-version, build]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: write
         if: |
             always() &&
-            ( needs.build.outputs.job_status == 'failure' ) &&
+            needs.build.result == 'failure' &&
             needs.bump-version.outputs.release_branch_commit
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: true
 
             - name: Configure git user name and email
               run: |
@@ -241,44 +371,53 @@ jobs:
               if: |
                   github.event.inputs.version == 'stable' ||
                   contains( needs.bump-version.outputs.old_version, 'rc' )
+              env:
+                  RELEAD_BRANCH_COMMIT: ${{ needs.bump-version.outputs.release_branch_commit }}
+                  RELEASE_BRANCH: ${{ needs.bump-version.outputs.release_branch }}
               run: |
-                  git revert --no-edit ${{ needs.bump-version.outputs.release_branch_commit }}
-                  git push --set-upstream origin "${{ needs.bump-version.outputs.release_branch }}"
+                  git revert --no-edit "$RELEAD_BRANCH_COMMIT"
+                  git push --set-upstream origin "$RELEASE_BRANCH"
 
             - name: Delete release branch if it was only just created for the RC
               if: |
                   github.event.inputs.version == 'rc' &&
                   ! contains( needs.bump-version.outputs.old_version, 'rc' )
+              env:
+                  RELEASE_BRANCH: ${{ needs.bump-version.outputs.release_branch }}
               run: |
-                  git push origin :"${{ needs.bump-version.outputs.release_branch }}"
+                  git push origin :"$RELEASE_BRANCH"
 
             - name: Revert version bump on trunk
               if: ${{ needs.bump-version.outputs.trunk_commit }}
+              env:
+                  TRUNK_COMMIT: ${{ needs.bump-version.outputs.trunk_commit }}
               run: |
                   git fetch --depth=2 origin trunk
                   git checkout trunk
-                  git revert --no-edit ${{ needs.bump-version.outputs.trunk_commit }}
+                  git revert --no-edit "$TRUNK_COMMIT"
                   git push --set-upstream origin trunk
 
     create-release:
         name: Create Release Draft and Attach Asset
         needs: [bump-version, build]
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: write
 
         steps:
             - name: Set Release Version
               id: get_release_version
               env:
                   VERSION: ${{ needs.bump-version.outputs.new_version }}
-              run: echo "version=$(echo $VERSION | cut -d / -f 3 | sed 's/-rc./ RC/' )" >> $GITHUB_OUTPUT
+              run: echo "version=$(echo "$VERSION" | cut -d / -f 3 | sed 's/-rc./ RC/' )" >> "$GITHUB_OUTPUT"
 
             - name: Download Plugin Zip Artifact
-              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: gutenberg-plugin
 
             - name: Download Release Notes Artifact
-              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
               with:
                   name: release-notes
 
@@ -308,26 +447,30 @@ jobs:
 
     npm-publish:
         name: Publish WordPress packages to npm
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         environment: WordPress packages
         needs: [bump-version, build]
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   path: main
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
                   ref: trunk
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: true
 
             - name: Configure git user name and email (for publishing)
               run: |
@@ -336,7 +479,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node.js
-              uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
@@ -346,6 +489,6 @@ jobs:
               run: |
                   cd main
                   npm ci
-                  ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
+                  npm exec --no release-cli -- npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

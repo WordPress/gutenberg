@@ -4,9 +4,9 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
+			"backgroundColor": "lighter-blue",
 			"align": "full",
-			"anchor": "test-id",
-			"backgroundColor": "lighter-blue"
+			"anchor": "test-id"
 		},
 		"innerBlocks": [
 			{

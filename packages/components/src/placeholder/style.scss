@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // This needs specificity to override individual block styles.
 .components-placeholder.components-placeholder {
 	font-size: $default-font-size;
@@ -14,7 +18,6 @@
 	gap: $grid-unit-20;
 
 	// Some editor styles unset this.
-	-moz-font-smoothing: subpixel-antialiased;
 	-webkit-font-smoothing: subpixel-antialiased;
 
 

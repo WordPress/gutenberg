@@ -24,11 +24,12 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const EMPTY_ARRAY = [];
@@ -117,14 +118,16 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 	</HStack>
 );
 
-const renderToggle =
-	( duotone, resetDuotone ) =>
-	( { onToggle, isOpen } ) => {
+const renderToggle = ( duotone, resetDuotone ) =>
+	function Toggle( { onToggle, isOpen } ) {
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {
 			onClick: onToggle,
-			className: clsx( { 'is-open': isOpen } ),
+			className: clsx(
+				'block-editor-global-styles-filters-panel__dropdown-toggle',
+				{ 'is-open': isOpen }
+			),
 			'aria-expanded': isOpen,
 			ref: duotoneButtonRef,
 		};

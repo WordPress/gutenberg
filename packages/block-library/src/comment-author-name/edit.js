@@ -1,21 +1,21 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import {
-	AlignmentControl,
-	BlockControls,
-	InspectorControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 /**
  * Renders the `core/comment-author-name` block on the editor.
@@ -25,28 +25,26 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
  * @param {Object} props.attributes            Block attributes.
  * @param {string} props.attributes.isLink     Whether the author name should be linked.
  * @param {string} props.attributes.linkTarget Target of the link.
- * @param {string} props.attributes.textAlign  Text alignment.
  * @param {Object} props.context               Inherited context.
  * @param {string} props.context.commentId     The comment ID.
  *
- * @return {JSX.Element} React element.
+ * @return {React.JSX.Element} React element.
  */
-export default function Edit( {
-	attributes: { isLink, linkTarget, textAlign },
-	context: { commentId },
-	setAttributes,
-} ) {
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+export default function Edit( props ) {
+	const {
+		attributes: { isLink, linkTarget },
+		context: { commentId },
+		setAttributes,
+	} = props;
+	useDeprecatedTextAlign( props );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const blockProps = useBlockProps();
 	let displayName = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 
 			const comment = getEntityRecord( 'root', 'comment', commentId );
-			const authorName = comment?.author_name; // eslint-disable-line camelcase
+			const authorName = comment?.author_name;
 
 			if ( comment && ! authorName ) {
 				const user = getEntityRecord( 'root', 'user', comment.author );
@@ -57,39 +55,57 @@ export default function Edit( {
 		[ commentId ]
 	);
 
-	const blockControls = (
-		<BlockControls group="block">
-			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
-			/>
-		</BlockControls>
-	);
-
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes( {
+						isLink: true,
+						linkTarget: '_self',
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
 					label={ __( 'Link to authors URL' ) }
-					onChange={ () => setAttributes( { isLink: ! isLink } ) }
-					checked={ isLink }
-				/>
-				{ isLink && (
+					isShownByDefault
+					hasValue={ () => ! isLink }
+					onDeselect={ () =>
+						setAttributes( {
+							isLink: true,
+						} )
+					}
+				>
 					<ToggleControl
-						__nextHasNoMarginBottom
+						label={ __( 'Link to authors URL' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</ToolsPanelItem>
+				{ isLink && (
+					<ToolsPanelItem
 						label={ __( 'Open in new tab' ) }
-						onChange={ ( value ) =>
+						isShownByDefault
+						hasValue={ () => linkTarget !== '_self' }
+						onDeselect={ () =>
 							setAttributes( {
-								linkTarget: value ? '_blank' : '_self',
+								linkTarget: '_self',
 							} )
 						}
-						checked={ linkTarget === '_blank' }
-					/>
+					>
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ linkTarget === '_blank' }
+						/>
+					</ToolsPanelItem>
 				) }
-			</PanelBody>
+			</ToolsPanel>
 		</InspectorControls>
 	);
 
@@ -110,7 +126,6 @@ export default function Edit( {
 	return (
 		<>
 			{ inspectorControls }
-			{ blockControls }
 			<div { ...blockProps }>{ displayAuthor }</div>
 		</>
 	);

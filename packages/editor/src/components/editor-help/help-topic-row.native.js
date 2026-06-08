@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import { TextControl, Icon } from '@wordpress/components';
+import { TextControl, Icon as WCIcon } from '@wordpress/components';
 import { chevronRight } from '@wordpress/icons';
 
 const HelpTopicRow = ( { label, icon, screenName, isLastItem } ) => {
@@ -25,7 +25,7 @@ const HelpTopicRow = ( { label, icon, screenName, isLastItem } ) => {
 			label={ label }
 			icon={ icon }
 		>
-			<Icon icon={ chevronRight } />
+			<WCIcon icon={ chevronRight } />
 		</TextControl>
 	);
 };
