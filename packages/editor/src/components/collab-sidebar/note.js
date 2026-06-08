@@ -12,6 +12,8 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 
@@ -248,14 +250,14 @@ export function Note( {
 				</ConfirmDialog>
 			) }
 			{ isOverflowing && 'edit' !== actionState && (
-				<Button
+				<UIButton
 					className="editor-collab-sidebar-panel__show-more-button"
-					variant="tertiary"
+					variant="unstyled"
 					size="small"
 					onClick={ () => setCollapsed( ! collapsed ) }
 				>
 					{ collapsed ? __( 'Show more' ) : __( 'Show less' ) }
-				</Button>
+				</UIButton>
 			) }
 		</NoteCard>
 	);

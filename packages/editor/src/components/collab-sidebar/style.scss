@@ -77,6 +77,14 @@
 
 .editor-collab-sidebar-panel__show-more-button {
 	width: fit-content;
+	color: var(--wpds-color-fg-interactive-brand);
+	cursor: var(--wpds-cursor-control);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: var(--wpds-color-fg-interactive-brand-active);
+	}
 }
 
 .editor-collab-sidebar-panel__note-content {
