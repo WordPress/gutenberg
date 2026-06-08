@@ -822,7 +822,7 @@ export const __unstableDeleteSelection =
 					...targetBlock.attributes,
 					...updatedAttributes,
 				},
-				innerBlocks: [ ...blockA.innerBlocks, ...blockB.innerBlocks ],
+				innerBlocks: blockB.innerBlocks,
 			},
 			...( isForward ? [] : blocksWithTheSameType ),
 		];
