@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
+import { parse, serialize } from '@wordpress/blocks';
 import {
 	useState,
 	useEffect,
@@ -64,6 +66,81 @@ function waitForSerializedNoteId( registry, noteId ) {
 				finish();
 			}
 		} );
+	} );
+}
+
+function getBlockPath( blocks, clientId ) {
+	for ( let index = 0; index < blocks.length; index++ ) {
+		const block = blocks[ index ];
+		if ( block.clientId === clientId ) {
+			return [ index ];
+		}
+
+		const childPath = getBlockPath( block.innerBlocks || [], clientId );
+		if ( childPath ) {
+			return [ index, ...childPath ];
+		}
+	}
+
+	return null;
+}
+
+function addNoteIdToBlockPath( blocks, path, noteId ) {
+	const [ index, ...rest ] = path;
+	return blocks.map( ( block, currentIndex ) => {
+		if ( currentIndex !== index ) {
+			return block;
+		}
+
+		if ( rest.length ) {
+			return {
+				...block,
+				innerBlocks: addNoteIdToBlockPath(
+					block.innerBlocks || [],
+					rest,
+					noteId
+				),
+			};
+		}
+
+		return {
+			...block,
+			attributes: {
+				...block.attributes,
+				metadata: cleanEmptyObject(
+					addNoteIdToMetadata( block.attributes?.metadata, noteId )
+				),
+			},
+		};
+	} );
+}
+
+async function saveNoteAttachmentOnly( registry, clientId, noteId ) {
+	const editor = registry.select( editorStore );
+	const blockEditor = registry.select( blockEditorStore );
+	const currentBlocks = blockEditor.getBlocks();
+	const blockPath = getBlockPath( currentBlocks, clientId );
+	const post = editor.getCurrentPost();
+	const savedContent = post.content?.raw || post.content || '';
+
+	if ( ! blockPath || ! savedContent ) {
+		return;
+	}
+
+	const savedBlocks = parse( savedContent );
+	const updatedContent = serialize(
+		addNoteIdToBlockPath( savedBlocks, blockPath, noteId )
+	);
+	const postType = await registry
+		.resolveSelect( coreStore )
+		.getPostType( editor.getCurrentPostType() );
+	const restBase = postType?.rest_base || editor.getCurrentPostType();
+	const restNamespace = postType?.rest_namespace || 'wp/v2';
+
+	await apiFetch( {
+		path: `/${ restNamespace }/${ restBase }/${ editor.getCurrentPostId() }`,
+		method: 'POST',
+		data: { content: updatedContent },
 	} );
 }
 
@@ -223,6 +300,9 @@ export function useNoteActions() {
 				if ( ! clientId ) {
 					return savedRecord;
 				}
+				const wasDirty = registry
+					.select( editorStore )
+					.isEditedPostDirty();
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				const updatedMetadata = addNoteIdToMetadata(
 					metadata,
@@ -232,7 +312,15 @@ export function useNoteActions() {
 					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
 				await waitForSerializedNoteId( registry, savedRecord.id );
-				await savePost();
+				if ( wasDirty ) {
+					await saveNoteAttachmentOnly(
+						registry,
+						clientId,
+						savedRecord.id
+					);
+				} else {
+					await savePost();
+				}
 			}
 
 			createNotice(
