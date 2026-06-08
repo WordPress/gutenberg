@@ -99,6 +99,7 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		$response = $this->dispatch_save( $this->get_post_room() );
 
 		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( array(), $response->get_data() );
 	}
 
 	/**

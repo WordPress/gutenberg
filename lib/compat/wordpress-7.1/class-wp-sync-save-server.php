@@ -134,12 +134,7 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 				);
 			}
 
-			return new WP_REST_Response(
-				array(
-					'room' => $room,
-				),
-				200
-			);
+			return [];
 		}
 
 		/**

@@ -314,9 +314,7 @@ describe( 'getEntityRecord', () => {
 
 		triggerFetch
 			.mockImplementationOnce( () => POST_RESPONSE )
-			.mockImplementationOnce( () => ( {
-				room: 'postType/post:1',
-			} ) );
+			.mockImplementationOnce( () => [] );
 
 		await getEntityRecord(
 			'postType',
@@ -386,9 +384,7 @@ describe( 'getEntityRecord', () => {
 
 		triggerFetch
 			.mockImplementationOnce( () => POST_RESPONSE )
-			.mockImplementationOnce( () => ( {
-				room: 'postType/post:1',
-			} ) );
+			.mockImplementationOnce( () => [] );
 
 		await getEntityRecord(
 			'postType',
