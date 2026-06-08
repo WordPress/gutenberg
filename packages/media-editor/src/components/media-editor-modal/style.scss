@@ -12,6 +12,9 @@
 	display: flex;
 	flex-direction: column;
 	min-height: 0;
+	// This isn't precise. The goal is to get closer to a uniform padding of 24px around the modal.
+	// The .components-modal__header is 72px height. Reducing the position by 10px gets us closer.
+	margin-top: 62px;
 }
 
 .media-editor-modal.components-modal__frame .components-modal__children-container {
