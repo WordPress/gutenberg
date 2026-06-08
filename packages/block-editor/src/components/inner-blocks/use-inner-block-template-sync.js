@@ -55,8 +55,11 @@ export default function useInnerBlockTemplateSync(
 			getSelectedBlocksInitialCaretPosition,
 			isBlockSelected,
 		} = registry.select( blockEditorStore );
-		const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
-			registry.dispatch( blockEditorStore );
+		const {
+			__unstableMarkNextChangeAsNotPersistent,
+			__unstableMarkNextChangeAsCombinedOperation,
+			replaceInnerBlocks,
+		} = registry.dispatch( blockEditorStore );
 
 		// There's an implicit dependency between useInnerBlockTemplateSync and useNestedSettingsUpdate
 		// The former needs to happen after the latter and since the latter is using microtasks to batch updates (performance optimization),
@@ -94,6 +97,7 @@ export default function useInnerBlockTemplateSync(
 				__unstableMarkNextChangeAsNotPersistent( {
 					history: 'ignore',
 				} );
+				__unstableMarkNextChangeAsCombinedOperation();
 				replaceInnerBlocks(
 					clientId,
 					nextBlocks,

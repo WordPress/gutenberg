@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
@@ -164,6 +164,12 @@ export default function useBlockSync( {
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
 
+	// Used to track deferred block syncs. deferredBlockSyncFlushSignal is updated
+	// to a new value when a deferred block is queued to sync to trigger a useEffect.
+	const deferredBlockSyncRef = useRef( null );
+	const [ deferredBlockSyncFlushSignal, setDeferredBlockSyncFlushSignal ] =
+		useState( 0 );
+
 	// Mapping between external (original) and internal (cloned) client IDs.
 	// This allows stable external IDs while using unique internal IDs.
 	const idMappingRef = useRef( {
@@ -299,6 +305,35 @@ export default function useBlockSync( {
 		onChangeRef.current = onChange;
 	}, [ onInput, onChange ] );
 
+	const flushDeferredBlockSync = () => {
+		const deferredBlockSync = deferredBlockSyncRef.current;
+
+		// Deferred block syncs are always persistent block changes, so use
+		// onChangeRef to persist.
+		deferredBlockSyncRef.current = null;
+		pendingChangesRef.current.outgoing.push( deferredBlockSync.blocks );
+		onChangeRef.current(
+			deferredBlockSync.blocks,
+			deferredBlockSync.options
+		);
+	};
+
+	useEffect( () => {
+		if ( deferredBlockSyncRef.current ) {
+			// When we deferredBlockSyncFlushSignal is updated and we have
+			// a deferred block sync, flush it.
+			flushDeferredBlockSync();
+		}
+	}, [ deferredBlockSyncFlushSignal ] );
+
+	const deferBlockSync = ( blocksToSync, options ) => {
+		deferredBlockSyncRef.current = {
+			blocks: blocksToSync,
+			options,
+		};
+		setDeferredBlockSyncFlushSignal( ( current ) => current + 1 );
+	};
+
 	// Determine if blocks need to be reset when they change.
 	// Also restores selection from context after blocks are set.
 	useEffect( () => {
@@ -343,6 +378,8 @@ export default function useBlockSync( {
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableGetLastBlockChangeHistoryMode,
+			__unstableDidLastBlockChangeInsertBlocks,
+			__unstableIsLastBlockChangeCombinedOperation,
 			__unstableIsLastBlockChangeIgnored,
 			areInnerBlocksControlled,
 			getBlockParents,
@@ -413,6 +450,11 @@ export default function useBlockSync( {
 				// receives both changes atomically.
 				registry.batch( () => {
 					if ( blocksChanged ) {
+						const isCombinedOperation =
+							__unstableIsLastBlockChangeCombinedOperation();
+						const didInsertBlocks =
+							__unstableDidLastBlockChangeInsertBlocks();
+
 						isPersistent = newIsPersistent;
 						blockHistoryMode = newBlockHistoryMode;
 
@@ -437,20 +479,58 @@ export default function useBlockSync( {
 							  )
 							: selectionInfo;
 
-						pendingChangesRef.current.outgoing.push(
-							blocksForParent
-						);
-
-						const updateParent = isPersistent
-							? onChangeRef.current
-							: onInputRef.current;
 						const updateOptions = {
 							selection: selectionForParent,
 						};
 						if ( blockHistoryMode === 'ignore' ) {
 							updateOptions.undoIgnore = true;
 						}
-						updateParent( blocksForParent, updateOptions );
+
+						if ( deferredBlockSyncRef.current ) {
+							if ( isCombinedOperation ) {
+								// This change was marked as a combined operation with
+								// __unstableMarkNextChangeAsCombinedOperation. Update the
+								// deferred payload and return early. It will be flushed
+								// by the deferredBlockSyncFlushSignal after browser
+								// microtasks are flushed.
+								//
+								// This is used with template insertion in RTC to ensure
+								// operations like outer block and inner template insertions
+								// are merged into the same change for peers.
+								deferredBlockSyncRef.current = {
+									...deferredBlockSyncRef.current,
+									blocks: blocksForParent,
+									options: {
+										...deferredBlockSyncRef.current.options,
+										selection: selectionForParent,
+									},
+								};
+								return;
+							}
+
+							// A new unrelated block change is starting, so flush
+							// the deferred block sync before handling it.
+							flushDeferredBlockSync();
+						}
+
+						const shouldDeferBlockSync =
+							isPersistent && didInsertBlocks;
+
+						if ( shouldDeferBlockSync ) {
+							// Insert-like persistent changes can trigger a
+							// template continuation in a browser microtask.
+							// Delay this payload briefly so that continuation
+							// can be merged before syncing to the parent.
+							deferBlockSync( blocksForParent, updateOptions );
+						} else {
+							pendingChangesRef.current.outgoing.push(
+								blocksForParent
+							);
+							const updateParent = isPersistent
+								? onChangeRef.current
+								: onInputRef.current;
+							updateParent( blocksForParent, updateOptions );
+						}
 					}
 
 					if (
@@ -506,6 +586,9 @@ export default function useBlockSync( {
 
 	useEffect( () => {
 		return () => {
+			if ( deferredBlockSyncRef.current ) {
+				flushDeferredBlockSync();
+			}
 			unsetControlledBlocks();
 		};
 	}, [] );

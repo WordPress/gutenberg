@@ -2950,6 +2950,29 @@ export function __unstableGetLastBlockChangeHistoryMode( state ) {
 }
 
 /**
+ * Returns true if the most recent block change should be treated as part of the
+ * same combined operation as a pending outbound block change.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {boolean} Whether the most recent block change is part of the combined operation.
+ */
+export function __unstableIsLastBlockChangeCombinedOperation( state ) {
+	return !! state.blocks.isLastBlockChangeCombinedOperation;
+}
+
+/**
+ * Returns true if the most recent block change inserted blocks.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {boolean} Whether the most recent block change inserted blocks.
+ */
+export function __unstableDidLastBlockChangeInsertBlocks( state ) {
+	return !! state.blocks.didLastBlockChangeInsertBlocks;
+}
+
+/**
  * Returns the block list settings for an array of blocks, if any exist.
  *
  * @param {Object} state     Editor state.

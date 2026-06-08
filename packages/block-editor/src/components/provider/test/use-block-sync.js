@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { registerBlockType } from '@wordpress/blocks';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
 
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -347,6 +347,62 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange ).toHaveBeenCalledWith(
 			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
 			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+		expect( onInput ).not.toHaveBeenCalled();
+	} );
+
+	it( 'merges combined-operation block changes into a deferred insertion', async () => {
+		const onChange = jest.fn();
+		const onInput = jest.fn();
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+		render(
+			<TestWrapper
+				setRegistry={ setRegistry }
+				value={ [] }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+		onChange.mockClear();
+		onInput.mockClear();
+
+		const parentBlock = createBlock( 'test/test-block' );
+		const templateBlock = createBlock( 'test/test-block', { foo: 2 } );
+
+		registry.dispatch( blockEditorStore ).insertBlock( parentBlock );
+		expect( onChange ).not.toHaveBeenCalled();
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkNextChangeAsNotPersistent( {
+				history: 'ignore',
+			} );
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkNextChangeAsCombinedOperation();
+		registry
+			.dispatch( blockEditorStore )
+			.replaceInnerBlocks( parentBlock.clientId, [ templateBlock ] );
+
+		await waitFor( () => expect( onChange ).toHaveBeenCalledTimes( 1 ) );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			[
+				expect.objectContaining( {
+					clientId: parentBlock.clientId,
+					innerBlocks: [
+						expect.objectContaining( {
+							clientId: templateBlock.clientId,
+						} ),
+					],
+				} ),
+			],
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+		expect( onChange.mock.calls[ 0 ][ 1 ] ).not.toHaveProperty(
+			'undoIgnore'
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );

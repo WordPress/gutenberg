@@ -420,19 +420,48 @@ const withBlockTree =
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
 	let nextHistoryMode;
+	let nextIsCombinedOperation;
 
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 
+		const didInsertBlocks =
+			( action.type === 'INSERT_BLOCKS' ||
+				action.type === 'REPLACE_BLOCKS' ||
+				action.type === 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN' ) &&
+			!! action.blocks?.length;
+		const isNotPersistentMarker =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+		const isCombinedOperationMarker =
+			action.type === 'MARK_NEXT_CHANGE_AS_COMBINED_OPERATION';
+		const hasMarker = isNotPersistentMarker || isCombinedOperationMarker;
 		const pendingHistoryMode = nextHistoryMode;
-		nextHistoryMode =
-			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
-				? action.history ?? 'merge'
-				: undefined;
+		const pendingIsCombinedOperation = nextIsCombinedOperation;
+
+		// Ensure MARK_NEXT_CHANGE_AS_COMBINED_OPERATION doesn't consume an existing
+		// MARK_NEXT_CHANGE_AS_NOT_PERSISTENT marker.
+		nextHistoryMode = undefined;
+		if ( isNotPersistentMarker ) {
+			nextHistoryMode = action.history ?? 'merge';
+		} else if ( isCombinedOperationMarker ) {
+			// For combined operations (e.g. inner template sync), keep the
+			// pending history mode for the next operation. The final combined
+			// operation should keep the intended history flag.
+			nextHistoryMode = pendingHistoryMode;
+		}
+
+		// Also ensure MARK_NEXT_CHANGE_AS_NOT_PERSISTENT does not consume an
+		// existing MARK_NEXT_CHANGE_AS_COMBINED_OPERATION marker.
+		nextIsCombinedOperation = false;
+		if ( isCombinedOperationMarker ) {
+			nextIsCombinedOperation = true;
+		} else if ( isNotPersistentMarker ) {
+			nextIsCombinedOperation = pendingIsCombinedOperation;
+		}
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
-			pendingHistoryMode;
+			( ! hasMarker && pendingHistoryMode );
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
@@ -452,15 +481,24 @@ function withPersistentBlockChange( reducer ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
-		if ( pendingHistoryMode === 'ignore' ) {
-			return {
-				...nextState,
-				isPersistentChange,
-				lastBlockChangeHistoryMode: 'ignore',
-			};
-		}
+		// Clear transient metadata from the previous block change. The current
+		// change adds back only the markers that apply to it below.
+		const {
+			lastBlockChangeHistoryMode,
+			isLastBlockChangeCombinedOperation,
+			didLastBlockChangeInsertBlocks,
+			...blockChange
+		} = nextState;
 
-		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
+		if ( pendingHistoryMode === 'ignore' ) {
+			blockChange.lastBlockChangeHistoryMode = 'ignore';
+		}
+		if ( pendingIsCombinedOperation ) {
+			blockChange.isLastBlockChangeCombinedOperation = true;
+		}
+		if ( didInsertBlocks ) {
+			blockChange.didLastBlockChangeInsertBlocks = true;
+		}
 
 		return { ...blockChange, isPersistentChange };
 	};

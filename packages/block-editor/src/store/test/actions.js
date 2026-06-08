@@ -54,6 +54,7 @@ const {
 	updateSettings,
 	validateBlocksToTemplate,
 	__unstableMarkNextChangeAsNotPersistent,
+	__unstableMarkNextChangeAsCombinedOperation,
 	registerInserterMediaCategory,
 	setBlockEditingMode,
 	unsetBlockEditingMode,
@@ -831,6 +832,14 @@ describe( 'actions', () => {
 			).toEqual( {
 				type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
 				history: 'ignore',
+			} );
+		} );
+	} );
+
+	describe( '__unstableMarkNextChangeAsCombinedOperation', () => {
+		it( 'should mark the next change as a combined operation', () => {
+			expect( __unstableMarkNextChangeAsCombinedOperation() ).toEqual( {
+				type: 'MARK_NEXT_CHANGE_AS_COMBINED_OPERATION',
 			} );
 		} );
 	} );
