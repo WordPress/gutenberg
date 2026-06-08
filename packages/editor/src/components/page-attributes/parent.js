@@ -33,34 +33,52 @@ import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
 function getTitle( post ) {
-	if ( post?.title?.rendered ) {
-		return decodeEntities( post.title.rendered );
+	const titleRaw = post?.title?.rendered || post?.title?.raw || '';
+	if ( titleRaw ) {
+		return decodeEntities( titleRaw );
 	}
 
-	let snippet = '';
-	if ( post?.excerpt?.rendered ) {
-		snippet = post.excerpt.rendered;
-	} else if ( post?.content?.rendered ) {
-		snippet = post.content.rendered;
+	const fallback = __( '(no title)' );
+	const rawSnippet = post?.excerpt?.rendered || post?.content?.rendered || '';
+
+	if ( ! rawSnippet ) {
+		return fallback;
 	}
 
-	const fallback = `#${ post?.id || '' } (${ __( 'no title' ) })`.trim();
-
-	if ( snippet ) {
-		const plainText = snippet.replace( /<[^>]+>/g, '' ).trim();
-		const truncated = plainText.substring( 0, 40 );
-		if ( truncated ) {
-			const ellipsis = plainText.length > 40 ? '…' : '';
-			return sprintf(
-				/* translators: 1: Default no title text, 2: Post excerpt/content snippet */
-				__( '%1$s - %2$s' ),
-				fallback,
-				truncated + ellipsis
-			);
-		}
+	// Safely strip HTML without triggering asset downloads
+	let plainText = '';
+	if ( typeof window !== 'undefined' && window.DOMParser ) {
+		const parser = new window.DOMParser();
+		plainText =
+			parser.parseFromString( rawSnippet, 'text/html' ).body
+				.textContent || '';
+	} else {
+		plainText = rawSnippet.replace( /<[^>]*>/g, '' );
 	}
 
-	return fallback;
+	plainText = decodeEntities( plainText ).replace( /\s+/g, ' ' ).trim();
+
+	if ( ! plainText ) {
+		return fallback;
+	}
+
+	// truncation at 40 characters or the last full word before 40 characters, whichever is shorter.
+	let snippet = plainText;
+	if ( plainText.length > 40 ) {
+		const trimmed = plainText.slice( 0, 41 );
+		const lastSpace = trimmed.lastIndexOf( ' ' );
+		snippet =
+			lastSpace > 0
+				? `${ trimmed.slice( 0, lastSpace ) }…`
+				: `${ plainText.slice( 0, 40 ) }…`;
+	}
+
+	return sprintf(
+		/* translators: 1: title fallback for an untitled post, 2: excerpt or content snippet. */
+		__( '%1$s - %2$s' ),
+		fallback,
+		snippet
+	);
 }
 
 export const getItemPriority = ( name, searchValue ) => {

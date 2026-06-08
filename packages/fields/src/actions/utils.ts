@@ -9,6 +9,95 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import type { Post, TemplatePart, Template } from '../types';
 
+const TITLE_FALLBACK_SNIPPET_LENGTH = 40;
+
+type RenderedContent = string | { raw?: string; rendered?: string };
+
+export type ItemWithTitleAndContent = {
+	title?: RenderedContent;
+	excerpt?: RenderedContent;
+	content?: RenderedContent;
+};
+
+function extractTextContent( content?: RenderedContent ): string {
+	if ( ! content ) {
+		return '';
+	}
+	if ( typeof content === 'string' ) {
+		return content;
+	}
+	return content.rendered || content.raw || '';
+}
+
+export function sanitizeAndStripHtml( html: string ): string {
+	if ( ! html ) {
+		return '';
+	}
+
+	let plainText = '';
+	if ( typeof window !== 'undefined' && window.DOMParser ) {
+		const parser = new DOMParser();
+		const doc = parser.parseFromString( html, 'text/html' );
+		plainText = doc.body.textContent || '';
+	} else {
+		// Safe SSR fallback
+		plainText = html.replace( /<[^>]*>/g, '' );
+	}
+
+	return decodeEntities( plainText ).replace( /\s+/g, ' ' ).trim();
+}
+
+export function smartTruncate(
+	text: string,
+	maxLength: number = TITLE_FALLBACK_SNIPPET_LENGTH
+): string {
+	if ( text.length <= maxLength ) {
+		return text;
+	}
+
+	// Slice to max length, then find the last space to avoid cutting words in half
+	const trimmed = text.slice( 0, maxLength + 1 );
+	const lastSpaceIndex = trimmed.lastIndexOf( ' ' );
+
+	if ( lastSpaceIndex > 0 ) {
+		return `${ trimmed.slice( 0, lastSpaceIndex ) }…`;
+	}
+
+	// Fallback for extremely long contiguous strings without spaces
+	return `${ text.slice( 0, maxLength ) }…`;
+}
+
+export function getFallbackSnippet( item: ItemWithTitleAndContent ): string {
+	const rawText =
+		extractTextContent( item.excerpt ) ||
+		extractTextContent( item.content );
+	const cleanText = sanitizeAndStripHtml( rawText );
+
+	return smartTruncate( cleanText );
+}
+
+export function getItemTitleWithFallbackSnippet(
+	item: ItemWithTitleAndContent,
+	fallback: string = __( '(no title)' )
+): string {
+	const title = getItemTitle( item, '' );
+	if ( title ) {
+		return title;
+	}
+
+	const snippet = getFallbackSnippet( item );
+	if ( ! snippet ) {
+		return fallback;
+	}
+
+	return sprintf(
+		/* translators: 1: title fallback for an untitled post, 2: excerpt or content snippet. */
+		__( '%1$s - %2$s' ),
+		fallback,
+		snippet
+	);
+}
+
 export function isTemplate( post: Post ): post is Template {
 	return post.type === 'wp_template';
 }
@@ -24,62 +113,11 @@ export function isTemplateOrTemplatePart(
 }
 
 export function getItemTitle(
-	item: {
-		title: string | { rendered: string } | { raw: string };
-		excerpt?: string | { rendered: string } | { raw: string };
-		content?: string | { rendered: string } | { raw: string };
-	},
+	item: { title?: RenderedContent },
 	fallback: string = __( '(no title)' )
-) {
-	let title = '';
-	if ( typeof item.title === 'string' ) {
-		title = decodeEntities( item.title );
-	} else if ( item.title && 'rendered' in item.title ) {
-		title = decodeEntities( item.title.rendered );
-	} else if ( item.title && 'raw' in item.title ) {
-		title = decodeEntities( item.title.raw );
-	}
-	if ( title ) {
-		return title;
-	}
-
-	let snippet = '';
-	if ( item.excerpt ) {
-		if ( typeof item.excerpt === 'string' ) {
-			snippet = item.excerpt;
-		} else if ( 'rendered' in item.excerpt ) {
-			snippet = item.excerpt.rendered;
-		} else if ( 'raw' in item.excerpt ) {
-			snippet = item.excerpt.raw;
-		}
-	}
-	if ( ! snippet && item.content ) {
-		if ( typeof item.content === 'string' ) {
-			snippet = item.content;
-		} else if ( 'rendered' in item.content ) {
-			snippet = item.content.rendered;
-		} else if ( 'raw' in item.content ) {
-			snippet = item.content.raw;
-		}
-	}
-
-	if ( snippet ) {
-		const plainText = decodeEntities(
-			snippet.replace( /<[^>]+>/g, '' )
-		).trim();
-		const truncated = plainText.substring( 0, 40 );
-		if ( truncated ) {
-			const ellipsis = plainText.length > 40 ? '…' : '';
-			return sprintf(
-				/* translators: 1: Default no title text, 2: Post excerpt/content snippet */
-				__( '%1$s - %2$s' ),
-				fallback,
-				truncated + ellipsis
-			);
-		}
-	}
-
-	return fallback;
+): string {
+	const title = sanitizeAndStripHtml( extractTextContent( item.title ) );
+	return title || fallback;
 }
 
 /**
