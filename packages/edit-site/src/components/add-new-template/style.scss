@@ -138,7 +138,7 @@
 		padding: $grid-unit-40;
 		display: flex;
 		flex-direction: column;
-		border: $border-width solid $gray-300;
+		border: $border-width solid var(--wpds-color-stroke-surface-neutral);
 		justify-content: center;
 
 		// Show the boundary of the button, in High Contrast Mode.
