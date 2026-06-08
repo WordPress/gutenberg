@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useRef, useState } from '@wordpress/element';
+import { RawHTML, useRef, useState, useEffect } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
@@ -105,6 +105,42 @@ export function Note( {
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
 
+	const prevContentRef = useRef( note?.content?.raw );
+	const commentRef = useRef( null );
+	const [ isOverflowing, setIsOverflowing ] = useState( false );
+	const [ collapsed, setCollapsed ] = useState( true );
+
+	useEffect( () => {
+		if ( prevContentRef.current !== note?.content?.raw ) {
+			setCollapsed( true );
+		}
+	}, [ note?.content?.raw ] );
+
+	useEffect( () => {
+		if ( ! collapsed ) {
+			return;
+		}
+
+		const commentElement = commentRef.current;
+		if ( ! commentElement ) {
+			return;
+		}
+
+		const isEdit = prevContentRef.current !== note?.content?.raw;
+		prevContentRef.current = note?.content?.raw;
+
+		if ( commentElement.scrollHeight > commentElement.clientHeight ) {
+			setIsOverflowing( true );
+
+			if ( isEdit ) {
+				setCollapsed( false );
+			}
+		} else {
+			setIsOverflowing( false );
+			setCollapsed( null );
+		}
+	}, [ collapsed, note?.content?.raw ] );
+
 	const handleCancel = () => {
 		setActionState( null );
 		actionButtonRef.current?.focus();
@@ -148,20 +184,27 @@ export function Note( {
 				  )
 				: actionText;
 		body = (
-			<RawHTML
+			<div
+				ref={ commentRef }
 				className={ clsx(
 					'editor-collab-sidebar-panel__note-content',
-					'editor-collab-sidebar-panel__resolution-text'
+					'editor-collab-sidebar-panel__resolution-text',
+					{ 'is-collapsed': collapsed }
 				) }
 			>
-				{ text }
-			</RawHTML>
+				<RawHTML>{ text }</RawHTML>
+			</div>
 		);
 	} else {
 		body = (
-			<RawHTML className="editor-collab-sidebar-panel__note-content">
-				{ note?.content?.rendered }
-			</RawHTML>
+			<div
+				ref={ commentRef }
+				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
+					'is-collapsed': collapsed,
+				} ) }
+			>
+				<RawHTML>{ note?.content?.rendered }</RawHTML>
+			</div>
 		);
 	}
 
@@ -203,6 +246,16 @@ export function Note( {
 				>
 					{ deleteConfirmMessage }
 				</ConfirmDialog>
+			) }
+			{ isOverflowing && 'edit' !== actionState && (
+				<Button
+					className="editor-collab-sidebar-panel__show-more-button"
+					variant="tertiary"
+					size="small"
+					onClick={ () => setCollapsed( ! collapsed ) }
+				>
+					{ collapsed ? __( 'Show more' ) : __( 'Show less' ) }
+				</Button>
 			) }
 		</NoteCard>
 	);
