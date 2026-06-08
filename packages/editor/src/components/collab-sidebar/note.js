@@ -170,42 +170,37 @@ export function Note( {
 				} }
 			/>
 		);
-	} else if ( isResolutionNote ) {
-		const actionText =
-			note.meta._wp_note_status === 'resolved'
-				? __( 'Marked as resolved' )
-				: __( 'Reopened' );
-		const raw = note?.content?.raw;
-		const text =
-			raw && typeof raw === 'string' && raw.trim() !== ''
-				? sprintf(
-						// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-						__( '%1$s: %2$s' ),
-						actionText,
-						raw
-				  )
-				: actionText;
-		body = (
-			<div
-				ref={ commentRef }
-				className={ clsx(
-					'editor-collab-sidebar-panel__note-content',
-					'editor-collab-sidebar-panel__resolution-text',
-					{ 'is-collapsed': collapsed }
-				) }
-			>
-				<RawHTML>{ text }</RawHTML>
-			</div>
-		);
 	} else {
+		let content;
+		if ( isResolutionNote ) {
+			const actionText =
+				note.meta._wp_note_status === 'resolved'
+					? __( 'Marked as resolved' )
+					: __( 'Reopened' );
+			const raw = note?.content?.raw;
+			content =
+				raw && typeof raw === 'string' && raw.trim() !== ''
+					? sprintf(
+							// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+							__( '%1$s: %2$s' ),
+							actionText,
+							raw
+					  )
+					: actionText;
+		} else {
+			content = note?.content?.rendered;
+		}
+
 		body = (
 			<div
 				ref={ commentRef }
 				className={ clsx( 'editor-collab-sidebar-panel__note-content', {
+					'editor-collab-sidebar-panel__resolution-text':
+						isResolutionNote,
 					'is-collapsed': collapsed,
 				} ) }
 			>
-				<RawHTML>{ note?.content?.rendered }</RawHTML>
+				<RawHTML>{ content }</RawHTML>
 			</div>
 		);
 	}
