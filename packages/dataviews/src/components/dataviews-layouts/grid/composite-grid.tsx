@@ -10,11 +10,11 @@ import type { ComponentProps, ReactElement, HTMLAttributes } from 'react';
 import {
 	Flex,
 	FlexItem,
-	Tooltip as WCTooltip,
 	Composite,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Stack, Tooltip } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
@@ -304,11 +304,18 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 										direction="row"
 									>
 										<>
-											<WCTooltip text={ field.label }>
-												<FlexItem className="dataviews-view-grid__field-name">
-													{ field.header }
-												</FlexItem>
-											</WCTooltip>
+											<Tooltip.Root>
+												<Tooltip.Trigger
+													render={
+														<FlexItem className="dataviews-view-grid__field-name">
+															{ field.header }
+														</FlexItem>
+													}
+												/>
+												<Tooltip.Popup>
+													{ field.label }
+												</Tooltip.Popup>
+											</Tooltip.Root>
 											<FlexItem
 												className="dataviews-view-grid__field-value"
 												style={ { maxHeight: 'none' } }

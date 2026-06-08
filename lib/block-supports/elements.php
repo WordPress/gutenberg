@@ -239,6 +239,11 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
  */
 function gutenberg_render_elements_class_name( $block_content, $block ) {
 	$class_string = $block['attrs']['className'] ?? '';
+
+	if ( ! is_string( $class_string ) ) {
+		return $block_content;
+	}
+
 	preg_match( '/\bwp-elements-\S+\b/', $class_string, $matches );
 
 	if ( empty( $matches ) ) {

@@ -11,6 +11,7 @@
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/admin-ui',
+	'@wordpress/api-fetch',
 	'@wordpress/block-directory',
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
@@ -39,6 +40,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/route',
 	'@wordpress/router',
 	'@wordpress/routes',
+	'@wordpress/storybook',
 	'@wordpress/sync',
 	'@wordpress/theme',
 	'@wordpress/dataviews',
