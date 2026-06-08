@@ -67,7 +67,7 @@ Components in this package use [CSS cascade layers](https://developer.mozilla.or
 If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-ui` layer, which you can use when defining your own layer order:
 
 ```css
-@layer example-app, wp-ui;
+@layer wp-ui, example-app;
 ```
 
 #### Mixing with `@wordpress/components`
