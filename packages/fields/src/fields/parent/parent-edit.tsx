@@ -144,7 +144,7 @@ export function PageAttributesParent( {
 				parent_exclude: postId,
 				orderby: 'menu_order',
 				order: 'asc',
-				_fields: 'id,title,parent',
+				_fields: 'id,title,parent,excerpt,content',
 				...( !! fieldValue && {
 					// Perform a search by relevance when the field is changed.
 					search: fieldValue,

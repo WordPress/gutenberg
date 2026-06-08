@@ -6,6 +6,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import {
 	Button,
 	__experimentalHStack as HStack,
@@ -41,13 +42,29 @@ const duplicatePost: Action< BasePost > = {
 	},
 	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ item, setItem ] = useState< BasePost >( {
-			...items[ 0 ],
-			title: sprintf(
-				/* translators: %s: Existing post title */
-				_x( '%s (Copy)', 'post' ),
-				getItemTitle( items[ 0 ] )
-			),
+		const [ item, setItem ] = useState< BasePost >( () => {
+			let rawTitle = '';
+			if ( typeof items[ 0 ].title === 'string' ) {
+				rawTitle = items[ 0 ].title;
+			} else if ( items[ 0 ].title && 'rendered' in items[ 0 ].title ) {
+				rawTitle = ( items[ 0 ].title as { rendered: string } )
+					.rendered;
+			} else if ( 'raw' in ( items[ 0 ].title || {} ) ) {
+				rawTitle = ( items[ 0 ].title as { raw: string } ).raw;
+			}
+
+			const decodedTitle = decodeEntities( rawTitle );
+
+			return {
+				...items[ 0 ],
+				title: decodedTitle
+					? sprintf(
+							/* translators: %s: Existing post title */
+							_x( '%s (Copy)', 'post' ),
+							decodedTitle
+					  )
+					: '',
+			};
 		} );
 
 		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
@@ -156,11 +173,13 @@ const duplicatePost: Action< BasePost > = {
 						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						placeholder={ __( 'No title' ) }
-						value={ getItemTitle( item ) }
+						value={
+							typeof item.title === 'string' ? item.title : ''
+						}
 						onChange={ ( value ) =>
 							setItem( ( prev ) => ( {
 								...prev,
-								title: value || __( 'No title' ),
+								title: value || '',
 							} ) )
 						}
 					/>

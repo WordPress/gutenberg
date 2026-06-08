@@ -33,9 +33,34 @@ import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
 function getTitle( post ) {
-	return post?.title?.rendered
-		? decodeEntities( post.title.rendered )
-		: `#${ post.id } (${ __( 'no title' ) })`;
+	if ( post?.title?.rendered ) {
+		return decodeEntities( post.title.rendered );
+	}
+
+	let snippet = '';
+	if ( post?.excerpt?.rendered ) {
+		snippet = post.excerpt.rendered;
+	} else if ( post?.content?.rendered ) {
+		snippet = post.content.rendered;
+	}
+
+	const fallback = `#${ post?.id || '' } (${ __( 'no title' ) })`.trim();
+
+	if ( snippet ) {
+		const plainText = snippet.replace( /<[^>]+>/g, '' ).trim();
+		const truncated = plainText.substring( 0, 40 );
+		if ( truncated ) {
+			const ellipsis = plainText.length > 40 ? '…' : '';
+			return sprintf(
+				/* translators: 1: Default no title text, 2: Post excerpt/content snippet */
+				__( '%1$s - %2$s' ),
+				fallback,
+				truncated + ellipsis
+			);
+		}
+	}
+
+	return fallback;
 }
 
 export const getItemPriority = ( name, searchValue ) => {
@@ -88,7 +113,7 @@ export function PageAttributesParent() {
 				parent_exclude: postId,
 				orderby: 'menu_order',
 				order: 'asc',
-				_fields: 'id,title,parent',
+				_fields: 'id,title,parent,excerpt,content',
 			};
 
 			// Perform a search by relevance when the field is changed.

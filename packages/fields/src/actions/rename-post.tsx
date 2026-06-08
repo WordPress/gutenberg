@@ -5,6 +5,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 // @ts-ignore
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import {
@@ -21,12 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 
 import { unlock } from '../lock-unlock';
-import {
-	getItemTitle,
-	isTemplateRemovable,
-	isTemplate,
-	isTemplatePart,
-} from './utils';
+import { isTemplateRemovable, isTemplate, isTemplatePart } from './utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 // Patterns.
@@ -82,7 +78,18 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => getItemTitle( item, '' ) );
+		const [ title, setTitle ] = useState( () => {
+			let rawTitle = '';
+			if ( typeof items[ 0 ].title === 'string' ) {
+				rawTitle = items[ 0 ].title;
+			} else if ( items[ 0 ].title && 'rendered' in items[ 0 ].title ) {
+				rawTitle = ( items[ 0 ].title as { rendered: string } )
+					.rendered;
+			} else if ( 'raw' in ( items[ 0 ].title || {} ) ) {
+				rawTitle = ( items[ 0 ].title as { raw: string } ).raw;
+			}
+			return decodeEntities( rawTitle );
+		} );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =

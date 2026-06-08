@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,6 +26,8 @@ export function isTemplateOrTemplatePart(
 export function getItemTitle(
 	item: {
 		title: string | { rendered: string } | { raw: string };
+		excerpt?: string | { rendered: string } | { raw: string };
+		content?: string | { rendered: string } | { raw: string };
 	},
 	fallback: string = __( '(no title)' )
 ) {
@@ -37,7 +39,47 @@ export function getItemTitle(
 	} else if ( item.title && 'raw' in item.title ) {
 		title = decodeEntities( item.title.raw );
 	}
-	return title || fallback;
+	if ( title ) {
+		return title;
+	}
+
+	let snippet = '';
+	if ( item.excerpt ) {
+		if ( typeof item.excerpt === 'string' ) {
+			snippet = item.excerpt;
+		} else if ( 'rendered' in item.excerpt ) {
+			snippet = item.excerpt.rendered;
+		} else if ( 'raw' in item.excerpt ) {
+			snippet = item.excerpt.raw;
+		}
+	}
+	if ( ! snippet && item.content ) {
+		if ( typeof item.content === 'string' ) {
+			snippet = item.content;
+		} else if ( 'rendered' in item.content ) {
+			snippet = item.content.rendered;
+		} else if ( 'raw' in item.content ) {
+			snippet = item.content.raw;
+		}
+	}
+
+	if ( snippet ) {
+		const plainText = decodeEntities(
+			snippet.replace( /<[^>]+>/g, '' )
+		).trim();
+		const truncated = plainText.substring( 0, 40 );
+		if ( truncated ) {
+			const ellipsis = plainText.length > 40 ? '…' : '';
+			return sprintf(
+				/* translators: 1: Default no title text, 2: Post excerpt/content snippet */
+				__( '%1$s - %2$s' ),
+				fallback,
+				truncated + ellipsis
+			);
+		}
+	}
+
+	return fallback;
 }
 
 /**

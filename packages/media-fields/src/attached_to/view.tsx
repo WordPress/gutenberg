@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 /**
  * Internal dependencies
@@ -21,23 +21,52 @@ export default function MediaAttachedToView( {
 	>( null );
 
 	const parentId = item.post;
-	const embeddedPostId = item._embedded?.[ 'wp:attached-to' ]?.[ 0 ]?.id;
-	const embeddedPostTitle =
-		item._embedded?.[ 'wp:attached-to' ]?.[ 0 ]?.title;
+	const embeddedPost = item._embedded?.[ 'wp:attached-to' ]?.[ 0 ];
+	const embeddedPostId = embeddedPost?.id;
+	const embeddedPostTitle = embeddedPost?.title;
+	const embeddedPostExcerpt = embeddedPost?.excerpt;
+	const embeddedPostContent = embeddedPost?.content;
 
 	useEffect( () => {
 		if ( !! parentId && parentId === embeddedPostId ) {
-			setAttachedPostTitle(
-				getRenderedContent( embeddedPostTitle ) ||
-					embeddedPostId?.toString() ||
-					''
-			);
+			const rawTitle = getRenderedContent( embeddedPostTitle );
+
+			if ( rawTitle ) {
+				setAttachedPostTitle( rawTitle );
+			} else {
+				const snippet =
+					getRenderedContent( embeddedPostExcerpt ) ||
+					getRenderedContent( embeddedPostContent ) ||
+					'';
+				const plainText = snippet.replace( /<[^>]+>/g, '' ).trim();
+
+				if ( plainText ) {
+					const truncated = plainText.substring( 0, 40 );
+					const ellipsis = plainText.length > 40 ? '…' : '';
+					setAttachedPostTitle(
+						sprintf(
+							/* translators: 1: Default no title text, 2: Post excerpt/content snippet */
+							__( '%1$s - %2$s' ),
+							__( '(no title)' ),
+							truncated + ellipsis
+						)
+					);
+				} else {
+					setAttachedPostTitle( __( '(no title)' ) );
+				}
+			}
 		}
 
 		if ( ! parentId ) {
 			setAttachedPostTitle( __( '(Unattached)' ) );
 		}
-	}, [ parentId, embeddedPostId, embeddedPostTitle ] );
+	}, [
+		parentId,
+		embeddedPostId,
+		embeddedPostTitle,
+		embeddedPostExcerpt,
+		embeddedPostContent,
+	] );
 
 	return <>{ attachedPostTitle }</>;
 }
