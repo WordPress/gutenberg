@@ -1,10 +1,41 @@
 @use "@wordpress/base-styles/variables" as *;
 
-.editor-post-revisions-timeline {
-	.editor-post-revisions-timeline__revision-date {
-		text-transform: uppercase;
-		font-weight: 600;
-		font-size: 12px;
+// Make the revisions inspector a fixed-height, inner-scrolling column so the
+// timeline fills the panel and the DataViewsPicker pagination stays pinned to
+// the bottom. The picker already scrolls its list and pins its footer; it just
+// needs an ancestor chain that hands it a bounded height. Scoped to revisions
+// mode (the `is-revisions-summary` panel modifier, set in the editor sidebar)
+// so the normal document inspector — which shares these classes — is unaffected.
+//
+// `is-revisions-summary` lands on `.components-panel` (PluginSidebar routes its
+// className to `panelClassName`), so the scroll container above it is reached
+// with `:has()`.
+.interface-complementary-area:has(.components-panel.is-revisions-summary) {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	// The tabs header keeps its natural height.
+	.editor-sidebar__panel-tabs {
+		flex-shrink: 0;
+	}
+}
+
+.components-panel.is-revisions-summary {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+
+	// Propagate the bounded height down the chain to the timeline wrapper.
+	[role="tabpanel"]:has(.editor-post-summary),
+	.editor-post-summary,
+	.editor-post-summary > .components-v-stack,
+	.editor-post-revisions-timeline {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
 	}
 }
 

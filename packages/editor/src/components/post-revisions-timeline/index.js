@@ -20,7 +20,7 @@ import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 import { authorField } from '@wordpress/fields';
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -95,8 +95,8 @@ export default function PostRevisionsTimeline() {
 		revisions,
 		revisionKey,
 		currentRevisionId,
-		postContent,
-		diffEntries,
+		currentRevision,
+		previousRevision,
 	} = useSelect( ( select ) => {
 		const { getCurrentPostType } = select( editorStore );
 		const {
@@ -113,25 +113,28 @@ export default function PostRevisionsTimeline() {
 		const _revisionKey = entityConfig?.revisionKey || 'id';
 		const _currentRevisionId = _getCurrentRevisionId();
 
-		const currentRevision = _currentRevisionId
-			? getCurrentRevision()
-			: undefined;
-		const previousRevision = _currentRevisionId
-			? getPreviousRevision()
-			: undefined;
-
 		return {
 			// Same desc-ordered window the header slider renders (warm cache).
 			revisions: getPageRevisions( getRevisionPage() ),
 			revisionKey: _revisionKey,
 			currentRevisionId: _currentRevisionId,
-			postContent: currentRevision?.content?.raw,
-			diffEntries: computeDiffEntries(
-				currentRevision,
-				previousRevision
-			),
+			// Return the stable revision references and derive the diff below;
+			// computing it here would return a fresh object on every store
+			// change and defeat useSelect's shallow-equality bailout.
+			currentRevision: _currentRevisionId
+				? getCurrentRevision()
+				: undefined,
+			previousRevision: _currentRevisionId
+				? getPreviousRevision()
+				: undefined,
 		};
 	}, [] );
+
+	const postContent = currentRevision?.content?.raw;
+	const diffEntries = useMemo(
+		() => computeDiffEntries( currentRevision, previousRevision ),
+		[ currentRevision, previousRevision ]
+	);
 
 	const isLoading = ! revisions;
 
@@ -152,12 +155,12 @@ export default function PostRevisionsTimeline() {
 							  )
 							: humanTimeDiff( date );
 					return (
-						<time
-							className="editor-post-revisions-timeline__revision-date"
-							dateTime={ _value }
+						<Text
+							variant="heading-sm"
+							render={ <time dateTime={ _value } /> }
 						>
 							{ displayDate }
-						</time>
+						</Text>
 					);
 				},
 				enableSorting: false,
@@ -272,20 +275,22 @@ export default function PostRevisionsTimeline() {
 	);
 
 	return (
-		<DataViewsPicker
-			view={ view }
-			onChangeView={ setView }
-			fields={ fields }
-			data={ shownRevisions }
-			isLoading={ isLoading }
-			paginationInfo={ paginationInfo }
-			defaultLayouts={ defaultLayouts }
-			getItemId={ getItemId }
-			selection={ selection }
-			onChangeSelection={ onChangeSelection }
-		>
-			<DataViewsPicker.Layout />
-			<DataViewsPicker.Pagination />
-		</DataViewsPicker>
+		<div className="editor-post-revisions-timeline">
+			<DataViewsPicker
+				view={ view }
+				onChangeView={ setView }
+				fields={ fields }
+				data={ shownRevisions }
+				isLoading={ isLoading }
+				paginationInfo={ paginationInfo }
+				defaultLayouts={ defaultLayouts }
+				getItemId={ getItemId }
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+			>
+				<DataViewsPicker.Layout />
+				<DataViewsPicker.Pagination />
+			</DataViewsPicker>
+		</div>
 	);
 }
