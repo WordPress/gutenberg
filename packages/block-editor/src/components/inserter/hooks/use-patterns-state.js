@@ -142,7 +142,7 @@ const usePatternsState = (
 			createSuccessNotice(
 				sprintf(
 					/* translators: %s: block pattern title. */
-					__( 'Block pattern "%s" inserted.' ),
+					__( 'Pattern "%s" inserted.' ),
 					pattern.title
 				),
 				{

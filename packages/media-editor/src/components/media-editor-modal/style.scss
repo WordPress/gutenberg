@@ -21,6 +21,74 @@
 	min-height: 0;
 }
 
+// Footer chrome — two layouts driven by `is-wide` / `is-narrow` modifier
+// classes set from the media editor at the sidebar-collapse breakpoint.
+// Wide is a single flex row (History | Cancel/Save); narrow stacks via
+// `flex-direction: column` (image controls above the History |
+// Cancel/Save row). Each layout has its own JSX tree (not `order`
+// reshuffling, which the project's stylelint rule treats as an a11y red
+// flag), so DOM order always matches visual order.
+.media-editor-modal.components-modal__frame .media-editor-modal__footer {
+	flex-shrink: 0;
+	display: flex;
+	gap: $grid-unit-20;
+	// Borderless: sections are demarcated by the inset canvas panel and
+	// spacing, not divider lines. 16px top / 32px sides / 24px bottom.
+	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
+	background: $white;
+
+	&.is-wide {
+		flex-direction: row;
+		align-items: center;
+
+		// Panel mode: the footer holds only History (left) and
+		// Cancel/Save (right). `margin-left: auto` pins the actions to the
+		// right edge whether or not History renders (e.g. non-image
+		// attachments show only `FooterActions`).
+		.media-editor__footer-actions {
+			margin-left: auto;
+		}
+	}
+
+	&.is-narrow {
+		flex-direction: column;
+	}
+
+	// Narrow only: image controls sit on their own row, centered.
+	&.is-narrow > .media-editor-image-controls {
+		align-self: center;
+	}
+}
+
+// Secondary row used by medium (History + Image controls + Cancel/Save) and
+// narrow (History + Cancel/Save). `margin-left: auto` on the image controls
+// cluster and on Cancel/Save splits any free space — History gets the
+// left edge, Cancel/Save the right edge, and the image controls (when
+// present, i.e. medium only) approximately centers. Exact centering only
+// holds when History and Cancel/Save have matching widths; in practice
+// they're close enough that the offset is imperceptible.
+.media-editor-modal__footer-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-20;
+
+	.media-editor-image-controls,
+	.media-editor__footer-actions {
+		margin-left: auto;
+	}
+}
+
+// Active (enabled) undo/redo icon buttons take the admin accent colour so
+// they read as live alongside the Reset/Cancel/Save actions. Disabled
+// buttons (rendered with `aria-disabled` via `accessibleWhenDisabled`)
+// keep the default muted icon colour.
+// NOTE: overrides @wordpress/components Button internals (`.components-button`,
+// `.has-icon`), scoped to our history-actions wrapper. Update if renamed.
+.media-editor__history-actions .components-button.has-icon:not([aria-disabled="true"]) {
+	color: var(--wp-admin-theme-color);
+}
+
 .media-editor-modal {
 	display: flex;
 	flex-direction: column;

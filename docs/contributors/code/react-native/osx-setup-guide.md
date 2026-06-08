@@ -78,7 +78,7 @@ Install [Xcode](https://developer.apple.com/xcode/) via the app store and then o
 
 ### react-native doctor
 
-[react-native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor) can be used to identify anything that's missing from your development environment. From your Gutenberg checkout, or relative to `/packages/react-native-editor folder`, run:
+[react-native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor) can be used to identify anything that's missing from your development environment. From your Gutenberg checkout, or relative to `/packages/react-native-editor` folder, run:
 
 ```sh
 npx @react-native-community/cli doctor

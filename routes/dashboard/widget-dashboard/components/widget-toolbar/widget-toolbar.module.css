@@ -4,8 +4,8 @@
  */
 .widgetToolbar {
 	position: absolute;
-	inset-block-start: var(--wpds-dimension-padding-md);
-	inset-inline-end: var(--wpds-dimension-padding-md);
+	inset-block-start: var(--wpds-dimension-padding-sm);
+	inset-inline-end: var(--wpds-dimension-padding-sm);
 	z-index: 1;
 	padding: var(--wpds-dimension-padding-xs);
 	border-radius: var(--wpds-border-radius-md);

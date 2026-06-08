@@ -24,6 +24,7 @@
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
+		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
 		"@wordpress/jest-preset-default": "file:../../packages/jest-preset-default",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"babel-jest": "^29.7.0",

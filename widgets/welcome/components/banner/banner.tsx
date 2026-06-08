@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -17,20 +12,9 @@ import styles from './banner.module.css';
 
 const DISPLAY_VERSION = '7.1';
 
-interface BannerProps {
-	isWide?: boolean;
-	isTiny?: boolean;
-}
-
-export function Banner( { isWide = false, isTiny = false }: BannerProps ) {
-	const className = clsx(
-		styles.banner,
-		isWide && styles.wide,
-		isTiny && styles.tiny
-	);
-
+export function Banner() {
 	return (
-		<Stack className={ className } direction="column" justify="center">
+		<Stack className={ styles.banner } direction="column" justify="center">
 			<HeaderBackground version={ DISPLAY_VERSION } />
 
 			<Stack

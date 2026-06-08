@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import type { ReactNode } from 'react';
 
 /**
@@ -20,13 +20,15 @@ import {
  * Internal dependencies
  */
 import { computeGridModelChange } from '../utils/grid-model-change';
+import { normalizeGridSettings } from '../utils/normalize-grid-settings';
+import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
 import type {
-	ResolveWidgetModule,
 	WidgetGridModel,
 	WidgetGridSettings,
 	DashboardWidget,
-	WidgetType,
 } from '../types';
+import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
+import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits
@@ -34,14 +36,11 @@ import type {
  * shape passes through untouched and missing fields fall back to whatever
  * defaults the grid model itself supplies.
  *
- * `widgets.tsx` also applies a hard-coded floor when `minColumnWidth`
- * resolves to `undefined`, to keep legibility intact for stored settings
- * that predate the layered model.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
-	columns: 6,
-	minColumnWidth: 350,
-	rowHeight: 200,
+	model: 'grid',
+	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
+	rowHeight: DEFAULT_ROW_HEIGHT,
 };
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
@@ -49,9 +48,10 @@ type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
 function resolveGridSettings(
 	settings: WidgetGridSettings
 ): GridSettingsWithColumns {
+	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
 	return {
-		...settings,
-		columns: settings.columns ?? DEFAULT_GRID.columns!,
+		...normalized,
+		columns: WIDGET_DASHBOARD_COLUMN_COUNT,
 	};
 }
 
@@ -103,6 +103,7 @@ function canonicalize( layout: DashboardWidget[] ): DashboardWidget[] {
  */
 interface InternalDashboardContextValue {
 	widgetTypes: WidgetType[];
+	isResolvingWidgetTypes: boolean;
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
@@ -133,10 +134,16 @@ interface InternalDashboardContextValue {
 	commitGridModelChange: ( targetModel: WidgetGridModel ) => void;
 
 	/**
-	 * Reverts both staging slices. By default also exits edit mode; pass
-	 * `{ exitEditMode: false }` when dismissing the layout settings drawer.
+	 * Reverts staging slices. By default reverts both layout and grid
+	 * settings and exits edit mode. Pass `{ exitEditMode: false }` when
+	 * dismissing the layout settings drawer. Pass `{ revertLayout: false }`
+	 * to revert only grid settings (preserves in-progress widget layout
+	 * edits while customize mode is active).
 	 */
-	cancel: ( options?: { exitEditMode?: boolean } ) => void;
+	cancel: ( options?: {
+		exitEditMode?: boolean;
+		revertLayout?: boolean;
+	} ) => void;
 
 	hasUncommittedChanges: boolean;
 	editMode: boolean;
@@ -166,6 +173,11 @@ interface ProviderProps {
 	 * Widget types available for rendering.
 	 */
 	widgetTypes: WidgetType[];
+
+	/**
+	 * When true, widget types are still loading.
+	 */
+	isResolvingWidgetTypes?: boolean;
 
 	/**
 	 * Committed layout.
@@ -220,24 +232,17 @@ interface ProviderProps {
  * `layout` and `gridSettings`; `commit` publishes whichever slice
  * differs from its committed prop, `cancel` reverts both.
  *
- * Two invariants the provider does not enforce on its own:
- *
- * - The shared commit assumes the two slices are not edited
- *   simultaneously. The bundled `Actions` keeps the layout-edit and
- *   settings-drawer flows mutually exclusive; consumers that compose
- *   a different surface must uphold the same invariant or accept the
- *   cross-publish.
- * - Staging re-syncs from the committed props on prop change.
- *   In-flight edits are dropped silently when an external update
- *   (cross-tab commit, reset, websocket push) lands. Consumers that
- *   cannot tolerate this loss should mediate the prop updates before
- *   forwarding them here.
+ * Staging re-syncs from the committed props on prop change. In-flight
+ * edits are dropped silently when an external update (cross-tab commit,
+ * reset, websocket push) lands. Consumers that cannot tolerate this
+ * loss should mediate the prop updates before forwarding them here.
  *
  * @param {ProviderProps} props Provider props
  * @return {React.ReactNode} The provider component.
  */
 export function WidgetDashboardProvider( {
 	widgetTypes,
+	isResolvingWidgetTypes = false,
 	layout: committedLayout,
 	onLayoutChange,
 	onLayoutReset,
@@ -259,11 +264,15 @@ export function WidgetDashboardProvider( {
 	}, [ committedLayout ] );
 
 	const [ stagingGridSettings, setStagingGridSettings ] =
-		useState< WidgetGridSettings >( committedGridSettings );
+		useState< WidgetGridSettings >( () =>
+			normalizeGridSettings( committedGridSettings, DEFAULT_ROW_HEIGHT )
+		);
 
 	// Same external-resync semantics as `stagingLayout`.
 	useEffect( () => {
-		setStagingGridSettings( committedGridSettings );
+		setStagingGridSettings(
+			normalizeGridSettings( committedGridSettings, DEFAULT_ROW_HEIGHT )
+		);
 	}, [ committedGridSettings ] );
 
 	const hasLayoutChanges = useMemo(
@@ -289,7 +298,12 @@ export function WidgetDashboardProvider( {
 			}
 
 			if ( hasGridSettingsChanges ) {
-				onGridSettingsChange?.( stagingGridSettings );
+				onGridSettingsChange?.(
+					normalizeGridSettings(
+						stagingGridSettings,
+						DEFAULT_ROW_HEIGHT
+					)
+				);
 			}
 
 			if ( options?.exitEditMode !== false ) {
@@ -308,8 +322,10 @@ export function WidgetDashboardProvider( {
 	);
 
 	const cancel = useCallback(
-		( options?: { exitEditMode?: boolean } ) => {
-			setStagingLayout( committedLayout );
+		( options?: { exitEditMode?: boolean; revertLayout?: boolean } ) => {
+			if ( options?.revertLayout !== false ) {
+				setStagingLayout( committedLayout );
+			}
 			setStagingGridSettings( committedGridSettings );
 			if ( options?.exitEditMode !== false ) {
 				onEditChange?.( false );
@@ -333,7 +349,9 @@ export function WidgetDashboardProvider( {
 			setStagingLayout( next.layout );
 			setStagingGridSettings( next.gridSettings );
 			onLayoutChange( canonicalize( next.layout ) );
-			onGridSettingsChange?.( next.gridSettings );
+			onGridSettingsChange?.(
+				normalizeGridSettings( next.gridSettings, DEFAULT_ROW_HEIGHT )
+			);
 			onEditChange?.( false );
 		},
 		[
@@ -365,6 +383,7 @@ export function WidgetDashboardProvider( {
 	const value = useMemo< InternalDashboardContextValue >(
 		() => ( {
 			widgetTypes,
+			isResolvingWidgetTypes,
 			layout: stagingLayout,
 			onLayoutChange: setStagingLayout,
 			onLayoutReset,
@@ -382,6 +401,7 @@ export function WidgetDashboardProvider( {
 		} ),
 		[
 			widgetTypes,
+			isResolvingWidgetTypes,
 			stagingLayout,
 			onLayoutReset,
 			stagingGridSettings,

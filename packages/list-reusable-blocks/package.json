@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/list-reusable-blocks",
-	"version": "5.46.0",
+	"version": "5.47.0",
 	"description": "Adding Export/Import support to the reusable blocks listing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,6 +45,7 @@
 	"wpScript": true,
 	"types": "build-types",
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
