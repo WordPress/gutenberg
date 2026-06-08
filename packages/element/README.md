@@ -122,12 +122,7 @@ Creates a portal into which a component can be rendered.
 
 _Related_
 
--   <https://github.com/facebook/react/issues/10309#issuecomment-318433235>
-
-_Parameters_
-
--   _child_ `React.ReactElement`: Any renderable child, such as an element, string, or fragment.
--   _container_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/createPortal>
 
 ### createRef
 
@@ -161,9 +156,9 @@ _Parameters_
 
 Forces React to flush any updates inside the provided callback synchronously.
 
-_Parameters_
+_Related_
 
--   _callback_ `Function`: Callback to run synchronously.
+-   <https://react.dev/reference/react-dom/flushSync>
 
 ### forwardRef
 

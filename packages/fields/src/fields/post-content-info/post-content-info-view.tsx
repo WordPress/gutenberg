@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
@@ -78,16 +78,16 @@ export default function PostContentInfoView( {
 	return (
 		<VStack spacing={ 1 }>
 			{ contentInfoText && (
-				<Text variant="muted">{ contentInfoText }</Text>
+				<WCText variant="muted">{ contentInfoText }</WCText>
 			) }
 			{ modified && (
-				<Text variant="muted">
+				<WCText variant="muted">
 					{ sprintf(
 						// translators: %s: Human-readable time difference, e.g. "2 days ago".
 						__( 'Last edited %s.' ),
 						humanTimeDiff( modified )
 					) }
-				</Text>
+				</WCText>
 			) }
 		</VStack>
 	);

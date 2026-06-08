@@ -90,7 +90,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data() {
 	// Define paths to preload - same for all pages
 	// Please also change packages/core-data/src/entities.js when changing this.
 	$preload_paths = array(
-		'/?_fields=description,gmt_offset,home,image_sizes,image_size_threshold,image_output_formats,jpeg_interlaced,png_interlaced,gif_interlaced,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
+		'/?_fields=description,gmt_offset,home,image_sizes,image_size_threshold,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
 		array( '/wp/v2/settings', 'OPTIONS' ),
 	);
 
@@ -134,7 +134,9 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		wp_dequeue_style( $style );
 	}
 
-	// Fire init action for extensions to register routes and menu items
+	/**
+	 * Fires when the {{PAGE_SLUG}} page is initialized so extensions can register routes and menu items.
+	 */
 	do_action( '{{PAGE_SLUG}}_init' );
 
 	// Enqueue command palette assets for boot-based pages
@@ -209,6 +211,21 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			}
 		}
 
+		/**
+		 * Filters the boot script-module dependencies for the
+		 * {{PAGE_SLUG}} page.
+		 *
+		 * Surfaces extending this page can append entries to the boot
+		 * dependency list. Each entry is an array with 'import' (string
+		 * 'static' or 'dynamic') and 'id' (script-module handle) keys.
+		 *
+		 * @param array $boot_dependencies Boot dependencies for the page.
+		 */
+		$boot_dependencies = apply_filters(
+			'{{PAGE_SLUG}}_boot_dependencies',
+			$boot_dependencies
+		);
+
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(
 			'{{PAGE_SLUG}}',
@@ -252,18 +269,10 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	print_admin_styles();
 	print_head_scripts();
 
-	/**
-	 * Fires in head section for a specific admin page.
-	 *
-	 * @since 2.1.0
-	 */
+	/** This action is documented in wp-admin/admin-header.php */
 	do_action( "admin_head-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
-	/**
-	 * Fires in head section for all admin pages.
-	 *
-	 * @since 2.1.0
-	 */
+	/** This action is documented in wp-admin/admin-header.php */
 	do_action( 'admin_head' );
 	// END see wp-admin/admin-header.php
 	?>
@@ -273,11 +282,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	<?php
 	// BEGIN see wp-admin/admin-footer.php
 
-	/**
-	 * Prints scripts or data before the default footer scripts.
-	 *
-	 * @since 1.2.0
-	 */
+	/** This action is documented in wp-admin/admin-footer.php */
 	do_action( 'admin_footer', '' );
 
 	// Print import map first so it's available for inline scripts
@@ -287,11 +292,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	wp_script_modules()->print_script_module_preloads();
 	wp_script_modules()->print_script_module_data();
 
-	/**
-	 * Prints scripts or data after the default footer scripts.
-	 *
-	 * @since 2.8.0
-	 */
+	/** This action is documented in wp-admin/admin-footer.php */
 	do_action( "admin_footer-{$hook_suffix}" ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 	// END see wp-admin/admin-footer.php
 	?>

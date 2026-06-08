@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.44.0",
+	"version": "9.47.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -95,6 +95,7 @@
 	],
 	"dependencies": {
 		"@arraypress/waveform-player": "1.2.1",
+		"@types/react": "^18.3.27",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -127,6 +128,8 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/shortcode": "file:../shortcode",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
@@ -139,9 +142,13 @@
 		"html-react-parser": "5.2.11",
 		"memize": "^2.1.0",
 		"remove-accents": "^0.5.0",
-		"uuid": "^9.0.1"
+		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.25.7",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
