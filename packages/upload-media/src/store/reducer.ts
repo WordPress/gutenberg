@@ -18,6 +18,7 @@ import {
 	type ResumeQueueAction,
 	type RetryItemAction,
 	type RevokeBlobUrlsAction,
+	type ScheduleRetryAction,
 	type State,
 	Type,
 	type UnknownAction,
@@ -27,6 +28,7 @@ import {
 import {
 	DEFAULT_MAX_CONCURRENT_UPLOADS,
 	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+	DEFAULT_RETRY_SETTINGS,
 } from './constants';
 
 const noop = () => {};
@@ -39,6 +41,7 @@ const DEFAULT_STATE: State = {
 		mediaUpload: noop,
 		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
 		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+		retry: { ...DEFAULT_RETRY_SETTINGS },
 	},
 };
 
@@ -48,6 +51,7 @@ type Action =
 	| RemoveAction
 	| CancelAction
 	| RetryItemAction
+	| ScheduleRetryAction
 	| PauseItemAction
 	| ResumeItemAction
 	| PauseQueueAction
@@ -139,6 +143,25 @@ function reducer(
 									status: ItemStatus.Processing,
 									error: undefined,
 									retryCount: ( item.retryCount ?? 0 ) + 1,
+									abortController: new AbortController(),
+							  }
+							: item
+				),
+			};
+
+		case Type.ScheduleRetry:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.PendingRetry,
+									error: action.error,
+									retryCount: action.retryCount,
+									nextRetryTimestamp:
+										action.nextRetryTimestamp,
 							  }
 							: item
 				),

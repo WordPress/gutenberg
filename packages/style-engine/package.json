@@ -65,7 +65,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"change-case": "^4.1.2"
 	},
 	"publishConfig": {

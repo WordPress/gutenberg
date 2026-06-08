@@ -70,12 +70,19 @@ export const templatesRoute = {
 			const isListView = await isTemplateListView( query );
 			return isListView ? <Editor /> : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileSidebar( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {
 				return <></>;
 			}
 			if ( ! siteData.currentTheme.is_block_theme ) {
 				return <SidebarNavigationScreenUnsupported />;
+			}
+			return undefined;
+		},
+		mobileContent( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			if ( ! isBlockTheme ) {
+				return undefined;
 			}
 			// Check if the template activation experiment is enabled.
 			const isTemplateActivateEnabled =

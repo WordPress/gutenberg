@@ -1646,12 +1646,20 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
- * Action that signals that the next block change should be marked explicitly as not persistent.
+ * Action that signals that the next block change should be marked explicitly
+ * as not persistent.
  *
+ * By default, non-persistent changes may still merge into undo history. Use
+ * `history: 'ignore'` for derived changes that should never be captured by undo.
+ *
+ * @param {Object} options         Options object.
+ * @param {string} options.history How the change should interact with history.
  * @return {Object} Action object.
  */
-export function __unstableMarkNextChangeAsNotPersistent() {
-	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT' };
+export function __unstableMarkNextChangeAsNotPersistent( {
+	history = 'merge',
+} = {} ) {
+	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT', history };
 }
 
 /**

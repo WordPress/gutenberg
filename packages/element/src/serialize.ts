@@ -626,9 +626,7 @@ export function renderElement(
 
 		case Consumer.$$typeof:
 			return renderElement(
-				props.children(
-					context || type._currentValue || type._context._currentValue
-				),
+				props.children( context || type._currentValue ),
 				context,
 				legacyContext
 			);

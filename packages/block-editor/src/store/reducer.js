@@ -419,18 +419,20 @@ const withBlockTree =
  */
 function withPersistentBlockChange( reducer ) {
 	let lastAction;
-	let markNextChangeAsNotPersistent = false;
+	let nextHistoryMode;
 
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 
-		const wasMarkedAsNotPersistent = markNextChangeAsNotPersistent;
-		markNextChangeAsNotPersistent =
-			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
+		const pendingHistoryMode = nextHistoryMode;
+		nextHistoryMode =
+			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT'
+				? action.history ?? 'merge'
+				: undefined;
 
 		const isExplicitPersistentChange =
 			action.type === 'MARK_LAST_CHANGE_AS_PERSISTENT' ||
-			wasMarkedAsNotPersistent;
+			pendingHistoryMode;
 
 		// Defer to previous state value (or default) unless changing or
 		// explicitly marking as persistent.
@@ -442,7 +444,7 @@ function withPersistentBlockChange( reducer ) {
 		}
 
 		const isPersistentChange = isExplicitPersistentChange
-			? ! wasMarkedAsNotPersistent
+			? ! pendingHistoryMode
 			: ! isUpdatingSameBlockAttribute( action, lastAction );
 
 		// In comparing against the previous action, consider only those which
@@ -450,7 +452,17 @@ function withPersistentBlockChange( reducer ) {
 		// have resulted in a changed state.
 		lastAction = action;
 
-		return { ...nextState, isPersistentChange };
+		if ( pendingHistoryMode === 'ignore' ) {
+			return {
+				...nextState,
+				isPersistentChange,
+				lastBlockChangeHistoryMode: 'ignore',
+			};
+		}
+
+		const { lastBlockChangeHistoryMode, ...blockChange } = nextState;
+
+		return { ...blockChange, isPersistentChange };
 	};
 }
 

@@ -61,7 +61,7 @@
 	],
 	"dependencies": {
 		"@react-spring/web": "^9.4.5",
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
@@ -116,11 +116,14 @@
 	},
 	"devDependencies": {
 		"@ariakit/test": "^0.4.13",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
