@@ -10,8 +10,16 @@ import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+<<<<<<< HEAD
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { forwardRef } from '@wordpress/element';
+=======
+import {
+	createBlock,
+	store as blocksStore,
+	__experimentalGetBlockLabel as getBlockLabel,
+} from '@wordpress/blocks';
+>>>>>>> 260a3f99dd0 (Fix `null` `allowedBlockType` causing error to be thrown when accessing `title` property)
 import { plus } from '@wordpress/icons';
 
 /**
@@ -110,6 +118,7 @@ const UnforwardedInserter = (
 		hasSingleBlockType,
 		blockTitle,
 		allowedBlockType,
+		blockTypeToInsert,
 		blockToInsert,
 		appenderLabel,
 		targetRootClientId,
@@ -156,12 +165,16 @@ const UnforwardedInserter = (
 			const defaultBlockType = directInsertBlock
 				? getBlockType( directInsertBlock.name )
 				: null;
+			const _blockTypeToInsert = _blockToInsert
+				? getBlockType( _blockToInsert.name )
+				: _allowedBlockType;
 
 			return {
 				hasItems: hasInserterItems( _targetRootClientId ),
 				hasSingleBlockType: _hasSingleBlockType,
 				blockTitle: _allowedBlockType ? _allowedBlockType.title : '',
 				allowedBlockType: _allowedBlockType,
+				blockTypeToInsert: _blockTypeToInsert,
 				blockToInsert: _blockToInsert,
 				appenderLabel: getAppenderLabel(
 					directInsertBlock,
@@ -272,12 +285,17 @@ const UnforwardedInserter = (
 
 		onSelectOrClose?.( newBlock );
 
-		const message = sprintf(
-			// translators: %s: the name of the block that has been added
-			__( '%s block added' ),
-			allowedBlockType.title
-		);
-		speak( message );
+		const blockLabel = blockTypeToInsert
+			? getBlockLabel( blockTypeToInsert, newBlock.attributes )
+			: allowedBlockType?.title;
+		if ( blockLabel ) {
+			const message = sprintf(
+				// translators: %s: the name of the block that has been added
+				__( '%s block added' ),
+				blockLabel
+			);
+			speak( message );
+		}
 	}
 
 	function renderToggle( { onToggle: dropdownOnToggle, isOpen } ) {
