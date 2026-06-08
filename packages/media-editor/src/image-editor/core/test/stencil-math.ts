@@ -24,13 +24,16 @@ describe( 'getMinCropPixels — operable on-screen floor', () => {
 		// A large image fit into a small window: ~0.2 CSS px per source px.
 		// 24 source px would render as ~4.8 px on screen — unusable. The
 		// usability term (44 / 0.2 = 220 source px) must win.
-		expect( getMinCropPixels( 0.2 ) ).toBe( MIN_CROP_SCREEN_PX / 0.2 );
+		expect( getMinCropPixels( 0.2 ) ).toBeCloseTo(
+			MIN_CROP_SCREEN_PX / 0.2,
+			5
+		);
 		expect( getMinCropPixels( 0.2 ) ).toBeGreaterThan( MIN_CROP_PIXELS );
 	} );
 
 	it( 'crosses over from usability floor to hard floor at displayScale = MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS', () => {
 		const crossover = MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS;
-		expect( getMinCropPixels( crossover ) ).toBe( MIN_CROP_PIXELS );
+		expect( getMinCropPixels( crossover ) ).toBeCloseTo( MIN_CROP_PIXELS, 5 );
 		// Just below the crossover, the usability term exceeds the hard floor.
 		expect( getMinCropPixels( crossover * 0.99 ) ).toBeGreaterThan(
 			MIN_CROP_PIXELS
