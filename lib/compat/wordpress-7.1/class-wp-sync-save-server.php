@@ -134,7 +134,7 @@ if ( ! class_exists( 'WP_Sync_Save_Server' ) ) {
 				);
 			}
 
-			return [];
+			return array();
 		}
 
 		/**
