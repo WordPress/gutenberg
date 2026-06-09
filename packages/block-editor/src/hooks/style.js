@@ -29,6 +29,7 @@ import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
+	isExplicitAspectRatio,
 } from './dimensions';
 import {
 	cleanEmptyObject,
@@ -147,7 +148,7 @@ function getStateFallbackDimensionStyles( stateStyles ) {
 		return undefined;
 	}
 
-	if ( dimensions.aspectRatio ) {
+	if ( isExplicitAspectRatio( dimensions.aspectRatio ) ) {
 		return {
 			dimensions: {
 				minHeight: 'unset',

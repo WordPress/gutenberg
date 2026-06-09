@@ -125,43 +125,75 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that fallback dimension declarations are added for aspect ratio.
+	 * Tests that fallback dimension styles are added for aspect ratio.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_fallback_dimension_styles
+	 * @covers ::gutenberg_get_state_style_with_fallback_dimension_styles
 	 */
-	public function test_adds_fallback_dimension_declarations_for_aspect_ratio() {
-		$actual = gutenberg_get_state_declarations_with_fallback_dimension_styles(
+	public function test_adds_fallback_dimension_styles_for_aspect_ratio() {
+		$actual = gutenberg_get_state_style_with_fallback_dimension_styles(
 			array(
-				'aspect-ratio' => '16/9',
+				'dimensions' => array(
+					'aspectRatio' => '16/9',
+				),
 			)
 		);
 
 		$this->assertSame(
 			array(
-				'aspect-ratio' => '16/9',
-				'min-height'   => 'unset',
-				'height'       => 'unset',
+				'dimensions' => array(
+					'aspectRatio' => '16/9',
+					'minHeight'   => 'unset',
+					'height'      => 'unset',
+				),
 			),
 			$actual
 		);
 	}
 
 	/**
-	 * Tests that fallback aspect-ratio declarations are added for height.
+	 * Tests that fallback dimension styles are not added for the default aspect ratio.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_fallback_dimension_styles
+	 * @covers ::gutenberg_get_state_style_with_fallback_dimension_styles
 	 */
-	public function test_adds_fallback_aspect_ratio_declaration_for_height() {
-		$actual = gutenberg_get_state_declarations_with_fallback_dimension_styles(
+	public function test_does_not_add_fallback_dimension_styles_for_default_aspect_ratio() {
+		$actual = gutenberg_get_state_style_with_fallback_dimension_styles(
 			array(
-				'height' => '20rem',
+				'dimensions' => array(
+					'aspectRatio' => 'auto',
+				),
 			)
 		);
 
 		$this->assertSame(
 			array(
-				'height'       => '20rem',
-				'aspect-ratio' => 'unset',
+				'dimensions' => array(
+					'aspectRatio' => 'auto',
+				),
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that fallback aspectRatio styles are added for height.
+	 *
+	 * @covers ::gutenberg_get_state_style_with_fallback_dimension_styles
+	 */
+	public function test_adds_fallback_aspect_ratio_style_for_height() {
+		$actual = gutenberg_get_state_style_with_fallback_dimension_styles(
+			array(
+				'dimensions' => array(
+					'height' => '20rem',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'dimensions' => array(
+					'height'      => '20rem',
+					'aspectRatio' => 'unset',
+				),
 			),
 			$actual
 		);

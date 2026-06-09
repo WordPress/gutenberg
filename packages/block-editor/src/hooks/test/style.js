@@ -224,6 +224,19 @@ describe( 'getStateStylesCSS', () => {
 		);
 	} );
 
+	it( 'does not add fallback dimensions when aspect ratio is the default', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						aspectRatio: 'auto',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe( '.wp-block-test { aspect-ratio: auto !important; }' );
+	} );
+
 	it( 'adds important fallback aspect ratio when height is set', () => {
 		expect(
 			getStateStylesCSS(
