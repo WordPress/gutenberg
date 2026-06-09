@@ -65,6 +65,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/rich-text-control": "file:../rich-text-control",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
