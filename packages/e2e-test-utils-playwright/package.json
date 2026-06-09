@@ -25,13 +25,13 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
-		"src",
+		"build",
 		"build-types"
 	],
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"default": "./src/index.ts"
+			"default": "./build/index.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -53,5 +53,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json"
 	}
 }
