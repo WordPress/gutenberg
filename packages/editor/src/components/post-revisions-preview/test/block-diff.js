@@ -339,30 +339,32 @@ describe( 'diffRevisionContent', () => {
 		] );
 		const blocks = diffRevisionContent( current, previous );
 
-		// LCS matches one block ("First block content" at prev[0] -> curr[1]).
+		// LCS matches one block ("Second block content" at prev[1] -> curr[0]).
 		// The other block appears as removed + added (showing the reorder).
 		// We intentionally don't pair identical blocks as "modified" since
 		// there's no actual content change - just a position change.
+		// (Pre-v8, LCS matched the other block. Both are equally-valid
+		// choices for a pure swap.)
 		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'Second block content',
-					__revisionDiffStatus: { status: 'added' },
+					content: 'First block content',
+					__revisionDiffStatus: { status: 'removed' },
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'First block content',
+					content: 'Second block content',
 					__revisionDiffStatus: undefined,
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'Second block content',
-					__revisionDiffStatus: { status: 'removed' },
+					content: 'First block content',
+					__revisionDiffStatus: { status: 'added' },
 				},
 			},
 		] );
@@ -435,6 +437,107 @@ describe( 'diffRevisionContent', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'First block content',
+					__revisionDiffStatus: undefined,
+				},
+			},
+		] );
+	} );
+
+	it( 'filters whitespace-only freeform pseudo-blocks before LCS', () => {
+		/*
+		 * Direct canary for the whitespace-pseudo-block filter in
+		 * `diffRawBlocks`. The grammar parser emits
+		 * `{ blockName: null, innerHTML: '\n\n' }` for the whitespace
+		 * between block markers; under `diff` v6+'s LCS tie-breaker,
+		 * those pseudo-blocks would otherwise be selected as the match
+		 * anchor in [paragraph, whitespace, paragraph] swaps, leaving
+		 * `pairSimilarBlocks` with two removed and two added paragraphs
+		 * to mis-match by similarity. With the filter, the LCS picks a
+		 * content block and the surrounding paragraphs pair cleanly.
+		 */
+		const previous = serialize( [
+			createBlock( 'core/paragraph', { content: 'Alpha content' } ),
+			createBlock( 'core/paragraph', { content: 'Beta content' } ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Beta content modified',
+			} ),
+			createBlock( 'core/paragraph', { content: 'Alpha content' } ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+		const normalized = normalizeBlockTree( blocks );
+
+		const statuses = normalized.map(
+			( b ) => b.attributes.__revisionDiffStatus?.status
+		);
+		// Exactly one modified pair and one unchanged anchor — not the
+		// double-modified mis-pair that the unfiltered LCS would yield.
+		expect( statuses.filter( ( s ) => s === 'modified' ) ).toHaveLength(
+			1
+		);
+		expect( statuses.filter( ( s ) => s === undefined ) ).toHaveLength( 1 );
+
+		const unchanged = normalized.find(
+			( b ) => b.attributes.__revisionDiffStatus === undefined
+		);
+		expect( unchanged.attributes.content ).toBe( 'Alpha content' );
+	} );
+
+	it( 'places paired modification at current-revision position when only unchanged blocks sit between', () => {
+		/*
+		 * Direct canary for the `crossesCurrentContent` "unchanged
+		 * between removed and added" branch. The modified block crosses
+		 * two unchanged paragraphs; the placement heuristic should
+		 * anchor it at its current-revision position (index 0), not at
+		 * the removed position (index 3) — otherwise the modified block
+		 * would render after content that already comes before it in
+		 * the current revision.
+		 */
+		const previous = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Stays one anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays two anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Original tail content sentence',
+			} ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Original tail content sentence rewritten',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays one anchor sentence',
+			} ),
+			createBlock( 'core/paragraph', {
+				content: 'Stays two anchor sentence',
+			} ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'Original tail content sentence<ins title="Added" class="revision-diff-added"> rewritten</ins>',
+					__revisionDiffStatus: { status: 'modified' },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Stays one anchor sentence',
+					__revisionDiffStatus: undefined,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Stays two anchor sentence',
 					__revisionDiffStatus: undefined,
 				},
 			},

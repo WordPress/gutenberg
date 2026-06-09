@@ -41,7 +41,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpCopyFiles": {
 		"files": [
@@ -65,6 +64,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"change-case": "^4.1.2"
 	},
 	"publishConfig": {

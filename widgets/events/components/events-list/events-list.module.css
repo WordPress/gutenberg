@@ -2,7 +2,14 @@
 	flex: 1;
 	min-width: 0;
 	min-height: 0;
-	overflow: auto;
+	overflow: hidden;
+}
+
+.listArea {
+	flex: 1;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
 }
 
 .eventIcon {
@@ -24,4 +31,11 @@
 
 .emptyState {
 	margin-block: var(--wpds-dimension-padding-2xl);
+}
+
+.eventNone {
+	flex-shrink: 0;
+	padding-block: var(--wpds-dimension-padding-md);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	color: var(--wpds-color-fg-content-neutral-weak);
 }

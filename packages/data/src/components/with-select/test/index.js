@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -636,11 +636,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const OriginalComponent = ( { value, ref } ) => (
+		const OriginalComponent = forwardRef( ( { value }, ref ) => (
 			<div ref={ ref } role="status">
 				{ value }
 			</div>
-		);
+		) );
 
 		const DataBoundComponent = withSelect( ( _select ) => ( {
 			value: _select( 'demo' ).getValue(),

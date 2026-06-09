@@ -41,12 +41,12 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@types/mousetrap": "^1.6.8",
+		"@types/react": "^18.3.27",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -60,10 +60,14 @@
 		"use-memo-one": "^1.1.1"
 	},
 	"devDependencies": {
-		"mock-match-media": "0.4.2"
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
+		"mock-match-media": "0.4.2",
+		"react-dom": "^18.3.0"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

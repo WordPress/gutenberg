@@ -14,15 +14,12 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { Figure } from './figure';
 import { BlockQuote } from './blockquote';
-
-const isWebPlatform = Platform.OS === 'web';
 
 function PullQuoteEdit( {
 	attributes,
@@ -69,7 +66,7 @@ function PullQuoteEdit( {
 					{ shouldShowCitation && (
 						<RichText
 							identifier="citation"
-							tagName={ isWebPlatform ? 'cite' : undefined }
+							tagName="cite"
 							style={ { display: 'block' } }
 							value={ citation }
 							aria-label={ __( 'Pullquote citation text' ) }

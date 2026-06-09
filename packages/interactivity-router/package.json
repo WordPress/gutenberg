@@ -39,7 +39,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScriptModuleExports": {
 		".": "./build-module/index.mjs",
 		"./full-page": "./build-module/full-page.mjs"

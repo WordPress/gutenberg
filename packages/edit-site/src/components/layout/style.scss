@@ -1,18 +1,17 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
 .edit-site-layout {
 	height: 100%;
-	background: $gray-900;
-	color: $gray-400;
+	background: var(--wpds-color-bg-surface-neutral-weak);
+	color: var(--wpds-color-fg-content-neutral);
 	display: flex;
 	flex-direction: column;
 
 	// Show a dark background in "frame" mode to avoid edge artifacts.
 	&:not(.is-full-canvas) .editor-visual-editor {
-		background: $gray-900;
+		background: var(--wpds-color-bg-surface-neutral-weak);
 	}
 }
 
@@ -81,6 +80,13 @@
 	}
 }
 
+.edit-site-layout__mobile-content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	background: var(--wpds-color-bg-surface-neutral);
+}
+
 .edit-site-layout__canvas-container {
 	position: relative;
 	flex-grow: 1;
@@ -104,7 +110,7 @@
 	}
 
 	.edit-site-resizable-frame__inner {
-		color: $gray-900;
+		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	@include break-medium {
@@ -173,7 +179,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	view-transition-name: toggle;
 	/* stylelint-enable  */
 	position: relative;
-	color: $white;
+	color: var(--wpds-color-fg-interactive-neutral);
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -181,12 +187,12 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: $gray-900;
+	background: var(--wpds-color-bg-surface-neutral-weak);
 	border-radius: 0;
 
 	&:hover,
 	&:active {
-		color: $white;
+		color: var(--wpds-color-fg-interactive-neutral-active);
 	}
 
 	&:focus-visible,
@@ -229,8 +235,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: $gray-900;
-	background: $white;
+	color: var(--wpds-color-fg-content-neutral);
+	background: var(--wpds-color-bg-surface-neutral-strong);
 
 	&:focus,
 	&:focus-within {
@@ -246,7 +252,9 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	}
 
 	@include break-medium {
-		border-left: $border-width solid $gray-300;
+		border-left:
+			$border-width solid
+			var(--wpds-color-stroke-surface-neutral);
 	}
 }
 

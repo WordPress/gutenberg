@@ -40,10 +40,12 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
+	"devDependencies": {
+		"react": "^18.3.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
