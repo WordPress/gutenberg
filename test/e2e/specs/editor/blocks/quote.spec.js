@@ -93,6 +93,36 @@ test.describe( 'Quote', () => {
 		);
 	} );
 
+	test( 'can be created by modifier-clicking the slash inserter option', async ( {
+		editor,
+		page,
+	} ) => {
+		const platformModifier =
+			process.platform === 'darwin' ? 'Meta' : 'Control';
+
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( '/quote' );
+
+		const quoteOption = page.getByRole( 'option', {
+			name: 'Quote',
+			exact: true,
+		} );
+		await expect( quoteOption ).toBeVisible();
+		await quoteOption.click( { modifiers: [ platformModifier ] } );
+		await expect( quoteOption ).toBeHidden();
+
+		await page.keyboard.type( 'I’m a clicked quote' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p>I’m a clicked quote</p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->`
+		);
+	} );
+
 	test( 'can be created by converting a paragraph', async ( {
 		editor,
 		page,
