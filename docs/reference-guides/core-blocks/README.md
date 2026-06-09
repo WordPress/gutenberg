@@ -579,7 +579,7 @@ Add a submenu to your navigation.
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/navigation
 -	**Supports:** anchor, interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** description, id, isTopLevelItem, kind, label, opensInNewTab, rel, title, type, url
+-	**Attributes:** description, id, isParentSubmenu, isTopLevelItem, kind, label, opensInNewTab, rel, title, type, url
 
 ## Page Break
 
@@ -598,7 +598,7 @@ Display a list of all pages.
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 -	**Allowed Blocks:** core/page-list-item
 -	**Supports:** anchor, color (background, gradients, link, text), contentRole, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** isNested, parentPageID
+-	**Attributes:** parentPageID
 
 ## Page List Item
 
