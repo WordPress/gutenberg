@@ -8,7 +8,13 @@ import clsx from 'clsx';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import {
+	BaseControl,
+	CustomSelectControl,
+	__experimentalGrid as Grid,
+	__experimentalUnitControl as UnitControl,
+	__experimentalNumberControl as NumberControl,
+} from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo, Platform } from '@wordpress/element';
@@ -76,8 +82,7 @@ export function getPositionCSS( { selector, style } ) {
 	} );
 
 	if ( positionType === 'sticky' || positionType === 'fixed' ) {
-		// TODO: Replace hard-coded z-index value with a z-index preset approach in theme.json.
-		output += `z-index: 10`;
+		output += `z-index: ${ style.position.zIndex ?? 10 };`;
 	}
 	output += `}`;
 
@@ -201,6 +206,7 @@ export function PositionPanelPure( {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
+	const prevZIndex = style?.position?.zIndex;
 
 	const { firstParentClientId } = useSelect(
 		( select ) => {
@@ -236,26 +242,35 @@ export function PositionPanelPure( {
 		return availableOptions;
 	}, [ allowFixed, allowSticky, value ] );
 
-	const onChangeType = ( next ) => {
-		// For now, use a hard-coded `0px` value for the position.
-		// `0px` is preferred over `0` as it can be used in `calc()` functions.
-		// In the future, it could be useful to allow for an offset value.
-		const placementValue = '0px';
-
+	const onChangeType = ( next, zIndex = 10 ) => {
 		const newStyle = {
 			...style,
 			position: {
 				...style?.position,
 				type: next,
-				top:
-					next === 'sticky' || next === 'fixed'
-						? placementValue
-						: undefined,
+				zIndex,
 			},
 		};
 
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
+		} );
+	};
+
+	const onChangePositionValues = ( { top, bottom, left, right } = {} ) => {
+		const updates = {
+			...style?.position,
+			...( top !== undefined && { top } ),
+			...( bottom !== undefined && { bottom } ),
+			...( left !== undefined && { left } ),
+			...( right !== undefined && { right } ),
+		};
+
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				position: updates,
+			} ),
 		} );
 	};
 
@@ -286,6 +301,67 @@ export function PositionPanelPure( {
 							size="__unstable-large"
 						/>
 					</BaseControl>
+					{ selectedOption.key !== 'default' && (
+						<>
+							<BaseControl __nextHasNoMarginBottom>
+								<NumberControl
+									__next40pxDefaultSize
+									label={ __( 'Z-Index' ) }
+									value={ prevZIndex }
+									onChange={ ( num ) => {
+										onChangeType(
+											selectedOption.value,
+											num
+										);
+									} }
+									min={ 0 }
+								/>
+							</BaseControl>
+							<BaseControl __nextHasNoMarginBottom>
+								<BaseControl.VisualLabel>
+									{ __( 'Position Value' ) }
+								</BaseControl.VisualLabel>
+								<Grid>
+									<UnitControl
+										__next40pxDefaultSize
+										label={ __( 'Top' ) }
+										value={ style?.position?.top }
+										onChange={ ( top ) => {
+											onChangePositionValues( { top } );
+										} }
+									/>
+									<UnitControl
+										__next40pxDefaultSize
+										label={ __( 'Right' ) }
+										value={ style?.position?.right }
+										onChange={ ( right ) => {
+											onChangePositionValues( { right } );
+										} }
+									/>
+
+									<UnitControl
+										__next40pxDefaultSize
+										label={ __( 'Bottom' ) }
+										value={ style?.position?.bottom }
+										onChange={ ( bottom ) => {
+											onChangePositionValues( {
+												bottom,
+											} );
+										} }
+									/>
+
+									<UnitControl
+										__next40pxDefaultSize
+										label={ __( 'Left' ) }
+										value={ style?.position?.left }
+										onChange={ ( left ) => {
+											onChangePositionValues( { left } );
+										} }
+									/>
+								</Grid>
+							</BaseControl>
+						</>
+					) }
 				</InspectorControls>
 			) : null,
 		native: null,
