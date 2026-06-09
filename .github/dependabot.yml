@@ -15,11 +15,6 @@ updates:
       labels:
           - 'GitHub Actions'
           - '[Type] Build Tooling'
-      ignore:
-          - dependency-name: 'actions/setup-java'
-          - dependency-name: 'gradle/*'
-          - dependency-name: 'reactivecircus/*'
-          - dependency-name: 'ruby/setup-ruby'
       groups:
           github-actions:
               applies-to: version-updates
