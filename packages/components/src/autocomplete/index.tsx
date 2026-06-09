@@ -398,7 +398,17 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useRefEffect( ( element: HTMLElement ) => {
+			const { ownerDocument } = element;
 			function _onKeyDown( event: Event ) {
+				// When the editing host is an ancestor (e.g. the block
+				// editor's writing flow wrapper), keydown events target that
+				// host rather than this element, so determine relevance from
+				// the selection rather than the event target.
+				const selection = ownerDocument.defaultView?.getSelection();
+				const anchorNode = selection?.anchorNode;
+				if ( ! anchorNode || ! element.contains( anchorNode ) ) {
+					return;
+				}
 				onKeyDownRef.current?.( event as KeyboardEvent );
 			}
 			// Capture phase. When the autocomplete popover is open,
@@ -410,7 +420,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 			// so firing in capture lets us preventDefault first when the
 			// popover is active.
 			return subscribeDelegatedListener(
-				element,
+				ownerDocument,
 				'keydown',
 				_onKeyDown,
 				true
