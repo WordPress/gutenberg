@@ -20,7 +20,7 @@ export interface ThemeProviderSettings {
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
-		bg?: string;
+		background?: string;
 	};
 
 	/**

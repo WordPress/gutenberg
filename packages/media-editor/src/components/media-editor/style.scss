@@ -48,6 +48,11 @@
 		margin: 0 $grid-unit-30;
 		border-radius: $radius-large;
 		overflow: hidden;
+		@include break-small() {
+			// Compensate for the left gutter in the sidebar panel
+			// so the modal padding is uniform (24px).
+			margin-right: $grid-unit-30 - $grid-unit-10;
+		}
 	}
 
 	.media-editor__canvas-toolbar {
@@ -98,6 +103,10 @@
 		}
 	}
 
+	.media-editor__sidebar-panel {
+		padding-bottom: $grid-unit-30;
+	}
+
 	// Borderless controls panel: clear the InterfaceSkeleton sidebar's
 	// default top border, left box-shadow, and high-contrast outline so the
 	// panel sits flush with no divider lines.
@@ -127,6 +136,7 @@
 	.components-panel__header.media-editor__sidebar-header {
 		padding-left: 0;
 		padding-right: $grid-unit-10;
+		margin-right: $grid-unit-30;
 
 		.components-button.has-icon {
 			padding: 0;
@@ -147,9 +157,20 @@
 	// present (empty when closed), so touching it unconditionally would paint an
 	// empty box over the canvas.
 
-	// Column (>= small): pull the open panel back in-flow at the sidebar width,
-	// so the controls sit beside the canvas down to 600px.
-	@include break-small() {
+	// Column (small–medium): between 600px and 782px `ComplementaryArea` is
+	// still in its mobile mode (inline `100vw`, see above) and the skeleton
+	// sidebar is absolutely positioned, so pull the open panel back in-flow at
+	// the sidebar width to sit it beside the canvas as a column.
+	//
+	// Bounded *below* the medium breakpoint on purpose. From 782px up,
+	// `InterfaceSkeleton` already makes the sidebar a `position: relative`,
+	// `width: auto` column and `ComplementaryArea` animates its width to
+	// `$sidebar-width` — exactly like the main editor. Pinning the width with
+	// `!important` there would freeze that open/close tween (the panel would
+	// sit mounted and unchanged for the animation's duration, then pop in or
+	// out), so we leave it to the skeleton. Below 782px there's nothing to
+	// freeze: `ComplementaryArea` zeroes the animation duration in mobile mode.
+	@media (min-width: #{ breakpoints.$break-small }) and (max-width: #{ (breakpoints.$break-medium - 1) }) {
 		.interface-interface-skeleton__sidebar:has(.interface-complementary-area__fill) {
 			position: relative !important;
 		}

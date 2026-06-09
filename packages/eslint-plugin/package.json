@@ -42,7 +42,7 @@
 	},
 	"dependencies": {
 		"@babel/eslint-parser": "^7.28.6",
-		"@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
 		"@eslint/compat": "^2.0.0",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/prettier-config": "file:../prettier-config",
@@ -51,20 +51,20 @@
 		"eslint-config-prettier": "^10.0.0",
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.31.0",
-		"eslint-plugin-jest": "^28.0.0",
+		"eslint-plugin-jest": "^28.11.0",
 		"eslint-plugin-jsdoc": "^50.0.0",
 		"eslint-plugin-jsx-a11y": "^6.10.0",
 		"eslint-plugin-playwright": "^2.1.0",
-		"eslint-plugin-prettier": "^5.0.0",
+		"eslint-plugin-prettier": "^5.5.5",
 		"eslint-plugin-react": "^7.37.0",
-		"eslint-plugin-react-hooks": "7.1.1",
+		"eslint-plugin-react-hooks": "^7.1.1",
 		"globals": "^16.0.0",
 		"requireindex": "^1.2.0",
-		"typescript-eslint": "^8.0.0"
+		"typescript-eslint": "^8.57.1"
 	},
 	"devDependencies": {
 		"@types/eslint": "^9",
-		"@types/estree": "1.0.5"
+		"@types/estree": "^1.0.5"
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",

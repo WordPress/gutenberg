@@ -34,7 +34,7 @@
 	"types": "build-types",
 	"devDependencies": {
 		"@types/node": "^20.19.39",
-		"@types/prettier": "2.4.4"
+		"@types/prettier": "^2.4.4"
 	},
 	"peerDependencies": {
 		"prettier": ">=3"

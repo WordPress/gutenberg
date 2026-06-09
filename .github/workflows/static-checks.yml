@@ -73,6 +73,9 @@ jobs:
             - name: Lint package.json files
               run: npm run lint:pkg-json
 
+            - name: Lint dependency versions across workspaces
+              run: npm run lint:deps
+
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
 
@@ -81,7 +84,8 @@ jobs:
 
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
-              run: npm run lint:js -- --format compact
+              # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
+              run: npm run lint:js -- --format compact --quiet
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}
