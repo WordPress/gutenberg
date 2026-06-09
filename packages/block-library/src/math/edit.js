@@ -12,6 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
@@ -76,12 +77,11 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					focusOnMount={ false }
 					__unstableSlotName="__unstable-block-tools-after"
 				>
-					<div style={ { padding: '4px', minWidth: '300px' } }>
-						<VStack spacing={ 1 }>
+					<div className="wp-block-math__popover-content">
+						<VStack spacing={ 4 }>
 							<TextareaControl
 								__next40pxDefaultSize
 								label={ __( 'LaTeX math syntax' ) }
-								hideLabelFromVision
 								value={ latex }
 								className="wp-block-math__textarea-control"
 								onChange={ ( newLatex ) => {
@@ -101,7 +101,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 											sprintf(
 												/* translators: %s: error message returned when parsing LaTeX. */
 												__(
-													'Error parsing mathematical expression: %s'
+													'Error parsing mathematical expression. Check your LaTeX syntax: %s'
 												),
 												err.message
 											)
@@ -112,7 +112,12 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 										latex: newLatex,
 									} );
 								} }
-								placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+								placeholder={ __(
+									'e.g., x^2, \\frac{a}{b}, \\sqrt{x}'
+								) }
+								help={ __(
+									'Enter valid LaTeX for equations, fractions, roots, and symbols.'
+								) }
 							/>
 							{ error && (
 								<>
@@ -129,6 +134,13 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 								</>
 							) }
+							<Link
+								href={ __(
+									'https://wordpress.org/documentation/article/math-block/'
+								) }
+							>
+								{ __( 'Learn more about LaTeX syntax' ) }
+							</Link>
 						</VStack>
 					</div>
 				</Popover>
