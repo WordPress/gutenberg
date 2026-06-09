@@ -54,5 +54,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
 };

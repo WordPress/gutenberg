@@ -29,5 +29,5 @@ export default ( props ) => ( element ) => {
 			.__unstableMarkLastChangeAsPersistent();
 	}
 
-	return subscribeDelegatedListener( element, 'beforeinput', onInput, true );
+	return subscribeDelegatedListener( element, 'beforeinput', onInput );
 };
