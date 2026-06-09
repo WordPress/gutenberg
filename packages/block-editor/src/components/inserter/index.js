@@ -9,8 +9,12 @@ import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	createBlock,
+	store as blocksStore,
+	__experimentalGetBlockLabel as getBlockLabel,
+} from '@wordpress/blocks';
 import { forwardRef } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
 
@@ -156,7 +160,6 @@ const UnforwardedInserter = (
 			const defaultBlockType = directInsertBlock
 				? getBlockType( directInsertBlock.name )
 				: null;
-
 			return {
 				hasItems: hasInserterItems( _targetRootClientId ),
 				hasSingleBlockType: _hasSingleBlockType,
@@ -173,8 +176,16 @@ const UnforwardedInserter = (
 		[ rootClientId, clientId, shouldDirectInsert ]
 	);
 
-	const registry = useRegistry();
 	const { insertBlock } = useDispatch( blockEditorStore );
+	const {
+		getBlock,
+		getBlockIndex,
+		getBlockOrder,
+		getBlockRootClientId,
+		getBlockSelectionEnd,
+		getPreviousBlockClientId,
+	} = useSelect( blockEditorStore );
+	const { getActiveBlockVariation, getBlockType } = useSelect( blocksStore );
 
 	// The global inserter (no isAppender, no rootClientId, no clientId) should
 	// always render, even with no items.
@@ -189,9 +200,6 @@ const UnforwardedInserter = (
 			if ( ! attributesToCopy?.length ) {
 				return {};
 			}
-
-			const { getBlock, getPreviousBlockClientId } =
-				registry.select( blockEditorStore );
 
 			// Find the adjacent block of the same type whose attributes
 			// should be copied: previous sibling when inserting next to
@@ -225,13 +233,6 @@ const UnforwardedInserter = (
 		}
 
 		function getInsertionIndex() {
-			const {
-				getBlockIndex,
-				getBlockSelectionEnd,
-				getBlockOrder,
-				getBlockRootClientId,
-			} = registry.select( blockEditorStore );
-
 			// If the clientId is defined, we insert at the position of the block.
 			if ( clientId ) {
 				return getBlockIndex( clientId );
@@ -272,12 +273,29 @@ const UnforwardedInserter = (
 
 		onSelectOrClose?.( newBlock );
 
-		const message = sprintf(
-			// translators: %s: the name of the block that has been added
-			__( '%s block added' ),
-			allowedBlockType.title
-		);
-		speak( message );
+		const blockTypeToInsert = getBlockType( blockName );
+		let blockLabelToInsert;
+		if ( blockTypeToInsert ) {
+			blockLabelToInsert = getBlockLabel(
+				blockTypeToInsert,
+				newBlock.attributes
+			);
+
+			if ( blockLabelToInsert === blockTypeToInsert.title ) {
+				blockLabelToInsert =
+					getActiveBlockVariation( blockName, newBlock.attributes )
+						?.title || blockLabelToInsert;
+			}
+		}
+
+		if ( blockLabelToInsert ) {
+			const message = sprintf(
+				// translators: %s: the name of the block that has been added
+				__( '%s block added' ),
+				blockLabelToInsert
+			);
+			speak( message );
+		}
 	}
 
 	function renderToggle( { onToggle: dropdownOnToggle, isOpen } ) {

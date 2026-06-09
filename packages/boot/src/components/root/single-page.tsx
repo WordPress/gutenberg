@@ -47,7 +47,10 @@ export default function RootSinglePage() {
 
 	return (
 		<SlotFillProvider>
-			<ThemeProvider isRoot color={ { ...themeColors, bg: '#f8f8f8' } }>
+			<ThemeProvider
+				isRoot
+				color={ { ...themeColors, background: '#f8f8f8' } }
+			>
 				<ThemeProvider color={ themeColors }>
 					<div
 						className={ clsx(
@@ -62,7 +65,10 @@ export default function RootSinglePage() {
 						<SnackbarNotices className="boot-notices__snackbar" />
 						<div className="boot-layout__surfaces">
 							<ThemeProvider
-								color={ { ...themeColors, bg: '#ffffff' } }
+								color={ {
+									...themeColors,
+									background: '#ffffff',
+								} }
 							>
 								<Outlet />
 								{ /* Render Canvas in Root to prevent remounting on route changes */ }

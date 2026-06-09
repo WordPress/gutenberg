@@ -12,7 +12,6 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
-import { Platform } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
@@ -109,14 +108,6 @@ const DEFAULT_INSERTER_OPTIONS = {
  */
 export function getBlockName( state, clientId ) {
 	const block = state.blocks.byClientId.get( clientId );
-	const socialLinkName = 'core/social-link';
-
-	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
-		const attributes = state.blocks.attributes.get( clientId );
-		const { service } = attributes ?? {};
-
-		return service ? `${ socialLinkName }-${ service }` : socialLinkName;
-	}
 	return block ? block.name : null;
 }
 

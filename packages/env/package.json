@@ -46,7 +46,7 @@
 		"@inquirer/prompts": "^7.2.0",
 		"@wp-playground/cli": "^3.0.48",
 		"adm-zip": "^0.5.9",
-		"chalk": "^4.0.0",
+		"chalk": "^4.1.1",
 		"copy-dir": "^1.3.0",
 		"cross-spawn": "^7.0.6",
 		"docker-compose": "^0.24.3",
@@ -54,7 +54,7 @@
 		"js-yaml": "^3.13.1",
 		"ora": "^4.0.2",
 		"rimraf": "^5.0.10",
-		"simple-git": "^3.5.0",
+		"simple-git": "^3.24.0",
 		"yargs": "^17.3.0"
 	},
 	"publishConfig": {

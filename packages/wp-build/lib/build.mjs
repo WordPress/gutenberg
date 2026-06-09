@@ -84,15 +84,11 @@ const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
-	'**/*.native.*',
-	'**/*.ios.*',
-	'**/*.android.*',
 	'**/*.{spec,test}.*',
 ];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 	/\.(spec|test)\.(js|ts|tsx)$/,
-	/\.(native|ios|android)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -2383,7 +2379,6 @@ async function watchMode() {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
 			'**/*.{spec,test}.{js,ts,tsx}',
-			'**/*.native.*',
 		],
 		persistent: true,
 		ignoreInitial: true,

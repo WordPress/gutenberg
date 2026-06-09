@@ -6,6 +6,10 @@
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
 
+### Internal
+
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
 ## 15.20.0 (2026-05-27)
 
 ### Bug Fix

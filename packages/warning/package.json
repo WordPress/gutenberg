@@ -41,7 +41,6 @@
 		"./package.json": "./package.json",
 		"./babel-plugin": "./babel-plugin.cjs"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
 	"types": "build-types",

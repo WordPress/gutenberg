@@ -14,6 +14,10 @@
 
 -   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
 
+### Internal
+
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
 ## 14.47.0 (2026-05-27)
 
 ### Enhancements

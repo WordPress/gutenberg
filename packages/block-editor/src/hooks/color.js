@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, Platform, useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -55,10 +55,6 @@ const hasColorSupport = ( blockNameOrType ) => {
 };
 
 const hasLinkColorSupport = ( blockType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return (
@@ -342,7 +338,6 @@ export function ColorEdit( {
 
 	const enableContrastChecking =
 		! isStateSelected &&
-		Platform.OS === 'web' &&
 		! value?.color?.gradient &&
 		( settings?.color?.text || settings?.color?.link ) &&
 		// Contrast checking is enabled by default.

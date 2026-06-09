@@ -41,12 +41,11 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
-		"benchmark": "2.1.4"
+		"benchmark": "^2.1.4"
 	},
 	"publishConfig": {
 		"access": "public"
