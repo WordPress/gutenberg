@@ -24,18 +24,48 @@ export default function useSelectAll() {
 				return;
 			}
 
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
+			const selection = defaultView.getSelection();
+
+			// When the writing flow wrapper is the editing host, keydown
+			// targets the wrapper rather than the inner rich text. Resolve the
+			// editable element from the selection so the gradual select-all
+			// steps operate per block.
+			const { anchorNode } = selection;
+			const anchorElement =
+				anchorNode?.nodeType === anchorNode?.ELEMENT_NODE
+					? anchorNode
+					: anchorNode?.parentElement;
+			const editable =
+				anchorElement?.closest( '[data-wp-block-attribute-key]' ) ??
+				event.target;
+
 			const selectedClientIds = getSelectedBlockClientIds();
 
 			if (
 				selectedClientIds.length < 2 &&
-				! isEntirelySelected( event.target )
+				! isEntirelySelected( editable )
 			) {
+				// If the wrapper is the editing host, the native select-all
+				// would select the entire wrapper (all blocks) at once. Select
+				// just this block's content first, preserving the gradual
+				// select-all behavior.
+				if (
+					editable !== event.target &&
+					ownerDocument.activeElement === node
+				) {
+					event.preventDefault();
+					const range = ownerDocument.createRange();
+					range.selectNodeContents( editable );
+					selection.removeAllRanges();
+					selection.addRange( range );
+				}
 				return;
 			}
 
 			event.preventDefault();
 
-			const { ownerDocument } = event.target;
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const activeClientId = getBlockClientId(
 				ownerDocument.activeElement
