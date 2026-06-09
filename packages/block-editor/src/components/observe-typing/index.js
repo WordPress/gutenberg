@@ -129,6 +129,15 @@ export function useTypingObserver() {
 			if ( isTyping ) {
 				let timerId;
 
+				// Capture the window reference while the node is still
+				// attached. React can run this cleanup after the iframe-hosted
+				// editor has been detached from its window, at which point
+				// `node.ownerDocument.defaultView` is `null`. Reusing the
+				// reference we held at mount keeps the cleanup (and the
+				// handlers) working against the same window we set things up
+				// on.
+				const { defaultView } = node.ownerDocument;
+
 				/**
 				 * Stops typing when focus transitions to a non-text field element.
 				 *
@@ -141,13 +150,11 @@ export function useTypingObserver() {
 					// before the keydown event, wait until after current stack
 					// before evaluating whether typing is to be stopped. Otherwise,
 					// typing will re-start.
-					timerId = node.ownerDocument.defaultView?.setTimeout(
-						() => {
-							if ( ! isTextField( target ) ) {
-								stopTyping();
-							}
+					timerId = defaultView.setTimeout( () => {
+						if ( ! isTextField( target ) ) {
+							stopTyping();
 						}
-					);
+					} );
 				}
 
 				/**
@@ -170,9 +177,8 @@ export function useTypingObserver() {
 				 * uncollapsed (shift) selection.
 				 */
 				function stopTypingOnSelectionUncollapse() {
-					const selection =
-						node.ownerDocument.defaultView?.getSelection();
-					if ( selection && ! selection.isCollapsed ) {
+					const selection = defaultView.getSelection();
+					if ( ! selection.isCollapsed ) {
 						stopTyping();
 					}
 				}
@@ -186,7 +192,7 @@ export function useTypingObserver() {
 				);
 
 				return () => {
-					node.ownerDocument.defaultView?.clearTimeout( timerId );
+					defaultView.clearTimeout( timerId );
 					node.removeEventListener(
 						'focus',
 						stopTypingOnNonTextField
