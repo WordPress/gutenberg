@@ -479,9 +479,12 @@ describe( 'Cropper', () => {
 		naturalHeight: 1200,
 	};
 
-	function imageWidth(): number {
+	// The view-scale magnification is folded into the image's transform as a
+	// leading `scale(...)`; with viewScale 1 the transform is just the matrix.
+	function imageScale(): number {
 		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
-		return parseFloat( img.style.width || '0' );
+		const match = img.style.transform.match( /^scale\(\s*([\d.]+)/ );
+		return match ? parseFloat( match[ 1 ] ) : 1;
 	}
 
 	it( 'magnifies the scene so an under-filling crop fills the canvas at rest', () => {
@@ -495,10 +498,9 @@ describe( 'Cropper', () => {
 		};
 		render( <Cropper src="tall.jpg" controller={ controller } /> );
 
-		// Contain-fit width is 400 * (400/600 vs 400/1200 -> 1/3) = 133.33.
-		// Binding axis (height) fills to 0.8 * 400, so viewScale = 2.4 and the
-		// image renders at 133.33 * 2.4 = 320.
-		expect( imageWidth() ).toBeCloseTo( 320, 0 );
+		// Footprint is 133.33x400. The square crop's binding axis (height) fills
+		// to 0.8 * 400, so the image magnifies by 0.8 * 400 / 133.33 = 2.4.
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
 	} );
 
 	it( 'does not magnify when the crop already fills the canvas', () => {
@@ -511,8 +513,8 @@ describe( 'Cropper', () => {
 		};
 		render( <Cropper src="tall.jpg" controller={ controller } /> );
 
-		// viewScale = 1, so the image stays at its contain-fit width (133.33).
-		expect( imageWidth() ).toBeCloseTo( 133.33, 0 );
+		// viewScale = 1, so the transform carries no magnification scale.
+		expect( imageScale() ).toBe( 1 );
 	} );
 
 	it( 'holds the magnified view while resizing instead of resetting the zoom', async () => {
@@ -526,8 +528,8 @@ describe( 'Cropper', () => {
 			<Cropper src="tall.jpg" controller={ controller } freeformCrop />
 		);
 
-		// At rest the square crop magnifies the image to 320.
-		expect( imageWidth() ).toBeCloseTo( 320, 0 );
+		// At rest the square crop magnifies the image by 2.4.
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
 
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize top-left corner',
@@ -539,9 +541,9 @@ describe( 'Cropper', () => {
 			pointerId: 1,
 		} );
 
-		// Grabbing a handle must not snap the scene back to the 133 footprint;
+		// Grabbing a handle must not snap the scene back to the footprint;
 		// the magnification holds for the duration of the drag.
-		expect( imageWidth() ).toBeCloseTo( 320, 0 );
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
 
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
 	} );

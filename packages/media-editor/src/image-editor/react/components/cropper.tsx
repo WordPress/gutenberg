@@ -433,13 +433,6 @@ function CropperInner(
 	// into `frozenViewScale`; on release the settle recomputes from the new crop.
 	const [ frozenViewScale, setFrozenViewScale ] = useState( 1 );
 	const viewScale = isResizing ? frozenViewScale : viewScaleRest;
-	const scaledElementSize = useMemo(
-		() => ( {
-			width: elementSize.width * viewScale,
-			height: elementSize.height * viewScale,
-		} ),
-		[ elementSize.width, elementSize.height, viewScale ]
-	);
 	const scaledVisualSize = useMemo(
 		() => ( {
 			width: visualSize.width * viewScale,
@@ -521,7 +514,7 @@ function CropperInner(
 	}, [ onWheelNative ] );
 
 	// Use the transform style hook for the image CSS transform.
-	const transformString = useTransformStyle( state, scaledVisualSize );
+	const transformString = useTransformStyle( state, visualSize );
 
 	/**
 	 * Handle the image load event.
@@ -674,10 +667,7 @@ function CropperInner(
 
 	let imageTransition: string | undefined;
 	if ( settling ) {
-		// Animate both the transform (pan reset) and the size/position, since
-		// the view-scale magnification changes the image's width/height/offset.
-		imageTransition =
-			'transform 200ms ease-out, width 200ms ease-out, height 200ms ease-out, top 200ms ease-out, left 200ms ease-out';
+		imageTransition = 'transform 200ms ease-out';
 	} else if ( isZooming ) {
 		imageTransition = 'transform 150ms linear';
 	}
@@ -685,25 +675,38 @@ function CropperInner(
 		? 'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out'
 		: undefined;
 
-	// Compute the image's CSS style. Uses the view-scaled element size so the
-	// image magnifies in lockstep with the crop overlay and stays centred.
+	// Compute the image's CSS style. The element keeps its contain-fit box; the
+	// view-scale magnification is folded into the transform as an outer
+	// `scale()` so the whole settle motion (zoom, pan, and magnification) is one
+	// coherent transform that interpolates as a unit — the image slides/scales
+	// to its position rather than animating its box separately. Magnifying
+	// around the centred box keeps the (centred) crop centred.
 	const imageStyle = useMemo( (): React.CSSProperties => {
-		if ( scaledElementSize.width === 0 || scaledElementSize.height === 0 ) {
+		if ( elementSize.width === 0 || elementSize.height === 0 ) {
 			return {};
 		}
-		const centerX = ( canvasSize.width - scaledElementSize.width ) / 2;
-		const centerY = ( canvasSize.height - scaledElementSize.height ) / 2;
+		const centerX = ( canvasSize.width - elementSize.width ) / 2;
+		const centerY = ( canvasSize.height - elementSize.height ) / 2;
 		return {
-			width: scaledElementSize.width,
-			height: scaledElementSize.height,
-			maxWidth: scaledElementSize.width,
-			maxHeight: scaledElementSize.height,
+			width: elementSize.width,
+			height: elementSize.height,
+			maxWidth: elementSize.width,
+			maxHeight: elementSize.height,
 			left: centerX,
 			top: centerY,
-			transform: transformString,
+			transform:
+				viewScale !== 1
+					? `scale(${ viewScale }) ${ transformString }`
+					: transformString,
 			transition: imageTransition,
 		};
-	}, [ canvasSize, scaledElementSize, transformString, imageTransition ] );
+	}, [
+		canvasSize,
+		elementSize,
+		transformString,
+		imageTransition,
+		viewScale,
+	] );
 
 	// Viewport pan CSS transform for the stage div. Applied during resize
 	// drags to keep handles visible when the crop extends past the canvas edge.
@@ -720,7 +723,14 @@ function CropperInner(
 			willChange,
 		};
 	} else if ( settling ) {
-		stageStyle = { transition: settleTransition, willChange };
+		// Animate the viewport pan back to an explicit identity translate rather
+		// than dropping the transform property, so the reset eases instead of
+		// snapping (transitions to a removed transform are unreliable).
+		stageStyle = {
+			transform: 'translate(0px, 0px)',
+			transition: settleTransition,
+			willChange,
+		};
 	}
 
 	// Forward the root element to the consumer's ref.
