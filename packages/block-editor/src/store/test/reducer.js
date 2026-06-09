@@ -2282,7 +2282,7 @@ describe( 'state', () => {
 					).toBeUndefined();
 				} );
 
-				it( 'should flag INSERT_BLOCKS-style changes that add blocks', () => {
+				it( 'should flag REPLACE_BLOCKS-style changes that add blocks', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
@@ -2307,8 +2307,8 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( insertState.didLastBlockChangeInsertBlocks ).toBe(
-						true
+					expect( insertState.didLastBlockChangeReplaceBlocks ).toBe(
+						undefined
 					);
 
 					original = deepFreeze( insertState );
@@ -2325,7 +2325,7 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( replaceState.didLastBlockChangeInsertBlocks ).toBe(
+					expect( replaceState.didLastBlockChangeReplaceBlocks ).toBe(
 						true
 					);
 
@@ -2338,7 +2338,7 @@ describe( 'state', () => {
 					} );
 
 					expect(
-						subsequentState.didLastBlockChangeInsertBlocks
+						subsequentState.didLastBlockChangeReplaceBlocks
 					).toBeUndefined();
 				} );
 
@@ -2363,7 +2363,7 @@ describe( 'state', () => {
 					} );
 
 					expect(
-						state.didLastBlockChangeInsertBlocks
+						state.didLastBlockChangeReplaceBlocks
 					).toBeUndefined();
 				} );
 

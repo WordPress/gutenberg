@@ -2950,14 +2950,14 @@ export function __unstableGetLastBlockChangeHistoryMode( state ) {
 }
 
 /**
- * Returns true if the most recent block change inserted blocks.
+ * Returns true if the most recent block change replaced blocks.
  *
  * @param {Object} state Block editor state.
  *
- * @return {boolean} Whether the most recent block change inserted blocks.
+ * @return {boolean} Whether the most recent block change replaced blocks.
  */
-export function __unstableDidLastBlockChangeInsertBlocks( state ) {
-	return !! state.blocks.didLastBlockChangeInsertBlocks;
+export function __unstableDidLastBlockChangeReplaceBlocks( state ) {
+	return !! state.blocks.didLastBlockChangeReplaceBlocks;
 }
 
 /**

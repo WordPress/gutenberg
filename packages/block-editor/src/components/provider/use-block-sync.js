@@ -378,7 +378,7 @@ export default function useBlockSync( {
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableGetLastBlockChangeHistoryMode,
-			__unstableDidLastBlockChangeInsertBlocks,
+			__unstableDidLastBlockChangeReplaceBlocks,
 			__unstableIsLastBlockChangeIgnored,
 			areInnerBlocksControlled,
 			getBlockParents,
@@ -449,8 +449,8 @@ export default function useBlockSync( {
 				// receives both changes atomically.
 				registry.batch( () => {
 					if ( blocksChanged ) {
-						const didInsertBlocks =
-							__unstableDidLastBlockChangeInsertBlocks();
+						const didReplaceBlocks =
+							__unstableDidLastBlockChangeReplaceBlocks();
 
 						isPersistent = newIsPersistent;
 						blockHistoryMode = newBlockHistoryMode;
@@ -489,7 +489,7 @@ export default function useBlockSync( {
 								blockHistoryMode === 'ignore'
 							) {
 								// Non-persistent, history-ignored block changes
-								// can follow a deferred insert before it flushes,
+								// can follow a deferred replacement before it flushes,
 								// such as inner template insertion. Update the
 								// deferred payload and return early. It will be
 								// flushed by a React effect after layout effects
@@ -515,10 +515,10 @@ export default function useBlockSync( {
 						}
 
 						const shouldDeferBlockSync =
-							isPersistent && didInsertBlocks;
+							isPersistent && didReplaceBlocks;
 
 						if ( shouldDeferBlockSync ) {
-							// Insert-like persistent changes can trigger a
+							// Replace-block persistent changes can trigger a
 							// template continuation during the same React commit.
 							// Defer this payload so that continuation
 							// can be merged before syncing to the parent.

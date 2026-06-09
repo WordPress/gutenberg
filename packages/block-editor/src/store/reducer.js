@@ -427,9 +427,8 @@ function withPersistentBlockChange( reducer ) {
 		const isNotPersistentMarker =
 			action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 		const pendingHistoryMode = nextHistoryMode;
-		const didInsertBlocks =
-			( action.type === 'INSERT_BLOCKS' ||
-				action.type === 'REPLACE_BLOCKS' ||
+		const didReplaceBlocks =
+			( action.type === 'REPLACE_BLOCKS' ||
 				action.type === 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN' ) &&
 			!! action.blocks?.length;
 
@@ -462,7 +461,7 @@ function withPersistentBlockChange( reducer ) {
 
 		const {
 			lastBlockChangeHistoryMode,
-			didLastBlockChangeInsertBlocks,
+			didLastBlockChangeReplaceBlocks,
 			...blockChange
 		} = nextState;
 		const result = { ...blockChange, isPersistentChange };
@@ -471,8 +470,8 @@ function withPersistentBlockChange( reducer ) {
 			result.lastBlockChangeHistoryMode = 'ignore';
 		}
 
-		if ( didInsertBlocks ) {
-			result.didLastBlockChangeInsertBlocks = true;
+		if ( didReplaceBlocks ) {
+			result.didLastBlockChangeReplaceBlocks = true;
 		}
 
 		return result;

@@ -351,17 +351,18 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
 
-	it( 'merges history-ignored block changes into a deferred insertion', async () => {
+	it( 'merges history-ignored block changes into a deferred replacement', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();
 		let registry;
 		const setRegistry = ( reg ) => {
 			registry = reg;
 		};
+		const initialBlock = createBlock( 'test/test-block' );
 		render(
 			<TestWrapper
 				setRegistry={ setRegistry }
-				value={ [] }
+				value={ [ initialBlock ] }
 				onChange={ onChange }
 				onInput={ onInput }
 			/>
@@ -372,7 +373,9 @@ describe( 'useBlockSync hook', () => {
 		const parentBlock = createBlock( 'test/test-block' );
 		const templateBlock = createBlock( 'test/test-block', { foo: 2 } );
 
-		registry.dispatch( blockEditorStore ).insertBlock( parentBlock );
+		registry
+			.dispatch( blockEditorStore )
+			.replaceBlock( initialBlock.clientId, parentBlock );
 		expect( onChange ).not.toHaveBeenCalled();
 		registry
 			.dispatch( blockEditorStore )
