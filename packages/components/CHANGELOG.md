@@ -14,6 +14,10 @@
 
 -   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
 
+### Internal
+
+-   `UnitControl`: Remove dead native code branches now that `Platform.OS` is always `'web'` following the React Native removal ([#79031](https://github.com/WordPress/gutenberg/pull/79031)).
+
 ## 34.0.0 (2026-05-27)
 
 ### Breaking Changes
