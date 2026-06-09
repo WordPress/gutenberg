@@ -27,8 +27,10 @@ $gutenberg_field_collections = array();
  * @param string      $kind          The entity kind (postType, taxonomy, user, etc.).
  * @param string|null $name          The entity name (attachment, product, etc.) or null for universal.
  * @param array       $fields        Array of field definitions keyed by field ID.
+ * @param string|null $fields_module Optional. Script Module handle providing the collection's
+ *                                   non-serializable field extensions, or null. Default null.
  */
-function gutenberg_register_field_collection( $id, $kind, $name, $fields ) {
+function gutenberg_register_field_collection( $id, $kind, $name, $fields, $fields_module = null ) {
 	global $gutenberg_field_collections;
 
 	if ( empty( $id ) || empty( $kind ) || empty( $fields ) ) {
@@ -44,10 +46,11 @@ function gutenberg_register_field_collection( $id, $kind, $name, $fields ) {
 	}
 
 	$collection = array(
-		'id'     => $id,
-		'kind'   => $kind,
-		'name'   => $name,
-		'fields' => $fields,
+		'id'            => $id,
+		'kind'          => $kind,
+		'name'          => $name,
+		'fields'        => $fields,
+		'fields_module' => $fields_module,
 	);
 
 	$gutenberg_field_collections[] = $collection;
