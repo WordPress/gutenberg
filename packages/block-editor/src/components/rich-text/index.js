@@ -40,14 +40,13 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 
+// These contexts live in `@wordpress/rich-text` so that lower-level rich text
+// fields (e.g. `RichTextControl` in `@wordpress/rich-text-control`) can share
+// the exact same context objects that format types read via `RichTextShortcut`
+// / `RichTextInputEvent`. They are private and consumed directly from
+// `@wordpress/rich-text` where needed, rather than re-exported here.
 const { useRichText, keyboardShortcutContext, inputEventContext } =
 	unlock( richTextPrivateApis );
-
-// These contexts now live in `@wordpress/rich-text` so that lower-level rich
-// text fields (e.g. `RichTextControl` in `@wordpress/rich-text-control`) can
-// share the exact same context objects that format types read via
-// `RichTextShortcut` / `RichTextInputEvent`. Re-exported here for back-compat.
-export { keyboardShortcutContext, inputEventContext };
 
 const instanceIdKey = Symbol( 'instanceId' );
 
