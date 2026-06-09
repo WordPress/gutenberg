@@ -1663,19 +1663,6 @@ export function __unstableMarkNextChangeAsNotPersistent( {
 }
 
 /**
- * Action that signals that the next block change should be treated as part of
- * the same combined operation as a pending outbound block change.
- *
- * Used in RTC to combine outer block and inter template insertions into a single
- * logical operation to other peers.
- *
- * @return {Object} Action object.
- */
-export function __unstableMarkNextChangeAsCombinedOperation() {
-	return { type: 'MARK_NEXT_CHANGE_AS_COMBINED_OPERATION' };
-}
-
-/**
  * Action that marks the last block change as an automatic change, meaning it was not
  * performed by the user, and can be undone using the `Escape` and `Backspace` keys.
  * This action must be called after the change was made, and any actions that are a

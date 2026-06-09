@@ -379,7 +379,6 @@ export default function useBlockSync( {
 			isLastBlockChangePersistent,
 			__unstableGetLastBlockChangeHistoryMode,
 			__unstableDidLastBlockChangeInsertBlocks,
-			__unstableIsLastBlockChangeCombinedOperation,
 			__unstableIsLastBlockChangeIgnored,
 			areInnerBlocksControlled,
 			getBlockParents,
@@ -450,8 +449,6 @@ export default function useBlockSync( {
 				// receives both changes atomically.
 				registry.batch( () => {
 					if ( blocksChanged ) {
-						const isCombinedOperation =
-							__unstableIsLastBlockChangeCombinedOperation();
 						const didInsertBlocks =
 							__unstableDidLastBlockChangeInsertBlocks();
 
@@ -487,11 +484,16 @@ export default function useBlockSync( {
 						}
 
 						if ( deferredBlockSyncRef.current ) {
-							if ( isCombinedOperation ) {
-								// This change was marked as a combined operation with
-								// __unstableMarkNextChangeAsCombinedOperation. Update the
-								// deferred payload and return early. It will be flushed
-								// by a React effect after layout effects have run.
+							if (
+								! isPersistent &&
+								blockHistoryMode === 'ignore'
+							) {
+								// Non-persistent, history-ignored block changes
+								// can follow a deferred insert before it flushes,
+								// such as inner template insertion. Update the
+								// deferred payload and return early. It will be
+								// flushed by a React effect after layout effects
+								// have run.
 								//
 								// This is used with template insertion in RTC to ensure
 								// operations like outer block and inner template insertions

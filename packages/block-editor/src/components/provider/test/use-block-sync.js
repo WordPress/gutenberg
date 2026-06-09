@@ -351,7 +351,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
 
-	it( 'merges combined-operation block changes into a deferred insertion', async () => {
+	it( 'merges history-ignored block changes into a deferred insertion', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();
 		let registry;
@@ -379,9 +379,6 @@ describe( 'useBlockSync hook', () => {
 			.__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );
-		registry
-			.dispatch( blockEditorStore )
-			.__unstableMarkNextChangeAsCombinedOperation();
 		registry
 			.dispatch( blockEditorStore )
 			.replaceInnerBlocks( parentBlock.clientId, [ templateBlock ] );

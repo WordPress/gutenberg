@@ -54,11 +54,8 @@ export default function useInnerBlockTemplateSync(
 			getSelectedBlocksInitialCaretPosition,
 			isBlockSelected,
 		} = registry.select( blockEditorStore );
-		const {
-			__unstableMarkNextChangeAsNotPersistent,
-			__unstableMarkNextChangeAsCombinedOperation,
-			replaceInnerBlocks,
-		} = registry.dispatch( blockEditorStore );
+		const { __unstableMarkNextChangeAsNotPersistent, replaceInnerBlocks } =
+			registry.dispatch( blockEditorStore );
 
 		// Only synchronize innerBlocks with template if innerBlocks are empty
 		// or a locking "all" or "contentOnly" exists directly on the block.
@@ -93,7 +90,6 @@ export default function useInnerBlockTemplateSync(
 			__unstableMarkNextChangeAsNotPersistent( {
 				history: 'ignore',
 			} );
-			__unstableMarkNextChangeAsCombinedOperation();
 			replaceInnerBlocks(
 				clientId,
 				nextBlocks,
