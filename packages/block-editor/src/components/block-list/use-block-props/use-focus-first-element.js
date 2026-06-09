@@ -53,8 +53,14 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 
 		const { ownerDocument } = ref.current;
 
-		// Do not focus the block if it already contains the active element.
-		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
+		// Do not focus the block if it already contains the active element, or
+		// if an ancestor editing host (the writing flow wrapper) is focused.
+		const { activeElement } = ownerDocument;
+		if (
+			isInsideRootBlock( ref.current, activeElement ) ||
+			( activeElement?.isContentEditable &&
+				activeElement.contains( ref.current ) )
+		) {
 			return;
 		}
 
