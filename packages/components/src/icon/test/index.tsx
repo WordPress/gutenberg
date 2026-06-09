@@ -95,4 +95,42 @@ describe( 'Icon', () => {
 
 		expect( screen.getByTestId( testId ) ).toHaveClass( className );
 	} );
+
+	it( "merges a consumer 'style' prop with the icon's intrinsic style", () => {
+		const strokeIcon = (
+			<SVG style={ { fill: 'none' } }>
+				<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+			</SVG>
+		);
+		render(
+			<Icon
+				data-testid={ testId }
+				icon={ strokeIcon }
+				style={ { marginInlineStart: 4 } }
+			/>
+		);
+		const icon = screen.getByTestId( testId );
+
+		// The icon's intrinsic `fill: none` survives…
+		expect( icon ).toHaveStyle( 'fill: none' );
+		// …alongside the consumer-supplied style.
+		expect( icon ).toHaveStyle( 'margin-inline-start: 4px' );
+	} );
+
+	it( "lets a consumer 'style' override the icon's intrinsic style", () => {
+		const strokeIcon = (
+			<SVG style={ { fill: 'none' } }>
+				<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+			</SVG>
+		);
+		render(
+			<Icon
+				data-testid={ testId }
+				icon={ strokeIcon }
+				style={ { fill: 'red' } }
+			/>
+		);
+
+		expect( screen.getByTestId( testId ) ).toHaveStyle( 'fill: red' );
+	} );
 } );

@@ -89,11 +89,18 @@ function Icon( {
 	}
 
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
+		const { style: consumerStyle, ...restProps } =
+			additionalProps as SVGProps< SVGSVGElement >;
+
 		const appliedProps = {
 			...icon.props,
 			width: size,
 			height: size,
-			...additionalProps,
+			...restProps,
+			// Merge styles so the icon's intrinsic style (e.g. `fill: none` on
+			// stroke-based icons) is preserved unless the consumer overrides
+			// the same property explicitly.
+			style: { ...icon.props.style, ...consumerStyle },
 		};
 
 		return <SVG { ...appliedProps } />;

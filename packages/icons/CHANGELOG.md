@@ -49,15 +49,20 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
 ### Enhancements
 
--   Redraw 35 icons as stroke-based for variable stroke-width support, and introduce the `vector-effect="non-scaling-stroke"` convention so stroke weight stays consistent across icon sizes (originally landed in [#78774](https://github.com/WordPress/gutenberg/pull/78774), reverted in [#78854](https://github.com/WordPress/gutenberg/pull/78854) due to CSS-override regressions, re-introduced here with the resilience fix): `addCard`, `addTemplate`, `cancelCircleFilled`, `caution`, `cautionFilled`, `code`, `commentAuthorAvatar`, `cover`, `currencyDollar`, `currencyEuro`, `currencyPound`, `drafts`, `help`, `helpFilled`, `image`, `info`, `lifesaver`, `link`, `linkOff`, `navigation`, `notAllowed`, `paragraph`, `pending`, `plusCircle`, `plusCircleFilled`, `published`, `scheduled`, `siteLogo`, `square`, `starEmpty`, `starFilled`, `starHalf`, `styles`, `time`, `tip`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Redraw 35 icons as stroke-based for variable stroke-width support, and introduce the `vector-effect="non-scaling-stroke"` convention so stroke weight stays consistent across icon sizes (originally landed in [#78774](https://github.com/WordPress/gutenberg/pull/78774), reverted in [#78854](https://github.com/WordPress/gutenberg/pull/78854) due to CSS-override regressions, re-introduced here with the resilience fix): `addCard`, `addTemplate`, `cancelCircleFilled`, `caution`, `cautionFilled`, `code`, `commentAuthorAvatar`, `cover`, `currencyDollar`, `currencyEuro`, `currencyPound`, `drafts`, `help`, `helpFilled`, `image`, `info`, `lifesaver`, `link`, `linkOff`, `navigation`, `notAllowed`, `paragraph`, `pending`, `plusCircle`, `plusCircleFilled`, `published`, `scheduled`, `siteLogo`, `square`, `starEmpty`, `starFilled`, `starHalf`, `styles`, `time`, `tip`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ### Breaking Changes
 
--   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
 -   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
--   Stroke-based icons now declare `fill` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary 3rd-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Rename `timeToRead` icon to `time`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+-   Stroke-based icons now declare `fill` via inline `style` on the outer `<svg>` instead of the `fill` attribute, so the source's intent survives ordinary 3rd-party CSS overrides like `.foo svg { fill: currentColor }` without using `!important`. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Bug Fixes
+
+-   `Icon`: Merge a consumer-supplied `style` prop with the icon's intrinsic styles instead of replacing them, so styles like `fill: none` on stroke-based icons survive unless the consumer overrides the same property explicitly. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
 
 ## 13.2.0 (2026-05-27)
 
