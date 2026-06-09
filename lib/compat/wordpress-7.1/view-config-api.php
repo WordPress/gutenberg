@@ -98,7 +98,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	);
 
 	if ( ! is_array( $filtered_config ) ) {
-		$filtered_config = array();
+		return $config;
 	}
 
 	// Backfill any dropped keys with their defaults, then discard any keys the
