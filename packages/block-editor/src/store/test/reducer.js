@@ -2282,7 +2282,7 @@ describe( 'state', () => {
 					).toBeUndefined();
 				} );
 
-				it( 'should flag deferred changes that add blocks', () => {
+				it( 'should flag changes that should defer block sync', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
@@ -2307,9 +2307,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( insertState.didLastBlockChangeAddBlocks ).toBe(
-						undefined
-					);
+					expect(
+						insertState.shouldLastBlockChangeDeferBlockSync
+					).toBeUndefined();
 
 					const deferredInsertState = blocks( original, {
 						type: 'INSERT_BLOCKS',
@@ -2326,7 +2326,7 @@ describe( 'state', () => {
 					} );
 
 					expect(
-						deferredInsertState.didLastBlockChangeAddBlocks
+						deferredInsertState.shouldLastBlockChangeDeferBlockSync
 					).toBe( true );
 
 					original = deepFreeze( insertState );
@@ -2343,9 +2343,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( replaceState.didLastBlockChangeAddBlocks ).toBe(
-						true
-					);
+					expect(
+						replaceState.shouldLastBlockChangeDeferBlockSync
+					).toBe( true );
 
 					const subsequentState = blocks( replaceState, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
@@ -2356,11 +2356,11 @@ describe( 'state', () => {
 					} );
 
 					expect(
-						subsequentState.didLastBlockChangeAddBlocks
+						subsequentState.shouldLastBlockChangeDeferBlockSync
 					).toBeUndefined();
 				} );
 
-				it( 'should not flag replacements that do not add blocks', () => {
+				it( 'should not flag replacements that do not defer block sync', () => {
 					const original = deepFreeze(
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
@@ -2380,7 +2380,9 @@ describe( 'state', () => {
 						blocks: [],
 					} );
 
-					expect( state.didLastBlockChangeAddBlocks ).toBeUndefined();
+					expect(
+						state.shouldLastBlockChangeDeferBlockSync
+					).toBeUndefined();
 				} );
 
 				it( 'should retain reference for same state, same persistence', () => {

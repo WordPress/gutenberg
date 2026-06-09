@@ -378,7 +378,7 @@ export default function useBlockSync( {
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableGetLastBlockChangeHistoryMode,
-			__unstableDidLastBlockChangeAddBlocks,
+			__unstableShouldLastBlockChangeDeferBlockSync,
 			__unstableIsLastBlockChangeIgnored,
 			areInnerBlocksControlled,
 			getBlockParents,
@@ -449,8 +449,8 @@ export default function useBlockSync( {
 				// receives both changes atomically.
 				registry.batch( () => {
 					if ( blocksChanged ) {
-						const didAddBlocks =
-							__unstableDidLastBlockChangeAddBlocks();
+						const shouldLastBlockChangeDeferBlockSync =
+							__unstableShouldLastBlockChangeDeferBlockSync();
 
 						isPersistent = newIsPersistent;
 						blockHistoryMode = newBlockHistoryMode;
@@ -515,10 +515,10 @@ export default function useBlockSync( {
 						}
 
 						const shouldDeferBlockSync =
-							isPersistent && didAddBlocks;
+							isPersistent && shouldLastBlockChangeDeferBlockSync;
 
 						if ( shouldDeferBlockSync ) {
-							// Block additions can trigger a inner template
+							// Block additions can trigger an inner template
 							// insertion during the same React commit.
 							// Defer this block so that block modifications
 							// can be merged before syncing to the parent.

@@ -2941,14 +2941,14 @@ export function __unstableGetLastBlockChangeHistoryMode( state ) {
 }
 
 /**
- * Returns true if the most recent block change added blocks.
+ * Returns true if the most recent block change should defer block sync.
  *
  * @param {Object} state Block editor state.
  *
- * @return {boolean} Whether the most recent block change added blocks.
+ * @return {boolean} Whether the most recent block change should defer block sync.
  */
-export function __unstableDidLastBlockChangeAddBlocks( state ) {
-	return !! state.blocks.didLastBlockChangeAddBlocks;
+export function __unstableShouldLastBlockChangeDeferBlockSync( state ) {
+	return !! state.blocks.shouldLastBlockChangeDeferBlockSync;
 }
 
 /**
