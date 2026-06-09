@@ -30,9 +30,13 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import type { CropperController } from '../hooks/use-cropper-reducer';
-import { getImageFit, getRotatedBBox } from '../../core/camera';
+import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
-import { MIN_CROP_PIXELS } from '../../core/constants';
+import {
+	MAX_VIEW_SCALE,
+	MIN_CROP_PIXELS,
+	SETTLE_TARGET_CANVAS_FILL,
+} from '../../core/constants';
 import { computeInscribedRect } from '../../core/crop-rect';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
@@ -401,6 +405,46 @@ function CropperInner(
 		null
 	);
 
+	// Presentational magnification so the at-rest crop fills the canvas. The
+	// crop overlay is laid out as `cropRect * visualSize` (the contain-fit
+	// footprint, no zoom), so a crop whose aspect differs from the image's can
+	// render far smaller than the canvas allows. Scaling `elementSize` and
+	// `visualSize` together magnifies the whole scene uniformly — image,
+	// overlays, and the pixel->normalized interaction math — and the root's
+	// `overflow: hidden` clips the image bleed. Held at 1 during a resize so the
+	// user sees the full footprint while dragging, then applied (animated via
+	// the settle transitions) once the crop settles. Magnifying around the
+	// footprint centre keeps the crop centred only because the at-rest crop is
+	// always centred (SETTLE_CROP, computeInscribedRect, and the initial
+	// full-frame crop all centre it).
+	const viewScale = useMemo(
+		() =>
+			isResizing
+				? 1
+				: getViewScale(
+						state.cropRect,
+						canvasSize,
+						visualSize,
+						SETTLE_TARGET_CANVAS_FILL,
+						MAX_VIEW_SCALE
+				  ),
+		[ isResizing, state.cropRect, canvasSize, visualSize ]
+	);
+	const scaledElementSize = useMemo(
+		() => ( {
+			width: elementSize.width * viewScale,
+			height: elementSize.height * viewScale,
+		} ),
+		[ elementSize.width, elementSize.height, viewScale ]
+	);
+	const scaledVisualSize = useMemo(
+		() => ( {
+			width: visualSize.width * viewScale,
+			height: visualSize.height * viewScale,
+		} ),
+		[ visualSize.width, visualSize.height, viewScale ]
+	);
+
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
 		handlers,
@@ -408,7 +452,7 @@ function CropperInner(
 		isDragging,
 		isZooming,
 		isPlacementActive: isInteractionPlacementActive,
-	} = useInteraction( state, controller, canvasSize, visualSize, {
+	} = useInteraction( state, controller, canvasSize, scaledVisualSize, {
 		minZoom: effectiveMinZoom,
 		maxZoom,
 		onGestureStart,
@@ -474,7 +518,7 @@ function CropperInner(
 	}, [ onWheelNative ] );
 
 	// Use the transform style hook for the image CSS transform.
-	const transformString = useTransformStyle( state, visualSize );
+	const transformString = useTransformStyle( state, scaledVisualSize );
 
 	/**
 	 * Handle the image load event.
@@ -622,7 +666,10 @@ function CropperInner(
 
 	let imageTransition: string | undefined;
 	if ( settling ) {
-		imageTransition = 'transform 200ms ease-out';
+		// Animate both the transform (pan reset) and the size/position, since
+		// the view-scale magnification changes the image's width/height/offset.
+		imageTransition =
+			'transform 200ms ease-out, width 200ms ease-out, height 200ms ease-out, top 200ms ease-out, left 200ms ease-out';
 	} else if ( isZooming ) {
 		imageTransition = 'transform 150ms linear';
 	}
@@ -630,24 +677,25 @@ function CropperInner(
 		? 'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out'
 		: undefined;
 
-	// Compute the image's CSS style.
+	// Compute the image's CSS style. Uses the view-scaled element size so the
+	// image magnifies in lockstep with the crop overlay and stays centred.
 	const imageStyle = useMemo( (): React.CSSProperties => {
-		if ( elementSize.width === 0 || elementSize.height === 0 ) {
+		if ( scaledElementSize.width === 0 || scaledElementSize.height === 0 ) {
 			return {};
 		}
-		const centerX = ( canvasSize.width - elementSize.width ) / 2;
-		const centerY = ( canvasSize.height - elementSize.height ) / 2;
+		const centerX = ( canvasSize.width - scaledElementSize.width ) / 2;
+		const centerY = ( canvasSize.height - scaledElementSize.height ) / 2;
 		return {
-			width: elementSize.width,
-			height: elementSize.height,
-			maxWidth: elementSize.width,
-			maxHeight: elementSize.height,
+			width: scaledElementSize.width,
+			height: scaledElementSize.height,
+			maxWidth: scaledElementSize.width,
+			maxHeight: scaledElementSize.height,
 			left: centerX,
 			top: centerY,
 			transform: transformString,
 			transition: imageTransition,
 		};
-	}, [ canvasSize, elementSize, transformString, imageTransition ] );
+	}, [ canvasSize, scaledElementSize, transformString, imageTransition ] );
 
 	// Viewport pan CSS transform for the stage div. Applied during resize
 	// drags to keep handles visible when the crop extends past the canvas edge.
@@ -753,6 +801,7 @@ function CropperInner(
 					{ /* The image layer */ }
 					<img
 						className="wp-media-editor-image-editor__image"
+						data-testid="cropper-image"
 						src={ src }
 						alt=""
 						onLoad={ handleImageLoad }
@@ -765,7 +814,7 @@ function CropperInner(
 						<DimmingOverlay
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
-							imageSize={ visualSize }
+							imageSize={ scaledVisualSize }
 							transition={ settleStencilTransition }
 						/>
 					) }
@@ -774,7 +823,7 @@ function CropperInner(
 					<StencilComponent
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
-						imageSize={ visualSize }
+						imageSize={ scaledVisualSize }
 						onCropChange={ handleCropChange }
 						onResizeStart={ handleResizeStart }
 						onResizeEnd={ handleResizeEnd }
@@ -791,7 +840,7 @@ function CropperInner(
 						<GridOverlay
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
-							imageSize={ visualSize }
+							imageSize={ scaledVisualSize }
 						/>
 					) }
 

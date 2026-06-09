@@ -468,4 +468,50 @@ describe( 'Cropper', () => {
 
 		fireEvent.pointerUp( resizeHandle, { pointerId: 1 } );
 	} );
+
+	// View-scale: at rest, the scene magnifies so an under-filling crop fills
+	// the canvas. Canvas is mocked at 600x400. A tall 400x1200 image contain-
+	// fits to a 133.33x400 footprint (fills the height, 133px of 600 wide). A
+	// square crop is bound by the footprint's 133px width, so it magnifies.
+	const TALL_IMAGE = {
+		src: 'tall.jpg',
+		naturalWidth: 400,
+		naturalHeight: 1200,
+	};
+
+	function imageWidth(): number {
+		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
+		return parseFloat( img.style.width || '0' );
+	}
+
+	it( 'magnifies the scene so an under-filling crop fills the canvas at rest', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			// Centered square crop: width fills the footprint (133px), height
+			// 1/3 of 400 = 133px. On-screen 133x133, well below 0.8 * 400.
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		// Contain-fit width is 400 * (400/600 vs 400/1200 -> 1/3) = 133.33.
+		// Binding axis (height) fills to 0.8 * 400, so viewScale = 2.4 and the
+		// image renders at 133.33 * 2.4 = 320.
+		expect( imageWidth() ).toBeCloseTo( 320, 0 );
+	} );
+
+	it( 'does not magnify when the crop already fills the canvas', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			// Full-frame crop already fills the canvas height (footprint == 400).
+			cropRect: { x: 0, y: 0, width: 1, height: 1 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		// viewScale = 1, so the image stays at its contain-fit width (133.33).
+		expect( imageWidth() ).toBeCloseTo( 133.33, 0 );
+	} );
 } );
