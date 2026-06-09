@@ -8,6 +8,12 @@ export default {
 			isIgnored: true,
 		},
 		{
+			label: 'Banned dependencies that should not be reintroduced.',
+			dependencies: [ 'classnames' ],
+			packages: [ '**' ],
+			isBanned: true,
+		},
+		{
 			label: 'peerDependencies use intentionally wide ranges; only enforce that the ranges are mutually satisfiable.',
 			dependencyTypes: [ 'peer' ],
 			policy: 'sameRange',
