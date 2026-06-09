@@ -32,7 +32,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );
 
-const PostTitle = forwardRef( ( _, forwardedRef ) => {
+const PostTitle = forwardRef( ( { tagName = 'h1' }, forwardedRef ) => {
 	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(
 		( select ) => {
 			const { getSettings, getEditedContentOnlySection } = unlock(
@@ -180,9 +180,10 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	// Instead use an inline style to dim the block when it's disabled.
 	const style = isEditingContentOnlySection ? { opacity: 0.2 } : undefined;
 
+	const TagName = tagName;
+
 	return (
-		/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
-		<h1
+		<TagName
 			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
 			contentEditable={ ! isEditingContentOnlySection && ! isPreview }
 			className={ className }
@@ -195,7 +196,6 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			onPaste={ onPaste }
 			style={ style }
 		/>
-		/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	);
 } );
 
@@ -207,8 +207,8 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
  *
  * @return {React.ReactNode} The rendered PostTitle component.
  */
-export default forwardRef( ( _, forwardedRef ) => (
+export default forwardRef( ( props, forwardedRef ) => (
 	<PostTypeSupportCheck supportKeys="title">
-		<PostTitle ref={ forwardedRef } />
+		<PostTitle { ...props } ref={ forwardedRef } />
 	</PostTypeSupportCheck>
 ) );

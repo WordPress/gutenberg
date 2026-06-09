@@ -82,6 +82,23 @@ function getPostContentAttributes( blocks ) {
 	}
 }
 
+function getPostTitleAttributes( blocks ) {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( blocks[ i ].name === 'core/post-title' ) {
+			return blocks[ i ].attributes;
+		}
+		if ( blocks[ i ].innerBlocks.length ) {
+			const nestedPostTitle = getPostTitleAttributes(
+				blocks[ i ].innerBlocks
+			);
+
+			if ( nestedPostTitle ) {
+				return nestedPostTitle;
+			}
+		}
+	}
+}
+
 function checkForPostContentAtRootLevel( blocks ) {
 	for ( let i = 0; i < blocks.length; i++ ) {
 		if ( blocks[ i ].name === 'core/post-content' ) {
@@ -256,6 +273,24 @@ function VisualEditor( {
 	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
 
 	const { layout = {}, align = '' } = newestPostContentAttributes || {};
+	const postTitleTagName = useMemo( () => {
+		if ( ! editedPostTemplate?.content && ! editedPostTemplate?.blocks ) {
+			return 'h1';
+		}
+
+		const postTitleAttributes = editedPostTemplate?.blocks
+			? getPostTitleAttributes( editedPostTemplate.blocks )
+			: getPostTitleAttributes(
+					parse(
+						typeof editedPostTemplate?.content === 'string'
+							? editedPostTemplate.content
+							: ''
+					)
+			  );
+		const level = postTitleAttributes?.level ?? 2;
+
+		return level === 0 ? 'p' : `h${ level }`;
+	}, [ editedPostTemplate?.content, editedPostTemplate?.blocks ] );
 
 	const postContentLayoutClasses = useLayoutClasses(
 		newestPostContentAttributes,
@@ -457,7 +492,10 @@ function VisualEditor( {
 								marginTop: '4rem',
 							} }
 						>
-							<PostTitle ref={ titleRef } />
+							<PostTitle
+								ref={ titleRef }
+								tagName={ postTitleTagName }
+							/>
 						</div>
 					) }
 					<RecursionProvider
