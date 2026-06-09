@@ -65,7 +65,19 @@ export default ( props ) => ( element ) => {
 
 	let isComposing = false;
 
+	// When the editing host is an ancestor (the writing flow wrapper), input
+	// events target that host rather than this element, so determine relevance
+	// from the selection rather than the event target.
+	function isSelectionInElement() {
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		return element.contains( anchorNode ) && element.contains( focusNode );
+	}
+
 	function onInput( event ) {
+		if ( ! isSelectionInElement() ) {
+			return;
+		}
+
 		// Do not trigger a change if characters are being composed. Browsers
 		// will usually emit a final `input` event when the characters are
 		// composed. As of December 2019, Safari doesn't support
@@ -196,14 +208,13 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onCompositionStart() {
+		if ( ! isSelectionInElement() ) {
+			return;
+		}
 		isComposing = true;
-		// Do not update the selection when characters are being composed as
-		// this rerenders the component and might destroy internal browser
-		// editing state.
-		ownerDocument.removeEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
+		// Selection changes are ignored while composing via the isComposing
+		// guard in handleSelectionChange (updating would rerender and destroy
+		// internal browser editing state).
 		// Remove the placeholder. Since the rich text value doesn't update
 		// during composition, the placeholder doesn't get removed. There's no
 		// need to re-add it, when the value is updated on compositionend it
@@ -212,15 +223,13 @@ export default ( props ) => ( element ) => {
 	}
 
 	function onCompositionEnd() {
+		if ( ! isComposing ) {
+			return;
+		}
 		isComposing = false;
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
 		onInput( { inputType: 'insertText' } );
-		// Tracking selection changes can be resumed.
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
 	}
 
 	function onFocus( event ) {
@@ -269,13 +278,9 @@ export default ( props ) => ( element ) => {
 
 		// There is no selection change event when the element is focused, so
 		// we need to manually trigger it. The selection is also not available
-		// yet in this call stack.
+		// yet in this call stack. The selectionchange listener itself is
+		// attached once on mount.
 		window.queueMicrotask( handleSelectionChange );
-
-		ownerDocument.addEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
 	}
 
 	// `input` and `compositionend` must run before block-editor's
@@ -283,18 +288,18 @@ export default ( props ) => ( element ) => {
 	// reading `record.current` updated by our `onInput`. Use capture phase
 	// so we fire before any ancestor bubble handlers.
 	const unsubscribeInput = subscribeDelegatedListener(
-		element,
+		ownerDocument,
 		'input',
 		onInput,
 		true
 	);
 	const unsubscribeCompositionStart = subscribeDelegatedListener(
-		element,
+		ownerDocument,
 		'compositionstart',
 		onCompositionStart
 	);
 	const unsubscribeCompositionEnd = subscribeDelegatedListener(
-		element,
+		ownerDocument,
 		'compositionend',
 		onCompositionEnd,
 		true
@@ -305,14 +310,21 @@ export default ( props ) => ( element ) => {
 		onFocus
 	);
 
+	// Always listen for selection changes so the selection syncs to the store
+	// even when the editing host is an ancestor (the writing flow wrapper) and
+	// this element never receives focus. handleSelectionChange guards on
+	// selection containment and composition state.
+	const unsubscribeSelectionChange = subscribeDelegatedListener(
+		ownerDocument,
+		'selectionchange',
+		handleSelectionChange
+	);
+
 	return () => {
 		unsubscribeInput();
 		unsubscribeCompositionStart();
 		unsubscribeCompositionEnd();
 		unsubscribeFocus();
-		ownerDocument.removeEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
+		unsubscribeSelectionChange();
 	};
 };

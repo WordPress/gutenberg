@@ -45,10 +45,11 @@ export default function useInput() {
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
-			// If writing flow is editable, NEVER allow the browser to alter the
-			// DOM. This will cause React errors (and the DOM should only be
-			// altered in a controlled fashion).
-			if ( node.contentEditable === 'true' ) {
+			// During a multi-block selection the browser must NEVER alter the
+			// DOM directly (it would span blocks uncontrolled and cause React
+			// errors); handle it in a controlled fashion instead. Single-block
+			// input is left to the browser and synced by rich text's onInput.
+			if ( hasMultiSelection() ) {
 				event.preventDefault();
 			}
 		}

@@ -13,10 +13,25 @@ import { unlock } from '../../../lock-unlock';
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
+
+	// When the editing host is an ancestor (the writing flow wrapper), keydown
+	// events target that host rather than this element, so determine relevance
+	// from the selection rather than the event target.
+	function isSelectionInElement() {
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		return element.contains( anchorNode ) && element.contains( focusNode );
+	}
+
 	function onKeyDown( event ) {
 		const { keyCode } = event;
 
 		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		if ( ! isSelectionInElement() ) {
 			return;
 		}
 
@@ -54,5 +69,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
+	return subscribeDelegatedListener( ownerDocument, 'keydown', onKeyDown );
 };

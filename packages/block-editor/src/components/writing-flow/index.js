@@ -46,6 +46,10 @@ export function useWritingFlow() {
 			useSelectAll(),
 			useArrowNav(),
 			usePreviewModeNav(),
+			// ALWAYS-ON: the writing flow wrapper is the persistent editing host.
+			useRefEffect( ( node ) => {
+				node.contentEditable = 'true';
+			}, [] ),
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = 0;

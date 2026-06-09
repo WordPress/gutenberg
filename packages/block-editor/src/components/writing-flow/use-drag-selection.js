@@ -16,7 +16,8 @@ import { store as blockEditorStore } from '../../store';
  * @param {boolean}     value `contentEditable` value (true or false)
  */
 function setContentEditableWrapper( node, value ) {
-	node.contentEditable = value;
+	// ALWAYS-ON: the wrapper stays editable; never turn it off.
+	node.contentEditable = 'true';
 	// Firefox doesn't automatically move focus.
 	if ( value ) {
 		node.focus();

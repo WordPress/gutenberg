@@ -53,13 +53,17 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 
 		const { ownerDocument } = ref.current;
 
-		// Do not focus the block if it already contains the active element, or
-		// if an ancestor editing host (the writing flow wrapper) is focused.
+		// Do not steal focus if this block already contains the active element,
+		// or if an ancestor editing host (the writing flow wrapper) is focused
+		// and the caret is already within this block. Otherwise (e.g. a newly
+		// selected/created block) focus it as usual.
 		const { activeElement } = ownerDocument;
+		const { anchorNode } = ownerDocument.defaultView.getSelection();
 		if (
 			isInsideRootBlock( ref.current, activeElement ) ||
 			( activeElement?.isContentEditable &&
-				activeElement.contains( ref.current ) )
+				activeElement.contains( ref.current ) &&
+				ref.current.contains( anchorNode ) )
 		) {
 			return;
 		}

@@ -85,13 +85,14 @@ function setContentEditableWrapper( node, value ) {
 	// Since we are calling this on every selection change, check if the value
 	// needs to be updated first because it trigger the browser to recalculate
 	// style.
-	if ( node.contentEditable !== String( value ) ) {
-		node.contentEditable = value;
+	// ALWAYS-ON: the wrapper stays editable; never turn it off.
+	if ( node.contentEditable !== 'true' ) {
+		node.contentEditable = 'true';
+	}
 
-		// Firefox doesn't automatically move focus.
-		if ( value ) {
-			node.focus();
-		}
+	// Firefox doesn't automatically move focus.
+	if ( value ) {
+		node.focus();
 	}
 }
 
