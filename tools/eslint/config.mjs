@@ -13,7 +13,6 @@ import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-import platformDocsConfig from '../../platform-docs/eslint-overrides.cjs';
 
 // Wrap plugins that don't yet support ESLint v10's rule context API.
 const jestDomPlugin = {
@@ -873,5 +872,4 @@ export default dedupePlugins( [
 
 	// Package-level configs (kept alongside the code they apply to).
 	...wpBuildConfig,
-	...platformDocsConfig,
 ] );

@@ -13,7 +13,6 @@ module.exports = {
 		'docs',
 		'node_modules',
 		'patches',
-		'platform-docs',
 		'results',
 		'schemas',
 		'storybook',
