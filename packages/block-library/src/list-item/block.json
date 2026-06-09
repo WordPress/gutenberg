@@ -66,5 +66,6 @@
 	"selectors": {
 		"root": ".wp-block-list > li",
 		"border": ".wp-block-list:not(.wp-block-list .wp-block-list) > li"
-	}
+	},
+	"editorStyle": "wp-block-list-item-editor"
 }
