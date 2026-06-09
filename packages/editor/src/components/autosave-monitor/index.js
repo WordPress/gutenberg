@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -11,73 +11,107 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export class AutosaveMonitor extends Component {
-	constructor( props ) {
-		super( props );
-		this.needsAutosave = !! ( props.isDirty && props.isAutosaveable );
-	}
+export function AutosaveMonitor( props ) {
+	const {
+		autosave,
+		isAutosaveable,
+		isAutosaving,
+		isDirty,
+		interval,
+		editsReference,
+		disableIntervalChecks,
+	} = props;
 
-	componentDidMount() {
-		if ( ! this.props.disableIntervalChecks ) {
-			this.setAutosaveTimer();
+	const needsAutosaveRef = useRef( !! ( isDirty && isAutosaveable ) );
+	const timerIdRef = useRef();
+
+	// Keep the latest props and timer handler accessible to the scheduled
+	// timer, which runs outside of React's render cycle.
+	const propsRef = useRef( props );
+	const autosaveTimerHandlerRef = useRef();
+
+	const setAutosaveTimer = useCallback(
+		( timeout = propsRef.current.interval * 1000 ) => {
+			timerIdRef.current = setTimeout( () => {
+				autosaveTimerHandlerRef.current();
+			}, timeout );
+		},
+		[]
+	);
+
+	// Sync the refs after every render so the timer callback always reads the
+	// latest props when it eventually fires.
+	useEffect( () => {
+		propsRef.current = props;
+		autosaveTimerHandlerRef.current = () => {
+			if ( ! propsRef.current.isAutosaveable ) {
+				setAutosaveTimer( 1000 );
+				return;
+			}
+
+			if ( needsAutosaveRef.current ) {
+				needsAutosaveRef.current = false;
+				propsRef.current.autosave();
+			}
+
+			setAutosaveTimer();
+		};
+	} );
+
+	// Equivalent to `componentDidMount` / `componentWillUnmount`.
+	useEffect( () => {
+		if ( ! disableIntervalChecks ) {
+			setAutosaveTimer();
 		}
-	}
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.disableIntervalChecks ) {
-			if ( this.props.editsReference !== prevProps.editsReference ) {
-				this.props.autosave();
+		return () => {
+			clearTimeout( timerIdRef.current );
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
+
+	// Equivalent to `componentDidUpdate`. A single effect preserves the exact
+	// branch ordering of the original class component.
+	const isMountedRef = useRef( false );
+	const prevPropsRef = useRef( props );
+	useEffect( () => {
+		if ( ! isMountedRef.current ) {
+			isMountedRef.current = true;
+			prevPropsRef.current = props;
+			return;
+		}
+
+		const prevProps = prevPropsRef.current;
+		prevPropsRef.current = props;
+
+		if ( disableIntervalChecks ) {
+			if ( editsReference !== prevProps.editsReference ) {
+				autosave();
 			}
 			return;
 		}
 
-		if ( this.props.interval !== prevProps.interval ) {
-			clearTimeout( this.timerId );
-			this.setAutosaveTimer();
+		if ( interval !== prevProps.interval ) {
+			clearTimeout( timerIdRef.current );
+			setAutosaveTimer();
 		}
 
-		if ( ! this.props.isDirty ) {
-			this.needsAutosave = false;
+		if ( ! isDirty ) {
+			needsAutosaveRef.current = false;
 			return;
 		}
 
-		if ( this.props.isAutosaving && ! prevProps.isAutosaving ) {
-			this.needsAutosave = false;
+		if ( isAutosaving && ! prevProps.isAutosaving ) {
+			needsAutosaveRef.current = false;
 			return;
 		}
 
-		if ( this.props.editsReference !== prevProps.editsReference ) {
-			this.needsAutosave = true;
+		if ( editsReference !== prevProps.editsReference ) {
+			needsAutosaveRef.current = true;
 		}
-	}
+	} );
 
-	componentWillUnmount() {
-		clearTimeout( this.timerId );
-	}
-
-	setAutosaveTimer( timeout = this.props.interval * 1000 ) {
-		this.timerId = setTimeout( () => {
-			this.autosaveTimerHandler();
-		}, timeout );
-	}
-
-	autosaveTimerHandler() {
-		if ( ! this.props.isAutosaveable ) {
-			this.setAutosaveTimer( 1000 );
-			return;
-		}
-
-		if ( this.needsAutosave ) {
-			this.needsAutosave = false;
-			this.props.autosave();
-		}
-
-		this.setAutosaveTimer();
-	}
-
-	render() {
-		return null;
-	}
+	return null;
 }
 
 /**

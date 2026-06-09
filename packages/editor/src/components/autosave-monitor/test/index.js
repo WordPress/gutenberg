@@ -13,16 +13,9 @@ jest.spyOn( global, 'clearTimeout' );
 jest.spyOn( global, 'setTimeout' );
 
 describe( 'AutosaveMonitor', () => {
-	let setAutosaveTimerSpy;
 	beforeEach( () => {
-		setAutosaveTimerSpy = jest.spyOn(
-			AutosaveMonitor.prototype,
-			'setAutosaveTimer'
-		);
-	} );
-
-	afterEach( () => {
-		setAutosaveTimerSpy.mockClear();
+		setTimeout.mockClear();
+		clearTimeout.mockClear();
 	} );
 
 	it( 'should render nothing', () => {
@@ -34,7 +27,7 @@ describe( 'AutosaveMonitor', () => {
 	it( 'should start autosave timer after being mounted', () => {
 		render( <AutosaveMonitor isDirty /> );
 
-		expect( setAutosaveTimerSpy ).toHaveBeenCalled();
+		expect( setTimeout ).toHaveBeenCalled();
 	} );
 
 	it( 'should clear the autosave timer after being unmounted', () => {
@@ -48,10 +41,11 @@ describe( 'AutosaveMonitor', () => {
 	it( 'should clear and restart autosave timer when the interval changes', () => {
 		const { rerender } = render( <AutosaveMonitor isDirty /> );
 
+		setTimeout.mockClear();
 		rerender( <AutosaveMonitor isDirty interval={ 999 } /> );
 
 		expect( clearTimeout ).toHaveBeenCalled();
-		expect( setAutosaveTimerSpy ).toHaveBeenCalledTimes( 2 );
+		expect( setTimeout ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should autosave when `editReference` changes', () => {
@@ -193,5 +187,68 @@ describe( 'AutosaveMonitor', () => {
 			expect.any( Function ),
 			1000
 		);
+	} );
+
+	it( 'should autosave on the first timer tick when mounted dirty and autosaveable', () => {
+		const autosave = jest.fn();
+		render(
+			<AutosaveMonitor
+				isDirty
+				isAutosaveable
+				autosave={ autosave }
+				interval={ 5 }
+			/>
+		);
+
+		jest.runOnlyPendingTimers();
+
+		expect( autosave ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not start a timer when `disableIntervalChecks` is true', () => {
+		render( <AutosaveMonitor isDirty disableIntervalChecks /> );
+
+		expect( setTimeout ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should autosave immediately when `editsReference` changes and `disableIntervalChecks` is true', () => {
+		const autosave = jest.fn();
+		const { rerender } = render(
+			<AutosaveMonitor disableIntervalChecks autosave={ autosave } />
+		);
+
+		expect( autosave ).not.toHaveBeenCalled();
+
+		rerender(
+			<AutosaveMonitor
+				disableIntervalChecks
+				autosave={ autosave }
+				editsReference={ [] }
+			/>
+		);
+
+		expect( autosave ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not autosave when `editsReference` is unchanged and `disableIntervalChecks` is true', () => {
+		const autosave = jest.fn();
+		const { rerender } = render(
+			<AutosaveMonitor
+				isDirty
+				disableIntervalChecks
+				autosave={ autosave }
+			/>
+		);
+
+		rerender(
+			<AutosaveMonitor
+				isDirty
+				disableIntervalChecks
+				autosave={ autosave }
+				interval={ 5 }
+			/>
+		);
+
+		expect( autosave ).not.toHaveBeenCalled();
 	} );
 } );
