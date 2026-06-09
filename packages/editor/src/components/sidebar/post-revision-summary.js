@@ -17,6 +17,7 @@ import { unlock } from '../../lock-unlock';
 import PostRevisionsTimeline from '../post-revisions-timeline';
 import PostPanelSection from '../post-panel-section';
 import PostCardPanel from '../post-card-panel';
+import RevisionFieldsDiffPanel from '../revision-fields-diff';
 
 export default function PostRevisionSummary() {
 	const { revisionId, postId } = useSelect( ( select ) => {
@@ -43,9 +44,10 @@ export default function PostRevisionSummary() {
 					>
 						{ __( 'Open classic revisions screen' ) }
 					</ExternalLink>
-					<PostRevisionsTimeline />
 				</VStack>
 			</PostPanelSection>
+			<RevisionFieldsDiffPanel />
+			<PostRevisionsTimeline />
 		</>
 	);
 }

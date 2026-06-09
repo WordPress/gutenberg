@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/variables" as *;
-
 // Make the revisions inspector a fixed-height, inner-scrolling column so the
 // timeline fills the panel and the DataViewsPicker pagination stays pinned to
 // the bottom. The picker already scrolls its list and pins its footer; it just
@@ -27,20 +25,20 @@
 	flex: 1;
 	min-height: 0;
 
-	// Propagate the bounded height down the chain to the timeline wrapper.
-	[role="tabpanel"]:has(.editor-post-summary),
-	.editor-post-summary,
-	.editor-post-summary > .components-v-stack,
-	.editor-post-revisions-timeline {
+	// The document tab panel becomes the flex column that stacks the
+	// revisions UI: the summary header, the Meta diff panel, then the
+	// timeline. It hands a bounded height to the timeline below.
+	[role="tabpanel"]:has(.editor-post-summary) {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
 		min-height: 0;
 	}
-}
 
-.editor-post-revisions-timeline__diff {
-	min-width: 280px;
-	max-width: 360px;
-	padding: $grid-unit-15;
+	// The summary header and Meta panel keep their natural height; only the
+	// timeline grows to fill the leftover space and scrolls internally.
+	.editor-post-revisions-timeline {
+		flex: 1;
+		min-height: 0;
+	}
 }

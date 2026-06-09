@@ -1,26 +1,14 @@
 /**
- * External dependencies
- */
-/*
- * `diffWordsWithSpace` preserves the v4-style per-word output. v6+
- * stopped treating whitespace as a token in `diffWords`, which coalesces
- * adjacent word changes into a single removed/added pair.
- */
-import { diffWordsWithSpace } from 'diff';
-
-/**
  * WordPress dependencies
  */
-import { Button, Dropdown } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { info } from '@wordpress/icons';
 import { authorField } from '@wordpress/fields';
-import { Stack, Text } from '@wordpress/ui';
+import { Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -28,7 +16,6 @@ import { Stack, Text } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { PostContentInformationUI } from '../post-content-information';
-import { RevisionDiffEntries } from '../revision-diff-panel';
 
 const PAGE_SIZE = 10;
 const EMPTY_ARRAY = [];
@@ -53,96 +40,38 @@ function getDisplayDate( value ) {
 		: humanTimeDiff( date );
 }
 
-function stringifyValue( value ) {
-	if ( value === null || value === undefined ) {
-		return '';
-	}
-	if ( typeof value === 'object' ) {
-		return JSON.stringify( value, null, 2 );
-	}
-	return String( value );
-}
-
-function computeDiffEntries( revision, previousRevision ) {
-	if ( ! revision ) {
-		return null;
-	}
-
-	const revisionMeta = revision.meta ?? {};
-	const previousMeta = previousRevision?.meta ?? {};
-	const allMetaKeys = new Set( [
-		...Object.keys( revisionMeta ),
-		...Object.keys( previousMeta ),
-	] );
-
-	const result = {};
-
-	for ( const key of allMetaKeys ) {
-		const revStr = stringifyValue( revisionMeta[ key ] );
-		const prevStr = stringifyValue( previousMeta[ key ] );
-
-		if ( ! revStr && ! prevStr ) {
-			continue;
-		}
-
-		result[ key ] = diffWordsWithSpace( prevStr, revStr );
-	}
-
-	if ( Object.keys( result ).length === 0 ) {
-		return null;
-	}
-
-	return result;
-}
-
 export default function PostRevisionsTimeline() {
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 	const [ view, setView ] = useState( baseView );
 
-	const {
-		revisions,
-		revisionKey,
-		currentRevisionId,
-		currentRevision,
-		previousRevision,
-	} = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( editorStore );
-		const {
-			getCurrentRevisionId: _getCurrentRevisionId,
-			getCurrentRevision,
-			getPreviousRevision,
-			getRevisionPage,
-			getPageRevisions,
-		} = unlock( select( editorStore ) );
-		const { getEntityConfig } = select( coreStore );
+	const { revisions, revisionKey, currentRevisionId, currentRevision } =
+		useSelect( ( select ) => {
+			const { getCurrentPostType } = select( editorStore );
+			const {
+				getCurrentRevisionId: _getCurrentRevisionId,
+				getCurrentRevision,
+				getRevisionPage,
+				getPageRevisions,
+			} = unlock( select( editorStore ) );
+			const { getEntityConfig } = select( coreStore );
 
-		const _postType = getCurrentPostType();
-		const entityConfig = getEntityConfig( 'postType', _postType );
-		const _revisionKey = entityConfig?.revisionKey || 'id';
-		const _currentRevisionId = _getCurrentRevisionId();
+			const _postType = getCurrentPostType();
+			const entityConfig = getEntityConfig( 'postType', _postType );
+			const _revisionKey = entityConfig?.revisionKey || 'id';
+			const _currentRevisionId = _getCurrentRevisionId();
 
-		return {
-			// Same desc-ordered window the header slider renders (warm cache).
-			revisions: getPageRevisions( getRevisionPage() ),
-			revisionKey: _revisionKey,
-			currentRevisionId: _currentRevisionId,
-			// Return the stable revision references and derive the diff below;
-			// computing it here would return a fresh object on every store
-			// change and defeat useSelect's shallow-equality bailout.
-			currentRevision: _currentRevisionId
-				? getCurrentRevision()
-				: undefined,
-			previousRevision: _currentRevisionId
-				? getPreviousRevision()
-				: undefined,
-		};
-	}, [] );
+			return {
+				// Same desc-ordered window the header slider renders (warm cache).
+				revisions: getPageRevisions( getRevisionPage() ),
+				revisionKey: _revisionKey,
+				currentRevisionId: _currentRevisionId,
+				currentRevision: _currentRevisionId
+					? getCurrentRevision()
+					: undefined,
+			};
+		}, [] );
 
 	const postContent = currentRevision?.content?.raw;
-	const diffEntries = useMemo(
-		() => computeDiffEntries( currentRevision, previousRevision ),
-		[ currentRevision, previousRevision ]
-	);
 
 	const isLoading = ! revisions;
 
@@ -178,53 +107,14 @@ export default function PostRevisionsTimeline() {
 						return null;
 					}
 					return (
-						<Stack
-							className="editor-post-revisions-timeline__details"
-							direction="row"
-							gap="sm"
-							justify="flex-start"
-							align="center"
-						>
-							<PostContentInformationUI
-								postContent={ postContent }
-							/>
-							{ diffEntries && (
-								<Dropdown
-									popoverProps={ {
-										placement: 'bottom-start',
-									} }
-									renderToggle={ ( { isOpen, onToggle } ) => (
-										<Button
-											size="small"
-											icon={ info }
-											label={ __(
-												'View changed fields'
-											) }
-											aria-expanded={ isOpen }
-											onClick={ ( event ) => {
-												// Stop the row's selection toggle from firing.
-												event.stopPropagation();
-												onToggle();
-											} }
-										/>
-									) }
-									renderContent={ () => (
-										<div className="editor-post-revisions-timeline__diff">
-											<RevisionDiffEntries
-												entries={ diffEntries }
-											/>
-										</div>
-									) }
-								/>
-							) }
-						</Stack>
+						<PostContentInformationUI postContent={ postContent } />
 					);
 				},
 				enableSorting: false,
 				enableHiding: false,
 			},
 		],
-		[ revisionKey, currentRevisionId, postContent, diffEntries ]
+		[ revisionKey, currentRevisionId, postContent ]
 	);
 
 	const { data: shownRevisions, paginationInfo } = useMemo(
