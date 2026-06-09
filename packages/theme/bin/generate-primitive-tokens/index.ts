@@ -53,10 +53,12 @@ function generatePrimitiveColorTokens() {
 				ramp: buildAccentRamp( seed, bgRamp ),
 			} ) );
 
-		// Convert the ramp values in a DTCG compatible format
+		// Convert the ramp values in a DTCG compatible format.
+		// Note: the background seed maps to the `bg` design token group. The
+		// design system token naming intentionally keeps the `bg` convention.
 		[
 			{
-				scaleName: 'background',
+				scaleName: 'bg',
 				ramp: bgRamp,
 			},
 			...accentRamps,

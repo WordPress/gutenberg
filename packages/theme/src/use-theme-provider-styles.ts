@@ -200,12 +200,14 @@ export function useThemeProviderStyles( {
 			primary,
 		};
 
-		// Generate ramps.
+		// Generate ramps, keyed by their design token group name. The
+		// `background` seed maps to the `bg` token group: the design system
+		// token naming intentionally keeps the `bg` convention.
 		const computedColorRamps = new Map< string, RampResult >();
 		const bgRamp = getCachedBgRamp( seeds.background );
 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
 			if ( rampName === 'background' ) {
-				computedColorRamps.set( rampName, bgRamp );
+				computedColorRamps.set( 'bg', bgRamp );
 			} else {
 				computedColorRamps.set(
 					rampName,
