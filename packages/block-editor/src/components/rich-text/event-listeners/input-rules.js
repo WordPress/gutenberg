@@ -158,15 +158,19 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
+	// Capture phase so these run before ancestor (writing flow) bubble
+	// handlers, matching the timing of the previous raw element listeners.
 	const unsubscribeInput = subscribeDelegatedListener(
 		element,
 		'input',
-		onInput
+		onInput,
+		true
 	);
 	const unsubscribeCompositionEnd = subscribeDelegatedListener(
 		element,
 		'compositionend',
-		onInput
+		onInput,
+		true
 	);
 	return () => {
 		unsubscribeInput();
