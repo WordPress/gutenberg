@@ -38,7 +38,6 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./react-polyfill": "./src/react-polyfill-base.ts",
 		"./package.json": "./package.json"
 	},
 	"wpScript": true,

@@ -25,6 +25,7 @@
 		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
 		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
 		"@wordpress/build": "file:../../packages/wp-build",
+		"@wordpress/react-19": "file:../react-19",
 		"@wordpress/scripts": "file:../../packages/scripts",
 		"babel-plugin-inline-json-import": "^0.3.2",
 		"chalk": "^4.1.1",
