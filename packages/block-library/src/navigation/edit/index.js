@@ -6,13 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useState,
-	useEffect,
-	useRef,
-	Platform,
-} from '@wordpress/element';
+import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -152,8 +146,7 @@ function ColorTools( {
 	// Detect if we're editing inside an overlay template part.
 	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
 
-	// Turn on contrast checker for web only since it's not supported on mobile yet.
-	const enableContrastChecking = Platform.OS === 'web';
+	const enableContrastChecking = true;
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
 			return;
