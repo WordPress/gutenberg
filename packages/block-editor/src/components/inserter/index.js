@@ -273,7 +273,7 @@ const UnforwardedInserter = (
 
 		onSelectOrClose?.( newBlock );
 
-		const blockTypeToInsert = getBlockType( blockName ) || allowedBlockType;
+		const blockTypeToInsert = getBlockType( blockName );
 		let blockLabelToInsert;
 		if ( blockTypeToInsert ) {
 			blockLabelToInsert = getBlockLabel(
