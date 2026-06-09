@@ -39,7 +39,10 @@ export function useBoundaryStyle( { record } ) {
 		const newColor = colord( computedStyle.color )
 			.alpha( 0.2 )
 			.toRgbString();
-		const selector = `.rich-text:focus ${ boundarySelector }`;
+		// Key off the focused editing host rather than the rich text element:
+		// when the writing flow wrapper is the host, the rich text element
+		// itself never receives focus, so `.rich-text:focus` would never match.
+		const selector = `[contenteditable="true"]:focus ${ boundarySelector }`;
 		const rule = `background-color: ${ newColor }`;
 		const style = `${ selector } {${ rule }}`;
 		const globalStyleId = 'rich-text-boundary-style';

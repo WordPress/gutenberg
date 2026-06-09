@@ -15,6 +15,17 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 const EMPTY_ACTIVE_FORMATS = [];
 
 export default ( props ) => ( element ) => {
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
+
+	// When the editing host is an ancestor (the writing flow wrapper), keydown
+	// events target that host rather than this element, so determine relevance
+	// from the selection rather than the event target.
+	function isSelectionInElement() {
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		return element.contains( anchorNode ) && element.contains( focusNode );
+	}
+
 	function onKeyDown( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
@@ -29,6 +40,10 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		if ( ! isSelectionInElement() ) {
+			return;
+		}
+
 		const { record, applyRecord, forceRender } = props.current;
 		const {
 			text,
@@ -38,7 +53,6 @@ export default ( props ) => ( element ) => {
 			activeFormats: currentActiveFormats = [],
 		} = record.current;
 		const collapsed = isCollapsed( record.current );
-		const { defaultView } = element.ownerDocument;
 		// To do: ideally, we should look at visual position instead.
 		const { direction } = defaultView.getComputedStyle( element );
 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
@@ -99,5 +113,10 @@ export default ( props ) => ( element ) => {
 		forceRender();
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
+	return subscribeDelegatedListener(
+		ownerDocument,
+		'keydown',
+		onKeyDown,
+		true
+	);
 };
