@@ -17,7 +17,6 @@ import undoAutomaticChange from './undo-automatic-change';
 import pasteHandler from './paste-handler';
 import _delete from './delete';
 import enter from './enter';
-import firefoxCompat from './firefox-compat';
 
 const allEventListeners = [
 	beforeInputRules,
@@ -30,7 +29,6 @@ const allEventListeners = [
 	pasteHandler,
 	_delete,
 	enter,
-	firefoxCompat,
 ];
 
 export function useEventListeners( props ) {
