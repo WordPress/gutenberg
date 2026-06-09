@@ -49,6 +49,17 @@ export function findSelection( blocks ) {
 }
 
 export default ( props ) => ( element ) => {
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
+
+	// When the editing host is an ancestor (the writing flow wrapper), input
+	// events target that host rather than this element, so determine relevance
+	// from the selection rather than the event target.
+	function isSelectionInElement() {
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		return element.contains( anchorNode ) && element.contains( focusNode );
+	}
+
 	function inputRule() {
 		const { getValue, onReplace, selectionChange, registry } =
 			props.current;
@@ -111,6 +122,10 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		if ( ! isSelectionInElement() ) {
+			return;
+		}
+
 		if ( __unstableAllowPrefixTransformations && inputRule() ) {
 			return;
 		}
@@ -161,13 +176,13 @@ export default ( props ) => ( element ) => {
 	// Capture phase so these run before ancestor (writing flow) bubble
 	// handlers, matching the timing of the previous raw element listeners.
 	const unsubscribeInput = subscribeDelegatedListener(
-		element,
+		ownerDocument,
 		'input',
 		onInput,
 		true
 	);
 	const unsubscribeCompositionEnd = subscribeDelegatedListener(
-		element,
+		ownerDocument,
 		'compositionend',
 		onInput,
 		true

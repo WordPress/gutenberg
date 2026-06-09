@@ -23,12 +23,27 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 const wrapSelectionSettings = [ '`', '"', "'", '“”', '‘’' ];
 
 export default ( props ) => ( element ) => {
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
+
+	// When the editing host is an ancestor (the writing flow wrapper), input
+	// events target that host rather than this element, so determine relevance
+	// from the selection rather than the event target.
+	function isSelectionInElement() {
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		return element.contains( anchorNode ) && element.contains( focusNode );
+	}
+
 	function onInput( event ) {
 		const { inputType, data } = event;
 		const { value, onChange, registry } = props.current;
 
 		// Only run the rules when inserting text.
 		if ( inputType !== 'insertText' ) {
+			return;
+		}
+
+		if ( ! isSelectionInElement() ) {
 			return;
 		}
 
@@ -71,8 +86,6 @@ export default ( props ) => ( element ) => {
 
 		init.data = endChar;
 
-		const { ownerDocument } = element;
-		const { defaultView } = ownerDocument;
 		const newEvent = new defaultView.InputEvent( 'input', init );
 
 		// Dispatch an `input` event with the new data. This will trigger the
@@ -89,5 +102,10 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 	}
 
-	return subscribeDelegatedListener( element, 'beforeinput', onInput, true );
+	return subscribeDelegatedListener(
+		ownerDocument,
+		'beforeinput',
+		onInput,
+		true
+	);
 };
