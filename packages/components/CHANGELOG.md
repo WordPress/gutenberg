@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   Fix bug displaying custom color option even when opted out ([74402](https://github.com/WordPress/gutenberg/pull/72402))
+-   -   `ColorPalette`: Avoid rendering an empty palette when custom colors are disabled and no color presets are available ([#72402](https://github.com/WordPress/gutenberg/pull/72402)).
 
 ## 34.0.0 (2026-05-27)
 
