@@ -34,10 +34,10 @@ import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
 import {
 	MAX_VIEW_SCALE,
-	MIN_CROP_PIXELS,
 	SETTLE_TARGET_CANVAS_FILL,
 } from '../../core/constants';
 import { computeInscribedRect } from '../../core/crop-rect';
+import { getMinCropPixels } from '../../core/stencil-math';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -272,32 +272,6 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// Per-axis minimum crop size in normalized space, expressing a
-	// pixel floor on the captured source region. cropRect is normalized
-	// in the viewport's snap-rotation bbox; the captured source-pixel
-	// width is `cropRect.width * bbox.width / zoom`, so the normalized
-	// floor scales with `zoom` to keep the source-pixel floor constant.
-	// Without this, SETTLE_CROP zooms in proportional to the shrink and
-	// successive drags can crop arbitrarily small.
-	const minCropSize: Size | undefined = useMemo( () => {
-		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
-			return undefined;
-		}
-		const snapRotation = Math.round( state.rotation / 90 ) * 90;
-		const bbox = getRotatedBBox(
-			naturalWidth,
-			naturalHeight,
-			snapRotation
-		);
-		return {
-			width: Math.min( 1, ( MIN_CROP_PIXELS * state.zoom ) / bbox.width ),
-			height: Math.min(
-				1,
-				( MIN_CROP_PIXELS * state.zoom ) / bbox.height
-			),
-		};
-	}, [ naturalWidth, naturalHeight, state.rotation, state.zoom ] );
-
 	// Report the rendered image size to the controller. Composite
 	// controllers need it to compute aspect-ratio reshapes from the
 	// reducer (the dropdown dispatches without DOM access); pure
@@ -440,6 +414,41 @@ function CropperInner(
 		} ),
 		[ visualSize.width, visualSize.height, viewScale ]
 	);
+
+	// Per-axis minimum crop size in normalized space, expressing a pixel floor
+	// on the captured source region. cropRect is normalized in the viewport's
+	// snap-rotation bbox; the captured source-pixel width is
+	// `cropRect.width * bbox.width / zoom`, so the normalized floor scales with
+	// `zoom` to keep the source-pixel floor constant. The floor itself adapts to
+	// the on-screen display scale (fit × zoom × view scale) via
+	// `getMinCropPixels`, so on a large image shown small the crop can't shrink
+	// until the handles collapse — it yields to the 24px source floor only once
+	// the image is shown large enough.
+	const minCropSize: Size | undefined = useMemo( () => {
+		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		const displayScale =
+			( elementSize.width / naturalWidth ) * state.zoom * viewScale;
+		const minPixels = getMinCropPixels( displayScale );
+		return {
+			width: Math.min( 1, ( minPixels * state.zoom ) / bbox.width ),
+			height: Math.min( 1, ( minPixels * state.zoom ) / bbox.height ),
+		};
+	}, [
+		naturalWidth,
+		naturalHeight,
+		state.rotation,
+		state.zoom,
+		elementSize.width,
+		viewScale,
+	] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
