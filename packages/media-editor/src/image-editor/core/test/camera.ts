@@ -6,6 +6,7 @@ import {
 	createExportCamera,
 	getImageFit,
 	getRotatedBBox,
+	getViewScale,
 } from '../camera';
 import {
 	restrictPanZoom,
@@ -944,5 +945,71 @@ describe( 'getSourceRegion — non-finite input regression', () => {
 		expect( Number.isFinite( out.rotation ) ).toBe( true );
 		expect( Number.isFinite( out.zoom ) ).toBe( true );
 		expect( out.zoom ).toBeGreaterThanOrEqual( 1 );
+	} );
+} );
+
+describe( 'getViewScale — presentational magnification to fill the canvas', () => {
+	// A tall image (1400x2500) fit into a short, wide canvas (1000x500):
+	// contain fit = min(1000/1400, 500/2500) = 0.2, so the rendered footprint
+	// is 280x500 — it fills the canvas height but only 280 of 1000 px wide.
+	const CANVAS: Size = { width: 1000, height: 500 };
+	const FOOTPRINT: Size = { width: 280, height: 500 };
+	const TARGET = 0.8;
+	const MAX = 8;
+
+	it( 'returns 1 when the crop already fills at least the target on its binding axis', () => {
+		// Full-footprint crop is 280x500 on screen: 500 == canvas height, well
+		// above 0.8 of it. No magnification needed.
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		expect( getViewScale( full, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			1
+		);
+	} );
+
+	it( 'magnifies an under-filling crop so its binding axis reaches target * canvas', () => {
+		// A square crop in the 280x500 footprint: width fills (cropRect.width=1
+		// -> 280px), height is 280/500 = 0.56 (-> 280px). On-screen 280x280.
+		// kW = 0.8*1000/280 = 2.857, kH = 0.8*500/280 = 1.4286, k = min = 1.4286.
+		const square = { x: 0, y: 0.22, width: 1, height: 280 / 500 };
+		const scale = getViewScale( square, CANVAS, FOOTPRINT, TARGET, MAX );
+		expect( scale ).toBeCloseTo( ( TARGET * 500 ) / 280, 5 );
+		// After magnification the binding (height) axis reaches 0.8 * canvas.
+		expect( square.height * FOOTPRINT.height * scale ).toBeCloseTo(
+			TARGET * CANVAS.height,
+			5
+		);
+	} );
+
+	it( 'clamps magnification at maxScale for a near-degenerate crop', () => {
+		// Tiny crop would need an enormous scale to fill; cap it.
+		const tiny = { x: 0.5, y: 0.5, width: 0.02, height: 0.02 };
+		expect( getViewScale( tiny, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			MAX
+		);
+	} );
+
+	it( 'never shrinks below 1 even when the crop overfills the target', () => {
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		expect( getViewScale( full, CANVAS, FOOTPRINT, 0.5, MAX ) ).toBe( 1 );
+	} );
+
+	it( 'returns 1 for zero or degenerate inputs', () => {
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		const zeroRect = { x: 0, y: 0, width: 0, height: 0 };
+		expect( getViewScale( zeroRect, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			1
+		);
+		expect(
+			getViewScale(
+				full,
+				{ width: 0, height: 0 },
+				FOOTPRINT,
+				TARGET,
+				MAX
+			)
+		).toBe( 1 );
+		expect(
+			getViewScale( full, CANVAS, { width: 0, height: 0 }, TARGET, MAX )
+		).toBe( 1 );
 	} );
 } );
