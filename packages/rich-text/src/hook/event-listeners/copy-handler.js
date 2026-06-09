@@ -7,7 +7,6 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
  * Internal dependencies
  */
 import { toHTMLString } from '../../to-html-string';
-import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
 import { getTextContent } from '../../get-text-content';
 import { unlock } from '../../lock-unlock';
@@ -18,10 +17,13 @@ export default ( props ) => ( element ) => {
 	function onCopy( event ) {
 		const { record } = props.current;
 		const { ownerDocument } = element;
-		if (
-			isCollapsed( record.current ) ||
-			! element.contains( ownerDocument.activeElement )
-		) {
+		// Determine relevance from the selection, not the active element, so
+		// the handler works regardless of which editing host is focused.
+		const selection = ownerDocument.defaultView.getSelection();
+		const { anchorNode, focusNode } = selection;
+		const containsSelection =
+			element.contains( anchorNode ) && element.contains( focusNode );
+		if ( selection.isCollapsed || ! containsSelection ) {
 			return;
 		}
 

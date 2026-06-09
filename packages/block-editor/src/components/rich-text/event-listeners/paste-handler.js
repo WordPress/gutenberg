@@ -33,9 +33,14 @@ export default ( props ) => ( element ) => {
 			registry,
 		} = props.current;
 
-		// The event listener is attached to the window, so we need to check if
-		// the target is the element or inside the element.
-		if ( ! element.contains( event.target ) ) {
+		// The event listener is attached to the window, so we need to check
+		// that the selection is within the element, rather than relying on the
+		// event target (which is the editing host, not necessarily this
+		// element).
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		const containsSelection =
+			element.contains( anchorNode ) && element.contains( focusNode );
+		if ( ! containsSelection ) {
 			return;
 		}
 
