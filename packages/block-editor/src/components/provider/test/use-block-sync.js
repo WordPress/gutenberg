@@ -45,6 +45,11 @@ describe( 'useBlockSync hook', () => {
 				foo: { type: 'number' },
 			},
 		} );
+		registerBlockType( 'test/container-block', {
+			apiVersion: 3,
+			title: 'Test container block',
+			allowedBlocks: [ 'test/test-block' ],
+		} );
 	} );
 
 	afterEach( () => {
@@ -351,18 +356,17 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
 
-	it( 'merges history-ignored block changes into a deferred replacement', async () => {
+	it( 'merges history-ignored block changes into a deferred block addition', async () => {
 		const onChange = jest.fn();
 		const onInput = jest.fn();
 		let registry;
 		const setRegistry = ( reg ) => {
 			registry = reg;
 		};
-		const initialBlock = createBlock( 'test/test-block' );
 		render(
 			<TestWrapper
 				setRegistry={ setRegistry }
-				value={ [ initialBlock ] }
+				value={ [] }
 				onChange={ onChange }
 				onInput={ onInput }
 			/>
@@ -370,12 +374,10 @@ describe( 'useBlockSync hook', () => {
 		onChange.mockClear();
 		onInput.mockClear();
 
-		const parentBlock = createBlock( 'test/test-block' );
+		const parentBlock = createBlock( 'test/container-block' );
 		const templateBlock = createBlock( 'test/test-block', { foo: 2 } );
 
-		registry
-			.dispatch( blockEditorStore )
-			.replaceBlock( initialBlock.clientId, parentBlock );
+		registry.dispatch( blockEditorStore ).insertBlock( parentBlock );
 		expect( onChange ).not.toHaveBeenCalled();
 		registry
 			.dispatch( blockEditorStore )

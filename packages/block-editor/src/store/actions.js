@@ -7,12 +7,12 @@ import {
 	__experimentalCloneSanitizedBlock,
 	createBlock,
 	doBlocksMatchTemplate,
+	getBlockSupport,
 	getBlockType,
 	getDefaultBlockName,
 	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
-	getBlockSupport,
 	isUnmodifiedDefaultBlock,
 	isUnmodifiedBlock,
 } from '@wordpress/blocks';
@@ -550,6 +550,20 @@ export function insertBlock(
 	);
 }
 
+function shouldDeferBlockSyncForInsertedBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( block.innerBlocks?.length ) {
+			return false;
+		}
+		// Empty blocks with inner block areas can receive default children
+		// immediately after insertion through useInnerBlockTemplateSync.
+		return (
+			getBlockType( block.name )?.allowedBlocks !== undefined ||
+			getBlockSupport( block.name, 'allowedBlocks' ) !== undefined
+		);
+	} );
+}
+
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
@@ -599,6 +613,12 @@ export const insertBlocks =
 			}
 		}
 		if ( allowedBlocks.length ) {
+			if ( shouldDeferBlockSyncForInsertedBlocks( allowedBlocks ) ) {
+				meta = {
+					...meta,
+					__unstableShouldDeferBlockSync: true,
+				};
+			}
 			dispatch( {
 				type: 'INSERT_BLOCKS',
 				blocks: allowedBlocks,

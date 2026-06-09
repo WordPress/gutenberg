@@ -52,6 +52,23 @@ async function insertListWithSlashInserter( editor: Editor, page: Page ) {
 	await page.keyboard.press( 'Enter' );
 }
 
+async function insertListWithSidebarInserter( editor: Editor, page: Page ) {
+	await editor.canvas
+		.locator( 'role=button[name="Add default block"i]' )
+		.click();
+	await page.keyboard.type( 'abc' );
+
+	await page.getByLabel( 'Block Inserter' ).click();
+	await page
+		.getByRole( 'region', { name: 'Block Library' } )
+		.getByRole( 'searchbox', { name: 'Search' } )
+		.fill( 'List' );
+	await page
+		.getByRole( 'listbox', { name: 'Blocks' } )
+		.getByRole( 'option', { name: 'List', exact: true } )
+		.click();
+}
+
 test.describe( 'Collaboration - WebSocket List Templates', () => {
 	test.skip(
 		CONFIGURED_WS_DELAY_MS < MIN_REQUIRED_WS_DELAY_MS,
@@ -78,6 +95,38 @@ test.describe( 'Collaboration - WebSocket List Templates', () => {
 		const editor3 = collaborationUtils.getEditor( 1 );
 
 		await insertListWithSlashInserter( editor, page );
+
+		await expect
+			.poll( async () => ( await getListItemCounts( editor ) ).length )
+			.toBe( 1 );
+
+		await collaborationUtils.waitForConvergence( { timeout: 5000 } );
+
+		expect( await getListItemCounts( editor ) ).toEqual( [ 1 ] );
+		expect( await getListItemCounts( editor2 ) ).toEqual( [ 1 ] );
+		expect( await getListItemCounts( editor3 ) ).toEqual( [ 1 ] );
+	} );
+
+	test( 'inserts the list item template once when the sidebar inserter inserts a list after text', async ( {
+		collaborationUtils,
+		requestUtils,
+		editor,
+		page,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			title: 'WebSocket Sidebar List Template Repro',
+			status: 'draft',
+			date_gmt: new Date().toISOString(),
+		} );
+
+		await collaborationUtils.openCollaborativeSession( post.id );
+		await requestUtils.createUser( THIRD_USER );
+		await collaborationUtils.joinUser( post.id, THIRD_USER );
+		await collaborationUtils.waitForMutualDiscovery();
+		const { editor2 } = collaborationUtils;
+		const editor3 = collaborationUtils.getEditor( 1 );
+
+		await insertListWithSidebarInserter( editor, page );
 
 		await expect
 			.poll( async () => ( await getListItemCounts( editor ) ).length )

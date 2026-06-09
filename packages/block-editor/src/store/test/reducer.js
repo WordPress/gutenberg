@@ -2282,7 +2282,7 @@ describe( 'state', () => {
 					).toBeUndefined();
 				} );
 
-				it( 'should flag REPLACE_BLOCKS-style changes that add blocks', () => {
+				it( 'should flag deferred changes that add blocks', () => {
 					let original = deepFreeze(
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
@@ -2307,9 +2307,27 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( insertState.didLastBlockChangeReplaceBlocks ).toBe(
+					expect( insertState.didLastBlockChangeAddBlocks ).toBe(
 						undefined
 					);
+
+					const deferredInsertState = blocks( original, {
+						type: 'INSERT_BLOCKS',
+						blocks: [
+							{
+								clientId: 'peach',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+						meta: {
+							__unstableShouldDeferBlockSync: true,
+						},
+					} );
+
+					expect(
+						deferredInsertState.didLastBlockChangeAddBlocks
+					).toBe( true );
 
 					original = deepFreeze( insertState );
 
@@ -2325,7 +2343,7 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( replaceState.didLastBlockChangeReplaceBlocks ).toBe(
+					expect( replaceState.didLastBlockChangeAddBlocks ).toBe(
 						true
 					);
 
@@ -2338,7 +2356,7 @@ describe( 'state', () => {
 					} );
 
 					expect(
-						subsequentState.didLastBlockChangeReplaceBlocks
+						subsequentState.didLastBlockChangeAddBlocks
 					).toBeUndefined();
 				} );
 
@@ -2362,9 +2380,7 @@ describe( 'state', () => {
 						blocks: [],
 					} );
 
-					expect(
-						state.didLastBlockChangeReplaceBlocks
-					).toBeUndefined();
+					expect( state.didLastBlockChangeAddBlocks ).toBeUndefined();
 				} );
 
 				it( 'should retain reference for same state, same persistence', () => {
