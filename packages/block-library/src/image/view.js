@@ -476,6 +476,7 @@ const { state, actions, callbacks } = store(
 
 				// Ratio of the biggest image stored in the database.
 				let imgRatio = imgMaxWidth / imgMaxHeight;
+				const fullSizeRatio = imgRatio;
 				let containerMaxWidth = imgMaxWidth;
 				let containerMaxHeight = imgMaxHeight;
 				let containerWidth = imgMaxWidth;
@@ -560,14 +561,14 @@ const { state, actions, callbacks } = store(
 				);
 				const targetContainerRatio = targetMaxWidth / targetMaxHeight;
 
-				if ( originalRatio > targetContainerRatio ) {
+				if ( fullSizeRatio > targetContainerRatio ) {
 					// If targetMaxWidth is reached before targetMaxHeight.
 					containerWidth = targetMaxWidth;
-					containerHeight = containerWidth / originalRatio;
+					containerHeight = containerWidth / fullSizeRatio;
 				} else {
 					// If targetMaxHeight is reached before targetMaxWidth.
 					containerHeight = targetMaxHeight;
-					containerWidth = containerHeight * originalRatio;
+					containerWidth = containerHeight * fullSizeRatio;
 				}
 
 				const containerScale = originalWidth / containerWidth;
