@@ -17,7 +17,7 @@
 	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
 
-	&:hover {
+	&.has-shortcut:hover {
 		background-color: $gray-200;
 	}
 
@@ -43,6 +43,9 @@
 }
 
 .editor-document-bar__command {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	flex-grow: 1;
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
@@ -55,8 +58,10 @@
 	max-width: 70%;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	@include break-medium() {
-		padding-left: $grid-unit-30;
+	.editor-document-bar.has-shortcut & {
+		@include break-medium() {
+			padding-left: $grid-unit-30;
+		}
 	}
 
 	h1 {
