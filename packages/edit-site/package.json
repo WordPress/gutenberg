@@ -41,7 +41,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptExtraDependencies": [
 		"wp-dom-ready"
@@ -87,6 +86,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/router": "file:../router",
 		"@wordpress/style-engine": "file:../style-engine",
+		"@wordpress/theme": "file:../theme",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
@@ -101,8 +101,8 @@
 		"react-autosize-textarea": "^7.1.0"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

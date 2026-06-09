@@ -40,7 +40,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
@@ -48,6 +47,7 @@
 	],
 	"dependencies": {
 		"@react-spring/web": "^9.4.5",
+		"@types/react": "^18.3.27",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
@@ -79,7 +79,7 @@
 		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

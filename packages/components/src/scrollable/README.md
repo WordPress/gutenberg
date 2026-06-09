@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`Scrollable` is a layout component that content in a scrollable container.
+`Scrollable` is a layout component that puts content in a scrollable container.
 
 ## Usage
 

@@ -1,9 +1,8 @@
 /**
  * Widget type definitions.
  *
- * Canonical home for widget identity types consumed by the registry,
- * hosts that render widgets, and tools that author them
- * (`@wordpress/build`, schema validators, IDE autocomplete).
+ * Canonical home for widget identity types consumed by the registry and
+ * hosts that render widgets.
  *
  * Each type is generic over the widget's attribute object (`Item`) so a
  * widget binds its own attribute shape once and gets typed `attributes`,
@@ -21,9 +20,7 @@ type IconProps = ComponentProps< typeof Icon >;
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
- * Both segments are lowercase, kebab-case; the full character pattern is
- * enforced by the `widget.json` schema at authoring time and validated at
- * registration time by `WIDGET_NAME_REGEXP` in `registerWidgetType`.
+ * Both segments are lowercase, kebab-case.
  */
 export type WidgetName = `${ string }/${ string }`;
 
@@ -34,7 +31,6 @@ export type WidgetName = `${ string }/${ string }`;
  * assets are discovered by convention from the widget directory
  * (`render.*`, `widget.*`, `render.scss`), not declared here.
  *
- * Consumed by tooling (IDE autocomplete, validation, the build pipeline).
  * Hosts that render widgets consume the richer `WidgetType` below,
  * which extends this shape with runtime-only fields produced by the
  * build manifest.
@@ -130,7 +126,7 @@ export interface WidgetTypeMetadata< Item = unknown > {
  * entry point.
  *
  * The PHP layer (`widget-types.php`) emits this data in snake_case
- * (`render_module`). The `getWidgetTypes` resolver is the single boundary
+ * (`render_module`). The `useWidgetTypes` hook is the single boundary
  * that maps it to the camelCase shape consumed throughout JS/TS.
  */
 export interface WidgetType< Item = unknown >
@@ -138,7 +134,7 @@ export interface WidgetType< Item = unknown >
 	/**
 	 * Script-module identifier resolved to a React component at render
 	 * time. Produced by the build pipeline from the conventional
-	 * `render.*` / `widget.*` entry points; not declared in `widget.json`.
+	 * `render.*` entry point; not declared in `widget.json`.
 	 */
 	renderModule: string;
 }
@@ -171,9 +167,9 @@ export interface WidgetModule {
 }
 
 /**
- * Resolver hook: maps a `WidgetType.renderModule` id to a React component.
- * Defaults to a dynamic `import()`; override for tests, Storybook, or to load
- * from a non-URL source.
+ * Resolver function: maps a `WidgetType.renderModule` id to a React
+ * component. Override for tests, Storybook, or to load from a non-URL
+ * source.
  */
 export type ResolveWidgetModule = (
 	moduleId: string

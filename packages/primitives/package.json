@@ -40,18 +40,18 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.scss"
 	],
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

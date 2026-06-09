@@ -31,7 +31,7 @@
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"default": "./src/index.ts"
+			"default": "./build/index.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -53,5 +53,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json"
 	}
 }

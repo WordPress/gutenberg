@@ -41,7 +41,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": [
@@ -49,16 +48,19 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
 		"@wordpress/data": "file:../data",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4"
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
