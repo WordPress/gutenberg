@@ -30,19 +30,15 @@ function cycleValue( value: number, total: number, offset: number ) {
 }
 
 function getFocusableContext(
-	container: HTMLElement | null,
+	container: HTMLElement,
 	target: Element,
 	tabbableOnly: boolean
 ) {
-	if ( ! container ) {
-		return null;
-	}
-
 	const finder = tabbableOnly ? focus.tabbable : focus.focusable;
 	const focusables = finder.find( container );
 
 	const index = focusables.indexOf( target as HTMLElement );
-	if ( index > -1 && target ) {
+	if ( index > -1 ) {
 		return { index, target, focusables };
 	}
 	return null;
@@ -107,7 +103,7 @@ function UnforwardedNavigableContainer(
 			}
 
 			const context = getFocusableContext(
-				container,
+				container!,
 				activeElement,
 				!! onlyBrowserTabstops
 			);
