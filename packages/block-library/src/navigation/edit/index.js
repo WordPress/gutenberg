@@ -146,11 +146,7 @@ function ColorTools( {
 	// Detect if we're editing inside an overlay template part.
 	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
 
-	const enableContrastChecking = true;
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
-			return;
-		}
 		detectColors(
 			navRef.current,
 			setDetectedColor,
@@ -175,12 +171,7 @@ function ColorTools( {
 				setDetectedOverlayBackgroundColor
 			);
 		}
-	}, [
-		enableContrastChecking,
-		overlayTextColor.color,
-		overlayBackgroundColor.color,
-		navRef,
-	] );
+	}, [ overlayTextColor.color, overlayBackgroundColor.color, navRef ] );
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	if ( ! colorGradientSettings.hasColorsOrGradients ) {
 		return null;
@@ -241,18 +232,14 @@ function ColorTools( {
 				gradients={ [] }
 				disableCustomGradients
 			/>
-			{ enableContrastChecking && (
-				<>
-					<ContrastChecker
-						backgroundColor={ detectedBackgroundColor }
-						textColor={ detectedColor }
-					/>
-					<ContrastChecker
-						backgroundColor={ detectedOverlayBackgroundColor }
-						textColor={ detectedOverlayColor }
-					/>
-				</>
-			) }
+			<ContrastChecker
+				backgroundColor={ detectedBackgroundColor }
+				textColor={ detectedColor }
+			/>
+			<ContrastChecker
+				backgroundColor={ detectedOverlayBackgroundColor }
+				textColor={ detectedOverlayColor }
+			/>
 		</>
 	);
 }
