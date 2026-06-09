@@ -26,9 +26,16 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useEffect,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -259,12 +266,15 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
+		isOnlySinglePageList,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
+				getBlockOrder,
+				getBlockName,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
@@ -276,12 +286,27 @@ export default function PageListEdit( {
 				'core/navigation',
 				true
 			);
+			const navParentClientId = navigationBlockParents[ 0 ];
+
+			// Check if the Navigation block contains only a single Page List (default state).
+			let isSinglePageList = false;
+
+			if ( navParentClientId ) {
+				const siblingClientIds = getBlockOrder( navParentClientId );
+
+				// Check if there's exactly one block and it's a Page List.
+				isSinglePageList =
+					siblingClientIds.length === 1 &&
+					getBlockName( siblingClientIds[ 0 ] ) === 'core/page-list';
+			}
+
 			return {
 				isNested: blockParents.length > 0,
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
-				parentClientId: navigationBlockParents[ 0 ],
+				parentClientId: navParentClientId,
+				isOnlySinglePageList: isSinglePageList,
 			};
 		},
 		[ clientId ]
@@ -305,6 +330,11 @@ export default function PageListEdit( {
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	// Track if we've already converted to avoid multiple conversions.
+	const hasConverted = useRef( false );
+	// Track the previous state to detect when a block is added.
+	const prevIsOnlySinglePageList = useRef( isOnlySinglePageList );
+
 	useEffect( () => {
 		if ( hasSelectedChild || hasDraggedChild ) {
 			openModal();
@@ -321,6 +351,55 @@ export default function PageListEdit( {
 	useEffect( () => {
 		setAttributes( { isNested } );
 	}, [ isNested, setAttributes ] );
+
+	// Auto-convert Page List to Navigation Links when a new block is added
+	// to a Navigation that previously contained only the default Page List.
+	// This improves the first-time editing experience for new users.
+	useEffect( () => {
+		// Only convert if:
+		// 1. Previously had only a single Page List (default state)
+		// 2. Now has multiple blocks (user just added something)
+		// 3. We haven't already converted
+		// 4. All other safety conditions are met
+		const shouldConvert =
+			prevIsOnlySinglePageList.current === true &&
+			isOnlySinglePageList === false &&
+			! hasConverted.current &&
+			allowConvertToLinks &&
+			hasResolvedPages &&
+			isChildOfNavigation;
+
+		if ( shouldConvert ) {
+			// Mark as converted to prevent multiple conversions.
+			hasConverted.current = true;
+
+			// Small delay to allow the newly inserted block to settle
+			// before triggering the conversion.
+			const timeoutId = setTimeout( () => {
+				// Announce the conversion to screen readers for accessibility.
+				speak(
+					__( 'Page List converted to editable Navigation Links.' ),
+					'assertive'
+				);
+
+				// Perform the conversion: replace the Page List block with
+				// individual Navigation Link blocks for each page.
+				convertToNavigationLinks();
+			}, 50 ); // 50ms delay - enough for block insertion to complete
+
+			// Cleanup function to cancel timeout if component unmounts.
+			return () => clearTimeout( timeoutId );
+		}
+
+		// Update the previous state for the next render.
+		prevIsOnlySinglePageList.current = isOnlySinglePageList;
+	}, [
+		isOnlySinglePageList,
+		allowConvertToLinks,
+		hasResolvedPages,
+		isChildOfNavigation,
+		convertToNavigationLinks,
+	] );
 
 	return (
 		<>
