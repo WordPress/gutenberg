@@ -14,7 +14,7 @@
 		 * its footer. `composes` the shared `.footer` so the chrome padding +
 		 * separator are inherited, then overrides the row layout to a column.
 		 *
-		 * The override lives in `wp-ui-compositions` (a higher layer than the
+		 * The override lives in `wp-ui.compositions` (a higher layer than the
 		 * composed `.footer`, which sits in `wp-ui-components`) so it always
 		 * wins regardless of stylesheet injection order. `composes` keeps the
 		 * two classes bound together so the base styles can never be applied
