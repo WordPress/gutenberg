@@ -25,5 +25,5 @@ export default () => ( node ) => {
 			event.preventDefault();
 		}
 	}
-	return subscribeDelegatedListener( node, 'keydown', onKeydown );
+	return subscribeDelegatedListener( node, 'keydown', onKeydown, true );
 };

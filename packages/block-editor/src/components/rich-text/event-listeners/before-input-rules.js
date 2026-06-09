@@ -89,5 +89,5 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 	}
 
-	return subscribeDelegatedListener( element, 'beforeinput', onInput );
+	return subscribeDelegatedListener( element, 'beforeinput', onInput, true );
 };

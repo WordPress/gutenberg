@@ -18,5 +18,5 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	return subscribeDelegatedListener( element, 'input', onInput );
+	return subscribeDelegatedListener( element, 'input', onInput, true );
 };

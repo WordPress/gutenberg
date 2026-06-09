@@ -42,5 +42,5 @@ export default ( props ) => ( element ) => {
 		__experimentalUndo();
 	}
 
-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
 };
