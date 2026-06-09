@@ -133,4 +133,19 @@ describe( 'Icon', () => {
 
 		expect( screen.getByTestId( testId ) ).toHaveStyle( 'fill: red' );
 	} );
+
+	it( "merges a consumer 'style' with a non-svg element's intrinsic style", () => {
+		render(
+			<Icon
+				icon={
+					<span data-testid={ testId } style={ { fill: 'none' } } />
+				}
+				style={ { marginInlineStart: 4 } }
+			/>
+		);
+		const icon = screen.getByTestId( testId );
+
+		expect( icon ).toHaveStyle( 'fill: none' );
+		expect( icon ).toHaveStyle( 'margin-inline-start: 4px' );
+	} );
 } );

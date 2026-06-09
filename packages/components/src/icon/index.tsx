@@ -1,4 +1,4 @@
-import type { ComponentType, HTMLProps, SVGProps } from 'react';
+import type { ComponentType, CSSProperties, HTMLProps, SVGProps } from 'react';
 import {
 	cloneElement,
 	createElement,
@@ -107,11 +107,20 @@ function Icon( {
 	}
 
 	if ( isValidElement< SizeProps >( icon ) ) {
+		const { style: consumerStyle, ...restProps } =
+			additionalProps as SVGProps< SVGSVGElement >;
+
 		return cloneElement( icon, {
 			size,
 			width: size,
 			height: size,
-			...additionalProps,
+			// Merge styles so the icon's intrinsic style is preserved unless
+			// the consumer overrides the same property explicitly.
+			style: {
+				...( icon.props as { style?: CSSProperties } ).style,
+				...consumerStyle,
+			},
+			...restProps,
 		} );
 	}
 
