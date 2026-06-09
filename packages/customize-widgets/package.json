@@ -37,7 +37,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",

@@ -405,22 +405,6 @@
 							}
 						]
 					},
-					{
-						"docs/contributors/code/react-native/README.md": [
-							{
-								"docs/contributors/code/react-native/getting-started-react-native.md": []
-							},
-							{
-								"docs/contributors/code/react-native/osx-setup-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/integration-test-guide.md": []
-							},
-							{
-								"docs/contributors/code/react-native/internationalization-guide.md": []
-							}
-						]
-					},
 					{ "docs/contributors/code/backward-compatibility.md": [] },
 					{ "docs/contributors/code/deprecations.md": [] },
 					{

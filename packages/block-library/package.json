@@ -43,7 +43,6 @@
 		"./build-style/*": "./build-style/*",
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
 		"./accordion/view": "./build-module/accordion/view.mjs",

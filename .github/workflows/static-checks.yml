@@ -81,7 +81,8 @@ jobs:
 
             - name: Lint JavaScript
               if: ${{ matrix.annotations }}
-              run: npm run lint:js -- --format compact
+              # `--quiet` reports only errors so they aren't buried under warnings in the CI log.
+              run: npm run lint:js -- --format compact --quiet
 
             - name: Lint Styles
               if: ${{ matrix.annotations }}

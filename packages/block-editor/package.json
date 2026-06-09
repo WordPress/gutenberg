@@ -41,7 +41,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptModuleExports": {
 		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.mjs"
