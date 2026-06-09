@@ -309,6 +309,9 @@ function _gutenberg_get_entity_view_config_post_type_page( $config, $entity ) {
 
 	return $config;
 }
+if ( has_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' ) ) {
+	remove_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' );
+}
 add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_config_post_type_page', 10, 2 );
 
 /**
@@ -384,6 +387,9 @@ function _gutenberg_get_entity_view_config_post_type_post( $config ) {
 	);
 
 	return $config;
+}
+if ( has_filter( 'get_entity_view_config_postType_post', '_wp_get_entity_view_config_post_type_post' ) ) {
+	remove_filter( 'get_entity_view_config_postType_post', '_wp_get_entity_view_config_post_type_post' );
 }
 add_filter( 'get_entity_view_config_postType_post', '_gutenberg_get_entity_view_config_post_type_post', 10, 1 );
 
@@ -474,6 +480,9 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $config ) {
 
 	return $config;
 }
+if ( has_filter( 'get_entity_view_config_postType_wp_block', '_wp_get_entity_view_config_post_type_wp_block' ) ) {
+	remove_filter( 'get_entity_view_config_postType_wp_block', '_wp_get_entity_view_config_post_type_wp_block' );
+}
 add_filter( 'get_entity_view_config_postType_wp_block', '_gutenberg_get_entity_view_config_post_type_wp_block', 10, 1 );
 
 /**
@@ -554,6 +563,9 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $config )
 	$config['view_list'] = $view_list;
 
 	return $config;
+}
+if ( has_filter( 'get_entity_view_config_postType_wp_template_part', '_wp_get_entity_view_config_post_type_wp_template_part' ) ) {
+	remove_filter( 'get_entity_view_config_postType_wp_template_part', '_wp_get_entity_view_config_post_type_wp_template_part' );
 }
 add_filter( 'get_entity_view_config_postType_wp_template_part', '_gutenberg_get_entity_view_config_post_type_wp_template_part', 10, 1 );
 
@@ -728,5 +740,8 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $config ) {
 	$config['view_list'] = array_merge( $view_list, $registered_authors, $user_authors );
 
 	return $config;
+}
+if ( has_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' ) ) {
+	remove_filter( 'get_entity_view_config_postType_wp_template', '_wp_get_entity_view_config_post_type_wp_template' );
 }
 add_filter( 'get_entity_view_config_postType_wp_template', '_gutenberg_get_entity_view_config_post_type_wp_template', 10, 1 );
