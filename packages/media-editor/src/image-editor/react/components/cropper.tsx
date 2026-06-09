@@ -411,25 +411,28 @@ function CropperInner(
 	// render far smaller than the canvas allows. Scaling `elementSize` and
 	// `visualSize` together magnifies the whole scene uniformly — image,
 	// overlays, and the pixel->normalized interaction math — and the root's
-	// `overflow: hidden` clips the image bleed. Held at 1 during a resize so the
-	// user sees the full footprint while dragging, then applied (animated via
-	// the settle transitions) once the crop settles. Magnifying around the
-	// footprint centre keeps the crop centred only because the at-rest crop is
-	// always centred (SETTLE_CROP, computeInscribedRect, and the initial
-	// full-frame crop all centre it).
-	const viewScale = useMemo(
+	// `overflow: hidden` clips the image bleed. Magnifying around the footprint
+	// centre keeps the crop centred only because the at-rest crop is always
+	// centred (SETTLE_CROP, computeInscribedRect, and the initial full-frame
+	// crop all centre it).
+	const viewScaleRest = useMemo(
 		() =>
-			isResizing
-				? 1
-				: getViewScale(
-						state.cropRect,
-						canvasSize,
-						visualSize,
-						SETTLE_TARGET_CANVAS_FILL,
-						MAX_VIEW_SCALE
-				  ),
-		[ isResizing, state.cropRect, canvasSize, visualSize ]
+			getViewScale(
+				state.cropRect,
+				canvasSize,
+				visualSize,
+				SETTLE_TARGET_CANVAS_FILL,
+				MAX_VIEW_SCALE
+			),
+		[ state.cropRect, canvasSize, visualSize ]
 	);
+	// During a resize the magnification is frozen at its pre-drag value rather
+	// than recomputed per pointer move: recomputing live would zoom the scene
+	// under the cursor, and snapping to 1 would reset the zoom the moment a
+	// handle is grabbed. `handleResizeStart` snapshots the current rest value
+	// into `frozenViewScale`; on release the settle recomputes from the new crop.
+	const [ frozenViewScale, setFrozenViewScale ] = useState( 1 );
+	const viewScale = isResizing ? frozenViewScale : viewScaleRest;
 	const scaledElementSize = useMemo(
 		() => ( {
 			width: elementSize.width * viewScale,
@@ -549,30 +552,32 @@ function CropperInner(
 			// visible even when the crop extends beyond the canvas edge.
 			if (
 				isResizingRef.current &&
-				visualSize.width > 0 &&
-				visualSize.height > 0
+				scaledVisualSize.width > 0 &&
+				scaledVisualSize.height > 0
 			) {
-				const offsetX = ( canvasSize.width - visualSize.width ) / 2;
-				const offsetY = ( canvasSize.height - visualSize.height ) / 2;
+				const offsetX =
+					( canvasSize.width - scaledVisualSize.width ) / 2;
+				const offsetY =
+					( canvasSize.height - scaledVisualSize.height ) / 2;
 				const rightOverflow = Math.max(
 					0,
 					offsetX +
-						( rect.x + rect.width ) * visualSize.width -
+						( rect.x + rect.width ) * scaledVisualSize.width -
 						canvasSize.width
 				);
 				const leftOverflow = Math.max(
 					0,
-					-( offsetX + rect.x * visualSize.width )
+					-( offsetX + rect.x * scaledVisualSize.width )
 				);
 				const bottomOverflow = Math.max(
 					0,
 					offsetY +
-						( rect.y + rect.height ) * visualSize.height -
+						( rect.y + rect.height ) * scaledVisualSize.height -
 						canvasSize.height
 				);
 				const topOverflow = Math.max(
 					0,
-					-( offsetY + rect.y * visualSize.height )
+					-( offsetY + rect.y * scaledVisualSize.height )
 				);
 				setViewportPan( {
 					x: -rightOverflow + leftOverflow,
@@ -580,7 +585,7 @@ function CropperInner(
 				} );
 			}
 		},
-		[ setCropRect, setViewportPan, canvasSize, visualSize ]
+		[ setCropRect, setViewportPan, canvasSize, scaledVisualSize ]
 	);
 
 	// Settling animation: brief linear transition after resize end.
@@ -627,6 +632,9 @@ function CropperInner(
 
 	const handleResizeStart = useCallback(
 		( handle?: HandlePosition ) => {
+			// Freeze the magnification at its current value so grabbing a
+			// handle doesn't reset the zoom; it holds for the whole drag.
+			setFrozenViewScale( viewScaleRest );
 			isResizingRef.current = true;
 			setIsResizing( true );
 			setActiveHandle( handle ?? null );
@@ -639,7 +647,7 @@ function CropperInner(
 			resetViewport();
 			onGestureStart?.();
 		},
-		[ onGestureStart, resetViewport ]
+		[ onGestureStart, resetViewport, viewScaleRest ]
 	);
 
 	/**

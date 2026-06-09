@@ -514,4 +514,35 @@ describe( 'Cropper', () => {
 		// viewScale = 1, so the image stays at its contain-fit width (133.33).
 		expect( imageWidth() ).toBeCloseTo( 133.33, 0 );
 	} );
+
+	it( 'holds the magnified view while resizing instead of resetting the zoom', async () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render(
+			<Cropper src="tall.jpg" controller={ controller } freeformCrop />
+		);
+
+		// At rest the square crop magnifies the image to 320.
+		expect( imageWidth() ).toBeCloseTo( 320, 0 );
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+
+		// Grabbing a handle must not snap the scene back to the 133 footprint;
+		// the magnification holds for the duration of the drag.
+		expect( imageWidth() ).toBeCloseTo( 320, 0 );
+
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+	} );
 } );
