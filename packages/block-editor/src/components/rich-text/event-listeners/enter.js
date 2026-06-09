@@ -88,9 +88,13 @@ export default ( props ) => ( element ) => {
 		'keydown',
 		onKeyDown
 	);
-	element.addEventListener( 'keydown', onKeyDownDeprecated );
+	const unsubscribeKeyDownDeprecated = subscribeDelegatedListener(
+		element,
+		'keydown',
+		onKeyDownDeprecated
+	);
 	return () => {
 		unsubscribeKeyDown();
-		element.removeEventListener( 'keydown', onKeyDownDeprecated );
+		unsubscribeKeyDownDeprecated();
 	};
 };
