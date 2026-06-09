@@ -184,10 +184,12 @@ function Layout() {
 												}
 											/>
 										) }
-										<SidebarContent routeKey={ routeKey }>
-											{ areas.mobileContent ? (
-												<ThemeProvider
-													color={ CONTENT_COLOR }
+										{ areas.mobileContent ? (
+											<ThemeProvider
+												color={ CONTENT_COLOR }
+											>
+												<SidebarContent
+													routeKey={ routeKey }
 												>
 													<div className="edit-site-layout__mobile-content">
 														<ErrorBoundary>
@@ -196,13 +198,17 @@ function Layout() {
 															}
 														</ErrorBoundary>
 													</div>
-												</ThemeProvider>
-											) : (
+												</SidebarContent>
+											</ThemeProvider>
+										) : (
+											<SidebarContent
+												routeKey={ routeKey }
+											>
 												<ErrorBoundary>
 													{ areas.mobileSidebar }
 												</ErrorBoundary>
-											) }
-										</SidebarContent>
+											</SidebarContent>
+										) }
 										<SaveHub />
 										<SavePanel />
 									</>
