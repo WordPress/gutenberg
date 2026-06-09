@@ -10,6 +10,7 @@ import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
 /**
@@ -23,6 +24,7 @@ import {
 	blockBindingsKey,
 	useBlockEditContext,
 } from '../../block-edit/context';
+import { store as blockEditorStore } from '../../../store';
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useBlockRefProvider } from './use-block-refs';
@@ -107,6 +109,15 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		deviceType,
 	} = useContext( PrivateBlockContext );
 
+	// A block that contains inner blocks is an editable root: its wrapper must
+	// stay part of the editing host so the inner blocks remain within the same
+	// host (the always-on writing flow wrapper). Leaf blocks default to
+	// non-editable atoms instead. See the `contentEditable` default below.
+	const hasInnerBlocks = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockCount( clientId ),
+		[ clientId ]
+	);
+
 	const defaultViewRef = useRefEffect( ( element ) => {
 		if ( element ) {
 			const { ownerDocument } = element;
@@ -176,12 +187,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	return {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		draggable: canMove && ! hasChildSelected ? true : undefined,
-		// Blocks are non-editable atoms by default. The editable regions are
-		// carved out by RichText, which sets `contentEditable` to true on its
-		// own element, overriding this when the block's outer element is a
-		// RichText. This keeps non-text blocks inert within the always-on
-		// editing host. Overridable through `props`.
-		contentEditable: false,
+		// Leaf blocks are non-editable atoms by default; container blocks stay
+		// editable roots so their inner blocks remain within the editing host.
+		// RichText overrides this to true on its own element, so text blocks
+		// are editable regardless. Overridable through `props`.
+		contentEditable: hasInnerBlocks,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
