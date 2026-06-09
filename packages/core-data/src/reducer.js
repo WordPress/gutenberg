@@ -13,7 +13,7 @@ import { createUndoManager } from '@wordpress/undo-manager';
 /**
  * Internal dependencies
  */
-import { ifMatchingAction, replaceAction } from './utils';
+import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { ConnectionErrorCode } from './sync';
@@ -152,30 +152,21 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
 		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
 			const persistedRecord =
 				state?.queriedData?.items?.default?.[ recordId ];
+			const edits = Object.fromEntries(
+				Object.entries( changes ).map( ( [ key, value ] ) => [
+					key,
+					action.type === 'UNDO' ? value.from : value.to,
+				] )
+			);
 
 			newState = reducer( newState, {
 				type: 'EDIT_ENTITY_RECORD',
 				kind,
 				name,
 				recordId,
-				edits: Object.fromEntries(
-					Object.entries( changes ).map( ( [ key, value ] ) => {
-						const editValue =
-							action.type === 'UNDO' ? value.from : value.to;
-						// If the value matches the persisted record, clear
-						// the edit so the entity is no longer dirty for
-						// this property.
-						const persisted =
-							persistedRecord?.[ key ]?.raw ??
-							persistedRecord?.[ key ];
-						return [
-							key,
-							fastDeepEqual( editValue, persisted )
-								? undefined
-								: editValue,
-						];
-					} )
-				),
+				// Clear edits matching the persisted record so the entity is
+				// no longer dirty after undoing back to its saved state.
+				edits: clearUnchangedEdits( edits, persistedRecord ),
 			} );
 		} );
 		return newState;
