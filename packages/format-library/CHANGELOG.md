@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Math format: seed the LaTeX input from the current selection when marking text as math.
+
 ## 5.48.0 (2026-06-10)
 
 ## 5.47.0 (2026-05-27)

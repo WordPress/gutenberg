@@ -141,12 +141,29 @@ function Edit( {
 				icon={ icon }
 				title={ title }
 				onClick={ () => {
+					// If there's a selection, seed the format with it so you
+					// can type LaTeX inline and then mark it as math.
+					const selectedText = value.text.slice(
+						value.start,
+						value.end
+					);
+					let innerHTML = '';
+					if ( selectedText && latexToMathML ) {
+						try {
+							innerHTML = latexToMathML( selectedText, {
+								displayMode: false,
+							} );
+						} catch {
+							// Leave unrendered; the popover opens with the text
+							// prefilled so the expression can be corrected.
+						}
+					}
 					const newValue = insertObject( value, {
 						type: name,
 						attributes: {
-							'data-latex': '',
+							'data-latex': selectedText,
 						},
-						innerHTML: '',
+						innerHTML,
 					} );
 					newValue.start = newValue.end - 1;
 					onChange( newValue );
