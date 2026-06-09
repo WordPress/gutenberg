@@ -277,7 +277,7 @@ function UnforwardedColorPalette(
 	);
 
 	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty circular option picker.
-	if ( disableCustomColors && colors.length === 0 ) {
+	if ( disableCustomColors && colors.length === 0 && ! actions ) {
 		return null;
 	}
 
