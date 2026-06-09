@@ -16,12 +16,14 @@ export default {
 			label: '`react` and `react-dom` must use the same version across the repo.',
 			dependencies: [ 'react', 'react-dom' ],
 			dependencyTypes: [ 'prod', 'dev' ],
+			// Bump this literal when upgrading React.
 			pinVersion: '^18.3.1',
 		},
 		{
 			label: 'All dependencies must use the same version across the repo.',
 			dependencies: [ '**' ],
 			packages: [ '**' ],
+			dependencyTypes: [ 'prod', 'dev' ],
 		},
 	],
 	semverGroups: [
