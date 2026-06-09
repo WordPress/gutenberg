@@ -1,7 +1,6 @@
-import clsx from 'clsx';
 import { forwardRef, useEffect, useId } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import fieldStyles from '../../../utils/css/field.module.css';
+import { Text } from '../../../text';
 import { useFieldsetContext } from './context';
 import { VisuallyHidden } from '../../../visually-hidden';
 import type { FieldsetDetailsProps } from './types';
@@ -36,10 +35,10 @@ export const FieldsetDetails = forwardRef<
 			<VisuallyHidden id={ id }>
 				{ __( 'More details follow.' ) }
 			</VisuallyHidden>
-			<div
-				ref={ ref }
-				className={ clsx( fieldStyles.description, className ) }
-				{ ...restProps }
+			<Text
+				render={ <div ref={ ref } { ...restProps } /> }
+				variant="body-sm"
+				className={ className }
 			/>
 		</>
 	);

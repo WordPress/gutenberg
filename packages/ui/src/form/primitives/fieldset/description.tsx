@@ -1,8 +1,7 @@
 import clsx from 'clsx';
-import { mergeProps, useRender } from '@base-ui/react';
 import { forwardRef, useEffect, useId } from '@wordpress/element';
-import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import fieldStyles from '../../../utils/css/field.module.css';
+import { Text } from '../../../text';
 import { useFieldsetContext } from './context';
 import type { FieldsetDescriptionProps } from './types';
 
@@ -23,22 +22,11 @@ export const FieldsetDescription = forwardRef<
 		return unregisterDescriptionId;
 	}, [ registerDescriptionId, unregisterDescriptionId, id ] );
 
-	const element = useRender( {
-		defaultTagName: 'p',
-		render,
-		ref,
-		props: mergeProps< 'p' >(
-			{
-				className: clsx(
-					defenseStyles.p,
-					fieldStyles.description,
-					className
-				),
-				id,
-			},
-			restProps
-		),
-	} );
-
-	return element;
+	return (
+		<Text
+			render={ render ?? <p ref={ ref } id={ id } { ...restProps } /> }
+			variant="body-sm"
+			className={ clsx( fieldStyles.description, className ) }
+		/>
+	);
 } );
