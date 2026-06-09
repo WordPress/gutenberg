@@ -36,11 +36,13 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
-				// When the whole editor is editable, let writing flow handle
-				// selection.
-				if (
-					node.parentElement.closest( '[contenteditable="true"]' )
-				) {
+				// When focus lands in an editable (text) region, let writing
+				// flow handle selection: it syncs the block selection from the
+				// caret. This also covers the case where the whole editor is
+				// editable (the always-on writing flow wrapper). For a
+				// non-editable atom (e.g. an image or separator) there is no
+				// caret to sync, so selection is handled below on focus.
+				if ( event.target.isContentEditable ) {
 					return;
 				}
 
