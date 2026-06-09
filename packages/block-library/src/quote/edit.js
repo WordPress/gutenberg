@@ -108,7 +108,6 @@ export default function QuoteEdit( {
 					isSelected={ isSelected }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					__unstableMobileNoFocusOnMount
 					icon={ verse }
 					label={ __( 'Quote citation' ) }
 					placeholder={
