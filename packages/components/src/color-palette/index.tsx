@@ -276,7 +276,7 @@ function UnforwardedColorPalette(
 		ariaLabelledby
 	);
 
-	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty circular option picker.
+	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
 	if ( disableCustomColors && colors.length === 0 && ! actions ) {
 		return null;
 	}
