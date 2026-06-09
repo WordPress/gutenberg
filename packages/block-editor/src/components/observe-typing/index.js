@@ -130,12 +130,9 @@ export function useTypingObserver() {
 				let timerId;
 
 				// Capture the window reference while the node is still
-				// attached. React can run this cleanup after the iframe-hosted
-				// editor has been detached from its window, at which point
-				// `node.ownerDocument.defaultView` is `null`. Reusing the
-				// reference we held at mount keeps the cleanup (and the
-				// handlers) working against the same window we set things up
-				// on.
+				// attached. Reusing the reference we held at mount keeps the
+				// cleanup and the handlers working against the same window
+				// we set things up on.
 				const { defaultView } = node.ownerDocument;
 
 				/**
