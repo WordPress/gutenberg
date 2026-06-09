@@ -24,6 +24,15 @@
 			outline: 0;
 		}
 
+		/*
+		 * Keep `.surface` from establishing a containing block. The arrow stays
+		 * aligned only because the nearest containing block for `Popover.Arrow`
+		 * remains `.popup` (the transformed motion layer), which shares the
+		 * positioner's edge. Adding `transform`, `filter`, `perspective`,
+		 * `will-change` of any of those, `contain: layout/paint/strict/content`,
+		 * or similar here would make `.surface` the containing block instead and
+		 * shift the arrow inward by the border width. Keep visual chrome only.
+		 */
 		.surface {
 			background-color: var(--wpds-color-bg-surface-neutral-strong);
 			padding: var(--wpds-dimension-padding-lg);
