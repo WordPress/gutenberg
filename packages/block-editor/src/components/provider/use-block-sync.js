@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
@@ -164,10 +164,11 @@ export default function useBlockSync( {
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
 
-	// Used to track deferred block syncs. The flush timeout gives template
-	// insertion microtasks a chance to update the deferred payload first.
+	// Used to track deferred block syncs. The deferred payload is flushed from
+	// an effect so template insertion layout effects can update it first.
 	const deferredBlockSyncRef = useRef( null );
-	const deferredBlockSyncFlushTimeoutRef = useRef( null );
+	const [ deferredBlockSyncFlushSignal, setDeferredBlockSyncFlushSignal ] =
+		useState( 0 );
 
 	// Mapping between external (original) and internal (cloned) client IDs.
 	// This allows stable external IDs while using unique internal IDs.
@@ -304,20 +305,12 @@ export default function useBlockSync( {
 		onChangeRef.current = onChange;
 	}, [ onInput, onChange ] );
 
-	const clearDeferredBlockSyncFlushTimeout = () => {
-		if ( deferredBlockSyncFlushTimeoutRef.current !== null ) {
-			clearTimeout( deferredBlockSyncFlushTimeoutRef.current );
-			deferredBlockSyncFlushTimeoutRef.current = null;
-		}
-	};
-
 	const flushDeferredBlockSync = () => {
 		if ( deferredBlockSyncRef.current ) {
 			const deferredBlockSync = deferredBlockSyncRef.current;
 
 			// Deferred block syncs are always persistent block changes, so use
 			// onChangeRef to persist.
-			clearDeferredBlockSyncFlushTimeout();
 			deferredBlockSyncRef.current = null;
 			pendingChangesRef.current.outgoing.push( deferredBlockSync.blocks );
 			onChangeRef.current(
@@ -332,11 +325,14 @@ export default function useBlockSync( {
 			blocks: blocksToSync,
 			options,
 		};
-		clearDeferredBlockSyncFlushTimeout();
-		deferredBlockSyncFlushTimeoutRef.current = setTimeout( () => {
-			flushDeferredBlockSync();
-		}, 0 );
+		setDeferredBlockSyncFlushSignal( ( signal ) => signal + 1 );
 	};
+
+	useEffect( () => {
+		if ( deferredBlockSyncFlushSignal ) {
+			flushDeferredBlockSync();
+		}
+	}, [ deferredBlockSyncFlushSignal ] );
 
 	// Determine if blocks need to be reset when they change.
 	// Also restores selection from context after blocks are set.
@@ -495,8 +491,7 @@ export default function useBlockSync( {
 								// This change was marked as a combined operation with
 								// __unstableMarkNextChangeAsCombinedOperation. Update the
 								// deferred payload and return early. It will be flushed
-								// by the scheduled timeout after browser microtasks are
-								// flushed.
+								// by a React effect after layout effects have run.
 								//
 								// This is used with template insertion in RTC to ensure
 								// operations like outer block and inner template insertions
@@ -522,8 +517,8 @@ export default function useBlockSync( {
 
 						if ( shouldDeferBlockSync ) {
 							// Insert-like persistent changes can trigger a
-							// template continuation in a browser microtask.
-							// Delay this payload briefly so that continuation
+							// template continuation during the same React commit.
+							// Defer this payload so that continuation
 							// can be merged before syncing to the parent.
 							deferBlockSync( blocksForParent, updateOptions );
 						} else {

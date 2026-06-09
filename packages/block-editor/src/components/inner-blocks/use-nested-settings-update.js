@@ -16,6 +16,17 @@ import { getLayoutType } from '../../layouts';
 
 const pendingSettingsUpdates = new WeakMap();
 
+export function flushPendingNestedSettingsUpdates( registry ) {
+	const settings = pendingSettingsUpdates.get( registry );
+	if ( ! settings || ! Object.keys( settings ).length ) {
+		return;
+	}
+
+	const { updateBlockListSettings } = registry.dispatch( blockEditorStore );
+	updateBlockListSettings( settings );
+	pendingSettingsUpdates.set( registry, {} );
+}
+
 // Creates a memoizing caching function that remembers the last value and keeps returning it
 // as long as the new values are shallowly equal. Helps keep dependencies stable.
 function createShallowMemo() {
@@ -164,13 +175,7 @@ export default function useNestedSettingsUpdate(
 		}
 		pendingSettingsUpdates.get( registry )[ clientId ] = newSettings;
 		window.queueMicrotask( () => {
-			const settings = pendingSettingsUpdates.get( registry );
-			if ( Object.keys( settings ).length ) {
-				const { updateBlockListSettings } =
-					registry.dispatch( blockEditorStore );
-				updateBlockListSettings( settings );
-				pendingSettingsUpdates.set( registry, {} );
-			}
+			flushPendingNestedSettingsUpdates( registry );
 		} );
 	}, [
 		clientId,
