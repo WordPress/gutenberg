@@ -5,12 +5,21 @@ import fetch from 'node-fetch';
 import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
+import { parseArgs } from 'node:util';
 
 const REPO = 'WordPress/gutenberg';
-const DRY_RUN = process.argv.includes( '--dry-run' );
-const LABEL =
-	process.argv.slice( 2 ).find( ( arg ) => ! arg.startsWith( '--' ) ) ||
-	'Backport to WP Beta/RC';
+const { values, positionals } = parseArgs( {
+	options: {
+		'dry-run': {
+			type: 'boolean',
+			default: false,
+		},
+	},
+	allowPositionals: true,
+	strict: false,
+} );
+const DRY_RUN = values[ 'dry-run' ];
+const LABEL = positionals[ 0 ] || 'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
