@@ -82,18 +82,16 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 	 * @param array $entity {
 	 *     The entity the configuration is built for.
 	 *
-	 *     @type string $kind            The entity kind.
-	 *     @type string $name            The entity name.
-	 *     @type string $all_items_title The localized "all items" title for the entity.
+	 *     @type string $kind The entity kind.
+	 *     @type string $name The entity name.
 	 * }
 	 */
 	$filtered_config = apply_filters(
 		"get_entity_view_config_{$kind}_{$name}",
 		$config,
 		array(
-			'kind'            => $kind,
-			'name'            => $name,
-			'all_items_title' => $all_items_title,
+			'kind' => $kind,
+			'name' => $name,
 		)
 	);
 
@@ -113,16 +111,9 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
  * @param array $config {
  *     The view configuration for the entity.
  * }
- * @param array $entity {
- *     The entity the configuration is built for.
- *
- *     @type string $kind            The entity kind.
- *     @type string $name            The entity name.
- *     @type string $all_items_title The localized "all items" title for the entity.
- * }
  * @return array The filtered view configuration.
  */
-function _gutenberg_get_entity_view_config_post_type_page( $config, $entity ) {
+function _gutenberg_get_entity_view_config_post_type_page( $config ) {
 	$config['default_layouts'] = array(
 		'table' => array(
 			'layout' => array(
@@ -152,10 +143,9 @@ function _gutenberg_get_entity_view_config_post_type_page( $config, $entity ) {
 	);
 
 	$config['view_list'] = array(
-		array(
-			'title' => $entity['all_items_title'],
-			'slug'  => 'all',
-		),
+		// Reuse the base "all items" view, whose title is derived from the post
+		// type's `all_items` label in gutenberg_get_entity_view_config().
+		$config['view_list'][0],
 		array(
 			'title' => __( 'Published', 'gutenberg' ),
 			'slug'  => 'published',
@@ -312,7 +302,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $config, $entity ) {
 if ( has_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' ) ) {
 	remove_filter( 'get_entity_view_config_postType_page', '_wp_get_entity_view_config_post_type_page' );
 }
-add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_config_post_type_page', 10, 2 );
+add_filter( 'get_entity_view_config_postType_page', '_gutenberg_get_entity_view_config_post_type_page', 10, 1 );
 
 /**
  * Provides the view configuration for the `post` post type.
