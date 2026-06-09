@@ -40,7 +40,7 @@ const TEMPLATE = [ [ 'core/paragraph', {} ] ];
  */
 const useMigrateOnLoad = ( attributes, clientId ) => {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } =
+	const { updateBlockAttributes, replaceInnerBlocks, selectBlock } =
 		useDispatch( blockEditorStore );
 	useEffect( () => {
 		// As soon as the block is loaded, migrate it to the new version.
@@ -59,9 +59,18 @@ const useMigrateOnLoad = ( attributes, clientId ) => {
 			alternative: 'inner blocks',
 		} );
 
+		const { hasSelectedInnerBlock, isBlockSelected } =
+			registry.select( blockEditorStore );
+		const shouldReselectBlock =
+			isBlockSelected( clientId ) ||
+			hasSelectedInnerBlock( clientId, true );
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
+			if ( shouldReselectBlock ) {
+				selectBlock( clientId );
+			}
 		} );
 	}, [ attributes.value ] );
 };

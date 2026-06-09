@@ -45,7 +45,7 @@ const NATIVE_MARGIN_SPACING = 8;
  */
 function useMigrateOnLoad( attributes, clientId ) {
 	const registry = useRegistry();
-	const { updateBlockAttributes, replaceInnerBlocks } =
+	const { updateBlockAttributes, replaceInnerBlocks, selectBlock } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -63,9 +63,18 @@ function useMigrateOnLoad( attributes, clientId ) {
 			alternative: 'inner blocks',
 		} );
 
+		const { hasSelectedInnerBlock, isBlockSelected } =
+			registry.select( blockEditorStore );
+		const shouldReselectBlock =
+			isBlockSelected( clientId ) ||
+			hasSelectedInnerBlock( clientId, true );
+
 		registry.batch( () => {
 			updateBlockAttributes( clientId, newAttributes );
 			replaceInnerBlocks( clientId, newInnerBlocks );
+			if ( shouldReselectBlock ) {
+				selectBlock( clientId );
+			}
 		} );
 	}, [ attributes.values ] );
 }

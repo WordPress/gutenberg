@@ -8,6 +8,21 @@ test.describe( 'List (@firefox)', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'keeps the list block selected after migrating legacy values', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			attributes: { values: '<li>List content</li>' },
+		} );
+
+		await editor.clickBlockToolbarButton( 'List' );
+		await expect(
+			page.getByRole( 'menu', { name: 'List' } )
+		).toBeVisible();
+	} );
+
 	test( 'can be copied from multi selection', async ( {
 		editor,
 		page,
