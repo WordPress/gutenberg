@@ -14,6 +14,7 @@ import {
 import {
 	getActiveDimensionValue,
 	getDimensionUpdateAttributes,
+	getStyleStateKey,
 } from '../utils/style-state';
 import { unlock } from '../lock-unlock';
 
@@ -54,6 +55,7 @@ const DimensionControls = ( {
 	hasSelectedStyleState = false,
 } ) => {
 	const { style } = attributes;
+	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const activeAspectRatio = getActiveDimensionValue( {
 		attributes,
 		selectedState: selectedStyleState,
@@ -108,6 +110,7 @@ const DimensionControls = ( {
 
 	return (
 		<DimensionsTool
+			key={ selectedStyleStateKey }
 			panelId={ clientId }
 			value={ {
 				aspectRatio: activeAspectRatio,

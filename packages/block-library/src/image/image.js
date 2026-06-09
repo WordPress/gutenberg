@@ -68,6 +68,7 @@ import {
 	getActiveDimensionValue,
 	getDimensionResetAttributes,
 	getDimensionUpdateAttributes,
+	getStyleStateKey,
 } from '../utils/style-state';
 import { useOpenImageMediaEditorModal } from './use-open-image-media-editor-modal';
 import {
@@ -695,6 +696,7 @@ export default function Image( {
 	);
 	const hasSelectedStyleState =
 		! isDefaultBlockStyleState( selectedStyleState );
+	const selectedStyleStateKey = getStyleStateKey( selectedStyleState );
 	const activeWidth = getActiveDimensionValue( {
 		attributes,
 		selectedState: selectedStyleState,
@@ -736,6 +738,7 @@ export default function Image( {
 		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
 				value={ { aspectRatio: activeAspectRatio, scale: activeScale } }
 				onChange={ ( { aspectRatio: newAspectRatio } ) => {
@@ -749,6 +752,7 @@ export default function Image( {
 			/>
 		) : (
 			<DimensionsTool
+				key={ selectedStyleStateKey }
 				panelId={ clientId }
 				value={ {
 					width: activeWidth,
