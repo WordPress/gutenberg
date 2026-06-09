@@ -876,7 +876,7 @@ function CropperInner(
 						<DimensionsOverlay
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
-							imageSize={ visualSize }
+							imageSize={ scaledVisualSize }
 							activeHandle={ activeHandle }
 							outputWidth={ outputSize.width }
 							outputHeight={ outputSize.height }

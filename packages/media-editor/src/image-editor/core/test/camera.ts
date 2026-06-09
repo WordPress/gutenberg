@@ -1012,4 +1012,34 @@ describe( 'getViewScale — presentational magnification to fill the canvas', ()
 			getViewScale( full, CANVAS, { width: 0, height: 0 }, TARGET, MAX )
 		).toBe( 1 );
 	} );
+
+	it( 'returns 1 (never NaN) for non-finite inputs', () => {
+		const full = { x: 0, y: 0, width: 1, height: 1 };
+		const nanRect = { x: 0, y: 0, width: NaN, height: 1 };
+		expect( getViewScale( nanRect, CANVAS, FOOTPRINT, TARGET, MAX ) ).toBe(
+			1
+		);
+		expect(
+			getViewScale(
+				full,
+				{ width: NaN, height: 500 },
+				FOOTPRINT,
+				TARGET,
+				MAX
+			)
+		).toBe( 1 );
+		expect(
+			getViewScale(
+				full,
+				CANVAS,
+				{ width: Infinity, height: 500 },
+				TARGET,
+				MAX
+			)
+		).toBe( 1 );
+		expect( getViewScale( full, CANVAS, FOOTPRINT, NaN, MAX ) ).toBe( 1 );
+		expect( getViewScale( full, CANVAS, FOOTPRINT, TARGET, NaN ) ).toBe(
+			1
+		);
+	} );
 } );

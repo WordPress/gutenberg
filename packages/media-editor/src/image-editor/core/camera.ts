@@ -149,11 +149,16 @@ export function getViewScale(
 ): number {
 	const cropScreenW = cropRect.width * visualSize.width;
 	const cropScreenH = cropRect.height * visualSize.height;
+	// `> 0` comparisons (rather than `<= 0`) reject NaN as well as zero and
+	// negatives, so a non-finite rect/dimension/scale can't propagate to a
+	// `scale(NaN)`. `isValidSize` already guards finiteness of the sizes.
 	if (
 		! isValidSize( canvasSize ) ||
-		cropScreenW <= 0 ||
-		cropScreenH <= 0 ||
-		targetFill <= 0
+		! isValidSize( visualSize ) ||
+		! ( cropScreenW > 0 ) ||
+		! ( cropScreenH > 0 ) ||
+		! ( targetFill > 0 ) ||
+		! ( maxScale >= 1 )
 	) {
 		return 1;
 	}
