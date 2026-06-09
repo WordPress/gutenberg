@@ -1,6 +1,38 @@
 import { OKLCH, type PlainColorObject } from 'colorjs.io/fn';
 import type { Ramp } from './types';
 
+/** Surface steps whose colors are frozen across contrast levels. */
+export const SURFACE_STEPS: ( keyof Ramp )[] = [
+	'surface1',
+	'surface2',
+	'surface3',
+	'surface4',
+	'surface5',
+	'surface6',
+];
+
+/** Decorative surface border strokes frozen in `low` contrast. */
+export const SURFACE_BORDER_STROKE_STEPS: ( keyof Ramp )[] = [
+	'stroke1',
+	'stroke2',
+];
+
+/** Strong fill backgrounds frozen in `low` contrast. */
+export const BG_FILL_STEPS: ( keyof Ramp )[] = [
+	'bgFill1',
+	'bgFill2',
+	'bgFillInverted1',
+	'bgFillInverted2',
+	'bgFillDark',
+];
+
+/** Steps held at default values in `low` contrast; only fg and interactive strokes retarget. */
+export const LOW_CONTRAST_FROZEN_STEPS: ( keyof Ramp )[] = [
+	...SURFACE_STEPS,
+	...SURFACE_BORDER_STROKE_STEPS,
+	...BG_FILL_STEPS,
+];
+
 export const WHITE: PlainColorObject = {
 	space: OKLCH,
 	coords: [ 1, 0, 0 ],
@@ -73,6 +105,40 @@ export const CONTRAST_COMBINATIONS: {
 	{
 		bgs: [ 'surface1', 'surface2', 'surface3' ],
 		fgs: [ 'stroke3' ],
+		target: 3,
+	},
+];
+
+export const HIGH_CONTRAST_COMBINATIONS: {
+	bgs: ( keyof Ramp )[];
+	fgs: ( keyof Ramp )[];
+	target: number;
+}[] = [
+	{
+		bgs: [ 'surface3' ],
+		fgs: [ 'fgSurface3', 'fgSurface4' ],
+		target: 7,
+	},
+	{
+		bgs: [ 'surface4', 'surface5' ],
+		fgs: [ 'fgSurface4' ],
+		target: 7,
+	},
+	{
+		bgs: [ 'surface3' ],
+		fgs: [ 'stroke3' ],
+		target: 7,
+	},
+];
+
+export const LOW_LEGIBILITY_FLOOR_COMBINATIONS: {
+	bgs: ( keyof Ramp )[];
+	fgs: ( keyof Ramp )[];
+	target: number;
+}[] = [
+	{
+		bgs: [ 'surface3' ],
+		fgs: [ 'fgSurface3', 'fgSurface4' ],
 		target: 3,
 	},
 ];

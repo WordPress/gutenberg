@@ -33,6 +33,12 @@ const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
 	{ id: 'pointer', title: 'Pointer' },
 ];
 
+const CONTRAST_OPTIONS: ThemeOption[] = [
+	{ id: 'low', title: 'Low' },
+	{ id: '', title: 'Default' },
+	{ id: 'high', title: 'High' },
+];
+
 function ThemeTooltipMessage( {
 	title,
 	globalName,
@@ -69,6 +75,11 @@ const ThemeTool = () => {
 			title: 'Cursor control',
 			globalName: 'dsCursorControl',
 			options: CURSOR_CONTROL_OPTIONS,
+		} ),
+		createElement( ThemeTooltipMessage, {
+			title: 'Contrast',
+			globalName: 'dsContrast',
+			options: CONTRAST_OPTIONS,
 		} )
 	);
 

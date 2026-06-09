@@ -59,6 +59,7 @@ export const globalTypes = {
 	},
 	dsColorTheme: {},
 	dsCursorControl: {},
+	dsContrast: {},
 };
 
 export const decorators = [

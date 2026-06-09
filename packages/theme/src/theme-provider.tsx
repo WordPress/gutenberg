@@ -38,6 +38,7 @@ export const ThemeProvider = ( {
 	children,
 	color = {},
 	cursor,
+	contrast,
 	isRoot = false,
 }: ThemeProviderProps ) => {
 	const instanceId = useId();
@@ -45,6 +46,7 @@ export const ThemeProvider = ( {
 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
 		color,
 		cursor,
+		contrast,
 	} );
 
 	const contextValue = useMemo(
@@ -67,6 +69,7 @@ export const ThemeProvider = ( {
 			<div
 				data-wpds-theme-provider-id={ instanceId }
 				data-wpds-root-provider={ isRoot }
+				data-wpds-contrast={ resolvedSettings.contrast }
 				className={ styles.root }
 			>
 				<ThemeContext.Provider value={ contextValue }>

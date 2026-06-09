@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
+import type { ContrastLevel } from '../lib/types';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
 const ColorGen = ( props: {
 	background: string;
 	primary: string;
+	contrast: ContrastLevel;
 	children: React.ReactNode;
 } ) => {
 	return <div>{ props.children }</div>;
@@ -24,6 +26,10 @@ const meta: Meta< typeof ColorGen > = {
 				presetColors: [ '#3858e9', '#069e08', '#873eff' ],
 			},
 		},
+		contrast: {
+			control: { type: 'select' },
+			options: [ 'low', 'default', 'high' ],
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -36,7 +42,8 @@ export const Default: StoryObj< typeof ColorGen > = {
 	render: ( args ) => {
 		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
 		const primarySeed = args.primary ?? DEFAULT_SEED_COLORS.primary;
-		const bgRamp = buildBgRamp( bgSeed );
+		const contrast = args.contrast ?? 'default';
+		const bgRamp = buildBgRamp( bgSeed, contrast );
 
 		const bgRampObj = {
 			seed: {
@@ -51,42 +58,56 @@ export const Default: StoryObj< typeof ColorGen > = {
 				name: 'bgFill1' as const,
 				value: primarySeed,
 			},
-			ramp: buildAccentRamp( primarySeed, bgRamp ).ramp,
+			ramp: buildAccentRamp( primarySeed, bgRamp, contrast ).ramp,
 		};
 		const infoRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.info,
 			},
-			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.info, bgRamp ).ramp,
+			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.info, bgRamp, contrast )
+				.ramp,
 		};
 		const successRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.success,
 			},
-			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.success, bgRamp ).ramp,
+			ramp: buildAccentRamp(
+				DEFAULT_SEED_COLORS.success,
+				bgRamp,
+				contrast
+			).ramp,
 		};
 		const warningRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.warning,
 			},
-			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.warning, bgRamp ).ramp,
+			ramp: buildAccentRamp(
+				DEFAULT_SEED_COLORS.warning,
+				bgRamp,
+				contrast
+			).ramp,
 		};
 		const cautionRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.caution,
 			},
-			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.caution, bgRamp ).ramp,
+			ramp: buildAccentRamp(
+				DEFAULT_SEED_COLORS.caution,
+				bgRamp,
+				contrast
+			).ramp,
 		};
 		const errorRampObj = {
 			seed: {
 				name: 'bgFill1' as const,
 				value: DEFAULT_SEED_COLORS.error,
 			},
-			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.error, bgRamp ).ramp,
+			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.error, bgRamp, contrast )
+				.ramp,
 		};
 
 		const unmetTargets = checkAccessibleCombinations( {
@@ -158,7 +179,9 @@ export const Default: StoryObj< typeof ColorGen > = {
 			</div>
 		);
 	},
-	args: {},
+	args: {
+		contrast: 'default',
+	},
 };
 
 export const SampleCombinations: StoryObj< typeof ColorGen > = {

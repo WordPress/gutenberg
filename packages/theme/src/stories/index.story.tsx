@@ -7,6 +7,7 @@ import {
 	createPortal,
 } from '@wordpress/element';
 import { ThemeProvider } from '../theme-provider';
+import type { ContrastLevel } from '../color-ramps';
 
 const meta: Meta< typeof ThemeProvider > = {
 	title: 'Design System/Theme/Theme Provider',
@@ -142,6 +143,8 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	render: ( args ) => {
 		const id = useId();
 		const [ primary, setPrimary ] = useState< undefined | string >();
+		const [ contrast, setContrast ] =
+			useState< ContrastLevel >( 'default' );
 
 		return (
 			<ThemeProvider
@@ -149,6 +152,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 				color={ {
 					primary,
 				} }
+				contrast={ contrast }
 			>
 				<div style={ { position: 'relative' } }>
 					<div
@@ -162,6 +166,10 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 							padding: '0.5rem',
 							borderRadius: '0.5rem',
 							boxShadow: '0 0 0.5rem 0 rgba(0, 0, 0, 0.1)',
+							display: 'flex',
+							flexWrap: 'wrap',
+							gap: '0.75rem',
+							alignItems: 'center',
 						} }
 					>
 						<div>
@@ -176,6 +184,28 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 							/>
 							<label htmlFor={ id }>Pick the primary color</label>
 						</div>
+						{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
+						<label
+							style={ {
+								display: 'inline-flex',
+								alignItems: 'center',
+								gap: '0.5rem',
+							} }
+						>
+							Contrast
+							<select
+								value={ contrast }
+								onChange={ ( e ) =>
+									setContrast(
+										e.target.value as ContrastLevel
+									)
+								}
+							>
+								<option value="low">Low</option>
+								<option value="default">Default</option>
+								<option value="high">High</option>
+							</select>
+						</label>
 					</div>
 					{ args.children }
 				</div>

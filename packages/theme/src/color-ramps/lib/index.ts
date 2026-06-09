@@ -14,8 +14,14 @@ import type {
 	RampDirection,
 	RampConfig,
 	RampResult,
+	ContrastLevel,
 } from './types';
-import { CONTRAST_EPSILON } from './constants';
+import {
+	CONTRAST_EPSILON,
+	LOW_CONTRAST_FROZEN_STEPS,
+	SURFACE_STEPS,
+} from './constants';
+import { resolveRampConfig } from './ramp-configs';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -29,6 +35,8 @@ import { CONTRAST_EPSILON } from './constants';
  * @param params.pinLightness          - Optional lightness override for a given step
  * @param params.pinLightness.stepName
  * @param params.pinLightness.value
+ * @param params.frozenRamp            - Precomputed ramp values for frozen steps
+ * @param params.frozenSteps           - Step names to reuse from `frozenRamp`
  * @return Object containing ramp results and satisfaction status
  */
 function calculateRamp( {
@@ -38,6 +46,8 @@ function calculateRamp( {
 	mainDir,
 	oppDir,
 	pinLightness,
+	frozenRamp,
+	frozenSteps,
 }: {
 	seed: PlainColorObject;
 	sortedSteps: ( keyof Ramp )[];
@@ -48,6 +58,8 @@ function calculateRamp( {
 		stepName: keyof Ramp;
 		value: number;
 	};
+	frozenRamp?: Partial< Record< keyof Ramp, string > >;
+	frozenSteps?: ( keyof Ramp )[];
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
 	let warnings: string[] | undefined;
@@ -60,7 +72,25 @@ function calculateRamp( {
 	const calculatedColors = new Map< keyof Ramp | 'seed', PlainColorObject >();
 	calculatedColors.set( 'seed', seed );
 
+	const frozenStepSet = new Set( frozenSteps ?? [] );
+	if ( frozenRamp && frozenSteps ) {
+		for ( const stepName of frozenSteps ) {
+			const colorString = frozenRamp[ stepName ];
+			if ( ! colorString ) {
+				throw new Error(
+					`Frozen ramp is missing color for step: ${ stepName }`
+				);
+			}
+			const color = clampToGamut( colorString );
+			calculatedColors.set( stepName, color );
+			rampResults[ stepName ] = colorString;
+		}
+	}
+
 	for ( const stepName of sortedSteps ) {
+		if ( frozenStepSet.has( stepName ) ) {
+			continue;
+		}
 		const {
 			contrast,
 			lightness: stepLightnessConstraint,
@@ -194,6 +224,8 @@ export function buildRamp(
 		mainDirection,
 		pinLightness,
 		rescaleToFitContrastTargets = true,
+		frozenRamp,
+		frozenSteps,
 	}: {
 		mainDirection?: RampDirection;
 		pinLightness?: {
@@ -201,6 +233,8 @@ export function buildRamp(
 			value: number;
 		};
 		rescaleToFitContrastTargets?: boolean;
+		frozenRamp?: Partial< Record< keyof Ramp, string > >;
+		frozenSteps?: ( keyof Ramp )[];
 	} = {}
 ): RampResult {
 	let seed: PlainColorObject;
@@ -243,11 +277,17 @@ export function buildRamp(
 		mainDir,
 		oppDir,
 		pinLightness,
+		frozenRamp,
+		frozenSteps,
 	} );
 
 	let bestRamp = rampResults;
 
-	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
+	if (
+		maxDeficit > CONTRAST_EPSILON &&
+		rescaleToFitContrastTargets &&
+		! frozenSteps?.length
+	) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
 
 		function getSeedForL( l: number ): PlainColorObject {
@@ -297,13 +337,15 @@ export function buildRamp(
 			mainDir,
 			oppDir,
 			pinLightness,
+			frozenRamp,
+			frozenSteps,
 		} ).rampResults;
 	}
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
 	// This ensures surface1 appears "behind" surface2, and surface3 appears "in front",
 	// regardless of the ramp's main direction.
-	if ( mainDir === 'darker' ) {
+	if ( mainDir === 'darker' && ! frozenSteps?.length ) {
 		const tmpSurface1 = bestRamp.surface1;
 		bestRamp.surface1 = bestRamp.surface3;
 		bestRamp.surface3 = tmpSurface1;
@@ -313,5 +355,60 @@ export function buildRamp(
 		ramp: bestRamp,
 		warnings,
 		direction: mainDir,
+		inputSeed: seedArg,
 	};
+}
+
+/**
+ * Builds a ramp for a contrast level. For `low` and `high`, surface steps are
+ * frozen from the `default` ramp. In `low`, decorative surface borders and fill
+ * backgrounds also stay at default values; only foreground and interactive stroke
+ * tokens (`stroke3`, `stroke4`) are retargeted. In `high`, fg/stroke/fill tokens
+ * are retargeted while surfaces stay fixed.
+ *
+ * @param seedArg
+ * @param config
+ * @param contrast
+ * @param options
+ * @param options.mainDirection
+ * @param options.pinLightness
+ * @param options.pinLightness.stepName
+ * @param options.pinLightness.value
+ * @param options.defaultBaseRamp
+ */
+export function buildRampForContrastLevel(
+	seedArg: string,
+	config: RampConfig,
+	contrast: ContrastLevel,
+	{
+		mainDirection,
+		pinLightness,
+		defaultBaseRamp,
+	}: {
+		mainDirection?: RampDirection;
+		pinLightness?: {
+			stepName: keyof Ramp;
+			value: number;
+		};
+		defaultBaseRamp?: RampResult;
+	} = {}
+): RampResult {
+	const defaultRamp =
+		defaultBaseRamp ??
+		buildRamp( seedArg, config, { mainDirection, pinLightness } );
+
+	if ( contrast === 'default' ) {
+		return defaultRamp;
+	}
+
+	const frozenSteps =
+		contrast === 'low' ? LOW_CONTRAST_FROZEN_STEPS : SURFACE_STEPS;
+
+	return buildRamp( seedArg, resolveRampConfig( config, contrast ), {
+		mainDirection: defaultRamp.direction,
+		pinLightness,
+		frozenRamp: defaultRamp.ramp,
+		frozenSteps,
+		rescaleToFitContrastTargets: false,
+	} );
 }

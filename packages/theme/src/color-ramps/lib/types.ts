@@ -32,6 +32,7 @@ export type Ramp = {
 
 export type RampDirection = 'lighter' | 'darker';
 export type FollowDirection = 'main' | 'opposite' | 'best' | RampDirection;
+export type ContrastLevel = 'low' | 'default' | 'high';
 export type ContrastRequirement = {
 	/** The reference color against which to calculate the contrast */
 	reference: keyof Ramp | 'seed';
@@ -51,9 +52,13 @@ export type ContrastRequirement = {
 	 */
 	preferLighter?: boolean;
 	/**
-	 * The contrast target to meet.
+	 * The contrast target to meet for the `default` contrast level (AA).
 	 */
 	target: number;
+	/**
+	 * Optional per-level overrides. `default` always uses `target`.
+	 */
+	contrastTargets?: Partial< Record< 'low' | 'high', number > >;
 	/**
 	 * When true, the algorithm won't count a failure in meeting the contrast
 	 * target as a reason to recalculate the ramp.
@@ -79,4 +84,6 @@ export type RampResult = {
 	ramp: Record< keyof Ramp, string >;
 	warnings?: string[];
 	direction: RampDirection;
+	/** The seed color string passed to the ramp builder. */
+	inputSeed?: string;
 };

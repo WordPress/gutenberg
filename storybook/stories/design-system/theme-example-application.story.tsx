@@ -8,12 +8,16 @@ import {
 	Badge,
 	Button,
 	Card,
+	Field,
 	Icon,
+	InputControl,
 	Link,
 	Notice,
+	SelectControl,
 	Stack,
 	Tabs,
 	Text,
+	Textarea,
 } from '@wordpress/ui';
 
 import { withRouter } from '../../decorators/with-router';
@@ -48,12 +52,15 @@ export default meta;
  * A mock application page demonstrating how `ThemeProvider` affects
  * `@wordpress/ui` and `@wordpress/admin-ui` components in concert. Use the inline controls to adjust
  * the `primary` and `bg` seed colors, and observe how every surface, text
- * element, and interactive control adapts accordingly.
+ * element, interactive control, and form field adapts accordingly.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		const [ primary, setPrimary ] = useState< string | undefined >();
 		const [ bg, setBg ] = useState< string | undefined >();
+		const [ contrast, setContrast ] = useState<
+			'low' | 'default' | 'high'
+		>( 'default' );
 
 		return (
 			<div>
@@ -99,9 +106,34 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							onChange={ ( e ) => setBg( e.target.value ) }
 						/>
 					</label>
+					<label
+						style={ {
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: '6px',
+						} }
+					>
+						Contrast
+						<select
+							value={ contrast }
+							onChange={ ( e ) =>
+								setContrast(
+									e.target.value as 'low' | 'default' | 'high'
+								)
+							}
+						>
+							<option value="low">Low</option>
+							<option value="default">Default</option>
+							<option value="high">High</option>
+						</select>
+					</label>
 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
 				</div>
-				<ThemeProvider color={ { primary, bg } } isRoot>
+				<ThemeProvider
+					color={ { primary, bg } }
+					contrast={ contrast }
+					isRoot
+				>
 					<div
 						style={ {
 							display: 'grid',
@@ -188,6 +220,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 								direction="column"
 								gap="lg"
 								style={ {
+									width: '100%',
 									maxWidth: '640px',
 									marginInline: 'auto',
 								} }
@@ -203,36 +236,68 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 								</Notice.Root>
 
 								{ /* Card 1: General */ }
-								<Card.Root>
+								<Card.Root style={ { width: '100%' } }>
 									<Card.Header>
 										<Card.Title>General</Card.Title>
 									</Card.Header>
 									<Card.Content>
-										<Stack direction="column" gap="md">
+										<Stack direction="column" gap="lg">
 											<Text>
 												Configure the basic settings for
-												your site. You can update your{ ' ' }
-												<Link href="#">site title</Link>
-												, tagline, and{ ' ' }
-												<Link href="#">
-													admin email address
-												</Link>{ ' ' }
-												at any time.
+												your site.
 											</Text>
-											<Text>
-												For more advanced options, visit
-												the{ ' ' }
-												<Link href="#">
-													developer documentation
-												</Link>
-												.
-											</Text>
+											<InputControl
+												label="Site title"
+												description="Appears in the browser tab and search results."
+												defaultValue="My App"
+												placeholder="Enter a site title"
+											/>
+											<Field.Root>
+												<Field.Label>
+													Tagline
+												</Field.Label>
+												<Textarea
+													defaultValue="Just another WordPress site"
+													placeholder="Describe your site in a few words"
+													rows={ 2 }
+												/>
+												<Field.Description>
+													A short phrase shown below
+													the site title.
+												</Field.Description>
+											</Field.Root>
+											<InputControl
+												label="Admin email"
+												description="Used for notifications and account recovery."
+												type="email"
+												defaultValue="admin@example.com"
+												placeholder="admin@example.com"
+											/>
+											<SelectControl
+												label="Language"
+												description="Choose the default language for your site."
+												defaultValue="en"
+												items={ [
+													{
+														value: 'en',
+														label: 'English',
+													},
+													{
+														value: 'es',
+														label: 'Spanish',
+													},
+													{
+														value: 'fr',
+														label: 'French',
+													},
+												] }
+											/>
 										</Stack>
 									</Card.Content>
 								</Card.Root>
 
 								{ /* Card 2: Display */ }
-								<Card.Root>
+								<Card.Root style={ { width: '100%' } }>
 									<Card.Header>
 										<Card.Title>Display</Card.Title>
 									</Card.Header>

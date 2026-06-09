@@ -23,8 +23,8 @@ import type { ThemeProviderProps } from './types';
 
 type Entry = [ string, string ];
 
-const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
-const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 30 } );
+const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 30 } );
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
 	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
@@ -161,9 +161,11 @@ function generateStyles( {
 export function useThemeProviderStyles( {
 	color = {},
 	cursor,
+	contrast,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
 	cursor?: ThemeProviderProps[ 'cursor' ];
+	contrast?: ThemeProviderProps[ 'contrast' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -178,6 +180,8 @@ export function useThemeProviderStyles( {
 	const bg =
 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
+	const resolvedContrast =
+		contrast ?? inheritedSettings.contrast ?? 'default';
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -186,8 +190,9 @@ export function useThemeProviderStyles( {
 				bg,
 			},
 			cursor: cursorControl ? { control: cursorControl } : undefined,
+			contrast: resolvedContrast,
 		} ),
-		[ primary, bg, cursorControl ]
+		[ primary, bg, cursorControl, resolvedContrast ]
 	);
 
 	const colorStyles = useMemo( () => {
@@ -200,14 +205,14 @@ export function useThemeProviderStyles( {
 
 		// Generate ramps.
 		const computedColorRamps = new Map< string, RampResult >();
-		const bgRamp = getCachedBgRamp( seeds.bg );
+		const bgRamp = getCachedBgRamp( seeds.bg, resolvedContrast );
 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
 			if ( rampName === 'bg' ) {
 				computedColorRamps.set( rampName, bgRamp );
 			} else {
 				computedColorRamps.set(
 					rampName,
-					getCachedAccentRamp( seed, bgRamp )
+					getCachedAccentRamp( seed, bgRamp, resolvedContrast )
 				);
 			}
 		} );
@@ -216,7 +221,7 @@ export function useThemeProviderStyles( {
 			primary: seeds.primary,
 			computedColorRamps,
 		} );
-	}, [ primary, bg ] );
+	}, [ primary, bg, resolvedContrast ] );
 
 	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {

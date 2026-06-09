@@ -1,26 +1,32 @@
 import { get, OKLCH } from 'colorjs.io/fn';
-import { buildRamp } from './lib/index';
+import { buildRamp, buildRampForContrastLevel } from './lib/index';
 import { clampAccentScaleReferenceLightness } from './lib/utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
 import type {
 	RampResult as InternalRampResult,
 	RampDirection,
 	Ramp,
+	ContrastLevel,
 } from './lib/types';
 import { getContrast } from './lib/color-utils';
 import { CONTRAST_COMBINATIONS } from './lib/constants';
 export { DEFAULT_SEED_COLORS } from './lib/constants';
+export type { ContrastLevel } from './lib/types';
 
 /**
  * Creates a background ramp.
- * @param seed The seed color for the background ramp.
+ * @param seed     The seed color for the background ramp.
+ * @param contrast The contrast level to use when generating the ramp.
  */
-export function buildBgRamp( seed: string ) {
+export function buildBgRamp(
+	seed: string,
+	contrast: ContrastLevel = 'default'
+) {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
-	return buildRamp( seed, BG_RAMP_CONFIG );
+	return buildRampForContrastLevel( seed, BG_RAMP_CONFIG, contrast );
 }
 
 const STEP_TO_PIN = 'surface2';
@@ -46,19 +52,42 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 /**
  * Creates an accent ramp (ie used by primary, success, info, warning and error
  * ramps).
- * @param seed   The seed color for the accent ramp.
- * @param bgRamp The ramp of the background on which the accent is shown.
+ * @param seed     The seed color for the accent ramp.
+ * @param bgRamp   The ramp of the background on which the accent is shown.
+ * @param contrast The contrast level to use when generating the ramp.
  */
 export function buildAccentRamp(
 	seed: string,
-	bgRamp?: InternalRampResult
+	bgRamp?: InternalRampResult,
+	contrast: ContrastLevel = 'default'
 ): InternalRampResult {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
-	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+
+	if ( contrast === 'default' ) {
+		return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+	}
+
+	const defaultBgRamp = bgRamp?.inputSeed
+		? buildBgRamp( bgRamp.inputSeed, 'default' )
+		: undefined;
+	const defaultBgRampInfo = defaultBgRamp
+		? getBgRampInfo( defaultBgRamp )
+		: bgRampInfo;
+	const defaultAccentRamp = buildRamp(
+		seed,
+		ACCENT_RAMP_CONFIG,
+		defaultBgRampInfo
+	);
+
+	return buildRampForContrastLevel( seed, ACCENT_RAMP_CONFIG, contrast, {
+		mainDirection: defaultAccentRamp.direction,
+		pinLightness: defaultBgRampInfo?.pinLightness,
+		defaultBaseRamp: defaultAccentRamp,
+	} );
 }
 
 /**
@@ -67,13 +96,20 @@ export function buildAccentRamp(
  * @param params
  * @param params.bgRamp
  * @param params.accentRamps
+ * @param params.combinations
  */
 export function checkAccessibleCombinations( {
 	bgRamp,
 	accentRamps = [],
+	combinations = CONTRAST_COMBINATIONS,
 }: {
 	bgRamp: InternalRampResult;
 	accentRamps?: InternalRampResult[];
+	combinations?: {
+		bgs: ( keyof Ramp )[];
+		fgs: ( keyof Ramp )[];
+		target: number;
+	}[];
 } ) {
 	const unmetTargets: {
 		bgName: keyof Ramp;
@@ -86,7 +122,7 @@ export function checkAccessibleCombinations( {
 
 	// Assess combinations within each ramp
 	[ bgRamp, ...accentRamps ].forEach( ( ramp ) => {
-		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+		combinations.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
 					const bgColor = ramp.ramp[ bg ];
@@ -108,7 +144,7 @@ export function checkAccessibleCombinations( {
 	} );
 	// Assess each accent ramp's fg color against bg ramp
 	accentRamps.forEach( ( ramp ) => {
-		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+		combinations.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
 					const bgColor = bgRamp.ramp[ bg ];

@@ -106,6 +106,22 @@ The `cursor` prop accepts an object with the following optional properties:
 
 When the `color` or `cursor` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
+The `contrast` prop controls the contrast level of generated color ramps:
+
+-   `default`: AA-compliant contrast targets (default).
+-   `high`: AAA-oriented contrast targets for stronger text, borders, and interactive affordances.
+-   `low`: Relaxed contrast for subtler UI chrome.
+
+When the `contrast` prop is omitted, it inherits from the closest parent `ThemeProvider`, or defaults to `default`.
+
+Surface background tokens (`--wpds-color-bg-surface-*`) stay fixed across contrast levels for a given seed color. In `low` contrast, decorative surface borders and fill backgrounds also stay at their default values. Only foreground and interactive stroke tokens (`--wpds-color-stroke-interactive-*`, `--wpds-color-fg-*`) are retargeted in `low`; `high` additionally strengthens strokes and fill backgrounds.
+
+```tsx
+<ThemeProvider contrast="high">
+	{ /* high-contrast UI */ }
+</ThemeProvider>
+```
+
 ### Nesting Providers
 
 The provider can be used recursively to override or modify the theme for a specific subtree.

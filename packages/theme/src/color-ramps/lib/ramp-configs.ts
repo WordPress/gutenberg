@@ -1,4 +1,9 @@
-import type { RampStepConfig, RampConfig, RampDirection } from './types';
+import type {
+	RampStepConfig,
+	RampConfig,
+	RampDirection,
+	ContrastLevel,
+} from './types';
 import type { TaperChromaOptions } from './taper-chroma';
 
 const lightnessConstraintForegroundHighContrast = (
@@ -44,6 +49,7 @@ const fgSurface4Config: RampStepConfig = {
 		reference: 'surface3',
 		followDirection: 'main',
 		target: 7,
+		contrastTargets: { low: 6.3 },
 		preferLighter: true,
 	},
 	lightness: lightnessConstraintForegroundHighContrast,
@@ -140,6 +146,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'stroke3',
 			followDirection: 'opposite',
 			target: 2.9,
+			contrastTargets: { high: 4.2 },
 		},
 		taperChromaOptions: STROKE_TAPER_CHROMA,
 	},
@@ -148,6 +155,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'stroke3',
 			followDirection: 'opposite',
 			target: 2.4,
+			contrastTargets: { high: 3.4 },
 		},
 		taperChromaOptions: STROKE_TAPER_CHROMA,
 	},
@@ -156,6 +164,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'surface3',
 			followDirection: 'main',
 			target: 3,
+			contrastTargets: { high: 7, low: 1.5 },
 		},
 		taperChromaOptions: STROKE_TAPER_CHROMA,
 	},
@@ -173,6 +182,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'surface3',
 			followDirection: 'main',
 			target: 2,
+			contrastTargets: { high: 3, low: 1.9 },
 			preferLighter: true,
 		},
 		taperChromaOptions: FG_TAPER_CHROMA,
@@ -182,6 +192,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'surface3',
 			followDirection: 'main',
 			target: 3,
+			contrastTargets: { high: 4.5, low: 2.9 },
 			preferLighter: true,
 		},
 		taperChromaOptions: FG_TAPER_CHROMA,
@@ -191,6 +202,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'surface3',
 			followDirection: 'main',
 			target: 4.5,
+			contrastTargets: { high: 7, low: 4.2 },
 			preferLighter: true,
 		},
 		lightness: lightnessConstraintForegroundMediumContrast,
@@ -203,6 +215,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'bgFill1',
 			followDirection: 'best',
 			target: 4.5,
+			contrastTargets: { high: 7, low: 4.2 },
 			preferLighter: true,
 		},
 		lightness: lightnessConstraintForegroundHighContrast,
@@ -213,6 +226,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'bgFillInverted1',
 			followDirection: 'best',
 			target: 4.5,
+			contrastTargets: { high: 7, low: 4.2 },
 			preferLighter: true,
 		},
 		lightness: lightnessConstraintForegroundHighContrast,
@@ -223,6 +237,7 @@ export const BG_RAMP_CONFIG: RampConfig = {
 			reference: 'bgFillDark',
 			followDirection: 'best',
 			target: 4.5,
+			contrastTargets: { high: 7, low: 4.2 },
 			preferLighter: true,
 		},
 		lightness: lightnessConstraintForegroundHighContrast,
@@ -304,3 +319,49 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 		taperChromaOptions: undefined,
 	},
 };
+
+/**
+ * Resolves a ramp config for a given contrast level by applying per-step
+ * contrast target overrides.
+ *
+ * @param config The base ramp configuration.
+ * @param level  The contrast level to resolve for.
+ * @return The resolved ramp configuration.
+ */
+export function resolveRampConfig(
+	config: RampConfig,
+	level: ContrastLevel
+): RampConfig {
+	if ( level === 'default' ) {
+		return config;
+	}
+
+	return Object.fromEntries(
+		Object.entries( config ).map( ( [ step, stepConfig ] ) => {
+			const override = stepConfig.contrast.contrastTargets?.[ level ];
+			let resolved: RampStepConfig = stepConfig;
+
+			if ( override !== undefined ) {
+				resolved = {
+					...resolved,
+					contrast: {
+						...stepConfig.contrast,
+						target: override,
+					},
+				};
+			}
+
+			// Let lowered contrast targets produce visibly softer colors instead
+			// of reusing the default ramp's pinned lightness / shared fill colors.
+			if ( level === 'low' ) {
+				resolved = {
+					...resolved,
+					lightness: undefined,
+					sameAsIfPossible: undefined,
+				};
+			}
+
+			return [ step, resolved ];
+		} )
+	) as RampConfig;
+}

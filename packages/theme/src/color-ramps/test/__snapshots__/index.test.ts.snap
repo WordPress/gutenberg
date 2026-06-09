@@ -18,6 +18,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#d1d1d1",
           "bgFill2": "#e6e6e6",
@@ -63,6 +64,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#d1d1d1",
           "bgFill2": "#e6e6e6",
@@ -108,6 +110,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#d1d1d1",
           "bgFill2": "#e6e6e6",
@@ -153,6 +156,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#d1d1d1",
           "bgFill2": "#e6e6e6",
@@ -198,6 +202,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#d2d2d2",
           "bgFill2": "#e6e6e6",
@@ -243,6 +248,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#fcfcfc",
           "bgFill2": "#e6e6e6",
@@ -285,6 +291,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#fcfcfc",
           "bgFill2": "#e6e6e6",
@@ -327,6 +334,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#fcfcfc",
           "bgFill2": "#e6e6e6",
@@ -369,6 +377,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#fcfcfc",
         "ramp": {
           "bgFill1": "#fcfcfc",
           "bgFill2": "#e6e6e6",
@@ -413,6 +422,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#4367f9",
@@ -455,6 +465,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#4367f9",
@@ -497,6 +508,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#4367f9",
@@ -539,6 +551,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#4367f9",
@@ -581,6 +594,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#4367f9",
@@ -623,6 +637,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#2e49d9",
@@ -665,6 +680,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#2e49d9",
@@ -707,6 +723,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#2e49d9",
@@ -749,6 +766,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#3858e9",
         "ramp": {
           "bgFill1": "#3858e9",
           "bgFill2": "#2e49d9",
@@ -793,6 +811,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#37a3ff",
@@ -835,6 +854,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#37a3ff",
@@ -877,6 +897,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#37a3ff",
@@ -919,6 +940,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#37a3ff",
@@ -961,6 +983,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#37a3ff",
@@ -1003,6 +1026,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#007fed",
@@ -1045,6 +1069,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#007fed",
@@ -1087,6 +1112,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#007fed",
@@ -1129,6 +1155,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#0090ff",
         "ramp": {
           "bgFill1": "#0090ff",
           "bgFill2": "#007fed",
@@ -1173,6 +1200,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#5dca77",
@@ -1215,6 +1243,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#5dca77",
@@ -1257,6 +1286,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#5dca77",
@@ -1299,6 +1329,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#5dca77",
@@ -1341,6 +1372,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#5dca77",
@@ -1383,6 +1415,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#37a756",
@@ -1425,6 +1458,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#37a756",
@@ -1467,6 +1501,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#37a756",
@@ -1509,6 +1544,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#4ab866",
         "ramp": {
           "bgFill1": "#4ab866",
           "bgFill2": "#37a756",
@@ -1553,6 +1589,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d148",
           "bgFill2": "#ffe762",
@@ -1597,6 +1634,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d148",
           "bgFill2": "#ffe762",
@@ -1641,6 +1679,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d148",
           "bgFill2": "#ffe762",
@@ -1685,6 +1724,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d148",
           "bgFill2": "#ffe762",
@@ -1729,6 +1769,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d148",
           "bgFill2": "#ffe762",
@@ -1773,6 +1814,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d149",
           "bgFill2": "#dcbe2f",
@@ -1815,6 +1857,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d149",
           "bgFill2": "#dcbe2f",
@@ -1857,6 +1900,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d149",
           "bgFill2": "#dcbe2f",
@@ -1899,6 +1943,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0d149",
         "ramp": {
           "bgFill1": "#f0d149",
           "bgFill2": "#dcbe2f",
@@ -1943,6 +1988,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#ffcd61",
@@ -1985,6 +2031,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#ffcd61",
@@ -2027,6 +2074,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#ffcd61",
@@ -2069,6 +2117,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#ffcd61",
@@ -2111,6 +2160,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#ffcd61",
@@ -2153,6 +2203,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#dda633",
@@ -2195,6 +2246,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#dda633",
@@ -2237,6 +2289,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#dda633",
@@ -2279,6 +2332,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#f0b849",
         "ramp": {
           "bgFill1": "#f0b849",
           "bgFill2": "#dda633",
@@ -2323,6 +2377,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#dd3029",
@@ -2365,6 +2420,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#dd3029",
@@ -2407,6 +2463,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#dd3029",
@@ -2449,6 +2506,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#dd3029",
@@ -2491,6 +2549,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#dd3029",
@@ -2533,6 +2592,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#fff2ee",
           "bgFill2": "#e9dcd8",
@@ -2578,6 +2638,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#b90000",
@@ -2620,6 +2681,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#b90000",
@@ -2662,6 +2724,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#cc1818",
         "ramp": {
           "bgFill1": "#cc1818",
           "bgFill2": "#b90000",
@@ -2706,6 +2769,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#64bede",
@@ -2748,6 +2812,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#64bede",
@@ -2790,6 +2855,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#64bede",
@@ -2832,6 +2898,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#64bede",
@@ -2874,6 +2941,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#64bede",
@@ -2916,6 +2984,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#409cbb",
@@ -2958,6 +3027,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#409cbb",
@@ -3000,6 +3070,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#409cbb",
@@ -3042,6 +3113,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#52accc",
         "ramp": {
           "bgFill1": "#52accc",
           "bgFill2": "#409cbb",
@@ -3086,6 +3158,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#d9b79a",
@@ -3128,6 +3201,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#d9b79a",
@@ -3170,6 +3244,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#d9b79a",
@@ -3212,6 +3287,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#d9b79a",
@@ -3254,6 +3330,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#d9b79a",
@@ -3296,6 +3373,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#b69479",
@@ -3338,6 +3416,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#b69479",
@@ -3380,6 +3459,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#b69479",
@@ -3422,6 +3502,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#c7a589",
         "ramp": {
           "bgFill1": "#c7a589",
           "bgFill2": "#b69479",
@@ -3466,6 +3547,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#b5c959",
@@ -3508,6 +3590,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#b5c959",
@@ -3550,6 +3633,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#b5c959",
@@ -3592,6 +3676,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#b5c959",
@@ -3634,6 +3719,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#b5c959",
@@ -3676,6 +3762,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#93a631",
@@ -3718,6 +3805,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#93a631",
@@ -3760,6 +3848,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#93a631",
@@ -3802,6 +3891,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#a3b745",
         "ramp": {
           "bgFill1": "#a3b745",
           "bgFill2": "#93a631",
@@ -3846,6 +3936,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#ef934d",
@@ -3888,6 +3979,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#ef934d",
@@ -3930,6 +4022,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#ef934d",
@@ -3972,6 +4065,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#ef934d",
@@ -4014,6 +4108,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "lighter",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#ef934d",
@@ -4056,6 +4151,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#cc7228",
@@ -4098,6 +4194,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#cc7228",
@@ -4140,6 +4237,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#cc7228",
@@ -4182,6 +4280,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
       },
       "output": {
         "direction": "darker",
+        "inputSeed": "#dd823b",
         "ramp": {
           "bgFill1": "#dd823b",
           "bgFill2": "#cc7228",
@@ -4223,6 +4322,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4258,6 +4358,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4293,6 +4394,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4328,6 +4430,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4363,6 +4466,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4398,6 +4502,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4433,6 +4538,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4468,6 +4574,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4503,6 +4610,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4538,6 +4646,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4573,6 +4682,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4608,6 +4718,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4643,6 +4754,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4678,6 +4790,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4713,6 +4826,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4748,6 +4862,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4783,6 +4898,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4818,6 +4934,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4853,6 +4970,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4888,6 +5006,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4923,6 +5042,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4958,6 +5078,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -4993,6 +5114,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5028,6 +5150,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5063,6 +5186,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5098,6 +5222,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5133,6 +5258,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5168,6 +5294,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5203,6 +5330,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5238,6 +5366,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5273,6 +5402,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5308,6 +5438,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5343,6 +5474,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5378,6 +5510,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5413,6 +5546,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5448,6 +5582,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 100%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -5483,6 +5618,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 80% 80%)",
       "ramp": {
         "bgFill1": "#724849",
         "bgFill2": "#643b3c",
@@ -5518,6 +5654,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 80%)",
       "ramp": {
         "bgFill1": "#59582b",
         "bgFill2": "#4c4b1d",
@@ -5553,6 +5690,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 100% 80%)",
       "ramp": {
         "bgFill1": "#346236",
         "bgFill2": "#27542a",
@@ -5588,6 +5726,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 100% 100%)",
       "ramp": {
         "bgFill1": "#2f5e5f",
         "bgFill2": "#215152",
@@ -5623,6 +5762,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 100%)",
       "ramp": {
         "bgFill1": "#514f7b",
         "bgFill2": "#44436d",
@@ -5658,6 +5798,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 80% 100%)",
       "ramp": {
         "bgFill1": "#6e436f",
         "bgFill2": "#603661",
@@ -5693,6 +5834,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(98% 82% 82%)",
       "ramp": {
         "bgFill1": "#6d4b4c",
         "bgFill2": "#5f3e3f",
@@ -5728,6 +5870,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(98% 98% 82%)",
       "ramp": {
         "bgFill1": "#585834",
         "bgFill2": "#4b4b28",
@@ -5763,6 +5906,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(82% 98% 82%)",
       "ramp": {
         "bgFill1": "#3c5f3d",
         "bgFill2": "#2f5231",
@@ -5798,6 +5942,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(82% 98% 98%)",
       "ramp": {
         "bgFill1": "#385d5d",
         "bgFill2": "#2b5050",
@@ -5833,6 +5978,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(82% 82% 98%)",
       "ramp": {
         "bgFill1": "#525173",
         "bgFill2": "#454466",
@@ -5868,6 +6014,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(98% 82% 98%)",
       "ramp": {
         "bgFill1": "#6a476a",
         "bgFill2": "#5c3a5d",
@@ -5903,6 +6050,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(96% 84% 84%)",
       "ramp": {
         "bgFill1": "#674e4e",
         "bgFill2": "#5a4141",
@@ -5938,6 +6086,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(96% 96% 84%)",
       "ramp": {
         "bgFill1": "#57573d",
         "bgFill2": "#4b4a31",
@@ -5973,6 +6122,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 96% 84%)",
       "ramp": {
         "bgFill1": "#435d43",
         "bgFill2": "#365037",
@@ -6008,6 +6158,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 96% 96%)",
       "ramp": {
         "bgFill1": "#405b5b",
         "bgFill2": "#344e4e",
@@ -6043,6 +6194,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 84% 96%)",
       "ramp": {
         "bgFill1": "#53526c",
         "bgFill2": "#46455e",
@@ -6078,6 +6230,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(96% 84% 96%)",
       "ramp": {
         "bgFill1": "#654b65",
         "bgFill2": "#573e58",
@@ -6113,6 +6266,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(94% 86% 86%)",
       "ramp": {
         "bgFill1": "#615051",
         "bgFill2": "#544444",
@@ -6148,6 +6302,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(94% 94% 86%)",
       "ramp": {
         "bgFill1": "#575745",
         "bgFill2": "#4a4a39",
@@ -6183,6 +6338,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(86% 94% 86%)",
       "ramp": {
         "bgFill1": "#495b4a",
         "bgFill2": "#3d4e3d",
@@ -6218,6 +6374,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(86% 94% 94%)",
       "ramp": {
         "bgFill1": "#485959",
         "bgFill2": "#3b4c4c",
@@ -6253,6 +6410,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(86% 86% 94%)",
       "ramp": {
         "bgFill1": "#545364",
         "bgFill2": "#474657",
@@ -6288,6 +6446,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(94% 86% 94%)",
       "ramp": {
         "bgFill1": "#604f60",
         "bgFill2": "#534253",
@@ -6323,6 +6482,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 88% 88%)",
       "ramp": {
         "bgFill1": "#5b5353",
         "bgFill2": "#4e4646",
@@ -6358,6 +6518,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 92% 88%)",
       "ramp": {
         "bgFill1": "#56564d",
         "bgFill2": "#494941",
@@ -6393,6 +6554,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 92% 88%)",
       "ramp": {
         "bgFill1": "#4f584f",
         "bgFill2": "#434b43",
@@ -6428,6 +6590,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 92% 92%)",
       "ramp": {
         "bgFill1": "#4f5757",
         "bgFill2": "#424a4a",
@@ -6463,6 +6626,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 88% 92%)",
       "ramp": {
         "bgFill1": "#54545d",
         "bgFill2": "#484750",
@@ -6498,6 +6662,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 88% 92%)",
       "ramp": {
         "bgFill1": "#5b525b",
         "bgFill2": "#4e454e",
@@ -6533,6 +6698,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 90% 90%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -6568,6 +6734,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 90% 90%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -6603,6 +6770,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 90% 90%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -6638,6 +6806,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 90% 90%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -6673,6 +6842,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 90% 90%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -6708,6 +6878,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 90% 90%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -6743,6 +6914,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 60% 60%)",
       "ramp": {
         "bgFill1": "#8a3035",
         "bgFill2": "#7b2229",
@@ -6778,6 +6950,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 60%)",
       "ramp": {
         "bgFill1": "#5c5900",
         "bgFill2": "#4f4c00",
@@ -6813,6 +6986,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 100% 60%)",
       "ramp": {
         "bgFill1": "#006a00",
         "bgFill2": "#005c00",
@@ -6848,6 +7022,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 100% 100%)",
       "ramp": {
         "bgFill1": "#006566",
         "bgFill2": "#005758",
@@ -6883,6 +7058,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 100%)",
       "ramp": {
         "bgFill1": "#3d338f",
         "bgFill2": "#322480",
@@ -6918,6 +7094,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 60% 100%)",
       "ramp": {
         "bgFill1": "#842386",
         "bgFill2": "#750f78",
@@ -6953,6 +7130,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(96% 64% 64%)",
       "ramp": {
         "bgFill1": "#823b3e",
         "bgFill2": "#732f32",
@@ -6988,6 +7166,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(96% 96% 64%)",
       "ramp": {
         "bgFill1": "#5b5900",
         "bgFill2": "#4e4c00",
@@ -7023,6 +7202,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(64% 96% 64%)",
       "ramp": {
         "bgFill1": "#0f671b",
         "bgFill2": "#005a08",
@@ -7058,6 +7238,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(64% 96% 96%)",
       "ramp": {
         "bgFill1": "#006364",
         "bgFill2": "#005556",
@@ -7093,6 +7274,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(64% 64% 96%)",
       "ramp": {
         "bgFill1": "#433e86",
         "bgFill2": "#373077",
@@ -7128,6 +7310,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(96% 64% 96%)",
       "ramp": {
         "bgFill1": "#7c327d",
         "bgFill2": "#6e246f",
@@ -7163,6 +7346,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 68% 68%)",
       "ramp": {
         "bgFill1": "#784445",
         "bgFill2": "#6a3739",
@@ -7198,6 +7382,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 92% 68%)",
       "ramp": {
         "bgFill1": "#5a581e",
         "bgFill2": "#4d4b0e",
@@ -7233,6 +7418,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(68% 92% 68%)",
       "ramp": {
         "bgFill1": "#2b642e",
         "bgFill2": "#1c5621",
@@ -7268,6 +7454,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(68% 92% 92%)",
       "ramp": {
         "bgFill1": "#236060",
         "bgFill2": "#135353",
@@ -7303,6 +7490,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(68% 68% 92%)",
       "ramp": {
         "bgFill1": "#49477c",
         "bgFill2": "#3d3a6e",
@@ -7338,6 +7526,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 68% 92%)",
       "ramp": {
         "bgFill1": "#733e74",
         "bgFill2": "#663167",
@@ -7373,6 +7562,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 72% 72%)",
       "ramp": {
         "bgFill1": "#6d4b4b",
         "bgFill2": "#5f3e3f",
@@ -7408,6 +7598,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 88% 72%)",
       "ramp": {
         "bgFill1": "#585834",
         "bgFill2": "#4b4b27",
@@ -7443,6 +7634,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(72% 88% 72%)",
       "ramp": {
         "bgFill1": "#3b603c",
         "bgFill2": "#2f5230",
@@ -7478,6 +7670,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(72% 88% 88%)",
       "ramp": {
         "bgFill1": "#385d5d",
         "bgFill2": "#2b5050",
@@ -7513,6 +7706,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(72% 72% 88%)",
       "ramp": {
         "bgFill1": "#504f73",
         "bgFill2": "#444265",
@@ -7548,6 +7742,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 72% 88%)",
       "ramp": {
         "bgFill1": "#6a476a",
         "bgFill2": "#5c3a5d",
@@ -7583,6 +7778,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 76% 76%)",
       "ramp": {
         "bgFill1": "#625050",
         "bgFill2": "#544444",
@@ -7618,6 +7814,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 84% 76%)",
       "ramp": {
         "bgFill1": "#575745",
         "bgFill2": "#4a4a39",
@@ -7653,6 +7850,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 84% 76%)",
       "ramp": {
         "bgFill1": "#495b49",
         "bgFill2": "#3d4e3d",
@@ -7688,6 +7886,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 84% 84%)",
       "ramp": {
         "bgFill1": "#475959",
         "bgFill2": "#3b4c4c",
@@ -7723,6 +7922,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 76% 84%)",
       "ramp": {
         "bgFill1": "#535365",
         "bgFill2": "#474657",
@@ -7758,6 +7958,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 76% 84%)",
       "ramp": {
         "bgFill1": "#604f60",
         "bgFill2": "#534253",
@@ -7793,6 +7994,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 80%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -7828,6 +8030,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 80%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -7863,6 +8066,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 80%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -7898,6 +8102,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 80%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -7933,6 +8138,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 80%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -7968,6 +8174,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 80%)",
       "ramp": {
         "bgFill1": "#555",
         "bgFill2": "#484848",
@@ -8003,6 +8210,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 40% 40%)",
       "ramp": {
         "bgFill1": "#7e000b",
         "bgFill2": "#640005",
@@ -8041,6 +8249,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 40%)",
       "ramp": {
         "bgFill1": "#5b5900",
         "bgFill2": "#4e4c00",
@@ -8076,6 +8285,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(40% 100% 40%)",
       "ramp": {
         "bgFill1": "#006b00",
         "bgFill2": "#005c00",
@@ -8111,6 +8321,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(40% 100% 100%)",
       "ramp": {
         "bgFill1": "#006566",
         "bgFill2": "#005758",
@@ -8146,6 +8357,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(40% 40% 100%)",
       "ramp": {
         "bgFill1": "#312b90",
         "bgFill2": "#261a7f",
@@ -8185,6 +8397,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 40% 100%)",
       "ramp": {
         "bgFill1": "#7b007d",
         "bgFill2": "#650067",
@@ -8220,6 +8433,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(94% 46% 46%)",
       "ramp": {
         "bgFill1": "#7c0017",
         "bgFill2": "#630009",
@@ -8258,6 +8472,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(94% 94% 46%)",
       "ramp": {
         "bgFill1": "#5b5900",
         "bgFill2": "#4e4c00",
@@ -8293,6 +8508,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(46% 94% 46%)",
       "ramp": {
         "bgFill1": "#006b00",
         "bgFill2": "#005c00",
@@ -8328,6 +8544,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(46% 94% 94%)",
       "ramp": {
         "bgFill1": "#006566",
         "bgFill2": "#005758",
@@ -8363,6 +8580,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(46% 46% 94%)",
       "ramp": {
         "bgFill1": "#362a90",
         "bgFill2": "#2b187f",
@@ -8401,6 +8619,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(94% 46% 94%)",
       "ramp": {
         "bgFill1": "#7a007d",
         "bgFill2": "#640067",
@@ -8436,6 +8655,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 52% 52%)",
       "ramp": {
         "bgFill1": "#712127",
         "bgFill2": "#61101a",
@@ -8471,6 +8691,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 88% 52%)",
       "ramp": {
         "bgFill1": "#5c5900",
         "bgFill2": "#4f4c00",
@@ -8506,6 +8727,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(52% 88% 52%)",
       "ramp": {
         "bgFill1": "#006908",
         "bgFill2": "#005b00",
@@ -8541,6 +8763,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(52% 88% 88%)",
       "ramp": {
         "bgFill1": "#006465",
         "bgFill2": "#005657",
@@ -8576,6 +8799,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(52% 52% 88%)",
       "ramp": {
         "bgFill1": "#372e82",
         "bgFill2": "#2b1f72",
@@ -8614,6 +8838,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(88% 52% 88%)",
       "ramp": {
         "bgFill1": "#731b75",
         "bgFill2": "#640466",
@@ -8649,6 +8874,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(82% 58% 58%)",
       "ramp": {
         "bgFill1": "#663234",
         "bgFill2": "#572528",
@@ -8684,6 +8910,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(82% 82% 58%)",
       "ramp": {
         "bgFill1": "#5a581d",
         "bgFill2": "#4d4b0c",
@@ -8719,6 +8946,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(58% 82% 58%)",
       "ramp": {
         "bgFill1": "#29642c",
         "bgFill2": "#1b561f",
@@ -8754,6 +8982,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(58% 82% 82%)",
       "ramp": {
         "bgFill1": "#226061",
         "bgFill2": "#115353",
@@ -8789,6 +9018,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(58% 58% 82%)",
       "ramp": {
         "bgFill1": "#38356a",
         "bgFill2": "#2c275b",
@@ -8827,6 +9057,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(82% 58% 82%)",
       "ramp": {
         "bgFill1": "#673168",
         "bgFill2": "#58235a",
@@ -8862,6 +9093,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 64% 64%)",
       "ramp": {
         "bgFill1": "#5a4041",
         "bgFill2": "#4d3434",
@@ -8897,6 +9129,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 76% 64%)",
       "ramp": {
         "bgFill1": "#58573c",
         "bgFill2": "#4b4a30",
@@ -8932,6 +9165,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(64% 76% 64%)",
       "ramp": {
         "bgFill1": "#3d593e",
         "bgFill2": "#314b31",
@@ -8967,6 +9201,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(64% 76% 76%)",
       "ramp": {
         "bgFill1": "#3d5858",
         "bgFill2": "#304b4b",
@@ -9002,6 +9237,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(64% 64% 76%)",
       "ramp": {
         "bgFill1": "#42415b",
         "bgFill2": "#35344d",
@@ -9037,6 +9273,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 64% 76%)",
       "ramp": {
         "bgFill1": "#5a405b",
         "bgFill2": "#4d334d",
@@ -9072,6 +9309,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 70% 70%)",
       "ramp": {
         "bgFill1": "#4d4d4d",
         "bgFill2": "#404040",
@@ -9107,6 +9345,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 70% 70%)",
       "ramp": {
         "bgFill1": "#4d4d4d",
         "bgFill2": "#404040",
@@ -9142,6 +9381,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 70% 70%)",
       "ramp": {
         "bgFill1": "#4d4d4d",
         "bgFill2": "#404040",
@@ -9177,6 +9417,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 70% 70%)",
       "ramp": {
         "bgFill1": "#4d4d4d",
         "bgFill2": "#404040",
@@ -9212,6 +9453,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 70% 70%)",
       "ramp": {
         "bgFill1": "#4d4d4d",
         "bgFill2": "#404040",
@@ -9247,6 +9489,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 70% 70%)",
       "ramp": {
         "bgFill1": "#4d4d4d",
         "bgFill2": "#404040",
@@ -9282,6 +9525,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 20% 20%)",
       "ramp": {
         "bgFill1": "#7f0000",
         "bgFill2": "#650000",
@@ -9320,6 +9564,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 20%)",
       "ramp": {
         "bgFill1": "#5b5900",
         "bgFill2": "#4e4c00",
@@ -9355,6 +9600,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(20% 100% 20%)",
       "ramp": {
         "bgFill1": "#006b00",
         "bgFill2": "#005c00",
@@ -9390,6 +9636,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(20% 100% 100%)",
       "ramp": {
         "bgFill1": "#006566",
         "bgFill2": "#005758",
@@ -9425,6 +9672,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 100%)",
       "ramp": {
         "bgFill1": "#a1bbff",
         "bgFill2": "#bacfff",
@@ -9463,6 +9711,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 20% 100%)",
       "ramp": {
         "bgFill1": "#6d006f",
         "bgFill2": "#570058",
@@ -9501,6 +9750,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 28% 28%)",
       "ramp": {
         "bgFill1": "#7d0004",
         "bgFill2": "#640001",
@@ -9539,6 +9789,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 92% 28%)",
       "ramp": {
         "bgFill1": "#5b5900",
         "bgFill2": "#4e4c00",
@@ -9574,6 +9825,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(28% 92% 28%)",
       "ramp": {
         "bgFill1": "#006b00",
         "bgFill2": "#005c00",
@@ -9609,6 +9861,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(28% 92% 92%)",
       "ramp": {
         "bgFill1": "#006566",
         "bgFill2": "#005758",
@@ -9644,6 +9897,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(28% 28% 92%)",
       "ramp": {
         "bgFill1": "#a8baff",
         "bgFill2": "#c0ceff",
@@ -9682,6 +9936,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(92% 28% 92%)",
       "ramp": {
         "bgFill1": "#6e006f",
         "bgFill2": "#570059",
@@ -9720,6 +9975,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 36% 36%)",
       "ramp": {
         "bgFill1": "#7d0013",
         "bgFill2": "#640006",
@@ -9758,6 +10014,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 84% 36%)",
       "ramp": {
         "bgFill1": "#5b5900",
         "bgFill2": "#4e4c00",
@@ -9793,6 +10050,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(36% 84% 36%)",
       "ramp": {
         "bgFill1": "#006300",
         "bgFill2": "#050",
@@ -9828,6 +10086,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(36% 84% 84%)",
       "ramp": {
         "bgFill1": "#006465",
         "bgFill2": "#005657",
@@ -9863,6 +10122,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(36% 36% 84%)",
       "ramp": {
         "bgFill1": "#afb8ff",
         "bgFill2": "#c4cdff",
@@ -9901,6 +10161,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(84% 36% 84%)",
       "ramp": {
         "bgFill1": "#6d006f",
         "bgFill2": "#570059",
@@ -9939,6 +10200,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 44% 44%)",
       "ramp": {
         "bgFill1": "#6b2227",
         "bgFill2": "#5b121a",
@@ -9977,6 +10239,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 76% 44%)",
       "ramp": {
         "bgFill1": "#595700",
         "bgFill2": "#4c4a00",
@@ -10012,6 +10275,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(44% 76% 44%)",
       "ramp": {
         "bgFill1": "#005800",
         "bgFill2": "#004900",
@@ -10047,6 +10311,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(44% 76% 76%)",
       "ramp": {
         "bgFill1": "#005859",
         "bgFill2": "#004a4b",
@@ -10082,6 +10347,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(44% 44% 76%)",
       "ramp": {
         "bgFill1": "#37317c",
         "bgFill2": "#2b226c",
@@ -10123,6 +10389,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(76% 44% 76%)",
       "ramp": {
         "bgFill1": "#661768",
         "bgFill2": "#560158",
@@ -10161,6 +10428,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(68% 52% 52%)",
       "ramp": {
         "bgFill1": "#543232",
         "bgFill2": "#452425",
@@ -10199,6 +10467,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(68% 68% 52%)",
       "ramp": {
         "bgFill1": "#4a4924",
         "bgFill2": "#3d3c17",
@@ -10234,6 +10503,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(52% 68% 52%)",
       "ramp": {
         "bgFill1": "#244a26",
         "bgFill2": "#173c19",
@@ -10269,6 +10539,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(52% 68% 68%)",
       "ramp": {
         "bgFill1": "#234a4a",
         "bgFill2": "#153c3d",
@@ -10304,6 +10575,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(52% 52% 68%)",
       "ramp": {
         "bgFill1": "#39385b",
         "bgFill2": "#2c2a4d",
@@ -10342,6 +10614,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(68% 52% 68%)",
       "ramp": {
         "bgFill1": "#522e53",
         "bgFill2": "#432144",
@@ -10380,6 +10653,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 60%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -10418,6 +10692,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 60%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -10456,6 +10731,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 60%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -10494,6 +10770,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 60%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -10532,6 +10809,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 60%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -10570,6 +10848,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 60%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -10608,6 +10887,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 0% 0%)",
       "ramp": {
         "bgFill1": "#7f0000",
         "bgFill2": "#650000",
@@ -10646,6 +10926,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 100% 0%)",
       "ramp": {
         "bgFill1": "#5a5a00",
         "bgFill2": "#4d4d00",
@@ -10681,6 +10962,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(0% 100% 0%)",
       "ramp": {
         "bgFill1": "#006b00",
         "bgFill2": "#005c00",
@@ -10716,6 +10998,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(0% 100% 100%)",
       "ramp": {
         "bgFill1": "#006565",
         "bgFill2": "#005757",
@@ -10751,6 +11034,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 0% 100%)",
       "ramp": {
         "bgFill1": "#87b2ff",
         "bgFill2": "#a2c5ff",
@@ -10786,6 +11070,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(100% 0% 100%)",
       "ramp": {
         "bgFill1": "#6e006f",
         "bgFill2": "#570059",
@@ -10824,6 +11109,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(90% 10% 10%)",
       "ramp": {
         "bgFill1": "#ffa697",
         "bgFill2": "#ffc2b6",
@@ -10865,6 +11151,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 90% 10%)",
       "ramp": {
         "bgFill1": "#5a5900",
         "bgFill2": "#4d4d00",
@@ -10900,6 +11187,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(10% 90% 10%)",
       "ramp": {
         "bgFill1": "#006a00",
         "bgFill2": "#005b00",
@@ -10935,6 +11223,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(10% 90% 90%)",
       "ramp": {
         "bgFill1": "#006566",
         "bgFill2": "#005757",
@@ -10970,6 +11259,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(10% 10% 90%)",
       "ramp": {
         "bgFill1": "#86acff",
         "bgFill2": "#9fbfff",
@@ -11005,6 +11295,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(90% 10% 90%)",
       "ramp": {
         "bgFill1": "#6e006f",
         "bgFill2": "#580059",
@@ -11043,6 +11334,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(80% 20% 20%)",
       "ramp": {
         "bgFill1": "#ffa69c",
         "bgFill2": "#ffc2ba",
@@ -11081,6 +11373,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 20%)",
       "ramp": {
         "bgFill1": "#5b5900",
         "bgFill2": "#4e4c00",
@@ -11116,6 +11409,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(20% 80% 20%)",
       "ramp": {
         "bgFill1": "#005900",
         "bgFill2": "#004b00",
@@ -11151,6 +11445,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(20% 80% 80%)",
       "ramp": {
         "bgFill1": "#005b5c",
         "bgFill2": "#004d4e",
@@ -11186,6 +11481,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 80%)",
       "ramp": {
         "bgFill1": "#99b0ff",
         "bgFill2": "#b0c4ff",
@@ -11221,6 +11517,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 20% 80%)",
       "ramp": {
         "bgFill1": "#6e006f",
         "bgFill2": "#570058",
@@ -11260,6 +11557,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(70% 30% 30%)",
       "ramp": {
         "bgFill1": "#ffa4a0",
         "bgFill2": "#ffc0bc",
@@ -11298,6 +11596,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 70% 30%)",
       "ramp": {
         "bgFill1": "#4d4c00",
         "bgFill2": "#403e00",
@@ -11333,6 +11632,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(30% 70% 30%)",
       "ramp": {
         "bgFill1": "#004900",
         "bgFill2": "#003900",
@@ -11368,6 +11668,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(30% 70% 70%)",
       "ramp": {
         "bgFill1": "#004a4b",
         "bgFill2": "#003c3c",
@@ -11403,6 +11704,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(30% 30% 70%)",
       "ramp": {
         "bgFill1": "#afb8ff",
         "bgFill2": "#c4cdff",
@@ -11441,6 +11743,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(70% 30% 70%)",
       "ramp": {
         "bgFill1": "#6d0070",
         "bgFill2": "#570059",
@@ -11482,6 +11785,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(60% 40% 40%)",
       "ramp": {
         "bgFill1": "#e7afae",
         "bgFill2": "#fbc2c1",
@@ -11523,6 +11827,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 40%)",
       "ramp": {
         "bgFill1": "#3e3d08",
         "bgFill2": "#312f00",
@@ -11561,6 +11866,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(40% 60% 40%)",
       "ramp": {
         "bgFill1": "#124516",
         "bgFill2": "#003707",
@@ -11599,6 +11905,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(40% 60% 60%)",
       "ramp": {
         "bgFill1": "#0a4243",
         "bgFill2": "#003435",
@@ -11637,6 +11944,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 60%)",
       "ramp": {
         "bgFill1": "#b6b8f0",
         "bgFill2": "#caccff",
@@ -11675,6 +11983,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 40% 60%)",
       "ramp": {
         "bgFill1": "#582a59",
         "bgFill2": "#491c4a",
@@ -11716,6 +12025,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(50% 50% 50%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -11754,6 +12064,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(50% 50% 50%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -11792,6 +12103,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(50% 50% 50%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -11830,6 +12142,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(50% 50% 50%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -11868,6 +12181,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(50% 50% 50%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -11906,6 +12220,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(50% 50% 50%)",
       "ramp": {
         "bgFill1": "#3b3b3b",
         "bgFill2": "#2e2e2e",
@@ -11944,6 +12259,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(80% 0% 0%)",
       "ramp": {
         "bgFill1": "#ffa697",
         "bgFill2": "#ffc2b6",
@@ -11982,6 +12298,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(80% 80% 0%)",
       "ramp": {
         "bgFill1": "#5a5a00",
         "bgFill2": "#4d4d00",
@@ -12017,6 +12334,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(0% 80% 0%)",
       "ramp": {
         "bgFill1": "#005800",
         "bgFill2": "#004900",
@@ -12052,6 +12370,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(0% 80% 80%)",
       "ramp": {
         "bgFill1": "#005a5b",
         "bgFill2": "#004c4d",
@@ -12087,6 +12406,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 0% 80%)",
       "ramp": {
         "bgFill1": "#6499ff",
         "bgFill2": "#7eacff",
@@ -12122,6 +12442,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(80% 0% 80%)",
       "ramp": {
         "bgFill1": "#ff97ff",
         "bgFill2": "#ffb8ff",
@@ -12163,6 +12484,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(72% 8% 8%)",
       "ramp": {
         "bgFill1": "#ffa698",
         "bgFill2": "#ffc2b6",
@@ -12201,6 +12523,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(72% 72% 8%)",
       "ramp": {
         "bgFill1": "#504f00",
         "bgFill2": "#424100",
@@ -12236,6 +12559,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(8% 72% 8%)",
       "ramp": {
         "bgFill1": "#004900",
         "bgFill2": "#003a00",
@@ -12271,6 +12595,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(8% 72% 72%)",
       "ramp": {
         "bgFill1": "#004c4c",
         "bgFill2": "#003d3e",
@@ -12306,6 +12631,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(8% 8% 72%)",
       "ramp": {
         "bgFill1": "#6a94ff",
         "bgFill2": "#82a8ff",
@@ -12341,6 +12667,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(72% 8% 72%)",
       "ramp": {
         "bgFill1": "#ff97ff",
         "bgFill2": "#ffb9ff",
@@ -12379,6 +12706,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(64% 16% 16%)",
       "ramp": {
         "bgFill1": "#ffa59c",
         "bgFill2": "#ffc1b9",
@@ -12417,6 +12745,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(64% 64% 16%)",
       "ramp": {
         "bgFill1": "#414000",
         "bgFill2": "#333200",
@@ -12452,6 +12781,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(16% 64% 16%)",
       "ramp": {
         "bgFill1": "#004600",
         "bgFill2": "#003700",
@@ -12490,6 +12820,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(16% 64% 64%)",
       "ramp": {
         "bgFill1": "#004344",
         "bgFill2": "#003435",
@@ -12528,6 +12859,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(16% 16% 64%)",
       "ramp": {
         "bgFill1": "#8097ff",
         "bgFill2": "#94abff",
@@ -12563,6 +12895,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(64% 16% 64%)",
       "ramp": {
         "bgFill1": "#ff97ff",
         "bgFill2": "#ffb8ff",
@@ -12601,6 +12934,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(56% 24% 24%)",
       "ramp": {
         "bgFill1": "#ffa4a0",
         "bgFill2": "#ffc0bc",
@@ -12639,6 +12973,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(56% 56% 24%)",
       "ramp": {
         "bgFill1": "#3f3d00",
         "bgFill2": "#312f00",
@@ -12677,6 +13012,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(24% 56% 24%)",
       "ramp": {
         "bgFill1": "#004700",
         "bgFill2": "#003700",
@@ -12715,6 +13051,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(24% 56% 56%)",
       "ramp": {
         "bgFill1": "#004344",
         "bgFill2": "#003435",
@@ -12753,6 +13090,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(24% 24% 56%)",
       "ramp": {
         "bgFill1": "#9ba4ff",
         "bgFill2": "#afb8ff",
@@ -12788,6 +13126,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(56% 24% 56%)",
       "ramp": {
         "bgFill1": "#f79ef5",
         "bgFill2": "#ffb8ff",
@@ -12826,6 +13165,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(48% 32% 32%)",
       "ramp": {
         "bgFill1": "#e0b1b0",
         "bgFill2": "#f4c4c3",
@@ -12864,6 +13204,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(48% 48% 32%)",
       "ramp": {
         "bgFill1": "#3e3d15",
         "bgFill2": "#302f06",
@@ -12905,6 +13246,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(32% 48% 32%)",
       "ramp": {
         "bgFill1": "#9cc89b",
         "bgFill2": "#afdbae",
@@ -12944,6 +13286,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(32% 48% 48%)",
       "ramp": {
         "bgFill1": "#9ac5c4",
         "bgFill2": "#acd8d8",
@@ -12985,6 +13328,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(32% 32% 48%)",
       "ramp": {
         "bgFill1": "#b7b9e8",
         "bgFill2": "#caccfc",
@@ -13023,6 +13367,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(48% 32% 48%)",
       "ramp": {
         "bgFill1": "#dcaedb",
         "bgFill2": "#f0c1ef",
@@ -13061,6 +13406,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 40%)",
       "ramp": {
         "bgFill1": "#bdbdbd",
         "bgFill2": "#d0d0d0",
@@ -13099,6 +13445,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 40%)",
       "ramp": {
         "bgFill1": "#bdbdbd",
         "bgFill2": "#d0d0d0",
@@ -13137,6 +13484,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 40%)",
       "ramp": {
         "bgFill1": "#bdbdbd",
         "bgFill2": "#d0d0d0",
@@ -13175,6 +13523,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 40%)",
       "ramp": {
         "bgFill1": "#bdbdbd",
         "bgFill2": "#d0d0d0",
@@ -13213,6 +13562,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 40%)",
       "ramp": {
         "bgFill1": "#bdbdbd",
         "bgFill2": "#d0d0d0",
@@ -13251,6 +13601,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 40%)",
       "ramp": {
         "bgFill1": "#bdbdbd",
         "bgFill2": "#d0d0d0",
@@ -13289,6 +13640,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(60% 0% 0%)",
       "ramp": {
         "bgFill1": "#ff8f7e",
         "bgFill2": "#ffab9c",
@@ -13324,6 +13676,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(60% 60% 0%)",
       "ramp": {
         "bgFill1": "#3e3e00",
         "bgFill2": "#313000",
@@ -13362,6 +13715,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(0% 60% 0%)",
       "ramp": {
         "bgFill1": "#004600",
         "bgFill2": "#003700",
@@ -13400,6 +13754,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(0% 60% 60%)",
       "ramp": {
         "bgFill1": "#004344",
         "bgFill2": "#003435",
@@ -13438,6 +13793,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 0% 60%)",
       "ramp": {
         "bgFill1": "#558dff",
         "bgFill2": "#6ea0ff",
@@ -13473,6 +13829,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(60% 0% 60%)",
       "ramp": {
         "bgFill1": "#ff97ff",
         "bgFill2": "#ffb8ff",
@@ -13511,6 +13868,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(54% 6% 6%)",
       "ramp": {
         "bgFill1": "#fe8173",
         "bgFill2": "#ff9e91",
@@ -13546,6 +13904,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(54% 54% 6%)",
       "ramp": {
         "bgFill1": "#3e3e00",
         "bgFill2": "#313000",
@@ -13584,6 +13943,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(6% 54% 6%)",
       "ramp": {
         "bgFill1": "#004700",
         "bgFill2": "#003700",
@@ -13625,6 +13985,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(6% 54% 54%)",
       "ramp": {
         "bgFill1": "#004344",
         "bgFill2": "#003435",
@@ -13663,6 +14024,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(6% 6% 54%)",
       "ramp": {
         "bgFill1": "#648bff",
         "bgFill2": "#799eff",
@@ -13698,6 +14060,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(54% 6% 54%)",
       "ramp": {
         "bgFill1": "#fd88fa",
         "bgFill2": "#ffa9ff",
@@ -13733,6 +14096,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(48% 12% 12%)",
       "ramp": {
         "bgFill1": "#eb857e",
         "bgFill2": "#ff978e",
@@ -13768,6 +14132,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "darker",
+      "inputSeed": "rgb(48% 48% 12%)",
       "ramp": {
         "bgFill1": "#3f3d00",
         "bgFill2": "#313000",
@@ -13809,6 +14174,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 48% 12%)",
       "ramp": {
         "bgFill1": "#7dcf77",
         "bgFill2": "#90e389",
@@ -13847,6 +14213,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 48% 48%)",
       "ramp": {
         "bgFill1": "#7fc9c9",
         "bgFill2": "#92dddc",
@@ -13885,6 +14252,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 12% 48%)",
       "ramp": {
         "bgFill1": "#798cf0",
         "bgFill2": "#899dff",
@@ -13920,6 +14288,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(48% 12% 48%)",
       "ramp": {
         "bgFill1": "#ea8ae7",
         "bgFill2": "#fd9cfb",
@@ -13955,6 +14324,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(42% 18% 18%)",
       "ramp": {
         "bgFill1": "#d7908d",
         "bgFill2": "#eaa19e",
@@ -13990,6 +14360,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(42% 42% 18%)",
       "ramp": {
         "bgFill1": "#bfc181",
         "bgFill2": "#d3d494",
@@ -14028,6 +14399,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(18% 42% 18%)",
       "ramp": {
         "bgFill1": "#8ccc8a",
         "bgFill2": "#9fe09c",
@@ -14066,6 +14438,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(18% 42% 42%)",
       "ramp": {
         "bgFill1": "#8ac8c7",
         "bgFill2": "#9ddbdb",
@@ -14104,6 +14477,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(18% 18% 42%)",
       "ramp": {
         "bgFill1": "#888ed5",
         "bgFill2": "#989fe6",
@@ -14139,6 +14513,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(42% 18% 42%)",
       "ramp": {
         "bgFill1": "#d792d5",
         "bgFill2": "#e9a4e8",
@@ -14174,6 +14549,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(36% 24% 24%)",
       "ramp": {
         "bgFill1": "#c49f9f",
         "bgFill2": "#d6b1b0",
@@ -14209,6 +14585,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(36% 36% 24%)",
       "ramp": {
         "bgFill1": "#bebf9d",
         "bgFill2": "#d2d2b0",
@@ -14247,6 +14624,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(24% 36% 24%)",
       "ramp": {
         "bgFill1": "#a4c6a3",
         "bgFill2": "#b6d9b6",
@@ -14285,6 +14663,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(24% 36% 36%)",
       "ramp": {
         "bgFill1": "#a1c3c3",
         "bgFill2": "#b4d6d6",
@@ -14323,6 +14702,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(24% 24% 36%)",
       "ramp": {
         "bgFill1": "#9d9ec2",
         "bgFill2": "#aeb0d4",
@@ -14358,6 +14738,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(36% 24% 36%)",
       "ramp": {
         "bgFill1": "#c4a0c3",
         "bgFill2": "#d6b2d5",
@@ -14393,6 +14774,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(30% 30% 30%)",
       "ramp": {
         "bgFill1": "#b2b2b2",
         "bgFill2": "#c4c4c4",
@@ -14428,6 +14810,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(30% 30% 30%)",
       "ramp": {
         "bgFill1": "#b2b2b2",
         "bgFill2": "#c4c4c4",
@@ -14463,6 +14846,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(30% 30% 30%)",
       "ramp": {
         "bgFill1": "#b2b2b2",
         "bgFill2": "#c4c4c4",
@@ -14498,6 +14882,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(30% 30% 30%)",
       "ramp": {
         "bgFill1": "#b2b2b2",
         "bgFill2": "#c4c4c4",
@@ -14533,6 +14918,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(30% 30% 30%)",
       "ramp": {
         "bgFill1": "#b2b2b2",
         "bgFill2": "#c4c4c4",
@@ -14568,6 +14954,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(30% 30% 30%)",
       "ramp": {
         "bgFill1": "#b2b2b2",
         "bgFill2": "#c4c4c4",
@@ -14603,6 +14990,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 0% 0%)",
       "ramp": {
         "bgFill1": "#da7365",
         "bgFill2": "#ec8374",
@@ -14638,6 +15026,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 40% 0%)",
       "ramp": {
         "bgFill1": "#c0c177",
         "bgFill2": "#d3d48a",
@@ -14676,6 +15065,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 40% 0%)",
       "ramp": {
         "bgFill1": "#7dd077",
         "bgFill2": "#90e389",
@@ -14714,6 +15104,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 40% 40%)",
       "ramp": {
         "bgFill1": "#7fcac9",
         "bgFill2": "#92dddc",
@@ -14752,6 +15143,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 0% 40%)",
       "ramp": {
         "bgFill1": "#6291f7",
         "bgFill2": "#73a3ff",
@@ -14787,6 +15179,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(40% 0% 40%)",
       "ramp": {
         "bgFill1": "#d273ce",
         "bgFill2": "#e383e0",
@@ -14822,6 +15215,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(36% 4% 4%)",
       "ramp": {
         "bgFill1": "#d2796f",
         "bgFill2": "#e4897e",
@@ -14857,6 +15251,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(36% 36% 4%)",
       "ramp": {
         "bgFill1": "#bfc178",
         "bgFill2": "#d2d58a",
@@ -14895,6 +15290,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(4% 36% 4%)",
       "ramp": {
         "bgFill1": "#7cc677",
         "bgFill2": "#8fd989",
@@ -14930,6 +15326,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(4% 36% 36%)",
       "ramp": {
         "bgFill1": "#80c6c5",
         "bgFill2": "#93d9d9",
@@ -14965,6 +15362,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(4% 4% 36%)",
       "ramp": {
         "bgFill1": "#7490e8",
         "bgFill2": "#83a0fa",
@@ -15000,6 +15398,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(36% 4% 36%)",
       "ramp": {
         "bgFill1": "#c573c3",
         "bgFill2": "#d783d4",
@@ -15035,6 +15434,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(32% 8% 8%)",
       "ramp": {
         "bgFill1": "#c77f79",
         "bgFill2": "#d98f89",
@@ -15070,6 +15470,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(32% 32% 8%)",
       "ramp": {
         "bgFill1": "#b8b97d",
         "bgFill2": "#cacc8f",
@@ -15105,6 +15506,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(8% 32% 8%)",
       "ramp": {
         "bgFill1": "#7bb878",
         "bgFill2": "#8dca89",
@@ -15140,6 +15542,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(8% 32% 32%)",
       "ramp": {
         "bgFill1": "#7eb8b7",
         "bgFill2": "#90caca",
@@ -15175,6 +15578,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(8% 8% 32%)",
       "ramp": {
         "bgFill1": "#8290d7",
         "bgFill2": "#91a0e9",
@@ -15210,6 +15614,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(32% 8% 32%)",
       "ramp": {
         "bgFill1": "#bd7abb",
         "bgFill2": "#ce8acb",
@@ -15245,6 +15650,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(28% 12% 12%)",
       "ramp": {
         "bgFill1": "#b98684",
         "bgFill2": "#ca9694",
@@ -15280,6 +15686,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(28% 28% 12%)",
       "ramp": {
         "bgFill1": "#aaab7f",
         "bgFill2": "#bcbd90",
@@ -15315,6 +15722,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 28% 12%)",
       "ramp": {
         "bgFill1": "#7fab7d",
         "bgFill2": "#8fbc8d",
@@ -15350,6 +15758,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 28% 28%)",
       "ramp": {
         "bgFill1": "#80aaaa",
         "bgFill2": "#91bcbb",
@@ -15385,6 +15794,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 12% 28%)",
       "ramp": {
         "bgFill1": "#8c91c3",
         "bgFill2": "#9ca1d4",
@@ -15420,6 +15830,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(28% 12% 28%)",
       "ramp": {
         "bgFill1": "#b282b1",
         "bgFill2": "#c392c2",
@@ -15455,6 +15866,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(24% 16% 16%)",
       "ramp": {
         "bgFill1": "#a88e8e",
         "bgFill2": "#b89e9e",
@@ -15490,6 +15902,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(24% 24% 16%)",
       "ramp": {
         "bgFill1": "#9d9e86",
         "bgFill2": "#aeae97",
@@ -15525,6 +15938,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(16% 24% 16%)",
       "ramp": {
         "bgFill1": "#869e86",
         "bgFill2": "#96ae96",
@@ -15560,6 +15974,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(16% 24% 24%)",
       "ramp": {
         "bgFill1": "#879e9d",
         "bgFill2": "#97aeae",
@@ -15595,6 +16010,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(16% 16% 24%)",
       "ramp": {
         "bgFill1": "#9293ac",
         "bgFill2": "#a2a3bd",
@@ -15630,6 +16046,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(24% 16% 24%)",
       "ramp": {
         "bgFill1": "#a58ca4",
         "bgFill2": "#b59cb5",
@@ -15665,6 +16082,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 20%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -15700,6 +16118,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 20%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -15735,6 +16154,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 20%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -15770,6 +16190,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 20%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -15805,6 +16226,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 20%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -15840,6 +16262,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 20%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -15875,6 +16298,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 0% 0%)",
       "ramp": {
         "bgFill1": "#c38278",
         "bgFill2": "#d49287",
@@ -15910,6 +16334,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 20% 0%)",
       "ramp": {
         "bgFill1": "#989968",
         "bgFill2": "#a8aa78",
@@ -15945,6 +16370,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 20% 0%)",
       "ramp": {
         "bgFill1": "#73a46e",
         "bgFill2": "#83b57e",
@@ -15980,6 +16406,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 20% 20%)",
       "ramp": {
         "bgFill1": "#719f9e",
         "bgFill2": "#81b0af",
@@ -16015,6 +16442,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(0% 0% 20%)",
       "ramp": {
         "bgFill1": "#7694d3",
         "bgFill2": "#85a5e5",
@@ -16050,6 +16478,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(20% 0% 20%)",
       "ramp": {
         "bgFill1": "#b87eb5",
         "bgFill2": "#c98ec6",
@@ -16085,6 +16514,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(18% 2% 2%)",
       "ramp": {
         "bgFill1": "#bb8680",
         "bgFill2": "#cc9690",
@@ -16120,6 +16550,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(18% 18% 2%)",
       "ramp": {
         "bgFill1": "#97996f",
         "bgFill2": "#a8a97f",
@@ -16155,6 +16586,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(2% 18% 2%)",
       "ramp": {
         "bgFill1": "#78a275",
         "bgFill2": "#88b385",
@@ -16190,6 +16622,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(2% 18% 18%)",
       "ramp": {
         "bgFill1": "#779e9d",
         "bgFill2": "#87afae",
@@ -16225,6 +16658,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(2% 2% 18%)",
       "ramp": {
         "bgFill1": "#8492c7",
         "bgFill2": "#94a3d8",
@@ -16260,6 +16694,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(18% 2% 18%)",
       "ramp": {
         "bgFill1": "#b382b0",
         "bgFill2": "#c492c1",
@@ -16295,6 +16730,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(16% 4% 4%)",
       "ramp": {
         "bgFill1": "#b38986",
         "bgFill2": "#c49996",
@@ -16330,6 +16766,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(16% 16% 4%)",
       "ramp": {
         "bgFill1": "#979876",
         "bgFill2": "#a7a986",
@@ -16365,6 +16802,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(4% 16% 4%)",
       "ramp": {
         "bgFill1": "#7ea07c",
         "bgFill2": "#8eb18c",
@@ -16400,6 +16838,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(4% 16% 16%)",
       "ramp": {
         "bgFill1": "#7c9c9c",
         "bgFill2": "#8cadad",
@@ -16435,6 +16874,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(4% 4% 16%)",
       "ramp": {
         "bgFill1": "#8c92bb",
         "bgFill2": "#9ca2cc",
@@ -16470,6 +16910,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(16% 4% 16%)",
       "ramp": {
         "bgFill1": "#ad86ab",
         "bgFill2": "#be96bc",
@@ -16505,6 +16946,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(14% 6% 6%)",
       "ramp": {
         "bgFill1": "#aa8d8c",
         "bgFill2": "#ba9d9c",
@@ -16540,6 +16982,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(14% 14% 6%)",
       "ramp": {
         "bgFill1": "#97977f",
         "bgFill2": "#a7a88f",
@@ -16575,6 +17018,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(6% 14% 6%)",
       "ramp": {
         "bgFill1": "#859d83",
         "bgFill2": "#95ae94",
@@ -16610,6 +17054,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(6% 14% 14%)",
       "ramp": {
         "bgFill1": "#839b9a",
         "bgFill2": "#93abab",
@@ -16645,6 +17090,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(6% 6% 14%)",
       "ramp": {
         "bgFill1": "#9093af",
         "bgFill2": "#a1a3bf",
@@ -16680,6 +17126,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(14% 6% 14%)",
       "ramp": {
         "bgFill1": "#a68ba5",
         "bgFill2": "#b79bb6",
@@ -16715,6 +17162,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 8% 8%)",
       "ramp": {
         "bgFill1": "#9f9191",
         "bgFill2": "#b0a2a1",
@@ -16750,6 +17198,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 12% 8%)",
       "ramp": {
         "bgFill1": "#969689",
         "bgFill2": "#a6a799",
@@ -16785,6 +17234,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(8% 12% 8%)",
       "ramp": {
         "bgFill1": "#8c998c",
         "bgFill2": "#9daa9c",
@@ -16820,6 +17270,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(8% 12% 12%)",
       "ramp": {
         "bgFill1": "#8b9898",
         "bgFill2": "#9ca9a8",
@@ -16855,6 +17306,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(8% 8% 12%)",
       "ramp": {
         "bgFill1": "#9394a2",
         "bgFill2": "#a4a4b2",
@@ -16890,6 +17342,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(12% 8% 12%)",
       "ramp": {
         "bgFill1": "#9e909e",
         "bgFill2": "#aea0ae",
@@ -16925,6 +17378,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(10% 10% 10%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -16960,6 +17414,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(10% 10% 10%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -16995,6 +17450,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(10% 10% 10%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -17030,6 +17486,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(10% 10% 10%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -17065,6 +17522,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(10% 10% 10%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",
@@ -17100,6 +17558,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
     },
     "output": {
       "direction": "lighter",
+      "inputSeed": "rgb(10% 10% 10%)",
       "ramp": {
         "bgFill1": "#959595",
         "bgFill2": "#a5a5a5",

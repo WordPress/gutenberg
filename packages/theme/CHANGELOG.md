@@ -4,6 +4,7 @@
 
 ### New Features
 
+-   Add `contrast` aspect to `ThemeProvider` with `low`, `default`, and `high` levels for adjusting generated color ramp contrast targets. Surface steps are frozen across contrast levels; in `low` contrast, decorative borders and fill backgrounds also stay at default values so only foreground and interactive stroke tokens change.
 -   Add `--wpds-dimension-size-*` design tokens for element sizing ([#76545](https://github.com/WordPress/gutenberg/pull/76545)).
 
 ### Code Quality

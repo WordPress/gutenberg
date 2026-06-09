@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import type { ContrastLevel } from './color-ramps';
 
 export interface ThemeProviderSettings {
 	/**
@@ -36,6 +37,18 @@ export interface ThemeProviderSettings {
 		 */
 		control?: 'default' | 'pointer';
 	};
+
+	/**
+	 * The contrast level for generated color ramps.
+	 *
+	 * - `default`: AA-compliant contrast targets (default).
+	 * - `high`: AAA-oriented contrast targets.
+	 * - `low`: Relaxed contrast for subtler UI.
+	 *
+	 * By default, it inherits from the parent `ThemeProvider`,
+	 * and falls back to `default`.
+	 */
+	contrast?: ContrastLevel;
 }
 
 export interface ThemeProviderProps extends ThemeProviderSettings {

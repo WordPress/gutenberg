@@ -30,6 +30,7 @@ export function WithDesignSystemTheme(
 
 	const colorTheme = context.globals.dsColorTheme;
 	const cursorControl = context.globals.dsCursorControl || undefined;
+	const contrast = context.globals.dsContrast || undefined;
 
 	let color;
 	if ( colorTheme === 'dark' ) {
@@ -40,6 +41,7 @@ export function WithDesignSystemTheme(
 		<ThemeProvider
 			color={ color }
 			cursor={ cursorControl ? { control: cursorControl } : undefined }
+			contrast={ contrast }
 			isRoot
 		>
 			<div
