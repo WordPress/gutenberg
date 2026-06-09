@@ -40,7 +40,7 @@ describe( 'MediaAttachedToView', () => {
 		expect( screen.getByText( 'Hello world' ) ).toBeInTheDocument();
 	} );
 
-	it( 'falls back to "(no title)" when the embedded post is loaded but has an empty title', () => {
+	it( 'falls back to an excerpt snippet when the embedded post has an empty title', () => {
 		const item: Partial< MediaItem > = {
 			post: 42,
 			_embedded: {
@@ -48,6 +48,35 @@ describe( 'MediaAttachedToView', () => {
 					{
 						id: 42,
 						title: { raw: '', rendered: '' },
+						excerpt: {
+							raw: 'Identifying excerpt',
+							rendered: '<p>Identifying excerpt</p>',
+						},
+					},
+				],
+			},
+		};
+
+		render(
+			<MediaAttachedToView item={ item as MediaItem } field={ field } />
+		);
+
+		expect(
+			screen.getByText( '(no title) Identifying excerpt' )
+		).toBeInTheDocument();
+		expect( screen.queryByText( '42' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'falls back to "(no title)" when the embedded post has no identifying text', () => {
+		const item: Partial< MediaItem > = {
+			post: 42,
+			_embedded: {
+				'wp:attached-to': [
+					{
+						id: 42,
+						title: { raw: '', rendered: '' },
+						excerpt: { raw: '', rendered: '' },
+						content: { raw: '', rendered: '' },
 					},
 				],
 			},

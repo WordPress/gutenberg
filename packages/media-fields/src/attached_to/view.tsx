@@ -8,7 +8,7 @@ import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import type { MediaItem } from '../types';
-import { getRenderedContent } from '../utils/get-rendered-content';
+import { getPostTitleWithFallbackSnippet } from '../utils/get-post-title-with-fallback-snippet';
 
 export default function MediaAttachedToView( {
 	item,
@@ -21,21 +21,20 @@ export default function MediaAttachedToView( {
 	>( null );
 
 	const parentId = item.post;
-	const embeddedPostId = item._embedded?.[ 'wp:attached-to' ]?.[ 0 ]?.id;
-	const embeddedPostTitle =
-		item._embedded?.[ 'wp:attached-to' ]?.[ 0 ]?.title;
+	const embeddedPost = item._embedded?.[ 'wp:attached-to' ]?.[ 0 ];
+	const embeddedPostId = embeddedPost?.id;
 
 	useEffect( () => {
-		if ( !! parentId && parentId === embeddedPostId ) {
+		if ( !! parentId && embeddedPost && parentId === embeddedPostId ) {
 			setAttachedPostTitle(
-				getRenderedContent( embeddedPostTitle ) || __( '(no title)' )
+				getPostTitleWithFallbackSnippet( embeddedPost )
 			);
 		}
 
 		if ( ! parentId ) {
 			setAttachedPostTitle( __( '(Unattached)' ) );
 		}
-	}, [ parentId, embeddedPostId, embeddedPostTitle ] );
+	}, [ parentId, embeddedPostId, embeddedPost ] );
 
 	return <>{ attachedPostTitle }</>;
 }

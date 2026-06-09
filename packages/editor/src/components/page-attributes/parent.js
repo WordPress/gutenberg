@@ -33,9 +33,59 @@ import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
 function getTitle( post ) {
-	return post?.title?.rendered
-		? decodeEntities( post.title.rendered )
-		: `#${ post.id } (${ __( 'no title' ) })`;
+	const title = getPlainText( post?.title );
+	if ( title ) {
+		return title;
+	}
+
+	const snippet = getSnippet( post?.excerpt ) || getSnippet( post?.content );
+	if ( ! snippet ) {
+		return __( '(no title)' );
+	}
+
+	return sprintf(
+		/* translators: 1: title fallback for an untitled post, 2: excerpt or content snippet. */
+		__( '%1$s %2$s' ),
+		__( '(no title)' ),
+		snippet
+	);
+}
+
+function getRenderedContent( content ) {
+	if ( ! content ) {
+		return '';
+	}
+
+	if ( typeof content === 'string' ) {
+		return content;
+	}
+
+	return content.rendered || content.raw || '';
+}
+
+function stripHTML( html ) {
+	if ( typeof document !== 'undefined' ) {
+		const element = document.createElement( 'div' );
+		element.innerHTML = html;
+		return element.textContent || '';
+	}
+
+	return html.replace( /<!--[\s\S]*?-->/g, '' ).replace( /<[^>]*>/g, '' );
+}
+
+function getPlainText( content ) {
+	return decodeEntities( stripHTML( getRenderedContent( content ) ) )
+		.replace( /\s+/g, ' ' )
+		.trim();
+}
+
+function getSnippet( content ) {
+	const text = getPlainText( content );
+	if ( text.length <= 80 ) {
+		return text;
+	}
+
+	return `${ text.slice( 0, 80 ).trimEnd() }...`;
 }
 
 export const getItemPriority = ( name, searchValue ) => {
@@ -88,7 +138,7 @@ export function PageAttributesParent() {
 				parent_exclude: postId,
 				orderby: 'menu_order',
 				order: 'asc',
-				_fields: 'id,title,parent',
+				_fields: 'id,title,parent,excerpt,content',
 			};
 
 			// Perform a search by relevance when the field is changed.

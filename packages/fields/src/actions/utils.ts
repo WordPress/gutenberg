@@ -2,12 +2,50 @@
  * WordPress dependencies
  */
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import type { Post, TemplatePart, Template } from '../types';
+
+const TITLE_FALLBACK_SNIPPET_LENGTH = 80;
+
+type RenderedContent = string | { raw?: string; rendered?: string };
+
+type ItemWithTitleAndContent = {
+	title?: RenderedContent;
+	excerpt?: RenderedContent;
+	content?: RenderedContent;
+};
+
+function getRenderedContent( content?: RenderedContent ) {
+	if ( ! content ) {
+		return '';
+	}
+
+	if ( typeof content === 'string' ) {
+		return content;
+	}
+
+	return content.rendered || content.raw || '';
+}
+
+function stripHTML( html: string ) {
+	if ( typeof document !== 'undefined' ) {
+		const element = document.createElement( 'div' );
+		element.innerHTML = html;
+		return element.textContent || '';
+	}
+
+	return html.replace( /<!--[\s\S]*?-->/g, '' ).replace( /<[^>]*>/g, '' );
+}
+
+function getPlainText( content?: RenderedContent ) {
+	return decodeEntities( stripHTML( getRenderedContent( content ) ) )
+		.replace( /\s+/g, ' ' )
+		.trim();
+}
 
 export function isTemplate( post: Post ): post is Template {
 	return post.type === 'wp_template';
@@ -25,19 +63,47 @@ export function isTemplateOrTemplatePart(
 
 export function getItemTitle(
 	item: {
-		title: string | { rendered: string } | { raw: string };
+		title?: string | { rendered: string } | { raw: string };
 	},
 	fallback: string = __( '(no title)' )
 ) {
-	let title = '';
-	if ( typeof item.title === 'string' ) {
-		title = decodeEntities( item.title );
-	} else if ( item.title && 'rendered' in item.title ) {
-		title = decodeEntities( item.title.rendered );
-	} else if ( item.title && 'raw' in item.title ) {
-		title = decodeEntities( item.title.raw );
-	}
+	const title = getPlainText( item.title );
 	return title || fallback;
+}
+
+export function getItemExcerptOrContentSnippet(
+	item: ItemWithTitleAndContent,
+	length: number = TITLE_FALLBACK_SNIPPET_LENGTH
+) {
+	const text = getPlainText( item.excerpt ) || getPlainText( item.content );
+
+	if ( text.length <= length ) {
+		return text;
+	}
+
+	return `${ text.slice( 0, length ).trimEnd() }...`;
+}
+
+export function getItemTitleWithFallbackSnippet(
+	item: ItemWithTitleAndContent,
+	fallback: string = __( '(no title)' )
+) {
+	const title = getItemTitle( item, '' );
+	if ( title ) {
+		return title;
+	}
+
+	const snippet = getItemExcerptOrContentSnippet( item );
+	if ( ! snippet ) {
+		return fallback;
+	}
+
+	return sprintf(
+		/* translators: 1: title fallback for an untitled post, 2: excerpt or content snippet. */
+		__( '%1$s %2$s' ),
+		fallback,
+		snippet
+	);
 }
 
 /**
