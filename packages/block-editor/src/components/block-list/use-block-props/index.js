@@ -176,6 +176,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	return {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		draggable: canMove && ! hasChildSelected ? true : undefined,
+		// Blocks are non-editable atoms by default. The editable regions are
+		// carved out by RichText, which sets `contentEditable` to true on its
+		// own element, overriding this when the block's outer element is a
+		// RichText. This keeps non-text blocks inert within the always-on
+		// editing host. Overridable through `props`.
+		contentEditable: false,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,
