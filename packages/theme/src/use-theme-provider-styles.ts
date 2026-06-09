@@ -178,7 +178,7 @@ export function useThemeProviderStyles( {
 	const background =
 		color.background ??
 		inheritedSettings.color?.background ??
-		DEFAULT_SEED_COLORS.bg;
+		DEFAULT_SEED_COLORS.background;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 
 	const resolvedSettings = useMemo(
@@ -196,15 +196,15 @@ export function useThemeProviderStyles( {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
-			bg: background,
+			background,
 			primary,
 		};
 
 		// Generate ramps.
 		const computedColorRamps = new Map< string, RampResult >();
-		const bgRamp = getCachedBgRamp( seeds.bg );
+		const bgRamp = getCachedBgRamp( seeds.background );
 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
-			if ( rampName === 'bg' ) {
+			if ( rampName === 'background' ) {
 				computedColorRamps.set( rampName, bgRamp );
 			} else {
 				computedColorRamps.set(

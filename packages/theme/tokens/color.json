@@ -782,7 +782,7 @@
 					}
 				}
 			},
-			"bg": {
+			"background": {
 				"surface2": {
 					"$value": {
 						"colorSpace": "srgb",
@@ -1098,15 +1098,15 @@
 		"bg": {
 			"surface": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.surface2}",
+					"$value": "{wpds-color.primitive.background.surface2}",
 					"$description": "Background color for surfaces with normal emphasis."
 				},
 				"neutral-strong": {
-					"$value": "{wpds-color.primitive.bg.surface3}",
+					"$value": "{wpds-color.primitive.background.surface3}",
 					"$description": "Background color for surfaces with strong emphasis."
 				},
 				"neutral-weak": {
-					"$value": "{wpds-color.primitive.bg.surface1}",
+					"$value": "{wpds-color.primitive.background.surface1}",
 					"$description": "Background color for surfaces with weak emphasis."
 				},
 				"brand": {
@@ -1156,15 +1156,15 @@
 			},
 			"interactive": {
 				"neutral-strong": {
-					"$value": "{wpds-color.primitive.bg.bgFillInverted1}",
+					"$value": "{wpds-color.primitive.background.bgFillInverted1}",
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis."
 				},
 				"neutral-strong-active": {
-					"$value": "{wpds-color.primitive.bg.bgFillInverted2}",
+					"$value": "{wpds-color.primitive.background.bgFillInverted2}",
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 				},
 				"neutral-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.surface5}",
+					"$value": "{wpds-color.primitive.background.surface5}",
 					"$description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
 				},
 				"neutral-weak": {
@@ -1176,7 +1176,7 @@
 					"$description": "Background color for interactive elements with neutral tone and weak emphasis."
 				},
 				"neutral-weak-active": {
-					"$value": "{wpds-color.primitive.bg.surface4}",
+					"$value": "{wpds-color.primitive.background.surface4}",
 					"$description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
 				},
 				"neutral-weak-disabled": {
@@ -1242,21 +1242,21 @@
 			},
 			"track": {
 				"neutral-weak": {
-					"$value": "{wpds-color.primitive.bg.stroke1}",
+					"$value": "{wpds-color.primitive.background.stroke1}",
 					"$description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
 				},
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.stroke2}",
+					"$value": "{wpds-color.primitive.background.stroke2}",
 					"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
 				}
 			},
 			"thumb": {
 				"neutral-weak": {
-					"$value": "{wpds-color.primitive.bg.stroke3}",
+					"$value": "{wpds-color.primitive.background.stroke3}",
 					"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
 				},
 				"neutral-weak-active": {
-					"$value": "{wpds-color.primitive.bg.stroke4}",
+					"$value": "{wpds-color.primitive.background.stroke4}",
 					"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
 				},
 				"brand": {
@@ -1268,7 +1268,7 @@
 					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
 				},
 				"neutral-disabled": {
-					"$value": "{wpds-color.primitive.bg.stroke2}",
+					"$value": "{wpds-color.primitive.background.stroke2}",
 					"$description": "Background color for thumbs with normal emphasis (eg. slider thumb and filled track), in their disabled state, regardless of the tone."
 				}
 			},
@@ -1279,11 +1279,11 @@
 		"fg": {
 			"content": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.fgSurface4}",
+					"$value": "{wpds-color.primitive.background.fgSurface4}",
 					"$description": "Foreground color for content like text with normal emphasis."
 				},
 				"neutral-weak": {
-					"$value": "{wpds-color.primitive.bg.fgSurface3}",
+					"$value": "{wpds-color.primitive.background.fgSurface3}",
 					"$description": "Foreground color for content like text with weak emphasis."
 				},
 				"success": {
@@ -1329,35 +1329,35 @@
 			},
 			"interactive": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.fgSurface4}",
+					"$value": "{wpds-color.primitive.background.fgSurface4}",
 					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis."
 				},
 				"neutral-active": {
-					"$value": "{wpds-color.primitive.bg.fgSurface4}",
+					"$value": "{wpds-color.primitive.background.fgSurface4}",
 					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
 				},
 				"neutral-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface2}",
+					"$value": "{wpds-color.primitive.background.fgSurface2}",
 					"$description": "Foreground color for interactive elements with normal emphasis, in their disabled state, regardless of the tone."
 				},
 				"neutral-strong": {
-					"$value": "{wpds-color.primitive.bg.fgFillInverted}",
+					"$value": "{wpds-color.primitive.background.fgFillInverted}",
 					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis."
 				},
 				"neutral-strong-active": {
-					"$value": "{wpds-color.primitive.bg.fgFillInverted}",
+					"$value": "{wpds-color.primitive.background.fgFillInverted}",
 					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
 				},
 				"neutral-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface2}",
+					"$value": "{wpds-color.primitive.background.fgSurface2}",
 					"$description": "Foreground color for interactive elements with strong emphasis, in their disabled state, regardless of the tone."
 				},
 				"neutral-weak": {
-					"$value": "{wpds-color.primitive.bg.fgSurface3}",
+					"$value": "{wpds-color.primitive.background.fgSurface3}",
 					"$description": "Foreground color for interactive elements with neutral tone and weak emphasis."
 				},
 				"neutral-weak-disabled": {
-					"$value": "{wpds-color.primitive.bg.fgSurface2}",
+					"$value": "{wpds-color.primitive.background.fgSurface2}",
 					"$description": "Foreground color for interactive elements with weak emphasis, in their disabled state, regardless of the tone."
 				},
 				"brand": {
@@ -1400,15 +1400,15 @@
 		"stroke": {
 			"surface": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.stroke2}",
+					"$value": "{wpds-color.primitive.background.stroke2}",
 					"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
 				},
 				"neutral-weak": {
-					"$value": "{wpds-color.primitive.bg.stroke1}",
+					"$value": "{wpds-color.primitive.background.stroke1}",
 					"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
 				},
 				"neutral-strong": {
-					"$value": "{wpds-color.primitive.bg.stroke3}",
+					"$value": "{wpds-color.primitive.background.stroke3}",
 					"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
 				},
 				"brand": {
@@ -1454,19 +1454,19 @@
 			},
 			"interactive": {
 				"neutral": {
-					"$value": "{wpds-color.primitive.bg.stroke3}",
+					"$value": "{wpds-color.primitive.background.stroke3}",
 					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
 				},
 				"neutral-active": {
-					"$value": "{wpds-color.primitive.bg.stroke4}",
+					"$value": "{wpds-color.primitive.background.stroke4}",
 					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
 				},
 				"neutral-disabled": {
-					"$value": "{wpds-color.primitive.bg.stroke2}",
+					"$value": "{wpds-color.primitive.background.stroke2}",
 					"$description": "Accessible stroke color used for interactive elements with normal emphasis, in their disabled state, regardless of the tone."
 				},
 				"neutral-strong": {
-					"$value": "{wpds-color.primitive.bg.stroke4}",
+					"$value": "{wpds-color.primitive.background.stroke4}",
 					"$description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
 				},
 				"brand": {

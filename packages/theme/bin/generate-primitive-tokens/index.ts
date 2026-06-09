@@ -45,9 +45,9 @@ function generatePrimitiveColorTokens() {
 		);
 
 		// Build the ramps
-		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.bg );
+		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const accentRamps = [ ...Object.entries( DEFAULT_SEED_COLORS ) ]
-			.filter( ( [ scaleName ] ) => scaleName !== 'bg' )
+			.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 			.map( ( [ scaleName, seed ] ) => ( {
 				scaleName,
 				ramp: buildAccentRamp( seed, bgRamp ),
@@ -56,7 +56,7 @@ function generatePrimitiveColorTokens() {
 		// Convert the ramp values in a DTCG compatible format
 		[
 			{
-				scaleName: 'bg',
+				scaleName: 'background',
 				ramp: bgRamp,
 			},
 			...accentRamps,

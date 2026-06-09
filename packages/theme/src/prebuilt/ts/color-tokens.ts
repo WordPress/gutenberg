@@ -70,48 +70,51 @@ export default {
 	],
 	'error-stroke4': [ 'stroke-interactive-error-active' ],
 	'error-stroke1': [ 'stroke-surface-error' ],
-	'bg-surface2': [ 'bg-surface-neutral' ],
-	'bg-surface5': [ 'bg-interactive-neutral-strong-disabled' ],
-	'bg-surface4': [ 'bg-interactive-neutral-weak-active' ],
-	'bg-surface3': [ 'bg-surface-neutral-strong' ],
-	'bg-fgSurface4': [
+	'background-surface2': [ 'bg-surface-neutral' ],
+	'background-surface5': [ 'bg-interactive-neutral-strong-disabled' ],
+	'background-surface4': [ 'bg-interactive-neutral-weak-active' ],
+	'background-surface3': [ 'bg-surface-neutral-strong' ],
+	'background-fgSurface4': [
 		'fg-content-neutral',
 		'fg-interactive-neutral',
 		'fg-interactive-neutral-active',
 	],
-	'bg-fgSurface3': [
+	'background-fgSurface3': [
 		'fg-content-neutral-weak',
 		'fg-interactive-neutral-weak',
 	],
-	'bg-fgSurface2': [
+	'background-fgSurface2': [
 		'fg-interactive-neutral-disabled',
 		'fg-interactive-neutral-strong-disabled',
 		'fg-interactive-neutral-weak-disabled',
 	],
-	'bg-stroke3': [
+	'background-stroke3': [
 		'bg-thumb-neutral-weak',
 		'stroke-interactive-neutral',
 		'stroke-surface-neutral-strong',
 	],
-	'bg-stroke4': [
+	'background-stroke4': [
 		'bg-thumb-neutral-weak-active',
 		'stroke-interactive-neutral-active',
 		'stroke-interactive-neutral-strong',
 	],
-	'bg-stroke2': [
+	'background-stroke2': [
 		'bg-thumb-neutral-disabled',
 		'bg-track-neutral',
 		'stroke-interactive-neutral-disabled',
 		'stroke-surface-neutral',
 	],
-	'bg-stroke1': [ 'bg-track-neutral-weak', 'stroke-surface-neutral-weak' ],
-	'bg-bgFillInverted2': [ 'bg-interactive-neutral-strong-active' ],
-	'bg-bgFillInverted1': [ 'bg-interactive-neutral-strong' ],
-	'bg-fgFillInverted': [
+	'background-stroke1': [
+		'bg-track-neutral-weak',
+		'stroke-surface-neutral-weak',
+	],
+	'background-bgFillInverted2': [ 'bg-interactive-neutral-strong-active' ],
+	'background-bgFillInverted1': [ 'bg-interactive-neutral-strong' ],
+	'background-fgFillInverted': [
 		'fg-interactive-neutral-strong',
 		'fg-interactive-neutral-strong-active',
 	],
-	'bg-surface1': [ 'bg-surface-neutral-weak' ],
+	'background-surface1': [ 'bg-surface-neutral-weak' ],
 	'caution-surface2': [ 'bg-surface-caution-weak' ],
 	'caution-surface4': [ 'bg-surface-caution' ],
 	'caution-fgSurface4': [ 'fg-content-caution' ],
