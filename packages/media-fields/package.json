@@ -62,7 +62,7 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
-		"clsx": "2.1.1"
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",

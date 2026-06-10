@@ -13,6 +13,7 @@
 ### Breaking Changes
 - Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
+-   Rename the `color.bg` prop on `ThemeProvider` to `color.background` ([#79007](https://github.com/WordPress/gutenberg/pull/79007)).
 
 ### Enhancements
 

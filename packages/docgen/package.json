@@ -34,13 +34,13 @@
 		"docgen": "./bin/cli.js"
 	},
 	"dependencies": {
-		"@babel/core": "7.25.7",
+		"@babel/core": "^7.25.7",
 		"comment-parser": "^1.1.1",
-		"mdast-util-inject": "1.1.0",
-		"optionator": "0.8.2",
-		"remark": "10.0.1",
-		"remark-parse": "6.0.3",
-		"unified": "7.1.0"
+		"mdast-util-inject": "^1.1.0",
+		"optionator": "^0.8.2",
+		"remark": "^10.0.1",
+		"remark-parse": "^6.0.3",
+		"unified": "^7.1.0"
 	},
 	"devDependencies": {
 		"@types/babel__core": "^7.20.5"

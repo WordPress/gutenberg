@@ -43,7 +43,7 @@
 	"wpScriptDefaultExport": true,
 	"types": "build-types",
 	"dependencies": {
-		"memize": "^2.0.1"
+		"memize": "^2.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

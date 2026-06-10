@@ -1,132 +1,134 @@
-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
 
-@layer wp-ui-utilities {
-	.popup {
-		composes: dropdown-motion from "./dropdown-motion.module.css";
+	@layer utilities {
+		.popup {
+			composes: dropdown-motion from "./dropdown-motion.module.css";
 
-		--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
 
-		display: grid;
-		grid-template-rows: auto minmax(0, 1fr);
-		grid-template-areas: "header" "main";
-		max-height: min(var(--available-height), 480px, 60dvh);
-		min-width: var(--anchor-width);
-		max-width: var(--available-width);
-		border-radius: var(--wpds-border-radius-md);
-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-		box-shadow: var(--wpds-elevation-md);
-		background-color: var(--wpds-color-bg-surface-neutral-strong);
-	}
-
-	.list {
-		display: grid;
-		grid-area: main;
-		grid-template-rows: minmax(0, 1fr) auto;
-		grid-template-areas: "scrollable" "footer";
-		font-family: var(--wpds-typography-font-family-body);
-		font-size: var(--wpds-typography-font-size-md);
-		line-height: var(--wpds-typography-line-height-sm);
-		color: var(--wpds-color-fg-interactive-neutral);
-	}
-
-	.list-scrollable-container {
-		overflow-block: auto;
-		overscroll-behavior: contain;
-		grid-area: scrollable;
-		scroll-padding-block: var(--wp-ui-popup-padding);
-
-		&:not(:empty) {
-			padding-block: var(--wp-ui-popup-padding);
-		}
-	}
-
-	.list-footer {
-		grid-area: footer;
-		padding-block: var(--wp-ui-popup-padding);
-
-		.list-scrollable-container:not(:empty) + & {
-			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-		}
-	}
-
-	.item {
-		--wp-ui-popup-item-height: 40px;
-		--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
-		--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
-
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
-		gap: var(--wpds-dimension-gap-xs);
-		min-height: var(--wp-ui-popup-item-height);
-		border-radius: var(--wpds-border-radius-sm);
-		user-select: none;
-		margin-inline: var(--wp-ui-popup-padding);
-		padding-block: var(--wp-ui-popup-item-padding-block);
-
-		/* Optically adjust the prefix icon to a more balanced position. */
-		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
-		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
-
-		&:not([data-disabled]) {
-			cursor: var(--wpds-cursor-control);
+			display: grid;
+			grid-template-rows: auto minmax(0, 1fr);
+			grid-template-areas: "header" "main";
+			max-height: min(var(--available-height), 480px, 60dvh);
+			min-width: var(--anchor-width);
+			max-width: var(--available-width);
+			border-radius: var(--wpds-border-radius-md);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			box-shadow: var(--wpds-elevation-md);
+			background-color: var(--wpds-color-bg-surface-neutral-strong);
 		}
 
-		&.is-size-compact {
-			--wp-ui-popup-item-height: 32px;
-			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
-		}
-
-		&.is-size-small {
-			--wp-ui-popup-item-height: 24px;
-			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
-			--wp-ui-popup-item-padding-block: 2px;
-		}
-
-		&:not([data-selected]) {
-			.item-indicator-icon {
-				opacity: 0;
-			}
-		}
-
-		&[data-highlighted]:not([aria-disabled="true"]) {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+		.list {
+			display: grid;
+			grid-area: main;
+			grid-template-rows: minmax(0, 1fr) auto;
+			grid-template-areas: "scrollable" "footer";
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-sm);
 			color: var(--wpds-color-fg-interactive-neutral);
-			outline: none; /* Disable user agent focus ring */
+		}
 
-			@media ( forced-colors: active ) {
-				outline: 1px solid Highlight;
+		.list-scrollable-container {
+			overflow-block: auto;
+			overscroll-behavior: contain;
+			grid-area: scrollable;
+			scroll-padding-block: var(--wp-ui-popup-padding);
+
+			&:not(:empty) {
+				padding-block: var(--wp-ui-popup-padding);
 			}
 		}
 
-		&[aria-disabled="true"] {
-			color: var(--wpds-color-fg-interactive-neutral-disabled);
+		.list-footer {
+			grid-area: footer;
+			padding-block: var(--wp-ui-popup-padding);
 
-			@media ( forced-colors: active ) {
-				color: GrayText;
+			.list-scrollable-container:not(:empty) + & {
+				border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			}
 		}
+
+		.item {
+			--wp-ui-popup-item-height: 40px;
+			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
+			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
+
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+			gap: var(--wpds-dimension-gap-xs);
+			min-height: var(--wp-ui-popup-item-height);
+			border-radius: var(--wpds-border-radius-sm);
+			user-select: none;
+			margin-inline: var(--wp-ui-popup-padding);
+			padding-block: var(--wp-ui-popup-item-padding-block);
+
+			/* Optically adjust the prefix icon to a more balanced position. */
+			padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
+			padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+
+			&.is-size-compact {
+				--wp-ui-popup-item-height: 32px;
+				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+			}
+
+			&.is-size-small {
+				--wp-ui-popup-item-height: 24px;
+				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+				--wp-ui-popup-item-padding-block: 2px;
+			}
+
+			&:not([data-selected]) {
+				.item-indicator-icon {
+					opacity: 0;
+				}
+			}
+
+			&[data-highlighted]:not([aria-disabled="true"]) {
+				background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+				color: var(--wpds-color-fg-interactive-neutral);
+				outline: none; /* Disable user agent focus ring */
+
+				@media ( forced-colors: active ) {
+					outline: 1px solid Highlight;
+				}
+			}
+
+			&[aria-disabled="true"] {
+				color: var(--wpds-color-fg-interactive-neutral-disabled);
+
+				@media ( forced-colors: active ) {
+					color: GrayText;
+				}
+			}
+		}
+
+		.item-icon {
+			flex-shrink: 0;
+		}
+
+		/* Only style when there is content, because otherwise the element would block clicks
+		on the .list beneath it (both share grid-area: main and overlap). */
+		.empty:not(:empty) {
+			--wp-ui-popup-empty-min-height: 40px;
+			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
+
+			grid-area: main;
+			display: flex;
+			align-items: center;
+			min-height: var(--wp-ui-popup-empty-min-height);
+			padding-inline: var(--wp-ui-popup-empty-padding-inline);
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			line-height: var(--wpds-typography-line-height-sm);
+			color: var(--wpds-color-fg-content-neutral-weak);
+		}
+
 	}
-
-	.item-icon {
-		flex-shrink: 0;
-	}
-
-	/* Only style when there is content, because otherwise the element would block clicks
-	on the .list beneath it (both share grid-area: main and overlap). */
-	.empty:not(:empty) {
-		--wp-ui-popup-empty-min-height: 40px;
-		--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
-
-		grid-area: main;
-		display: flex;
-		align-items: center;
-		min-height: var(--wp-ui-popup-empty-min-height);
-		padding-inline: var(--wp-ui-popup-empty-padding-inline);
-		font-family: var(--wpds-typography-font-family-body);
-		font-size: var(--wpds-typography-font-size-md);
-		line-height: var(--wpds-typography-line-height-sm);
-		color: var(--wpds-color-fg-content-neutral-weak);
-	}
-
 }
