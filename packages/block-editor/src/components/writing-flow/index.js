@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
@@ -33,6 +34,24 @@ export function useWritingFlow() {
 		[]
 	);
 
+	// The writing flow wrapper is the editing host (cross-block selection) only
+	// while the selected block opts into being an editable root. Otherwise the
+	// block's own editable keeps focus, preserving back compatibility.
+	const isEditableRoot = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getBlockName,
+			hasMultiSelection: _hasMultiSelection,
+		} = select( blockEditorStore );
+		if ( _hasMultiSelection() ) {
+			return true;
+		}
+		const clientId = getSelectedBlockClientId();
+		return clientId
+			? hasBlockSupport( getBlockName( clientId ), 'editableRoot', false )
+			: false;
+	}, [] );
+
 	return [
 		before,
 		useMergeRefs( [
@@ -46,6 +65,12 @@ export function useWritingFlow() {
 			useSelectAll(),
 			useArrowNav(),
 			usePreviewModeNav(),
+			useRefEffect(
+				( node ) => {
+					node.contentEditable = isEditableRoot ? 'true' : 'false';
+				},
+				[ isEditableRoot ]
+			),
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = 0;
