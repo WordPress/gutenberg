@@ -26,6 +26,21 @@ export default function useSpace( clientId ) {
 
 	return useRefEffect(
 		( element ) => {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+
+			// When the editing host is an ancestor (the writing flow wrapper),
+			// keydown events target that host rather than this element, so
+			// determine relevance from the selection rather than the event
+			// target.
+			function isSelectionInElement() {
+				const { anchorNode, focusNode } = defaultView.getSelection();
+				return (
+					element.contains( anchorNode ) &&
+					element.contains( focusNode )
+				);
+			}
+
 			function onKeyDown( event ) {
 				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
@@ -37,6 +52,10 @@ export default function useSpace( clientId ) {
 					metaKey ||
 					ctrlKey
 				) {
+					return;
+				}
+
+				if ( ! isSelectionInElement() ) {
 					return;
 				}
 
@@ -64,7 +83,7 @@ export default function useSpace( clientId ) {
 			// Capture phase so we run before writing-flow's ancestor-bubble
 			// keydown handlers that gate on `event.defaultPrevented`.
 			return subscribeDelegatedListener(
-				element,
+				ownerDocument,
 				'keydown',
 				onKeyDown,
 				true
