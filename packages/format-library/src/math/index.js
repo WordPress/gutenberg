@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
-import { insertObject, useAnchor } from '@wordpress/rich-text';
+import { insert, insertObject, useAnchor } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,
@@ -141,6 +141,19 @@ function Edit( {
 				icon={ icon }
 				title={ title }
 				onClick={ () => {
+					// If a math object is already active, revert it to its
+					// LaTeX source so clicking the button toggles back to the
+					// exact text it was created from.
+					if ( isObjectActive ) {
+						onChange(
+							insert(
+								value,
+								activeObjectAttributes?.[ 'data-latex' ] || ''
+							)
+						);
+						onFocus();
+						return;
+					}
 					// If there's a selection, seed the format with it so you
 					// can type LaTeX inline and then mark it as math.
 					const selectedText = value.text.slice(

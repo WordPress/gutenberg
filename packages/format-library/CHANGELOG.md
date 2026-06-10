@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Math format: seed the LaTeX input from the current selection when marking text as math. ([79052](https://github.com/WordPress/gutenberg/pull/79052))
+-   Math format: seed the LaTeX input from the current selection when marking text as math, and toggle an active math object back to its LaTeX source when the button is clicked again. ([79052](https://github.com/WordPress/gutenberg/pull/79052))
 
 ## 5.48.0 (2026-06-10)
 

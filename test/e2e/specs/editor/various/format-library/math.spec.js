@@ -116,5 +116,19 @@ test.describe( 'Format Library - Math', () => {
 				},
 			},
 		] );
+
+		// Clicking the button again on the active object should revert it to
+		// its LaTeX source, so the round-trip lands back on the original text.
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'equation: x^2',
+				},
+			},
+		] );
 	} );
 } );
