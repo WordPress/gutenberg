@@ -6,7 +6,6 @@
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
 		{ "path": "../element" },
-		{ "path": "../i18n" },
-		{ "path": "../ui" }
+		{ "path": "../i18n" }
 	]
 }

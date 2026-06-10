@@ -52,8 +52,10 @@ neither side has to know about the other:
 - `useWidgetTypes()` → `[ widgetTypes, isResolvingWidgetTypes ]`: the
   `WidgetType[]` available on the current page, plus a flag that is true while
   they are still resolving.
-- Contract types: `WidgetType`, `WidgetName`, `WidgetRenderProps`,
-  `ResolveWidgetModule`.
+- Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
+  `WidgetRenderProps`, `ResolveWidgetModule`. `WidgetIcon` is a rendered SVG
+  element (typically one from `@wordpress/icons`); hosts pass it to their
+  icon primitive as is.
 
 ## How discovery works
 

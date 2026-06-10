@@ -12,17 +12,20 @@
 /**
  * External dependencies
  */
-import type { ComponentProps, ComponentType } from 'react';
+import type { ComponentProps, ComponentType, ReactElement } from 'react';
 import type { Field } from '@wordpress/dataviews';
-import type { Icon } from '@wordpress/ui';
-
-type IconProps = ComponentProps< typeof Icon >;
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
  * Both segments are lowercase, kebab-case.
  */
 export type WidgetName = `${ string }/${ string }`;
+
+/**
+ * Icon for a widget type: a rendered SVG element, typically one from
+ * `@wordpress/icons`. Hosts pass it to their icon primitive as is.
+ */
+export type WidgetIcon = ReactElement< ComponentProps< 'svg' > >;
 
 /**
  * Literal contents of a widget's `widget.json` metadata file.
@@ -59,7 +62,7 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	/**
 	 * Visual identifier shown in the widget header.
 	 */
-	icon?: IconProps[ 'icon' ];
+	icon?: WidgetIcon;
 
 	/**
 	 * Grouping category. Core provides `dashboard`; plugins and themes may
