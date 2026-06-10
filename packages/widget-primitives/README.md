@@ -35,10 +35,10 @@ exposes the `/wp/v2/widget-modules` REST endpoint.
 
 ## Purpose
 
-A widget is a self-contained unit; a _host_ is any context that renders one (the
-dashboard today, a sidebar or an inspector tomorrow). This package sits between
-the build pipeline that produces widgets and the hosts that render them, so
-neither side has to know about the other:
+A widget is a self-contained unit; a _host_ is any context that renders one (a
+dashboard, a sidebar, an inspector). This package sits between the build
+pipeline that produces widgets and the hosts that render them, so neither side
+has to know about the other:
 
 -   **Contract.** It defines the widget type shape (`WidgetType`, `WidgetName`)
     and the render contract (`WidgetRenderProps`). Authors type their

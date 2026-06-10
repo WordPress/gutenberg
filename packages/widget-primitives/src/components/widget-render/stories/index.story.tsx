@@ -220,7 +220,7 @@ export const WithSettings: StoryObj = {
 	parameters: {
 		docs: {
 			description: {
-				story: "A widget type declares its settings as dataviews `Field[]` in `attributes`. The host mounts a `DataForm` directly from that schema, with no per-widget form wiring, and the edited attributes flow into the rendered widget: the same round trip the dashboard's settings drawer uses.",
+				story: 'A widget type declares its settings as dataviews `Field[]` in `attributes`. The host mounts a `DataForm` directly from that schema, with no per-widget form wiring, and the edited attributes flow into the rendered widget. Any host can build its settings surface this way.',
 			},
 		},
 	},
