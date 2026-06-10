@@ -59,12 +59,12 @@
 	flex-direction: column;
 }
 
-// The Advanced panel is nested inside the already-padded
-// `.media-editor-modal__panel`. Pull its root flush to the panel edges
-// while relying on PanelBody's own content padding.
-.media-editor-crop-advanced-panel {
-	margin-left: -$grid-unit-20;
-	margin-right: -$grid-unit-20;
+.media-editor__sidebar-panel .media-editor-crop-advanced-panel {
+	border-bottom: none;
+	padding: 0;
+	&.is-opened .components-panel__body-title {
+		margin: 0 0 $grid-unit-20 0;
+	}
 }
 
 // `<SnackbarNotices>` renders `.components-snackbar-list` with
