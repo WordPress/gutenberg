@@ -329,6 +329,7 @@ function ListItem< Item >( {
 					>
 						<Stack direction="row" align="center">
 							<div
+								role="gridcell"
 								className="dataviews-title-field dataviews-view-list__title-field"
 								id={ labelId }
 							>
@@ -337,7 +338,10 @@ function ListItem< Item >( {
 							{ usedActions }
 						</Stack>
 						{ renderDescription && (
-							<div className="dataviews-view-list__field">
+							<div
+								role="gridcell"
+								className="dataviews-view-list__field"
+							>
 								<descriptionField.render
 									item={ item }
 									field={ descriptionField }
@@ -351,6 +355,7 @@ function ListItem< Item >( {
 							{ otherFields.map( ( field ) => (
 								<div
 									key={ field.id }
+									role="gridcell"
 									className="dataviews-view-list__field"
 								>
 									<VisuallyHidden
