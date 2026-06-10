@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
-import { parse, serialize } from '@wordpress/blocks';
 import {
 	useState,
 	useEffect,
@@ -37,36 +35,24 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-function contentHasNoteId( content, noteId ) {
-	return new RegExp(
-		`"noteId"\\s*:\\s*(?:\\[[^\\]]*\\b${ noteId }\\b|${ noteId }\\b)`
-	).test( content );
+function getBlockAttributeText( block, attributeName ) {
+	const value = block?.attributes?.[ attributeName ];
+	return typeof value === 'string' ? value : value?.toString?.() || '';
 }
 
-function waitForSerializedNoteId( registry, noteId ) {
-	return new Promise( ( resolve ) => {
-		const selectEditor = () => registry.select( editorStore );
-		const isSerialized = () =>
-			contentHasNoteId( selectEditor().getEditedPostContent(), noteId );
-		let unsubscribe = () => {};
-		const finish = () => {
-			unsubscribe();
-			resolve();
-		};
+function mergeNoteMetadata( savedMetadata, liveMetadata ) {
+	const noteId = [
+		...new Set( [
+			...getNoteIdsFromMetadata( savedMetadata ),
+			...getNoteIdsFromMetadata( liveMetadata ),
+		] ),
+	];
 
-		if ( isSerialized() ) {
-			resolve();
-			return;
-		}
-
-		const timeout = setTimeout( finish, 1000 );
-		unsubscribe = registry.subscribe( () => {
-			if ( isSerialized() ) {
-				clearTimeout( timeout );
-				finish();
-			}
-		} );
-	} );
+	return {
+		...savedMetadata,
+		...liveMetadata,
+		noteId,
+	};
 }
 
 function getBlockPath( blocks, clientId ) {
@@ -83,65 +69,6 @@ function getBlockPath( blocks, clientId ) {
 	}
 
 	return null;
-}
-
-function addNoteIdToBlockPath( blocks, path, noteId ) {
-	const [ index, ...rest ] = path;
-	return blocks.map( ( block, currentIndex ) => {
-		if ( currentIndex !== index ) {
-			return block;
-		}
-
-		if ( rest.length ) {
-			return {
-				...block,
-				innerBlocks: addNoteIdToBlockPath(
-					block.innerBlocks || [],
-					rest,
-					noteId
-				),
-			};
-		}
-
-		return {
-			...block,
-			attributes: {
-				...block.attributes,
-				metadata: cleanEmptyObject(
-					addNoteIdToMetadata( block.attributes?.metadata, noteId )
-				),
-			},
-		};
-	} );
-}
-
-async function saveNoteAttachmentOnly( registry, clientId, noteId ) {
-	const editor = registry.select( editorStore );
-	const blockEditor = registry.select( blockEditorStore );
-	const currentBlocks = blockEditor.getBlocks();
-	const blockPath = getBlockPath( currentBlocks, clientId );
-	const post = editor.getCurrentPost();
-	const savedContent = post.content?.raw || post.content || '';
-
-	if ( ! blockPath || ! savedContent ) {
-		return;
-	}
-
-	const savedBlocks = parse( savedContent );
-	const updatedContent = serialize(
-		addNoteIdToBlockPath( savedBlocks, blockPath, noteId )
-	);
-	const postType = await registry
-		.resolveSelect( coreStore )
-		.getPostType( editor.getCurrentPostType() );
-	const restBase = postType?.rest_base || editor.getCurrentPostType();
-	const restNamespace = postType?.rest_namespace || 'wp/v2';
-
-	await apiFetch( {
-		path: `/${ restNamespace }/${ restBase }/${ editor.getCurrentPostId() }`,
-		method: 'POST',
-		data: { content: updatedContent },
-	} );
 }
 
 export function useNoteThreads( postId ) {
@@ -255,13 +182,22 @@ export function useNoteThreads( postId ) {
 }
 
 export function useNoteActions() {
-	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	const { persistEntityBlockAttributes } = unlock( useDispatch( coreStore ) );
 	const { savePost } = useDispatch( editorStore );
-	const { getCurrentPostId } = useSelect( editorStore );
-	const { getBlockAttributes, getSelectedBlockClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getCurrentPost,
+		getCurrentPostId,
+		getCurrentPostType,
+		isEditedPostDirty,
+	} = useSelect( editorStore );
+	const {
+		getBlock,
+		getBlockAttributes,
+		getBlocks,
+		getSelectedBlockClientId,
+	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
@@ -300,10 +236,9 @@ export function useNoteActions() {
 				if ( ! clientId ) {
 					return savedRecord;
 				}
-				const wasDirty = registry
-					.select( editorStore )
-					.isEditedPostDirty();
+				const wasDirty = isEditedPostDirty();
 				const metadata = getBlockAttributes( clientId )?.metadata;
+				const selectedBlock = getBlock( clientId );
 				const updatedMetadata = addNoteIdToMetadata(
 					metadata,
 					savedRecord.id
@@ -311,14 +246,37 @@ export function useNoteActions() {
 				updateBlockAttributes( clientId, {
 					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
-				await waitForSerializedNoteId( registry, savedRecord.id );
-				if ( wasDirty ) {
-					await saveNoteAttachmentOnly(
-						registry,
-						clientId,
-						savedRecord.id
-					);
-				} else {
+				const blockPath = getBlockPath( getBlocks(), clientId );
+				const didPersistBlockAttributes = persistEntityBlockAttributes
+					? await persistEntityBlockAttributes(
+							'postType',
+							getCurrentPostType(),
+							getCurrentPostId(),
+							{
+								record: getCurrentPost(),
+								blockPath,
+								isMatch: ( block ) =>
+									block?.name === selectedBlock?.name &&
+									getBlockAttributeText(
+										block,
+										'content'
+									) ===
+										getBlockAttributeText(
+											selectedBlock,
+											'content'
+										),
+								attributes: ( attributes ) => ( {
+									metadata: cleanEmptyObject(
+										mergeNoteMetadata(
+											attributes?.metadata,
+											updatedMetadata
+										)
+									),
+								} ),
+							}
+					  )
+					: false;
+				if ( ! didPersistBlockAttributes && ! wasDirty ) {
 					await savePost();
 				}
 			}

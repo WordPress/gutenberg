@@ -17,9 +17,12 @@ const {
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
+	createYjsDoc,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
+	initializeYjsDoc,
 	retrySyncConnection,
+	serializeCrdtDoc,
 } = unlock( syncPrivateApis );
 
 export {
@@ -27,9 +30,12 @@ export {
 	Delta,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
+	createYjsDoc,
+	initializeYjsDoc,
 	LOCAL_EDITOR_ORIGIN,
 	LOCAL_UNDO_IGNORED_ORIGIN,
 	retrySyncConnection,
+	serializeCrdtDoc,
 };
 
 let syncManager: SyncManager;

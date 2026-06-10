@@ -50,7 +50,7 @@ describe( 'saveCRDTDoc', () => {
 		await flushPromises();
 
 		fetch.resolve( {} );
-		await save;
+		await expect( save ).resolves.toBe( true );
 
 		expect( apiFetch ).toHaveBeenCalledWith( {
 			path: '/wp-sync/v1/save',
@@ -65,7 +65,9 @@ describe( 'saveCRDTDoc', () => {
 	it( 'does not call the sync endpoint when there is no serialized CRDT document', async () => {
 		syncManager.createPersistedCRDTDoc.mockResolvedValue( null );
 
-		await saveCRDTDoc( 'postType/post', 1 );
+		await expect( saveCRDTDoc( 'postType/post', 1 ) ).resolves.toBe(
+			false
+		);
 
 		expect( apiFetch ).not.toHaveBeenCalled();
 	} );

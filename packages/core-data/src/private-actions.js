@@ -2,12 +2,21 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { parse, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getSyncManager, hasSyncManager } from './sync';
+import {
+	createYjsDoc,
+	getSyncManager,
+	hasSyncManager,
+	initializeYjsDoc,
+	serializeCrdtDoc,
+} from './sync';
+import { saveCRDTDoc } from './utils';
+import { POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './utils/crdt';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -177,6 +186,180 @@ export const setCollaborationSupported =
 		if ( ! supported && hasSyncManager() ) {
 			getSyncManager().unloadAll();
 		}
+	};
+
+/**
+ * Persists the current CRDT document for a sync-enabled entity.
+ *
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Entity record ID.
+ * @return {Promise<boolean>} Whether a CRDT document was persisted.
+ */
+export const persistEntityCRDTDoc =
+	( kind, name, recordId ) =>
+	async ( { select } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		if ( ! entityConfig?.syncConfig?.supportsPersistence ) {
+			return false;
+		}
+
+		return saveCRDTDoc( `${ kind }/${ name }`, recordId );
+	};
+
+function getRawContent( record ) {
+	return record?.content?.raw || record?.content || '';
+}
+
+function findBlockPath( blocks, isMatch ) {
+	for ( let index = 0; index < blocks.length; index++ ) {
+		const block = blocks[ index ];
+		if ( isMatch( block ) ) {
+			return [ index ];
+		}
+
+		const childPath = findBlockPath( block.innerBlocks || [], isMatch );
+		if ( childPath ) {
+			return [ index, ...childPath ];
+		}
+	}
+
+	return null;
+}
+
+function getBlockAtPath( blocks, path ) {
+	return path.reduce(
+		( currentBlock, index ) =>
+			Array.isArray( currentBlock )
+				? currentBlock[ index ]
+				: currentBlock?.innerBlocks?.[ index ],
+		blocks
+	);
+}
+
+function updateBlockAttributesAtPath( blocks, path, attributes ) {
+	const [ index, ...rest ] = path;
+	const block = blocks[ index ];
+	if ( ! block ) {
+		return null;
+	}
+
+	const nextBlocks = [ ...blocks ];
+	if ( rest.length ) {
+		const innerBlocks = updateBlockAttributesAtPath(
+			block.innerBlocks || [],
+			rest,
+			attributes
+		);
+		if ( ! innerBlocks ) {
+			return null;
+		}
+
+		nextBlocks[ index ] = {
+			...block,
+			innerBlocks,
+		};
+		return nextBlocks;
+	}
+
+	const attributeChanges =
+		typeof attributes === 'function'
+			? attributes( block.attributes || {} )
+			: attributes;
+	if ( ! attributeChanges ) {
+		return null;
+	}
+
+	nextBlocks[ index ] = {
+		...block,
+		attributes: {
+			...block.attributes,
+			...attributeChanges,
+		},
+	};
+	return nextBlocks;
+}
+
+/**
+ * Persists targeted block attribute changes against a sync-enabled entity's
+ * saved content and CRDT document without using unrelated dirty editor state.
+ *
+ * @param {string}          kind               Entity kind.
+ * @param {string}          name               Entity name.
+ * @param {number|string}   recordId           Entity record ID.
+ * @param {Object}          options            Options.
+ * @param {Object}          options.record     Saved entity record snapshot.
+ * @param {number[]}        options.blockPath  Path to the block in saved content.
+ * @param {Object|Function} options.attributes Attribute changes or updater.
+ * @param {Function}        options.isMatch    Optional block matcher for path validation.
+ * @return {Promise<boolean>} Whether block attributes were persisted.
+ */
+export const persistEntityBlockAttributes =
+	( kind, name, recordId, { record, blockPath, attributes, isMatch } ) =>
+	async ( { select } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		if (
+			! entityConfig?.baseURL ||
+			! entityConfig?.syncConfig?.supportsPersistence ||
+			! Array.isArray( blockPath )
+		) {
+			return false;
+		}
+
+		const content = getRawContent( record );
+		if ( ! content ) {
+			return false;
+		}
+
+		const parsedBlocks = parse( content );
+		let targetPath = blockPath;
+		if (
+			isMatch &&
+			! isMatch( getBlockAtPath( parsedBlocks, blockPath ) )
+		) {
+			targetPath = findBlockPath( parsedBlocks, isMatch ) || blockPath;
+		}
+
+		if ( ! targetPath ) {
+			return false;
+		}
+
+		const blocks = updateBlockAttributesAtPath(
+			parsedBlocks,
+			targetPath,
+			attributes
+		);
+		if ( ! blocks ) {
+			return false;
+		}
+
+		const updatedRecord = {
+			...record,
+			blocks,
+			content: serialize( blocks ),
+		};
+		const ydoc = createYjsDoc();
+		initializeYjsDoc( ydoc );
+		entityConfig.syncConfig.applyChangesToCRDTDoc( ydoc, updatedRecord );
+		const serializedDoc = serializeCrdtDoc( ydoc );
+		ydoc.destroy();
+
+		if ( ! serializedDoc ) {
+			return false;
+		}
+
+		await apiFetch( {
+			path: `${ entityConfig.baseURL }/${ recordId }`,
+			method: 'POST',
+			data: {
+				content: updatedRecord.content,
+				meta: {
+					[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
+				},
+			},
+		} );
+
+		return true;
 	};
 
 /**
