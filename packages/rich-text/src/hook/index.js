@@ -168,20 +168,10 @@ function useRichTextBase( {
 			typeof value === 'string' &&
 			previousValue.length !== value.length;
 
-		// This element is actively edited when focus is on it or a descendant,
-		// or when an ancestor editing host (the writing flow wrapper) is
-		// focused and the selection is within this element.
-		const element = ref.current;
-		const { ownerDocument } = element;
-		const { activeElement } = ownerDocument;
-		const { anchorNode } = ownerDocument.defaultView.getSelection();
-		const hasFocus =
-			element.contains( activeElement ) ||
-			!! (
-				activeElement?.isContentEditable &&
-				activeElement.contains( element ) &&
-				element.contains( anchorNode )
-			);
+		// Check if focus is on this element
+		const hasFocus = ref.current?.contains(
+			ref.current.ownerDocument.activeElement
+		);
 
 		// Skip re-applying the selection state when content changed from external source
 		// (e.g., typing in sidebar input changes canvas text)
@@ -206,16 +196,7 @@ function useRichTextBase( {
 			return;
 		}
 
-		// Don't steal focus from an ancestor editing host (the writing flow
-		// wrapper): it already holds focus, and applyRecord sets the selection.
-		const { activeElement } = ref.current.ownerDocument;
-		if (
-			activeElement !== ref.current &&
-			! (
-				activeElement?.isContentEditable &&
-				activeElement.contains( ref.current )
-			)
-		) {
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
 			ref.current.focus();
 		}
 
