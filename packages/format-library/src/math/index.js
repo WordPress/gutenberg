@@ -143,14 +143,14 @@ function Edit( {
 				onClick={ () => {
 					// If a math object is already active, revert it to its
 					// LaTeX source so clicking the button toggles back to the
-					// exact text it was created from.
+					// exact text it was created from. Keep the restored text
+					// selected so it can be edited or re-marked right away.
 					if ( isObjectActive ) {
-						onChange(
-							insert(
-								value,
-								activeObjectAttributes?.[ 'data-latex' ] || ''
-							)
-						);
+						const latex =
+							activeObjectAttributes?.[ 'data-latex' ] || '';
+						const newValue = insert( value, latex );
+						newValue.start = newValue.end - latex.length;
+						onChange( newValue );
 						onFocus();
 						return;
 					}

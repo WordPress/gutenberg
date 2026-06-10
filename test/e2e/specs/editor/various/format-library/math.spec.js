@@ -130,5 +130,20 @@ test.describe( 'Format Library - Math', () => {
 				},
 			},
 		] );
+
+		// The restored text stays selected, so re-marking it as math without
+		// reselecting should round-trip straight back to the math object.
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.getByRole( 'menuitem', { name: 'Math' } ).click();
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'equation: <math data-latex="x^2"><semantics><msup><mi>x</mi><mn>2</mn></msup><annotation encoding="application/x-tex">x^2</annotation></semantics></math>',
+				},
+			},
+		] );
 	} );
 } );
