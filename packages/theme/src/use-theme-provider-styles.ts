@@ -175,35 +175,39 @@ export function useThemeProviderStyles( {
 		color.primary ??
 		inheritedSettings.color?.primary ??
 		DEFAULT_SEED_COLORS.primary;
-	const bg =
-		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const background =
+		color.background ??
+		inheritedSettings.color?.background ??
+		DEFAULT_SEED_COLORS.background;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 
 	const resolvedSettings = useMemo(
 		() => ( {
 			color: {
 				primary,
-				bg,
+				background,
 			},
 			cursor: cursorControl ? { control: cursorControl } : undefined,
 		} ),
-		[ primary, bg, cursorControl ]
+		[ primary, background, cursorControl ]
 	);
 
 	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
-			bg,
+			background,
 			primary,
 		};
 
-		// Generate ramps.
+		// Generate ramps, keyed by their design token group name. The
+		// `background` seed maps to the `bg` token group: the design system
+		// token naming intentionally keeps the `bg` convention.
 		const computedColorRamps = new Map< string, RampResult >();
-		const bgRamp = getCachedBgRamp( seeds.bg );
+		const bgRamp = getCachedBgRamp( seeds.background );
 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
-			if ( rampName === 'bg' ) {
-				computedColorRamps.set( rampName, bgRamp );
+			if ( rampName === 'background' ) {
+				computedColorRamps.set( 'bg', bgRamp );
 			} else {
 				computedColorRamps.set(
 					rampName,
@@ -216,7 +220,7 @@ export function useThemeProviderStyles( {
 			primary: seeds.primary,
 			computedColorRamps,
 		} );
-	}, [ primary, bg ] );
+	}, [ primary, background ] );
 
 	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {
