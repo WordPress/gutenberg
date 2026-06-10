@@ -187,7 +187,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	},
 };
 
-const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+const NestingDebug = ( { background = '', primary = '' } ) => (
 	<div
 		style={ {
 			padding: 'var(--wpds-dimension-padding-lg)',
@@ -200,7 +200,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 		} }
 	>
 		<pre style={ { margin: 0 } }>
-			bg: { bg } | primary: { primary } | density: { density }
+			background: { background } | primary: { primary }
 		</pre>
 		<span
 			style={ {
@@ -235,38 +235,32 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 		return (
 			<ThemeProvider>
 				<NestingDebug
-					bg="inherit (root)"
+					background="inherit (root)"
 					primary="inherit (root)"
-					density="inherit (root)"
 				/>
 				<div style={ { paddingInlineStart: '1rem' } }>
 					<ThemeProvider
 						color={ {
-							bg: '#1e1e1e',
+							background: '#1e1e1e',
 						} }
-						density="compact"
 					>
 						<NestingDebug
-							bg="#1e1e1e"
+							background="#1e1e1e"
 							primary="inherit (root)"
-							density="compact"
 						/>
 						<div style={ { paddingInlineStart: '1rem' } }>
 							<ThemeProvider>
 								<NestingDebug
-									bg="inherit (#1e1e1e)"
+									background="inherit (#1e1e1e)"
 									primary="inherit (root)"
-									density="inherit (compact)"
 								/>
 								<div style={ { paddingInlineStart: '1rem' } }>
 									<ThemeProvider
 										color={ { primary: 'hotpink' } }
-										density="default"
 									>
 										<NestingDebug
-											bg="inherit (#1e1e1e)"
+											background="inherit (#1e1e1e)"
 											primary="hotpink"
-											density="default"
 										/>
 										<div
 											style={ {
@@ -274,12 +268,13 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 											} }
 										>
 											<ThemeProvider
-												color={ { bg: '#f8f8f8' } }
+												color={ {
+													background: '#f8f8f8',
+												} }
 											>
 												<NestingDebug
-													bg="#f8f8f8"
+													background="#f8f8f8"
 													primary="inherit (hotpink)"
-													density="inherit (default)"
 												/>
 											</ThemeProvider>
 										</div>

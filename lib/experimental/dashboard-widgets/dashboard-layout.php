@@ -11,7 +11,7 @@
 
 /**
  * Preferences scope under which the dashboard layout is stored.
- * Mirrors the scope read by the JS surface.
+ * Mirrors the scope read by the dashboard's JS layer.
  */
 const GUTENBERG_DASHBOARD_LAYOUT_SCOPE = 'core/dashboard';
 
@@ -22,10 +22,10 @@ const GUTENBERG_DASHBOARD_LAYOUT_SCOPE = 'core/dashboard';
 const GUTENBERG_DASHBOARD_LAYOUT_KEY = 'dashboardLayout';
 
 /**
- * Identifier of the bundled dashboard surface, formatted as
- * `<plugin>_<page>` to match the underscore form produced by the
- * wp-build pipeline (mirrors the `{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}`
- * pair used in generated page templates).
+ * Identifier of the bundled dashboard, formatted as `<plugin>_<page>`
+ * to match the underscore form produced by the wp-build pipeline
+ * (mirrors the `{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}` pair used in
+ * generated page templates).
  *
  * Passed as context to `gutenberg_dashboard_default_layout` and used
  * as the `{name}` segment of the REST default-layout route.
@@ -37,9 +37,11 @@ const GUTENBERG_DASHBOARD_NAME = 'gutenberg_dashboard';
  * `persisted_preferences` read when the stored layout is empty.
  *
  * Hooks into `get_user_metadata` so the default propagates through
- * the same persistence layer the dashboard's JS surface reads from.
+ * the same persistence layer the dashboard's JS layer reads from.
  * The JS side stays oblivious: a default and a user-saved layout
  * look identical at the preferences-store boundary.
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
  *
  * @param mixed  $value    The pre-fetched value, or null to let the
  *                         meta API resolve normally.
@@ -81,7 +83,7 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 	 * `uuid`, `type`, optional `attributes`, optional `placement`.
 	 *
 	 * @param array  $default_layout Default array of widget instances.
-	 * @param string $dashboard_name Identifier of the dashboard surface
+	 * @param string $dashboard_name Identifier of the dashboard
 	 *                               receiving the default. Callbacks
 	 *                               targeting a specific dashboard
 	 *                               should switch on this value.
@@ -104,12 +106,12 @@ function gutenberg_inject_dashboard_default_layout( $value, $user_id, $meta_key 
 add_filter( 'get_user_metadata', 'gutenberg_inject_dashboard_default_layout', 99, 3 );
 
 /**
- * Returns the default layout registered for a dashboard surface.
+ * Returns the default layout registered for a dashboard.
  *
  * Resolves `gutenberg_dashboard_default_layout` for the supplied
  * dashboard name, returning a fresh evaluation of the filter chain
- * each call. Used by the JS surface to back a "reset to default"
- * action without depending on the user-meta hydration path.
+ * each call. Used by the dashboard's JS layer to back a "reset to
+ * default" action without depending on the user-meta hydration path.
  *
  * @param WP_REST_Request $request REST request carrying the
  *                                 dashboard name segment.

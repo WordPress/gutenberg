@@ -84,15 +84,11 @@ const IGNORE_PATTERNS = [
 	'**/benchmark/**',
 	'**/{__mocks__,__tests__,test}/**',
 	'**/{storybook,stories}/**',
-	'**/*.native.*',
-	'**/*.ios.*',
-	'**/*.android.*',
 	'**/*.{spec,test}.*',
 ];
 const TEST_FILE_PATTERNS = [
 	/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 	/\.(spec|test)\.(js|ts|tsx)$/,
-	/\.(native|ios|android)\.(js|ts|tsx)$/,
 ];
 
 /**
@@ -1311,7 +1307,7 @@ async function transpilePackage( packageName ) {
 	const emotionPlugin = babel( {
 		filter: /\.[jt]sx?$/,
 		config: {
-			plugins: [ '@emotion/babel-plugin' ],
+			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
 		},
 	} );
 	const externalizeAllExceptCssPlugin = {
@@ -1752,14 +1748,31 @@ async function buildRoute( routeName ) {
 }
 
 /**
- * Build all discovered routes.
+ * Build discovered routes.
  *
+ * Routes whose pages are all in `experimentalPageIds` are skipped. Pass an
+ * empty set (the default) to build every route.
+ *
+ * @param {Set<string>} experimentalPageIds Page ids marked experimental.
  * @return {Promise<void>}
  */
-async function buildAllRoutes() {
+async function buildRoutes( experimentalPageIds = new Set() ) {
 	console.log( '\n🚦 Phase 3: Building routes...\n' );
 
-	const routes = getAllRoutes( ROOT_DIR );
+	const allRoutes = getAllRoutes( ROOT_DIR );
+
+	const routes =
+		experimentalPageIds.size === 0
+			? allRoutes
+			: allRoutes.filter( ( routeName ) => {
+					const metadata = getRouteMetadata( ROOT_DIR, routeName );
+					if ( ! metadata?.pages?.length ) {
+						return true;
+					}
+					return metadata.pages.some(
+						( page ) => ! experimentalPageIds.has( page )
+					);
+			  } );
 
 	if ( routes.length === 0 ) {
 		console.log( '   No routes found, skipping.\n' );
@@ -2085,8 +2098,36 @@ async function buildAll( baseUrlExpression ) {
 		} )
 	);
 
-	// Build routes
-	await buildAllRoutes();
+	// Normalize PAGES config to support both string and object formats
+	const normalizedPages = PAGES.map( ( page ) => {
+		if ( typeof page === 'string' ) {
+			return { id: page, init: [], title: undefined };
+		}
+		return {
+			id: page.id,
+			init: page.init || [],
+			title: page.title || undefined,
+			experimental: page.experimental || false,
+		};
+	} );
+
+	// When building for WordPress Core, exclude experimental pages.
+	const isCoreBuild =
+		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
+	const activePages = isCoreBuild
+		? normalizedPages.filter( ( page ) => ! page.experimental )
+		: normalizedPages;
+
+	// In Core builds, skip routes whose pages are all experimental.
+	const experimentalPageIds = isCoreBuild
+		? new Set(
+				normalizedPages
+					.filter( ( page ) => page.experimental )
+					.map( ( page ) => page.id )
+		  )
+		: new Set();
+	await buildRoutes( experimentalPageIds );
 
 	// Build widgets
 	await buildAllWidgets();
@@ -2118,27 +2159,6 @@ async function buildAll( baseUrlExpression ) {
 			};
 		} );
 	} );
-
-	// Normalize PAGES config to support both string and object formats
-	const normalizedPages = PAGES.map( ( page ) => {
-		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
-		}
-		return {
-			id: page.id,
-			init: page.init || [],
-			title: page.title || undefined,
-			experimental: page.experimental || false,
-		};
-	} );
-
-	// When building for WordPress Core, exclude experimental pages.
-	const isCoreBuild =
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE );
-	const activePages = isCoreBuild
-		? normalizedPages.filter( ( page ) => ! page.experimental )
-		: normalizedPages;
 
 	const activePageIds = new Set( activePages.map( ( p ) => p.id ) );
 	const activeRoutes = routes.filter( ( r ) => activePageIds.has( r.page ) );
@@ -2359,7 +2379,6 @@ async function watchMode() {
 		ignored: [
 			'**/{__mocks__,__tests__,test,storybook,stories}/**',
 			'**/*.{spec,test}.{js,ts,tsx}',
-			'**/*.native.*',
 		],
 		persistent: true,
 		ignoreInitial: true,

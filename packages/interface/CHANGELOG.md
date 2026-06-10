@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-## 9.33.0 (2026-06-04)
+### Documentation
+
+-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
 
 ## 9.32.0 (2026-05-27)
 

@@ -6,13 +6,13 @@ import { render, screen } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { Component, Suspense } from '@wordpress/element';
 import {
 	createRegistry,
 	createReduxStore,
 	useSuspenseSelect,
 	RegistryProvider,
 } from '@wordpress/data';
+import { Component, Suspense } from '@wordpress/element';
 
 function createRegistryWithStore() {
 	const initialState = {

@@ -77,6 +77,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
 	// WordPress 7.1 compat.
+	require __DIR__ . '/compat/wordpress-7.1/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.1/collaboration.php';
@@ -116,7 +117,6 @@ require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
-require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
@@ -129,6 +129,8 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 }
 
 // WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/media.php';
+require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
 
 // Experimental features.

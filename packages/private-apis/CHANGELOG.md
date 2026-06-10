@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-## 1.48.0 (2026-06-04)
+### Enhancements
+
+- Allow `@wordpress/storybook` to opt in to private APIs. ([#78814](https://github.com/WordPress/gutenberg/pull/78814))
 
 ## 1.47.0 (2026-05-27)
 

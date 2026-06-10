@@ -20,7 +20,7 @@ export interface ThemeProviderSettings {
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
-		bg?: string;
+		background?: string;
 	};
 
 	/**
@@ -36,15 +36,6 @@ export interface ThemeProviderSettings {
 		 */
 		control?: 'default' | 'pointer';
 	};
-
-	/**
-	 * The density of the theme. If left unspecified, the theme inherits from
-	 * the density of the closest `ThemeProvider`, or uses the default density
-	 * if there is no inherited density.
-	 *
-	 * @default undefined
-	 */
-	density?: undefined | 'default' | 'compact' | 'comfortable';
 }
 
 export interface ThemeProviderProps extends ThemeProviderSettings {

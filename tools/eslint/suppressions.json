@@ -522,11 +522,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/waveform-player.js": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/video/tracks-editor.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -1270,24 +1265,13 @@
 		}
 	},
 	"packages/format-library/src/image/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
 	},
 	"packages/format-library/src/language/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"packages/format-library/src/link/css-classes-setting.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/format-library/src/link/inline.js": {
@@ -1296,17 +1280,11 @@
 		}
 	},
 	"packages/format-library/src/math/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
 	},
 	"packages/format-library/src/text-color/inline.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
@@ -1660,6 +1638,11 @@
 			"count": 3
 		}
 	},
+	"routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"routes/experiments-home/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
@@ -1849,6 +1832,11 @@
 	"storybook/stories/playground/with-undo-redo/index.jsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
+		}
+	},
+	"widgets/events/components/location-picker/location-picker.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 5
 		}
 	},
 	"widgets/quick-draft/components/drafts-list/drafts-list.tsx": {
