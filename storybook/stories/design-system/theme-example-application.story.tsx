@@ -56,7 +56,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 		const [ primary, setPrimary ] = useState< string | undefined >();
 		const [ background, setBackground ] = useState< string | undefined >();
 		const [ cornerRadiusPreset, setCornerRadiusPreset ] =
-			useState< CornerRadiusPreset >( 'sm' );
+			useState< CornerRadiusPreset >( 'sharp' );
 
 		return (
 			<div>
@@ -121,11 +121,11 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							}
 						>
 							<option value="none">None</option>
-							<option value="sm">Small</option>
-							<option value="md">Medium</option>
-							<option value="lg">Large</option>
-							<option value="xl">Extra large</option>
-							<option value="2xl">2x extra large</option>
+							<option value="sharp">Sharp</option>
+							<option value="subtle">Subtle</option>
+							<option value="soft">Soft</option>
+							<option value="rounded">Rounded</option>
+							<option value="pill">Pill</option>
 						</select>
 					</label>
 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }

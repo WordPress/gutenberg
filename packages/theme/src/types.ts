@@ -1,6 +1,12 @@
 import { type ReactNode } from 'react';
 
-export type CornerRadiusPreset = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type CornerRadiusPreset =
+	| 'none'
+	| 'sharp'
+	| 'subtle'
+	| 'soft'
+	| 'rounded'
+	| 'pill';
 
 export interface ThemeProviderSettings {
 	/**
@@ -40,15 +46,14 @@ export interface ThemeProviderSettings {
 	};
 
 	/**
-	 * Overall roundness preset for the theme subtree: `none` (sharp corners),
-	 * `sm` (small), `md` (medium), `lg` (large), `xl` (extra large), or
-	 * `2xl` (2x extra large).
+	 * Overall roundness preset for the theme subtree: `none` (square corners),
+	 * `sharp`, `subtle`, `soft`, `rounded`, or `pill` (most rounded).
 	 *
-	 * Not the same as the individual `--wpds-border-radius-*` token sizes
-	 * (which are also named xs–lg).
+	 * This adjusts the individual `--wpds-border-radius-*` token sizes for the
+	 * subtree; it is a roundness character, not a single token size.
 	 *
 	 * By default, it inherits from the parent `ThemeProvider`,
-	 * and falls back to the prebuilt default (`sm`).
+	 * and falls back to the prebuilt default (`sharp`).
 	 */
 	cornerRadius?: CornerRadiusPreset;
 }
