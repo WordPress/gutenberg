@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,56 +14,41 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
  * @param {Object}         options                 Parameters to avoid extra store subscriptions.
  * @param {Object|boolean} options.blockVisibility Block visibility metadata.
  * @param {string}         options.deviceType      Current device type ('desktop', 'tablet', 'mobile').
- * @return {Object} Object with `isBlockCurrentlyHidden` and `currentViewport` boolean properties.
+ * @param {Window?}        options.view            Window instance in which to perform viewport matching
+ * @return {Object} Object with `isBlockCurrentlyHidden` (boolean) and `currentViewport` (string) properties.
  */
 export default function useBlockVisibility( options = {} ) {
 	const {
 		blockVisibility = undefined,
 		deviceType = BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
+		view = window,
 	} = options;
 
-	const isLargerThanMobile = useViewportMatch( 'mobile', '>=' ); // >= 480px
-	const isLargerThanTablet = useViewportMatch( 'medium', '>=' ); // >= 782px
+	const isLargerThanMobile = useViewportMatch( 'mobile', '>=', view ); // >= 480px
+	const isLargerThanTablet = useViewportMatch( 'medium', '>=', view ); // >= 782px
 
 	/*
 	 * Priority:
 	 * 1. Device type override (Mobile/Tablet) - uses device type to determine viewport
 	 * 2. Actual window size (Desktop mode) - uses viewport detection
 	 */
-	const currentViewport = useMemo( () => {
-		if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.mobile.key ) {
-			return BLOCK_VISIBILITY_VIEWPORTS.mobile.key;
-		}
-		if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.tablet.key ) {
-			return BLOCK_VISIBILITY_VIEWPORTS.tablet.key;
-		}
-		if ( ! isLargerThanMobile ) {
-			return BLOCK_VISIBILITY_VIEWPORTS.mobile.key;
-		}
-		if ( isLargerThanMobile && ! isLargerThanTablet ) {
-			return BLOCK_VISIBILITY_VIEWPORTS.tablet.key;
-		}
-		return BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
-	}, [ deviceType, isLargerThanMobile, isLargerThanTablet ] );
+	let currentViewport;
+	if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.mobile.key ) {
+		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.mobile.key;
+	} else if ( deviceType === BLOCK_VISIBILITY_VIEWPORTS.tablet.key ) {
+		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.tablet.key;
+	} else if ( ! isLargerThanMobile ) {
+		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.mobile.key;
+	} else if ( isLargerThanMobile && ! isLargerThanTablet ) {
+		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.tablet.key;
+	} else {
+		currentViewport = BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
+	}
 
 	// Determine if block is currently hidden.
-	const isBlockCurrentlyHidden = useMemo( () => {
-		if ( blockVisibility === false ) {
-			return true;
-		}
+	const isBlockCurrentlyHidden =
+		blockVisibility === false ||
+		blockVisibility?.viewport?.[ currentViewport ] === false;
 
-		if (
-			window.__experimentalHideBlocksBasedOnScreenSize &&
-			blockVisibility?.viewport?.[ currentViewport ] === false
-		) {
-			return true;
-		}
-
-		return false;
-	}, [ blockVisibility, currentViewport ] );
-
-	return {
-		isBlockCurrentlyHidden,
-		currentViewport,
-	};
+	return { isBlockCurrentlyHidden, currentViewport };
 }

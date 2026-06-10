@@ -15,13 +15,12 @@
 # Blocks
 /packages/block-library                         @ajitbohra @fabiankaegy
 /packages/block-library/src/gallery
-/packages/block-library/src/table-of-contents   @ZebulanStanphill
 
 # Duotone
-/lib/block-supports/duotone.php
-/packages/block-editor/src/components/duotone-control
-/packages/block-editor/src/hooks/duotone.js
-/packages/components/src/duotone-picker
+/lib/block-supports/duotone.php									@sgomes
+/packages/block-editor/src/components/duotone-control	@sgomes
+/packages/block-editor/src/hooks/duotone.js			@sgomes
+/packages/components/src/duotone-picker					@sgomes
 
 # Editor
 /packages/annotations                           @atimmer
@@ -34,7 +33,6 @@
 /packages/blocks
 /packages/edit-post
 /packages/editor
-/packages/editor/src/components/post-title @alexstine
 /packages/list-reusable-blocks
 /packages/shortcode
 /packages/block-directory
@@ -55,9 +53,8 @@
 /packages/interactivity                         @luisherranz @darerodz
 
 # Tooling
-/bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra
-/docs/tool                                      @ajitbohra
+/bin                                            @ntwb @nerrad @ajitbohra @manzoorwanijk
+/tools                                          @manzoorwanijk
 /packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @ntwb @nerrad @ajitbohra
@@ -80,8 +77,9 @@
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
-/packages/components                            @ajitbohra
+/packages/components                            @ajitbohra @WordPress/gutenberg-components
 /packages/compose                               @ajitbohra
+/packages/design-system-mcp                     @WordPress/gutenberg-components
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
 /packages/nux                                   @ajitbohra @peterwilsoncc
@@ -138,11 +136,3 @@
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey
-
-# Native (Unowned)
-*.native.js
-*.android.js
-*.ios.js
-*.native.scss
-*.android.scss
-*.ios.scss

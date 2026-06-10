@@ -13,8 +13,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	useInnerBlocksProps,
 	InspectorControls,
+	useInnerBlocksProps,
 	RichText,
 	useBlockProps,
 	useBlockEditingMode,
@@ -35,11 +35,13 @@ import { ItemSubmenuIcon } from './icons';
 import {
 	Controls,
 	LinkUI,
-	updateAttributes,
 	useEntityBinding,
+	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
 	useEnableLinkStatusValidation,
+	useIsDraggingWithin,
+	selectLabelText,
 } from '../navigation-link/shared';
 import {
 	getColors,
@@ -51,58 +53,8 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/page-list',
+	'core/loginout',
 ];
-
-/**
- * A React hook to determine if it's dragging within the target element.
- *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
- *
- * @return {boolean} Is dragging within the target element.
- */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
-
-	useEffect( () => {
-		const { ownerDocument } = elementRef.current;
-
-		function handleDragStart( event ) {
-			// Check the first time when the dragging starts.
-			handleDragEnter( event );
-		}
-
-		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDraggingWithin( false );
-		}
-
-		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
-			} else {
-				setIsDraggingWithin( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that
-		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [] );
-
-	return isDraggingWithin;
-};
 
 /**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
@@ -133,21 +85,25 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const {
-		showSubmenuIcon,
-		maxNestingLevel,
-		openSubmenusOnClick: contextOpenSubmenusOnClick,
-	} = context;
+	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
 	const blockEditingMode = useBlockEditingMode();
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
-		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
+		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
+
+	const handleLinkChange = useHandleLinkChange( {
 		clientId,
 		attributes,
+		setAttributes,
+		allowTextUpdate: true,
 	} );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
@@ -258,25 +214,10 @@ export default function NavigationSubmenuEdit( {
 				/^.+\.[a-z]+/.test( label )
 			) {
 				// Focus and select the label text.
-				selectLabelText();
+				selectLabelText( ref );
 			}
 		}
 	}, [ url ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
 
 	const {
 		textColor,
@@ -310,6 +251,7 @@ export default function NavigationSubmenuEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
+			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
 			color: ! textColor && customTextColor,
@@ -396,11 +338,12 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls group="content">
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					isLinkEditable={ ! openSubmenusOnClick }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -445,6 +388,11 @@ export default function NavigationSubmenuEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 							} }
@@ -453,26 +401,7 @@ export default function NavigationSubmenuEdit( {
 								setAttributes( { url: '' } );
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
-							onChange={ ( updatedValue ) => {
-								// updateAttributes determines the final state and returns metadata
-								const {
-									isEntityLink,
-									attributes: updatedAttributes,
-								} = updateAttributes(
-									updatedValue,
-									setAttributes,
-									attributes
-								);
-
-								// Handle URL binding based on the final computed state
-								// Only create bindings for entity links (posts, pages, taxonomies)
-								// Never create bindings for custom links (manual URLs)
-								if ( isEntityLink ) {
-									createBinding( updatedAttributes );
-								} else {
-									clearBinding();
-								}
-							} }
+							onChange={ handleLinkChange }
 						/>
 					) }
 				</ParentElement>

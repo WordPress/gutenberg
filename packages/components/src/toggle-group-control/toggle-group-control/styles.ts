@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { css } from '@emotion/react';
-import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
@@ -39,7 +38,7 @@ export const toggleGroupControl = ( {
 		content: '';
 		position: absolute;
 		pointer-events: none;
-		background: ${ COLORS.theme.foregroundInverted };
+		background: ${ COLORS.theme.gray[ 100 ] };
 		border: 1px solid ${ COLORS.theme.gray[ 700 ] };
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
@@ -99,9 +98,4 @@ export const toggleGroupControlSize = (
 export const block = css`
 	display: flex;
 	width: 100%;
-`;
-
-export const VisualLabelWrapper = styled.div`
-	// Makes the inline label be the correct height, equivalent to setting line-height: 0
-	display: flex;
 `;

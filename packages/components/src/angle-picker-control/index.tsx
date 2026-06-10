@@ -104,5 +104,6 @@ function UnforwardedAnglePickerControl(
  * ```
  */
 export const AnglePickerControl = forwardRef( UnforwardedAnglePickerControl );
+AnglePickerControl.displayName = 'AnglePickerControl';
 
 export default AnglePickerControl;

@@ -31,6 +31,11 @@ const meta: Meta< typeof Flex > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation. For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS.',
+		},
 	},
 };
 export default meta;

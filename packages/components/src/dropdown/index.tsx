@@ -61,7 +61,7 @@ const UnconnectedDropdown = (
 	// re-renders when the popover's anchor updates.
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
-	const containerRef = useRef< HTMLDivElement >();
+	const containerRef = useRef< HTMLDivElement >( null );
 
 	const [ isOpen, setIsOpen ] = useControlledValue( {
 		defaultValue: defaultOpen,

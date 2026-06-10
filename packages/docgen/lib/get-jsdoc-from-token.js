@@ -14,10 +14,14 @@ const getTypeAnnotation = require( './get-type-annotation' );
  * a object representing the leading JSDoc comment of the token,
  * if any.
  *
- * @param {Object} token Espree token.
+ * @param {Object} token                 Espree token to extract the leading JSDoc comment from.
+ * @param {Object} [typeAnnotationToken] Espree token to use for type inference. Defaults to `token`.
+ *                                       Pass the function implementation node when the JSDoc lives on
+ *                                       an overload signature so that inferred types reflect the
+ *                                       implementation's parameter/return types.
  * @return {Object} Object representing the JSDoc comment.
  */
-module.exports = ( token ) => {
+module.exports = ( token, typeAnnotationToken = token ) => {
 	let jsdoc;
 	const comments = getLeadingComments( token );
 	if ( comments && /^\*\r?\n/.test( comments ) ) {
@@ -44,7 +48,7 @@ module.exports = ( token ) => {
 
 				return {
 					...tag,
-					type: getTypeAnnotation( tag, token, index ),
+					type: getTypeAnnotation( tag, typeAnnotationToken, index ),
 					description:
 						tag.description === '\n'
 							? tag.description.trim()
@@ -55,7 +59,7 @@ module.exports = ( token ) => {
 			if ( jsdoc.tags.length === 0 ) {
 				const potentialTypeAnnotation = getTypeAnnotation(
 					{ tag: 'type' },
-					token,
+					typeAnnotationToken,
 					0
 				);
 				if ( potentialTypeAnnotation ) {

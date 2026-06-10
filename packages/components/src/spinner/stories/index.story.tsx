@@ -10,6 +10,7 @@ import Spinner from '../';
 import { space } from '../../utils/space';
 
 const meta: Meta< typeof Spinner > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Feedback/Spinner',
 	id: 'components-spinner',
 	component: Spinner,
@@ -18,6 +19,10 @@ const meta: Meta< typeof Spinner > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

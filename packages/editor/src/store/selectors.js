@@ -11,7 +11,6 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { Platform } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -524,8 +523,7 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state ) ||
-		Platform.OS === 'native'
+		! isEditedPostEmpty( state )
 	);
 }
 
@@ -1252,6 +1250,12 @@ export const isEditorPanelOpened = createRegistrySelector(
 
 /**
  * A block selection object.
+ *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
  *
  * @typedef {Object} WPBlockSelection
  *

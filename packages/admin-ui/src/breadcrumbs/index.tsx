@@ -1,61 +1,109 @@
 /**
  * WordPress dependencies
  */
-import { Link } from '@wordpress/route';
+import { Link as RouterLink } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalHeading as Heading,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import type {
-	BreadcrumbsProps,
-	BreadcrumbItem as BreadcrumbItemType,
-} from './types';
+import type { BreadcrumbsProps } from './types';
+import styles from './style.module.css';
 
-const BreadcrumbItem = ( {
-	item: { label, to },
-}: {
-	item: BreadcrumbItemType;
-} ) => {
-	if ( ! to ) {
-		return (
-			<li>
-				<Heading level={ 1 } truncate>
-					{ label }
-				</Heading>
-			</li>
-		);
-	}
-
-	return (
-		<li>
-			<Link to={ to }>{ label }</Link>
-		</li>
-	);
-};
-
+/**
+ * Renders a breadcrumb navigation trail.
+ *
+ * All items except the last one must provide a `to` prop for navigation.
+ * In development mode, an error is thrown when a non-last item is missing `to`.
+ * The last item represents the current page and its `to` prop is optional.
+ * Only the last item (when it has no `to` prop) is rendered as an `h1`.
+ *
+ * @param props
+ * @param props.items The breadcrumb items to display.
+ *
+ * @example
+ * ```jsx
+ * <Breadcrumbs
+ *   items={ [
+ *     { label: 'Home', to: '/' },
+ *     { label: 'Settings', to: '/settings' },
+ *     { label: 'General' },
+ *   ] }
+ * />
+ * ```
+ */
 export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 	if ( ! items.length ) {
 		return null;
 	}
 
+	const precedingItems = items.slice( 0, -1 );
+	const lastItem = items[ items.length - 1 ];
+
+	if ( process.env.NODE_ENV !== 'production' ) {
+		const invalidItem = precedingItems.find( ( item ) => ! item.to );
+		if ( invalidItem ) {
+			throw new Error(
+				`Breadcrumbs: item "${ invalidItem.label }" is missing a \`to\` prop. All items except the last one must have a \`to\` prop.`
+			);
+		}
+	}
+
 	return (
 		<nav aria-label={ __( 'Breadcrumbs' ) }>
-			<HStack
-				as="ul"
-				className="admin-ui-breadcrumbs__list"
-				spacing={ 0 }
-				justify="flex-start"
-				alignment="center"
+			<Stack
+				render={ <ul /> }
+				direction="row"
+				align="center"
+				className={ styles.list }
 			>
-				{ items.map( ( item, index ) => (
-					<BreadcrumbItem key={ index } item={ item } />
+				{ precedingItems.map( ( item, index ) => (
+					<li key={ index }>
+						<Text
+							variant="body-lg"
+							render={
+								<Link
+									tone="neutral"
+									render={ <RouterLink to={ item.to } /> }
+								/>
+							}
+						>
+							{ item.label }
+						</Text>
+						<Text
+							variant="body-lg"
+							aria-hidden="true"
+							className={ styles.separator }
+						>
+							/
+						</Text>
+					</li>
 				) ) }
-			</HStack>
+				<li>
+					{ lastItem.to ? (
+						<Text
+							variant="body-lg"
+							render={
+								<Link
+									tone="neutral"
+									render={ <RouterLink to={ lastItem.to } /> }
+								/>
+							}
+						>
+							{ lastItem.label }
+						</Text>
+					) : (
+						<Text
+							variant="heading-lg"
+							render={ <h1 /> }
+							className={ styles.current }
+						>
+							{ lastItem.label }
+						</Text>
+					) }
+				</li>
+			</Stack>
 		</nav>
 	);
 };

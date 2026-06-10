@@ -123,6 +123,32 @@ describe( 'private selectors', () => {
 			expect( supports ).toEqual( [] );
 		} );
 
+		it( 'return the list of globally supported panels for text element (textIndent should be excluded)', () => {
+			const supports = getSupportedStyles( getState( [] ), null, 'text' );
+
+			expect( supports ).toEqual( [
+				'background',
+				'backgroundColor',
+				'color',
+				'linkColor',
+				'captionColor',
+				'buttonColor',
+				'headingColor',
+				'fontFamily',
+				'fontSize',
+				'fontStyle',
+				'fontWeight',
+				'lineHeight',
+				'padding',
+				'contentSize',
+				'wideSize',
+				'blockGap',
+				'textAlign',
+				'textTransform',
+				'letterSpacing',
+			] );
+		} );
+
 		it( 'return the allowed styles according to the blocks support keys', () => {
 			const supports = getSupportedStyles(
 				getState( [
@@ -155,6 +181,25 @@ describe( 'private selectors', () => {
 				'textTransform',
 				'letterSpacing',
 			] );
+		} );
+
+		it( 'return textIndent when supported by blocks (not elements)', () => {
+			const supports = getSupportedStyles(
+				getState( [
+					{
+						name: 'core/paragraph',
+						supports: {
+							typography: {
+								textIndent: true,
+								fontSize: true,
+							},
+						},
+					},
+				] ),
+				'core/paragraph'
+			);
+
+			expect( supports ).toEqual( [ 'fontSize', 'textIndent' ] );
 		} );
 	} );
 } );

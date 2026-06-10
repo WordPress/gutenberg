@@ -43,6 +43,8 @@ function NavigationEditStage() {
 
 	return (
 		<Page
+			ariaLabel={ decodeEntities( menuTitle ) }
+			headingLevel={ 2 }
 			breadcrumbs={
 				<Breadcrumbs
 					items={ [

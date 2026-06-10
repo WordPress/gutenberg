@@ -15,17 +15,58 @@ import { useEffect, createInterpolateElement } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { unlock } from '../../lock-unlock';
+import { DOCUMENT_SIZE_LIMIT_EXCEEDED } from '../../utils/sync-error-messages';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
+function CollaborationContext() {
+	const { isCollaborationSupported, syncConnectionStatus } = useSelect(
+		( select ) => {
+			const {
+				isCollaborationSupported: isSupported,
+				getSyncConnectionStatus,
+			} = unlock( select( coreStore ) );
+			return {
+				isCollaborationSupported: isSupported(),
+				syncConnectionStatus: getSyncConnectionStatus(),
+			};
+		},
+		[]
+	);
+
+	if ( isCollaborationSupported ) {
+		return null;
+	}
+
+	if ( DOCUMENT_SIZE_LIMIT_EXCEEDED === syncConnectionStatus?.error?.code ) {
+		return (
+			<p>
+				{ __(
+					'Because this post is too large for real-time collaboration, only one person can edit at a time.'
+				) }
+			</p>
+		);
+	}
+
+	return (
+		<p>
+			{ __(
+				'Because this post uses plugins that aren’t compatible with real-time collaboration, only one person can edit at a time.'
+			) }
+		</p>
+	);
+}
+
 function PostLockedModal() {
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
+		isCollaborationEnabled,
 		isLocked,
 		isTakeover,
 		user,
@@ -34,22 +75,21 @@ function PostLockedModal() {
 		activePostLock,
 		postType,
 		previewLink,
-		supportsSync,
 	} = useSelect( ( select ) => {
 		const {
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
 			getCurrentPostId,
-			getCurrentPostType,
 			getActivePostLock,
 			getEditedPostAttribute,
 			getEditedPostPreviewLink,
 			getEditorSettings,
-		} = select( editorStore );
-		const { getPostType, getEntityConfig } = select( coreStore );
-		const currentPostType = getCurrentPostType();
+			isCollaborationEnabledForCurrentPost,
+		} = unlock( select( editorStore ) );
+		const { getPostType } = select( coreStore );
 		return {
+			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
@@ -58,9 +98,6 @@ function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
-			supportsSync: Boolean(
-				getEntityConfig( 'postType', currentPostType )?.syncConfig
-			),
 		};
 	}, [] );
 
@@ -155,10 +192,8 @@ function PostLockedModal() {
 	}
 
 	// Avoid sending the modal if sync is supported, but retain functionality around locks etc.
-	if ( supportsSync ) {
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			return null;
-		}
+	if ( isCollaborationEnabled ) {
+		return null;
 	}
 
 	const userDisplayName = user.name;
@@ -202,29 +237,32 @@ function PostLockedModal() {
 				) }
 				<div>
 					{ !! isTakeover && (
-						<p>
-							{ createInterpolateElement(
-								userDisplayName
-									? sprintf(
-											/* translators: %s: user's display name */
-											__(
-												'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-											),
-											userDisplayName
-									  )
-									: __(
-											'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-									  ),
-								{
-									strong: <strong />,
-									PreviewLink: (
-										<ExternalLink href={ previewLink }>
-											{ __( 'preview' ) }
-										</ExternalLink>
-									),
-								}
-							) }
-						</p>
+						<>
+							<p>
+								{ createInterpolateElement(
+									userDisplayName
+										? sprintf(
+												/* translators: %s: user's display name */
+												__(
+													'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+												),
+												userDisplayName
+										  )
+										: __(
+												'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+										  ),
+									{
+										strong: <strong />,
+										PreviewLink: (
+											<ExternalLink href={ previewLink }>
+												{ __( 'preview' ) }
+											</ExternalLink>
+										),
+									}
+								) }
+							</p>
+							<CollaborationContext />
+						</>
 					) }
 					{ ! isTakeover && (
 						<>
@@ -251,6 +289,7 @@ function PostLockedModal() {
 									}
 								) }
 							</p>
+							<CollaborationContext />
 							<p>
 								{ __(
 									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'

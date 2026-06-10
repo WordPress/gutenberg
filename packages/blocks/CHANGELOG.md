@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+## 15.21.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Internal
+
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
+## 15.20.0 (2026-05-27)
+
+### Bug Fix
+
+- Fix `mergeSchemas` in `getBlockContentSchemaFromTransforms` to preserve array values (e.g. `classes`) instead of converting them to objects with numeric string keys when merging schemas ([#70615](https://github.com/WordPress/gutenberg/pull/70615)).
+
+## 15.19.0 (2026-05-14)
+
+## 15.18.0 (2026-04-29)
+
+- Update `registerBlockType` to accept the attributes type as a generic.
+- Update `registerBlockVariation`, `unregisterBlockVariation` type signature to match the dispatch call.
+
+## 15.17.0 (2026-04-15)
+
+## 15.16.0 (2026-04-01)
+
+## 15.15.0 (2026-03-18)
+
+## 15.14.0 (2026-03-04)
+
+## 15.13.0 (2026-02-18)
+
+## 15.12.0 (2026-01-29)
+
 ## 15.11.0 (2026-01-16)
 
 ## 15.9.0 (2025-11-26)

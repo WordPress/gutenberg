@@ -12,7 +12,6 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorKeyboardShortcutsRegister,
-	EditorSnackbars,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
@@ -25,14 +24,13 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
-	useEffect,
 	useMemo,
 	useId,
 	useRef,
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
@@ -40,19 +38,19 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Icon,
-	ResizableBox,
+	Icon as WCIcon,
 	SlotFillProvider,
-	Tooltip,
-	VisuallyHidden,
 	__unstableUseNavigateRegions as useNavigateRegions,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
-	useEvent,
 	useMediaQuery,
+	useMergeRefs,
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -73,7 +71,10 @@ import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record
 import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initialization';
 
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { Editor, FullscreenMode } = unlock( editorPrivateApis );
+/** @type {{} & {useDrag: import('@use-gesture/react').useDrag}} */
+const { useDrag } = unlock( componentsPrivateApis );
+const { Editor, FullscreenMode, UploadProgressSnackbar } =
+	unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -133,7 +134,7 @@ function useEditorStyles( settings ) {
 
 /**
  * @param {Object}  props
- * @param {boolean} props.isLegacy True when the editor canvas is not in an iframe.
+ * @param {boolean} props.isLegacy True for device previews where split view is disabled.
  */
 function MetaBoxesMain( { isLegacy } ) {
 	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
@@ -148,10 +149,10 @@ function MetaBoxesMain( { isLegacy } ) {
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const metaBoxesMainRef = useRef();
+
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
-	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
+	const [ { min = 0, max }, setHeightConstraints ] = useState( () => ( {} ) );
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
 	// aria-valuenow attribute on the separator.
@@ -162,8 +163,8 @@ function MetaBoxesMain( { isLegacy } ) {
 		if ( ! container ) {
 			return;
 		}
-		const noticeLists = container.querySelectorAll(
-			':scope > .components-notice-list'
+		const noticeContainer = container.querySelector(
+			':scope > .notices-inline-notices-wrapper'
 		);
 		const resizeHandle = container.querySelector(
 			'.edit-post-meta-boxes-main__presenter'
@@ -171,38 +172,48 @@ function MetaBoxesMain( { isLegacy } ) {
 		const deriveConstraints = () => {
 			const fullHeight = container.offsetHeight;
 			let nextMax = fullHeight;
-			for ( const element of noticeLists ) {
-				nextMax -= element.offsetHeight;
+			if ( noticeContainer ) {
+				nextMax -= noticeContainer.offsetHeight;
 			}
-			const nextMin = resizeHandle.offsetHeight;
+			const nextMin = resizeHandle?.offsetHeight ?? 0;
 			setHeightConstraints( { min: nextMin, max: nextMax } );
 		};
 		const observer = new window.ResizeObserver( deriveConstraints );
 		observer.observe( container );
-		for ( const element of noticeLists ) {
-			observer.observe( element );
+		if ( noticeContainer ) {
+			observer.observe( noticeContainer );
 		}
 		return () => observer.disconnect();
 	}, [] );
+	const metaBoxesMainRef = useRef();
+	const setMainRefs = useMergeRefs( [
+		metaBoxesMainRef,
+		effectSizeConstraints,
+	] );
 
-	const resizeDataRef = useRef( {} );
 	const separatorRef = useRef();
 	const separatorHelpId = useId();
+
+	const heightRef = useRef();
+
+	const getAriaValueNow = ( height ) =>
+		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
+	const persistIsOpen = ( to = ! isOpen ) =>
+		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
 
 	/**
 	 * @param {number|'auto'} [candidateHeight] Height in pixels or 'auto'.
 	 * @param {boolean}       isPersistent      Whether to persist the height in preferences.
-	 * @param {boolean}       isInstant         Whether to update the height in the DOM.
 	 */
-	const applyHeight = (
-		candidateHeight = 'auto',
-		isPersistent,
-		isInstant
-	) => {
+	const applyHeight = ( candidateHeight = 'auto', isPersistent ) => {
+		let styleHeight;
 		if ( candidateHeight === 'auto' ) {
 			isPersistent = false; // Just in case — “auto” should never persist.
+			styleHeight = candidateHeight;
 		} else {
 			candidateHeight = Math.min( max, Math.max( min, candidateHeight ) );
+			heightRef.current = candidateHeight;
+			styleHeight = `${ candidateHeight }px`;
 		}
 		if ( isPersistent ) {
 			setPreference(
@@ -211,35 +222,60 @@ function MetaBoxesMain( { isLegacy } ) {
 				candidateHeight
 			);
 		}
-		// Updates aria-valuenow only when not persisting the value because otherwise
-		// it's done by the render that persisting the value causes.
-		else if ( ! isShort ) {
-			separatorRef.current.ariaValueNow =
-				getAriaValueNow( candidateHeight );
-		}
-		if ( isInstant ) {
-			metaBoxesMainRef.current.updateSize( {
-				height: candidateHeight,
-				// Oddly, when the event that triggered this was not from the mouse (e.g. keydown),
-				// if `width` is left unspecified a subsequent drag gesture applies a fixed
-				// width and the pane fails to widen/narrow with parent width changes from
-				// sidebars opening/closing or window resizes.
-				width: 'auto',
-			} );
+		// Applies imperative DOM updates only when not persisting the value
+		// because otherwise it's done by the subsequent render.
+		else {
+			metaBoxesMainRef.current.style.height = styleHeight;
+			if ( ! isShort ) {
+				separatorRef.current.ariaValueNow =
+					getAriaValueNow( candidateHeight );
+			}
 		}
 	};
-	const getRenderValues = useEvent( () => ( { isOpen, openHeight, min } ) );
-	// Sets the height to 'auto' when not resizable (isShort) and to the
-	// preferred height when resizable.
-	useEffect( () => {
-		const fresh = getRenderValues();
-		// Tests for `min` having a value to skip the first render.
-		if ( fresh.min !== undefined && metaBoxesMainRef.current ) {
-			const usedOpenHeight = isShort ? 'auto' : fresh.openHeight;
-			const usedHeight = fresh.isOpen ? usedOpenHeight : fresh.min;
-			applyHeight( usedHeight, false, true );
-		}
-	}, [ isShort ] );
+
+	// useDrag includes keyboard support with arrow keys emulating a drag.
+	// TODO: Support more/all keyboard interactions from the window splitter pattern:
+	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
+	const bindDragGesture = useDrag(
+		( { movement, first, last, memo, tap, args } ) => {
+			const pane = metaBoxesMainRef.current;
+			const [ , yMovement ] = movement;
+			if ( first ) {
+				pane.classList.add( 'is-resizing' );
+				let fromHeight = heightRef.current ?? pane.offsetHeight;
+				if ( isOpen ) {
+					// Starts from max in case shortening the window has imposed it.
+					if ( fromHeight > max ) {
+						fromHeight = max;
+					}
+				} else {
+					fromHeight = min;
+				}
+				applyHeight( fromHeight - yMovement );
+				return { fromHeight };
+			}
+
+			if ( ! first && ! last && ! tap ) {
+				applyHeight( memo.fromHeight - yMovement );
+				return memo;
+			}
+			// Here, `last === true` – it’s the final event of the gesture.
+
+			pane.classList.remove( 'is-resizing' );
+			if ( tap ) {
+				const [ onTap ] = args;
+				onTap?.();
+				return;
+			}
+			const nextIsOpen = heightRef.current > min;
+			persistIsOpen( nextIsOpen );
+			// Persists height only if still open. This is so that when closed by a drag the
+			// prior height can be restored by the toggle button instead of having to drag
+			// the pane open again.
+			applyHeight( heightRef.current, nextIsOpen );
+		},
+		{ keyboardDisplacement: 20, filterTaps: true }
+	);
 
 	if ( ! hasAnyVisible ) {
 		return;
@@ -261,141 +297,77 @@ function MetaBoxesMain( { isLegacy } ) {
 	}
 
 	const isAutoHeight = openHeight === undefined;
-	const getAriaValueNow = ( height ) =>
-		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
+	const usedOpenHeight = isShort ? 'auto' : openHeight;
+	const usedHeight = isOpen ? usedOpenHeight : min;
+
 	const usedAriaValueNow =
-		max === undefined || isAutoHeight ? 50 : getAriaValueNow( openHeight );
+		max === undefined || isAutoHeight ? 50 : getAriaValueNow( usedHeight );
 
-	const persistIsOpen = ( to = ! isOpen ) =>
-		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
-
-	// TODO: Support more/all keyboard interactions from the window splitter pattern:
-	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
-	const onSeparatorKeyDown = ( event ) => {
-		const delta = { ArrowUp: 20, ArrowDown: -20 }[ event.key ];
-		if ( delta ) {
-			const pane = metaBoxesMainRef.current.resizable;
-			const fromHeight = isAutoHeight ? pane.offsetHeight : openHeight;
-			const nextHeight = delta + fromHeight;
-			applyHeight( nextHeight, true, true );
-			persistIsOpen( nextHeight > min );
-			event.preventDefault();
-		}
-	};
 	const paneLabel = __( 'Meta Boxes' );
 
+	// The toggle button. It also resizes when the viewport is tall to provide
+	// a larger hit area than the small separator button.
 	const toggle = (
 		<button
 			aria-expanded={ isOpen }
+			// Toggles for all clicks when short and only keyboard “clicks” when
+			// resizable because pointer input is handled by the drag gesture.
 			onClick={ ( { detail } ) => {
-				const { isToggleInferred } = resizeDataRef.current;
-				if ( isShort || ! detail || isToggleInferred ) {
+				if ( isShort || ! detail ) {
 					persistIsOpen();
-					const usedOpenHeight = isShort ? 'auto' : openHeight;
-					const usedHeight = isOpen ? min : usedOpenHeight;
-					applyHeight( usedHeight, false, true );
 				}
 			} }
-			// Prevents resizing in short viewports.
-			{ ...( isShort && {
-				onMouseDown: ( event ) => event.stopPropagation(),
-				onTouchStart: ( event ) => event.stopPropagation(),
-			} ) }
+			// Passes a toggle callback that the drag gesture handler calls when
+			// it interprets the input as a click/tap.
+			{ ...( ! isShort && bindDragGesture( persistIsOpen ) ) }
 		>
 			{ paneLabel }
-			<Icon icon={ isOpen ? chevronUp : chevronDown } />
+			<WCIcon icon={ isOpen ? chevronUp : chevronDown } />
 		</button>
 	);
 
+	// The separator button that provides a11y for resizing.
 	const separator = ! isShort && (
 		<>
-			<Tooltip text={ __( 'Drag to resize' ) }>
-				<button // eslint-disable-line jsx-a11y/role-supports-aria-props
-					ref={ separatorRef }
-					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
-					aria-valuenow={ usedAriaValueNow }
-					aria-label={ __( 'Drag to resize' ) }
-					aria-describedby={ separatorHelpId }
-					onKeyDown={ onSeparatorKeyDown }
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={
+						<button
+							ref={ separatorRef }
+							role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
+							aria-valuenow={ usedAriaValueNow }
+							aria-label={ __( 'Drag to resize' ) }
+							aria-describedby={ separatorHelpId }
+							{ ...bindDragGesture() }
+						/>
+					}
 				/>
-			</Tooltip>
+				<Tooltip.Popup>{ __( 'Drag to resize' ) }</Tooltip.Popup>
+			</Tooltip.Root>
 			<VisuallyHidden id={ separatorHelpId }>
 				{ __(
-					'Use up and down arrow keys to resize the meta box panel.'
+					'Use up and down arrow keys to resize the meta box pane.'
 				) }
 			</VisuallyHidden>
 		</>
 	);
 
-	const paneProps = /** @type {Parameters<typeof ResizableBox>[0]} */ ( {
-		as: NavigableRegion,
-		ref: metaBoxesMainRef,
-		className: 'edit-post-meta-boxes-main',
-		defaultSize: { height: isOpen ? openHeight : 0 },
-		minHeight: min,
-		maxHeight: max,
-		enable: { top: true },
-		handleClasses: { top: 'edit-post-meta-boxes-main__presenter' },
-		handleComponent: {
-			top: (
-				<>
-					{ toggle }
-					{ separator }
-				</>
-			),
-		},
-		// Avoids hiccups while dragging over objects like iframes and ensures that
-		// the event to end the drag is captured by the target (resize handle)
-		// whether or not it’s under the pointer.
-		onPointerDown: ( { pointerId, target } ) => {
-			if ( separatorRef.current?.parentElement.contains( target ) ) {
-				target.setPointerCapture( pointerId );
-			}
-		},
-		onResizeStart: ( { timeStamp }, direction, elementRef ) => {
-			if ( isAutoHeight ) {
-				// Sets the starting height to avoid visual jumps in height and
-				// aria-valuenow being `NaN` for the first (few) resize events.
-				applyHeight( elementRef.offsetHeight, false, true );
-			}
-			elementRef.classList.add( 'is-resizing' );
-			resizeDataRef.current = { timeStamp, maxDelta: 0 };
-		},
-		onResize: ( event, direction, elementRef, delta ) => {
-			const { maxDelta } = resizeDataRef.current;
-			const newDelta = Math.abs( delta.height );
-			resizeDataRef.current.maxDelta = Math.max( maxDelta, newDelta );
-			applyHeight( metaBoxesMainRef.current.state.height );
-		},
-		onResizeStop: ( event, direction, elementRef ) => {
-			elementRef.classList.remove( 'is-resizing' );
-			const duration = event.timeStamp - resizeDataRef.current.timeStamp;
-			const wasSeparator = event.target === separatorRef.current;
-			const { maxDelta } = resizeDataRef.current;
-			const isToggleInferred =
-				maxDelta < 1 || ( duration < 144 && maxDelta < 5 );
-			if ( isShort || ( ! wasSeparator && isToggleInferred ) ) {
-				resizeDataRef.current.isToggleInferred = true;
-			} else {
-				const { height } = metaBoxesMainRef.current.state;
-				const nextIsOpen = height > min;
-				persistIsOpen( nextIsOpen );
-				// Persists height only if still open. This is so that when closed by a drag the
-				// prior height can be restored by the toggle button instead of having to drag
-				// the pane open again. Also, if already closed, a click on the separator won’t
-				// persist the height as the minimum.
-				if ( nextIsOpen ) {
-					applyHeight( height, true );
-				}
-			}
-		},
-	} );
-
 	return (
-		<ResizableBox aria-label={ paneLabel } { ...paneProps }>
-			<meta ref={ effectSizeConstraints } />
+		<NavigableRegion
+			ariaLabel={ paneLabel }
+			ref={ setMainRefs }
+			className={ clsx(
+				'edit-post-meta-boxes-main',
+				! isShort && 'is-resizable'
+			) }
+			style={ { height: usedHeight } }
+		>
+			<div className="edit-post-meta-boxes-main__presenter">
+				{ toggle }
+				{ separator }
+			</div>
 			{ contents }
-		</ResizableBox>
+		</NavigableRegion>
 	);
 }
 
@@ -412,7 +384,6 @@ function Layout( {
 		currentPost: { postId: currentPostId, postType: currentPostType },
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-		previousSelectedBlockPath,
 	} = useNavigateToEntityRecord(
 		initialPostId,
 		initialPostType,
@@ -507,7 +478,6 @@ function Layout( {
 			styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode: 'post-only',
 		} ),
 		[
 			settings,
@@ -608,61 +578,57 @@ function Layout( {
 
 	return (
 		<SlotFillProvider>
-			<ErrorBoundary canCopyContent>
-				<WelcomeGuide postType={ currentPostType } />
-				<div
-					className={ navigateRegionsProps.className }
-					{ ...navigateRegionsProps }
-					ref={ navigateRegionsProps.ref }
-				>
-					<Editor
-						settings={ editorSettings }
-						initialEdits={ initialEdits }
-						postType={ currentPostType }
-						postId={ currentPostId }
-						templateId={ templateId }
-						className={ className }
-						forceIsDirty={ hasActiveMetaboxes }
-						disableIframe={ ! shouldIframe }
-						// We should auto-focus the canvas (title) on load.
-						// eslint-disable-next-line jsx-a11y/no-autofocus
-						autoFocus={ ! isWelcomeGuideVisible }
-						onActionPerformed={ onActionPerformed }
-						initialSelection={ previousSelectedBlockPath }
-						extraSidebarPanels={
-							showMetaBoxes && <MetaBoxes location="side" />
-						}
-						extraContent={
-							! isDistractionFree &&
-							showMetaBoxes && (
-								<MetaBoxesMain
-									isLegacy={
-										! shouldIframe || isDevicePreview
-									}
-								/>
-							)
-						}
-					>
-						<PostLockedModal />
-						<EditorInitialization />
-						<FullscreenMode isActive={ isFullscreenActive } />
-						<BrowserURL />
-						<UnsavedChangesWarning />
-						<AutosaveMonitor />
-						<LocalAutosaveMonitor />
-						<EditPostKeyboardShortcuts />
-						<EditorKeyboardShortcutsRegister />
-						<BlockKeyboardShortcuts />
-						{ currentPostType === 'wp_block' && (
-							<InitPatternModal />
-						) }
-						<PluginArea onError={ onPluginAreaError } />
-						<PostEditorMoreMenu />
-						{ backButton }
-						<EditorSnackbars />
-					</Editor>
-				</div>
-			</ErrorBoundary>
+			<Tooltip.Provider>
+				<ErrorBoundary canCopyContent>
+					<WelcomeGuide postType={ currentPostType } />
+					<div { ...navigateRegionsProps }>
+						<Editor
+							settings={ editorSettings }
+							initialEdits={ initialEdits }
+							postType={ currentPostType }
+							postId={ currentPostId }
+							templateId={ templateId }
+							className={ className }
+							forceIsDirty={ hasActiveMetaboxes }
+							disableIframe={ ! shouldIframe }
+							// We should auto-focus the canvas (title) on load.
+							// eslint-disable-next-line jsx-a11y/no-autofocus
+							autoFocus={ ! isWelcomeGuideVisible }
+							onActionPerformed={ onActionPerformed }
+							extraSidebarPanels={
+								showMetaBoxes && <MetaBoxes location="side" />
+							}
+							extraContent={
+								! isDistractionFree &&
+								showMetaBoxes && (
+									<MetaBoxesMain
+										isLegacy={ isDevicePreview }
+									/>
+								)
+							}
+						>
+							<PostLockedModal />
+							<EditorInitialization />
+							<FullscreenMode isActive={ isFullscreenActive } />
+							<BrowserURL />
+							<UnsavedChangesWarning />
+							<AutosaveMonitor />
+							<LocalAutosaveMonitor />
+							<EditPostKeyboardShortcuts />
+							<EditorKeyboardShortcutsRegister />
+							<BlockKeyboardShortcuts />
+							{ currentPostType === 'wp_block' && (
+								<InitPatternModal />
+							) }
+							<PluginArea onError={ onPluginAreaError } />
+							<PostEditorMoreMenu />
+							{ backButton }
+							<SnackbarNotices className="edit-post-layout__snackbar" />
+							<UploadProgressSnackbar />
+						</Editor>
+					</div>
+				</ErrorBoundary>
+			</Tooltip.Provider>
 		</SlotFillProvider>
 	);
 }

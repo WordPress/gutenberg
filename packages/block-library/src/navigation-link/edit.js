@@ -8,11 +8,7 @@ import clsx from 'clsx';
  */
 import { createBlock } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	ToolbarButton,
-	ToolbarGroup,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -26,6 +22,7 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { VisuallyHidden } from '@wordpress/ui';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
@@ -37,11 +34,13 @@ import {
 	Controls,
 	LinkUI,
 	useEntityBinding,
-	MissingEntityHelpText,
+	getInvalidLinkHelpText,
 	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
 	useEnableLinkStatusValidation,
+	useIsDraggingWithin,
+	selectLabelText,
 } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
@@ -49,57 +48,6 @@ const NESTING_BLOCK_NAMES = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
-
-/**
- * A React hook to determine if it's dragging within the target element.
- *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
- *
- * @return {boolean} Is dragging within the target element.
- */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
-
-	useEffect( () => {
-		const { ownerDocument } = elementRef.current;
-
-		function handleDragStart( event ) {
-			// Check the first time when the dragging starts.
-			handleDragEnter( event );
-		}
-
-		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDraggingWithin( false );
-		}
-
-		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
-			} else {
-				setIsDraggingWithin( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that
-		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [ elementRef ] );
-
-	return isDraggingWithin;
-};
 
 function getMissingText( type ) {
 	let missingText = '';
@@ -216,15 +164,17 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { hasUrlBinding, isBoundEntityAvailable } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
 		attributes,
 		setAttributes,
+		allowTextUpdate: true,
 	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
@@ -293,7 +243,7 @@ export default function NavigationLinkEdit( {
 		// If the label looks like a URL, focus and select the label text.
 		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
 			// Focus and select the label text.
-			selectLabelText();
+			selectLabelText( ref );
 		} else {
 			// If the link was just created, we want to select the block so the inspector controls
 			// are accurate.
@@ -316,21 +266,6 @@ export default function NavigationLinkEdit( {
 			}
 		}
 	}, [ url, isLinkOpen, isNewLink, label ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
 
 	/**
 	 * Removes the current link if set.
@@ -403,7 +338,6 @@ export default function NavigationLinkEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			...blockProps,
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{
@@ -430,6 +364,7 @@ export default function NavigationLinkEdit( {
 	} );
 
 	const missingText = getMissingText( type );
+	const invalidLinkHelpText = getInvalidLinkHelpText();
 
 	return (
 		<>
@@ -454,7 +389,7 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls group="content">
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
@@ -464,7 +399,7 @@ export default function NavigationLinkEdit( {
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
 					<VisuallyHidden id={ missingEntityDescriptionId }>
-						<MissingEntityHelpText type={ type } kind={ kind } />
+						{ invalidLinkHelpText }
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
@@ -525,6 +460,11 @@ export default function NavigationLinkEdit( {
 							ref={ linkUIref }
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 								// If there is no link and no binding, remove the auto-inserted block.

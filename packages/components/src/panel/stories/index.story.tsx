@@ -17,6 +17,7 @@ import PanelBody from '../body';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof Panel > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Containers/Panel',
 	id: 'components-panel',
 	component: Panel,
@@ -27,6 +28,10 @@ const meta: Meta< typeof Panel > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

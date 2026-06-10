@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useEffect, Platform } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	RichText,
@@ -17,10 +17,16 @@ import { generateAnchor, setAnchor } from './autogenerate-anchors';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 function HeadingEdit( props ) {
-	const { attributes, setAttributes, mergeBlocks, onReplace, clientId } =
-		props;
+	const {
+		attributes,
+		setAttributes,
+		mergeBlocks,
+		onReplace,
+		style,
+		clientId,
+	} = props;
 	useDeprecatedTextAlign( props );
-	const { style, content, level, placeholder, anchor } = attributes;
+	const { content, level, placeholder, anchor } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		style,
@@ -84,7 +90,6 @@ function HeadingEdit( props ) {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				placeholder={ placeholder || __( 'Heading' ) }
-				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
 				{ ...blockProps }
 			/>
 		</>

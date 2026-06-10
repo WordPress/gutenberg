@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import FormTokenField from '../';
 
 const meta: Meta< typeof FormTokenField > = {
+	tags: [ 'manifest' ],
 	component: FormTokenField,
 	title: 'Components/Selection & Input/Common/FormTokenField',
 	id: 'components-formtokenfield',
@@ -24,12 +25,18 @@ const meta: Meta< typeof FormTokenField > = {
 		__experimentalValidateInput: {
 			control: false,
 		},
+		help: { control: 'text' },
 	},
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SearchableChipSelect` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

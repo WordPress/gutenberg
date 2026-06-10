@@ -4,12 +4,17 @@
 import { pasteHandler } from '@wordpress/blocks';
 import { isEmpty, insert, create } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
@@ -25,6 +30,7 @@ export default ( props ) => ( element ) => {
 			__unstableEmbedURLOnPaste,
 			preserveWhiteSpace,
 			pastePlainText,
+			registry,
 		} = props.current;
 
 		// The event listener is attached to the window, so we need to check if
@@ -42,8 +48,10 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
+		// `pasteHandler` also logs this, but we're not using `pasteHandler` in
+		// every case.
+		window.console.log( 'Received HTML (RichText):\n\n', html );
+		window.console.log( 'Received plain text (RichText):\n\n', plainText );
 
 		if ( disableFormats ) {
 			onChange( insert( value, plainText ) );
@@ -114,19 +122,28 @@ export default ( props ) => ( element ) => {
 
 		if ( typeof content === 'string' ) {
 			pasteInline( content );
-		} else if ( content.length > 0 ) {
-			if ( onReplace && isEmpty( value ) ) {
-				onReplace( content, content.length - 1, -1 );
-			}
+			return;
 		}
+
+		if ( ! content.length || ! onReplace || ! isEmpty( value ) ) {
+			return;
+		}
+
+		// Record an intermediate paragraph-with-URL state so a single undo
+		// after the URL → block transformation restores the pasted link.
+		if ( mode === 'BLOCKS' ) {
+			pasteInline( html );
+			registry
+				.dispatch( blockEditorStore )
+				.__unstableMarkLastChangeAsPersistent();
+		}
+
+		onReplace( content, content.length - 1, -1 );
 	}
 
 	const { defaultView } = element.ownerDocument;
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	defaultView.addEventListener( 'paste', _onPaste );
-	return () => {
-		defaultView.removeEventListener( 'paste', _onPaste );
-	};
+	return subscribeDelegatedListener( defaultView, 'paste', _onPaste );
 };

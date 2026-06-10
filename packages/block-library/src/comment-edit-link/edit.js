@@ -1,17 +1,7 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentControl,
-	BlockControls,
-	InspectorControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -23,29 +13,16 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-export default function Edit( {
-	attributes: { linkTarget, textAlign },
-	setAttributes,
-} ) {
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+export default function Edit( props ) {
+	const { attributes, setAttributes } = props;
+	const { linkTarget } = attributes;
+	useDeprecatedTextAlign( props );
+	const blockProps = useBlockProps();
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const blockControls = (
-		<BlockControls group="block">
-			<AlignmentControl
-				value={ textAlign }
-				onChange={ ( newAlign ) =>
-					setAttributes( { textAlign: newAlign } )
-				}
-			/>
-		</BlockControls>
-	);
 	const inspectorControls = (
 		<InspectorControls>
 			<ToolsPanel
@@ -81,7 +58,6 @@ export default function Edit( {
 
 	return (
 		<>
-			{ blockControls }
 			{ inspectorControls }
 			<div { ...blockProps }>
 				<a

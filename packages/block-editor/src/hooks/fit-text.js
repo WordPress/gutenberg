@@ -23,6 +23,7 @@ import { store as blockEditorStore } from '../store';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import InspectorControls from '../components/inspector-controls';
 import FitTextSizeWarning from '../components/fit-text-size-warning';
+import { unlock } from '../lock-unlock';
 
 export const FIT_TEXT_SUPPORT_KEY = 'typography.fitText';
 
@@ -68,18 +69,25 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes, and parent changes.
+	// Monitor block attribute changes, parent changes, and block mode.
 	// Any attribute or parent change may change the available space.
-	const { blockAttributes, parentId } = useSelect(
+	// Block mode is needed to disable fit text when in HTML editing mode.
+	const { blockAttributes, parentId, blockMode } = useSelect(
 		( select ) => {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
 				return EMPTY_OBJECT;
+			}
+			const _blockMode =
+				select( blockEditorStore ).getBlockMode( clientId );
+			if ( _blockMode === 'html' ) {
+				return { blockMode: _blockMode };
 			}
 			return {
 				blockAttributes:
 					select( blockEditorStore ).getBlockAttributes( clientId ),
 				parentId:
 					select( blockEditorStore ).getBlockRootClientId( clientId ),
+				blockMode: _blockMode,
 			};
 		},
 		[ clientId, hasFitTextSupport, fitText ]
@@ -118,7 +126,8 @@ function useFitText( { fitText, name, clientId } ) {
 			! fitText ||
 			! blockElement ||
 			! clientId ||
-			! hasFitTextSupport
+			! hasFitTextSupport ||
+			blockMode === 'html'
 		) {
 			return;
 		}
@@ -189,11 +198,17 @@ function useFitText( { fitText, name, clientId } ) {
 		applyFitText,
 		blockElement,
 		hasFitTextSupport,
+		blockMode,
 	] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
-		if ( fitText && blockElement && hasFitTextSupport ) {
+		if (
+			fitText &&
+			blockElement &&
+			hasFitTextSupport &&
+			blockMode !== 'html'
+		) {
 			// Wait for next frame to ensure DOM has updated after content changes
 			const frameId = window.requestAnimationFrame( () => {
 				if ( blockElement ) {
@@ -209,6 +224,7 @@ function useFitText( { fitText, name, clientId } ) {
 		applyFitText,
 		blockElement,
 		hasFitTextSupport,
+		blockMode,
 	] );
 
 	return { fontSize };
@@ -217,14 +233,13 @@ function useFitText( { fitText, name, clientId } ) {
 /**
  * Fit text control component for the typography panel.
  *
- * @param {Object}      props               Component props.
- * @param {string}      props.clientId      Block client ID.
- * @param {Function}    props.setAttributes Function to set block attributes.
- * @param {string}      props.name          Block name.
- * @param {boolean}     props.fitText       Whether fit text is enabled.
- * @param {string}      props.fontSize      Font size slug.
- * @param {Object}      props.style         Block style object.
- * @param {JSX.Element} props.warning       Warning component to display.
+ * @param {Object}   props               Component props.
+ * @param {string}   props.clientId      Block client ID.
+ * @param {Function} props.setAttributes Function to set block attributes.
+ * @param {string}   props.name          Block name.
+ * @param {boolean}  props.fitText       Whether fit text is enabled.
+ * @param {string}   props.fontSize      Font size slug.
+ * @param {Object}   props.style         Block style object.
  */
 export function FitTextControl( {
 	clientId,
@@ -233,56 +248,67 @@ export function FitTextControl( {
 	name,
 	fontSize,
 	style,
-	warning,
 } ) {
+	const hasSelectedStyleState = useSelect(
+		( select ) => {
+			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
+				unlock( select( blockEditorStore ) );
+
+			return hasSelectedBlockStyleState( clientId );
+		},
+		[ clientId ]
+	);
+
 	if ( ! hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY ) ) {
 		return null;
 	}
+
+	if ( hasSelectedStyleState ) {
+		return null;
+	}
+
 	return (
-		<InspectorControls group="typography">
-			<ToolsPanelItem
-				hasValue={ () => fitText }
+		<ToolsPanelItem
+			hasValue={ () => fitText }
+			label={ __( 'Fit text' ) }
+			onDeselect={ () => setAttributes( { fitText: undefined } ) }
+			resetAllFilter={ () => ( { fitText: undefined } ) }
+			panelId={ clientId }
+		>
+			<ToggleControl
 				label={ __( 'Fit text' ) }
-				onDeselect={ () => setAttributes( { fitText: undefined } ) }
-				resetAllFilter={ () => ( { fitText: undefined } ) }
-				panelId={ clientId }
-			>
-				<ToggleControl
-					label={ __( 'Fit text' ) }
-					checked={ fitText }
-					onChange={ () => {
-						const newFitText = ! fitText || undefined;
-						const updates = { fitText: newFitText };
+				checked={ fitText }
+				onChange={ () => {
+					const newFitText = ! fitText || undefined;
+					const updates = { fitText: newFitText };
 
-						// When enabling fit text, clear font size if it has a value
-						if ( newFitText ) {
-							if ( fontSize ) {
-								updates.fontSize = undefined;
-							}
-							if ( style?.typography?.fontSize ) {
-								updates.style = {
-									...style,
-									typography: {
-										...style?.typography,
-										fontSize: undefined,
-									},
-								};
-							}
+					// When enabling fit text, clear font size if it has a value
+					if ( newFitText ) {
+						if ( fontSize ) {
+							updates.fontSize = undefined;
 						}
-
-						setAttributes( updates );
-					} }
-					help={
-						fitText
-							? __( 'Text will resize to fit its container.' )
-							: __(
-									'The text will resize to fit its container, resetting other font size settings.'
-							  )
+						if ( style?.typography?.fontSize ) {
+							updates.style = {
+								...style,
+								typography: {
+									...style?.typography,
+									fontSize: undefined,
+								},
+							};
+						}
 					}
-				/>
-				{ warning }
-			</ToolsPanelItem>
-		</InspectorControls>
+
+					setAttributes( updates );
+				} }
+				help={
+					fitText
+						? __( 'Text will resize to fit its container.' )
+						: __(
+								'The text will resize to fit its container, resetting other font size settings.'
+						  )
+				}
+			/>
+		</ToolsPanelItem>
 	);
 }
 
@@ -343,14 +369,27 @@ const hasFitTextSupport = ( blockNameOrType ) => {
 	return hasBlockSupport( blockNameOrType, FIT_TEXT_SUPPORT_KEY );
 };
 
-/*
- * Helper to encapsulate calls to the relatively expensive `useFitText` hook.
- * Used in `addFitTextControl` so that the hook is only called when a block's
- * `fitText` attribute is set.
+/**
+ * Component that handles the fit text font size and displays a warning
+ * if the fit text font size is below a minimum threshold.
+ *
+ * @param {Object}  props            Component props.
+ * @param {boolean} props.fitText    Whether fit text is enabled.
+ * @param {string}  props.name       Block name.
+ * @param {string}  props.clientId   Block client ID.
+ * @param {boolean} props.isSelected Whether the block is selected.
+ * @return {Element|null} Warning component or null.
  */
-function WithFitTextFontSize( { fitText, name, clientId, children } ) {
+function FitTextFontSize( { fitText, name, clientId, isSelected } ) {
 	const { fontSize } = useFitText( { fitText, name, clientId } );
-	return children( fontSize );
+	if ( isSelected && fontSize && fontSize < MIN_FONT_SIZE_FOR_WARNING ) {
+		return (
+			<InspectorControls group="typography">
+				<FitTextSizeWarning />
+			</InspectorControls>
+		);
+	}
+	return null;
 }
 
 /*
@@ -360,7 +399,7 @@ function WithFitTextFontSize( { fitText, name, clientId, children } ) {
  * `editor.BlockEdit` filter.
  */
 const addFitTextControl = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
+	return function AddFitTextControl( props ) {
 		const { name, attributes, clientId, isSelected, setAttributes } = props;
 		const { fitText } = attributes;
 		const supportsFitText = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
@@ -370,33 +409,7 @@ const addFitTextControl = createHigherOrderComponent( ( BlockEdit ) => {
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ fitText && (
-					<WithFitTextFontSize
-						fitText={ fitText }
-						name={ name }
-						clientId={ clientId }
-					>
-						{ ( fontSize ) =>
-							isSelected && (
-								<FitTextControl
-									clientId={ clientId }
-									fitText={ fitText }
-									setAttributes={ setAttributes }
-									name={ name }
-									fontSize={ attributes.fontSize }
-									style={ attributes.style }
-									warning={
-										fontSize <
-											MIN_FONT_SIZE_FOR_WARNING && (
-											<FitTextSizeWarning />
-										)
-									}
-								/>
-							)
-						}
-					</WithFitTextFontSize>
-				) }
-				{ ! fitText && isSelected && (
+				<InspectorControls group="typography">
 					<FitTextControl
 						clientId={ clientId }
 						fitText={ fitText }
@@ -404,6 +417,14 @@ const addFitTextControl = createHigherOrderComponent( ( BlockEdit ) => {
 						name={ name }
 						fontSize={ attributes.fontSize }
 						style={ attributes.style }
+					/>
+				</InspectorControls>
+				{ fitText && (
+					<FitTextFontSize
+						fitText={ fitText }
+						name={ name }
+						clientId={ clientId }
+						isSelected={ isSelected }
 					/>
 				) }
 			</>

@@ -18,6 +18,7 @@ import TextareaControl from '../../textarea-control/';
 import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Disabled',
 	id: 'components-disabled',
 	component: Disabled,
@@ -30,6 +31,10 @@ const meta: Meta< typeof Disabled > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 

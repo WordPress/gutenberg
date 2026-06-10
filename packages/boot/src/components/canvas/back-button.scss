@@ -32,9 +32,9 @@
 
 	&:focus:not(:active) {
 		outline:
-			var(--wpds-border-width-interactive-focus) solid
+			var(--wpds-border-width-focus) solid
 			var(--wpds-color-stroke-focus-brand);
-		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus));
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 }
 

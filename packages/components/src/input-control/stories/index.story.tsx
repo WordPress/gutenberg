@@ -31,7 +31,7 @@ const meta: Meta< typeof InputControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onChange: fn(),
 		onValidate: fn(),
@@ -40,6 +40,11 @@ const meta: Meta< typeof InputControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `InputControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

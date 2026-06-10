@@ -4,6 +4,8 @@
 import { DataForm } from '@wordpress/dataviews';
 import type { Form, Field } from '@wordpress/dataviews';
 import { Spinner, __experimentalVStack as VStack } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
 import type { ReactNode } from 'react';
 
 /**
@@ -45,18 +47,28 @@ export default function MediaForm( {
 		);
 	}
 
+	// Fields that use a regular (non-panel) layout, rendered at the top.
+	const regularFieldIds = [ 'title', 'alt_text', 'caption', 'description' ];
+
+	// Place the non-panel (regular layout) fields at the top of the array,
+	// with the remaining panel fields below.
+	const sortedFields = [
+		...fields.filter( ( field: Field< Media > ) =>
+			regularFieldIds.includes( field.id )
+		),
+		...fields.filter(
+			( field: Field< Media > ) => ! regularFieldIds.includes( field.id )
+		),
+	];
+
 	// Default form structure with panel layout
 	const defaultForm: Form = {
 		layout: {
 			type: 'panel',
 		},
-		fields: fields.map( ( field: Field< Media > ) => {
+		fields: sortedFields.map( ( field: Field< Media > ) => {
 			// Use regular layout for main editable fields
-			if (
-				[ 'title', 'alt_text', 'caption', 'description' ].includes(
-					field.id
-				)
-			) {
+			if ( regularFieldIds.includes( field.id ) ) {
 				return {
 					id: field.id,
 					layout: {
@@ -74,6 +86,9 @@ export default function MediaForm( {
 	return (
 		<div className="media-editor-form">
 			<VStack spacing={ 4 }>
+				<VisuallyHidden render={ <h2 /> }>
+					{ __( 'Media details' ) }
+				</VisuallyHidden>
 				{ header }
 				<DataForm
 					data={ media }

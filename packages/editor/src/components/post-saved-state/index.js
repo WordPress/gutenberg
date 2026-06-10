@@ -32,7 +32,7 @@ import { ATTACHMENT_POST_TYPE } from '../../store/constants';
  * @param {Object}   props              Component props.
  * @param {?boolean} props.forceIsDirty Whether to force the post to be marked
  *                                      as dirty.
- * @return {import('react').ComponentType} The component.
+ * @return {React.ComponentType} The component.
  */
 export default function PostSavedState( { forceIsDirty } ) {
 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
@@ -45,6 +45,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		isPublished,
 		isSaveable,
 		isSaving,
+		isSavingLocked,
 		isScheduled,
 		hasPublishAction,
 		showIconLabels,
@@ -60,6 +61,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				isEditedPostDirty,
 				isSavingPost,
 				isEditedPostSaveable,
+				isPostSavingLocked,
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
@@ -73,6 +75,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				isPublished: isCurrentPostPublished(),
 				isSaving: isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
+				isSavingLocked: isPostSavingLocked(),
 				isScheduled: isCurrentPostScheduled(),
 				hasPublishAction:
 					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
@@ -140,7 +143,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = isSaving || isSaved;
-	const isDisabled = isSaving || isSaved || ! isSaveable;
+	const isDisabled = isSaving || isSaved || ! isSaveable || isSavingLocked;
 	let text;
 
 	if ( isSaving ) {

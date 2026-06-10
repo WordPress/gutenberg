@@ -28,6 +28,10 @@ const meta: Meta< typeof BorderControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

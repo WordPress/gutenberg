@@ -9,6 +9,10 @@ import {
 	setInsertionPoint,
 	startDragging,
 	stopDragging,
+	showViewportModal,
+	hideViewportModal,
+	setSelectedBlockStyleState,
+	setSelectedBlockStyleStateCanvasPreview,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -118,6 +122,48 @@ describe( 'private actions', () => {
 			).toEqual( {
 				type: 'SET_INSERTION_POINT',
 				value: { rootClientId: '', index: '123' },
+			} );
+		} );
+	} );
+
+	describe( 'showViewportModal', () => {
+		it( 'should return the SHOW_VIEWPORT_MODAL action with clientIds', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			expect( showViewportModal( clientIds ) ).toEqual( {
+				type: 'SHOW_VIEWPORT_MODAL',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'hideViewportModal', () => {
+		it( 'should return the HIDE_VIEWPORT_MODAL action', () => {
+			expect( hideViewportModal() ).toEqual( {
+				type: 'HIDE_VIEWPORT_MODAL',
+			} );
+		} );
+	} );
+
+	describe( 'setSelectedBlockStyleState', () => {
+		it( 'returns the SET_SELECTED_BLOCK_STYLE_STATE action', () => {
+			expect(
+				setSelectedBlockStyleState( 'client-1', { pseudo: ':hover' } )
+			).toEqual( {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: { pseudo: ':hover' },
+			} );
+		} );
+	} );
+
+	describe( 'setSelectedBlockStyleStateCanvasPreview', () => {
+		it( 'returns the SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW action', () => {
+			expect(
+				setSelectedBlockStyleStateCanvasPreview( 'client-1', false )
+			).toEqual( {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
+				clientId: 'client-1',
+				value: false,
 			} );
 		} );
 	} );

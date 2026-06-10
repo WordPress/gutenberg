@@ -19,6 +19,15 @@ const { state } = store( 'test/router-styles', {
 			yield actions.navigate( e.target.href );
 			state.clientSideNavigation = true;
 		} ),
+		navigateForce: withSyncEvent( function* ( e ) {
+			e.preventDefault();
+			state.clientSideNavigation = false;
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.navigate( e.target.href, { force: true } );
+			state.clientSideNavigation = true;
+		} ),
 		*prefetch() {
 			state.prefetching = true;
 			const { ref } = getElement();

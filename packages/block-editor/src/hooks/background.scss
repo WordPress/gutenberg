@@ -1,0 +1,45 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+/**
+ * ItemGroup-like border styles for the background panel's ToolsPanelItems.
+ * Replicates the separated border of the `ItemGroup` component while
+ * allowing for hidden placeholder items (same approach as the color panel).
+ */
+.block-editor-background-panel__item {
+	padding: 0;
+	max-width: 100%;
+	position: relative;
+
+	// Border styles.
+	border-left: 1px solid $gray-300;
+	border-right: 1px solid $gray-300;
+	border-bottom: 1px solid $gray-300;
+
+	// Identify the first visible instance as placeholder items will not have this class.
+	&:nth-child(1 of &) {
+		border-top-left-radius: $radius-small;
+		border-top-right-radius: $radius-small;
+		border-top: 1px solid $gray-300;
+	}
+
+	// Identify the last visible instance as placeholder items will not have this class.
+	&:nth-last-child(1 of &) {
+		border-bottom-left-radius: $radius-small;
+		border-bottom-right-radius: $radius-small;
+	}
+
+	> div,
+	> div > button {
+		border-radius: inherit;
+	}
+}
+
+.background-block-support-panel {
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.background-block-support-panel__inner-wrapper {
+			row-gap: 0;
+		}
+	}
+}

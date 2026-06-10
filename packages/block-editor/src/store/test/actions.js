@@ -53,6 +53,7 @@ const {
 	updateBlockListSettings,
 	updateSettings,
 	validateBlocksToTemplate,
+	__unstableMarkNextChangeAsNotPersistent,
 	registerInserterMediaCategory,
 	setBlockEditingMode,
 	unsetBlockEditingMode,
@@ -60,6 +61,7 @@ const {
 
 describe( 'actions', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			content: {},
 		},
@@ -813,6 +815,26 @@ describe( 'actions', () => {
 		} );
 	} );
 
+	describe( '__unstableMarkNextChangeAsNotPersistent', () => {
+		it( 'should use merge history by default', () => {
+			expect( __unstableMarkNextChangeAsNotPersistent() ).toEqual( {
+				type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+				history: 'merge',
+			} );
+		} );
+
+		it( 'should allow ignoring history for the next change', () => {
+			expect(
+				__unstableMarkNextChangeAsNotPersistent( {
+					history: 'ignore',
+				} )
+			).toEqual( {
+				type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT',
+				history: 'ignore',
+			} );
+		} );
+	} );
+
 	describe( 'mergeBlocks', () => {
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
@@ -863,6 +885,7 @@ describe( 'actions', () => {
 
 		it( 'should merge the blocks if blocks of the same type', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -933,6 +956,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks have different types without transformation', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -986,6 +1010,7 @@ describe( 'actions', () => {
 
 		it( 'should transform and merge the blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -1004,6 +1029,7 @@ describe( 'actions', () => {
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block-2', {
+				apiVersion: 3,
 				attributes: {
 					content2: {
 						type: 'string',
@@ -1081,6 +1107,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks if blockB editing mode is `disabled`', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},
@@ -1140,6 +1167,7 @@ describe( 'actions', () => {
 
 		it( 'should not merge the blocks if blockA editing mode is `disabled`', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {},
 				},

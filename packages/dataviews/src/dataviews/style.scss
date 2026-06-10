@@ -1,26 +1,35 @@
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/mixins" as *;
+
+@mixin dataviews-refreshing {
+	opacity: 0.5;
+	pointer-events: none;
+
+	@media not (prefers-reduced-motion) {
+		opacity: 1;
+		animation: dataviews-pulse 1s ease-in-out infinite;
+	}
+}
 
 .dataviews-wrapper,
 .dataviews-picker-wrapper {
 	height: 100%;
-	overflow: auto;
+	flex-grow: 1;
+	min-height: 0;
 	box-sizing: border-box;
-	scroll-padding-bottom: $grid-unit-80;
+	scroll-padding-bottom: calc(var(--wpds-dimension-base) * 16);
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 	container: dataviews-wrapper / inline-size;
 	display: flex;
 	flex-direction: column;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
-	background-color: var(--wp-dataviews-color-background, $white);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
+	background-color: var(--wp-dataviews-color-background, var(--wpds-color-bg-surface-neutral-strong));
 }
 
 .dataviews__view-actions,
 .dataviews-filters__container {
 	box-sizing: border-box;
-	padding: $grid-unit-20 $grid-unit-30;
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -33,7 +42,7 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 $grid-unit-30;
+	padding: 0 var(--wpds-dimension-padding-2xl);
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -44,6 +53,21 @@
 	}
 }
 
+.dataviews-no-results.is-refreshing {
+	@include dataviews-refreshing();
+}
+
+@keyframes dataviews-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
+}
+
 .dataviews-loading-more {
 	text-align: center;
 }
@@ -51,14 +75,14 @@
 @container (max-width: 430px) {
 	.dataviews__view-actions,
 	.dataviews-filters__container {
-		padding: $grid-unit-15 $grid-unit-30;
+		padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
 	}
 }
 
 .dataviews-title-field {
-	font-size: $default-font-size;
-	font-weight: $font-weight-medium;
-	color: $gray-800;
+	font-size: var(--wpds-typography-font-size-md);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	color: var(--wpds-color-fg-content-neutral);
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
@@ -70,10 +94,10 @@
 		overflow: hidden;
 		display: block;
 		flex-grow: 0;
-		color: $gray-800;
+		color: var(--wpds-color-fg-interactive-neutral);
 
 		&:hover {
-			color: var(--wp-admin-theme-color);
+			color: var(--wpds-color-fg-interactive-brand);
 		}
 		@include link-reset();
 	}
@@ -86,20 +110,27 @@
 		overflow: hidden;
 		display: block;
 		width: 100%;
-		color: $gray-900;
+		color: var(--wpds-color-fg-interactive-neutral-active);
 		&:hover {
-			color: var(--wp-admin-theme-color);
+			color: var(--wpds-color-fg-interactive-brand);
 		}
 	}
 }
 
 .dataviews-title-field--clickable {
-	cursor: pointer;
-	color: $gray-800;
+	cursor: var(--wpds-cursor-control);
+	color: var(--wpds-color-fg-interactive-neutral);
 	&:hover {
-		color: var(--wp-admin-theme-color);
+		color: var(--wpds-color-fg-interactive-brand);
 	}
 	@include link-reset();
+}
+
+.dataviews__view-actions--infinite-scroll {
+	position: sticky;
+	top: 0;
+	z-index: 2; // Ensure it appears above dataview items when scrolling.
+	background-color: #fff;
 }
 
 /**
@@ -107,6 +138,6 @@
  */
 .components-card__body:has(> .dataviews-wrapper),
 .components-card__body:has(> .dataviews-picker-wrapper) {
-	padding: $grid-unit-10 0 0;
+	padding: var(--wpds-dimension-padding-sm) 0 0;
 	overflow: hidden; // Prevent cells with white backgrounds overflowing the card
 }

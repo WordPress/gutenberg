@@ -9,7 +9,7 @@ import type { SelectItemProps } from './types';
 
 export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 	function Item(
-		{ className, value, size = 'default', children = value, ...restProps },
+		{ className, value, size = 'default', children, ...restProps },
 		ref
 	) {
 		return (
@@ -27,7 +27,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 				<Icon
 					icon={ check }
 					className={ clsx(
-						itemPopupStyles[ 'item-indicator' ],
+						itemPopupStyles[ 'item-icon' ],
 						itemPopupStyles[ 'item-indicator-icon' ]
 					) }
 					size={ size === 'small' ? 20 : 24 }

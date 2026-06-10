@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Math format: seed the LaTeX input from the current selection when marking text as math, and toggle an active math object back to its LaTeX source when the button is clicked again. ([79052](https://github.com/WordPress/gutenberg/pull/79052))
+
+## 5.48.0 (2026-06-10)
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
 ## 5.38.0 (2026-01-16)
 
 ## 5.36.0 (2025-11-26)
