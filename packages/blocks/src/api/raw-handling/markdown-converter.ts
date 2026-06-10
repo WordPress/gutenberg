@@ -20,7 +20,7 @@ const converter = new Marked( {
 		// before `</code>`, which leaks into the Code block's content as a
 		// trailing blank line.
 		code( { text, lang }: Tokens.Code ): string {
-			const language = ( lang || '' ).match( /\S*/ )?.[ 0 ];
+			const language = ( lang || '' ).match( /^\S*/ )?.[ 0 ];
 			const cls = language
 				? ` class="${ language } language-${ language }"`
 				: '';
