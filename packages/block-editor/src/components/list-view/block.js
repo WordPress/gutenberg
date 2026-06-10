@@ -25,7 +25,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -54,9 +54,7 @@ import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { useBlockVisibility, BlockVisibilityModal } from '../block-visibility';
-import { deviceTypeKey } from '../../store/private-keys';
-import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -83,8 +81,6 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
-	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
-		useState( null );
 	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
@@ -101,6 +97,7 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
+		showViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -128,51 +125,22 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides, selectedDeviceType } =
-		useSelect(
-			( select ) => {
-				const { getBlock, getBlockName, getSettings } = unlock(
-					select( blockEditorStore )
-				);
-
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-					selectedDeviceType:
-						getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
-						BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
-				};
-			},
-			[ clientId ]
-		);
-	const { canRename } = useBlockRename( blockName );
-	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
-	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
-		blockVisibility: block?.attributes?.metadata?.blockVisibility,
-		deviceType: selectedDeviceType,
-	} );
-
-	// Determine label based on whether block or parent is hidden
-	const blockVisibilityDescription = useMemo( () => {
-		if ( isBlockCurrentlyHidden ) {
-			if ( block?.attributes?.metadata?.blockVisibility === false ) {
-				return __( 'Block is hidden' );
-			}
-			return sprintf(
-				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
-				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
-					currentViewport
+	const { block, blockName, allowRightClickOverrides } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings } = unlock(
+				select( blockEditorStore )
 			);
-		}
-		return null;
-	}, [
-		isBlockCurrentlyHidden,
-		block?.attributes?.metadata?.blockVisibility,
-		currentViewport,
-	] );
+
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+			};
+		},
+		[ clientId ]
+	);
+	const { canRename } = useBlockRename( blockName );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -413,8 +381,18 @@ function ListViewBlock( {
 				return;
 			}
 
+			// Don't allow visibility toggle for blocks that
+			// are not in the default editing mode.
+			if (
+				blocksToUpdate.some(
+					( id ) => getBlockEditingMode( id ) !== 'default'
+				)
+			) {
+				return;
+			}
+
 			// Open the visibility breakpoints modal.
-			setVisibilityModalClientIds( blocksToUpdate );
+			showViewportModal( blocksToUpdate );
 		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const isContentOnly =
@@ -437,7 +415,12 @@ function ListViewBlock( {
 
 	const selectEditorBlock = useCallback(
 		( event ) => {
-			selectBlock( event, clientId );
+			// For keyboard activation (Enter/Space on a link), transfer focus
+			// to the canvas with the caret at the end of the block.
+			// For mouse clicks, keep focus in the list view so that subsequent
+			// keyboard operations (arrow navigation, copy/paste) still work.
+			const isKeyboardActivation = event?.detail === 0;
+			selectBlock( event, clientId, isKeyboardActivation ? -1 : null );
 			event.preventDefault();
 		},
 		[ clientId, selectBlock ]
@@ -550,6 +533,11 @@ function ListViewBlock( {
 		isLocked
 	);
 
+	// Determine label based on where block is hidden (not when/current viewport)
+	const blockVisibilityDescription = getBlockVisibilityLabel(
+		block?.attributes?.metadata?.blockVisibility
+	);
+
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const moverCellClassName = clsx(
@@ -642,6 +630,7 @@ function ListViewBlock( {
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
+							visibilityLabel={ blockVisibilityDescription }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [
@@ -717,15 +706,14 @@ function ListViewBlock( {
 							__experimentalSelectBlock={
 								updateFocusAndSelection
 							}
+							isContentOnlyListView={
+								!! rootClientId &&
+								getBlockEditingMode( rootClientId ) ===
+									'contentOnly'
+							}
 						/>
 					) }
 				</TreeGridCell>
-			) }
-			{ visibilityModalClientIds && (
-				<BlockVisibilityModal
-					clientIds={ visibilityModalClientIds }
-					onClose={ () => setVisibilityModalClientIds( null ) }
-				/>
 			) }
 			{ isRenameModalOpen && (
 				<BlockRenameModal

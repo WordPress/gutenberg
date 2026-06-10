@@ -171,9 +171,6 @@ export function ActionsMenuGroup< Item >( {
 	return (
 		<Menu.Group>
 			{ renderActionGroup( primaryActions ) }
-			{ primaryActions.length > 0 && regularActions.length > 0 && (
-				<Menu.Separator />
-			) }
 			{ renderActionGroup( regularActions ) }
 		</Menu.Group>
 	);

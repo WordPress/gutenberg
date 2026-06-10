@@ -56,7 +56,7 @@ const meta: Meta< typeof Menu > = {
 			source: { excludeDecorators: true },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
 		},
@@ -513,7 +513,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 				const { forwardedContext = [] } = fillProps;
 
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup

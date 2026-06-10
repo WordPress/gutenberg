@@ -34,6 +34,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
 	isIsolatedEditorKey,
 } from './private-keys';
@@ -115,6 +116,48 @@ export function isContainerInsertableToInContentOnlyMode(
 	);
 }
 
+function getClientIdWithClientIdsTreeUnmemoized( state, clientId ) {
+	return {
+		clientId,
+		innerBlocks: getClientIdsTreeUnmemoized( state, clientId ),
+	};
+}
+
+function getClientIdsTreeUnmemoized( state, rootClientId = '' ) {
+	return getBlockOrder( state, rootClientId ).map( ( clientId ) =>
+		getClientIdWithClientIdsTreeUnmemoized( state, clientId )
+	);
+}
+
+/**
+ * Returns a stripped down block object containing only its client ID,
+ * and its inner blocks' client IDs.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Client ID of the block to get.
+ *
+ * @return {Object} Client IDs of the post blocks.
+ */
+export const getClientIdWithClientIdsTree = createSelector(
+	getClientIdWithClientIdsTreeUnmemoized,
+	( state ) => [ state.blocks.order ]
+);
+
+/**
+ * Returns the block tree represented in the block-editor store from the
+ * given root, consisting of stripped down block objects containing only
+ * their client IDs, and their inner blocks' client IDs.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Client IDs of the post blocks.
+ */
+export const getClientIdsTree = createSelector(
+	getClientIdsTreeUnmemoized,
+	( state ) => [ state.blocks.order ]
+);
+
 function getEnabledClientIdsTreeUnmemoized( state, rootClientId ) {
 	const blockOrder = getBlockOrder( state, rootClientId );
 	const result = [];
@@ -147,7 +190,7 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 	] )
 );
 
@@ -170,7 +213,7 @@ export const getEnabledBlockParents = createSelector(
 	},
 	( state ) => [
 		state.blocks.parents,
-		state.blockEditingModes,
+		state.blocks.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
 	]
@@ -361,7 +404,9 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 
 				return mapUserPattern(
 					block,
-					state.settings.__experimentalUserPatternCategories
+					state.settings[ userPatternCategoriesSelectKey ]?.(
+						select
+					) ?? state.settings.__experimentalUserPatternCategories
 				);
 			}
 
@@ -393,7 +438,9 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				.map( ( userPattern ) =>
 					mapUserPattern(
 						userPattern,
-						state.settings.__experimentalUserPatternCategories
+						state.settings[ userPatternCategoriesSelectKey ]?.(
+							select
+						) ?? state.settings.__experimentalUserPatternCategories
 					)
 				),
 			// This setting is left for back compat.
@@ -475,6 +522,60 @@ export const getContentLockingParent = ( state, clientId ) => {
 };
 
 /**
+ * Checks whether a block meets the raw criteria to be a section block,
+ * without considering contextual factors like nesting or the edited
+ * content-only section. Used internally by `isSectionBlock` and
+ * `getParentSectionBlock` to avoid circular calls between them.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {boolean} Whether the block is a candidate section block.
+ */
+function isSectionBlockCandidate( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	if ( blockName === 'core/block' ) {
+		return true;
+	}
+
+	const attributes = getBlockAttributes( state, clientId );
+	const isTemplatePart = blockName === 'core/template-part';
+
+	// When in an isolated editing context (e.g., editing a template part or pattern directly),
+	// don't treat nested unsynced patterns as section blocks.
+	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+
+	const disableContentOnlyForUnsyncedPatterns =
+		state.settings?.disableContentOnlyForUnsyncedPatterns;
+
+	const disableContentOnlyForTemplateParts =
+		state.settings?.disableContentOnlyForTemplateParts;
+
+	if (
+		( ( ! disableContentOnlyForUnsyncedPatterns &&
+			attributes?.metadata?.patternName ) ||
+			( isTemplatePart && ! disableContentOnlyForTemplateParts ) ) &&
+		! isIsolatedEditor
+	) {
+		return true;
+	}
+
+	// TemplateLock cascades to all inner parent blocks. Only the top-level
+	// block that's contentOnly templateLocked is the true contentLocker,
+	// all the others are mere imitators.
+	const hasContentOnlyTemplateLock =
+		getTemplateLock( state, clientId ) === 'contentOnly';
+	const rootClientId = getBlockRootClientId( state, clientId );
+	const hasRootContentOnlyTemplateLock =
+		getTemplateLock( state, rootClientId ) === 'contentOnly';
+	if ( hasContentOnlyTemplateLock && ! hasRootContentOnlyTemplateLock ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Retrieves the client ID of the parent section block.
  *
  * @param {Object} state    Global application state.
@@ -483,13 +584,19 @@ export const getContentLockingParent = ( state, clientId ) => {
  * @return {?string} Client ID of the ancestor block that is a contentOnly section.
  */
 export const getParentSectionBlock = ( state, clientId ) => {
+	// If this block is within the edited content-only section,
+	// it has no parent section — it's temporarily fully editable.
+	if ( isWithinEditedContentOnlySection( state, clientId ) ) {
+		return undefined;
+	}
+
 	let current = clientId;
 	let result;
 
 	// If sections are nested, return the top level section block.
 	// Don't return early.
 	while ( ( current = state.blocks.parents.get( current ) ) ) {
-		if ( isSectionBlock( state, current ) ) {
+		if ( isSectionBlockCandidate( state, current ) ) {
 			result = current;
 		}
 	}
@@ -505,42 +612,21 @@ export const getParentSectionBlock = ( state, clientId ) => {
  * @return {boolean} Whether the block is a contentOnly section.
  */
 export function isSectionBlock( state, clientId ) {
-	if ( clientId === state.editedContentOnlySection ) {
+	// isWithinEditedContentOnlySection -
+	// If the section is being edited or a parent section is being edited,
+	// this block is temporarily not considered a section.
+	//
+	// getParentSectionBlock -
+	// Only the top level section is considered the section,
+	// a nested section is managed by its parent section.
+	if (
+		isWithinEditedContentOnlySection( state, clientId ) ||
+		getParentSectionBlock( state, clientId )
+	) {
 		return false;
 	}
 
-	const blockName = getBlockName( state, clientId );
-	if ( blockName === 'core/block' ) {
-		return true;
-	}
-
-	const attributes = getBlockAttributes( state, clientId );
-	const isTemplatePart = blockName === 'core/template-part';
-
-	// When in an isolated editing context (e.g., editing a template part or pattern directly),
-	// don't treat nested unsynced patterns as section blocks.
-	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
-
-	if (
-		( attributes?.metadata?.patternName || isTemplatePart ) &&
-		! isIsolatedEditor
-	) {
-		return true;
-	}
-
-	// TemplateLock cascades to all inner parent blocks. Only the top-level
-	// block that's contentOnly templateLocked is the true contentLocker,
-	// all the others are mere imitators.
-	const hasContentOnlyTempateLock =
-		getTemplateLock( state, clientId ) === 'contentOnly';
-	const rootClientId = getBlockRootClientId( state, clientId );
-	const hasRootContentOnlyTemplateLock =
-		getTemplateLock( state, rootClientId ) === 'contentOnly';
-	if ( hasContentOnlyTempateLock && ! hasRootContentOnlyTemplateLock ) {
-		return true;
-	}
-
-	return false;
+	return isSectionBlockCandidate( state, clientId );
 }
 
 /**
@@ -981,10 +1067,89 @@ export function isListViewPanelOpened( state, clientId ) {
 /**
  * Returns the List View expand revision number.
  *
+ * This counter is used in the ListView component's key prop to force remounting.
+ *
  * @param {Object} state Global application state.
  *
  * @return {number} The expand revision number.
  */
 export function getListViewExpandRevision( state ) {
 	return state.listViewExpandRevision || 0;
+}
+
+/**
+ * Returns the client IDs for the viewport modal, or null if
+ * the modal is not open.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string[]|null} Client IDs for the visibility modal, or null.
+ */
+export function getViewportModalClientIds( state ) {
+	return state.viewportModalClientIds;
+}
+
+/**
+ * Returns the requested inspector tab state, if any.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object|null} The requested tab state with tabName and options, or null if no request is pending.
+ */
+export function getRequestedInspectorTab( state ) {
+	return state.requestedInspectorTab;
+}
+
+const DEFAULT_BLOCK_STYLE_STATE = {
+	viewport: 'default',
+	pseudo: 'default',
+};
+
+/**
+ * Returns the selected style state for a block's style controls.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {Object} The selected block style state.
+ */
+export function getSelectedBlockStyleState( state, clientId ) {
+	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
+		return DEFAULT_BLOCK_STYLE_STATE;
+	}
+
+	return state.selectedBlockStyleState.value ?? DEFAULT_BLOCK_STYLE_STATE;
+}
+
+/**
+ * Returns whether a non-default style state is selected for a block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether a non-default block style state is selected.
+ */
+export function hasSelectedStyleState( state, clientId ) {
+	const selectedState = getSelectedBlockStyleState( state, clientId );
+
+	return (
+		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
+		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
+	);
+}
+
+/**
+ * Returns whether the selected style state is shown on the canvas.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {boolean} Whether the selected style state is shown on the canvas.
+ */
+export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
+	if ( state.selectedBlockStyleState?.clientId !== clientId ) {
+		return true;
+	}
+
+	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
 }

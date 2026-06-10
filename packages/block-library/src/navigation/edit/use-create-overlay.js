@@ -39,7 +39,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			( templatePart ) => templatePart.title?.rendered
 		);
 		const uniqueTitle = getUniqueTemplatePartTitle(
-			__( 'Overlay' ),
+			__( 'Navigation Overlay' ),
 			templatePartsWithTitles
 		);
 		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );

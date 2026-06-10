@@ -4,13 +4,17 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 
-const { useRemoteUrlData } = unlock( blockEditorPrivateApis );
+const { useRemoteUrlData, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Capitalize the first letter of a string.
@@ -23,36 +27,83 @@ function capitalize( str ) {
 }
 
 /**
+ * Check if a URL points to the site homepage.
+ * Handles protocol (http/https) and trailing slash variations.
+ * Does not match subdomains unless they are the site URL.
+ *
+ * @param {string} url     - The URL to check
+ * @param {string} homeUrl - The WordPress site URL
+ * @return {boolean} True if url is the homepage
+ */
+export function isHomepage( url, homeUrl ) {
+	if ( url === '/' ) {
+		return true;
+	}
+	if ( ! url || ! homeUrl ) {
+		return false;
+	}
+	try {
+		const urlParsed = new URL( url, homeUrl );
+		const homeParsed = new URL( homeUrl );
+
+		// Same host, i.e. sub.homepage.com or homepage.com
+		if ( urlParsed.hostname !== homeParsed.hostname ) {
+			return false;
+		}
+
+		// Path must match site root (normalize trailing slash)
+		const urlPath = urlParsed.pathname.replace( /\/$/, '' );
+		const homePath = homeParsed.pathname.replace( /\/$/, '' );
+
+		return urlPath === homePath;
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Compute display URL - strips site URL if internal, shows full URL if external.
  *
- * @param {string} url - The URL to process
+ * @param {Object} options         - Parameters object
+ * @param {string} options.linkUrl - The URL to process
+ * @param {string} options.homeUrl - The WordPress site URL (required for internal/external detection)
  * @return {Object} Object with displayUrl and isExternal flag
  */
-function computeDisplayUrl( url ) {
-	if ( ! url ) {
+export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
+	if ( ! linkUrl ) {
 		return { displayUrl: '', isExternal: false };
 	}
 
-	let displayUrl = safeDecodeURI( url );
+	let displayUrl = safeDecodeURI( linkUrl );
 	let isExternal = false;
 
+	// Check hash links and relative paths first - these are always internal
+	if ( isRelativePath( linkUrl ) || isHashLink( linkUrl ) ) {
+		return { displayUrl, isExternal: false };
+	}
+
+	// Try to parse as a full URL to determine if it's actually external
+	// This must happen before trusting the type attribute
 	try {
-		const linkUrl = new URL( url );
-		const siteUrl = window.location.origin;
-		if ( linkUrl.origin === siteUrl ) {
+		const parsedUrl = new URL( linkUrl );
+		// Compare by host (not origin) so http/https to same site both count as internal
+		const siteHost = new URL( homeUrl ).host;
+
+		if ( parsedUrl.host === siteHost ) {
 			// Show only the pathname (and search/hash if present)
-			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
+			let path = parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
 			// Remove trailing slash
 			if ( path.endsWith( '/' ) && path.length > 1 ) {
 				path = path.slice( 0, -1 );
 			}
 			displayUrl = path;
 		} else {
+			// Different host - this is an external link
 			isExternal = true;
 		}
-	} catch ( e ) {
-		// If URL parsing fails, use the original URL
-		displayUrl = safeDecodeURI( url );
+	} catch {
+		// URL parsing failed - treat as external (e.g. no homeUrl, or URL without protocol)
+		isExternal = true;
 	}
 
 	return { displayUrl, isExternal };
@@ -63,6 +114,7 @@ function computeDisplayUrl( url ) {
  *
  * @param {Object}  options                   - Options object
  * @param {string}  options.url               - Link URL
+ * @param {string}  options.homeUrl           - WordPress site URL (for homepage detection)
  * @param {string}  options.type              - Entity type (page, post, etc.)
  * @param {boolean} options.isExternal        - Whether link is external
  * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
@@ -70,8 +122,9 @@ function computeDisplayUrl( url ) {
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
  * @return {Array} Array of badge objects with label and intent
  */
-function computeBadges( {
+export function computeBadges( {
 	url,
+	homeUrl,
 	type,
 	isExternal,
 	entityStatus,
@@ -79,7 +132,6 @@ function computeBadges( {
 	isEntityAvailable,
 } ) {
 	const badges = [];
-
 	// Kind badge
 	if ( url ) {
 		if ( isExternal ) {
@@ -87,8 +139,28 @@ function computeBadges( {
 				label: __( 'External link' ),
 				intent: 'default',
 			} );
-		} else if ( type ) {
+		} else if ( isHashLink( url ) ) {
+			// Hash links should be detected before type check
+			// because they're not entity links even if type is set
+			badges.push( {
+				label: __( 'Internal link' ),
+				intent: 'default',
+			} );
+		} else if ( isHomepage( url, homeUrl ) ) {
+			badges.push( {
+				label: __( 'Homepage' ),
+				intent: 'default',
+			} );
+		} else if ( type && type !== 'custom' ) {
+			// Show entity type badge (page, post, category, etc.)
+			// but not 'custom' since that's just a manual link
 			badges.push( { label: capitalize( type ), intent: 'default' } );
+		} else {
+			// Internal link (not external, not hash, not entity)
+			badges.push( {
+				label: __( 'Page' ),
+				intent: 'default',
+			} );
 		}
 	}
 
@@ -130,35 +202,75 @@ function computeBadges( {
  *
  * @param {Object}  options                   - Options object
  * @param {string}  options.url               - Link URL
- * @param {string}  options.title             - Link title (from entity or rich data)
- * @param {string}  options.image             - Link image URL
  * @param {string}  options.type              - Entity type (page, post, etc.)
- * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
+ * @param {Object}  options.entityRecord      - Entity record
  * @param {boolean} options.hasBinding        - Whether link has entity binding
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
  * @return {Object} Preview data object with title, url, image, and badges
  */
 export function useLinkPreview( {
 	url,
-	title,
-	image,
+	entityRecord,
 	type,
-	entityStatus,
 	hasBinding,
 	isEntityAvailable,
 } ) {
+	// Get the WordPress homepage URL from settings
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreDataStore ).getEntityRecord(
+			'root',
+			'__unstableBase'
+		)?.home;
+	}, [] );
+
+	const title =
+		entityRecord?.title?.rendered ||
+		entityRecord?.title ||
+		entityRecord?.name;
+
 	// Fetch rich URL data if we don't have a title. Internal links should have passed a title.
 	const { richData } = useRemoteUrlData( title ? null : url );
 
 	// Compute display URL and external flag
-	const { displayUrl, isExternal } = computeDisplayUrl( url );
+	const { displayUrl, isExternal } = computeDisplayUrl( {
+		linkUrl: url,
+		homeUrl,
+	} );
+
+	const image = useSelect(
+		( select ) => {
+			// Only fetch for post-type entities with featured media
+			if ( ! entityRecord?.featured_media ) {
+				return null;
+			}
+
+			const { getEntityRecord } = select( coreDataStore );
+
+			// Get the media entity to fetch the image URL
+			const media = getEntityRecord(
+				'postType',
+				'attachment',
+				entityRecord.featured_media
+			);
+
+			// Return the thumbnail or medium size URL, fallback to source_url
+			return (
+				media?.media_details?.sizes?.thumbnail?.source_url ||
+				media?.media_details?.sizes?.medium?.source_url ||
+				media?.source_url ||
+				null
+			);
+		},
+		[ entityRecord?.featured_media ]
+	);
 
 	// Compute badges
 	const badges = computeBadges( {
 		url,
+		homeUrl,
 		type,
 		isExternal,
-		entityStatus,
+		entityStatus: entityRecord?.status,
 		hasBinding,
 		isEntityAvailable,
 	} );

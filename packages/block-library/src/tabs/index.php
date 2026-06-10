@@ -8,37 +8,34 @@
 /**
  * Extract tabs list from tab-panel innerblocks.
  *
- * @param array $innerblocks Parsed inner blocks of tabs block.
+ * @since 7.0.0
+ *
+ * @param array  $innerblocks Parsed inner blocks of tabs block.
+ * @param string $tabs_id     Unique ID for the tabs instance, used to generate tab IDs.
  *
  * @return array List of tabs with id, label, index.
  */
-function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): array {
+function block_core_tabs_generate_tabs_list( array $innerblocks = array(), string $tabs_id = '' ): array {
 	$tabs_list = array();
 
 	// Find tab-panel block
 	foreach ( $innerblocks as $inner_block ) {
-		if ( 'core/tab-panel' === ( $inner_block['blockName'] ?? '' ) ) {
+		if ( 'core/tab-panels' === ( $inner_block['blockName'] ?? '' ) ) {
 			$tab_index = 0;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
-				if ( 'core/tab' === ( $tab_block['blockName'] ?? '' ) ) {
+				if ( 'core/tab-panel' === ( $tab_block['blockName'] ?? '' ) ) {
 					$attrs     = $tab_block['attrs'] ?? array();
 					$tab_label = $attrs['label'] ?? '';
 
-					// Try to get the ID from the rendered content
-					$tab_id = $attrs['anchor'] ?? '';
-					if ( empty( $tab_id ) && ! empty( $tab_block['innerHTML'] ) ) {
-						$tag_processor = new WP_HTML_Tag_Processor( $tab_block['innerHTML'] );
-						if ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tab' ) ) ) {
-							$tab_id = $tag_processor->get_attribute( 'id' ) ?? '';
-						}
-					}
-					if ( empty( $tab_id ) ) {
-						$tab_id = 'tab-' . $tab_index;
-					}
+					$tab_id = ! empty( $attrs['anchor'] )
+						? $attrs['anchor']
+						: ( ! empty( $tabs_id )
+							? $tabs_id . '-tab-' . $tab_index
+							: 'tab-' . $tab_index );
 
 					$tabs_list[] = array(
-						'id'    => $tab_id,
-						'label' => esc_html( (string) $tab_label ),
+						'id'    => esc_attr( $tab_id ),
+						'label' => $tab_label,
 						'index' => $tab_index,
 					);
 					++$tab_index;
@@ -52,9 +49,11 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
 }
 
 /**
- * Filter to provide tabs list context to core/tabs and core/tabs-menu blocks.
+ * Filter to provide tabs list context to core/tabs and core/tab-list blocks.
  * It is more performant to do this here, once, rather than in the tabs render and tabs context filters.
  * In this way core/tabs is both a provider and a consumer of the core/tabs-list context.
+ *
+ * @since 7.0.0
  *
  * @param array $context      Default block context.
  * @param array $parsed_block The block being rendered.
@@ -63,9 +62,13 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
  */
 function block_core_tabs_provide_context( array $context, array $parsed_block ): array {
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
-		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array() );
+		// Generate a unique ID for the tabs instance first, so it can be used
+		// to derive stable tab IDs. Used for 3rd party extensibility to identify
+		// the tabs instance.
+		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_id( 'tabs_' );
+		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
 		$context['core/tabs-list'] = $tabs_list;
-		$context['core/tabs-id']   = $parsed_block['attrs']['anchor'] ?? wp_unique_id( 'tabs_' ); // Generate a unique ID for each tabs instance. Used for 3rd party extensibility to identify the tabs instance.
+		$context['core/tabs-id']   = $tabs_id;
 	}
 
 	return $context;
@@ -74,6 +77,8 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
 
 /**
  * Render callback for core/tabs.
+ *
+ * @since 7.0.0
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
@@ -91,12 +96,6 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		return '';
 	}
 
-	$title = $attributes['metadata']['name'] ?? '';
-	if ( empty( $title ) ) {
-		$title = 'Tab Contents';
-	}
-	$title = wp_sprintf( '<h3 class="wp-block-tabs__title">%s</h3>', esc_html( $title ) );
-
 	$is_vertical = false;
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
@@ -104,9 +103,9 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) );
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/tabs/private' );
 
-	// Inspect inside the tabs-menu to see if its vertical or not.
+	// Inspect inside the tab-list to see if its vertical or not.
 	$tag_processor->set_bookmark( 'core/tabs_wrapper' );
-	while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs-menu' ) ) ) {
+	while ( $tag_processor->next_tag( array( 'class_name' => 'wp-block-tabs-list' ) ) ) {
 		if ( $tag_processor->has_class( 'is-vertical' ) ) {
 			$is_vertical = true;
 			break;
@@ -129,9 +128,6 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 
 	$output = $tag_processor->get_updated_html();
 
-	// Insert the title after the first opening tag.
-	$output = preg_replace( '/^(<[^>]+>)/', '$1' . $title, $output );
-
 	/**
 	 * Builds a client side state for just this tabs instance.
 	 * This allows 3rd party extensibility of tabs while retaining
@@ -150,7 +146,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 /**
  * Registers the `core/tabs` block on the server.
  *
- * @since 6.8.0
+ * @since 7.0.0
  */
 function register_block_core_tabs() {
 	register_block_type_from_metadata(

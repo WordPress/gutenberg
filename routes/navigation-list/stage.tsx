@@ -131,6 +131,7 @@ function NavigationList() {
 		<>
 			<Page
 				title={ __( 'Navigation' ) }
+				headingLevel={ 2 }
 				className="navigation-page"
 				hasPadding={ false }
 				actions={
@@ -155,7 +156,7 @@ function NavigationList() {
 						totalPages,
 					} }
 					defaultLayouts={ {
-						list: {},
+						list: true,
 					} }
 					getItemId={ getItemId }
 					selection={ selection }

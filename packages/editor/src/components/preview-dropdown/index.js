@@ -12,8 +12,7 @@ import {
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
-	VisuallyHidden,
-	Icon,
+	Icon as WCIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
@@ -22,6 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -97,6 +97,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 
 	/**
 	 * The choices for the device type.
+	 * Duplicated in block-editor block-visibility constants and edit-site
+	 * use-viewport-sync. Update all three when adding new viewport types.
 	 *
 	 * @type {Array}
 	 */
@@ -149,7 +151,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								onClick={ onClose }
 							>
 								{ __( 'View site' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )
@@ -187,7 +189,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								textContent={
 									<>
 										{ __( 'Preview in new tab' ) }
-										<Icon icon={ external } />
+										<WCIcon icon={ external } />
 									</>
 								}
 								onPreview={ onClose }

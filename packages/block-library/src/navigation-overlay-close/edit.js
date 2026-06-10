@@ -28,6 +28,9 @@ export default function NavigationOverlayCloseEdit( {
 	const showIcon = displayMode === 'icon' || displayMode === 'both';
 	const showText = displayMode === 'text' || displayMode === 'both';
 
+	// Use translated default if text is empty
+	const displayText = text || __( 'Close' );
+
 	const blockProps = useBlockProps( {
 		className: 'wp-block-navigation-overlay-close',
 	} );
@@ -84,12 +87,10 @@ export default function NavigationOverlayCloseEdit( {
 				{ showText && (
 					<RichText
 						identifier="text"
-						value={ text }
+						value={ displayText }
 						onChange={ ( value ) =>
 							setAttributes( { text: value } )
 						}
-						placeholder={ __( 'Close' ) }
-						withoutInteractiveFormatting
 						tagName="span"
 						className="wp-block-navigation-overlay-close__text"
 						allowedFormats={ [ 'core/bold', 'core/italic' ] }

@@ -69,7 +69,7 @@ test.describe( 'Template Part', () => {
 		await editor.insertBlock( { name: 'core/template-part' } );
 		await editor.canvas.locator( 'role=button[name="Choose"i]' ).click();
 		await page.click(
-			'role=listbox[name="Block Patterns"i] >> role=option[name="header"i]'
+			'role=listbox[name="Patterns"i] >> role=option[name="header"i]'
 		);
 
 		// There are now two header template parts.
@@ -176,6 +176,7 @@ test.describe( 'Template Part', () => {
 	test( 'can detach blocks from a template part', async ( {
 		admin,
 		editor,
+		page,
 	} ) => {
 		const paragraphText = 'Test 3';
 
@@ -210,6 +211,10 @@ test.describe( 'Template Part', () => {
 		// Detach the paragraph from the header template part.
 		await editor.selectBlocks( templatePartWithParagraph );
 		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
 
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();
@@ -410,6 +415,6 @@ test.describe( 'Template Part', () => {
 		// Undo the change.
 		await pageUtils.pressKeys( 'primary+z' );
 
-		await expect( paragraph ).toBeFocused();
+		await expect( siteTitleInGroup ).toHaveClass( /is-selected/ );
 	} );
 } );

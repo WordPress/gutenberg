@@ -42,7 +42,7 @@ export function getProviderCreators(): ProviderCreator[] {
 	}
 
 	// Check if real-time collaboration is enabled via WordPress setting.
-	if ( ! window.__wpSyncEnabled ) {
+	if ( ! window._wpCollaborationEnabled ) {
 		return [];
 	}
 

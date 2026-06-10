@@ -1,0 +1,9 @@
+// The canvas wrapper fills the modal's canvas area so the cropper has a
+// sized parent (the cropper uses 100% width/height of its container).
+// `position: relative` establishes a stacking context for any future
+// overlays rendered inside the canvas.
+.media-editor-canvas {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}

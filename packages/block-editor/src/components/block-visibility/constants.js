@@ -6,7 +6,10 @@ import { desktop, tablet, mobile } from '@wordpress/icons';
 
 /**
  * The choices for the block visibility.
- * Must match those in packages/editor/src/components/preview-dropdown/index.js.
+ *
+ * Duplicated in packages/editor/src/components/preview-dropdown/index.js (choices array)
+ * and packages/edit-site/src/components/block-editor/use-viewport-sync.js
+ * (VALID_DEVICE_TYPES). Update all three when adding new viewport types.
  *
  * @todo create a single source of truth for the viewport types.
  */

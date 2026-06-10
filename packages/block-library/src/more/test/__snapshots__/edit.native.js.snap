@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`More block inserts block 1`] = `
-"<!-- wp:more -->
-<!--more-->
-<!-- /wp:more -->"
-`;

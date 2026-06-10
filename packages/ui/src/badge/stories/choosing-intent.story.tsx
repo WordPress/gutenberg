@@ -7,7 +7,7 @@ const meta: Meta< typeof Badge > = {
 	component: Badge,
 	decorators: [
 		( Story ) => (
-			<Stack direction="row" gap="xs" wrap="wrap">
+			<Stack direction="row" gap="sm" wrap="wrap">
 				<Story />
 			</Stack>
 		),
@@ -15,7 +15,7 @@ const meta: Meta< typeof Badge > = {
 	parameters: {
 		controls: { disable: true },
 	},
-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
+	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
 };
 export default meta;
 

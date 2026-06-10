@@ -40,6 +40,9 @@ module.exports = function downloadWPPHPUnit(
 
 	const promises = [];
 	for ( const env in config.env ) {
+		if ( env === 'tests' && config.testsEnvironment === false ) {
+			continue;
+		}
 		const wpVersion = wpVersions[ env ] ? wpVersions[ env ] : null;
 		const directory = path.join(
 			config.workDirectoryPath,
@@ -108,6 +111,7 @@ async function downloadTestSuite(
 			directory,
 			{
 				'--depth': '1',
+				'--filter': 'blob:none',
 				'--no-checkout': null,
 			}
 		);

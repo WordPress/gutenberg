@@ -9,11 +9,11 @@ const env = require( '../env' );
  * Mocked dependencies
  */
 jest.spyOn( process, 'exit' ).mockImplementation( () => {} );
-jest.mock( 'ora', () => () => ( {
-	start() {
-		return { text: '', succeed: jest.fn(), fail: jest.fn() };
-	},
-} ) );
+jest.mock( 'ora', () => () => {
+	const spinner = { text: '', succeed: jest.fn(), fail: jest.fn() };
+	spinner.start = () => spinner;
+	return spinner;
+} );
 jest.mock( '../env', () => {
 	const actual = jest.requireActual( '../env' );
 	return {
@@ -34,8 +34,21 @@ describe( 'env cli', () => {
 
 	it( 'parses start commands.', () => {
 		cli().parse( [ 'start' ] );
-		const { spinner } = env.start.mock.calls[ 0 ][ 0 ];
+		const { spinner, autoPort } = env.start.mock.calls[ 0 ][ 0 ];
 		expect( spinner.text ).toBe( '' );
+		expect( autoPort ).toBeUndefined();
+	} );
+
+	it( 'parses start commands with --auto-port.', () => {
+		cli().parse( [ 'start', '--auto-port' ] );
+		const { autoPort } = env.start.mock.calls[ 0 ][ 0 ];
+		expect( autoPort ).toBe( true );
+	} );
+
+	it( 'parses start commands with --no-auto-port.', () => {
+		cli().parse( [ 'start', '--no-auto-port' ] );
+		const { autoPort } = env.start.mock.calls[ 0 ][ 0 ];
+		expect( autoPort ).toBe( false );
 	} );
 
 	it( 'parses stop commands.', () => {
@@ -47,7 +60,7 @@ describe( 'env cli', () => {
 	it( 'parses reset commands for the default environment.', () => {
 		cli().parse( [ 'reset' ] );
 		const { environment, spinner } = env.reset.mock.calls[ 0 ][ 0 ];
-		expect( environment ).toBe( 'tests' );
+		expect( environment ).toBe( 'development' );
 		expect( spinner.text ).toBe( '' );
 	} );
 	it( 'parses reset commands for all environments.', () => {
@@ -72,7 +85,7 @@ describe( 'env cli', () => {
 	it( 'parses clean (deprecated) commands for the default environment.', () => {
 		cli().parse( [ 'clean' ] );
 		const { environment, spinner } = env.clean.mock.calls[ 0 ][ 0 ];
-		expect( environment ).toBe( 'tests' );
+		expect( environment ).toBe( 'development' );
 		expect( spinner.text ).toBe( '' );
 	} );
 

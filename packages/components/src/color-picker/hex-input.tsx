@@ -20,7 +20,7 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {
-		if ( ! nextValue ) {
+		if ( nextValue === undefined ) {
 			return;
 		}
 		const hexValue = nextValue.startsWith( '#' )

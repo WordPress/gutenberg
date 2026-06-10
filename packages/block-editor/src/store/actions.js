@@ -88,6 +88,12 @@ export const validateBlocksToTemplate =
 /**
  * A block selection object.
  *
+ * This type is duplicated to avoid creating circular dependencies.
+ *
+ * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
+ * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
+ * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
+ *
  * @typedef {Object} WPBlockSelection
  *
  * @property {string} clientId     A block client ID.
@@ -816,6 +822,8 @@ export const __unstableDeleteSelection =
 					...targetBlock.attributes,
 					...updatedAttributes,
 				},
+				// Block A's inner blocks sit inside the selection; only B's survive.
+				innerBlocks: blockB.innerBlocks,
 			},
 			...( isForward ? [] : blocksWithTheSameType ),
 		];
@@ -1616,16 +1624,17 @@ export function updateSettings( settings ) {
  * Action that signals that a temporary reusable block has been saved
  * in order to switch its temporary id with the real id.
  *
- * @param {string} id        Reusable block's id.
- * @param {string} updatedId Updated block's id.
- *
- * @return {Object} Action object.
+ * @deprecated
  */
-export function __unstableSaveReusableBlock( id, updatedId ) {
+export function __unstableSaveReusableBlock() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).__unstableSaveReusableBlock',
+		{
+			since: '7.1',
+		}
+	);
 	return {
-		type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-		id,
-		updatedId,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -1639,12 +1648,20 @@ export function __unstableMarkLastChangeAsPersistent() {
 }
 
 /**
- * Action that signals that the next block change should be marked explicitly as not persistent.
+ * Action that signals that the next block change should be marked explicitly
+ * as not persistent.
  *
+ * By default, non-persistent changes may still merge into undo history. Use
+ * `history: 'ignore'` for derived changes that should never be captured by undo.
+ *
+ * @param {Object} options         Options object.
+ * @param {string} options.history How the change should interact with history.
  * @return {Object} Action object.
  */
-export function __unstableMarkNextChangeAsNotPersistent() {
-	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT' };
+export function __unstableMarkNextChangeAsNotPersistent( {
+	history = 'merge',
+} = {} ) {
+	return { type: 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT', history };
 }
 
 /**
@@ -1767,15 +1784,11 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
@@ -1810,15 +1823,11 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock(
@@ -2186,6 +2195,11 @@ export function __unstableToggleListViewPanel( clientId, isOpen ) {
 
 /**
  * Increments the List View expand revision to force re-render.
+ *
+ * This action increments a counter that is used in the ListView component's key prop.
+ * When the key changes, the component will remount with a fresh expanded state,
+ * ensuring parent blocks show their children. For example, after click-through
+ * navigation.
  *
  * @return {Object} Action object.
  */

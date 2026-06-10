@@ -1,12 +1,10 @@
-@use "@wordpress/base-styles/colors" as *;
-
 .sidebar-navigation__more-menu {
 	.components-button {
-		color: $gray-200;
+		color: var(--wpds-color-fg-interactive-neutral);
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			color: $gray-100;
+			color: var(--wpds-color-fg-interactive-neutral);
 		}
 	}
 }

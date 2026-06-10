@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "6.39.0",
+	"version": "8.0.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,20 +38,25 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
+		"./react-polyfill": "./src/react-polyfill-base.ts",
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/escape-html": "file:../escape-html",
 		"change-case": "^4.1.2",
 		"is-plain-object": "^5.0.0",
-		"react": "^18.3.0",
-		"react-dom": "^18.3.0"
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2"
 	},
 	"publishConfig": {
 		"access": "public"

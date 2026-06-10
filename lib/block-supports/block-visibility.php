@@ -15,14 +15,22 @@
 function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 
-	if ( ! $block_type || ! block_has_support( $block_type, 'visibility', true ) ) {
+	if ( ! $block_type ) {
 		return $block_content;
 	}
 
 	$block_visibility = $block['attrs']['metadata']['blockVisibility'] ?? null;
 
+	// Hide the block whenever the value is boolean false, regardless of the
+	// block's current visibility support. This prevents blocks that previously
+	// supported visibility from unintentionally appearing on the front end
+	// after their support was disabled.
 	if ( false === $block_visibility ) {
 		return '';
+	}
+
+	if ( ! block_has_support( $block_type, 'visibility', true ) ) {
+		return $block_content;
 	}
 
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
@@ -137,6 +145,16 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			$processor = new WP_HTML_Tag_Processor( $block_content );
 			if ( $processor->next_tag() ) {
 				$processor->add_class( implode( ' ', $class_names ) );
+
+				/*
+				 * Set all IMG tags to be `fetchpriority=auto` so that wp_get_loading_optimization_attributes() won't add
+				 * `fetchpriority=high` or increment the media count to affect whether subsequent IMG tags get `loading=lazy`.
+				 */
+				do {
+					if ( 'IMG' === $processor->get_tag() ) {
+						$processor->set_attribute( 'fetchpriority', 'auto' );
+					}
+				} while ( $processor->next_tag() );
 				$block_content = $processor->get_updated_html();
 			}
 		}

@@ -141,8 +141,8 @@ describe( 'Store Actions', () => {
 
 		it( 'should validate and reject ability with invalid name format', () => {
 			const testCases = [
-				'invalid', // No namespace
-				'my-plugin/feature/action', // Multiple slashes
+				'invalid', // No namespace (only 1 segment)
+				'my-plugin/a/b/c/d', // Too many slashes (5 segments)
 				'My-Plugin/feature', // Uppercase letters
 				'my_plugin/feature', // Underscores not allowed
 				'my-plugin/feature!', // Special characters not allowed
@@ -167,6 +167,39 @@ describe( 'Store Actions', () => {
 				);
 				expect( mockDispatch ).not.toHaveBeenCalled();
 				mockDispatch.mockClear();
+			}
+		} );
+
+		it( 'should accept valid nested namespace ability names (2-4 segments)', () => {
+			const validNames = [
+				'test/ability', // 2 segments
+				'core/posts/find', // 3 segments
+				'my-plugin/resource/action', // 3 segments
+				'my-plugin/resource/sub/action', // 4 segments
+			];
+
+			for ( const validName of validNames ) {
+				const ability: Ability = {
+					name: validName,
+					label: 'Test Ability',
+					description: 'Test description',
+					category: 'test-category',
+					callback: jest.fn(),
+				};
+
+				mockSelect.getAbility.mockReturnValue( null );
+				mockDispatch.mockClear();
+
+				const action = registerAbility( ability );
+				action( { select: mockSelect, dispatch: mockDispatch } );
+
+				expect( mockDispatch ).toHaveBeenCalledWith( {
+					type: REGISTER_ABILITY,
+					ability: {
+						...ability,
+						meta: { annotations: { clientRegistered: true } },
+					},
+				} );
 			}
 		} );
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -15,13 +10,13 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -244,7 +239,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		// FIXME: I think we should show the indicator when hovering on patterns as well?
@@ -338,7 +333,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			PATTERN_NAME
 		);
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
@@ -414,7 +409,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.hover(
-			`role=listbox[name="Block Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
+			`role=listbox[name="Patterns"i] >> role=option[name="${ PATTERN_NAME }"i]`
 		);
 
 		const paragraphBoundingBox = await paragraphBlock.boundingBox();
@@ -662,7 +657,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 				name: 'Search',
 			} )
 			.first()
-			.fill( 'Verse' );
+			.fill( 'Poetry' );
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 
 		await expect(
@@ -672,7 +667,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 					name: 'Search',
 				} )
 				.first()
-		).toHaveValue( 'Verse' );
+		).toHaveValue( 'Poetry' );
 		await expect(
 			page.getByRole( 'listbox', { name: 'Blocks' } ).first()
 		).toHaveCount( 1 );
@@ -766,15 +761,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 test.describe( 'insert media from inserter', () => {
 	let uploadedMedia;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllMedia(),

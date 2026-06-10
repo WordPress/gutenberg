@@ -35,8 +35,8 @@ import { ItemSubmenuIcon } from './icons';
 import {
 	Controls,
 	LinkUI,
-	updateAttributes,
 	useEntityBinding,
+	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
 	useEnableLinkStatusValidation,
@@ -48,12 +48,12 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
-import { getSubmenuVisibility } from '../navigation/utils/get-submenu-visibility';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/page-list',
+	'core/loginout',
 ];
 
 /**
@@ -85,20 +85,25 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel } = context;
+	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
 	const blockEditingMode = useBlockEditingMode();
-
-	// Determine effective submenu visibility with backward compatibility
-	const submenuVisibility = getSubmenuVisibility( context );
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
 		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
+
+	const handleLinkChange = useHandleLinkChange( {
 		clientId,
 		attributes,
+		setAttributes,
+		allowTextUpdate: true,
 	} );
 
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
@@ -338,6 +343,7 @@ export default function NavigationSubmenuEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					isLinkEditable={ ! openSubmenusOnClick }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -382,6 +388,11 @@ export default function NavigationSubmenuEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 							} }
@@ -390,26 +401,7 @@ export default function NavigationSubmenuEdit( {
 								setAttributes( { url: '' } );
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
-							onChange={ ( updatedValue ) => {
-								// updateAttributes determines the final state and returns metadata
-								const {
-									isEntityLink,
-									attributes: updatedAttributes,
-								} = updateAttributes(
-									updatedValue,
-									setAttributes,
-									attributes
-								);
-
-								// Handle URL binding based on the final computed state
-								// Only create bindings for entity links (posts, pages, taxonomies)
-								// Never create bindings for custom links (manual URLs)
-								if ( isEntityLink ) {
-									createBinding( updatedAttributes );
-								} else {
-									clearBinding();
-								}
-							} }
+							onChange={ handleLinkChange }
 						/>
 					) }
 				</ParentElement>

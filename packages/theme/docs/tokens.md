@@ -5,6 +5,122 @@ Do not edit directly.
 
 # Design System Tokens reference
 
+Design tokens are named values. They encode design decisions which describe the visual purpose of a value. Rather than referencing a raw value like `#3858e9`, a token like `--wpds-color-bg-interactive-brand-strong` describes what the value is for. Tokens are delivered as CSS custom properties and consumed with `var( --wpds-* )`.
+
+## How to pick a token
+
+Each segment of a token name answers one question about the value being applied:
+
+-   **Type** identifies the kind of value, like `color` or `dimension`. It is usually determined by the CSS property being set.
+-   **Property** describes which aspect of the element the token applies to, such as `bg`, `fg`, `stroke`, `padding`, or `gap`.
+-   **Target** describes the kind of element the token applies to, such as a `surface`, an `interactive` control, static `content`, a `track` or `thumb`, or a `focus` indicator.
+-   **Tone** describes the semantic intent of a color, such as `neutral`, `brand`, `success`, or `error`.
+-   **Emphasis** and **state** are modifiers that adjust strength and reflect interactive states.
+
+## Naming pattern
+
+Semantic tokens follow a consistent naming pattern:
+
+```
+--wpds-<type>-<property>-<target>[-<modifier>]
+```
+
+### Type
+
+Indicates what kind of value the token represents, usually mapping to a [DTCG](https://design-tokens.github.io/community-group/format/) token type.
+
+| Value        | Description                                                                    |
+| ------------ | ------------------------------------------------------------------------------ |
+| `color`      | Color values for backgrounds, foregrounds, and strokes                         |
+| `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+| `border`     | Border properties like radius and width                                        |
+| `elevation`  | Shadow definitions for layering and depth                                      |
+| `motion`     | Animation durations and easing curves                                          |
+| `typography` | Typography properties like font family, font size, and line-height             |
+
+### Property
+
+The specific design property being defined.
+
+| Value         | Description                        |
+| ------------- | ---------------------------------- |
+| `bg`          | Background color                   |
+| `fg`          | Foreground color (text and icons)  |
+| `stroke`      | Border and outline color           |
+| `padding`     | Internal spacing within an element |
+| `gap`         | Spacing between elements           |
+| `radius`      | Border radius for rounded corners  |
+| `width`       | Border width                       |
+| `duration`    | Animation duration                 |
+| `easing`      | Animation easing curve             |
+| `font-size`   | Font size                          |
+| `font-family` | Font family                        |
+| `font-weight` | Font weight                        |
+| `line-height` | Line height                        |
+
+### Target
+
+The component or element type the token applies to.
+
+| Value         | Description                                                                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `surface`     | Backgrounds and borders of containers, cards, panels, message bubbles, and other static layout elements. Not for clickable parts.             |
+| `interactive` | Elements the user directly interacts with: buttons, inputs, links, checkboxes, toggles, menu items. Implies a clickable/focusable affordance. |
+| `content`     | Static content like body text and icons. Use for foreground colors where there is no interactive behavior.                                    |
+| `track`       | The non-moving rail of a track-and-thumb control (scrollbar track, slider track, progressbar track).                                          |
+| `thumb`       | The moving indicator of a track-and-thumb control (scrollbar thumb, slider handle, filled progress).                                          |
+| `focus`       | Focus indicators and rings.                                                                                                                   |
+
+### Modifier
+
+An optional size or intensity modifier.
+
+| Value                                      | Description          |
+| ------------------------------------------ | -------------------- |
+| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
+
+## Color token modifiers
+
+Color tokens extend the base pattern with additional modifiers for tone, emphasis, and state:
+
+```
+--wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]
+```
+
+### Tone
+
+The semantic intent of the color.
+
+| Value     | Description                                                                             |
+| --------- | --------------------------------------------------------------------------------------- |
+| `neutral` | Neutrally toned UI elements                                                             |
+| `brand`   | Brand-accented or primary action colors                                                 |
+| `success` | Positive or completed states                                                            |
+| `info`    | Informational or system-generated context                                               |
+| `caution` | Heads-up or low-severity issues; "proceed carefully"                                    |
+| `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors |
+| `error`   | Blocking issues, validation failures, or destructive actions                            |
+
+Note: `caution` and `warning` represent two escalation levels of non-error severity. Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
+
+### Emphasis
+
+Adjusts color strength relative to the base tone. The default (no modifier) is normal emphasis.
+
+| Value    | Description                                    |
+| -------- | ---------------------------------------------- |
+| `strong` | Higher contrast and/or elevated emphasis       |
+| `weak`   | Subtle variant for secondary or muted elements |
+
+### State
+
+The interactive state of the element. The default (no modifier) is the idle state.
+
+| Value      | Description                         |
+| ---------- | ----------------------------------- |
+| `active`   | Hovered, pressed, or selected state |
+| `disabled` | Unavailable or inoperable state     |
+
 ## Semantic tokens
 
 ### Border
@@ -114,25 +230,45 @@ Do not edit directly.
 | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
 | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
 
+### Cursor
+
+| Variable name           | Description                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `--wpds-cursor-control` | Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). |
+
 ### Dimension
 
-| Variable name                  | Description            |
-| ------------------------------ | ---------------------- |
-| `--wpds-dimension-base`        | Base dimension unit    |
-| `--wpds-dimension-padding-xs`  | Extra small padding    |
-| `--wpds-dimension-padding-sm`  | Small padding          |
-| `--wpds-dimension-padding-md`  | Medium padding         |
-| `--wpds-dimension-padding-lg`  | Large padding          |
-| `--wpds-dimension-padding-xl`  | Extra large padding    |
-| `--wpds-dimension-padding-2xl` | 2x extra large padding |
-| `--wpds-dimension-padding-3xl` | 3x extra large padding |
-| `--wpds-dimension-gap-xs`      | Extra small gap        |
-| `--wpds-dimension-gap-sm`      | Small gap              |
-| `--wpds-dimension-gap-md`      | Medium gap             |
-| `--wpds-dimension-gap-lg`      | Large gap              |
-| `--wpds-dimension-gap-xl`      | Extra large gap        |
-| `--wpds-dimension-gap-2xl`     | 2x extra large gap     |
-| `--wpds-dimension-gap-3xl`     | 3x extra large gap     |
+| Variable name                        | Description                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------ |
+| `--wpds-dimension-base`              | Base dimension unit                                                      |
+| `--wpds-dimension-padding-xs`        | Extra small padding                                                      |
+| `--wpds-dimension-padding-sm`        | Small padding                                                            |
+| `--wpds-dimension-padding-md`        | Medium padding                                                           |
+| `--wpds-dimension-padding-lg`        | Large padding                                                            |
+| `--wpds-dimension-padding-xl`        | Extra large padding                                                      |
+| `--wpds-dimension-padding-2xl`       | 2x extra large padding                                                   |
+| `--wpds-dimension-padding-3xl`       | 3x extra large padding                                                   |
+| `--wpds-dimension-gap-xs`            | Extra small gap                                                          |
+| `--wpds-dimension-gap-sm`            | Small gap                                                                |
+| `--wpds-dimension-gap-md`            | Medium gap                                                               |
+| `--wpds-dimension-gap-lg`            | Large gap                                                                |
+| `--wpds-dimension-gap-xl`            | Extra large gap                                                          |
+| `--wpds-dimension-gap-2xl`           | 2x extra large gap                                                       |
+| `--wpds-dimension-gap-3xl`           | 3x extra large gap                                                       |
+| `--wpds-dimension-size-5xs`          | Notification indicators                                                  |
+| `--wpds-dimension-size-4xs`          | Visual size for small interactive elements like resize handles           |
+| `--wpds-dimension-size-3xs`          | Small markers                                                            |
+| `--wpds-dimension-size-2xs`          | For small controls like checkboxes and radios, or small decorative icons |
+| `--wpds-dimension-size-xs`           | For medium sized icons                                                   |
+| `--wpds-dimension-size-sm`           | For icons and small buttons                                              |
+| `--wpds-dimension-size-md`           | For medium-sized buttons and inputs                                      |
+| `--wpds-dimension-size-lg`           | Default size for buttons and inputs                                      |
+| `--wpds-dimension-surface-width-xs`  | Extra small surface width                                                |
+| `--wpds-dimension-surface-width-sm`  | Small surface width                                                      |
+| `--wpds-dimension-surface-width-md`  | Medium surface width                                                     |
+| `--wpds-dimension-surface-width-lg`  | Large surface width                                                      |
+| `--wpds-dimension-surface-width-xl`  | Extra large surface width                                                |
+| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width                                             |
 
 ### Elevation
 
@@ -143,24 +279,37 @@ Do not edit directly.
 | `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
 | `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
 
+### Motion
+
+| Variable name                     | Description                                                                                         |
+| --------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `--wpds-motion-duration-xs`       | Micro-delays and transition offsets                                                                 |
+| `--wpds-motion-duration-sm`       | Micro-interactions like focus rings and state changes                                               |
+| `--wpds-motion-duration-md`       | Standard transitions like menus and popovers                                                        |
+| `--wpds-motion-duration-lg`       | Deliberate animations like slides and reveals                                                       |
+| `--wpds-motion-duration-xl`       | Extended animations like complex or multi-step transitions                                          |
+| `--wpds-motion-easing-subtle`     | Nearly imperceptible easing for hover, color, and background transitions                            |
+| `--wpds-motion-easing-balanced`   | General-purpose easing for on-screen movement like resizing, morphing, and layout shifts            |
+| `--wpds-motion-easing-expressive` | Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers |
+
 ### Typography
 
-| Variable name                 | Description                                  |
-| ----------------------------- | -------------------------------------------- |
-| `--wpds-font-family-heading`  | Headings font family                         |
-| `--wpds-font-family-body`     | Body font family                             |
-| `--wpds-font-family-mono`     | Monospace font family                        |
-| `--wpds-font-size-xs`         | Extra small font size                        |
-| `--wpds-font-size-sm`         | Small font size                              |
-| `--wpds-font-size-md`         | Medium font size                             |
-| `--wpds-font-size-lg`         | Large font size                              |
-| `--wpds-font-size-xl`         | Extra large font size                        |
-| `--wpds-font-size-2xl`        | 2X large font size                           |
-| `--wpds-font-line-height-xs`  | Extra small line height                      |
-| `--wpds-font-line-height-sm`  | Small line height                            |
-| `--wpds-font-line-height-md`  | Medium line height                           |
-| `--wpds-font-line-height-lg`  | Large line height                            |
-| `--wpds-font-line-height-xl`  | Extra large line height                      |
-| `--wpds-font-line-height-2xl` | 2X large line height                         |
-| `--wpds-font-weight-regular`  | Regular font weight for body text            |
-| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |
+| Variable name                           | Description                                  |
+| --------------------------------------- | -------------------------------------------- |
+| `--wpds-typography-font-family-heading` | Headings font family                         |
+| `--wpds-typography-font-family-body`    | Body font family                             |
+| `--wpds-typography-font-family-mono`    | Monospace font family                        |
+| `--wpds-typography-font-size-xs`        | Extra small font size                        |
+| `--wpds-typography-font-size-sm`        | Small font size                              |
+| `--wpds-typography-font-size-md`        | Medium font size                             |
+| `--wpds-typography-font-size-lg`        | Large font size                              |
+| `--wpds-typography-font-size-xl`        | Extra large font size                        |
+| `--wpds-typography-font-size-2xl`       | 2X large font size                           |
+| `--wpds-typography-line-height-xs`      | Extra small line height                      |
+| `--wpds-typography-line-height-sm`      | Small line height                            |
+| `--wpds-typography-line-height-md`      | Medium line height                           |
+| `--wpds-typography-line-height-lg`      | Large line height                            |
+| `--wpds-typography-line-height-xl`      | Extra large line height                      |
+| `--wpds-typography-line-height-2xl`     | 2X large line height                         |
+| `--wpds-typography-font-weight-regular` | Regular font weight for body text            |
+| `--wpds-typography-font-weight-medium`  | Medium font weight for emphasis and headings |

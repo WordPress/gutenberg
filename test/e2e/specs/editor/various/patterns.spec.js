@@ -5,6 +5,13 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Pattern editing involves page reloads and entity navigation to pages
+		// without the DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -16,6 +23,12 @@ test.describe( 'Unsynced pattern', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test( 'create a new unsynced pattern via the block options menu', async ( {
@@ -335,7 +348,7 @@ test.describe( 'Unsynced pattern', () => {
 		).toHaveCount( 2 );
 	} );
 
-	test( 'supports editing pattern via Edit section button', async ( {
+	test( 'supports editing pattern via Edit pattern button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -384,12 +397,12 @@ test.describe( 'Unsynced pattern', () => {
 		// Click on the pattern in List View to select it.
 		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
 
-		// Open settings sidebar and click "Edit section" button.
+		// Open settings sidebar and click "Edit pattern" button.
 		await editor.openDocumentSettingsSidebar();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit section' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
 			.click();
 
 		// Expand the inner Group to see all blocks including separator.
@@ -413,11 +426,152 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 
-		// Exit pattern editing by clicking the "Exit section" button.
+		// Exit pattern editing by clicking the "Exit pattern" button.
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Exit section' } )
+			.getByRole( 'button', { name: 'Exit pattern' } )
 			.click();
+
+		// Verify pattern is back to content-only mode (separator hidden again).
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Separator',
+				exact: true,
+			} )
+		).not.toBeAttached();
+
+		// Verify content blocks are still visible.
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Test heading',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Paragraph',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Image',
+				exact: true,
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'detaches an unsynced pattern via the block options menu', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert a paragraph block with unsynced pattern metadata.
+		await editor.setContent(
+			`<!-- wp:paragraph {"metadata":{"patternName":"my-pattern","name":"My unsynced pattern"}} -->
+<p>Pattern content</p>
+<!-- /wp:paragraph -->`
+		);
+
+		// Select the paragraph block (the unsynced pattern).
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Open the block options menu and click "Detach".
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
+
+		// Verify block content is preserved but patternName is removed from metadata.
+		const blocks = await editor.getBlocks();
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/paragraph' );
+		expect( blocks[ 0 ].attributes.content ).toBe( 'Pattern content' );
+		expect( blocks[ 0 ].attributes.metadata?.patternName ).toBeUndefined();
+		expect( blocks[ 0 ].attributes.metadata?.name ).toBe(
+			'My unsynced pattern'
+		);
+	} );
+
+	test( 'supports editing pattern via Edit pattern toolbar button', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert the pattern structure.
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"core/block/123","name":"My pattern"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:heading -->
+<h2 class="wp-block-heading">Test heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->
+
+<!-- wp:paragraph -->
+<p>Test paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->` );
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// Expand the pattern to see its inner blocks in content-only mode.
+		await listView
+			.getByRole( 'gridcell', { name: 'My pattern' } )
+			.getByTestId( 'list-view-expander' )
+			.click( { force: true } );
+
+		// Verify separator is initially hidden in content-only mode.
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Separator',
+				exact: true,
+			} )
+		).not.toBeAttached();
+
+		// Click on the pattern in List View to select it.
+		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
+
+		// Click "Edit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit pattern' );
+
+		// Expand the inner Group to see all blocks including separator.
+		await listView
+			.getByRole( 'gridcell', { name: 'Group' } )
+			.getByTestId( 'list-view-expander' )
+			.click( { force: true } );
+
+		// Assert all blocks are now visible in List View.
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Separator',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Group',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		// Exit pattern editing by clicking "Exit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Exit pattern' );
 
 		// Verify pattern is back to content-only mode (separator hidden again).
 		await expect(
@@ -453,6 +607,13 @@ test.describe( 'Unsynced pattern', () => {
 
 test.describe( 'Synced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Pattern editing involves page reloads and entity navigation to pages
+		// without the DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -465,6 +626,12 @@ test.describe( 'Synced pattern', () => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test( 'create a new synced pattern via the block options menu', async ( {
@@ -671,7 +838,11 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -682,6 +853,7 @@ test.describe( 'Synced pattern', () => {
 	} );
 
 	test( 'can be created, inserted, and converted to a regular block', async ( {
+		page,
 		editor,
 		requestUtils,
 	} ) => {
@@ -706,7 +878,11 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -762,6 +938,7 @@ test.describe( 'Synced pattern', () => {
 	} );
 
 	test( 'can be created from multiselection and converted back to regular blocks', async ( {
+		page,
 		editor,
 		pageUtils,
 	} ) => {
@@ -807,7 +984,11 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -858,7 +1039,7 @@ test.describe( 'Synced pattern', () => {
 
 		await expect(
 			page
-				.getByRole( 'listbox', { name: 'Block patterns' } )
+				.getByRole( 'listbox', { name: 'Patterns' } )
 				.getByRole( 'option', {
 					name: 'Awesome empty',
 				} )
@@ -977,5 +1158,84 @@ test.describe( 'Synced pattern', () => {
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		).toBeVisible();
+	} );
+} );
+
+test.describe( 'Synced pattern - entity navigation', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.deleteAllBlocks();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deleteAllBlocks();
+	} );
+
+	test( 'should restore selection after navigating back from pattern editing', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Navigation test pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		// Insert a pattern block within the post content.
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Enable "Show template" to enter template-locked mode.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Template options' } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		// Close the dropdown.
+		await page.keyboard.press( 'Escape' );
+
+		// Select the pattern block.
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		await editor.selectBlocks( patternBlock );
+
+		// Click "Edit original" in the block toolbar.
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Edit original' } )
+			.click();
+
+		// Verify we navigated to the pattern editing view.
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Navigation test pattern',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		// Click "Back" to return to the post.
+		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
+
+		// The pattern block should still be selected.
+		await expect( patternBlock ).toHaveClass( /is-selected/ );
 	} );
 } );

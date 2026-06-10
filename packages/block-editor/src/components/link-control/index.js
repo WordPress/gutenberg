@@ -38,6 +38,7 @@ import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
 import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
+import normalizeUrl from './normalize-url';
 
 /**
  * Default properties associated with a link control value.
@@ -100,6 +101,9 @@ import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
  * @property {WPLinkControlValue=}        value                      Current link value.
  * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
  *                                                                   the user selects a new link or updates settings.
+ * @property {Function=}                  onInputChange              Callback fired when the search input value changes.
+ *                                                                   Use this for observation only (e.g., to track search state).
+ * @property {string=}                    inputValue                 Initial value for the search input (uncontrolled).
  * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
  * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
  * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
@@ -121,6 +125,37 @@ const PREFERENCE_KEY = 'linkControlSettingsDrawer';
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
  * for how that link is expected to behave.
+ * ## Usage Patterns
+ *
+ * The component does not support a fully controlled implementation,
+ * but it does support an observable implementation.
+ *
+ * ### Uncontrolled (default)
+ * The component manages its own search input state:
+ * ```jsx
+ * <LinkControl value={ link } onChange={ setLink } />
+ * ```
+ *
+ * ### Observable
+ * Observe input changes without controlling the value:
+ * ```jsx
+ * <LinkControl
+ *   value={ link }
+ *   onChange={ setLink }
+ *   onInputChange={ ( newValue ) => console.log( newValue ) }
+ * />
+ * ```
+ *
+ * ### Uncontrolled with Initial Value
+ * Pre-populate the search input with a default value:
+ * ```jsx
+ * <LinkControl
+ *   value={ link }
+ *   onChange={ setLink }
+ *   inputValue="wordpress"
+ *   onInputChange={ ( newValue ) => console.log( newValue ) }
+ * />
+ * ```
  *
  * @param {WPLinkControlProps} props Component props.
  */
@@ -129,6 +164,7 @@ function LinkControl( {
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
+	onInputChange,
 	onRemove,
 	onCancel,
 	noDirectEntry = false,
@@ -213,6 +249,12 @@ function LinkControl( {
 		createSetInternalSettingValueHandler,
 	] = useInternalValue( value );
 
+	// Wrapper for input changes that calls both internal and external handlers
+	const handleInputChange = ( newValue ) => {
+		setInternalURLInputValue( newValue );
+		onInputChange?.( newValue );
+	};
+
 	// Compute isEntity internally based on handleEntities prop and presence of ID
 	const isEntity = handleEntities && !! internalControlValue?.id;
 
@@ -269,6 +311,25 @@ function LinkControl( {
 			isMountingRef.current = true;
 		};
 	}, [] );
+
+	// Warn when inputValue changes after mount. inputValue only sets the
+	// initial value. The component is uncontrolled and changes
+	// from the parent will not update the search input.
+	const prevInputValueRef = useRef();
+	useEffect( () => {
+		if ( prevInputValueRef.current === undefined ) {
+			prevInputValueRef.current = propInputValue;
+			return;
+		}
+
+		if ( prevInputValueRef.current !== propInputValue ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'LinkControl: The inputValue prop is uncontrolled and only sets the initial value. onInputChange is an observer for the input value. Changes to inputValue from the parent will not update the search input.'
+			);
+			prevInputValueRef.current = propInputValue;
+		}
+	}, [ propInputValue ] );
 
 	// Trigger validation display when customValidity becomes invalid.
 	// This effect runs after React has applied the customValidity state update
@@ -363,6 +424,13 @@ function LinkControl( {
 				setCustomValidity( validation );
 				return;
 			}
+
+			// Validation passed - normalize the URL
+			const { url: normalizedUrl } = normalizeUrl( urlToValidate );
+			updatedValue = {
+				...updatedValue,
+				url: normalizedUrl,
+			};
 		}
 
 		// Preserve the URL for taxonomy entities before binding overrides it
@@ -444,7 +512,7 @@ function LinkControl( {
 			onChange( {
 				...value,
 				...internalControlValue,
-				url: currentUrlInputValue,
+				url: normalizeUrl( currentUrlInputValue ).url,
 			} );
 		}
 		stopEditing();
@@ -530,8 +598,12 @@ function LinkControl( {
 		}
 	}, [ shouldFocusSearchInput ] );
 
+	// Prioritize internal value (even if empty string), but allow propInputValue to set
+	// the initial default value.
 	const currentUrlInputValue =
-		propInputValue || internalControlValue?.url || '';
+		internalControlValue?.url !== undefined
+			? internalControlValue.url
+			: propInputValue || '';
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
@@ -616,7 +688,7 @@ function LinkControl( {
 							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
-							onChange={ setInternalURLInputValue }
+							onChange={ handleInputChange }
 							onSelect={ handleSelectSuggestion }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }

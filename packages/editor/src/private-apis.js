@@ -29,10 +29,7 @@ import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
-import {
-	useGenerateBlockPath,
-	useRestoreBlockFromPath,
-} from './utils/block-selection-path';
+import UploadProgressSnackbar from './components/upload-progress-snackbar';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -52,6 +49,7 @@ lock( privateApis, {
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 	ResizableEditor,
+	UploadProgressSnackbar,
 	registerCoreBlockBindingsSources,
 	getTemplateInfo,
 	// Global Styles
@@ -60,9 +58,6 @@ lock( privateApis, {
 	StyleBookPreview,
 	useGlobalStyles,
 	useStyle,
-	// Block selection
-	useGenerateBlockPath,
-	useRestoreBlockFromPath,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,

@@ -1,0 +1,25 @@
+{
+	"name": "@wordpress/quick-draft-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/autop": "file:../../packages/autop",
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/compose": "file:../../packages/compose",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/dataviews": "file:../../packages/dataviews",
+		"@wordpress/date": "file:../../packages/date",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/escape-html": "file:../../packages/escape-html",
+		"@wordpress/html-entities": "file:../../packages/html-entities",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/url": "file:../../packages/url",
+		"@wordpress/ui": "file:../../packages/ui",
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
+	}
+}

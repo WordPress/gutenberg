@@ -45,6 +45,7 @@ function selector( select ) {
 		isTyping,
 		isDragging,
 		isZoomOut,
+		getViewportModalClientIds,
 	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
@@ -56,6 +57,7 @@ function selector( select ) {
 		isTyping: isTyping(),
 		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
+		viewportModalClientIds: getViewportModalClientIds(),
 	};
 }
 
@@ -73,10 +75,14 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
-		useSelect( selector, [] );
-	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
-		useState( null );
+	const {
+		clientId,
+		hasFixedToolbar,
+		isTyping,
+		isZoomOutMode,
+		isDragging,
+		viewportModalClientIds,
+	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
@@ -86,6 +92,7 @@ export default function BlockTools( {
 		getBlockName,
 		isGroupable,
 		getEditedContentOnlySection,
+		canEditBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
@@ -108,6 +115,8 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 		stopEditingContentOnlySection,
+		showViewportModal,
+		hideViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -226,7 +235,10 @@ export default function BlockTools( {
 			if ( clientIds.length === 1 ) {
 				const isContentOnly =
 					getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly';
-				const canRenameBlock = canRename && ! isContentOnly;
+				const canRenameBlock =
+					canRename &&
+					! isContentOnly &&
+					canEditBlock( clientIds[ 0 ] );
 				if ( canRenameBlock ) {
 					event.preventDefault();
 					setRenamingBlockClientId( clientIds[ 0 ] );
@@ -247,8 +259,21 @@ export default function BlockTools( {
 					return;
 				}
 
+				// Don't allow visibility toggle for blocks that are not in the
+				// default editing mode or when block editing is disabled
+				// (e.g. Revisions UI with isPreviewMode).
+				if (
+					clientIds.some(
+						( id ) =>
+							getBlockEditingMode( id ) !== 'default' ||
+							! canEditBlock( id )
+					)
+				) {
+					return;
+				}
+
 				// Open the visibility breakpoints modal.
-				setVisibilityModalClientIds( clientIds );
+				showViewportModal( clientIds );
 			}
 		}
 
@@ -321,10 +346,10 @@ export default function BlockTools( {
 					onClose={ () => setRenamingBlockClientId( null ) }
 				/>
 			) }
-			{ visibilityModalClientIds && (
+			{ viewportModalClientIds && (
 				<BlockVisibilityModal
-					clientIds={ visibilityModalClientIds }
-					onClose={ () => setVisibilityModalClientIds( null ) }
+					clientIds={ viewportModalClientIds }
+					onClose={ hideViewportModal }
 				/>
 			) }
 		</div>

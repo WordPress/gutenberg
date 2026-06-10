@@ -63,7 +63,7 @@ function UnforwardedModal(
 		__experimentalHideHeader = false,
 	} = props;
 
-	const ref = useRef< HTMLDivElement >();
+	const ref = useRef< HTMLDivElement >( null );
 
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
@@ -113,12 +113,13 @@ function UnforwardedModal(
 
 	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
-		ariaHelper.modalize( ref.current );
+		ariaHelper.modalize( ref.current! );
 		return () => ariaHelper.unmodalize();
 	}, [] );
 
 	// Keeps a fresh ref for the subsequent effect.
-	const onRequestCloseRef = useRef< ModalProps[ 'onRequestClose' ] >();
+	const onRequestCloseRef =
+		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
 	useEffect( () => {
 		onRequestCloseRef.current = onRequestClose;
 	}, [ onRequestClose ] );
@@ -167,8 +168,7 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
-	const { closeModal, frameRef, frameStyle, overlayClassname } =
-		useModalExitAnimation();
+	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -258,10 +258,7 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ {
-						...frameStyle,
-						...style,
-					} }
+					style={ style }
 					ref={ useMergeRefs( [
 						frameRef,
 						constrainedTabbingRef,

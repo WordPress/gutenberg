@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { DataForm, DataViews, type Form } from '@wordpress/dataviews';
-import type { Field, View } from '@wordpress/dataviews';
+import type { Field, View, Form } from '@wordpress/dataviews';
+import { DataForm, DataViews } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -386,12 +386,6 @@ export const DataViewsPreview = () => {
 		totalPages: 1,
 	};
 
-	const defaultLayouts = {
-		table: {},
-		list: {},
-		grid: {},
-	};
-
 	return (
 		<div style={ { padding: '20px' } }>
 			<h2>Media Fields DataViews Preview</h2>
@@ -406,7 +400,6 @@ export const DataViewsPreview = () => {
 				view={ view }
 				onChangeView={ ( nextView: View ) => setView( nextView ) }
 				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
 			/>
 		</div>
 	);

@@ -19,7 +19,9 @@ import {
 	convertImageFormat,
 	compressImage,
 	resizeImage,
+	rotateImage,
 	hasTransparency,
+	getUltraHdrInfo,
 } from './index';
 
 /**
@@ -30,7 +32,9 @@ const api = {
 	convertImageFormat,
 	compressImage,
 	resizeImage,
+	rotateImage,
 	hasTransparency,
+	getUltraHdrInfo,
 };
 
 expose( api );

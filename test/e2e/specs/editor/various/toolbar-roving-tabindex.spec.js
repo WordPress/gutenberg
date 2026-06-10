@@ -64,7 +64,8 @@ test.describe( 'Toolbar roving tabindex', () => {
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'List' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
 			'Block: List',
-			'List'
+			'List',
+			{ hasInnerBlocks: true }
 		);
 
 		// ensures table block toolbar uses roving tabindex
@@ -88,7 +89,9 @@ test.describe( 'Toolbar roving tabindex', () => {
 		);
 		await ToolbarRovingTabindexUtils.wrapCurrentBlockWithGroup( 'Table' );
 		await ToolbarRovingTabindexUtils.testGroupKeyboardNavigation(
-			'Block: Table',
+			// ArrowRight from Group enters the table cell directly,
+			// not the Table block wrapper.
+			'Body cell text',
 			'Table'
 		);
 
@@ -181,9 +184,19 @@ class ToolbarRovingTabindexUtils {
 		await this.page.click( `role=menuitem[name="Group"]` );
 	}
 
-	async testGroupKeyboardNavigation( currentBlockLabel, currentBlockTitle ) {
+	async testGroupKeyboardNavigation(
+		currentBlockLabel,
+		currentBlockTitle,
+		{ hasInnerBlocks = false } = {}
+	) {
 		await this.expectLabelToHaveFocus( 'Block: Group' );
 		await this.page.keyboard.press( 'ArrowRight' );
+		if ( hasInnerBlocks ) {
+			// ArrowRight enters a nested inner block (e.g. list-item
+			// inside list). Use primary+a to escalate selection back
+			// to the expected parent block.
+			await this.pageUtils.pressKeys( 'primary+a', { times: 2 } );
+		}
 		await this.expectLabelToHaveFocus( currentBlockLabel );
 		await this.pageUtils.pressKeys( 'shift+Tab' );
 		await this.expectLabelToHaveFocus( 'Select parent block: Group' );

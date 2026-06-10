@@ -43,7 +43,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 			type: 'application/javascript',
 		} );
 		workerBlobUrl = URL.createObjectURL( blob );
-		worker = new Worker( workerBlobUrl );
+		worker = new Worker( workerBlobUrl, { type: 'module' } );
 		workerAPI = wrap< WorkerAPI >( worker );
 	}
 	return workerAPI;
@@ -103,11 +103,15 @@ export async function vipsCompressImage(
 /**
  * Resizes an image using vips in a worker.
  *
+ * UltraHDR JPEGs are auto-detected by libvips and their gain map is
+ * preserved through the resize.
+ *
  * @param id        Item ID.
  * @param buffer    Original file buffer.
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1). Defaults to 0.82.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -115,7 +119,8 @@ export async function vipsResizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -124,7 +129,7 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, smartCrop );
+	return api.resizeImage( id, buffer, type, resize, smartCrop, quality );
 }
 
 /**
@@ -138,6 +143,46 @@ export async function vipsHasTransparency(
 ): Promise< boolean > {
 	const api = getWorkerAPI();
 	return api.hasTransparency( buffer );
+}
+
+/**
+ * Probes a JPEG buffer for UltraHDR (ISO 21496-1 gain map) support using vips
+ * in a worker.
+ *
+ * @param buffer Image buffer to probe.
+ * @return UltraHDR info (dimensions and HDR headroom in stops) if the buffer
+ *         is a valid UltraHDR JPEG; otherwise null.
+ */
+export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ): Promise< {
+	width: number;
+	height: number;
+	hdrCapacity: number;
+} | null > {
+	const api = getWorkerAPI();
+	return api.getUltraHdrInfo( buffer );
+}
+
+/**
+ * Rotates an image based on EXIF orientation using vips in a worker.
+ *
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Rotated file data plus the new dimensions.
+ */
+export async function vipsRotateImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	orientation: number
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const api = getWorkerAPI();
+	return api.rotateImage( id, buffer, type, orientation );
 }
 
 /**

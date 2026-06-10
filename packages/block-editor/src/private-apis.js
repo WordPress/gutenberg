@@ -24,26 +24,35 @@ import {
 	setBackgroundStyleDefaults,
 	useLayoutClasses,
 	useLayoutStyles,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 	useZoomOut,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
 import TextAlignmentControl from './components/text-alignment-control';
 import { usesContextKey } from './components/rich-text/format-edit';
-import { ExperimentalBlockCanvas } from './components/block-canvas';
+import {
+	ExperimentalBlockCanvas,
+	BlockCanvasCover,
+} from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
 	deviceTypeKey,
+	onViewportStateChangeKey,
 	isIsolatedEditorKey,
+	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -53,8 +62,8 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
-import CommentIconSlotFill from './components/collab/block-comment-icon-slot';
-import CommentIconToolbarSlotFill from './components/collab/block-comment-icon-toolbar-slot';
+import NoteIconSlotFill from './components/collab/note-icon-slot';
+import NoteIconToolbarSlotFill from './components/collab/note-icon-toolbar-slot';
 import HTMLElementControl from './components/html-element-control';
 import {
 	useBlockElementRef,
@@ -76,6 +85,7 @@ export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockCanvas,
+	BlockCanvasCover,
 	ExperimentalBlockEditorProvider,
 	getDuotoneFilter,
 	getRichTextValues,
@@ -110,19 +120,25 @@ lock( privateApis, {
 	PrivateRichText,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	PrivateBlockPopover,
 	PrivatePublishDateTimePicker,
 	useSpacingSizes,
 	useBlockDisplayTitle,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
-	CommentIconSlotFill,
-	CommentIconToolbarSlotFill,
+	NoteIconSlotFill,
+	NoteIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
 	deviceTypeKey,
+	onViewportStateChangeKey,
 	isIsolatedEditorKey,
+	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
+	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

@@ -6,10 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon, Tooltip } from '@wordpress/components';
+import { Button, Icon as WCIcon } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,15 +48,20 @@ export default function SummaryButton< Item >( {
 	onClick: () => void;
 	'aria-expanded'?: boolean;
 } ) {
-	const labelPosition = ( field.layout as NormalizedPanelLayout )
-		.labelPosition;
+	const { labelPosition, editVisibility } =
+		field.layout as NormalizedPanelLayout;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
 	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
-		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`
+		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`,
+		{
+			'is-disabled': disabled,
+			'dataforms-layouts-panel__field-trigger--edit-always':
+				editVisibility === 'always',
+		}
 	);
 
 	const controlId = useInstanceId(
@@ -73,17 +81,52 @@ export default function SummaryButton< Item >( {
 				fieldLabel || ''
 		  );
 
+	const rowRef = useRef< HTMLDivElement >( null );
+
+	const handleRowClick = () => {
+		const selection =
+			rowRef.current?.ownerDocument.defaultView?.getSelection();
+		if ( selection && selection.toString().length > 0 ) {
+			return;
+		}
+		onClick();
+	};
+
+	const handleKeyDown = ( event: React.KeyboardEvent ) => {
+		if (
+			event.target === event.currentTarget &&
+			( event.key === 'Enter' || event.key === ' ' )
+		) {
+			event.preventDefault();
+			onClick();
+		}
+	};
+
 	return (
-		<div className={ className } aria-disabled={ disabled || undefined }>
+		<div
+			ref={ rowRef }
+			className={ className }
+			onClick={ ! disabled ? handleRowClick : undefined }
+			onKeyDown={ ! disabled ? handleKeyDown : undefined }
+		>
 			{ labelPosition !== 'none' && (
 				<span className={ labelClassName }>{ labelContent }</span>
 			) }
 			{ labelPosition === 'none' && showError && (
-				<Tooltip text={ errorMessage } placement="top">
-					<span className="dataforms-layouts-panel__field-label-error-content">
-						<Icon icon={ errorIcon } size={ 16 } />
-					</span>
-				</Tooltip>
+				<Tooltip.Root>
+					<Tooltip.Trigger
+						render={
+							<span
+								className="dataforms-layouts-panel__field-label-error-content"
+								role="img"
+								aria-label={ errorMessage }
+							>
+								<WCIcon icon={ errorIcon } size={ 16 } />
+							</span>
+						}
+					/>
+					<Tooltip.Popup>{ errorMessage }</Tooltip.Popup>
+				</Tooltip.Root>
 			) }
 			<span
 				id={ `${ controlId }` }
@@ -122,17 +165,15 @@ export default function SummaryButton< Item >( {
 				) }
 			</span>
 			{ ! disabled && (
-				<button
-					type="button"
+				<Button
 					className="dataforms-layouts-panel__field-trigger-icon"
-					aria-label={ ariaLabel }
+					label={ ariaLabel }
+					icon={ pencil }
+					size="small"
 					aria-expanded={ ariaExpanded }
 					aria-haspopup="dialog"
 					aria-describedby={ `${ controlId }` }
-					onClick={ onClick }
-				>
-					<Icon icon={ pencil } size={ 24 } />
-				</button>
+				/>
 			) }
 		</div>
 	);

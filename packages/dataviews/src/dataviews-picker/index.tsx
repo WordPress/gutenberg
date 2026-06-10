@@ -2,12 +2,19 @@
  * External dependencies
  */
 import type { ReactNode } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import { useResizeObserver, throttle } from '@wordpress/compose';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -30,6 +37,8 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useData from '../hooks/use-data';
+import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import type { ActionButton, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -52,9 +61,8 @@ type DataViewsPickerProps< Item > = {
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-		infiniteScrollHandler?: () => void;
 	};
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts?: SupportedLayouts;
 	selection: string[];
 	onChangeSelection: ( items: string[] ) => void;
 	children?: ReactNode;
@@ -63,12 +71,17 @@ type DataViewsPickerProps< Item > = {
 	};
 	itemListLabel?: string;
 	empty?: ReactNode;
+	onReset?: ( () => void ) | false;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const EMPTY_ARRAY: any[] = [];
+const DEFAULT_PICKER_LAYOUTS: SupportedLayouts = {
+	pickerGrid: true,
+	pickerTable: true,
+};
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
@@ -79,13 +92,18 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
+	const { view } = useContext( DataViewsContext );
+	const isInfiniteScroll = view.infiniteScrollEnabled;
 	return (
 		<>
 			<Stack
 				direction="row"
 				align="top"
 				justify="space-between"
-				className="dataviews__view-actions"
+				className={ clsx( 'dataviews__view-actions', {
+					'dataviews__view-actions--infinite-scroll':
+						isInfiniteScroll,
+				} ) }
 				gap="xs"
 			>
 				<Stack
@@ -119,16 +137,27 @@ function DataViewsPicker< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts: defaultLayoutsProperty,
+	defaultLayouts: defaultLayoutsProperty = DEFAULT_PICKER_LAYOUTS,
 	selection,
 	onChangeSelection,
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	itemListLabel,
 	empty,
+	onReset,
 }: DataViewsPickerProps< Item > ) {
-	const { infiniteScrollHandler } = paginationInfo;
-	const containerRef = useRef< HTMLDivElement | null >( null );
+	// useData ensures data loading is correct whether infinite scroll is enabled or pagination is used.
+	const { data: displayData, setVisibleEntries } = useData( {
+		view,
+		data: data as any,
+		getItemId: getItemId as any,
+		selection,
+		paginationInfo,
+	} ) as {
+		data: ( Item & { position?: number } )[];
+		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
+	};
+	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {
@@ -148,6 +177,7 @@ function DataViewsPicker< Item >( {
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 	const filters = useFilters( _fields, view );
+
 	const hasPrimaryOrLockedFilters = useMemo(
 		() =>
 			( filters || [] ).some(
@@ -159,50 +189,35 @@ function DataViewsPicker< Item >( {
 		hasPrimaryOrLockedFilters
 	);
 
+	const { intersectionObserver } = useInfiniteScroll( {
+		view,
+		onChangeView,
+		isLoading,
+		paginationInfo,
+		containerRef,
+		setVisibleEntries,
+	} );
+
 	useEffect( () => {
 		if ( hasPrimaryOrLockedFilters && ! isShowingFilter ) {
 			setIsShowingFilter( true );
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Attach scroll event listener for infinite scroll
-	useEffect( () => {
-		if ( ! view.infiniteScrollEnabled || ! containerRef.current ) {
-			return;
-		}
-
-		const handleScroll = throttle( ( event: unknown ) => {
-			const target = ( event as Event ).target as HTMLElement;
-			const scrollTop = target.scrollTop;
-			const scrollHeight = target.scrollHeight;
-			const clientHeight = target.clientHeight;
-
-			// Check if user has scrolled near the bottom
-			if ( scrollTop + clientHeight >= scrollHeight - 100 ) {
-				infiniteScrollHandler?.();
-			}
-		}, 100 ); // Throttle to 100ms
-
-		const container = containerRef.current;
-		container.addEventListener( 'scroll', handleScroll );
-
-		return () => {
-			container.removeEventListener( 'scroll', handleScroll );
-			handleScroll.cancel(); // Cancel any pending throttled calls
-		};
-	}, [ infiniteScrollHandler, view.infiniteScrollEnabled ] );
-
-	// Filter out DataViewsPicker layouts.
+	// Filter out non-picker layouts and normalize `true` to `{}`.
 	const defaultLayouts = useMemo(
 		() =>
 			Object.fromEntries(
-				Object.entries( defaultLayoutsProperty ).filter(
-					( [ layoutType ] ) => {
+				Object.entries( defaultLayoutsProperty )
+					.filter( ( [ layoutType ] ) => {
 						return dataViewsPickerLayouts.some(
 							( viewLayout ) => viewLayout.type === layoutType
 						);
-					}
-				)
+					} )
+					.map( ( [ key, value ] ) => [
+						key,
+						value === true ? {} : value,
+					] )
 			),
 		[ defaultLayoutsProperty ]
 	);
@@ -218,7 +233,7 @@ function DataViewsPicker< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
+				data: displayData,
 				isLoading,
 				paginationInfo,
 				isItemClickable,
@@ -237,10 +252,12 @@ function DataViewsPicker< Item >( {
 				config,
 				itemListLabel,
 				empty,
-				hasInfiniteScrollHandler: !! infiniteScrollHandler,
+				onReset,
+				hasInitiallyLoaded: true,
+				intersectionObserver,
 			} }
 		>
-			<div className="dataviews-picker-wrapper" ref={ containerRef }>
+			<div className="dataviews-picker-wrapper">
 				{ children ?? (
 					<DefaultUI search={ search } searchLabel={ searchLabel } />
 				) }

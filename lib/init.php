@@ -27,7 +27,8 @@ function gutenberg_menu() {
 		__( 'Demo', 'gutenberg' ),
 		__( 'Demo', 'gutenberg' ),
 		'edit_posts',
-		'gutenberg'
+		'gutenberg',
+		'__return_null',
 	);
 
 	if ( current_user_can( 'edit_posts' ) ) {
@@ -46,14 +47,5 @@ function gutenberg_menu() {
 			'https://developer.wordpress.org/block-editor/'
 		);
 	}
-
-	add_submenu_page(
-		'gutenberg',
-		__( 'Experiments Settings', 'gutenberg' ),
-		__( 'Experiments', 'gutenberg' ),
-		'manage_options',
-		'gutenberg-experiments',
-		'the_gutenberg_experiments'
-	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );

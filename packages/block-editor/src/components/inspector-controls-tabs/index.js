@@ -2,13 +2,15 @@
  * WordPress dependencies
  */
 import {
-	Icon,
-	Tooltip,
+	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect, useDispatch } from '@wordpress/data';
+
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -37,7 +39,16 @@ export default function InspectorControlsTabs( {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
-	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
+	// Get any requested inspector tab (used for initial state when programmatically switching)
+	const { requestedTab } = useSelect( ( select ) => ( {
+		requestedTab: unlock(
+			select( blockEditorStore )
+		).getRequestedInspectorTab(),
+	} ) );
+
+	const [ selectedTabId, setSelectedTabId ] = useState(
+		() => requestedTab?.tabName ?? tabs[ 0 ]?.name
+	);
 	const hasUserSelectionRef = useRef( false );
 	const isProgrammaticSwitchRef = useRef( false );
 	const {
@@ -46,11 +57,63 @@ export default function InspectorControlsTabs( {
 			incrementListViewExpandRevision,
 		__unstableSetAllListViewPanelsOpen: setAllListViewPanelsOpen,
 	} = useDispatch( blockEditorStore );
+	const { clearRequestedInspectorTab } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	// Reset when switching blocks
 	useEffect( () => {
 		hasUserSelectionRef.current = false;
 	}, [ clientId ] );
+
+	// Handle explicit inspector tab requests (panel opening, refs, clear).
+	// Tab state is initialized from requestedTab above.
+	useEffect( () => {
+		if ( ! requestedTab ) {
+			return;
+		}
+
+		// Switch to the requested tab
+		setSelectedTabId( requestedTab.tabName );
+
+		// Handle tab-specific options
+		if (
+			requestedTab.tabName === TAB_LIST_VIEW.name &&
+			requestedTab.options?.openPanel
+		) {
+			// Open the specific panel for List View
+			setOpenListViewPanel( requestedTab.options.openPanel );
+			incrementListViewExpandRevision();
+		}
+
+		// Mark as handled (programmatic switch)
+		isProgrammaticSwitchRef.current = true;
+		hasUserSelectionRef.current = true;
+
+		// Clear the request
+		clearRequestedInspectorTab();
+	}, [
+		requestedTab,
+		setOpenListViewPanel,
+		incrementListViewExpandRevision,
+		clearRequestedInspectorTab,
+	] );
+
+	// Initialize List View panels when the tab is selected and clientId changes
+	useEffect( () => {
+		if (
+			selectedTabId === TAB_LIST_VIEW.name &&
+			! hasUserSelectionRef.current
+		) {
+			setAllListViewPanelsOpen();
+			incrementListViewExpandRevision();
+		}
+	}, [
+		clientId,
+		selectedTabId,
+		setAllListViewPanelsOpen,
+		incrementListViewExpandRevision,
+	] );
 
 	// Auto-select first available tab unless user has made a selection
 	useEffect( () => {
@@ -114,14 +177,16 @@ export default function InspectorControlsTabs( {
 								{ tab.title }
 							</Tabs.Tab>
 						) : (
-							<Tooltip text={ tab.title } key={ tab.name }>
+							<Tooltip.Root key={ tab.name }>
 								<Tabs.Tab
 									tabId={ tab.name }
 									aria-label={ tab.title }
+									render={ <Tooltip.Trigger /> }
 								>
-									<Icon icon={ tab.icon } />
+									<WCIcon icon={ tab.icon } />
 								</Tabs.Tab>
-							</Tooltip>
+								<Tooltip.Popup>{ tab.title }</Tooltip.Popup>
+							</Tooltip.Root>
 						)
 					) }
 				</Tabs.TabList>

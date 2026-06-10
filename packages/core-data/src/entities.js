@@ -17,8 +17,10 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -42,11 +44,13 @@ export const rootEntitiesConfig = [
 		baseURL: '/',
 		baseURLParams: {
 			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-6.8/preload.php
+			// @see lib/compat/wordpress-7.1/preload.php
 			_fields: [
 				'description',
 				'gmt_offset',
 				'home',
+				'image_sizes',
+				'image_size_threshold',
 				'name',
 				'site_icon',
 				'site_icon_url',
@@ -61,6 +65,7 @@ export const rootEntitiesConfig = [
 		// The entity doesn't support selecting multiple records.
 		// The property is maintained for backward compatibility.
 		plural: '__unstableBases',
+		supportsPagination: false,
 	},
 	{
 		label: __( 'Post Type' ),
@@ -70,6 +75,7 @@ export const rootEntitiesConfig = [
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
 		plural: 'postTypes',
+		supportsPagination: false,
 	},
 	{
 		name: 'media',
@@ -89,6 +95,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'taxonomies',
 		label: __( 'Taxonomy' ),
+		supportsPagination: false,
 	},
 	{
 		name: 'sidebar',
@@ -98,6 +105,7 @@ export const rootEntitiesConfig = [
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
+		supportsPagination: false,
 	},
 	{
 		name: 'widget',
@@ -107,6 +115,7 @@ export const rootEntitiesConfig = [
 		plural: 'widgets',
 		transientEdits: { blocks: true },
 		label: __( 'Widgets' ),
+		supportsPagination: false,
 	},
 	{
 		name: 'widgetType',
@@ -115,6 +124,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'widgetTypes',
 		label: __( 'Widget types' ),
+		supportsPagination: false,
 	},
 	{
 		label: __( 'User' ),
@@ -134,6 +144,7 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
+		syncConfig: defaultCollectionSyncConfig,
 	},
 	{
 		name: 'menu',
@@ -162,6 +173,7 @@ export const rootEntitiesConfig = [
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
+		supportsPagination: false,
 	},
 	{
 		label: __( 'Global Styles' ),
@@ -185,6 +197,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'themes',
 		key: 'stylesheet',
+		supportsPagination: false,
 	},
 	{
 		label: __( 'Plugins' ),
@@ -194,6 +207,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'plugins',
 		key: 'plugin',
+		supportsPagination: false,
 	},
 	{
 		label: __( 'Status' ),
@@ -203,6 +217,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'statuses',
 		key: 'slug',
+		supportsPagination: false,
 	},
 	{
 		label: __( 'Registered Templates' ),
@@ -210,6 +225,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/registered-templates',
 		key: 'id',
+		supportsPagination: false,
 	},
 	{
 		label: __( 'Font Collections' ),
@@ -219,17 +235,19 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'view' },
 		plural: 'fontCollections',
 		key: 'slug',
+		supportsPagination: true,
 	},
-].map( ( entity ) => {
-	const syncEnabledRootEntities = new Set( [ 'comment' ] );
-
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		if ( syncEnabledRootEntities.has( entity.name ) ) {
-			entity.syncConfig = defaultSyncConfig;
-		}
-	}
-	return entity;
-} );
+	{
+		label: __( 'Icons' ),
+		name: 'icon',
+		kind: 'root',
+		baseURL: '/wp/v2/icons',
+		baseURLParams: { context: 'view' },
+		plural: 'icons',
+		key: 'name',
+		supportsPagination: false,
+	},
+];
 
 export const deprecatedEntities = {
 	root: {
@@ -261,9 +279,9 @@ export const additionalEntityConfigLoaders = [
  * @param {Object}  edits           Edits.
  * @param {string}  name            Post type name.
  * @param {boolean} isTemplate      Whether the post type is a template.
- * @return {Object} Updated edits.
+ * @return {Promise< Object >} Updated edits.
  */
-export const prePersistPostType = (
+export const prePersistPostType = async (
 	persistedRecord,
 	edits,
 	name,
@@ -288,15 +306,22 @@ export const prePersistPostType = (
 		}
 	}
 
-	// Add meta for persisted CRDT document.
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		if ( persistedRecord ) {
-			const objectType = `postType/${ name }`;
-			const objectId = persistedRecord.id;
-			const meta = getSyncManager()?.createMeta( objectType, objectId );
+	// Add meta for the persisted CRDT document during real post saves so the
+	// saved post and CRDT snapshot are committed in the same request. We don't
+	// want a post save to fail but a CRDT update to succeed or vice versa.
+	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
+	if ( persistedRecord ) {
+		const objectType = `postType/${ name }`;
+		const objectId = persistedRecord.id;
+		const serializedDoc = getSyncManager()?.createPersistedCRDTDoc(
+			objectType,
+			objectId
+		);
+
+		if ( serializedDoc ) {
 			newEdits.meta = {
 				...edits.meta,
-				...meta,
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
 			};
 		}
 	}
@@ -310,14 +335,41 @@ export const prePersistPostType = (
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
-	} );
+	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
+	const taxonomiesPromise = window._wpCollaborationEnabled
+		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
+		: Promise.resolve( {} );
+	const [ postTypes, taxonomies ] = await Promise.all( [
+		postTypesPromise,
+		taxonomiesPromise,
+	] );
+
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
+
+		const syncedProperties = new Set( [
+			'author',
+			'blocks',
+			'content',
+			'comment_status',
+			'date',
+			'excerpt',
+			'featured_media',
+			'format',
+			'meta',
+			'ping_status',
+			'slug',
+			'status',
+			'sticky',
+			'template',
+			'title',
+			...( postType.taxonomies
+				?.map( ( taxonomy ) => taxonomies?.[ taxonomy ]?.rest_base )
+				?.filter( Boolean ) ?? [] ),
+		] );
 
 		const entity = {
 			kind: 'postType',
@@ -353,60 +405,66 @@ async function loadPostTypeEntities() {
 					: DEFAULT_ENTITY_KEY,
 		};
 
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		/**
+		 * @type {import('@wordpress/sync').SyncConfig}
+		 */
+		entity.syncConfig = {
+			// Save a CRDT document with this entity
+			supportsPersistence: true,
+
 			/**
-			 * @type {import('@wordpress/sync').SyncConfig}
+			 * Apply changes from the local editor to the local CRDT document so
+			 * that those changes can be synced to other peers (via the provider).
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+			 * @return {void}
 			 */
-			entity.syncConfig = {
-				/**
-				 * Apply changes from the local editor to the local CRDT document so
-				 * that those changes can be synced to other peers (via the provider).
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-				 * @return {void}
-				 */
-				applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-					applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
 
-				/**
-				 * Create the awareness instance for the entity's CRDT document.
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
-				 * @param {import('@wordpress/sync').ObjectID} objectId
-				 * @return {import('@wordpress/sync').Awareness} Awareness instance
-				 */
-				createAwareness: ( ydoc, objectId ) => {
-					const kind = 'postType';
-					const id = parseInt( objectId, 10 );
-					return new PostEditorAwareness( ydoc, kind, name, id );
-				},
+			/**
+			 * Create the awareness instance for the entity's CRDT document.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
+			 * @param {import('@wordpress/sync').ObjectID} objectId
+			 * @return {import('@wordpress/sync').Awareness} Awareness instance
+			 */
+			createAwareness: ( ydoc, objectId ) => {
+				const kind = 'postType';
+				const id = parseInt( objectId, 10 );
+				return new PostEditorAwareness( ydoc, kind, name, id );
+			},
 
-				/**
-				 * Extract changes from a CRDT document that can be used to update the
-				 * local editor state.
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-				 * @param {import('@wordpress/sync').ObjectData} editedRecord
-				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
-				 */
-				getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
-					getPostChangesFromCRDTDoc(
-						crdtDoc,
-						editedRecord,
-						postType
-					),
+			/**
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+			 * @param {import('@wordpress/sync').ObjectData} editedRecord
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+				getPostChangesFromCRDTDoc(
+					crdtDoc,
+					editedRecord,
+					syncedProperties
+				),
 
-				/**
-				 * Sync features supported by the entity.
-				 *
-				 * @type {Record< string, boolean >}
-				 */
-				supports: {
-					crdtPersistence: true,
-				},
-			};
-		}
+			/**
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
+			 *
+			 * @param {import('@wordpress/sync').ObjectData} record
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getPersistedCRDTDoc: ( record ) => {
+				return (
+					record?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
+					null
+				);
+			},
+		};
 
 		return entity;
 	} );
@@ -433,9 +491,7 @@ async function loadTaxonomyEntities() {
 			supportsPagination: true,
 		};
 
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			entity.syncConfig = defaultSyncConfig;
-		}
+		entity.syncConfig = defaultSyncConfig;
 
 		return entity;
 	} );
@@ -453,6 +509,7 @@ async function loadSiteEntity() {
 		kind: 'root',
 		key: false,
 		baseURL: '/wp/v2/settings',
+		supportsPagination: false,
 		meta: {},
 	};
 

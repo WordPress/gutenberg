@@ -5,7 +5,6 @@
 const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
-const terminalLink = require( 'terminal-link' );
 
 /**
  * Internal dependencies
@@ -21,28 +20,27 @@ const {
 	EnvironmentNotInitializedError,
 } = require( './runtime' );
 
-// Colors.
-const boldWhite = chalk.bold.white;
-const wpPrimary = boldWhite.bgHex( '#00669b' );
-const wpGreen = boldWhite.bgHex( '#4ab866' );
-const wpRed = boldWhite.bgHex( '#d94f4f' );
-const wpYellow = boldWhite.bgHex( '#f0b849' );
-
 // Spinner.
 const withSpinner =
 	( command ) =>
 	( ...args ) => {
-		const spinner = ora().start();
+		const isJSON = args[ 0 ].json;
+		const spinner = ora();
+		if ( ! isJSON ) {
+			spinner.start();
+		}
 		args[ 0 ].spinner = spinner;
 		let time = process.hrtime();
 		return command( ...args ).then(
 			( message ) => {
 				time = process.hrtime( time );
-				spinner.succeed(
-					`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
-						time[ 1 ] / 1e6
-					).toFixed( 0 ) }ms)`
-				);
+				if ( ! isJSON ) {
+					spinner.succeed(
+						`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
+							time[ 1 ] / 1e6
+						).toFixed( 0 ) }ms)`
+					);
+				}
 				process.exit( 0 );
 			},
 			( error ) => {
@@ -95,7 +93,8 @@ const withSpinner =
 	};
 
 module.exports = function cli() {
-	yargs.usage( wpPrimary( '$0 <command>' ) );
+	yargs.usage( '$0 <command>' );
+	yargs.usage( '$0 <command> -- --help' );
 	yargs.option( 'debug', {
 		type: 'boolean',
 		describe: 'Enable debug output.',
@@ -120,15 +119,7 @@ module.exports = function cli() {
 
 	yargs.command(
 		'start',
-		wpGreen(
-			chalk`Starts WordPress for development on port {bold.underline ${ terminalLink(
-				'8888',
-				'http://localhost:8888'
-			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
-				'8889',
-				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
-		),
+		chalk`Starts WordPress, listening locally. The current working directory must be a WordPress installation, a plugin, a theme, or contain a {bold .wp-env.json} file. The config's port can be overridden via {bold WP_ENV_PORT}.`,
 		( args ) => {
 			args.option( 'update', {
 				type: 'boolean',
@@ -160,26 +151,29 @@ module.exports = function cli() {
 				choices: getAvailableRuntimes(),
 				default: 'docker',
 			} );
+			args.option( 'auto-port', {
+				type: 'boolean',
+				describe:
+					'Automatically find available ports when configured ports are busy. Overrides the .wp-env.json "autoPort" setting.',
+			} );
 		},
 		withSpinner( env.start )
 	);
 	yargs.command(
 		'stop',
-		wpRed(
-			'Stops running WordPress for development and tests and frees the ports.'
-		),
+		'Stops running WordPress and frees the ports.',
 		() => {},
 		withSpinner( env.stop )
 	);
 	yargs.command(
 		'reset [environment]',
-		wpYellow( 'Resets the WordPress databases.' ),
+		chalk`{bold.red Resets} the WordPress databases.`,
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
 				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
-				default: 'tests',
+				default: 'development',
 			} );
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -191,13 +185,13 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'clean [environment]',
-		chalk.gray( '[Deprecated: use reset] Resets the WordPress databases.' ),
+		false,
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
 				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
-				default: 'tests',
+				default: 'development',
 			} );
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -235,7 +229,7 @@ module.exports = function cli() {
 
 	yargs.command(
 		'run <container> [command...]',
-		'Runs an arbitrary command in one of the underlying Docker containers. A double dash can be used to pass arguments to the container without parsing them. This is necessary if you are using an option that is defined below. You can use `bash` to open a shell session and both `composer` and `phpunit` are available in all WordPress and CLI containers. WP-CLI is also available in the CLI containers.',
+		chalk`Runs an arbitrary command in one of the underlying Docker containers. Use a double dash to pass arguments to it. You can use {bold bash} to open a shell session. {bold composer} and {bold phpunit} are available in all WordPress and CLI containers. {bold wp} is also available in the CLI containers.`,
 		( args ) => {
 			args.option( 'env-cwd', {
 				type: 'string',
@@ -272,9 +266,7 @@ module.exports = function cli() {
 
 	yargs.command(
 		'destroy',
-		wpRed(
-			'Destroy the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.'
-		),
+		chalk`{bold.red Destroys} the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.`,
 		( args ) => {
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -291,9 +283,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'cleanup',
-		wpYellow(
-			'Cleanup the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.'
-		),
+		chalk`{bold.red Cleans up} the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.`,
 		( args ) => {
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -320,6 +310,9 @@ module.exports = function cli() {
 		},
 		withSpinner( env.status )
 	);
+	// Wrap at 100 chars unless the terminal is narrower than that, but ensure
+	// formatting is applied even when stdout is not a terminal.
+	yargs.wrap( Math.min( 100, yargs.terminalWidth() ?? 100 ) );
 
 	return yargs;
 };
