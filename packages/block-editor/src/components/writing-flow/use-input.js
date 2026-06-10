@@ -16,6 +16,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getSelectionEditableElement } from '../../utils/dom';
 
 /**
  * Handles input for selections across blocks.
@@ -45,10 +46,25 @@ export default function useInput() {
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
-			// If writing flow is editable, NEVER allow the browser to alter the
-			// DOM. This will cause React errors (and the DOM should only be
-			// altered in a controlled fashion).
-			if ( node.contentEditable === 'true' ) {
+			// If writing flow is editable, never allow the browser to alter
+			// the DOM outside of an editable element within a block. This
+			// will cause React errors (and the DOM should only be altered in
+			// a controlled fashion). The wrapper can be contentEditable with
+			// a single selection when the selected block supports
+			// `editableRoot`; in that case edits within the block's editable
+			// element are handled by its rich text instance.
+			if ( node.contentEditable !== 'true' ) {
+				return;
+			}
+
+			if ( hasMultiSelection() ) {
+				event.preventDefault();
+				return;
+			}
+
+			const selection = node.ownerDocument.defaultView.getSelection();
+
+			if ( ! getSelectionEditableElement( selection, node ) ) {
 				event.preventDefault();
 			}
 		}
