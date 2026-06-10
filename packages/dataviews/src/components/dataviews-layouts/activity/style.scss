@@ -13,7 +13,7 @@
 	}
 
 	.dataviews-view-activity__item-actions {
-		min-width: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+		min-width: var(--wpds-dimension-size-sm);
 	}
 
 	.dataviews-view-activity__item-content {
@@ -22,7 +22,7 @@
 		.dataviews-view-activity__item-title,
 		.dataviews-view-activity__item-description,
 		.dataviews-view-activity__item-fields {
-			min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
+			min-height: var(--wpds-dimension-size-2xs);
 		}
 
 		.dataviews-view-activity__item-title {
@@ -119,7 +119,7 @@
 
 		&.is-balanced {
 			.dataviews-view-activity__item-type {
-				width: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
+				width: var(--wpds-dimension-size-sm);
 
 				&::before {
 					height: calc(var(--wpds-dimension-base) * 3);
@@ -137,7 +137,7 @@
 
 		&.is-comfortable {
 			.dataviews-view-activity__item-type {
-				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				width: var(--wpds-dimension-size-md);
 
 				&::before {
 					height: calc(var(--wpds-dimension-base) * 2);

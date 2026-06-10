@@ -27,9 +27,8 @@
  * logical borders so RTL needs no mirroring).
  */
 .handleCorner {
-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
-	width: calc(var(--wpds-dimension-base) * 6);
-	height: calc(var(--wpds-dimension-base) * 6);
+	width: var(--wpds-dimension-size-sm);
+	height: var(--wpds-dimension-size-sm);
 	cursor: nwse-resize;
 }
 
@@ -76,8 +75,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
-	width: calc(var(--wpds-dimension-base) * 6);
+	width: var(--wpds-dimension-size-sm);
 	height: calc(var(--wpds-dimension-base) * 10);
 	padding-inline-end: var(--widget-resize-handle-visual-inset);
 	cursor: ew-resize;
