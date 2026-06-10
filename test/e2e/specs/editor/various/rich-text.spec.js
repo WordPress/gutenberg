@@ -115,6 +115,11 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( ' 2' );
 		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+		// The selection updates asynchronously, so apply the format on the next
+		// frame to act on the moved selection rather than the previous one.
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 		await pageUtils.pressKeys( 'primary+b' );
 
 		const count = await editor.canvas
