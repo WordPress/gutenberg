@@ -6,6 +6,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
@@ -16,6 +17,39 @@ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 import type { SandBoxProps } from './types';
 
 type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
+
+type SandBoxMessage = {
+	action: string;
+	width?: number;
+	height?: number;
+};
+
+function parseSandBoxMessage( data: unknown ): SandBoxMessage | null {
+	if ( ! data ) {
+		return null;
+	}
+
+	let message = data;
+
+	if ( 'string' === typeof message ) {
+		try {
+			message = JSON.parse( message );
+		} catch {
+			return null;
+		}
+	}
+
+	if (
+		'object' !== typeof message ||
+		null === message ||
+		! ( 'action' in message ) ||
+		'string' !== typeof ( message as SandBoxMessage ).action
+	) {
+		return null;
+	}
+
+	return message as SandBoxMessage;
+}
 
 const observeAndResizeJS = function () {
 	const { MutationObserver } = window;
@@ -37,7 +71,41 @@ const observeAndResizeJS = function () {
 		);
 	}
 
-	const observer = new MutationObserver( sendResize );
+	function checkMessageForReady( event: MessageEvent ) {
+		if ( event.source !== window.parent ) {
+			return;
+		}
+
+		const data = event.data || {};
+
+		if ( 'string' === typeof data ) {
+			try {
+				const parsed = JSON.parse( data );
+				if ( 'ready' === parsed.action ) {
+					sendResize();
+				}
+			} catch {}
+			return;
+		}
+
+		if ( 'ready' === data.action ) {
+			sendResize();
+		}
+	}
+
+	function attachIframeLoadListeners() {
+		Array.prototype.forEach.call(
+			document.querySelectorAll( 'iframe' ),
+			function ( nestedIframe ) {
+				nestedIframe.addEventListener( 'load', sendResize, true );
+			}
+		);
+	}
+
+	const observer = new MutationObserver( function () {
+		sendResize();
+		attachIframeLoadListeners();
+	} );
 	observer.observe( document.body, {
 		attributes: true,
 		attributeOldValue: false,
@@ -47,6 +115,7 @@ const observeAndResizeJS = function () {
 		subtree: true,
 	} );
 
+	window.addEventListener( 'message', checkMessageForReady );
 	window.addEventListener( 'load', sendResize, true );
 
 	// Hack: Remove viewport unit styles, as these are relative
@@ -86,6 +155,7 @@ const observeAndResizeJS = function () {
 	document.body.style.width = '100%';
 	document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
+	attachIframeLoadListeners();
 	sendResize();
 
 	// Resize events can change the width of elements with 100% width, but we don't
@@ -174,9 +244,11 @@ function buildSandBoxDocument( {
  *
  * Because `srcdoc` is a declarative attribute, the browser automatically
  * re-renders the content when the iframe is moved in the DOM (e.g.,
- * block reordering), so no `load` event listener is needed.
- * The `message` listener is re-synced on every `load` so
- * it follows the iframe if it's reparented into a different document.
+ * block reordering). The parent notifies the iframe when it is ready to
+ * receive resize messages, and the iframe responds with its dimensions.
+ * The `message` listener is re-synced on every `load` and whenever
+ * `srcDoc` changes so it follows the iframe if it is reparented into a
+ * different document.
  */
 function IsolatedSandBox( {
 	html = '',
@@ -196,7 +268,7 @@ function IsolatedSandBox( {
 		[ html, title, type, styles, scripts ]
 	);
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const iframe = ref.current;
 		if ( ! iframe ) {
 			return;
@@ -211,23 +283,20 @@ function IsolatedSandBox( {
 				return;
 			}
 
-			// Attempt to parse the message data as JSON if passed as string.
-			let data = event.data || {};
-
-			if ( 'string' === typeof data ) {
-				try {
-					data = JSON.parse( data );
-				} catch {}
-			}
+			const data = parseSandBoxMessage( event.data );
 
 			// Update the state only if the message is formatted as we expect,
 			// i.e. as an object with a 'resize' action.
-			if ( 'resize' !== data.action ) {
+			if ( ! data || 'resize' !== data.action ) {
 				return;
 			}
 
-			setWidth( data.width );
-			setHeight( data.height );
+			setWidth( data.width ?? 0 );
+			setHeight( data.height ?? 0 );
+		}
+
+		function notifySandBoxReady() {
+			iframe?.contentWindow?.postMessage( { action: 'ready' }, '*' );
 		}
 
 		let currentView: Window | null = null;
@@ -246,17 +315,23 @@ function IsolatedSandBox( {
 			currentView?.addEventListener( 'message', checkMessageForResize );
 		}
 
+		function handleLoad() {
+			syncListener();
+			notifySandBoxReady();
+		}
+
 		syncListener();
-		iframe.addEventListener( 'load', syncListener );
+		notifySandBoxReady();
+		iframe.addEventListener( 'load', handleLoad );
 
 		return () => {
-			iframe.removeEventListener( 'load', syncListener );
+			iframe.removeEventListener( 'load', handleLoad );
 			currentView?.removeEventListener(
 				'message',
 				checkMessageForResize
 			);
 		};
-	}, [] );
+	}, [ srcDoc ] );
 
 	return (
 		<iframe
@@ -388,37 +463,40 @@ function SameOriginSandBox( {
 				return;
 			}
 
-			// Attempt to parse the message data as JSON if passed as string.
-			let data = event.data || {};
-
-			if ( 'string' === typeof data ) {
-				try {
-					data = JSON.parse( data );
-				} catch {}
-			}
+			const data = parseSandBoxMessage( event.data );
 
 			// Update the state only if the message is formatted as we expect,
 			// i.e. as an object with a 'resize' action.
-			if ( 'resize' !== data.action ) {
+			if ( ! data || 'resize' !== data.action ) {
 				return;
 			}
 
-			setWidth( data.width );
-			setHeight( data.height );
+			setWidth( data.width ?? 0 );
+			setHeight( data.height ?? 0 );
+		}
+
+		function notifySandBoxReady() {
+			ref.current?.contentWindow?.postMessage( { action: 'ready' }, '*' );
 		}
 
 		const iframe = ref.current;
 		const defaultView = iframe?.ownerDocument?.defaultView;
 
+		function handleLoad() {
+			tryNoForceSandBox();
+			notifySandBoxReady();
+		}
+
 		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
 		// after reordering the containing block. See these two issues for more details:
 		// https://github.com/WordPress/gutenberg/issues/6146
 		// https://github.com/facebook/react/issues/18752
-		iframe?.addEventListener( 'load', tryNoForceSandBox, false );
+		iframe?.addEventListener( 'load', handleLoad, false );
 		defaultView?.addEventListener( 'message', checkMessageForResize );
+		notifySandBoxReady();
 
 		return () => {
-			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
+			iframe?.removeEventListener( 'load', handleLoad, false );
 			defaultView?.removeEventListener(
 				'message',
 				checkMessageForResize

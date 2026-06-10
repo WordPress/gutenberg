@@ -109,4 +109,15 @@ describe( 'SandBox', () => {
 			expect.stringContaining( 'https://another.super.embed' )
 		);
 	} );
+
+	it( 'should listen for ready messages in srcdoc', () => {
+		render( <SandBox html="<p>Hello</p>" title="Resize Test" /> );
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Resize Test' );
+		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
+
+		expect( srcDoc ).toContain( 'checkMessageForReady' );
+		expect( srcDoc ).toContain( "'ready'" );
+		expect( srcDoc ).toContain( 'attachIframeLoadListeners' );
+	} );
 } );
