@@ -64,6 +64,35 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
+	 * Creates a guideline fixture and assigns the given guideline type slug.
+	 *
+	 * @param string $owner_role Role key from the self::$users fixture map.
+	 * @param string $status     Post status for the guideline fixture.
+	 * @param string $type_slug  Guideline type slug.
+	 * @return int Inserted guideline post ID.
+	 */
+	private function create_guideline_with_type( string $owner_role, string $status, string $type_slug ): int {
+		$term = get_term_by( 'slug', $type_slug, Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		if ( ! $term ) {
+			$term_id = self::factory()->term->create(
+				array(
+					'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+					'name'     => ucfirst( $type_slug ),
+					'slug'     => $type_slug,
+				)
+			);
+		} else {
+			$term_id = $term->term_id;
+		}
+
+		$post_id = $this->create_guideline( $owner_role, $status );
+
+		wp_set_object_terms( $post_id, array( (int) $term_id ), Gutenberg_Guidelines_Post_Type::TAXONOMY );
+
+		return $post_id;
+	}
+
+	/**
 	 * Switches the current user to a fixture user with the named role.
 	 *
 	 * @param string $role Role key from the self::$users fixture map.
@@ -145,6 +174,101 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
+	 * A POST may supply a registered `wp_guideline_type` slug without first
+	 * looking up the term ID. The controller creates the backing term on demand.
+	 */
+	public function test_create_guideline_accepts_registered_type_slug(): void {
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'status', 'private' );
+		$request->set_param( 'title', 'Memory guideline' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'memory' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		$terms = wp_get_object_terms(
+			$response->get_data()['id'],
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'fields' => 'slugs' )
+		);
+
+		$this->assertSame( array( 'memory' ), $terms );
+	}
+
+	/**
+	 * Contributor+ users can use registered slugs when creating private
+	 * guidelines.
+	 */
+	public function test_create_private_guideline_accepts_registered_type_slug_for_contributor(): void {
+		$this->switch_to_user_role( 'contributor' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'title', 'Contributor memory guideline' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'memory' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'private', $response->get_data()['status'] );
+
+		$terms = wp_get_object_terms(
+			$response->get_data()['id'],
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'fields' => 'slugs' )
+		);
+
+		$this->assertSame( array( 'memory' ), $terms );
+	}
+
+	/**
+	 * Existing custom terms can also be assigned by slug.
+	 */
+	public function test_create_guideline_accepts_existing_custom_type_slug(): void {
+		self::factory()->term->create(
+			array(
+				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'name'     => 'Project',
+				'slug'     => 'project',
+			)
+		);
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'status', 'private' );
+		$request->set_param( 'title', 'Project guideline' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'project' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		$terms = wp_get_object_terms(
+			$response->get_data()['id'],
+			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			array( 'fields' => 'slugs' )
+		);
+
+		$this->assertSame( array( 'project' ), $terms );
+	}
+
+	/**
+	 * Unknown slugs are rejected instead of creating arbitrary guideline types.
+	 */
+	public function test_create_guideline_rejects_unknown_type_slug(): void {
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_param( 'status', 'private' );
+		$request->set_param( 'title', 'Unknown type guideline' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'not-a-guideline-type' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_guideline_type', $response->get_data()['code'] );
+	}
+
+	/**
 	 * The collection route returns matching guidelines and totals.
 	 */
 	public function test_get_items_lists_guidelines(): void {
@@ -165,6 +289,50 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 		$this->assertContains( $first_post_id, $ids );
 		$this->assertContains( $second_post_id, $ids );
 		$this->assertSame( 2, (int) $headers['X-WP-Total'] );
+	}
+
+	/**
+	 * Collection queries may include guidelines by type slug.
+	 */
+	public function test_get_items_accepts_type_slug_filter(): void {
+		$memory_post_id   = $this->create_guideline_with_type( 'administrator', 'draft', 'memory' );
+		$artifact_post_id = $this->create_guideline_with_type( 'administrator', 'draft', 'artifact' );
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'GET', self::REST_BASE );
+		$request->set_param( 'status', 'draft' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'memory' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$ids = wp_list_pluck( $response->get_data(), 'id' );
+
+		$this->assertContains( $memory_post_id, $ids );
+		$this->assertNotContains( $artifact_post_id, $ids );
+	}
+
+	/**
+	 * Collection queries may exclude guidelines by type slug.
+	 */
+	public function test_get_items_accepts_type_slug_exclude_filter(): void {
+		$memory_post_id   = $this->create_guideline_with_type( 'administrator', 'draft', 'memory' );
+		$artifact_post_id = $this->create_guideline_with_type( 'administrator', 'draft', 'artifact' );
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'GET', self::REST_BASE );
+		$request->set_param( 'status', 'draft' );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY . '_exclude', array( 'memory' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$ids = wp_list_pluck( $response->get_data(), 'id' );
+
+		$this->assertNotContains( $memory_post_id, $ids );
+		$this->assertContains( $artifact_post_id, $ids );
 	}
 
 	/**
@@ -260,6 +428,25 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
 		$this->assertSame( array( 'artifact' ), $terms );
+	}
+
+	/**
+	 * A PATCH may update the assigned guideline type by slug.
+	 */
+	public function test_update_guideline_accepts_type_slug(): void {
+		$post_id = $this->create_guideline( 'administrator', 'draft' );
+
+		$this->switch_to_user_role( 'administrator' );
+
+		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
+		$request->set_param( Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'memory' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
+
+		$this->assertSame( array( 'memory' ), $terms );
 	}
 
 	/**
