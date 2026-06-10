@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-test-utils-playwright",
-	"version": "1.47.0",
+	"version": "1.48.0",
 	"description": "End-To-End (E2E) test utils for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"default": "./src/index.ts"
+			"default": "./build/index.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -44,7 +44,7 @@
 		"web-vitals": "^4.2.1"
 	},
 	"devDependencies": {
-		"@types/mime": "2.0.3",
+		"@types/mime": "^2.0.3",
 		"@types/node": "^20.19.39"
 	},
 	"peerDependencies": {
@@ -53,5 +53,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json"
 	}
 }

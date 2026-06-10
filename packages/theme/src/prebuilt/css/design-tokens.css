@@ -82,7 +82,7 @@
 	/* Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active. */
 	--wpds-color-bg-interactive-error-weak-active: #f6e6e3;
 	/* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
-	--wpds-color-bg-track-neutral-weak: #e4e4e4;
+	--wpds-color-bg-track-neutral-weak: #f0f0f0;
 	/* Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). */
 	--wpds-color-bg-track-neutral: #dbdbdb;
 	/* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb). */
@@ -154,27 +154,27 @@
 	/* Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-neutral: #dbdbdb;
 	/* Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis. */
-	--wpds-color-stroke-surface-neutral-weak: #e4e4e4;
+	--wpds-color-stroke-surface-neutral-weak: #f0f0f0;
 	/* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-neutral-strong: #8d8d8d;
 	/* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-brand: #a3b1d4;
+	--wpds-color-stroke-surface-brand: #b0bbd6;
 	/* Decorative stroke color used to define brand-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-brand-strong: #3858e9;
 	/* Decorative stroke color used to define success-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-success: #8ac894;
+	--wpds-color-stroke-surface-success: #94d29e;
 	/* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-success-strong: #008030;
 	/* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-info: #9fbcdc;
+	--wpds-color-stroke-surface-info: #a9c6e7;
 	/* Decorative stroke color used to define info-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-info-strong: #006bd7;
 	/* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-warning: #d0b481;
+	--wpds-color-stroke-surface-warning: #e1bc7c;
 	/* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300;
 	/* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
-	--wpds-color-stroke-surface-error: #daa39b;
+	--wpds-color-stroke-surface-error: #dab1aa;
 	/* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-error-strong: #cc1818;
 	/* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis. */
@@ -229,6 +229,22 @@
 	--wpds-dimension-gap-2xl: 32px;
 	/* 3x extra large gap */
 	--wpds-dimension-gap-3xl: 40px;
+	/* Notification indicators */
+	--wpds-dimension-size-5xs: 4px;
+	/* Visual size for small interactive elements like resize handles */
+	--wpds-dimension-size-4xs: 8px;
+	/* Small markers */
+	--wpds-dimension-size-3xs: 12px;
+	/* For small controls like checkboxes and radios, or small decorative icons */
+	--wpds-dimension-size-2xs: 16px;
+	/* For medium sized icons */
+	--wpds-dimension-size-xs: 20px;
+	/* For icons and small buttons */
+	--wpds-dimension-size-sm: 24px;
+	/* For medium-sized buttons and inputs */
+	--wpds-dimension-size-md: 32px;
+	/* Default size for buttons and inputs */
+	--wpds-dimension-size-lg: 40px;
 	/* Extra small surface width */
 	--wpds-dimension-surface-width-xs: 240px;
 	/* Small surface width */
