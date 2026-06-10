@@ -251,6 +251,8 @@ export function RectangleStencil( {
 					}
 					let newRect: NormalizedRect;
 					if ( h.hasLockedRatio ) {
+						// Locked-ratio drags don't apply RESIZE_OUTWARD_GAIN yet
+						// (the ratio-projection math is subtler); they stay 1:1.
 						newRect = h.computeLockedRect( drag, latestX, latestY );
 					} else if ( latestShift ) {
 						newRect = h.computeShiftLockedRect(
