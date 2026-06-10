@@ -17,7 +17,7 @@
 	border-radius: $grid-unit-05;
 	width: min(100%, 450px);
 
-	&.has-shortcut:hover {
+	&:hover {
 		background-color: $gray-200;
 	}
 
@@ -43,9 +43,6 @@
 }
 
 .editor-document-bar__command {
-	display: flex;
-	align-items: center;
-	justify-content: center;
 	flex-grow: 1;
 	color: var(--wp-block-synced-color);
 	overflow: hidden;

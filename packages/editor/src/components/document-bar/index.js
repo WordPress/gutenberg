@@ -142,7 +142,6 @@ export default function DocumentBar( props ) {
 	const isReducedMotion = useReducedMotion();
 
 	const hasShortcut = ! window.__experimentalAdminBarInEditor;
-	const CommandWrapper = hasShortcut ? Button : 'div';
 
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const hasBackButton =
@@ -212,14 +211,10 @@ export default function DocumentBar( props ) {
 			{ isNotFound ? (
 				<WCText>{ __( 'Document not found' ) }</WCText>
 			) : (
-				<CommandWrapper
+				<Button
 					className="editor-document-bar__command"
-					{ ...( hasShortcut
-						? {
-								onClick: () => openCommandCenter(),
-								size: 'compact',
-						  }
-						: {} ) }
+					onClick={ () => openCommandCenter() }
+					size="compact"
 				>
 					<motion.div
 						className="editor-document-bar__title"
@@ -280,7 +275,7 @@ export default function DocumentBar( props ) {
 							{ displayShortcut.primary( 'k' ) }
 						</span>
 					) }
-				</CommandWrapper>
+				</Button>
 			) }
 		</div>
 	);
