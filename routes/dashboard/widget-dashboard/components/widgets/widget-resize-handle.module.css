@@ -44,10 +44,10 @@
 	box-sizing: border-box;
 	border-block-end:
 		var(--wpds-border-width-sm) solid
-		var(--wpds-color-fg-interactive-brand);
+		var(--wpds-color-foreground-interactive-brand);
 	border-inline-end:
 		var(--wpds-border-width-sm) solid
-		var(--wpds-color-fg-interactive-brand);
+		var(--wpds-color-foreground-interactive-brand);
 	border-block-start: none;
 	border-inline-start: none;
 	/* Elbow only: matches tile scale; arm ends stay square. */
@@ -66,10 +66,10 @@
 	transform: scale(var(--widget-resize-handle-hover-scale));
 	border-block-end:
 		var(--wpds-border-width-sm) solid
-		var(--wpds-color-fg-interactive-brand-active);
+		var(--wpds-color-foreground-interactive-brand-active);
 	border-inline-end:
 		var(--wpds-border-width-sm) solid
-		var(--wpds-color-fg-interactive-brand-active);
+		var(--wpds-color-foreground-interactive-brand-active);
 }
 
 .handleHorizontal {
@@ -109,7 +109,7 @@
 	width: var(--wpds-border-width-sm);
 	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
 	height: calc(var(--wpds-dimension-base) * 3);
-	background-color: var(--wpds-color-fg-interactive-brand);
+	background-color: var(--wpds-color-foreground-interactive-brand);
 	transform: scale(1);
 	transform-origin: 50% 100%;
 }
@@ -118,7 +118,7 @@
 .handleHorizontal:hover::after,
 .handleHorizontal:focus-visible::after {
 	transform: scale(var(--widget-resize-handle-hover-scale));
-	background-color: var(--wpds-color-fg-interactive-brand-active);
+	background-color: var(--wpds-color-foreground-interactive-brand-active);
 }
 
 @media (forced-colors: active) {
