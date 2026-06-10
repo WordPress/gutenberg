@@ -47,7 +47,7 @@ interface WidgetModuleRecord {
  * metadata imports have not finished resolving. Layout instances must not
  * be treated as missing until it is false.
  */
-export type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
+type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 
 /**
  * Returns the registered widget types, with each record's metadata

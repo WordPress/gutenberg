@@ -87,7 +87,7 @@ no custom data store and no client-side registration step.
 A widget type is metadata plus a render module. It belongs to no host in
 particular.
 
-The same `core/on-this-day` widget can render in a dashboard grid, a sidebar
+The same `core/hello-world` widget can render in a dashboard grid, a sidebar
 within another page, a modal inserter, or a plugin panel. The choice of where to
 render belongs to the consumer; the registry knows nothing about it.
 
