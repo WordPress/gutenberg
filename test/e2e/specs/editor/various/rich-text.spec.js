@@ -44,6 +44,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'primary+a' );
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 		await pageUtils.pressKeys( 'primary+b' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
