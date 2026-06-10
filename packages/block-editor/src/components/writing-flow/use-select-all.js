@@ -43,13 +43,7 @@ export default function useSelectAll() {
 
 			const selectedClientIds = getSelectedBlockClientIds();
 
-			// Only carve out a block's text content on the first select-all when
-			// the selection is within a rich text (resolved from the anchor).
-			// When a block is selected at the block level (no text caret) the
-			// editable falls back to the event target, and we should escalate
-			// the selection rather than re-select content.
 			if (
-				editable !== event.target &&
 				selectedClientIds.length < 2 &&
 				! isEntirelySelected( editable )
 			) {
@@ -57,7 +51,10 @@ export default function useSelectAll() {
 				// would select the entire wrapper (all blocks) at once. Select
 				// just this block's content first, preserving the gradual
 				// select-all behavior.
-				if ( ownerDocument.activeElement === node ) {
+				if (
+					editable !== event.target &&
+					ownerDocument.activeElement === node
+				) {
 					event.preventDefault();
 					const range = ownerDocument.createRange();
 					range.selectNodeContents( editable );
@@ -99,10 +96,7 @@ export default function useSelectAll() {
 					node.ownerDocument.defaultView
 						.getSelection()
 						.removeAllRanges();
-					// Select the parent as a unit without an initial caret
-					// position: a caret would otherwise be placed into the
-					// first child, collapsing the block-level selection.
-					selectBlock( rootClientId, null );
+					selectBlock( rootClientId );
 				}
 				return;
 			}
