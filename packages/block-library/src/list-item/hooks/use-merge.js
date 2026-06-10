@@ -139,9 +139,20 @@ export default function useMerge( clientId, onMerge ) {
 				mergeWithNested( clientId, nextBlockClientId );
 			}
 		} else {
-			// Merging is only done from the top level. For lowel levels, the
-			// list item is outdented instead.
+			// Merging is only done from the top level. For lower levels, the
+			// list item is outdented instead — unless there is a previous
+			// sibling at the same level, in which case we merge with it (the
+			// same way top-level items do). This prevents an empty item created
+			// by pressing Enter from being incorrectly promoted to a higher
+			// list level when Backspace is used to undo the split.
 			if ( getParentListItemId( clientId ) ) {
+				const previousBlockClientId =
+					getPreviousBlockClientId( clientId );
+				if ( previousBlockClientId ) {
+					const trailingId = getTrailingId( previousBlockClientId );
+					mergeWithNested( trailingId, clientId );
+					return;
+				}
 				outdentListItem( clientId );
 				return;
 			}
