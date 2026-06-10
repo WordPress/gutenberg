@@ -36,11 +36,11 @@ const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
 const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
 	{ id: '', title: 'Default' },
 	{ id: 'none', title: 'None' },
-	{ id: 'sharp', title: 'Sharp' },
 	{ id: 'subtle', title: 'Subtle' },
 	{ id: 'soft', title: 'Soft' },
-	{ id: 'rounded', title: 'Rounded' },
-	{ id: 'pill', title: 'Pill' },
+	{ id: 'moderate', title: 'Moderate' },
+	{ id: 'generous', title: 'Generous' },
+	{ id: 'pronounced', title: 'Pronounced' },
 ];
 
 function ThemeTooltipMessage( {

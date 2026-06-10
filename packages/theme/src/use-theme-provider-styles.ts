@@ -183,7 +183,7 @@ export function useThemeProviderStyles( {
 		DEFAULT_SEED_COLORS.background;
 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 	const cornerRadiusPreset =
-		cornerRadius ?? inheritedSettings.cornerRadius ?? 'sharp';
+		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
 
 	const resolvedSettings = useMemo(
 		() => ( {

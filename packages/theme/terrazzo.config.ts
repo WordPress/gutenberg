@@ -74,10 +74,6 @@ const config: Config = {
 					selectors: [ '[data-wpds-corner-radius="none"]' ],
 				},
 				{
-					mode: 'corner-radius-sharp',
-					selectors: [ '[data-wpds-corner-radius="sharp"]' ],
-				},
-				{
 					mode: 'corner-radius-subtle',
 					selectors: [ '[data-wpds-corner-radius="subtle"]' ],
 				},
@@ -86,12 +82,16 @@ const config: Config = {
 					selectors: [ '[data-wpds-corner-radius="soft"]' ],
 				},
 				{
-					mode: 'corner-radius-rounded',
-					selectors: [ '[data-wpds-corner-radius="rounded"]' ],
+					mode: 'corner-radius-moderate',
+					selectors: [ '[data-wpds-corner-radius="moderate"]' ],
 				},
 				{
-					mode: 'corner-radius-pill',
-					selectors: [ '[data-wpds-corner-radius="pill"]' ],
+					mode: 'corner-radius-generous',
+					selectors: [ '[data-wpds-corner-radius="generous"]' ],
+				},
+				{
+					mode: 'corner-radius-pronounced',
+					selectors: [ '[data-wpds-corner-radius="pronounced"]' ],
 				},
 			],
 			legacyHex: true,

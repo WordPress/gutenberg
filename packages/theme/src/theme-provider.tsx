@@ -49,7 +49,7 @@ export const ThemeProvider = ( {
 		cornerRadius,
 	} );
 
-	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'sharp';
+	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
 
 	const contextValue = useMemo(
 		() => ( {
