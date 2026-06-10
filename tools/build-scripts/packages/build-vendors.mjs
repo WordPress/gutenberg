@@ -2,8 +2,9 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir } from 'fs/promises';
 import esbuild from 'esbuild';
+import { patchReactLegacyElement } from './codemod-react-legacy-element.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../../..' );
@@ -47,6 +48,8 @@ const VENDOR_SCRIPTS = [
 		handle: 'react-19',
 		dependencies: [ 'wp-polyfill' ],
 		version: '19',
+		// Teach React 19 to also accept legacy (React 17/18) elements.
+		patchLegacyElement: true,
 	},
 	{
 		name: '@wordpress/react-19/react-dom',
@@ -54,6 +57,8 @@ const VENDOR_SCRIPTS = [
 		handle: 'react-dom-19',
 		dependencies: [ 'react' ],
 		version: '19',
+		// Teach React 19 to also accept legacy (React 17/18) elements.
+		patchLegacyElement: true,
 	},
 	{
 		name: '@wordpress/react-19/react-jsx-runtime',
@@ -83,6 +88,25 @@ async function generateAssetFile( config ) {
 	const assetFilePath = path.join( VENDORS_DIR, `${ handle }.min.asset.php` );
 	await mkdir( path.dirname( assetFilePath ), { recursive: true } );
 	await writeFile( assetFilePath, assetContent );
+}
+
+/**
+ * Applies the legacy-element codemod to a built vendor file. The original,
+ * unpatched source is written alongside it with an `-orig` suffix (e.g.
+ * `react-19-orig.js`) so the patch can be diffed.
+ *
+ * @param {string} fileName Built file name (e.g., `react-19.js`).
+ * @return {Promise<void>} Promise that resolves once the file is patched.
+ */
+async function patchVendorOutput( fileName ) {
+	const filePath = path.join( VENDORS_DIR, fileName );
+	const code = await readFile( filePath, 'utf-8' );
+
+	const ext = fileName.endsWith( '.min.js' ) ? '.min.js' : '.js';
+	const origFileName = `${ fileName.slice( 0, -ext.length ) }-orig${ ext }`;
+
+	await writeFile( path.join( VENDORS_DIR, origFileName ), code );
+	await writeFile( filePath, patchReactLegacyElement( code, fileName ) );
 }
 
 /**
@@ -159,6 +183,13 @@ async function bundleVendorScript( config ) {
 		} ),
 		generateAssetFile( config ),
 	] );
+
+	if ( config.patchLegacyElement ) {
+		await Promise.all( [
+			patchVendorOutput( handle + '.js' ),
+			patchVendorOutput( handle + '.min.js' ),
+		] );
+	}
 }
 
 /**
