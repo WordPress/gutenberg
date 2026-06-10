@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { ToolbarGroup } from '@wordpress/components';
-import { list, grid } from '@wordpress/icons';
+import { list, grid, stretchWide } from '@wordpress/icons';
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
@@ -184,6 +184,18 @@ export default function TermTemplateEdit( {
 									columnCount,
 								} ),
 							isActive: layoutType === 'grid',
+						},
+						{
+							icon: stretchWide,
+							title: _x(
+								'Flex view',
+								'Term template block display setting'
+							),
+							onClick: () =>
+								setDisplayLayout( {
+									type: 'flex',
+								} ),
+							isActive: layoutType === 'flex',
 						},
 					] }
 				/>
