@@ -28,12 +28,15 @@ const converter = new Marked( {
 				text
 			) }</code></pre>`;
 		},
-		text( this: any, token: Tokens.Text | Tokens.Escape ): string {
-			if ( 'tokens' in token && token.tokens ) {
-				return this.parser.parseInline( token.tokens );
-			}
-			if ( 'escaped' in token && token.escaped ) {
-				return token.text;
+		text( token: Tokens.Text | Tokens.Escape ): string | false {
+			// Only the plain-text case differs (skip escaping quotes);
+			// defer inline tokens and already-escaped text to marked's
+			// default by returning `false`.
+			if (
+				( 'tokens' in token && token.tokens ) ||
+				( 'escaped' in token && token.escaped )
+			) {
+				return false;
 			}
 			return escapeBodyText( token.text );
 		},
