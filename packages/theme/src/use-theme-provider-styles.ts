@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import {
 	ColorSpace,
 	clone,
+	equals,
 	set,
 	to,
 	sRGB,
@@ -26,61 +27,21 @@ type Entry = [ string, string ];
 const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
 const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
 
-const legacyWpComponentsOverridesCSS: Entry[] = [
-	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
-	[
-		'--wp-components-color-accent-darker-10',
-		'var(--wp-admin-theme-color-darker-10)',
-	],
-	[
-		'--wp-components-color-accent-darker-20',
-		'var(--wp-admin-theme-color-darker-20)',
-	],
-	[
-		'--wp-components-color-accent-inverted',
-		'var(--wpds-color-foreground-interactive-brand-strong)',
-	],
-	[
-		'--wp-components-color-background',
-		'var(--wpds-color-background-surface-neutral-strong)',
-	],
-	[
-		'--wp-components-color-foreground',
-		'var(--wpds-color-foreground-content-neutral)',
-	],
-	[
-		'--wp-components-color-foreground-inverted',
-		'var(--wpds-color-background-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-100',
-		'var(--wpds-color-background-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-200',
-		'var(--wpds-color-stroke-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-300',
-		'var(--wpds-color-stroke-surface-neutral)',
-	],
-	[
-		'--wp-components-color-gray-400',
-		'var(--wpds-color-stroke-interactive-neutral)',
-	],
-	[
-		'--wp-components-color-gray-600',
-		'var(--wpds-color-stroke-interactive-neutral)',
-	],
-	[
-		'--wp-components-color-gray-700',
-		'var(--wpds-color-foreground-content-neutral-weak)',
-	],
-	[
-		'--wp-components-color-gray-800',
-		'var(--wpds-color-foreground-content-neutral)',
-	],
-];
+// Compares two color strings for visual equivalence, so any parseable
+// representation of the same color matches (e.g. `#3858E9` ≡ `#3858e9` ≡
+// `rgb(56 88 233)`). Returns `false` for inputs that can't be parsed, letting
+// callers treat them as "changed" and surface the descriptive parse error
+// downstream when the ramps are computed.
+function colorsMatch( a: string, b: string ): boolean {
+	try {
+		// Register sRGB inline (idempotent) to keep the module top level free
+		// of side effects. See #77653.
+		ColorSpace.register( sRGB );
+		return equals( a, b );
+	} catch {
+		return false;
+	}
+}
 
 function customRgbFormat( color: PlainColorObject ): string {
 	const rgb = to( color, sRGB );
@@ -90,6 +51,8 @@ function customRgbFormat( color: PlainColorObject ): string {
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+	// Register sRGB inline (idempotent) to keep the module top level free of
+	// side effects. See #77653.
 	ColorSpace.register( sRGB );
 	const parsedAccent = to( accent, HSL );
 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
@@ -140,24 +103,6 @@ function colorTokensCSS(
 	return entries;
 }
 
-function generateStyles( {
-	primary,
-	computedColorRamps,
-}: {
-	primary: string;
-	computedColorRamps: Map< string, RampResult >;
-} ): CSSProperties {
-	return Object.fromEntries(
-		[
-			// Semantic color tokens
-			colorTokensCSS( computedColorRamps ),
-			// Legacy overrides
-			legacyWpAdminThemeOverridesCSS( primary ),
-			legacyWpComponentsOverridesCSS,
-		].flat()
-	);
-}
-
 export function useThemeProviderStyles( {
 	color = {},
 	cursor,
@@ -169,19 +114,22 @@ export function useThemeProviderStyles( {
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
-	// Compute settings:
-	// - used provided prop value;
-	// - otherwise, use inherited value from parent instance;
-	// - otherwise, use fallback value (where applicable).
-	const primary =
-		color.primary ??
-		inheritedSettings.color?.primary ??
-		DEFAULT_SEED_COLORS.primary;
-	const background =
-		color.background ??
-		inheritedSettings.color?.background ??
-		DEFAULT_SEED_COLORS.background;
-	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
+	// Inherited values come from the closest parent provider, or — at the top
+	// of the tree, where there is no parent — from the prebuilt `:root`
+	// defaults.
+	const inheritedPrimary =
+		inheritedSettings.color?.primary ?? DEFAULT_SEED_COLORS.primary;
+	const inheritedBackground =
+		inheritedSettings.color?.background ?? DEFAULT_SEED_COLORS.background;
+	const inheritedCursorControl = inheritedSettings.cursor?.control;
+
+	// Resolve each setting: explicit prop wins, then the inherited value.
+	const primary = color.primary ?? inheritedPrimary;
+	const background = color.background ?? inheritedBackground;
+	const cursorControl = cursor?.control ?? inheritedCursorControl;
+	// `cornerRadius` is applied independently of the emitted style (as a data
+	// attribute on the provider element), so it only needs resolving here for
+	// propagation to descendants through context.
 	const cornerRadiusPreset =
 		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
 
@@ -197,7 +145,21 @@ export function useThemeProviderStyles( {
 		[ primary, background, cursorControl, cornerRadiusPreset ]
 	);
 
+	// Whether each resolved value differs from what the cascade already
+	// provides. Emitting overrides identical to the inherited values would be
+	// redundant, so the work is skipped in that case. The comparison is against
+	// the *inherited* values (not the prebuilt defaults) so a nested provider
+	// can still reset a setting back to the default and win over an ancestor's
+	// override.
+	const primaryChanged = ! colorsMatch( primary, inheritedPrimary );
+	const backgroundChanged = ! colorsMatch( background, inheritedBackground );
+	const cursorChanged = cursorControl !== inheritedCursorControl;
+
 	const colorStyles = useMemo( () => {
+		if ( ! primaryChanged && ! backgroundChanged ) {
+			return undefined;
+		}
+
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
@@ -222,21 +184,36 @@ export function useThemeProviderStyles( {
 			}
 		} );
 
-		return generateStyles( {
-			primary: seeds.primary,
-			computedColorRamps,
-		} );
-	}, [ primary, background ] );
+		return Object.fromEntries(
+			[
+				colorTokensCSS( computedColorRamps ),
+				// Only pin `--wp-admin-theme-color*` when the primary differs
+				// from the inherited value; otherwise leave the inherited (or
+				// surrounding WP admin) color scheme in place.
+				primaryChanged
+					? legacyWpAdminThemeOverridesCSS( seeds.primary )
+					: [],
+			].flat()
+		);
+	}, [ primary, background, primaryChanged, backgroundChanged ] );
 
-	const themeProviderStyles: CSSProperties = useMemo(
-		() => ( {
+	const themeProviderStyles: CSSProperties | undefined = useMemo( () => {
+		if ( ! primaryChanged && ! backgroundChanged && ! cursorChanged ) {
+			return undefined;
+		}
+		return {
 			...colorStyles,
 			...( cursorControl && {
 				'--wpds-cursor-control': cursorControl,
 			} ),
-		} ),
-		[ colorStyles, cursorControl ]
-	);
+		};
+	}, [
+		colorStyles,
+		cursorControl,
+		primaryChanged,
+		backgroundChanged,
+		cursorChanged,
+	] );
 
 	return {
 		resolvedSettings,

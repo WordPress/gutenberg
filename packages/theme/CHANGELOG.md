@@ -25,6 +25,11 @@
 ### Internal
 
 -   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
+-   `ThemeProvider`: skip applying per-instance overrides (and the associated color-ramp computation) when the resolved settings already match the inherited ones — the closest parent `<ThemeProvider>`, or the prebuilt `:root` defaults at the top of the tree. `--wp-admin-theme-color*` overrides are applied only when the resolved `color.primary` differs from the inherited value, letting the surrounding admin color scheme show through otherwise ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+
+### Documentation
+
+-   Document the static-stylesheet + `<ThemeProvider>` delivery model, the `isRoot` prop, and the canonical pattern for using `<ThemeProvider>` across documents (iframes and other portals) ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
 
 ### Code Quality
 

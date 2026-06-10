@@ -222,17 +222,24 @@ describe( 'ThemeProvider', () => {
 				screen.getByTestId( 'overriding' )
 			);
 
-			// A nested provider with no settings of its own inherits everything.
-			expect( readProp( inheriting, BRAND_BG ) ).toBe( PRIMARY );
-			expect( readProp( inheriting, SURFACE_BG ) ).toBe( BACKGROUND );
-			expect( readProp( inheriting, CURSOR_CONTROL ) ).toBe( 'pointer' );
+			// A nested provider whose settings all resolve to the inherited
+			// values emits no style of its own; its descendants pick the tokens
+			// up from the ancestor through the CSS cascade. jsdom does not model
+			// that cascade, so the custom properties are absent on the nested
+			// provider's own element. Only the inherited `cornerRadius` (applied
+			// as a data attribute, not a custom property) is still reflected.
+			expect( readProp( inheriting, BRAND_BG ) ).toBe( '' );
+			expect( readProp( inheriting, SURFACE_BG ) ).toBe( '' );
+			expect( readProp( inheriting, CURSOR_CONTROL ) ).toBe( '' );
 			expect( inheriting ).toHaveAttribute(
 				'data-wpds-corner-radius',
 				'pronounced'
 			);
 
-			// A nested provider overrides only what it defines (`primary`),
-			// inheriting the rest (`background`, `cursor`, `cornerRadius`).
+			// A nested provider that overrides a setting (`primary`) re-pins the
+			// full token set on its own element so the change wins in the
+			// cascade, while still reflecting the settings it inherited
+			// (`background`, `cursor`, `cornerRadius`).
 			expect( readProp( overriding, BRAND_BG ) ).toBe( OTHER_PRIMARY );
 			expect( readProp( overriding, SURFACE_BG ) ).toBe( BACKGROUND );
 			expect( readProp( overriding, CURSOR_CONTROL ) ).toBe( 'pointer' );
