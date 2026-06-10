@@ -9,6 +9,92 @@
 class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 
 	/**
+	 * Test that Navigation state classes are copied to inner list containers.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::block_core_navigation_add_state_class_to_container
+	 */
+	public function test_state_class_is_added_to_inner_list_container() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = block_core_navigation_add_state_class_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">Item</li></ul></nav>',
+			$actual
+		);
+	}
+
+	/**
+	 * Test that non-Navigation blocks are unchanged.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::block_core_navigation_add_state_class_to_container
+	 */
+	public function test_state_class_is_not_added_to_non_navigation_blocks() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/group' );
+
+		$actual = block_core_navigation_add_state_class_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that inner list containers are unchanged when the wrapper has no state class.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::block_core_navigation_add_state_class_to_container
+	 */
+	public function test_state_class_is_not_added_when_wrapper_has_no_state_class() {
+		$block_content = '<nav class="wp-block-navigation"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = block_core_navigation_add_state_class_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that existing inner state classes are preserved.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::block_core_navigation_add_state_class_to_container
+	 */
+	public function test_existing_inner_state_class_is_preserved() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-abcd1234"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = block_core_navigation_add_state_class_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that Navigation state classes are copied to multiple inner list containers.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::block_core_navigation_add_state_class_to_container
+	 */
+	public function test_state_class_is_added_to_multiple_inner_list_containers() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Two</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = block_core_navigation_add_state_class_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">Two</li></ul></nav>',
+			$actual
+		);
+	}
+
+	/**
 	 * Test that navigation links are wrapped in list items to preserve accessible markup
 	 *
 	 * @group navigation-renderer
