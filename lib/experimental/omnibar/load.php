@@ -1,19 +1,19 @@
 <?php
 /**
- * Admin bar in editor experiment.
+ * Omnibar experiment.
  *
  * @package gutenberg
  */
 
 /**
- * Enables the admin bar in editor experiment.
+ * Enables the omnibar experiment.
  */
-function gutenberg_enable_admin_bar_in_editor_experiment() {
+function gutenberg_enable_omnibar_experiment() {
 	$screen = get_current_screen();
 	if (
 		! $screen ||
 		! is_admin_bar_showing() ||
-		! gutenberg_is_experiment_enabled( 'gutenberg-admin-bar-in-editor' )
+		! gutenberg_is_experiment_enabled( 'gutenberg-omnibar' )
 	) {
 		return;
 	}
@@ -31,10 +31,10 @@ function gutenberg_enable_admin_bar_in_editor_experiment() {
 	);
 }
 
-add_action( 'admin_enqueue_scripts', 'gutenberg_enable_admin_bar_in_editor_experiment' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_enable_omnibar_experiment' );
 
 /**
- * Adds a body class when the admin bar in editor experiment is enabled.
+ * Adds a body class when the omnibar experiment is enabled.
  *
  * Applied on every admin page where the admin bar is shown, so that
  * pages that use wp-build (such as `font-library-wp-admin`)
@@ -43,10 +43,10 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_enable_admin_bar_in_editor_exper
  * @param string $classes Space-separated list of admin body classes.
  * @return string Filtered list of admin body classes.
  */
-function gutenberg_admin_bar_in_editor_body_class( $classes ) {
+function gutenberg_omnibar_body_class( $classes ) {
 	if (
 		! is_admin_bar_showing() ||
-		! gutenberg_is_experiment_enabled( 'gutenberg-admin-bar-in-editor' )
+		! gutenberg_is_experiment_enabled( 'gutenberg-omnibar' )
 	) {
 		return $classes;
 	}
@@ -54,15 +54,15 @@ function gutenberg_admin_bar_in_editor_body_class( $classes ) {
 	return $classes . ' has-admin-bar-in-editor';
 }
 
-add_filter( 'admin_body_class', 'gutenberg_admin_bar_in_editor_body_class' );
+add_filter( 'admin_body_class', 'gutenberg_omnibar_body_class' );
 
 /**
- * Enables the admin bar on the site-editor-v2 page.
+ * Enables the omnibar experiment on the site-editor-v2 page.
  */
-function gutenberg_enable_admin_bar_in_site_editor_v2() {
+function gutenberg_enable_omnibar_in_site_editor_v2() {
 	if (
 		! is_admin_bar_showing() ||
-		! gutenberg_is_experiment_enabled( 'gutenberg-admin-bar-in-editor' )
+		! gutenberg_is_experiment_enabled( 'gutenberg-omnibar' )
 	) {
 		return;
 	}
@@ -91,4 +91,4 @@ function gutenberg_enable_admin_bar_in_site_editor_v2() {
 	wp_enqueue_style( 'colors' );
 }
 
-add_action( 'site-editor-v2_init', 'gutenberg_enable_admin_bar_in_site_editor_v2' );
+add_action( 'site-editor-v2_init', 'gutenberg_enable_omnibar_in_site_editor_v2' );

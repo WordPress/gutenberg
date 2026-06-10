@@ -31,7 +31,7 @@
 
 	// The skeleton must always sit in the modal's flow (`top: auto`). The reset
 	// above sets that, but external rules can outrank its low specificity — e.g.
-	// the "Toolbar in editor" experiment (`gutenberg-admin-bar-in-editor`)
+	// the "Omnipresent Toolbar" experiment (`gutenberg-omnibar`)
 	// offsets every `.interface-interface-skeleton` below the admin bar via a
 	// `body.has-admin-bar-in-editor.is-fullscreen-mode` rule, which would push
 	// the editor (and the fine-rotation ruler under the canvas) down inside our
