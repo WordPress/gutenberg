@@ -3,14 +3,21 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { create } from '@wordpress/rich-text';
+import {
+	create,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
+
+const { ownsSelection } = unlock( richTextPrivateApis );
 
 /**
  * Extract the selection start node from the selection. When the anchor node is
@@ -116,8 +123,14 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		isMultiSelecting,
+		getBlockName,
+		getSelectionStart,
+		getSelectionEnd,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -131,6 +144,59 @@ export default function useSelectionObserver() {
 
 			function onKeyDown() {
 				isTripleClick = false;
+			}
+
+			// Tracks composition so no selection is dispatched while the user
+			// is composing text: a re-render may destroy the composition.
+			let isComposing = false;
+
+			function onCompositionStart() {
+				isComposing = true;
+			}
+
+			function onCompositionEnd() {
+				isComposing = false;
+			}
+
+			// Syncs a collapsed selection to the store while the wrapper
+			// holds focus. The current store selection is compared first so
+			// selection changes that are already in sync (e.g. the result of
+			// typing, which rich text syncs itself) don't dispatch.
+			function syncCollapsedSelection( selection, startNode, clientId ) {
+				const richTextElement = getRichTextElement( startNode );
+				const attributeKey =
+					richTextElement?.dataset.wpBlockAttributeKey;
+
+				if ( attributeKey === undefined ) {
+					if ( getBlockSelectionStart() !== clientId ) {
+						selectBlock( clientId );
+					}
+					return;
+				}
+
+				const richTextData = create( {
+					element: richTextElement,
+					range: selection.getRangeAt( 0 ),
+					__unstableIsEditableTree: true,
+				} );
+				const offset = richTextData.start ?? 0;
+				const selectionStart = getSelectionStart();
+				const selectionEnd = getSelectionEnd();
+
+				if (
+					selectionStart.clientId === clientId &&
+					selectionEnd.clientId === clientId &&
+					selectionStart.attributeKey === attributeKey &&
+					selectionStart.offset === offset &&
+					selectionEnd.offset === offset
+				) {
+					return;
+				}
+
+				selectionChange( {
+					start: { clientId, attributeKey, offset },
+					end: { clientId, attributeKey, offset },
+				} );
 			}
 
 			function onSelectionChange( event ) {
@@ -161,6 +227,56 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
+					const collapsedClientId = getBlockClientId( startNode );
+
+					// If the block supports an editable root, keep (or make)
+					// the wrapper contentEditable so the native selection can
+					// extend across blocks. The wrapper holds focus, so rich
+					// text instances don't sync the selection; do it here.
+					if (
+						! isMultiSelecting() &&
+						collapsedClientId &&
+						hasBlockSupport(
+							getBlockName( collapsedClientId ),
+							'editableRoot',
+							false
+						)
+					) {
+						setContentEditableWrapper( node, true );
+
+						// While the wrapper is editable it must hold focus: a
+						// nested editable element cannot retain it (the first
+						// DOM mutation moves focus to the host, inconsistently
+						// across browsers). Don't steal focus from UI elements
+						// (e.g. buttons).
+						const { activeElement } = ownerDocument;
+						if (
+							activeElement !== node &&
+							activeElement?.isContentEditable &&
+							node.contains( activeElement )
+						) {
+							node.focus();
+						}
+
+						// Only sync when the selection moved to a different
+						// block. Within the same block, the rich text
+						// instance owns the selection and syncs it itself;
+						// dispatching here as well would race that sync and
+						// reset its active formats.
+						if (
+							! isComposing &&
+							ownerDocument.activeElement === node &&
+							getBlockSelectionStart() !== collapsedClientId
+						) {
+							syncCollapsedSelection(
+								selection,
+								startNode,
+								collapsedClientId
+							);
+						}
+						return;
+					}
+
 					if (
 						node.contentEditable === 'true' &&
 						! isMultiSelecting()
@@ -248,7 +364,11 @@ export default function useSelectionObserver() {
 
 						if (
 							richTextElement &&
-							ownerDocument.activeElement !== richTextElement
+							ownerDocument.activeElement !== richTextElement &&
+							// If the rich text instance owns the selection
+							// (e.g. through a focused editing host), it syncs
+							// the selection itself.
+							! ownsSelection( richTextElement )
 						) {
 							const range = selection.getRangeAt( 0 );
 							const richTextData = create( {
@@ -256,29 +376,39 @@ export default function useSelectionObserver() {
 								range,
 								__unstableIsEditableTree: true,
 							} );
+							const attributeKey =
+								richTextElement.dataset.wpBlockAttributeKey;
+							// Clamp the offsets to the element. A forward selection
+							// can overshoot past the rich text (e.g. a triple
+							// click extends into the next block at offset 0),
+							// leaving `end` undefined; that means the selection
+							// reaches through the end of this element's content.
+							const startOffset = richTextData.start ?? 0;
+							const endOffset =
+								richTextData.end ?? richTextData.text.length;
+							const selectionStart = getSelectionStart();
+							const selectionEnd = getSelectionEnd();
+
+							if (
+								selectionStart.clientId === startClientId &&
+								selectionEnd.clientId === startClientId &&
+								selectionStart.attributeKey === attributeKey &&
+								selectionStart.offset === startOffset &&
+								selectionEnd.offset === endOffset
+							) {
+								return;
+							}
+
 							selectionChange( {
 								start: {
 									clientId: startClientId,
-									attributeKey:
-										richTextElement.dataset
-											.wpBlockAttributeKey,
-									offset: richTextData.start ?? 0,
+									attributeKey,
+									offset: startOffset,
 								},
 								end: {
 									clientId: startClientId,
-									attributeKey:
-										richTextElement.dataset
-											.wpBlockAttributeKey,
-									// Clamp the end offset to the element. A
-									// forward selection can overshoot past the
-									// rich text (e.g. a triple click extends
-									// into the next block at offset 0), leaving
-									// `end` undefined; that means the selection
-									// reaches through the end of this element's
-									// content.
-									offset:
-										richTextData.end ??
-										richTextData.text.length,
+									attributeKey,
+									offset: endOffset,
 								},
 							} );
 						} else {
@@ -356,6 +486,8 @@ export default function useSelectionObserver() {
 			defaultView.addEventListener( 'mouseup', onSelectionChange );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
+			node.addEventListener( 'compositionstart', onCompositionStart );
+			node.addEventListener( 'compositionend', onCompositionEnd );
 			return () => {
 				ownerDocument.removeEventListener(
 					'selectionchange',
@@ -364,6 +496,11 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onSelectionChange );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
+				node.removeEventListener(
+					'compositionstart',
+					onCompositionStart
+				);
+				node.removeEventListener( 'compositionend', onCompositionEnd );
 			};
 		},
 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]

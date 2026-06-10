@@ -9,6 +9,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { getActiveFormats } from '../../get-active-formats';
 import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
+import { ownsSelection } from '../../owns-selection';
 import { unlock } from '../../lock-unlock';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -132,9 +133,14 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Ensure the active element is the rich text element. The listener
-		// stays subscribed but no-ops for instances that aren't focused.
-		if ( ownerDocument.activeElement !== element ) {
+		// Ensure the active element is the rich text element, or that the
+		// element owns the selection through a focused editing host (the
+		// editable block editor canvas wrapper). The listener stays
+		// subscribed but no-ops for instances that don't own the selection.
+		if (
+			ownerDocument.activeElement !== element &&
+			! ownsSelection( element )
+		) {
 			return;
 		}
 
@@ -261,8 +267,12 @@ export default ( props ) => ( element ) => {
 			props.current;
 
 		// When the whole editor is editable, let writing flow handle
-		// selection.
+		// selection state, but keep the internal record in sync.
 		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
+			ownerDocument.addEventListener(
+				'selectionchange',
+				handleSelectionChange
+			);
 			return;
 		}
 
@@ -292,6 +302,7 @@ export default ( props ) => ( element ) => {
 		// yet in this call stack.
 		window.queueMicrotask( handleSelectionChange );
 	}
+
 
 	// `input` and `compositionend` must run before block-editor's
 	// `input-rules.js` element-level listeners, which call `getValue()`

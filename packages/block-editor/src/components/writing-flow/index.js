@@ -14,6 +14,9 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import useEditableRoot from './use-editable-root';
+import useEventRedirect from './use-event-redirect';
+import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
 import useArrowNav from './use-arrow-nav';
@@ -36,9 +39,14 @@ export function useWritingFlow() {
 	return [
 		before,
 		useMergeRefs( [
+			// Must come first so host-targeted events are redirected before
+			// any other writing flow listener sees them.
+			useEventRedirect(),
 			ref,
 			useClipboardHandler(),
 			useInput(),
+			useEditableRoot(),
+			useHomeEnd(),
 			useDragSelection(),
 			useSelectionObserver(),
 			useClickSelection(),

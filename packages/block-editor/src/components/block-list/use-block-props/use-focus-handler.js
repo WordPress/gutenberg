@@ -27,6 +27,16 @@ export function useFocusHandler( clientId ) {
 
 	return useRefEffect(
 		( node ) => {
+			let isShiftMouseDown = false;
+
+			function onMouseDown( event ) {
+				isShiftMouseDown = event.shiftKey;
+			}
+
+			function onMouseUp() {
+				isShiftMouseDown = false;
+			}
+
 			/**
 			 * Marks the block as selected when focused and not already
 			 * selected. This specifically handles the case where block does not
@@ -36,9 +46,12 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
-				// When the whole editor is editable, let writing flow handle
-				// selection.
+				// When the whole editor is editable and a shift+click gesture
+				// is in progress, let writing flow handle (multi) selection.
+				// Without the shift key, focus within an editable wrapper
+				// still expresses the intent to select the block.
 				if (
+					isShiftMouseDown &&
 					node.parentElement.closest( '[contenteditable="true"]' )
 				) {
 					return;
@@ -63,7 +76,27 @@ export function useFocusHandler( clientId ) {
 				selectBlock( clientId );
 			}
 
-			return subscribeDelegatedListener( node, 'focusin', onFocus );
+			const unsubscribeFocus = subscribeDelegatedListener(
+				node,
+				'focusin',
+				onFocus
+			);
+			const unsubscribeMouseDown = subscribeDelegatedListener(
+				node,
+				'mousedown',
+				onMouseDown
+			);
+			const unsubscribeMouseUp = subscribeDelegatedListener(
+				node.ownerDocument,
+				'mouseup',
+				onMouseUp
+			);
+
+			return () => {
+				unsubscribeFocus();
+				unsubscribeMouseDown();
+				unsubscribeMouseUp();
+			};
 		},
 		[ isBlockSelected, selectBlock ]
 	);

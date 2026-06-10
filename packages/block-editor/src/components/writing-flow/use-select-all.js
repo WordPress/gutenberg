@@ -30,6 +30,31 @@ export default function useSelectAll() {
 				selectedClientIds.length < 2 &&
 				! isEntirelySelected( event.target )
 			) {
+				// When the wrapper is contentEditable (the selected block
+				// supports `editableRoot`), the browser default would select
+				// the entire canvas. Select the contents of the editable
+				// element instead, like the default does when the element
+				// itself holds focus.
+				if (
+					node.contentEditable === 'true' &&
+					event.target !== node &&
+					event.target.isContentEditable
+				) {
+					event.preventDefault();
+					const { ownerDocument } = event.target;
+					const range = ownerDocument.createRange();
+					range.selectNodeContents( event.target );
+					const selection = ownerDocument.defaultView.getSelection();
+					selection.removeAllRanges();
+					selection.addRange( range );
+					// The native `selectionchange` event is asynchronous;
+					// dispatch it synchronously so that listeners depending
+					// on it (e.g. the rich text internal record sync) run
+					// before any event following this one.
+					ownerDocument.dispatchEvent(
+						new Event( 'selectionchange' )
+					);
+				}
 				return;
 			}
 
