@@ -842,7 +842,7 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should remove blockA and focus blockB if blockA has a merge function but empty content', () => {
+		it( 'should remove blockA and focus blockB if blockA has a merge function but empty content and a different type than blockB', () => {
 			registerBlockType( 'core/test-block', {
 				apiVersion: 3,
 				attributes: {
@@ -869,9 +869,11 @@ describe( 'actions', () => {
 				attributes: {},
 				innerBlocks: [],
 			} );
+			// blockB is a different block type — the guard only fires when types differ,
+			// because same-type merges never transform blockB's type.
 			const blockB = deepFreeze( {
 				clientId: 'ribs',
-				name: 'core/test-block',
+				name: 'core/test-block-b',
 				attributes: { content: 'ribs' },
 				innerBlocks: [],
 			} );
