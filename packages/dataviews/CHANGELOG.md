@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.0.0 (2026-06-10)
+
 ### Breaking Changes
 
 - Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
@@ -20,6 +22,7 @@
 
 ### Internal
 
+-   Update `@ariakit/react` to `0.4.29` ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
 -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
 
 ## 15.0.0 (2026-05-27)

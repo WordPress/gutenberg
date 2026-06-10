@@ -151,6 +151,20 @@ describe( 'ColorPalette', () => {
 		).not.toBeInTheDocument();
 	} );
 
+	it( 'should render nothing when custom colors are disabled, there are no colors, and it is not clearable', () => {
+		const onChange = jest.fn();
+		const { container } = render(
+			<ColorPalette
+				colors={ [] }
+				disableCustomColors
+				clearable={ false }
+				onChange={ onChange }
+			/>
+		);
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
 	it( 'should render dropdown and its content', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
@@ -211,6 +225,22 @@ describe( 'ColorPalette', () => {
 		const onChange = jest.fn();
 
 		render( <ColorPalette colors={ [] } onChange={ onChange } /> );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Clear' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should still show the clear button when colors is empty and custom colors are disabled', () => {
+		const onChange = jest.fn();
+
+		render(
+			<ColorPalette
+				colors={ [] }
+				disableCustomColors
+				onChange={ onChange }
+			/>
+		);
 
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )

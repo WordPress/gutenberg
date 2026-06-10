@@ -21,7 +21,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `parentPageID` | `integer` | `0` | — |
-| `isNested` | `boolean` | `false` | — |
 
 ## Supports
 
@@ -65,6 +64,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `style`
 - `openSubmenusOnClick`
 - `submenuVisibility`
+- `core/isInsideSubmenu`
 
 ## Block Markup
 
