@@ -203,29 +203,29 @@ if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_is_post_type_collaboration_enabled' ) ) {
+if ( ! function_exists( 'wp_is_post_type_collaboration_disabled' ) ) {
 	/**
-	 * Determines whether real-time collaboration is enabled for a post type.
+	 * Determines whether real-time collaboration is disabled for a post type.
 	 *
 	 * @since 7.1.0
 	 *
 	 * @param string $post_type Post type name.
-	 * @return bool Whether real-time collaboration is enabled for the post type.
+	 * @return bool Whether real-time collaboration is disabled for the post type.
 	 */
-	function wp_is_post_type_collaboration_enabled( $post_type ) {
+	function wp_is_post_type_collaboration_disabled( $post_type ) {
 		if ( ! post_type_exists( $post_type ) ) {
-			return false;
+			return true;
 		}
 
 		/**
-		 * Filters whether real-time collaboration is enabled for a post type.
+		 * Filters whether real-time collaboration is disabled for a post type.
 		 *
 		 * @since 7.1.0
 		 *
-		 * @param bool   $enabled   Whether real-time collaboration is enabled for the post type.
+		 * @param bool   $disabled  Whether real-time collaboration is disabled for the post type.
 		 * @param string $post_type Post type name.
 		 */
-		return (bool) apply_filters( 'wp_is_post_type_collaboration_enabled', true, $post_type );
+		return (bool) apply_filters( 'wp_is_post_type_collaboration_disabled', false, $post_type );
 	}
 }
 
@@ -253,9 +253,7 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	$disabled_post_types = array_values(
 		array_filter(
 			get_post_types( array( 'show_in_rest' => true ) ),
-			static function ( $post_type ) {
-				return ! wp_is_post_type_collaboration_enabled( $post_type );
-			}
+			'wp_is_post_type_collaboration_disabled'
 		)
 	);
 
