@@ -10,24 +10,7 @@ This document explains how the pieces of the dashboard widget system relate to e
 
 A widget travels through five stations, each owned by a different part of the codebase:
 
-```
-widgets/<name>/                      authoring: one folder per widget
-      │
-      ▼  build time
-@wordpress/build (wp-build)          discovers folders, compiles two ES modules
-      │                              per widget, emits a PHP manifest
-      ▼  init (PHP)
-WP_Widget_Type_Registry              hydrated from the manifest; the server's
-      │                              runtime source of truth
-      ▼  REST
-/wp/v2/widget-modules                exposes { name, render_module,
-      │                              widget_module, presentation }
-      ▼  client
-@wordpress/widget-primitives         useWidgetTypes() resolves records into
-      │                              WidgetType[]; WidgetRender mounts one
-      ▼
-Host (e.g. the dashboard)            owns layout, chrome, persistence
-```
+![The widget pipeline: from the widgets folder, through the build and the server registry, to the client package and hosts](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/dashboard-widgets-pipeline.svg)
 
 No station knows about the internals of the next one; each consumes a narrow artifact (a folder convention, a manifest, a registry, a REST record, a `WidgetType`). That separation is what lets each piece evolve independently and is the reason the client contract lives in its own package.
 
