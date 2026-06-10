@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { v4 as uuid } from 'uuid';
+
+/**
  * Internal dependencies
  */
 import type { DashboardWidget, GridTilePlacement } from '../../types';
@@ -24,7 +29,7 @@ export function createDashboardWidget< T >(
 	initialAttributes?: T
 ): DashboardWidget< T > {
 	return {
-		uuid: crypto.randomUUID(),
+		uuid: uuid(),
 		type: widgetType.name,
 		attributes:
 			initialAttributes ?? ( widgetType.example?.attributes as T ),

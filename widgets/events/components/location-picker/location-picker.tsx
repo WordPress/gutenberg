@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useId, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
 import {
@@ -23,18 +29,27 @@ type LocationOption = {
 	value: string;
 };
 
+const DRAFT_DEBOUNCE_MS = 300;
+
 export function LocationPicker( {
-	hidden,
-	onSubmit,
-	showCancel,
-	onCancel,
+	onSubmit = () => {},
 	seedInput = '',
+	hideLabelFromVision = true,
+	selectButton = true,
+	onChange,
 }: {
-	hidden: boolean;
-	onSubmit: ( location: string ) => void;
-	showCancel: boolean;
-	onCancel: () => void;
+	onSubmit?: ( location: string ) => void;
 	seedInput?: string;
+	hideLabelFromVision?: boolean;
+	/**
+	 * Controls Select button visibility.
+	 */
+	selectButton?: boolean;
+	/**
+	 * Called after the input value settles (debounced). Used when `selectButton`
+	 * is false to stage attribute updates before Save.
+	 */
+	onChange?: ( location: string ) => void;
 } ) {
 	const locationInputId = useId();
 	const [ locationInput, setLocationInput ] = useState( seedInput );
@@ -42,12 +57,59 @@ export function LocationPicker( {
 		LocationOption[]
 	>( [] );
 	const [ isLocatingCity, setIsLocatingCity ] = useState( false );
+	const draftTimeoutRef = useRef< ReturnType< typeof setTimeout > | null >(
+		null
+	);
 
 	useEffect( () => {
-		if ( showCancel && seedInput ) {
+		if ( ! selectButton || seedInput ) {
 			setLocationInput( seedInput );
 		}
-	}, [ showCancel, seedInput ] );
+	}, [ selectButton, seedInput ] );
+
+	const clearDraftTimeout = useCallback( () => {
+		if ( draftTimeoutRef.current ) {
+			clearTimeout( draftTimeoutRef.current );
+			draftTimeoutRef.current = null;
+		}
+	}, [] );
+
+	const tryPublishDraft = useCallback( () => {
+		if ( selectButton || ! onChange ) {
+			return;
+		}
+		const draft = locationInput.trim();
+		const saved = seedInput.trim();
+		if ( draft === saved ) {
+			return;
+		}
+		onChange( locationInput );
+	}, [ selectButton, locationInput, onChange, seedInput ] );
+
+	const scheduleDraftPublish = useCallback( () => {
+		if ( selectButton || ! onChange ) {
+			return;
+		}
+		clearDraftTimeout();
+		draftTimeoutRef.current = setTimeout( () => {
+			draftTimeoutRef.current = null;
+			tryPublishDraft();
+		}, DRAFT_DEBOUNCE_MS );
+	}, [ clearDraftTimeout, selectButton, onChange, tryPublishDraft ] );
+
+	useEffect( () => {
+		if ( selectButton || ! onChange ) {
+			clearDraftTimeout();
+			return;
+		}
+		scheduleDraftPublish();
+		return clearDraftTimeout;
+	}, [ clearDraftTimeout, selectButton, onChange, scheduleDraftPublish ] );
+
+	const flushDraftPublish = useCallback( () => {
+		clearDraftTimeout();
+		tryPublishDraft();
+	}, [ clearDraftTimeout, tryPublishDraft ] );
 
 	const fillCityFromGeolocation = async () => {
 		if ( ! navigator.geolocation || isLocatingCity ) {
@@ -172,80 +234,81 @@ export function LocationPicker( {
 		};
 	}, [ locationInput ] );
 
-	if ( hidden ) {
-		return null;
-	}
-
 	return (
-		<div className={ styles.locationPicker }>
-			<form
-				onSubmit={ ( e ) => {
-					e.preventDefault();
+		<form
+			onSubmit={ ( e ) => {
+				e.preventDefault();
+				if ( selectButton ) {
 					onSubmit( locationInput );
-				} }
-			>
-				<Stack direction="row" align="start" wrap="wrap" gap="sm">
-					<Autocomplete.Root
-						items={ locationOptions }
-						value={ locationInput }
-						onValueChange={ setLocationInput }
-					>
-						<Autocomplete.Input
-							id={ locationInputId }
-							className={ styles.locationInput }
-							render={
-								<InputControl
-									autoComplete="off"
-									label={ __( 'City' ) }
-									hideLabelFromVision
-									size="compact"
-									description={ __(
-										'Select a city to view upcoming events.'
-									) }
-									onValueChange={ () => {} }
-									suffix={
-										<InputLayout.Slot padding="minimal">
-											<Autocomplete.Clear />
-											<IconButton
-												icon={ mapMarker }
-												label={ __(
-													'Use current location'
-												) }
-												onClick={
-													fillCityFromGeolocation
-												}
-												disabled={ isLocatingCity }
-												size="small"
-												variant="minimal"
-											/>
-										</InputLayout.Slot>
-									}
-								/>
-							}
-							placeholder={ __( 'City, like Tokyo…' ) }
-						/>
-						{ locationOptions.length > 0 && (
-							<Autocomplete.Popup>
-								<Autocomplete.List>
-									<Autocomplete.ListBody>
-										<Autocomplete.Collection>
-											{ ( item: {
-												id: string;
-												value: string;
-											} ) => (
-												<Autocomplete.Item
-													key={ item.id }
-													value={ item }
-												>
-													{ item.value }
-												</Autocomplete.Item>
+				}
+			} }
+		>
+			<Stack direction="row" align="start" wrap="wrap" gap="sm">
+				<Autocomplete.Root
+					items={ locationOptions }
+					value={ locationInput }
+					onValueChange={ setLocationInput }
+				>
+					<Autocomplete.Input
+						id={ locationInputId }
+						className={ styles.locationInput }
+						render={
+							<InputControl
+								autoComplete="off"
+								label={ __( 'City' ) }
+								hideLabelFromVision={ hideLabelFromVision }
+								size="compact"
+								description={ __(
+									'Select a city to view upcoming events.'
+								) }
+								onValueChange={ () => {} }
+								onBlur={
+									! selectButton
+										? flushDraftPublish
+										: undefined
+								}
+								suffix={
+									<InputLayout.Slot padding="minimal">
+										<Autocomplete.Clear />
+										<IconButton
+											icon={ mapMarker }
+											label={ __(
+												'Use current location'
 											) }
-										</Autocomplete.Collection>
-									</Autocomplete.ListBody>
-								</Autocomplete.List>
-							</Autocomplete.Popup>
-						) }
-					</Autocomplete.Root>
+											onClick={ fillCityFromGeolocation }
+											disabled={ isLocatingCity }
+											size="small"
+											variant="minimal"
+										/>
+									</InputLayout.Slot>
+								}
+							/>
+						}
+						placeholder={ __( 'City, like Tokyo…' ) }
+					/>
+					{ locationOptions.length > 0 && (
+						<Autocomplete.Popup>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item: {
+											id: string;
+											value: string;
+										} ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					) }
+				</Autocomplete.Root>
+				{ selectButton && (
 					<Button
 						variant="outline"
 						size="compact"
@@ -254,18 +317,8 @@ export function LocationPicker( {
 					>
 						{ __( 'Select' ) }
 					</Button>
-					{ showCancel && (
-						<Button
-							size="compact"
-							tone="neutral"
-							variant="minimal"
-							onClick={ onCancel }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-					) }
-				</Stack>
-			</form>
-		</div>
+				) }
+			</Stack>
+		</form>
 	);
 }

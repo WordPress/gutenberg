@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
-import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
@@ -13,17 +12,18 @@ import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpres
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { migrateLayout } from '../../utils/migrate-layout';
-import type {
-	WidgetGridLayoutSettings,
-	WidgetGridModel,
-	WidgetGridSettings,
+import {
+	presetToRowHeight,
+	rowHeightToPreset,
+	type RowHeightPreset,
+} from '../../utils/row-height-presets';
+import {
+	WIDGET_DASHBOARD_COLUMN_COUNT,
+	type WidgetGridLayoutSettings,
+	type WidgetGridModel,
+	type WidgetGridSettings,
 } from '../../types';
 import { LayoutModelEditField } from './layout-model-edit-field';
-
-const DEFAULT_FIXED_COLUMNS = 6;
-const DEFAULT_MIN_COLUMN_WIDTH = 350;
-const DEFAULT_ROW_HEIGHT = 200;
-const ROW_HEIGHT_AUTO = 'auto' as const;
 
 function getModel( item: WidgetGridSettings ): WidgetGridModel {
 	return item.model ?? 'grid';
@@ -31,58 +31,6 @@ function getModel( item: WidgetGridSettings ): WidgetGridModel {
 
 function isMasonry( item: WidgetGridSettings ): boolean {
 	return getModel( item ) === 'masonry';
-}
-
-function getRowHeight(
-	item: WidgetGridSettings
-): WidgetGridLayoutSettings[ 'rowHeight' ] {
-	if ( isMasonry( item ) ) {
-		return undefined;
-	}
-	return ( item as WidgetGridLayoutSettings ).rowHeight;
-}
-
-function isAutoRowHeight( item: WidgetGridSettings ): boolean {
-	return getRowHeight( item ) === ROW_HEIGHT_AUTO;
-}
-
-function StepperIntegerEdit( {
-	data,
-	field,
-	onChange,
-}: DataFormControlProps< WidgetGridSettings > ) {
-	const { label, description, getValue, setValue, isValid } = field;
-	const value = getValue( { item: data } );
-	const disabled = field.isDisabled( { item: data, field } );
-	const min =
-		typeof isValid.min?.constraint === 'number'
-			? isValid.min.constraint
-			: undefined;
-	const max =
-		typeof isValid.max?.constraint === 'number'
-			? isValid.max.constraint
-			: undefined;
-
-	return (
-		<NumberControl
-			__next40pxDefaultSize
-			label={ label }
-			help={ description }
-			value={ value ?? '' }
-			min={ min }
-			max={ max }
-			step={ 1 }
-			spinControls="custom"
-			disabled={ disabled }
-			onChange={ ( next ) => {
-				const parsed =
-					next === '' || next === undefined
-						? undefined
-						: Number( next );
-				onChange( setValue( { item: data, value: parsed } ) );
-			} }
-		/>
-	);
 }
 
 const fields: Field< WidgetGridSettings >[] = [
@@ -101,85 +49,33 @@ const fields: Field< WidgetGridSettings >[] = [
 		getValue: ( { item } ) => getModel( item ),
 	},
 	{
-		id: 'columns',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Columns' ),
-		description: __(
-			'How many columns to show when the dashboard has enough space.'
-		),
-		isValid: { min: 1, max: 12 },
-	},
-	{
-		id: 'adaptiveColumns',
-		type: 'boolean',
-		Edit: 'toggle',
-		label: __( 'Adjust on narrow screens' ),
-		description: __(
-			'Show fewer columns when the dashboard gets too narrow to keep tiles readable.'
-		),
-		getValue: ( { item } ) => item.minColumnWidth !== 0,
-		setValue: ( { item, value } ) => {
-			if ( ! value ) {
-				return { minColumnWidth: 0 };
+		id: 'rowHeight',
+		type: 'text',
+		Edit: 'toggleGroup',
+		label: __( 'Row height' ),
+		description: __( 'Height of each grid row.' ),
+		elements: [
+			{ value: 'small', label: __( 'Small' ) },
+			{ value: 'medium', label: __( 'Medium' ) },
+			{ value: 'large', label: __( 'Large' ) },
+		],
+		getValue: ( { item } ) => {
+			const rowHeight = ( item as WidgetGridLayoutSettings ).rowHeight;
+			if ( typeof rowHeight !== 'number' ) {
+				return 'medium';
 			}
-			const previous = item.minColumnWidth;
-			return {
-				minColumnWidth:
-					previous && previous > 0
-						? previous
-						: DEFAULT_MIN_COLUMN_WIDTH,
-			};
+			return rowHeightToPreset( rowHeight );
 		},
-	},
-	{
-		id: 'minColumnWidth',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Minimum tile width' ),
-		description: __(
-			'The smallest tile width before a column is removed.'
-		),
-		isValid: { min: 48, max: 600 },
-		isVisible: ( item ) => item.minColumnWidth !== 0,
-	},
-	{
-		id: 'autoRowHeight',
-		type: 'boolean',
-		Edit: 'toggle',
-		label: __( 'Auto-fit row height to content' ),
-		getValue: ( { item } ) => isAutoRowHeight( item ),
 		setValue: ( { value } ) => ( {
-			rowHeight: value ? ROW_HEIGHT_AUTO : DEFAULT_ROW_HEIGHT,
+			rowHeight: presetToRowHeight( value as RowHeightPreset ),
 		} ),
 		isVisible: ( item ) => ! isMasonry( item ),
-	},
-	{
-		id: 'rowHeight',
-		type: 'integer',
-		Edit: StepperIntegerEdit,
-		label: __( 'Row height (px)' ),
-		description: __( 'Height of each row in the standard grid.' ),
-		isValid: { min: 100 },
-		getValue: ( { item } ) => {
-			const rh = getRowHeight( item );
-			return typeof rh === 'number' ? rh : undefined;
-		},
-		isVisible: ( item ) => ! isMasonry( item ),
-		isDisabled: ( { item } ) => isAutoRowHeight( item ),
 	},
 ];
 
 const form: Form = {
 	layout: { type: 'regular', labelPosition: 'top' },
-	fields: [
-		'model',
-		'columns',
-		'adaptiveColumns',
-		'minColumnWidth',
-		'autoRowHeight',
-		'rowHeight',
-	],
+	fields: [ 'model', 'rowHeight' ],
 };
 
 interface LayoutSettingsProps {
@@ -195,8 +91,8 @@ interface LayoutSettingsProps {
 }
 
 /**
- * Modal side drawer for grid-level settings (model, column behavior,
- * row height). Reads from and writes to the staging copy in
+ * Modal side drawer for grid-level settings (model, row height).
+ * Reads from and writes to the staging copy in
  * `useDashboardInternalContext`; edits preview through the backdrop
  * and are committed or rolled back by the drawer's Save / Cancel
  * buttons.
@@ -243,7 +139,7 @@ export function LayoutSettings( {
 					layout,
 					currentModel,
 					nextModel,
-					{ columns: gridSettings.columns ?? DEFAULT_FIXED_COLUMNS }
+					{ columns: WIDGET_DASHBOARD_COLUMN_COUNT }
 				);
 				onLayoutChange( migrated );
 			}
