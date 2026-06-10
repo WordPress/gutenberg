@@ -31,9 +31,8 @@ export function WithDesignSystemTheme(
 
 	const colorTheme = context.globals.dsColorTheme;
 	const cursorControl = context.globals.dsCursorControl || undefined;
-	const cornerRadiusPreset = context.globals.dsCornerRadius as
-		| CornerRadiusPreset
-		| undefined;
+	const cornerRadiusPreset =
+		( context.globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
 
 	let color;
 	if ( colorTheme === 'dark' ) {
