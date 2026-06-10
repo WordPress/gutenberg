@@ -39,7 +39,7 @@
 	// specificity that beats such rules, anchored on the modal frame
 	// (`.media-editor` only ever renders inside `.media-editor-modal`) rather
 	// than on the experiment's class, which may change if it ever graduates.
-	.components-modal__frame.media-editor-modal & .interface-interface-skeleton {
+	.media-editor-modal & .interface-interface-skeleton.interface-interface-skeleton {
 		top: auto;
 	}
 
