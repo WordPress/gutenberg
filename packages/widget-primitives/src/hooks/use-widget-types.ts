@@ -16,7 +16,7 @@ import type { WidgetName, WidgetType, WidgetTypeMetadata } from '../types';
  *
  * Scoped to this experimental feature: the entity lives here instead of
  * the static `rootEntitiesConfig` array, so WP installs that never load
- * the dashboard widgets package never see it.
+ * this package never see it.
  */
 dispatch( coreStore ).addEntities( [
 	{
@@ -44,8 +44,8 @@ interface WidgetModuleRecord {
 
 /**
  * `isResolvingWidgetTypes` is true while widget-module records or their
- * metadata imports have not finished resolving. Layout instances must not
- * be treated as missing until it is false.
+ * metadata imports have not finished resolving. Hosts must not treat a
+ * widget instance as missing until it is false.
  */
 type UseWidgetTypesResult = readonly [ WidgetType[], boolean ];
 

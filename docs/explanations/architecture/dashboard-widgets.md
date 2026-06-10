@@ -52,7 +52,7 @@ The output of the build is therefore two things: registered script modules (load
 The registry is the server's runtime answer to "which widget types exist on this site", and two consumers read it:
 
 -   The REST controller (`WP_REST_Widget_Modules_Controller`) exposes it at `/wp/v2/widget-modules`, returning `{ name, render_module, widget_module, presentation }` per record.
--   The dashboard page's boot dependencies filter adds every registered module to the page's import map as a `dynamic` dependency: reachable by `import()`, but never eagerly executed.
+-   A hosting page adds every registered module to its import map as a `dynamic` dependency (reachable by `import()`, never eagerly executed) through the generic `{page-id}-wp-admin_boot_dependencies` filter; the dashboard page does this today.
 
 The registry exists as a class (rather than the manifest being read directly by REST) so that the _source_ of widget types stays an implementation detail. Today the only source is the build manifest; a plugin-facing registration API would target the registry without touching the pipeline behind it.
 

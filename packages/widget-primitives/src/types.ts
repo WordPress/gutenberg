@@ -50,17 +50,18 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	name: WidgetName;
 
 	/**
-	 * Display title; shown in the inserter.
+	 * Display title; hosts surface it in pickers and chrome.
 	 */
 	title: string;
 
 	/**
-	 * Short description shown in the widget inspector.
+	 * Short description; hosts surface it in pickers and help panels.
 	 */
 	description?: string;
 
 	/**
-	 * Visual identifier shown in the widget header.
+	 * Visual identifier; hosts render it alongside the title in their
+	 * chrome.
 	 */
 	icon?: WidgetIcon;
 
@@ -84,7 +85,7 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
 
 	/**
-	 * Search aliases used to surface the widget from the inserter.
+	 * Search aliases hosts use to match the widget in their pickers.
 	 */
 	keywords?: string[];
 
@@ -111,9 +112,9 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	attributes?: Field< Item >[];
 
 	/**
-	 * Structured example data for the Inspector Help Panel preview, and
-	 * the default attributes applied when a new instance is created
-	 * without initial attributes.
+	 * Structured example data hosts use for previews, and the default
+	 * attributes applied when a new instance is created without initial
+	 * attributes.
 	 */
 	example?: {
 		attributes?: Partial< Item >;
