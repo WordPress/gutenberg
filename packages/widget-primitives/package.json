@@ -52,7 +52,9 @@
 		"@wordpress/i18n": "file:../i18n"
 	},
 	"devDependencies": {
-		"@wordpress/components": "file:../components"
+		"@wordpress/components": "file:../components",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/ui": "file:../ui"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

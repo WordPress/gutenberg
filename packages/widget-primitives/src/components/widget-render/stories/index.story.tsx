@@ -14,7 +14,9 @@ import '@wordpress/components/build-style/style.css';
 import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
-import { Suspense, useMemo, useState } from '@wordpress/element';
+import { Suspense, useId, useMemo, useState } from '@wordpress/element';
+import { wordpress } from '@wordpress/icons';
+import { Card, Icon, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -94,6 +96,7 @@ const demoWidgetType: WidgetType< DemoAttributes > = {
 	name: 'demo/hello-world',
 	title: 'Hello World',
 	description: 'Minimal widget demonstrating the render contract.',
+	icon: wordpress,
 	renderModule: 'demo/widgets/hello-world/render',
 	attributes: [
 		{
@@ -234,6 +237,64 @@ export const WithSettings: StoryObj = {
 		docs: {
 			description: {
 				story: 'A widget type declares its settings as dataviews `Field[]` in `attributes`. The host mounts a `DataForm` directly from that schema, with no per-widget form wiring, and the edited attributes flow into the rendered widget. Any host can build its settings surface this way.',
+			},
+		},
+	},
+};
+
+function WidgetInHostChrome() {
+	const [ attributes, setAttributes ] = useState< DemoAttributes >( {
+		...demoWidgetType.example?.attributes,
+	} );
+	const titleId = useId();
+
+	return (
+		<Card.Root
+			render={ <section /> }
+			aria-labelledby={ titleId }
+			style={ { maxWidth: 480 } }
+		>
+			<Card.Header>
+				<Stack direction="row" align="center" gap="sm">
+					{ demoWidgetType.icon && (
+						<span aria-hidden="true">
+							<Icon icon={ demoWidgetType.icon } />
+						</span>
+					) }
+					<Card.Title id={ titleId } render={ <h3 /> }>
+						{ demoWidgetType.title }
+					</Card.Title>
+				</Stack>
+			</Card.Header>
+			<Card.Content>
+				<Suspense fallback={ null }>
+					<WidgetRender< DemoAttributes >
+						widgetType={ demoWidgetType }
+						attributes={ attributes }
+						setAttributes={ ( next ) =>
+							setAttributes( ( prev ) => ( {
+								...prev,
+								...next,
+							} ) )
+						}
+						resolveWidgetModule={ resolveDemoModule }
+					/>
+				</Suspense>
+			</Card.Content>
+		</Card.Root>
+	);
+}
+
+/*
+ * Chrome belongs to the host: a widget never declares its own header. The
+ * host reads the type's metadata and frames the render however it wants.
+ */
+export const WithHostChrome: StoryObj = {
+	render: () => <WidgetInHostChrome />,
+	parameters: {
+		docs: {
+			description: {
+				story: "Chrome belongs to the host: a widget never declares its own header. This minimal chrome is a `Card` whose header stacks the type's metadata (`icon`, `title`), and the card body frames the widget render, the way a host lays a widget out as a tile.",
 			},
 		},
 	},
