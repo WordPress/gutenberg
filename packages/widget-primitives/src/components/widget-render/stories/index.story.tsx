@@ -7,7 +7,7 @@ import type { ComponentType } from 'react';
 /**
  * WordPress dependencies
  */
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { Suspense, useMemo, useState } from '@wordpress/element';
 
@@ -91,7 +91,12 @@ const demoWidgetType: WidgetType< DemoAttributes > = {
 	description: 'Minimal widget demonstrating the render contract.',
 	renderModule: 'demo/widgets/hello-world/render',
 	attributes: [
-		{ id: 'message', label: 'Message', type: 'text' },
+		{
+			id: 'message',
+			label: 'Message',
+			type: 'text',
+			isValid: { required: true },
+		},
 		{
 			id: 'tone',
 			label: 'Tone',
@@ -181,6 +186,8 @@ function WidgetWithSettings() {
 	const applyEdits = ( edits: Partial< DemoAttributes > ) =>
 		setAttributes( ( prev ) => ( { ...prev, ...edits } ) );
 
+	const { validity } = useFormValidity( attributes, fields, form );
+
 	return (
 		<div
 			style={ {
@@ -208,6 +215,7 @@ function WidgetWithSettings() {
 					data={ attributes }
 					fields={ fields }
 					form={ form }
+					validity={ validity }
 					onChange={ applyEdits }
 				/>
 			</aside>
