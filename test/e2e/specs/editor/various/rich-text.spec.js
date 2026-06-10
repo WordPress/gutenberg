@@ -32,7 +32,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 					},
 				},
 				edit( { attributes, setAttributes } ) {
-					return el( 'p', useBlockProps(),
+					return el(
+						'p',
+						useBlockProps(),
 						el( RichText, {
 							'aria-label': 'Test content',
 							value: attributes.value,
@@ -44,7 +46,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 					);
 				},
 				save( { attributes } ) {
-					return el( 'p', useBlockProps.save(),
+					return el(
+						'p',
+						useBlockProps.save(),
 						el( RichText.Content, { value: attributes.value } )
 					);
 				},
@@ -67,10 +71,10 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'Backspace' );
 		await pageUtils.pressKeys( 'primary+v' );
 
-		const renderedText = await editor.canvas
-			.locator( 'role=textbox[name="Test content"]' )
-			.innerText();
-		expect( renderedText ).toBe( 'First Second Third' );
+		const renderedText = editor.canvas.locator(
+			'role=textbox[name="Test content"]'
+		);
+		await expect( renderedText ).toHaveText( 'First Second Third' );
 
 		await page.evaluate( () => {
 			window.wp.blocks.unregisterBlockType( 'test/disable-line-breaks' );
