@@ -62,8 +62,10 @@
 .media-editor__sidebar-panel .media-editor-crop-advanced-panel {
 	border-bottom: none;
 	padding: 0;
-	&.is-opened .components-panel__body-title {
-		margin: 0 0 $grid-unit-20 0;
+	&.is-opened {
+		.components-panel__body-title {
+			margin: 0 0 $grid-unit-20 0;
+		}
 	}
 }
 
