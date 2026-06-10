@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback, useEffect, useState } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
@@ -132,8 +132,9 @@ function createColorHOC( colorTypes, withColorPalette ) {
 			return function WithColors( props ) {
 				const { colors, attributes, setAttributes } = props;
 
-				const [ colorState, setColorState ] = useState( () =>
-					computeDerivedColorState( attributes, colors )
+				const colorState = useMemo(
+					() => computeDerivedColorState( attributes, colors ),
+					[ attributes, colors ]
 				);
 
 				const getMostReadableColorFn = useCallback(
@@ -179,17 +180,6 @@ function createColorHOC( colorTypes, withColorPalette ) {
 						{}
 					);
 				}, [ colors, setAttributes ] );
-
-				// Mimic the behavior of getDerivedStateFromProps.
-				useEffect( () => {
-					setColorState( ( prevState ) =>
-						computeDerivedColorState(
-							attributes,
-							colors,
-							prevState
-						)
-					);
-				}, [ attributes, colors ] );
 
 				return (
 					<WrappedComponent
