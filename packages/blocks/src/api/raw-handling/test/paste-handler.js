@@ -324,7 +324,7 @@ describe( 'pasteHandler — core/image', () => {
 		initAndRegisterImageBlock();
 	} );
 
-	it( 'preserves explicit pixel width and height from a bare <img>', () => {
+	it( 'pins the width and lets the height follow the aspect ratio for a bare <img>', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<img src="https://example.com/i.jpg" width="77" height="77" />',
 			mode: 'BLOCKS',
@@ -335,10 +335,12 @@ describe( 'pasteHandler — core/image', () => {
 		expect( result.name ).toBe( 'core/image' );
 		expect( result.attributes.url ).toBe( 'https://example.com/i.jpg' );
 		expect( result.attributes.width ).toBe( '77px' );
-		expect( result.attributes.height ).toBe( '77px' );
+		// Height is pinned to `auto` rather than the literal pixel value so the
+		// image scales proportionally when the content width constrains it.
+		expect( result.attributes.height ).toBe( 'auto' );
 	} );
 
-	it( 'preserves explicit pixel width and height from an <img> inside a <figure>', () => {
+	it( 'pins the width and lets the height follow the aspect ratio for an <img> inside a <figure>', () => {
 		const [ result ] = pasteHandler( {
 			HTML: '<figure><img src="https://example.com/i.jpg" width="120" height="80" /></figure>',
 			mode: 'BLOCKS',
@@ -348,6 +350,33 @@ describe( 'pasteHandler — core/image', () => {
 
 		expect( result.name ).toBe( 'core/image' );
 		expect( result.attributes.width ).toBe( '120px' );
+		expect( result.attributes.height ).toBe( 'auto' );
+	} );
+
+	it( 'pins the width and lets the height follow when only a width is present', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="120" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.width ).toBe( '120px' );
+		expect( result.attributes.height ).toBe( 'auto' );
+	} );
+
+	it( 'pins the height and lets the width follow when only a height is present', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" height="80" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		// A height-only source keeps its height; the width follows via `auto`.
+		expect( result.attributes.width ).toBe( 'auto' );
 		expect( result.attributes.height ).toBe( '80px' );
 	} );
 
