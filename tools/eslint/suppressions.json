@@ -1572,11 +1572,6 @@
 			"count": 12
 		}
 	},
-	"packages/theme/src/stories/index.story.tsx": {
-		"react-hooks/refs": {
-			"count": 5
-		}
-	},
 	"packages/ui/src/alert-dialog/root.tsx": {
 		"react-hooks/refs": {
 			"count": 2
