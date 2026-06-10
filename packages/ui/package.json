@@ -44,7 +44,6 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@base-ui/react": "^1.5.0",
-		"@types/react": "^18.3.27",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
@@ -70,8 +69,14 @@
 		"storybook": "^10.2.8"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"
