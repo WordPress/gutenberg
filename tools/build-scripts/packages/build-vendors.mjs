@@ -20,7 +20,7 @@ const VENDOR_SCRIPTS = [
 		global: 'React',
 		handle: 'react',
 		dependencies: [ 'wp-polyfill' ],
-		version: '18',
+		version: '18.3.1',
 	},
 	{
 		name: 'react-dom',
@@ -33,22 +33,22 @@ const VENDOR_SCRIPTS = [
 			'  ...require("react-dom/client"),',
 			'};',
 		].join( '\n' ),
-		version: '18',
+		version: '18.3.1',
 	},
 	{
 		name: 'react/jsx-runtime',
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime',
 		dependencies: [ 'react' ],
-		version: '18',
+		version: '18.3.1',
 	},
 	{
 		name: '@wordpress/react-19/react',
 		global: 'React',
 		handle: 'react-19',
 		dependencies: [ 'wp-polyfill' ],
-		version: '19',
-		// Teach React 19 to also accept legacy (React 17/18) elements.
+		version: '19.2.7',
+		// Patch React 19 to also accept legacy (React 17/18) elements.
 		patchLegacyElement: true,
 	},
 	{
@@ -56,8 +56,8 @@ const VENDOR_SCRIPTS = [
 		global: 'ReactDOM',
 		handle: 'react-dom-19',
 		dependencies: [ 'react' ],
-		version: '19',
-		// Teach React 19 to also accept legacy (React 17/18) elements.
+		version: '19.2.7',
+		// Patch React 19 to also accept legacy (React 17/18) elements.
 		patchLegacyElement: true,
 	},
 	{
@@ -65,7 +65,7 @@ const VENDOR_SCRIPTS = [
 		global: 'ReactJSXRuntime',
 		handle: 'react-jsx-runtime-19',
 		dependencies: [ 'react' ],
-		version: '19',
+		version: '19.2.7',
 	},
 ];
 
