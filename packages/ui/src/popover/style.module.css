@@ -123,7 +123,7 @@
 			}
 
 			@media not (prefers-reduced-motion) {
-				transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+				transition: opacity var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
 			}
 		}
 	}
