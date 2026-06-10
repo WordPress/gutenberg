@@ -116,6 +116,19 @@ const meta: Meta< typeof WidgetRender > = {
 	title: 'Widget Primitives/WidgetRender',
 	component: WidgetRender,
 	tags: [ 'status-experimental' ],
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'The `@wordpress/widget-primitives` package is under active development: APIs may change without notice. Recommended for development workflows only; not production-ready.',
+		},
+		docs: {
+			description: {
+				component:
+					'Host-agnostic entry point that renders a widget type. The host provides the `WidgetType` (on a WordPress page it arrives through `useWidgetTypes()`), a `resolveWidgetModule` to load the render component, and optionally `setAttributes`. These stories run outside WordPress, so both halves are declared inline and injected.',
+			},
+		},
+	},
 };
 
 export default meta;
@@ -139,13 +152,15 @@ function DefaultStory() {
 	);
 }
 
-/*
- * `WidgetRender` mounts the widget with the `attributes` / `setAttributes`
- * contract. Suspense is a host concern: the primitive resolves the module
- * with `lazy()` and the host decides the loading UI.
- */
 export const Default: StoryObj = {
 	render: () => <DefaultStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: 'The render contract: `attributes` flow into the widget, and the widget writes back through `setAttributes` (the internal "Cycle tone" button). Suspense is a host concern: the primitive resolves the module with `lazy()` and the host decides the loading UI.',
+			},
+		},
+	},
 };
 
 function WidgetWithSettings() {
@@ -201,28 +216,13 @@ function WidgetWithSettings() {
 	);
 }
 
-/*
- * The full round trip: the host mounts a `DataForm` straight from the
- * type's `attributes` (`Field[]`), and edits flow back through
- * `setAttributes` into the rendered widget. This mirrors how the dashboard
- * settings drawer edits a widget instance.
- */
 export const WithSettings: StoryObj = {
 	render: () => <WidgetWithSettings />,
-};
-
-/*
- * Without `setAttributes` the widget renders read-only: the contract marks
- * the setter optional because some hosts (previews, pickers) never write.
- */
-export const ReadOnly: StoryObj = {
-	render: () => (
-		<Suspense fallback={ null }>
-			<WidgetRender< DemoAttributes >
-				widgetType={ demoWidgetType }
-				attributes={ demoWidgetType.example?.attributes }
-				resolveWidgetModule={ resolveDemoModule }
-			/>
-		</Suspense>
-	),
+	parameters: {
+		docs: {
+			description: {
+				story: "A widget type declares its settings as dataviews `Field[]` in `attributes`. The host mounts a `DataForm` directly from that schema, with no per-widget form wiring, and routes edits back through `setAttributes`: the same round trip the dashboard's settings drawer uses.",
+			},
+		},
+	},
 };
