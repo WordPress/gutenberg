@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { pasteHandler } from '@wordpress/blocks';
+import { pasteHandler, serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -338,6 +338,13 @@ describe( 'pasteHandler — core/image', () => {
 		// Height is pinned to `auto` rather than the literal pixel value so the
 		// image scales proportionally when the content width constrains it.
 		expect( result.attributes.height ).toBe( 'auto' );
+		expect( result.attributes.aspectRatio ).toBe( '1' );
+		// The serialized style must keep `height:auto` plus the declared
+		// aspect ratio so a capped width never stretches the image.
+		const serialized = serialize( result );
+		expect( serialized ).toContain( 'width:77px' );
+		expect( serialized ).toContain( 'height:auto' );
+		expect( serialized ).toContain( 'aspect-ratio:1' );
 	} );
 
 	it( 'pins the width and lets the height follow the aspect ratio for an <img> inside a <figure>', () => {
@@ -351,6 +358,32 @@ describe( 'pasteHandler — core/image', () => {
 		expect( result.name ).toBe( 'core/image' );
 		expect( result.attributes.width ).toBe( '120px' );
 		expect( result.attributes.height ).toBe( 'auto' );
+		expect( result.attributes.aspectRatio ).toBe( '1.5' );
+	} );
+
+	it( 'pins the width, sets the aspect ratio, and lifts the anchor for an anchor-wrapped <img> (e.g. a Flickr embed)', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<a data-flickr-embed="true" href="https://www.flickr.com/photos/x/123/"><img src="https://live.staticflickr.com/65535/123_b.jpg" width="1024" height="683" alt="pexels" /></a>',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		expect( result.attributes.url ).toBe(
+			'https://live.staticflickr.com/65535/123_b.jpg'
+		);
+		expect( result.attributes.width ).toBe( '1024px' );
+		expect( result.attributes.height ).toBe( 'auto' );
+		expect( result.attributes.aspectRatio ).toBe( String( 1024 / 683 ) );
+		expect( result.attributes.linkDestination ).toBe( 'custom' );
+		expect( result.attributes.href ).toBe(
+			'https://www.flickr.com/photos/x/123/'
+		);
+		const serialized = serialize( result );
+		expect( serialized ).toContain( 'width:1024px' );
+		expect( serialized ).toContain( 'height:auto' );
+		expect( serialized ).toContain( `aspect-ratio:${ 1024 / 683 }` );
 	} );
 
 	it( 'pins the width and lets the height follow when only a width is present', () => {
@@ -364,6 +397,8 @@ describe( 'pasteHandler — core/image', () => {
 		expect( result.name ).toBe( 'core/image' );
 		expect( result.attributes.width ).toBe( '120px' );
 		expect( result.attributes.height ).toBe( 'auto' );
+		// A single declared dimension can't carry an aspect ratio.
+		expect( result.attributes.aspectRatio ).toBeUndefined();
 	} );
 
 	it( 'pins the height and lets the width follow when only a height is present', () => {
@@ -378,6 +413,20 @@ describe( 'pasteHandler — core/image', () => {
 		// A height-only source keeps its height; the width follows via `auto`.
 		expect( result.attributes.width ).toBe( 'auto' );
 		expect( result.attributes.height ).toBe( '80px' );
+		expect( result.attributes.aspectRatio ).toBeUndefined();
+	} );
+
+	it( 'omits the aspect ratio when a dimension is zero', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<img src="https://example.com/i.jpg" width="100" height="0" />',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+
+		expect( result.name ).toBe( 'core/image' );
+		// A zero dimension would divide to `Infinity`/`NaN`, so no ratio is set.
+		expect( result.attributes.aspectRatio ).toBeUndefined();
 	} );
 
 	it( 'drops non-pixel width/height (e.g. percentages)', () => {
