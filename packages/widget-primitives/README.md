@@ -1,22 +1,41 @@
-# `widget-primitives`
+# Widget Primitives
+
+<div class="callout callout-alert">
+This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
+</div>
 
 The host-agnostic toolkit for dashboard widgets. It is the single source of
 truth for what a widget *is* (the contract types) and the runtime for working
 with widgets (discovering the registered widget types and resolving their render
 modules). It is not tied to any host.
 
+## Installation
+
+Install the module:
+
+```bash
+npm install @wordpress/widget-primitives --save
+```
+
+_This package assumes that your code will run in an **ES2015+** environment.
+If you're using an environment that has limited or no support for such
+language features and APIs, you should include [the polyfill shipped in
+`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill)
+in your code._
+
 ## Purpose
 
 A widget is a self-contained unit; a *host* is any context that renders one (the
-dashboard today, a sidebar or an inspector tomorrow). `widget-primitives` sits between
+dashboard today, a sidebar or an inspector tomorrow). This package sits between
 the build pipeline that produces widgets and the hosts that render them, so
 neither side has to know about the other:
 
 - **Contract.** It defines the widget type shape (`WidgetType`, `WidgetName`)
   and the render contract (`WidgetRenderProps`). Authors type their
   `widget.ts` / `render.tsx` against these, and hosts consume the same types.
-  Nothing re-exports them: every consumer imports from `widget-primitives`
-  directly, so the source of truth stays in one place.
+  Nothing re-exports them: every consumer imports from
+  `@wordpress/widget-primitives` directly, so the source of truth stays in one
+  place.
 - **Discovery.** `useWidgetTypes()` returns the `WidgetType[]` registered on the
   current page.
 - **Rendering.** `<WidgetRender>` resolves a widget's render module via a
@@ -65,9 +84,17 @@ needs to be available to the browser. The build pipeline registers each widget's
 script module with WordPress at `init`, which makes it loadable. Hosts decide
 when to import; they do not register widgets.
 
-## Status
+## Contributing to this package
 
-This module lives inside the dashboard route while its API stabilizes. Because
-both hosts and widget authors consume it, its destination is a top-level,
-private (unpublished) package, `@wordpress/widget-primitives`, in the same vein as
-`@wordpress/grid`.
+This is an individual package that's part of the Gutenberg project.
+The project is organized as a monorepo. It's made up of multiple
+self-contained software packages, each with a specific purpose. The
+packages in this monorepo are published to [npm](https://www.npmjs.com/)
+and used by [WordPress](https://make.wordpress.org/core/) as well as
+other software projects.
+
+To find out more about contributing to this package or Gutenberg as a
+whole, please read the project's main
+[contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

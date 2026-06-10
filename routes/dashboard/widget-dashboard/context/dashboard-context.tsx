@@ -15,6 +15,10 @@ import {
 	useMemo,
 	useState,
 } from '@wordpress/element';
+import type {
+	ResolveWidgetModule,
+	WidgetType,
+} from '@wordpress/widget-primitives';
 
 /**
  * Internal dependencies
@@ -28,7 +32,6 @@ import type {
 	DashboardWidget,
 } from '../types';
 import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
-import type { ResolveWidgetModule, WidgetType } from '../../widget-primitives';
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits
