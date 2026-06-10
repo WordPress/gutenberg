@@ -126,8 +126,6 @@ export function useResolveEditedEntity() {
 		if ( postType && postId && authorizedPostTypes.includes( postType ) ) {
 			return { postType, postId };
 		}
-		// TODO: for post types lists we should probably not render the front page, but maybe a placeholder
-		// with a message like "Select a page" or something similar.
 		if ( homePage?.postType === 'page' ) {
 			return { postType: 'page', postId: homePage?.postId };
 		}

@@ -221,6 +221,17 @@ export default function PostList( { postType } ) {
 		}
 	}, [ history, postIdWasDeleted, path ] );
 
+	// select the first item to preview.
+	useEffect( () => {
+		if ( hasResolved && ! isLoadingData && data?.length > 0 && ! postId ) {
+			history.navigate(
+				addQueryArgs( path, {
+					postId: getItemId( data[ 0 ] ),
+				} )
+			);
+		}
+	}, [ hasResolved, isLoadingData, data, postId, path, history ] );
+
 	const paginationInfo = useMemo(
 		() => ( {
 			totalItems,
