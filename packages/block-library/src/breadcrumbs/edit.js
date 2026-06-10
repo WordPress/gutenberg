@@ -9,9 +9,9 @@ import {
 	CheckboxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalHeading as Heading,
 	Spinner,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
@@ -284,7 +284,9 @@ export default function BreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<Heading>{ __( 'BREADCRUMBS' ) }</Heading>
+				<Text render={ <h3 /> } style={ { marginBottom: '16px' } }>
+					{ __( 'Breadcrumbs' ) }
+				</Text>
 				<CheckboxControl
 					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
