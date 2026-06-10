@@ -286,15 +286,15 @@ function WidgetInHostChrome() {
 }
 
 /*
- * Chrome belongs to the host: a widget never declares its own header. The
- * host reads the type's metadata and frames the render however it wants.
+ * Chrome belongs to the host: it reads the type's metadata and frames the
+ * render however it wants. In this story, a Card header.
  */
 export const WithHostChrome: StoryObj = {
 	render: () => <WidgetInHostChrome />,
 	parameters: {
 		docs: {
 			description: {
-				story: "Chrome belongs to the host: a widget never declares its own header. This minimal chrome is a `Card` whose header stacks the type's metadata (`icon`, `title`), and the card body frames the widget render, the way a host lays a widget out as a tile.",
+				story: "Chrome belongs to the host. In this story, the widget doesn't declare its own header: the chrome is a `Card` whose header stacks the type's metadata (`icon`, `title`), and the card body frames the widget render.",
 			},
 		},
 	},

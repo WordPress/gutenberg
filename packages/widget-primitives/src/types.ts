@@ -60,8 +60,8 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	description?: string;
 
 	/**
-	 * Visual identifier; hosts render it alongside the title in their
-	 * chrome.
+	 * Visual identifier for the widget type; hosts decide where, and
+	 * whether, to render it.
 	 */
 	icon?: WidgetIcon;
 
