@@ -213,7 +213,7 @@ it can help you adjust how a block is rendered. For example, you could render a 
 
 ```jsx
 save: ( { attributes, innerBlocks } ) => {
-	const { className, ...rest } = useBlockProps.save();
+	let { className, ...rest } = useBlockProps.save();
 
 	// innerBlocks could also be an object - react element during initialization
 	const numberOfInnerBlocks = innerBlocks?.length;

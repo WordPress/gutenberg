@@ -503,7 +503,7 @@ describe( 'SyncManager', () => {
 			jest.clearAllMocks();
 			manager.update( 'post', '456', { title: 'Updated' }, 'local' );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
@@ -600,7 +600,7 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '123', changes, 'local-editor' );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
@@ -616,13 +616,89 @@ describe( 'SyncManager', () => {
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
+		it( 'applies local CRDT updates synchronously before processing remote record updates', async () => {
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const initialRecord = {
+				id: '123',
+				title: 'Initial title',
+				content: 'Initial content',
+				meta: {},
+			};
+			const editedRecord = {
+				...initialRecord,
+				content: 'Local content',
+			};
+			const syncConfig = {
+				...mockSyncConfig,
+				applyChangesToCRDTDoc: jest.fn(
+					( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+						const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+						Object.entries( changes ).forEach(
+							( [ key, value ] ) => {
+								recordMap.set( key, value );
+							}
+						);
+					}
+				),
+			};
+			const handlers = {
+				...mockHandlers,
+				editRecord: jest.fn(),
+				getEditedRecord: jest.fn( async () =>
+					Promise.resolve( editedRecord )
+				),
+			};
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				syncConfig,
+				'post',
+				'123',
+				initialRecord,
+				handlers
+			);
+
+			handlers.editRecord.mockClear();
+
+			manager.update(
+				'post',
+				'123',
+				{ content: 'Local content' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			const remoteDoc = new Y.Doc();
+			remoteDoc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.set( 'remoteField', 'Remote value' );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait for the async remote-to-store observer.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( handlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			expect( handlers.editRecord ).toHaveBeenCalledWith( {
+				remoteField: 'Remote value',
+			} );
+		} );
+
 		it( 'does not update when entity is not loaded', async () => {
 			const manager = createSyncManager();
 
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '999', changes, 'local-editor' );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect(
@@ -662,7 +738,7 @@ describe( 'SyncManager', () => {
 
 			manager.update( 'post', '123', changes, customOrigin );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( transactSpy ).toHaveBeenCalledWith(
@@ -671,7 +747,7 @@ describe( 'SyncManager', () => {
 			);
 		} );
 
-		it( 'updates the record metadata when the update is associated with a save', async () => {
+		it( 'updates save metadata when the update is associated with a save', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
@@ -698,7 +774,7 @@ describe( 'SyncManager', () => {
 				isSave: true,
 			} );
 
-			// Wait a tick for yieldToEventLoop.
+			// Wait a tick for any async follow-up work.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
@@ -891,6 +967,44 @@ describe( 'SyncManager', () => {
 			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
 				title: 'Title from remote peer',
 			} );
+		} );
+
+		it( 'refetches the entity record when a remote save updates save metadata', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			mockHandlers.refetchRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			const remoteDoc = new Y.Doc();
+			const stateMap = remoteDoc.getMap( CRDT_STATE_MAP_KEY );
+			stateMap.set( SAVED_AT_KEY, Date.now() + 1000 );
+			stateMap.set( SAVED_BY_KEY, remoteDoc.clientID );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.refetchRecord ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'does not edit the local record for local transactions', async () => {

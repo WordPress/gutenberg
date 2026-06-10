@@ -7,23 +7,27 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { getLazyWidgetComponent } from '../../../widget-primitives';
+import { WidgetRender } from '../../../widget-primitives';
 import type { DashboardWidget } from '../../types';
 import type { WidgetType } from '../../../widget-primitives';
 
-interface WidgetRenderInternalProps {
+interface DashboardWidgetRenderProps {
 	widget: DashboardWidget< unknown >;
 	widgetType: WidgetType;
 }
 
-function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
+/*
+ * Dashboard-specific adapter around the host-agnostic `WidgetRender`
+ * primitive. Bridges the dashboard context (`resolveWidgetModule`, layout
+ * state) and turns layout-level attribute updates into the per-instance
+ * `setAttributes` callback the render contract expects.
+ */
+export function DashboardWidgetRender( {
+	widget,
+	widgetType,
+}: DashboardWidgetRenderProps ) {
 	const { layout, onLayoutChange, resolveWidgetModule } =
 		useDashboardInternalContext();
-
-	const WidgetComponent = getLazyWidgetComponent(
-		widgetType.renderModule,
-		resolveWidgetModule
-	);
 
 	const setAttributes = useCallback(
 		( next: Partial< unknown > ) => {
@@ -45,25 +49,11 @@ function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
 	);
 
 	return (
-		<>
-			{ /* WidgetComponent is a cached `lazy()` keyed by renderModule, so its identity stays stable across renders. */ }
-			{ /* eslint-disable-next-line react-hooks/static-components */ }
-			<WidgetComponent
-				attributes={ widget.attributes }
-				setAttributes={ setAttributes }
-			/>
-		</>
+		<WidgetRender
+			widgetType={ widgetType }
+			attributes={ widget.attributes }
+			setAttributes={ setAttributes }
+			resolveWidgetModule={ resolveWidgetModule }
+		/>
 	);
 }
-
-/**
- * Resolves a widget's render module via the configured resolver and renders
- * it with the minimal `WidgetRenderProps` contract: `attributes` plus
- * `setAttributes`. Suspense and error handling live one layer up in
- * `DashboardWidgetChrome`, so a failing or pending body does not tear down
- * the surrounding header or controls.
- *
- * Kept internal to the package. Surfaces that want bare widget rendering
- * should compose `DashboardWidgetChrome` instead.
- */
-export const WidgetRender = WidgetRenderImpl;

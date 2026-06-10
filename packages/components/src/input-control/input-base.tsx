@@ -23,7 +23,6 @@ import {
 	useContextSystem,
 } from '../context';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-import type { FlexDirection } from '../flex/types';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -35,7 +34,7 @@ function useUniqueId( idProp?: string ) {
 // Adapter to map props for the new ui/flex component.
 function getUIFlexProps( labelPosition?: LabelPosition ) {
 	const props: {
-		direction?: FlexDirection;
+		direction?: string;
 		gap?: number;
 		justify?: string;
 		expanded?: boolean;
@@ -93,6 +92,7 @@ function InputBase(
 	}, [ __next40pxDefaultSize, size ] );
 
 	return (
+		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
 			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }
