@@ -347,7 +347,19 @@ export function RichTextWrapper(
 	const inputEvents = useRef( new Set() );
 
 	function onFocus() {
-		anchorRef.current?.focus();
+		const element = anchorRef.current;
+		if ( ! element ) {
+			return;
+		}
+		// Focus the editing host, which may be an ancestor (the writing flow
+		// wrapper) rather than this element when the wrapper is the active
+		// editing host. Focusing the absorbed inner element does not return
+		// focus to the editor.
+		let host = element;
+		while ( host.parentElement?.isContentEditable ) {
+			host = host.parentElement;
+		}
+		host.focus();
 	}
 
 	const TagName = tagName;
