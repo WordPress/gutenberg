@@ -10,7 +10,6 @@ import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
 
 /**
@@ -24,7 +23,6 @@ import {
 	blockBindingsKey,
 	useBlockEditContext,
 } from '../../block-edit/context';
-import { store as blockEditorStore } from '../../../store';
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useBlockRefProvider } from './use-block-refs';
@@ -107,16 +105,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canMove,
 		blockVisibility,
 		deviceType,
+		hasInnerBlocks,
 	} = useContext( PrivateBlockContext );
-
-	// A block that contains inner blocks is an editable root: its wrapper must
-	// stay part of the editing host so the inner blocks remain within the same
-	// host (the always-on writing flow wrapper). Leaf blocks default to
-	// non-editable atoms instead. See the `contentEditable` default below.
-	const hasInnerBlocks = useSelect(
-		( select ) => !! select( blockEditorStore ).getBlockCount( clientId ),
-		[ clientId ]
-	);
 
 	const defaultViewRef = useRefEffect( ( element ) => {
 		if ( element ) {
