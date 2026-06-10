@@ -696,6 +696,15 @@ function CropperInner(
 		}
 		const centerX = ( canvasSize.width - elementSize.width ) / 2;
 		const centerY = ( canvasSize.height - elementSize.height ) / 2;
+		// CSS pixels rendered per source pixel: the contain fit
+		// (elementSize / natural), times zoom and the view-scale magnification.
+		// Above 1:1 the image is upscaled, so render nearest-neighbour to keep
+		// pixel boundaries crisp (e.g. small images the cropper magnifies);
+		// below 1:1 leave smoothing on for downscaled large images.
+		const displayScale =
+			naturalWidth > 0
+				? ( elementSize.width / naturalWidth ) * state.zoom * viewScale
+				: 0;
 		return {
 			width: elementSize.width,
 			height: elementSize.height,
@@ -708,10 +717,13 @@ function CropperInner(
 					? `scale(${ viewScale }) ${ transformString }`
 					: transformString,
 			transition: imageTransition,
+			imageRendering: displayScale > 1 ? 'pixelated' : undefined,
 		};
 	}, [
 		canvasSize,
 		elementSize,
+		naturalWidth,
+		state.zoom,
 		transformString,
 		imageTransition,
 		viewScale,

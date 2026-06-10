@@ -547,4 +547,36 @@ describe( 'Cropper', () => {
 
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
 	} );
+
+	function imageRendering(): string {
+		return screen.getByTestId< HTMLImageElement >( 'cropper-image' ).style
+			.imageRendering;
+	}
+
+	it( 'renders upscaled (small) images pixelated so pixel boundaries stay crisp', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			// A 50x50 image contain-fits to 400px in the 600x400 canvas — an 8x
+			// upscale — so the display scale exceeds 1:1.
+			image: { src: 'tiny.png', naturalWidth: 50, naturalHeight: 50 },
+		};
+		render( <Cropper src="tiny.png" controller={ controller } /> );
+
+		expect( imageRendering() ).toBe( 'pixelated' );
+	} );
+
+	it( 'renders downscaled (large) images smoothly', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			// Tall image is shown well below 1:1 (fit ~0.33), even when the crop
+			// magnifies, so the image is downscaled and should stay smooth.
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		expect( imageRendering() ).not.toBe( 'pixelated' );
+	} );
 } );
