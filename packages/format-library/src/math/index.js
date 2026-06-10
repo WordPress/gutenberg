@@ -8,9 +8,9 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import {
 	Popover,
 	TextControl,
-	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { math as icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 
@@ -88,7 +88,7 @@ function InlineUI( {
 			className="block-editor-format-toolbar__math-popover"
 		>
 			<div style={ { minWidth: '300px', padding: '4px' } }>
-				<VStack spacing={ 1 }>
+				<Stack direction="column" gap="xs">
 					<TextControl
 						__next40pxDefaultSize
 						hideLabelFromVision
@@ -114,7 +114,7 @@ function InlineUI( {
 							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 						</>
 					) }
-				</VStack>
+				</Stack>
 			</div>
 		</Popover>
 	);

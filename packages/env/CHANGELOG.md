@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.8.0 (2026-06-10)
+
 ### Enhancements
 
 -   Use partial clones (`--filter=blob:none`) when downloading git sources and the PHPUnit test suite to reduce download size. ([#78918](https://github.com/WordPress/gutenberg/pull/78918))

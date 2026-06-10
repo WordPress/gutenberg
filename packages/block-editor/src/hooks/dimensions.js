@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -171,10 +171,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
  * @return {boolean} Whether there is support.
  */
 export function hasDimensionsSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( blockName, DIMENSIONS_SUPPORT_KEY );
 
 	if ( support === true ) {

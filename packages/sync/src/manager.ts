@@ -244,10 +244,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			event.keysChanged.forEach( ( key ) => {
 				switch ( key ) {
 					case SAVED_AT_KEY:
-						const newValue = stateMap.get( SAVED_AT_KEY );
-						if ( 'number' === typeof newValue && newValue > now ) {
-							// Another peer has saved the record. Refetch it so that we have
-							// a correct understanding of our own unsaved edits.
+						const savedAt = stateMap.get( SAVED_AT_KEY );
+						if ( 'number' === typeof savedAt && savedAt > now ) {
+							// Another peer saved the entity. Refetch the
+							// record so this cache sees server-side save
+							// mutations.
 							log( 'loadEntity', 'refetching record', entityId );
 							void handlers.refetchRecord().catch( () => {} );
 						}
@@ -396,7 +397,8 @@ export function createSyncManager( debug = false ): SyncManager {
 					case SAVED_AT_KEY:
 						const newValue = stateMap.get( SAVED_AT_KEY );
 						if ( 'number' === typeof newValue && newValue > now ) {
-							// Another peer has mutated the collection. Refetch it so that we
+							// Another peer has performed a user-facing save that
+							// may affect the collection. Refetch it so that we
 							// obtain the updated records.
 							void handlers.refetchRecords().catch( () => {} );
 						}
@@ -472,7 +474,9 @@ export function createSyncManager( debug = false ): SyncManager {
 		const entityId = getEntityId( objectType, objectId );
 		log( 'unloadEntity', 'unloading', entityId );
 		entityStates.get( entityId )?.unload();
-		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
+		updateCRDTDoc( objectType, null, {}, origin, {
+			isSave: true,
+		} );
 	}
 
 	/**
@@ -626,7 +630,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {Partial< ObjectData >}    changes                Updates to make.
 	 * @param {string}                   origin                 The source of change.
 	 * @param {SyncManagerUpdateOptions} options                Optional flags for the update.
-	 * @param {boolean}                  options.isSave         Whether this update is part of a save operation. Defaults to false.
+	 * @param {boolean}                  options.isSave         Whether this update represents a user-facing entity save.
 	 * @param {boolean}                  options.isNewUndoLevel Whether to create a new undo level for this change. Defaults to false.
 	 */
 	function updateCRDTDoc(
