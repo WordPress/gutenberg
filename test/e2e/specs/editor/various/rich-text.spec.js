@@ -496,6 +496,11 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+x' );
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
+		// The caret position updates asynchronously, so the paste must split on
+		// the next frame to land at the moved caret rather than the old one.
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 		await pageUtils.pressKeys( 'primary+v' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
