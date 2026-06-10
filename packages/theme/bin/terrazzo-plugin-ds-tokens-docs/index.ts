@@ -5,7 +5,7 @@ function titleCase( str: string ) {
 	return str[ 0 ].toUpperCase() + str.slice( 1 );
 }
 
-const STATIC_PREAMBLE = `Design tokens are named values. They encode design decisions which describe the visual purpose of a value. Rather than referencing a raw value like \`#3858e9\`, a token like \`--wpds-color-bg-interactive-brand-strong\` describes what the value is for. Tokens are delivered as CSS custom properties and consumed with \`var( --wpds-* )\`.
+const STATIC_PREAMBLE = `Design tokens are named values. They encode design decisions which describe the visual purpose of a value. Rather than referencing a raw value like \`#3858e9\`, a token like \`--wpds-color-background-interactive-brand-strong\` describes what the value is for. Tokens are delivered as CSS custom properties and consumed with \`var( --wpds-* )\`.
 
 ## How to pick a token
 

@@ -26,7 +26,7 @@
 		// keeping selection legible even for bullet-only items.
 		&.is-selected,
 		&:hover {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 
 		// Selection outline only renders in Windows High Contrast mode.
@@ -124,7 +124,7 @@
 		}
 
 		.dataviews-view-picker-activity__item-fields {
-			color: var(--wpds-color-fg-content-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 			display: flex;
 			gap: var(--wpds-dimension-gap-md);
 			row-gap: var(--wpds-dimension-gap-xs);
@@ -190,7 +190,7 @@
 	.dataviews-view-picker-activity-group__header {
 		font-size: var(--wpds-typography-font-size-lg);
 		font-weight: var(--wpds-typography-font-weight-medium);
-		color: var(--wpds-color-fg-content-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral-weak);
 		margin: 0 0 var(--wpds-dimension-gap-sm) 0;
 		padding: 0;
 		padding-inline-start: var(--wpds-dimension-padding-2xl);

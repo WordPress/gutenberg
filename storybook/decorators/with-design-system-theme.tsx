@@ -47,7 +47,7 @@ export function WithDesignSystemTheme(
 					color?.background
 						? {
 								background:
-									'var(--wpds-color-bg-surface-neutral-strong)',
+									'var(--wpds-color-background-surface-neutral-strong)',
 								padding:
 									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
 								outline:
@@ -65,7 +65,7 @@ export function WithDesignSystemTheme(
 							opacity: 0.5,
 							marginTop: 'var(--wpds-dimension-gap-md)',
 							fontSize: 'var(--wpds-typography-font-size-xs)',
-							color: 'var(--wpds-color-fg-content-neutral-weak)',
+							color: 'var(--wpds-color-foreground-content-neutral-weak)',
 							textTransform: 'uppercase',
 							textAlign: 'end',
 						} }

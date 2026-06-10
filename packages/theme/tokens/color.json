@@ -1095,7 +1095,7 @@
 				}
 			}
 		},
-		"bg": {
+		"background": {
 			"surface": {
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.surface2}",
@@ -1276,7 +1276,7 @@
 				"com.figma.scopes": [ "FRAME_FILL", "SHAPE_FILL" ]
 			}
 		},
-		"fg": {
+		"foreground": {
 			"content": {
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.fgSurface4}",

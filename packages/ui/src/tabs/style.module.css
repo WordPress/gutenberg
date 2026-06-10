@@ -91,7 +91,7 @@
 				width: 100%;
 				height: var(--active-tab-height);
 				translate: -50% var(--active-tab-top);
-				background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 			}
 
 			.tablist[data-select-on-move="true"]:has(:focus-visible)
@@ -131,11 +131,11 @@
 
 			line-height: 1.2;
 			font-weight: 400;
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 
 			&[data-disabled] {
 				cursor: default;
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
@@ -143,7 +143,7 @@
 			}
 
 			&:not([data-disabled]):is(:hover, :focus-visible) {
-				color: var(--wpds-color-fg-interactive-neutral-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 			}
 
 			/* Focus indicator. */

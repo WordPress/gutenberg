@@ -7,7 +7,7 @@
 	.dataviews-view-activity__group-header {
 		font-size: var(--wpds-typography-font-size-lg);
 		font-weight: var(--wpds-typography-font-weight-medium);
-		color: var(--wpds-color-fg-content-neutral-weak);
+		color: var(--wpds-color-foreground-content-neutral-weak);
 		margin: 0 0 var(--wpds-dimension-gap-sm) 0;
 		padding: 0;
 	}
@@ -55,7 +55,7 @@
 		}
 
 		.dataviews-view-activity__item-fields {
-			color: var(--wpds-color-fg-content-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 			display: flex;
 			gap: var(--wpds-dimension-gap-md);
 			row-gap: var(--wpds-dimension-gap-xs);
@@ -185,7 +185,7 @@
 	.dataviews-view-activity__item-type-icon {
 		overflow: hidden;
 		flex-shrink: 0;
-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		background-color: var(--wpds-color-background-surface-neutral-strong);
 
 		img,
 		svg,

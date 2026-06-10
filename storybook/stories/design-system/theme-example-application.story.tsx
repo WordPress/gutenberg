@@ -109,7 +109,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 							display: 'grid',
 							gridTemplateColumns: '200px 1fr',
 							minHeight: '500px',
-							color: 'var(--wpds-color-fg-content-neutral)',
+							color: 'var(--wpds-color-foreground-content-neutral)',
 							borderRadius: 'var(--wpds-border-radius-xl)',
 							border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
 							overflow: 'hidden',
@@ -119,7 +119,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						<div
 							style={ {
 								backgroundColor:
-									'var(--wpds-color-bg-surface-neutral-weak)',
+									'var(--wpds-color-background-surface-neutral-weak)',
 								padding:
 									'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
 								borderInlineEnd:

@@ -1,7 +1,7 @@
 /* Invalid: Using wpds tokens with fallbacks */
 .with-fallback {
-	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
-	background-color: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
+	color: var(--wpds-color-foreground-content-neutral, #1e1e1e);
+	background-color: var(--wpds-color-background-surface-neutral-weak, #f0f0f0);
 	border-radius: var(--wpds-border-radius-sm, 2px);
 }
 
@@ -12,5 +12,5 @@
 
 /* Invalid: A wpds token with a fallback, even when nested inside another var() */
 .nested-with-fallback {
-	color: var(--my-custom-color, var(--wpds-color-fg-content-neutral, #1e1e1e));
+	color: var(--my-custom-color, var(--wpds-color-foreground-content-neutral, #1e1e1e));
 }

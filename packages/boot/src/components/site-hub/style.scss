@@ -3,7 +3,7 @@
 .boot-site-hub {
 	position: sticky;
 	top: 0;
-	background-color: var(--wpds-color-bg-surface-neutral-weak);
+	background-color: var(--wpds-color-background-surface-neutral-weak);
 	z-index: 1;
 	display: grid;
 	grid-template-columns: 60px 1fr auto;
@@ -52,7 +52,7 @@
 }
 
 .boot-site-hub__title-text {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	font-size: variables.$font-size-medium;
 	font-weight: variables.$font-weight-medium;
 	overflow: hidden;
@@ -61,7 +61,7 @@
 }
 
 .boot-site-hub__url {
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	font-size: variables.$font-size-small;
 	overflow: hidden;
 	text-overflow: ellipsis;
