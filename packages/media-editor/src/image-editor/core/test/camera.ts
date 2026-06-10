@@ -11,6 +11,7 @@ import {
 import {
 	restrictPanZoom,
 	restrictCropRect,
+	restrictCropGrowth,
 	getImageCropBounds,
 	getMinZoom,
 } from '../containment';
@@ -1041,5 +1042,62 @@ describe( 'getViewScale — presentational magnification to fill the canvas', ()
 		expect( getViewScale( full, CANVAS, FOOTPRINT, TARGET, NaN ) ).toBe(
 			1
 		);
+	} );
+} );
+
+describe( 'restrictCropGrowth — coverage-limited resize', () => {
+	// A tall image (1400x2500) at a fine angle: covering an axis-aligned crop
+	// needs more zoom than at a 90° snap, so dragging a handle out past the
+	// coverage limit would otherwise force a zoom-in with no net change.
+	const W = 1400;
+	const H = 2500;
+	const ASPECT = W / H;
+	const ROTATION = 45;
+
+	// Coverage-floor zoom for a crop at this rotation (what the committed state
+	// settles to), via the public getMinZoom wrapper.
+	function coverZoom( cropRect: CropperState[ 'cropRect' ] ): number {
+		return getMinZoom(
+			makeState( {
+				image: { src: 't', naturalWidth: W, naturalHeight: H },
+				rotation: ROTATION,
+				cropRect,
+			} )
+		);
+	}
+
+	it( 'pulls a growing edge back to the coverage limit when there is no bleed', () => {
+		const prev = { x: 0.3, y: 0.3, width: 0.4, height: 0.4 };
+		const zoom = coverZoom( prev ); // image exactly covers prev — no bleed.
+		const next = { x: 0.3, y: 0.3, width: 0.55, height: 0.4 }; // right edge out
+		const result = restrictCropGrowth( prev, next, zoom, ROTATION, ASPECT );
+
+		// Anchored edges (left/top/bottom) stay put.
+		expect( result.x ).toBeCloseTo( 0.3, 6 );
+		expect( result.y ).toBeCloseTo( 0.3, 6 );
+		expect( result.height ).toBeCloseTo( 0.4, 6 );
+		// Growth is clamped short of the requested width.
+		expect( result.width ).toBeLessThan( 0.55 );
+		expect( result.width ).toBeGreaterThanOrEqual( 0.4 - 1e-6 );
+		// And the clamped rect is coverable at the current zoom.
+		expect( coverZoom( result ) ).toBeLessThanOrEqual( zoom + 1e-3 );
+	} );
+
+	it( 'leaves growth untouched when the image still covers it (bleed available)', () => {
+		const prev = { x: 0.3, y: 0.3, width: 0.4, height: 0.4 };
+		const next = { x: 0.3, y: 0.3, width: 0.5, height: 0.4 };
+		const zoom = coverZoom( next ) + 0.5; // plenty of zoom: next is covered.
+		expect(
+			restrictCropGrowth( prev, next, zoom, ROTATION, ASPECT )
+		).toEqual( next );
+	} );
+
+	it( 'returns the next rect unchanged when shrinking', () => {
+		const prev = { x: 0.2, y: 0.2, width: 0.6, height: 0.6 };
+		const zoom = coverZoom( prev );
+		const next = { x: 0.25, y: 0.25, width: 0.5, height: 0.5 };
+		expect(
+			restrictCropGrowth( prev, next, zoom, ROTATION, ASPECT )
+		).toEqual( next );
 	} );
 } );

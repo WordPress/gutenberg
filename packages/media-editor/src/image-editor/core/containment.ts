@@ -282,6 +282,83 @@ export function restrictCropRect(
 }
 
 /**
+ * Linear interpolation between two crop rects, component-wise. Edges that are
+ * equal in both rects stay fixed for any `t`.
+ *
+ * @param a Rect at `t = 0`.
+ * @param b Rect at `t = 1`.
+ * @param t Interpolation factor in [0, 1].
+ * @return The interpolated rect.
+ */
+function lerpRect(
+	a: NormalizedRect,
+	b: NormalizedRect,
+	t: number
+): NormalizedRect {
+	return {
+		x: a.x + ( b.x - a.x ) * t,
+		y: a.y + ( b.y - a.y ) * t,
+		width: a.width + ( b.width - a.width ) * t,
+		height: a.height + ( b.height - a.height ) * t,
+	};
+}
+
+/**
+ * Limit a resize so the crop can't grow past what the rotated image covers at
+ * the current zoom.
+ *
+ * `enforceContainment` otherwise bumps zoom to cover whatever crop it's handed,
+ * so dragging a handle outward past the coverage limit zooms the image IN. At a
+ * fine rotation — where the image doesn't fill its axis-aligned bounding box —
+ * that means dragging out from a crop already at the image bounds zooms in for
+ * no net change, which reads as a broken "drag out to zoom out". This clamps the
+ * grown rect back to the coverage limit instead: edges that didn't move stay
+ * fixed (`prevRect` and `nextRect` share them, so the interpolation preserves
+ * them), and grown edges are pulled back along the drag until the image covers
+ * the crop at `zoom`. When there is bleed (zoom above the coverage floor), the
+ * grown rect already fits and is returned unchanged, so the zoom-out path is
+ * unaffected.
+ *
+ * `prevRect` is assumed coverable at `zoom` — committed state always satisfies
+ * containment — so it is the feasible fallback (`t = 0`).
+ *
+ * @param prevRect         The crop rect before this resize step.
+ * @param nextRect         The proposed crop rect from the resize.
+ * @param zoom             The current zoom factor.
+ * @param rotation         The rotation angle in degrees.
+ * @param imageAspectRatio The image width / height ratio.
+ * @return The largest rect along prev->next that the image covers at `zoom`.
+ */
+export function restrictCropGrowth(
+	prevRect: NormalizedRect,
+	nextRect: NormalizedRect,
+	zoom: number,
+	rotation: number,
+	imageAspectRatio: number
+): NormalizedRect {
+	const aspectRatio = Math.max( imageAspectRatio, Number.EPSILON );
+	const limit = zoom * ( 1 + EPSILON );
+	if ( getMinZoomForCover( rotation, aspectRatio, nextRect ) <= limit ) {
+		return nextRect;
+	}
+	// Binary-search the furthest point along prev->next that the image still
+	// covers. `getMinZoomForCover` is monotonic as the crop grows, so a simple
+	// bisection converges.
+	let lo = 0;
+	let hi = 1;
+	for ( let i = 0; i < 24; i++ ) {
+		const mid = ( lo + hi ) / 2;
+		const rect = lerpRect( prevRect, nextRect, mid );
+		if ( getMinZoomForCover( rotation, aspectRatio, rect ) <= limit ) {
+			lo = mid;
+		} else {
+			hi = mid;
+		}
+	}
+	return lerpRect( prevRect, nextRect, lo );
+}
+
+/**
  * Canonical container used internally by restrictPanZoom.
  * Containment is scale-invariant, so the actual size doesn't matter —
  * only the relative geometry between stencil and image matters.

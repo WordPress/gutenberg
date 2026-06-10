@@ -31,7 +31,11 @@ import type {
 } from '../../core/types';
 import type { CropperController } from '../hooks/use-cropper-reducer';
 import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
-import { getImageCropBounds, getMinZoom } from '../../core/containment';
+import {
+	getImageCropBounds,
+	getMinZoom,
+	restrictCropGrowth,
+} from '../../core/containment';
 import {
 	MAX_VIEW_SCALE,
 	SETTLE_TARGET_CANVAS_FILL,
@@ -548,7 +552,23 @@ function CropperInner(
 	);
 
 	const handleCropChange = useCallback(
-		( rect: NormalizedRect ) => {
+		( requestedRect: NormalizedRect ) => {
+			// Don't let an outward resize grow the crop past what the image
+			// covers at the current zoom. Otherwise enforceContainment zooms the
+			// image in to cover it — at a fine rotation that's a confusing
+			// zoom-in with no net change (the crop is already at the image
+			// bounds). When there's bleed (zoomed in), the grown rect already
+			// fits, so the drag-out-to-zoom-out path is unaffected.
+			const rect =
+				naturalWidth > 0 && naturalHeight > 0
+					? restrictCropGrowth(
+							state.cropRect,
+							requestedRect,
+							state.zoom,
+							state.rotation,
+							naturalWidth / naturalHeight
+					  )
+					: requestedRect;
 			setCropRect( rect );
 			// During a resize drag, pan the viewport so the handle stays
 			// visible even when the crop extends beyond the canvas edge.
@@ -587,7 +607,17 @@ function CropperInner(
 				} );
 			}
 		},
-		[ setCropRect, setViewportPan, canvasSize, scaledVisualSize ]
+		[
+			setCropRect,
+			setViewportPan,
+			canvasSize,
+			scaledVisualSize,
+			state.cropRect,
+			state.zoom,
+			state.rotation,
+			naturalWidth,
+			naturalHeight,
+		]
 	);
 
 	// Settling animation: brief linear transition after resize end.
