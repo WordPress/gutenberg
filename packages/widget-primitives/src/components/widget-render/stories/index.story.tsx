@@ -7,6 +7,11 @@ import type { ComponentType } from 'react';
 /**
  * WordPress dependencies
  */
+// Form controls read these stylesheets, normally enqueued by WordPress.
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '@wordpress/components/build-style/style.css';
+// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
+import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { Suspense, useMemo, useState } from '@wordpress/element';
