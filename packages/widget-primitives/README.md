@@ -23,6 +23,16 @@ language features and APIs, you should include [the polyfill shipped in
 `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill)
 in your code._
 
+## Setup
+
+This package ships no stylesheets and injects no styles; there is nothing
+to enqueue or import.
+
+The contract types and `<WidgetRender>` work in any React application. The
+`useWidgetTypes()` hook reads the `widgetModule` entity through
+`@wordpress/core-data`, so it expects to run against a WordPress site that
+exposes the `/wp/v2/widget-modules` REST endpoint.
+
 ## Purpose
 
 A widget is a self-contained unit; a *host* is any context that renders one (the

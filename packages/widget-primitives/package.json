@@ -42,6 +42,7 @@
 	},
 	"wpScript": false,
 	"types": "build-types",
+	"sideEffects": false,
 	"dependencies": {
 		"@types/react": "^18.3.27",
 		"@wordpress/core-data": "file:../core-data",
