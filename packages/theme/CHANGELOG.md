@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.15.0 (2026-06-10)
+
 ### New Features
 
 -   Add `--wpds-dimension-size-*` design tokens for element sizing ([#76545](https://github.com/WordPress/gutenberg/pull/76545)).

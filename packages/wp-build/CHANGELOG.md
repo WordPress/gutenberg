@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.16.0 (2026-06-10)
+
 ### Bug Fixes
 
 -   Remove the incorrect `#wpwrap` background from wp-admin critical CSS to prevent a black flash before hydration; rely on the existing `body` background instead ([#78493](https://github.com/WordPress/gutenberg/pull/78493)).

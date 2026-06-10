@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.15.0 (2026-06-10)
+
 ### Breaking Changes
 
 -   Update CSS cascade layers from flat list to nested, replacing `wp-ui-utilities`, `wp-ui-components`, `wp-ui-compositions`, and `wp-ui-overrides` with a single layer `wp-ui` ([#78959](https://github.com/WordPress/gutenberg/pull/78959)).

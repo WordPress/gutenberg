@@ -184,10 +184,18 @@ function Layout() {
 												}
 											/>
 										) }
-										<SidebarContent routeKey={ routeKey }>
-											{ areas.mobileContent ? (
-												<ThemeProvider
-													color={ CONTENT_COLOR }
+										{ areas.mobileContent ? (
+											/*
+											 * ThemeProvider wraps SidebarContent (rather than
+											 * just the content) so the scroll wrapper it renders
+											 * inherits the content background tokens. See
+											 * `.edit-site-sidebar__screen-wrapper` in style.scss.
+											 */
+											<ThemeProvider
+												color={ CONTENT_COLOR }
+											>
+												<SidebarContent
+													routeKey={ routeKey }
 												>
 													<div className="edit-site-layout__mobile-content">
 														<ErrorBoundary>
@@ -196,13 +204,17 @@ function Layout() {
 															}
 														</ErrorBoundary>
 													</div>
-												</ThemeProvider>
-											) : (
+												</SidebarContent>
+											</ThemeProvider>
+										) : (
+											<SidebarContent
+												routeKey={ routeKey }
+											>
 												<ErrorBoundary>
 													{ areas.mobileSidebar }
 												</ErrorBoundary>
-											) }
-										</SidebarContent>
+											</SidebarContent>
+										) }
 										<SaveHub />
 										<SavePanel />
 									</>
