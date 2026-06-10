@@ -1101,3 +1101,234 @@ describe( 'restrictCropGrowth — coverage-limited resize', () => {
 		).toEqual( next );
 	} );
 } );
+
+describe( 'getViewScale — property invariants', () => {
+	const ITERATIONS = 500;
+
+	it( `holds across ${ ITERATIONS } random valid inputs`, () => {
+		for ( let i = 0; i < ITERATIONS; i++ ) {
+			const canvasW = 200 + ( ( i * 37 ) % 1800 );
+			const canvasH = 200 + ( ( i * 53 ) % 1200 );
+			const footprintW = 50 + ( ( i * 19 ) % 800 );
+			const footprintH = 50 + ( ( i * 29 ) % 1000 );
+			const cropW = 0.05 + ( ( i * 3 ) % 95 ) / 100;
+			const cropH = 0.05 + ( ( i * 5 ) % 95 ) / 100;
+			const cropX = Math.min( ( ( i * 11 ) % 100 ) / 100, 1 - cropW );
+			const cropY = Math.min( ( ( i * 17 ) % 100 ) / 100, 1 - cropH );
+			const targetFill = 0.1 + ( ( i * 7 ) % 90 ) / 100;
+			const maxScale = 1 + ( ( i * 13 ) % 20 );
+
+			const canvas: Size = { width: canvasW, height: canvasH };
+			const footprint: Size = { width: footprintW, height: footprintH };
+			const cropRect = {
+				x: cropX,
+				y: cropY,
+				width: cropW,
+				height: cropH,
+			};
+
+			const scale = getViewScale(
+				cropRect,
+				canvas,
+				footprint,
+				targetFill,
+				maxScale
+			);
+
+			expect( Number.isFinite( scale ) ).toBe( true );
+			expect( scale ).toBeGreaterThanOrEqual( 1 );
+			expect( scale ).toBeLessThanOrEqual( maxScale );
+
+			const cropScreenW = cropRect.width * footprintW;
+			const cropScreenH = cropRect.height * footprintH;
+			const kW = ( targetFill * canvasW ) / cropScreenW;
+			const kH = ( targetFill * canvasH ) / cropScreenH;
+			const k = Math.min( kW, kH );
+			const unclamped = Math.max( 1, k );
+
+			expect( scale ).toBeCloseTo( Math.min( maxScale, unclamped ), 10 );
+
+			const shouldCheckFill = scale > 1 && scale < maxScale - 1e-10;
+			const bindingIsWidth = kW <= kH + 1e-10;
+			const magnifiedBinding = bindingIsWidth
+				? cropScreenW * scale
+				: cropScreenH * scale;
+			const targetBinding = bindingIsWidth
+				? targetFill * canvasW
+				: targetFill * canvasH;
+			expect(
+				shouldCheckFill ? magnifiedBinding / targetBinding : 1
+			).toBeCloseTo( 1, shouldCheckFill ? 4 : 10 );
+		}
+	} );
+} );
+
+describe( 'restrictCropGrowth — property invariants', () => {
+	const ROTATIONS = [ 0, 15, 30, 45, 60, 75, 90, 135, 180, 270 ];
+	const ASPECTS = [ 0.5, 0.75, 1, 1.33, 1.5, 2, 3 ];
+	const ITERATIONS = 500;
+	const ZOOM_EPSILON = 1e-2;
+
+	function randomCropRect( i: number ) {
+		const cropW = 0.1 + ( ( i * 3 ) % 7 ) / 10;
+		const cropH = 0.1 + ( ( i * 5 ) % 7 ) / 10;
+		const cropX = Math.min( ( ( i * 11 ) % 10 ) / 10, 1 - cropW );
+		const cropY = Math.min( ( ( i * 17 ) % 10 ) / 10, 1 - cropH );
+		return { x: cropX, y: cropY, width: cropW, height: cropH };
+	}
+
+	function coverZoomAt(
+		cropRect: CropperState[ 'cropRect' ],
+		rotation: number,
+		aspect: number
+	): number {
+		const W = 1000;
+		const H = W / aspect;
+		return getMinZoom(
+			makeState( {
+				image: { src: 't', naturalWidth: W, naturalHeight: H },
+				rotation,
+				cropRect,
+			} )
+		);
+	}
+
+	function growFromPrev(
+		prev: CropperState[ 'cropRect' ],
+		i: number
+	): CropperState[ 'cropRect' ] {
+		const edge = i % 4;
+		const delta = 0.01 + ( ( i * 31 ) % 30 ) / 100;
+		switch ( edge ) {
+			case 0:
+				return {
+					...prev,
+					width: Math.min( prev.width + delta, 1 - prev.x ),
+				};
+			case 1:
+				return {
+					...prev,
+					height: Math.min( prev.height + delta, 1 - prev.y ),
+				};
+			case 2: {
+				const shift = Math.min( delta, prev.x );
+				return {
+					...prev,
+					x: prev.x - shift,
+					width: prev.width + shift,
+				};
+			}
+			default: {
+				const shift = Math.min( delta, prev.y );
+				return {
+					...prev,
+					y: prev.y - shift,
+					height: prev.height + shift,
+				};
+			}
+		}
+	}
+
+	function shrinkFromPrev(
+		prev: CropperState[ 'cropRect' ],
+		i: number
+	): CropperState[ 'cropRect' ] {
+		const delta = 0.01 + ( ( i * 23 ) % 20 ) / 100;
+		const inset = Math.min( delta / 2, prev.width / 4, prev.height / 4 );
+		return {
+			x: prev.x + inset,
+			y: prev.y + inset,
+			width: Math.max( prev.width - 2 * inset, 0.05 ),
+			height: Math.max( prev.height - 2 * inset, 0.05 ),
+		};
+	}
+
+	function assertBetween( value: number, a: number, b: number ): void {
+		const lo = Math.min( a, b );
+		const hi = Math.max( a, b );
+		expect( value ).toBeGreaterThanOrEqual( lo - 1e-9 );
+		expect( value ).toBeLessThanOrEqual( hi + 1e-9 );
+	}
+
+	it( `holds across ${ ITERATIONS } random outward resize steps`, () => {
+		for ( let i = 0; i < ITERATIONS; i++ ) {
+			const rotation =
+				ROTATIONS[ i % ROTATIONS.length ] + ( ( i * 3 ) % 10 );
+			const aspect = ASPECTS[ i % ASPECTS.length ];
+			const prev = randomCropRect( i );
+			const next = growFromPrev( prev, i );
+			const zoom =
+				coverZoomAt( prev, rotation, aspect ) +
+				( ( i * 7 ) % 50 ) / 100;
+
+			const result = restrictCropGrowth(
+				prev,
+				next,
+				zoom,
+				rotation,
+				aspect
+			);
+
+			expect( Number.isFinite( result.x ) ).toBe( true );
+			expect( Number.isFinite( result.y ) ).toBe( true );
+			expect( Number.isFinite( result.width ) ).toBe( true );
+			expect( Number.isFinite( result.height ) ).toBe( true );
+
+			expect(
+				coverZoomAt( result, rotation, aspect )
+			).toBeLessThanOrEqual( zoom + ZOOM_EPSILON );
+
+			const nextIsCoverable =
+				coverZoomAt( next, rotation, aspect ) <= zoom + 1e-9;
+			expect( result ).toEqual( nextIsCoverable ? next : result );
+
+			assertBetween( result.x, prev.x, next.x );
+			assertBetween( result.y, prev.y, next.y );
+			assertBetween( result.width, prev.width, next.width );
+			assertBetween( result.height, prev.height, next.height );
+
+			const leftAnchored = Math.abs( prev.x - next.x ) < 1e-12;
+			const topAnchored = Math.abs( prev.y - next.y ) < 1e-12;
+			const rightAnchored =
+				Math.abs( prev.x + prev.width - ( next.x + next.width ) ) <
+				1e-12;
+			const bottomAnchored =
+				Math.abs( prev.y + prev.height - ( next.y + next.height ) ) <
+				1e-12;
+
+			expect( result.x ).toBeCloseTo(
+				leftAnchored ? prev.x : result.x,
+				9
+			);
+			expect( result.y ).toBeCloseTo(
+				topAnchored ? prev.y : result.y,
+				9
+			);
+			expect( result.x + result.width ).toBeCloseTo(
+				rightAnchored ? prev.x + prev.width : result.x + result.width,
+				9
+			);
+			expect( result.y + result.height ).toBeCloseTo(
+				bottomAnchored
+					? prev.y + prev.height
+					: result.y + result.height,
+				9
+			);
+		}
+	} );
+
+	it( `returns next unchanged across ${ ITERATIONS } random shrink steps`, () => {
+		for ( let i = 0; i < ITERATIONS; i++ ) {
+			const rotation =
+				ROTATIONS[ i % ROTATIONS.length ] + ( ( i * 3 ) % 10 );
+			const aspect = ASPECTS[ i % ASPECTS.length ];
+			const prev = randomCropRect( i );
+			const next = shrinkFromPrev( prev, i );
+			const zoom = coverZoomAt( prev, rotation, aspect );
+
+			expect(
+				restrictCropGrowth( prev, next, zoom, rotation, aspect )
+			).toEqual( next );
+		}
+	} );
+} );
