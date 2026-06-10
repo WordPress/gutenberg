@@ -194,7 +194,6 @@ function WidgetWithSettings() {
 				<WidgetRender< DemoAttributes >
 					widgetType={ demoWidgetType }
 					attributes={ attributes }
-					setAttributes={ applyEdits }
 					resolveWidgetModule={ resolveDemoModule }
 				/>
 			</Suspense>
@@ -221,7 +220,7 @@ export const WithSettings: StoryObj = {
 	parameters: {
 		docs: {
 			description: {
-				story: "A widget type declares its settings as dataviews `Field[]` in `attributes`. The host mounts a `DataForm` directly from that schema, with no per-widget form wiring, and routes edits back through `setAttributes`: the same round trip the dashboard's settings drawer uses.",
+				story: "A widget type declares its settings as dataviews `Field[]` in `attributes`. The host mounts a `DataForm` directly from that schema, with no per-widget form wiring, and the edited attributes flow into the rendered widget: the same round trip the dashboard's settings drawer uses.",
 			},
 		},
 	},
