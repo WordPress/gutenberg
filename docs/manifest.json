@@ -3090,6 +3090,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "The Dashboard Widget System",
+		"slug": "dashboard-widgets",
+		"markdown_source": "../docs/explanations/architecture/dashboard-widgets.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "User Interface",
 		"slug": "user-interface",
 		"markdown_source": "../docs/explanations/user-interface/README.md",

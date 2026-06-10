@@ -5,7 +5,7 @@ This package is still experimental. “Experimental” means this is an early im
 </div>
 
 The host-agnostic toolkit for dashboard widgets. It is the single source of
-truth for what a widget *is* (the contract types) and the runtime for working
+truth for what a widget _is_ (the contract types) and the runtime for working
 with widgets (discovering the registered widget types and resolving their render
 modules). It is not tied to any host.
 
@@ -35,37 +35,41 @@ exposes the `/wp/v2/widget-modules` REST endpoint.
 
 ## Purpose
 
-A widget is a self-contained unit; a *host* is any context that renders one (the
+A widget is a self-contained unit; a _host_ is any context that renders one (the
 dashboard today, a sidebar or an inspector tomorrow). This package sits between
 the build pipeline that produces widgets and the hosts that render them, so
 neither side has to know about the other:
 
-- **Contract.** It defines the widget type shape (`WidgetType`, `WidgetName`)
-  and the render contract (`WidgetRenderProps`). Authors type their
-  `widget.ts` / `render.tsx` against these, and hosts consume the same types.
-  Nothing re-exports them: every consumer imports from
-  `@wordpress/widget-primitives` directly, so the source of truth stays in one
-  place.
-- **Discovery.** `useWidgetTypes()` returns the `WidgetType[]` registered on the
-  current page.
-- **Rendering.** `<WidgetRender>` resolves a widget's render module via a
-  host-provided resolver and mounts the resulting component under the host's
-  Suspense boundary.
+-   **Contract.** It defines the widget type shape (`WidgetType`, `WidgetName`)
+    and the render contract (`WidgetRenderProps`). Authors type their
+    `widget.ts` / `render.tsx` against these, and hosts consume the same types.
+    Nothing re-exports them: every consumer imports from
+    `@wordpress/widget-primitives` directly, so the source of truth stays in one
+    place.
+-   **Discovery.** `useWidgetTypes()` returns the `WidgetType[]` registered on the
+    current page.
+-   **Rendering.** `<WidgetRender>` resolves a widget's render module via a
+    host-provided resolver and mounts the resulting component under the host's
+    Suspense boundary.
+
+For how the full pipeline fits together (authoring, build, server registry,
+hosts), see the
+[dashboard widget system architecture document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/explanations/architecture/dashboard-widgets.md).
 
 ## Public API
 
-- `<WidgetRender>`: canonical entry point for any host that mounts a widget.
-  Resolves the widget's render module via a host-provided `resolveWidgetModule`
-  and mounts the resulting component with the standard `attributes` plus
-  `setAttributes` render contract. Suspense, error handling, and chrome are
-  host concerns and live outside the primitive.
-- `useWidgetTypes()` → `[ widgetTypes, isResolvingWidgetTypes ]`: the
-  `WidgetType[]` available on the current page, plus a flag that is true while
-  they are still resolving.
-- Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
-  `WidgetRenderProps`, `ResolveWidgetModule`. `WidgetIcon` is a rendered SVG
-  element (typically one from `@wordpress/icons`); hosts pass it to their
-  icon primitive as is.
+-   `<WidgetRender>`: canonical entry point for any host that mounts a widget.
+    Resolves the widget's render module via a host-provided `resolveWidgetModule`
+    and mounts the resulting component with the standard `attributes` plus
+    `setAttributes` render contract. Suspense, error handling, and chrome are
+    host concerns and live outside the primitive.
+-   `useWidgetTypes()` → `[ widgetTypes, isResolvingWidgetTypes ]`: the
+    `WidgetType[]` available on the current page, plus a flag that is true while
+    they are still resolving.
+-   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
+    `WidgetRenderProps`, `ResolveWidgetModule`. `WidgetIcon` is a rendered SVG
+    element (typically one from `@wordpress/icons`); hosts pass it to their
+    icon primitive as is.
 
 ## How discovery works
 
@@ -79,7 +83,7 @@ no custom data store and no client-side registration step.
 3. **core-data entity.** A `widgetModule` entity reads the endpoint via
    `getEntityRecords( 'root', 'widgetModule' )`.
 4. **Hook.** `useWidgetTypes()` reads those records and `await import(
-   record.widget_module )` to fetch each widget's metadata, merging it with
+record.widget_module )` to fetch each widget's metadata, merging it with
    `name` and `renderModule` into a `WidgetType`.
 
 ## Identity vs host
