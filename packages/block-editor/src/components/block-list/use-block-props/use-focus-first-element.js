@@ -29,9 +29,8 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const { isBlockSelected, isMultiSelecting, isZoomOut, getBlockCount } =
+		unlock( useSelect( blockEditorStore ) );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -59,11 +58,16 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		// selected/created block) focus it as usual.
 		const { activeElement } = ownerDocument;
 		const { anchorNode } = ownerDocument.defaultView.getSelection();
+		const hostFocused =
+			activeElement?.isContentEditable &&
+			activeElement.contains( ref.current );
 		if (
 			isInsideRootBlock( ref.current, activeElement ) ||
-			( activeElement?.isContentEditable &&
-				activeElement.contains( ref.current ) &&
-				ref.current.contains( anchorNode ) )
+			( hostFocused && ref.current.contains( anchorNode ) ) ||
+			// A container selected as a unit while the editing host is focused
+			// must not have a caret placed into a child, which would collapse
+			// the block-level selection back to that child.
+			( hostFocused && getBlockCount( clientId ) > 0 )
 		) {
 			return;
 		}
