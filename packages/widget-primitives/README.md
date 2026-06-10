@@ -96,9 +96,12 @@ within another page, a modal inserter, or a plugin panel. The choice of where to
 render belongs to the consumer; the registry knows nothing about it.
 
 For `import( widget.renderModule )` to resolve at runtime, the render module
-needs to be available to the browser. The build pipeline registers each widget's
-script module with WordPress at `init`, which makes it loadable. Hosts decide
-when to import; they do not register widgets.
+needs to be available to the browser. The build pipeline registers each
+widget's script module with WordPress at `init`; how a module is then loaded
+is the host's call. The dashboard exposes every module in its page's import
+map for dynamic `import()`; other hosts may enqueue modules eagerly or
+resolve them through their own `resolveWidgetModule`. Hosts decide when and
+how to load; they do not register widgets.
 
 ## Contributing to this package
 

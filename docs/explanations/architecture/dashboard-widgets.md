@@ -52,7 +52,9 @@ The output of the build is therefore two things: registered script modules (load
 The registry is the server's runtime answer to "which widget types exist on this site", and two consumers read it:
 
 -   The REST controller (`WP_REST_Widget_Modules_Controller`) exposes it at `/wp/v2/widget-modules`, returning `{ name, render_module, widget_module, presentation }` per record.
--   A hosting page adds every registered module to its import map as a `dynamic` dependency (reachable by `import()`, never eagerly executed) through the generic `{page-id}-wp-admin_boot_dependencies` filter; the dashboard page does this today.
+-   The dashboard page hooks the (otherwise generic) `{page-id}-wp-admin_boot_dependencies` filter to add every registered module to its import map as a `dynamic` dependency: reachable by `import()`, never eagerly executed.
+
+Registration makes the modules known to WordPress; loading them is a separate, per-host decision. Dynamic `import()` against the import map is how the dashboard loads widgets today, but a host can equally enqueue a module eagerly (`wp_enqueue_script_module()`), declare it as a `static` dependency of its own module, or, outside WordPress, skip the import map entirely and resolve modules through its own `ResolveWidgetModule`.
 
 The registry exists as a class (rather than the manifest being read directly by REST) so that the _source_ of widget types stays an implementation detail. Today the only source is the build manifest; a plugin-facing registration API would target the registry without touching the pipeline behind it.
 
@@ -62,7 +64,7 @@ The package is the single source of truth for what a widget _is_ on the client, 
 
 -   **Contract types**: `WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`. Authors type `widget.ts` / `render.tsx` against them; hosts consume the same shapes. Nothing re-exports them.
 -   **Discovery**: `useWidgetTypes()` reads the `widgetModule` core-data entity (backed by `/wp/v2/widget-modules`), dynamically imports each record's `widget_module` to retrieve the live metadata, and merges both halves into `WidgetType[]`. The record's `presentation` (originating in `widget.json`) wins over the module's value.
--   **Rendering**: `<WidgetRender>` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. The default resolver in a WordPress page is just `( id ) => import( id )`, which works because the build registered the module and the boot filter put it in the import map.
+-   **Rendering**: `<WidgetRender>` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. On a WordPress page the resolver can be as simple as `( id ) => import( id )`, provided the hosting page exposed the module in its import map; hosts with other loading strategies supply their own resolver.
 
 Equally important is what the package does not do: no chrome, no layout, no persistence, no data store of its own, and no knowledge of any host. That is what makes it publishable and consumable outside the WordPress admin.
 
