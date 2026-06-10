@@ -1,7 +1,6 @@
 {
 	"name": "@wordpress/grid",
-	"version": "1.0.0-prerelease",
-	"private": true,
+	"version": "0.1.0-prerelease",
 	"description": "Grid component with drag-and-drop reordering and resize for dashboard layouts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
