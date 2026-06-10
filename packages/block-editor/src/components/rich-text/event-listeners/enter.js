@@ -13,8 +13,23 @@ import { unlock } from '../../../lock-unlock';
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
+
+	// When the editing host is an ancestor (the writing flow wrapper), keydown
+	// events target that host rather than this element, so determine relevance
+	// from the selection rather than the event target.
+	function isSelectionInElement() {
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		return element.contains( anchorNode ) && element.contains( focusNode );
+	}
+
 	function onKeyDownDeprecated( event ) {
 		if ( event.keyCode !== ENTER ) {
+			return;
+		}
+
+		if ( ! isSelectionInElement() ) {
 			return;
 		}
 
@@ -30,9 +45,7 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// The event listener is attached to the window, so we need to check if
-		// the target is the element.
-		if ( event.target !== element ) {
+		if ( ! isSelectionInElement() ) {
 			return;
 		}
 
@@ -79,8 +92,6 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	const { defaultView } = element.ownerDocument;
-
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
 	const unsubscribeKeyDown = subscribeDelegatedListener(
@@ -91,7 +102,7 @@ export default ( props ) => ( element ) => {
 	// Capture phase so this runs before ancestor (writing flow) bubble
 	// handlers, matching the timing of the previous raw element listener.
 	const unsubscribeKeyDownDeprecated = subscribeDelegatedListener(
-		element,
+		ownerDocument,
 		'keydown',
 		onKeyDownDeprecated,
 		true

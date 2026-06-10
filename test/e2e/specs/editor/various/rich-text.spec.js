@@ -686,12 +686,19 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '2' );
 
-		// Select all and copy.
+		// Select all and copy. The selection updates asynchronously, so wait a
+		// frame before copying so the full content is captured.
 		await pageUtils.pressKeys( 'primary+a' );
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 		await pageUtils.pressKeys( 'primary+c' );
 
 		// Collapse the selection to the end.
 		await page.keyboard.press( 'ArrowRight' );
+		await page.evaluate(
+			() => new Promise( window.requestAnimationFrame )
+		);
 
 		// Create a list.
 		await page.keyboard.press( 'Enter' );
