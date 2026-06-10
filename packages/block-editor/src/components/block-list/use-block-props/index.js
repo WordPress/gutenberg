@@ -105,7 +105,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		canMove,
 		blockVisibility,
 		deviceType,
-		hasInnerBlocks,
 	} = useContext( PrivateBlockContext );
 
 	const defaultViewRef = useRefEffect( ( element ) => {
@@ -177,11 +176,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	return {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		draggable: canMove && ! hasChildSelected ? true : undefined,
-		// Leaf blocks are non-editable atoms by default; container blocks stay
-		// editable roots so their inner blocks remain within the editing host.
-		// RichText overrides this to true on its own element, so text blocks
-		// are editable regardless. Overridable through `props`.
-		contentEditable: hasInnerBlocks,
 		...wrapperProps,
 		...props,
 		ref: mergedRefs,

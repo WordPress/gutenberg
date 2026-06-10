@@ -583,7 +583,6 @@ function BlockListBlockProvider( props ) {
 				getBlocksByName,
 
 				getBlockIndex,
-				getBlockCount,
 				isBlockMultiSelected,
 				isBlockSubtreeDisabled,
 				isBlockHighlighted,
@@ -629,7 +628,6 @@ function BlockListBlockProvider( props ) {
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const previewContext = {
 				isPreviewMode,
-				hasInnerBlocks: getBlockCount( clientId ) > 0,
 				blockWithoutAttributes,
 				name: blockName,
 				attributes,
@@ -808,7 +806,6 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		hasInnerBlocks,
 		isSectionBlock,
 		isWithinSectionBlock,
 		isSelectionWithinCurrentSection,
@@ -843,7 +840,6 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		hasInnerBlocks,
 		isSectionBlock,
 		isWithinSectionBlock,
 		isSelectionWithinCurrentSection,

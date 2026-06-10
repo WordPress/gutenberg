@@ -53,19 +53,8 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 
 		const { ownerDocument } = ref.current;
 
-		// Do not steal focus if this block already contains the active element,
-		// or if an ancestor editing host (the writing flow wrapper) is focused
-		// and the caret is already within this block. Otherwise (e.g. a newly
-		// selected/created block) focus it as usual.
-		const { activeElement } = ownerDocument;
-		const { anchorNode } = ownerDocument.defaultView.getSelection();
-		const hostFocused =
-			activeElement?.isContentEditable &&
-			activeElement.contains( ref.current );
-		if (
-			isInsideRootBlock( ref.current, activeElement ) ||
-			( hostFocused && ref.current.contains( anchorNode ) )
-		) {
+		// Do not focus the block if it already contains the active element.
+		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
 			return;
 		}
 
@@ -81,12 +70,7 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
-			// Do not focus a contentEditable inner blocks wrapper: focusing it
-			// would place a caret in a child and collapse a block-level
-			// selection. The always-on editing host already manages focus.
-			if ( ref.current.getAttribute( 'contenteditable' ) !== 'true' ) {
-				ref.current.focus();
-			}
+			ref.current.focus();
 			return;
 		}
 

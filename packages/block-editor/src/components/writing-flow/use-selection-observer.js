@@ -5,6 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { create } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -85,14 +86,13 @@ function setContentEditableWrapper( node, value ) {
 	// Since we are calling this on every selection change, check if the value
 	// needs to be updated first because it trigger the browser to recalculate
 	// style.
-	// ALWAYS-ON: the wrapper stays editable; never turn it off.
-	if ( node.contentEditable !== 'true' ) {
-		node.contentEditable = 'true';
-	}
+	if ( node.contentEditable !== String( value ) ) {
+		node.contentEditable = value;
 
-	// Firefox doesn't automatically move focus.
-	if ( value ) {
-		node.focus();
+		// Firefox doesn't automatically move focus.
+		if ( value ) {
+			node.focus();
+		}
 	}
 }
 
@@ -108,8 +108,12 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		isMultiSelecting,
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -140,17 +144,31 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					if (
-						node.contentEditable === 'true' &&
-						! isMultiSelecting()
-					) {
-						setContentEditableWrapper( node, false );
-						let element =
-							startNode.nodeType === startNode.ELEMENT_NODE
-								? startNode
-								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
+					if ( ! isMultiSelecting() ) {
+						// When the collapsed selection is within a block that
+						// opts into being an editable root, keep the writing flow
+						// wrapper as the editing host so a cross-block selection
+						// can be started. Otherwise turn the host off and let the
+						// block's own editable take focus.
+						const clientId = getBlockClientId( startNode );
+						const supportsEditableRoot =
+							clientId &&
+							hasBlockSupport(
+								getBlockName( clientId ),
+								'editableRoot',
+								false
+							);
+						if ( supportsEditableRoot ) {
+							setContentEditableWrapper( node, true );
+						} else if ( node.contentEditable === 'true' ) {
+							setContentEditableWrapper( node, false );
+							let element =
+								startNode.nodeType === startNode.ELEMENT_NODE
+									? startNode
+									: startNode.parentElement;
+							element = element?.closest( '[contenteditable]' );
+							element?.focus();
+						}
 					}
 					return;
 				}

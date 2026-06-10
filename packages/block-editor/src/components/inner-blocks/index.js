@@ -290,12 +290,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	return {
 		...props,
 		ref,
-		// An inner blocks container is an editable root: it must remain part of
-		// the editing host so its child blocks stay within the same host (the
-		// always-on writing flow wrapper). Override the block wrapper's default
-		// `contentEditable={ false }`, which would otherwise isolate the inner
-		// blocks into their own editing hosts.
-		contentEditable: true,
 		className: clsx(
 			props.className,
 			'block-editor-block-list__layout',
