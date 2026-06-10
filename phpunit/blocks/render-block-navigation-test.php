@@ -143,13 +143,13 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
 	 */
 	public function test_state_class_is_added_to_inner_list_container() {
-		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Item</li></ul></nav>';
 		$block         = array( 'blockName' => 'core/navigation' );
 
 		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
 
 		$this->assertSame(
-			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">Item</li></ul></nav>',
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Item</li></ul></nav>',
 			$actual
 		);
 	}
@@ -160,7 +160,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
 	 */
 	public function test_state_class_is_not_added_to_non_navigation_blocks() {
-		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Item</li></ul></nav>';
 		$block         = array( 'blockName' => 'core/group' );
 
 		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
@@ -174,7 +174,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
 	 */
 	public function test_existing_inner_state_class_is_preserved() {
-		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-abcd1234"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-abcd1234"><li class="wp-block-navigation-item">Item</li></ul></nav>';
 		$block         = array( 'blockName' => 'core/navigation' );
 
 		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
@@ -191,13 +191,13 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
 	 */
 	public function test_state_class_is_added_to_multiple_inner_list_containers() {
-		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Two</li></ul></nav>';
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Two</li></ul></nav>';
 		$block         = array( 'blockName' => 'core/navigation' );
 
 		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
 
 		$this->assertSame(
-			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">Two</li></ul></nav>',
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Two</li></ul></nav>',
 			$actual
 		);
 	}
@@ -208,13 +208,13 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
 	 */
 	public function test_state_class_is_not_added_to_nested_navigation_containers() {
-		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>';
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>';
 		$block         = array( 'blockName' => 'core/navigation' );
 
 		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
 
 		$this->assertSame(
-			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>',
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>',
 			$actual
 		);
 	}
@@ -225,13 +225,13 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
 	 */
 	public function test_nested_navigation_preserves_its_own_state_class() {
-		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-states-abcd1234"><ul class="wp-block-navigation__container wp-states-abcd1234"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>';
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-states-abcd1234"><ul class="wp-block-navigation__container wp-block-navigation wp-states-abcd1234"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>';
 		$block         = array( 'blockName' => 'core/navigation' );
 
 		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
 
 		$this->assertSame(
-			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-1234abcd"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-states-abcd1234"><ul class="wp-block-navigation__container wp-states-abcd1234"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>',
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-states-abcd1234"><ul class="wp-block-navigation__container wp-block-navigation wp-states-abcd1234"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>',
 			$actual
 		);
 	}

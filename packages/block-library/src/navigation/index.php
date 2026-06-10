@@ -1590,7 +1590,7 @@ function block_core_navigation_add_state_class_to_container( $block_content, $bl
 	while ( $processor->next_tag() ) {
 		// Custom overlay content can include nested Navigation blocks.
 		// Avoid applying the outer Navigation state class to an inner nav block.
-		if ( $processor->has_class( 'wp-block-navigation' ) ) {
+		if ( $processor->has_class( 'wp-block-navigation' ) && ! $processor->has_class( 'wp-block-navigation__container' ) ) {
 			break;
 		}
 
