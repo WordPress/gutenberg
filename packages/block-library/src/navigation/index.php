@@ -1562,8 +1562,8 @@ add_action( 'init', 'register_block_core_navigation' );
  *
  * State block support adds the generated `wp-states-*` class to the outer
  * block wrapper. The Navigation block renders its menu items inside an inner
- * list container, so the same state class is also needed there for state styles
- * to apply directly to the menu list.
+ * `wp-block-navigation__container` list, so the same state class is also needed
+ * there for state styles to apply directly to the menu list.
  *
  * @since 7.1.0
  *
@@ -1587,8 +1587,13 @@ function block_core_navigation_add_state_class_to_container( $block_content, $bl
 	}
 
 	$state_class = $matches[0];
-	$processor   = new WP_HTML_Tag_Processor( $block_content );
 	while ( $processor->next_tag() ) {
+		// Custom overlay content can include nested Navigation blocks.
+		// Avoid applying the outer Navigation state class to an inner nav block.
+		if ( $processor->has_class( 'wp-block-navigation' ) ) {
+			break;
+		}
+
 		if ( ! $processor->has_class( 'wp-block-navigation__container' ) ) {
 			continue;
 		}
