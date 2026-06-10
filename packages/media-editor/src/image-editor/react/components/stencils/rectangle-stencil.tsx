@@ -17,6 +17,7 @@ import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
 	DEFAULT_KEYBOARD_STEP,
 	KEYBOARD_SHIFT_STEP_MULTIPLIER,
+	RESIZE_OUTWARD_GAIN,
 } from '../../../core/constants';
 import {
 	computeFreeResizeRect,
@@ -164,7 +165,8 @@ export function RectangleStencil( {
 		computeFreeRect: (
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number
+			clientY: number,
+			outwardGain?: number
 		) => NormalizedRect;
 		computeShiftLockedRect: (
 			drag: ResizeDragState,
@@ -257,7 +259,12 @@ export function RectangleStencil( {
 							latestY
 						);
 					} else {
-						newRect = h.computeFreeRect( drag, latestX, latestY );
+						newRect = h.computeFreeRect(
+							drag,
+							latestX,
+							latestY,
+							RESIZE_OUTWARD_GAIN
+						);
 					}
 					h.onCropChange( newRect );
 				} );
@@ -308,7 +315,10 @@ export function RectangleStencil( {
 		(
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number
+			clientY: number,
+			// Pointer drags amplify the outward direction to make zoom-out more
+			// responsive; keyboard resize omits this and stays 1:1 for precision.
+			outwardGain: number = 1
 		): NormalizedRect =>
 			computeFreeResizeRect(
 				drag,
@@ -316,7 +326,8 @@ export function RectangleStencil( {
 				clientY,
 				imageSize,
 				bounds,
-				minCropSize
+				minCropSize,
+				outwardGain
 			),
 		[ imageSize, bounds, minCropSize ]
 	);

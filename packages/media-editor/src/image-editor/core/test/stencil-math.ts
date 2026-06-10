@@ -51,6 +51,115 @@ describe( 'getMinCropPixels — operable on-screen floor', () => {
 
 const FULL_BOUNDS: CropBounds = { minX: 0, minY: 0, maxX: 1, maxY: 1 };
 
+describe( 'computeFreeResizeRect — outward gain', () => {
+	// Generous bounds so an outward drag can grow the crop past the footprint
+	// (cropRect > 1), which is where dragging out produces a zoom-out.
+	const WIDE_BOUNDS: CropBounds = { minX: -1, minY: -1, maxX: 2, maxY: 2 };
+	const imageSize: Size = { width: 100, height: 100 };
+	const start = { x: 0.4, y: 0.4, width: 0.2, height: 0.2 };
+	const noMin: Size = { width: 0, height: 0 };
+
+	it( 'amplifies an outward (growing) drag by the gain', () => {
+		// East handle dragged right by 10px -> dx = 0.1. Outward for the right
+		// edge, so a gain of 2 should move it twice as far.
+		const drag = {
+			handle: 'e' as const,
+			startX: 0,
+			startY: 0,
+			startRect: start,
+		};
+		const gain1 = computeFreeResizeRect(
+			drag,
+			10,
+			0,
+			imageSize,
+			WIDE_BOUNDS,
+			noMin,
+			1
+		);
+		const gain2 = computeFreeResizeRect(
+			drag,
+			10,
+			0,
+			imageSize,
+			WIDE_BOUNDS,
+			noMin,
+			2
+		);
+		expect( gain1.width ).toBeCloseTo( 0.3, 5 );
+		expect( gain2.width ).toBeCloseTo( 0.4, 5 );
+	} );
+
+	it( 'amplifies a west-edge outward drag (negative dx grows the crop)', () => {
+		const drag = {
+			handle: 'w' as const,
+			startX: 0,
+			startY: 0,
+			startRect: start,
+		};
+		const gain2 = computeFreeResizeRect(
+			drag,
+			-10,
+			0,
+			imageSize,
+			WIDE_BOUNDS,
+			noMin,
+			2
+		);
+		// Left edge moves left twice as far: 0.4 - 0.2 = 0.2, width 0.6 - 0.2 = 0.4.
+		expect( gain2.x ).toBeCloseTo( 0.2, 5 );
+		expect( gain2.width ).toBeCloseTo( 0.4, 5 );
+	} );
+
+	it( 'leaves an inward (shrinking) drag at 1:1 regardless of gain', () => {
+		// East handle dragged left by 5px -> dx = -0.05, shrinking the crop.
+		const drag = {
+			handle: 'e' as const,
+			startX: 0,
+			startY: 0,
+			startRect: start,
+		};
+		const gain1 = computeFreeResizeRect(
+			drag,
+			-5,
+			0,
+			imageSize,
+			WIDE_BOUNDS,
+			noMin,
+			1
+		);
+		const gain2 = computeFreeResizeRect(
+			drag,
+			-5,
+			0,
+			imageSize,
+			WIDE_BOUNDS,
+			noMin,
+			2
+		);
+		expect( gain2.width ).toBeCloseTo( gain1.width, 5 );
+		expect( gain2.width ).toBeCloseTo( 0.15, 5 );
+	} );
+
+	it( 'defaults to no gain (1:1) when the gain argument is omitted', () => {
+		const drag = {
+			handle: 'e' as const,
+			startX: 0,
+			startY: 0,
+			startRect: start,
+		};
+		const result = computeFreeResizeRect(
+			drag,
+			10,
+			0,
+			imageSize,
+			WIDE_BOUNDS,
+			noMin
+		);
+		expect( result.width ).toBeCloseTo( 0.3, 5 );
+	} );
+} );
+
 describe( 'computeLockedResizeRect — driver-axis selection', () => {
 	// On non-square images, the locked-ratio resize must pick the
 	// driving axis based on which the user moved more in *pixel* space,
