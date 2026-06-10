@@ -202,6 +202,18 @@ export default function useBlockSync( {
 			: !! getBlockName( startClientId );
 
 		if ( isOurs ) {
+			// Do not steal the selection if it is already actively selecting a valid block
+			// in the store (e.g., in another duplicate block controller).
+			// If our own blocks were just replaced, our old selection would be deleted
+			// and getBlockName would return null, allowing us to restore the selection.
+			const currentSelectionStartId = getSelectionStart()?.clientId;
+			if (
+				currentSelectionStartId &&
+				getBlockName( currentSelectionStartId )
+			) {
+				return;
+			}
+
 			appliedSelectionRef.current = selection;
 			// Inner block controllers need to convert external→internal
 			// IDs via the clone mapping; the root controller uses
