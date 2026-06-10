@@ -22,9 +22,9 @@ export interface BorderIndividualStyles< T extends BoxEdge > {
 
 /**
  * A style object — for example a block's `attributes.style` or the top-level
- * styles in `theme.json`. Describes borders, spacing, typography, colors,
- * dimensions and element styles, and is the input `compileCSS` and
- * `getCSSRules` turn into CSS.
+ * styles in `theme.json`. Groups visual style properties such as color,
+ * typography, spacing, dimensions, borders, backgrounds and element styles,
+ * and is the input `compileCSS` and `getCSSRules` turn into CSS.
  */
 export interface Style {
 	background?: {
