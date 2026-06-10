@@ -47,13 +47,13 @@ export default meta;
 /**
  * A mock application page demonstrating how `ThemeProvider` affects
  * `@wordpress/ui` and `@wordpress/admin-ui` components in concert. Use the inline controls to adjust
- * the `primary` and `bg` seed colors, and observe how every surface, text
+ * the `primary` and `background` seed colors, and observe how every surface, text
  * element, and interactive control adapts accordingly.
  */
 export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		const [ primary, setPrimary ] = useState< string | undefined >();
-		const [ bg, setBg ] = useState< string | undefined >();
+		const [ background, setBackground ] = useState< string | undefined >();
 
 		return (
 			<div>
@@ -95,13 +95,15 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						Background
 						<input
 							type="color"
-							value={ bg ?? '#ffffff' }
-							onChange={ ( e ) => setBg( e.target.value ) }
+							value={ background ?? '#ffffff' }
+							onChange={ ( e ) =>
+								setBackground( e.target.value )
+							}
 						/>
 					</label>
 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
 				</div>
-				<ThemeProvider color={ { primary, bg } } isRoot>
+				<ThemeProvider color={ { primary, background } } isRoot>
 					<div
 						style={ {
 							display: 'grid',

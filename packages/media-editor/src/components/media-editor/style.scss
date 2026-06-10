@@ -29,6 +29,20 @@
 		flex-direction: column;
 	}
 
+	// The skeleton must always sit in the modal's flow (`top: auto`). The reset
+	// above sets that, but external rules can outrank its low specificity — e.g.
+	// the "Omnipresent Toolbar" experiment (`gutenberg-omnibar`)
+	// offsets every `.interface-interface-skeleton` below the admin bar via a
+	// `body.has-admin-bar-in-editor.is-fullscreen-mode` rule, which would push
+	// the editor (and the fine-rotation ruler under the canvas) down inside our
+	// full-screen modal that already overlays the admin bar. Re-assert `top` at a
+	// specificity that beats such rules, anchored on the modal frame
+	// (`.media-editor` only ever renders inside `.media-editor-modal`) rather
+	// than on the experiment's class, which may change if it ever graduates.
+	.media-editor-modal & .interface-interface-skeleton.interface-interface-skeleton {
+		top: auto;
+	}
+
 	.interface-interface-skeleton__editor {
 		min-width: 0;
 		flex: 1;

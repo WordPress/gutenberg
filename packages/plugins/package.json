@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "7.47.0",
+	"version": "7.48.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -50,7 +50,7 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"memize": "^2.0.1"
+		"memize": "^2.1.0"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
