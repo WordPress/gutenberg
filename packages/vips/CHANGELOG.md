@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2026-06-10)
+
 ### New Features
 
 - Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
