@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useMemo,
-	Component,
-	useCallback,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { useMemo, useCallback, useEffect, useState } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
@@ -45,9 +39,10 @@ const upperFirst = ( [ firstLetter, ...rest ] ) =>
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => (
-			<WrappedComponent { ...props } colors={ colorsArray } />
-		),
+		( WrappedComponent ) =>
+			function WithCustomColorPalette( props ) {
+				return <WrappedComponent { ...props } colors={ colorsArray } />;
+			},
 		'withCustomColorPalette'
 	);
 
@@ -59,22 +54,24 @@ const withCustomColorPalette = ( colorsArray ) =>
  */
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => {
-			const [ userPalette, themePalette, defaultPalette ] = useSettings(
-				'color.palette.custom',
-				'color.palette.theme',
-				'color.palette.default'
-			);
-			const allColors = useMemo(
-				() => [
-					...( userPalette || [] ),
-					...( themePalette || [] ),
-					...( defaultPalette || [] ),
-				],
-				[ userPalette, themePalette, defaultPalette ]
-			);
-			return <WrappedComponent { ...props } colors={ allColors } />;
-		},
+		( WrappedComponent ) =>
+			function WithEditorColorPalette( props ) {
+				const [ userPalette, themePalette, defaultPalette ] =
+					useSettings(
+						'color.palette.custom',
+						'color.palette.theme',
+						'color.palette.default'
+					);
+				const allColors = useMemo(
+					() => [
+						...( userPalette || [] ),
+						...( themePalette || [] ),
+						...( defaultPalette || [] ),
+					],
+					[ userPalette, themePalette, defaultPalette ]
+				);
+				return <WrappedComponent { ...props } colors={ allColors } />;
+			},
 		'withEditorColorPalette'
 	);
 
@@ -132,7 +129,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 	return compose( [
 		withColorPalette,
 		( WrappedComponent ) => {
-			return function ( props ) {
+			return function WithColors( props ) {
 				const { colors, attributes, setAttributes } = props;
 
 				const [ colorState, setColorState ] = useState( () =>

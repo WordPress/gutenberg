@@ -3,6 +3,13 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Internal dependencies
+ */
+const {
+	setCollaboration,
+} = require( '../../editor/collaboration/fixtures/collaboration-utils' );
+
 const dummyBlocksContent = `<!-- wp:heading -->
 <h2 class="wp-block-heading">This is a dummy heading</h2>
 <!-- /wp:heading -->
@@ -10,7 +17,7 @@ const dummyBlocksContent = `<!-- wp:heading -->
 <p class="dummy-paragraph">This is a dummy paragraph.</p>
 <!-- /wp:paragraph -->`;
 const dummyClassicContent =
-	'<h2 class="dummy-heading">This is a dummy heading</h2><p class="dummy-paragraph">This is a dummy paragraph.</p>';
+	'<h2 class="dummy-classic-heading">This is a dummy heading</h2><p class="dummy-classic-paragraph">This is a dummy paragraph.</p>';
 
 const getHookedBlockClassName = ( relativePosition, anchorBlock ) =>
 	`hooked-block-${ relativePosition }-${ anchorBlock.replace(
@@ -38,6 +45,7 @@ test.describe( 'Block Hooks API', () => {
 	].forEach( ( { name, postType, blockType, createMethod } ) => {
 		test.describe( `Hooked blocks in ${ name } (blocks)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -65,6 +73,12 @@ test.describe( 'Block Hooks API', () => {
 				} else {
 					containerPost = postObject;
 				}
+
+				/**
+				 * Since the Block Hooks API relies on server-side rendering to insert
+				 * the hooked blocks, there is a fundamental incompatibility with RTC.
+				 */
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test.afterAll( async ( { requestUtils } ) => {
@@ -74,6 +88,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
+				await setCollaboration( requestUtils, true );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -84,9 +99,11 @@ test.describe( 'Block Hooks API', () => {
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
 					'wp-block-heading',
-					getHookedBlockClassName( 'after', 'core/heading' ),
-					'dummy-paragraph',
-					getHookedBlockClassName( 'last_child', blockType ),
+					getHookedBlockClassName( 'after', 'core/heading' ) +
+						' wp-block-paragraph',
+					'dummy-paragraph wp-block-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
 				] );
 			} );
 
@@ -158,15 +175,18 @@ test.describe( 'Block Hooks API', () => {
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
 					'wp-block-heading',
-					getHookedBlockClassName( 'after', 'core/heading' ),
-					getHookedBlockClassName( 'last_child', blockType ),
-					'dummy-paragraph',
+					getHookedBlockClassName( 'after', 'core/heading' ) +
+						' wp-block-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
+					'dummy-paragraph wp-block-paragraph',
 				] );
 			} );
 		} );
 
 		test.describe( `Hooked blocks in ${ name } (classic)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -194,6 +214,12 @@ test.describe( 'Block Hooks API', () => {
 				} else {
 					containerPost = postObject;
 				}
+
+				/**
+				 * Since the Block Hooks API relies on server-side rendering to insert
+				 * the hooked blocks, there is a fundamental incompatibility with RTC.
+				 */
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test.afterAll( async ( { requestUtils } ) => {
@@ -203,6 +229,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
+				await setCollaboration( requestUtils, true );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -212,9 +239,10 @@ test.describe( 'Block Hooks API', () => {
 				await expect(
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
-					'dummy-heading',
-					'dummy-paragraph',
-					getHookedBlockClassName( 'last_child', blockType ),
+					'dummy-classic-heading',
+					'dummy-classic-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
 				] );
 			} );
 
@@ -271,9 +299,10 @@ test.describe( 'Block Hooks API', () => {
 				await expect(
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
-					getHookedBlockClassName( 'last_child', blockType ),
-					'dummy-heading',
-					'dummy-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
+					'dummy-classic-heading',
+					'dummy-classic-paragraph',
 				] );
 			} );
 		} );
@@ -281,6 +310,7 @@ test.describe( 'Block Hooks API', () => {
 
 	test.describe( 'Hooked blocks in Navigation Menu', () => {
 		let postObject, containerPost;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			postObject = await requestUtils.createNavigationMenu( {
 				title: 'Navigation Menu',
@@ -319,7 +349,7 @@ test.describe( 'Block Hooks API', () => {
 				page.locator( '.wp-block-navigation__container > *' )
 			).toHaveClass( [
 				'wp-block-navigation-item wp-block-home-link',
-				' wp-block-navigation-item wp-block-navigation-link',
+				'wp-block-navigation-item wp-block-navigation-link',
 				'wp-block-page-list',
 			] );
 		} );
@@ -397,7 +427,7 @@ test.describe( 'Block Hooks API', () => {
 			await expect(
 				page.locator( '.wp-block-navigation__container > *' )
 			).toHaveClass( [
-				' wp-block-navigation-item wp-block-navigation-link',
+				'wp-block-navigation-item wp-block-navigation-link',
 				'wp-block-navigation-item wp-block-home-link',
 				'wp-block-page-list',
 			] );

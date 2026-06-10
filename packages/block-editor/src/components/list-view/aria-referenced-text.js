@@ -7,8 +7,8 @@ import { useRef, useEffect } from '@wordpress/element';
  * A component specifically designed to be used as an element referenced
  * by ARIA attributes such as `aria-labelledby` or `aria-describedby`.
  *
- * @param {Object}                    props          Props.
- * @param {import('react').ReactNode} props.children
+ * @param {Object}          props          Props.
+ * @param {React.ReactNode} props.children
  */
 export default function AriaReferencedText( { children, ...props } ) {
 	const ref = useRef();

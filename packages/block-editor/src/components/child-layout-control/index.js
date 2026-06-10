@@ -6,7 +6,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalInputControl as InputControl,
-	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -41,13 +40,14 @@ function helpText( selfStretch, parentLayout ) {
 /**
  * Form to edit the child layout value.
  *
- * @param {Object}   props                  Props.
- * @param {Object}   props.value            The child layout value.
- * @param {Function} props.onChange         Function to update the child layout value.
- * @param {Object}   props.parentLayout     The parent layout value.
+ * @param {Object}   props                      Props.
+ * @param {Object}   props.value                The child layout value.
+ * @param {Function} props.onChange             Function to update the child layout value.
+ * @param {Object}   props.parentLayout         The parent layout value.
  *
- * @param {boolean}  props.isShownByDefault
- * @param {string}   props.panelId
+ * @param {boolean}  props.isShownByDefault     Whether the control is shown by default.
+ * @param {string}   props.panelId              The panel ID.
+ * @param {boolean}  props.showGridSpanDefaults Whether unset grid span controls should show default values.
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
@@ -56,6 +56,7 @@ export default function ChildLayoutControl( {
 	parentLayout,
 	isShownByDefault,
 	panelId,
+	showGridSpanDefaults = true,
 } ) {
 	const {
 		type: parentType,
@@ -81,6 +82,7 @@ export default function ChildLayoutControl( {
 				parentLayout={ parentLayout }
 				isShownByDefault={ isShownByDefault }
 				panelId={ panelId }
+				showGridSpanDefaults={ showGridSpanDefaults }
 			/>
 		);
 	}
@@ -138,7 +140,6 @@ function FlexControls( {
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
 				size="__unstable-large"
 				label={ childLayoutOrientation( parentLayout ) }
 				value={ selfStretch || 'fit' }
@@ -208,9 +209,10 @@ function GridControls( {
 	parentLayout,
 	isShownByDefault,
 	panelId,
+	showGridSpanDefaults,
 } ) {
 	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
-	const { columnCount = 3, rowCount } = parentLayout ?? {};
+	const { columnCount, rowCount } = parentLayout ?? {};
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
@@ -218,7 +220,7 @@ function GridControls( {
 		useDispatch( blockEditorStore );
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		rootClientId,
-		columnCount
+		columnCount || 3
 	);
 	const hasStartValue = () => !! columnStart || !! rowStart;
 	const hasSpanValue = () => !! columnSpan || !! rowSpan;
@@ -235,9 +237,23 @@ function GridControls( {
 		} );
 	};
 
+	// Calculate max column span based on current position and grid width
+	const maxColumnSpan = columnCount
+		? columnCount - ( columnStart ?? 1 ) + 1
+		: undefined;
+
+	// Calculate max row span based on current position and grid height
+	const maxRowSpan =
+		window.__experimentalEnableGridInteractivity && rowCount
+			? rowCount - ( rowStart ?? 1 ) + 1
+			: undefined;
+	const columnSpanValue =
+		columnSpan ?? ( showGridSpanDefaults ? 1 : undefined );
+	const rowSpanValue = rowSpan ?? ( showGridSpanDefaults ? 1 : undefined );
+
 	return (
 		<>
-			<HStack
+			<Flex
 				as={ ToolsPanelItem }
 				hasValue={ hasSpanValue }
 				label={ __( 'Grid span' ) }
@@ -245,44 +261,58 @@ function GridControls( {
 				isShownByDefault={ isShownByDefault }
 				panelId={ panelId }
 			>
-				<InputControl
-					size="__unstable-large"
-					label={ __( 'Column span' ) }
-					type="number"
-					onChange={ ( value ) => {
-						// Don't allow unsetting.
-						const newColumnSpan =
-							value === '' ? 1 : parseInt( value, 10 );
-						onChange( {
-							columnStart,
-							rowStart,
-							rowSpan,
-							columnSpan: newColumnSpan,
-						} );
-					} }
-					value={ columnSpan ?? 1 }
-					min={ 1 }
-				/>
-				<InputControl
-					size="__unstable-large"
-					label={ __( 'Row span' ) }
-					type="number"
-					onChange={ ( value ) => {
-						// Don't allow unsetting.
-						const newRowSpan =
-							value === '' ? 1 : parseInt( value, 10 );
-						onChange( {
-							columnStart,
-							rowStart,
-							columnSpan,
-							rowSpan: newRowSpan,
-						} );
-					} }
-					value={ rowSpan ?? 1 }
-					min={ 1 }
-				/>
-			</HStack>
-			{ window.__experimentalEnableGridInteractivity && columnCount && (
+				<FlexItem style={ { width: '50%' } }>
+					<InputControl
+						size="__unstable-large"
+						label={ __( 'Column span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							// Don't allow unsetting.
+							const newColumnSpan =
+								value === '' ? 1 : parseInt( value, 10 );
+							const constrainedValue = maxColumnSpan
+								? Math.min( newColumnSpan, maxColumnSpan )
+								: newColumnSpan;
+
+							onChange( {
+								columnStart,
+								rowStart,
+								rowSpan,
+								columnSpan: constrainedValue,
+							} );
+						} }
+						value={ columnSpanValue }
+						min={ 1 }
+						max={ maxColumnSpan }
+					/>
+				</FlexItem>
+				<FlexItem style={ { width: '50%' } }>
+					<InputControl
+						size="__unstable-large"
+						label={ __( 'Row span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							const newRowSpan =
+								value === '' ? 1 : parseInt( value, 10 );
+							const constrainedValue = maxRowSpan
+								? Math.min( newRowSpan, maxRowSpan )
+								: newRowSpan;
+
+							onChange( {
+								columnStart,
+								rowStart,
+								columnSpan,
+								rowSpan: constrainedValue,
+							} );
+						} }
+						value={ rowSpanValue }
+						min={ 1 }
+						max={ maxRowSpan }
+					/>
+				</FlexItem>
+			</Flex>
+
+			{ window.__experimentalEnableGridInteractivity && (
 				// Use Flex with an explicit width on the FlexItem instead of HStack to
 				// work around an issue in webkit where inputs with a max attribute are
 				// sized incorrectly.

@@ -5,30 +5,38 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post Meta source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme(
-			'gutenberg-test-themes/block-bindings'
-		);
+		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
-	} );
-
 	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts( 'movie' );
 		await requestUtils.deleteAllMedia();
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
 	test.describe( 'Movie CPT template', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.createTemplate( 'wp_template', {
+				slug: 'single-movie',
+				title: 'Single Movie',
+				content:
+					'<!-- wp:post-title /--><!-- wp:post-content {"layout":{"inherit":true}} /-->',
+			} );
+		} );
+
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//single-movie',
+				postId: 'emptytheme//single-movie',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
 			await editor.openDocumentSettingsSidebar();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllTemplates( 'wp_template' );
 		} );
 
 		test.describe( 'Block attributes values', () => {
@@ -59,6 +67,7 @@ test.describe( 'Post Meta source', () => {
 					'false'
 				);
 			} );
+
 			test( 'should show the default value if it is defined', async ( {
 				editor,
 			} ) => {
@@ -85,6 +94,7 @@ test.describe( 'Post Meta source', () => {
 					'Movie field default value'
 				);
 			} );
+
 			test( 'should fall back to the field label if the default value is not defined', async ( {
 				editor,
 			} ) => {
@@ -111,6 +121,7 @@ test.describe( 'Post Meta source', () => {
 					'Field with only label'
 				);
 			} );
+
 			test( 'should fall back to the field key if the field label is not defined', async ( {
 				editor,
 			} ) => {
@@ -144,60 +155,51 @@ test.describe( 'Post Meta source', () => {
 				editor,
 				page,
 			} ) => {
-				/**
-				 * Create connection manually until this issue is solved:
-				 * https://github.com/WordPress/gutenberg/pull/65604
-				 *
-				 * Once solved, block with the binding can be directly inserted.
-				 */
 				await editor.insertBlock( {
 					name: 'core/paragraph',
+					attributes: {
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'movie_field',
+									},
+								},
+							},
+						},
+					},
 				} );
-				await page.getByLabel( 'Attributes options' ).click();
-				await page
-					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
-					} )
-					.click();
 				const contentBinding = page.getByRole( 'button', {
 					name: 'content',
 				} );
-				await contentBinding.click();
-				await page
-					.getByRole( 'menuitemradio' )
-					.filter( { hasText: 'Movie field label' } )
-					.click();
 				await expect( contentBinding ).toContainText(
 					'Movie field label'
 				);
 			} );
+
 			test( 'should fall back to the field key if the field label is not defined', async ( {
 				editor,
 				page,
 			} ) => {
-				/**
-				 * Create connection manually until this issue is solved:
-				 * https://github.com/WordPress/gutenberg/pull/65604
-				 *
-				 * Once solved, block with the binding can be directly inserted.
-				 */
 				await editor.insertBlock( {
 					name: 'core/paragraph',
+					attributes: {
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: {
+										key: 'field_without_label_or_default',
+									},
+								},
+							},
+						},
+					},
 				} );
-				await page.getByLabel( 'Attributes options' ).click();
-				await page
-					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
-					} )
-					.click();
 				const contentBinding = page.getByRole( 'button', {
 					name: 'content',
 				} );
-				await contentBinding.click();
-				await page
-					.getByRole( 'menuitemradio' )
-					.filter( { hasText: 'field_without_label_or_default' } )
-					.click();
 				await expect( contentBinding ).toContainText(
 					'field_without_label_or_default'
 				);
@@ -221,58 +223,69 @@ test.describe( 'Post Meta source', () => {
 						name: 'content',
 					} )
 					.click();
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Post Meta',
+					} )
+					.click();
 			} );
 
 			test( 'should include movie fields in UI to connect attributes', async ( {
 				page,
 			} ) => {
 				const movieField = page
-					.getByRole( 'menuitemradio' )
+					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: 'Movie field label' } );
 				await expect( movieField ).toBeVisible();
 			} );
+
 			test( 'should include global fields in UI to connect attributes', async ( {
 				page,
 			} ) => {
 				const globalField = page
-					.getByRole( 'menuitemradio' )
+					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: 'text_custom_field' } );
 				await expect( globalField ).toBeVisible();
 			} );
+
 			test( 'should not include protected fields', async ( { page } ) => {
 				// Ensure the fields have loaded by checking the field is visible.
 				const globalField = page
-					.getByRole( 'menuitemradio' )
+					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: 'text_custom_field' } );
 				await expect( globalField ).toBeVisible();
 				// Check the protected fields are not visible.
 				const protectedField = page
-					.getByRole( 'menuitemradio' )
+					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: '_protected_field' } );
 				await expect( protectedField ).toBeHidden();
 				const showInRestFalseField = page
-					.getByRole( 'menuitemradio' )
+					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: 'show_in_rest_false_field' } );
 				await expect( showInRestFalseField ).toBeHidden();
 			} );
+
 			test( 'should show the default value if it is defined', async ( {
 				page,
 			} ) => {
 				const fieldButton = page
-					.getByRole( 'menuitemradio' )
+					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: 'Movie field label' } );
 				await expect( fieldButton ).toContainText(
 					'Movie field default value'
 				);
 			} );
+
+			// We need to discuss this approach. As now is showing the label, like post-meta getValues function on the editor.
 			test( 'should not show anything if the default value is not defined', async ( {
 				page,
 			} ) => {
 				const fieldButton = page
-					.getByRole( 'menuitemradio' )
+					.getByRole( 'menuitemcheckbox' )
 					.filter( { hasText: 'Field with only label' } );
-				// Check it only contains the field label.
-				await expect( fieldButton ).toHaveText(
+
+				// Check that the field contains the label text
+				await expect( fieldButton ).toContainText(
 					'Field with only label'
 				);
 			} );
@@ -282,7 +295,7 @@ test.describe( 'Post Meta source', () => {
 	test.describe( 'Custom template', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
-				postId: 'gutenberg-test-themes/block-bindings//custom-template',
+				postId: 'emptytheme//custom-template',
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
@@ -314,21 +327,28 @@ test.describe( 'Post Meta source', () => {
 					name: 'content',
 				} )
 				.click();
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Complete Source',
+				} )
+				.click();
 			// Check the fields registered by other sources are there.
 			const customSourceField = page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'Text Field Label' } );
 			await expect( customSourceField ).toBeVisible();
 			// Check the post meta fields are not visible.
 			const globalField = page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'text_custom_field' } );
 			await expect( globalField ).toBeHidden();
-			const movieField = page
-				.getByRole( 'menuitemradio' )
-				.filter( { hasText: 'Movie field label' } );
+			const movieField = page.getByRole( 'menuitem', {
+				name: 'Post Meta',
+			} );
+
 			await expect( movieField ).toBeHidden();
 		} );
+
 		test( 'should show the key in attributes connected to post meta', async ( {
 			editor,
 		} ) => {
@@ -356,12 +376,23 @@ test.describe( 'Post Meta source', () => {
 	} );
 
 	test.describe( 'Movie CPT post', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-content-only-inspector-fields',
+			] );
+		} );
+
 		test.beforeEach( async ( { admin } ) => {
 			// CHECK HOW TO CREATE A MOVIE.
 			await admin.createNewPost( {
 				postType: 'movie',
 				title: 'Test bindings',
 			} );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			// Ensure experiments are disabled after test.
+			await requestUtils.setGutenbergExperiments( [] );
 		} );
 
 		test( 'should show the custom field value of that specific post', async ( {
@@ -396,6 +427,7 @@ test.describe( 'Post Meta source', () => {
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'Movie field default value' );
 		} );
+
 		test( 'should fall back to the key when custom field is not accessible', async ( {
 			editor,
 		} ) => {
@@ -424,6 +456,7 @@ test.describe( 'Post Meta source', () => {
 				'false'
 			);
 		} );
+
 		test( 'should not show or edit the value of a protected field', async ( {
 			editor,
 		} ) => {
@@ -452,6 +485,7 @@ test.describe( 'Post Meta source', () => {
 				'false'
 			);
 		} );
+
 		test( 'should not show or edit the value of a field with `show_in_rest` set to false', async ( {
 			editor,
 		} ) => {
@@ -482,6 +516,7 @@ test.describe( 'Post Meta source', () => {
 				'false'
 			);
 		} );
+
 		test( 'should be possible to edit the value of the connected custom fields', async ( {
 			editor,
 		} ) => {
@@ -525,7 +560,7 @@ test.describe( 'Post Meta source', () => {
 			).toHaveText( 'new value' );
 		} );
 
-		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by the plugin', async ( {
+		test( 'should be possible to edit the value of the connected custom fields in the inspector control registered by Block Fields experiment', async ( {
 			editor,
 			page,
 		} ) => {
@@ -547,9 +582,9 @@ test.describe( 'Post Meta source', () => {
 				},
 			} );
 			const contentInput = page.getByRole( 'textbox', {
-				name: 'Content',
+				label: 'Content',
 			} );
-			await expect( contentInput ).toHaveValue(
+			await expect( contentInput ).toHaveText(
 				'Movie field default value'
 			);
 			await contentInput.fill( 'new value' );
@@ -572,6 +607,7 @@ test.describe( 'Post Meta source', () => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 			} );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
@@ -583,11 +619,17 @@ test.describe( 'Post Meta source', () => {
 					name: 'content',
 				} )
 				.click();
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Post Meta',
+				} )
+				.click();
 			const movieField = page
-				.getByRole( 'menuitemradio' )
+				.getByRole( 'menuitemcheckbox' )
 				.filter( { hasText: 'Movie field label' } );
 			await expect( movieField ).toBeVisible();
 		} );
+
 		test( 'should not be possible to connect non-supported fields through the attributes panel', async ( {
 			editor,
 			page,
@@ -595,6 +637,7 @@ test.describe( 'Post Meta source', () => {
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 			} );
+			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
@@ -606,33 +649,38 @@ test.describe( 'Post Meta source', () => {
 					name: 'content',
 				} )
 				.click();
+			await page
+				.getByRole( 'menuitem', {
+					name: 'Post Meta',
+				} )
+				.click();
 			await expect(
-				page.getByRole( 'menuitemradio', {
+				page.getByRole( 'menuitemcheckbox', {
 					name: 'String custom field',
 				} )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'menuitemradio', {
+				page.getByRole( 'menuitemcheckbox', {
 					name: 'Number custom field',
 				} )
 			).toBeHidden();
 			await expect(
-				page.getByRole( 'menuitemradio', {
+				page.getByRole( 'menuitemcheckbox', {
 					name: 'Integer custom field',
 				} )
 			).toBeHidden();
 			await expect(
-				page.getByRole( 'menuitemradio', {
+				page.getByRole( 'menuitemcheckbox', {
 					name: 'Boolean custom field',
 				} )
 			).toBeHidden();
 			await expect(
-				page.getByRole( 'menuitemradio', {
+				page.getByRole( 'menuitemcheckbox', {
 					name: 'Object custom field',
 				} )
 			).toBeHidden();
 			await expect(
-				page.getByRole( 'menuitemradio', {
+				page.getByRole( 'menuitemcheckbox', {
 					name: 'Array custom field',
 				} )
 			).toBeHidden();

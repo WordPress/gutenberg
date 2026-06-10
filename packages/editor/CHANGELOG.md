@@ -2,6 +2,79 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+## 14.47.0 (2026-05-27)
+
+### Enhancements
+
+-   Editor: Add padding around inline notices in the editor content area and distraction-free header.
+-   Editor: Pause the client-side media upload queue while the browser is offline and resume it automatically when connectivity returns ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+-   The Media Editor modal is now mounted unconditionally and the `openMediaEditorModal` setting is always provided to the block editor. Previously both were gated behind the `gutenberg-media-editor-modal` experiment, which has been removed.
+
+### Bug Fixes
+
+-   `mediaFinalize` now returns the post-finalize attachment (transformed from the REST response), so the upload-media queue can refresh the in-flight attachment URL. Required for the front-end `srcset` to render on client-side-media uploads that exceeded the big-image threshold.
+-   Template actions panel: Fix the keyboard activation of the "Change template" preview so it only opens the swap modal on <kbd>Enter</kbd> / <kbd>Space</kbd> ([#78641](https://github.com/WordPress/gutenberg/pull/78641)).
+
+## 14.46.0 (2026-05-14)
+
+### Internal
+
+-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+
+## 14.45.0 (2026-04-29)
+
+## 14.44.0 (2026-04-15)
+
+## 14.43.0 (2026-04-01)
+
+## 14.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Fixed avatar contrast ring not displaying over loaded images by using a `::after` pseudo-element instead of an inset `box-shadow`.
+
+## 14.41.0 (2026-03-04)
+
+## 14.40.0 (2026-02-18)
+
+## 14.39.0 (2026-01-29)
+
+## 14.38.0 (2026-01-16)
+
+## 14.36.0 (2025-11-26)
+
+### Internal
+
+-   Applied the `welcome-guide` close-button hover color locally to maintain consistent styling after changes to the shared `Guide` component.
+
+## 14.35.0 (2025-11-12)
+
+## 14.34.0 (2025-10-29)
+
+## 14.33.0 (2025-10-17)
+
+## 14.32.0 (2025-10-01)
+
+## 14.31.0 (2025-09-17)
+
+## 14.30.0 (2025-09-03)
+
+## 14.29.0 (2025-08-20)
+
+## 14.28.0 (2025-08-07)
+
+## 14.27.0 (2025-07-23)
+
+## 14.26.0 (2025-06-25)
+
 ## 14.25.0 (2025-06-04)
 
 ## 14.24.0 (2025-05-22)

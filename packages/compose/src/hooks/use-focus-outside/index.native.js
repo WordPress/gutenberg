@@ -15,8 +15,6 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @typedef {HTMLButtonElement | HTMLLinkElement | HTMLInputElement} FocusNormalizedButton
  */
 
-// Disable reason: Rule doesn't support predicate return types.
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns true if the given element is a button element subject to focus
  * normalization, or false otherwise.
@@ -41,10 +39,9 @@ function isFocusNormalizedButton( eventTarget ) {
 
 	return false;
 }
-/* eslint-enable jsdoc/valid-types */
 
 /**
- * @typedef {import('react').SyntheticEvent} SyntheticEvent
+ * @typedef {React.SyntheticEvent} SyntheticEvent
  */
 
 /**
@@ -58,7 +55,7 @@ function isFocusNormalizedButton( eventTarget ) {
  */
 
 /**
- * @typedef {import('react').MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
+ * @typedef {React.MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
  */
 
 /**
@@ -91,7 +88,7 @@ export default function useFocusOutside( onFocusOutside ) {
 	const preventBlurCheck = useRef( false );
 
 	/**
-	 * @type {import('react').MutableRefObject<number | undefined>}
+	 * @type {React.MutableRefObject<number | undefined>}
 	 */
 	const blurCheckTimeoutId = useRef();
 

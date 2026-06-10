@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { _x, __, sprintf } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,6 +16,9 @@ import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -23,7 +27,23 @@ export { metadata, name };
 export const settings = {
 	icon: linkIcon,
 
-	__experimentalLabel: ( { label } ) => label,
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'list-view' ) {
+			return attributes?.label;
+		}
+
+		if ( context === 'appender' ) {
+			const type = attributes?.type || 'link';
+			return sprintf(
+				/* translators: %s: block type (e.g., 'page', 'post', 'category') */
+				_x( 'Add %s', 'add default block type' ),
+				type
+			);
+		}
+
+		// Backwards compatibility - return label for unknown contexts
+		return attributes?.label;
+	},
 
 	merge( leftAttributes, { label: rightLabel = '' } ) {
 		return {
@@ -88,6 +108,34 @@ export const settings = {
 	],
 	transforms,
 };
+
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
+		{
+			id: 'label',
+			label: __( 'Label' ),
+			type: 'text',
+			Edit: 'rich-text',
+		},
+		{
+			id: 'link',
+			label: __( 'Link' ),
+			type: 'url',
+			Edit: 'link',
+			getValue: ( { item } ) => ( {
+				url: item.url,
+				rel: item.rel,
+			} ),
+			setValue: ( { value } ) => ( {
+				url: value.url,
+				rel: value.rel,
+			} ),
+		},
+	];
+	settings[ formKey ] = {
+		fields: [ 'label', 'link' ],
+	};
+}
 
 export const init = () => {
 	addFilter(

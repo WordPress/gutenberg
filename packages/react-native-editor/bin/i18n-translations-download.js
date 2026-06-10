@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
 
 /**
  * External dependencies
@@ -243,7 +242,7 @@ const getUsedStrings = ( usedStringsFile, domain ) => {
 const generateIndexFile = ( translations, pluginDir ) => {
 	const indexNative = `/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
 /* eslint-disable prettier/prettier */
-	
+
 	const translations = {
 	${ translations
 		.filter( Boolean )
@@ -253,9 +252,9 @@ const generateIndexFile = ( translations, pluginDir ) => {
 		)
 		.join( '\n' ) }
 	};
-	
+
 	export const getTranslation = ( locale ) => translations[ locale ];
-	
+
 /* eslint-enable prettier/prettier */
 `;
 
@@ -312,5 +311,3 @@ if ( require.main === module ) {
 		generateIndexFile( translations, pluginDir );
 	} );
 }
-
-/* eslint-enable no-console */

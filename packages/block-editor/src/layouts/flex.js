@@ -12,24 +12,25 @@ import {
 	arrowDown,
 } from '@wordpress/icons';
 import {
-	ToggleControl,
 	Flex,
-	FlexItem,
+	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { appendSelectors, getBlockGapCSS } from './utils';
-import { getGapCSSValue } from '../hooks/gap';
+import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import {
 	BlockControls,
 	JustifyContentControl,
 	BlockVerticalAlignmentControl,
 } from '../components';
-import { shouldSkipSerialization } from '../hooks/utils';
+import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
 // Used with the default, horizontal flex orientation.
@@ -70,30 +71,111 @@ export default {
 		layout = {},
 		onChange,
 		layoutBlockSupport = {},
+		resetLayout = {},
+		clientId,
 	} ) {
-		const { allowOrientation = true, allowJustification = true } =
-			layoutBlockSupport;
+		const {
+			allowOrientation = true,
+			allowJustification = true,
+			allowWrap = true,
+		} = layoutBlockSupport;
+		const hasLayoutValue = ( key, defaultValue ) =>
+			( layout?.[ key ] ?? defaultValue ) !==
+			( resetLayout?.[ key ] ?? defaultValue );
+		const hasJustificationValue = () =>
+			hasLayoutValue( 'justifyContent', 'left' );
+		const hasOrientationValue = () =>
+			hasLayoutValue( 'orientation', 'horizontal' );
+		const hasWrapValue = () => hasLayoutValue( 'flexWrap', 'wrap' );
+		const resetJustification = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					justifyContent: resetLayout?.justifyContent,
+				} )
+			);
+		const resetOrientation = () => {
+			const { verticalAlignment, justifyContent } = layout;
+			const nextOrientation = resetLayout?.orientation;
+			const isHorizontal =
+				! nextOrientation || nextOrientation === 'horizontal';
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					orientation: nextOrientation,
+					verticalAlignment:
+						resetLayout?.verticalAlignment ??
+						( isHorizontal && verticalAlignment === 'space-between'
+							? 'center'
+							: verticalAlignment ),
+					justifyContent:
+						resetLayout?.justifyContent ??
+						( isHorizontal && justifyContent === 'stretch'
+							? 'left'
+							: justifyContent ),
+				} )
+			);
+		};
+		const resetWrap = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					flexWrap: resetLayout?.flexWrap,
+				} )
+			);
+
 		return (
 			<>
-				<Flex>
-					{ allowJustification && (
-						<FlexItem>
-							<FlexLayoutJustifyContentControl
-								layout={ layout }
-								onChange={ onChange }
-							/>
-						</FlexItem>
-					) }
-					{ allowOrientation && (
-						<FlexItem>
-							<OrientationControl
-								layout={ layout }
-								onChange={ onChange }
-							/>
-						</FlexItem>
-					) }
-				</Flex>
-				<FlexWrapControl layout={ layout } onChange={ onChange } />
+				{ ( allowJustification || allowOrientation ) && (
+					<Flex
+						align="flex-start"
+						className="block-editor-hooks__flex-layout-controls"
+						gap={ 4 }
+						justify="flex-start"
+					>
+						{ allowJustification && (
+							<ToolsPanelItem
+								label={ __( 'Justification' ) }
+								hasValue={ hasJustificationValue }
+								onDeselect={ resetJustification }
+								isShownByDefault
+								panelId={ clientId }
+							>
+								<FlexLayoutJustifyContentControl
+									layout={ layout }
+									onChange={ onChange }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ allowOrientation && (
+							<ToolsPanelItem
+								label={ __( 'Orientation' ) }
+								hasValue={ hasOrientationValue }
+								onDeselect={ resetOrientation }
+								isShownByDefault
+								panelId={ clientId }
+							>
+								<OrientationControl
+									layout={ layout }
+									onChange={ onChange }
+								/>
+							</ToolsPanelItem>
+						) }
+					</Flex>
+				) }
+				{ allowWrap && (
+					<ToolsPanelItem
+						label={ __( 'Wrapping' ) }
+						hasValue={ hasWrapValue }
+						onDeselect={ resetWrap }
+						panelId={ clientId }
+					>
+						<FlexWrapControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
+				) }
 			</>
 		);
 	},
@@ -129,50 +211,92 @@ export default {
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
-		layout,
+		layout = {},
+		viewportOverrides,
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const { orientation = 'horizontal' } = layout;
+		const hasViewportOverrides = viewportOverrides !== undefined;
+		const effectiveLayout = hasViewportOverrides
+			? { ...layout, ...viewportOverrides }
+			: layout;
+		const hasViewportOverride = ( key ) =>
+			Object.hasOwn( viewportOverrides || {}, key );
+		const { orientation = 'horizontal' } = effectiveLayout;
+
+		// Determine the fallback gap value using global styles (theme.json),
+		// falling back to '0.5em' for backwards compatibility.
+		let fallbackGapValue = '0.5em';
+		if ( globalBlockGapValue ) {
+			const gapBox =
+				getGapBoxControlValueFromStyle( globalBlockGapValue );
+			fallbackGapValue =
+				getSpacingPresetCssVar( gapBox?.left ) ||
+				getSpacingPresetCssVar( gapBox?.top ) ||
+				'0.5em';
+		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
+				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
-		const justifyContent = justifyContentMap[ layout.justifyContent ];
-		const flexWrap = flexWrapOptions.includes( layout.flexWrap )
-			? layout.flexWrap
+		const hasBlockGapOverride =
+			! hasViewportOverrides ||
+			Object.hasOwn( style?.spacing || {}, 'blockGap' );
+		const justifyContent =
+			justifyContentMap[ effectiveLayout.justifyContent ];
+		const flexWrap = flexWrapOptions.includes( effectiveLayout.flexWrap )
+			? effectiveLayout.flexWrap
 			: 'wrap';
 		const verticalAlignment =
-			verticalAlignmentMap[ layout.verticalAlignment ];
+			verticalAlignmentMap[ effectiveLayout.verticalAlignment ];
 		const alignItems =
-			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
+			alignItemsMap[ effectiveLayout.justifyContent ] ||
+			alignItemsMap.left;
 
 		let output = '';
 		const rules = [];
 
-		if ( flexWrap && flexWrap !== 'wrap' ) {
+		const shouldOutputFlexWrap =
+			! hasViewportOverrides || hasViewportOverride( 'flexWrap' );
+		const shouldOutputFlexOrientation =
+			! hasViewportOverrides || hasViewportOverride( 'orientation' );
+		const shouldOutputFlexJustification =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'justifyContent' ) ||
+			hasViewportOverride( 'orientation' );
+		const shouldOutputFlexAlignment =
+			! hasViewportOverrides ||
+			hasViewportOverride( 'verticalAlignment' ) ||
+			hasViewportOverride( 'orientation' );
+
+		if ( shouldOutputFlexWrap && flexWrap && flexWrap !== 'wrap' ) {
 			rules.push( `flex-wrap: ${ flexWrap }` );
 		}
 
 		if ( orientation === 'horizontal' ) {
-			if ( verticalAlignment ) {
+			if ( shouldOutputFlexAlignment && verticalAlignment ) {
 				rules.push( `align-items: ${ verticalAlignment }` );
 			}
-			if ( justifyContent ) {
+			if ( shouldOutputFlexJustification && justifyContent ) {
 				rules.push( `justify-content: ${ justifyContent }` );
 			}
 		} else {
-			if ( verticalAlignment ) {
+			if ( shouldOutputFlexAlignment && verticalAlignment ) {
 				rules.push( `justify-content: ${ verticalAlignment }` );
 			}
-			rules.push( 'flex-direction: column' );
-			rules.push( `align-items: ${ alignItems }` );
+			if ( shouldOutputFlexOrientation ) {
+				rules.push( 'flex-direction: column' );
+			}
+			if ( shouldOutputFlexJustification ) {
+				rules.push( `align-items: ${ alignItems }` );
+			}
 		}
 
 		if ( rules.length ) {
@@ -182,7 +306,7 @@ export default {
 		}
 
 		// Output blockGap styles based on rules contained in layout definitions in theme.json.
-		if ( hasBlockGapSupport && blockGapValue ) {
+		if ( hasBlockGapSupport && hasBlockGapOverride && blockGapValue ) {
 			output += getBlockGapCSS(
 				selector,
 				layoutDefinitions,
@@ -298,7 +422,6 @@ function FlexLayoutJustifyContentControl( {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -322,7 +445,6 @@ function FlexWrapControl( { layout, onChange } ) {
 	const { flexWrap = 'wrap' } = layout;
 	return (
 		<ToggleControl
-			__nextHasNoMarginBottom
 			label={ __( 'Allow to wrap to multiple lines' ) }
 			onChange={ ( value ) => {
 				onChange( {
@@ -344,7 +466,6 @@ function OrientationControl( { layout, onChange } ) {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }

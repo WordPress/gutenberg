@@ -6,7 +6,7 @@ import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -55,7 +55,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 		);
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ items.length > 1
 						? sprintf(
 								// translators: %d: number of items to delete.
@@ -71,7 +71,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 								_x( 'Delete "%s"?', 'template part' ),
 								getItemTitle( items[ 0 ] )
 						  ) }
-				</Text>
+				</WCText>
 				<HStack justify="right">
 					<Button
 						variant="tertiary"
@@ -94,7 +94,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 										getMessage: ( item ) => {
 											return isResetting
 												? sprintf(
-														/* translators: The template/part's name. */
+														/* translators: %s: The template/part's name. */
 														__( '"%s" reset.' ),
 														decodeEntities(
 															getItemTitle( item )

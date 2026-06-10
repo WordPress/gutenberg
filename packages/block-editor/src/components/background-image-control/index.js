@@ -13,10 +13,9 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
 	DropZone,
-	FlexItem,
+	FlexBlock,
 	FocalPointPicker,
 	MenuItem,
-	VisuallyHidden,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Dropdown,
@@ -25,6 +24,8 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
+import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
@@ -32,11 +33,11 @@ import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
+import { getResolvedValue } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getResolvedValue } from '../global-styles/utils';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
@@ -56,6 +57,24 @@ const BACKGROUND_POPOVER_PROPS = {
 	className: 'block-editor-global-styles-background-panel__popover',
 };
 const noop = () => {};
+
+/**
+ * Focuses the toggle button.
+ * @param {Object} containerRef - ref object containing current element
+ */
+const focusToggleButton = ( containerRef ) => {
+	// Use requestAnimationFrame to ensure DOM updates are complete
+	window.requestAnimationFrame( () => {
+		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		if ( ! toggleButton ) {
+			return;
+		}
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton.focus();
+	} );
+};
 
 /**
  * Get the help text for the background size control.
@@ -115,7 +134,6 @@ function InspectorImagePreviewItem( {
 	toggleProps = {},
 	filename,
 	label,
-	className,
 	onToggleCallback = noop,
 } ) {
 	const { isOpen, ...restToggleProps } = toggleProps;
@@ -128,32 +146,23 @@ function InspectorImagePreviewItem( {
 
 	const renderPreviewContent = () => {
 		return (
-			<HStack
-				justify="flex-start"
-				as="span"
-				className="block-editor-global-styles-background-panel__inspector-preview-inner"
-			>
-				{ imgUrl && (
-					<span
-						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
-						aria-hidden
-					>
-						<span
-							className="block-editor-global-styles-background-panel__inspector-image-indicator"
-							style={ {
-								backgroundImage: `url(${ imgUrl })`,
-							} }
-						/>
-					</span>
-				) }
-				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
+			<HStack className="block-editor-global-styles-background-panel__inspector-preview-inner">
+				<span
+					className="block-editor-global-styles-background-panel__inspector-image-indicator"
+					style={ {
+						backgroundImage: imgUrl
+							? `url(${ imgUrl })`
+							: undefined,
+					} }
+				/>
+				<FlexBlock>
 					<Truncate
 						numberOfLines={ 1 }
 						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
 					>
 						{ label }
 					</Truncate>
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
@@ -162,18 +171,13 @@ function InspectorImagePreviewItem( {
 							  )
 							: __( 'No background image selected' ) }
 					</VisuallyHidden>
-				</FlexItem>
+				</FlexBlock>
 			</HStack>
 		);
 	};
 
 	return as === 'button' ? (
-		<Button
-			__next40pxDefaultSize
-			className={ className }
-			{ ...restToggleProps }
-			aria-expanded={ isOpen }
-		>
+		<Button __next40pxDefaultSize { ...restToggleProps }>
 			{ renderPreviewContent() }
 		</Button>
 	) : (
@@ -188,13 +192,14 @@ function BackgroundControlsPanel( {
 	children,
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
+	onReset,
+	containerRef,
 } ) {
 	if ( ! hasImageValue ) {
 		return;
 	}
 
-	const imgLabel =
-		label || getFilename( imgUrl ) || __( 'Add background image' );
+	const imgLabel = label || getFilename( imgUrl ) || __( 'Image' );
 
 	return (
 		<Dropdown
@@ -211,14 +216,34 @@ function BackgroundControlsPanel( {
 					isOpen,
 				};
 				return (
-					<InspectorImagePreviewItem
-						imgUrl={ imgUrl }
-						filename={ filename }
-						label={ imgLabel }
-						toggleProps={ toggleProps }
-						as="button"
-						onToggleCallback={ onToggleCallback }
-					/>
+					<>
+						<InspectorImagePreviewItem
+							imgUrl={ imgUrl }
+							filename={ filename }
+							label={ imgLabel }
+							toggleProps={ toggleProps }
+							as="button"
+							onToggleCallback={ onToggleCallback }
+						/>
+						{ onReset && (
+							<Button
+								__next40pxDefaultSize
+								label={ __( 'Reset' ) }
+								className="block-editor-global-styles-background-panel__reset"
+								size="small"
+								icon={ resetIcon }
+								onClick={ () => {
+									onReset();
+									// Close the dropdown if open.
+									if ( isOpen ) {
+										onToggle();
+									}
+									// Focus the toggle button.
+									focusToggleButton( containerRef );
+								} }
+							/>
+						) }
+					</>
 				);
 			} }
 			renderContent={ () => (
@@ -325,7 +350,7 @@ function BackgroundImageControls( {
 		);
 		setIsUploading( false );
 		// Close the dropdown and focus the toggle button.
-		closeAndFocus();
+		focusToggleButton( containerRef );
 	};
 
 	// Drag and drop callback, restricting image to one.
@@ -343,22 +368,6 @@ function BackgroundImageControls( {
 
 	const hasValue = hasBackgroundImageValue( style );
 
-	const closeAndFocus = () => {
-		// Use requestAnimationFrame to ensure DOM updates are complete
-		window.requestAnimationFrame( () => {
-			const [ toggleButton ] = focus.tabbable.find(
-				containerRef?.current
-			);
-			if ( ! toggleButton ) {
-				return;
-			}
-			// Focus the toggle button and close the dropdown menu.
-			// This ensures similar behaviour as to selecting an image, where the dropdown is
-			// closed and focus is redirected to the dropdown toggle button.
-			toggleButton.focus();
-		} );
-	};
-
 	const onRemove = () =>
 		onChange(
 			setImmutably( style, [ 'background' ], {
@@ -366,8 +375,7 @@ function BackgroundImageControls( {
 			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
-	const imgLabel =
-		title || getFilename( url ) || __( 'Add background image' );
+	const imgLabel = title || getFilename( url ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">
@@ -386,7 +394,6 @@ function BackgroundImageControls( {
 				} }
 				name={
 					<InspectorImagePreviewItem
-						className="block-editor-global-styles-background-panel__image-preview"
 						imgUrl={ url }
 						filename={ title }
 						label={ imgLabel }
@@ -397,14 +404,14 @@ function BackgroundImageControls( {
 				) }
 				onError={ onUploadError }
 				onReset={ () => {
-					closeAndFocus();
+					focusToggleButton( containerRef );
 					onResetImage();
 				} }
 			>
 				{ canRemove && (
 					<MenuItem
 						onClick={ () => {
-							closeAndFocus();
+							focusToggleButton( containerRef );
 							onRemove();
 							onRemoveImage();
 						} }
@@ -561,20 +568,17 @@ function BackgroundSizeControls( {
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
-				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
 				url={ imageValue }
 				value={ backgroundPositionToCoords( backgroundPositionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Fixed background' ) }
 				checked={ attachmentValue === 'fixed' }
 				onChange={ toggleScrollWithPage }
 			/>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
 				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
@@ -624,7 +628,6 @@ function BackgroundSizeControls( {
 					}
 				/>
 				<ToggleControl
-					__nextHasNoMarginBottom
 					label={ __( 'Repeat' ) }
 					checked={ repeatCheckedValue }
 					onChange={ toggleIsRepeated }
@@ -720,6 +723,8 @@ export default function BackgroundImagePanel( {
 					url={ url }
 					onToggle={ setIsDropDownOpen }
 					hasImageValue={ hasImageValue }
+					onReset={ resetBackground }
+					containerRef={ containerRef }
 				>
 					<VStack spacing={ 3 } className="single-column">
 						<BackgroundImageControls

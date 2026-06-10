@@ -19,7 +19,7 @@ component, and the `Menu.Popover` component.
 
 ### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 517 more ...`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -57,7 +57,7 @@ override the `defaultOpen` prop.
 
 ### `onOpenChange`
 
- - Type: `(open: boolean) => void`
+ - Type: `((open: boolean) => void)`
  - Required: No
 
 A callback that gets called when the `open` state changes.

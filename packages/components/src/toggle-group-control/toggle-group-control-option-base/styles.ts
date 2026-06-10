@@ -52,7 +52,6 @@ export const buttonView = ( {
 	text-align: center;
 	@media not ( prefers-reduced-motion ) {
 		transition:
-			background ${ CONFIG.transitionDurationFast } linear,
 			color ${ CONFIG.transitionDurationFast } linear,
 			font-weight 60ms linear;
 	}
@@ -64,13 +63,14 @@ export const buttonView = ( {
 		border: 0;
 	}
 
-	&[disabled] {
+	&[disabled],
+	&[aria-disabled='true'] {
 		opacity: 0.4;
 		cursor: default;
 	}
 
-	&:active {
-		background: ${ COLORS.ui.background };
+	&:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+		color: ${ COLORS.theme.foreground };
 	}
 
 	${ isDeselectable && deselectable }
@@ -79,21 +79,20 @@ export const buttonView = ( {
 `;
 
 const pressed = css`
-	color: ${ COLORS.theme.foregroundInverted };
-
-	&:active {
-		background: transparent;
-	}
+	color: ${ COLORS.theme.foreground };
+	font-weight: ${ CONFIG.fontWeightMedium };
 `;
 
 const deselectable = css`
-	color: ${ COLORS.theme.foreground };
-
 	&:focus {
-		box-shadow:
-			inset 0 0 0 1px ${ COLORS.ui.background },
-			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
-		outline: 2px solid transparent;
+		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
+		outline-offset: 2px;
+
+		// Hide overlapping border
+		&[aria-pressed='false'] {
+			background: ${ COLORS.ui.background };
+			box-shadow: 0 0 0 2px ${ COLORS.ui.background };
+		}
 	}
 `;
 
@@ -107,12 +106,11 @@ const isIconStyles = ( {
 	size = 'default',
 }: Pick< ToggleGroupControlProps, 'size' > ) => {
 	const iconButtonSizes = {
-		default: '30px',
-		'__unstable-large': '32px',
+		default: '34px',
+		'__unstable-large': '38px',
 	};
 
 	return css`
-		color: ${ COLORS.theme.foreground };
 		height: ${ iconButtonSizes[ size ] };
 		aspect-ratio: 1;
 		padding-left: 0;

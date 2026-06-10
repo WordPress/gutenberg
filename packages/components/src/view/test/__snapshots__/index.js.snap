@@ -3,7 +3,7 @@
 exports[`props should render as another element 1`] = `
 <div>
   <p
-    class="emotion-0 emotion-1"
+    class="css-1ragr82-PolymorphicDiv emotion-0"
   >
     <span />
   </p>
@@ -13,7 +13,7 @@ exports[`props should render as another element 1`] = `
 exports[`props should render correctly 1`] = `
 <div>
   <div
-    class="emotion-0 emotion-1"
+    class="css-1ragr82-PolymorphicDiv emotion-0"
   >
     <span />
   </div>
@@ -23,7 +23,7 @@ exports[`props should render correctly 1`] = `
 exports[`props should render with custom styles (Array) 1`] = `
 <div>
   <p
-    class="emotion-0 emotion-1"
+    class="css-1ragr82-PolymorphicDiv emotion-0"
   >
     <span />
   </p>
@@ -33,7 +33,7 @@ exports[`props should render with custom styles (Array) 1`] = `
 exports[`props should render with custom styles (object) 1`] = `
 <div>
   <p
-    class="emotion-0 emotion-1"
+    class="css-1ragr82-PolymorphicDiv emotion-0"
   >
     <span />
   </p>
@@ -43,7 +43,7 @@ exports[`props should render with custom styles (object) 1`] = `
 exports[`props should render with custom styles (string) 1`] = `
 <div>
   <p
-    class="emotion-0 emotion-1"
+    class="css-1ragr82-PolymorphicDiv emotion-0"
   >
     <span />
   </p>

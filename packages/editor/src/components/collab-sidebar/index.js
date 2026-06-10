@@ -2,370 +2,235 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useSelect,
-	useDispatch,
-	resolveSelect,
-	subscribe,
-} from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
-import { addFilter } from '@wordpress/hooks';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
-import { collabHistorySidebarName, collabSidebarName } from './constants';
-import { Comments } from './comments';
-import { AddComment } from './add-comment';
+import {
+	ALL_NOTES_SIDEBAR,
+	FLOATING_NOTES_SIDEBAR,
+	SIDEBARS,
+} from './constants';
+import { Notes } from './notes';
 import { store as editorStore } from '../../store';
-import AddCommentButton from './comment-button';
-import AddCommentToolbarButton from './comment-button-toolbar';
-import { useGlobalStylesContext } from '../global-styles-provider';
-import { getCommentIdsFromBlocks } from './utils';
+import { AddNoteMenuItem } from './add-note-menu-item';
+import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { useGlobalStyles } from '../global-styles';
+import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
+import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import PostTypeSupportCheck from '../post-type-support-check';
+import { unlock } from '../../lock-unlock';
 
-const modifyBlockCommentAttributes = ( settings ) => {
-	if ( ! settings.attributes.blockCommentId ) {
-		settings.attributes = {
-			...settings.attributes,
-			blockCommentId: {
-				type: 'number',
-			},
-		};
-	}
-
-	return settings;
-};
-
-// Apply the filter to all core blocks
-addFilter(
-	'blocks.registerBlockType',
-	'block-comment/modify-core-block-attributes',
-	modifyBlockCommentAttributes
-);
-
-function CollabSidebarContent( {
-	showCommentBoard,
-	setShowCommentBoard,
-	styles,
-	comments,
-} ) {
-	const { createNotice } = useDispatch( noticesStore );
-	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
-	const { getEntityRecord } = resolveSelect( coreStore );
-
-	const { postId } = useSelect( ( select ) => {
-		const { getCurrentPostId } = select( editorStore );
-		const _postId = getCurrentPostId();
-
-		return {
-			postId: _postId,
-		};
-	}, [] );
-
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	// Function to save the comment.
-	const addNewComment = async ( comment, parentCommentId ) => {
-		const args = {
-			post: postId,
-			content: comment,
-			comment_type: 'block_comment',
-			comment_approved: 0,
-		};
-
-		// Create a new object, conditionally including the parent property
-		const updatedArgs = {
-			...args,
-			...( parentCommentId ? { parent: parentCommentId } : {} ),
-		};
-
-		const savedRecord = await saveEntityRecord(
-			'root',
-			'comment',
-			updatedArgs
-		);
-
-		if ( savedRecord ) {
-			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parentCommentId ) {
-				updateBlockAttributes( getSelectedBlockClientId(), {
-					blockCommentId: savedRecord?.id,
-				} );
-			}
-
-			createNotice(
-				'snackbar',
-				parentCommentId
-					? // translators: Reply added successfully
-					  __( 'Reply added successfully.' )
-					: // translators: Comment added successfully
-					  __( 'Comment added successfully.' ),
-				{
-					type: 'snackbar',
-					isDismissible: true,
-				}
-			);
-		} else {
-			onError();
-		}
-	};
-
-	const onCommentResolve = async ( commentId ) => {
-		const savedRecord = await saveEntityRecord( 'root', 'comment', {
-			id: commentId,
-			status: 'approved',
-		} );
-
-		if ( savedRecord ) {
-			// translators: Comment resolved successfully
-			createNotice( 'snackbar', __( 'Comment marked as resolved.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} else {
-			onError();
-		}
-	};
-
-	const onEditComment = async ( commentId, comment ) => {
-		const savedRecord = await saveEntityRecord( 'root', 'comment', {
-			id: commentId,
-			content: comment,
-		} );
-
-		if ( savedRecord ) {
-			createNotice(
-				'snackbar',
-				// translators: Comment edited successfully
-				__( 'Comment edited successfully.' ),
-				{
-					type: 'snackbar',
-					isDismissible: true,
-				}
-			);
-		} else {
-			onError();
-		}
-	};
-
-	const onError = () => {
-		createNotice(
-			'error',
-			// translators: Error message when comment submission fails
-			__(
-				'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
-			),
-			{
-				isDismissible: true,
-			}
-		);
-	};
-
-	const onCommentDelete = async ( commentId ) => {
-		const childComment = await getEntityRecord(
-			'root',
-			'comment',
-			commentId
-		);
-		await deleteEntityRecord( 'root', 'comment', commentId );
-
-		if ( childComment && ! childComment.parent ) {
-			updateBlockAttributes( getSelectedBlockClientId(), {
-				blockCommentId: undefined,
-			} );
-		}
-
-		createNotice(
-			'snackbar',
-			// translators: Comment deleted successfully
-			__( 'Comment deleted successfully.' ),
-			{
-				type: 'snackbar',
-				isDismissible: true,
-			}
-		);
-	};
-
-	return (
-		<div className="editor-collab-sidebar-panel" style={ styles }>
-			<AddComment
-				onSubmit={ addNewComment }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-			/>
-			<Comments
-				key={ getSelectedBlockClientId() }
-				threads={ comments }
-				onEditComment={ onEditComment }
-				onAddReply={ addNewComment }
-				onCommentDelete={ onCommentDelete }
-				onCommentResolve={ onCommentResolve }
-				showCommentBoard={ showCommentBoard }
-				setShowCommentBoard={ setShowCommentBoard }
-			/>
-		</div>
-	);
-}
-
-/**
- * Renders the Collab sidebar.
- */
-export default function CollabSidebar() {
-	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { toggleBlockSpotlight, selectBlock } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const sidebarRef = useRef( null );
 
-	const { postId, postType, postStatus, threads } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
-		const _postId = getCurrentPostId();
-		const data =
-			!! _postId && typeof _postId === 'number'
-				? select( coreStore ).getEntityRecords( 'root', 'comment', {
-						post: _postId,
-						type: 'block_comment',
-						status: 'any',
-						per_page: 100,
-				  } )
-				: null;
-		return {
-			postId: _postId,
-			postType: getCurrentPostType(),
-			postStatus:
-				select( editorStore ).getEditedPostAttribute( 'status' ),
-			threads: data,
-		};
-	}, [] );
-
-	const { blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
+	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
-
 		return {
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.blockCommentId
+			clientId: _clientId,
+			noteId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
 				: null,
+			isClassicBlock: _clientId
+				? getBlockName( _clientId ) === 'core/freeform'
+				: false,
 		};
 	}, [] );
 
-	const openCollabBoard = () => {
-		setShowCommentBoard( true );
-		enableComplementaryArea( 'core', 'edit-post/collab-sidebar' );
-	};
+	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
+	const { isDistractionFree } = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		return {
+			isDistractionFree: get( 'core', 'distractionFree' ),
+		};
+	}, [] );
+	const selectedNote = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
 
-	const [ blocks ] = useEntityBlockEditor( 'postType', postType, {
-		id: postId,
-	} );
+	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
-	// Process comments to build the tree structure
-	const { resultComments, sortedThreads } = useMemo( () => {
-		// Create a compare to store the references to all objects by id
-		const compare = {};
-		const result = [];
+	// Only enable the floating sidebar for large viewports.
+	const showFloatingSidebar = isLargeViewport;
+	// Fallback to "All notes" sidebar on smaller viewports.
+	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
+	useEnableFloatingSidebar(
+		showFloatingSidebar &&
+			( unresolvedNotes.length > 0 || selectedNote !== undefined )
+	);
 
-		const filteredComments = ( threads ?? [] ).filter(
-			( comment ) => comment.status !== 'trash'
-		);
-
-		// Initialize each object with an empty `reply` array
-		filteredComments.forEach( ( item ) => {
-			compare[ item.id ] = { ...item, reply: [] };
-		} );
-
-		// Iterate over the data to build the tree structure
-		filteredComments.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		if ( 0 === result?.length ) {
-			return { resultComments: [], sortedThreads: [] };
+	async function focusNote( {
+		targetClientId,
+		noteId: targetNoteId,
+		isApproved,
+	} ) {
+		if ( ! targetClientId ) {
+			return;
 		}
 
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
+		const prevArea = await getActiveComplementaryArea( 'core' );
+		if ( isApproved ) {
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
+		} else if ( ! SIDEBARS.includes( prevArea ) || ! showAllNotesSidebar ) {
+			enableComplementaryArea(
+				'core',
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
+			);
+		}
 
-		const blockCommentIds = getCommentIdsFromBlocks( blocks );
+		const currentArea = await getActiveComplementaryArea( 'core' );
+		// Bail out if the current active area is not one of note sidebars.
+		if ( ! SIDEBARS.includes( currentArea ) ) {
+			return;
+		}
 
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ thread.id, thread ] )
+		// A special case for the List View, where block selection isn't required to trigger an action.
+		// The action won't do anything if the block is already selected.
+		selectBlock( targetClientId, null );
+		toggleBlockSpotlight( targetClientId, true );
+		selectNote( targetNoteId, { focus: true } );
+	}
+
+	function openNoteForBlock( targetClientId ) {
+		// A block can carry multiple threads; surface the most relevant.
+		const blockThreads = notes.filter(
+			( thread ) => thread.blockClientId === targetClientId
 		);
-
-		const sortedComments = blockCommentIds
-			.map( ( id ) => threadIdMap.get( id ) )
-			.filter( ( thread ) => thread !== undefined );
-
-		return { resultComments: updatedResult, sortedThreads: sortedComments };
-	}, [ threads, blocks ] );
-
-	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStylesContext();
-	const backgroundColor = GlobalStyles?.styles?.color?.background;
-
-	if ( 0 < resultComments.length ) {
-		const unsubscribe = subscribe( () => {
-			const activeSidebar = getActiveComplementaryArea( 'core' );
-
-			if ( ! activeSidebar ) {
-				enableComplementaryArea( 'core', collabSidebarName );
-				unsubscribe();
-			}
+		const target = pickPrimaryNote( blockThreads );
+		return focusNote( {
+			targetClientId,
+			noteId: target?.id ?? 'new',
+			isApproved: target?.status === 'approved',
 		} );
 	}
 
-	if ( postStatus === 'publish' ) {
-		return null; // or maybe return some message indicating no threads are available.
+	function addNewNoteForBlock( targetClientId ) {
+		return focusNote( {
+			targetClientId,
+			noteId: 'new',
+			isApproved: false,
+		} );
 	}
 
-	const AddCommentComponent = blockCommentId
-		? AddCommentToolbarButton
-		: AddCommentButton;
+	useShortcut(
+		'core/editor/new-note',
+		( event ) => {
+			event.preventDefault();
+			addNewNoteForBlock( clientId );
+		},
+		{
+			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
+		}
+	);
+
+	// Get the global styles to set the background color of the sidebar.
+	const { merged: GlobalStyles } = useGlobalStyles();
+	const backgroundColor = GlobalStyles?.styles?.color?.background;
+
+	// Surface one thread for the avatar indicator.
+	const currentThreads =
+		blockNoteIds.length > 0
+			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
+			: [];
+	const currentThread = pickPrimaryNote( currentThreads );
+
+	if ( isDistractionFree ) {
+		return <AddNoteMenuItem isDistractionFree />;
+	}
 
 	return (
 		<>
-			<AddCommentComponent onClick={ openCollabBoard } />
-			<PluginSidebar
-				identifier={ collabHistorySidebarName }
-				// translators: Comments sidebar title
-				title={ __( 'Comments' ) }
-				icon={ commentIcon }
-			>
-				<CollabSidebarContent
-					comments={ resultComments }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
+			{ !! currentThread && (
+				<NoteAvatarIndicator
+					note={ currentThread }
+					onClick={ () => openNoteForBlock( clientId ) }
 				/>
-			</PluginSidebar>
-			<PluginSidebar
-				isPinnable={ false }
-				header={ false }
-				identifier={ collabSidebarName }
-				className="editor-collab-sidebar"
-				headerClassName="editor-collab-sidebar__header"
-			>
-				<CollabSidebarContent
-					comments={ sortedThreads }
-					showCommentBoard={ showCommentBoard }
-					setShowCommentBoard={ setShowCommentBoard }
-					styles={ {
-						backgroundColor,
-					} }
-				/>
-			</PluginSidebar>
+			) }
+			<AddNoteMenuItem
+				onClick={ ( menuClientId ) =>
+					addNewNoteForBlock( menuClientId )
+				}
+			/>
+			{ showAllNotesSidebar && (
+				<PluginSidebar
+					identifier={ ALL_NOTES_SIDEBAR }
+					name={ ALL_NOTES_SIDEBAR }
+					title={ __( 'All notes' ) }
+					header={
+						<h2 className="interface-complementary-area-header__title">
+							{ __( 'All notes' ) }
+						</h2>
+					}
+					icon={ commentIcon }
+					closeLabel={ __( 'Close Notes' ) }
+				>
+					<Notes notes={ notes } sidebarRef={ sidebarRef } />
+				</PluginSidebar>
+			) }
+			{ isLargeViewport && (
+				<PluginSidebar
+					isPinnable={ false }
+					header={ false }
+					identifier={ FLOATING_NOTES_SIDEBAR }
+					className="editor-collab-sidebar"
+					headerClassName="editor-collab-sidebar__header"
+					backgroundColor={ backgroundColor }
+				>
+					<Notes
+						notes={ unresolvedNotes }
+						sidebarRef={ sidebarRef }
+						styles={ { backgroundColor } }
+						isFloating
+					/>
+				</PluginSidebar>
+			) }
 		</>
+	);
+}
+
+export default function NotesSidebarContainer() {
+	const { postId, editorMode, revisionsMode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getEditorMode, isRevisionsMode } = unlock(
+			select( editorStore )
+		);
+		return {
+			postId: getCurrentPostId(),
+			editorMode: getEditorMode(),
+			revisionsMode: isRevisionsMode(),
+		};
+	}, [] );
+
+	if ( ! postId || typeof postId !== 'number' ) {
+		return null;
+	}
+
+	// Hide Notes sidebar for Code Editor and in-editor revision mode.
+	if ( editorMode === 'text' || revisionsMode ) {
+		return null;
+	}
+
+	return (
+		<PostTypeSupportCheck supportKeys="editor.notes">
+			<NotesSidebar postId={ postId } />
+		</PostTypeSupportCheck>
 	);
 }

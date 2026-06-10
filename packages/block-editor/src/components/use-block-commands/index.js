@@ -16,13 +16,16 @@ import {
 	plus as add,
 	group,
 	ungroup,
+	seen,
+	unseen,
+	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -90,8 +93,8 @@ const getTransformCommands = () =>
 		}
 
 		// Simple block transformation based on the `Block Transforms` API.
-		function onBlockTransform( name ) {
-			const newBlocks = switchToBlockType( blocks, name );
+		function onBlockTransform( name, variationName ) {
+			const newBlocks = switchToBlockType( blocks, name, variationName );
 			replaceBlocks( clientIds, newBlocks );
 			selectForMultipleBlocks( newBlocks );
 		}
@@ -114,16 +117,28 @@ const getTransformCommands = () =>
 
 		const commands = possibleBlockTransformations.map(
 			( transformation ) => {
-				const { name, title, icon } = transformation;
+				const { id, name, title, icon, variationName } = transformation;
+				/*
+				 * Command menu uses Icon from @wordpress/icons, which expects a ReactElement
+				 * (cloneElement). Normalize to blockDefaultIcon to avoid crash. See #55668 / PR #55676.
+				 */
+				const blockIcon =
+					! icon?.src || icon?.src === 'block-default'
+						? {
+								src: blockDefaultIcon,
+						  }
+						: icon;
+
 				return {
 					name:
 						'core/block-editor/transform-to-' +
-						name.replace( '/', '-' ),
+						( id || name ).replace( /\//g, '-' ),
 					/* translators: %s: Block or block variation name. */
 					label: sprintf( __( 'Transform to %s' ), title ),
-					icon: <BlockIcon icon={ icon } />,
+					icon: blockIcon?.src,
+					category: 'command',
 					callback: ( { close } ) => {
-						onBlockTransform( name );
+						onBlockTransform( name, variationName );
 						close();
 					},
 				};
@@ -157,19 +172,22 @@ const getQuickActionsCommands = () =>
 			getBlockRootClientId,
 			getBlocksByClientId,
 			canRemoveBlocks,
-		} = useSelect( blockEditorStore );
+			isBlockHiddenAnywhere,
+		} = unlock( useSelect( blockEditorStore ) );
+		const { getBlockEditingMode } = useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
 
 		const blocks = getBlocksByClientId( clientIds );
 
+		const blockEditorDispatch = useDispatch( blockEditorStore );
 		const {
 			removeBlocks,
 			replaceBlocks,
 			duplicateBlocks,
 			insertAfterBlock,
 			insertBeforeBlock,
-		} = useDispatch( blockEditorStore );
+		} = blockEditorDispatch;
 
 		const onGroup = () => {
 			if ( ! blocks.length ) {
@@ -204,6 +222,7 @@ const getQuickActionsCommands = () =>
 			return { isLoading: false, commands: [] };
 		}
 
+		const { showViewportModal } = unlock( blockEditorDispatch );
 		const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 		const canInsertDefaultBlock = canInsertBlockType(
 			getDefaultBlockName(),
@@ -283,11 +302,32 @@ const getQuickActionsCommands = () =>
 			} );
 		}
 
+		const supportsVisibility = blocks.every(
+			( block ) =>
+				!! block && hasBlockSupport( block.name, 'visibility', true )
+		);
+		const allBlocksDefaultMode = clientIds.every(
+			( id ) => getBlockEditingMode( id ) === 'default'
+		);
+
+		if ( supportsVisibility && allBlocksDefaultMode ) {
+			const hasHiddenBlock = clientIds.some( ( id ) =>
+				isBlockHiddenAnywhere( id )
+			);
+			commands.push( {
+				name: 'toggle-visibility',
+				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
+				callback: () => showViewportModal( clientIds ),
+				icon: hasHiddenBlock ? seen : unseen,
+			} );
+		}
+
 		return {
 			isLoading: false,
 			commands: commands.map( ( command ) => ( {
 				...command,
 				name: 'core/block-editor/action-' + command.name,
+				category: 'command',
 				callback: ( { close } ) => {
 					command.callback();
 					close();

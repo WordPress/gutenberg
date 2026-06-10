@@ -22,6 +22,7 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
@@ -51,6 +52,8 @@ function AudioEdit( {
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -161,6 +164,7 @@ function AudioEdit( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						onReset={ () => onSelectAudio( undefined ) }
+						variant="toolbar"
 					/>
 				</BlockControls>
 			) }
@@ -187,7 +191,6 @@ function AudioEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ !! autoplay }
@@ -205,7 +208,6 @@ function AudioEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Loop' ) }
 							onChange={ toggleAttribute( 'loop' ) }
 							checked={ !! loop }
@@ -223,7 +225,6 @@ function AudioEdit( {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ _x(
 								'Preload',
 								'noun; Audio block parameter'
@@ -264,7 +265,9 @@ function AudioEdit( {
 					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Audio caption text' ) }
-					showToolbarButton={ isSingleSelected }
+					showToolbarButton={
+						isSingleSelected && hasNonContentControls
+					}
 				/>
 			</figure>
 		</>

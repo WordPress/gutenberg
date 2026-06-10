@@ -18,3 +18,4 @@ const initialContextValue: NavigatorContextType = {
 	params: {},
 };
 export const NavigatorContext = createContext( initialContextValue );
+NavigatorContext.displayName = 'NavigatorContext';

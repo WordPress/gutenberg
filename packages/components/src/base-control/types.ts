@@ -7,16 +7,10 @@ export type BaseControlProps = {
 	/**
 	 * Start opting into the new margin-free styles that will become the default in a future version.
 	 *
-	 * @default false
-	 */
-	__nextHasNoMarginBottom?: boolean;
-	/**
-	 * Temporary private prop for showing better deprecation messages,
-	 * e.g. `Some feature from wp.components.${ __associatedWPControl } is deprecated`.
-	 *
+	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
 	 * @ignore
 	 */
-	__associatedWPComponentName?: string;
+	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
 	 * This is necessary to accessibly associate the label with that element.

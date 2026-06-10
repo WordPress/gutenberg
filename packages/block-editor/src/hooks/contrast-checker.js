@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useReducer } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockSelector } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -15,19 +18,35 @@ function getComputedValue( node, property ) {
 		.getPropertyValue( property );
 }
 
-function getBlockElementColors( blockEl ) {
-	if ( ! blockEl ) {
+function getBlockElementColors( blockEl, blockType ) {
+	if ( ! blockEl || ! blockType ) {
 		return {};
 	}
 
-	const firstLinkElement = blockEl.querySelector( 'a' );
-	const linkColor = !! firstLinkElement?.innerText
-		? getComputedValue( firstLinkElement, 'color' )
-		: undefined;
+	// Get color-specific selectors.
+	const textSelector = getBlockSelector( blockType, 'color.text', {
+		fallback: true,
+	} );
+	const backgroundSelector = getBlockSelector(
+		blockType,
+		'color.background',
+		{ fallback: true }
+	);
 
-	const textColor = getComputedValue( blockEl, 'color' );
+	// Find target elements - querySelector handles all the complexity
+	const textElement = blockEl.querySelector( textSelector ) || blockEl;
+	const backgroundElement =
+		blockEl.querySelector( backgroundSelector ) || blockEl;
+	const linkElement = blockEl.querySelector( 'a' );
 
-	let backgroundColorNode = blockEl;
+	// Get computed colors from the appropriate elements
+	const textColor = getComputedValue( textElement, 'color' );
+	const linkColor =
+		linkElement && linkElement.textContent
+			? getComputedValue( linkElement, 'color' )
+			: undefined;
+
+	let backgroundColorNode = backgroundElement;
 	let backgroundColor = getComputedValue(
 		backgroundColorNode,
 		'background-color'
@@ -61,27 +80,55 @@ function reducer( prevColors, newColors ) {
 	return hasChanged ? newColors : prevColors;
 }
 
-export default function BlockColorContrastChecker( { clientId } ) {
+export default function BlockColorContrastChecker( { clientId, name } ) {
 	const blockEl = useBlockElement( clientId );
 	const [ colors, setColors ] = useReducer( reducer, {} );
+
+	const blockType = useSelect(
+		( select ) => {
+			return name
+				? select( blocksStore ).getBlockType( name )
+				: undefined;
+		},
+		[ name ]
+	);
 
 	// There are so many things that can change the color of a block
 	// So we perform this check on every render.
 	useLayoutEffect( () => {
-		if ( ! blockEl ) {
+		if ( ! blockEl || ! blockType ) {
 			return;
-		}
-
-		function updateColors() {
-			setColors( getBlockElementColors( blockEl ) );
 		}
 
 		// Combine `useLayoutEffect` and two rAF calls to ensure that values are read
 		// after the current paint but before the next paint.
 		window.requestAnimationFrame( () =>
-			window.requestAnimationFrame( updateColors )
+			window.requestAnimationFrame( () =>
+				setColors( getBlockElementColors( blockEl, blockType ) )
+			)
 		);
 	} );
+
+	// Runs in its own effect with dependencies so the observer is only
+	// recreated when the block element or block type changes.
+	useLayoutEffect( () => {
+		if ( ! blockEl || ! blockType ) {
+			return;
+		}
+
+		const observer = new window.MutationObserver( () => {
+			setColors( getBlockElementColors( blockEl, blockType ) );
+		} );
+
+		observer.observe( blockEl, {
+			attributes: true,
+			attributeFilter: [ 'class', 'style' ],
+		} );
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [ blockEl, blockType ] );
 
 	return (
 		<ContrastChecker

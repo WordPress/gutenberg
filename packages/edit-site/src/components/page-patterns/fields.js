@@ -9,12 +9,10 @@ import clsx from 'clsx';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState, useMemo, useId } from '@wordpress/element';
-import {
-	BlockPreview,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { BlockPreview } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/icons';
 import { parse } from '@wordpress/blocks';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -24,16 +22,16 @@ import {
 	PATTERN_SYNC_TYPES,
 	OPERATOR_IS,
 } from '../../utils/constants';
-import { unlock } from '../../lock-unlock';
 import { useAddedBy } from '../page-templates/hooks';
+import { unlock } from '../../lock-unlock';
 
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 function PreviewField( { item } ) {
 	const descriptionId = useId();
 	const description = item.description || item?.excerpt?.raw;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
+	const backgroundColor = useStyle( 'color.background' );
 	const blocks = useMemo( () => {
 		return (
 			item.blocks ??
@@ -128,7 +126,7 @@ function AuthorField( { item } ) {
 		<HStack alignment="left" spacing={ 0 }>
 			{ imageUrl && (
 				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
+					className={ clsx( 'fields-controls__author-avatar', {
 						'is-loaded': isImageLoaded,
 					} ) }
 				>
@@ -140,11 +138,11 @@ function AuthorField( { item } ) {
 				</div>
 			) }
 			{ ! imageUrl && (
-				<div className="page-templates-author-field__icon">
+				<div className="fields-controls__author-icon">
 					<Icon icon={ icon } />
 				</div>
 			) }
-			<span className="page-templates-author-field__name">{ text }</span>
+			<span className="fields-controls__author-name">{ text }</span>
 		</HStack>
 	);
 }

@@ -1,3 +1,7 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // To hide the horizontal scrollbar and show the drag handle on the
 // left and right of the container.
 .editor-resizable-editor.is-resizable {

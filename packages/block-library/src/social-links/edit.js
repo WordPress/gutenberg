@@ -182,8 +182,7 @@ export function SocialLinksEdit( props ) {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Icon Size' ) }
+							label={ __( 'Icon size' ) }
 							onChange={ ( newSize ) => {
 								setAttributes( {
 									size: newSize === '' ? undefined : newSize,
@@ -202,7 +201,6 @@ export function SocialLinksEdit( props ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show text' ) }
 							checked={ showLabels }
 							onChange={ () =>
@@ -219,7 +217,6 @@ export function SocialLinksEdit( props ) {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open links in new tab' ) }
 							checked={ openInNewTab }
 							onChange={ () =>

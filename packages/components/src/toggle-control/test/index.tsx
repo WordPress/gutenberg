@@ -6,13 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import _ToggleControl from '..';
-
-const ToggleControl = (
-	props: React.ComponentProps< typeof _ToggleControl >
-) => {
-	return <_ToggleControl { ...props } __nextHasNoMarginBottom />;
-};
+import ToggleControl from '..';
 
 describe( 'ToggleControl', () => {
 	it( 'should label the toggle', () => {
@@ -28,10 +22,16 @@ describe( 'ToggleControl', () => {
 
 		render( <ToggleControl label="My toggle" onChange={ onChange } /> );
 
-		screen.getByRole( 'checkbox' ).click();
+		screen
+			.getByRole( 'checkbox' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.click();
 		expect( onChange ).toHaveBeenLastCalledWith( true );
 
-		screen.getByRole( 'checkbox' ).click();
+		screen
+			.getByRole( 'checkbox' )
+			// eslint-disable-next-line testing-library/no-node-access
+			.click();
 		expect( onChange ).toHaveBeenLastCalledWith( false );
 	} );
 

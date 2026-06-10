@@ -16,14 +16,16 @@ test.describe( 'Block template registration', () => {
 			'gutenberg-test-block-template-registration'
 		);
 	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-block-template-registration'
 		);
-	} );
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'templates can be registered and edited', async ( {
@@ -363,6 +365,9 @@ class BlockTemplateRegistrationUtils {
 		await this.page.getByPlaceholder( 'Search' ).fill( searchTerm );
 		await expect
 			.poll( async () => await searchResults.count() )
-			.toBeLessThan( initialSearchResultsCount );
+			.toBeLessThanOrEqual( initialSearchResultsCount );
+		await expect
+			.poll( async () => this.page.url() )
+			.toContain( `search=${ encodeURIComponent( searchTerm ) }` );
 	}
 }

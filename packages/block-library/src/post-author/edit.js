@@ -12,61 +12,156 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
+	Button,
 	ComboboxControl,
 	SelectControl,
 	ToggleControl,
+	__experimentalText as WCText,
+	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { debounce } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { recreateWithRecommendedBlocks } from './utils';
+import {
+	useDefaultAvatar,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 
-const minimumUsersForCombobox = 25;
+const { InspectorControlsLastItem } = unlock( blockEditorPrivateApis );
 
 const AUTHORS_QUERY = {
 	who: 'authors',
 	per_page: 100,
+	_fields: 'id,name',
+	context: 'view',
 };
+
+function AuthorCombobox( { value, onChange } ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const { authors, isLoading } = useSelect(
+		( select ) => {
+			const { getUsers, isResolving } = select( coreStore );
+
+			const query = { ...AUTHORS_QUERY };
+			if ( filterValue ) {
+				query.search = filterValue;
+				query.search_columns = [ 'name' ];
+			}
+
+			return {
+				authors: getUsers( query ),
+				isLoading: isResolving( 'getUsers', [ query ] ),
+			};
+		},
+		[ filterValue ]
+	);
+
+	const authorOptions = useMemo( () => {
+		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
+			return {
+				value: author.id,
+				label: decodeEntities( author.name ),
+			};
+		} );
+
+		// Ensure the current author is included in the list.
+		const foundAuthor = fetchedAuthors.findIndex(
+			( fetchedAuthor ) => value?.id === fetchedAuthor.value
+		);
+
+		let currentAuthor = [];
+		if ( foundAuthor < 0 && value ) {
+			currentAuthor = [
+				{
+					value: value.id,
+					label: decodeEntities( value.name ),
+				},
+			];
+		} else if ( foundAuthor < 0 && ! value ) {
+			currentAuthor = [
+				{
+					value: 0,
+					label: __( '(No author)' ),
+				},
+			];
+		}
+
+		return [ ...currentAuthor, ...fetchedAuthors ];
+	}, [ authors, value ] );
+
+	return (
+		<ComboboxControl
+			__next40pxDefaultSize
+			label={ __( 'Author' ) }
+			options={ authorOptions }
+			value={ value?.id }
+			onFilterValueChange={ debounce( setFilterValue, 300 ) }
+			onChange={ onChange }
+			allowReset={ false }
+			isLoading={ isLoading }
+		/>
+	);
+}
 
 function PostAuthorEdit( {
 	isSelected,
 	context: { postType, postId, queryId },
 	attributes,
 	setAttributes,
+	clientId,
 } ) {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const defaultAvatar = useDefaultAvatar();
 
-	const { authorId, authorDetails, authors, supportsAuthor } = useSelect(
+	const { authorDetails, canAssignAuthor, supportsAuthor } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getUsers, getPostType } =
+			const { getEditedEntityRecord, getUser, getPostType } =
 				select( coreStore );
-			const _authorId = getEditedEntityRecord(
+			const currentPost = getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
-			)?.author;
+			);
+			const authorId = currentPost?.author;
 
 			return {
-				authorId: _authorId,
-				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getUsers( AUTHORS_QUERY ),
+				authorDetails: authorId
+					? getUser( authorId, { context: 'view' } )
+					: null,
 				supportsAuthor:
 					getPostType( postType )?.supports?.author ?? false,
+				canAssignAuthor: currentPost?._links?.[
+					'wp:action-assign-author'
+				]
+					? true
+					: false,
 			};
 		},
 		[ postType, postId ]
 	);
-
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
 	const {
 		textAlign,
@@ -94,24 +189,14 @@ function PostAuthorEdit( {
 		} ),
 	} );
 
-	const authorOptions = authors?.length
-		? authors.map( ( { id, name } ) => {
-				return {
-					value: id,
-					label: name,
-				};
-		  } )
-		: [];
-
 	const handleSelect = ( nextAuthorId ) => {
 		editEntityRecord( 'postType', postType, postId, {
 			author: nextAuthorId,
 		} );
 	};
 
-	const showCombobox = authorOptions.length >= minimumUsersForCombobox;
 	const showAuthorControl =
-		!! postId && ! isDescendentOfQueryLoop && authorOptions.length > 0;
+		!! postId && ! isDescendentOfQueryLoop && canAssignAuthor;
 
 	if ( ! supportsAuthor && postType !== undefined ) {
 		return (
@@ -122,6 +207,13 @@ function PostAuthorEdit( {
 					postType
 				) }
 			</div>
+		);
+	}
+
+	function transformBlock() {
+		replaceBlock(
+			clientId,
+			recreateWithRecommendedBlocks( attributes, blockTypes )
 		);
 	}
 
@@ -142,26 +234,10 @@ function PostAuthorEdit( {
 				>
 					{ showAuthorControl && (
 						<div style={ { gridColumn: '1 / -1' } }>
-							{ ( showCombobox && (
-								<ComboboxControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Author' ) }
-									options={ authorOptions }
-									value={ authorId }
-									onChange={ handleSelect }
-									allowReset={ false }
-								/>
-							) ) || (
-								<SelectControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Author' ) }
-									value={ authorId }
-									options={ authorOptions }
-									onChange={ handleSelect }
-								/>
-							) }
+							<AuthorCombobox
+								value={ authorDetails }
+								onChange={ handleSelect }
+							/>
 						</div>
 					) }
 					<ToolsPanelItem
@@ -173,7 +249,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show avatar' ) }
 							checked={ showAvatar }
 							onChange={ () =>
@@ -194,7 +269,6 @@ function PostAuthorEdit( {
 						>
 							<SelectControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={ __( 'Avatar size' ) }
 								value={ avatarSize }
 								options={ avatarSizes }
@@ -215,7 +289,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show bio' ) }
 							checked={ !! showBio }
 							onChange={ () =>
@@ -230,7 +303,6 @@ function PostAuthorEdit( {
 						onDeselect={ () => setAttributes( { isLink: false } ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link author name to author page' ) }
 							checked={ isLink }
 							onChange={ () =>
@@ -248,7 +320,6 @@ function PostAuthorEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {
@@ -261,7 +332,30 @@ function PostAuthorEdit( {
 					) }
 				</ToolsPanel>
 			</InspectorControls>
-
+			{ blockTypes.some(
+				( blockType ) => blockType.name === 'core/group'
+			) && (
+				<InspectorControlsLastItem>
+					<VStack
+						className="wp-block-post-author__transform"
+						alignment="left"
+						spacing={ 4 }
+					>
+						<WCText as="p">
+							{ __(
+								'This block is no longer supported. Recreate its design with the Avatar, Author Name and Author Biography blocks.'
+							) }
+						</WCText>
+						<Button
+							variant="primary"
+							onClick={ transformBlock }
+							__next40pxDefaultSize
+						>
+							{ __( 'Recreate' ) }
+						</Button>
+					</VStack>
+				</InspectorControlsLastItem>
+			) }
 			<BlockControls group="block">
 				<AlignmentControl
 					value={ textAlign }
@@ -270,14 +364,18 @@ function PostAuthorEdit( {
 					} }
 				/>
 			</BlockControls>
-
 			<div { ...blockProps }>
-				{ showAvatar && authorDetails?.avatar_urls && (
+				{ showAvatar && (
 					<div className="wp-block-post-author__avatar">
 						<img
 							width={ avatarSize }
-							src={ authorDetails.avatar_urls[ avatarSize ] }
-							alt={ authorDetails.name }
+							src={
+								authorDetails?.avatar_urls?.[ avatarSize ] ||
+								defaultAvatar
+							}
+							alt={
+								authorDetails?.name || __( 'Default Avatar' )
+							}
 						/>
 					</div>
 				) }

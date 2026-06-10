@@ -11,7 +11,6 @@ export function CommentsPaginationArrowControls( { value, onChange } ) {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Arrow' ) }
 			value={ value }
 			onChange={ onChange }

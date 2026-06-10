@@ -10,6 +10,7 @@ import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import { unlock } from '../../lock-unlock';
+import { isThemeDataLoaded } from './utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -29,24 +30,30 @@ export const navigationItemRoute = {
 	path: '/wp_navigation/:postId',
 	areas: {
 		sidebar( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<SidebarNavigationScreenNavigationMenu backPath="/navigation" />
 			) : (
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
 		preview( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<Editor />
 			) : (
 				<SidebarNavigationScreenUnsupported />
 			);
 		},
 		mobile( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return <></>;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<MobileNavigationItemView />
 			) : (
 				<SidebarNavigationScreenUnsupported />

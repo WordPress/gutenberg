@@ -13,6 +13,7 @@ export { metadata, name };
 export const settings = {
 	edit,
 	save,
+	example: {},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
