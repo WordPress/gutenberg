@@ -5,11 +5,13 @@
  * @package gutenberg
  */
 
+require_once __DIR__ . '/class-wp-sync-config.php';
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
 }
+require_once __DIR__ . '/class-wp-sync-save-server.php';
 
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	/**
@@ -59,6 +61,9 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 		$sync_storage = new WP_Sync_Post_Meta_Storage();
 		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
+
+		$sync_save_server = new WP_Sync_Save_Server();
+		$sync_save_server->register_routes();
 	}
 	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
 }
@@ -68,7 +73,7 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	 * Registers post meta for persisting CRDT documents.
 	 */
 	function gutenberg_rest_api_crdt_post_meta() {
-		// This string must match WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/sync.
+		// This string must match POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/core-data.
 		$persisted_crdt_post_meta_key = '_crdt_document';
 
 		register_meta(
