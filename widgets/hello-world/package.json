@@ -1,0 +1,13 @@
+{
+	"name": "@wordpress/hello-world-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/ui": "file:../../packages/ui",
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
+	}
+}

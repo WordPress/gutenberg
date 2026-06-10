@@ -16,7 +16,7 @@ import { wordpress } from '@wordpress/icons';
 
 ### `icon`
 
- - Type: `IconType`
+ - Type: `IconType | null`
  - Required: No
  - Default: `null`
 

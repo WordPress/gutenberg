@@ -7,7 +7,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	EntityProvider,
@@ -28,14 +28,15 @@ import { createBlock } from '@wordpress/blocks';
  */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
+import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
+import useNetworkReconnect from './use-network-reconnect';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -44,6 +45,7 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import MediaEditorModalMount from '../media/media-editor-modal';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -78,6 +80,7 @@ const NON_CONTEXTUAL_POST_TYPES = [
  * @return {Array} Block editor props.
  */
 function useBlockEditorProps( post, template, mode ) {
+	const revisionBlocks = useRevisionBlocks();
 	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -115,6 +118,11 @@ function useBlockEditorProps( post, template, mode ) {
 
 		return postBlocks;
 	}, [ maybeNavigationBlocks, rootLevelPost, templateBlocks, postBlocks ] );
+
+	// In revisions mode, use the revision blocks and disable editing.
+	if ( revisionBlocks !== null ) {
+		return [ revisionBlocks, noop, noop ];
+	}
 
 	// Handle fallback to postBlocks outside of the above useMemo, to ensure
 	// that constructed block templates that call `createBlock` are not generated
@@ -177,6 +185,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			mode,
 			defaultMode,
 			postTypeEntities,
+			isInRevisionsMode,
+			currentRevisionId,
 		} = useSelect(
 			( select ) => {
 				const {
@@ -184,6 +194,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					getRenderingMode,
 					__unstableIsEditorReady,
 					getDefaultRenderingMode,
+					isRevisionsMode: _isRevisionsMode,
+					getCurrentRevisionId: _getCurrentRevisionId,
 				} = unlock( select( editorStore ) );
 				const { getEntitiesConfig, getEntityRecordEdits } =
 					select( coreStore );
@@ -224,6 +236,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						post.type === 'wp_template'
 							? getEntitiesConfig( 'postType' )
 							: null,
+					isInRevisionsMode: _isRevisionsMode(),
+					currentRevisionId: _getCurrentRevisionId(),
 				};
 			},
 			[ post.type, post.id, hasTemplate ]
@@ -297,6 +311,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
+		const registry = useRegistry();
 
 		const onChangeSelection = useCallback(
 			( newSelection ) => {
@@ -321,7 +336,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			}
 
 			updatePostLock( settings.postLock );
-			setupEditor( post, initialEdits, settings.template );
+			// `setupEditor` may already have been dispatched by the
+			// editor's pre-mount kickoff (see edit-post's
+			// `initializeEditor`). Skip the redundant dispatch — it
+			// would otherwise re-parse + reset blocks for new posts.
+			if ( ! registry.select( editorStore ).__unstableIsEditorReady() ) {
+				setupEditor( post, initialEdits, settings.template );
+			}
 			if ( settings.autosave ) {
 				createWarningNotice(
 					__(
@@ -383,33 +404,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
 
+		// Pause/resume media upload queue on network disconnect/reconnect.
+		useNetworkReconnect();
+
 		if ( ! isReady || ! mode ) {
 			return null;
-		}
-
-		const isAttachment =
-			post.type === ATTACHMENT_POST_TYPE &&
-			window?.__experimentalMediaEditor;
-
-		// Early return for attachments - no block editor needed
-		if ( isAttachment ) {
-			return (
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						{ children }
-						{ ! settings.isPreviewMode && (
-							<>
-								<EditorKeyboardShortcuts />
-								<KeyboardShortcutHelpModal />
-							</>
-						) }
-					</EntityProvider>
-				</EntityProvider>
-			);
 		}
 
 		return (
@@ -418,14 +417,19 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					kind="postType"
 					type={ post.type }
 					id={ post.id }
+					revisionId={ currentRevisionId ?? undefined }
 				>
 					<BlockContextProvider value={ defaultBlockContext }>
 						<BlockEditorProviderComponent
 							value={ blocks }
 							onChange={ onChange }
 							onInput={ onInput }
-							selection={ selection }
-							onChangeSelection={ onChangeSelection }
+							selection={
+								isInRevisionsMode ? undefined : selection
+							}
+							onChangeSelection={
+								isInRevisionsMode ? noop : onChangeSelection
+							}
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
@@ -447,6 +451,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<StartTemplateOptions />
 									<PatternRenameModal />
 									<PatternDuplicateModal />
+									<MediaEditorModalMount />
 								</>
 							) }
 						</BlockEditorProviderComponent>

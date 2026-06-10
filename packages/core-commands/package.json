@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "1.41.0",
+	"version": "1.48.0",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,7 +38,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"sideEffects": false,
 	"dependencies": {

@@ -15,6 +15,7 @@ import MenuItemsChoice from '..';
 import MenuGroup from '../../menu-group';
 
 const meta: Meta< typeof MenuItemsChoice > = {
+	tags: [ 'manifest' ],
 	component: MenuItemsChoice,
 	title: 'Components/Actions/MenuItemsChoice',
 	id: 'components-menuitemschoice',
@@ -29,7 +30,7 @@ const meta: Meta< typeof MenuItemsChoice > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Subcomponent of `DropdownMenu`.',
 		},

@@ -23,7 +23,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { compose, useRefEffect } from '@wordpress/compose';
 import { safeHTML } from '@wordpress/dom';
 
 /**
@@ -741,10 +741,19 @@ function BlockListBlockProvider( props ) {
 		[ clientId, rootClientId ]
 	);
 
+	const defaultViewRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			defaultViewRef.current = defaultView;
+		}
+	}, [] );
+
 	// Use block visibility hook with data from existing useSelect to avoid extra subscription
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility: selectedProps?.blockVisibility,
 		deviceType: selectedProps?.deviceType,
+		view: defaultViewRef.current,
 	} );
 
 	// Users of the editor.BlockListBlock filter used to be able to

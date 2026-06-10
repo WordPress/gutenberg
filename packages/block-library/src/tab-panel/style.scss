@@ -1,4 +1,23 @@
 .wp-block-tab-panel {
+	max-width: 100%;
+	flex-basis: 100%;
 	flex-grow: 1;
-	min-width: 0;
+	box-sizing: border-box;
+
+	& > *:first-child {
+		margin-top: 0;
+	}
+	& > *:last-child {
+		margin-bottom: 0;
+	}
+
+	&[hidden],
+	&:empty {
+		display: none !important;
+	}
+}
+
+.wp-block-tab-panel.wp-block.has-background,
+.wp-block-tab-panel:not(.wp-block).has-background {
+	padding: var(--wp--preset--spacing--30);
 }

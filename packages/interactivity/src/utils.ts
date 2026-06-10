@@ -24,7 +24,7 @@ interface Flusher {
 
 declare global {
 	interface Window {
-		scheduler?: {
+		scheduler: {
 			postTask: (
 				callback: () => unknown,
 				options?: object
@@ -401,7 +401,7 @@ export const warn = ( message: string ): void => {
 		// A consumer can use 'pause on caught exceptions'
 		try {
 			throw Error( message );
-		} catch ( e ) {
+		} catch {
 			// Do nothing.
 		}
 		logged.add( message );

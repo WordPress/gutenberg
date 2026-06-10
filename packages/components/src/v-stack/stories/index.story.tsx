@@ -43,9 +43,9 @@ const meta: Meta< typeof VStack > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `Stack` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Use `Stack` from `@wordpress/ui` instead.',
 		},
 	},
 };

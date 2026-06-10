@@ -13,6 +13,7 @@ import ValidationComponent from './validation';
 import VisibilityComponent from './visibility';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataForm',
 	component: DataForm,
 };
@@ -67,6 +68,21 @@ export const LayoutPanel = {
 			description: 'Chooses when the edit icon is visible.',
 			options: [ 'default', 'always', 'on-hover' ],
 		},
+		applyLabel: {
+			control: { type: 'text' },
+			description:
+				'Custom text for the modal apply button. Defaults to "Apply".',
+			if: { arg: 'openAs', eq: 'modal' },
+		},
+		cancelLabel: {
+			control: { type: 'text' },
+			description:
+				'Custom text for the modal cancel button. Defaults to "Cancel".',
+			if: { arg: 'openAs', eq: 'modal' },
+		},
+	},
+	args: {
+		openAs: 'default',
 	},
 };
 
@@ -78,6 +94,13 @@ export const LayoutRegular = {
 			description: 'Chooses the label position.',
 			options: [ 'default', 'top', 'side', 'none' ],
 		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Disable all fields in the form.',
+		},
+	},
+	args: {
+		disabled: false,
 	},
 };
 

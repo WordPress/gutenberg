@@ -20,11 +20,11 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
 	getNormalizedCommaSeparable,
-	isRawAttribute,
 	setNestedValue,
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
+import { getSyncManager } from './sync';
 import type * as ET from './entity-types';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
@@ -45,6 +45,10 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Object >;
 	undoManager: UndoManager;
+	syncUndoManagerState: {
+		hasRedo: boolean;
+		hasUndo: boolean;
+	};
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
@@ -55,6 +59,7 @@ export interface State {
 	editorAssets: Record< string, any > | null;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
+	viewConfigs: Record< string, Record< string, any > >;
 }
 
 type EntityRecordKey = string | number;
@@ -523,25 +528,26 @@ export const getRawEntityRecord = createSelector(
 			name,
 			key
 		);
-		return (
-			record &&
-			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				if (
-					isRawAttribute( getEntityConfig( state, kind, name ), _key )
-				) {
-					// Because edits are the "raw" attribute values,
-					// we return those from record selectors to make rendering,
-					// comparisons, and joins with edits easier.
-					accumulator[ _key ] =
-						record[ _key ]?.raw !== undefined
-							? record[ _key ]?.raw
-							: record[ _key ];
-				} else {
-					accumulator[ _key ] = record[ _key ];
+		const config = getEntityConfig( state, kind, name );
+		if ( ! record || ! config?.rawAttributes?.length ) {
+			return record;
+		}
+
+		// Because edits are the "raw" attribute values,
+		// we return those from record selectors to make rendering,
+		// comparisons, and joins with edits easier.
+		return Object.fromEntries(
+			Object.keys( record ).map( ( _key ) => {
+				if ( config.rawAttributes.includes( _key ) ) {
+					const rawValue = record[ _key ]?.raw;
+					return [
+						_key,
+						rawValue !== undefined ? rawValue : record[ _key ],
+					];
 				}
-				return accumulator;
-			}, {} as any )
-		);
+				return [ _key, record[ _key ] ];
+			} )
+		) as EntityRecord;
 	},
 	(
 		state: State,
@@ -654,7 +660,10 @@ export const getEntityRecords = ( <
 	if ( ! queriedState ) {
 		return null;
 	}
-	return getQueriedItems( queriedState, query );
+	return getQueriedItems( queriedState, query, {
+		supportsPagination: !! getEntityConfig( state, kind, name )
+			?.supportsPagination,
+	} );
 } ) as GetEntityRecords;
 
 /**
@@ -712,7 +721,10 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query?.per_page === -1 ) {
+	if (
+		! getEntityConfig( state, kind, name )?.supportsPagination ||
+		query?.per_page === -1
+	) {
 		return 1;
 	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
@@ -1141,6 +1153,9 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
+	if ( getSyncManager()?.undoManager ) {
+		return state.syncUndoManagerState.hasUndo;
+	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1153,6 +1168,9 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
+	if ( getSyncManager()?.undoManager ) {
+		return state.syncUndoManagerState.hasRedo;
+	}
 	return getUndoManager( state ).hasRedo();
 }
 
@@ -1525,6 +1543,62 @@ export const getRevisions = (
 };
 
 /**
+ * Returns true if a revision has been received for the given set of parameters,
+ * or false otherwise.
+ *
+ * Note: This does not trigger a request for the revision from the API
+ * if it's not available in the local state.
+ *
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revision you want to check.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query.
+ *
+ * @return Whether a revision has been received.
+ */
+export function hasRevision(
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): boolean {
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
+	if ( ! queriedState ) {
+		return false;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		return !! queriedState.itemIsComplete[ context ]?.[ revisionKey ];
+	}
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return false;
+	}
+
+	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	for ( let i = 0; i < fields.length; i++ ) {
+		const path = fields[ i ].split( '.' );
+		let value = item;
+		for ( let p = 0; p < path.length; p++ ) {
+			const part = path[ p ];
+			if ( ! value || ! Object.hasOwn( value, part ) ) {
+				return false;
+			}
+			value = value[ part ];
+		}
+	}
+
+	return true;
+}
+
+/**
  * Returns a single, specific revision of a parent entity.
  *
  * @param state       State tree
@@ -1598,35 +1672,3 @@ export const getRevision = createSelector(
 		];
 	}
 );
-
-/**
- * Returns the current sync connection status across all entities. Prioritizes
- * disconnected states, then connecting, then connected.
- *
- * @param state Data state.
- *
- * @return The current sync connection state, prioritized by importance.
- */
-export function getSyncConnectionStatus(
-	state: State
-): ConnectionStatus | undefined {
-	if ( ! state.syncConnectionStatuses ) {
-		return undefined;
-	}
-
-	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
-
-	let coalesced: ConnectionStatus | undefined;
-
-	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
-		if (
-			! coalesced ||
-			PRIORITIZED_STATUSES.indexOf( status.status ) <
-				PRIORITIZED_STATUSES.indexOf( coalesced.status )
-		) {
-			coalesced = status;
-		}
-	}
-
-	return coalesced;
-}

@@ -20,13 +20,18 @@ The root element is considered to be the highest ancestor element returned by th
 Consider the following component located at `packages/components/src/notice/index.js`:
 
 ```jsx
-export default function Notice( { children, onRemove } ) {
+export default function Notice( { children, onRemove, actions = [] } ) {
 	return (
 		<div className="components-notice">
 			<div className="components-notice__content">{ children }</div>
+			{ actions.length > 0 && (
+				<div className="components-notice__actions">
+					{ /* action buttons */ }
+				</div>
+			) }
 			<Button
 				className="components-notice__dismiss"
-				icon={ check }
+				icon={ closeSmall }
 				label={ __( 'Dismiss this notice' ) }
 				onClick={ onRemove }
 			/>
@@ -35,18 +40,20 @@ export default function Notice( { children, onRemove } ) {
 }
 ```
 
+Optional regions exposed via props should use additional `__descriptor` classes on direct descendants of the root, following the same pattern as the other child elements in the example above.
+
 Components may be assigned with class names that indicate states (for example, an "active" tab or an "opened" panel). These modifiers should be applied as a separate class name, prefixed as an adjective expression by `is-` (`is-active` or `is-opened`). In rare cases, you may encounter variations of the modifier prefix, usually to improve readability (`has-warning`). Because a modifier class name is not contextualized to a specific component, it should always be written in stylesheets as accompanying the component being modified (`.components-panel.is-opened`).
 
 **Example:**
 
-Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
+Consider a panel that can be expanded. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
 
 ```jsx
 import clsx from 'clsx';
 
-export default function Notice( { children, onRemove, isDismissible } ) {
-	const classes = clsx( 'components-notice', {
-		'is-dismissible': isDismissible,
+export default function Panel( { children, isExpanded } ) {
+	const classes = clsx( 'components-panel', {
+		'is-expanded': isExpanded,
 	} );
 
 	return <div className={ classes }>{ /* ... */ }</div>;
@@ -148,13 +155,13 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
-The public interface of such APIs is not yet finalized. Aside from references within the code, they APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
+The public interface of such APIs is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
 
 While a plugin-only API may often stabilize into a publicly-available API, there is no guarantee that it will.
 
 #### Private APIs
 
-Each `@wordpress` package wanting to privately access or expose a private APIs can
+Each `@wordpress` package wanting to privately access or expose private APIs can
 do so by opting-in to `@wordpress/private-apis`:
 
 ```js
@@ -400,7 +407,7 @@ export function MyComponent() {
 
 WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
 
-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.js](/packages/block-editor/src/store/private-actions.js):
 
 ```js
 const privateSettings = [
@@ -785,7 +792,7 @@ For class components, there is no recommendation for documenting the props of th
 ## PHP
 
 We use
-[`phpcs` (PHP_CodeSniffer)](https://github.com/squizlabs/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
+[`phpcs` (PHP_CodeSniffer)](https://github.com/PHPCSStandards/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
 
 The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint:php`.
 

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -6,6 +11,8 @@ import {
 	useState,
 	useCallback,
 	useMemo,
+	useRef,
+	useEffect,
 } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
@@ -16,7 +23,14 @@ import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
-import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import type {
+	Field,
+	ActionButton,
+	SupportedLayouts,
+	View,
+} from '@wordpress/dataviews';
+import { useView } from '@wordpress/views';
+import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
 	attachedToField,
@@ -32,7 +46,6 @@ import {
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
-import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -41,6 +54,9 @@ import type { Attachment, RestAttachment } from '../../utils/types';
 import { transformAttachment } from '../../utils/transform-attachment';
 import { uploadMedia } from '../../utils/upload-media';
 import { unlock } from '../../lock-unlock';
+import { UploadStatusPopover } from './upload-status-popover';
+import { useInvalidateAttachmentResolutions } from './use-invalidate-attachment-resolutions';
+import { useUploadStatus } from './use-upload-status';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 
@@ -53,6 +69,48 @@ const NOTICES_CONTEXT = 'media-modal';
 
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
+
+type ViewQueryParams = Pick< View, 'page' | 'search' >;
+
+const defaultQueryParams: ViewQueryParams = {
+	page: 1,
+	search: '',
+};
+
+const defaultView: View = {
+	type: LAYOUT_PICKER_GRID,
+	fields: [],
+	showTitle: false,
+	titleField: 'title',
+	mediaField: 'media_thumbnail',
+	perPage: 50,
+	filters: [],
+	layout: {
+		previewSize: 170,
+		density: 'compact',
+	},
+};
+
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_PICKER_GRID ]: {
+		fields: [],
+		showTitle: false,
+		layout: {
+			previewSize: 170,
+			density: 'compact',
+		},
+	},
+	[ LAYOUT_PICKER_TABLE ]: {
+		fields: [
+			'filename',
+			'filesize',
+			'media_dimensions',
+			'author',
+			'date',
+		],
+		showTitle: true,
+	},
+};
 
 interface MediaUploadModalProps {
 	/**
@@ -173,26 +231,35 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
-	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
+	const { createSuccessNotice, removeAllNotices } =
 		useDispatch( noticesStore );
-	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
-	const { invalidateResolution } = useDispatch( coreStore );
+	const invalidateAttachmentResolutions =
+		useInvalidateAttachmentResolutions();
+	const [ queryParams, setQueryParams ] = useState< ViewQueryParams >(
+		() => defaultQueryParams
+	);
 
-	// DataViews configuration - allow view updates
-	const [ view, setView ] = useState< View >( () => ( {
-		type: LAYOUT_PICKER_GRID,
-		fields: [],
-		showTitle: false,
-		titleField: 'title',
-		mediaField: 'media_thumbnail',
-		search: '',
-		page: 1,
-		perPage: 20,
-		filters: [],
-		layout: {
-			previewSize: 170,
+	// Persist view configuration across sessions via the preferences store.
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: 'attachment',
+		slug: 'media-modal',
+		defaultView,
+		queryParams,
+		onChangeQueryParams: setQueryParams,
+	} );
+
+	// Normalize undefined transient DataViews values so they do not persist as modified modal preferences.
+	const handleChangeView = useCallback(
+		( nextView: View ) => {
+			const normalizedView = { ...nextView };
+			if ( normalizedView.startPosition === undefined ) {
+				delete normalizedView.startPosition;
+			}
+			updateView( normalizedView );
 		},
-	} ) );
+		[ updateView ]
+	);
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -225,11 +292,34 @@ export function MediaUploadModal( {
 			}
 		} );
 
-		// Base media type on allowedTypes if no filter is set
-		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes?.includes( '*' )
-				? undefined
-				: allowedTypes;
+		// Base media and mime type on allowedTypes if no filter is set
+		if (
+			! filters.media_type &&
+			! filters.mime_type &&
+			allowedTypes &&
+			! allowedTypes.includes( '*' )
+		) {
+			const { mediaTypes, mimeTypes } = allowedTypes.reduce(
+				( acc, type ) => {
+					if ( type.endsWith( '/*' ) ) {
+						acc.mediaTypes.push( type.replace( '/*', '' ) );
+					} else if ( type.includes( '/' ) ) {
+						acc.mimeTypes.push( type );
+					} else {
+						acc.mediaTypes.push( type );
+					}
+
+					return acc;
+				},
+				{ mediaTypes: [] as string[], mimeTypes: [] as string[] }
+			);
+
+			if ( mediaTypes.length ) {
+				filters.media_type = mediaTypes;
+			}
+			if ( mimeTypes.length ) {
+				filters.mime_type = mimeTypes;
+			}
 		}
 
 		return {
@@ -243,6 +333,51 @@ export function MediaUploadModal( {
 			...filters,
 		};
 	}, [ view, allowedTypes ] );
+
+	// Per-batch completion handler: auto-select uploaded items and refresh the grid.
+	const handleBatchComplete = useCallback(
+		( attachments: Partial< Attachment >[] ) => {
+			const uploadedIds = attachments
+				.map( ( attachment ) => String( attachment.id ) )
+				.filter( Boolean );
+
+			if ( multiple ) {
+				setSelection( ( prev ) => {
+					const existing = new Set( prev );
+					const newIds = uploadedIds.filter(
+						( id ) => ! existing.has( id )
+					);
+					return [ ...prev, ...newIds ];
+				} );
+			} else {
+				setSelection( uploadedIds.slice( 0, 1 ) );
+			}
+
+			// Invalidate all cached attachment queries so every page of
+			// results refreshes — not just the page the user is viewing.
+			invalidateAttachmentResolutions();
+		},
+		[ multiple, invalidateAttachmentResolutions ]
+	);
+
+	const {
+		uploadingFiles,
+		registerBatch,
+		dismissError,
+		clearCompleted,
+		allComplete,
+	} = useUploadStatus( { onBatchComplete: handleBatchComplete } );
+
+	const isPopoverOpenRef = useRef( false );
+	const handlePopoverOpenChange = useCallback(
+		( open: boolean ) => {
+			isPopoverOpenRef.current = open;
+			if ( ! open ) {
+				clearCompleted();
+			}
+		},
+		[ clearCompleted ]
+	);
 
 	// Fetch all media attachments using WordPress core data with permissions
 	const {
@@ -288,7 +423,7 @@ export function MediaUploadModal( {
 		() => [
 			{
 				id: 'select',
-				label: multiple ? __( 'Select' ) : __( 'Select' ),
+				label: __( 'Select' ),
 				isPrimary: true,
 				supportsBulk: multiple,
 				async callback() {
@@ -318,42 +453,45 @@ export function MediaUploadModal( {
 						? transformedPosts
 						: transformedPosts?.[ 0 ];
 
+					removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 					onSelect( selectedItems );
 				},
 			},
 		],
-		[ multiple, onSelect, selection ]
+		[ multiple, onSelect, selection, removeAllNotices ]
 	);
 
 	const handleModalClose = useCallback( () => {
+		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		onClose?.();
-	}, [ onClose ] );
+	}, [ removeAllNotices, onClose ] );
+
+	useEffect( () => {
+		if ( ! isOpen ) {
+			setQueryParams( defaultQueryParams );
+		}
+	}, [ isOpen ] );
 
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
-	// Shared upload success handler
-	const handleUploadComplete = useCallback(
-		( attachments: Partial< Attachment >[] ) => {
-			// Check if all uploads are complete (no blob URLs)
-			const allComplete = attachments.every(
-				( attachment ) =>
-					attachment.id &&
-					attachment.url &&
-					! isBlobURL( attachment.url )
-			);
-
-			if ( allComplete && attachments.length > 0 ) {
-				// Show success notice (replaces progress notice via ID)
+	// Show success notice and auto-clear completed entries when all batches finish.
+	const prevAllCompleteRef = useRef( false );
+	useEffect( () => {
+		if ( allComplete && ! prevAllCompleteRef.current ) {
+			const completeCount = uploadingFiles.filter(
+				( file ) => file.status === 'uploaded'
+			).length;
+			if ( completeCount > 0 ) {
 				createSuccessNotice(
 					sprintf(
 						// translators: %s: number of files
 						_n(
 							'Uploaded %s file',
 							'Uploaded %s files',
-							attachments.length
+							completeCount
 						),
-						attachments.length.toLocaleString()
+						completeCount.toLocaleString()
 					),
 					{
 						type: 'snackbar',
@@ -361,84 +499,33 @@ export function MediaUploadModal( {
 						id: NOTICE_ID_UPLOAD_PROGRESS,
 					}
 				);
-
-				// Auto-select the newly uploaded items
-				const uploadedIds = attachments
-					.map( ( attachment ) => String( attachment.id ) )
-					.filter( Boolean );
-
-				if ( multiple ) {
-					// In multiple mode, add to existing selection
-					setSelection( ( prev ) => [ ...prev, ...uploadedIds ] );
-				} else {
-					// In single mode, replace selection with the first uploaded item
-					setSelection( uploadedIds.slice( 0, 1 ) );
-				}
-
-				// Invalidate the entity records resolution to refresh the view
-				invalidateResolution( 'getEntityRecords', [
-					'postType',
-					'attachment',
-					queryArgs,
-				] );
 			}
-		},
-		[ createSuccessNotice, invalidateResolution, queryArgs, multiple ]
-	);
 
-	// Shared upload error handler
-	const handleUploadError = useCallback(
-		( error: Error ) => {
-			// Show error notice (replaces progress notice via ID)
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-				context: NOTICES_CONTEXT,
-				id: NOTICE_ID_UPLOAD_PROGRESS,
-			} );
-		},
-		[ createErrorNotice ]
-	);
+			// Auto-clear completed entries, unless the popover is
+			// open — in that case, they'll be cleared on close.
+			if ( ! isPopoverOpenRef.current ) {
+				clearCompleted();
+			}
+		}
+		prevAllCompleteRef.current = allComplete;
+	}, [ allComplete, uploadingFiles, createSuccessNotice, clearCompleted ] );
 
 	const handleFileSelect = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
 			const files = event.target.files;
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
-
-				// Show upload start notice
-				createInfoNotice(
-					sprintf(
-						// translators: %s: number of files
-						_n(
-							'Uploading %s file',
-							'Uploading %s files',
-							filesArray.length
-						),
-						filesArray.length.toLocaleString()
-					),
-					{
-						type: 'snackbar',
-						context: NOTICES_CONTEXT,
-						id: NOTICE_ID_UPLOAD_PROGRESS,
-						explicitDismiss: true,
-					}
-				);
+				const { onFileChange, onError } = registerBatch( filesArray );
 
 				handleUpload( {
 					allowedTypes,
 					filesList: filesArray,
-					onFileChange: handleUploadComplete,
-					onError: handleUploadError,
+					onFileChange,
+					onError,
 				} );
 			}
 		},
-		[
-			allowedTypes,
-			handleUpload,
-			createInfoNotice,
-			handleUploadComplete,
-			handleUploadError,
-		]
+		[ allowedTypes, handleUpload, registerBatch ]
 	);
 
 	const paginationInfo = useMemo(
@@ -447,26 +534,6 @@ export function MediaUploadModal( {
 			totalPages,
 		} ),
 		[ totalItems, totalPages ]
-	);
-
-	const defaultLayouts = useMemo(
-		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {
-				fields: [],
-				showTitle: false,
-			},
-			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [
-					'filename',
-					'filesize',
-					'media_dimensions',
-					'author',
-					'date',
-				],
-				showTitle: true,
-			},
-		} ),
-		[]
 	);
 
 	// Build accept attribute from allowedTypes
@@ -525,30 +592,14 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
-						// Show upload start notice
-						createInfoNotice(
-							sprintf(
-								// translators: %s: number of files
-								_n(
-									'Uploading %s file',
-									'Uploading %s files',
-									filteredFiles.length
-								),
-								filteredFiles.length.toLocaleString()
-							),
-							{
-								type: 'snackbar',
-								context: NOTICES_CONTEXT,
-								id: NOTICE_ID_UPLOAD_PROGRESS,
-								explicitDismiss: true,
-							}
-						);
+						const { onFileChange, onError } =
+							registerBatch( filteredFiles );
 
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
-							onFileChange: handleUploadComplete,
-							onError: handleUploadError,
+							onFileChange,
+							onError,
 						} );
 					}
 				} }
@@ -558,7 +609,7 @@ export function MediaUploadModal( {
 				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ handleChangeView }
 				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ setSelection }
@@ -566,10 +617,47 @@ export function MediaUploadModal( {
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
-				search={ search }
-				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
-			/>
+				onReset={ isModified ? resetToDefault : false }
+			>
+				<Stack
+					direction="row"
+					align="top"
+					justify="space-between"
+					className="dataviews__view-actions"
+					gap="xs"
+				>
+					<Stack
+						direction="row"
+						gap="sm"
+						justify="start"
+						className="dataviews__search"
+					>
+						{ search && (
+							<DataViewsPicker.Search label={ searchLabel } />
+						) }
+						<DataViewsPicker.FiltersToggle />
+					</Stack>
+					<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
+						<DataViewsPicker.LayoutSwitcher />
+						<DataViewsPicker.ViewConfig />
+					</Stack>
+				</Stack>
+				<DataViewsPicker.FiltersToggled className="dataviews-filters__container" />
+				<DataViewsPicker.Layout />
+				<div
+					className={ clsx( 'media-upload-modal__footer', {
+						'is-uploading': uploadingFiles.length > 0,
+					} ) }
+				>
+					<UploadStatusPopover
+						uploadingFiles={ uploadingFiles }
+						onDismissError={ dismissError }
+						onOpenChange={ handlePopoverOpenChange }
+					/>
+					<DataViewsPicker.BulkActionToolbar />
+				</div>
+			</DataViewsPicker>
 			{ createPortal(
 				<SnackbarNotices
 					className="media-upload-modal__snackbar"

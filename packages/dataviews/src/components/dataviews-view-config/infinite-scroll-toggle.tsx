@@ -15,11 +15,6 @@ export default function InfiniteScrollToggle() {
 	const { view, onChangeView } = context;
 	const infiniteScrollEnabled = view.infiniteScrollEnabled ?? false;
 
-	// Only render the toggle if an infinite scroll handler is available
-	if ( ! context.hasInfiniteScrollHandler ) {
-		return null;
-	}
-
 	return (
 		<ToggleControl
 			label={ __( 'Enable infinite scroll' ) }

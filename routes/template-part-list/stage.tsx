@@ -34,7 +34,6 @@ import {
 	DEFAULT_VIEW,
 	getActiveViewOverridesForTab,
 	DEFAULT_VIEWS,
-	DEFAULT_LAYOUTS,
 	viewToQuery,
 } from './view-utils';
 import { previewField } from './fields/preview';
@@ -250,6 +249,7 @@ function TemplatePartList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			headingLevel={ 2 }
 			subTitle={ postTypeObject.labels?.description }
 			className="template-part-page"
 			actions={
@@ -298,7 +298,6 @@ function TemplatePartList() {
 					totalItems,
 					totalPages,
 				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
 				onReset={ isModified ? onReset : false }

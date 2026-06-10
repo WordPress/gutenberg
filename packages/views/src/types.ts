@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import type { View } from '@wordpress/dataviews';
+import type { View, SupportedLayouts } from '@wordpress/dataviews';
 
 export type ActiveViewOverrides = {
 	// scalar values
@@ -50,6 +50,13 @@ export interface ViewConfig {
 	 * view settings.
 	 */
 	activeViewOverrides?: ActiveViewOverrides;
+
+	/**
+	 * Default layout configurations keyed by layout type.
+	 * Used to apply layout-type-specific defaults (e.g., table column styles)
+	 * that are merged as overrides based on the resolved view type.
+	 */
+	defaultLayouts?: SupportedLayouts;
 
 	/**
 	 * Optional query parameters from URL (page, search)
