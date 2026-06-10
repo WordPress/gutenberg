@@ -228,6 +228,23 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Generates a stylesheet for a given style object and selector.
 
+_Usage_
+
+```js
+import { compileCSS } from '@wordpress/style-engine';
+
+// With a selector, a full stylesheet string is returned.
+compileCSS(
+	{ spacing: { padding: '10px', margin: '12px' } },
+	{ selector: '.my-block' }
+);
+// '.my-block { margin: 12px; padding: 10px; }'
+
+// Without a selector, inline declarations are returned.
+compileCSS( { spacing: { padding: '10px', margin: '12px' } } );
+// 'margin: 12px; padding: 10px;'
+```
+
 _Parameters_
 
 -   _style_ `Style`: Style object, for example, the value of a block's attributes.style object or the top level styles in theme.json
@@ -248,6 +265,21 @@ A single CSS rule produced by `getCSSRules`.
 ### getCSSRules
 
 Returns a JSON representation of the generated CSS rules.
+
+_Usage_
+
+```js
+import { getCSSRules } from '@wordpress/style-engine';
+
+getCSSRules(
+	{ spacing: { padding: '10px', margin: '12px' } },
+	{ selector: '.my-block' }
+);
+// [
+//   { selector: '.my-block', key: 'margin', value: '12px' },
+//   { selector: '.my-block', key: 'padding', value: '10px' },
+// ]
+```
 
 _Parameters_
 
