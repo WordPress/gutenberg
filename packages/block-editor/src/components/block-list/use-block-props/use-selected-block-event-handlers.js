@@ -5,13 +5,18 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 function isColorTransparent( color ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
@@ -69,7 +74,28 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				if ( target !== node || isTextField( target ) ) {
+				// Act on a block-level interaction with this block, not when
+				// editing a text field. On trunk the event targets this block's
+				// wrapper. Under the always-on editing host it targets the host
+				// wrapper; determine "not editing text" from the live selection
+				// (the caret is not inside a rich text).
+				const { anchorNode } =
+					node.ownerDocument.defaultView.getSelection();
+				const anchorElement =
+					anchorNode?.nodeType === 1
+						? anchorNode
+						: anchorNode?.parentElement;
+				const isEditingText = !! anchorElement?.closest(
+					'[data-wp-block-attribute-key]'
+				);
+				const isBlockWrapperTarget =
+					target === node && ! isTextField( target );
+				const isHostTarget =
+					target !== node &&
+					target.isContentEditable &&
+					target.contains( node ) &&
+					! isEditingText;
+				if ( ! isBlockWrapperTarget && ! isHostTarget ) {
 					return;
 				}
 
@@ -291,7 +317,14 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
-			node.addEventListener( 'keydown', onKeyDown );
+			// Attach the keydown listener at the document level: under the
+			// always-on editing host the event targets the wrapper rather than
+			// this block, so a per-node listener would never fire.
+			const unsubscribeKeyDown = subscribeDelegatedListener(
+				node.ownerDocument,
+				'keydown',
+				onKeyDown
+			);
 			node.addEventListener( 'dragstart', onDragStart );
 
 			/**
@@ -322,7 +355,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			node.addEventListener( 'dblclick', onDoubleClick );
 
 			return () => {
-				node.removeEventListener( 'keydown', onKeyDown );
+				unsubscribeKeyDown();
 				node.removeEventListener( 'dragstart', onDragStart );
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
