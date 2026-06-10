@@ -69,8 +69,14 @@ export function getChildLayoutStyleRules( {
 		hasViewportOverride( 'selfStretch' ) ||
 		hasViewportOverride( 'flexSize' )
 	) {
-		if ( selfStretch === 'fixed' && flexSize ) {
+		if (
+			( selfStretch === 'fixed' || selfStretch === 'fixedNoShrink' ) &&
+			flexSize
+		) {
 			declarations[ 'flex-basis' ] = flexSize;
+			if ( selfStretch === 'fixedNoShrink' ) {
+				declarations[ 'flex-shrink' ] = '0';
+			}
 			declarations[ 'box-sizing' ] = 'border-box';
 		} else if ( selfStretch === 'fill' ) {
 			declarations[ 'flex-grow' ] = '1';

@@ -14,6 +14,10 @@ import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
  */
 import ChildLayoutControl from '../';
 
+jest.mock( '../../use-settings', () => ( {
+	useSettings: () => [ undefined ],
+} ) );
+
 jest.mock( '@wordpress/data/src/components/use-select', () =>
 	jest.fn( ( mapSelect ) => {
 		if ( typeof mapSelect === 'function' ) {
@@ -121,6 +125,68 @@ describe( 'ChildLayoutControl', () => {
 			rowStart: undefined,
 			rowSpan: undefined,
 			columnSpan: 1,
+		} );
+	} );
+
+	it( 'shows legacy fixed flex sizing as max width', () => {
+		renderControl( {
+			parentLayout: {
+				type: 'flex',
+				orientation: 'horizontal',
+			},
+			value: {
+				selfStretch: 'fixed',
+				flexSize: '320px',
+			},
+		} );
+
+		expect(
+			screen.getByRole( 'radio', { name: 'Max width' } )
+		).toBeChecked();
+	} );
+
+	it( 'sets fixedNoShrink when selecting fixed flex sizing', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		renderControl( {
+			parentLayout: {
+				type: 'flex',
+				orientation: 'horizontal',
+			},
+			value: {},
+			onChange,
+		} );
+
+		await user.click( screen.getByRole( 'radio', { name: 'Fixed' } ) );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			selfStretch: 'fixedNoShrink',
+			flexSize: undefined,
+		} );
+	} );
+
+	it( 'sets legacy fixed when selecting max width', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+
+		renderControl( {
+			parentLayout: {
+				type: 'flex',
+				orientation: 'horizontal',
+			},
+			value: {
+				selfStretch: 'fixedNoShrink',
+				flexSize: '320px',
+			},
+			onChange,
+		} );
+
+		await user.click( screen.getByRole( 'radio', { name: 'Max width' } ) );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			selfStretch: 'fixed',
+			flexSize: '320px',
 		} );
 	} );
 } );

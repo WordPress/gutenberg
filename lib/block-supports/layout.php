@@ -320,8 +320,11 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 	$self_stretch = $child_layout['selfStretch'] ?? null;
 
 	if ( null === $viewport_overrides || $has_viewport_property_override( 'selfStretch' ) || $has_viewport_property_override( 'flexSize' ) ) {
-		if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
+		if ( ( 'fixed' === $self_stretch || 'fixedNoShrink' === $self_stretch ) && isset( $child_layout['flexSize'] ) ) {
 			$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
+			if ( 'fixedNoShrink' === $self_stretch ) {
+				$child_layout_declarations['flex-shrink'] = '0';
+			}
 			$child_layout_declarations['box-sizing'] = 'border-box';
 		} elseif ( 'fill' === $self_stretch ) {
 			$child_layout_declarations['flex-grow'] = '1';
