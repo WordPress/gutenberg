@@ -108,7 +108,27 @@ function render_block_core_icon( $attributes ) {
 	}
 
 	// Return the updated SVG markup.
-	$svg        = $processor->get_updated_html();
+	$svg = $processor->get_updated_html();
+
+	// Wrap in anchor if URL is set.
+	if ( ! empty( $attributes['url'] ) ) {
+		$link_attrs = 'href="' . esc_url( $attributes['url'] ) . '"';
+
+		if ( ! empty( $attributes['linkTarget'] ) ) {
+			$link_attrs .= ' target="' . esc_attr( $attributes['linkTarget'] ) . '"';
+		}
+
+		if ( ! empty( $attributes['rel'] ) ) {
+			$link_attrs .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
+		}
+
+		if ( ! empty( $attributes['ariaLabel'] ) ) {
+			$link_attrs .= ' aria-label="' . esc_attr( $attributes['ariaLabel'] ) . '"';
+		}
+
+		$svg = sprintf( '<a %s>%s</a>', $link_attrs, $svg );
+	}
+
 	$attributes = get_block_wrapper_attributes();
 	return sprintf( '<div %s>%s</div>', $attributes, $svg );
 }
