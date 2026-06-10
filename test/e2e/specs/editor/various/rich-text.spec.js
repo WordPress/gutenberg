@@ -9,13 +9,52 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 	} );
 
 	test( 'should strip line breaks when pasting with disableLineBreaks enabled', async ( {
+		page,
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.insertBlock( { name: 'core/site-title' } );
+		// Register a minimal block with disableLineBreaks so the test is not
+		// coupled to core/site-title ever gaining line-break support.
+		await page.evaluate( () => {
+			const { registerBlockType } = window.wp.blocks;
+			const { useBlockProps, RichText } = window.wp.blockEditor;
+			const el = window.wp.element.createElement;
+
+			registerBlockType( 'test/disable-line-breaks', {
+				apiVersion: 3,
+				title: 'Test Disable Line Breaks',
+				category: 'text',
+				attributes: {
+					value: {
+						type: 'string',
+						source: 'html',
+						selector: 'p',
+					},
+				},
+				edit( { attributes, setAttributes } ) {
+					return el( 'p', useBlockProps(),
+						el( RichText, {
+							'aria-label': 'Test content',
+							value: attributes.value,
+							onChange( value ) {
+								setAttributes( { value } );
+							},
+							disableLineBreaks: true,
+						} )
+					);
+				},
+				save( { attributes } ) {
+					return el( 'p', useBlockProps.save(),
+						el( RichText.Content, { value: attributes.value } )
+					);
+				},
+			} );
+		} );
+
+		await editor.insertBlock( { name: 'test/disable-line-breaks' } );
 
 		await editor.canvas
-			.locator( 'role=textbox[name="Site title text"]' )
+			.locator( 'role=textbox[name="Test content"]' )
 			.click();
 
 		const multiLineContent = 'First\nSecond\nThird';
@@ -29,9 +68,13 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+v' );
 
 		const renderedText = await editor.canvas
-			.locator( 'role=textbox[name="Site title text"]' )
+			.locator( 'role=textbox[name="Test content"]' )
 			.innerText();
 		expect( renderedText ).toBe( 'First Second Third' );
+
+		await page.evaluate( () => {
+			window.wp.blocks.unregisterBlockType( 'test/disable-line-breaks' );
+		} );
 	} );
 
 	test( 'should not strip line breaks when pasting with disableLineBreaks diabled', async ( {
