@@ -158,6 +158,30 @@ import * as footnotes from './footnotes';
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
 import { unlock } from './lock-unlock';
 
+const getEnabledExperimentalBlocks = () => {
+	const blocks = [];
+
+	if ( window?.__experimentalEnableFormBlocks ) {
+		blocks.push( form );
+		blocks.push( formInput );
+		blocks.push( formSubmitButton );
+		blocks.push( formSubmissionNotification );
+	}
+
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( tabList );
+		blocks.push( tabs );
+		blocks.push( tabPanel );
+		blocks.push( tabPanels );
+		blocks.push( playlist );
+		blocks.push( playlistTrack );
+		blocks.push( slider );
+		blocks.push( slide );
+	}
+
+	return blocks.filter( Boolean );
+};
+
 /**
  * Function to get all the block-library blocks in an array
  */
@@ -280,23 +304,7 @@ const getAllBlocks = () => {
 		breadcrumbs,
 	];
 
-	if ( window?.__experimentalEnableFormBlocks ) {
-		blocks.push( form );
-		blocks.push( formInput );
-		blocks.push( formSubmitButton );
-		blocks.push( formSubmissionNotification );
-	}
-
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tabList );
-		blocks.push( tabs );
-		blocks.push( tabPanel );
-		blocks.push( tabPanels );
-		blocks.push( playlist );
-		blocks.push( playlistTrack );
-		blocks.push( slider );
-		blocks.push( slide );
-	}
+	blocks.push( ...getEnabledExperimentalBlocks() );
 
 	// Always register the classic block. Inserter availability is controlled
 	// by the block's `supports.inserter` value in `freeform/init`.
@@ -316,9 +324,12 @@ const getAllBlocks = () => {
  * ```
  */
 export const __experimentalGetCoreBlocks = () =>
-	getAllBlocks().filter(
-		( { metadata } ) => ! isBlockMetadataExperimental( metadata )
-	);
+	[
+		...getAllBlocks().filter(
+			( { metadata } ) => ! isBlockMetadataExperimental( metadata )
+		),
+		...getEnabledExperimentalBlocks(),
+	].filter( Boolean );
 
 /**
  * Function to register core blocks provided by the block editor.
