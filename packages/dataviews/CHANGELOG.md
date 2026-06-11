@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.0.0 (2026-06-10)
+
 ### Breaking Changes
 
 - Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
@@ -13,6 +15,15 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Include DataViews components in [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) documented components ([#78960](https://github.com/WordPress/gutenberg/pull/78960)).
+
+### Internal
+
+-   Update `@ariakit/react` to `0.4.29` ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
 
 ## 15.0.0 (2026-05-27)
 

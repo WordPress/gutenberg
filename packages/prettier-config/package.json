@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/prettier-config",
-	"version": "4.47.0",
+	"version": "4.48.0",
 	"description": "WordPress Prettier shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,7 +34,7 @@
 	"types": "build-types",
 	"devDependencies": {
 		"@types/node": "^20.19.39",
-		"@types/prettier": "2.4.4"
+		"@types/prettier": "^2.4.4"
 	},
 	"peerDependencies": {
 		"prettier": ">=3"

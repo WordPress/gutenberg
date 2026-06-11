@@ -22,6 +22,7 @@ import {
 	rotateImage,
 	hasTransparency,
 	setJxlWasmUrl,
+	getUltraHdrInfo,
 } from './index';
 
 /**
@@ -35,6 +36,7 @@ const api = {
 	rotateImage,
 	hasTransparency,
 	setJxlWasmUrl,
+	getUltraHdrInfo,
 };
 
 expose( api );

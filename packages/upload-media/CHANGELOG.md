@@ -7,9 +7,16 @@
 - Add JPEG XL (JXL) as a client-side supported MIME type and output format. The vips-jxl.wasm module is loaded lazily on first use via `vipsEnsureJxlSupport()`, keeping it out of the default bundle.
 - Convert uploaded JPEG XL (JXL) images to JPEG client-side via vips, since JXL is not yet broadly web-compatible (most browsers cannot display it and the server cannot read it). The original `.jxl` is preserved as a companion file alongside the JPEG derivative, mirroring how HEIC uploads are handled.
 
+## 0.33.0 (2026-06-10)
+
 ### Enhancement
 
+- UltraHDR (ISO 21496-1 gain map) JPEGs are now detected and resized via libvips's native `uhdrload`/`uhdrsave` pipeline, so gain maps are preserved automatically through the existing resize step ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
 - Automatically retry failed uploads with exponential backoff for transient (network/server) errors. Retry behavior is configurable via the `retry` store setting; non-transient failures and child sideloads are not retried. The upload queue can also be paused and resumed, allowing uploads to halt while the browser is offline and continue on reconnect ([#76765](https://github.com/WordPress/gutenberg/pull/76765)).
+
+### Bug Fix
+
+-   Route very large images, especially interlaced/progressive JPEGs, to server-side processing instead of attempting client-side processing that would exceed the 1 GiB wasm-vips memory cap and fail. [#78949](https://github.com/WordPress/gutenberg/pull/78949).
 
 ### Code Quality
 

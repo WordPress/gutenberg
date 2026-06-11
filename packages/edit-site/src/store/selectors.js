@@ -4,7 +4,6 @@
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector, createSelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -100,12 +99,9 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
 		version: '6.8',
 		alternative: `select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )`,
 	} );
-	const isWeb = Platform.OS === 'web';
-	return isWeb
-		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
-				per_page: -1,
-		  } )
-		: [];
+	return select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
+		per_page: -1,
+	} );
 } );
 
 /**

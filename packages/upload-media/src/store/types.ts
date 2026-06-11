@@ -247,6 +247,11 @@ export interface Attachment {
 	featured_media?: number;
 	missing_image_sizes?: string[];
 	poster?: string;
+	meta?:
+		| []
+		| {
+				[ k: string ]: unknown;
+		  };
 	/**
 	 * EXIF orientation value from the original image.
 	 * Values 1-8 follow the EXIF specification.
@@ -291,6 +296,8 @@ export enum OperationType {
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
+	// UltraHDR operations
+	DetectUltraHdr = 'DETECT_ULTRAHDR',
 }
 
 /**
