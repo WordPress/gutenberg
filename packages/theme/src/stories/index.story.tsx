@@ -187,7 +187,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	},
 };
 
-const NestingDebug = ( { bg = '', primary = '' } ) => (
+const NestingDebug = ( { background = '', primary = '' } ) => (
 	<div
 		style={ {
 			padding: 'var(--wpds-dimension-padding-lg)',
@@ -200,7 +200,7 @@ const NestingDebug = ( { bg = '', primary = '' } ) => (
 		} }
 	>
 		<pre style={ { margin: 0 } }>
-			bg: { bg } | primary: { primary }
+			background: { background } | primary: { primary }
 		</pre>
 		<span
 			style={ {
@@ -234,18 +234,24 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 	render: () => {
 		return (
 			<ThemeProvider>
-				<NestingDebug bg="inherit (root)" primary="inherit (root)" />
+				<NestingDebug
+					background="inherit (root)"
+					primary="inherit (root)"
+				/>
 				<div style={ { paddingInlineStart: '1rem' } }>
 					<ThemeProvider
 						color={ {
-							bg: '#1e1e1e',
+							background: '#1e1e1e',
 						} }
 					>
-						<NestingDebug bg="#1e1e1e" primary="inherit (root)" />
+						<NestingDebug
+							background="#1e1e1e"
+							primary="inherit (root)"
+						/>
 						<div style={ { paddingInlineStart: '1rem' } }>
 							<ThemeProvider>
 								<NestingDebug
-									bg="inherit (#1e1e1e)"
+									background="inherit (#1e1e1e)"
 									primary="inherit (root)"
 								/>
 								<div style={ { paddingInlineStart: '1rem' } }>
@@ -253,7 +259,7 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 										color={ { primary: 'hotpink' } }
 									>
 										<NestingDebug
-											bg="inherit (#1e1e1e)"
+											background="inherit (#1e1e1e)"
 											primary="hotpink"
 										/>
 										<div
@@ -262,10 +268,12 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 											} }
 										>
 											<ThemeProvider
-												color={ { bg: '#f8f8f8' } }
+												color={ {
+													background: '#f8f8f8',
+												} }
 											>
 												<NestingDebug
-													bg="#f8f8f8"
+													background="#f8f8f8"
 													primary="inherit (hotpink)"
 												/>
 											</ThemeProvider>
