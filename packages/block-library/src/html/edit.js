@@ -106,12 +106,9 @@ export default function HTMLEdit( { clientId } ) {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<VStack
-					className="block-editor-block-inspector-edit-contents"
-					expanded
-				>
+				<VStack className="block-library-html__edit-code" expanded>
 					<Button
-						className="block-editor-block-inspector-edit-contents__button"
+						className="block-library-html__edit-code-button"
 						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ () => setIsModalOpen( true ) }

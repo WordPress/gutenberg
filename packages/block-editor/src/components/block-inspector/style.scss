@@ -62,10 +62,3 @@
 		justify-content: center;
 	}
 }
-
-// When rendered within the inspector tabs (e.g. the Custom HTML block's
-// "Edit code" button) rather than above them, the zeroed top margin would
-// press the button against the tab list.
-.block-editor-block-inspector__tabs .block-editor-block-inspector-edit-contents {
-	margin-top: $grid-unit-20;
-}
