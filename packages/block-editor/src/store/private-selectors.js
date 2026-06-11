@@ -1078,6 +1078,45 @@ export function getListViewExpandRevision( state ) {
 }
 
 /**
+ * Returns whether a block instance participates in List View-specific UI for
+ * its inner blocks.
+ *
+ * Intentionally private: this is the derived participation logic (block type
+ * `listView` support, the `core/navigation` special case, and the
+ * "managed inner blocks" inference) shared by the List View consumers. A block
+ * opts out implicitly by entering a managed state — `templateLock: 'all'` with
+ * no inner blocks — so there is no dedicated public flag. Keeping the read
+ * internal lets this computation evolve without a back-compat commitment.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the block participates in List View-specific UI.
+ */
+export function hasBlockListViewSupport( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	const hasTypeSupport =
+		blockName === 'core/navigation' ||
+		hasBlockSupport( blockName, 'listView' );
+
+	if ( ! hasTypeSupport ) {
+		return false;
+	}
+
+	// A block whose inner blocks are fully managed — the template is locked
+	// (`templateLock: 'all'`) and there are currently no inner blocks — has
+	// nothing to select or navigate, so it doesn't participate in the List
+	// View. This lets blocks that enter a "managed inner blocks" mode (e.g. a
+	// gallery resolving its images dynamically) opt out without a dedicated
+	// flag.
+	const hasManagedInnerBlocks =
+		getTemplateLock( state, clientId ) === 'all' &&
+		getBlockOrder( state, clientId ).length === 0;
+
+	return ! hasManagedInnerBlocks;
+}
+
+/**
  * Returns the client IDs for the viewport modal, or null if
  * the modal is not open.
  *

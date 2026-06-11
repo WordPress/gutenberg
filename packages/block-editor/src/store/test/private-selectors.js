@@ -27,6 +27,7 @@ import {
 	getSelectedBlockStyleState,
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
+	hasBlockListViewSupport,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -72,6 +73,86 @@ describe( 'private selectors', () => {
 				'123456',
 				'78910',
 			] );
+		} );
+	} );
+
+	describe( 'hasBlockListViewSupport', () => {
+		const blockWithListViewSupport = 'core/test-list-view-support';
+		const blockWithoutListViewSupport = 'core/test-no-list-view-support';
+
+		const createState = (
+			blockName,
+			{ templateLock, innerBlocks = [] } = {}
+		) => ( {
+			blocks: {
+				byClientId: new Map( [ [ 'client-1', { name: blockName } ] ] ),
+				order: new Map( [ [ 'client-1', innerBlocks ] ] ),
+			},
+			blockListSettings: templateLock
+				? new Map( [ [ 'client-1', { templateLock } ] ] )
+				: new Map(),
+		} );
+
+		beforeAll( () => {
+			registerBlockType( blockWithListViewSupport, {
+				apiVersion: 3,
+				title: 'List View support',
+				category: 'text',
+				supports: {
+					listView: true,
+				},
+			} );
+			registerBlockType( blockWithoutListViewSupport, {
+				apiVersion: 3,
+				title: 'No List View support',
+				category: 'text',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( blockWithListViewSupport );
+			unregisterBlockType( blockWithoutListViewSupport );
+		} );
+
+		it( 'returns true for blocks with list view support', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false when the inner blocks are managed (locked and empty)', () => {
+			const state = createState( blockWithListViewSupport, {
+				templateLock: 'all',
+			} );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns true when locked but the block still has inner blocks', () => {
+			const state = createState( blockWithListViewSupport, {
+				templateLock: 'all',
+				innerBlocks: [ 'child-1' ],
+			} );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'does not grant list view support to unsupported block types', () => {
+			const state = createState( blockWithoutListViewSupport, {
+				templateLock: 'all',
+			} );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'preserves the navigation block special case', () => {
+			const state = createState( 'core/navigation' );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
 		} );
 	} );
 

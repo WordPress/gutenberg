@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   List View: a block that supports `listView` is now excluded from the List View when its inner blocks are fully managed — locked with `templateLock: 'all'` and currently empty — since there is nothing to select or navigate. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
+
 ## 15.21.1 (2026-06-16)
 
 ## 15.21.0 (2026-06-10)
