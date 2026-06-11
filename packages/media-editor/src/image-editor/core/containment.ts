@@ -319,15 +319,28 @@ function lerpRect(
  * grown rect already fits and is returned unchanged, so the zoom-out path is
  * unaffected.
  *
+ * The bisection runs from the intersection of `prev` and `next` (not `prev`)
+ * to `next`. A diagonal corner drag can grow one edge while shrinking the
+ * perpendicular one; interpolating the whole rect by a single `t` from `prev`
+ * would throttle the shrinking edge along with the clamped growing edge, so the
+ * corner "catches" instead of following the cursor. The intersection takes each
+ * edge's shrunk/un-grown value, so shrinking edges already sit at their `next`
+ * position (fixed for every `t`) and only the growing edges are clamped.
+ * Applying the shrink first also lowers the required zoom, giving the growing
+ * edge more room. The intersection is a subset of `prev` — coverable, since
+ * `getMinZoomForCover` is monotonic in crop size — so it is the feasible
+ * fallback (`t = 0`). For a pure outward drag the intersection equals `prev`,
+ * so the single-edge behaviour is unchanged.
+ *
  * `prevRect` is assumed coverable at `zoom` — committed state always satisfies
- * containment — so it is the feasible fallback (`t = 0`).
+ * containment.
  *
  * @param prevRect         The crop rect before this resize step.
  * @param nextRect         The proposed crop rect from the resize.
  * @param zoom             The current zoom factor.
  * @param rotation         The rotation angle in degrees.
  * @param imageAspectRatio The image width / height ratio.
- * @return The largest rect along prev->next that the image covers at `zoom`.
+ * @return The largest coverable rect between intersection(prev, next) and next.
  */
 export function restrictCropGrowth(
 	prevRect: NormalizedRect,
@@ -341,21 +354,40 @@ export function restrictCropGrowth(
 	if ( getMinZoomForCover( rotation, aspectRatio, nextRect ) <= limit ) {
 		return nextRect;
 	}
-	// Binary-search the furthest point along prev->next that the image still
+	// Feasible base: each edge at its shrunk/un-grown value (the intersection of
+	// prev and next). A subset of the coverable prev, so coverable itself. Only
+	// the grown edges differ from `next`, so the bisection clamps those alone.
+	const left = Math.max( prevRect.x, nextRect.x );
+	const top = Math.max( prevRect.y, nextRect.y );
+	const right = Math.min(
+		prevRect.x + prevRect.width,
+		nextRect.x + nextRect.width
+	);
+	const bottom = Math.min(
+		prevRect.y + prevRect.height,
+		nextRect.y + nextRect.height
+	);
+	const baseRect: NormalizedRect = {
+		x: left,
+		y: top,
+		width: Math.max( 0, right - left ),
+		height: Math.max( 0, bottom - top ),
+	};
+	// Binary-search the furthest point along base->next that the image still
 	// covers. `getMinZoomForCover` is monotonic as the crop grows, so a simple
 	// bisection converges.
 	let lo = 0;
 	let hi = 1;
 	for ( let i = 0; i < 24; i++ ) {
 		const mid = ( lo + hi ) / 2;
-		const rect = lerpRect( prevRect, nextRect, mid );
+		const rect = lerpRect( baseRect, nextRect, mid );
 		if ( getMinZoomForCover( rotation, aspectRatio, rect ) <= limit ) {
 			lo = mid;
 		} else {
 			hi = mid;
 		}
 	}
-	return lerpRect( prevRect, nextRect, lo );
+	return lerpRect( baseRect, nextRect, lo );
 }
 
 /**

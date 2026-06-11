@@ -1100,6 +1100,29 @@ describe( 'restrictCropGrowth — coverage-limited resize', () => {
 			restrictCropGrowth( prev, next, zoom, ROTATION, ASPECT )
 		).toEqual( next );
 	} );
+
+	it( 'lets the shrinking edge of a diagonal corner drag move freely while clamping the growing edge', () => {
+		// Top-left corner dragged "down and outward": the left edge grows
+		// (x decreases) while the top edge shrinks (y increases). At the
+		// coverage floor the growth alone exceeds the limit; the shrink must
+		// not be throttled along with it.
+		const prev = { x: 0.3, y: 0.3, width: 0.4, height: 0.4 };
+		const zoom = coverZoom( prev ); // exactly covers prev — no bleed.
+		const next = { x: 0.2, y: 0.4, width: 0.5, height: 0.3 };
+		const result = restrictCropGrowth( prev, next, zoom, ROTATION, ASPECT );
+
+		// Right/bottom edges were anchored — they stay put.
+		expect( result.x + result.width ).toBeCloseTo( 0.7, 6 );
+		expect( result.y + result.height ).toBeCloseTo( 0.7, 6 );
+		// The shrinking top edge reaches its requested position, untethered
+		// from the clamped left edge.
+		expect( result.y ).toBeCloseTo( 0.4, 6 );
+		// The growing left edge is clamped short of the requested 0.2.
+		expect( result.x ).toBeGreaterThan( 0.2 + 1e-6 );
+		expect( result.x ).toBeLessThanOrEqual( 0.3 + 1e-6 );
+		// The result stays coverable at the current zoom.
+		expect( coverZoom( result ) ).toBeLessThanOrEqual( zoom + 1e-3 );
+	} );
 } );
 
 describe( 'getViewScale — property invariants', () => {
