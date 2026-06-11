@@ -91,6 +91,7 @@ export default function RevisionFieldsDiffPanel() {
 			title={ __( 'Meta' ) }
 			entries={ entries }
 			initialOpen={ false }
+			className="editor-revision-meta-diff__content"
 		/>
 	);
 }

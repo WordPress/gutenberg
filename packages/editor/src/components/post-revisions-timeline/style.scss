@@ -35,7 +35,13 @@
 		min-height: 0;
 	}
 
-	// The summary header and Meta panel keep their natural height; only the
+	// Cap only the post-meta diff content so a large
+	// diff (e.g. footnotes) can't dominate the column.
+	.editor-revision-meta-diff__content {
+		max-height: 80px;
+		overflow-y: auto;
+	}
+
 	// timeline grows to fill the leftover space and scrolls internally.
 	.editor-post-revisions-timeline {
 		flex: 1;
