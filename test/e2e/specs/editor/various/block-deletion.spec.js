@@ -3,6 +3,34 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Asserts that the block element holds the selection: either the element has
+ * focus itself, or a focused editing host contains it and the selection is
+ * inside it. Blocks supporting `editableRoot` keep focus on the editing host.
+ *
+ * @param {import('@playwright/test').Locator} locator Block element locator.
+ */
+function expectBlockToHoldSelection( locator ) {
+	return expect
+		.poll( () =>
+			locator.evaluate( ( element ) => {
+				const { activeElement } = element.ownerDocument;
+				if ( element === activeElement ) {
+					return true;
+				}
+				const selection =
+					element.ownerDocument.defaultView.getSelection();
+				return (
+					!! activeElement?.isContentEditable &&
+					activeElement.contains( element ) &&
+					!! selection.anchorNode &&
+					element.contains( selection.anchorNode )
+				);
+			} )
+		)
+		.toBe( true );
+}
+
 test.describe( 'Block deletion', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -26,14 +54,14 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Ensure the last paragraph is focused.
-		await expect(
+		// Ensure the last paragraph holds the selection.
+		await expectBlockToHoldSelection(
 			editor.canvas
 				.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} )
 				.last()
-		).toBeFocused();
+		);
 
 		// Remove the current paragraph via the Block Toolbar options menu.
 		await editor.showBlockToolbar();
@@ -124,14 +152,14 @@ test.describe( 'Block deletion', () => {
 			attributes: { content: 'Third' },
 		} );
 
-		// Ensure the last paragraph is focused.
-		await expect(
+		// Ensure the last paragraph holds the selection.
+		await expectBlockToHoldSelection(
 			editor.canvas
 				.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} )
 				.last()
-		).toBeFocused();
+		);
 
 		// Remove the current paragraph via dedicated keyboard shortcut.
 		await pageUtils.pressKeys( 'access+z' );
@@ -171,9 +199,9 @@ test.describe( 'Block deletion', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 		} );
-		await expect(
+		await expectBlockToHoldSelection(
 			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
-		).toBeFocused();
+		);
 
 		// Hit backspace to remove the empty paragraph.
 		await page.keyboard.press( 'Backspace' );
@@ -262,12 +290,12 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 		} );
 
-		// Ensure the empty paragraph is focused.
-		await expect(
+		// Ensure the empty paragraph holds the selection.
+		await expectBlockToHoldSelection(
 			editor.canvas.getByRole( 'document', {
 				name: 'Empty block',
 			} )
-		).toBeFocused();
+		);
 
 		// Select the last two paragraphs.
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
@@ -290,13 +318,13 @@ test.describe( 'Block deletion', () => {
 			{ name: 'core/paragraph', attributes: { content: '' } },
 		] );
 
-		// Ensure that the newly created empty block is focused.
+		// Ensure that the newly created empty block holds the selection.
 		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
-		await expect(
+		await expectBlockToHoldSelection(
 			editor.canvas.getByRole( 'document', {
 				name: 'Empty block',
 			} )
-		).toBeFocused();
+		);
 	} );
 
 	test( 'deleting all blocks', async ( { editor, page } ) => {
@@ -305,11 +333,11 @@ test.describe( 'Block deletion', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Test' },
 		} );
-		await expect(
+		await expectBlockToHoldSelection(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} )
-		).toBeFocused();
+		);
 
 		// Remove that paragraph via its options menu.
 		await editor.showBlockToolbar();
@@ -319,12 +347,12 @@ test.describe( 'Block deletion', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
 
-		// Ensure an empty block was created and focused.
-		await expect(
+		// Ensure an empty block was created and holds the selection.
+		await expectBlockToHoldSelection(
 			editor.canvas.getByRole( 'document', {
 				name: 'Empty block',
 			} )
-		).toBeFocused();
+		);
 		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
