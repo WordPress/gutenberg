@@ -36,20 +36,47 @@ const run = ( cmd, args ) => execFileSync( cmd, args, { stdio: 'inherit' } );
 // --- 16-bit HDR fixture -------------------------------------------------
 const hdrSrc = path.join( tmp, 'hdr_src.png' );
 run( 'magick', [
-	'-size', '200x150', 'gradient:black-white',
-	'-depth', '16', '-define', 'png:color-type=2', hdrSrc,
+	'-size',
+	'200x150',
+	'gradient:black-white',
+	'-depth',
+	'16',
+	'-define',
+	'png:color-type=2',
+	hdrSrc,
 ] );
 // -d 0 = mathematically lossless, preserving the full 16-bit depth.
-run( 'cjxl', [ hdrSrc, '200x150_e2e_test_image_hdr.jxl', '-d', '0', '-e', '3' ] );
+run( 'cjxl', [
+	hdrSrc,
+	'200x150_e2e_test_image_hdr.jxl',
+	'-d',
+	'0',
+	'-e',
+	'3',
+] );
 
 // --- gain-map fixture ---------------------------------------------------
 const gmSrc = path.join( tmp, 'gm_src.png' );
 const gmBase = path.join( tmp, 'gm_base.jxl' );
 const gmPayload = path.join( tmp, 'gainmap.jpg' );
-run( 'magick', [ '-size', '200x150', 'gradient:navy-orange', '-depth', '8', gmSrc ] );
+run( 'magick', [
+	'-size',
+	'200x150',
+	'gradient:navy-orange',
+	'-depth',
+	'8',
+	gmSrc,
+] );
 run( 'cjxl', [ gmSrc, gmBase, '-q', '90', '-e', '3' ] );
 // Synthesize a plausible half-resolution grayscale gain map image.
-run( 'magick', [ '-size', '100x75', 'gradient:black-white', '-colorspace', 'Gray', gmPayload ] );
+run( 'magick', [
+	'-size',
+	'100x75',
+	'gradient:black-white',
+	'-colorspace',
+	'Gray',
+	gmPayload,
+] );
 
 const base = fs.readFileSync( gmBase );
 const payload = fs.readFileSync( gmPayload );
@@ -63,4 +90,7 @@ fs.writeFileSync(
 );
 
 fs.rmSync( tmp, { recursive: true, force: true } );
-console.log( 'Wrote 200x150_e2e_test_image_hdr.jxl and 200x150_e2e_test_image_gainmap.jxl' );
+console.log(
+	'Wrote 200x150_e2e_test_image_hdr.jxl and 200x150_e2e_test_image_gainmap.jxl'
+);
+/* eslint-enable no-console */
