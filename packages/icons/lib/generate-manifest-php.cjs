@@ -47,8 +47,8 @@ function generatePHPArray( manifest ) {
 		const filePath = escapePHPString( item.filePath );
 
 		return `${ key } => array(
-		'label'    => _x( '${ label }', 'icon label', 'gutenberg' ),
-		'filePath' => '${ filePath }',
+		'label'     => _x( '${ label }', 'icon label', 'gutenberg' ),
+		'file_path' => '${ filePath }',
 	),`;
 	} );
 
