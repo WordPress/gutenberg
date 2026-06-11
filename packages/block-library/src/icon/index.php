@@ -96,7 +96,17 @@ function render_block_core_icon( $attributes ) {
 	$processor = new WP_HTML_Tag_Processor( $svg );
 	if ( $processor->next_tag( 'svg' ) ) {
 		if ( ! empty( $styles['css'] ) ) {
-			$processor->set_attribute( 'style', $styles['css'] );
+			// Merge with the SVG's intrinsic style (e.g. `fill: none` on
+			// stroke-based icons) so it is preserved. The block styles come last
+			// so they win on any conflicting property.
+			$existing_style = $processor->get_attribute( 'style' );
+			$trimmed_style  = is_string( $existing_style )
+				? rtrim( trim( $existing_style ), ';' )
+				: '';
+			$merged_style   = '' !== $trimmed_style
+				? $trimmed_style . '; ' . $styles['css']
+				: $styles['css'];
+			$processor->set_attribute( 'style', $merged_style );
 		}
 
 		// Apply flip classes to the SVG.
