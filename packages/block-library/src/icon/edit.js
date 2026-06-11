@@ -94,9 +94,9 @@ export function Edit( { attributes, setAttributes } ) {
 	const iconToDisplay = selectedIcon?.content || '';
 
 	const flipClasses = {
-			'is-flip-horizontal': flipHorizontal,
-			'is-flip-vertical': flipVertical,
-		};
+		'is-flip-horizontal': flipHorizontal,
+		'is-flip-vertical': flipVertical,
+	};
 
 	const rotationStyle = rotation ? { rotate: `${ rotation }deg` } : {};
 
@@ -115,10 +115,10 @@ export function Edit( { attributes, setAttributes } ) {
 			</BlockControls>
 			{ icon && (
 				<BlockControls group="other">
-					<ToolbarGroup className="components-toolbar-group">
+					<ToolbarGroup>
 						<ToolbarButton
 							icon={ flipHorizontalIcon }
-							label={ __( 'Flip horizontally' ) }
+							label={ __( 'Flip horizontal' ) }
 							isPressed={ flipHorizontal }
 							onClick={ () =>
 								setAttributes( {
@@ -128,7 +128,7 @@ export function Edit( { attributes, setAttributes } ) {
 						/>
 						<ToolbarButton
 							icon={ flipVerticalIcon }
-							label={ __( 'Flip vertically' ) }
+							label={ __( 'Flip vertical' ) }
 							isPressed={ flipVertical }
 							onClick={ () =>
 								setAttributes( {
@@ -153,7 +153,7 @@ export function Edit( { attributes, setAttributes } ) {
 				// With content only mode active, the inspector is hidden, so users need another way
 				// to edit these attributes.
 				<BlockControls group="other">
-					<ToolbarGroup className="components-toolbar-group">
+					<ToolbarGroup>
 						<DropdownMenu
 							icon=""
 							popoverProps={ {

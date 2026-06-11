@@ -101,17 +101,17 @@ function render_block_core_icon( $attributes ) {
 	$flip_vertical   = $attributes['flipVertical'] ?? false;
 
 	if ( $flip_horizontal ) {
-		$processor->add_class( 'wp-block-icon--flip-horizontal' );
+		$processor->add_class( 'is-flip-horizontal' );
 	}
 	if ( $flip_vertical ) {
-		$processor->add_class( 'wp-block-icon--flip-vertical' );
+		$processor->add_class( 'is-flip-vertical' );
 	}
 
 	$rotation = isset( $attributes['rotation'] ) ? (int) $attributes['rotation'] : 0;
 
 	if ( $rotation ) {
 		$current_style = $processor->get_attribute( 'style' ) ?? '';
-		$rotation_css  = '--wp-block-icon-rotation: ' . $rotation . 'deg;';
+		$rotation_css  = 'rotate: ' . $rotation . 'deg;';
 		if ( $current_style ) {
 			$processor->set_attribute( 'style', $current_style . ' ' . $rotation_css );
 		} else {
