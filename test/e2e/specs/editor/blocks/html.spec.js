@@ -86,6 +86,7 @@ test.describe( 'HTML block', () => {
 		);
 		await expect( paragraph ).toBeVisible();
 		await paragraph.click();
+		await expect( paragraph ).toBeFocused();
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' updated' );
 
@@ -97,10 +98,19 @@ test.describe( 'HTML block', () => {
 <!-- /wp:html -->`
 		);
 
-		// The inner block is locked: it cannot be removed or moved.
-		await editor.clickBlockOptionsMenuItem( 'Delete' ).catch( () => {} );
-		expect( await editor.getEditedPostContent() ).toContain(
-			'<p>Editable paragraph updated</p>'
-		);
+		// The inner block is locked: the options menu offers no removal and
+		// the toolbar offers no movers.
+		await editor.clickBlockToolbarButton( 'Options' );
+		const optionsMenu = page.getByRole( 'menu', { name: 'Options' } );
+		await expect( optionsMenu ).toBeVisible();
+		await expect(
+			optionsMenu.getByRole( 'menuitem', { name: 'Delete' } )
+		).toBeHidden();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.locator(
+				'role=toolbar[name="Block tools"i] >> role=button[name="Move up"i]'
+			)
+		).toBeHidden();
 	} );
 } );
