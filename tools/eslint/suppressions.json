@@ -1265,24 +1265,13 @@
 		}
 	},
 	"packages/format-library/src/image/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
 	},
 	"packages/format-library/src/language/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		},
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"packages/format-library/src/link/css-classes-setting.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/format-library/src/link/inline.js": {
@@ -1291,17 +1280,11 @@
 		}
 	},
 	"packages/format-library/src/math/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}
 	},
 	"packages/format-library/src/text-color/inline.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 2
 		}

@@ -135,7 +135,6 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
-import * as tab from './tab';
 import * as tabPanel from './tab-panel';
 import * as tabPanels from './tab-panels';
 import * as table from './table';
@@ -287,7 +286,6 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
 		blocks.push( tabList );
 		blocks.push( tabs );
 		blocks.push( tabPanel );

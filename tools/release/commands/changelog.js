@@ -506,21 +506,6 @@ const createOmitByLabel = ( labels ) => ( text, issue ) =>
 		: text;
 
 /**
- * Higher-order function which returns a normalization function to omit by issue
- * label starting with any of the given prefixes
- *
- * @param {string[]} prefixes Label prefixes from which to determine if given entry
- *                            should be omitted.
- *
- * @return {WPChangelogNormalization} Normalization function.
- */
-const createOmitByLabelPrefix = ( prefixes ) => ( text, issue ) =>
-	issue.labels.some( ( label ) =>
-		prefixes.some( ( prefix ) => label.name.startsWith( prefix ) )
-	)
-		? undefined
-		: text;
-/**
  * Given an issue title and issue, returns the title with redundant grouping
  * type details removed. The prefix is redundant since it would already be clear
  * enough by group assignment that the prefix would be inferred.
@@ -564,8 +549,6 @@ function removeFeaturePrefix( text ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByLabelPrefix( [ 'Mobile App' ] ),
-	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
 	removeRedundantTypePrefix,
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
@@ -1091,7 +1074,6 @@ module.exports = {
 	capitalizeAfterColonSeparatedPrefix,
 	createOmitByTitlePrefix,
 	createOmitByLabel,
-	createOmitByLabelPrefix,
 	addTrailingPeriod,
 	getNormalizedTitle,
 	getReleaseChangelog,
