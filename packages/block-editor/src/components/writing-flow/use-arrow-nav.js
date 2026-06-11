@@ -18,7 +18,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -198,8 +198,17 @@ export default function useArrowNav() {
 				return;
 			}
 
-			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
-				event;
+			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
+			// When the wrapper is contentEditable and holds focus (the
+			// selected block supports `editableRoot`), the event targets the
+			// wrapper; resolve the editable element containing the selection.
+			const target =
+				( event.target === node &&
+					getSelectionEditableElement(
+						node.ownerDocument.defaultView.getSelection(),
+						node
+					) ) ||
+				event.target;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;

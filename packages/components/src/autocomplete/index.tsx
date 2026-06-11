@@ -8,18 +8,14 @@ import {
 	useReducer,
 	useRef,
 } from '@wordpress/element';
-import {
-	useInstanceId,
-	useMergeRefs,
-	useRefEffect,
-	privateApis as composePrivateApis,
-} from '@wordpress/compose';
+import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	create,
 	slice,
 	insert,
 	isCollapsed,
 	getTextContent,
+	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
 import { isAppleOS } from '@wordpress/keycodes';
@@ -43,7 +39,7 @@ import type {
 import getNodeText from '../utils/get-node-text';
 import { unlock } from '../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
@@ -409,7 +405,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 			// fire at bubble phase and gate on `event.defaultPrevented`,
 			// so firing in capture lets us preventDefault first when the
 			// popover is active.
-			return subscribeDelegatedListener(
+			return subscribeOwnedListener(
 				element,
 				'keydown',
 				_onKeyDown,
