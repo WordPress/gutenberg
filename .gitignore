@@ -43,6 +43,7 @@ Thumbs.db
 junit.xml
 
 # Local overrides
+/.vscode/settings.json
 .wp-env.override.json
 .wp-env.test.override.json
 playwright.config.override.ts
