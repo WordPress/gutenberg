@@ -179,7 +179,7 @@ export default function PostRevisionsTimeline() {
 				onChangeSelection={ onChangeSelection }
 			>
 				<DataViewsPicker.Layout />
-				<DataViewsPicker.Pagination />
+				<DataViewsPicker.Footer />
 			</DataViewsPicker>
 		</div>
 	);
