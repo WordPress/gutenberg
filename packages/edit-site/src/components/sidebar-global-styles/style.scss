@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-styles {
@@ -25,7 +24,7 @@
 		}
 	}
 	.edit-site-sidebar-button {
-		color: $gray-900;
+		color: var(--wpds-color-fg-interactive-neutral);
 	}
 }
 

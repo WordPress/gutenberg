@@ -85,6 +85,10 @@ function InstalledFonts() {
 	const [ fontFamilies, setFontFamilies ] = useSetting<
 		Record< string, FontFamilyPreset[] > | undefined
 	>( 'typography.fontFamilies' );
+	const [ lastSelectedFontSlug, setLastSelectedFontSlug ] = useState<
+		string | undefined
+	>( undefined );
+
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] =
 		useState< boolean >( false );
 	const [ notice, setNotice ] = useState< {
@@ -327,6 +331,10 @@ function InstalledFonts() {
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
+														shouldFocus={
+															font.slug ===
+															lastSelectedFontSlug
+														}
 														onClick={ () => {
 															setNotice( null );
 															handleSetLibraryFontSelected(
@@ -368,6 +376,10 @@ function InstalledFonts() {
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
+														shouldFocus={
+															font.slug ===
+															lastSelectedFontSlug
+														}
 														onClick={ () => {
 															setNotice( null );
 															handleSetLibraryFontSelected(
@@ -405,6 +417,9 @@ function InstalledFonts() {
 									}
 									size="small"
 									onClick={ () => {
+										setLastSelectedFontSlug(
+											libraryFontSelected?.slug
+										);
 										handleSetLibraryFontSelected(
 											undefined
 										);
