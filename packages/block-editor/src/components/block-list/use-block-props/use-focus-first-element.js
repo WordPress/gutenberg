@@ -58,6 +58,23 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
+		// Do not move the caret when a focused editing host contains the
+		// block (the block supports `editableRoot`) and the selection is
+		// already inside the block.
+		const { activeElement } = ownerDocument;
+		if (
+			activeElement?.isContentEditable &&
+			activeElement.contains( ref.current )
+		) {
+			const selection = ownerDocument.defaultView.getSelection();
+			if (
+				selection.anchorNode &&
+				ref.current.contains( selection.anchorNode )
+			) {
+				return;
+			}
+		}
+
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
 			.find( ref.current )
