@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.15.0 (2026-06-10)
+
 ### New Features
 
 -   Add `--wpds-dimension-size-*` design tokens for element sizing ([#76545](https://github.com/WordPress/gutenberg/pull/76545)).
@@ -13,10 +15,15 @@
 ### Breaking Changes
 - Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
+-   Rename the `color.bg` prop on `ThemeProvider` to `color.background` ([#79007](https://github.com/WordPress/gutenberg/pull/79007)).
 
 ### Enhancements
 
 -   Increase the contrast target of `stroke1` from `2.6` to `2.9` so that, on the default scale, it lands between `gray100` and `gray200`. This regenerates `stroke1` for every ramp and updates the values of `--wpds-color-stroke-surface-{brand,error,info,success,warning,neutral-weak}` and `--wpds-color-bg-track-neutral-weak` ([#77599](https://github.com/WordPress/gutenberg/pull/77599)).
+
+### Internal
+
+-   Add Figma `WIDTH_HEIGHT` scopes to `--wpds-dimension-size-*` design tokens ([#79032](https://github.com/WordPress/gutenberg/pull/79032)).
 
 ## 0.14.0 (2026-05-27)
 

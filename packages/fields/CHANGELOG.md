@@ -6,6 +6,8 @@
 
 - Fields: The `title` field now uses the DataViews `richtext` control, removing the dependency on `@wordpress/rich-text-control`. [#78825](https://github.com/WordPress/gutenberg/pull/78825)
 
+## 0.40.0 (2026-06-10)
+
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).

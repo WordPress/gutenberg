@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-data",
-	"version": "7.47.0",
+	"version": "7.48.0",
 	"description": "Access to and manipulation of core WordPress entities.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -77,7 +77,7 @@
 		"@testing-library/react": "^16.3.2",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.19.39",
-		"deep-freeze": "0.0.1"
+		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

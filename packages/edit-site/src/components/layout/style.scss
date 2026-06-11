@@ -84,6 +84,13 @@
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
+}
+
+// On mobile, the content surface lives on the scroll wrapper
+// (not the inner content element) so it also covers the wrapper's
+// reserved scrollbar gutter, preventing the theme background color from
+// bleeding through.
+.edit-site-sidebar__screen-wrapper:has(.edit-site-layout__mobile-content) {
 	background: var(--wpds-color-bg-surface-neutral);
 }
 

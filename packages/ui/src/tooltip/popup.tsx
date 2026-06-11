@@ -15,22 +15,23 @@ import styles from './style.module.css';
 const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
+/*
+ * This should ideally use whatever dark color makes sense, and not be
+ * hardcoded to #1e1e1e. The solutions would be to:
+ *   - review the design of the tooltip, in case we want to stop hardcoding
+ *     it to a dark background
+ *   - create new semantic tokens as needed (aliasing either the "inverted
+ *     bg" or "perma-dark bg" private tokens) and have Tooltip.Popup use them;
+ *   - remove the hardcoded `background` setting altogether
+ */
+const POPUP_COLOR = { background: '#1e1e1e' };
+
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 	{ portal, positioner, children, className, ...props },
 	ref
 ) {
 	const popupContent = (
-		/* This should ideally use whatever dark color makes sense,
-		 * and not be hardcoded to #1e1e1e. The solutions would be to:
-		 *   - review the design of the tooltip, in case we want to stop
-		 *     hardcoding it to a dark background
-		 *   - create new semantic tokens as needed (aliasing either the
-		 *     "inverted bg" or "perma-dark bg" private tokens) and have
-		 *     Tooltip.Popup use them;
-		 *   - remove the hardcoded `bg` setting from the `ThemeProvider`
-		 *     below
-		 */
-		<ThemeProvider color={ { bg: '#1e1e1e' } }>
+		<ThemeProvider color={ POPUP_COLOR }>
 			<_Tooltip.Popup
 				ref={ ref }
 				className={ clsx( styles.popup, className ) }

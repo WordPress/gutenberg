@@ -50,36 +50,6 @@ const { useRichText, keyboardShortcutContext, inputEventContext } =
 
 const instanceIdKey = Symbol( 'instanceId' );
 
-/**
- * Removes props used for the native version of RichText so that they are not
- * passed to the DOM element and log warnings.
- *
- * @param {Object} props Props to filter.
- *
- * @return {Object} Filtered props.
- */
-function removeNativeProps( props ) {
-	const {
-		__unstableMobileNoFocusOnMount,
-		deleteEnter,
-		placeholderTextColor,
-		textAlign,
-		selectionColor,
-		tagsToEliminate,
-		disableEditingMenu,
-		fontSize,
-		fontFamily,
-		fontWeight,
-		fontStyle,
-		minWidth,
-		maxWidth,
-		disableSuggestions,
-		disableAutocorrection,
-		...restProps
-	} = props;
-	return restProps;
-}
-
 export function RichTextWrapper(
 	{
 		children,
@@ -112,8 +82,6 @@ export function RichTextWrapper(
 	},
 	forwardedRef
 ) {
-	props = removeNativeProps( props );
-
 	if ( onSplit ) {
 		deprecated( 'wp.blockEditor.RichText onSplit prop', {
 			since: '6.4',
@@ -531,7 +499,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 			__unstableAllowPrefixTransformations,
 			readOnly,
 			...contentProps
-		} = removeNativeProps( props );
+		} = props;
 		return (
 			<Tag
 				ref={ ref }

@@ -64,9 +64,7 @@ test.describe( 'Fullscreen Mode', () => {
 		admin,
 		requestUtils,
 	} ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-admin-bar-in-editor',
-		] );
+		await requestUtils.setGutenbergExperiments( [ 'gutenberg-omnibar' ] );
 		await admin.createNewPost();
 		await enableFullscreenMode( page );
 
@@ -84,9 +82,7 @@ test.describe( 'Fullscreen Mode', () => {
 		requestUtils,
 		pageUtils,
 	} ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-admin-bar-in-editor',
-		] );
+		await requestUtils.setGutenbergExperiments( [ 'gutenberg-omnibar' ] );
 		await admin.createNewPost();
 		await enableFullscreenMode( page );
 		await enableDistractionFreeMode( pageUtils );
@@ -103,9 +99,7 @@ test.describe( 'Fullscreen Mode', () => {
 		requestUtils,
 		pageUtils,
 	} ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-admin-bar-in-editor',
-		] );
+		await requestUtils.setGutenbergExperiments( [ 'gutenberg-omnibar' ] );
 		await pageUtils.setBrowserViewport( 'small' );
 		await admin.createNewPost();
 		await enableDistractionFreeMode( pageUtils );
@@ -131,7 +125,7 @@ test.describe( 'Fullscreen Mode', () => {
 			requestUtils,
 		} ) => {
 			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-admin-bar-in-editor',
+				'gutenberg-omnibar',
 			] );
 			await admin.visitSiteEditor( { canvas: 'edit' } );
 

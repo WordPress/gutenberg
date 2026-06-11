@@ -1465,28 +1465,24 @@ describe( 'Tabs', () => {
 							/>
 						);
 
-						// When the selected tab is changed, focus should not be changed.
+						// When the selected tab is changed by the controlling
+						// component while the tablist holds focus, focus moves to
+						// the newly selected tab (Gamma).
 						expect(
 							screen.getByRole( 'tab', {
 								selected: true,
 								name: 'Gamma',
 							} )
-						).toBeVisible();
-						expect(
-							screen.getByRole( 'tab', {
-								selected: false,
-								name: 'Beta',
-							} )
 						).toHaveFocus();
 
-						// Arrow left should move focus to the previous tab (alpha).
-						// The alpha tab should be always focused, and should be selected
+						// Arrow left should move focus to the previous tab (Beta).
+						// Beta should always be focused, and should be selected
 						// when the `selectOnMove` prop is set to `true`.
 						await press.ArrowLeft();
 						expect(
 							screen.getByRole( 'tab', {
 								selected: selectOnMove,
-								name: 'Alpha',
+								name: 'Beta',
 							} )
 						).toHaveFocus();
 					} );
@@ -1530,17 +1526,14 @@ describe( 'Tabs', () => {
 							</>
 						);
 
-						// When the selected tab is changed, it should not automatically receive focus.
+						// When the selected tab is changed by the controlling
+						// component while the tablist holds focus, focus moves to
+						// the newly selected tab (Gamma), which also becomes the
+						// active tab.
 						expect(
 							screen.getByRole( 'tab', {
 								selected: true,
 								name: 'Gamma',
-							} )
-						).toBeVisible();
-						expect(
-							screen.getByRole( 'tab', {
-								selected: false,
-								name: 'Beta',
 							} )
 						).toHaveFocus();
 
@@ -1550,18 +1543,14 @@ describe( 'Tabs', () => {
 							screen.getByRole( 'button', { name: 'Focus me' } )
 						).toHaveFocus();
 
-						// Press tab, move focus back to the tablist
+						// Press tab, move focus back to the tablist. Because the
+						// newly selected tab became the active tab, focus returns
+						// to Gamma regardless of `selectOnMove`.
 						await press.Tab();
-
-						const betaTab = screen.getByRole( 'tab', {
-							name: 'Beta',
-						} );
-						const gammaTab = screen.getByRole( 'tab', {
-							name: 'Gamma',
-						} );
-
 						expect(
-							selectOnMove ? gammaTab : betaTab
+							screen.getByRole( 'tab', {
+								name: 'Gamma',
+							} )
 						).toHaveFocus();
 					} );
 				}

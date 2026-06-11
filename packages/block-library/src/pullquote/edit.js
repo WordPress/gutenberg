@@ -61,7 +61,6 @@ function PullQuoteEdit( {
 							// translators: placeholder text used for the quote
 							__( 'Add quote' )
 						}
-						textAlign="center"
 					/>
 					{ shouldShowCitation && (
 						<RichText
@@ -80,8 +79,6 @@ function PullQuoteEdit( {
 								} )
 							}
 							className="wp-block-pullquote__citation"
-							__unstableMobileNoFocusOnMount
-							textAlign="center"
 							__unstableOnSplitAtEnd={ () =>
 								insertBlocksAfter(
 									createBlock( getDefaultBlockName() )
