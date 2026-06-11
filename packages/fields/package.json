@@ -43,6 +43,7 @@
 	"wpScriptModuleExports": {
 		"./loader": "./build-module/collections/loader.mjs",
 		"./postType-attachment": "./build-module/collections/postType-attachment/extensions.mjs",
+		"./postType-default": "./build-module/collections/postType-default/extensions.mjs",
 		"./postType-page": "./build-module/collections/postType-page/extensions.mjs",
 		"./postType-post": "./build-module/collections/postType-post/extensions.mjs",
 		"./postType-wp_block": "./build-module/collections/postType-wp_block/extensions.mjs",
