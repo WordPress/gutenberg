@@ -10,7 +10,11 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { isInsideRootBlock, getBlockClientId } from '../../utils/dom';
+import {
+	isInsideRootBlock,
+	getBlockClientId,
+	getSelectionEditableElement,
+} from '../../utils/dom';
 
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
@@ -25,26 +29,28 @@ export default function useSelectAll() {
 			}
 
 			const selectedClientIds = getSelectedBlockClientIds();
+			const { ownerDocument } = node;
+			const selection = ownerDocument.defaultView.getSelection();
+			// When the wrapper is contentEditable and holds focus (the
+			// selected block supports `editableRoot`), the event targets the
+			// wrapper; resolve the editable element containing the selection.
+			const editable =
+				( event.target === node &&
+					getSelectionEditableElement( selection, node ) ) ||
+				event.target;
 
 			if (
 				selectedClientIds.length < 2 &&
-				! isEntirelySelected( event.target )
+				! isEntirelySelected( editable )
 			) {
-				// When the wrapper is contentEditable (the selected block
-				// supports `editableRoot`), the browser default would select
-				// the entire canvas. Select the contents of the editable
-				// element instead, like the default does when the element
-				// itself holds focus.
-				if (
-					node.contentEditable === 'true' &&
-					event.target !== node &&
-					event.target.isContentEditable
-				) {
+				// While the wrapper is contentEditable, the browser default
+				// would select the entire canvas. Select the contents of the
+				// editable element instead, like the default does when the
+				// element itself holds focus.
+				if ( event.target === node && editable !== node ) {
 					event.preventDefault();
-					const { ownerDocument } = event.target;
 					const range = ownerDocument.createRange();
-					range.selectNodeContents( event.target );
-					const selection = ownerDocument.defaultView.getSelection();
+					range.selectNodeContents( editable );
 					selection.removeAllRanges();
 					selection.addRange( range );
 					// The native `selectionchange` event is asynchronous;
@@ -60,7 +66,6 @@ export default function useSelectAll() {
 
 			event.preventDefault();
 
-			const { ownerDocument } = event.target;
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const activeClientId = getBlockClientId(
 				ownerDocument.activeElement
