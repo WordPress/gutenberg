@@ -1,7 +1,14 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -48,6 +55,13 @@ export default function MediaEditorCanvas( {
 	const cropperImage = controller.state.image;
 	const { beginGesture, endGesture, setImage } = controller;
 
+	// Tracks whether the image pixels have actually loaded. The cropper's
+	// geometry is driven by the known media dimensions, so its handles and
+	// overlays would otherwise appear before the image finishes streaming in.
+	const [ status, setStatus ] = useState< 'loading' | 'loaded' | 'error' >(
+		'loading'
+	);
+
 	// Resolved aspect ratio is derived from the preset key + the
 	// loaded image (for the "Original" preset). The reducer doesn't
 	// store this number — only the preset key — so it's a render-time
@@ -90,23 +104,69 @@ export default function MediaEditorCanvas( {
 		} );
 	}, [ cropperImage, mediaUrl, mediaWidth, mediaHeight, setImage ] );
 
-	if ( ! mediaUrl || mediaType.type !== 'image' ) {
+	const isImage = mediaType.type === 'image';
+
+	// Probe the image to know when its pixels have loaded (or failed),
+	// independent of the cropper. The browser shares one fetch/cache with the
+	// cropper's own `<img>`, so this adds no network cost. The cropper stays
+	// framework-pure — load/error handling lives here in the wrapper layer.
+	useEffect( () => {
+		if ( ! mediaUrl || ! isImage ) {
+			return;
+		}
+		setStatus( 'loading' );
+		const probe = new window.Image();
+		probe.onload = () => setStatus( 'loaded' );
+		probe.onerror = () => setStatus( 'error' );
+		probe.src = mediaUrl;
+		// Cached images may already be complete before listeners attach.
+		if ( probe.complete ) {
+			setStatus( probe.naturalWidth > 0 ? 'loaded' : 'error' );
+		}
+		return () => {
+			probe.onload = null;
+			probe.onerror = null;
+		};
+	}, [ mediaUrl, isImage ] );
+
+	if ( ! mediaUrl || ! isImage ) {
 		return null;
+	}
+
+	if ( status === 'error' ) {
+		return (
+			<div className="media-editor-canvas">
+				<div className="media-editor-canvas__error">
+					<p>{ __( 'Failed to load image.' ) }</p>
+				</div>
+			</div>
+		);
 	}
 
 	return (
 		<div className="media-editor-canvas">
-			<Cropper
-				src={ mediaUrl }
-				controller={ controller }
-				aspectRatio={ aspectRatio }
-				freeformCrop
-				focusOnMount={ focusOnMount }
-				showGrid="interactive"
-				isPlacementActive={ isPlacementActive }
-				onGestureStart={ handleGestureStart }
-				onGestureEnd={ handleGestureEnd }
-			/>
+			{ status === 'loading' && (
+				<div className="media-editor-canvas__spinner">
+					<Spinner />
+				</div>
+			) }
+			<div
+				className={ clsx( 'media-editor-canvas__cropper', {
+					'is-loaded': status === 'loaded',
+				} ) }
+			>
+				<Cropper
+					src={ mediaUrl }
+					controller={ controller }
+					aspectRatio={ aspectRatio }
+					freeformCrop
+					focusOnMount={ focusOnMount }
+					showGrid="interactive"
+					isPlacementActive={ isPlacementActive }
+					onGestureStart={ handleGestureStart }
+					onGestureEnd={ handleGestureEnd }
+				/>
+			</div>
 		</div>
 	);
 }
