@@ -534,7 +534,7 @@
 
 @mixin wordpress-admin-schemes() {
 	body.admin-color-light {
-		@include admin-scheme(#0085ba);
+		@include admin-scheme(#007cba);
 	}
 
 	body.admin-color-modern {
@@ -542,27 +542,27 @@
 	}
 
 	body.admin-color-blue {
-		@include admin-scheme(#096484);
+		@include admin-scheme(#437aa8);
 	}
 
 	body.admin-color-coffee {
-		@include admin-scheme(#46403c);
+		@include admin-scheme(#916745);
 	}
 
 	body.admin-color-ectoplasm {
-		@include admin-scheme(#523f6d);
+		@include admin-scheme(#646c3e);
 	}
 
 	body.admin-color-midnight {
-		@include admin-scheme(#e14d43);
+		@include admin-scheme(#cf4339);
 	}
 
 	body.admin-color-ocean {
-		@include admin-scheme(#627c83);
+		@include admin-scheme(#567958);
 	}
 
 	body.admin-color-sunrise {
-		@include admin-scheme(#dd823b);
+		@include admin-scheme(#ad631e);
 	}
 }
 

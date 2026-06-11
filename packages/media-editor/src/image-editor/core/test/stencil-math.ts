@@ -5,10 +5,49 @@ import {
 	computeFreeResizeRect,
 	computeLockedResizeRect,
 	computeShiftLockedResizeRect,
+	getMinCropPixels,
 	type CropBounds,
 	type ResizeDragState,
 } from '../stencil-math';
+import { MIN_CROP_PIXELS, MIN_CROP_SCREEN_PX } from '../constants';
 import type { Size } from '../types';
+
+describe( 'getMinCropPixels — operable on-screen floor', () => {
+	it( 'returns the source-pixel hard floor when the image is shown large enough', () => {
+		// displayScale = 2 CSS px per source px (zoomed in). The usability
+		// term is 44 / 2 = 22 px, below the 24-source-px hard floor, so the
+		// hard floor wins.
+		expect( getMinCropPixels( 2 ) ).toBe( MIN_CROP_PIXELS );
+	} );
+
+	it( 'raises the floor so the crop stays operable when the image is shown small', () => {
+		// A large image fit into a small window: ~0.2 CSS px per source px.
+		// 24 source px would render as ~4.8 px on screen — unusable. The
+		// usability term (44 / 0.2 = 220 source px) must win.
+		expect( getMinCropPixels( 0.2 ) ).toBeCloseTo(
+			MIN_CROP_SCREEN_PX / 0.2,
+			5
+		);
+		expect( getMinCropPixels( 0.2 ) ).toBeGreaterThan( MIN_CROP_PIXELS );
+	} );
+
+	it( 'crosses over from usability floor to hard floor at displayScale = MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS', () => {
+		const crossover = MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS;
+		expect( getMinCropPixels( crossover ) ).toBeCloseTo(
+			MIN_CROP_PIXELS,
+			5
+		);
+		// Just below the crossover, the usability term exceeds the hard floor.
+		expect( getMinCropPixels( crossover * 0.99 ) ).toBeGreaterThan(
+			MIN_CROP_PIXELS
+		);
+	} );
+
+	it( 'falls back to the hard floor for a non-positive display scale', () => {
+		expect( getMinCropPixels( 0 ) ).toBe( MIN_CROP_PIXELS );
+		expect( getMinCropPixels( -1 ) ).toBe( MIN_CROP_PIXELS );
+	} );
+} );
 
 const FULL_BOUNDS: CropBounds = { minX: 0, minY: 0, maxX: 1, maxY: 1 };
 

@@ -644,7 +644,8 @@ export default function Image( {
 		isSingleSelected &&
 		canEditImage &&
 		! isEditingImage &&
-		! isContentOnlyMode;
+		! isContentOnlyMode &&
+		! isUploading;
 
 	function switchToCover() {
 		replaceBlocks(

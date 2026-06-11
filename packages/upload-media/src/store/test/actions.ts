@@ -334,6 +334,61 @@ describe( 'actions', () => {
 			);
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
+
+		it( 'routes very large interlaced images to the server', async () => {
+			// A progressive JPEG (SOF2) header reporting 20000x11857, which
+			// exceeds the client-side memory budget for interlaced images.
+			const dimensions = new Uint8Array( 4 );
+			const dimView = new DataView( dimensions.buffer );
+			dimView.setUint16( 0, 11857 ); // height
+			dimView.setUint16( 2, 20000 ); // width
+			const bytes = new Uint8Array( [
+				0xff,
+				0xd8, // SOI
+				0xff,
+				0xc2, // SOF2 (progressive)
+				0x00,
+				0x11, // segment length
+				0x08, // precision
+				...dimensions, // height (2) + width (2)
+				0x03, // components
+				0x00,
+				0x00,
+				0x00,
+			] );
+			const largeJpeg = new File( [ bytes ], 'huge.jpg', {
+				type: 'image/jpeg',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: largeJpeg,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Should fall back to server-side processing: only Upload, no
+			// client-side thumbnail generation.
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
 	} );
 
 	describe( 'concurrent sideloads', () => {

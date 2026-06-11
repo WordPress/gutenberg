@@ -73,7 +73,8 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
 const { useCommandContext } = unlock( commandsPrivateApis );
 /** @type {{} & {useDrag: import('@use-gesture/react').useDrag}} */
 const { useDrag } = unlock( componentsPrivateApis );
-const { Editor, FullscreenMode } = unlock( editorPrivateApis );
+const { Editor, FullscreenMode, UploadProgressSnackbar } =
+	unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -623,6 +624,7 @@ function Layout( {
 							<PostEditorMoreMenu />
 							{ backButton }
 							<SnackbarNotices className="edit-post-layout__snackbar" />
+							<UploadProgressSnackbar />
 						</Editor>
 					</div>
 				</ErrorBoundary>
