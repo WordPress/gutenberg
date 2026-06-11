@@ -215,10 +215,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		$icons = array();
 
 		foreach ( $this->registered_icons as $icon ) {
-			if ( empty( $icon['show_in_rest'] ) ) {
-				continue;
-			}
-
 			if ( ! empty( $search )
 				&& false === stripos( $icon['name'], $search )
 				&& false === stripos( $icon['label'], $search )
@@ -294,6 +290,9 @@ function gutenberg_override_wp_icons_registry() {
 				$icon_properties['file_path'] = $icon['file_path'];
 			} else {
 				continue;
+			}
+			if ( isset( $icon['show_in_rest'] ) ) {
+				$icon_properties['show_in_rest'] = $icon['show_in_rest'];
 			}
 			$register_method->invoke( $gutenberg_registry, $icon['name'], $icon_properties );
 		}

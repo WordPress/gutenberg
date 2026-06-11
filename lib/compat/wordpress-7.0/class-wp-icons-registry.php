@@ -68,8 +68,9 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				$this->register(
 					'core/' . $icon_name,
 					array(
-						'label'     => $icon_data['label'],
-						'file_path' => $icons_directory . $icon_data['filePath'],
+						'label'        => $icon_data['label'],
+						'file_path'    => $icons_directory . $icon_data['filePath'],
+						'show_in_rest' => ! empty( $icon_data['showInRest'] ),
 					)
 				);
 			}
@@ -87,6 +88,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 *                            If not provided, the content will be retrieved from the `file_path` if set.
 		 *                            If both `content` and `file_path` are not set, the icon will not be registered.
 		 *     @type string $file_path Optional. The full path to the file containing the icon content.
+		 *     @type bool   $show_in_rest Optional. Whether the icon is exposed through the REST API.
 		 * }
 		 * @return bool True if the icon was registered with success and false otherwise.
 		 */
@@ -100,7 +102,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				return false;
 			}
 
-			$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path' ), 1 );
+			$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'show_in_rest' ), 1 );
 			foreach ( array_keys( $icon_properties ) as $key ) {
 				if ( ! array_key_exists( $key, $allowed_keys ) ) {
 					_doing_it_wrong(
@@ -156,6 +158,15 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					);
 					return false;
 				}
+			}
+
+			if ( isset( $icon_properties['show_in_rest'] ) && ! is_bool( $icon_properties['show_in_rest'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon show_in_rest flag must be a boolean.', 'gutenberg' ),
+					'7.1.0'
+				);
+				return false;
 			}
 
 			$icon = array_merge(
