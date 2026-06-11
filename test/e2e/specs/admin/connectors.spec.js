@@ -461,11 +461,13 @@ test.describe( 'Connectors', () => {
 			slug: 'gutenberg-test-connectors-never-installed',
 			name: 'Test Install Required Connector',
 			action: 'Install',
+			pluginSlug: 'gutenberg-test-connectors-never-installed',
 		};
 		const activateRequiredConnector = {
 			slug: 'hello',
 			name: 'Test Activate Required Connector',
 			action: 'Activate',
+			pluginSlug: 'hello',
 		};
 		const clearCapabilityRestriction = async ( requestUtils ) => {
 			await requestUtils.rest( {
@@ -519,7 +521,7 @@ test.describe( 'Connectors', () => {
 					CONNECTORS_PAGE_QUERY
 				);
 
-				for ( const { slug, name, action } of [
+				for ( const { slug, name, action, pluginSlug } of [
 					installRequiredConnector,
 					activateRequiredConnector,
 				] ) {
@@ -528,9 +530,14 @@ test.describe( 'Connectors', () => {
 					await expect(
 						card.getByRole( 'heading', { name, level: 2 } )
 					).toBeVisible();
-					await expect(
-						card.getByText( 'Not available' )
-					).toBeVisible();
+					const learnMoreLink = card.getByRole( 'link', {
+						name: 'Learn more',
+					} );
+					await expect( learnMoreLink ).toBeVisible();
+					await expect( learnMoreLink ).toHaveAttribute(
+						'href',
+						`https://wordpress.org/plugins/${ pluginSlug }/`
+					);
 					await expect(
 						card.getByRole( 'button', { name: action } )
 					).toBeHidden();

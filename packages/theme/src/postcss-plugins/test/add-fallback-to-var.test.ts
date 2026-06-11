@@ -1,4 +1,4 @@
-import { addFallbackToVar } from '../add-fallback-to-var';
+import { addFallbackToVar } from '../add-fallback-to-var.mjs';
 
 const mockFallbacks: Record< string, string > = {
 	'--wpds-border-radius-sm': '2px',

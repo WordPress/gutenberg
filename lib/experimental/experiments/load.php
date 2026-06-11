@@ -34,6 +34,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-classic-block-deprecation',
+					'label'       => __( 'Classic block deprecation', 'gutenberg' ),
+					'description' => __( 'Enables UI changes aimed at deprecating the Classic block, including prompts on existing Classic blocks to migrate their content to blocks or to a Custom HTML block.', 'gutenberg' ),
+				),
 			),
 		),
 		array(
@@ -42,13 +47,8 @@ function gutenberg_initialize_experiments_settings() {
 			'items' => array(
 				array(
 					'id'          => 'gutenberg-media-editor',
-					'label'       => __( 'Media Editor', 'gutenberg' ),
-					'description' => __( 'Adds an "Edit media" action on image blocks for editing the attached media item (metadata and content) in the editor.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-media-editor-modal',
-					'label'       => __( 'Media Editor Modal', 'gutenberg' ),
-					'description' => __( 'Enables an in-place modal for image editing — cropping, adjustments, and metadata — opened from blocks like the image block without navigating away from the current post.', 'gutenberg' ),
+					'label'       => __( 'Media Editor (Route)', 'gutenberg' ),
+					'description' => __( 'Enables a dedicated route-based media editor screen for editing media items (metadata and content).', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dataviews-media-modal',
@@ -129,6 +129,16 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-omnibar',
+					'label'       => __( 'Omnipresent Toolbar', 'gutenberg' ),
+					'description' => __( 'Improves the toolbar as navigation layer, including showing the toolbar in the fullscreen Post and Site Editor.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-react-19',
+					'label'       => __( 'React 19', 'gutenberg' ),
+					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
 				),
 			),
 		),

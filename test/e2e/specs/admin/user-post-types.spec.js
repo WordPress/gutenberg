@@ -4,7 +4,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_PAGE_PATH = 'options-general.php';
-const POST_TYPES_PAGE_QUERY = 'page=post-types-wp-admin';
+const CONTENT_TYPES_PAGE_QUERY = 'page=content-types-wp-admin&p=/post-types';
 const POST_TYPES_REST_BASE = 'user-post-types';
 
 async function createUserPostType( requestUtils ) {
@@ -35,7 +35,10 @@ test.describe( 'User post types', () => {
 	} );
 
 	test( 'creates a post type and registers it', async ( { admin, page } ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
+		await admin.visitAdminPage(
+			SETTINGS_PAGE_PATH,
+			CONTENT_TYPES_PAGE_QUERY
+		);
 
 		await page.getByRole( 'button', { name: 'Add post type' } ).click();
 
@@ -81,7 +84,10 @@ test.describe( 'User post types', () => {
 		requestUtils,
 	} ) => {
 		await createUserPostType( requestUtils );
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
+		await admin.visitAdminPage(
+			SETTINGS_PAGE_PATH,
+			CONTENT_TYPES_PAGE_QUERY
+		);
 
 		await page
 			.getByRole( 'row', { name: 'Books' } )
@@ -101,7 +107,10 @@ test.describe( 'User post types', () => {
 		await admin.visitAdminPage( 'edit.php', 'post_type=book' );
 		await expect( page.getByText( 'Invalid post type.' ) ).toBeVisible();
 
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, POST_TYPES_PAGE_QUERY );
+		await admin.visitAdminPage(
+			SETTINGS_PAGE_PATH,
+			CONTENT_TYPES_PAGE_QUERY
+		);
 		await page
 			.getByRole( 'row', { name: 'Books' } )
 			.getByRole( 'button', { name: 'Actions' } )
@@ -130,7 +139,7 @@ test.describe( 'User post types', () => {
 		const created = await createUserPostType( requestUtils );
 		await admin.visitAdminPage(
 			SETTINGS_PAGE_PATH,
-			`${ POST_TYPES_PAGE_QUERY }&p=/edit/${ created.id }`
+			`page=content-types-wp-admin&p=/post-types/${ created.id }`
 		);
 
 		await page

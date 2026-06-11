@@ -106,18 +106,17 @@ export function useNoteThreads( postId ) {
 		}
 
 		// Single pass over clientIds builds the forward map and reverse lookup
-		// together. Coerce ids to Number: legacy metadata may be string-typed,
-		// while the comments REST endpoint returns numeric ids.
+		// together. getNoteIdsFromMetadata returns numeric ids, matching the
+		// types returned by the comments REST endpoint.
 		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
 			if ( noteIds.length > 0 ) {
-				const keys = noteIds.map( Number );
-				blocksWithNotes[ clientId ] = keys;
-				for ( const key of keys ) {
-					clientIdByNoteId.set( key, clientId );
+				blocksWithNotes[ clientId ] = noteIds;
+				for ( const noteId of noteIds ) {
+					clientIdByNoteId.set( noteId, clientId );
 				}
 			}
 		}

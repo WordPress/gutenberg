@@ -55,10 +55,14 @@ describe( 'getNoteIdsFromMetadata', () => {
 		expect( getNoteIdsFromMetadata( { noteId: 42 } ) ).toEqual( [ 42 ] );
 	} );
 
-	it( 'handles string noteId (legacy format)', () => {
-		expect( getNoteIdsFromMetadata( { noteId: '42' } ) ).toEqual( [
-			'42',
-		] );
+	it( 'coerces a string-typed legacy noteId to a number', () => {
+		expect( getNoteIdsFromMetadata( { noteId: '42' } ) ).toEqual( [ 42 ] );
+	} );
+
+	it( 'drops non-numeric and non-positive ids', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, 'abc', -3, 2 ] } )
+		).toEqual( [ 1, 2 ] );
 	} );
 
 	it( 'returns array from array noteId', () => {
@@ -83,6 +87,21 @@ describe( 'getNoteIdsFromMetadata', () => {
 		expect(
 			getNoteIdsFromMetadata( { noteId: [ null, undefined, 0, '' ] } )
 		).toEqual( [] );
+	} );
+
+	it( 'deduplicates repeated ids while preserving first occurrence order', () => {
+		expect( getNoteIdsFromMetadata( { noteId: [ 1, 1, 1 ] } ) ).toEqual( [
+			1,
+		] );
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, 2, 1, 3, 2 ] } )
+		).toEqual( [ 1, 2, 3 ] );
+	} );
+
+	it( 'deduplicates across numeric and string-typed duplicates', () => {
+		expect(
+			getNoteIdsFromMetadata( { noteId: [ 1, '1', 2, '2' ] } )
+		).toEqual( [ 1, 2 ] );
 	} );
 } );
 

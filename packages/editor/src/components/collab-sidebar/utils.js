@@ -24,7 +24,7 @@ const OVERLAP_MARGIN = 20;
  */
 const AVATAR_BORDER_COLORS = [
 	'#C36EFF', // Purple
-	'#FF51A8', // Pink
+	'#D94145', // Red
 	'#E4780A', // Orange
 	'#FF35EE', // Magenta
 	'#879F11', // Olive
@@ -92,22 +92,24 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
- * Normalizes noteId metadata to always return an array.
- * Handles both scalar (legacy) and array (new) noteId values.
+ * Normalizes noteId metadata to always return an array of unique numeric ids,
+ * preserving insertion order. Handles both scalar (legacy, possibly
+ * string-typed) and array (new) values.
  *
  * @param {Object} metadata Block metadata object
  * @return {number[]} Array of note IDs (may be empty)
  */
 export function getNoteIdsFromMetadata( metadata ) {
-	if ( ! metadata || metadata.noteId === null ) {
-		return [];
+	const noteId = metadata?.noteId;
+	const raw = Array.isArray( noteId ) ? noteId : [ noteId ];
+	const ids = new Set();
+	for ( const value of raw ) {
+		const id = Number( value );
+		if ( Number.isFinite( id ) && id > 0 ) {
+			ids.add( id );
+		}
 	}
-	// New format: noteId is an array.
-	if ( Array.isArray( metadata.noteId ) ) {
-		return metadata.noteId.filter( Boolean );
-	}
-	// Legacy format: noteId is a scalar.
-	return metadata.noteId ? [ metadata.noteId ] : [];
+	return [ ...ids ];
 }
 
 /**
@@ -119,17 +121,13 @@ export function getNoteIdsFromMetadata( metadata ) {
  * @return {Object} Updated metadata object
  */
 export function addNoteIdToMetadata( metadata, noteId ) {
-	const existingIds = getNoteIdsFromMetadata( metadata );
-	// Compare as strings so a string-typed legacy id (e.g. '5') and a numeric
-	// id (5) are treated as duplicates.
-	const noteIdKey = String( noteId );
-	if ( existingIds.some( ( id ) => String( id ) === noteIdKey ) ) {
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	const id = Number( noteId );
+	if ( ids.has( id ) ) {
 		return metadata;
 	}
-	return {
-		...metadata,
-		noteId: [ ...existingIds, noteId ],
-	};
+	ids.add( id );
+	return { ...metadata, noteId: [ ...ids ] };
 }
 
 const NOTE_FORMAT_TYPE = 'core/note';
@@ -204,14 +202,11 @@ export function pickPrimaryNote( threads ) {
  * @return {Object} Updated metadata object
  */
 export function removeNoteIdFromMetadata( metadata, noteId ) {
-	const existingIds = getNoteIdsFromMetadata( metadata );
-	// Compare as strings so a string-typed legacy id (e.g. '5') matches a
-	// numeric id (5) when removing.
-	const noteIdKey = String( noteId );
-	const newIds = existingIds.filter( ( id ) => String( id ) !== noteIdKey );
+	const ids = new Set( getNoteIdsFromMetadata( metadata ) );
+	ids.delete( Number( noteId ) );
 	return {
 		...metadata,
-		noteId: newIds.length > 0 ? newIds : undefined,
+		noteId: ids.size > 0 ? [ ...ids ] : undefined,
 	};
 }
 

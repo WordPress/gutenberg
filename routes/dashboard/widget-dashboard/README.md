@@ -23,7 +23,7 @@ function Dashboard() {
 }
 ```
 
-`<WidgetDashboard>` renders `<WidgetDashboard.Widgets />` by default. Pass `children` to compose the surface — header, empty state, footer — around the grid:
+`<WidgetDashboard>` renders `<WidgetDashboard.Widgets />` by default. Pass `children` to compose the dashboard — header, empty state, footer — around the grid:
 
 ```tsx
 <WidgetDashboard
@@ -70,17 +70,17 @@ Optional. Configures the underlying grid.
 
 #### `children`: `ReactNode`
 
-Optional. Composition slot for arbitrary surface markup. When omitted, the engine renders `<WidgetDashboard.Widgets />` directly.
+Optional. Composition slot for arbitrary dashboard markup. When omitted, the engine renders `<WidgetDashboard.Widgets />` directly.
 
 ## Compound components
 
 #### `<WidgetDashboard.Widgets />`
 
-Iterates `layout`, renders each entry through `<WidgetDashboard.Widget />`, and feeds the resulting tree into the underlying grid (`@wordpress/grid`).
+Iterates `layout`, renders each entry through `<WidgetDashboard.WidgetChrome />`, and feeds the resulting tree into the underlying grid (`@wordpress/grid`).
 
-#### `<WidgetDashboard.Widget />`
+#### `<WidgetDashboard.WidgetChrome />`
 
-Per-instance wrapper. Provides widget identity to the render tree via context and hosts the widget's render module under a `Suspense` boundary and an error boundary. The instance is read from `layout`; consumers don't pass it manually.
+Per-instance wrapper (the `DashboardWidgetChrome` component). Provides widget identity to the render tree via context and hosts the widget's render module under a `Suspense` boundary and an error boundary. The instance is read from `layout`; consumers don't pass it manually.
 
 #### `<WidgetDashboard.NoWidgetsState>`
 
@@ -88,9 +88,9 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off and a "Done" button while it is on. Clicking either fires `onEditChange` with the toggled value. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Layout settings" (when `onGridSettingsChange` is provided), "Cancel", "Done" while it is on. Layout settings is only available in customize mode. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
 
-`<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin surfaces (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
+`<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
 ```tsx
 import { Page } from '@wordpress/admin-ui';
@@ -113,6 +113,14 @@ import { Page } from '@wordpress/admin-ui';
 
 `<Page>` is optional. The compound renders inside any container, so a bare `<header>` or custom chrome works just as well.
 
+## Inserting widgets
+
+A modal-based inserter is mounted automatically inside `WidgetDashboard`. It stays hidden until the "Add widget" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
+
+On confirmation, the inserter creates instances via `createDashboardWidget( widgetType )` (using each type's `example.attributes` as the initial values) and appends them to `layout` through `onLayoutChange`. The dialog closes after a successful insertion or when the user dismisses it.
+
+The inserter has no opt-out today; hosts that want a custom widget-picking experience should compose their own UI alongside `<WidgetDashboard.Widgets />` and avoid rendering `<WidgetDashboard.Actions />` (which exposes the trigger).
+
 ## Authoring widgets
 
 Widget render modules receive only what they need to render and edit:
@@ -124,7 +132,7 @@ interface WidgetRenderProps< Item = unknown > {
 }
 ```
 
-`setAttributes` flows back through `onLayoutChange` on the dashboard. Removal, badges, and error chrome are not part of this contract — those belong to the surface.
+`setAttributes` flows back through `onLayoutChange` on the dashboard. Removal, badges, and error chrome are not part of this contract — those belong to the host.
 
 ## Types
 
@@ -134,4 +142,4 @@ interface WidgetRenderProps< Item = unknown > {
 - `ResolveWidgetModule` — module resolver signature.
 - `WidgetGridSettings` — grid configuration.
 
-`WidgetName`, `WidgetTypeMetadata`, and `WidgetType` are declared locally in `types.ts` until `@wordpress/widget-types` lands in trunk; at that point those three collapse into a re-export from the package.
+The widget contract types (`WidgetName`, `WidgetType`, `WidgetRenderProps`, `ResolveWidgetModule`) are defined in `widget-primitives` and imported from there directly; this engine does not re-export them.

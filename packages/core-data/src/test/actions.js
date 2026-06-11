@@ -33,6 +33,7 @@ jest.mock( '../batch', () => {
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
 	LOCAL_EDITOR_ORIGIN: 'local-editor',
+	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
 
 describe( 'editEntityRecord', () => {
@@ -920,6 +921,63 @@ describe( 'saveEntityRecord', () => {
 		);
 
 		expect( result ).toBe( updatedRecord );
+	} );
+
+	it( 'preserves the live sync title when a CRDT persistence save returns stale post fields', async () => {
+		const liveSyncState = {
+			isSaved: false,
+			title: 'synced title',
+		};
+		const post = { id: 10, title: 'synced title' };
+		const configs = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				syncConfig: {},
+			},
+		];
+		const syncManager = {
+			update: jest.fn(
+				( _objectType, _objectId, changes, _origin, options ) => {
+					if (
+						Object.prototype.hasOwnProperty.call( changes, 'title' )
+					) {
+						liveSyncState.title = changes.title;
+					}
+					if ( options?.isSave ) {
+						liveSyncState.isSaved = true;
+					}
+				}
+			),
+		};
+		const select = {
+			getRawEntityRecord: () => post,
+		};
+		const resolveSelect = { getEntitiesConfig: jest.fn( () => configs ) };
+
+		const staleSaveResponse = { ...post, title: 'initial title' };
+		apiFetch.mockImplementation( () => {
+			return staleSaveResponse;
+		} );
+		getSyncManager.mockReturnValue( syncManager );
+
+		const result = await saveEntityRecord( 'postType', 'post', post, {
+			__unstableSkipSyncUpdate: true,
+		} )( { select, dispatch, resolveSelect } );
+
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			10,
+			{},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( liveSyncState ).toEqual( {
+			isSaved: true,
+			title: 'synced title',
+		} );
+		expect( result ).toBe( staleSaveResponse );
 	} );
 
 	it( 'triggers a PUT request for an existing record with a custom key', async () => {

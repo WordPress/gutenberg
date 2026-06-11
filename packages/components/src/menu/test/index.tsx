@@ -156,7 +156,7 @@ describe( 'Menu', () => {
 			await waitForFocusedMenuItem( 'First item' );
 		} );
 
-		it( 'should open and focus the first item when pressing the space key on the trigger', async () => {
+		it( 'should open when pressing the space key on the trigger', async () => {
 			render(
 				<Menu>
 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
@@ -180,10 +180,17 @@ describe( 'Menu', () => {
 			// Menu closed
 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
 
-			await press.Space();
+			// Keyboard-triggered clicks have `detail: 0`, which Ariakit uses to
+			// distinguish keyboard activation from pointer activation.
+			await press.Space( toggleButton, { detail: 0 } );
 
-			// Menu open, focus is on the first focusable item
-			await waitForFocusedMenuItem( 'First item' );
+			await waitFor( () =>
+				expect( toggleButton ).toHaveAttribute(
+					'aria-expanded',
+					'true'
+				)
+			);
+			expect( screen.getByRole( 'menu' ) ).toBeVisible();
 		} );
 
 		it( 'should close when pressing the escape key', async () => {

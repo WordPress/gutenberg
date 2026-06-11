@@ -297,6 +297,20 @@ function buildRows(): ParityRow[] {
 			}
 		}
 	}
+	const subOneZoomState = makeState( {
+		rotation: 19,
+		zoom: 0.98,
+		cropRect: { x: 0.48, y: 0, width: 0.04, height: 1 },
+	} );
+	for ( const { label: probeLabel, u, v } of PROBES ) {
+		rows.push( {
+			label: `fine-rotation sub-1 zoom probe=${ probeLabel }`,
+			state: subOneZoomState,
+			probeLabel,
+			u,
+			v,
+		} );
+	}
 	return rows;
 }
 

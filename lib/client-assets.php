@@ -361,10 +361,15 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
 	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
+	// When the React 19 experiment is enabled, register React 19 vendor
+	// scripts under the `react`, `react-dom`, and `react-jsx-runtime` handles.
+	$use_react_19 = gutenberg_is_experiment_enabled( 'gutenberg-react-19' );
+
 	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
 
 	foreach ( $vendor_handles as $handle ) {
-		$asset_file   = $vendors_dir . $handle . '.min.asset.php';
+		$source       = $use_react_19 ? $handle . '-19' : $handle;
+		$asset_file   = $vendors_dir . $source . '.min.asset.php';
 		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
 		$dependencies = $asset['dependencies'] ?? array();
 		$version      = $asset['version'] ?? '0';
@@ -372,7 +377,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		gutenberg_override_script(
 			$scripts,
 			$handle,
-			gutenberg_url( 'build/scripts/vendors/' . $handle . $extension ),
+			gutenberg_url( 'build/scripts/vendors/' . $source . $extension ),
 			$dependencies,
 			$version
 		);
@@ -441,9 +446,7 @@ function gutenberg_enqueue_latex_to_mathml_loader() {
  *
  * @see packages/vips/src/loader.ts
  */
-if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
-}
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
 function gutenberg_enqueue_vips_loader() {
 	wp_enqueue_script_module( '@wordpress/vips/loader' );
 }

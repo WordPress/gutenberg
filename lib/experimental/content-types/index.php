@@ -53,6 +53,51 @@ const GUTENBERG_USER_TAXONOMY_CONFIG_MARKER = 'isUserTaxonomyConfigJSON';
 const GUTENBERG_USER_TAXONOMY_SLUG_PATTERN = '/^[a-z0-9_-]{1,32}$/';
 
 /**
+ * Option key flagging that the next `init` should regenerate rewrite rules.
+ * Set by the REST controllers when a wp_user_post_type or wp_user_taxonomy
+ * write changes a field that affects rewrite rules (slug, has_archive,
+ * public) or toggles whether the record is registered.
+ */
+const GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION = '_gutenberg_user_content_types_flush_rewrite_rules';
+
+/**
+ * Flags the next `init` to regenerate rewrite rules. Flushing inline in the
+ * REST handler would regenerate against the pre-update registration — the
+ * post type / taxonomy registers at `init` priority 20, before the REST
+ * request handler runs, so by the time we'd flush, the registered state
+ * still reflects the old record. Deferring to the next request's
+ * `init` (priority 30, after registration runs against the new record)
+ * picks up the new rewrite rules.
+ */
+function gutenberg_user_content_types_schedule_flush_rewrite_rules() {
+	// Autoload off — the option is short-lived (cleared on next init), and
+	// keeping it out of the alloptions cache means a stray uncleared row
+	// can't bloat every page load.
+	update_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION, '1', false );
+}
+
+/**
+ * Regenerates the rewrite rules option if a recent write scheduled a flush.
+ *
+ * Runs at `init` priority 30 — after `register_post_type()` and
+ * `register_taxonomy()` have been called for user-defined records at
+ * priority 20, so the regenerated rules see the new registration state.
+ *
+ * Soft flush only — the standard `.htaccess` block doesn't depend on
+ * individual post type or taxonomy registrations, so there's nothing for
+ * a hard flush to update there, and avoiding the file write keeps this
+ * cheap.
+ */
+function gutenberg_user_content_types_maybe_flush_rewrite_rules() {
+	if ( ! get_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION ) ) {
+		return;
+	}
+	delete_option( GUTENBERG_USER_CONTENT_TYPES_FLUSH_OPTION );
+	flush_rewrite_rules( false );
+}
+add_action( 'init', 'gutenberg_user_content_types_maybe_flush_rewrite_rules', 30 );
+
+/**
  * Registers the wp_user_taxonomy CPT.
  */
 function gutenberg_register_user_taxonomy_cpt() {
@@ -95,6 +140,7 @@ function gutenberg_register_user_taxonomy_cpt() {
 			'has_archive'           => false,
 			'rewrite'               => false,
 			'query_var'             => false,
+			'_builtin'              => true, /* internal use only. don't use this when registering your own post type. */
 		)
 	);
 
@@ -365,6 +411,7 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 		'show_tagcloud',
 		'show_in_quick_edit',
 		'show_admin_column',
+		'sort',
 	);
 	foreach ( $bool_keys as $key ) {
 		if ( array_key_exists( $key, $config ) ) {
@@ -372,6 +419,13 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 		}
 	}
 	$args['show_in_rest'] = isset( $config['show_in_rest'] ) ? (bool) $config['show_in_rest'] : true;
+
+	if ( isset( $config['default_term']['name'] ) ) {
+		$default_term_name = sanitize_text_field( (string) $config['default_term']['name'] );
+		if ( '' !== $default_term_name ) {
+			$args['default_term'] = array( 'name' => $default_term_name );
+		}
+	}
 
 	return array( $slug, $object_type, $args );
 }
@@ -408,4 +462,6 @@ function gutenberg_register_user_defined_taxonomies() {
 		register_taxonomy( $slug, $object_type, $args );
 	}
 }
-add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
+// Priority 25 — after gutenberg_register_user_defined_post_types() (priority 20)
+// so user CPT slugs exist when register_taxonomy() records the object_type association.
+add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 25 );

@@ -43,7 +43,7 @@ const meta: Meta< typeof Dropdown > = {
 			expanded: true,
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

@@ -34,7 +34,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 			expanded: true,
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 		docs: { canvas: { sourceState: 'shown' } },

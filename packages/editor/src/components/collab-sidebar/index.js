@@ -29,7 +29,7 @@ import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
-import { useGlobalStylesContext } from '../global-styles-provider';
+import { useGlobalStyles } from '../global-styles';
 import {
 	useAnnotateBlocks,
 	useEnableFloatingSidebar,
@@ -160,7 +160,7 @@ function NotesSidebar( { postId } ) {
 	);
 
 	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStylesContext();
+	const { merged: GlobalStyles } = useGlobalStyles();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
 	// Surface one thread for the avatar indicator.

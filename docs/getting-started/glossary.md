@@ -32,7 +32,7 @@ A theme built in block forward way that allows Full Site Editing to work. The co
 
 ## Block categories
 
-These are not a WordPress taxonomy, but instead used internally to sort blocks in the Block Library.
+These are not a WordPress taxonomy but instead are used internally to sort blocks in the Block Library.
 
 ## Block ~Inserter~ Library
 

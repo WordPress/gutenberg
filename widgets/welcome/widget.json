@@ -1,0 +1,7 @@
+{
+	"name": "core/welcome",
+	"title": "Welcome",
+	"description": "Displays a welcome panel to introduce users to WordPress.",
+	"category": "dashboard",
+	"presentation": "full-bleed"
+}
