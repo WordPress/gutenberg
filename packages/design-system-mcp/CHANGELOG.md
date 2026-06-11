@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove implicit dependency on `storybook` in TypeScript types.
+
 ## 0.5.0 (2026-06-10)
 
 ## 0.4.0 (2026-05-27)
