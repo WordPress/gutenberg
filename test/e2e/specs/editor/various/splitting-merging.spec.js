@@ -3,6 +3,34 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Asserts that the block element holds the selection: either the element has
+ * focus itself, or a focused editing host contains it and the selection is
+ * inside it. Blocks supporting `editableRoot` keep focus on the editing host.
+ *
+ * @param {import('@playwright/test').Locator} locator Block element locator.
+ */
+function expectBlockToHoldSelection( locator ) {
+	return expect
+		.poll( () =>
+			locator.evaluate( ( element ) => {
+				const { activeElement } = element.ownerDocument;
+				if ( element === activeElement ) {
+					return true;
+				}
+				const selection =
+					element.ownerDocument.defaultView.getSelection();
+				return (
+					!! activeElement?.isContentEditable &&
+					activeElement.contains( element ) &&
+					!! selection.anchorNode &&
+					element.contains( selection.anchorNode )
+				);
+			} )
+		)
+		.toBe( true );
+}
+
 test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
@@ -319,10 +347,10 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		// But the effective saved content is still empty:
 		expect( await editor.getEditedPostContent() ).toBe( '' );
 
-		// And focus is retained:
-		await expect(
+		// And the selection is retained:
+		await expectBlockToHoldSelection(
 			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
-		).toBeFocused();
+		);
 	} );
 
 	test( 'should undo split in one go', async ( {

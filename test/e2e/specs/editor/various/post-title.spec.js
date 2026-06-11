@@ -3,6 +3,37 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Asserts that the block element holds the selection: either the element has
+ * focus itself, or a focused editing host contains it and the selection is
+ * inside it. Blocks supporting `editableRoot` keep focus on the editing host.
+ *
+ * @param {import('@playwright/test').Locator} locator Block element locator.
+ * @param {string}                             message Assertion message.
+ */
+function expectBlockToHoldSelection( locator, message ) {
+	return expect
+		.poll(
+			() =>
+				locator.evaluate( ( element ) => {
+					const { activeElement } = element.ownerDocument;
+					if ( element === activeElement ) {
+						return true;
+					}
+					const selection =
+						element.ownerDocument.defaultView.getSelection();
+					return (
+						!! activeElement?.isContentEditable &&
+						activeElement.contains( element ) &&
+						!! selection.anchorNode &&
+						element.contains( selection.anchorNode )
+					);
+				} ),
+			message
+		)
+		.toBe( true );
+}
+
 test.describe( 'Post title', () => {
 	test.describe( 'Focus handling', () => {
 		test( 'should focus on the post title field when creating a new post in visual mode', async ( {
@@ -18,12 +49,12 @@ test.describe( 'Post title', () => {
 
 			await expect( pageTitleField ).toBeFocused();
 			await page.keyboard.press( 'Enter' );
-			await expect(
+			await expectBlockToHoldSelection(
 				editor.canvas.getByRole( 'document', {
 					name: 'Empty block',
 				} ),
-				'should move focus to an empty paragraph block when the Enter key is pressed'
-			).toBeFocused();
+				'should move the selection to an empty paragraph block when the Enter key is pressed'
+			);
 		} );
 
 		test( 'should focus on the post title field when creating a new post in code editor mode', async ( {

@@ -69,15 +69,17 @@ export default function useEditableRoot() {
 				}
 
 				// Move focus from the block's editable element to the
-				// wrapper, but only when such an element within the wrapper
-				// has focus. Never steal focus from other regions (e.g. List
-				// View) or UI elements (e.g. buttons). The selection is
-				// preserved.
+				// wrapper, but only when an editable element belonging to
+				// the selected block has focus. Never steal focus from other
+				// regions (e.g. List View), UI elements (e.g. buttons), or
+				// other editables within the wrapper (e.g. the post title).
+				// The selection is preserved.
 				const { activeElement } = node.ownerDocument;
 				if (
 					activeElement !== node &&
 					activeElement?.isContentEditable &&
-					node.contains( activeElement )
+					node.contains( activeElement ) &&
+					getBlockClientId( activeElement ) === selectedClientId
 				) {
 					node.focus();
 				}
