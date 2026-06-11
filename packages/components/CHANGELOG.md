@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows.
+
 ### Bug Fixes
 
 -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
