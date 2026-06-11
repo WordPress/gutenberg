@@ -96,7 +96,6 @@ Private exports:
 - `normalizeString`
 - `PrivateListView`
 - `ResizableBoxPopover`
-- `BlockInfo`
 - `useHasBlockToolbar`
 - `cleanEmptyObject`
 - `BlockQuickNavigation`
@@ -125,8 +124,8 @@ Private exports:
 - `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
-- `__unstableCommentIconFill`
-- `__unstableCommentIconToolbarFill`
+- `NoteIconSlotFill`
+- `NoteIconToolbarSlotFill`
 
 ### `core/block-editor` store
 

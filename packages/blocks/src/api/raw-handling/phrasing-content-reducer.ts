@@ -52,7 +52,7 @@ export default function phrasingContentReducer(
 		// In jsdom-jscore, 'node.target' can be null.
 		// TODO: Explore fixing this by patching jsdom-jscore.
 		if ( anchor.target && anchor.target.toLowerCase() === '_blank' ) {
-			anchor.rel = 'noreferrer noopener';
+			anchor.rel = 'noopener';
 		} else {
 			anchor.removeAttribute( 'target' );
 			anchor.removeAttribute( 'rel' );

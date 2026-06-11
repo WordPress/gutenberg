@@ -191,7 +191,14 @@ function CoverEdit( {
 			} );
 		} )();
 		// Update the block only when the featured image changes.
-	}, [ mediaUrl ] );
+		// The other dependencies are stable references (dispatch actions / setters).
+	}, [
+		mediaUrl,
+		__unstableMarkNextChangeAsNotPersistent,
+		setAttributes,
+		setOverlayColor,
+		useFeaturedImage,
+	] );
 
 	// instead of destructuring the attributes
 	// we define the url and background type
@@ -703,6 +710,7 @@ function CoverEdit( {
 						style={ mediaStyle }
 					>
 						<SandBox
+							allowSameOrigin
 							html={ embedHtml }
 							title="Background video"
 							styles={ [

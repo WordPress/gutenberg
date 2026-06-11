@@ -35,6 +35,7 @@ const countries = [
 ];
 
 const meta: Meta< typeof ComboboxControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/ComboboxControl',
 	id: 'components-comboboxcontrol',
 	component: ComboboxControl,
@@ -49,7 +50,7 @@ const meta: Meta< typeof ComboboxControl > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `SearchableSelectControl` in `@wordpress/ui`, but continue using for now.',
 		},

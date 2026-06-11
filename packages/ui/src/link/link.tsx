@@ -20,20 +20,10 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		openInNewTab = false,
 		render,
 		className,
-		onClick,
 		...props
 	},
 	ref
 ) {
-	const isInternalAnchor = !! props.href?.startsWith( '#' );
-
-	const handleClick = ( event: React.MouseEvent< HTMLAnchorElement > ) => {
-		if ( openInNewTab && isInternalAnchor ) {
-			event.preventDefault();
-		}
-		onClick?.( event );
-	};
-
 	const element = useRender( {
 		render,
 		defaultTagName: 'a',
@@ -46,27 +36,23 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				variant !== 'unstyled' && styles.link,
 				variant !== 'unstyled' && styles[ `is-${ tone }` ],
 				variant === 'unstyled' && styles[ 'is-unstyled' ],
-				openInNewTab && styles[ 'has-link-icon' ],
 				className
 			),
-			onClick: handleClick,
 			target: openInNewTab ? '_blank' : undefined,
-			children: openInNewTab ? (
+			children: (
 				<>
-					<span className={ styles[ 'link-contents' ] }>
-						{ children }
-					</span>
-					<span
-						className={ styles[ 'link-icon' ] }
-						role="img"
-						aria-label={
-							/* translators: accessibility text appended to link text */
-							__( '(opens in a new tab)' )
-						}
-					/>
+					{ children }
+					{ openInNewTab && (
+						<span
+							className={ styles[ 'link-icon' ] }
+							role="img"
+							aria-label={
+								/* translators: accessibility text appended to link text */
+								__( '(opens in a new tab)' )
+							}
+						/>
+					) }
 				</>
-			) : (
-				children
 			),
 		} ),
 	} );

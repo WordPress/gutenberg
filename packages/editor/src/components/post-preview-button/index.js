@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { Button, Path, SVG, VisuallyHidden } from '@wordpress/components';
+import { Button, Path, SVG } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 import { store as coreStore } from '@wordpress/core-data';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -196,7 +197,7 @@ export default function PostPreviewButton( {
 			{ textContent || (
 				<>
 					{ _x( 'Preview', 'imperative verb' ) }
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{
 							/* translators: accessibility text */
 							__( '(opens in a new tab)' )

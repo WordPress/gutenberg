@@ -28,6 +28,19 @@ interface UserSession {
 	editor: Editor;
 }
 
+interface NormalizedBlock {
+	attributes: Record< string, unknown >;
+	innerBlocks: NormalizedBlock[];
+	name: string;
+}
+
+interface NormalizedCollaborativeState {
+	blocks: NormalizedBlock[];
+	title: string;
+}
+
+type CleanupUsersMode = 'all' | 'tracked' | 'none';
+
 export const SECOND_USER: UserCredentials = {
 	username: 'collaborator',
 	email: 'collaborator@example.com',
@@ -38,26 +51,32 @@ export const SECOND_USER: UserCredentials = {
 };
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
+const USE_TEST_WS_PROVIDER = process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
 
 export default class CollaborationUtils {
 	private admin: Admin;
+	private cleanupUsersMode: CleanupUsersMode;
 	private editor: Editor;
 	private requestUtils: RequestUtils;
 	private primaryPage: Page;
 	private sessions: UserSession[] = [];
+	private trackedUserIds: number[] = [];
 
 	constructor( {
 		admin,
+		cleanupUsersMode = 'all',
 		editor,
 		requestUtils,
 		page,
 	}: {
 		admin: Admin;
+		cleanupUsersMode?: CleanupUsersMode;
 		editor: Editor;
 		requestUtils: RequestUtils;
 		page: Page;
 	} ) {
 		this.admin = admin;
+		this.cleanupUsersMode = cleanupUsersMode;
 		this.editor = editor;
 		this.requestUtils = requestUtils;
 		this.primaryPage = page;
@@ -70,14 +89,7 @@ export default class CollaborationUtils {
 	 * @param postId The post ID to open.
 	 */
 	async openPost( postId: number ) {
-		await this.admin.visitAdminPage(
-			'post.php',
-			`post=${ postId }&action=edit`
-		);
-		await this.editor.setPreferences( 'core/edit-post', {
-			welcomeGuide: false,
-			fullscreenMode: false,
-		} );
+		await this.admin.editPost( postId );
 		await this.waitForCollaborationReady( this.primaryPage );
 	}
 
@@ -97,6 +109,9 @@ export default class CollaborationUtils {
 	): Promise< { page: Page; editor: Editor } > {
 		const context = await this.admin.browser.newContext( {
 			baseURL: BASE_URL,
+			...( USE_TEST_WS_PROVIDER
+				? { storageState: { cookies: [], origins: [] } }
+				: {} ),
 		} );
 		const newPage = await context.newPage();
 
@@ -150,15 +165,81 @@ export default class CollaborationUtils {
 		const pages = this.allPages;
 		const resolvedTimeout = timeout ?? 10000 + pages.length * 2500;
 
+		if ( USE_TEST_WS_PROVIDER ) {
+			const roomName = await this.getCurrentPostRoomName(
+				this.primaryPage
+			);
+			await Promise.all(
+				pages.map( ( pg ) =>
+					this.waitForTestWebSocketAwarenessPeerCount(
+						pg,
+						pages.length,
+						resolvedTimeout,
+						roomName
+					)
+				)
+			);
+			await Promise.all(
+				pages.map( ( pg ) =>
+					this.waitForSyncCycle( pg, 3, {
+						timeout: resolvedTimeout,
+						room: roomName,
+					} )
+				)
+			);
+			return;
+		}
+
 		await Promise.all(
 			pages.map( ( pg ) =>
 				pg
-					.getByRole( 'button', { name: /Collaborators list/ } )
+					.getByRole( 'button', {
+						name: /Collaborators list/,
+					} )
 					.waitFor( { timeout: resolvedTimeout } )
 			)
 		);
+		await Promise.all(
+			pages.map( ( pg ) =>
+				this.waitForSyncCycle( pg, 3, { timeout: resolvedTimeout } )
+			)
+		);
+	}
 
-		await Promise.all( pages.map( ( pg ) => this.waitForSyncCycle( pg ) ) );
+	async waitForTestWebSocketAwarenessPeerCount(
+		page: Page,
+		expectedPeerCount: number,
+		timeout: number,
+		roomName: string
+	) {
+		await page.waitForFunction(
+			( { expected, room }: { expected: number; room: string } ) => {
+				const state = ( window as any ).__gutenbergTestWebSocketSync;
+				const matchingRoom = state?.rooms?.[ room ];
+
+				return (
+					matchingRoom?.status === 'connected' &&
+					matchingRoom?.awarenessCount >= expected
+				);
+			},
+			{ expected: expectedPeerCount, room: roomName },
+			{ timeout }
+		);
+	}
+
+	async getCurrentPostRoomName( page: Page ): Promise< string > {
+		const postId = await page.evaluate(
+			() =>
+				( window as any ).wp?.data
+					?.select( 'core/editor' )
+					?.getCurrentPostId?.()
+		);
+
+		if ( ! postId ) {
+			throw new Error( 'Current post ID is unavailable.' );
+		}
+
+		return `postType/post:${ postId }`;
 	}
 
 	/**
@@ -260,26 +341,25 @@ export default class CollaborationUtils {
 					.select( 'core/editor' )
 					.isSavingPost();
 			},
+			undefined,
 			{ timeout }
 		);
 	}
 
 	/**
-	 * Read the _crdt_document meta value from the currently loaded entity record.
+	 * Read the _crdt_document meta value for the current post.
 	 *
 	 * @param page The Playwright page to evaluate on.
 	 */
 	async getCrdtDocument( page: Page ): Promise< string | null > {
-		return page.evaluate( () => {
+		return page.evaluate( async () => {
 			const postId = ( window as any ).wp.data
 				.select( 'core/editor' )
 				.getCurrentPostId();
-			return (
-				( window as any ).wp.data
-					.select( 'core' )
-					.getEntityRecord( 'postType', 'post', postId )?.meta
-					?._crdt_document ?? null
-			);
+			const post = await ( window as any ).wp.apiFetch( {
+				path: `/wp/v2/posts/${ postId }?context=edit`,
+			} );
+			return post?.meta?._crdt_document ?? null;
 		} );
 	}
 
@@ -300,6 +380,7 @@ export default class CollaborationUtils {
 				( window as any )._wpCollaborationEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
+			undefined,
 			{ timeout }
 		);
 	}
@@ -315,12 +396,36 @@ export default class CollaborationUtils {
 	 * @param cycles            Number of sync responses to wait for (default 3).
 	 * @param [options]         Optional settings.
 	 * @param [options.timeout] Maximum wait time per cycle in ms (default 10000).
+	 * @param options.room
 	 */
 	async waitForSyncCycle(
 		page: Page,
 		cycles = 3,
-		{ timeout = 10000 }: { timeout?: number } = {}
+		{ timeout = 10000, room }: { timeout?: number; room?: string } = {}
 	) {
+		if ( USE_TEST_WS_PROVIDER ) {
+			// y-websocket distinguishes 'connected' (socket up) from 'synced'
+			// (sync step 2 applied). Waiting only on connected lets tests race
+			// past initial document load. Require both, on the exact target
+			// room, to rule out stale rooms from earlier navigations.
+			const targetRoom =
+				room ?? ( await this.getCurrentPostRoomName( page ) );
+			await page.waitForFunction(
+				( roomName: string ) => {
+					const state = ( window as any )
+						.__gutenbergTestWebSocketSync;
+					const matchingRoom = state?.rooms?.[ roomName ];
+					return (
+						matchingRoom?.status === 'connected' &&
+						matchingRoom?.synced === true
+					);
+				},
+				targetRoom,
+				{ timeout }
+			);
+			return;
+		}
+
 		for ( let i = 0; i < cycles; i++ ) {
 			await page.waitForResponse(
 				( response ) =>
@@ -329,6 +434,92 @@ export default class CollaborationUtils {
 				{ timeout }
 			);
 		}
+	}
+
+	/**
+	 * Returns a normalized view of the current collaborative editor state for
+	 * equality checks across participants.
+	 *
+	 * @param page The page to inspect.
+	 */
+	async getNormalizedPostState(
+		page: Page
+	): Promise< NormalizedCollaborativeState > {
+		return page.evaluate( () => {
+			const normalizeBlocks = (
+				blockTree: Array< {
+					attributes?: Record< string, unknown >;
+					innerBlocks?: Array< unknown >;
+					name: string;
+				} >
+			): NormalizedBlock[] =>
+				blockTree.map( ( block ) => ( {
+					name: block.name,
+					attributes: JSON.parse(
+						JSON.stringify( block.attributes ?? {} )
+					),
+					innerBlocks: normalizeBlocks(
+						( block.innerBlocks ?? [] ) as Array< {
+							attributes?: Record< string, unknown >;
+							innerBlocks?: Array< unknown >;
+							name: string;
+						} >
+					),
+				} ) );
+
+			const blocks = ( window as any ).wp.data
+				.select( 'core/block-editor' )
+				.getBlocks();
+
+			return {
+				title:
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditedPostAttribute( 'title' ) ?? '',
+				blocks: normalizeBlocks( blocks ),
+			};
+		} );
+	}
+
+	/**
+	 * Wait until all tracked pages converge on the same normalized editor state.
+	 *
+	 * @param [options]         Optional settings.
+	 * @param [options.pages]   Specific pages to compare.
+	 * @param [options.timeout] Maximum wait time in ms.
+	 */
+	async waitForConvergence( {
+		pages = this.allPages,
+		timeout = 15000,
+	}: {
+		pages?: Page[];
+		timeout?: number;
+	} = {} ): Promise< NormalizedCollaborativeState > {
+		const deadline = Date.now() + timeout;
+		let lastStates: NormalizedCollaborativeState[] = [];
+
+		while ( Date.now() < deadline ) {
+			lastStates = await Promise.all(
+				pages.map( ( page ) => this.getNormalizedPostState( page ) )
+			);
+
+			const serializedFirstState = JSON.stringify( lastStates[ 0 ] );
+			const isSettled = lastStates.every(
+				( state ) => JSON.stringify( state ) === serializedFirstState
+			);
+
+			if ( isSettled ) {
+				return lastStates[ 0 ];
+			}
+
+			await pages[ 0 ].waitForTimeout( 250 );
+		}
+
+		throw new Error(
+			`Collaborative state did not converge within ${ timeout }ms: ${ JSON.stringify(
+				lastStates
+			) }`
+		);
 	}
 
 	/**
@@ -401,6 +592,12 @@ export default class CollaborationUtils {
 		return this.sessions[ 0 ].editor;
 	}
 
+	registerCleanupUser( userId: number ) {
+		if ( ! this.trackedUserIds.includes( userId ) ) {
+			this.trackedUserIds.push( userId );
+		}
+	}
+
 	/**
 	 * Clean up: close all secondary browser contexts and delete test users.
 	 */
@@ -409,7 +606,27 @@ export default class CollaborationUtils {
 			await session.context.close();
 		}
 		this.sessions = [];
-		await this.requestUtils.deleteAllUsers();
+
+		if ( this.cleanupUsersMode === 'all' ) {
+			await this.requestUtils.deleteAllUsers();
+		} else if ( this.cleanupUsersMode === 'tracked' ) {
+			for ( const userId of this.trackedUserIds ) {
+				try {
+					await this.requestUtils.rest( {
+						method: 'DELETE',
+						path: `/wp/v2/users/${ userId }`,
+						params: {
+							force: true,
+							reassign: 1,
+						},
+					} );
+				} catch {
+					// Ignore cleanup failures so one stale user does not mask test results.
+				}
+			}
+		}
+
+		this.trackedUserIds = [];
 	}
 }
 

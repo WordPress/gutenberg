@@ -26,12 +26,7 @@ function UnforwardedExternalLink(
 	const { href, children, className, rel = '', ...additionalProps } = props;
 	const optimizedRel = [
 		...new Set(
-			[
-				...rel.split( ' ' ),
-				'external',
-				'noreferrer',
-				'noopener',
-			].filter( Boolean )
+			[ ...rel.split( ' ' ), 'external', 'noopener' ].filter( Boolean )
 		),
 	].join( ' ' );
 	const classes = clsx( 'components-external-link', className );
