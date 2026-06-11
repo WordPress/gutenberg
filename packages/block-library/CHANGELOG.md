@@ -7,6 +7,7 @@
 ### Code Quality
 
 -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+-   Page List: derive `isNested` from a new `core/isInsideSubmenu` block context provided by Navigation Submenu, replacing the self-setting attribute pattern that was dirtying related entities ([#79015](https://github.com/WordPress/gutenberg/issues/79015)).
 
 ## 9.47.0 (2026-05-27)
 

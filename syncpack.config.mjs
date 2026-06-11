@@ -19,6 +19,12 @@ export default {
 			policy: 'sameRange',
 		},
 		{
+			label: '`@wordpress/react-19` is the experimental React 19 build; it intentionally declares React v19.',
+			dependencies: [ 'react', 'react-dom' ],
+			packages: [ '@wordpress/react-19' ],
+			isIgnored: true,
+		},
+		{
 			label: '`react` and `react-dom` must use the same version across the repo.',
 			dependencies: [ 'react', 'react-dom' ],
 			dependencyTypes: [ 'prod', 'dev' ],
