@@ -1565,6 +1565,10 @@ add_action( 'init', 'register_block_core_navigation' );
  * `wp-block-navigation__container` list, so the same state class is also needed
  * there for state styles to apply directly to the menu list.
  *
+ * Currently this is required as a workaround because of how difficult it is for nav
+ * child blocks to inherit styles through the complex responsive nav block html. The
+ * bug in https://github.com/WordPress/gutenberg/issues/62690 also prevents inheritance.
+ *
  * @since 7.1.0
  *
  * @param string $block_content The block content.
