@@ -117,6 +117,28 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a 'my-wp-elements-*' class name is skipped from processing.
+	 *
+	 * @covers ::gutenberg_render_elements_class_name
+	 */
+	public function test_elements_block_support_class_with_invalid_elements_prefix() {
+		$block = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => 'my-wp-elements-foo',
+			),
+		);
+
+		$block_content = "<p>Test</p>\n";
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_elements_class_name( $block_content, $block ),
+			'Block content should be returned unchanged when className lacks a class with the expected prefix'
+		);
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array

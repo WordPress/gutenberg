@@ -254,8 +254,8 @@ describe( 'RTC rich-text cursor scope bug', () => {
 				},
 				'LOCAL_EDITOR_ORIGIN'
 			);
-			// SyncManager.update is deferred through yieldToEventLoop.
-			// Wait one tick so the CRDT write has been applied before inspecting it.
+			// Selection history writes are deferred. Wait one tick before
+			// inspecting the document.
 			await waitForNextTick();
 		}
 

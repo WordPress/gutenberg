@@ -19,6 +19,7 @@ import type {
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
 import { DashboardWidgetChrome } from '../dashboard-widget-chrome';
 import { WidgetSettingsToolbar } from '../widget-settings';
 import { WidgetLayoutToolbar } from './widget-layout-toolbar';
@@ -30,13 +31,6 @@ import type {
 	MasonryTilePlacement,
 } from '../../types';
 import type { WidgetName } from '../../../widget-primitives';
-
-// Floor applied as `minColumnWidth` on every surface render. Acts as a
-// safety net for stored settings that predate the layered model (where
-// `minColumnWidth` was XOR with `columns` and could be persisted as
-// `undefined`), and keeps tiles legible on narrow viewports without
-// requiring the consumer to wire the floor up themselves.
-const DASHBOARD_MIN_COLUMN_WIDTH = 350;
 
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
@@ -107,9 +101,9 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
 		const { layout, onLayoutChange, editMode, gridSettings, widgetTypes } =
 			useDashboardInternalContext();
+		const { containerRef, columnCount } =
+			useDashboardContainerColumnCount( ref );
 		const isMasonry = gridSettings.model === 'masonry';
-		const minColumnWidth =
-			gridSettings.minColumnWidth ?? DASHBOARD_MIN_COLUMN_WIDTH;
 
 		const gridLayout = useMemo(
 			() =>
@@ -183,8 +177,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		const surface: React.ReactNode = isMasonry ? (
 			<DashboardLanes
 				layout={ gridLayout as DashboardLanesLayoutItem[] }
-				columns={ gridSettings.columns }
-				minColumnWidth={ minColumnWidth }
+				columns={ columnCount }
 				flowTolerance={ gridSettings.flowTolerance }
 				onChangeLayout={ handleMasonryChange }
 				{ ...sharedRenderProps }
@@ -194,8 +187,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		) : (
 			<DashboardGrid
 				layout={ gridLayout as DashboardGridLayoutItem[] }
-				columns={ gridSettings.columns }
-				minColumnWidth={ minColumnWidth }
+				columns={ columnCount }
 				rowHeight={ gridSettings.rowHeight }
 				onChangeLayout={ handleGridChange }
 				{ ...sharedRenderProps }
@@ -205,7 +197,10 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		);
 
 		return (
-			<div ref={ ref } className={ clsx( styles.grid, className ) }>
+			<div
+				ref={ containerRef }
+				className={ clsx( styles.grid, className ) }
+			>
 				{ surface }
 			</div>
 		);
