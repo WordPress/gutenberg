@@ -12,7 +12,7 @@ import {
 	type Field,
 	type Form,
 } from '@wordpress/dataviews';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useNavigate, useParams } from '@wordpress/route';
@@ -72,6 +72,7 @@ type TaxonomyPageProps = {
 	breadcrumbLabel: string;
 	subTitle: string;
 	onSaved?: ( saved: TaxonomyFormData & { id: number } ) => void;
+	focusSaveButton?: boolean;
 };
 
 export function TaxonomyEdit() {
@@ -79,6 +80,7 @@ export function TaxonomyEdit() {
 	const navigate = useNavigate();
 	const isAddMode = id === NEW_ID;
 	const taxonomyId = parseInt( id, 10 );
+	const [ justCreated, setJustCreated ] = useState( false );
 	const record = useSelect(
 		( select ) => {
 			return (
@@ -105,10 +107,10 @@ export function TaxonomyEdit() {
 				subTitle: __(
 					'Define a new taxonomy. Fill in the essentials under General; expand Labels to customize.'
 				),
-				onSaved: ( saved ) =>
-					navigate( {
-						to: `${ TAXONOMIES_PATH }/${ saved.id }`,
-					} ),
+				onSaved: ( saved ) => {
+					setJustCreated( true );
+					navigate( { to: `${ TAXONOMIES_PATH }/${ saved.id }` } );
+				},
 		  }
 		: {
 				...commonProps,
@@ -117,6 +119,7 @@ export function TaxonomyEdit() {
 				subTitle: __(
 					'Edit this taxonomy. Expand the Labels section to adjust labels.'
 				),
+				focusSaveButton: justCreated,
 		  };
 
 	// key remounts TaxonomyPage when navigating between records so in-flight
@@ -131,8 +134,18 @@ function TaxonomyPage( {
 	breadcrumbLabel,
 	subTitle,
 	onSaved,
+	focusSaveButton,
 }: TaxonomyPageProps ) {
 	const [ data, setData ] = useState< TaxonomyFormData >( initialData );
+	const saveButtonRef = useRef< HTMLButtonElement >( null );
+
+	// Restore focus to the Save button after navigating from add mode.
+	useEffect( () => {
+		if ( focusSaveButton ) {
+			saveButtonRef.current?.focus();
+		}
+	}, [ focusSaveButton ] );
+
 	const [ isSaving, setIsSaving ] = useState( false );
 	const originalSlug = ! isAddMode ? initialData.slug : undefined;
 	const slugField = useSlugField( originalSlug, data.slug );
@@ -289,6 +302,7 @@ function TaxonomyPage( {
 			subTitle={ subTitle }
 			actions={
 				<Button
+					ref={ saveButtonRef }
 					__next40pxDefaultSize
 					variant="primary"
 					size="compact"
