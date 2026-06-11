@@ -7,17 +7,28 @@ export const DEFAULT_PEEK_AMOUNT = 32;
 export const DEFAULT_PEEK_UNIT = 'px';
 export const ZERO_PEEK_CLASS = 'is-zero-peek';
 
+function getSliderGapCSSValue( blockGap ) {
+	if ( blockGap === 0 || blockGap === '0' ) {
+		return '0px';
+	}
+
+	return getGapCSSValue( blockGap );
+}
+
 function getSliderGapValue( blockGap ) {
+	if ( typeof blockGap === 'string' || blockGap === 0 ) {
+		return getSliderGapCSSValue( blockGap );
+	}
+
 	if ( ! blockGap ) {
 		return null;
 	}
 
-	if ( typeof blockGap === 'string' ) {
-		return getGapCSSValue( blockGap );
-	}
-
 	const horizontalGap = blockGap.left ?? blockGap.top;
-	return horizontalGap ? getGapCSSValue( horizontalGap ) : null;
+
+	return horizontalGap || horizontalGap === 0
+		? getSliderGapCSSValue( horizontalGap )
+		: null;
 }
 
 export function getSliderStyle( {

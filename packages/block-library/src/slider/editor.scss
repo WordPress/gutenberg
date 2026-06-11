@@ -1,7 +1,8 @@
 .wp-block-slider {
 	--wp--style--slider-peek: 32px;
 	--wp--style--slider-peek-double: 64px;
-	--slider-gap: var(--wp--style--slider-gap, var(--wp--style--block-gap, 0));
+	/* stylelint-disable-next-line length-zero-no-unit -- 0px is set explicitly so that it can be used in calc values. */
+	--slider-gap: var(--wp--style--slider-gap, 0px);
 	--slider-gap-double: calc(var(--slider-gap) + var(--slider-gap));
 	--slider-edge-space: calc(var(--wp--style--slider-peek) + var(--slider-gap));
 	--slider-slide-size: calc(100% - var(--wp--style--slider-peek-double) - var(--slider-gap-double));
