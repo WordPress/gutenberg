@@ -10,8 +10,11 @@
 					"mode": {
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-subtle": { "value": 1, "unit": "px" },
-						"corner-radius-moderate": { "value": 3, "unit": "px" },
-						"corner-radius-pronounced": { "value": 7, "unit": "px" }
+						"corner-radius-moderate": { "value": 6, "unit": "px" },
+						"corner-radius-pronounced": {
+							"value": 18,
+							"unit": "px"
+						}
 					},
 					"com.figma.scopes": [ "CORNER_RADIUS" ]
 				}
@@ -23,9 +26,9 @@
 					"mode": {
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-subtle": { "value": 2, "unit": "px" },
-						"corner-radius-moderate": { "value": 5, "unit": "px" },
+						"corner-radius-moderate": { "value": 8, "unit": "px" },
 						"corner-radius-pronounced": {
-							"value": 12,
+							"value": 20,
 							"unit": "px"
 						}
 					},
@@ -39,9 +42,9 @@
 					"mode": {
 						"corner-radius-none": { "value": 0, "unit": "px" },
 						"corner-radius-subtle": { "value": 4, "unit": "px" },
-						"corner-radius-moderate": { "value": 8, "unit": "px" },
+						"corner-radius-moderate": { "value": 12, "unit": "px" },
 						"corner-radius-pronounced": {
-							"value": 16,
+							"value": 22,
 							"unit": "px"
 						}
 					},
@@ -57,7 +60,7 @@
 						"corner-radius-subtle": { "value": 8, "unit": "px" },
 						"corner-radius-moderate": { "value": 16, "unit": "px" },
 						"corner-radius-pronounced": {
-							"value": 32,
+							"value": 20,
 							"unit": "px"
 						}
 					},

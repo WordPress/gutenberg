@@ -4,21 +4,21 @@
 			"xs": {
 				"$type": "dimension",
 				"$value": {
-					"value": 3,
+					"value": 6,
 					"unit": "px"
 				}
 			},
 			"sm": {
 				"$type": "dimension",
 				"$value": {
-					"value": 5,
+					"value": 8,
 					"unit": "px"
 				}
 			},
 			"md": {
 				"$type": "dimension",
 				"$value": {
-					"value": 8,
+					"value": 12,
 					"unit": "px"
 				}
 			},
