@@ -50,7 +50,7 @@ export function getSelectionEditableElement( selection, root ) {
 
 	const element =
 		anchorNode.nodeType === anchorNode.ELEMENT_NODE
-			? anchorNode
+			? /** @type {Element} */ ( anchorNode )
 			: anchorNode.parentElement;
 	const editable = element?.closest( '[contenteditable="true"]' );
 
