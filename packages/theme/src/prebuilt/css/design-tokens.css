@@ -229,6 +229,22 @@
 	--wpds-dimension-gap-2xl: 32px;
 	/* 3x extra large gap */
 	--wpds-dimension-gap-3xl: 40px;
+	/* Notification indicators */
+	--wpds-dimension-size-5xs: 4px;
+	/* Visual size for small interactive elements like resize handles */
+	--wpds-dimension-size-4xs: 8px;
+	/* Small markers */
+	--wpds-dimension-size-3xs: 12px;
+	/* For small controls like checkboxes and radios, or small decorative icons */
+	--wpds-dimension-size-2xs: 16px;
+	/* For medium sized icons */
+	--wpds-dimension-size-xs: 20px;
+	/* For icons and small buttons */
+	--wpds-dimension-size-sm: 24px;
+	/* For medium-sized buttons and inputs */
+	--wpds-dimension-size-md: 32px;
+	/* Default size for buttons and inputs */
+	--wpds-dimension-size-lg: 40px;
 	/* Extra small surface width */
 	--wpds-dimension-surface-width-xs: 240px;
 	/* Small surface width */

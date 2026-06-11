@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.48.0 (2026-06-10)
+
 ### New Features
 
 -   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress. The snackbar shows a spinner during uploads and a checkmark briefly when all uploads complete.
@@ -13,6 +15,10 @@
 ### Documentation
 
 -   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+### Internal
+
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
 
 ## 14.47.0 (2026-05-27)
 

@@ -1,0 +1,17 @@
+.wp-block-tab-list {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0.5em;
+
+	button {
+		&.is-active::before {
+			content: "";
+			position: absolute;
+			border-bottom: 2px solid currentColor;
+			pointer-events: none;
+			left: 0;
+			width: 100%;
+			bottom: 0;
+		}
+	}
+}

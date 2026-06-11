@@ -141,6 +141,8 @@ export default function DocumentBar( props ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
+	const hasShortcut = ! window.__experimentalAdminBarInEditor;
+
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const hasBackButton =
 		!! onNavigateToPreviousEntityRecord || !! unlockedPatternInfo;
@@ -175,6 +177,7 @@ export default function DocumentBar( props ) {
 		<div
 			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
+				'has-shortcut': hasShortcut,
 			} ) }
 		>
 			<AnimatePresence>
@@ -267,9 +270,11 @@ export default function DocumentBar( props ) {
 								) }
 						</WCText>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
+					{ hasShortcut && (
+						<span className="editor-document-bar__shortcut">
+							{ displayShortcut.primary( 'k' ) }
+						</span>
+					) }
 				</Button>
 			) }
 		</div>

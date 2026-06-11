@@ -30,17 +30,17 @@
 		"@eslint/js": "^10.0.0",
 		"@wordpress/eslint-plugin": "file:../../packages/eslint-plugin",
 		"@wordpress/scripts": "file:../../packages/scripts",
-		"eslint-import-resolver-typescript": "4.4.4",
-		"eslint-plugin-import": "2.31.0",
-		"eslint-plugin-jest": "28.11.0",
-		"eslint-plugin-jest-dom": "5.5.0",
-		"eslint-plugin-prettier": "5.5.5",
-		"eslint-plugin-react-hooks": "7.1.1",
-		"eslint-plugin-storybook": "10.2.19",
-		"eslint-plugin-testing-library": "7.16.0",
-		"glob": "7.1.2",
-		"globals": "14.0.0",
-		"typescript-eslint": "8.57.1"
+		"eslint-import-resolver-typescript": "^4.4.4",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-jest": "^28.11.0",
+		"eslint-plugin-jest-dom": "^5.5.0",
+		"eslint-plugin-prettier": "^5.5.5",
+		"eslint-plugin-react-hooks": "^7.1.1",
+		"eslint-plugin-storybook": "^10.2.19",
+		"eslint-plugin-testing-library": "^7.16.0",
+		"glob": "^7.1.2",
+		"globals": "^16.0.0",
+		"typescript-eslint": "^8.57.1"
 	},
 	"publishConfig": {
 		"access": "public"
