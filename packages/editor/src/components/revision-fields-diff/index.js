@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { diffWords } from 'diff/lib/diff/word';
+/*
+ * `diffWordsWithSpace` preserves the v4-style per-word output. v6+
+ * stopped treating whitespace as a token in `diffWords`, which coalesces
+ * adjacent word changes into a single removed/added pair.
+ */
+import { diffWordsWithSpace } from 'diff';
 
 /**
  * WordPress dependencies
@@ -71,7 +76,7 @@ export default function RevisionFieldsDiffPanel() {
 				continue;
 			}
 
-			result[ key ] = diffWords( prevStr, revStr );
+			result[ key ] = diffWordsWithSpace( prevStr, revStr );
 		}
 
 		if ( Object.keys( result ).length === 0 ) {

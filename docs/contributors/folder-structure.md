@@ -71,12 +71,6 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── docs/*.md
     │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
     │
-    ├── platform-docs
-    │   Documentation website targeted to non WordPress developers
-    │   using Gutenberg in their own applications.
-    │   Deployed on [https://wordpress.org/gutenberg-framework/](https://wordpress.org/gutenberg-framework/).
-    │
-    │
     ├── lib
     │   PHP Source code of the Gutenberg plugin.
     │
