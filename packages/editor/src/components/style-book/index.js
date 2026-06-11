@@ -216,7 +216,7 @@ export function getExamplesForSinglePageUse( examples ) {
  * @return {Array} Updated examples with variation applied.
  */
 function applyBlockVariationsToExamples( examples, variation ) {
-	if ( ! variation ) {
+	if ( ! variation || ! examples ) {
 		return examples;
 	}
 	return examples.map( ( example ) => {
