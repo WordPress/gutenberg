@@ -78,16 +78,8 @@ const config: Config = {
 					selectors: [ '[data-wpds-corner-radius="subtle"]' ],
 				},
 				{
-					mode: 'corner-radius-soft',
-					selectors: [ '[data-wpds-corner-radius="soft"]' ],
-				},
-				{
 					mode: 'corner-radius-moderate',
 					selectors: [ '[data-wpds-corner-radius="moderate"]' ],
-				},
-				{
-					mode: 'corner-radius-generous',
-					selectors: [ '[data-wpds-corner-radius="generous"]' ],
 				},
 				{
 					mode: 'corner-radius-pronounced',

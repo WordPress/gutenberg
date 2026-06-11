@@ -37,9 +37,7 @@ const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
 	{ id: '', title: 'Default' },
 	{ id: 'none', title: 'None' },
 	{ id: 'subtle', title: 'Subtle' },
-	{ id: 'soft', title: 'Soft' },
 	{ id: 'moderate', title: 'Moderate' },
-	{ id: 'generous', title: 'Generous' },
 	{ id: 'pronounced', title: 'Pronounced' },
 ];
 

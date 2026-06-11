@@ -1,12 +1,6 @@
 import { type ReactNode } from 'react';
 
-export type CornerRadiusPreset =
-	| 'none'
-	| 'subtle'
-	| 'soft'
-	| 'moderate'
-	| 'generous'
-	| 'pronounced';
+export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
 
 export interface ThemeProviderSettings {
 	/**
@@ -47,7 +41,7 @@ export interface ThemeProviderSettings {
 
 	/**
 	 * Overall roundness preset for the theme subtree: `none` (square corners),
-	 * `subtle`, `soft`, `moderate`, `generous`, or `pronounced` (most rounded).
+	 * `subtle`, `moderate`, or `pronounced` (most rounded).
 	 *
 	 * This scales the individual `--wpds-border-radius-*` token sizes for the
 	 * subtree; it sets the overall amount of roundness, not a single token

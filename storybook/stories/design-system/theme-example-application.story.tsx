@@ -122,9 +122,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 						>
 							<option value="none">None</option>
 							<option value="subtle">Subtle</option>
-							<option value="soft">Soft</option>
 							<option value="moderate">Moderate</option>
-							<option value="generous">Generous</option>
 							<option value="pronounced">Pronounced</option>
 						</select>
 					</label>

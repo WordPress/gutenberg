@@ -356,17 +356,6 @@
 	--wpds-border-radius-lg: 8px;
 }
 
-[data-wpds-corner-radius='soft'] {
-	/* Extra small radius */
-	--wpds-border-radius-xs: 2px;
-	/* Small radius */
-	--wpds-border-radius-sm: 4px;
-	/* Medium radius */
-	--wpds-border-radius-md: 6px;
-	/* Large radius */
-	--wpds-border-radius-lg: 12px;
-}
-
 [data-wpds-corner-radius='moderate'] {
 	/* Extra small radius */
 	--wpds-border-radius-xs: 3px;
@@ -376,17 +365,6 @@
 	--wpds-border-radius-md: 8px;
 	/* Large radius */
 	--wpds-border-radius-lg: 16px;
-}
-
-[data-wpds-corner-radius='generous'] {
-	/* Extra small radius */
-	--wpds-border-radius-xs: 5px;
-	/* Small radius */
-	--wpds-border-radius-sm: 8px;
-	/* Medium radius */
-	--wpds-border-radius-md: 12px;
-	/* Large radius */
-	--wpds-border-radius-lg: 24px;
 }
 
 [data-wpds-corner-radius='pronounced'] {
