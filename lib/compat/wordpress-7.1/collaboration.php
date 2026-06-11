@@ -436,6 +436,10 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 		return $actions;
 	}
 
+	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
+		return $actions;
+	}
+
 	$title = _draft_or_post_title( $post->ID );
 
 	/*
