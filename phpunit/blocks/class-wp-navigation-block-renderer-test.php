@@ -421,4 +421,118 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
 		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
 	}
+
+	/**
+	 * Test that a Navigation block inside a custom overlay inherits text and
+	 * typography styles from the parent Navigation block when it does not set
+	 * its own values.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_navigation_block_in_custom_overlay_inherits_parent_text_and_typography_styles() {
+		$current_theme = get_stylesheet();
+		$slug          = 'test-overlay-with-navigation-styles';
+
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Overlay With Navigation Styles',
+				'post_name'    => $slug,
+				'post_content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation {"layout":{"type":"flex","orientation":"vertical"}} --><!-- wp:navigation-link {"label":"About","url":"/about"} /--><!-- /wp:navigation --></div><!-- /wp:group -->',
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+
+		$output = do_blocks(
+			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always","customTextColor":"#123456","customFontSize":32,"fontFamily":"heading","style":{"typography":{"fontStyle":"italic","fontWeight":"700","lineHeight":"1.2","textTransform":"uppercase","letterSpacing":"0.08em","textDecoration":"underline"}}} /-->'
+		);
+
+		$tags = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'DIV',
+					'class_name' => 'wp-block-navigation',
+				)
+			),
+			'Nested Navigation block should render as a div inside the custom overlay.'
+		);
+
+		$style = $tags->get_attribute( 'style' );
+		$class = $tags->get_attribute( 'class' );
+
+		$this->assertStringContainsString( 'has-text-color', $class );
+		$this->assertStringContainsString( 'has-heading-font-family', $class );
+		$this->assertStringContainsString( 'has-text-decoration-underline', $class );
+		$this->assertStringContainsString( 'color: #123456;', $style );
+		$this->assertStringContainsString( 'font-size: 32px', $style );
+		$this->assertStringContainsString( 'font-style:italic', $style );
+		$this->assertStringContainsString( 'font-weight:700', $style );
+		$this->assertStringContainsString( 'line-height:1.2', $style );
+		$this->assertStringContainsString( 'text-transform:uppercase', $style );
+		$this->assertStringContainsString( 'letter-spacing:0.08em', $style );
+	}
+
+	/**
+	 * Test that explicit styles on a Navigation block inside a custom overlay
+	 * are preserved instead of being replaced by parent Navigation styles.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers WP_Navigation_Block_Renderer::get_responsive_container_markup
+	 */
+	public function test_navigation_block_in_custom_overlay_preserves_explicit_text_and_typography_styles() {
+		$current_theme = get_stylesheet();
+		$slug          = 'test-overlay-with-explicit-navigation-styles';
+
+		$template_part_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_title'   => 'Test Overlay With Explicit Navigation Styles',
+				'post_name'    => $slug,
+				'post_content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation {"customTextColor":"#654321","customFontSize":20,"fontFamily":"body","style":{"typography":{"fontWeight":"400"}},"layout":{"type":"flex","orientation":"vertical"}} --><!-- wp:navigation-link {"label":"About","url":"/about"} /--><!-- /wp:navigation --></div><!-- /wp:group -->',
+			),
+			true
+		);
+		$this->assertNotWPError( $template_part_id );
+
+		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
+
+		$output = do_blocks(
+			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always","customTextColor":"#123456","customFontSize":32,"fontFamily":"heading","style":{"typography":{"fontWeight":"700","textTransform":"uppercase"}}} /-->'
+		);
+
+		$tags = new WP_HTML_Tag_Processor( $output );
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'DIV',
+					'class_name' => 'wp-block-navigation',
+				)
+			),
+			'Nested Navigation block should render as a div inside the custom overlay.'
+		);
+
+		$style = $tags->get_attribute( 'style' );
+		$class = $tags->get_attribute( 'class' );
+
+		$this->assertStringContainsString( 'has-body-font-family', $class );
+		$this->assertStringNotContainsString( 'has-heading-font-family', $class );
+		$this->assertStringContainsString( 'color: #654321;', $style );
+		$this->assertStringContainsString( 'font-size: 20px', $style );
+		$this->assertStringContainsString( 'font-weight:400', $style );
+		$this->assertStringContainsString( 'text-transform:uppercase', $style );
+		$this->assertStringNotContainsString( 'color: #123456;', $style );
+		$this->assertStringNotContainsString( 'font-size: 32px', $style );
+		$this->assertStringNotContainsString( 'font-weight:700', $style );
+	}
 }

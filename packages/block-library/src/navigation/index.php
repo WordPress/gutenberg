@@ -336,7 +336,7 @@ class WP_Navigation_Block_Renderer {
 	 * @param array $blocks Array of parsed block arrays.
 	 * @return array Modified blocks with overlayMenu set to 'never' for navigation blocks.
 	 */
-	private static function disable_overlay_menu_for_nested_navigation_blocks( $blocks ) {
+	private static function disable_overlay_menu_for_nested_navigation_blocks( $blocks, $parent_navigation_attributes = array() ) {
 		if ( empty( $blocks ) || ! is_array( $blocks ) ) {
 			return $blocks;
 		}
@@ -351,6 +351,7 @@ class WP_Navigation_Block_Renderer {
 				if ( ! isset( $block['attrs'] ) ) {
 					$block['attrs'] = array();
 				}
+				$block['attrs']                = static::inherit_navigation_styles_for_overlay_block( $block['attrs'], $parent_navigation_attributes );
 				$block['attrs']['overlayMenu'] = 'never';
 				// Mark this as a nested navigation within an overlay template part
 				// so we can handle its rendering differently.
@@ -359,11 +360,85 @@ class WP_Navigation_Block_Renderer {
 
 			// Recursively process inner blocks.
 			if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-				$block['innerBlocks'] = static::disable_overlay_menu_for_nested_navigation_blocks( $block['innerBlocks'] );
+				$block['innerBlocks'] = static::disable_overlay_menu_for_nested_navigation_blocks( $block['innerBlocks'], $parent_navigation_attributes );
 			}
 		}
 
 		return $blocks;
+	}
+
+	/**
+	 * Inherits parent Navigation text and typography styles for a Navigation block
+	 * rendered inside a custom navigation overlay.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array $block_attributes             Nested Navigation block attributes.
+	 * @param array $parent_navigation_attributes Parent Navigation block attributes.
+	 * @return array Modified nested Navigation block attributes.
+	 */
+	private static function inherit_navigation_styles_for_overlay_block( $block_attributes, $parent_navigation_attributes ) {
+		$block_color       = isset( $block_attributes['style']['color'] ) && is_array( $block_attributes['style']['color'] ) ? $block_attributes['style']['color'] : array();
+		$block_typography  = isset( $block_attributes['style']['typography'] ) && is_array( $block_attributes['style']['typography'] ) ? $block_attributes['style']['typography'] : array();
+		$parent_typography = isset( $parent_navigation_attributes['style']['typography'] ) && is_array( $parent_navigation_attributes['style']['typography'] ) ? $parent_navigation_attributes['style']['typography'] : array();
+
+		$has_text_color = array_key_exists( 'textColor', $block_attributes ) ||
+			array_key_exists( 'customTextColor', $block_attributes ) ||
+			array_key_exists( 'text', $block_color );
+
+		if ( ! $has_text_color ) {
+			foreach ( array( 'textColor', 'customTextColor' ) as $color_attribute ) {
+				if ( array_key_exists( $color_attribute, $parent_navigation_attributes ) ) {
+					$block_attributes[ $color_attribute ] = $parent_navigation_attributes[ $color_attribute ];
+				}
+			}
+		}
+
+		$has_font_size = array_key_exists( 'fontSize', $block_attributes ) ||
+			array_key_exists( 'customFontSize', $block_attributes ) ||
+			array_key_exists( 'fontSize', $block_typography );
+
+		if ( ! $has_font_size ) {
+			foreach ( array( 'fontSize', 'customFontSize' ) as $font_size_attribute ) {
+				if ( array_key_exists( $font_size_attribute, $parent_navigation_attributes ) ) {
+					$block_attributes[ $font_size_attribute ] = $parent_navigation_attributes[ $font_size_attribute ];
+				}
+			}
+			if ( array_key_exists( 'fontSize', $parent_typography ) ) {
+				$block_attributes['style']['typography']['fontSize'] = $parent_typography['fontSize'];
+			}
+		}
+
+		$has_font_family = array_key_exists( 'fontFamily', $block_attributes ) ||
+			array_key_exists( 'fontFamily', $block_typography );
+
+		if ( ! $has_font_family ) {
+			if ( array_key_exists( 'fontFamily', $parent_navigation_attributes ) ) {
+				$block_attributes['fontFamily'] = $parent_navigation_attributes['fontFamily'];
+			} elseif ( array_key_exists( 'fontFamily', $parent_typography ) ) {
+				$block_attributes['style']['typography']['fontFamily'] = $parent_typography['fontFamily'];
+			}
+		}
+
+		$typography_attributes = array(
+			'fontStyle',
+			'fontWeight',
+			'lineHeight',
+			'textTransform',
+			'letterSpacing',
+			'textDecoration',
+		);
+
+		foreach ( $typography_attributes as $typography_attribute ) {
+			if (
+				array_key_exists( $typography_attribute, $parent_typography ) &&
+				! array_key_exists( $typography_attribute, $block_typography )
+			) {
+				$block_attributes['style']['typography'][ $typography_attribute ] = $parent_typography[ $typography_attribute ];
+			}
+		}
+
+		return $block_attributes;
 	}
 
 	/**
@@ -432,7 +507,7 @@ class WP_Navigation_Block_Renderer {
 				$parsed_blocks = parse_blocks( $content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 				// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
-				$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
+				$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks, $attributes );
 				return new WP_Block_List( $blocks, $attributes );
 			}
 			return new WP_Block_List( array(), $attributes );
@@ -462,7 +537,7 @@ class WP_Navigation_Block_Renderer {
 		$blocks = parse_blocks( $markup );
 
 		// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
-		$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
+		$blocks = static::disable_overlay_menu_for_nested_navigation_blocks( $blocks, $attributes );
 
 		return new WP_Block_List( $blocks, $attributes );
 	}

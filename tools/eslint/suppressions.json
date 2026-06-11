@@ -407,11 +407,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-library/src/navigation/edit/index.js": {
-		"react-hooks/immutability": {
-			"count": 3
-		}
-	},
 	"packages/block-library/src/navigation/edit/navigation-list-view-header.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -430,16 +425,6 @@
 	"packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation/edit/overlay-panel.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation/edit/overlay-template-part-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
 		}
 	},
 	"packages/block-library/src/navigation/edit/unsaved-inner-blocks.js": {

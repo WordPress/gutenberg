@@ -10,13 +10,12 @@ import {
 	Button,
 	FlexBlock,
 	FlexItem,
-	__experimentalHStack as HStack,
-	__experimentalText as WCText,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
 import { plus } from '@wordpress/icons';
+import { Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -36,6 +35,7 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
  * @param {Function} props.setIsCreatingOverlay     Function to set creating overlay state (lifted state).
+ * @param {Object}   props.navigationAttributes     Parent Navigation block attributes.
  * @return {React.JSX.Element} The overlay template part selector component.
  */
 export default function OverlayTemplatePartSelector( {
@@ -45,6 +45,7 @@ export default function OverlayTemplatePartSelector( {
 	onNavigateToEntityRecord,
 	isCreatingOverlay,
 	setIsCreatingOverlay,
+	navigationAttributes,
 } ) {
 	const headingId = useInstanceId(
 		OverlayTemplatePartSelector,
@@ -87,8 +88,10 @@ export default function OverlayTemplatePartSelector( {
 	}, [ templateParts ] );
 
 	// Hook to create overlay template part
-	const createOverlayTemplatePart =
-		useCreateOverlayTemplatePart( overlayTemplateParts );
+	const createOverlayTemplatePart = useCreateOverlayTemplatePart(
+		overlayTemplateParts,
+		navigationAttributes
+	);
 
 	// Find the selected template part to get its title
 	const selectedTemplatePart = useMemo( () => {
@@ -303,8 +306,9 @@ export default function OverlayTemplatePartSelector( {
 						showTooltip
 						className="wp-block-navigation__overlay-create-button"
 					/>
-					<HStack
-						alignment="flex-start"
+					<Stack
+						direction="row"
+						align="flex-start"
 						className="wp-block-navigation__overlay-selector-controls"
 					>
 						<FlexBlock>
@@ -337,7 +341,7 @@ export default function OverlayTemplatePartSelector( {
 								</Button>
 							</FlexItem>
 						) }
-					</HStack>
+					</Stack>
 					{ isOverlayMissing && (
 						<DeletedOverlayWarning
 							onClear={ handleClearOverlay }
@@ -347,20 +351,21 @@ export default function OverlayTemplatePartSelector( {
 					) }
 				</>
 			) }
-			<HStack
-				alignment="flex-start"
+			<Stack
+				direction="row"
+				align="flex-start"
 				className="wp-block-navigation__overlay-help-text-wrapper"
 			>
-				<WCText
-					variant="muted"
-					isBlock
+				<Text
+					variant="body-sm"
+					render={ <p /> }
 					className="wp-block-navigation__overlay-help-text"
 				>
 					{ __(
 						'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
 					) }
-				</WCText>
-			</HStack>
+				</Text>
+			</Stack>
 		</div>
 	);
 }
