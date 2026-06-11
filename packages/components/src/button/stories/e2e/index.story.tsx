@@ -20,11 +20,9 @@ const meta: Meta< typeof Button > = {
 };
 export default meta;
 
-export const VariantStates: StoryFn< typeof Button > = ( storyProps ) => {
-	// None of the stories below set `href`, so at runtime `Button` will always
-	// render as a `<button>`. Casting here avoids issues where props spreading
-	// has conflicts with `ButtonProps` discriminated union.
-	const props = storyProps as ButtonAsButtonProps;
+export const VariantStates: StoryFn< typeof Button > = (
+	props: ButtonAsButtonProps
+) => {
 	const variants: ( typeof props.variant )[] = [
 		undefined,
 		'primary',

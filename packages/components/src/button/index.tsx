@@ -4,16 +4,17 @@
 import clsx from 'clsx';
 import type {
 	ComponentPropsWithoutRef,
+	ForwardedRef,
 	HTMLAttributes,
 	MouseEvent,
 	ReactElement,
-	Ref,
 } from 'react';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -103,10 +104,10 @@ function useDeprecatedProps( {
  * );
  * ```
  */
-export function Button( {
-	ref,
-	...props
-}: ButtonProps & DeprecatedButtonProps ) {
+export function UnforwardedButton(
+	props: ButtonProps & DeprecatedButtonProps,
+	ref: ForwardedRef< any >
+) {
 	const {
 		__next40pxDefaultSize,
 		accessibleWhenDisabled,
@@ -234,6 +235,7 @@ export function Button( {
 		className: classes,
 		'aria-label': additionalProps[ 'aria-label' ] || label,
 		'aria-describedby': describedById,
+		ref,
 	};
 
 	const elementChildren = (
@@ -256,7 +258,6 @@ export function Button( {
 				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
 				{ ...disableEventProps }
 				{ ...commonProps }
-				ref={ ref as Ref< HTMLAnchorElement > }
 			>
 				{ elementChildren }
 			</a>
@@ -266,7 +267,6 @@ export function Button( {
 				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
 				{ ...disableEventProps }
 				{ ...commonProps }
-				ref={ ref as Ref< HTMLButtonElement > }
 			>
 				{ elementChildren }
 			</button>
@@ -303,4 +303,6 @@ export function Button( {
 	);
 }
 
+export const Button = forwardRef( UnforwardedButton );
+Button.displayName = 'Button';
 export default Button;

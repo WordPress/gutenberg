@@ -1,4 +1,11 @@
-import type { ReactNode, Ref } from 'react';
+/**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
+ * Internal dependencies
+ */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
 import type { WordPressComponentProps } from '../context/wordpress-component';
@@ -123,10 +130,6 @@ type _ButtonProps = {
 	 * In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
 	 */
 	disabled?: boolean;
-	/**
-	 * A ref forwarded to the rendered element.
-	 */
-	ref?: Ref< HTMLButtonElement >;
 };
 
 type AnchorProps = {
@@ -145,10 +148,6 @@ type AnchorProps = {
 	 * If provided with `href`, sets the `target` attribute to the `a`.
 	 */
 	target?: string;
-	/**
-	 * A ref forwarded to the rendered element.
-	 */
-	ref?: Ref< HTMLAnchorElement >;
 };
 
 export type DeprecatedButtonProps = {
