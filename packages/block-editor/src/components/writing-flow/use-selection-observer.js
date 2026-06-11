@@ -279,7 +279,6 @@ export default function useSelectionObserver() {
 						return;
 					}
 				}
-
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {

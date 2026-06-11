@@ -9,7 +9,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { getSelectionEditableElement } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -82,11 +82,24 @@ export default function useEditableRoot() {
 
 				// If the wrapper held focus, return focus to the editable
 				// element containing the selection, which is focusable again
-				// now that the wrapper is no longer an editing host.
+				// now that the wrapper is no longer an editing host. Only do
+				// so if that element belongs to the selected block: when the
+				// selection moved to another block through the store, the
+				// stale DOM selection must not reclaim block selection
+				// through its focus handler.
 				if ( node.ownerDocument.activeElement === node ) {
 					const selection =
 						node.ownerDocument.defaultView.getSelection();
-					getSelectionEditableElement( selection, node )?.focus();
+					const editable = getSelectionEditableElement(
+						selection,
+						node
+					);
+					if (
+						editable &&
+						getBlockClientId( editable ) === selectedClientId
+					) {
+						editable.focus();
+					}
 				}
 			}
 		},
