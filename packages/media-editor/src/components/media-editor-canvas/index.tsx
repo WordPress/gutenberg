@@ -136,7 +136,7 @@ export default function MediaEditorCanvas( {
 	if ( status === 'error' ) {
 		return (
 			<div className="media-editor-canvas">
-				<div className="media-editor-canvas__error">
+				<div className="media-editor-canvas__error" role="alert">
 					<p>{ __( 'Failed to load image.' ) }</p>
 				</div>
 			</div>
@@ -150,6 +150,15 @@ export default function MediaEditorCanvas( {
 					<Spinner />
 				</div>
 			) }
+			{ /*
+			 * The cropper stays mounted while loading (hidden behind the
+			 * spinner) so the image decodes off-screen and reveals in one paint
+			 * instead of streaming in top-to-bottom. Until it's revealed it's
+			 * non-interactive (`pointer-events: none` in CSS), and focus is
+			 * withheld by gating `focusOnMount` on the loaded state — the
+			 * cropper's focus effect keys off that prop, so focus lands on the
+			 * crop area only once it's visible.
+			 */ }
 			<div
 				className={ clsx( 'media-editor-canvas__cropper', {
 					'is-loaded': status === 'loaded',
@@ -160,7 +169,7 @@ export default function MediaEditorCanvas( {
 					controller={ controller }
 					aspectRatio={ aspectRatio }
 					freeformCrop
-					focusOnMount={ focusOnMount }
+					focusOnMount={ focusOnMount && status === 'loaded' }
 					showGrid="interactive"
 					isPlacementActive={ isPlacementActive }
 					onGestureStart={ handleGestureStart }

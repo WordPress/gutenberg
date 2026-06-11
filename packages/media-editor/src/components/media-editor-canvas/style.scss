@@ -10,18 +10,21 @@
 	width: 100%;
 	height: 100%;
 
-	// Holds the cropper, hidden until the image pixels have loaded so the
-	// crop handles and overlays don't appear over a half-loaded image.
+	// The cropper stays mounted while loading so the image decodes behind the
+	// spinner and reveals in one paint. It's hidden and non-interactive until
+	// the image has loaded, then fades in.
 	&__cropper {
 		width: 100%;
 		height: 100%;
 		opacity: 0;
+		pointer-events: none;
 
 		// Explicit `opacity: 1` (not just the animation's fill mode) keeps the
 		// cropper visible for reduced-motion users, since `animation__fade-in`
 		// is gated behind `@media not (prefers-reduced-motion)`.
 		&.is-loaded {
 			opacity: 1;
+			pointer-events: auto;
 			@include animation__fade-in( 0.2s );
 		}
 	}
