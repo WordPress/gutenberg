@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -134,11 +129,7 @@ const SidebarContent = ( {
 			// This classname is added so we can apply a corrective negative
 			// margin to the panel.
 			// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
-			// `is-revisions-summary` scopes the inner-scrolling layout used by
-			// the revisions timeline so the normal document inspector is untouched.
-			className={ clsx( 'editor-sidebar__panel', {
-				'is-revisions-summary': isRevisionsMode,
-			} ) }
+			className="editor-sidebar__panel"
 			headerClassName="editor-sidebar__panel-tabs"
 			title={
 				/* translators: button label text should, if possible, be under 16 characters. */

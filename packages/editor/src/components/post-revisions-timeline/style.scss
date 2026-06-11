@@ -1,14 +1,9 @@
-// Make the revisions inspector a fixed-height, inner-scrolling column so the
-// timeline fills the panel and the DataViewsPicker pagination stays pinned to
-// the bottom. The picker already scrolls its list and pins its footer; it just
-// needs an ancestor chain that hands it a bounded height. Scoped to revisions
-// mode (the `is-revisions-summary` panel modifier, set in the editor sidebar)
-// so the normal document inspector — which shares these classes — is unaffected.
+// Give the revisions inspector a bounded height so the timeline scrolls
+// internally and the picker's pagination stays pinned to the bottom.
 //
-// `is-revisions-summary` lands on `.components-panel` (PluginSidebar routes its
-// className to `panelClassName`), so the scroll container above it is reached
-// with `:has()`.
-.interface-complementary-area:has(.components-panel.is-revisions-summary) {
+// The timeline only renders in revisions mode, so its ancestors are scoped
+// with `:has()` — keeping this layout out of the generic editor sidebar.
+.interface-complementary-area:has(.editor-post-revisions-timeline) {
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -19,16 +14,14 @@
 	}
 }
 
-.components-panel.is-revisions-summary {
+.editor-sidebar__panel:has(.editor-post-revisions-timeline) {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
 	min-height: 0;
 
-	// The document tab panel becomes the flex column that stacks the
-	// revisions UI: the summary header, the Meta diff panel, then the
-	// timeline. It hands a bounded height to the timeline below.
-	[role="tabpanel"]:has(.editor-post-summary) {
+	// The document tab panel hands its bounded height down to the timeline.
+	[role="tabpanel"]:has(.editor-post-revisions-timeline) {
 		display: flex;
 		flex-direction: column;
 		flex: 1;
