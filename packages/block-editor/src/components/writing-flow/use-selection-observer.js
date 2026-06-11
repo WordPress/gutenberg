@@ -146,59 +146,6 @@ export default function useSelectionObserver() {
 				isTripleClick = false;
 			}
 
-			// Tracks composition so no selection is dispatched while the user
-			// is composing text: a re-render may destroy the composition.
-			let isComposing = false;
-
-			function onCompositionStart() {
-				isComposing = true;
-			}
-
-			function onCompositionEnd() {
-				isComposing = false;
-			}
-
-			// Syncs a collapsed selection to the store while the wrapper
-			// holds focus. The current store selection is compared first so
-			// selection changes that are already in sync (e.g. the result of
-			// typing, which rich text syncs itself) don't dispatch.
-			function syncCollapsedSelection( selection, startNode, clientId ) {
-				const richTextElement = getRichTextElement( startNode );
-				const attributeKey =
-					richTextElement?.dataset.wpBlockAttributeKey;
-
-				if ( attributeKey === undefined ) {
-					if ( getBlockSelectionStart() !== clientId ) {
-						selectBlock( clientId );
-					}
-					return;
-				}
-
-				const richTextData = create( {
-					element: richTextElement,
-					range: selection.getRangeAt( 0 ),
-					__unstableIsEditableTree: true,
-				} );
-				const offset = richTextData.start ?? 0;
-				const selectionStart = getSelectionStart();
-				const selectionEnd = getSelectionEnd();
-
-				if (
-					selectionStart.clientId === clientId &&
-					selectionEnd.clientId === clientId &&
-					selectionStart.attributeKey === attributeKey &&
-					selectionStart.offset === offset &&
-					selectionEnd.offset === offset
-				) {
-					return;
-				}
-
-				selectionChange( {
-					start: { clientId, attributeKey, offset },
-					end: { clientId, attributeKey, offset },
-				} );
-			}
-
 			function onSelectionChange( event ) {
 				const selection = defaultView.getSelection();
 
@@ -248,7 +195,8 @@ export default function useSelectionObserver() {
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
 						// across browsers). Don't steal focus from UI elements
-						// (e.g. buttons).
+						// (e.g. buttons). The rich text instance owning the
+						// selection syncs it to the store itself.
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
@@ -256,23 +204,6 @@ export default function useSelectionObserver() {
 							node.contains( activeElement )
 						) {
 							node.focus();
-						}
-
-						// Only sync when the selection moved to a different
-						// block. Within the same block, the rich text
-						// instance owns the selection and syncs it itself;
-						// dispatching here as well would race that sync and
-						// reset its active formats.
-						if (
-							! isComposing &&
-							ownerDocument.activeElement === node &&
-							getBlockSelectionStart() !== collapsedClientId
-						) {
-							syncCollapsedSelection(
-								selection,
-								startNode,
-								collapsedClientId
-							);
 						}
 						return;
 					}
@@ -486,8 +417,6 @@ export default function useSelectionObserver() {
 			defaultView.addEventListener( 'mouseup', onSelectionChange );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
-			node.addEventListener( 'compositionstart', onCompositionStart );
-			node.addEventListener( 'compositionend', onCompositionEnd );
 			return () => {
 				ownerDocument.removeEventListener(
 					'selectionchange',
@@ -496,11 +425,6 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onSelectionChange );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
-				node.removeEventListener(
-					'compositionstart',
-					onCompositionStart
-				);
-				node.removeEventListener( 'compositionend', onCompositionEnd );
 			};
 		},
 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
