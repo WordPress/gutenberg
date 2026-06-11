@@ -23,17 +23,24 @@ const wpScriptsBin = require.resolve( '@wordpress/scripts/bin/wp-scripts.js' );
 const FORMAT_FLAGS = [ '-f', '--format' ];
 
 function resolveFormatter( name ) {
-	if ( name.includes( '/' ) || name.includes( '\\' ) ) {
+	if (
+		name.startsWith( '/' ) ||
+		name.startsWith( './' ) ||
+		name.startsWith( '../' ) ||
+		/^[A-Za-z]:\\/.test( name )
+	) {
 		return name;
 	}
 
-	try {
-		return require.resolve( `eslint-formatter-${ name }`, {
-			paths: [ __dirname ],
-		} );
-	} catch {
-		return name;
+	for ( const candidate of [ name, `eslint-formatter-${ name }` ] ) {
+		try {
+			return require.resolve( candidate, { paths: [ __dirname ] } );
+		} catch {}
 	}
+
+	throw new Error(
+		`Formatter "${ name }" not found. Install the corresponding eslint-formatter-<name> package in tools/eslint/ or use a built-in formatter (stylish, json, etc.).`
+	);
 }
 
 const childArgs = args.map( ( arg, index ) => {
