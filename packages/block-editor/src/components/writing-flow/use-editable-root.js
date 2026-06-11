@@ -56,8 +56,16 @@ export default function useEditableRoot() {
 	return useRefEffect(
 		( node ) => {
 			if ( supportsEditableRoot && ! isZoomOut() ) {
-				if ( node.contentEditable !== 'true' ) {
-					node.contentEditable = true;
+				if ( node.getAttribute( 'contenteditable' ) !== 'true' ) {
+					node.setAttribute( 'contenteditable', 'true' );
+
+					// Abort in environments without contentEditable support
+					// (JSDOM): without editing host semantics the wrapper
+					// must not claim to be one.
+					if ( ! node.isContentEditable ) {
+						node.removeAttribute( 'contenteditable' );
+						return;
+					}
 				}
 
 				// Move focus from the block's editable element to the
@@ -74,11 +82,11 @@ export default function useEditableRoot() {
 					node.focus();
 				}
 			} else if (
-				node.contentEditable === 'true' &&
+				node.getAttribute( 'contenteditable' ) === 'true' &&
 				! hasMultiSelection() &&
 				! isMultiSelecting()
 			) {
-				node.contentEditable = false;
+				node.setAttribute( 'contenteditable', 'false' );
 
 				// If the wrapper held focus, return focus to the editable
 				// element containing the selection, which is focusable again
