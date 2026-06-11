@@ -19,31 +19,12 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
-	excerptField,
-	featuredImageField,
-	dateField,
-	parentField,
-	passwordField,
-	commentStatusField,
-	pingStatusField,
-	discussionField,
-	slugField,
-	statusField,
-	authorField,
-	titleField,
-	templateField,
-	notesField,
-	scheduledDateField,
-	formatField,
-	postContentInfoField,
-	stickyField,
 } from '@wordpress/fields';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
 import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
 
@@ -51,20 +32,6 @@ declare global {
 	interface Window {
 		__experimentalTemplateActivate?: boolean;
 	}
-}
-
-/**
- * Check if a post type supports editor notes.
- *
- * @param supports The post type supports object.
- * @return Whether editor notes are supported.
- */
-function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
-	const editor = supports?.editor;
-	if ( Array.isArray( editor ) ) {
-		return !! editor[ 0 ]?.notes;
-	}
-	return false;
 }
 
 export function registerEntityAction< Item >(
@@ -162,10 +129,6 @@ export const registerPostTypeSchema =
 					} ),
 			]
 		);
-		const { disablePostFormats } = registry
-			.select( editorStore )
-			.getEditorSettings();
-
 		let canDuplicate =
 			! [ 'wp_block', 'wp_template_part' ].includes(
 				postTypeConfig.slug
@@ -217,53 +180,16 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		let fields;
-
-		if ( postType === ATTACHMENT_POST_TYPE ) {
-			// Attachment fields are provided by the `core/media-fields`
-			// field collection registered server-side. The generic fields
-			// below don't apply to media, so there is no client-side
-			// fallback.
-			fields = [];
-		} else {
-			fields = [
-				postTypeConfig.supports?.thumbnail &&
-					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
-					featuredImageField,
-				postTypeConfig.supports?.author && authorField,
-				statusField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					dateField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					scheduledDateField,
-				slugField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					postTypeConfig.supports?.excerpt &&
-					excerptField,
-				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-				postTypeConfig.supports?.comments && commentStatusField,
-				postTypeConfig.supports?.trackbacks && pingStatusField,
-				( postTypeConfig.supports?.comments ||
-					postTypeConfig.supports?.trackbacks ) &&
-					discussionField,
-				templateField,
-				postTypeConfig.supports?.[ 'post-formats' ] &&
-					! disablePostFormats &&
-					formatField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					postTypeConfig.supports?.editor &&
-					postContentInfoField,
-				passwordField,
-				postTypeConfig.slug === 'post' && stickyField,
-				postTypeConfig.supports?.editor &&
-					postTypeConfig.viewable &&
-					postPreviewField,
-				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
-			].filter( Boolean );
-			if ( postTypeConfig.supports?.title ) {
-				fields.push( titleField );
-			}
-		}
+		// All other fields are provided by the field collections registered
+		// server-side. The preview field cannot move there: its render
+		// depends on editor internals (EditorProvider, global styles, the
+		// editor store) that the collections' script modules in
+		// `@wordpress/fields` cannot import.
+		const fields = [
+			postTypeConfig.supports?.editor &&
+				postTypeConfig.viewable &&
+				postPreviewField,
+		].filter( Boolean );
 
 		// Load the script modules providing the non-serializable extensions
 		// (getValue, render, Edit…) of each field collection, and merge them
@@ -324,11 +250,6 @@ export const registerPostTypeSchema =
 					field
 				);
 			} );
-			// Collection fields are registered after the client-side
-			// defaults and replace any field with the same id, so
-			// server-registered collections are authoritative and the
-			// client-side definitions act as a fallback when the
-			// collections request fails.
 			collectionFields.forEach( ( field: Field< any > ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityField(
 					'postType',
