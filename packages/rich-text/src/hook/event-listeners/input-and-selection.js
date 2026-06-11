@@ -268,12 +268,8 @@ export default ( props ) => ( element ) => {
 			props.current;
 
 		// When the whole editor is editable, let writing flow handle
-		// selection state, but keep the internal record in sync.
+		// selection.
 		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
-			ownerDocument.addEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
 			return;
 		}
 
