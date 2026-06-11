@@ -121,7 +121,9 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 
 	it( 'returns true when the current post type sync config should sync', () => {
 		const shouldSync = jest.fn( () => true );
-		setupRegistry( { syncConfig: { shouldSync } } );
+		setupRegistry( {
+			syncConfig: { shouldSync, supportsPersistence: true },
+		} );
 
 		const state = { postType: 'book', postId: 123 };
 
@@ -129,8 +131,23 @@ describe( 'isCollaborationEnabledForCurrentPost', () => {
 		expect( shouldSync ).toHaveBeenCalledWith( 'postType/book', 123 );
 	} );
 
+	it( 'returns false when the current post type sync config does not support persistence', () => {
+		const shouldSync = jest.fn( () => true );
+		setupRegistry( { syncConfig: { shouldSync } } );
+
+		const state = { postType: 'book', postId: 123 };
+
+		expect( isCollaborationEnabledForCurrentPost( state ) ).toBe( false );
+		expect( shouldSync ).not.toHaveBeenCalled();
+	} );
+
 	it( 'returns false when the current post type sync config should not sync', () => {
-		setupRegistry( { syncConfig: { shouldSync: () => false } } );
+		setupRegistry( {
+			syncConfig: {
+				shouldSync: () => false,
+				supportsPersistence: true,
+			},
+		} );
 
 		const state = { postType: 'book', postId: 123 };
 
