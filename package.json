@@ -128,7 +128,7 @@
 		"lint:md:docs": "wp-scripts lint-md-docs",
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
-		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
+		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json' 'tools/*/package.json'",
 		"other:changelog": "npm exec --no release-cli -- changelog",
 		"other:check-licenses": "concurrently \"npm run --workspace @wordpress/validation-tools check-licenses --\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build && npm run --workspace @wordpress/theme build",
