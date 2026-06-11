@@ -25,7 +25,7 @@
 			"lg": {
 				"$type": "dimension",
 				"$value": {
-					"value": 20,
+					"value": 24,
 					"unit": "px"
 				}
 			}

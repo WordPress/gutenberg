@@ -60,7 +60,7 @@
 						"corner-radius-subtle": { "value": 8, "unit": "px" },
 						"corner-radius-moderate": { "value": 16, "unit": "px" },
 						"corner-radius-pronounced": {
-							"value": 20,
+							"value": 24,
 							"unit": "px"
 						}
 					},
