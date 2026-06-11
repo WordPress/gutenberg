@@ -162,19 +162,35 @@ class ToolbarRovingTabindexUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		let ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
+		// Resolves the element owning the focus: the active element, or,
+		// when a focused editing host owns the selection, the editable
+		// element containing the selection.
+		const getFocusOwnerLabel = () => {
+			const doc = document.activeElement.contentDocument ?? document;
+			let { activeElement } = doc;
+			const selection = doc.defaultView.getSelection();
+			const { anchorNode } = selection;
+			if (
+				activeElement.isContentEditable &&
+				anchorNode &&
+				activeElement.contains( anchorNode )
+			) {
+				const editable = (
+					anchorNode.nodeType === anchorNode.ELEMENT_NODE
+						? anchorNode
+						: anchorNode.parentElement
+				).closest( '[contenteditable="true"]' );
+				if ( editable && editable !== activeElement ) {
+					activeElement = editable;
+				}
+			}
 			return activeElement.getAttribute( 'aria-label' );
-		} );
+		};
+		let ariaLabel = await this.page.evaluate( getFocusOwnerLabel );
 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
 		if ( ariaLabel !== label ) {
 			await this.page.keyboard.press( 'ArrowUp' );
-			ariaLabel = await this.page.evaluate( () => {
-				const { activeElement } =
-					document.activeElement.contentDocument ?? document;
-				return activeElement.getAttribute( 'aria-label' );
-			} );
+			ariaLabel = await this.page.evaluate( getFocusOwnerLabel );
 		}
 		expect( ariaLabel ).toBe( label );
 	}
