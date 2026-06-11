@@ -11,6 +11,7 @@ import {
 	useRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	forwardRef,
 	useContext,
@@ -345,6 +346,55 @@ export function RichTextWrapper(
 		record: value,
 		onChange,
 	} );
+
+	// While a focused editing host owns the selection (the block supports
+	// `editableRoot`), ARIA attributes describing the autocomplete state must
+	// be mirrored onto the host: assistive technology resolves them relative
+	// to the focused element.
+	const {
+		'aria-autocomplete': ariaAutocomplete,
+		'aria-owns': ariaOwns,
+		'aria-activedescendant': ariaActiveDescendant,
+	} = autocompleteProps;
+	useEffect( () => {
+		if ( ! hasEditableRoot || ! isSelected ) {
+			return;
+		}
+
+		const host = anchorRef.current?.parentElement?.closest(
+			'[contenteditable="true"]'
+		);
+
+		if ( ! host ) {
+			return;
+		}
+
+		const attributes = {
+			'aria-autocomplete': ariaAutocomplete,
+			'aria-owns': ariaOwns,
+			'aria-activedescendant': ariaActiveDescendant,
+		};
+
+		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
+			if ( value_ === undefined ) {
+				host.removeAttribute( key );
+			} else {
+				host.setAttribute( key, value_ );
+			}
+		}
+
+		return () => {
+			for ( const key of Object.keys( attributes ) ) {
+				host.removeAttribute( key );
+			}
+		};
+	}, [
+		hasEditableRoot,
+		isSelected,
+		ariaAutocomplete,
+		ariaOwns,
+		ariaActiveDescendant,
+	] );
 
 	useMarkPersistent( { html: adjustedValue, value } );
 
