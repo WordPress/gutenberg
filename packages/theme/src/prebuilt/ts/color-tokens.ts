@@ -71,7 +71,11 @@ export default {
 	'error-stroke4': [ 'stroke-interactive-error-active' ],
 	'error-stroke1': [ 'stroke-surface-error' ],
 	'bg-surface2': [ 'background-surface-neutral' ],
-	'bg-surface5': [ 'background-interactive-neutral-strong-disabled' ],
+	'bg-surface5': [
+		'background-interactive-brand-strong-disabled',
+		'background-interactive-error-strong-disabled',
+		'background-interactive-neutral-strong-disabled',
+	],
 	'bg-surface4': [ 'background-interactive-neutral-weak-active' ],
 	'bg-surface3': [ 'background-surface-neutral-strong' ],
 	'bg-fgSurface4': [
@@ -84,6 +88,10 @@ export default {
 		'foreground-interactive-neutral-weak',
 	],
 	'bg-fgSurface2': [
+		'foreground-interactive-brand-disabled',
+		'foreground-interactive-brand-strong-disabled',
+		'foreground-interactive-error-disabled',
+		'foreground-interactive-error-strong-disabled',
 		'foreground-interactive-neutral-disabled',
 		'foreground-interactive-neutral-strong-disabled',
 		'foreground-interactive-neutral-weak-disabled',
@@ -101,6 +109,9 @@ export default {
 	'bg-stroke2': [
 		'background-thumb-neutral-disabled',
 		'background-track-neutral',
+		'stroke-interactive-brand-disabled',
+		'stroke-interactive-error-disabled',
+		'stroke-interactive-error-strong-disabled',
 		'stroke-interactive-neutral-disabled',
 		'stroke-surface-neutral',
 	],
