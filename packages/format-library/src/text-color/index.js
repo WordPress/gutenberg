@@ -6,7 +6,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
 import {
 	Icon,
-	color as colorIcon,
+	background as backgroundColorIcon,
 	textColor as textColorIcon,
 } from '@wordpress/icons';
 import { removeFormat } from '@wordpress/rich-text';
@@ -19,7 +19,8 @@ import { default as InlineColorUI, getActiveColors } from './inline';
 export const transparentValue = 'rgba(0, 0, 0, 0)';
 
 const name = 'core/text-color';
-const title = __( 'Highlight' );
+const title = __( 'Text color' );
+const backgroundTitle = __( 'Background color' );
 
 const EMPTY_ARRAY = [];
 
@@ -65,14 +66,25 @@ function TextColorEdit( {
 		'color.custom',
 		'color.palette'
 	);
-	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const colorIndicatorStyle = useMemo(
+	const [ activeTab, setActiveTab ] = useState( null );
+	const activeColors = useMemo(
+		() => getActiveColors( value, name, colors ),
+		[ value, colors ]
+	);
+	const textColorIndicatorStyle = useMemo(
 		() =>
-			fillComputedColors(
-				contentRef.current,
-				getActiveColors( value, name, colors )
-			),
-		[ contentRef, value, colors ]
+			fillComputedColors( contentRef.current, {
+				color: activeColors.color,
+				backgroundColor: undefined,
+			} ),
+		[ contentRef, activeColors ]
+	);
+	const highlightColorIndicatorStyle = useMemo(
+		() =>
+			activeColors.backgroundColor
+				? { color: activeColors.backgroundColor }
+				: undefined,
+		[ activeColors ]
 	);
 
 	const hasColorsToChoose = !! colors.length || allowCustomControl;
@@ -80,39 +92,56 @@ function TextColorEdit( {
 		return null;
 	}
 
+	const isTextColorActive = !! activeColors.color;
+	const isHighlightColorActive = !! activeColors.backgroundColor;
+
 	return (
 		<>
 			<RichTextToolbarButton
 				className="format-library-text-color-button"
-				isActive={ isActive }
+				isActive={ isTextColorActive }
 				icon={
 					<Icon
-						icon={
-							Object.keys( activeAttributes ).length
-								? textColorIcon
-								: colorIcon
-						}
-						style={ colorIndicatorStyle }
+						icon={ textColorIcon }
+						style={ textColorIndicatorStyle }
 					/>
 				}
 				title={ title }
 				// If has no colors to choose but a color is active remove the color onClick.
 				onClick={
 					hasColorsToChoose
-						? () => setIsAddingColor( true )
+						? () => setActiveTab( 'color' )
 						: () => onChange( removeFormat( value, name ) )
 				}
 				role="menuitemcheckbox"
 			/>
-			{ isAddingColor && (
+			<RichTextToolbarButton
+				isActive={ isHighlightColorActive }
+				icon={
+					<Icon
+						icon={ backgroundColorIcon }
+						style={ highlightColorIndicatorStyle }
+					/>
+				}
+				title={ backgroundTitle }
+				// If has no colors to choose but a color is active remove the color onClick.
+				onClick={
+					hasColorsToChoose
+						? () => setActiveTab( 'backgroundColor' )
+						: () => onChange( removeFormat( value, name ) )
+				}
+				role="menuitemcheckbox"
+			/>
+			{ activeTab !== null && (
 				<InlineColorUI
 					name={ name }
-					onClose={ () => setIsAddingColor( false ) }
+					onClose={ () => setActiveTab( null ) }
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
 					isActive={ isActive }
+					defaultTab={ activeTab }
 				/>
 			) }
 		</>
