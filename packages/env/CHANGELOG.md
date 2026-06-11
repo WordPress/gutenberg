@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.8.0 (2026-06-10)
+
 ### Enhancements
 
 -   Use the versioned WordPress.org zip file for the default core source to speed up fresh environment creation while preserving version-based cache invalidation. ([#78942](https://github.com/WordPress/gutenberg/pull/78942))

@@ -2,11 +2,15 @@
  * WordPress dependencies
  */
 import { BACKSPACE, ESCAPE } from '@wordpress/keycodes';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 export default ( props ) => ( element ) => {
 	function onKeyDown( event ) {
@@ -38,8 +42,5 @@ export default ( props ) => ( element ) => {
 		__experimentalUndo();
 	}
 
-	element.addEventListener( 'keydown', onKeyDown );
-	return () => {
-		element.removeEventListener( 'keydown', onKeyDown );
-	};
+	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
 };

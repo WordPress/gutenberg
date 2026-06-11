@@ -2,9 +2,11 @@
 
 ## Unreleased
 
-### New Features
+## 8.0.0 (2026-06-10)
 
--   Added polyfills for the `render`, `hydrate` and `unmountComponentAtNode` APIs that React 19 no longer ships.
+### Breaking Changes
+
+-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
 
 ## 7.0.0 (2026-05-27)
 

@@ -3,11 +3,15 @@
  */
 import { insert, isCollapsed } from '@wordpress/rich-text';
 import { applyFilters } from '@wordpress/hooks';
+import { privateApis as composePrivateApis } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 /**
  * When typing over a selection, the selection will we wrapped by a matching
@@ -85,8 +89,5 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 	}
 
-	element.addEventListener( 'beforeinput', onInput );
-	return () => {
-		element.removeEventListener( 'beforeinput', onInput );
-	};
+	return subscribeDelegatedListener( element, 'beforeinput', onInput, true );
 };

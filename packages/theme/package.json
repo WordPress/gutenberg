@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.14.0",
+	"version": "0.15.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -75,12 +75,11 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^19.2.13",
+		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
@@ -100,8 +99,8 @@
 		"storybook": "^10.2.8"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0",
 		"stylelint": "^16.8.2"
 	},
 	"peerDependenciesMeta": {

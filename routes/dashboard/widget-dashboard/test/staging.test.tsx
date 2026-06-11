@@ -289,7 +289,6 @@ describe( 'WidgetDashboard staging layer', () => {
 	describe( 'grid settings staging', () => {
 		const initialSettings: WidgetGridSettings = {
 			model: 'grid',
-			minColumnWidth: 350,
 			rowHeight: 200,
 		};
 
@@ -310,13 +309,13 @@ describe( 'WidgetDashboard staging layer', () => {
 			act( () => {
 				readProbe().mutateGridSettings( {
 					...initialSettings,
-					minColumnWidth: 420,
+					rowHeight: 300,
 				} );
 			} );
 
 			expect( onGridSettingsChange ).not.toHaveBeenCalled();
 			expect( readProbe().hasUncommittedChanges ).toBe( true );
-			expect( readProbe().gridSettings.minColumnWidth ).toBe( 420 );
+			expect( readProbe().gridSettings.rowHeight ).toBe( 300 );
 		} );
 
 		it( 'publishes both layout and settings on commit', () => {
