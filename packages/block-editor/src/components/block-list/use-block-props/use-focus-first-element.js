@@ -29,9 +29,8 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
-		useSelect( blockEditorStore )
-	);
+	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
+		unlock( useSelect( blockEditorStore ) );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -60,16 +59,23 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 
 		// Do not move the caret when a focused editing host contains the
 		// block (the block supports `editableRoot`) and the selection is
-		// already inside the block.
+		// already inside the block, unless an edge position is explicitly
+		// requested while the block's rich text doesn't own the selection
+		// (the store selection carries no offsets for the block): the
+		// in-block selection is then left over from a previous state (e.g.
+		// after removing the focused block in between).
 		const { activeElement } = ownerDocument;
 		if (
 			activeElement?.isContentEditable &&
 			activeElement.contains( ref.current )
 		) {
+			const { clientId: selectionClientId, offset } = getSelectionStart();
 			const selection = ownerDocument.defaultView.getSelection();
 			if (
 				selection.anchorNode &&
-				ref.current.contains( selection.anchorNode )
+				ref.current.contains( selection.anchorNode ) &&
+				( initialPosition === 0 ||
+					( offset !== undefined && selectionClientId === clientId ) )
 			) {
 				return;
 			}
