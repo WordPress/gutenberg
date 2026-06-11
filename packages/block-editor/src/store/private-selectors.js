@@ -1083,12 +1083,12 @@ export function getListViewExpandRevision( state ) {
  * its inner blocks.
  *
  * Intentionally private: this is the derived participation logic (block type
- * `listView` support, the `core/navigation` special case, and the
- * "managed inner blocks" inference) shared by the List View consumers. A block
- * opts out implicitly by entering a managed state — it has no inner blocks and
- * disallows insertion (`allowedBlocks: []`) — so there is no dedicated public
- * flag. Keeping the read internal lets this computation evolve without a
- * back-compat commitment.
+ * `listView` support and the `core/navigation` special case) shared by the List
+ * View consumers. A `listView`-supporting block drops out when its List View
+ * would be completely unusable — it has no inner blocks and disallows insertion
+ * (`allowedBlocks: []`), so there is nothing to show, rearrange, or add — to
+ * avoid bloating the UI. Keeping the read internal lets this computation evolve
+ * without a back-compat commitment.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
@@ -1108,30 +1108,25 @@ export function hasBlockListViewSupport( state, clientId ) {
 		return false;
 	}
 
-	// A block with inner blocks always participates — there are real children to
-	// view and navigate.
-	if ( getBlockOrder( state, clientId ).length !== 0 ) {
-		return true;
-	}
-
-	// The block is empty and has "managed inner blocks" — so opts out of the
-	// List View — when nothing can be inserted into it. This lets a block that
-	// resolves its own children (e.g. a gallery in a dynamic mode) opt out
-	// without a dedicated flag, by declaring `allowedBlocks: []` while it has no
-	// inner blocks: there is nothing to navigate and nothing to add.
+	// Hide the List View only when it would be completely unusable: the block
+	// has no inner blocks to view or rearrange, and disallows insertion
+	// (`allowedBlocks: []`), so it has no appender either. When insertion is
+	// allowed the List View still shows an appender, so it stays.
 	//
-	// `allowedBlocks` is read from block list settings rather than inferred from
-	// `templateLock` because a content-locked ancestor relaxes a child's own
+	// `allowedBlocks` is used rather than inferring this from `templateLock`,
+	// because a content-locked ancestor relaxes a child's own
 	// `templateLock: 'all'` to `contentOnly` (see `useNestedSettingsUpdate`),
 	// whereas `allowedBlocks` is carried through unchanged.
 	const allowedBlocks = getBlockListSettings(
 		state,
 		clientId
 	)?.allowedBlocks;
-	const hasManagedInnerBlocks =
-		Array.isArray( allowedBlocks ) && allowedBlocks.length === 0;
+	const isListViewUnusable =
+		getBlockOrder( state, clientId ).length === 0 &&
+		Array.isArray( allowedBlocks ) &&
+		allowedBlocks.length === 0;
 
-	return ! hasManagedInnerBlocks;
+	return ! isListViewUnusable;
 }
 
 /**

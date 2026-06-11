@@ -128,7 +128,7 @@ describe( 'private selectors', () => {
 			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
 		} );
 
-		it( 'returns false when the inner blocks are managed (empty and insertion disallowed)', () => {
+		it( 'returns false when empty and insertion is disallowed (List View would be unusable)', () => {
 			const state = createState( blockWithListViewSupport, {
 				allowedBlocks: [],
 			} );
