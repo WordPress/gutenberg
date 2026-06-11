@@ -9,6 +9,11 @@
 	box-sizing: border-box;
 }
 
+.wp-block-slider.is-zero-peek {
+	--slider-edge-space: 0;
+	--slider-slide-size: 100%;
+}
+
 .wp-block-slider__viewport {
 	overflow: hidden;
 	overscroll-behavior-x: contain;

@@ -5,6 +5,7 @@ import { __experimentalGetGapCSSValue as getGapCSSValue } from '@wordpress/block
 
 export const DEFAULT_PEEK_AMOUNT = 32;
 export const DEFAULT_PEEK_UNIT = 'px';
+export const ZERO_PEEK_CLASS = 'is-zero-peek';
 
 function getSliderGapValue( blockGap ) {
 	if ( ! blockGap ) {
@@ -39,4 +40,8 @@ export function getSliderStyle( {
 	}
 
 	return sliderStyle;
+}
+
+export function isZeroPeek( peekAmount = DEFAULT_PEEK_AMOUNT ) {
+	return Number.isFinite( peekAmount ) && peekAmount === 0;
 }

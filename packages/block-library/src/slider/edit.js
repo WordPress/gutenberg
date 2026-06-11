@@ -32,6 +32,8 @@ import {
 	DEFAULT_PEEK_AMOUNT,
 	DEFAULT_PEEK_UNIT,
 	getSliderStyle,
+	isZeroPeek,
+	ZERO_PEEK_CLASS,
 } from './utils';
 
 const PERCENT_PEEK_AMOUNT = 8;
@@ -120,6 +122,9 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 		useDispatch( blockEditorStore );
 	const slideCount = slides.length || SLIDER_TEMPLATE.length;
 	const blockProps = useBlockProps( {
+		className: clsx( {
+			[ ZERO_PEEK_CLASS ]: isZeroPeek( peekAmount ),
+		} ),
 		style: getSliderStyle( { peekAmount, peekUnit, style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps(
