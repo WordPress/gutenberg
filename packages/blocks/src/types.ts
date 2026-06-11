@@ -488,6 +488,14 @@ export interface Block<
 	 */
 	innerBlocks: Block[];
 	/**
+	 * Static HTML fragments interleaved with inner blocks, for blocks with
+	 * the `innerContent` support. `null` entries mark the positions of the
+	 * inner blocks within the static markup. When present, this is the
+	 * canonical source of the block's own markup and is used for
+	 * serialization instead of the `save` implementation.
+	 */
+	innerContent?: Array< string | null >;
+	/**
 	 * Original content of the block before validation fixes.
 	 */
 	originalContent?: string;
@@ -872,6 +880,16 @@ export interface BlockSupports {
 	 * (default) false
 	 */
 	allowedBlocks?: boolean;
+
+	/**
+	 * Allows the block to keep static HTML fragments interleaved with inner
+	 * blocks as the canonical source of its own markup. When enabled, the
+	 * block is serialized from its parsed inner content instead of a `save`
+	 * implementation.
+	 *
+	 * (default) false
+	 */
+	innerContent?: boolean;
 
 	/**
 	 * Anchors let you link directly to a specific block on a page.

@@ -1,0 +1,122 @@
+/**
+ * WordPress dependencies
+ */
+import {
+	createPortal,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+import BlockListBlock from '../block-list/block';
+import { LayoutProvider } from '../block-list/layout';
+
+const SLOT_TAG_NAME = 'wp-inner-block-slot';
+
+// The static markup surrounding the inner blocks is arbitrary HTML the block
+// editor doesn't manage, so it provides no layout context: no alignments are
+// available to the inner blocks.
+const LAYOUT = { type: 'default', alignments: [] };
+
+/**
+ * Renders the static HTML fragments of a block with the `innerContent`
+ * support, mounting each inner block at the position of its `null`
+ * placeholder within the static markup.
+ *
+ * Unlike `InnerBlocks`, the rendered blocks are not a contiguous list: they
+ * live at arbitrary positions inside markup the block editor doesn't manage.
+ * The static fragments are rendered as inert DOM (scripts don't execute and
+ * inline event handlers are stripped), and the inner blocks are portalled
+ * into placeholder elements. Inner blocks are locked: they can be edited in
+ * place but not moved, removed, or added to.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId Client ID of the block whose inner content
+ *                                should be rendered.
+ */
+export default function InnerContent( { clientId } ) {
+	const { innerContent, order } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockOrder } = select( blockEditorStore );
+			return {
+				innerContent: getBlock( clientId )?.innerContent,
+				order: getBlockOrder( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+	const { updateBlockListSettings } = useDispatch( blockEditorStore );
+
+	// Lock the inner blocks: editable in place, but not movable, removable,
+	// or insertable.
+	useEffect( () => {
+		updateBlockListSettings( clientId, { templateLock: 'all' } );
+	}, [ clientId, updateBlockListSettings ] );
+
+	const html = useMemo( () => {
+		let slotIndex = 0;
+		return ( innerContent ?? [] )
+			.map( ( item ) =>
+				item === null
+					? `<${ SLOT_TAG_NAME } data-slot-index="${ slotIndex++ }" style="display: contents"></${ SLOT_TAG_NAME }>`
+					: item
+			)
+			.join( '' );
+	}, [ innerContent ] );
+
+	const containerRef = useRef();
+	const [ slots, setSlots ] = useState( [] );
+
+	useLayoutEffect( () => {
+		const container = containerRef.current;
+		container.innerHTML = html;
+
+		// The static markup is rendered inert: assigning `innerHTML` never
+		// executes `<script>` elements, and inline event handlers are
+		// stripped here so they can't fire inside the editor canvas.
+		container.querySelectorAll( '*' ).forEach( ( element ) => {
+			for ( const attribute of [ ...element.attributes ] ) {
+				if ( attribute.name.startsWith( 'on' ) ) {
+					element.removeAttribute( attribute.name );
+				}
+			}
+		} );
+
+		setSlots(
+			Array.from( container.querySelectorAll( SLOT_TAG_NAME ) ).sort(
+				( a, b ) =>
+					Number( a.dataset.slotIndex ) -
+					Number( b.dataset.slotIndex )
+			)
+		);
+	}, [ html ] );
+
+	return (
+		<LayoutProvider value={ LAYOUT }>
+			<div
+				ref={ containerRef }
+				className="block-editor-inner-content"
+				style={ { display: 'contents' } }
+			/>
+			{ order.map( ( childClientId, index ) =>
+				slots[ index ]
+					? createPortal(
+							<BlockListBlock
+								rootClientId={ clientId }
+								clientId={ childClientId }
+							/>,
+							slots[ index ],
+							childClientId
+					  )
+					: null
+			) }
+		</LayoutProvider>
+	);
+}

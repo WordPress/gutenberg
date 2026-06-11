@@ -751,6 +751,26 @@ supports: {
 }
 ```
 
+## innerContent
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Allows the block to keep static HTML fragments interleaved with inner blocks as the canonical source of its own markup. When enabled:
+
+-   The parser retains the block's `innerContent` (an array of static HTML fragments where `null` entries mark the positions of inner blocks) on the parsed block.
+-   The block is serialized from that inner content instead of a `save` implementation, so the static markup round-trips by construction and `save`-based validation doesn't apply.
+-   In the editor, inner blocks render at their positions within the static markup, where they can be edited in place but not moved, removed, or added to.
+
+This is used by the Custom HTML block to support editable blocks at arbitrary positions inside an otherwise static HTML structure.
+
+```js
+supports: {
+	// Serialize from static HTML fragments interleaved with inner blocks.
+	innerContent: true
+}
+```
+
 ## inserter
 
 -   Type: `boolean`

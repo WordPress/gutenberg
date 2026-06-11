@@ -63,7 +63,44 @@ test.describe( 'HTML block', () => {
 		await editor.publishPost();
 		await page.reload();
 		await expect(
-			editor.canvas.locator( '[data-type="core/html"] iframe' )
-		).toBeVisible();
+			editor.canvas.locator( '[data-type="core/html"]' )
+		).toContainText( '1 < 2' );
+	} );
+
+	test( 'supports editable inner blocks within static HTML', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			`<!-- wp:html -->
+<div class="banner"><h1>Static heading</h1><!-- wp:paragraph -->
+<p>Editable paragraph</p>
+<!-- /wp:paragraph --><footer>Static footer</footer></div>
+<!-- /wp:html -->`
+		);
+
+		// The inner paragraph renders at its position within the static
+		// markup and is editable in place.
+		const paragraph = editor.canvas.locator(
+			'role=document[name="Block: Paragraph"i]'
+		);
+		await expect( paragraph ).toBeVisible();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' updated' );
+
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:html -->
+<div class="banner"><h1>Static heading</h1><!-- wp:paragraph -->
+<p>Editable paragraph updated</p>
+<!-- /wp:paragraph --><footer>Static footer</footer></div>
+<!-- /wp:html -->`
+		);
+
+		// The inner block is locked: it cannot be removed or moved.
+		await editor.clickBlockOptionsMenuItem( 'Delete' ).catch( () => {} );
+		expect( await editor.getEditedPostContent() ).toContain(
+			'<p>Editable paragraph updated</p>'
+		);
 	} );
 } );

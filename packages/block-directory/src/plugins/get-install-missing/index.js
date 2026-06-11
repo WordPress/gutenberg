@@ -53,9 +53,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 	const convertToHTML = () => {
 		replaceBlock(
 			props.clientId,
-			createBlock( 'core/html', {
-				content: originalUndelimitedContent,
-			} )
+			createBlock( 'core/html', {}, [], [ originalUndelimitedContent ] )
 		);
 	};
 

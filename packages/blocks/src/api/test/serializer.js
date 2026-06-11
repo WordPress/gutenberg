@@ -391,6 +391,80 @@ describe( 'block serializer', () => {
 
 			expect( serializeBlock( block ) ).toBe( '<!-- wp:quote /-->' );
 		} );
+		it( 'serializes blocks with innerContent support from their static fragments', () => {
+			registerBlockType( 'core/static-html', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'static html block',
+				supports: {
+					innerContent: true,
+				},
+				save: () => null,
+			} );
+			registerBlockType( 'core/fruit', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'fruit block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+
+			const block = createBlock(
+				'core/static-html',
+				{},
+				[ createBlock( 'core/fruit', { fruit: 'Bananas' } ) ],
+				[ '<div>', null, '</div>' ]
+			);
+
+			expect( serializeBlock( block ) ).toBe(
+				'<!-- wp:static-html -->\n' +
+					'<div><!-- wp:fruit {"fruit":"Bananas"} -->\n' +
+					'Bananas\n' +
+					'<!-- /wp:fruit --></div>\n' +
+					'<!-- /wp:static-html -->'
+			);
+		} );
+		it( 'appends inner blocks missing an innerContent placeholder', () => {
+			registerBlockType( 'core/static-html', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'static html block',
+				supports: {
+					innerContent: true,
+				},
+				save: () => null,
+			} );
+			registerBlockType( 'core/fruit', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'fruit block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+
+			const block = createBlock(
+				'core/static-html',
+				{},
+				[ createBlock( 'core/fruit', { fruit: 'Bananas' } ) ],
+				[ '<div></div>' ]
+			);
+
+			expect( serializeBlock( block ) ).toBe(
+				'<!-- wp:static-html -->\n' +
+					'<div></div><!-- wp:fruit {"fruit":"Bananas"} -->\n' +
+					'Bananas\n' +
+					'<!-- /wp:fruit -->\n' +
+					'<!-- /wp:static-html -->'
+			);
+		} );
 	} );
 
 	describe( 'serialize()', () => {

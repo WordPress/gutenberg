@@ -394,6 +394,11 @@
 					"type": "boolean",
 					"default": true
 				},
+				"innerContent": {
+					"description": "Allows the block to keep static HTML fragments interleaved with inner blocks as the canonical source of its own markup. When enabled, the block is serialized from its parsed inner content instead of a save implementation, and inner blocks are rendered at their positions within the static markup, where they can be edited in place but not moved, removed, or added to.",
+					"type": "boolean",
+					"default": false
+				},
 				"inserter": {
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",
 					"type": "boolean",

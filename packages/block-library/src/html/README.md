@@ -13,9 +13,7 @@ Add custom HTML code and preview it as you edit.
 
 _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
-|-----------|------|---------|-------------|
-| `content` | `string` | — | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `raw`. [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+_This block has no custom attributes._
 
 ## Supports
 
@@ -24,8 +22,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`customClassName`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
 - [`className`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname): `false`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`innerContent`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#innercontent): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`listView`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 - `customCSS`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 

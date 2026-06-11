@@ -8,7 +8,11 @@ import {
 	BlockIcon,
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { parse, getBlockContent } from '@wordpress/blocks';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import {
 	ToolbarButton,
 	ToolbarGroup,
@@ -21,17 +25,49 @@ import { code } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import Preview from './preview';
+import { unlock } from '../lock-unlock';
 import HTMLEditModal from './modal';
 
-export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
+const { InnerContent } = unlock( blockEditorPrivateApis );
+
+export default function HTMLEdit( { clientId } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const registry = useRegistry();
+	const { updateBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const content = useSelect(
+		( select ) => {
+			const block = select( blockEditorStore ).getBlock( clientId );
+			return block ? getBlockContent( block ) : '';
+		},
+		[ clientId ]
+	);
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
 	} );
 
+	// Re-parse the edited content: static HTML becomes the block's
+	// `innerContent` fragments and `<!-- wp:* -->` delimited segments become
+	// inner blocks mounted at their positions within the static markup.
+	const onUpdate = ( nextContent ) => {
+		const [ parsedBlock ] = parse(
+			`<!-- wp:html -->\n${ nextContent }\n<!-- /wp:html -->`
+		);
+		registry.batch( () => {
+			updateBlock( clientId, {
+				innerContent:
+					parsedBlock?.innerContent ??
+					( nextContent ? [ nextContent ] : [] ),
+			} );
+			replaceInnerBlocks(
+				clientId,
+				parsedBlock?.innerBlocks ?? [],
+				false
+			);
+		} );
+	};
+
 	// Show placeholder when content is empty
-	if ( ! attributes.content?.trim() ) {
+	if ( ! content?.trim() ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
@@ -52,8 +88,8 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				{ isModalOpen && (
 					<HTMLEditModal
 						onRequestClose={ () => setIsModalOpen( false ) }
-						content={ attributes.content }
-						setAttributes={ setAttributes }
+						content={ content }
+						onUpdate={ onUpdate }
 					/>
 				) }
 			</div>
@@ -84,12 +120,12 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</Button>
 				</VStack>
 			</InspectorControls>
-			<Preview content={ attributes.content } isSelected={ isSelected } />
+			<InnerContent clientId={ clientId } />
 			{ isModalOpen && (
 				<HTMLEditModal
 					onRequestClose={ () => setIsModalOpen( false ) }
-					content={ attributes.content }
-					setAttributes={ setAttributes }
+					content={ content }
+					onUpdate={ onUpdate }
 				/>
 			) }
 		</div>

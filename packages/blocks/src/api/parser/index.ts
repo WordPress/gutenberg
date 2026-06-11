@@ -11,6 +11,7 @@ import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 	getBlockType,
+	hasBlockSupport,
 } from '../registration';
 import { getSaveContent } from '../serializer';
 import { validateBlock } from '../validation';
@@ -214,6 +215,19 @@ export function parseRawBlock(
 		parsedInnerBlocks
 	);
 	parsedBlock.originalContent = normalizedBlock.innerHTML;
+
+	// Blocks with the `innerContent` support keep the interleaved static
+	// HTML fragments as the canonical source of their own markup, so the
+	// `save`-based validation and deprecation flows don't apply: the parsed
+	// content round-trips by construction.
+	if ( hasBlockSupport( blockType, 'innerContent' ) ) {
+		parsedBlock.innerContent = normalizedBlock.innerContent ?? [
+			normalizedBlock.innerHTML,
+		];
+		parsedBlock.isValid = true;
+		parsedBlock.validationIssues = [];
+		return parsedBlock;
+	}
 
 	const validatedBlock = applyBlockValidation( parsedBlock, blockType );
 	const { validationIssues } = validatedBlock;

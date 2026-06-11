@@ -55,9 +55,12 @@ export default function BlockInvalidWarning( { clientId } ) {
 				return replaceBlock( block.clientId, classicBlock );
 			},
 			toHTML() {
-				const htmlBlock = createBlock( 'core/html', {
-					content: block.originalContent,
-				} );
+				const htmlBlock = createBlock(
+					'core/html',
+					{},
+					[],
+					[ block.originalContent ]
+				);
 				return replaceBlock( block.clientId, htmlBlock );
 			},
 			toBlocks() {

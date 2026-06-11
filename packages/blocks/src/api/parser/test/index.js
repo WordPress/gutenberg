@@ -487,4 +487,79 @@ describe( 'block parser', () => {
 			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
 	} );
+
+	describe( 'blocks with innerContent support', () => {
+		const staticHtmlBlockSettings = {
+			apiVersion: 3,
+			category: 'text',
+			title: 'static html block',
+			supports: {
+				innerContent: true,
+			},
+			save: () => null,
+		};
+
+		const innerBlockSettings = {
+			apiVersion: 3,
+			category: 'text',
+			title: 'inner block',
+			attributes: {
+				content: {
+					type: 'string',
+					source: 'html',
+				},
+			},
+			save: ( { attributes } ) => attributes.content || null,
+		};
+
+		it( 'should retain innerContent and mark the block valid', () => {
+			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
+			registerBlockType( 'core/inner', innerBlockSettings );
+
+			const [ block ] = parse(
+				'<!-- wp:static-html -->\n' +
+					'<div><!-- wp:inner -->\nBananas\n<!-- /wp:inner --></div>\n' +
+					'<!-- /wp:static-html -->'
+			);
+
+			expect( block.name ).toBe( 'core/static-html' );
+			expect( block.isValid ).toBe( true );
+			expect( block.innerContent ).toEqual( [
+				'\n<div>',
+				null,
+				'</div>\n',
+			] );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/inner' );
+			expect( block.innerBlocks[ 0 ].attributes.content ).toBe(
+				'Bananas'
+			);
+		} );
+
+		it( 'should round-trip static HTML interleaved with inner blocks', () => {
+			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
+			registerBlockType( 'core/inner', innerBlockSettings );
+
+			const content =
+				'<!-- wp:static-html -->\n' +
+				'<div class="banner"><h1>Static</h1><!-- wp:inner -->\n' +
+				'Editable\n' +
+				'<!-- /wp:inner --><footer>Footer</footer></div>\n' +
+				'<!-- /wp:static-html -->';
+
+			expect( serialize( parse( content ) ) ).toBe( content );
+		} );
+
+		it( 'should round-trip static HTML without inner blocks', () => {
+			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
+
+			const content =
+				'<!-- wp:static-html -->\n' +
+				'<h1>Some HTML code</h1>\n' +
+				'<div>This is a div</div>\n' +
+				'<!-- /wp:static-html -->';
+
+			expect( serialize( parse( content ) ) ).toBe( content );
+		} );
+	} );
 } );

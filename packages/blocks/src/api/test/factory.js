@@ -181,6 +181,37 @@ describe( 'block factory', () => {
 
 			expect( block.attributes ).toEqual( {} );
 		} );
+
+		it( 'should attach innerContent when the block type supports it', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					innerContent: true,
+				},
+			} );
+
+			const block = createBlock(
+				'core/test-block',
+				{},
+				[],
+				[ '<div></div>' ]
+			);
+
+			expect( block.innerContent ).toEqual( [ '<div></div>' ] );
+		} );
+
+		it( 'should ignore innerContent when the block type lacks support', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/test-block',
+				{},
+				[],
+				[ '<div></div>' ]
+			);
+
+			expect( block.innerContent ).toBeUndefined();
+		} );
 	} );
 
 	describe( 'createBlocksFromInnerBlocksTemplate', () => {

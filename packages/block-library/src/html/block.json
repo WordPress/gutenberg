@@ -7,20 +7,15 @@
 	"description": "Add custom HTML code and preview it as you edit.",
 	"keywords": [ "embed" ],
 	"textdomain": "default",
-	"attributes": {
-		"content": {
-			"type": "string",
-			"source": "raw",
-			"role": "content"
-		}
-	},
 	"supports": {
 		"customClassName": false,
 		"className": false,
 		"html": false,
+		"innerContent": true,
 		"interactivity": {
 			"clientNavigation": true
 		},
+		"listView": true,
 		"customCSS": false,
 		"visibility": false
 	},
