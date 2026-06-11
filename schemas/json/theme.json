@@ -869,12 +869,12 @@
 						"mobile": {
 							"description": "Maximum viewport width for mobile styles.",
 							"type": "string",
-							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem|vw|vh|vmin|vmax|ch|ex|cm|mm|in|pt|pc|q)$"
+							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
 						},
 						"tablet": {
 							"description": "Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width.",
 							"type": "string",
-							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem|vw|vh|vmin|vmax|ch|ex|cm|mm|in|pt|pc|q)$"
+							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
 						}
 					},
 					"additionalProperties": false

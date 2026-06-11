@@ -1067,7 +1067,7 @@ Block styles can be scoped to two named breakpoints: `@mobile` and `@tablet`. An
 | `@mobile` | `@media (width <= 480px)` |
 | `@tablet` | `@media (480px < width <= 782px)` |
 
-Themes can override the default breakpoint widths with `settings.viewport.mobile` and `settings.viewport.tablet`:
+Themes can override the default breakpoint widths with `settings.viewport.mobile` and `settings.viewport.tablet`. Breakpoint values can use `px`, `em`, or `rem` units.
 
 ```json
 {

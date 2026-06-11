@@ -9,8 +9,7 @@ type ViewportBreakpoint = keyof typeof DEFAULT_VIEWPORT_BREAKPOINTS;
 type ViewportState = `@${ ViewportBreakpoint }`;
 type ViewportSettings = Partial< Record< ViewportBreakpoint, string > >;
 
-const VIEWPORT_SIZE_REGEXP =
-	/^(?:\d+|\d*\.\d+)(?:px|em|rem|vw|vh|vmin|vmax|ch|ex|cm|mm|in|pt|pc|q)$/;
+const VIEWPORT_SIZE_REGEXP = /^(?:\d+|\d*\.\d+)(?:px|em|rem)$/;
 
 function isViewportSettings(
 	configOrSettings: GlobalStylesConfig | ViewportSettings

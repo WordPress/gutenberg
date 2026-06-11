@@ -716,7 +716,7 @@ class WP_Theme_JSON_Gutenberg {
 			return false;
 		}
 
-		return 1 === preg_match( '/^(?:\d+|\d*\.\d+)(?:px|em|rem|vw|vh|vmin|vmax|ch|ex|cm|mm|in|pt|pc|q)$/', $value );
+		return 1 === preg_match( '/^(?:\d+|\d*\.\d+)(?:px|em|rem)$/', $value );
 	}
 
 	/**
