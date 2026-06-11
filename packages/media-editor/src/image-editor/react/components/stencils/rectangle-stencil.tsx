@@ -17,7 +17,6 @@ import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
 	DEFAULT_KEYBOARD_STEP,
 	KEYBOARD_SHIFT_STEP_MULTIPLIER,
-	RESIZE_OUTWARD_GAIN,
 } from '../../../core/constants';
 import {
 	computeFreeResizeRect,
@@ -165,8 +164,7 @@ export function RectangleStencil( {
 		computeFreeRect: (
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number,
-			outwardGain?: number
+			clientY: number
 		) => NormalizedRect;
 		computeShiftLockedRect: (
 			drag: ResizeDragState,
@@ -251,8 +249,6 @@ export function RectangleStencil( {
 					}
 					let newRect: NormalizedRect;
 					if ( h.hasLockedRatio ) {
-						// Locked-ratio drags don't apply RESIZE_OUTWARD_GAIN yet
-						// (the ratio-projection math is subtler); they stay 1:1.
 						newRect = h.computeLockedRect( drag, latestX, latestY );
 					} else if ( latestShift ) {
 						newRect = h.computeShiftLockedRect(
@@ -261,12 +257,7 @@ export function RectangleStencil( {
 							latestY
 						);
 					} else {
-						newRect = h.computeFreeRect(
-							drag,
-							latestX,
-							latestY,
-							RESIZE_OUTWARD_GAIN
-						);
+						newRect = h.computeFreeRect( drag, latestX, latestY );
 					}
 					h.onCropChange( newRect );
 				} );
@@ -317,10 +308,7 @@ export function RectangleStencil( {
 		(
 			drag: ResizeDragState,
 			clientX: number,
-			clientY: number,
-			// Pointer drags amplify the outward direction to make zoom-out more
-			// responsive; keyboard resize omits this and stays 1:1 for precision.
-			outwardGain: number = 1
+			clientY: number
 		): NormalizedRect =>
 			computeFreeResizeRect(
 				drag,
@@ -328,8 +316,7 @@ export function RectangleStencil( {
 				clientY,
 				imageSize,
 				bounds,
-				minCropSize,
-				outwardGain
+				minCropSize
 			),
 		[ imageSize, bounds, minCropSize ]
 	);

@@ -57,19 +57,6 @@ export const SETTLE_TARGET_CANVAS_FILL = 0.8;
 export const MAX_VIEW_SCALE = 8;
 
 /**
- * Multiplier applied to an outward (crop-growing) free-form pointer resize.
- * Because the settled view fills the crop to the canvas, the crop's larger axis
- * sits at the magnified footprint edge, so dragging out to zoom out otherwise
- * needs a long, partly off-canvas drag. Amplifying only the growing direction
- * reaches a bigger crop — and a stronger zoom-out on settle — with less travel.
- * Inward (shrinking) drags stay 1:1 so small crops remain precise.
- *
- * Applies to free-form pointer resize only. Aspect-locked resize and keyboard
- * resize stay 1:1; extending the gain to the locked-ratio paths is a follow-up.
- */
-export const RESIZE_OUTWARD_GAIN = 2;
-
-/**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
  * This could be made configurable as a prop to the Cropper component.
  */

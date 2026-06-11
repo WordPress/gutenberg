@@ -72,8 +72,6 @@ export interface ResizeDragState {
  * @param imageSize   The rendered image dimensions in pixels.
  * @param bounds      The allowed crop area bounds.
  * @param minCropSize Minimum crop rect dimension in normalized space, per axis.
- * @param outwardGain Multiplier applied to the crop-growing direction of the
- *                    drag (per edge); shrinking stays 1:1. Defaults to 1.
  * @return The new crop rect in normalized coordinates.
  */
 export function computeFreeResizeRect(
@@ -82,20 +80,12 @@ export function computeFreeResizeRect(
 	clientY: number,
 	imageSize: Size,
 	bounds: CropBounds,
-	minCropSize: Size = DEFAULT_MIN_CROP_SIZE,
-	outwardGain: number = 1
+	minCropSize: Size = DEFAULT_MIN_CROP_SIZE
 ): NormalizedRect {
 	const dx =
 		imageSize.width > 0 ? ( clientX - drag.startX ) / imageSize.width : 0;
 	const dy =
 		imageSize.height > 0 ? ( clientY - drag.startY ) / imageSize.height : 0;
-
-	// Amplify only the direction that grows the crop, per edge (top grows when
-	// dragged up, bottom when down, etc.). Shrinking stays 1:1.
-	const dyTop = dy < 0 ? dy * outwardGain : dy;
-	const dyBottom = dy > 0 ? dy * outwardGain : dy;
-	const dxLeft = dx < 0 ? dx * outwardGain : dx;
-	const dxRight = dx > 0 ? dx * outwardGain : dx;
 
 	const s = drag.startRect;
 	const handle = drag.handle;
@@ -108,25 +98,25 @@ export function computeFreeResizeRect(
 	if ( handle === 'n' || handle === 'nw' || handle === 'ne' ) {
 		edgeTop = Math.max(
 			bounds.minY,
-			Math.min( s.y + dyTop, edgeBottom - minCropSize.height )
+			Math.min( s.y + dy, edgeBottom - minCropSize.height )
 		);
 	}
 	if ( handle === 's' || handle === 'sw' || handle === 'se' ) {
 		edgeBottom = Math.max(
 			edgeTop + minCropSize.height,
-			Math.min( s.y + s.height + dyBottom, bounds.maxY )
+			Math.min( s.y + s.height + dy, bounds.maxY )
 		);
 	}
 	if ( handle === 'w' || handle === 'nw' || handle === 'sw' ) {
 		edgeLeft = Math.max(
 			bounds.minX,
-			Math.min( s.x + dxLeft, edgeRight - minCropSize.width )
+			Math.min( s.x + dx, edgeRight - minCropSize.width )
 		);
 	}
 	if ( handle === 'e' || handle === 'ne' || handle === 'se' ) {
 		edgeRight = Math.max(
 			edgeLeft + minCropSize.width,
-			Math.min( s.x + s.width + dxRight, bounds.maxX )
+			Math.min( s.x + s.width + dx, bounds.maxX )
 		);
 	}
 
