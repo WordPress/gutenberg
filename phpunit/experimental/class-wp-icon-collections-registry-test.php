@@ -43,8 +43,8 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	/**
 	 * Invokes WP_Icons_Registry_Gutenberg::register despite it being private.
 	 *
-	 * @param string $icon_name       Icon name (without namespace prefix).
-	 * @param array  $icon_properties Icon properties (label, content, file_path, collection).
+	 * @param string $icon_name       Namespaced icon name (e.g. "plugin-a/alpha").
+	 * @param array  $icon_properties Icon properties (label, content, file_path).
 	 * @return bool True if the icon was registered successfully.
 	 */
 	private function register_icon( $icon_name, $icon_properties ) {
@@ -143,27 +143,24 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 
 		$icons = WP_Icons_Registry_Gutenberg::get_instance();
 		$this->register_icon(
-			'alpha',
+			'plugin-a/alpha',
 			array(
-				'label'      => 'Alpha',
-				'content'    => '<svg></svg>',
-				'collection' => 'plugin-a',
+				'label'   => 'Alpha',
+				'content' => '<svg></svg>',
 			)
 		);
 		$this->register_icon(
-			'beta',
+			'plugin-a/beta',
 			array(
-				'label'      => 'Beta',
-				'content'    => '<svg></svg>',
-				'collection' => 'plugin-a',
+				'label'   => 'Beta',
+				'content' => '<svg></svg>',
 			)
 		);
 		$this->register_icon(
-			'gamma',
+			'plugin-b/gamma',
 			array(
-				'label'      => 'Gamma',
-				'content'    => '<svg></svg>',
-				'collection' => 'plugin-b',
+				'label'   => 'Gamma',
+				'content' => '<svg></svg>',
 			)
 		);
 
@@ -176,7 +173,7 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 		$this->assertFalse( $icons->is_registered( 'plugin-a/beta' ) );
 		$this->assertTrue( $icons->is_registered( 'plugin-b/gamma' ) );
 
-		$icons->unregister( 'gamma', 'plugin-b' );
+		$icons->unregister( 'plugin-b/gamma' );
 	}
 
 	/**

@@ -39,17 +39,17 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	/**
 	 * Registers a new icon.
 	 *
-	 * @param string $icon_name Icon name (e.g. "arrow-left").
+	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
+	 *                          (e.g. "core/arrow-left"). When the collection prefix is
+	 *                          omitted, the icon is registered under the "core" collection.
 	 * @param array  $args {
 	 *     List of properties for the icon.
 	 *
-	 *     @type string $label      Required. A human-readable label for the icon.
-	 *     @type string $collection Optional. The slug of a registered icon collection that this icon belongs to.
-	 *                              Defaults to "core" when omitted.
-	 *     @type string $content    Optional. SVG markup for the icon.
-	 *                              If not provided, the content will be retrieved from the `file_path` if set.
-	 *                              If both `content` and `file_path` are not set, the icon will not be registered.
-	 *     @type string $file_path  Optional. The full path to the file containing the icon content.
+	 *     @type string $label     Required. A human-readable label for the icon.
+	 *     @type string $content   Optional. SVG markup for the icon.
+	 *                             If not provided, the content will be retrieved from the `file_path` if set.
+	 *                             If both `content` and `file_path` are not set, the icon will not be registered.
+	 *     @type string $file_path Optional. The full path to the file containing the icon content.
 	 * }
 	 * @return bool True if the icon was registered successfully, else false.
 	 */
@@ -62,12 +62,12 @@ if ( ! function_exists( 'wp_unregister_icon' ) ) {
 	/**
 	 * Unregisters an icon.
 	 *
-	 * @param string $icon_name Icon name (e.g. "arrow-left").
-	 * @param string $collection Slug of the collection the icon belongs to.
+	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
+	 *                          (e.g. "core/arrow-left").
 	 * @return bool True if the icon was unregistered successfully, else false.
 	 */
-	function wp_unregister_icon( $icon_name, $collection ) {
-		return WP_Icons_Registry::get_instance()->unregister( $icon_name, $collection );
+	function wp_unregister_icon( $icon_name ) {
+		return WP_Icons_Registry::get_instance()->unregister( $icon_name );
 	}
 }
 
@@ -129,11 +129,10 @@ function gutenberg_register_default_icons() {
 		}
 
 		wp_register_icon(
-			$icon_name,
+			'core/' . $icon_name,
 			array(
-				'label'      => $icon_data['label'],
-				'file_path'  => $icons_directory . $icon_data['filePath'],
-				'collection' => 'core',
+				'label'     => $icon_data['label'],
+				'file_path' => $icons_directory . $icon_data['filePath'],
 			)
 		);
 	}

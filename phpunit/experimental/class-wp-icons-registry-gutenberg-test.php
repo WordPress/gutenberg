@@ -49,8 +49,8 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	/**
 	 * Invokes WP_Icons_Registry_Gutenberg::register despite it being private
 	 *
-	 * @param string $icon_name       Icon name (without namespace prefix).
-	 * @param array  $icon_properties Icon properties (label, content, file_path, collection).
+	 * @param string $icon_name       Namespaced icon name (e.g. "test-collection/my-icon").
+	 * @param array  $icon_properties Icon properties (label, content, file_path).
 	 * @return bool True if the icon was registered successfully.
 	 */
 	private function register( $icon_name, $icon_properties ) {
@@ -74,27 +74,26 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function test_register_icon() {
 		$settings = array(
-			'label'      => 'My Icon',
-			'content'    => '<svg></svg>',
-			'collection' => 'test-collection',
+			'label'   => 'My Icon',
+			'content' => '<svg></svg>',
 		);
 
-		$result = $this->register( 'my-icon', $settings );
+		$result = $this->register( 'test-collection/my-icon', $settings );
 		$this->assertTrue( $result );
 		$this->assertTrue( $this->registry->is_registered( 'test-collection/my-icon' ) );
 	}
 
 	/**
-	 * Provides invalid icon names.
+	 * Provides invalid namespaced icon names.
 	 *
 	 * @return array[]
 	 */
 	public function data_invalid_icon_names() {
 		return array(
 			'non-string name'      => array( 1 ),
-			'contains slash'       => array( 'test-collection/plus' ),
-			'uppercase characters' => array( 'Plus' ),
-			'invalid characters'   => array( '_doing_it_wrong' ),
+			'empty name'           => array( 'test-collection/' ),
+			'uppercase characters' => array( 'test-collection/Plus' ),
+			'invalid characters'   => array( 'test-collection/_doing_it_wrong' ),
 		);
 	}
 
@@ -105,14 +104,13 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function test_register_icon_twice() {
 		$settings = array(
-			'label'      => 'Icon',
-			'content'    => '<svg></svg>',
-			'collection' => 'test-collection',
+			'label'   => 'Icon',
+			'content' => '<svg></svg>',
 		);
 
-		$result = $this->register( 'duplicate', $settings );
+		$result = $this->register( 'test-collection/duplicate', $settings );
 		$this->assertTrue( $result );
-		$result2 = $this->register( 'duplicate', $settings );
+		$result2 = $this->register( 'test-collection/duplicate', $settings );
 		$this->assertFalse( $result2 );
 	}
 
@@ -126,9 +124,8 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function test_register_invalid_name( $name ) {
 		$settings = array(
-			'label'      => 'Icon',
-			'content'    => '<svg></svg>',
-			'collection' => 'test-collection',
+			'label'   => 'Icon',
+			'content' => '<svg></svg>',
 		);
 
 		$result = $this->register( $name, $settings );
@@ -151,34 +148,34 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should fail when `collection` is not a string.
+	 * Should reject `collection` passed as an icon property, since the collection
+	 * is now derived from the namespaced icon name instead.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
 	 */
-	public function test_register_rejects_non_string_collection() {
+	public function test_register_rejects_collection_property() {
 		$result = $this->register(
-			'my-icon',
+			'test-collection/my-icon',
 			array(
 				'label'      => 'Icon',
 				'content'    => '<svg></svg>',
-				'collection' => 123,
+				'collection' => 'test-collection',
 			)
 		);
 		$this->assertFalse( $result );
 	}
 
 	/**
-	 * Should fail when `collection` is not a registered collection.
+	 * Should fail when the name references a collection that is not registered.
 	 *
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
 	 */
 	public function test_register_rejects_unregistered_collection() {
 		$result = $this->register(
-			'my-icon',
+			'unregistered-collection/my-icon',
 			array(
-				'label'      => 'Icon',
-				'content'    => '<svg></svg>',
-				'collection' => 'unregistered-collection',
+				'label'   => 'Icon',
+				'content' => '<svg></svg>',
 			)
 		);
 		$this->assertFalse( $result );
@@ -192,18 +189,16 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 		$collections->register( 'other-collection', array( 'label' => 'Other' ) );
 
 		$settings_a = array(
-			'label'      => 'Shared A',
-			'content'    => '<svg></svg>',
-			'collection' => 'test-collection',
+			'label'   => 'Shared A',
+			'content' => '<svg></svg>',
 		);
 		$settings_b = array(
-			'label'      => 'Shared B',
-			'content'    => '<svg></svg>',
-			'collection' => 'other-collection',
+			'label'   => 'Shared B',
+			'content' => '<svg></svg>',
 		);
 
-		$this->assertTrue( $this->register( 'shared', $settings_a ) );
-		$this->assertTrue( $this->register( 'shared', $settings_b ) );
+		$this->assertTrue( $this->register( 'test-collection/shared', $settings_a ) );
+		$this->assertTrue( $this->register( 'other-collection/shared', $settings_b ) );
 
 		$this->assertTrue( $this->registry->is_registered( 'test-collection/shared' ) );
 		$this->assertTrue( $this->registry->is_registered( 'other-collection/shared' ) );
@@ -221,16 +216,15 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function test_unregister_icon() {
 		$this->register(
-			'my-icon',
+			'test-collection/my-icon',
 			array(
-				'label'      => 'Icon',
-				'content'    => '<svg></svg>',
-				'collection' => 'test-collection',
+				'label'   => 'Icon',
+				'content' => '<svg></svg>',
 			)
 		);
 
 		$this->assertTrue( $this->registry->is_registered( 'test-collection/my-icon' ) );
-		$this->assertTrue( $this->registry->unregister( 'my-icon', 'test-collection' ) );
+		$this->assertTrue( $this->registry->unregister( 'test-collection/my-icon' ) );
 		$this->assertFalse( $this->registry->is_registered( 'test-collection/my-icon' ) );
 	}
 
@@ -240,6 +234,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::unregister
 	 */
 	public function test_unregister_unknown_icon() {
-		$this->assertFalse( $this->registry->unregister( 'ghost', 'test-collection' ) );
+		$this->assertFalse( $this->registry->unregister( 'test-collection/ghost' ) );
 	}
 }

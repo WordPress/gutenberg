@@ -128,11 +128,9 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 			}
 
 			$icons_registry = WP_Icons_Registry_Gutenberg::get_instance();
-			$prefix         = $collection_slug . '/';
 			foreach ( $icons_registry->get_registered_icons() as $icon ) {
 				if ( isset( $icon['collection'] ) && $icon['collection'] === $collection_slug ) {
-					$unqualified_name = substr( $icon['name'], strlen( $prefix ) );
-					$icons_registry->unregister( $unqualified_name, $collection_slug );
+					$icons_registry->unregister( $icon['name'] );
 				}
 			}
 
