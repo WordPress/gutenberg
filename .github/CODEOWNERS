@@ -136,11 +136,3 @@
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs
 /lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey
-
-# Native (Unowned)
-*.native.js
-*.android.js
-*.ios.js
-*.native.scss
-*.android.scss
-*.ios.scss
