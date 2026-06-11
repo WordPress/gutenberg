@@ -30,8 +30,6 @@ updates:
       # disables noisy npm *version* updates across the monorepo;
       # *security* updates ignore this limit and keep running.
       open-pull-requests-limit: 0
-      cooldown:
-          default-days: 7
       labels:
           - 'dependencies'
           - '[Type] Build Tooling'
