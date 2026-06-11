@@ -1079,6 +1079,53 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'uses custom viewport breakpoints for responsive block styles', () => {
+			const tree = {
+				settings: {
+					viewport: {
+						mobile: '640px',
+						tablet: '960px',
+					},
+				},
+				styles: {
+					blocks: {
+						'core/button': {
+							'@mobile': {
+								color: {
+									text: 'blue',
+								},
+							},
+							'@tablet': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 640px){:root :where(.wp-block-button){color: blue;}}@media (640px < width <= 960px){:root :where(.wp-block-button){color: green;}}'
+			);
+		} );
+
 		it( 'handles responsive pseudo selector styles', () => {
 			const tree = {
 				styles: {

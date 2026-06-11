@@ -24,6 +24,10 @@ export { getBlockSelector } from './core/selectors';
 export { getTypographyFontSizeValue } from './utils/typography';
 export { getDimensionPresetCssVar } from './utils/dimensions';
 export {
+	getResponsiveMediaQueries,
+	getViewportBreakpoints,
+} from './utils/viewport';
+export {
 	getValueFromVariable,
 	getPresetVariableFromValue,
 	getResolvedValue,

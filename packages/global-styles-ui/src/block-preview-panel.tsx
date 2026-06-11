@@ -6,7 +6,10 @@ import { BlockPreview } from '@wordpress/block-editor';
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { __unstableGeneratePreviewStateStyles as generatePreviewStateStyles } from '@wordpress/global-styles-engine';
+import {
+	getViewportBreakpoints,
+	__unstableGeneratePreviewStateStyles as generatePreviewStateStyles,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -19,14 +22,55 @@ interface BlockPreviewPanelProps {
 	selectedViewport?: string;
 	selectedState?: string;
 	stateStyles?: any;
+	viewportSettings?: {
+		mobile?: string;
+		tablet?: string;
+	};
 }
 
-// Keep in sync with responsive breakpoint media queries in the global styles engine.
-const PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
+const DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT: Record< string, number > = {
 	default: 783,
 	'@tablet': 600,
 	'@mobile': 480,
 };
+
+function getPixelValue( value: string ) {
+	if ( ! value.endsWith( 'px' ) ) {
+		return undefined;
+	}
+
+	return Number.parseFloat( value );
+}
+
+function getPreviewWidthByViewport(
+	selectedViewport: string,
+	viewportSettings: BlockPreviewPanelProps[ 'viewportSettings' ]
+) {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+	const mobileWidth = getPixelValue( breakpoints.mobile );
+
+	if ( selectedViewport === 'mobile' && mobileWidth ) {
+		return mobileWidth;
+	}
+
+	const tabletWidth = getPixelValue( breakpoints.tablet );
+
+	if ( selectedViewport === 'tablet' && mobileWidth && tabletWidth ) {
+		if (
+			breakpoints.mobile === '480px' &&
+			breakpoints.tablet === '782px'
+		) {
+			return DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT.tablet;
+		}
+		return Math.round( ( mobileWidth + tabletWidth ) / 2 );
+	}
+
+	if ( selectedViewport === 'default' && tabletWidth ) {
+		return tabletWidth + 1;
+	}
+
+	return DEFAULT_PREVIEW_WIDTH_BY_VIEWPORT[ selectedViewport ];
+}
 
 const BlockPreviewPanel = ( {
 	name,
@@ -34,6 +78,7 @@ const BlockPreviewPanel = ( {
 	selectedViewport = 'default',
 	selectedState = 'default',
 	stateStyles,
+	viewportSettings,
 }: BlockPreviewPanelProps ) => {
 	const blockExample = getBlockType( name )?.example;
 	const blocks = useMemo( () => {
@@ -69,7 +114,7 @@ const BlockPreviewPanel = ( {
 	}
 
 	const viewportWidth =
-		PREVIEW_WIDTH_BY_VIEWPORT[ selectedViewport ] ??
+		getPreviewWidthByViewport( selectedViewport, viewportSettings ) ??
 		blockExample.viewportWidth ??
 		500;
 	const normalizedViewportWidth = blockExample.viewportWidth ?? 500;

@@ -375,6 +375,69 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_block_visibility_support_uses_custom_viewport_breakpoints() {
+		$this->register_visibility_block_with_support(
+			'test/viewport-custom-breakpoints',
+			array( 'visibility' => true )
+		);
+
+		$filter = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => array(
+							'mobile' => '640px',
+							'tablet' => '960px',
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$block = array(
+				'blockName' => 'test/viewport-custom-breakpoints',
+				'attrs'     => array(
+					'metadata' => array(
+						'blockVisibility' => array(
+							'viewport' => array(
+								'mobile'  => false,
+								'tablet'  => false,
+								'desktop' => false,
+							),
+						),
+					),
+				),
+			);
+
+			gutenberg_render_block_visibility_support( '<div>Test content</div>', $block );
+			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+
+			$this->assertStringContainsString(
+				'@media (width <= 640px){.wp-block-hidden-mobile{display:none !important;}}',
+				$actual_stylesheet,
+				'CSS should contain custom mobile visibility rule'
+			);
+			$this->assertStringContainsString(
+				'@media (640px < width <= 960px){.wp-block-hidden-tablet{display:none !important;}}',
+				$actual_stylesheet,
+				'CSS should contain custom tablet visibility rule'
+			);
+			$this->assertStringContainsString(
+				'@media (width > 960px){.wp-block-hidden-desktop{display:none !important;}}',
+				$actual_stylesheet,
+				'CSS should contain custom desktop visibility rule'
+			);
+		} finally {
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
 	public function test_block_visibility_support_generated_css_with_empty_content() {
 		$this->register_visibility_block_with_support(
 			'test/viewport-empty-content',

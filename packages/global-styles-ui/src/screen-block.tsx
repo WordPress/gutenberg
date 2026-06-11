@@ -100,8 +100,11 @@ interface ScreenBlockProps {
 }
 
 function ScreenBlock( { name, variation }: ScreenBlockProps ) {
-	const { user: userConfig, onChange: onChangeGlobalStyles } =
-		useContext( GlobalStylesContext );
+	const {
+		user: userConfig,
+		merged: mergedConfig,
+		onChange: onChangeGlobalStyles,
+	} = useContext( GlobalStylesContext );
 
 	let prefixParts: string[] = [];
 	if ( variation ) {
@@ -355,6 +358,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				selectedViewport={ selectedViewport }
 				selectedState={ hasSelectedState ? stateParam : 'default' }
 				stateStyles={ hasSelectedState ? inheritedStyle : undefined }
+				viewportSettings={ mergedConfig.settings?.viewport }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">

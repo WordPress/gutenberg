@@ -14,6 +14,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { getResponsiveMediaQueries } from '@wordpress/global-styles-engine';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -49,12 +50,6 @@ import {
 const VARIATION_PREFIX = 'is-style-';
 
 const layoutBlockSupportKey = 'layout';
-// Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
-// packages/global-styles-engine/src/core/render.tsx.
-const RESPONSIVE_BREAKPOINTS = {
-	'@mobile': '@media (width <= 480px)',
-	'@tablet': '@media (480px < width <= 782px)',
-};
 const CHILD_LAYOUT_KEYS = [
 	'selfStretch',
 	'flexSize',
@@ -241,6 +236,7 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
  * @param { Object }  options.layout              Active block layout.
  * @param { boolean } options.hasBlockGapSupport  Whether block gap is supported.
  * @param { * }       options.globalBlockGapValue Global block gap fallback.
+ * @param { Object }  options.viewportSettings    Viewport breakpoint settings.
  *
  * @return { string } CSS rule.
  */
@@ -251,8 +247,9 @@ export function getResponsiveLayoutStyles( {
 	layout = {},
 	hasBlockGapSupport,
 	globalBlockGapValue,
+	viewportSettings,
 } ) {
-	return Object.entries( RESPONSIVE_BREAKPOINTS )
+	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
 		.map( ( [ viewport, mediaQuery ] ) => {
 			const viewportStyle = getStyleForState( attributes?.style, {
 				viewport,
@@ -643,6 +640,7 @@ function BlockWithLayoutStyles( {
 	props,
 	blockGapSupport,
 	globalBlockGapValue,
+	viewportSettings,
 	layoutClasses,
 } ) {
 	const { name, attributes } = props;
@@ -678,6 +676,7 @@ function BlockWithLayoutStyles( {
 		layout: usedLayout,
 		hasBlockGapSupport,
 		globalBlockGapValue,
+		viewportSettings,
 	} );
 	const css = [ baseLayoutCSS, responsiveLayoutCSS ]
 		.filter( Boolean )
@@ -763,7 +762,12 @@ export const withLayoutStyles = createHigherOrderComponent(
 						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
 						globalStyles?.spacing?.blockGap;
 
-					return { blockGapSupport, globalBlockGapValue };
+					return {
+						blockGapSupport,
+						globalBlockGapValue,
+						viewportSettings:
+							settings?.__experimentalFeatures?.viewport,
+					};
 				},
 				[ blockSupportsLayout, clientId, attributes?.className, name ]
 			);
