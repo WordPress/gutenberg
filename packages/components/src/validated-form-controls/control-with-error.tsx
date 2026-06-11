@@ -21,21 +21,26 @@ function appendRequiredIndicator(
 	required: boolean | undefined,
 	markWhenOptional: boolean | undefined
 ) {
+	let suffix;
 	if ( required && ! markWhenOptional ) {
-		return (
-			<>
-				{ label } { `(${ __( 'Required' ) })` }
-			</>
-		);
+		suffix = `(${ __( 'Required' ) })`;
+	} else if ( ! required && markWhenOptional ) {
+		suffix = `(${ __( 'Optional' ) })`;
 	}
-	if ( ! required && markWhenOptional ) {
-		return (
-			<>
-				{ label } { `(${ __( 'Optional' ) })` }
-			</>
-		);
+
+	if ( ! suffix ) {
+		return label;
 	}
-	return label;
+
+	if ( typeof label === 'string' ) {
+		return `${ label } ${ suffix }`;
+	}
+
+	return (
+		<>
+			{ label } { suffix }
+		</>
+	);
 }
 
 const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';

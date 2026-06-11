@@ -24,15 +24,66 @@ Install using NPM:
 npm install @wordpress/ui
 ```
 
-As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. This is managed on your behalf in a WordPress admin page context, but you will need to install and include the base theme stylesheet yourself if you're using the components in an application outside WordPress:
+## Setup
+
+As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
+
+### Within standard WordPress editor screens
+
+In standard WordPress editor screens (such as the post editor or the site editor), stylesheets, isolation styles, and layout styles are managed centrally by Gutenberg. You don't need to add any setup yourself — and you should avoid doing so in this shared context to prevent conflicts.
+
+### Elsewhere
+
+The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
 
 ```
 npm install @wordpress/theme
 ```
 
-```tsx
+```js
 import '@wordpress/theme/design-tokens.css';
 ```
+
+This stylesheet is universal and does not have a separate RTL version.
+
+To ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
+
+```css
+.root {
+	isolation: isolate;
+}
+```
+
+In order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+
+```css
+body {
+	position: relative;
+}
+```
+
+Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles, which can conflict in some applications which apply styles on bare element selectors (for example, `input { border-color: #aaa; }`). You should avoid these kinds of bare element selector styling if you can, preferring CSS classes instead where possible.
+
+If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-ui` layer, which you can use when defining your own layer order:
+
+```css
+@layer wp-ui, example-app;
+```
+
+#### Mixing with `@wordpress/components`
+
+If your app pairs `@wordpress/ui` with `@wordpress/components` overlays and bundles both packages directly (i.e. without relying on the `window.wp.components` global exposed by WordPress's script-loader), call `useEnableWpCompatOverlaySlot()` once from a long-lived root component:
+
+```tsx
+import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+
+function App() {
+	useEnableWpCompatOverlaySlot();
+	return <YourApp />;
+}
+```
+
+This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
 ## Usage
 
@@ -104,10 +155,10 @@ Interactive components that manage internal state (such as open/closed, selected
 
 For a given state `x`, the convention is:
 
-| Prop | Purpose |
-| --- | --- |
-| `defaultX` | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally. |
-| `x` | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes. |
+| Prop        | Purpose                                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultX`  | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally.                             |
+| `x`         | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes.               |
 | `onXChange` | Callback invoked when the state changes. Receives the new value as its first argument. Works in both controlled and uncontrolled modes. |
 
 For example, a component with an open/closed state would expose:

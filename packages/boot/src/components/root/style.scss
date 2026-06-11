@@ -19,7 +19,7 @@
 	bottom: 0;
 	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 100002;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .boot-layout__sidebar {

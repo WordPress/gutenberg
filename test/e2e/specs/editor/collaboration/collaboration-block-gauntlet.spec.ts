@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import path from 'path';
-
-/**
  * Internal dependencies
  */
 import { test, expect } from './fixtures';
@@ -234,10 +229,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		test.setTimeout( 30_000 );
 
 		const uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 
 		const post = await requestUtils.createPost( {
@@ -589,10 +581,7 @@ test.describe( 'Collaboration - Block Gauntlet', () => {
 		test.setTimeout( 30_000 );
 
 		const uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 
 		const post = await requestUtils.createPost( {

@@ -20,7 +20,7 @@ import {
 	ComboboxControl,
 	SelectControl,
 	ToggleControl,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -341,11 +341,11 @@ function PostAuthorEdit( {
 						alignment="left"
 						spacing={ 4 }
 					>
-						<Text as="p">
+						<WCText as="p">
 							{ __(
 								'This block is no longer supported. Recreate its design with the Avatar, Author Name and Author Biography blocks.'
 							) }
-						</Text>
+						</WCText>
 						<Button
 							variant="primary"
 							onClick={ transformBlock }
@@ -356,7 +356,6 @@ function PostAuthorEdit( {
 					</VStack>
 				</InspectorControlsLastItem>
 			) }
-
 			<BlockControls group="block">
 				<AlignmentControl
 					value={ textAlign }
@@ -365,7 +364,6 @@ function PostAuthorEdit( {
 					} }
 				/>
 			</BlockControls>
-
 			<div { ...blockProps }>
 				{ showAvatar && (
 					<div className="wp-block-post-author__avatar">

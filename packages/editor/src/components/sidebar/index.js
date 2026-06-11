@@ -6,13 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Platform,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -33,7 +27,6 @@ import SidebarHeader from './header';
 import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
-import { MediaMetadataPanel } from '../media';
 import PostRevisionsPanel from '../post-revisions-panel';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
@@ -41,7 +34,6 @@ import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
-	ATTACHMENT_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
@@ -49,10 +41,7 @@ import {
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
+const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
 const SidebarContent = ( {
 	tabName,
@@ -66,7 +55,6 @@ const SidebarContent = ( {
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
-	const isAttachment = postType === ATTACHMENT_POST_TYPE;
 	const isRevisionsMode = useSelect( ( select ) => {
 		return unlock( select( editorStore ) ).isRevisionsMode();
 	} );
@@ -99,11 +87,7 @@ const SidebarContent = ( {
 	}, [ tabName ] );
 
 	let tabContent;
-	if ( isAttachment ) {
-		tabContent = (
-			<MediaMetadataPanel onActionPerformed={ onActionPerformed } />
-		);
-	} else if ( isRevisionsMode ) {
+	if ( isRevisionsMode ) {
 		tabContent = <PostRevisionSummary />;
 	} else {
 		tabContent = (
@@ -112,7 +96,13 @@ const SidebarContent = ( {
 				<PluginDocumentSettingPanel.Slot />
 				<TemplateContentPanel />
 				{ window?.__experimentalDataFormInspector &&
-					[ 'post', 'page' ].includes( postType ) && (
+					[
+						'post',
+						'page',
+						'wp_template',
+						'wp_template_part',
+						'wp_block',
+					].includes( postType ) && (
 						<>
 							<TemplateActionsPanel />
 							<PostRevisionsPanel />
@@ -153,12 +143,10 @@ const SidebarContent = ( {
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					{ tabContent }
 				</Tabs.TabPanel>
-				{ ! isAttachment && (
-					<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-						<BlockInspector />
-						{ isRevisionsMode && <RevisionBlockDiffPanel /> }
-					</Tabs.TabPanel>
-				) }
+				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
+					<BlockInspector />
+					{ isRevisionsMode && <RevisionBlockDiffPanel /> }
+				</Tabs.TabPanel>
 			</Tabs.Context.Provider>
 		</PluginSidebar>
 	);

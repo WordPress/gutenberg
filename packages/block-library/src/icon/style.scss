@@ -25,21 +25,14 @@
 }
 
 // Flip transformations.
-.wp-block-icon--flip-horizontal {
+.is-flip-horizontal {
 	transform: scaleX(-1);
 }
 
-.wp-block-icon--flip-vertical {
+.is-flip-vertical {
 	transform: scaleY(-1);
 }
 
-.wp-block-icon--flip-horizontal.wp-block-icon--flip-vertical {
+.is-flip-horizontal.is-flip-vertical {
 	transform: scaleX(-1) scaleY(-1);
-}
-
-[style*="--wp-block-icon-rotation"] {
-	transform:
-		scaleX(var(--wp-block-icon-flip-x, 1))
-		scaleY(var(--wp-block-icon-flip-y, 1))
-		rotate(var(--wp-block-icon-rotation, 0deg));
 }

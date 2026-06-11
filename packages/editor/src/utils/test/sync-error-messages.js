@@ -9,6 +9,7 @@ describe( 'getSyncErrorMessages', () => {
 		'connection-expired',
 		'connection-limit-exceeded',
 		'document-size-limit-exceeded',
+		'protocol-mismatch',
 		'unknown-error',
 	] )( 'should return title and description for "%s"', ( code ) => {
 		const result = getSyncErrorMessages( { code } );

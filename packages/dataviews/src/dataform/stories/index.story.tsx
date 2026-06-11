@@ -13,6 +13,7 @@ import ValidationComponent from './validation';
 import VisibilityComponent from './visibility';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataForm',
 	component: DataForm,
 };
@@ -93,6 +94,13 @@ export const LayoutRegular = {
 			description: 'Chooses the label position.',
 			options: [ 'default', 'top', 'side', 'none' ],
 		},
+		disabled: {
+			control: { type: 'boolean' },
+			description: 'Disable all fields in the form.',
+		},
+	},
+	args: {
+		disabled: false,
 	},
 };
 

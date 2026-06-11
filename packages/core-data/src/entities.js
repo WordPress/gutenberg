@@ -17,6 +17,7 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -43,17 +44,13 @@ export const rootEntitiesConfig = [
 		baseURL: '/',
 		baseURLParams: {
 			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-7.0/preload.php
+			// @see lib/compat/wordpress-7.1/preload.php
 			_fields: [
 				'description',
 				'gmt_offset',
 				'home',
 				'image_sizes',
 				'image_size_threshold',
-				'image_output_formats',
-				'jpeg_interlaced',
-				'png_interlaced',
-				'gif_interlaced',
 				'name',
 				'site_icon',
 				'site_icon_url',
@@ -147,6 +144,7 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
+		syncConfig: defaultCollectionSyncConfig,
 	},
 	{
 		name: 'menu',
@@ -249,14 +247,7 @@ export const rootEntitiesConfig = [
 		key: 'name',
 		supportsPagination: false,
 	},
-].map( ( entity ) => {
-	const syncEnabledRootEntities = new Set( [ 'comment' ] );
-
-	if ( syncEnabledRootEntities.has( entity.name ) ) {
-		entity.syncConfig = defaultSyncConfig;
-	}
-	return entity;
-} );
+];
 
 export const deprecatedEntities = {
 	root: {
@@ -315,11 +306,14 @@ export const prePersistPostType = async (
 		}
 	}
 
-	// Add meta for persisted CRDT document.
+	// Add meta for the persisted CRDT document during real post saves so the
+	// saved post and CRDT snapshot are committed in the same request. We don't
+	// want a post save to fail but a CRDT update to succeed or vice versa.
+	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
-		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
+		const serializedDoc = getSyncManager()?.createPersistedCRDTDoc(
 			objectType,
 			objectId
 		);
@@ -415,6 +409,9 @@ async function loadPostTypeEntities() {
 		 * @type {import('@wordpress/sync').SyncConfig}
 		 */
 		entity.syncConfig = {
+			// Save a CRDT document with this entity
+			supportsPersistence: true,
+
 			/**
 			 * Apply changes from the local editor to the local CRDT document so
 			 * that those changes can be synced to other peers (via the provider).

@@ -54,7 +54,7 @@ function GridTools( { clientId, layout } ) {
 				const settings = getSettings();
 				const currentDeviceType =
 					settings?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.value;
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
 
 				return {
 					isVisible: true,

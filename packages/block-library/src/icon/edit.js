@@ -94,24 +94,24 @@ export function Edit( { attributes, setAttributes } ) {
 	const iconToDisplay = selectedIcon?.content || '';
 
 	const flipClasses = {
-		'wp-block-icon--flip-horizontal': flipHorizontal,
-		'wp-block-icon--flip-vertical': flipVertical,
-	};
+			'is-flip-horizontal': flipHorizontal,
+			'is-flip-vertical': flipVertical,
+		};
 
-	const rotationStyle = rotation
-		? { '--wp-block-icon-rotation': `${ rotation }deg` }
-		: {};
+	const rotationStyle = rotation ? { rotate: `${ rotation }deg` } : {};
 
 	const blockControls = (
 		<>
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
-				<ToolbarButton
-					onClick={ () => {
-						setInserterOpen( true );
-					} }
-				>
-					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
-				</ToolbarButton>
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () => {
+							setInserterOpen( true );
+						} }
+					>
+						{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
 			</BlockControls>
 			{ icon && (
 				<BlockControls group="other">

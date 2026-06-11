@@ -267,12 +267,6 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 		);
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
-	} );
-
 	test.beforeEach( async ( { admin, previewUtils } ) => {
 		await admin.createNewPost();
 		await previewUtils.toggleCustomFieldsOption( true );
@@ -280,6 +274,12 @@ test.describe( 'Preview with Custom Fields enabled', () => {
 
 	test.afterEach( async ( { previewUtils } ) => {
 		await previewUtils.toggleCustomFieldsOption( false );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	// Catch regressions of https://github.com/WordPress/gutenberg/issues/12617
@@ -380,6 +380,7 @@ class PreviewUtils {
 		}
 
 		await this.page.click( 'role=menuitem[name="Preview in new tab"i]' );
+		// eslint-disable-next-line playwright/no-wait-for-navigation
 		return previewPage.waitForNavigation();
 	}
 
@@ -414,6 +415,7 @@ class PreviewUtils {
 
 		if ( isSaveVisible ) {
 			saveButton.click();
+			// eslint-disable-next-line playwright/no-wait-for-navigation
 			await this.page.waitForNavigation();
 			return;
 		}

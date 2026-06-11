@@ -14,12 +14,13 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import DataViewsPicker from '../index';
-import { LAYOUT_PICKER_GRID, LAYOUT_PICKER_TABLE } from '../../constants';
+import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { ActionButton, View } from '../../types';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
+	tags: [ 'manifest' ],
 	title: 'DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
@@ -186,11 +187,12 @@ const DataViewsPickerContent = ( {
 				fields={ fields }
 				onChangeView={ setView }
 				config={ { perPageSizes } }
-				itemListLabel="Galactic Bodies"
 				defaultLayouts={ {
-					[ LAYOUT_PICKER_GRID ]: {},
-					[ LAYOUT_PICKER_TABLE ]: {},
+					pickerGrid: true,
+					pickerTable: true,
+					pickerActivity: true,
 				} }
+				itemListLabel="Galactic Bodies"
 			/>
 		</>
 	);
@@ -258,6 +260,7 @@ export const WithModal = ( {
 			<Stack direction="row" justify="left" gap="sm">
 				<Button
 					variant="primary"
+					__next40pxDefaultSize
 					onClick={ () => setIsModalOpen( true ) }
 				>
 					Open Picker Modal
@@ -266,6 +269,7 @@ export const WithModal = ( {
 					onClick={ () => setSelectedItems( [] ) }
 					disabled={ ! selectedItems.length }
 					accessibleWhenDisabled
+					__next40pxDefaultSize
 				>
 					Clear Selection
 				</Button>
