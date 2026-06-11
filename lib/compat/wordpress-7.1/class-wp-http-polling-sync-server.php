@@ -5,6 +5,10 @@
  * @package gutenberg
  */
 
+if ( ! class_exists( 'WP_Sync_Config' ) ) {
+	require_once __DIR__ . '/class-wp-sync-config.php';
+}
+
 if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 	/**
@@ -230,14 +234,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					}
 				}
 
-				$type_parts   = explode( '/', $room, 2 );
-				$object_parts = explode( ':', $type_parts[1] ?? '', 2 );
-
-				$entity_kind = $type_parts[0];
-				$entity_name = $object_parts[0];
-				$object_id   = $object_parts[1] ?? null;
-
-				if ( ! $this->can_user_sync_entity_type( $entity_kind, $entity_name, $object_id ) ) {
+				$parsed_room = WP_Sync_Config::parse_room( $room );
+				if ( null === $parsed_room || ! WP_Sync_Config::can_user_sync_entity_type( $parsed_room['entity_kind'], $parsed_room['entity_name'], $parsed_room['object_id'] ) ) {
 					$forbidden_rooms[] = $room;
 				}
 			}
@@ -330,84 +328,6 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			}
 
 			return new WP_REST_Response( $response, 200 );
-		}
-
-		/**
-		 * Checks if the current user can sync a specific entity type.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param string      $entity_kind The entity kind, e.g. 'postType', 'taxonomy', 'root'.
-		 * @param string      $entity_name The entity name, e.g. 'post', 'category', 'site'.
-		 * @param string|null $object_id   The numeric object ID / entity key for single entities, null for collections.
-		 * @return bool True if user has permission, otherwise false.
-		 */
-		private function can_user_sync_entity_type( string $entity_kind, string $entity_name, ?string $object_id ): bool {
-			if ( is_string( $object_id ) ) {
-				if ( ! ctype_digit( $object_id ) ) {
-					return false;
-				}
-				$object_id = (int) $object_id;
-			}
-			if ( null !== $object_id && $object_id <= 0 ) {
-				// Object ID must be numeric if provided.
-				return false;
-			}
-
-			// Validate permissions for the provided object ID.
-			if ( is_int( $object_id ) ) {
-				// Handle single post type entities with a defined object ID.
-				if ( 'postType' === $entity_kind ) {
-					if ( get_post_type( $object_id ) !== $entity_name ) {
-						// Post is not of the specified post type.
-						return false;
-					}
-					return current_user_can( 'edit_post', $object_id );
-				}
-
-				// Handle single taxonomy term entities with a defined object ID.
-				if ( 'taxonomy' === $entity_kind ) {
-					$term_exists = term_exists( $object_id, $entity_name );
-					if ( ! is_array( $term_exists ) || ! isset( $term_exists['term_id'] ) ) {
-						// Either term doesn't exist OR term is not in specified taxonomy.
-						return false;
-					}
-
-					return current_user_can( 'edit_term', $object_id );
-				}
-
-				// Handle single comment entities with a defined object ID.
-				if ( 'root' === $entity_kind && 'comment' === $entity_name ) {
-					return current_user_can( 'edit_comment', $object_id );
-				}
-			}
-
-			// All the remaining checks are for collections. If an object ID is provided,
-			// reject the request.
-			if ( null !== $object_id ) {
-				return false;
-			}
-
-			// For postType collections, check if the user can edit posts of this type.
-			if ( 'postType' === $entity_kind ) {
-				$post_type_object = get_post_type_object( $entity_name );
-				if ( ! isset( $post_type_object->cap->edit_posts ) ) {
-					return false;
-				}
-
-				return current_user_can( $post_type_object->cap->edit_posts );
-			}
-
-			// Collection syncing does not exchange entity data. It only signals if
-			// another user has updated an entity in the collection. Therefore, we only
-			// compare against an allow list of collection types.
-			$allowed_collection_entity_kinds = array(
-				'postType',
-				'root',
-				'taxonomy',
-			);
-
-			return in_array( $entity_kind, $allowed_collection_entity_kinds, true );
 		}
 
 		/**

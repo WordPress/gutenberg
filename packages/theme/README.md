@@ -96,7 +96,7 @@ function App() {
 The `color` prop accepts an object with the following optional properties:
 
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
--   `bg`: The background seed color (default: `'#f8f8f8'`).
+-   `background`: The background seed color (default: `'#f8f8f8'`).
 
 Both properties accept a hex string (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword (e.g. `'blue'`). The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
@@ -111,9 +111,9 @@ When the `color` or `cursor` prop is omitted, the theme inherits the value from 
 The provider can be used recursively to override or modify the theme for a specific subtree.
 
 ```tsx
-<ThemeProvider color={ { bg: 'white' } }>
+<ThemeProvider color={ { background: 'white' } }>
 	{ /* light-themed UI components */ }
-	<ThemeProvider color={ { bg: '#1e1e1e' } }>
+	<ThemeProvider color={ { background: '#1e1e1e' } }>
 		{ /* dark-themed UI components */ }
 		<ThemeProvider color={ { primary: 'red' } }>
 			{ /* dark-themed with red accent */ }

@@ -6,6 +6,14 @@
 
 - Use a high-bit-depth `wasm-vips` build (libaom `CONFIG_AV1_HIGHBITDEPTH=1`) so 10/12-bit AVIF images can be decoded and encoded. Previously these failed with "Bitstream not supported by this decoder". See [#78889](https://github.com/WordPress/gutenberg/issues/78889).
 
+## 2.1.0 (2026-06-10)
+
+### New Features
+
+- Add `getUltraHdrInfo` for probing UltraHDR (ISO 21496-1 gain map) JPEGs ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+- Preserve UltraHDR gain maps through `resizeImage`: libvips's `uhdrload`/`uhdrsave` priority is leveraged automatically, the save path keeps `icc|gainmap` metadata, and positional crop now also crops the attached gain map ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+- Bump `wasm-vips` to `^0.0.17` for native UltraHDR support ([#74873](https://github.com/WordPress/gutenberg/pull/74873)).
+
 ## 2.0.0 (2026-05-27)
 
 ### Breaking Changes
