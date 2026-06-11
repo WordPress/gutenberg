@@ -10,7 +10,7 @@ Install the module:
 npm install @wordpress/icons --save
 ```
 
-*This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code.*
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Usage
 
@@ -28,7 +28,7 @@ import { Icon, check } from '@wordpress/icons';
 
 ## Docs & Examples
 
-You can browse the icons docs and examples at <https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default>
+You can browse the icons docs and examples at [https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default](https://wordpress.github.io/gutenberg/?path=/docs/icons-icon--default)
 
 ## Adding new icons
 
@@ -49,10 +49,12 @@ To ship an icon to WordPress core and register it in the icon registry, add it t
    - `showInRest` (optional): Set to `true` to list the icon in the SVG Icons REST API and offer it in the Icon block. Defaults to `false` when omitted, registering the icon without exposing it through the REST API.
 2. **Do not edit `manifest.php`**: The `manifest.php` file is automatically generated from `manifest.json` by the build script. Do not edit it manually, as your changes will be overwritten when the build runs.
 
-Run `npm run build` again to regenerate `manifest.php`. Icons.
+After adding your icon, run `npm run build` to generate the TypeScript files and update `manifest.php`.
 
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
 
 To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
