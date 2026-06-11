@@ -157,6 +157,8 @@ export function getViewScale(
 		! isValidSize( visualSize ) ||
 		! ( cropScreenW > 0 ) ||
 		! ( cropScreenH > 0 ) ||
+		! Number.isFinite( targetFill ) ||
+		! Number.isFinite( maxScale ) ||
 		! ( targetFill > 0 ) ||
 		! ( maxScale >= 1 )
 	) {

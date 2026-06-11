@@ -504,6 +504,49 @@ describe( 'Cropper', () => {
 		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
 	} );
 
+	it( 'positions crop overlays against the magnified footprint', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } showGrid /> );
+
+		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
+
+		const expectedRect = {
+			left: 140,
+			top: 40,
+			width: 320,
+			height: 320,
+		};
+		const expectOverlayRect = ( element: HTMLElement | null ) => {
+			expect( element ).not.toBeNull();
+			const overlay = element as HTMLElement;
+			expect( parseFloat( overlay.style.left ) ).toBeCloseTo(
+				expectedRect.left,
+				1
+			);
+			expect( parseFloat( overlay.style.top ) ).toBeCloseTo(
+				expectedRect.top,
+				1
+			);
+			expect( parseFloat( overlay.style.width ) ).toBeCloseTo(
+				expectedRect.width,
+				1
+			);
+			expect( parseFloat( overlay.style.height ) ).toBeCloseTo(
+				expectedRect.height,
+				1
+			);
+		};
+
+		expectOverlayRect( screen.getByTestId( 'cropper-stencil' ) );
+		expectOverlayRect( screen.getByTestId( 'cropper-dimming' ) );
+		expectOverlayRect( screen.getByTestId( GRID_TEST_ID ) );
+	} );
+
 	it( 'does not magnify when the crop already fills the canvas', () => {
 		const controller = createController();
 		controller.state = {

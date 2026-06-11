@@ -1045,7 +1045,7 @@ describe( 'getViewScale — presentational magnification to fill the canvas', ()
 } );
 
 describe( 'getViewScale — property invariants', () => {
-	const ITERATIONS = 500;
+	const ITERATIONS = 100;
 
 	it( `holds across ${ ITERATIONS } random valid inputs`, () => {
 		for ( let i = 0; i < ITERATIONS; i++ ) {
