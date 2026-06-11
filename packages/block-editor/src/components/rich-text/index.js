@@ -414,9 +414,13 @@ export function RichTextWrapper(
 	// supports `editableRoot`), nested editable elements are no longer
 	// focusable areas on their own, so an explicit tabIndex restores their
 	// focusability.
+	// Only an iframed canvas (where the wrapper is the document body) may
+	// become an editing host; in other editors the legacy behavior applies.
+	const isIframedCanvas =
+		!! anchorElement && anchorElement.ownerDocument !== document;
 	let tabIndex = props.tabIndex;
 	if ( ! shouldDisableEditing ) {
-		if ( hasEditableRoot ) {
+		if ( hasEditableRoot && isIframedCanvas ) {
 			tabIndex = props.tabIndex ?? 0;
 		} else if ( props.tabIndex === 0 ) {
 			tabIndex = null;
