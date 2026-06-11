@@ -3,13 +3,12 @@
  */
 import {
 	createPortal,
-	useEffect,
 	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -52,14 +51,6 @@ export default function InnerContent( { clientId } ) {
 		},
 		[ clientId ]
 	);
-	const { updateBlockListSettings } = useDispatch( blockEditorStore );
-
-	// Lock the inner blocks: editable in place, but not movable, removable,
-	// or insertable.
-	useEffect( () => {
-		updateBlockListSettings( clientId, { templateLock: 'all' } );
-	}, [ clientId, updateBlockListSettings ] );
-
 	const html = useMemo( () => {
 		let slotIndex = 0;
 		return ( innerContent ?? [] )
