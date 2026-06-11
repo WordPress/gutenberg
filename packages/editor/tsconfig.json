@@ -31,7 +31,6 @@
 		{ "path": "../keycodes" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../media-editor" },
-		{ "path": "../media-fields" },
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../plugins" },

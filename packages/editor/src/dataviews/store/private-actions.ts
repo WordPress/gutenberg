@@ -39,18 +39,6 @@ import {
 	postContentInfoField,
 	stickyField,
 } from '@wordpress/fields';
-import {
-	altTextField,
-	attachedToField,
-	authorField as mediaAuthorField,
-	captionField,
-	dateAddedField,
-	descriptionField,
-	filenameField,
-	filesizeField,
-	mediaDimensionsField,
-	mimeTypeField,
-} from '@wordpress/media-fields';
 
 /**
  * Internal dependencies
@@ -139,31 +127,6 @@ export function setIsReady( kind: string, name: string ) {
 		name,
 	};
 }
-
-/*
- * Media fields for the attachment post type.
- *
- * Field order follows a logical grouping:
- * 1. Metadata fields in panels (date, author, file info)
- * 2. Core editable fields (title, alt text, caption, description)
- *
- * Note: media_thumbnail is not included as it's shown in the canvas preview
- */
-const ORDERED_MEDIA_FIELDS = [
-	// Metadata in panels (collapsed by default).
-	dateAddedField,
-	mediaAuthorField,
-	filenameField,
-	mimeTypeField,
-	filesizeField,
-	mediaDimensionsField,
-	attachedToField,
-	// Regular layout fields (always visible).
-	titleField,
-	altTextField,
-	captionField,
-	descriptionField,
-];
 
 export const registerPostTypeSchema =
 	( postType: string ) =>
@@ -255,11 +218,14 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// Handle attachment post type separately with media-specific fields
 		let fields;
 
 		if ( postType === ATTACHMENT_POST_TYPE ) {
-			fields = ORDERED_MEDIA_FIELDS;
+			// Attachment fields are provided by the `core/media-fields`
+			// field collection registered server-side. The generic fields
+			// below don't apply to media, so there is no client-side
+			// fallback.
+			fields = [];
 		} else {
 			fields = [
 				postTypeConfig.supports?.thumbnail &&
