@@ -10,8 +10,10 @@ import {
 	Button,
 	Card,
 	Icon,
+	InputControl,
 	Link,
 	Notice,
+	SelectControl,
 	Stack,
 	Tabs,
 	Text,
@@ -33,6 +35,14 @@ const sidebarNavItems = [
 	'Comments',
 	'Appearance',
 	'Settings',
+];
+
+const siteLanguageOptions = [
+	{ value: 'en-US', label: 'English (United States)' },
+	{ value: 'en-GB', label: 'English (United Kingdom)' },
+	{ value: 'fr-FR', label: 'Français' },
+	{ value: 'de-DE', label: 'Deutsch' },
+	{ value: 'ja', label: '日本語' },
 ];
 
 const meta: Meta< typeof ThemeProvider > = {
@@ -219,6 +229,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 								direction="column"
 								gap="lg"
 								style={ {
+									width: '100%',
 									maxWidth: '640px',
 									marginInline: 'auto',
 								} }
@@ -242,22 +253,43 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
 										<Stack direction="column" gap="md">
 											<Text>
 												Configure the basic settings for
-												your site. You can update your{ ' ' }
-												<Link href="#">site title</Link>
-												, tagline, and{ ' ' }
-												<Link href="#">
-													admin email address
-												</Link>{ ' ' }
-												at any time.
+												your site. The fields below
+												adopt the corner radius preset
+												alongside cards, buttons, and
+												other surfaces.
 											</Text>
-											<Text>
-												For more advanced options, visit
-												the{ ' ' }
-												<Link href="#">
-													developer documentation
-												</Link>
-												.
-											</Text>
+											<InputControl
+												label="Site title"
+												placeholder="My WordPress site"
+												defaultValue="My WordPress site"
+											/>
+											<InputControl
+												label="Tagline"
+												description="A short phrase shown below the site title."
+												placeholder="Just another WordPress site"
+											/>
+											<InputControl
+												label="Admin email address"
+												type="email"
+												placeholder="you@example.com"
+												defaultValue="admin@example.com"
+											/>
+											<SelectControl
+												label="Site language"
+												description="The default language for the site interface."
+												items={ siteLanguageOptions }
+												defaultValue={
+													siteLanguageOptions[ 0 ]
+												}
+											/>
+											<Stack
+												direction="row"
+												style={ {
+													justifyContent: 'flex-end',
+												} }
+											>
+												<Button>Save</Button>
+											</Stack>
 										</Stack>
 									</Card.Content>
 								</Card.Root>
