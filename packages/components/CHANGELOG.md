@@ -109,6 +109,10 @@
 
 -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
 
+### Internal
+
+-   `Autocomplete`: subscribe the keyboard listener through the rich text selection owner, so it also handles events targeting a focused editing host ([#79105](https://github.com/WordPress/gutenberg/pull/79105)).
+
 ## 35.0.1 (2026-06-16)
 
 ## 35.0.0 (2026-06-10)
