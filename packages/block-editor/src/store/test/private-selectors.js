@@ -82,16 +82,24 @@ describe( 'private selectors', () => {
 
 		const createState = (
 			blockName,
-			{ templateLock, innerBlocks = [] } = {}
-		) => ( {
-			blocks: {
-				byClientId: new Map( [ [ 'client-1', { name: blockName } ] ] ),
-				order: new Map( [ [ 'client-1', innerBlocks ] ] ),
-			},
-			blockListSettings: templateLock
-				? new Map( [ [ 'client-1', { templateLock } ] ] )
-				: new Map(),
-		} );
+			{ allowedBlocks, innerBlocks = [] } = {}
+		) => {
+			const blockListSettings = new Map();
+			if ( allowedBlocks !== undefined ) {
+				blockListSettings.set( 'client-1', { allowedBlocks } );
+			}
+
+			return {
+				blocks: {
+					byClientId: new Map( [
+						[ 'client-1', { name: blockName } ],
+					] ),
+					order: new Map( [ [ 'client-1', innerBlocks ] ] ),
+					parents: new Map(),
+				},
+				blockListSettings,
+			};
+		};
 
 		beforeAll( () => {
 			registerBlockType( blockWithListViewSupport, {
@@ -120,9 +128,9 @@ describe( 'private selectors', () => {
 			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
 		} );
 
-		it( 'returns false when the inner blocks are managed (locked and empty)', () => {
+		it( 'returns false when the inner blocks are managed (empty and insertion disallowed)', () => {
 			const state = createState( blockWithListViewSupport, {
-				templateLock: 'all',
+				allowedBlocks: [],
 			} );
 
 			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(
@@ -130,9 +138,25 @@ describe( 'private selectors', () => {
 			);
 		} );
 
-		it( 'returns true when locked but the block still has inner blocks', () => {
+		it( 'returns true when empty but insertion is allowed', () => {
+			// e.g. a static, still-empty gallery: nothing yet, but the user can
+			// start inserting, so its List View stays available.
 			const state = createState( blockWithListViewSupport, {
-				templateLock: 'all',
+				allowedBlocks: [ 'core/image' ],
+			} );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when empty with no allowedBlocks restriction', () => {
+			const state = createState( blockWithListViewSupport );
+
+			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe( true );
+		} );
+
+		it( 'returns true when insertion is disallowed but the block still has inner blocks', () => {
+			const state = createState( blockWithListViewSupport, {
+				allowedBlocks: [],
 				innerBlocks: [ 'child-1' ],
 			} );
 
@@ -141,7 +165,7 @@ describe( 'private selectors', () => {
 
 		it( 'does not grant list view support to unsupported block types', () => {
 			const state = createState( blockWithoutListViewSupport, {
-				templateLock: 'all',
+				allowedBlocks: [],
 			} );
 
 			expect( hasBlockListViewSupport( state, 'client-1' ) ).toBe(

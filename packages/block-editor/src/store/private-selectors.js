@@ -14,6 +14,7 @@ import {
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
+	getBlockListSettings,
 	getSettings,
 	canInsertBlockType,
 	getBlockName,
@@ -1084,9 +1085,10 @@ export function getListViewExpandRevision( state ) {
  * Intentionally private: this is the derived participation logic (block type
  * `listView` support, the `core/navigation` special case, and the
  * "managed inner blocks" inference) shared by the List View consumers. A block
- * opts out implicitly by entering a managed state — `templateLock: 'all'` with
- * no inner blocks — so there is no dedicated public flag. Keeping the read
- * internal lets this computation evolve without a back-compat commitment.
+ * opts out implicitly by entering a managed state — it has no inner blocks and
+ * disallows insertion (`allowedBlocks: []`) — so there is no dedicated public
+ * flag. Keeping the read internal lets this computation evolve without a
+ * back-compat commitment.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
@@ -1095,23 +1097,39 @@ export function getListViewExpandRevision( state ) {
  */
 export function hasBlockListViewSupport( state, clientId ) {
 	const blockName = getBlockName( state, clientId );
-	const hasTypeSupport =
-		blockName === 'core/navigation' ||
-		hasBlockSupport( blockName, 'listView' );
 
-	if ( ! hasTypeSupport ) {
+	// The navigation block always participates; its List View is core to how it
+	// is edited, regardless of how its menu is locked or populated.
+	if ( blockName === 'core/navigation' ) {
+		return true;
+	}
+
+	if ( ! hasBlockSupport( blockName, 'listView' ) ) {
 		return false;
 	}
 
-	// A block whose inner blocks are fully managed — the template is locked
-	// (`templateLock: 'all'`) and there are currently no inner blocks — has
-	// nothing to select or navigate, so it doesn't participate in the List
-	// View. This lets blocks that enter a "managed inner blocks" mode (e.g. a
-	// gallery resolving its images dynamically) opt out without a dedicated
-	// flag.
+	// A block with inner blocks always participates — there are real children to
+	// view and navigate.
+	if ( getBlockOrder( state, clientId ).length !== 0 ) {
+		return true;
+	}
+
+	// The block is empty and has "managed inner blocks" — so opts out of the
+	// List View — when nothing can be inserted into it. This lets a block that
+	// resolves its own children (e.g. a gallery in a dynamic mode) opt out
+	// without a dedicated flag, by declaring `allowedBlocks: []` while it has no
+	// inner blocks: there is nothing to navigate and nothing to add.
+	//
+	// `allowedBlocks` is read from block list settings rather than inferred from
+	// `templateLock` because a content-locked ancestor relaxes a child's own
+	// `templateLock: 'all'` to `contentOnly` (see `useNestedSettingsUpdate`),
+	// whereas `allowedBlocks` is carried through unchanged.
+	const allowedBlocks = getBlockListSettings(
+		state,
+		clientId
+	)?.allowedBlocks;
 	const hasManagedInnerBlocks =
-		getTemplateLock( state, clientId ) === 'all' &&
-		getBlockOrder( state, clientId ).length === 0;
+		Array.isArray( allowedBlocks ) && allowedBlocks.length === 0;
 
 	return ! hasManagedInnerBlocks;
 }

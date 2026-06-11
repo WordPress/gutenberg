@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   List View: a block that supports `listView` is now excluded from the List View when its inner blocks are fully managed — locked with `templateLock: 'all'` and currently empty — since there is nothing to select or navigate. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
+-   List View: a block that supports `listView` is now excluded from the List View when its inner blocks are fully managed — it has no inner blocks and disallows insertion (`allowedBlocks: []`) — since there is nothing to select, navigate, or add. Unlike `templateLock`, `allowedBlocks` is not relaxed by a content-locked (`contentOnly`) ancestor, so the exclusion holds in every context. ([#78932](https://github.com/WordPress/gutenberg/pull/78932))
 
 ## 15.21.1 (2026-06-16)
 
