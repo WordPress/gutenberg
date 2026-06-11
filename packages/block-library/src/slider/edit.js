@@ -13,11 +13,10 @@ import {
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import {
-	RangeControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -38,9 +37,17 @@ import {
 
 const PERCENT_PEEK_AMOUNT = 8;
 const SLIDER_TEMPLATE = [ [ 'core/slide' ], [ 'core/slide' ] ];
+const PEEK_UNITS = [
+	{ value: 'px', label: 'px', default: DEFAULT_PEEK_AMOUNT },
+	{ value: '%', label: '%', default: PERCENT_PEEK_AMOUNT },
+];
 
 function getPeekMax( unit ) {
 	return unit === '%' ? 30 : 160;
+}
+
+function getPeekValue( amount, unit ) {
+	return `${ amount }${ unit }`;
 }
 
 function SliderEditorControls( { activeSlideIndex, slideCount } ) {
@@ -158,26 +165,19 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
-	const onPeekUnitChange = ( nextUnit ) => {
-		if ( ! nextUnit || nextUnit === peekUnit ) {
-			return;
-		}
-
-		setAttributes( {
-			peekUnit: nextUnit,
-			peekAmount:
-				nextUnit === '%'
-					? Math.min( PERCENT_PEEK_AMOUNT, getPeekMax( nextUnit ) )
-					: DEFAULT_PEEK_AMOUNT,
-		} );
-	};
-
 	const onPeekAmountChange = ( nextAmount ) => {
-		const normalizedAmount = Number.isFinite( nextAmount )
-			? Math.max( 0, Math.min( nextAmount, getPeekMax( peekUnit ) ) )
+		const [ amount, unit = peekUnit ] = parseQuantityAndUnitFromRawValue(
+			nextAmount,
+			PEEK_UNITS
+		);
+		const normalizedAmount = Number.isFinite( amount )
+			? Math.max( 0, Math.min( amount, getPeekMax( unit ) ) )
 			: 0;
 
-		setAttributes( { peekAmount: normalizedAmount } );
+		setAttributes( {
+			peekAmount: normalizedAmount,
+			peekUnit: unit,
+		} );
 	};
 
 	return (
@@ -208,30 +208,15 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 							} )
 						}
 					>
-						<ToggleGroupControl
+						<UnitControl
 							__next40pxDefaultSize
-							isBlock
-							label={ __( 'Peek unit' ) }
-							value={ peekUnit }
-							onChange={ onPeekUnitChange }
-						>
-							<ToggleGroupControlOption
-								label={ __( 'Pixels' ) }
-								value="px"
-							/>
-							<ToggleGroupControlOption
-								label={ __( 'Percent' ) }
-								value="%"
-							/>
-						</ToggleGroupControl>
-						<RangeControl
-							__next40pxDefaultSize
+							isResetValueOnUnitChange
 							label={ __( 'Peek' ) }
 							min={ 0 }
 							max={ getPeekMax( peekUnit ) }
-							value={ peekAmount }
 							onChange={ onPeekAmountChange }
-							withInputField
+							units={ PEEK_UNITS }
+							value={ getPeekValue( peekAmount, peekUnit ) }
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
