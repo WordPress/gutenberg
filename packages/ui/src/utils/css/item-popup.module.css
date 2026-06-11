@@ -59,10 +59,6 @@
 			align-items: center;
 			min-height: 32px;
 			padding-inline: var(--wpds-dimension-padding-md);
-			font-size: var(--wpds-typography-font-size-xs);
-			line-height: var(--wpds-typography-line-height-xs);
-			font-weight: var(--wpds-typography-font-weight-medium);
-			text-transform: uppercase;
 			color: var(--wpds-color-fg-content-neutral-weak);
 		}
 
