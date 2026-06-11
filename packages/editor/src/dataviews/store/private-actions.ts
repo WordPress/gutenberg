@@ -32,7 +32,6 @@ import {
 	authorField,
 	titleField,
 	templateField,
-	templateTitleField,
 	patternTitleField,
 	notesField,
 	scheduledDateField,
@@ -261,17 +260,6 @@ export const registerPostTypeSchema =
 
 		if ( postType === ATTACHMENT_POST_TYPE ) {
 			fields = ORDERED_MEDIA_FIELDS;
-		} else if ( postType === 'page' ) {
-			// Page fields are provided by the `core/page-fields` field
-			// collection registered server-side, except the content preview
-			// field: its render depends on editor internals (EditorProvider,
-			// global styles, the editor store) that the collection's script
-			// module in `@wordpress/fields` cannot import.
-			fields = [
-				postTypeConfig.supports?.editor &&
-					postTypeConfig.viewable &&
-					postPreviewField,
-			].filter( Boolean );
 		} else {
 			fields = [
 				postTypeConfig.supports?.thumbnail &&
@@ -309,9 +297,7 @@ export const registerPostTypeSchema =
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
-				if ( postType === 'wp_template' ) {
-					_titleField = templateTitleField;
-				} else if ( postType === 'wp_block' ) {
+				if ( postType === 'wp_block' ) {
 					_titleField = patternTitleField;
 				} else {
 					_titleField = titleField;
@@ -379,6 +365,11 @@ export const registerPostTypeSchema =
 					field
 				);
 			} );
+			// Collection fields are registered after the client-side
+			// defaults and replace any field with the same id, so
+			// server-registered collections are authoritative and the
+			// client-side definitions act as a fallback when the
+			// collections request fails.
 			collectionFields.forEach( ( field: Field< any > ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityField(
 					'postType',

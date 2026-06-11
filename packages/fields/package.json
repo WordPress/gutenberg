@@ -42,7 +42,8 @@
 	},
 	"wpScriptModuleExports": {
 		"./loader": "./build-module/collections/loader.mjs",
-		"./postType-page": "./build-module/collections/postType-page/extensions.mjs"
+		"./postType-page": "./build-module/collections/postType-page/extensions.mjs",
+		"./postType-wp_template": "./build-module/collections/postType-wp_template/extensions.mjs"
 	},
 	"wpCopyFiles": {
 		"files": [
