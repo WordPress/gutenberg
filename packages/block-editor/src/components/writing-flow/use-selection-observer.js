@@ -195,13 +195,16 @@ export default function useSelectionObserver() {
 						// nested editable element cannot retain it (the first
 						// DOM mutation moves focus to the host, inconsistently
 						// across browsers). Don't steal focus from UI elements
-						// (e.g. buttons). The rich text instance owning the
+						// (e.g. buttons) or editables outside the block (e.g.
+						// the post title). The rich text instance owning the
 						// selection syncs it to the store itself.
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
 							activeElement?.isContentEditable &&
-							node.contains( activeElement )
+							node.contains( activeElement ) &&
+							getBlockClientId( activeElement ) ===
+								collapsedClientId
 						) {
 							node.focus();
 						}
