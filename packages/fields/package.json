@@ -45,6 +45,7 @@
 		"./postType-attachment": "./build-module/collections/postType-attachment/extensions.mjs",
 		"./postType-page": "./build-module/collections/postType-page/extensions.mjs",
 		"./postType-post": "./build-module/collections/postType-post/extensions.mjs",
+		"./postType-wp_block": "./build-module/collections/postType-wp_block/extensions.mjs",
 		"./postType-wp_template": "./build-module/collections/postType-wp_template/extensions.mjs",
 		"./postType-wp_template_part": "./build-module/collections/postType-wp_template_part/extensions.mjs"
 	},

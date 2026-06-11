@@ -32,7 +32,6 @@ import {
 	authorField,
 	titleField,
 	templateField,
-	patternTitleField,
 	notesField,
 	scheduledDateField,
 	formatField,
@@ -262,13 +261,7 @@ export const registerPostTypeSchema =
 				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
-				let _titleField;
-				if ( postType === 'wp_block' ) {
-					_titleField = patternTitleField;
-				} else {
-					_titleField = titleField;
-				}
-				fields.push( _titleField );
+				fields.push( titleField );
 			}
 		}
 
