@@ -29,9 +29,10 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
@@ -62,13 +63,31 @@ export function Edit( { attributes, setAttributes } ) {
 				selectedIcon: icon
 					? getEntityRecord( 'root', 'icon', icon )
 					: null,
-				allIcons: isInserterOpen
-					? getEntityRecords( 'root', 'icon' )
-					: undefined,
+				allIcons:
+					isInserterOpen || ! icon
+						? getEntityRecords( 'root', 'icon' )
+						: undefined,
 			};
 		},
 		[ isInserterOpen, icon ]
 	);
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( ! icon && allIcons?.length ) {
+			const randomIcon =
+				allIcons[ Math.floor( Math.random() * allIcons.length ) ];
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { icon: randomIcon.name } );
+		}
+	}, [
+		icon,
+		allIcons,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const iconToDisplay = selectedIcon?.content || '';
 
