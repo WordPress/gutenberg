@@ -42,7 +42,12 @@
 	},
 	"wpScriptModuleExports": {
 		"./loader": "./build-module/collections/loader.mjs",
-		"./postType-page": "./build-module/collections/postType-page.mjs"
+		"./postType-page": "./build-module/collections/postType-page/extensions.mjs"
+	},
+	"wpCopyFiles": {
+		"files": [
+			"src/collections/*/fields.php"
+		]
 	},
 	"types": "build-types",
 	"sideEffects": [
