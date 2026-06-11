@@ -27,6 +27,9 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 		// Reset the global collections for each test.
 		global $gutenberg_field_collections;
 		$gutenberg_field_collections = array();
+
+		// Reset the script modules registry for each test.
+		unset( $GLOBALS['wp_script_modules'] );
 	}
 
 	public function test_register_routes() {
@@ -176,6 +179,53 @@ class Gutenberg_REST_Field_Collections_Controller_Test extends WP_Test_REST_Cont
 
 		$this->assertCount( 1, $collections );
 		$this->assertNull( $collections[0]['fields_module'] );
+	}
+
+	public function test_enqueue_field_collections_loader_adds_modules_to_import_map() {
+		gutenberg_register_field_collection(
+			'test/with-module',
+			'postType',
+			'page',
+			array(
+				array(
+					'id'   => 'status',
+					'type' => 'text',
+				),
+			),
+			'test-page-fields-module'
+		);
+
+		wp_register_script_module( '@wordpress/fields/loader', 'https://example.com/loader.js' );
+		wp_register_script_module( 'test-page-fields-module', 'https://example.com/page-fields.js' );
+
+		gutenberg_enqueue_field_collections_loader();
+
+		$this->assertContains( '@wordpress/fields/loader', wp_script_modules()->get_queue() );
+
+		$import_map = get_echo( array( wp_script_modules(), 'print_import_map' ) );
+
+		$this->assertStringContainsString( 'test-page-fields-module', $import_map );
+		$this->assertStringContainsString( 'page-fields.js', $import_map );
+	}
+
+	public function test_enqueue_field_collections_loader_without_modules_is_a_noop() {
+		gutenberg_register_field_collection(
+			'test/basic',
+			'postType',
+			'page',
+			array(
+				array(
+					'id'   => 'title',
+					'type' => 'text',
+				),
+			)
+		);
+
+		wp_register_script_module( '@wordpress/fields/loader', 'https://example.com/loader.js' );
+
+		gutenberg_enqueue_field_collections_loader();
+
+		$this->assertNotContains( '@wordpress/fields/loader', wp_script_modules()->get_queue() );
 	}
 
 	public function test_get_items_permissions_check() {

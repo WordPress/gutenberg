@@ -40,6 +40,10 @@
 		},
 		"./package.json": "./package.json"
 	},
+	"wpScriptModuleExports": {
+		"./loader": "./build-module/collections/loader.mjs",
+		"./postType-page": "./build-module/collections/postType-page.mjs"
+	},
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",

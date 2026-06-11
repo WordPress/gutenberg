@@ -39,6 +39,19 @@ $notes_count = array(
 	'filterBy'      => false,
 );
 
+// Serializable properties of the title field. The non-serializable
+// extensions (getValue, render) live in the script module declared as the
+// collection's `fields_module`.
+$title = array(
+	'id'                 => 'title',
+	'type'               => 'text',
+	'label'              => __( 'Title', 'gutenberg' ),
+	'placeholder'        => __( 'No title', 'gutenberg' ),
+	'enableHiding'       => false,
+	'enableGlobalSearch' => true,
+	'filterBy'           => false,
+);
+
 gutenberg_register_field_collection(
 	'core/page-fields',
 	'postType',
@@ -46,5 +59,7 @@ gutenberg_register_field_collection(
 	array(
 		$comment_status,
 		$notes_count,
-	)
+		$title,
+	),
+	'@wordpress/fields/postType-page'
 );

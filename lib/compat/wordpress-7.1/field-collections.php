@@ -92,3 +92,43 @@ function gutenberg_get_all_field_collections() {
 	global $gutenberg_field_collections;
 	return $gutenberg_field_collections ?? array();
 }
+
+/**
+ * Makes the script modules of registered field collections importable.
+ *
+ * A script module can only be resolved by `import()` if it is present in the
+ * page's import map, and WordPress only prints import map entries for modules
+ * reachable from an enqueued module's dependency graph. This re-registers the
+ * (intentionally empty) `@wordpress/fields/loader` module with
+ * every collection's `fields_module` as a dynamic dependency and enqueues it:
+ * the modules land in the import map but are only fetched when the editor
+ * dynamically imports them.
+ *
+ * @see packages/fields/src/collections/loader.ts
+ */
+function gutenberg_enqueue_field_collections_loader() {
+	$dependencies = array();
+	foreach ( gutenberg_get_all_field_collections() as $collection ) {
+		if ( ! empty( $collection['fields_module'] ) ) {
+			$dependencies[ $collection['fields_module'] ] = array(
+				'id'     => $collection['fields_module'],
+				'import' => 'dynamic',
+			);
+		}
+	}
+
+	if ( empty( $dependencies ) ) {
+		return;
+	}
+
+	$loader_id = '@wordpress/fields/loader';
+	$src       = gutenberg_get_script_module_src( $loader_id );
+	if ( null === $src ) {
+		return;
+	}
+
+	wp_deregister_script_module( $loader_id );
+	wp_register_script_module( $loader_id, $src, array_values( $dependencies ) );
+	wp_enqueue_script_module( $loader_id );
+}
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_field_collections_loader' );

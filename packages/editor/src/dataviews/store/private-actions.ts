@@ -32,7 +32,6 @@ import {
 	titleField,
 	templateField,
 	templateTitleField,
-	pageTitleField,
 	patternTitleField,
 	scheduledDateField,
 	formatField,
@@ -279,11 +278,11 @@ export const registerPostTypeSchema =
 					postTypeConfig.viewable &&
 					postPreviewField,
 			].filter( Boolean );
-			if ( postTypeConfig.supports?.title ) {
+			// The page title field is provided by the `core/page-fields`
+			// field collection registered server-side.
+			if ( postTypeConfig.supports?.title && postType !== 'page' ) {
 				let _titleField;
-				if ( postType === 'page' ) {
-					_titleField = pageTitleField;
-				} else if ( postType === 'wp_template' ) {
+				if ( postType === 'wp_template' ) {
 					_titleField = templateTitleField;
 				} else if ( postType === 'wp_block' ) {
 					_titleField = patternTitleField;
@@ -293,6 +292,50 @@ export const registerPostTypeSchema =
 				fields.push( _titleField );
 			}
 		}
+
+		// Load the script modules providing the non-serializable extensions
+		// (getValue, render, Edit…) of each field collection, and merge them
+		// into the serializable field definitions by field id.
+		const collectionFields = (
+			await Promise.all(
+				( fieldCollections ?? [] )
+					.filter(
+						( collection: any ) =>
+							collection.kind === 'postType' &&
+							( collection.name === postType ||
+								collection.name === null )
+					)
+					.map( async ( collection: any ) => {
+						let extensions: Partial< Field< any > >[] = [];
+						if ( collection.fields_module ) {
+							try {
+								const fieldsModule = await import(
+									/* webpackIgnore: true */
+									collection.fields_module
+								);
+								extensions = fieldsModule.default ?? [];
+							} catch ( error ) {
+								// eslint-disable-next-line no-console
+								console.warn(
+									`Could not load the "${ collection.fields_module }" script module of the "${ collection.id }" field collection. Falling back to the serializable field definitions.`,
+									error
+								);
+							}
+						}
+						return collection.fields.map(
+							( field: Field< any > ) => {
+								const extension = extensions.find(
+									( fieldExtension ) =>
+										fieldExtension.id === field.id
+								);
+								return extension
+									? { ...field, ...extension }
+									: field;
+							}
+						);
+					} )
+			)
+		).flat();
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
@@ -309,19 +352,12 @@ export const registerPostTypeSchema =
 					field
 				);
 			} );
-			( fieldCollections ?? [] ).forEach( ( collection: any ) => {
-				if (
-					collection.kind !== 'postType' ||
-					collection.name !== postType
-				) {
-					return;
-				}
-
-				collection.fields.forEach( ( field: Field< any > ) => {
-					unlock(
-						registry.dispatch( editorStore )
-					).registerEntityField( 'postType', postType, field );
-				} );
+			collectionFields.forEach( ( field: Field< any > ) => {
+				unlock( registry.dispatch( editorStore ) ).registerEntityField(
+					'postType',
+					postType,
+					field
+				);
 			} );
 		} );
 
