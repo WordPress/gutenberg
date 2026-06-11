@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows.
+-   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
 
 ### Bug Fixes
 
