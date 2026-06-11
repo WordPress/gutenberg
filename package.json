@@ -128,7 +128,6 @@
 		"prelint:php": "npm run other:update-packages:php",
 		"lint:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script lint",
 		"lint:pkg-json": "wp-scripts lint-pkg-json . 'packages/*/package.json'",
-		"native": "npm run --prefix packages/react-native-editor",
 		"other:changelog": "npm exec --workspace @wordpress/release-tools --no release-cli -- changelog",
 		"other:check-licenses": "concurrently \"npm run --workspace @wordpress/validation-tools check-licenses --\" \"wp-scripts check-licenses --dev\"",
 		"preother:check-local-changes": "npm run docs:build && npm run --workspace @wordpress/theme build",
