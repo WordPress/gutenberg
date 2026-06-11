@@ -138,6 +138,37 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that original markup is returned when there are no state classes.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
+	 */
+	public function test_no_state_class_preserves_block_markup() {
+		$block_content = '<nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that Navigation state classes are copied to inner list containers.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
+	 */
+	public function test_state_class_is_added_to_inner_list_container() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_state_class_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Item</li></ul></nav>',
+			$actual
+		);
+	}
+
+	/**
 	 * Test that Navigation state classes are copied to inner list containers.
 	 *
 	 * @covers ::gutenberg_block_core_navigation_add_state_class_to_container
