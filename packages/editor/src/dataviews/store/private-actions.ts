@@ -24,6 +24,7 @@ import {
 	dateField,
 	parentField,
 	passwordField,
+	commentStatusField,
 	pingStatusField,
 	discussionField,
 	slugField,
@@ -33,6 +34,7 @@ import {
 	templateField,
 	templateTitleField,
 	patternTitleField,
+	notesField,
 	scheduledDateField,
 	formatField,
 	postContentInfoField,
@@ -63,6 +65,20 @@ declare global {
 	interface Window {
 		__experimentalTemplateActivate?: boolean;
 	}
+}
+
+/**
+ * Check if a post type supports editor notes.
+ *
+ * @param supports The post type supports object.
+ * @return Whether editor notes are supported.
+ */
+function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
+	const editor = supports?.editor;
+	if ( Array.isArray( editor ) ) {
+		return !! editor[ 0 ]?.notes;
+	}
+	return false;
 }
 
 export function registerEntityAction< Item >(
@@ -272,6 +288,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.excerpt &&
 					excerptField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
+				postTypeConfig.supports?.comments && commentStatusField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
@@ -288,6 +305,7 @@ export const registerPostTypeSchema =
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,
+				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
 			].filter( Boolean );
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
