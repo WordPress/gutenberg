@@ -63,49 +63,49 @@
 		"slug": "arrow-down-left",
 		"label": "Arrow Down Left",
 		"filePath": "library/arrow-down-left.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "arrow-down-right",
 		"label": "Arrow Down Right",
 		"filePath": "library/arrow-down-right.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "arrow-down",
 		"label": "Arrow Down",
 		"filePath": "library/arrow-down.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "arrow-left",
 		"label": "Arrow Left",
 		"filePath": "library/arrow-left.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "arrow-right",
 		"label": "Arrow Right",
 		"filePath": "library/arrow-right.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "arrow-up-left",
 		"label": "Arrow Up Left",
 		"filePath": "library/arrow-up-left.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "arrow-up-right",
 		"label": "Arrow Up Right",
 		"filePath": "library/arrow-up-right.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "arrow-up",
 		"label": "Arrow Up",
 		"filePath": "library/arrow-up.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "aspect-ratio",
@@ -116,13 +116,13 @@
 		"slug": "at-symbol",
 		"label": "At Symbol (@)",
 		"filePath": "library/at-symbol.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "audio",
 		"label": "Audio",
 		"filePath": "library/audio.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "background",
@@ -138,7 +138,7 @@
 		"slug": "bell",
 		"label": "Bell",
 		"filePath": "library/bell.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "bell-unread",
@@ -149,19 +149,19 @@
 		"slug": "block-default",
 		"label": "Block Default",
 		"filePath": "library/block-default.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "block-meta",
 		"label": "Block Meta",
 		"filePath": "library/block-meta.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "block-table",
 		"label": "Block Table",
 		"filePath": "library/block-table.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "border",
@@ -202,7 +202,7 @@
 		"slug": "calendar",
 		"label": "Calendar",
 		"filePath": "library/calendar.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "cancel-circle-filled",
@@ -218,31 +218,31 @@
 		"slug": "capture-photo",
 		"label": "Capture Photo",
 		"filePath": "library/capture-photo.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "capture-video",
 		"label": "Capture Video",
 		"filePath": "library/capture-video.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "cart",
 		"label": "Cart",
 		"filePath": "library/cart.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "category",
 		"label": "Category",
 		"filePath": "library/category.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "caution",
 		"label": "Caution",
 		"filePath": "library/caution.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "caution-filled",
@@ -253,67 +253,67 @@
 		"slug": "chart-bar",
 		"label": "Chart Bar",
 		"filePath": "library/chart-bar.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "check",
 		"label": "Check",
 		"filePath": "library/check.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-down",
 		"label": "Chevron Down",
 		"filePath": "library/chevron-down.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-down-small",
 		"label": "Chevron Down Small",
 		"filePath": "library/chevron-down-small.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-left",
 		"label": "Chevron Left",
 		"filePath": "library/chevron-left.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-left-small",
 		"label": "Chevron Left Small",
 		"filePath": "library/chevron-left-small.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-right",
 		"label": "Chevron Right",
 		"filePath": "library/chevron-right.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-right-small",
 		"label": "Chevron Right Small",
 		"filePath": "library/chevron-right-small.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-up",
 		"label": "Chevron Up",
 		"filePath": "library/chevron-up.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-up-down",
 		"label": "Chevron Up Down",
 		"filePath": "library/chevron-up-down.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "chevron-up-small",
 		"label": "Chevron Up Small",
 		"filePath": "library/chevron-up-small.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "classic",
@@ -374,7 +374,7 @@
 		"slug": "comment",
 		"label": "Comment",
 		"filePath": "library/comment.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "comment-author-avatar",
@@ -445,13 +445,13 @@
 		"slug": "cover",
 		"label": "Cover",
 		"filePath": "library/cover.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "create",
 		"label": "Create",
 		"filePath": "library/create.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "contents",
@@ -497,7 +497,7 @@
 		"slug": "desktop",
 		"label": "Desktop",
 		"filePath": "library/desktop.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "details",
@@ -508,7 +508,7 @@
 		"slug": "download",
 		"label": "Download",
 		"filePath": "library/download.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "drafts",
@@ -524,37 +524,37 @@
 		"slug": "drawer-left",
 		"label": "Drawer Left",
 		"filePath": "library/drawer-left.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "drawer-right",
 		"label": "Drawer Right",
 		"filePath": "library/drawer-right.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "envelope",
 		"label": "Envelope",
 		"filePath": "library/envelope.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "error",
 		"label": "Error",
 		"filePath": "library/error.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "external",
 		"label": "External",
 		"filePath": "library/external.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "file",
 		"label": "File",
 		"filePath": "library/file.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "filter",
@@ -680,7 +680,7 @@
 		"slug": "gallery",
 		"label": "Gallery",
 		"filePath": "library/gallery.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "gift",
@@ -701,7 +701,7 @@
 		"slug": "group",
 		"label": "Group",
 		"filePath": "library/group.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "handle",
@@ -717,7 +717,7 @@
 		"slug": "heading",
 		"label": "Heading",
 		"filePath": "library/heading.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "heading-level-1",
@@ -753,7 +753,7 @@
 		"slug": "help",
 		"label": "Help",
 		"filePath": "library/help.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "help-filled",
@@ -764,7 +764,7 @@
 		"slug": "home",
 		"label": "Home",
 		"filePath": "library/home.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "home-button",
@@ -780,7 +780,7 @@
 		"slug": "image",
 		"label": "Image",
 		"filePath": "library/image.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "inbox",
@@ -791,7 +791,7 @@
 		"slug": "info",
 		"label": "Info",
 		"filePath": "library/info.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "insert-after",
@@ -862,7 +862,7 @@
 		"slug": "key",
 		"label": "Key",
 		"filePath": "library/key.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "keyboard",
@@ -883,7 +883,7 @@
 		"slug": "language",
 		"label": "Language",
 		"filePath": "library/language.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "layout",
@@ -969,7 +969,7 @@
 		"slug": "map-marker",
 		"label": "Map Marker",
 		"filePath": "library/map-marker.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "math",
@@ -995,13 +995,13 @@
 		"slug": "menu",
 		"label": "Menu",
 		"filePath": "library/menu.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "mobile",
 		"label": "Mobile",
 		"filePath": "library/mobile.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "more",
@@ -1012,13 +1012,13 @@
 		"slug": "more-horizontal",
 		"label": "More Horizontal",
 		"filePath": "library/more-horizontal.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "more-vertical",
 		"label": "More Vertical",
 		"filePath": "library/more-vertical.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "move-to",
@@ -1039,7 +1039,7 @@
 		"slug": "next",
 		"label": "Next",
 		"filePath": "library/next.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "not-allowed",
@@ -1080,19 +1080,19 @@
 		"slug": "paragraph",
 		"label": "Paragraph",
 		"filePath": "library/paragraph.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "payment",
 		"label": "Payment",
 		"filePath": "library/payment.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "pencil",
 		"label": "Pencil",
 		"filePath": "library/pencil.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "pending",
@@ -1103,7 +1103,7 @@
 		"slug": "people",
 		"label": "People",
 		"filePath": "library/people.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "percent",
@@ -1129,13 +1129,13 @@
 		"slug": "plus",
 		"label": "Plus",
 		"filePath": "library/plus.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "plus-circle",
 		"label": "Plus Circle",
 		"filePath": "library/plus-circle.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "plus-circle-filled",
@@ -1226,13 +1226,13 @@
 		"slug": "previous",
 		"label": "Previous",
 		"filePath": "library/previous.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "published",
 		"label": "Published",
 		"filePath": "library/published.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "pull-left",
@@ -1273,13 +1273,13 @@
 		"slug": "quote",
 		"label": "Quote",
 		"filePath": "library/quote.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "receipt",
 		"label": "Receipt",
 		"filePath": "library/receipt.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "redo",
@@ -1335,19 +1335,19 @@
 		"slug": "rss",
 		"label": "RSS",
 		"filePath": "library/rss.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "scheduled",
 		"label": "Scheduled",
 		"filePath": "library/scheduled.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "search",
 		"label": "Search",
 		"filePath": "library/search.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "seen",
@@ -1368,25 +1368,25 @@
 		"slug": "settings",
 		"label": "Settings",
 		"filePath": "library/settings.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "shadow",
 		"label": "Shadow",
 		"filePath": "library/shadow.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "share",
 		"label": "Share",
 		"filePath": "library/share.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "shield",
 		"label": "Shield",
 		"filePath": "library/shield.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "shipping",
@@ -1402,7 +1402,7 @@
 		"slug": "shuffle",
 		"label": "Shuffle",
 		"filePath": "library/shuffle.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "sidebar",
@@ -1468,25 +1468,25 @@
 		"slug": "star-empty",
 		"label": "Star Empty",
 		"filePath": "library/star-empty.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "star-filled",
 		"label": "Star Filled",
 		"filePath": "library/star-filled.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "star-half",
 		"label": "Star Half",
 		"filePath": "library/star-half.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "store",
 		"label": "Store",
 		"filePath": "library/store.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "stretch-full-width",
@@ -1502,7 +1502,7 @@
 		"slug": "styles",
 		"label": "Styles",
 		"filePath": "library/styles.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "subscript",
@@ -1523,19 +1523,19 @@
 		"slug": "symbol",
 		"label": "Symbol",
 		"filePath": "library/symbol.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "symbol-filled",
 		"label": "Symbol Filled",
 		"filePath": "library/symbol-filled.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "table",
 		"label": "Table",
 		"filePath": "library/table.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "table-column-after",
@@ -1576,7 +1576,7 @@
 		"slug": "tablet",
 		"label": "Tablet",
 		"filePath": "library/tablet.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "tab",
@@ -1602,7 +1602,7 @@
 		"slug": "tag",
 		"label": "Tag",
 		"filePath": "library/tag.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "term-count",
@@ -1653,7 +1653,7 @@
 		"slug": "tip",
 		"label": "Tip",
 		"filePath": "library/tip.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "title",
@@ -1714,13 +1714,13 @@
 		"slug": "upload",
 		"label": "Upload",
 		"filePath": "library/upload.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "verse",
 		"label": "Verse",
 		"filePath": "library/verse.svg",
-		"public": true
+		"showInRest": true
 	},
 	{
 		"slug": "video",
