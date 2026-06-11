@@ -21,6 +21,7 @@ const stories = [
 	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
 	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+	'../packages/editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
@@ -33,6 +34,7 @@ const stories = [
 	'../packages/theme/src/**/stories/*.mdx',
 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
 	'../packages/grid/src/**/stories/*.story.@(ts|tsx)',
+	'../routes/dashboard/**/stories/*.story.@(ts|tsx)',
 	'../packages/ui/src/**/stories/*.mdx',
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 	'../packages/admin-ui/src/**/stories/*.story.@(ts|tsx)',
@@ -56,7 +58,7 @@ const config: StorybookConfig = {
 	],
 	framework: '@storybook/react-vite',
 	features: {
-		experimentalComponentsManifest: NODE_ENV === 'production',
+		experimentalComponentsManifest: NODE_ENV !== 'development',
 	},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',

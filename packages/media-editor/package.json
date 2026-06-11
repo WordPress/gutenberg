@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-editor",
-	"version": "0.7.0",
+	"version": "0.11.0",
 	"description": "Media editor components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,7 +34,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
@@ -44,21 +43,31 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/date": "file:../date",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interface": "file:../interface",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1",
 		"gl-matrix": "^3.4.3"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

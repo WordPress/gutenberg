@@ -1,0 +1,190 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// Default to WordPress core's admin theme blue when the host hasn't
+// set `--wp-admin-theme-color` (e.g. inside Storybook). Hosts that do
+// set it (the media modal, the editor) will override this with their
+// theme.
+$rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
+
+// Vertical layout (top → bottom):
+//   0–14:  label row (translates with strip; active label sits centered)
+//   14–32: tick lines (anchored to strip bottom)
+//   14–32: pointer line (overlays the tick area at center)
+.rotation-ruler {
+	position: relative;
+	min-width: 180px;
+	height: 32px;
+	padding: 0 $grid-unit-10;
+	box-sizing: border-box;
+	color: $gray-900;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	user-select: none;
+	touch-action: none;
+	cursor: ew-resize;
+	// Always declare the container so the inline-size query below can
+	// match. Cheap; only affects layout if a child uses cqw/cqh.
+	container-type: inline-size;
+
+	&[data-disabled] {
+		opacity: 0.5;
+		pointer-events: none;
+		cursor: default;
+	}
+
+	&:has(.rotation-ruler__input:focus-visible) {
+		outline: 2px solid $rotation-ruler-accent;
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+}
+
+// Visually hidden but kept in layout so it's focusable.
+.rotation-ruler__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0 0 0 0);
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+// Thin vertical line marking the centered value. Spans the tick area
+// so it reads as a precise reference line over the ruler graduations
+// without competing with the active label above.
+.rotation-ruler__pointer {
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 2px;
+	height: 18px;
+	background: $rotation-ruler-accent;
+	border-radius: 1px;
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+
+.rotation-ruler__strip {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	// Fade ticks/labels toward each edge so the strip looks like a
+	// continuous ruler running off-screen rather than a strip with hard
+	// cut-offs.
+	mask-image: linear-gradient(to right, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+	-webkit-mask-image: linear-gradient(to right, transparent 0, #000 8px, #000 calc(100% - 8px), transparent 100%);
+}
+
+.rotation-ruler__ticks {
+	position: absolute;
+	// The tick offset is applied as a JS-set inline `transform: translateX()`
+	// (see rotation-ruler/index.tsx), which rtlcss can't mirror. If rtlcss
+	// flipped this `left` to `right`, the anchor and the transform would
+	// disagree and the ticks would render off-screen in RTL. Keep it `left`
+	// so the two stay in sync; the strip is a symmetric number line anyway.
+	/*rtl:ignore*/
+	left: 50%;
+	top: 0;
+	display: block;
+	// Allow text glyphs at the SVG's left/right edges to render outside
+	// the SVG box; the strip's `overflow: hidden` still clips at its
+	// own edges, which is what we want.
+	overflow: visible;
+}
+
+.rotation-ruler__tick {
+	stroke: currentColor;
+	stroke-width: 1;
+
+	&--minor {
+		opacity: 0.35;
+	}
+
+	&--mid {
+		opacity: 0.6;
+	}
+
+	&--major {
+		opacity: 1;
+	}
+}
+
+// Major-tick labels live inside the SVG and translate with the strip.
+.rotation-ruler__label {
+	fill: currentColor;
+	font-size: 10px;
+	font-weight: 400;
+	opacity: 0.45;
+}
+
+// Active label is a fixed-center HTML element so it stays steady at the
+// pointer while the SVG behind it transitions smoothly. The label box
+// is sized to the number alone — the unit is positioned absolutely so
+// it does not influence centering — and a fixed-width ::before
+// pseudo-element provides the grey-fading-to-transparent mask (matching
+// the canvas/ruler surface) that occludes the static labels directly
+// behind.
+.rotation-ruler__active-label {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	height: 14px;
+	transform: translateX(-50%);
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 14px;
+	color: $gray-900;
+	pointer-events: none;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 50%;
+		width: 60px;
+		height: 100%;
+		transform: translateX(-50%);
+		background: linear-gradient(to right, transparent 0, $gray-200 12px, $gray-200 calc(100% - 12px), transparent 100%);
+	}
+}
+
+// The number drives the centering: the label box's width equals the
+// number's width, so `transform: translateX(-50%)` on the label
+// centers the digits on the marker.
+.rotation-ruler__active-label-number {
+	position: relative;
+	display: inline-block;
+}
+
+// Sign sits flush to the left of the number (mirror of the unit).
+// Rendered only for negative values, and removed from flow so the
+// leading `-` does not nudge the digits off the marker line.
+.rotation-ruler__active-label-sign {
+	position: absolute;
+	top: 0;
+	right: 100%;
+}
+
+// Unit sits flush to the right of the number, out of normal flow so
+// it contributes no width to the label box.
+.rotation-ruler__active-label-unit {
+	position: absolute;
+	top: 0;
+	left: 100%;
+}
+
+// Below ~220px container width, fade out 1° ticks; mid/major remain.
+@container (max-width: 220px) {
+	.rotation-ruler__tick--minor {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rotation-ruler__ticks {
+		transition: none;
+	}
+}

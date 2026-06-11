@@ -4,7 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
+const { randomUUID } = require( 'crypto' );
 
 /**
  * WordPress dependencies
@@ -232,7 +232,7 @@ class ImageBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const extension = customFile ? path.extname( customFile ) : '.png';
 		const tmpFileName = path.join( tmpDirectory, fileName + extension );
 		const filePath = customFile

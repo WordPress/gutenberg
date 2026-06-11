@@ -174,7 +174,9 @@ export const FreeCompositionComponent = () => {
 						No planets
 					</WCText>
 					<WCText variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</WCText>
-					<Button variant="secondary">Create new planet</Button>
+					<Button variant="secondary" __next40pxDefaultSize>
+						Create new planet
+					</Button>
 				</Stack>
 			}
 		>
