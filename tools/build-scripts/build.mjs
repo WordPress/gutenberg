@@ -85,17 +85,29 @@ async function build() {
 	const startTime = Date.now();
 
 	try {
-		// Step 0: Verify node_modules is in sync with package-lock.json
-		console.log( '🔍 Checking dependencies...' );
-		await exec( 'npm', [
-			'run',
-			'check-installed-deps',
-			'--workspace',
-			'@wordpress/validation-tools',
-			'--silent',
-		] ).catch( () => {
-			throw new Error( 'Run `npm install` to update.' );
-		} );
+		/*
+		 * Step 0: Verify node_modules is in sync with package-lock.json.
+		 *
+		 * GUTENBERG_CHECK_INSTALLED_DEPS controls when this runs:
+		 *   - `BEFORE_BUILD` (default): pre-build gate.
+		 *   - `NEVER`: skip entirely (sticky opt-out for power users).
+		 */
+		if ( process.env.GUTENBERG_CHECK_INSTALLED_DEPS === 'NEVER' ) {
+			console.log(
+				'🔍 Skipping dependency check (GUTENBERG_CHECK_INSTALLED_DEPS=NEVER).'
+			);
+		} else {
+			console.log( '🔍 Checking dependencies...' );
+			await exec( 'npm', [
+				'run',
+				'check-installed-deps',
+				'--workspace',
+				'@wordpress/validation-tools',
+				'--silent',
+			] ).catch( () => {
+				throw new Error( 'Run `npm install` to update.' );
+			} );
+		}
 
 		console.log( '\n🧹 Cleaning packages...' );
 		await exec( 'npm', [ 'run', 'clean:packages' ], { silent: true } );

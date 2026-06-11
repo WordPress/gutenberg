@@ -42,7 +42,7 @@ export const stylebookRoute = {
 				/>
 			) : undefined;
 		},
-		mobile( { siteData } ) {
+		mobileContent( { siteData } ) {
 			return isClassicThemeWithStyleBookSupport( siteData ) ? (
 				<StyleBookPreview
 					isStatic
