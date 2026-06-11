@@ -59,12 +59,12 @@ function gutenberg_enable_form_input_blocks() {
 function gutenberg_enable_block_experiments() {
 	// Experimental form blocks.
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-form-blocks' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableFormBlocks = true', 'before' );
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableFormBlocks = true', 'before' );
 	}
 
 	// General experimental blocks that are not in the default block library.
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-block-experiments' ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockExperiments = true', 'before' );
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalEnableBlockExperiments = true', 'before' );
 	}
 }
 

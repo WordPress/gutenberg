@@ -53,6 +53,7 @@
 		"./playlist/view": "./build-module/playlist/view.mjs",
 		"./query/view": "./build-module/query/view.mjs",
 		"./search/view": "./build-module/search/view.mjs",
+		"./slider/view": "./build-module/slider/view.mjs",
 		"./tabs/view": "./build-module/tabs/view.mjs"
 	},
 	"wpStyleEntryPoints": [
