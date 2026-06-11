@@ -1,0 +1,67 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slider",
+	"title": "Slider",
+	"category": "design",
+	"description": "Display content in a carousel.",
+	"textdomain": "default",
+	"allowedBlocks": [ "core/slide" ],
+	"attributes": {
+		"peekAmount": {
+			"type": "number",
+			"default": 32
+		},
+		"peekUnit": {
+			"type": "string",
+			"default": "px"
+		},
+		"editorActiveSlideIndex": {
+			"type": "number",
+			"role": "local"
+		}
+	},
+	"providesContext": {
+		"core/slider-editorActiveSlideIndex": "editorActiveSlideIndex"
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"anchor": true,
+		"html": false,
+		"interactivity": true,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"spacing": {
+			"blockGap": true,
+			"margin": [ "top", "bottom" ],
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"renaming": true
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style-index.css",
+	"viewScriptModule": "@wordpress/block-library/slider/view"
+}

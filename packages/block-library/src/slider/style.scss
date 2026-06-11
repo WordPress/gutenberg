@@ -1,0 +1,122 @@
+.wp-block-slider {
+	--wp--style--slider-peek: 32px;
+	--wp--style--slider-peek-double: 64px;
+	--slider-gap: var(--wp--style--slider-gap, var(--wp--style--block-gap, 0));
+	--slider-gap-double: calc(var(--slider-gap) + var(--slider-gap));
+	--slider-edge-space: calc(var(--wp--style--slider-peek) + var(--slider-gap));
+	--slider-slide-size: calc(100% - var(--wp--style--slider-peek-double) - var(--slider-gap-double));
+
+	box-sizing: border-box;
+}
+
+.wp-block-slider__viewport {
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-padding-inline: var(--slider-edge-space);
+	scroll-snap-type: x mandatory;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.wp-block-slider__track {
+	display: flex;
+	align-items: stretch;
+	gap: var(--slider-gap);
+	inline-size: 100%;
+}
+
+.wp-block-slider__track::before,
+.wp-block-slider__track::after {
+	content: "";
+	flex: 0 0 var(--wp--style--slider-peek);
+}
+
+.wp-block-slider__track:has(> .wp-block-slide:only-child)::before,
+.wp-block-slider__track:has(> .wp-block-slide:only-child)::after {
+	content: none;
+}
+
+.wp-block-slider__track > .wp-block-slide {
+	flex: 0 0 var(--slider-slide-size);
+	scroll-snap-align: start;
+}
+
+.wp-block-slider__track > .wp-block-slide:only-child {
+	flex-basis: 100%;
+}
+
+.wp-block-slider__controls {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	margin-block-start: 14px;
+}
+
+.wp-block-slider__arrow {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 36px;
+	block-size: 36px;
+	padding: 0;
+	border: 1px solid currentColor;
+	border-radius: 999px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	line-height: 1;
+	cursor: pointer;
+	transition:
+		background-color 160ms ease,
+		color 160ms ease,
+		opacity 160ms ease;
+}
+
+.wp-block-slider__arrow:not(:disabled):hover {
+	opacity: 0.72;
+}
+
+.wp-block-slider__arrow:disabled {
+	cursor: default;
+	opacity: 0.35;
+}
+
+.wp-block-slider__dots {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-inline-size: 58px;
+	block-size: 16px;
+}
+
+.wp-block-slider__dot {
+	display: block;
+	inline-size: 0;
+	block-size: 6px;
+	margin-inline: 0;
+	border-radius: 999px;
+	background: currentColor;
+	opacity: 0;
+	transform: scale(0.6);
+	transition:
+		inline-size 180ms ease,
+		margin-inline 180ms ease,
+		opacity 180ms ease,
+		transform 180ms ease;
+}
+
+.wp-block-slider__dot.is-visible {
+	inline-size: 6px;
+	margin-inline: 4px;
+	opacity: 0.45;
+	transform: scale(1);
+}
+
+.wp-block-slider__dot.is-active {
+	inline-size: 18px;
+	opacity: 1;
+}

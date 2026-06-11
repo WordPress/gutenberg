@@ -1,0 +1,23 @@
+.wp-block-slide {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	min-inline-size: 0;
+	min-block-size: 100%;
+}
+
+.wp-block-slide > * {
+	inline-size: 100%;
+}
+
+.wp-block-slide > *:first-child {
+	margin-block-start: 0;
+}
+
+.wp-block-slide > *:last-child {
+	margin-block-end: 0;
+}
+
+.wp-block-slide.has-background {
+	padding: var(--wp--preset--spacing--40);
+}
