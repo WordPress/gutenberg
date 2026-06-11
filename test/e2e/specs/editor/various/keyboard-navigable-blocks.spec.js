@@ -115,8 +115,29 @@ class KeyboardNavigableBlocks {
 
 	async expectLabelToHaveFocus( label ) {
 		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
+			const doc = document.activeElement.contentDocument ?? document;
+			let { activeElement } = doc;
+			// When a focused editing host owns the selection, the editable
+			// element containing the selection owns the focus.
+			const { anchorNode, focusNode } = doc.defaultView.getSelection();
+			if (
+				activeElement.isContentEditable &&
+				anchorNode &&
+				activeElement.contains( anchorNode )
+			) {
+				const editable = (
+					anchorNode.nodeType === anchorNode.ELEMENT_NODE
+						? anchorNode
+						: anchorNode.parentElement
+				).closest( '[contenteditable="true"]' );
+				if (
+					editable &&
+					editable !== activeElement &&
+					editable.contains( focusNode )
+				) {
+					activeElement = editable;
+				}
+			}
 			return (
 				activeElement.getAttribute( 'aria-label' ) ||
 				activeElement.innerText
