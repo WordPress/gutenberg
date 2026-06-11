@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `placeCaretAtEdge`: only place a caret when the container is itself an editable element, not when it merely inherits content editability from an editing host ancestor ([#79105](https://github.com/WordPress/gutenberg/pull/79105)).
+
 ## 4.50.0 (2026-07-01)
 
 ## 4.49.0 (2026-06-24)
