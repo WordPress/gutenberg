@@ -20,6 +20,7 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../media-fields" },
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../primitives" },
