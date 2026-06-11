@@ -3,12 +3,10 @@
  */
 import { useMemo, useContext } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
 import Edit from './edit';
 import {
 	BlockEditContextProvider,
@@ -23,7 +21,6 @@ import {
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
 import { PrivateBlockContext } from '../block-list/private-block-context';
-import { unlock } from '../../lock-unlock';
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -58,20 +55,10 @@ export default function BlockEdit( {
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
 	const parentBlockEditContext = useBlockEditContext();
-	const typeHasListViewSupport =
-		hasBlockSupport( name, 'listView' ) || name === 'core/navigation';
-	const participatesInListView = useSelect(
-		( select ) =>
-			typeHasListViewSupport
-				? unlock( select( blockEditorStore ) ).hasBlockListViewSupport(
-						clientId
-				  )
-				: false,
-		[ clientId, typeHasListViewSupport ]
-	);
 	const isInListViewBlockSupportTree =
 		!! parentBlockEditContext[ isInListViewBlockSupportTreeKey ] ||
-		participatesInListView;
+		hasBlockSupport( name, 'listView' ) ||
+		name === 'core/navigation';
 	const { originalBlockClientId } = useContext( PrivateBlockContext );
 
 	return (
