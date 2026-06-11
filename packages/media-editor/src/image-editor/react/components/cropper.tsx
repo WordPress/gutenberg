@@ -557,8 +557,10 @@ function CropperInner(
 			// covers at the current zoom. Otherwise enforceContainment zooms the
 			// image in to cover it — at a fine rotation that's a confusing
 			// zoom-in with no net change (the crop is already at the image
-			// bounds). When there's bleed (zoomed in), the grown rect already
-			// fits, so the drag-out-to-zoom-out path is unaffected.
+			// bounds). Only the growing edges are clamped, so a diagonal corner
+			// drag that shrinks one edge while growing another still tracks the
+			// shrinking edge. When there's bleed (zoomed in), the grown rect
+			// already fits, so the drag-out-to-zoom-out path is unaffected.
 			const rect =
 				naturalWidth > 0 && naturalHeight > 0
 					? restrictCropGrowth(
@@ -742,10 +744,13 @@ function CropperInner(
 			maxHeight: elementSize.height,
 			left: centerX,
 			top: centerY,
-			transform:
-				viewScale !== 1
-					? `scale(${ viewScale }) ${ transformString }`
-					: transformString,
+			// Always lead with `scale()` (identity at rest) so the transform's
+			// function list stays structurally constant across rest, resize, and
+			// settle. A conditional that dropped `scale()` at viewScale === 1
+			// would change the list shape exactly when the settle transition
+			// crosses 1:1, forcing the browser to fall back to matrix-decomposition
+			// interpolation instead of interpolating each function in turn.
+			transform: `scale(${ viewScale }) ${ transformString }`,
 			transition: imageTransition,
 			imageRendering: displayScale > 1 ? 'pixelated' : undefined,
 		};

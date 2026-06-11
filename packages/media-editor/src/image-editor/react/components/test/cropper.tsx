@@ -480,7 +480,8 @@ describe( 'Cropper', () => {
 	};
 
 	// The view-scale magnification is folded into the image's transform as a
-	// leading `scale(...)`; with viewScale 1 the transform is just the matrix.
+	// leading `scale(...)`, always present (identity `scale(1)` at rest) so the
+	// transform's function list stays structurally constant for transitions.
 	function imageScale(): number {
 		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
 		const match = img.style.transform.match( /^scale\(\s*([\d.]+)/ );
@@ -513,7 +514,7 @@ describe( 'Cropper', () => {
 		};
 		render( <Cropper src="tall.jpg" controller={ controller } /> );
 
-		// viewScale = 1, so the transform carries no magnification scale.
+		// viewScale = 1, so the leading scale is identity (no magnification).
 		expect( imageScale() ).toBe( 1 );
 	} );
 
