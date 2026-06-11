@@ -54,12 +54,12 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 
 			foreach ( $collection as $icon_name => $icon_data ) {
 				if (
-					empty( $icon_data['file_path'] )
-					|| ! is_string( $icon_data['file_path'] )
+					empty( $icon_data['filePath'] )
+					|| ! is_string( $icon_data['filePath'] )
 				) {
 					_doing_it_wrong(
 						__METHOD__,
-						__( 'Core icon collection manifest must provide valid a "file_path" for each icon.', 'gutenberg' ),
+						__( 'Core icon collection manifest must provide valid a "filePath" for each icon.', 'gutenberg' ),
 						'7.0.0'
 					);
 					return;
@@ -69,7 +69,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					'core/' . $icon_name,
 					array(
 						'label'     => $icon_data['label'],
-						'file_path' => $icons_directory . $icon_data['file_path'],
+						'file_path' => $icons_directory . $icon_data['filePath'],
 					)
 				);
 			}
