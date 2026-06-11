@@ -245,6 +245,17 @@ export const registerPostTypeSchema =
 
 		if ( postType === ATTACHMENT_POST_TYPE ) {
 			fields = ORDERED_MEDIA_FIELDS;
+		} else if ( postType === 'page' ) {
+			// Page fields are provided by the `core/page-fields` field
+			// collection registered server-side, except the content preview
+			// field: its render depends on editor internals (EditorProvider,
+			// global styles, the editor store) that the collection's script
+			// module in `@wordpress/fields` cannot import.
+			fields = [
+				postTypeConfig.supports?.editor &&
+					postTypeConfig.viewable &&
+					postPreviewField,
+			].filter( Boolean );
 		} else {
 			fields = [
 				postTypeConfig.supports?.thumbnail &&
@@ -278,9 +289,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.viewable &&
 					postPreviewField,
 			].filter( Boolean );
-			// The page title field is provided by the `core/page-fields`
-			// field collection registered server-side.
-			if ( postTypeConfig.supports?.title && postType !== 'page' ) {
+			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
 				if ( postType === 'wp_template' ) {
 					_titleField = templateTitleField;
