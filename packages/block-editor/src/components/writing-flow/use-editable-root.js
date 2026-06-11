@@ -55,15 +55,7 @@ export default function useEditableRoot() {
 
 	return useRefEffect(
 		( node ) => {
-			// Only a canvas in its own (iframed) document may become an
-			// editing host: in non-iframed editors (e.g. the widgets
-			// screens) the wrapper is an ordinary element within the admin
-			// page, and making it an editing host holding focus interferes
-			// with the surrounding page (tab order, focus driven UI, key
-			// events bubbling without a document boundary).
-			const isIframedCanvas = node.ownerDocument !== document;
-
-			if ( supportsEditableRoot && ! isZoomOut() && isIframedCanvas ) {
+			if ( supportsEditableRoot && ! isZoomOut() ) {
 				if ( node.getAttribute( 'contenteditable' ) !== 'true' ) {
 					node.setAttribute( 'contenteditable', 'true' );
 
