@@ -135,6 +135,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Omnipresent Toolbar', 'gutenberg' ),
 					'description' => __( 'Improves the toolbar as navigation layer, including showing the toolbar in the fullscreen Post and Site Editor.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-react-19',
+					'label'       => __( 'React 19', 'gutenberg' ),
+					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
+				),
 			),
 		),
 	);
