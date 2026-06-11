@@ -9,7 +9,7 @@ describe( 'getAdminThemeColors', () => {
 
 		expect( getAdminThemeColors() ).toEqual( {
 			primary: '#916745',
-			bg: '#5b534d',
+			background: '#5b534d',
 		} );
 	} );
 
@@ -18,7 +18,7 @@ describe( 'getAdminThemeColors', () => {
 
 		expect( getAdminThemeColors() ).toEqual( {
 			primary: '#3858e9',
-			bg: '#25292b',
+			background: '#25292b',
 		} );
 	} );
 
@@ -27,7 +27,7 @@ describe( 'getAdminThemeColors', () => {
 
 		expect( getAdminThemeColors() ).toEqual( {
 			primary: '#3858e9',
-			bg: '#25292b',
+			background: '#25292b',
 		} );
 	} );
 } );

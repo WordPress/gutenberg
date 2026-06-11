@@ -5,7 +5,7 @@
 @use "./components/layout/style.scss" as *;
 @use "./components/meta-boxes/meta-boxes-area/style.scss" as *;
 @use "./components/welcome-guide/style.scss" as *;
-@use "./experimental-admin-bar-in-editor.scss" as *;
+@use "./experimental-omnibar.scss" as *;
 
 body.js.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );

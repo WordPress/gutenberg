@@ -22,7 +22,6 @@ const packagePathCache = new Map();
  * @property {string}                 [license]               Package license.
  * @property {string}                 [main]                  Main entry point.
  * @property {string}                 [module]                ES module entry point.
- * @property {string}                 [react-native]          React Native entry point.
  * @property {Record<string, string>} [dependencies]          Runtime dependencies.
  * @property {Record<string, string>} [devDependencies]       Development dependencies.
  * @property {Record<string, string>} [peerDependencies]      Peer dependencies.

@@ -22,7 +22,7 @@
 	"type": "module",
 	"dependencies": {
 		"@emotion/babel-plugin": "^11.13.5",
-		"@typescript/native-preview": "7.0.0-dev.20260423.1",
+		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
 		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
 		"@wordpress/build": "file:../../packages/wp-build",
 		"@wordpress/scripts": "file:../../packages/scripts",
@@ -31,8 +31,8 @@
 		"cross-spawn": "^7.0.6",
 		"esbuild": "^0.27.2",
 		"fast-glob": "^3.2.7",
-		"react": "^18.3.0",
-		"react-dom": "^18.3.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
 		"source-map": "^0.6.1"
 	},
 	"publishConfig": {
