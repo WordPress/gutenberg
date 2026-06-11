@@ -50,7 +50,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 * Invokes WP_Icons_Registry_Gutenberg::register despite it being private
 	 *
 	 * @param string $icon_name       Icon name (without namespace prefix).
-	 * @param array  $icon_properties Icon properties (label, content, filePath, collection).
+	 * @param array  $icon_properties Icon properties (label, content, file_path, collection).
 	 * @return bool True if the icon was registered successfully.
 	 */
 	private function register( $icon_name, $icon_properties ) {

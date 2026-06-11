@@ -19,9 +19,9 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *     @type string $collection Optional. The slug of a registered icon collection that this icon belongs to.
 	 *                              Defaults to "core" when omitted.
 	 *     @type string $content    Optional. SVG markup for the icon.
-	 *                              If not provided, the content will be retrieved from the `filePath` if set.
-	 *                              If both `content` and `filePath` are not set, the icon will not be registered.
-	 *     @type string $filePath   Optional. The full path to the file containing the icon content.
+	 *                              If not provided, the content will be retrieved from the `file_path` if set.
+	 *                              If both `content` and `file_path` are not set, the icon will not be registered.
+	 *     @type string $file_path  Optional. The full path to the file containing the icon content.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
@@ -53,7 +53,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$allowed_keys = array_fill_keys( array( 'label', 'content', 'filePath', 'collection' ), 1 );
+		$allowed_keys = array_fill_keys( array( 'label', 'content', 'file_path', 'collection' ), 1 );
 		foreach ( array_keys( $icon_properties ) as $key ) {
 			if ( ! array_key_exists( $key, $allowed_keys ) ) {
 				_doing_it_wrong(
@@ -103,12 +103,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		}
 
 		if (
-			( ! isset( $icon_properties['content'] ) && ! isset( $icon_properties['filePath'] ) ) ||
-			( isset( $icon_properties['content'] ) && isset( $icon_properties['filePath'] ) )
+			( ! isset( $icon_properties['content'] ) && ! isset( $icon_properties['file_path'] ) ) ||
+			( isset( $icon_properties['content'] ) && isset( $icon_properties['file_path'] ) )
 		) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icons must provide either `content` or `filePath`.', 'gutenberg' ),
+				__( 'Icons must provide either `content` or `file_path`.', 'gutenberg' ),
 				'7.0.0'
 			);
 			return false;
@@ -251,8 +251,8 @@ function gutenberg_override_wp_icons_registry() {
 			$icon_properties = array( 'label' => $icon['label'] );
 			if ( ! empty( $icon['content'] ) ) {
 				$icon_properties['content'] = $icon['content'];
-			} elseif ( ! empty( $icon['filePath'] ) ) {
-				$icon_properties['filePath'] = $icon['filePath'];
+			} elseif ( ! empty( $icon['file_path'] ) ) {
+				$icon_properties['file_path'] = $icon['file_path'];
 			} else {
 				continue;
 			}
