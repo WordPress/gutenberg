@@ -141,8 +141,16 @@ export function getClosestTabbable(
 			return false;
 		}
 
-		// Skip focusable elements such as links within content editable nodes.
-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+		// Skip focusable elements such as links within content editable
+		// nodes: nodes whose closest editable host is an editable element
+		// within a block. When an editable root (e.g. the canvas wrapper)
+		// is the editing host, everything within it is content editable,
+		// but focusables like block wrappers are not text content.
+		if (
+			node.isContentEditable &&
+			node.contentEditable !== 'true' &&
+			getBlockClientId( node.closest( '[contenteditable="true"]' ) )
+		) {
 			return false;
 		}
 
