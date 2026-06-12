@@ -87,3 +87,80 @@ CSS;
 
 add_action( 'wp_enqueue_scripts', 'gutenberg_omnibar_site_icon_styles' );
 add_action( 'admin_enqueue_scripts', 'gutenberg_omnibar_site_icon_styles' );
+
+/**
+ * Replaces the 26px avatar in the admin bar my-account item with a 28px one.
+ *
+ * Backports https://github.com/WordPress/wordpress-develop/pull/11799.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
+ */
+function gutenberg_omnibar_user_avatar( $wp_admin_bar ) {
+	if (
+		! is_admin_bar_showing() ||
+		! gutenberg_is_experiment_enabled( 'gutenberg-omnibar' )
+	) {
+		return;
+	}
+
+	$node    = $wp_admin_bar->get_node( 'my-account' );
+	$user_id = get_current_user_id();
+	if ( ! $node || ! $user_id ) {
+		return;
+	}
+
+	$old_avatar = get_avatar( $user_id, 26 );
+	$new_avatar = get_avatar( $user_id, 28 );
+	if ( ! $old_avatar || ! $new_avatar ) {
+		return;
+	}
+
+	$wp_admin_bar->add_node(
+		array(
+			'id'    => 'my-account',
+			'title' => str_replace( $old_avatar, $new_avatar, $node->title ),
+		)
+	);
+}
+
+add_action( 'admin_bar_menu', 'gutenberg_omnibar_user_avatar', 9992 );
+
+/**
+ * Adds the styles that make the admin bar user avatar circular.
+ *
+ * Backports https://github.com/WordPress/wordpress-develop/pull/11799.
+ */
+function gutenberg_omnibar_user_avatar_styles() {
+	if (
+		! is_admin_bar_showing() ||
+		! gutenberg_is_experiment_enabled( 'gutenberg-omnibar' )
+	) {
+		return;
+	}
+
+	$css = <<<CSS
+#wpadminbar #wp-admin-bar-user-info .avatar {
+	border-radius: 50%;
+}
+
+#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-empty-item img,
+#wpadminbar #wp-admin-bar-my-account.with-avatar > a img {
+	height: 20px;
+	border-radius: 50%;
+}
+
+@media screen and (max-width: 782px) {
+	#wpadminbar .quicklinks li#wp-admin-bar-my-account.with-avatar > a img {
+		top: 12px;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+	}
+}
+CSS;
+
+	wp_add_inline_style( 'admin-bar', $css );
+}
+
+add_action( 'wp_enqueue_scripts', 'gutenberg_omnibar_user_avatar_styles' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_omnibar_user_avatar_styles' );
