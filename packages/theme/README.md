@@ -67,7 +67,7 @@ Design tokens are the visual design atoms of a design system. They are named ent
 
 Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
 
-For more information about how design tokens are implemented, you'll find additional documentation in [`tokens/README.md`](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
+For more information about how design tokens are implemented, see [`tokens/README.md`](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
 
 ## Theme Provider
 
