@@ -14,15 +14,14 @@ import type { Size } from '../types';
 
 describe( 'getMinCropPixels — operable on-screen floor', () => {
 	it( 'returns the source-pixel hard floor when the image is shown large enough', () => {
-		// displayScale = 2 CSS px per source px (zoomed in). The usability
-		// term is 44 / 2 = 22 px, below the 24-source-px hard floor, so the
-		// hard floor wins.
-		expect( getMinCropPixels( 2 ) ).toBe( MIN_CROP_PIXELS );
+		const displayScale = ( MIN_CROP_SCREEN_PX / MIN_CROP_PIXELS ) * 1.1;
+
+		expect( getMinCropPixels( displayScale ) ).toBe( MIN_CROP_PIXELS );
 	} );
 
 	it( 'raises the floor so the crop stays operable when the image is shown small', () => {
 		// A large image fit into a small window: ~0.2 CSS px per source px.
-		// 24 source px would render as ~4.8 px on screen — unusable. The
+		// The source-pixel floor would render too small on screen. The
 		// usability term (44 / 0.2 = 220 source px) must win.
 		expect( getMinCropPixels( 0.2 ) ).toBeCloseTo(
 			MIN_CROP_SCREEN_PX / 0.2,

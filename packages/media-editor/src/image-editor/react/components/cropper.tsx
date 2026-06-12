@@ -48,6 +48,7 @@ import { GridOverlay } from './overlays/grid-overlay';
 import { DimensionsOverlay } from './overlays/dimensions-overlay';
 import {
 	getSourceRegion,
+	snapCropRectToSourcePixelGrid,
 	snapCropRectToSourcePixels,
 } from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
@@ -475,6 +476,51 @@ function CropperInner(
 		},
 		[ displayScale, naturalWidth, naturalHeight, state ]
 	);
+
+	const wasPixelSnapEnabledRef = useRef( false );
+	useEffect( () => {
+		const isPixelSnapEnabled =
+			freeformCrop &&
+			( ! aspectRatio || aspectRatio <= 0 ) &&
+			displayScale >= PIXEL_SNAP_DISPLAY_SCALE &&
+			naturalWidth > 0 &&
+			naturalHeight > 0;
+		const wasPixelSnapEnabled = wasPixelSnapEnabledRef.current;
+		wasPixelSnapEnabledRef.current = isPixelSnapEnabled;
+
+		if ( ! isPixelSnapEnabled || wasPixelSnapEnabled ) {
+			return;
+		}
+
+		const snappedCropRect = snapCropRectToSourcePixelGrid(
+			state,
+			{ width: naturalWidth, height: naturalHeight },
+			state.cropRect
+		);
+		const currentCropRect = state.cropRect;
+		if (
+			Math.abs( currentCropRect.x - snappedCropRect.x ) <
+				CROP_RECT_EPSILON &&
+			Math.abs( currentCropRect.y - snappedCropRect.y ) <
+				CROP_RECT_EPSILON &&
+			Math.abs( currentCropRect.width - snappedCropRect.width ) <
+				CROP_RECT_EPSILON &&
+			Math.abs( currentCropRect.height - snappedCropRect.height ) <
+				CROP_RECT_EPSILON
+		) {
+			return;
+		}
+
+		setCropRect( snappedCropRect );
+	}, [
+		aspectRatio,
+		displayScale,
+		freeformCrop,
+		naturalWidth,
+		naturalHeight,
+		setCropRect,
+		state,
+	] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {

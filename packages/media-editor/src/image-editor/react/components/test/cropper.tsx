@@ -636,7 +636,7 @@ describe( 'Cropper', () => {
 
 	it( 'snaps freeform resize output to source pixels when the image is shown at 1:1 or larger', async () => {
 		const image = { src: 'tiny.png', naturalWidth: 50, naturalHeight: 50 };
-		const cropRect = { x: 0.113, y: 0.127, width: 0.6, height: 0.456 };
+		const cropRect = { x: 0.1, y: 0.12, width: 0.6, height: 0.44 };
 		const controller = createController();
 		controller.state = {
 			...controller.state,
@@ -663,7 +663,6 @@ describe( 'Cropper', () => {
 			{ width: image.naturalWidth, height: image.naturalHeight }
 		);
 		expect( region.x ).toBeCloseTo( initialRegion.x, 3 );
-		expect( region.x ).not.toBeCloseTo( Math.round( region.x ), 3 );
 		expect( region.x + region.width ).toBeCloseTo(
 			Math.round( region.x + region.width ),
 			3
@@ -707,6 +706,105 @@ describe( 'Cropper', () => {
 				region.x + region.width - Math.round( region.x + region.width )
 			)
 		).toBeGreaterThan( 0.01 );
+	} );
+
+	it( 'snaps all crop edges once when display scale reaches source-pixel size', async () => {
+		const image = {
+			src: 'crossing.png',
+			naturalWidth: 1000,
+			naturalHeight: 1000,
+		};
+		const cropRect = {
+			x: 0.113,
+			y: 0.127,
+			width: 0.733,
+			height: 0.641,
+		};
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+			zoom: 0.5,
+		};
+		const { rerender } = render(
+			<Cropper
+				src="crossing.png"
+				controller={ controller }
+				freeformCrop
+			/>
+		);
+
+		await screen.findByTestId( 'cropper-image' );
+		expect( controller.setCropRect ).not.toHaveBeenCalled();
+
+		controller.state = { ...controller.state, zoom: 3 };
+		rerender(
+			<Cropper
+				src="crossing.png"
+				controller={ controller }
+				freeformCrop
+			/>
+		);
+
+		await waitFor( () =>
+			expect( controller.setCropRect ).toHaveBeenCalledTimes( 1 )
+		);
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		for ( const edge of [
+			region.x,
+			region.y,
+			region.x + region.width,
+			region.y + region.height,
+		] ) {
+			expect( edge ).toBeCloseTo( Math.round( edge ), 3 );
+		}
+	} );
+
+	it( 'does not snap all crop edges for fixed-aspect freeform crops', async () => {
+		const image = {
+			src: 'locked-ratio.png',
+			naturalWidth: 1000,
+			naturalHeight: 1000,
+		};
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect: {
+				x: 0.113,
+				y: 0.127,
+				width: 0.733,
+				height: 0.641,
+			},
+			zoom: 0.5,
+		};
+		const { rerender } = render(
+			<Cropper
+				src="locked-ratio.png"
+				controller={ controller }
+				freeformCrop
+				aspectRatio={ 1 }
+			/>
+		);
+
+		await screen.findByTestId( 'cropper-image' );
+		controller.state = { ...controller.state, zoom: 3 };
+		rerender(
+			<Cropper
+				src="locked-ratio.png"
+				controller={ controller }
+				freeformCrop
+				aspectRatio={ 1 }
+			/>
+		);
+
+		expect( controller.setCropRect ).not.toHaveBeenCalled();
 	} );
 
 	function imageRendering(): string {

@@ -202,6 +202,13 @@ function getCropRectFromSourceRegion(
 	};
 }
 
+interface SourcePixelSnapEdges {
+	left: boolean;
+	top: boolean;
+	right: boolean;
+	bottom: boolean;
+}
+
 /**
  * Snap a crop rect so the selected source-region edges land on whole pixels.
  *
@@ -220,24 +227,55 @@ export function snapCropRectToSourcePixels(
 	cropRect: NormalizedRect,
 	handle: HandlePosition
 ): NormalizedRect {
+	return snapCropRectEdgesToSourcePixels( state, imageSize, cropRect, {
+		left: handle.includes( 'w' ),
+		top: handle.includes( 'n' ),
+		right: handle.includes( 'e' ),
+		bottom: handle.includes( 's' ),
+	} );
+}
+
+/**
+ * Snap all source-region edges for a crop rect to the nearest whole pixels.
+ *
+ * @param state     The current cropper state.
+ * @param imageSize The natural dimensions of the source image.
+ * @param cropRect  The crop rect to align to the source-pixel grid.
+ * @return A crop rect whose source-region edges are whole pixels.
+ */
+export function snapCropRectToSourcePixelGrid(
+	state: CropperState,
+	imageSize: Size,
+	cropRect: NormalizedRect
+): NormalizedRect {
+	return snapCropRectEdgesToSourcePixels( state, imageSize, cropRect, {
+		left: true,
+		top: true,
+		right: true,
+		bottom: true,
+	} );
+}
+
+function snapCropRectEdgesToSourcePixels(
+	state: CropperState,
+	imageSize: Size,
+	cropRect: NormalizedRect,
+	edges: SourcePixelSnapEdges
+): NormalizedRect {
 	if ( ! isValidSize( imageSize ) ) {
 		return cropRect;
 	}
 
 	const stateWithCrop = sanitizeCropperState( { ...state, cropRect } );
 	const region = getSourceRegion( stateWithCrop, imageSize );
-	const snapLeft = handle.includes( 'w' );
-	const snapRight = handle.includes( 'e' );
-	const snapTop = handle.includes( 'n' );
-	const snapBottom = handle.includes( 's' );
-	const shouldSnapX = snapLeft || snapRight;
-	const shouldSnapY = snapTop || snapBottom;
-	const left = snapLeft ? Math.round( region.x ) : region.x;
-	const top = snapTop ? Math.round( region.y ) : region.y;
-	const right = snapRight
+	const shouldSnapX = edges.left || edges.right;
+	const shouldSnapY = edges.top || edges.bottom;
+	const left = edges.left ? Math.round( region.x ) : region.x;
+	const top = edges.top ? Math.round( region.y ) : region.y;
+	const right = edges.right
 		? Math.round( region.x + region.width )
 		: region.x + region.width;
-	const bottom = snapBottom
+	const bottom = edges.bottom
 		? Math.round( region.y + region.height )
 		: region.y + region.height;
 	if ( right <= left || bottom <= top ) {

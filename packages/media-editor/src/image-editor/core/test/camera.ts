@@ -17,6 +17,7 @@ import {
 import {
 	getSourceRegion,
 	getSourceRegionPercent,
+	snapCropRectToSourcePixelGrid,
 	snapCropRectToSourcePixels,
 } from '../source-region';
 import { computeTransformStyle } from '../transform-style';
@@ -632,6 +633,30 @@ describe( 'snapCropRectToSourcePixels', () => {
 		} );
 		expect( snapped.left ).toBeCloseTo( unsnapped.x, 3 );
 		expect( snapped.top ).toBeCloseTo( unsnapped.y, 3 );
+		expect( snapped.right ).toBeCloseTo( Math.round( snapped.right ), 3 );
+		expect( snapped.bottom ).toBeCloseTo( Math.round( snapped.bottom ), 3 );
+	} );
+
+	it( 'snaps all source-region edges to whole pixels', () => {
+		const state = makeState( {
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		const snappedCropRect = snapCropRectToSourcePixelGrid(
+			state,
+			IMAGE,
+			candidate
+		);
+		const snapped = getSourceEdges( {
+			...state,
+			cropRect: snappedCropRect,
+		} );
+
+		expect( snapped.left ).toBeCloseTo( Math.round( snapped.left ), 3 );
+		expect( snapped.top ).toBeCloseTo( Math.round( snapped.top ), 3 );
 		expect( snapped.right ).toBeCloseTo( Math.round( snapped.right ), 3 );
 		expect( snapped.bottom ).toBeCloseTo( Math.round( snapped.bottom ), 3 );
 	} );
