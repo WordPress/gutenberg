@@ -67,24 +67,7 @@ Design tokens are the visual design atoms of a design system. They are named ent
 
 Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
 
-#### Structure
-
-The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
-
-| File              | Description                                                                                                                      |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `color.json`      | Color palettes including primitive color ramps and semantic color tokens for backgrounds, foregrounds, strokes, and focus states |
-| `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
-| `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
-| `border.json`     | Border radius and width values                                                                                                   |
-| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
-| `motion.json`     | Animation durations and easing curves                                                                                            |
-
-Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
-
-#### Token Naming
-
-Semantic tokens follow a consistent naming pattern that encodes the token's purpose. See the [Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) for the naming pattern, the meaning of each segment (type, property, target, tone, emphasis, state), and guidance on how to pick the right token.
+For more information about how design tokens are implemented, you'll find additional documentation in [`tokens/README.md`](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/tokens/README.md).
 
 ## Theme Provider
 
