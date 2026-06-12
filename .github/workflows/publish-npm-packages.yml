@@ -114,7 +114,7 @@ jobs:
               run: |
                   cd cli
                   npm ci
-                  npm exec --workspace @okwordpress/release-tools -- release-cli -- npm-bugfix --ci --repository-path ../publish
+                  npm exec --workspace @wordpress/release-tools -- release-cli -- npm-bugfix --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
