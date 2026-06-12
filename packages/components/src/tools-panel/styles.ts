@@ -34,6 +34,7 @@ export const ToolsPanel = ( columns: number ) => css`
 	${ toolsPanelGrid.columns( columns ) }
 	${ toolsPanelGrid.spacing }
 
+	/* TODO: should use the wpds-color-stroke-surface-neutral token when refactored to SCSS modules */
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
 	padding: ${ space( 4 ) };
