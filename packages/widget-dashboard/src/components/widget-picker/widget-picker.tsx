@@ -12,7 +12,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { createDashboardWidget } from '../../utils/create-dashboard-widget';
-import { DashboardWidgetRender } from '../widget-render';
+import { WidgetRender } from '../widget-render';
 import styles from './widget-picker.module.css';
 
 const DEFAULT_VIEW: View = {
@@ -34,10 +34,7 @@ function WidgetPreview( { item }: { item: WidgetType } ) {
 	return (
 		<div className={ styles.preview } { ...{ inert: '' } }>
 			<Suspense fallback={ null }>
-				<DashboardWidgetRender
-					widget={ exampleWidget }
-					widgetType={ item }
-				/>
+				<WidgetRender widget={ exampleWidget } widgetType={ item } />
 			</Suspense>
 		</div>
 	);

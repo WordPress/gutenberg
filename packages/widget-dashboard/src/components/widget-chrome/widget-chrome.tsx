@@ -25,7 +25,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
-import { DashboardWidgetRender } from '../widget-render';
+import { WidgetRender } from '../widget-render';
 import styles from './widget-chrome.module.css';
 import type { DashboardWidget } from '../../types';
 
@@ -211,10 +211,7 @@ export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
 		const body = (
 			<WidgetErrorBoundary>
 				<Suspense fallback={ <LoadingOverlay /> }>
-					<DashboardWidgetRender
-						widget={ widget }
-						widgetType={ widgetType }
-					/>
+					<WidgetRender widget={ widget } widgetType={ widgetType } />
 				</Suspense>
 			</WidgetErrorBoundary>
 		);

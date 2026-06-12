@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { WidgetRender } from '@wordpress/widget-primitives';
+import { WidgetRender as WidgetRenderPrimitive } from '@wordpress/widget-primitives';
 import type { WidgetType } from '@wordpress/widget-primitives';
 
 /**
@@ -11,21 +11,18 @@ import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import type { DashboardWidget } from '../../types';
 
-interface DashboardWidgetRenderProps {
+interface WidgetRenderProps {
 	widget: DashboardWidget< unknown >;
 	widgetType: WidgetType;
 }
 
 /*
- * Dashboard-specific adapter around the host-agnostic `WidgetRender`
- * primitive. Bridges the dashboard context (`resolveWidgetModule`, layout
- * state) and turns layout-level attribute updates into the per-instance
- * `setAttributes` callback the render contract expects.
+ * Adapter around the host-agnostic `WidgetRender` primitive. Bridges the
+ * dashboard context (`resolveWidgetModule`, layout state) and turns
+ * layout-level attribute updates into the per-instance `setAttributes`
+ * callback the render contract expects.
  */
-export function DashboardWidgetRender( {
-	widget,
-	widgetType,
-}: DashboardWidgetRenderProps ) {
+export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 	const { layout, onLayoutChange, resolveWidgetModule } =
 		useDashboardInternalContext();
 
@@ -49,7 +46,7 @@ export function DashboardWidgetRender( {
 	);
 
 	return (
-		<WidgetRender
+		<WidgetRenderPrimitive
 			widgetType={ widgetType }
 			attributes={ widget.attributes }
 			setAttributes={ setAttributes }
