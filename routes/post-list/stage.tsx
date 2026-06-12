@@ -26,11 +26,11 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
+import { unlock } from '@wordpress/lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import {
 	getDefaultView,
 	getActiveViewOverridesForTab,

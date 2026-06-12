@@ -14,11 +14,11 @@ import {
 import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Badge, Link } from '@wordpress/ui';
+import { unlock } from '@wordpress/lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { useConnectorPlugin } from './use-connector-plugin';
 import {
 	OpenAILogo,

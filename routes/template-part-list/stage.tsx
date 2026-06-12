@@ -25,11 +25,11 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
+import { unlock } from '@wordpress/lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import {
 	DEFAULT_VIEW,
 	getActiveViewOverridesForTab,
