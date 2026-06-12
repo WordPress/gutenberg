@@ -34,7 +34,7 @@ type CommandCallback = ( options: { close: () => void } ) => void;
  * Registers dashboard-specific command palette commands and sets the
  * active command context so they surface under Suggestions by default.
  */
-export function DashboardCommands() {
+export function Commands() {
 	const {
 		editMode,
 		onEditChange,

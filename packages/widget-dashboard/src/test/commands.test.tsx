@@ -16,7 +16,7 @@ import type { WidgetType } from '@wordpress/widget-primitives';
  * Internal dependencies
  */
 import { WidgetDashboard } from '../widget-dashboard';
-import { DASHBOARD_COMMAND_CONTEXT } from '../components/dashboard-commands';
+import { DASHBOARD_COMMAND_CONTEXT } from '../components/commands';
 import type { DashboardWidget } from '../types';
 
 const widgetTypes: WidgetType[] = [];
@@ -102,7 +102,7 @@ function getRegistered( probe: HTMLElement ): Record< string, boolean > {
 	return JSON.parse( probe.getAttribute( 'data-registered' ) ?? '{}' );
 }
 
-describe( 'WidgetDashboard.DashboardCommands', () => {
+describe( 'WidgetDashboard.Commands', () => {
 	it( 'sets the dashboard command context and registers core commands', () => {
 		render( <Harness withGridSettings withLayoutReset /> );
 		const probe = screen.getByTestId( 'commands-probe' );
