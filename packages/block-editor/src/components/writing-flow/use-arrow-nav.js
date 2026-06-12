@@ -11,7 +11,15 @@ import {
 	isRTL,
 	isFormElement,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import {
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	HOME,
+	END,
+	isAppleOS,
+} from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
@@ -248,7 +256,7 @@ export default function useArrowNav() {
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
 			const isRight = keyCode === RIGHT;
-			const isReverse = isUp || isLeft;
+			const isReverse = isUp || isLeft || keyCode === HOME;
 			const isHorizontal = isLeft || isRight;
 			const isVertical = isUp || isDown;
 			const isNav = isHorizontal || isVertical;
@@ -257,7 +265,15 @@ export default function useArrowNav() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			if ( ! isNav ) {
+			const isCmdUp = isAppleOS() && metaKey && isUp;
+			const isCmdDown = isAppleOS() && metaKey && isDown;
+			const isCtrlHome = ! isAppleOS() && ctrlKey && keyCode === HOME;
+			const isCtrlEnd = ! isAppleOS() && ctrlKey && keyCode === END;
+			const isJumpToTop = isCmdUp || isCtrlHome;
+			const isJumpToBottom = isCmdDown || isCtrlEnd;
+			const isDocumentEdgeNav = isJumpToTop || isJumpToBottom;
+
+			if ( ! isNav && ! isDocumentEdgeNav ) {
 				return;
 			}
 
@@ -323,14 +339,15 @@ export default function useArrowNav() {
 					// Firefox doesn't automatically move focus.
 					node.focus();
 				}
-			} else if ( isVertical && metaKey && ! keepCaretInsideBlock ) {
-				// ⌘ + ↑/↓ on macOS should move the caret to the very
-				// start or end of the document, not just the current block.
-				const edgeTabbable = getEdgeTabbable( node, isReverse );
+			} else if ( isDocumentEdgeNav && ! keepCaretInsideBlock ) {
+				// ⌘ + ↑/↓ on macOS or Ctrl + Home/End on Windows should move the caret
+				// to the very start or end of the document, not just the current block.
+				const edgeTabbable = getEdgeTabbable( node, isJumpToTop );
 
 				if ( edgeTabbable ) {
-					placeCaretAtVerticalEdge( edgeTabbable, isReverse );
-					event.preventDefault();
+					edgeTabbable.focus();
+					// Do not prevent default, so the browser natively moves the caret
+					// to the start or end of the newly focused block.
 				}
 			} else if (
 				isVertical &&
