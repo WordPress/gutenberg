@@ -19,7 +19,7 @@ import {
 } from '../../utils/row-height-presets';
 import {
 	WIDGET_DASHBOARD_COLUMN_COUNT,
-	type WidgetGridLayoutSettings,
+	type WidgetGridLayoutSettingsDrawer,
 	type WidgetGridModel,
 	type WidgetGridSettings,
 } from '../../types';
@@ -60,7 +60,8 @@ const fields: Field< WidgetGridSettings >[] = [
 			{ value: 'large', label: __( 'Large' ) },
 		],
 		getValue: ( { item } ) => {
-			const rowHeight = ( item as WidgetGridLayoutSettings ).rowHeight;
+			const rowHeight = ( item as WidgetGridLayoutSettingsDrawer )
+				.rowHeight;
 			if ( typeof rowHeight !== 'number' ) {
 				return 'medium';
 			}
@@ -78,7 +79,7 @@ const form: Form = {
 	fields: [ 'model', 'rowHeight' ],
 };
 
-interface LayoutSettingsProps {
+interface LayoutSettingsDrawerProps {
 	/**
 	 * Whether the drawer is visible.
 	 */
@@ -111,13 +112,13 @@ interface LayoutSettingsProps {
  * dismiss revert only grid settings so in-progress widget layout
  * edits in the same customize session are preserved.
  *
- * @param {LayoutSettingsProps} props Layout settings props.
+ * @param {LayoutSettingsDrawerProps} props Layout settings props.
  * @return {React.ReactNode} The layout settings component.
  */
-export function LayoutSettings( {
+export function LayoutSettingsDrawer( {
 	open,
 	onOpenChange,
-}: LayoutSettingsProps ): React.ReactNode {
+}: LayoutSettingsDrawerProps ): React.ReactNode {
 	const {
 		gridSettings,
 		onGridSettingsChange,

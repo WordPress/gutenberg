@@ -15,7 +15,7 @@ import { AlertDialog, Button, Stack } from '@wordpress/ui';
 import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
-import { LayoutSettings } from '../layout-settings';
+import { LayoutSettingsDrawer } from '../layout-settings-drawer';
 import { MoreActionsDropdown } from '../more-actions-dropdown';
 import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 
@@ -214,7 +214,7 @@ export function Actions(): React.ReactNode {
 			</AlertDialog.Root>
 
 			{ canEditGridSettings && (
-				<LayoutSettings
+				<LayoutSettingsDrawer
 					open={ layoutSettingsOpen }
 					onOpenChange={ setLayoutSettingsOpen }
 				/>
