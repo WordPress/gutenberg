@@ -10,7 +10,7 @@ import { Button, IconButton, Tooltip } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
 

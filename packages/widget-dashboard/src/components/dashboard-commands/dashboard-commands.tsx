@@ -18,7 +18,7 @@ import {
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getGridModel } from '../../utils/grid-model-change';

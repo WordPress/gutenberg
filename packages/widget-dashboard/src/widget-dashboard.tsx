@@ -20,7 +20,7 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * widget store; types flow in via the `widgetTypes` prop.
  *
  * ```tsx
- * import { WidgetDashboard } from '@wordpress/dashboard';
+ * import { WidgetDashboard } from '@wordpress/widget-dashboard';
  *
  * function MyDashboard() {
  * 	const [ layout, setLayout ] = useState( defaultLayout );

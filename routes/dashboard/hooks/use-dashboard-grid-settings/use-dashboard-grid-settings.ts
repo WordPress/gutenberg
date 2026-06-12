@@ -8,14 +8,12 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
-import type { WidgetGridSettings } from '../../widget-dashboard/types';
-import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../../widget-dashboard/types';
-import { normalizeGridSettings } from '../../widget-dashboard/utils/normalize-grid-settings';
-import { DEFAULT_ROW_HEIGHT } from '../../widget-dashboard/utils/row-height-presets';
+import {
+	DEFAULT_ROW_HEIGHT,
+	normalizeGridSettings,
+	WIDGET_DASHBOARD_COLUMN_COUNT,
+} from '@wordpress/widget-dashboard';
+import type { WidgetGridSettings } from '@wordpress/widget-dashboard';
 
 const SCOPE = 'core/dashboard';
 const KEY = 'dashboardGridSettings';

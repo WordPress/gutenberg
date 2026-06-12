@@ -11,7 +11,7 @@ import { IconButton } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetToolbar } from '../widget-toolbar';
 import styles from './widget-layout-toolbar.module.css';
