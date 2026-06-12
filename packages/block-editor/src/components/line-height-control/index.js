@@ -16,6 +16,34 @@ import {
 	isLineHeightDefined,
 } from './utils';
 
+/**
+ * Line Height Control component that provides a number input control for adjusting line height values.
+ * The component handles both defined and undefined line height states, with special handling for
+ * initial spin up/down actions from an undefined state.
+ *
+ * @see https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-editor/src/components/line-height-control/README.md
+ *
+ * @example
+ * ```jsx
+ * function MyBlockEdit() {
+ *   const [ lineHeight, setLineHeight ] = useState();
+ *   return (
+ *     <LineHeightControl
+ *       value={ lineHeight }
+ *       onChange={ setLineHeight }
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * @param {Object}   props                       Component props.
+ * @param {boolean}  props.__next40pxDefaultSize Whether to opt into the larger 40px default size that
+ *                                               will become the default in a future version.
+ * @param {string}   props.value                 The line height value. Can be undefined for default line height.
+ * @param {Function} props.onChange              Callback function when the line height value changes.
+ * @param {string}   props.__unstableInputWidth  Custom width for the number input control. Defaults to '60px'.
+ * @return {Element}                           The LineHeightControl component.
+ */
 const LineHeightControl = ( {
 	/** Start opting into the larger default height that will become the default size in a future version. */
 	__next40pxDefaultSize = false,
