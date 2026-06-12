@@ -21,6 +21,10 @@
 
 -   Increase the contrast target of `stroke1` from `2.6` to `2.9` so that, on the default scale, it lands between `gray100` and `gray200`. This regenerates `stroke1` for every ramp and updates the values of `--wpds-color-stroke-surface-{brand,error,info,success,warning,neutral-weak}` and `--wpds-color-bg-track-neutral-weak` ([#77599](https://github.com/WordPress/gutenberg/pull/77599)).
 
+### Internal
+
+-   Add Figma `WIDTH_HEIGHT` scopes to `--wpds-dimension-size-*` design tokens ([#79032](https://github.com/WordPress/gutenberg/pull/79032)).
+
 ## 0.14.0 (2026-05-27)
 
 ### Breaking Changes
