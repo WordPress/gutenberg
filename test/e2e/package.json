@@ -32,11 +32,6 @@
 		"ws": "^8.18.3",
 		"y-websocket": "^3.0.0"
 	},
-	"overrides": {
-		"@flakiness/flakiness-report": {
-			"zod": "^4.1.12"
-		}
-	},
 	"publishConfig": {
 		"access": "public"
 	},

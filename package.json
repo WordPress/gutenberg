@@ -88,7 +88,10 @@
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0"
+		"jsdom": "26.1.0",
+		"@flakiness/flakiness-report": {
+			"zod": "^4.1.12"
+		}
 	},
 	"scripts": {
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",
