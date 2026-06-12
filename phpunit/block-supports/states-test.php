@@ -816,6 +816,47 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a responsive element color generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_element_color_generates_media_query_scoped_css() {
+		$this->ensure_block_registered( 'core/group' );
+
+		$block_content = '<div class="wp-block-group"><p><a href="#">Link</a></p></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'style' => array(
+					'mobile' => array(
+						'elements' => array(
+							'link' => array(
+								'color' => array(
+									'text' => '#00ff00',
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<div class="wp-block-group (wp-states-[a-f0-9]{8})"><p><a href="#">Link<\/a><\/p><\/div>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . ' a:where(:not(.wp-element-button)){color:#00ff00 !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
 	 * Tests that a responsive pseudo-state generates media-query scoped CSS.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
