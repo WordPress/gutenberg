@@ -1,20 +1,10 @@
 @use "./shared.scss" as *;
 
-.wp-block-slider.is-zero-peek {
-	--slider-edge-space: 0;
-	--slider-slide-size: 100%;
-}
-
 .wp-block-slider__viewport {
 	overflow: hidden;
 	overscroll-behavior-x: contain;
 	scroll-behavior: auto;
 	scroll-snap-type: none;
-	scrollbar-width: none;
-
-	&::-webkit-scrollbar {
-		display: none;
-	}
 }
 
 .wp-block-slider__track,

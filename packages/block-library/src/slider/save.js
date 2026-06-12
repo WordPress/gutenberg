@@ -33,14 +33,10 @@ export default function save( { attributes } ) {
 			<div className="wp-block-slider__viewport">
 				<div { ...innerBlocksProps } />
 			</div>
-			<div
-				className="wp-block-slider__controls"
-				aria-label="Slider controls"
-			>
+			<div className="wp-block-slider__controls">
 				<button
 					type="button"
 					className="wp-block-slider__arrow wp-block-slider__arrow--previous"
-					aria-label="Previous slide"
 					disabled
 				>
 					&lsaquo;
@@ -53,7 +49,6 @@ export default function save( { attributes } ) {
 				<button
 					type="button"
 					className="wp-block-slider__arrow wp-block-slider__arrow--next"
-					aria-label="Next slide"
 				>
 					&rsaquo;
 				</button>
@@ -61,9 +56,7 @@ export default function save( { attributes } ) {
 					className="wp-block-slider__status screen-reader-text"
 					aria-live="polite"
 					aria-atomic="true"
-				>
-					Slide 1 of 2
-				</span>
+				/>
 			</div>
 		</div>
 	);

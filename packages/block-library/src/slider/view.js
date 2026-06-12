@@ -1,16 +1,10 @@
 /**
  * WordPress dependencies
  */
-import {
-	store,
-	getContext,
-	getElement,
-	withSyncEvent,
-} from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const SLIDER_SELECTOR = '.wp-block-slider';
 const VIEWPORT_SELECTOR = '.wp-block-slider__viewport';
-const SLIDE_SELECTOR = '.wp-block-slider__track > .wp-block-slide';
 
 function clampSlideIndex( index, slideCount ) {
 	return Math.max( 0, Math.min( index, Math.max( slideCount - 1, 0 ) ) );
@@ -25,8 +19,13 @@ function getSliderRoot( ref ) {
 function getSliderParts( ref ) {
 	const slider = getSliderRoot( ref );
 	const viewport = slider?.querySelector( VIEWPORT_SELECTOR );
-	const slides = slider
-		? Array.from( slider.querySelectorAll( SLIDE_SELECTOR ) )
+	const track = Array.from( viewport?.children ?? [] ).find( ( element ) =>
+		element.classList.contains( 'wp-block-slider__track' )
+	);
+	const slides = track
+		? Array.from( track.children ).filter( ( element ) =>
+				element.classList.contains( 'wp-block-slide' )
+		  )
 		: [];
 
 	return { slider, viewport, slides };
@@ -56,46 +55,18 @@ function getClosestSlideIndex( viewport, slides ) {
 	return closestIndex;
 }
 
-function getTargetScrollLeft( viewport, slides, index ) {
+function scrollToSlide( slides, index, behavior = 'auto' ) {
 	const slide = slides[ index ];
 
-	if ( ! viewport || ! slide ) {
-		return 0;
+	if ( slide ) {
+		slide.scrollIntoView( {
+			behavior,
+			block: 'nearest',
+			inline: 'start',
+		} );
 	}
 
-	if ( index <= 0 ) {
-		return 0;
-	}
-
-	const maxScrollLeft = Math.max(
-		0,
-		viewport.scrollWidth - viewport.clientWidth
-	);
-
-	if ( index >= slides.length - 1 ) {
-		return maxScrollLeft;
-	}
-
-	const viewportRect = viewport.getBoundingClientRect();
-	const slideRect = slide.getBoundingClientRect();
-	const slideStart = slideRect.left - viewportRect.left + viewport.scrollLeft;
-	const centerOffset = Math.max(
-		0,
-		( viewportRect.width - slideRect.width ) / 2
-	);
-
-	return Math.max( 0, Math.min( slideStart - centerOffset, maxScrollLeft ) );
-}
-
-function scrollToSlide( viewport, slides, index, behavior = 'auto' ) {
-	const left = getTargetScrollLeft( viewport, slides, index );
-
-	viewport?.scrollTo( {
-		left,
-		behavior,
-	} );
-
-	return left;
+	return !! slide;
 }
 
 function setActiveSlideIndex( context, nextIndex, slideCount ) {
@@ -118,14 +89,13 @@ function setActiveSlideIndex( context, nextIndex, slideCount ) {
 
 function clearPendingScroll( context ) {
 	context.pendingSlideIndex = undefined;
-	context.pendingScrollLeft = undefined;
 	context.pendingScrollUntil = undefined;
 }
 
 function refreshSlider() {
 	const context = getContext();
 	const { ref } = getElement();
-	const { viewport, slides } = getSliderParts( ref );
+	const { slides } = getSliderParts( ref );
 	const slideCount = slides.length || context.slideCount || 0;
 	const nextIndex = clampSlideIndex( context.activeSlideIndex, slideCount );
 
@@ -136,7 +106,7 @@ function refreshSlider() {
 	context.hasOutgoingNextDot = false;
 	clearPendingScroll( context );
 
-	scrollToSlide( viewport, slides, nextIndex );
+	scrollToSlide( slides, nextIndex );
 }
 
 const { actions } = store(
@@ -192,7 +162,7 @@ const { actions } = store(
 			goTo( index ) {
 				const context = getContext();
 				const { ref } = getElement();
-				const { viewport, slides } = getSliderParts( ref );
+				const { slides } = getSliderParts( ref );
 				const slideCount = slides.length || context.slideCount || 0;
 				const nextIndex = clampSlideIndex( index, slideCount );
 
@@ -200,33 +170,19 @@ const { actions } = store(
 				context.slideCount = slideCount;
 				context.pendingSlideIndex = nextIndex;
 				context.pendingScrollUntil = Date.now() + 600;
-				context.pendingScrollLeft = scrollToSlide(
-					viewport,
-					slides,
-					nextIndex,
-					'smooth'
-				);
+				scrollToSlide( slides, nextIndex, 'smooth' );
 			},
-			handleScroll: withSyncEvent( ( event ) => {
+			handleScroll() {
 				const context = getContext();
-				const viewport = event.currentTarget;
+				const { ref: viewport } = getElement();
 				const { slides } = getSliderParts( viewport );
 				const nextIndex = getClosestSlideIndex( viewport, slides );
 
 				if ( context.pendingSlideIndex !== undefined ) {
 					const isPendingScrollExpired =
 						Date.now() > ( context.pendingScrollUntil ?? 0 );
-					const reachedTarget =
-						Math.abs(
-							viewport.scrollLeft -
-								( context.pendingScrollLeft ??
-									viewport.scrollLeft )
-						) < 1;
 
-					if (
-						reachedTarget ||
-						nextIndex === context.pendingSlideIndex
-					) {
+					if ( nextIndex === context.pendingSlideIndex ) {
 						clearPendingScroll( context );
 					} else if ( ! isPendingScrollExpired ) {
 						context.slideCount = slides.length;
@@ -239,7 +195,7 @@ const { actions } = store(
 				}
 
 				context.slideCount = slides.length;
-			} ),
+			},
 		},
 		callbacks: {
 			init: refreshSlider,

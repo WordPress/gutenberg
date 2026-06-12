@@ -26,6 +26,26 @@ function block_core_slider_count_slides( array $inner_blocks ): int {
 }
 
 /**
+ * Moves the HTML processor to the next tag matching the query at a specific depth.
+ *
+ * @since 7.0.0
+ *
+ * @param WP_HTML_Processor  $processor HTML processor.
+ * @param string|array|null  $query     Optional. Tag name or query.
+ * @param int                $depth     Required nesting depth.
+ * @return bool Whether a matching tag was found.
+ */
+function block_core_slider_next_tag_at_depth( WP_HTML_Processor $processor, $query, int $depth ): bool {
+	while ( $processor->next_tag( $query ) ) {
+		if ( $depth === $processor->get_current_depth() ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Render callback for core/slider.
  *
  * @since 7.0.0
@@ -42,65 +62,75 @@ function block_core_slider_render( array $attributes, string $content, \WP_Block
 	}
 
 	$slide_count = block_core_slider_count_slides( $block->parsed_block['innerBlocks'] ?? array() );
-	$processor   = new WP_HTML_Tag_Processor( $content );
+	$processor   = WP_HTML_Processor::create_fragment( $content );
 
-	if ( ! $processor->next_tag( array( 'class_name' => 'wp-block-slider' ) ) ) {
+	if ( null === $processor || ! $processor->next_tag( array( 'class_name' => 'wp-block-slider' ) ) ) {
 		return $content;
 	}
 
+	$slider_depth = $processor->get_current_depth();
 	$processor->set_attribute( 'data-wp-interactive', 'core/slider' );
 	$processor->set_attribute(
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'activeSlideIndex'       => 0,
-				'dotAnimationDirection'  => '',
-				'dotAnimationFrame'      => false,
-				'hasOutgoingNextDot'     => false,
-				'hasOutgoingPreviousDot' => false,
-				'slideCount'             => $slide_count,
+				'activeSlideIndex' => 0,
+				'slideCount'       => $slide_count,
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
 	);
 	$processor->set_attribute( 'data-wp-init', 'callbacks.init' );
 	$processor->set_attribute( 'data-wp-on-window--resize', 'callbacks.refresh' );
+	$processor->set_bookmark( 'core/slider' );
 
-	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__viewport' ) ) ) {
+	if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__viewport' ), $slider_depth + 1 ) ) {
 		$processor->set_attribute( 'data-wp-on--scroll', 'actions.handleScroll' );
 	}
 
-	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__arrow--previous' ) ) ) {
-		$processor->set_attribute( 'data-wp-on--click', 'actions.previous' );
-		$processor->set_attribute( 'data-wp-bind--disabled', '!state.canGoPrevious' );
-	}
+	$processor->seek( 'core/slider' );
 
-	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__dots' ) ) ) {
-		$processor->set_attribute( 'data-wp-class--is-moving-next', 'state.isDotAnimationNext' );
-		$processor->set_attribute( 'data-wp-class--is-moving-previous', 'state.isDotAnimationPrevious' );
-		$processor->set_attribute( 'data-wp-class--is-animation-frame-a', 'state.isDotAnimationFrameA' );
-		$processor->set_attribute( 'data-wp-class--is-animation-frame-b', 'state.isDotAnimationFrameB' );
-		$processor->set_attribute( 'data-wp-class--has-outgoing-next-dot', 'state.hasOutgoingNextDot' );
-		$processor->set_attribute( 'data-wp-class--has-outgoing-previous-dot', 'state.hasOutgoingPreviousDot' );
-	}
+	if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__controls' ), $slider_depth + 1 ) ) {
+		$controls_depth = $processor->get_current_depth();
 
-	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__dot--previous' ) ) ) {
-		$processor->set_attribute( 'data-wp-class--is-visible', 'state.canGoPrevious' );
-		$processor->set_attribute( 'data-wp-bind--aria-hidden', '!state.canGoPrevious' );
-	}
+		$processor->set_attribute( 'aria-label', __( 'Slider controls' ) );
 
-	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__dot--next' ) ) ) {
-		$processor->set_attribute( 'data-wp-class--is-visible', 'state.canGoNext' );
-		$processor->set_attribute( 'data-wp-bind--aria-hidden', '!state.canGoNext' );
-	}
+		if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__arrow--previous' ), $controls_depth + 1 ) ) {
+			$processor->set_attribute( 'aria-label', __( 'Previous slide' ) );
+			$processor->set_attribute( 'data-wp-on--click', 'actions.previous' );
+			$processor->set_attribute( 'data-wp-bind--disabled', '!state.canGoPrevious' );
+		}
 
-	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__arrow--next' ) ) ) {
-		$processor->set_attribute( 'data-wp-on--click', 'actions.next' );
-		$processor->set_attribute( 'data-wp-bind--disabled', '!state.canGoNext' );
-	}
+		if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__dots' ), $controls_depth + 1 ) ) {
+			$dots_depth = $processor->get_current_depth();
 
-	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__status' ) ) ) {
-		$processor->set_attribute( 'data-wp-text', 'state.slideStatus' );
+			$processor->set_attribute( 'data-wp-class--is-moving-next', 'state.isDotAnimationNext' );
+			$processor->set_attribute( 'data-wp-class--is-moving-previous', 'state.isDotAnimationPrevious' );
+			$processor->set_attribute( 'data-wp-class--is-animation-frame-a', 'state.isDotAnimationFrameA' );
+			$processor->set_attribute( 'data-wp-class--is-animation-frame-b', 'state.isDotAnimationFrameB' );
+			$processor->set_attribute( 'data-wp-class--has-outgoing-next-dot', 'state.hasOutgoingNextDot' );
+			$processor->set_attribute( 'data-wp-class--has-outgoing-previous-dot', 'state.hasOutgoingPreviousDot' );
+
+			if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__dot--previous' ), $dots_depth + 1 ) ) {
+				$processor->set_attribute( 'data-wp-class--is-visible', 'state.canGoPrevious' );
+				$processor->set_attribute( 'data-wp-bind--aria-hidden', '!state.canGoPrevious' );
+			}
+
+			if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__dot--next' ), $dots_depth + 1 ) ) {
+				$processor->set_attribute( 'data-wp-class--is-visible', 'state.canGoNext' );
+				$processor->set_attribute( 'data-wp-bind--aria-hidden', '!state.canGoNext' );
+			}
+		}
+
+		if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__arrow--next' ), $controls_depth + 1 ) ) {
+			$processor->set_attribute( 'aria-label', __( 'Next slide' ) );
+			$processor->set_attribute( 'data-wp-on--click', 'actions.next' );
+			$processor->set_attribute( 'data-wp-bind--disabled', '!state.canGoNext' );
+		}
+
+		if ( block_core_slider_next_tag_at_depth( $processor, array( 'class_name' => 'wp-block-slider__status' ), $controls_depth + 1 ) ) {
+			$processor->set_attribute( 'data-wp-text', 'state.slideStatus' );
+		}
 	}
 
 	return $processor->get_updated_html();

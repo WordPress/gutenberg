@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { gallery as icon } from '@wordpress/icons';
 
 /**
@@ -25,7 +25,11 @@ export const settings = {
 				{
 					name: 'core/heading',
 					attributes: {
-						content: __( 'Slide' ) + ` ${ index }`,
+						content: sprintf(
+							/* translators: %d: slide number. */
+							__( 'Slide %d' ),
+							index
+						),
 					},
 				},
 				{

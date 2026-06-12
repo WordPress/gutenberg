@@ -10,6 +10,19 @@
 	box-sizing: border-box;
 }
 
+.wp-block-slider.is-zero-peek {
+	--slider-edge-space: 0;
+	--slider-slide-size: 100%;
+}
+
+.wp-block-slider__viewport {
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
 .wp-block-slider__controls {
 	display: flex;
 	align-items: center;
@@ -39,6 +52,10 @@
 
 .wp-block-slider__arrow:disabled {
 	opacity: 0.35;
+}
+
+:where([dir="rtl"]) .wp-block-slider__arrow {
+	transform: scaleX(-1);
 }
 
 .wp-block-slider__dots {
