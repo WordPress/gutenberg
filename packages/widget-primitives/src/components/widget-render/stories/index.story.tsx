@@ -137,8 +137,17 @@ const meta: Meta< typeof WidgetRender > = {
 		},
 		docs: {
 			description: {
-				component:
-					'Host-agnostic entry point that renders a widget type. The host provides the `WidgetType` (on a WordPress page it arrives through `useWidgetTypes()`), a `resolveWidgetModule` to load the render component, and optionally `setAttributes`. These stories run outside WordPress, so both halves are declared inline and injected.',
+				component: `
+\`WidgetRender\` is the host-agnostic entry point that renders a widget type: it resolves the widget's render component and mounts it with the current attributes. Everything else stays in the hands of the host.
+
+A host provides three things:
+
+- \`widgetType\`: the widget's metadata, as declared by its author. On a WordPress page it arrives through \`useWidgetTypes()\`.
+- \`resolveWidgetModule\`: how the render component is loaded. Dynamic \`import()\` against an import map, eagerly enqueued script modules, or a custom resolver are all valid strategies.
+- \`setAttributes\` (optional): grants the widget write access to its own attributes. Omit it and the widget renders read-only.
+
+These stories run outside WordPress, so both halves (the type and the module resolution) are declared inline and injected.
+`,
 			},
 		},
 	},
@@ -170,7 +179,14 @@ export const Default: StoryObj = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'The render contract: `attributes` flow into the widget, and the widget writes back through `setAttributes` (the internal "Cycle tone" button). Suspense is a host concern: the primitive resolves the module with `lazy()` and the host decides the loading UI.',
+				story: `
+The minimal contract between a host and a widget:
+
+- \`attributes\` flow into the widget as plain data.
+- The widget writes back through \`setAttributes\`. Here, the "Cycle tone" button updates the \`tone\` attribute from inside the widget.
+
+The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
+`,
 			},
 		},
 	},
@@ -236,7 +252,15 @@ export const WithSettings: StoryObj = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'A widget type declares its settings as dataviews `Field[]` in `attributes`. The host mounts a `DataForm` directly from that schema, with no per-widget form wiring, and the edited attributes flow into the rendered widget. Any host can build its settings surface this way.',
+				story: `
+A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`. That single declaration is enough for a host to build a settings surface:
+
+- The \`DataForm\` on the right is mounted straight from the schema, with no per-widget form wiring.
+- Validation comes from the same source: the \`message\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.
+- Edits flow into the rendered widget on the left through the shared attributes state.
+
+Any host can derive its settings UI this way, whatever shape that surface takes.
+`,
 			},
 		},
 	},
@@ -294,7 +318,11 @@ export const WithHostChrome: StoryObj = {
 	parameters: {
 		docs: {
 			description: {
-				story: "Chrome belongs to the host. In this story, the widget doesn't declare its own header: the chrome is a `Card` whose header stacks the type's metadata (`icon`, `title`), and the card body frames the widget render.",
+				story: `
+Chrome belongs to the host: the widget describes itself through metadata, and each host decides how (and whether) to frame it.
+
+In this story the chrome is a \`Card\`. Its header reads the type's metadata (\`icon\`, \`title\`) and the card body frames the widget render. The widget doesn't render a header of its own; another host could place the same metadata elsewhere, or skip it entirely.
+`,
 			},
 		},
 	},
