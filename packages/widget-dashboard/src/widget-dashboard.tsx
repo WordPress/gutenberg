@@ -44,9 +44,11 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * }
  * ```
  *
- * `Commands` is opt-in: compose it to register the dashboard's command
- * palette commands. Its "Reset to default" command opens the dialog hosted
- * by `Actions`, so pair the two.
+ * `Commands` registers the dashboard's command palette commands. It ships
+ * in the default composition; when passing custom children, compose
+ * `<WidgetDashboard.Commands />` to keep the palette integration. Its
+ * "Reset to default" command opens the dialog hosted by `Actions`, so
+ * pair the two.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -81,6 +83,7 @@ export const WidgetDashboard = Object.assign(
 							<NoWidgetsState />
 							<Actions />
 							<Widgets />
+							<Commands />
 						</>
 					) }
 
