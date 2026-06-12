@@ -22,10 +22,7 @@ export default function EmptyBlockInserter( {
 		rootClientId,
 	} = useSelectedBlockToolProps( clientId );
 
-	const popoverProps = useBlockToolbarPopoverProps( {
-		contentElement: __unstableContentRef?.current,
-		clientId,
-	} );
+	const popoverProps = useBlockToolbarPopoverProps( { clientId } );
 
 	return (
 		<BlockPopoverCover

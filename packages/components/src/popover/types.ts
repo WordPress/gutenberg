@@ -138,12 +138,16 @@ export type PopoverProps = {
 	/**
 	 * Enables the `Popover` to shift in order to stay in view when meeting the
 	 * viewport edges.
+	 *
+	 * Pass an object with a `padding` value (in px) to control the gap kept
+	 * from the viewport edges before shifting kicks in (default `1`).
+	 *
 	 * _Note: The `resize` and `shift` props are not intended to be used together.
 	 * Enabling both can cause unexpected behavior._
 	 *
 	 * @default false
 	 */
-	shift?: boolean;
+	shift?: boolean | { padding?: number };
 	/**
 	 * Specifies the popover's style.
 	 *

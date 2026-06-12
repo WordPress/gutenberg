@@ -247,7 +247,12 @@ const UnforwardedPopover = (
 			shiftMiddleware( {
 				crossAxis: true,
 				limiter: limitShift(),
-				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+				// `1` avoids flickering at the edge of the viewport. Callers
+				// can opt into a larger inset by passing `shift={ { padding } }`.
+				padding:
+					typeof shift === 'object' && shift.padding !== undefined
+						? shift.padding
+						: 1,
 			} ),
 		arrow( { element: arrowRef } ),
 	];
