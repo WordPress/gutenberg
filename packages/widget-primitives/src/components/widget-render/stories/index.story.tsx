@@ -276,7 +276,17 @@ function WidgetInHostChrome() {
 		<Card.Root
 			render={ <section /> }
 			aria-labelledby={ titleId }
-			style={ { maxWidth: 480 } }
+			style={ {
+				// Striped background to tell the chrome apart from the render.
+				background: `repeating-linear-gradient(
+					45deg,
+					var(--wpds-color-bg-surface-neutral),
+					var(--wpds-color-bg-surface-neutral) 8px,
+					var(--wpds-color-bg-surface-neutral-weak) 8px,
+					var(--wpds-color-bg-surface-neutral-weak) 16px
+				)`,
+				maxWidth: 480,
+			} }
 		>
 			<Card.Header>
 				<Stack direction="row" align="center" gap="sm">
@@ -321,7 +331,9 @@ export const WithHostChrome: StoryObj = {
 				story: `
 Chrome belongs to the host: the widget describes itself through metadata, and each host decides how (and whether) to frame it.
 
-In this story the chrome is a \`Card\`. Its header reads the type's metadata (\`icon\`, \`title\`) and the card body frames the widget render. The widget doesn't render a header of its own; another host could place the same metadata elsewhere, or skip it entirely.
+In this story the chrome is a \`Card\`: its header reads the type's metadata (\`icon\`, \`title\`) and the card body frames the widget render.
+
+The diagonal stripes mark the chrome's area. Everything striped is drawn by the host; the solid panel inside is the widget render. The widget doesn't render a header of its own; another host could place the same metadata elsewhere, or skip it entirely.
 `,
 			},
 		},
