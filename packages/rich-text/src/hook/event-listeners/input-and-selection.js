@@ -270,6 +270,17 @@ export default ( props ) => ( element ) => {
 		// When the whole editor is editable, let writing flow handle
 		// selection.
 		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
+			// A nested editable element does not receive a caret from being
+			// focused, unlike an editing host. Match the editing host
+			// behavior for programmatic focus: place the caret at the start,
+			// unless the element already contains the selection.
+			const selection = defaultView.getSelection();
+			if (
+				! selection.anchorNode ||
+				! element.contains( selection.anchorNode )
+			) {
+				selection.collapse( element, 0 );
+			}
 			return;
 		}
 

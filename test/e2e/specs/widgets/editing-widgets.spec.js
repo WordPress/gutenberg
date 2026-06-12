@@ -51,6 +51,8 @@ test.describe( 'Widgets screen', () => {
 			'Update button should start out disabled'
 		).toBeDisabled();
 
+		// Wait for the widget areas to render before taking the snapshot.
+		await expect( widgetsScreen.widgetAreas.first() ).toBeVisible();
 		const [ firstWidgetArea, secondWidgetArea ] =
 			await widgetsScreen.widgetAreas.all();
 
@@ -633,6 +635,8 @@ test.describe( 'Widgets screen', () => {
 		await pageUtils.setBrowserViewport( 'small' );
 
 		const firstWidgetArea = widgetsScreen.widgetAreas.first();
+		// Wait for the widget areas to render before inserting.
+		await expect( firstWidgetArea ).toBeVisible();
 
 		const addParagraphBlock =
 			await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );
