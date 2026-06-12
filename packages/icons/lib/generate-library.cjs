@@ -223,10 +223,14 @@ async function generateIndex() {
 	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.ts' ), indexTemplate );
 }
 
-// Split a CSS declaration list (the contents of a `style` attribute) on `;`,
-// ignoring semicolons that appear inside parentheses (e.g. an `url()` value) or
-// quoted strings (e.g. a base64 `data:` URI). A naive `split( ';' )` would
-// break such values apart.
+ * Splits a CSS declaration list (the contents of a `style` attribute) on `;`,
+ * ignoring semicolons that appear inside parentheses (e.g. an `url()` value) or
+ * quoted strings (e.g. a base64 `data:` URI). A naive `split( ';' )` would
+ * break such values apart.
+ *
+ * @param {string} cssString - String of CSS properties.
+ * @return {string[]} Declarations.
+ */
 function splitStyleDeclarations( cssString ) {
 	const declarations = [];
 	let current = '';
