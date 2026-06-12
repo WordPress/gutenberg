@@ -2,9 +2,9 @@
 	"name": "@wordpress/lock-unlock",
 	"version": "1.0.0",
 	"private": true,
-	"main": "index.ts",
 	"exports": {
-		".": "./index.ts"
+		".": "./index.ts",
+		"./package.json": "./package.json"
 	},
 	"dependencies": {
 		"@wordpress/private-apis": "file:../../packages/private-apis"
