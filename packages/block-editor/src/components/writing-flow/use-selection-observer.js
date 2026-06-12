@@ -412,6 +412,31 @@ export default function useSelectionObserver() {
 				}
 			}
 
+			// Native `selectionchange` events are asynchronous: a clipboard
+			// event may fire before the store has been updated with a cross
+			// block selection that was just made. Sync it before the clipboard
+			// handlers (bubble phase) read the store.
+			function ensureMultiBlockSelectionSync( event ) {
+				const selection = defaultView.getSelection();
+
+				if ( ! selection.rangeCount || selection.isCollapsed ) {
+					return;
+				}
+
+				// Only a selection across different blocks needs to be synced
+				// here; rich text owns selections within a single block.
+				const startClientId = getBlockClientId(
+					extractSelectionStartNode( selection )
+				);
+				const endClientId = getBlockClientId(
+					extractSelectionEndNode( selection, isTripleClick )
+				);
+
+				if ( startClientId !== endClientId ) {
+					onSelectionChange( event );
+				}
+			}
+
 			ownerDocument.addEventListener(
 				'selectionchange',
 				onSelectionChange
@@ -419,6 +444,21 @@ export default function useSelectionObserver() {
 			defaultView.addEventListener( 'mouseup', onSelectionChange );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
+			ownerDocument.addEventListener(
+				'copy',
+				ensureMultiBlockSelectionSync,
+				true
+			);
+			ownerDocument.addEventListener(
+				'cut',
+				ensureMultiBlockSelectionSync,
+				true
+			);
+			ownerDocument.addEventListener(
+				'paste',
+				ensureMultiBlockSelectionSync,
+				true
+			);
 			return () => {
 				ownerDocument.removeEventListener(
 					'selectionchange',
@@ -427,6 +467,21 @@ export default function useSelectionObserver() {
 				defaultView.removeEventListener( 'mouseup', onSelectionChange );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
+				ownerDocument.removeEventListener(
+					'copy',
+					ensureMultiBlockSelectionSync,
+					true
+				);
+				ownerDocument.removeEventListener(
+					'cut',
+					ensureMultiBlockSelectionSync,
+					true
+				);
+				ownerDocument.removeEventListener(
+					'paste',
+					ensureMultiBlockSelectionSync,
+					true
+				);
 			};
 		},
 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
