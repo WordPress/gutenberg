@@ -10,10 +10,6 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
-/**
- * The color space ids that are accepted as seed-color input. Seeds must be
- * sRGB-parseable strings (hex, `rgb()`/`rgba()`, or a CSS named color).
- */
 const ALLOWED_SEED_SPACE_IDS = new Set( [ 'srgb' ] );
 
 /**
@@ -43,16 +39,13 @@ export function getContrast(
 }
 
 /**
- * Assert that a seed-color string conforms to the documented input contract:
- * an sRGB-parseable string (hex, `rgb()`/`rgba()`, or a CSS named color).
+ * Assert that a seed-color string is sRGB-parseable (hex, `rgb()`/`rgba()`, or
+ * a CSS named color), throwing otherwise.
  *
- * This is deliberately strict and deterministic: it rejects any other color
- * space (`oklch()`, `hsl()`, `lab()`, `hwb()`, `color()`, …) REGARDLESS of
- * which `ColorSpace`s happen to be globally registered. For example, the
- * `OKLCH` registration that `clampToGamut` requires would otherwise make
- * `oklch()` strings parseable; here, a successfully parsed `oklch()` color
- * still reports a space id of `oklch`, which is not in the allowlist and so is
- * rejected.
+ * Rejection is deterministic regardless of which `ColorSpace`s are globally
+ * registered: `clampToGamut` registers `OKLCH`, which would otherwise make
+ * `oklch()` strings parse, but their space id is `oklch` (not `srgb`) so they
+ * are still rejected.
  *
  * @param seed The seed-color string to validate.
  * @throws If `seed` is not an sRGB-parseable string.

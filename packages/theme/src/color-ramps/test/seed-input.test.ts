@@ -53,8 +53,7 @@ describe( 'seed color input contract', () => {
 	} );
 
 	it( 'rejects oklch() even when the OKLCH color space is globally registered', () => {
-		// Registering OKLCH would otherwise make `oklch(...)` strings parseable.
-		// The contract must stay deterministic regardless of global registration.
+		// Registering OKLCH would otherwise make `oklch(...)` strings parse.
 		ColorSpace.register( OKLCH );
 
 		expect( () =>

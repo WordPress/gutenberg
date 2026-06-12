@@ -208,10 +208,8 @@ export function buildRamp(
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
-	// Enforce the documented seed-color input contract at the single
-	// user-input chokepoint. Internal recursive callers pass
-	// `PlainColorObject`s to `clampToGamut`, not strings to `buildRamp`, so
-	// this is the right boundary for string validation.
+	// Validate here: the single point where user-supplied color strings enter.
+	// Internal recursive callers pass color objects to `clampToGamut` instead.
 	assertValidSeedColor( seedArg );
 
 	let seed: PlainColorObject;
