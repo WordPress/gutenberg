@@ -44,14 +44,14 @@ if ( ! function_exists( 'wp_knowledge_types' ) ) {
 		return apply_filters(
 			'wp_knowledge_types',
 			array(
-				'artifact' => array(
-					'title' => __( 'Artifact', 'gutenberg' ),
+				'instruction' => array(
+					'title' => __( 'Instruction', 'gutenberg' ),
 				),
-				'content'  => array(
-					'title' => __( 'Content', 'gutenberg' ),
-				),
-				'memory'   => array(
+				'memory'      => array(
 					'title' => __( 'Memory', 'gutenberg' ),
+				),
+				'note'        => array(
+					'title' => __( 'Note', 'gutenberg' ),
 				),
 			)
 		);
@@ -61,7 +61,7 @@ if ( ! function_exists( 'wp_knowledge_types' ) ) {
 if ( ! function_exists( '_wp_knowledge_ensure_default_type_term' ) ) {
 	/**
 	 * Hook callback for the `save_post_wp_knowledge` action that assigns the
-	 * `artifact` fallback term when a knowledge post is saved without a type
+	 * `note` fallback term when a knowledge post is saved without a type
 	 * term.
 	 *
 	 * Uses `get_the_terms()` so the check is served by the object term cache.
@@ -83,9 +83,9 @@ if ( ! function_exists( '_wp_knowledge_ensure_default_type_term' ) ) {
 		// Resolve to an ID up front (creating the term on first use):
 		// wp_set_object_terms() interprets strings as names for hierarchical
 		// taxonomies, not slugs.
-		$term = term_exists( 'artifact', 'wp_knowledge_type' );
+		$term = term_exists( 'note', 'wp_knowledge_type' );
 		if ( ! $term ) {
-			$term = wp_insert_term( 'artifact', 'wp_knowledge_type' );
+			$term = wp_insert_term( 'note', 'wp_knowledge_type' );
 			if ( is_wp_error( $term ) ) {
 				return;
 			}

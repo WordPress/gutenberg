@@ -46,7 +46,7 @@ add_action( 'rest_api_init', array( 'Gutenberg_Knowledge_Post_Type', 'register_p
  * Register content singleton routes beside the standard CPT routes.
  * The singleton rule is scoped to /wp/v2/content-guidelines for UI handling.
  * The standard /wp/v2/knowledge route keeps default post handling for every
- * `wp_knowledge` post. If `content` becomes a data level singleton, add
+ * `wp_knowledge` post. If `instruction` becomes a data level singleton, add
  * enforcement to the default CPT route too.
  */
 add_action(

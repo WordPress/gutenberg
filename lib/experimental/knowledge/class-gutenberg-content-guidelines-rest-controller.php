@@ -2,11 +2,11 @@
 /**
  * Content Guidelines REST API Controller.
  *
- * Specialized controller for the site-wide "content" guideline singleton.
+ * Specialized controller for the site-wide guidelines singleton.
  * Exposes a flat `/wp/v2/content-guidelines` endpoint that always reads,
- * creates, and updates a single post tagged with the `content` term in
- * the `wp_knowledge_type` taxonomy. Other knowledge posts (artifacts) are
- * served by the standard `/wp/v2/knowledge` collection.
+ * creates, and updates a single post tagged with the `instruction` term in
+ * the `wp_knowledge_type` taxonomy. Other knowledge posts (notes, memories)
+ * are served by the standard `/wp/v2/knowledge` collection.
  *
  * @package gutenberg
  */
@@ -53,7 +53,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Resolves a post ID to a content-typed guideline post.
 	 *
 	 * Restricts /wp/v2/content-guidelines/{id} to posts tagged with the
-	 * `content` term. Other knowledge types are addressable only via the
+	 * `instruction` term. Other knowledge types are addressable only via the
 	 * standard /wp/v2/knowledge collection.
 	 *
 	 * @param int $id Post ID.
@@ -246,7 +246,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Creates the content guidelines singleton.
 	 *
 	 * Enforces the singleton constraint — only one post tagged with the
-	 * `content` term may exist.
+	 * `instruction` term may exist.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
@@ -261,19 +261,19 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			);
 		}
 
-		$content_term_id = self::get_or_create_term_id(
-			Gutenberg_Knowledge_Post_Type::TERM_CONTENT,
-			__( 'Content', 'gutenberg' )
+		$instruction_term_id = self::get_or_create_term_id(
+			Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION,
+			__( 'Instruction', 'gutenberg' )
 		);
-		if ( is_wp_error( $content_term_id ) ) {
-			return $content_term_id;
+		if ( is_wp_error( $instruction_term_id ) ) {
+			return $instruction_term_id;
 		}
 
 		$prepared             = $this->prepare_item_for_database( $request );
 		$prepared->post_type  = $this->post_type;
 		$prepared->post_title = __( 'Guidelines', 'gutenberg' );
 		$prepared->tax_input  = array(
-			Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $content_term_id ),
+			Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $instruction_term_id ),
 		);
 
 		if ( ! isset( $prepared->post_status ) ) {
@@ -630,7 +630,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 					array(
 						'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
 						'field'    => 'slug',
-						'terms'    => Gutenberg_Knowledge_Post_Type::TERM_CONTENT,
+						'terms'    => Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION,
 					),
 				),
 			)
@@ -796,7 +796,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Resolve the `wp_knowledge_type` term by slug, creating it if missing.
 	 *
 	 * Used by the create flow to attach the freshly-inserted content guideline
-	 * to the `content` term on first use, before the term is otherwise needed.
+	 * to the `instruction` term on first use, before the term is otherwise needed.
 	 *
 	 * @param string $slug Term slug.
 	 * @param string $name Human-readable term name, used when creating.

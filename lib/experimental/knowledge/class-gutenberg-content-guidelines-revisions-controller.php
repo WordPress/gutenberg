@@ -148,7 +148,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 	 * Resolves a parent post ID to a content-typed guideline post.
 	 *
 	 * Restricts /wp/v2/content-guidelines/{parent}/revisions to parents tagged
-	 * with the `content` term. Revisions of other knowledge types are
+	 * with the `instruction` term. Revisions of other knowledge types are
 	 * addressable only via the standard /wp/v2/knowledge collection.
 	 *
 	 * @param int $parent_post_id Supplied ID.

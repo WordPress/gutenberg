@@ -20,9 +20,9 @@ class Knowledge_Test extends WP_UnitTestCase {
 	public function test_returns_default_knowledge_types() {
 		$this->assertSame(
 			array(
-				'artifact' => array( 'title' => 'Artifact' ),
-				'content'  => array( 'title' => 'Content' ),
-				'memory'   => array( 'title' => 'Memory' ),
+				'instruction' => array( 'title' => 'Instruction' ),
+				'memory'      => array( 'title' => 'Memory' ),
+				'note'        => array( 'title' => 'Note' ),
 			),
 			wp_knowledge_types()
 		);
@@ -53,14 +53,14 @@ class Knowledge_Test extends WP_UnitTestCase {
 		add_filter(
 			'wp_knowledge_types',
 			static function ( $types ) {
-				unset( $types['content'] );
+				unset( $types['instruction'] );
 				return $types;
 			}
 		);
 
 		$types = wp_knowledge_types();
 
-		$this->assertArrayNotHasKey( 'content', $types );
+		$this->assertArrayNotHasKey( 'instruction', $types );
 	}
 
 	/**
@@ -68,8 +68,8 @@ class Knowledge_Test extends WP_UnitTestCase {
 	 */
 	public function test_label_filter_ignores_other_taxonomies() {
 		$input  = array(
-			'name' => 'artifact',
-			'slug' => 'artifact',
+			'name' => 'note',
+			'slug' => 'note',
 		);
 		$output = _wp_knowledge_maybe_map_term_label( $input, 'category' );
 
@@ -81,8 +81,8 @@ class Knowledge_Test extends WP_UnitTestCase {
 	 */
 	public function test_label_filter_preserves_user_provided_name() {
 		$input  = array(
-			'name' => 'My Custom Artifact',
-			'slug' => 'artifact',
+			'name' => 'My Custom Note',
+			'slug' => 'note',
 		);
 		$output = _wp_knowledge_maybe_map_term_label( $input, 'wp_knowledge_type' );
 
@@ -103,7 +103,7 @@ class Knowledge_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * End-to-end: when wp_set_object_terms() lazily creates the 'artifact'
+	 * End-to-end: when wp_set_object_terms() lazily creates the 'note'
 	 * term, the resulting term name should be the human-readable title rather
 	 * than the raw slug.
 	 */
@@ -111,10 +111,10 @@ class Knowledge_Test extends WP_UnitTestCase {
 		$post_id = self::factory()->post->create();
 		register_taxonomy( 'wp_knowledge_type', 'post' );
 
-		wp_set_object_terms( $post_id, 'artifact', 'wp_knowledge_type' );
+		wp_set_object_terms( $post_id, 'note', 'wp_knowledge_type' );
 
-		$term = get_term_by( 'slug', 'artifact', 'wp_knowledge_type' );
+		$term = get_term_by( 'slug', 'note', 'wp_knowledge_type' );
 		$this->assertInstanceOf( WP_Term::class, $term );
-		$this->assertSame( 'Artifact', $term->name );
+		$this->assertSame( 'Note', $term->name );
 	}
 }

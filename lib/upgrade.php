@@ -88,8 +88,9 @@ function _gutenberg_migrate_enable_real_time_collaboration() {
 
 /**
  * Rename the experimental Guidelines storage to Knowledge: `wp_guideline`
- * posts become `wp_knowledge`, and `wp_guideline_type` terms move to the
- * `wp_knowledge_type` taxonomy.
+ * posts become `wp_knowledge`, `wp_guideline_type` terms move to the
+ * `wp_knowledge_type` taxonomy, and the built-in type terms are re-slugged
+ * (`content` becomes `instruction`, `artifact` becomes `note`).
  *
  * Runs regardless of whether the `gutenberg-guidelines` experiment is
  * currently enabled so rows created while it was previously on are migrated
@@ -124,7 +125,51 @@ function _gutenberg_migrate_guidelines_to_knowledge() {
 			array( 'taxonomy' => 'wp_knowledge_type' ),
 			array( 'taxonomy' => 'wp_guideline_type' )
 		);
-		clean_term_cache( array_map( 'intval', $term_ids ), 'wp_knowledge_type' );
+	}
+
+	/*
+	 * Re-slug the renamed built-in types. Term names are only replaced when
+	 * they still match the previous default label (raw slug or its original
+	 * English title), so user-customized labels survive.
+	 */
+	$type_renames = array(
+		'content'  => array(
+			'slug'       => 'instruction',
+			'old_labels' => array( 'content', 'Content' ),
+			'new_label'  => __( 'Instruction', 'gutenberg' ),
+		),
+		'artifact' => array(
+			'slug'       => 'note',
+			'old_labels' => array( 'artifact', 'Artifact' ),
+			'new_label'  => __( 'Note', 'gutenberg' ),
+		),
+	);
+
+	foreach ( $type_renames as $old_slug => $rename ) {
+		$term = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT t.term_id, t.name FROM {$wpdb->terms} t
+				INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_id = t.term_id
+				WHERE tt.taxonomy = %s AND t.slug = %s",
+				'wp_knowledge_type',
+				$old_slug
+			)
+		);
+		if ( ! $term ) {
+			continue;
+		}
+
+		$update = array( 'slug' => $rename['slug'] );
+		if ( in_array( $term->name, $rename['old_labels'], true ) ) {
+			$update['name'] = $rename['new_label'];
+		}
+
+		$wpdb->update( $wpdb->terms, $update, array( 'term_id' => (int) $term->term_id ) );
+		$term_ids[] = (int) $term->term_id;
+	}
+
+	if ( $term_ids ) {
+		clean_term_cache( array_unique( array_map( 'intval', $term_ids ) ), 'wp_knowledge_type' );
 	}
 }
 

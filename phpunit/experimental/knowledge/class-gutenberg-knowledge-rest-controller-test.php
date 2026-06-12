@@ -85,7 +85,7 @@ class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 
 	/**
 	 * A POST to the collection creates the knowledge post and the save_post
-	 * hook assigns the `artifact` fallback type term.
+	 * hook assigns the `note` fallback type term.
 	 */
 	public function test_create_knowledge_post(): void {
 		$this->switch_to_user_role( 'administrator' );
@@ -109,12 +109,12 @@ class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 
 		$terms = wp_get_object_terms( $data['id'], Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( 'artifact' ), $terms );
+		$this->assertSame( array( 'note' ), $terms );
 	}
 
 	/**
 	 * A POST that explicitly supplies a `wp_knowledge_type` term keeps that
-	 * term; the `artifact` fallback only applies when no term is given.
+	 * term; the `note` fallback only applies when no term is given.
 	 */
 	public function test_create_knowledge_post_preserves_explicit_type(): void {
 		$memory_term_id = self::factory()->term->create(
@@ -259,7 +259,7 @@ class Gutenberg_Knowledge_REST_Controller_Test extends WP_UnitTestCase {
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( 'artifact' ), $terms );
+		$this->assertSame( array( 'note' ), $terms );
 	}
 
 	/**

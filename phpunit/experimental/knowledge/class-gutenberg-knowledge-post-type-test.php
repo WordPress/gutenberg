@@ -97,24 +97,24 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A knowledge post saved without a type term should get 'artifact'
+	 * A knowledge post saved without a type term should get 'note'
 	 * assigned by the save_post hook (replacement for default_term).
 	 */
-	public function test_save_post_assigns_artifact_fallback() {
+	public function test_save_post_assigns_note_fallback() {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'No-type guideline',
+				'post_title'  => 'No-type knowledge post',
 			)
 		);
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Knowledge_Post_Type::TAXONOMY );
 		$this->assertCount( 1, $terms );
-		$this->assertSame( 'artifact', $terms[0]->slug );
+		$this->assertSame( 'note', $terms[0]->slug );
 		// The wp_insert_term_data filter should have mapped the raw slug to
 		// the localized label when the term was created on first use.
-		$this->assertSame( 'Artifact', $terms[0]->name );
+		$this->assertSame( 'Note', $terms[0]->name );
 	}
 
 	/**
@@ -123,11 +123,11 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_explicit_term() {
 		wp_set_current_user( self::$admin_id );
 
-		$content_term_id = self::factory()->term->create(
+		$instruction_term_id = self::factory()->term->create(
 			array(
 				'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
-				'name'     => 'Content',
-				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_CONTENT,
+				'name'     => 'Instruction',
+				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION,
 			)
 		);
 
@@ -135,23 +135,23 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'Content guideline',
+				'post_title'  => 'Instruction-typed knowledge post',
 				'tax_input'   => array(
-					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $content_term_id ),
+					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $instruction_term_id ),
 				),
 			)
 		);
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_CONTENT ), $terms );
+		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION ), $terms );
 	}
 
 	/**
 	 * End-to-end check for the agent flow the cap relaxation enables: a
 	 * Contributor creates a new `wp_knowledge_type` term and attaches a
 	 * private knowledge post to it in the same session. The post must end up
-	 * tagged with the new term instead of the `artifact` fallback.
+	 * tagged with the new term instead of the `note` fallback.
 	 */
 	public function test_save_post_preserves_new_term_for_contributor() {
 		wp_set_current_user( self::$contributor_id );
@@ -190,11 +190,11 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	public function test_save_post_preserves_term_on_update() {
 		wp_set_current_user( self::$admin_id );
 
-		$content_term_id = self::factory()->term->create(
+		$instruction_term_id = self::factory()->term->create(
 			array(
 				'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
-				'name'     => 'Content',
-				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_CONTENT,
+				'name'     => 'Instruction',
+				'slug'     => Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION,
 			)
 		);
 
@@ -202,9 +202,9 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'Content guideline',
+				'post_title'  => 'Instruction-typed knowledge post',
 				'tax_input'   => array(
-					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $content_term_id ),
+					Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $instruction_term_id ),
 				),
 			)
 		);
@@ -218,7 +218,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 
 		$terms = wp_get_object_terms( $post_id, Gutenberg_Knowledge_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
 
-		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_CONTENT ), $terms );
+		$this->assertSame( array( Gutenberg_Knowledge_Post_Type::TERM_INSTRUCTION ), $terms );
 	}
 
 	/**

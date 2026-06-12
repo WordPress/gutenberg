@@ -11,8 +11,9 @@ class Knowledge_Migration_Test extends WP_UnitTestCase {
 
 	/**
 	 * Legacy `wp_guideline` rows move to `wp_knowledge`, their
-	 * `wp_guideline_type` terms move to `wp_knowledge_type`, and the
-	 * term relationships survive the rename.
+	 * `wp_guideline_type` terms move to `wp_knowledge_type` with the
+	 * built-in slugs renamed (`content` becomes `instruction`), and the
+	 * term relationships survive.
 	 */
 	public function test_migrates_legacy_guideline_rows() {
 		// The legacy taxonomy is no longer registered by the plugin; register
@@ -40,9 +41,31 @@ class Knowledge_Migration_Test extends WP_UnitTestCase {
 		$migrated_term = get_term( $term['term_id'] );
 		$this->assertInstanceOf( WP_Term::class, $migrated_term );
 		$this->assertSame( 'wp_knowledge_type', $migrated_term->taxonomy );
+		$this->assertSame( 'instruction', $migrated_term->slug );
+		$this->assertSame( 'Instruction', $migrated_term->name );
 
 		$slugs = wp_get_object_terms( $post_id, 'wp_knowledge_type', array( 'fields' => 'slugs' ) );
-		$this->assertSame( array( 'content' ), $slugs );
+		$this->assertSame( array( 'instruction' ), $slugs );
+	}
+
+	/**
+	 * Built-in type terms already living in `wp_knowledge_type` are
+	 * re-slugged too, and a user-customized term name is preserved while
+	 * the slug still moves.
+	 */
+	public function test_reslugs_existing_knowledge_type_terms() {
+		$term = wp_insert_term(
+			'My Working Files',
+			'wp_knowledge_type',
+			array( 'slug' => 'artifact' )
+		);
+		$this->assertIsArray( $term, 'Pre-condition: term must insert cleanly.' );
+
+		_gutenberg_migrate_guidelines_to_knowledge();
+
+		$migrated_term = get_term( $term['term_id'] );
+		$this->assertSame( 'note', $migrated_term->slug );
+		$this->assertSame( 'My Working Files', $migrated_term->name );
 	}
 
 	/**
@@ -57,13 +80,13 @@ class Knowledge_Migration_Test extends WP_UnitTestCase {
 				'post_title'  => 'Already migrated row',
 			)
 		);
-		wp_set_object_terms( $post_id, 'artifact', 'wp_knowledge_type' );
+		wp_set_object_terms( $post_id, 'memory', 'wp_knowledge_type' );
 
 		_gutenberg_migrate_guidelines_to_knowledge();
 
 		$this->assertSame( 'wp_knowledge', get_post( $post_id )->post_type );
 
 		$slugs = wp_get_object_terms( $post_id, 'wp_knowledge_type', array( 'fields' => 'slugs' ) );
-		$this->assertSame( array( 'artifact' ), $slugs );
+		$this->assertSame( array( 'memory' ), $slugs );
 	}
 }

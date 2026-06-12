@@ -29,11 +29,15 @@ class Gutenberg_Knowledge_Post_Type {
 	const TAXONOMY = 'wp_knowledge_type';
 
 	/**
-	 * Taxonomy term slug used for site-wide content guidelines.
+	 * Taxonomy term slug used for the site-wide guidelines singleton.
+	 *
+	 * Instructions are loaded by default when applicable; the site-wide
+	 * guidelines post managed by the Settings → Guidelines page carries
+	 * this term.
 	 *
 	 * @var string
 	 */
-	const TERM_CONTENT = 'content';
+	const TERM_INSTRUCTION = 'instruction';
 
 	/**
 	 * The standard guideline category meta keys.
@@ -192,14 +196,15 @@ class Gutenberg_Knowledge_Post_Type {
 	}
 
 	/**
-	 * Determines whether a knowledge post belongs to the content singleton.
+	 * Determines whether a knowledge post belongs to the site-wide
+	 * guidelines singleton.
 	 *
-	 * Used by the /wp/v2/content-guidelines route to reject non-content-typed
-	 * posts addressed by ID — those belong to the standard /wp/v2/knowledge
-	 * collection.
+	 * Used by the /wp/v2/content-guidelines route to reject posts without
+	 * the `instruction` term addressed by ID — those belong to the standard
+	 * /wp/v2/knowledge collection.
 	 *
 	 * @param int $post_id Post ID.
-	 * @return bool True if the post has the `content` term.
+	 * @return bool True if the post has the `instruction` term.
 	 */
 	public static function is_content_guideline( $post_id ) {
 		$terms = get_the_terms( $post_id, self::TAXONOMY );
@@ -208,7 +213,7 @@ class Gutenberg_Knowledge_Post_Type {
 		}
 
 		foreach ( $terms as $term ) {
-			if ( self::TERM_CONTENT === $term->slug ) {
+			if ( self::TERM_INSTRUCTION === $term->slug ) {
 				return true;
 			}
 		}

@@ -422,16 +422,16 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Helper: insert an artifact-typed guideline post directly, bypassing the singleton route.
+	 * Helper: insert a note-typed knowledge post directly, bypassing the singleton route.
 	 *
 	 * @return int Post ID.
 	 */
-	private function create_artifact_post() {
-		$artifact_term_id = self::factory()->term->create(
+	private function create_note_post() {
+		$note_term_id = self::factory()->term->create(
 			array(
 				'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
-				'name'     => 'Artifact',
-				'slug'     => 'artifact',
+				'name'     => 'Note',
+				'slug'     => 'note',
 			)
 		);
 
@@ -439,40 +439,40 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 			array(
 				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
-				'post_title'  => 'Artifact',
+				'post_title'  => 'Note',
 			)
 		);
 
-		wp_set_object_terms( $post_id, array( $artifact_term_id ), Gutenberg_Knowledge_Post_Type::TAXONOMY );
+		wp_set_object_terms( $post_id, array( $note_term_id ), Gutenberg_Knowledge_Post_Type::TAXONOMY );
 
 		return $post_id;
 	}
 
 	/**
-	 * Test that GET /content-guidelines/{id} rejects non-content-typed posts.
+	 * Test that GET /content-guidelines/{id} rejects non-instruction-typed posts.
 	 *
 	 * @covers ::get_post
 	 */
-	public function test_get_item_rejects_artifact_post() {
+	public function test_get_item_rejects_note_post() {
 		wp_set_current_user( self::$admin_id );
-		$artifact_id = $this->create_artifact_post();
+		$note_post_id = $this->create_note_post();
 
-		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $artifact_id );
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $note_post_id );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
 	}
 
 	/**
-	 * Test that PATCH /content-guidelines/{id} rejects non-content-typed posts.
+	 * Test that PATCH /content-guidelines/{id} rejects non-instruction-typed posts.
 	 *
 	 * @covers ::get_post
 	 */
-	public function test_update_item_rejects_artifact_post() {
+	public function test_update_item_rejects_note_post() {
 		wp_set_current_user( self::$admin_id );
-		$artifact_id = $this->create_artifact_post();
+		$note_post_id = $this->create_note_post();
 
-		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $artifact_id );
+		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $note_post_id );
 		$request->set_param( 'status', 'publish' );
 		$response = rest_get_server()->dispatch( $request );
 
@@ -480,15 +480,15 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Test that DELETE /content-guidelines/{id} rejects non-content-typed posts.
+	 * Test that DELETE /content-guidelines/{id} rejects non-instruction-typed posts.
 	 *
 	 * @covers ::get_post
 	 */
-	public function test_delete_item_rejects_artifact_post() {
+	public function test_delete_item_rejects_note_post() {
 		wp_set_current_user( self::$admin_id );
-		$artifact_id = $this->create_artifact_post();
+		$note_post_id = $this->create_note_post();
 
-		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $artifact_id );
+		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $note_post_id );
 		$request->set_param( 'force', true );
 		$response = rest_get_server()->dispatch( $request );
 
@@ -496,15 +496,15 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Test that /content-guidelines/{id}/revisions rejects non-content-typed parents.
+	 * Test that /content-guidelines/{id}/revisions rejects non-instruction-typed parents.
 	 *
 	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::get_parent
 	 */
-	public function test_revisions_reject_artifact_parent() {
+	public function test_revisions_reject_note_parent() {
 		wp_set_current_user( self::$admin_id );
-		$artifact_id = $this->create_artifact_post();
+		$note_post_id = $this->create_note_post();
 
-		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $artifact_id . '/revisions' );
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $note_post_id . '/revisions' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
