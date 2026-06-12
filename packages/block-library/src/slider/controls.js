@@ -22,7 +22,7 @@ function createSlideBlock() {
 	] );
 }
 
-function getSlideSelectionClientId( slide ) {
+export function getSlideSelectionClientId( slide ) {
 	return slide?.innerBlocks?.[ 0 ]?.clientId || slide?.clientId;
 }
 

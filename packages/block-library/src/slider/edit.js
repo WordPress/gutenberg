@@ -18,15 +18,18 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import SliderControls, { useSliderSlides } from './controls';
+import SliderControls, {
+	getSlideSelectionClientId,
+	useSliderSlides,
+} from './controls';
 import {
 	DEFAULT_PEEK_AMOUNT,
 	DEFAULT_PEEK_UNIT,
@@ -126,9 +129,17 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 		style,
 	} = attributes;
 	const { activeSlideIndex, slides } = useSliderSlides( clientId );
+	const selectedBlockClientId = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		[]
+	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		selectBlock,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+	const hasSelectedInitialSlideContentRef = useRef( false );
 	const slideCount = slides.length || SLIDER_TEMPLATE.length;
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -169,6 +180,36 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
+
+	useEffect( () => {
+		if (
+			hasSelectedInitialSlideContentRef.current ||
+			! selectedBlockClientId
+		) {
+			return;
+		}
+
+		const isSliderSelected = selectedBlockClientId === clientId;
+		const isSlideSelected = slides.some(
+			( slide ) => slide.clientId === selectedBlockClientId
+		);
+
+		if ( ! isSliderSelected && ! isSlideSelected ) {
+			return;
+		}
+
+		const selectionClientId = getSlideSelectionClientId( slides[ 0 ] );
+
+		if (
+			! selectionClientId ||
+			selectionClientId === slides[ 0 ]?.clientId
+		) {
+			return;
+		}
+
+		hasSelectedInitialSlideContentRef.current = true;
+		selectBlock( selectionClientId );
+	}, [ clientId, selectBlock, selectedBlockClientId, slides ] );
 
 	const onPeekAmountChange = ( nextAmount ) => {
 		const [ amount, unit = peekUnit ] = parseQuantityAndUnitFromRawValue(
