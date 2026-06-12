@@ -62,6 +62,7 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 			$processor->set_attribute( 'aria-label', $args['label'] );
 		} else {
 			$processor->set_attribute( 'aria-hidden', 'true' );
+			$processor->set_attribute( 'focusable', 'false' );
 		}
 
 		return $processor->get_updated_html();
