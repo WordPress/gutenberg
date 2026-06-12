@@ -23,6 +23,7 @@ import type {
 /**
  * Internal dependencies
  */
+import { DEFAULT_GRID } from '../utils/default-grid';
 import { computeGridModelChange } from '../utils/grid-model-change';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
@@ -32,19 +33,6 @@ import type {
 	DashboardWidget,
 } from '../types';
 import { WIDGET_DASHBOARD_COLUMN_COUNT } from '../types';
-
-/*
- * Defaults for the active grid model. Applied when the consumer omits
- * `gridSettings` entirely; if `gridSettings` is provided, the consumer's
- * shape passes through untouched and missing fields fall back to whatever
- * defaults the grid model itself supplies.
- *
- */
-const DEFAULT_GRID: WidgetGridSettings = {
-	model: 'grid',
-	columns: WIDGET_DASHBOARD_COLUMN_COUNT,
-	rowHeight: DEFAULT_ROW_HEIGHT,
-};
 
 type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
 
