@@ -10,7 +10,7 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 
-const ALLOWED_SEED_SPACE_IDS = new Set( [ 'srgb' ] );
+const ALLOWED_SEED_COLOR_SPACES = [ sRGB ];
 
 /**
  * Get string representation of a color.
@@ -51,7 +51,9 @@ export function getContrast(
  * @throws If `seed` is not an sRGB-parseable string.
  */
 export function assertValidSeedColor( seed: string ): void {
-	ColorSpace.register( sRGB );
+	ALLOWED_SEED_COLOR_SPACES.forEach( ( space ) =>
+		ColorSpace.register( space )
+	);
 
 	let spaceId: string;
 	try {
@@ -62,7 +64,9 @@ export function assertValidSeedColor( seed: string ): void {
 		);
 	}
 
-	if ( ! ALLOWED_SEED_SPACE_IDS.has( spaceId ) ) {
+	if (
+		! ALLOWED_SEED_COLOR_SPACES.some( ( space ) => space.id === spaceId )
+	) {
 		throw new Error(
 			`Unsupported seed color "${ seed }": expected a hex value, an \`rgb()\`/\`rgba()\` string, or a CSS named color, but received a \`${ spaceId }\` color.`
 		);
