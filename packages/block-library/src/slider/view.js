@@ -88,10 +88,38 @@ function getTargetScrollLeft( viewport, slides, index ) {
 }
 
 function scrollToSlide( viewport, slides, index, behavior = 'auto' ) {
+	const left = getTargetScrollLeft( viewport, slides, index );
+
 	viewport?.scrollTo( {
-		left: getTargetScrollLeft( viewport, slides, index ),
+		left,
 		behavior,
 	} );
+
+	return left;
+}
+
+function setActiveSlideIndex( context, nextIndex, slideCount ) {
+	const activeSlideIndex = context.activeSlideIndex ?? 0;
+
+	if ( nextIndex !== activeSlideIndex ) {
+		const direction = nextIndex > activeSlideIndex ? 'next' : 'previous';
+
+		context.dotAnimationDirection = direction;
+		context.dotAnimationFrame = ! context.dotAnimationFrame;
+		context.hasOutgoingPreviousDot =
+			direction === 'next' && activeSlideIndex > 0;
+		context.hasOutgoingNextDot =
+			direction === 'previous' &&
+			activeSlideIndex < Math.max( slideCount - 1, 0 );
+	}
+
+	context.activeSlideIndex = nextIndex;
+}
+
+function clearPendingScroll( context ) {
+	context.pendingSlideIndex = undefined;
+	context.pendingScrollLeft = undefined;
+	context.pendingScrollUntil = undefined;
 }
 
 function refreshSlider() {
@@ -103,6 +131,10 @@ function refreshSlider() {
 
 	context.slideCount = slideCount;
 	context.activeSlideIndex = nextIndex;
+	context.dotAnimationDirection = '';
+	context.hasOutgoingPreviousDot = false;
+	context.hasOutgoingNextDot = false;
+	clearPendingScroll( context );
 
 	scrollToSlide( viewport, slides, nextIndex );
 }
@@ -123,6 +155,30 @@ const { actions } = store(
 				const { activeSlideIndex, slideCount } = getContext();
 				return `Slide ${ activeSlideIndex + 1 } of ${ slideCount }`;
 			},
+			get isDotAnimationNext() {
+				const { dotAnimationDirection } = getContext();
+				return dotAnimationDirection === 'next';
+			},
+			get isDotAnimationPrevious() {
+				const { dotAnimationDirection } = getContext();
+				return dotAnimationDirection === 'previous';
+			},
+			get isDotAnimationFrameA() {
+				const { dotAnimationFrame } = getContext();
+				return !! dotAnimationFrame;
+			},
+			get isDotAnimationFrameB() {
+				const { dotAnimationFrame } = getContext();
+				return ! dotAnimationFrame;
+			},
+			get hasOutgoingPreviousDot() {
+				const { hasOutgoingPreviousDot } = getContext();
+				return !! hasOutgoingPreviousDot;
+			},
+			get hasOutgoingNextDot() {
+				const { hasOutgoingNextDot } = getContext();
+				return !! hasOutgoingNextDot;
+			},
 		},
 		actions: {
 			previous() {
@@ -140,10 +196,16 @@ const { actions } = store(
 				const slideCount = slides.length || context.slideCount || 0;
 				const nextIndex = clampSlideIndex( index, slideCount );
 
-				context.activeSlideIndex = nextIndex;
+				setActiveSlideIndex( context, nextIndex, slideCount );
 				context.slideCount = slideCount;
-
-				scrollToSlide( viewport, slides, nextIndex, 'smooth' );
+				context.pendingSlideIndex = nextIndex;
+				context.pendingScrollUntil = Date.now() + 600;
+				context.pendingScrollLeft = scrollToSlide(
+					viewport,
+					slides,
+					nextIndex,
+					'smooth'
+				);
 			},
 			handleScroll: withSyncEvent( ( event ) => {
 				const context = getContext();
@@ -151,8 +213,29 @@ const { actions } = store(
 				const { slides } = getSliderParts( viewport );
 				const nextIndex = getClosestSlideIndex( viewport, slides );
 
+				if ( context.pendingSlideIndex !== undefined ) {
+					const isPendingScrollExpired =
+						Date.now() > ( context.pendingScrollUntil ?? 0 );
+					const reachedTarget =
+						Math.abs(
+							viewport.scrollLeft -
+								( context.pendingScrollLeft ??
+									viewport.scrollLeft )
+						) < 1;
+
+					if (
+						reachedTarget ||
+						nextIndex === context.pendingSlideIndex
+					) {
+						clearPendingScroll( context );
+					} else if ( ! isPendingScrollExpired ) {
+						context.slideCount = slides.length;
+						return;
+					}
+				}
+
 				if ( nextIndex !== context.activeSlideIndex ) {
-					context.activeSlideIndex = nextIndex;
+					setActiveSlideIndex( context, nextIndex, slides.length );
 				}
 
 				context.slideCount = slides.length;

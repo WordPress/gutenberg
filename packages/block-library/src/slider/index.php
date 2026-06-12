@@ -53,8 +53,12 @@ function block_core_slider_render( array $attributes, string $content, \WP_Block
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'activeSlideIndex' => 0,
-				'slideCount'       => $slide_count,
+				'activeSlideIndex'       => 0,
+				'dotAnimationDirection'  => '',
+				'dotAnimationFrame'      => false,
+				'hasOutgoingNextDot'     => false,
+				'hasOutgoingPreviousDot' => false,
+				'slideCount'             => $slide_count,
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
@@ -69,6 +73,15 @@ function block_core_slider_render( array $attributes, string $content, \WP_Block
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__arrow--previous' ) ) ) {
 		$processor->set_attribute( 'data-wp-on--click', 'actions.previous' );
 		$processor->set_attribute( 'data-wp-bind--disabled', '!state.canGoPrevious' );
+	}
+
+	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__dots' ) ) ) {
+		$processor->set_attribute( 'data-wp-class--is-moving-next', 'state.isDotAnimationNext' );
+		$processor->set_attribute( 'data-wp-class--is-moving-previous', 'state.isDotAnimationPrevious' );
+		$processor->set_attribute( 'data-wp-class--is-animation-frame-a', 'state.isDotAnimationFrameA' );
+		$processor->set_attribute( 'data-wp-class--is-animation-frame-b', 'state.isDotAnimationFrameB' );
+		$processor->set_attribute( 'data-wp-class--has-outgoing-next-dot', 'state.hasOutgoingNextDot' );
+		$processor->set_attribute( 'data-wp-class--has-outgoing-previous-dot', 'state.hasOutgoingPreviousDot' );
 	}
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-slider__dot--previous' ) ) ) {
