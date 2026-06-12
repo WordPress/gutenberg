@@ -27,7 +27,7 @@
 
 .widgetChromeHeaderIcon {
 	display: inline-flex;
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 }
 
 /*

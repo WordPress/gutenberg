@@ -37,15 +37,15 @@
 		cursor: var(--wpds-cursor-control);
 
 		&.is-selected {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 
 		&.is-hovered {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 
 		&.is-selected.is-hovered {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 		}
 	}
 }

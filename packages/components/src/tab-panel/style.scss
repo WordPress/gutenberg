@@ -21,15 +21,15 @@
 	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: var(--wpds-typography-font-weight-regular);
-	color: var(--wpds-color-fg-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 
 	&:disabled,
 	&[aria-disabled="true"] {
-		color: var(--wpds-color-fg-interactive-neutral-disabled);
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
 	&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
-		color: var(--wpds-color-fg-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
 	&:focus:not(:disabled) {
@@ -101,7 +101,7 @@
 		}
 
 		&.is-active {
-			background: var(--wpds-color-bg-interactive-neutral-weak-active);
+			background: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 	}
 }

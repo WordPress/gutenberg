@@ -1,5 +1,7 @@
 import { type ReactNode } from 'react';
 
+export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
+
 export interface ThemeProviderSettings {
 	/**
 	 * The set of color options to apply to the theme.
@@ -20,7 +22,7 @@ export interface ThemeProviderSettings {
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
-		bg?: string;
+		background?: string;
 	};
 
 	/**
@@ -36,6 +38,19 @@ export interface ThemeProviderSettings {
 		 */
 		control?: 'default' | 'pointer';
 	};
+
+	/**
+	 * Overall roundness preset for the theme subtree: `none` (square corners),
+	 * `subtle`, `moderate`, or `pronounced` (most rounded).
+	 *
+	 * This scales the individual `--wpds-border-radius-*` token sizes for the
+	 * subtree; it sets the overall amount of roundness, not a single token
+	 * size.
+	 *
+	 * By default, it inherits from the parent `ThemeProvider`,
+	 * and falls back to the prebuilt default (`subtle`).
+	 */
+	cornerRadius?: CornerRadiusPreset;
 }
 
 export interface ThemeProviderProps extends ThemeProviderSettings {

@@ -1,5 +1,5 @@
 .components-external-link {
-	color: var(--wpds-color-fg-interactive-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
 	text-decoration: none;
 
 	// Match the `outset-ring--focus` utility used by `Link` in `@wordpress/ui`.
@@ -12,12 +12,12 @@
 	outline-offset: 1px;
 
 	&:visited {
-		color: var(--wpds-color-fg-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-brand);
 	}
 
 	&:hover,
 	&:active {
-		color: var(--wpds-color-fg-interactive-brand-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
 	}
 
 	&:focus {

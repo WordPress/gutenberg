@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { MouseEventHandler } from 'react';
 
 /**
  * WordPress dependencies
@@ -21,6 +20,7 @@ import type {
 	CustomGradientBarReducerAction,
 	CustomGradientBarIdleState,
 } from '../types';
+import type { MouseEventHandler } from 'react';
 
 const customGradientBarReducer = (
 	state: CustomGradientBarReducerState,

@@ -15,7 +15,7 @@ In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/t
 
 ### Using Design Tokens
 
-Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
+Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-foreground-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
 
 The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors for a specific part of your application.
 
@@ -56,7 +56,7 @@ This separation allows the design system to maintain consistency while providing
 
 Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
 
-Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
+Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-background-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
 
 #### Structure
 
@@ -96,7 +96,7 @@ function App() {
 The `color` prop accepts an object with the following optional properties:
 
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
--   `bg`: The background seed color (default: `'#f8f8f8'`).
+-   `background`: The background seed color (default: `'#f8f8f8'`).
 
 Both properties accept a hex string (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword (e.g. `'blue'`). The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
@@ -104,16 +104,18 @@ The `cursor` prop accepts an object with the following optional properties:
 
 -   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
-When the `color` or `cursor` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
+
+When the `color`, `cursor`, or `cornerRadius` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
 The provider can be used recursively to override or modify the theme for a specific subtree.
 
 ```tsx
-<ThemeProvider color={ { bg: 'white' } }>
+<ThemeProvider color={ { background: 'white' } }>
 	{ /* light-themed UI components */ }
-	<ThemeProvider color={ { bg: '#1e1e1e' } }>
+	<ThemeProvider color={ { background: '#1e1e1e' } }>
 		{ /* dark-themed UI components */ }
 		<ThemeProvider color={ { primary: 'red' } }>
 			{ /* dark-themed with red accent */ }
@@ -171,7 +173,7 @@ This rule reports an error when a CSS value references a `--wpds-*` custom prope
 
 /* ✓ OK */
 .example {
-	color: var( --wpds-color-fg-content-neutral );
+	color: var( --wpds-color-foreground-content-neutral );
 }
 ```
 
@@ -187,7 +189,7 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 
 /* ✗ Error: Overriding existing tokens is also not allowed */
 .example {
-	--wpds-color-fg-content-neutral: red;
+	--wpds-color-foreground-content-neutral: red;
 }
 
 /* ✓ OK */
@@ -201,14 +203,14 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
 
 ```css
-/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
+/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-foreground-content-neutral' */
 .example {
-	color: var( --wpds-color-fg-content-neutral, #1e1e1e );
+	color: var( --wpds-color-foreground-content-neutral, #1e1e1e );
 }
 
 /* ✓ OK */
 .example {
-	color: var( --wpds-color-fg-content-neutral );
+	color: var( --wpds-color-foreground-content-neutral );
 }
 
 /* ✓ OK: Non-wpds custom properties are not checked */
@@ -219,7 +221,7 @@ This rule reports an error when a `var()` call for a `--wpds-*` token includes a
 
 ## Build Plugins
 
-This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-fg-content-neutral)` becomes `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
+This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-foreground-content-neutral)` becomes `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
 
 `@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
 

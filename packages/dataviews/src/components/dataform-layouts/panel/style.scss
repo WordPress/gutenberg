@@ -27,14 +27,14 @@
 	}
 
 	&:not(.is-disabled):hover {
-		color: var(--wpds-color-fg-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-brand);
 
 		.dataforms-layouts-panel__field-trigger-icon {
 			opacity: 1;
 		}
 
 		.dataforms-layouts-panel__field-label {
-			color: var(--wpds-color-fg-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
 
@@ -42,7 +42,7 @@
 		cursor: default;
 
 		.dataforms-layouts-panel__field-control {
-			color: var(--wpds-color-fg-content-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 			font-weight: var(--wpds-typography-font-weight-regular);
 		}
 	}
@@ -55,13 +55,13 @@
 
 	&:hover,
 	&:focus-visible {
-		fill: var(--wpds-color-fg-interactive-brand);
+		fill: var(--wpds-color-foreground-interactive-brand);
 	}
 }
 
 .dataforms-layouts-panel__field-trigger-icon {
 	padding: 0;
-	color: var(--wpds-color-fg-interactive-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
 	flex: 0 0 auto;
 	opacity: 0;
 	border-radius: var(--wpds-border-radius-xs);
@@ -90,7 +90,7 @@
 	align-items: center;
 	line-height: var(--wpds-typography-line-height-sm);
 	hyphens: auto;
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 
 	.components-base-control__label {
 		display: inline;
@@ -99,7 +99,7 @@
 	}
 
 	&.has-error {
-		color: var(--wpds-color-fg-content-error-weak);
+		color: var(--wpds-color-foreground-content-error-weak);
 	}
 }
 
@@ -107,7 +107,7 @@
 	position: relative;
 	z-index: 1;
 	cursor: help;
-	fill: var(--wpds-color-fg-content-error-weak);
+	fill: var(--wpds-color-foreground-content-error-weak);
 	display: inline-flex;
 	flex-direction: row;
 	align-items: center;

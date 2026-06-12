@@ -8,7 +8,7 @@ $header-height: variables.$header-height;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--wpds-color-bg-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-weak);
 	text-decoration: none;
 
 	@media not (prefers-reduced-motion) {

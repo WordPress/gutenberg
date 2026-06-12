@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.0.0 (2026-06-10)
+
 ### Breaking Changes
 
 -   Turn `@wordpress/nux` into a deprecated no-op compatibility package. `DotTip` renders nothing, selectors return empty disabled values, and actions no longer have runtime effects ([#77773](https://github.com/WordPress/gutenberg/pull/77773)).
