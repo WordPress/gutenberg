@@ -276,6 +276,7 @@ function Navigation( {
 			flexWrap = 'wrap',
 		} = {},
 		hasIcon,
+		overlayOpenButtonDisplay,
 		icon = 'handle',
 	} = attributes;
 
@@ -788,6 +789,7 @@ function Navigation( {
 								submenuVisibility: 'hover',
 								overlayMenu: 'mobile',
 								hasIcon: true,
+								overlayOpenButtonDisplay: undefined,
 								icon: 'handle',
 							} );
 						} }
@@ -907,6 +909,7 @@ function Navigation( {
 						overlayMenuPreview={ overlayMenuPreview }
 						setOverlayMenuPreview={ setOverlayMenuPreview }
 						hasIcon={ hasIcon }
+						overlayOpenButtonDisplay={ overlayOpenButtonDisplay }
 						icon={ icon }
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
 						overlayMenuPreviewId={ overlayMenuPreviewId }
@@ -977,6 +980,7 @@ function Navigation( {
 						onToggle={ setResponsiveMenuVisibility }
 						isOpen={ isResponsiveMenuOpen }
 						hasIcon={ hasIcon }
+						overlayOpenButtonDisplay={ overlayOpenButtonDisplay }
 						icon={ icon }
 						isResponsive={ isResponsive }
 						isHiddenByDefault={ isHiddenByDefault }
@@ -1141,6 +1145,9 @@ function Navigation( {
 									id={ clientId }
 									onToggle={ setResponsiveMenuVisibility }
 									hasIcon={ hasIcon }
+									overlayOpenButtonDisplay={
+										overlayOpenButtonDisplay
+									}
 									icon={ icon }
 									isOpen={ isResponsiveMenuOpen }
 									isResponsive={ isResponsive }

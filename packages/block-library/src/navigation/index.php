@@ -733,18 +733,43 @@ class WP_Navigation_Block_Renderer {
 			$is_hidden_by_default ? 'always-shown' : '',
 		);
 
-		$should_display_icon_label = isset( $attributes['hasIcon'] ) && true === $attributes['hasIcon'];
-		$toggle_button_icon        = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h16v1.5H4z"></path><path d="M4 15h16v1.5H4z"></path></svg>';
+		// Derive display mode: new attribute takes precedence; fall back to legacy hasIcon.
+		if ( ! empty( $attributes['overlayOpenButtonDisplay'] ) ) {
+			$display_mode = $attributes['overlayOpenButtonDisplay'];
+		} else {
+			$display_mode = ( isset( $attributes['hasIcon'] ) && false === $attributes['hasIcon'] ) ? 'text' : 'icon';
+		}
+
+		$show_icon = 'icon' === $display_mode || 'both' === $display_mode;
+		$show_text = 'text' === $display_mode || 'both' === $display_mode;
+
+		$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7.5h16v1.5H4z"></path><path d="M4 15h16v1.5H4z"></path></svg>';
 		if ( isset( $attributes['icon'] ) ) {
 			if ( 'menu' === $attributes['icon'] ) {
 				$toggle_button_icon = '<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 5v1.5h14V5H5z"></path><path d="M5 12.8h14v-1.5H5v1.5z"></path><path d="M5 19h14v-1.5H5V19z"></path></svg>';
 			}
 		}
-		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
+
+		$toggle_button_content = '';
+		if ( $show_icon ) {
+			$toggle_button_content .= $toggle_button_icon;
+		}
+		if ( $show_text ) {
+			$toggle_button_content .= __( 'Menu' );
+		}
+
 		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
-		$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
-		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
-		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
+		$toggle_close_button_content = '';
+		if ( $show_icon ) {
+			$toggle_close_button_content .= $toggle_close_button_icon;
+		}
+		if ( $show_text ) {
+			$toggle_close_button_content .= __( 'Close' );
+		}
+
+		// Aria-label is needed only when the button shows no visible text.
+		$toggle_aria_label_open  = ( $show_icon && ! $show_text ) ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
+		$toggle_aria_label_close = ( $show_icon && ! $show_text ) ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
 
 		// Add Interactivity API directives to the markup if needed.
 		$open_button_directives          = '';

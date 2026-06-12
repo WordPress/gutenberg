@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -14,53 +13,81 @@ import { __ } from '@wordpress/i18n';
  */
 import OverlayMenuIcon from './overlay-menu-icon';
 
-export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
+export default function OverlayMenuPreview( {
+	setAttributes,
+	overlayOpenButtonDisplay,
+	icon,
+} ) {
+	const showIconPicker = overlayOpenButtonDisplay !== 'text';
+
 	return (
 		<>
 			<ToolsPanelItem
-				label={ __( 'Show icon button' ) }
+				label={ __( 'Display Mode' ) }
 				isShownByDefault
-				hasValue={ () => ! hasIcon }
-				onDeselect={ () => setAttributes( { hasIcon: true } ) }
-			>
-				<ToggleControl
-					label={ __( 'Show icon button' ) }
-					help={ __(
-						'Configure the visual appearance of the button that toggles the overlay menu.'
-					) }
-					onChange={ ( value ) =>
-						setAttributes( { hasIcon: value } )
-					}
-					checked={ hasIcon }
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				label={ __( 'Icon' ) }
-				isShownByDefault
-				hasValue={ () => icon !== 'handle' }
-				onDeselect={ () => setAttributes( { icon: 'handle' } ) }
+				hasValue={ () => overlayOpenButtonDisplay !== undefined }
+				onDeselect={ () =>
+					setAttributes( {
+						overlayOpenButtonDisplay: undefined,
+					} )
+				}
 			>
 				<ToggleGroupControl
 					__next40pxDefaultSize
-					className="wp-block-navigation__overlay-menu-icon-toggle-group"
-					label={ __( 'Icon' ) }
-					value={ icon }
-					onChange={ ( value ) => setAttributes( { icon: value } ) }
+					label={ __( 'Display Mode' ) }
+					value={ overlayOpenButtonDisplay ?? 'icon' }
+					onChange={ ( value ) =>
+						setAttributes( {
+							overlayOpenButtonDisplay: value,
+						} )
+					}
 					isBlock
 				>
 					<ToggleGroupControlOption
-						value="handle"
-						aria-label={ __( 'handle' ) }
-						label={ <OverlayMenuIcon icon="handle" /> }
+						value="icon"
+						label={ __( 'Icon' ) }
 					/>
 					<ToggleGroupControlOption
-						value="menu"
-						aria-label={ __( 'menu' ) }
-						label={ <OverlayMenuIcon icon="menu" /> }
+						value="text"
+						label={ __( 'Text' ) }
+					/>
+					<ToggleGroupControlOption
+						value="both"
+						label={ __( 'Both' ) }
 					/>
 				</ToggleGroupControl>
 			</ToolsPanelItem>
+
+			{ showIconPicker && (
+				<ToolsPanelItem
+					label={ __( 'Icon' ) }
+					isShownByDefault
+					hasValue={ () => icon !== 'handle' }
+					onDeselect={ () => setAttributes( { icon: 'handle' } ) }
+				>
+					<ToggleGroupControl
+						__next40pxDefaultSize
+						className="wp-block-navigation__overlay-menu-icon-toggle-group"
+						label={ __( 'Icon' ) }
+						value={ icon }
+						onChange={ ( value ) =>
+							setAttributes( { icon: value } )
+						}
+						isBlock
+					>
+						<ToggleGroupControlOption
+							value="handle"
+							aria-label={ __( 'handle' ) }
+							label={ <OverlayMenuIcon icon="handle" /> }
+						/>
+						<ToggleGroupControlOption
+							value="menu"
+							aria-label={ __( 'menu' ) }
+							label={ <OverlayMenuIcon icon="menu" /> }
+						/>
+					</ToggleGroupControl>
+				</ToolsPanelItem>
+			) }
 		</>
 	);
 }

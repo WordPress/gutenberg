@@ -29,6 +29,7 @@ export default function ResponsiveWrapper( {
 	overlayBackgroundColor,
 	overlayTextColor,
 	hasIcon,
+	overlayOpenButtonDisplay,
 	icon,
 	overlay,
 	onNavigateToEntityRecord,
@@ -41,6 +42,12 @@ export default function ResponsiveWrapper( {
 	if ( ! isResponsive ) {
 		return children;
 	}
+
+	// Derive display mode: new attribute takes precedence; fall back to legacy hasIcon.
+	const displayMode =
+		overlayOpenButtonDisplay ?? ( hasIcon !== false ? 'icon' : 'text' );
+	const showIcon = displayMode === 'icon' || displayMode === 'both';
+	const showText = displayMode === 'text' || displayMode === 'both';
 
 	// Only apply overlay colors if there's no custom overlay template part.
 	const hasCustomOverlay = !! overlay;
@@ -116,12 +123,14 @@ export default function ResponsiveWrapper( {
 				<Button
 					__next40pxDefaultSize
 					aria-haspopup="true"
-					aria-label={ hasIcon && __( 'Open menu' ) }
+					aria-label={
+						showIcon && ! showText ? __( 'Open menu' ) : undefined
+					}
 					className={ openButtonClasses }
 					onClick={ handleToggleClick }
 				>
-					{ hasIcon && <OverlayMenuIcon icon={ icon } /> }
-					{ ! hasIcon && __( 'Menu' ) }
+					{ showIcon && <OverlayMenuIcon icon={ icon } /> }
+					{ showText && __( 'Menu' ) }
 				</Button>
 			) }
 
@@ -138,11 +147,15 @@ export default function ResponsiveWrapper( {
 						<Button
 							__next40pxDefaultSize
 							className="wp-block-navigation__responsive-container-close"
-							aria-label={ hasIcon && __( 'Close menu' ) }
+							aria-label={
+								showIcon && ! showText
+									? __( 'Close menu' )
+									: undefined
+							}
 							onClick={ () => onToggle( false ) }
 						>
-							{ hasIcon && <Icon icon={ close } /> }
-							{ ! hasIcon && __( 'Close' ) }
+							{ showIcon && <Icon icon={ close } /> }
+							{ showText && __( 'Close' ) }
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"

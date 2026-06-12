@@ -57,6 +57,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `overlay` | `string` | — | — |
 | `icon` | `string` | `"handle"` | — |
 | `hasIcon` | `boolean` | `true` | — |
+| `overlayOpenButtonDisplay` | `string` | — | [Enum](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `icon`, `text`, `both` |
 | `__unstableLocation` | `string` | — | — |
 | `overlayBackgroundColor` | `string` | — | — |
 | `customOverlayBackgroundColor` | `string` | — | — |
