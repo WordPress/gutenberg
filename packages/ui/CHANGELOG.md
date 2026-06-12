@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `Field.Details`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
+-   `Field.Description`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
 
 ## 0.15.0 (2026-06-10)
 
