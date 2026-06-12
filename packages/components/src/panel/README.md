@@ -2,6 +2,8 @@
 
 Panels expand and collapse multiple sections of content.
 
+The `Panel` family is intended for the block inspector sidebar. For collapsible sections elsewhere, use the [`CollapsibleCard`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-collapsiblecard--docs) component instead.
+
 ![](https://make.wordpress.org/design/files/2019/03/panel.png)
 
 ## Design guidelines
@@ -49,8 +51,6 @@ Panels should be expanded by default if the content is important or essential. P
 ## Development guidelines
 
 The `Panel` creates a container with a header that can take collapsible `PanelBody` components to easily create a user friendly interface for affecting state and attributes.
-
-> **Note:** The `Panel` family is intended for the block inspector sidebar. For collapsible sections elsewhere, use the [`CollapsibleCard`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-collapsiblecard--docs) component instead.
 
 ### Usage
 
