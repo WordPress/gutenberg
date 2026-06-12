@@ -1,5 +1,10 @@
 import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
-import { clampToGamut, getContrast, getColorString } from './color-utils';
+import {
+	assertValidSeedColor,
+	clampToGamut,
+	getContrast,
+	getColorString,
+} from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
 	sortByDependency,
@@ -203,6 +208,12 @@ export function buildRamp(
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
+	// Enforce the documented seed-color input contract at the single
+	// user-input chokepoint. Internal recursive callers pass
+	// `PlainColorObject`s to `clampToGamut`, not strings to `buildRamp`, so
+	// this is the right boundary for string validation.
+	assertValidSeedColor( seedArg );
+
 	let seed: PlainColorObject;
 	try {
 		seed = clampToGamut( seedArg );

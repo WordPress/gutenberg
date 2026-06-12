@@ -98,7 +98,7 @@ The `color` prop accepts an object with the following optional properties:
 -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
 -   `background`: The background seed color (default: `'#f8f8f8'`).
 
-Both properties accept a hex string (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword (e.g. `'blue'`). The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+Both properties accept an sRGB-parseable string: a hex value (e.g. `#3858e9`), an `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Other CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and will throw an error. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
 The `cursor` prop accepts an object with the following optional properties:
 

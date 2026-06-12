@@ -6,16 +6,22 @@ export interface ThemeProviderSettings {
 	 */
 	color?: {
 		/**
-		 * The primary seed color to use for the theme. Accepts a hex string
-		 * (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword.
+		 * The primary seed color to use for the theme. Accepts an
+		 * sRGB-parseable string: a hex value (e.g. `#3858e9`), an
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Other
+		 * CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted
+		 * and throw an error.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
 		primary?: string;
 		/**
-		 * The background seed color to use for the theme. Accepts a hex string
-		 * (e.g. `#f8f8f8`), an `rgb(...)` string, or a CSS color keyword.
+		 * The background seed color to use for the theme. Accepts an
+		 * sRGB-parseable string: a hex value (e.g. `#f8f8f8`), an
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Other
+		 * CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted
+		 * and throw an error.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
