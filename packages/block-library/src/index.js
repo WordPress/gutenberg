@@ -133,10 +133,10 @@ import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as slide from './slide';
+import * as slider from './slider';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
-import * as slider from './slider';
 import * as tabPanel from './tab-panel';
 import * as tabPanels from './tab-panels';
 import * as table from './table';
@@ -294,8 +294,8 @@ const getAllBlocks = () => {
 		blocks.push( tabPanels );
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
-		blocks.push( slider );
 		blocks.push( slide );
+		blocks.push( slider );
 	}
 
 	// Always register the classic block. Inserter availability is controlled
