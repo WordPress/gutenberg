@@ -73,7 +73,6 @@
 		"cross-env": "^7.0.3",
 		"eslint": "^10.0.0",
 		"eslint-formatter-compact": "^9.0.1",
-		"glob": "^7.1.2",
 		"husky": "^7.0.0",
 		"lerna": "^9.0.7",
 		"lint-staged": "^16.4.0",

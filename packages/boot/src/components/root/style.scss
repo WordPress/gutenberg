@@ -6,9 +6,9 @@
 	width: 100%;
 	display: flex;
 	flex-direction: row;
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	isolation: isolate;
-	background: var(--wpds-color-bg-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-weak);
 }
 
 .boot-layout__sidebar-backdrop {
@@ -36,7 +36,7 @@
 		inset-inline-start: 0;
 		width: 300px;
 		max-width: 85vw;
-		background: var(--wpds-color-bg-surface-neutral-weak);
+		background: var(--wpds-color-background-surface-neutral-weak);
 		z-index: 100003;
 		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
 	}
@@ -53,7 +53,7 @@
 	}
 
 	z-index: 3;
-	background: var(--wpds-color-bg-surface-neutral);
+	background: var(--wpds-color-background-surface-neutral);
 	padding: variables.$grid-unit-20;
 	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 	display: flex;
@@ -86,8 +86,8 @@
 .boot-layout__inspector {
 	flex: 1;
 	overflow-y: auto;
-	background: var(--wpds-color-bg-surface-neutral);
-	color: var(--wpds-color-fg-content-neutral);
+	background: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	position: relative;
 
 	// Mobile-first: surfaces take full screen with fixed positioning
@@ -139,8 +139,8 @@
 .boot-layout__canvas {
 	flex: 1;
 	overflow-y: auto;
-	background: var(--wpds-color-bg-surface-neutral);
-	color: var(--wpds-color-fg-content-neutral);
+	background: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 	position: relative;

@@ -4,14 +4,14 @@
 
 .edit-site-layout {
 	height: 100%;
-	background: var(--wpds-color-bg-surface-neutral-weak);
-	color: var(--wpds-color-fg-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	display: flex;
 	flex-direction: column;
 
 	// Show a dark background in "frame" mode to avoid edge artifacts.
 	&:not(.is-full-canvas) .editor-visual-editor {
-		background: var(--wpds-color-bg-surface-neutral-weak);
+		background: var(--wpds-color-background-surface-neutral-weak);
 	}
 }
 
@@ -91,7 +91,7 @@
 // reserved scrollbar gutter, preventing the theme background color from
 // bleeding through.
 .edit-site-sidebar__screen-wrapper:has(.edit-site-layout__mobile-content) {
-	background: var(--wpds-color-bg-surface-neutral);
+	background: var(--wpds-color-background-surface-neutral);
 }
 
 .edit-site-layout__canvas-container {
@@ -117,7 +117,7 @@
 	}
 
 	.edit-site-resizable-frame__inner {
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@include break-medium {
@@ -186,7 +186,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	view-transition-name: toggle;
 	/* stylelint-enable  */
 	position: relative;
-	color: var(--wpds-color-fg-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -194,12 +194,12 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--wpds-color-bg-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-weak);
 	border-radius: 0;
 
 	&:hover,
 	&:active {
-		color: var(--wpds-color-fg-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
 	&:focus-visible,
@@ -242,8 +242,8 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	left: auto;
 	right: 0;
 	width: $sidebar-width;
-	color: var(--wpds-color-fg-content-neutral);
-	background: var(--wpds-color-bg-surface-neutral-strong);
+	color: var(--wpds-color-foreground-content-neutral);
+	background: var(--wpds-color-background-surface-neutral-strong);
 
 	&:focus,
 	&:focus-within {
