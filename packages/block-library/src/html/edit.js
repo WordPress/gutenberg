@@ -11,7 +11,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { parse, getBlockContent } from '@wordpress/blocks';
+import { parse, serialize, getBlockContent } from '@wordpress/blocks';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import {
 	ToolbarButton,
@@ -49,20 +49,36 @@ export default function HTMLEdit( { clientId } ) {
 	// `innerContent` fragments and `<!-- wp:* -->` delimited segments become
 	// inner blocks mounted at their positions within the static markup.
 	const onUpdate = ( nextContent ) => {
+		if ( nextContent === content ) {
+			return;
+		}
+
 		const [ parsedBlock ] = parse(
 			`<!-- wp:html -->\n${ nextContent }\n<!-- /wp:html -->`
 		);
+		const nextInnerBlocks = parsedBlock?.innerBlocks ?? [];
+		const prevInnerBlocks = registry
+			.select( blockEditorStore )
+			.getBlocks( clientId );
+		// Keep the existing inner blocks, and thereby their client IDs and
+		// selection, when their markup is unchanged — e.g. when only the
+		// surrounding static HTML was edited.
+		const innerBlocksUnchanged =
+			prevInnerBlocks.length === nextInnerBlocks.length &&
+			prevInnerBlocks.every(
+				( block, index ) =>
+					serialize( block ) === serialize( nextInnerBlocks[ index ] )
+			);
+
 		registry.batch( () => {
 			updateBlock( clientId, {
 				innerContent:
 					parsedBlock?.innerContent ??
 					( nextContent ? [ nextContent ] : [] ),
 			} );
-			replaceInnerBlocks(
-				clientId,
-				parsedBlock?.innerBlocks ?? [],
-				false
-			);
+			if ( ! innerBlocksUnchanged ) {
+				replaceInnerBlocks( clientId, nextInnerBlocks, false );
+			}
 		} );
 	};
 
