@@ -271,15 +271,20 @@ export default ( props ) => ( element ) => {
 		// selection.
 		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
 			// A nested editable element does not receive a caret from being
-			// focused, unlike an editing host. Match the editing host
-			// behavior for programmatic focus: place the caret at the start,
-			// unless the element already contains the selection.
+			// focused, unlike an editing host. When the element does not
+			// contain the selection, restore the internal record's selection,
+			// or match the editing host behavior for programmatic focus and
+			// place the caret at the start.
 			const selection = defaultView.getSelection();
 			if (
 				! selection.anchorNode ||
 				! element.contains( selection.anchorNode )
 			) {
-				selection.collapse( element, 0 );
+				if ( isSelected && record.current.start !== undefined ) {
+					applyRecord( record.current );
+				} else {
+					selection.collapse( element, 0 );
+				}
 			}
 			return;
 		}
