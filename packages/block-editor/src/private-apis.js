@@ -69,6 +69,7 @@ import useBlockDisplayTitle from './components/block-title/use-block-display-tit
 import TabbedSidebar from './components/tabbed-sidebar';
 import NoteIconSlotFill from './components/collab/note-icon-slot';
 import NoteIconToolbarSlotFill from './components/collab/note-icon-toolbar-slot';
+import BlockLockModalActionsSlotFill from './components/block-lock/modal-actions-slot';
 import HTMLElementControl from './components/html-element-control';
 import {
 	useBlockElementRef,
@@ -138,6 +139,7 @@ lock( privateApis, {
 	sectionRootClientIdKey,
 	NoteIconSlotFill,
 	NoteIconToolbarSlotFill,
+	BlockLockModalActionsSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
 	deviceTypeKey,

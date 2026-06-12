@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `BlockLockModalActionsSlotFill` private SlotFill so higher layers can add actions to the block lock modal.
+
 ## 15.21.0 (2026-06-10)
 
 ### Code Quality

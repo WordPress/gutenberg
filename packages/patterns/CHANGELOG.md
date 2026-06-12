@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a "Lock design…" action to the block lock modal that turns the block into an unsynced pattern (content-only), connecting block locking with patterns.
+
 ## 2.48.0 (2026-06-10)
 
 ## 2.47.0 (2026-05-27)

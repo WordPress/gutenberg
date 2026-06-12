@@ -14,7 +14,7 @@
 }
 
 .block-editor-block-lock-modal__options legend {
-	margin-bottom: $grid-unit-20;
+	margin-bottom: $grid-unit-10;
 	padding: 0;
 }
 
@@ -39,7 +39,7 @@
 	align-items: center;
 	gap: $grid-unit-15;
 	margin-bottom: 0;
-	padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-40;
+	padding: 0 0 $grid-unit-15 $grid-unit-40;
 
 	.block-editor-block-lock-modal__lock-icon {
 		flex-shrink: 0;
@@ -54,9 +54,25 @@
 }
 
 .block-editor-block-lock-modal__template-lock {
+	margin-top: $grid-unit-20;
+	padding-top: $grid-unit-20;
+}
+
+.block-editor-block-lock-modal__extra-actions {
 	border-top: $border-width solid $gray-300;
 	margin-top: $grid-unit-20;
 	padding-top: $grid-unit-20;
+}
+
+.block-editor-block-lock-modal__lock-design-help {
+	margin: 0 0 $grid-unit-15;
+}
+
+// The state classes are chained to outrank the component's own
+// `.components-button.has-icon.has-text { justify-content: start }` rule.
+.block-editor-block-lock-modal__lock-design-button.components-button.has-icon.has-text {
+	width: 100%;
+	justify-content: center;
 }
 
 .block-editor-block-lock-modal__actions {

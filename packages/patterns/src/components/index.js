@@ -8,25 +8,29 @@ import { BlockSettingsMenuControls } from '@wordpress/block-editor';
  */
 import PatternConvertButton from './pattern-convert-button';
 import PatternsManageButton from './patterns-manage-button';
+import LockDesignButton from './lock-design-button';
 
 export default function PatternsMenuItems( { rootClientId } ) {
 	return (
-		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds, onClose } ) => (
-				<>
-					<PatternConvertButton
-						clientIds={ selectedClientIds }
-						rootClientId={ rootClientId }
-						closeBlockSettingsMenu={ onClose }
-					/>
-					{ selectedClientIds.length === 1 && (
-						<PatternsManageButton
-							clientId={ selectedClientIds[ 0 ] }
-							onClose={ onClose }
+		<>
+			<BlockSettingsMenuControls>
+				{ ( { selectedClientIds, onClose } ) => (
+					<>
+						<PatternConvertButton
+							clientIds={ selectedClientIds }
+							rootClientId={ rootClientId }
+							closeBlockSettingsMenu={ onClose }
 						/>
-					) }
-				</>
-			) }
-		</BlockSettingsMenuControls>
+						{ selectedClientIds.length === 1 && (
+							<PatternsManageButton
+								clientId={ selectedClientIds[ 0 ] }
+								onClose={ onClose }
+							/>
+						) }
+					</>
+				) }
+			</BlockSettingsMenuControls>
+			<LockDesignButton />
+		</>
 	);
 }

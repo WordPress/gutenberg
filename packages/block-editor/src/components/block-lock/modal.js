@@ -22,6 +22,7 @@ import { getBlockType } from '@wordpress/blocks';
 import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
+import BlockLockModalActionsSlotFill from './modal-actions-slot';
 
 // Entity based blocks which allow edit locking
 const ALLOWS_EDIT_LOCKING = [ 'core/navigation' ];
@@ -205,7 +206,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 					{ hasTemplateLock && (
 						<ToggleControl
-							className="block-editor-block-lock-modal__template-lock"
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ applyTemplateLock }
 							disabled={ lock.move && ! lock.remove }
@@ -215,6 +215,9 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						/>
 					) }
 				</fieldset>
+				<BlockLockModalActionsSlotFill.Slot
+					fillProps={ { clientId, onClose } }
+				/>
 				<Flex
 					className="block-editor-block-lock-modal__actions"
 					justify="flex-end"
