@@ -1587,7 +1587,7 @@
 			"count": 1
 		}
 	},
-	"packages/widget-dashboard/src/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx": {
+	"packages/widget-dashboard/src/components/widget-chrome/widget-chrome.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}

@@ -21,7 +21,7 @@ import type { WidgetName } from '@wordpress/widget-primitives';
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
-import { DashboardWidgetChrome } from '../dashboard-widget-chrome';
+import { WidgetChrome } from '../widget-chrome';
 import { WidgetSettingsToolbar } from '../widget-settings';
 import { WidgetLayoutToolbar } from './widget-layout-toolbar';
 import { WidgetResizeHandle } from './widget-resize-handle';
@@ -148,7 +148,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			}
 
 			return (
-				<DashboardWidgetChrome
+				<WidgetChrome
 					key={ widget.uuid }
 					widget={ widget }
 					index={ index }
