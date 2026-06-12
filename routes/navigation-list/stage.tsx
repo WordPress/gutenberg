@@ -12,7 +12,7 @@ import { useView } from '@wordpress/views';
 import { DataViews } from '@wordpress/dataviews';
 import { Button } from '@wordpress/components';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies

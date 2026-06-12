@@ -14,7 +14,7 @@ import {
 import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Badge, Link } from '@wordpress/ui';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies

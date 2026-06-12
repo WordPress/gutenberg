@@ -3,7 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies

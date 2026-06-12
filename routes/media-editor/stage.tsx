@@ -12,7 +12,7 @@ import {
 	type Media,
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies

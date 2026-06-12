@@ -12,7 +12,7 @@ import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { seen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useEditorSettings } from '@wordpress/lazy-editor';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies

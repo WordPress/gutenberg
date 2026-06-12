@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/lock-unlock",
+	"name": "@wordpress/routes-lock-unlock",
 	"version": "1.0.0",
 	"private": true,
 	"exports": {

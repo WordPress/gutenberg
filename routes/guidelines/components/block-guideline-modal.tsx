@@ -20,7 +20,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies

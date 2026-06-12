@@ -19,7 +19,7 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/lock-unlock": "file:../lock-unlock",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/dataviews": "file:../../packages/dataviews",
 		"@wordpress/notices": "file:../../packages/notices",
 		"@wordpress/block-library": "file:../../packages/block-library",

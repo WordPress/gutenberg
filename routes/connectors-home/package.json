@@ -20,7 +20,7 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/lock-unlock": "file:../lock-unlock",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/ui": "file:../../packages/ui",
 		"@wordpress/url": "file:../../packages/url"
 	},
