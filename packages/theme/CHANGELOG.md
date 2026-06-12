@@ -7,6 +7,10 @@
 -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
 -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
 
+### Enhancements
+
+-   `ThemeProvider`: forward the `cornerRadius` preset to the document element when `isRoot` is set, so the `--wpds-border-radius-*` tokens also apply to `<html>`, matching the existing behavior for `color` and `cursor` tokens. [#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER).
+
 ### Breaking Changes
 
 -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
