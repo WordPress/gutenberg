@@ -139,7 +139,7 @@ test.describe( 'Guidelines', () => {
 		// Re-expand each accordion and confirm the textareas were
 		// rehydrated with the values that were saved. Reading back from
 		// the UI (rather than REST) verifies the full round trip: the
-		// wp_guideline CPT stored the post, the REST controller served
+		// wp_knowledge CPT stored the post, the REST controller served
 		// it, the app hydrated its store, and the DataForm populated.
 		const copyCard = getCategoryCard( page, 'Copy' );
 		await copyCard.getByRole( 'button', { name: 'Copy' } ).click();

@@ -1,6 +1,6 @@
 <?php
 /**
- * Guidelines experimental feature.
+ * Knowledge experimental feature.
  *
  * @package gutenberg
  */
@@ -9,17 +9,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once __DIR__ . '/guidelines.php';
-require_once __DIR__ . '/class-gutenberg-guidelines-post-type.php';
-require_once __DIR__ . '/class-gutenberg-guidelines-rest-controller.php';
+require_once __DIR__ . '/knowledge.php';
+require_once __DIR__ . '/class-gutenberg-knowledge-post-type.php';
+require_once __DIR__ . '/class-gutenberg-knowledge-rest-controller.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-revisions-controller.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php';
 
 /*
- * Register the guideline post type.
- * The standard /wp/v2/guidelines collection uses the default posts controller.
+ * Register the knowledge post type.
+ * The standard /wp/v2/knowledge collection uses the default posts controller.
  */
-add_action( 'init', array( 'Gutenberg_Guidelines_Post_Type', 'register' ) );
+add_action( 'init', array( 'Gutenberg_Knowledge_Post_Type', 'register' ) );
 
 /*
  * Ensure the post type is registered before any other `rest_api_init` callback
@@ -32,21 +32,21 @@ add_action( 'init', array( 'Gutenberg_Guidelines_Post_Type', 'register' ) );
 add_action(
 	'rest_api_init',
 	static function () {
-		if ( ! post_type_exists( Gutenberg_Guidelines_Post_Type::POST_TYPE ) ) {
-			Gutenberg_Guidelines_Post_Type::register();
+		if ( ! post_type_exists( Gutenberg_Knowledge_Post_Type::POST_TYPE ) ) {
+			Gutenberg_Knowledge_Post_Type::register();
 		}
 	},
 	1
 );
 
 // Register post meta once the REST API loads and the block registry is available.
-add_action( 'rest_api_init', array( 'Gutenberg_Guidelines_Post_Type', 'register_post_meta' ) );
+add_action( 'rest_api_init', array( 'Gutenberg_Knowledge_Post_Type', 'register_post_meta' ) );
 
 /*
  * Register content singleton routes beside the standard CPT routes.
  * The singleton rule is scoped to /wp/v2/content-guidelines for UI handling.
- * The standard /wp/v2/guidelines route keeps default post handling for every
- * `wp_guideline` post. If `content` becomes a data level singleton, add
+ * The standard /wp/v2/knowledge route keeps default post handling for every
+ * `wp_knowledge` post. If `content` becomes a data level singleton, add
  * enforcement to the default CPT route too.
  */
 add_action(

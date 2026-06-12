@@ -7,7 +7,7 @@
 
 if ( ! defined( '_GUTENBERG_VERSION_MIGRATION' ) ) {
 	// It's necessary to update this version every time a new migration is needed.
-	define( '_GUTENBERG_VERSION_MIGRATION', '22.8.0' );
+	define( '_GUTENBERG_VERSION_MIGRATION', '23.5.0' );
 }
 
 /**
@@ -27,6 +27,10 @@ function _gutenberg_migrate_database() {
 
 		if ( version_compare( $gutenberg_installed_version, '22.8.0', '<' ) ) {
 			_gutenberg_migrate_enable_real_time_collaboration();
+		}
+
+		if ( version_compare( $gutenberg_installed_version, '23.5.0', '<' ) ) {
+			_gutenberg_migrate_guidelines_to_knowledge();
 		}
 
 		update_option( 'gutenberg_version_migration', _GUTENBERG_VERSION_MIGRATION );
@@ -80,6 +84,48 @@ function _gutenberg_migrate_enable_real_time_collaboration() {
 
 	delete_option( 'enable_real_time_collaboration' );
 	delete_option( 'wp_enable_real_time_collaboration' );
+}
+
+/**
+ * Rename the experimental Guidelines storage to Knowledge: `wp_guideline`
+ * posts become `wp_knowledge`, and `wp_guideline_type` terms move to the
+ * `wp_knowledge_type` taxonomy.
+ *
+ * Runs regardless of whether the `gutenberg-guidelines` experiment is
+ * currently enabled so rows created while it was previously on are migrated
+ * too. Revisions and `_guideline_*` post meta keep their parent linkage and
+ * names, so no further updates are needed.
+ *
+ * @since 23.5.0
+ */
+function _gutenberg_migrate_guidelines_to_knowledge() {
+	global $wpdb;
+
+	$post_ids = $wpdb->get_col(
+		$wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s", 'wp_guideline' )
+	);
+	if ( $post_ids ) {
+		$wpdb->update(
+			$wpdb->posts,
+			array( 'post_type' => 'wp_knowledge' ),
+			array( 'post_type' => 'wp_guideline' )
+		);
+		foreach ( $post_ids as $post_id ) {
+			clean_post_cache( (int) $post_id );
+		}
+	}
+
+	$term_ids = $wpdb->get_col(
+		$wpdb->prepare( "SELECT term_id FROM {$wpdb->term_taxonomy} WHERE taxonomy = %s", 'wp_guideline_type' )
+	);
+	if ( $term_ids ) {
+		$wpdb->update(
+			$wpdb->term_taxonomy,
+			array( 'taxonomy' => 'wp_knowledge_type' ),
+			array( 'taxonomy' => 'wp_guideline_type' )
+		);
+		clean_term_cache( array_map( 'intval', $term_ids ), 'wp_knowledge_type' );
+	}
 }
 
 // Deletion of the `_wp_file_based` term (in _gutenberg_migrate_remove_fse_drafts) must happen

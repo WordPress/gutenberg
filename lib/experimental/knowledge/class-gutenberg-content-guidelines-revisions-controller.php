@@ -6,7 +6,7 @@
  * Inherits standard WordPress revision list/get behavior and adds
  * guideline_categories to responses plus a restore endpoint that returns the
  * parent post in the singleton response shape. The standard
- * /wp/v2/guidelines/{id}/revisions route is served by the default
+ * /wp/v2/knowledge/{id}/revisions route is served by the default
  * WP_REST_Revisions_Controller.
  *
  * @package gutenberg
@@ -46,9 +46,9 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 	 * Constructor.
 	 */
 	public function __construct() {
-		parent::__construct( Gutenberg_Guidelines_Post_Type::POST_TYPE );
+		parent::__construct( Gutenberg_Knowledge_Post_Type::POST_TYPE );
 
-		$this->parent_post_type = Gutenberg_Guidelines_Post_Type::POST_TYPE;
+		$this->parent_post_type = Gutenberg_Knowledge_Post_Type::POST_TYPE;
 		$this->parent_base      = Gutenberg_Content_Guidelines_REST_Controller::REST_BASE;
 	}
 
@@ -148,8 +148,8 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 	 * Resolves a parent post ID to a content-typed guideline post.
 	 *
 	 * Restricts /wp/v2/content-guidelines/{parent}/revisions to parents tagged
-	 * with the `content` term. Revisions of other guideline types are
-	 * addressable only via the standard /wp/v2/guidelines collection.
+	 * with the `content` term. Revisions of other knowledge types are
+	 * addressable only via the standard /wp/v2/knowledge collection.
 	 *
 	 * @param int $parent_post_id Supplied ID.
 	 * @return WP_Post|WP_Error Post object if ID is valid, WP_Error otherwise.
@@ -160,7 +160,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 			return $parent;
 		}
 
-		if ( ! Gutenberg_Guidelines_Post_Type::is_content_guideline( $parent->ID ) ) {
+		if ( ! Gutenberg_Knowledge_Post_Type::is_content_guideline( $parent->ID ) ) {
 			return new WP_Error(
 				'rest_post_invalid_parent',
 				__( 'Invalid post parent ID.', 'gutenberg' ),
@@ -191,7 +191,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 
 		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
 			$data                         = $response->get_data();
-			$guideline_categories         = Gutenberg_Guidelines_Post_Type::get_guideline_categories_from_meta( $item->ID );
+			$guideline_categories         = Gutenberg_Knowledge_Post_Type::get_guideline_categories_from_meta( $item->ID );
 			$data['guideline_categories'] = ! empty( $guideline_categories ) ? $guideline_categories : new stdClass();
 			$response->set_data( $data );
 		}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Tests for the `wp_guideline` capability policy: ambient cap synthesis and
+ * Tests for the `wp_knowledge` capability policy: ambient cap synthesis and
  * per-post meta-cap resolution across the default roles.
  *
  * Each test asserts `WP_User::has_cap()` directly against a known role,
@@ -9,9 +9,9 @@
  *
  * @package gutenberg
  *
- * @group guidelines
+ * @group knowledge
  */
-class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
+class Gutenberg_Knowledge_Access_Test extends WP_UnitTestCase {
 
 	/**
 	 * Map of role => user ID. Populated once per test class.
@@ -50,44 +50,44 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Creates a guideline fixture owned by the named role and saved with the
-	 * given post status.
+	 * Creates a knowledge post fixture owned by the named role and saved with
+	 * the given post status.
 	 *
 	 * @param string $owner_role Role key from the self::$users fixture map.
-	 * @param string $status     Post status for the guideline fixture.
-	 * @return int Inserted guideline post ID.
+	 * @param string $status     Post status for the knowledge post fixture.
+	 * @return int Inserted knowledge post ID.
 	 */
-	private function create_guideline( string $owner_role, string $status ): int {
+	private function create_knowledge_post( string $owner_role, string $status ): int {
 		return self::factory()->post->create(
 			array(
-				'post_type'    => Gutenberg_Guidelines_Post_Type::POST_TYPE,
+				'post_type'    => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status'  => $status,
-				'post_title'   => "{$status} guideline owned by {$owner_role}",
-				'post_content' => "Guideline fixture content for {$owner_role} with {$status} status.",
+				'post_title'   => "{$status} knowledge post owned by {$owner_role}",
+				'post_content' => "Knowledge fixture content for {$owner_role} with {$status} status.",
 				'post_author'  => self::$users[ $owner_role ],
 			)
 		);
 	}
 
 	/**
-	 * Administrator holds every guideline-prefixed capability without a
+	 * Administrator holds every knowledge-prefixed capability without a
 	 * post context.
 	 */
 	public function test_administrator_ambient_caps() {
 		$admin = $this->user( 'administrator' );
 
 		foreach ( array(
-			'read_guidelines',
-			'edit_guidelines',
-			'edit_others_guidelines',
-			'edit_published_guidelines',
-			'edit_private_guidelines',
-			'publish_guidelines',
-			'delete_guidelines',
-			'delete_others_guidelines',
-			'delete_published_guidelines',
-			'delete_private_guidelines',
-			'read_private_guidelines',
+			'read_knowledge',
+			'edit_knowledge',
+			'edit_others_knowledge',
+			'edit_published_knowledge',
+			'edit_private_knowledge',
+			'publish_knowledge',
+			'delete_knowledge',
+			'delete_others_knowledge',
+			'delete_published_knowledge',
+			'delete_private_knowledge',
+			'read_private_knowledge',
 		) as $cap ) {
 			$this->assertTrue( $admin->has_cap( $cap ), "Administrator should hold {$cap} ambiently" );
 		}
@@ -95,27 +95,27 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 
 	/**
 	 * Editor, Author, and Contributor hold the post-type read floor
-	 * (`read_guidelines`) and the namespace-wide ownership cap
-	 * (`edit_guidelines`) ambiently. Publish, private, and others-scoped
+	 * (`read_knowledge`) and the namespace-wide ownership cap
+	 * (`edit_knowledge`) ambiently. Publish, private, and others-scoped
 	 * primitives are not granted without a post context.
 	 */
 	public function test_contributor_plus_ambient_caps() {
 		foreach ( array( 'editor', 'author', 'contributor' ) as $role ) {
 			$user = $this->user( $role );
 
-			foreach ( array( 'read_guidelines', 'edit_guidelines' ) as $cap ) {
+			foreach ( array( 'read_knowledge', 'edit_knowledge' ) as $cap ) {
 				$this->assertTrue( $user->has_cap( $cap ), "{$role} should hold {$cap} ambiently" );
 			}
 
 			foreach ( array(
-				'publish_guidelines',
-				'read_private_guidelines',
-				'edit_others_guidelines',
-				'delete_others_guidelines',
-				'edit_private_guidelines',
-				'edit_published_guidelines',
-				'delete_private_guidelines',
-				'delete_published_guidelines',
+				'publish_knowledge',
+				'read_private_knowledge',
+				'edit_others_knowledge',
+				'delete_others_knowledge',
+				'edit_private_knowledge',
+				'edit_published_knowledge',
+				'delete_private_knowledge',
+				'delete_published_knowledge',
 			) as $cap ) {
 				$this->assertFalse( $user->has_cap( $cap ), "{$role} must not hold {$cap} ambiently" );
 			}
@@ -123,23 +123,23 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Subscriber holds none of the guideline-prefixed capabilities.
+	 * Subscriber holds none of the knowledge-prefixed capabilities.
 	 */
 	public function test_subscriber_ambient_caps() {
 		$subscriber = $this->user( 'subscriber' );
 
 		foreach ( array(
-			'read_guidelines',
-			'edit_guidelines',
-			'edit_others_guidelines',
-			'edit_published_guidelines',
-			'edit_private_guidelines',
-			'publish_guidelines',
-			'delete_guidelines',
-			'delete_others_guidelines',
-			'delete_published_guidelines',
-			'delete_private_guidelines',
-			'read_private_guidelines',
+			'read_knowledge',
+			'edit_knowledge',
+			'edit_others_knowledge',
+			'edit_published_knowledge',
+			'edit_private_knowledge',
+			'publish_knowledge',
+			'delete_knowledge',
+			'delete_others_knowledge',
+			'delete_published_knowledge',
+			'delete_private_knowledge',
+			'read_private_knowledge',
 		) as $cap ) {
 			$this->assertFalse( $subscriber->has_cap( $cap ), "Subscriber must not hold {$cap}" );
 		}
@@ -162,7 +162,7 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 		$owner_role = 'self' === $ownership
 			? $role
 			: ( 'administrator' === $role ? 'contributor' : 'administrator' );
-		$post_id    = $this->create_guideline( $owner_role, $status );
+		$post_id    = $this->create_knowledge_post( $owner_role, $status );
 
 		$result = $this->user( $role )->has_cap( $cap, $post_id );
 
@@ -236,13 +236,13 @@ class Gutenberg_Guidelines_Access_Test extends WP_UnitTestCase {
 	 * - `manage_terms` / `delete_terms` — Administrator only.
 	 * - `edit_terms` / `assign_terms` — Contributor and above, so agent flows
 	 *   can introduce new type slugs (e.g. `memory`) and attach them to
-	 *   guideline posts.
+	 *   knowledge posts.
 	 * - Subscribers hold none of these.
 	 *
 	 * @dataProvider data_taxonomy_caps_by_role
 	 */
 	public function test_taxonomy_caps_per_role( $role, $cap_key, $expected ) {
-		$taxonomy  = get_taxonomy( Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		$taxonomy  = get_taxonomy( Gutenberg_Knowledge_Post_Type::TAXONOMY );
 		$primitive = $taxonomy->cap->{$cap_key};
 
 		$this->assertSame(

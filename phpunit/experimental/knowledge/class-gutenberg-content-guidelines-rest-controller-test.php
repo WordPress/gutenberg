@@ -429,7 +429,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	private function create_artifact_post() {
 		$artifact_term_id = self::factory()->term->create(
 			array(
-				'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+				'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
 				'name'     => 'Artifact',
 				'slug'     => 'artifact',
 			)
@@ -437,13 +437,13 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 
 		$post_id = self::factory()->post->create(
 			array(
-				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
+				'post_type'   => Gutenberg_Knowledge_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
 				'post_title'  => 'Artifact',
 			)
 		);
 
-		wp_set_object_terms( $post_id, array( $artifact_term_id ), Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		wp_set_object_terms( $post_id, array( $artifact_term_id ), Gutenberg_Knowledge_Post_Type::TAXONOMY );
 
 		return $post_id;
 	}

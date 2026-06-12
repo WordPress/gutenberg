@@ -1,6 +1,6 @@
 <?php
 /**
- * Guidelines Post Type registration.
+ * Knowledge Post Type registration.
  *
  * @package gutenberg
  */
@@ -10,23 +10,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles registration of the Guidelines custom post type.
+ * Handles registration of the Knowledge custom post type.
  */
-class Gutenberg_Guidelines_Post_Type {
+class Gutenberg_Knowledge_Post_Type {
 
 	/**
 	 * The post type name.
 	 *
 	 * @var string
 	 */
-	const POST_TYPE = 'wp_guideline';
+	const POST_TYPE = 'wp_knowledge';
 
 	/**
-	 * The taxonomy name for guideline types.
+	 * The taxonomy name for knowledge types.
 	 *
 	 * @var string
 	 */
-	const TAXONOMY = 'wp_guideline_type';
+	const TAXONOMY = 'wp_knowledge_type';
 
 	/**
 	 * Taxonomy term slug used for site-wide content guidelines.
@@ -113,23 +113,29 @@ class Gutenberg_Guidelines_Post_Type {
 					'view_items'               => __( 'View Guidelines', 'gutenberg' ),
 				),
 				'public'                => false,
-				// Guidelines have no native post-type screens; management
+				// Knowledge rows have no native post-type screens; management
 				// flows through the Settings → Guidelines page (see
 				// load.php) and the REST API.
 				'show_ui'               => false,
 				'show_in_rest'          => true,
-				'rest_base'             => 'guidelines',
+				'rest_base'             => 'knowledge',
 
-				'rest_controller_class' => Gutenberg_Guidelines_REST_Controller::class,
+				'rest_controller_class' => Gutenberg_Knowledge_REST_Controller::class,
 
-				'capability_type'       => 'guideline',
+				// "knowledge" is a mass noun, so the singular and plural bases
+				// must differ: with both set to `knowledge`, the generated
+				// per-post meta caps (`edit_knowledge_item`) would collide with
+				// the primitive caps (`edit_knowledge`). The `*_knowledge_item`
+				// forms are never granted; `map_meta_cap()` resolves them onto
+				// the primitives.
+				'capability_type'       => array( 'knowledge_item', 'knowledge' ),
 				'map_meta_cap'          => true,
 				// `read` is remapped so Subscribers (who hold the base `read`
 				// cap) are blocked at the post-type door. Every other primitive
-				// defaults to a guideline-prefixed cap synthesized by
-				// `_wp_guidelines_synthesize_caps()`.
+				// defaults to a knowledge-prefixed cap synthesized by
+				// `_wp_knowledge_synthesize_caps()`.
 				'capabilities'          => array(
-					'read' => 'read_guidelines',
+					'read' => 'read_knowledge',
 				),
 				'supports'              => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
 				'hierarchical'          => false,
@@ -167,9 +173,9 @@ class Gutenberg_Guidelines_Post_Type {
 				),
 				'capabilities'       => array(
 					'manage_terms' => 'manage_options',
-					'edit_terms'   => 'edit_guidelines',
+					'edit_terms'   => 'edit_knowledge',
 					'delete_terms' => 'manage_options',
-					'assign_terms' => 'edit_guidelines',
+					'assign_terms' => 'edit_knowledge',
 				),
 				'query_var'          => false,
 				'rewrite'            => false,
@@ -180,16 +186,16 @@ class Gutenberg_Guidelines_Post_Type {
 			)
 		);
 
-		add_filter( 'user_has_cap', '_wp_guidelines_synthesize_caps', 10, 4 );
-		add_action( 'save_post_' . self::POST_TYPE, '_wp_guidelines_ensure_default_type_term' );
-		add_filter( 'wp_insert_term_data', '_wp_guidelines_maybe_map_term_label', 10, 2 );
+		add_filter( 'user_has_cap', '_wp_knowledge_synthesize_caps', 10, 4 );
+		add_action( 'save_post_' . self::POST_TYPE, '_wp_knowledge_ensure_default_type_term' );
+		add_filter( 'wp_insert_term_data', '_wp_knowledge_maybe_map_term_label', 10, 2 );
 	}
 
 	/**
-	 * Determines whether a guideline post belongs to the content singleton.
+	 * Determines whether a knowledge post belongs to the content singleton.
 	 *
 	 * Used by the /wp/v2/content-guidelines route to reject non-content-typed
-	 * posts addressed by ID — those belong to the standard /wp/v2/guidelines
+	 * posts addressed by ID — those belong to the standard /wp/v2/knowledge
 	 * collection.
 	 *
 	 * @param int $post_id Post ID.

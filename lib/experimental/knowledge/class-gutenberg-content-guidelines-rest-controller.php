@@ -5,8 +5,8 @@
  * Specialized controller for the site-wide "content" guideline singleton.
  * Exposes a flat `/wp/v2/content-guidelines` endpoint that always reads,
  * creates, and updates a single post tagged with the `content` term in
- * the `wp_guideline_type` taxonomy. Other guideline posts (artifacts) are
- * served by the standard `/wp/v2/guidelines` collection.
+ * the `wp_knowledge_type` taxonomy. Other knowledge posts (artifacts) are
+ * served by the standard `/wp/v2/knowledge` collection.
  *
  * @package gutenberg
  */
@@ -45,7 +45,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Constructor.
 	 */
 	public function __construct() {
-		parent::__construct( Gutenberg_Guidelines_Post_Type::POST_TYPE );
+		parent::__construct( Gutenberg_Knowledge_Post_Type::POST_TYPE );
 		$this->rest_base = self::REST_BASE;
 	}
 
@@ -53,8 +53,8 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Resolves a post ID to a content-typed guideline post.
 	 *
 	 * Restricts /wp/v2/content-guidelines/{id} to posts tagged with the
-	 * `content` term. Other guideline types are addressable only via the
-	 * standard /wp/v2/guidelines collection.
+	 * `content` term. Other knowledge types are addressable only via the
+	 * standard /wp/v2/knowledge collection.
 	 *
 	 * @param int $id Post ID.
 	 * @return WP_Post|WP_Error Post object on success, WP_Error on failure.
@@ -65,7 +65,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			return $post;
 		}
 
-		if ( ! Gutenberg_Guidelines_Post_Type::is_content_guideline( $post->ID ) ) {
+		if ( ! Gutenberg_Knowledge_Post_Type::is_content_guideline( $post->ID ) ) {
 			return new WP_Error(
 				'rest_post_invalid_id',
 				__( 'Invalid post ID.', 'gutenberg' ),
@@ -98,7 +98,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						'category' => array(
 							'description'       => __( 'Limit response to a specific guideline category.', 'gutenberg' ),
 							'type'              => 'string',
-							'enum'              => Gutenberg_Guidelines_Post_Type::VALID_CATEGORIES,
+							'enum'              => Gutenberg_Knowledge_Post_Type::VALID_CATEGORIES,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 						'block'    => array(
@@ -109,7 +109,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						'status'   => array(
 							'description'       => __( 'Limit response to guidelines with a specific status.', 'gutenberg' ),
 							'type'              => 'string',
-							'enum'              => Gutenberg_Guidelines_Post_Type::VALID_STATUSES,
+							'enum'              => Gutenberg_Knowledge_Post_Type::VALID_STATUSES,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 					),
@@ -262,7 +262,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		}
 
 		$content_term_id = self::get_or_create_term_id(
-			Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+			Gutenberg_Knowledge_Post_Type::TERM_CONTENT,
 			__( 'Content', 'gutenberg' )
 		);
 		if ( is_wp_error( $content_term_id ) ) {
@@ -273,7 +273,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		$prepared->post_type  = $this->post_type;
 		$prepared->post_title = __( 'Guidelines', 'gutenberg' );
 		$prepared->tax_input  = array(
-			Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $content_term_id ),
+			Gutenberg_Knowledge_Post_Type::TAXONOMY => array( $content_term_id ),
 		);
 
 		if ( ! isset( $prepared->post_status ) ) {
@@ -386,7 +386,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		}
 
 		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
-			$guideline_categories = Gutenberg_Guidelines_Post_Type::get_guideline_categories_from_meta( $post->ID );
+			$guideline_categories = Gutenberg_Knowledge_Post_Type::get_guideline_categories_from_meta( $post->ID );
 
 			// Handle ?block filter.
 			$block_filter = $request->get_param( 'block' );
@@ -494,7 +494,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 */
 	protected function save_guideline_categories_to_meta( int $post_id, array $categories ): void {
 		// Save standard categories.
-		foreach ( Gutenberg_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
+		foreach ( Gutenberg_Knowledge_Post_Type::CATEGORY_META_KEYS as $category ) {
 			if ( isset( $categories[ $category ] ) ) {
 				$meta_key = '_guideline_' . $category;
 				$value    = $categories[ $category ]['guidelines'] ?? '';
@@ -505,7 +505,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		// Handle block-specific guidelines as individual meta keys.
 		if ( isset( $categories['blocks'] ) && is_array( $categories['blocks'] ) ) {
 			foreach ( $categories['blocks'] as $block_name => $block_data ) {
-				$meta_key = Gutenberg_Guidelines_Post_Type::block_name_to_meta_key( $block_name );
+				$meta_key = Gutenberg_Knowledge_Post_Type::block_name_to_meta_key( $block_name );
 				$value    = $block_data['guidelines'] ?? '';
 
 				if ( ! empty( $value ) ) {
@@ -528,7 +528,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			return array();
 		}
 
-		$valid_categories = Gutenberg_Guidelines_Post_Type::VALID_CATEGORIES;
+		$valid_categories = Gutenberg_Knowledge_Post_Type::VALID_CATEGORIES;
 		$sanitized        = array_intersect_key( $categories, array_flip( $valid_categories ) );
 
 		foreach ( $sanitized as $key => &$category ) {
@@ -628,9 +628,9 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 				'no_found_rows'  => true,
 				'tax_query'      => array(
 					array(
-						'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+						'taxonomy' => Gutenberg_Knowledge_Post_Type::TAXONOMY,
 						'field'    => 'slug',
-						'terms'    => Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+						'terms'    => Gutenberg_Knowledge_Post_Type::TERM_CONTENT,
 					),
 				),
 			)
@@ -663,7 +663,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 				'status'               => array(
 					'description' => __( 'The status of the guidelines (draft or publish).', 'gutenberg' ),
 					'type'        => 'string',
-					'enum'        => Gutenberg_Guidelines_Post_Type::VALID_STATUSES,
+					'enum'        => Gutenberg_Knowledge_Post_Type::VALID_STATUSES,
 					'context'     => array( 'view', 'edit' ),
 				),
 				'guideline_categories' => array(
@@ -793,7 +793,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	}
 
 	/**
-	 * Resolve the `wp_guideline_type` term by slug, creating it if missing.
+	 * Resolve the `wp_knowledge_type` term by slug, creating it if missing.
 	 *
 	 * Used by the create flow to attach the freshly-inserted content guideline
 	 * to the `content` term on first use, before the term is otherwise needed.
@@ -803,14 +803,14 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * @return int|WP_Error Term ID on success, WP_Error on failure.
 	 */
 	private static function get_or_create_term_id( string $slug, string $name ) {
-		$term = get_term_by( 'slug', $slug, Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		$term = get_term_by( 'slug', $slug, Gutenberg_Knowledge_Post_Type::TAXONOMY );
 		if ( $term ) {
 			return (int) $term->term_id;
 		}
 
 		$inserted = wp_insert_term(
 			$name,
-			Gutenberg_Guidelines_Post_Type::TAXONOMY,
+			Gutenberg_Knowledge_Post_Type::TAXONOMY,
 			array( 'slug' => $slug )
 		);
 
