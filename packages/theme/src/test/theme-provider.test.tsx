@@ -5,6 +5,7 @@
 
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '../theme-provider';
+import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
 // Mock the CSS module so the provider's scoping class is a real, stable class
 // name. Without this the global Jest CSS mock leaves the class `undefined`, and
@@ -13,9 +14,8 @@ jest.mock( '../style.module.css', () => ( {
 	root: 'theme-provider-root',
 } ) );
 
-// The legacy accent property is set to the seed color's sRGB channels, which
-// makes the expected value predictable regardless of color serialization.
-const ACCENT_RGB = '--wp-admin-theme-color--rgb';
+// A semantic design-system token derived from the `color.primary` seed.
+const BRAND_BG = '--wpds-color-bg-interactive-brand-strong';
 
 function readProp( element: Element, property: string ) {
 	return getComputedStyle( element ).getPropertyValue( property ).trim();
@@ -33,28 +33,31 @@ describe( 'ThemeProvider', () => {
 		expect( screen.getByText( 'content' ) ).toBeInTheDocument();
 	} );
 
-	it( 'defines the themed custom property within its subtree', () => {
+	it( 'defines the brand color token within its subtree', () => {
 		render(
-			<ThemeProvider color={ { primary: 'rgb(255, 0, 0)' } }>
+			<ThemeProvider>
 				<div data-testid="child">x</div>
 			</ThemeProvider>
 		);
 
 		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
-		expect( readProp( provider, ACCENT_RGB ) ).toBe( '255, 0, 0' );
+		// With no overrides, the brand background resolves to the default seed.
+		expect( readProp( provider, BRAND_BG ) ).toBe(
+			DEFAULT_SEED_COLORS.primary
+		);
 	} );
 
 	it( 'does not define the custom property outside of the provider', () => {
 		render(
-			<ThemeProvider color={ { primary: 'rgb(255, 0, 0)' } }>
-				x
+			<ThemeProvider>
+				<div data-testid="child">x</div>
 			</ThemeProvider>
 		);
 
 		const outside = document.createElement( 'div' );
 		document.body.appendChild( outside );
 
-		expect( readProp( outside, ACCENT_RGB ) ).toBe( '' );
+		expect( readProp( outside, BRAND_BG ) ).toBe( '' );
 	} );
 
 	it( 'applies the cursor custom property when set', () => {
@@ -71,55 +74,72 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	describe( 'isRoot', () => {
-		it( 'defines the custom property on the document root', () => {
+		it( 'defines the token on the document root', () => {
 			render(
-				<ThemeProvider isRoot color={ { primary: 'rgb(255, 0, 0)' } }>
-					x
+				<ThemeProvider isRoot>
+					<div>x</div>
 				</ThemeProvider>
 			);
 
-			expect( readProp( document.documentElement, ACCENT_RGB ) ).toBe(
-				'255, 0, 0'
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
+				DEFAULT_SEED_COLORS.primary
 			);
 		} );
 
 		it( 'does not affect the document root by default', () => {
 			render(
-				<ThemeProvider color={ { primary: 'rgb(255, 0, 0)' } }>
-					x
+				<ThemeProvider>
+					<div>x</div>
 				</ThemeProvider>
 			);
 
-			expect( readProp( document.documentElement, ACCENT_RGB ) ).toBe(
-				''
-			);
+			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
 		} );
 	} );
 
 	describe( 'nested providers', () => {
 		it( 'inherits the parent value, and a nested provider can override it', () => {
 			render(
-				<ThemeProvider color={ { primary: 'rgb(255, 0, 0)' } }>
-					<ThemeProvider>
-						<div data-testid="inheriting">a</div>
+				<>
+					<ThemeProvider color={ { primary: 'rgb(255, 0, 0)' } }>
+						<div data-testid="parent">p</div>
+						<ThemeProvider>
+							<div data-testid="inheriting">a</div>
+						</ThemeProvider>
+						<ThemeProvider color={ { primary: 'rgb(0, 255, 0)' } }>
+							<div data-testid="overriding">b</div>
+						</ThemeProvider>
 					</ThemeProvider>
 					<ThemeProvider color={ { primary: 'rgb(0, 255, 0)' } }>
-						<div data-testid="overriding">b</div>
+						<div data-testid="reference-green">g</div>
 					</ThemeProvider>
-				</ThemeProvider>
+				</>
 			);
 
-			const inheriting = getScopingProvider(
-				screen.getByTestId( 'inheriting' )
+			const parentValue = readProp(
+				getScopingProvider( screen.getByTestId( 'parent' ) ),
+				BRAND_BG
 			);
-			const overriding = getScopingProvider(
-				screen.getByTestId( 'overriding' )
+			const inheritingValue = readProp(
+				getScopingProvider( screen.getByTestId( 'inheriting' ) ),
+				BRAND_BG
+			);
+			const overridingValue = readProp(
+				getScopingProvider( screen.getByTestId( 'overriding' ) ),
+				BRAND_BG
+			);
+			const referenceGreenValue = readProp(
+				getScopingProvider( screen.getByTestId( 'reference-green' ) ),
+				BRAND_BG
 			);
 
 			// A nested provider without its own `color` inherits the parent's.
-			expect( readProp( inheriting, ACCENT_RGB ) ).toBe( '255, 0, 0' );
-			// A nested provider with its own `color` overrides the parent's.
-			expect( readProp( overriding, ACCENT_RGB ) ).toBe( '0, 255, 0' );
+			expect( inheritingValue ).toBe( parentValue );
+			// A nested provider with its own `color` overrides the parent's,
+			// resolving to the same value as a standalone provider seeded with
+			// that color.
+			expect( overridingValue ).not.toBe( parentValue );
+			expect( overridingValue ).toBe( referenceGreenValue );
 		} );
 	} );
 } );
