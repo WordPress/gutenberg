@@ -378,7 +378,30 @@ describe( 'DimensionsTool', () => {
 	} );
 
 	describe( 'updating scale', () => {
-		// No custom interactions here. Things should just update normally.
+		it( 'when default scale is cover, setting scale to fill preserves the fill value', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const scaleFillRadio = screen.getByRole( 'radio', {
+				name: 'Fill',
+			} );
+
+			await user.click( scaleFillRadio );
+			expect( scaleFillRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'fill' } ],
+			] );
+		} );
 	} );
 
 	describe( 'updating dimensions', () => {

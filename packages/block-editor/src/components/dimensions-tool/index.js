@@ -56,7 +56,7 @@ function DimensionsTool( {
 	aspectRatioOptions, // Default options handled by AspectRatioTool.
 	defaultAspectRatio = 'auto', // Match CSS default value for aspect-ratio.
 	scaleOptions, // Default options handled by ScaleTool.
-	defaultScale = 'fill', // Match CSS default value for object-fit.
+	defaultScale = 'cover',
 	unitsOptions, // Default options handled by UnitControl.
 	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
 } ) {
@@ -73,10 +73,7 @@ function DimensionsTool( {
 		value.aspectRatio === undefined || value.aspectRatio === 'auto'
 			? null
 			: value.aspectRatio;
-	const scale =
-		value.scale === undefined || value.scale === 'fill'
-			? null
-			: value.scale;
+	const scale = value.scale === undefined ? null : value.scale;
 
 	// Keep track of state internally, so when the value is cleared by means
 	// other than directly editing that field, it's easier to restore the
@@ -197,9 +194,6 @@ function DimensionsTool( {
 					value={ lastScale }
 					onChange={ ( nextScale ) => {
 						const nextValue = { ...value };
-
-						// 'fill' is CSS default, so it gets treated as null.
-						nextScale = nextScale === 'fill' ? null : nextScale;
 
 						setLastScale( nextScale );
 
