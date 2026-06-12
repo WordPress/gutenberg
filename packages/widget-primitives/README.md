@@ -79,12 +79,14 @@ no custom data store and no client-side registration step.
 1. **Server (PHP).** `WP_Widget_Type_Registry` is hydrated at `init` from the
    build manifest. One entry per widget folder under `widgets/`.
 2. **REST endpoint.** `/wp/v2/widget-modules` exposes the registry. Each record
-   returns `{ name, render_module, widget_module }`.
+   returns `{ name, render_module, widget_module, presentation }`.
 3. **core-data entity.** A `widgetModule` entity reads the endpoint via
    `getEntityRecords( 'root', 'widgetModule' )`.
 4. **Hook.** `useWidgetTypes()` reads those records and `await import(
 record.widget_module )` to fetch each widget's metadata, merging it with
-   `name` and `renderModule` into a `WidgetType`.
+   `name`, `renderModule`, and `presentation` into a `WidgetType`. The
+   record's `presentation` (originating in `widget.json`) wins over the
+   module's value.
 
 ## Identity vs host
 
