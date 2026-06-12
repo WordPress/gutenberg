@@ -212,6 +212,31 @@ describe( 'RectangleStencil', () => {
 			expect( newRect.height ).toBeCloseTo( 0.81, 5 );
 			expect( newRect.y ).toBeCloseTo( 0.1, 5 );
 		} );
+
+		it( 'applies snapCropRect to freeform resize output', () => {
+			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => ( {
+				...rect,
+				width: 0.82,
+			} ) );
+			const { onCropChange } = renderStencil( { snapCropRect } );
+			const eHandle = screen.getAllByRole( 'button' )[ 3 ];
+
+			fireEvent.keyDown( eHandle, {
+				key: 'ArrowRight',
+				shiftKey: false,
+			} );
+
+			expect( snapCropRect ).toHaveBeenCalledTimes( 1 );
+			expect( snapCropRect.mock.calls[ 0 ][ 0 ].width ).toBeCloseTo(
+				0.81,
+				5
+			);
+			expect( snapCropRect.mock.calls[ 0 ][ 1 ] ).toBe( 'e' );
+			expect( onCropChange.mock.calls[ 0 ][ 0 ].width ).toBeCloseTo(
+				0.82,
+				5
+			);
+		} );
 	} );
 
 	describe( 'keyboard — arrow keys (coarse step with Shift)', () => {
@@ -246,6 +271,21 @@ describe( 'RectangleStencil', () => {
 			const coarseDelta = coarseRect.width - DEFAULT_CROP_RECT.width;
 
 			expect( coarseDelta / fineDelta ).toBeCloseTo( 10, 0 );
+		} );
+
+		it( 'does not apply snapCropRect while resizing a locked aspect ratio', () => {
+			const snapCropRect = jest.fn( ( rect: NormalizedRect ) => rect );
+			renderStencil( { aspectRatio: 1, snapCropRect } );
+			const nwHandle = screen.getByRole( 'button', {
+				name: 'Resize top-left corner',
+			} );
+
+			fireEvent.keyDown( nwHandle, {
+				key: 'ArrowRight',
+				shiftKey: false,
+			} );
+
+			expect( snapCropRect ).not.toHaveBeenCalled();
 		} );
 	} );
 

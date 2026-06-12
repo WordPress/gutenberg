@@ -34,6 +34,7 @@ import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
 import {
 	MAX_VIEW_SCALE,
+	PIXEL_SNAP_DISPLAY_SCALE,
 	SETTLE_TARGET_CANVAS_FILL,
 } from '../../core/constants';
 import { computeInscribedRect } from '../../core/crop-rect';
@@ -45,7 +46,10 @@ import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
 import { DimensionsOverlay } from './overlays/dimensions-overlay';
-import { getSourceRegion } from '../../core/source-region';
+import {
+	getSourceRegion,
+	snapCropRectToSourcePixels,
+} from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
 
@@ -414,6 +418,12 @@ function CropperInner(
 		} ),
 		[ visualSize.width, visualSize.height, viewScale ]
 	);
+	// CSS pixels rendered per source pixel: the contain fit
+	// (elementSize / natural), times zoom and the view-scale magnification.
+	const displayScale =
+		naturalWidth > 0
+			? ( elementSize.width / naturalWidth ) * state.zoom * viewScale
+			: 0;
 
 	// Per-axis minimum crop size in normalized space, expressing a pixel floor
 	// on the captured source region. cropRect is normalized in the viewport's
@@ -434,8 +444,6 @@ function CropperInner(
 			naturalHeight,
 			snapRotation
 		);
-		const displayScale =
-			( elementSize.width / naturalWidth ) * state.zoom * viewScale;
 		const minPixels = getMinCropPixels( displayScale );
 		return {
 			width: Math.min( 1, ( minPixels * state.zoom ) / bbox.width ),
@@ -446,9 +454,27 @@ function CropperInner(
 		naturalHeight,
 		state.rotation,
 		state.zoom,
-		elementSize.width,
-		viewScale,
+		displayScale,
 	] );
+
+	const snapCropRect = useCallback(
+		( rect: NormalizedRect, handle: HandlePosition ): NormalizedRect => {
+			if (
+				displayScale < PIXEL_SNAP_DISPLAY_SCALE ||
+				naturalWidth <= 0 ||
+				naturalHeight <= 0
+			) {
+				return rect;
+			}
+			return snapCropRectToSourcePixels(
+				state,
+				{ width: naturalWidth, height: naturalHeight },
+				rect,
+				handle
+			);
+		},
+		[ displayScale, naturalWidth, naturalHeight, state ]
+	);
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -699,15 +725,9 @@ function CropperInner(
 		}
 		const centerX = ( canvasSize.width - elementSize.width ) / 2;
 		const centerY = ( canvasSize.height - elementSize.height ) / 2;
-		// CSS pixels rendered per source pixel: the contain fit
-		// (elementSize / natural), times zoom and the view-scale magnification.
 		// Above 1:1 the image is upscaled, so render nearest-neighbour to keep
 		// pixel boundaries crisp (e.g. small images the cropper magnifies);
 		// below 1:1 leave smoothing on for downscaled large images.
-		const displayScale =
-			naturalWidth > 0
-				? ( elementSize.width / naturalWidth ) * state.zoom * viewScale
-				: 0;
 		return {
 			width: elementSize.width,
 			height: elementSize.height,
@@ -728,10 +748,9 @@ function CropperInner(
 	}, [
 		canvasSize,
 		elementSize,
-		naturalWidth,
-		state.zoom,
 		transformString,
 		imageTransition,
+		displayScale,
 		viewScale,
 	] );
 
@@ -878,6 +897,7 @@ function CropperInner(
 						stencilTransition={ settleStencilTransition }
 						cropBounds={ cropBounds }
 						minCropSize={ minCropSize }
+						snapCropRect={ snapCropRect }
 					/>
 
 					{ /* Rule-of-thirds grid */ }

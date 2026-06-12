@@ -57,6 +57,13 @@ export const SETTLE_TARGET_CANVAS_FILL = 0.8;
 export const MAX_VIEW_SCALE = 8;
 
 /**
+ * CSS pixels per source pixel required before resize handles snap the selected
+ * source region to whole-pixel edges. Below 1:1, a source pixel is sub-pixel on
+ * screen, so snapping would feel notchy without a visible pixel boundary.
+ */
+export const PIXEL_SNAP_DISPLAY_SCALE = 1;
+
+/**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
  * This could be made configurable as a prop to the Cropper component.
  */

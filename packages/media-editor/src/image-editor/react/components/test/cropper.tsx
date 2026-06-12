@@ -15,6 +15,7 @@ import {
 import { Cropper } from '../cropper';
 import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
+import { getSourceRegion } from '../../../core/source-region';
 
 const GRID_TEST_ID = 'cropper-grid';
 const GRID_INTERACTIVE_CLASS =
@@ -425,7 +426,12 @@ describe( 'Cropper', () => {
 		//   rightOverflow = 1.01 * 600 − 600 = 6 → pan.x = −6
 		fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
 
-		expect( stage ).toHaveStyle( 'transform: translate(-6px, 0px)' );
+		const match = stage.style.transform.match(
+			/^translate\((-?\d+(?:\.\d+)?)px, (-?\d+(?:\.\d+)?)px\)$/
+		);
+		expect( match ).not.toBeNull();
+		expect( Number( match?.[ 1 ] ) ).toBeCloseTo( -6, 5 );
+		expect( Number( match?.[ 2 ] ) ).toBeCloseTo( 0, 5 );
 
 		jest.useRealTimers();
 	} );
@@ -626,6 +632,81 @@ describe( 'Cropper', () => {
 		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
 
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
+	} );
+
+	it( 'snaps freeform resize output to source pixels when the image is shown at 1:1 or larger', async () => {
+		const image = { src: 'tiny.png', naturalWidth: 50, naturalHeight: 50 };
+		const cropRect = { x: 0.113, y: 0.127, width: 0.6, height: 0.456 };
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+		};
+		const initialRegion = getSourceRegion(
+			{ ...controller.state, cropRect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		render(
+			<Cropper src="tiny.png" controller={ controller } freeformCrop />
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize right edge',
+		} );
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		expect( region.x ).toBeCloseTo( initialRegion.x, 3 );
+		expect( region.x ).not.toBeCloseTo( Math.round( region.x ), 3 );
+		expect( region.x + region.width ).toBeCloseTo(
+			Math.round( region.x + region.width ),
+			3
+		);
+		expect( rect.x ).toBeCloseTo( cropRect.x, 5 );
+		expect( rect.y ).toBeCloseTo( cropRect.y, 5 );
+		expect( rect.height ).toBeCloseTo( cropRect.height, 5 );
+	} );
+
+	it( 'keeps freeform resize smooth below 1:1 display scale', async () => {
+		const image = {
+			src: 'large.png',
+			naturalWidth: 3333,
+			naturalHeight: 3333,
+		};
+		const cropRect = { x: 0.113, y: 0.127, width: 0.6, height: 0.456 };
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image,
+			cropRect,
+		};
+		render(
+			<Cropper src="large.png" controller={ controller } freeformCrop />
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize right edge',
+		} );
+		fireEvent.keyDown( handle, { key: 'ArrowRight' } );
+
+		const rect = ( controller.setCropRect as jest.Mock ).mock
+			.calls[ 0 ][ 0 ];
+		const region = getSourceRegion(
+			{ ...controller.state, cropRect: rect },
+			{ width: image.naturalWidth, height: image.naturalHeight }
+		);
+		expect( rect.width ).toBeCloseTo( 0.61, 5 );
+		expect(
+			Math.abs(
+				region.x + region.width - Math.round( region.x + region.width )
+			)
+		).toBeGreaterThan( 0.01 );
 	} );
 
 	function imageRendering(): string {

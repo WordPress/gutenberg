@@ -104,6 +104,7 @@ type RectangleStencilProps = StencilProps;
  * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
  * @param props.onEscape          Called when Escape is pressed on a resize handle.
  * @param props.minCropSize       Minimum crop rect dimension in normalized space, per axis.
+ * @param props.snapCropRect      Optional post-processor for freeform resize output.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -119,6 +120,7 @@ export function RectangleStencil( {
 	cropBounds,
 	onEscape,
 	minCropSize,
+	snapCropRect,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -173,6 +175,10 @@ export function RectangleStencil( {
 		) => NormalizedRect;
 		onCropChange: ( rect: NormalizedRect ) => void;
 		onResizeEnd?: () => void;
+		snapCropRect?: (
+			rect: NormalizedRect,
+			handle: HandlePosition
+		) => NormalizedRect;
 	} | null >( null );
 
 	// The normalized aspect ratio: the w/h ratio in normalized space that
@@ -258,6 +264,8 @@ export function RectangleStencil( {
 						);
 					} else {
 						newRect = h.computeFreeRect( drag, latestX, latestY );
+						newRect =
+							h.snapCropRect?.( newRect, drag.handle ) ?? newRect;
 					}
 					h.onCropChange( newRect );
 				} );
@@ -371,6 +379,7 @@ export function RectangleStencil( {
 		computeShiftLockedRect,
 		onCropChange,
 		onResizeEnd,
+		snapCropRect,
 	};
 
 	/**
@@ -459,9 +468,8 @@ export function RectangleStencil( {
 				};
 				const clientX = dx * imageSize.width;
 				const clientY = dy * imageSize.height;
-				onCropChange(
-					computeFreeRect( syntheticDrag, clientX, clientY )
-				);
+				const rect = computeFreeRect( syntheticDrag, clientX, clientY );
+				onCropChange( snapCropRect?.( rect, handle ) ?? rect );
 				scheduleKeyboardResizeEnd();
 			}
 		},
@@ -476,6 +484,7 @@ export function RectangleStencil( {
 			onResizeStart,
 			onResizeEnd,
 			onEscape,
+			snapCropRect,
 		]
 	);
 
