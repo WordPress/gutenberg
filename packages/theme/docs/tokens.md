@@ -125,17 +125,18 @@ The interactive state of the element. The default (no modifier) is the idle stat
 
 ### Border
 
-| Variable name               | Description                 |
-| --------------------------- | --------------------------- |
-| `--wpds-border-radius-xs`   | Extra small radius          |
-| `--wpds-border-radius-sm`   | Small radius                |
-| `--wpds-border-radius-md`   | Medium radius               |
-| `--wpds-border-radius-lg`   | Large radius                |
-| `--wpds-border-width-xs`    | Extra small width           |
-| `--wpds-border-width-sm`    | Small width                 |
-| `--wpds-border-width-md`    | Medium width                |
-| `--wpds-border-width-lg`    | Large width                 |
-| `--wpds-border-width-focus` | Border width for focus ring |
+| Variable name               | Description                                                   |
+| --------------------------- | ------------------------------------------------------------- |
+| `--wpds-border-radius-xs`   | Buttons and other elements nested inside controls.            |
+| `--wpds-border-radius-sm`   | Standalone buttons, inputs, and compact controls.             |
+| `--wpds-border-radius-md`   | Menus, popovers, and other small portaled overlays.           |
+| `--wpds-border-radius-lg`   | Cards, dialogs, notices, and other larger content containers. |
+| `--wpds-border-radius-xl`   | Page and app shell surfaces.                                  |
+| `--wpds-border-width-xs`    | Extra small width                                             |
+| `--wpds-border-width-sm`    | Small width                                                   |
+| `--wpds-border-width-md`    | Medium width                                                  |
+| `--wpds-border-width-lg`    | Large width                                                   |
+| `--wpds-border-width-focus` | Border width for focus ring                                   |
 
 ### Color
 
@@ -238,29 +239,37 @@ The interactive state of the element. The default (no modifier) is the idle stat
 
 ### Dimension
 
-| Variable name                        | Description                  |
-| ------------------------------------ | ---------------------------- |
-| `--wpds-dimension-base`              | Base dimension unit          |
-| `--wpds-dimension-padding-xs`        | Extra small padding          |
-| `--wpds-dimension-padding-sm`        | Small padding                |
-| `--wpds-dimension-padding-md`        | Medium padding               |
-| `--wpds-dimension-padding-lg`        | Large padding                |
-| `--wpds-dimension-padding-xl`        | Extra large padding          |
-| `--wpds-dimension-padding-2xl`       | 2x extra large padding       |
-| `--wpds-dimension-padding-3xl`       | 3x extra large padding       |
-| `--wpds-dimension-gap-xs`            | Extra small gap              |
-| `--wpds-dimension-gap-sm`            | Small gap                    |
-| `--wpds-dimension-gap-md`            | Medium gap                   |
-| `--wpds-dimension-gap-lg`            | Large gap                    |
-| `--wpds-dimension-gap-xl`            | Extra large gap              |
-| `--wpds-dimension-gap-2xl`           | 2x extra large gap           |
-| `--wpds-dimension-gap-3xl`           | 3x extra large gap           |
-| `--wpds-dimension-surface-width-xs`  | Extra small surface width    |
-| `--wpds-dimension-surface-width-sm`  | Small surface width          |
-| `--wpds-dimension-surface-width-md`  | Medium surface width         |
-| `--wpds-dimension-surface-width-lg`  | Large surface width          |
-| `--wpds-dimension-surface-width-xl`  | Extra large surface width    |
-| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width |
+| Variable name                        | Description                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------ |
+| `--wpds-dimension-base`              | Base dimension unit                                                      |
+| `--wpds-dimension-padding-xs`        | Extra small padding                                                      |
+| `--wpds-dimension-padding-sm`        | Small padding                                                            |
+| `--wpds-dimension-padding-md`        | Medium padding                                                           |
+| `--wpds-dimension-padding-lg`        | Large padding                                                            |
+| `--wpds-dimension-padding-xl`        | Extra large padding                                                      |
+| `--wpds-dimension-padding-2xl`       | 2x extra large padding                                                   |
+| `--wpds-dimension-padding-3xl`       | 3x extra large padding                                                   |
+| `--wpds-dimension-gap-xs`            | Extra small gap                                                          |
+| `--wpds-dimension-gap-sm`            | Small gap                                                                |
+| `--wpds-dimension-gap-md`            | Medium gap                                                               |
+| `--wpds-dimension-gap-lg`            | Large gap                                                                |
+| `--wpds-dimension-gap-xl`            | Extra large gap                                                          |
+| `--wpds-dimension-gap-2xl`           | 2x extra large gap                                                       |
+| `--wpds-dimension-gap-3xl`           | 3x extra large gap                                                       |
+| `--wpds-dimension-size-5xs`          | Notification indicators                                                  |
+| `--wpds-dimension-size-4xs`          | Visual size for small interactive elements like resize handles           |
+| `--wpds-dimension-size-3xs`          | Small markers                                                            |
+| `--wpds-dimension-size-2xs`          | For small controls like checkboxes and radios, or small decorative icons |
+| `--wpds-dimension-size-xs`           | For medium sized icons                                                   |
+| `--wpds-dimension-size-sm`           | For icons and small buttons                                              |
+| `--wpds-dimension-size-md`           | For medium-sized buttons and inputs                                      |
+| `--wpds-dimension-size-lg`           | Default size for buttons and inputs                                      |
+| `--wpds-dimension-surface-width-xs`  | Extra small surface width                                                |
+| `--wpds-dimension-surface-width-sm`  | Small surface width                                                      |
+| `--wpds-dimension-surface-width-md`  | Medium surface width                                                     |
+| `--wpds-dimension-surface-width-lg`  | Large surface width                                                      |
+| `--wpds-dimension-surface-width-xl`  | Extra large surface width                                                |
+| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width                                             |
 
 ### Elevation
 

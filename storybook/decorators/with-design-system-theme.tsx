@@ -33,7 +33,7 @@ export function WithDesignSystemTheme(
 
 	let color;
 	if ( colorTheme === 'dark' ) {
-		color = { bg: '#1e1e1e', primary: '#3858e9' };
+		color = { background: '#1e1e1e', primary: '#3858e9' };
 	}
 
 	return (
@@ -44,7 +44,7 @@ export function WithDesignSystemTheme(
 		>
 			<div
 				style={
-					color?.bg
+					color?.background
 						? {
 								background:
 									'var(--wpds-color-bg-surface-neutral-strong)',
@@ -58,7 +58,7 @@ export function WithDesignSystemTheme(
 				}
 			>
 				<Story { ...context } />
-				{ color?.bg && (
+				{ color?.background && (
 					<small
 						style={ {
 							display: 'block',

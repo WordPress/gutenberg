@@ -5,11 +5,13 @@
  * @package gutenberg
  */
 
+require_once __DIR__ . '/class-wp-sync-config.php';
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/interface-wp-sync-storage.php';
 	require_once __DIR__ . '/class-wp-sync-post-meta-storage.php';
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
 }
+require_once __DIR__ . '/class-wp-sync-save-server.php';
 
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	/**
@@ -59,6 +61,9 @@ if ( ! function_exists( 'gutenberg_register_collaboration_rest_routes' ) ) {
 		$sync_storage = new WP_Sync_Post_Meta_Storage();
 		$sync_server  = new WP_HTTP_Polling_Sync_Server( $sync_storage );
 		$sync_server->register_routes();
+
+		$sync_save_server = new WP_Sync_Save_Server();
+		$sync_save_server->register_routes();
 	}
 	add_action( 'rest_api_init', 'gutenberg_register_collaboration_rest_routes' );
 }
@@ -68,7 +73,7 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	 * Registers post meta for persisting CRDT documents.
 	 */
 	function gutenberg_rest_api_crdt_post_meta() {
-		// This string must match WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/sync.
+		// This string must match POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/core-data.
 		$persisted_crdt_post_meta_key = '_crdt_document';
 
 		register_meta(
@@ -203,6 +208,32 @@ if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_is_post_type_collaboration_disabled' ) ) {
+	/**
+	 * Determines whether real-time collaboration is disabled for a post type.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $post_type Post type name.
+	 * @return bool Whether real-time collaboration is disabled for the post type.
+	 */
+	function wp_is_post_type_collaboration_disabled( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			return true;
+		}
+
+		/**
+		 * Filters whether real-time collaboration is disabled for a post type.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param bool   $disabled  Whether real-time collaboration is disabled for the post type.
+		 * @param string $post_type Post type name.
+		 */
+		return (bool) apply_filters( 'wp_is_post_type_collaboration_disabled', false, $post_type );
+	}
+}
+
 /**
  * Injects the real-time collaboration setting into a global variable.
  *
@@ -224,9 +255,17 @@ function gutenberg_inject_real_time_collaboration_setting() {
 		$enabled = false;
 	}
 
+	$disabled_post_types = array_values(
+		array_filter(
+			get_post_types( array( 'show_in_rest' => true ) ),
+			'wp_is_post_type_collaboration_disabled'
+		)
+	);
+
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';',
+		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';' .
+		'window._wpCollaborationDisabledPostTypes = ' . wp_json_encode( $disabled_post_types ) . ';',
 		'after'
 	);
 }
@@ -394,6 +433,10 @@ function gutenberg_filter_locked_post_text_for_rtc( $translation, $text, $domain
  */
 function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 	if ( ! isset( $actions['edit'] ) ) {
+		return $actions;
+	}
+
+	if ( wp_is_post_type_collaboration_disabled( $post->post_type ) ) {
 		return $actions;
 	}
 

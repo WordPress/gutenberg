@@ -23,7 +23,7 @@
 		"@apidevtools/json-schema-ref-parser": "^11.6.4",
 		"@babel/core": "^7.25.7",
 		"chalk": "^4.1.1",
-		"change-case": "4.1.2",
+		"change-case": "^4.1.2",
 		"comment-parser": "^1.1.1",
 		"execa": "^4.0.2",
 		"fast-glob": "^3.2.7",

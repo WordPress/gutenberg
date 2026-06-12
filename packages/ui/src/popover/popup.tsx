@@ -48,6 +48,20 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		deprioritizedAttributes: [ CLOSE_ATTR ],
 	} );
 	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
+	const useDefaultSurface = variant !== 'unstyled';
+
+	const validatedChildren = (
+		<PopoverValidationProvider>{ children }</PopoverValidationProvider>
+	);
+
+	// The popup is the (transformed) motion layer; visual chrome lives on the
+	// inner surface so the arrow's containing block stays borderless. See
+	// `style.module.css` for the full rationale.
+	const popupChildren = useDefaultSurface ? (
+		<div className={ styles.surface }>{ validatedChildren }</div>
+	) : (
+		validatedChildren
+	);
 
 	const backdropElement = backdrop ? (
 		<_Popover.Backdrop className={ styles.backdrop } />
@@ -60,14 +74,12 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 				initialFocus={ resolvedInitialFocus }
 				finalFocus={ finalFocus }
 				className={ clsx(
-					variant !== 'unstyled' && styles.popup,
+					useDefaultSurface && styles.popup,
 					className
 				) }
 				{ ...props }
 			>
-				<PopoverValidationProvider>
-					{ children }
-				</PopoverValidationProvider>
+				{ popupChildren }
 			</_Popover.Popup>
 		</ThemeProvider>
 	);

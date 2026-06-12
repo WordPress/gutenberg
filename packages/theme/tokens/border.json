@@ -2,21 +2,26 @@
 	"wpds-border": {
 		"$type": "dimension",
 		"radius": {
+			"$description": "Border radius scale for elegant hierarchical nesting. Outer surfaces use larger steps; nested elements use smaller ones so concentric corners stay visually harmonious.",
 			"xs": {
 				"$value": { "value": 1, "unit": "px" },
-				"$description": "Extra small radius"
+				"$description": "Buttons and other elements nested inside controls."
 			},
 			"sm": {
 				"$value": { "value": 2, "unit": "px" },
-				"$description": "Small radius"
+				"$description": "Standalone buttons, inputs, and compact controls."
 			},
 			"md": {
 				"$value": { "value": 4, "unit": "px" },
-				"$description": "Medium radius"
+				"$description": "Menus, popovers, and other small portaled overlays."
 			},
 			"lg": {
 				"$value": { "value": 8, "unit": "px" },
-				"$description": "Large radius"
+				"$description": "Cards, dialogs, notices, and other larger content containers."
+			},
+			"xl": {
+				"$value": { "value": 12, "unit": "px" },
+				"$description": "Page and app shell surfaces."
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "CORNER_RADIUS" ]

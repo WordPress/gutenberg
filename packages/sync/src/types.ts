@@ -119,6 +119,7 @@ export interface CollectionHandlers {
 }
 
 export interface SyncManagerUpdateOptions {
+	// Whether this update represents a user-facing entity save.
 	isSave?: boolean;
 	isNewUndoLevel?: boolean;
 }
@@ -160,6 +161,7 @@ export interface SyncConfig {
 		objectType: ObjectType,
 		objectId: ObjectID | null
 	) => boolean;
+	supportsPersistence?: boolean;
 }
 
 export interface SyncManager {

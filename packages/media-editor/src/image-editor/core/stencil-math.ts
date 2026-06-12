@@ -1,9 +1,32 @@
 /**
  * Internal dependencies
  */
+import { MIN_CROP_PIXELS, MIN_CROP_SCREEN_PX } from './constants';
 import type { HandlePosition, NormalizedRect, Size } from './types';
 
 export type { HandlePosition };
+
+/**
+ * Resolve the minimum crop dimension, in source-image pixels, for the current
+ * display scale.
+ *
+ * Two floors compete: a fixed source-pixel floor (`MIN_CROP_PIXELS`) that
+ * avoids sub-pixel crops, and an on-screen floor (`MIN_CROP_SCREEN_PX`) that
+ * keeps the crop large enough to grab. The on-screen floor converted to source
+ * pixels is `MIN_CROP_SCREEN_PX / displayScale`; the binding constraint is the
+ * larger of the two. When zoomed out (small `displayScale`) the on-screen floor
+ * dominates; once the image is shown large enough the source-pixel floor takes
+ * over.
+ *
+ * @param displayScale CSS pixels rendered per source pixel (fit scale × zoom).
+ * @return Minimum crop dimension in source-image pixels.
+ */
+export function getMinCropPixels( displayScale: number ): number {
+	if ( displayScale <= 0 ) {
+		return MIN_CROP_PIXELS;
+	}
+	return Math.max( MIN_CROP_PIXELS, MIN_CROP_SCREEN_PX / displayScale );
+}
 
 /**
  * Default minimum crop rect dimension in normalized space, used when no

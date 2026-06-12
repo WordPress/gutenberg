@@ -15,14 +15,13 @@ Display the tab buttons for a tabbed interface.
 **[Parent](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/tabs`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
 
-**[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
-- [`core/tab`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab/)
-
 ## Attributes
 
 _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-_This block has no custom attributes._
+| Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
+|-----------|------|---------|-------------|
+| `tabs` | `array` | `[]` | [Source](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `query`. [Selector](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#value-source): `button` |
 
 ## Supports
 
@@ -61,12 +60,23 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 
 - `core/tabs-list`
 
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **border**: `.wp-block-tab-list button`
+- **color**:
+  - background: `.wp-block-tab-list button`
+  - text: `.wp-block-tab-list button`
+- **spacing**:
+  - padding: `.wp-block-tab-list button`
+
 ## Block Markup
 
 This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:tab-list -->
+<!-- wp:tab-list {"tabs":[]} -->
 <!-- Content... -->
 <!-- /wp:tab-list -->
 ```

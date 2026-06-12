@@ -67,8 +67,6 @@ module.exports = {
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.*/build-types/',
 		'<rootDir>/.+.d.ts$',
-		'<rootDir>/.+.native.js$',
-		'/packages/react-native-*',
 	],
 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {

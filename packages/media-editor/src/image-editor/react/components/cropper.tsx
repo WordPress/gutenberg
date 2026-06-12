@@ -32,7 +32,7 @@ import type {
 import type { CropperController } from '../hooks/use-cropper-reducer';
 import { getImageFit, getRotatedBBox } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
-import { MIN_CROP_PIXELS } from '../../core/constants';
+import { getMinCropPixels } from '../../core/stencil-math';
 import { computeInscribedRect } from '../../core/crop-rect';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
@@ -275,6 +275,11 @@ function CropperInner(
 	// floor scales with `zoom` to keep the source-pixel floor constant.
 	// Without this, SETTLE_CROP zooms in proportional to the shrink and
 	// successive drags can crop arbitrarily small.
+	//
+	// The source-pixel floor is resolved per display scale so the crop
+	// stays grabbable: a large image fit into a small canvas would render
+	// the 24px floor only a few CSS pixels wide. `elementSize.width /
+	// naturalWidth` is the fit scale; × zoom gives CSS px per source px.
 	const minCropSize: Size | undefined = useMemo( () => {
 		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
 			return undefined;
@@ -285,14 +290,19 @@ function CropperInner(
 			naturalHeight,
 			snapRotation
 		);
+		const displayScale = ( elementSize.width / naturalWidth ) * state.zoom;
+		const minPixels = getMinCropPixels( displayScale );
 		return {
-			width: Math.min( 1, ( MIN_CROP_PIXELS * state.zoom ) / bbox.width ),
-			height: Math.min(
-				1,
-				( MIN_CROP_PIXELS * state.zoom ) / bbox.height
-			),
+			width: Math.min( 1, ( minPixels * state.zoom ) / bbox.width ),
+			height: Math.min( 1, ( minPixels * state.zoom ) / bbox.height ),
 		};
-	}, [ naturalWidth, naturalHeight, state.rotation, state.zoom ] );
+	}, [
+		naturalWidth,
+		naturalHeight,
+		state.rotation,
+		state.zoom,
+		elementSize.width,
+	] );
 
 	// Report the rendered image size to the controller. Composite
 	// controllers need it to compute aspect-ratio reshapes from the
