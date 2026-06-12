@@ -14,6 +14,7 @@ import type {
 } from './types';
 import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
 import { isValidSize, sanitizeCropperState } from './math/sanitize';
+import { normalizeRotation } from './math/rotation';
 
 /**
  * The selected image region in source-pixel coordinates.
@@ -209,6 +210,23 @@ interface SourcePixelSnapEdges {
 	bottom: boolean;
 }
 
+const CARDINAL_ROTATION_EPSILON = 1e-6;
+
+/**
+ * Check whether a rotation is effectively at a 90-degree stop.
+ *
+ * @param rotation The rotation angle in degrees.
+ * @return Whether the rotation is close enough to a cardinal angle.
+ */
+function isCardinalRotation( rotation: number ): boolean {
+	const normalizedRotation = normalizeRotation( rotation );
+	const nearestCardinal = Math.round( normalizedRotation / 90 ) * 90;
+	return (
+		Math.abs( normalizedRotation - nearestCardinal ) <
+		CARDINAL_ROTATION_EPSILON
+	);
+}
+
 /**
  * Snap a crop rect so the selected source-region edges land on whole pixels.
  *
@@ -227,7 +245,12 @@ export function snapCropRectToSourcePixels(
 	cropRect: NormalizedRect,
 	handle: HandlePosition
 ): NormalizedRect {
-	return snapCropRectEdgesToSourcePixels( state, imageSize, cropRect, {
+	const safeState = sanitizeCropperState( state );
+	if ( ! isCardinalRotation( safeState.rotation ) ) {
+		return cropRect;
+	}
+
+	return snapCropRectEdgesToSourcePixels( safeState, imageSize, cropRect, {
 		left: handle.includes( 'w' ),
 		top: handle.includes( 'n' ),
 		right: handle.includes( 'e' ),

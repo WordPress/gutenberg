@@ -28,7 +28,7 @@ export const MAX_ZOOM = 10;
  * enough to allow tight crops (favicons, icons). Adjust here to tune the
  * floor globally.
  */
-export const MIN_CROP_PIXELS = 4;
+export const MIN_CROP_PIXELS = 16;
 
 /**
  * Minimum on-screen crop rect dimension in CSS pixels. The source-pixel

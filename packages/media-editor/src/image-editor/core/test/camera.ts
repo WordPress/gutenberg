@@ -639,6 +639,7 @@ describe( 'snapCropRectToSourcePixels', () => {
 
 	it( 'snaps all source-region edges to whole pixels', () => {
 		const state = makeState( {
+			rotation: 30,
 			zoom: 2.25,
 			pan: { x: 0.013, y: -0.017 },
 			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
@@ -659,6 +660,20 @@ describe( 'snapCropRectToSourcePixels', () => {
 		expect( snapped.top ).toBeCloseTo( Math.round( snapped.top ), 3 );
 		expect( snapped.right ).toBeCloseTo( Math.round( snapped.right ), 3 );
 		expect( snapped.bottom ).toBeCloseTo( Math.round( snapped.bottom ), 3 );
+	} );
+
+	it( 'does not snap selected edges while fine rotation couples source axes', () => {
+		const state = makeState( {
+			rotation: 30,
+			zoom: 2.25,
+			pan: { x: 0.013, y: -0.017 },
+			cropRect: { x: 0.12, y: 0.18, width: 0.33, height: 0.41 },
+		} );
+		const candidate = { x: 0.123, y: 0.187, width: 0.337, height: 0.419 };
+
+		expect(
+			snapCropRectToSourcePixels( state, IMAGE, candidate, 'e' )
+		).toBe( candidate );
 	} );
 
 	it( 'returns the input crop rect when the image dimensions are invalid', () => {
