@@ -3,6 +3,27 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function expectBlockToHoldSelection( locator ) {
+	return expect
+		.poll( () =>
+			locator.evaluate( ( element ) => {
+				const { activeElement } = element.ownerDocument;
+				if ( element === activeElement ) {
+					return true;
+				}
+				const selection =
+					element.ownerDocument.defaultView.getSelection();
+				return (
+					!! activeElement?.isContentEditable &&
+					activeElement.contains( element ) &&
+					!! selection.anchorNode &&
+					element.contains( selection.anchorNode )
+				);
+			} )
+		)
+		.toBe( true );
+}
+
 test.describe( 'Region navigation (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -28,7 +49,7 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
 			} )
 			.filter( { hasText: 'Dummy text' } );
 
-		await expect( dummyParagraph ).toBeFocused();
+		await expectBlockToHoldSelection( dummyParagraph );
 
 		// Navigate to first region and check that we made it. Must navigate forward 4 times as initial focus is placed in post title field.
 		await page.keyboard.press( 'Control+`' );
