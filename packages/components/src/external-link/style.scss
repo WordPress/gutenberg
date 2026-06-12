@@ -23,7 +23,7 @@
 	&:focus {
 		outline:
 			var(--wpds-border-width-focus) solid
-			var(--wpds-color-stroke-focus-brand);
+			var(--wpds-color-stroke-focus);
 		// Override style from wp-admin common.css.
 		box-shadow: none;
 		border-radius: 0;

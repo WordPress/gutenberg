@@ -116,7 +116,7 @@
 			outline: none;
 			box-shadow:
 				0 0 0 var(--wpds-border-width-focus)
-				var(--wpds-color-stroke-focus-brand);
+				var(--wpds-color-stroke-focus);
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
@@ -166,7 +166,7 @@
 			outline: none;
 			box-shadow:
 				0 0 0 var(--wpds-border-width-focus)
-				var(--wpds-color-stroke-focus-brand);
+				var(--wpds-color-stroke-focus);
 		}
 	}
 }
@@ -347,7 +347,7 @@
 			background: var(--wpds-color-background-surface-neutral-strong);
 			box-shadow:
 				inset 0 0 0 var(--wpds-border-width-focus)
-				var(--wpds-color-stroke-focus-brand);
+				var(--wpds-color-stroke-focus);
 		}
 
 		&::placeholder {

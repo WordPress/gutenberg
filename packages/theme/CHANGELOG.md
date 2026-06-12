@@ -10,6 +10,7 @@
 ### Breaking Changes
 
 -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+-   Rename the `--wpds-color-stroke-focus-brand` design token to `--wpds-color-stroke-focus` ([#79125](https://github.com/WordPress/gutenberg/pull/79125)).
 
 ## 0.15.0 (2026-06-10)
 

@@ -99,7 +99,7 @@
 				box-sizing: border-box;
 				border:
 					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus-brand);
+					var(--wpds-color-stroke-focus);
 			}
 		}
 
@@ -155,7 +155,7 @@
 				/* Outline works for Windows high contrast mode as well. */
 				outline:
 					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus-brand);
+					var(--wpds-color-stroke-focus);
 				border-radius: var(--wpds-border-radius-sm);
 
 				/* Animation */

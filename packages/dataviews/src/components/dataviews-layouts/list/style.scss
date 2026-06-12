@@ -117,7 +117,7 @@ div.dataviews-view-list {
 				position: absolute;
 				content: "";
 				inset: var(--wp-admin-border-width-focus);
-				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus-brand);
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
 				border-radius: var(--wpds-border-radius-sm);
 				// Windows High Contrast mode will show this outline, but not the box-shadow.
 				outline: 2px solid transparent;

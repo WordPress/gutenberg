@@ -101,7 +101,7 @@ export default [
 	'--wpds-color-stroke-interactive-error',
 	'--wpds-color-stroke-interactive-error-active',
 	'--wpds-color-stroke-interactive-error-strong',
-	'--wpds-color-stroke-focus-brand',
+	'--wpds-color-stroke-focus',
 	'--wpds-cursor-control',
 	'--wpds-dimension-base',
 	'--wpds-dimension-padding-xs',

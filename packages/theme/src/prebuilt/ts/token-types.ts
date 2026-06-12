@@ -54,13 +54,7 @@ export type BorderWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'focus';
 /**
  * Target elements that tokens can be applied to.
  */
-export type Target =
-	| 'surface'
-	| 'interactive'
-	| 'track'
-	| 'thumb'
-	| 'content'
-	| 'focus';
+export type Target = 'surface' | 'interactive' | 'track' | 'thumb' | 'content';
 
 /**
  * Background color variants for surface elements.

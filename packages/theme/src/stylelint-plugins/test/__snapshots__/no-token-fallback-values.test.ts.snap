@@ -40,12 +40,12 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
   },
   {
     "column": 53,
-    "endColumn": 89,
+    "endColumn": 83,
     "endLine": 10,
     "line": 10,
     "rule": "plugin-wpds/no-token-fallback-values",
     "severity": "error",
-    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus-brand'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
   },
   {
     "column": 32,

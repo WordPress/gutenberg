@@ -7,7 +7,7 @@
 
 /* Invalid: Fallbacks in complex values */
 .complex {
-	outline: var(--wpds-border-width-focus, 2px) solid var(--wpds-color-stroke-focus-brand, #0073aa);
+	outline: var(--wpds-border-width-focus, 2px) solid var(--wpds-color-stroke-focus, #0073aa);
 }
 
 /* Invalid: A wpds token with a fallback, even when nested inside another var() */

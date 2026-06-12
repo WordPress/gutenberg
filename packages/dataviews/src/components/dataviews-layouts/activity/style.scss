@@ -36,7 +36,7 @@
 				cursor: var(--wpds-cursor-control);
 
 				&:focus-visible {
-					outline: var(--wp-admin-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+					outline: var(--wp-admin-border-width-focus) solid var(--wpds-color-stroke-focus);
 					outline-offset: var(--wp-admin-border-width-focus);
 					border-radius: var(--wpds-border-radius-sm);
 				}

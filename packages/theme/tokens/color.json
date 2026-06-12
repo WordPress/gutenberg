@@ -1491,10 +1491,8 @@
 				}
 			},
 			"focus": {
-				"brand": {
-					"$value": "{wpds-color.primitive.primary.stroke3}",
-					"$description": "Accessible stroke color applied to focus rings."
-				}
+				"$value": "{wpds-color.primitive.primary.stroke3}",
+				"$description": "Accessible stroke color applied to focus rings."
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "STROKE" ]
