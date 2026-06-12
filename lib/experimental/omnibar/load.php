@@ -164,3 +164,40 @@ CSS;
 
 add_action( 'wp_enqueue_scripts', 'gutenberg_omnibar_user_avatar_styles' );
 add_action( 'admin_enqueue_scripts', 'gutenberg_omnibar_user_avatar_styles' );
+
+/**
+ * Removes the "Howdy," prefix from the admin bar my-account item, keeping the
+ * display name visible next to the avatar.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
+ */
+function gutenberg_omnibar_remove_howdy( $wp_admin_bar ) {
+	if (
+		! is_admin_bar_showing() ||
+		! gutenberg_is_experiment_enabled( 'gutenberg-omnibar' )
+	) {
+		return;
+	}
+
+	$node = $wp_admin_bar->get_node( 'my-account' );
+	if ( ! $node ) {
+		return;
+	}
+
+	$display_name = wp_get_current_user()->display_name;
+	$display_span = '<span class="display-name">' . $display_name . '</span>';
+	/* translators: %s: Current user's display name. */
+	$howdy = sprintf( __( 'Howdy, %s', 'default' ), $display_span );
+	if ( ! str_contains( $node->title, $howdy ) ) {
+		return;
+	}
+
+	$wp_admin_bar->add_node(
+		array(
+			'id'    => 'my-account',
+			'title' => str_replace( $howdy, $display_span, $node->title ),
+		)
+	);
+}
+
+add_action( 'admin_bar_menu', 'gutenberg_omnibar_remove_howdy', 9992 );
