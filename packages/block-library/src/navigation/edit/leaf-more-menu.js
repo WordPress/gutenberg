@@ -38,18 +38,34 @@ function AddSubmenuItem( {
 	expandedState,
 	expand,
 	setInsertedBlock,
+	displayDepth,
+	currentLevel,
 } ) {
 	const { insertBlock, replaceBlock, replaceInnerBlocks } =
 		useDispatch( blockEditorStore );
 
 	const clientId = block.clientId;
-	const isDisabled = ! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes(
-		block.name
-	);
+	const isUnsupportedBlock =
+		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( block.name );
+	const isHiddenByDepth = displayDepth > 0 && currentLevel >= displayDepth;
+
+	const isDisabled = isUnsupportedBlock || isHiddenByDepth;
+
 	return (
 		<MenuItem
 			icon={ addSubmenu }
 			disabled={ isDisabled }
+			info={
+				isHiddenByDepth
+					? sprintf(
+							/* translators: %d: the maximum number of submenu levels shown on the front end */
+							__(
+								'Display depth is limited to %d level(s). This submenu will not appear on the front end.'
+							),
+							displayDepth
+					  )
+					: undefined
+			}
 			onClick={ () => {
 				const updateSelectionOnInsert = false;
 				const newLink = createBlock(
@@ -122,45 +138,70 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					canInsertBlockType,
-					getDirectInsertBlock,
-					getBlockIndex,
-					getBlockCount,
-				} = select( blockEditorStore );
-				const { getDefaultBlockName } = select( blocksStore );
+	const {
+		rootClientId,
+		canDuplicate,
+		canInsertBlock,
+		isFirst,
+		isLast,
+		displayDepth,
+		currentLevel,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				canInsertBlockType,
+				getDirectInsertBlock,
+				getBlockIndex,
+				getBlockCount,
+				getBlockParents,
+				getBlockName,
+				getBlock,
+			} = select( blockEditorStore );
+			const { getDefaultBlockName } = select( blocksStore );
 
-				const _rootClientId = getBlockRootClientId( clientId );
-				const canInsertDefaultBlock = canInsertBlockType(
-					getDefaultBlockName(),
-					_rootClientId
-				);
-				const directInsertBlock = _rootClientId
-					? getDirectInsertBlock( _rootClientId )
-					: null;
+			const _rootClientId = getBlockRootClientId( clientId );
+			const canInsertDefaultBlock = canInsertBlockType(
+				getDefaultBlockName(),
+				_rootClientId
+			);
+			const directInsertBlock = _rootClientId
+				? getDirectInsertBlock( _rootClientId )
+				: null;
 
-				return {
-					rootClientId: _rootClientId,
-					canDuplicate:
-						!! block &&
-						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, _rootClientId ),
-					canInsertBlock:
-						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						!! block &&
-						canInsertBlockType( block.name, _rootClientId ),
-					isFirst: getBlockIndex( clientId ) === 0,
-					isLast:
-						getBlockIndex( clientId ) ===
-						getBlockCount( _rootClientId ) - 1,
-				};
-			},
-			[ clientId, block ]
-		);
+			const parents = getBlockParents( clientId ) || [];
+			const navClientId = parents.find(
+				( id ) => getBlockName( id ) === 'core/navigation'
+			);
+			const navBlock = navClientId ? getBlock( navClientId ) : null;
+
+			const computedDisplayDepth = navBlock?.attributes?.depth ?? 0;
+
+			const computedCurrentLevel =
+				parents.filter(
+					( id ) => getBlockName( id ) === 'core/navigation-submenu'
+				).length + 1;
+
+			return {
+				rootClientId: _rootClientId,
+				canDuplicate:
+					!! block &&
+					hasBlockSupport( block.name, 'multiple', true ) &&
+					canInsertBlockType( block.name, _rootClientId ),
+				canInsertBlock:
+					( canInsertDefaultBlock || !! directInsertBlock ) &&
+					!! block &&
+					canInsertBlockType( block.name, _rootClientId ),
+				isFirst: getBlockIndex( clientId ) === 0,
+				isLast:
+					getBlockIndex( clientId ) ===
+					getBlockCount( _rootClientId ) - 1,
+				displayDepth: computedDisplayDepth,
+				currentLevel: computedCurrentLevel,
+			};
+		},
+		[ clientId, block ]
+	);
 
 	return (
 		<DropdownMenu
@@ -202,6 +243,8 @@ export default function LeafMoreMenu( props ) {
 							expandedState={ props.expandedState }
 							expand={ props.expand }
 							setInsertedBlock={ props.setInsertedBlock }
+							displayDepth={ displayDepth }
+							currentLevel={ currentLevel }
 						/>
 						{ canDuplicate && (
 							<MenuItem

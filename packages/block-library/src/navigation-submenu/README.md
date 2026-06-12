@@ -65,6 +65,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 - `openSubmenusOnClick`
 - `submenuVisibility`
 - `style`
+- `depth`
 
 **Provides context:**
 

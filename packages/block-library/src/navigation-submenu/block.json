@@ -64,7 +64,8 @@
 		"maxNestingLevel",
 		"openSubmenusOnClick",
 		"submenuVisibility",
-		"style"
+		"style",
+		"depth"
 	],
 	"supports": {
 		"anchor": true,

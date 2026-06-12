@@ -273,6 +273,54 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Recursively filters parsed blocks to limit rendering depth.
+	 * Navigation submenu blocks beyond the specified depth are converted
+	 * to navigation-link blocks, dropping their children.
+	 *
+	 * @since 23.1.0
+	 *
+	 * @param array $blocks        Array of parsed block arrays.
+	 * @param int   $max_depth     Maximum nesting depth to render.
+	 *                             1 = top-level only (no submenus rendered).
+	 * @param int   $current_depth Current depth level (1-indexed). Default 1.
+	 * @return array Filtered array of parsed blocks.
+	 */
+	private static function filter_parsed_blocks_by_depth( $blocks, $max_depth, $current_depth = 1 ) {
+		if ( empty( $blocks ) || ! is_array( $blocks ) ) {
+			return $blocks;
+		}
+
+		$filtered = array();
+
+		foreach ( $blocks as $block ) {
+			if ( 'core/navigation-submenu' === ( $block['blockName'] ?? null ) ) {
+				if ( $current_depth >= $max_depth ) {
+					$block['blockName']   = 'core/navigation-link';
+					$block['innerBlocks'] = array();
+					$block['innerContent'] = array_values(
+						array_filter(
+							$block['innerContent'] ?? array(),
+							static function ( $content ) {
+								return null !== $content;
+							}
+						)
+					);
+				} else {
+					$block['innerBlocks'] = static::filter_parsed_blocks_by_depth(
+						$block['innerBlocks'] ?? array(),
+						$max_depth,
+						$current_depth + 1
+					);
+				}
+			}
+
+			$filtered[] = $block;
+		}
+
+		return $filtered;
+	}
+
+	/**
 	 * Gets the inner blocks for the navigation block from the navigation post.
 	 *
 	 * @since 6.5.0
@@ -302,8 +350,12 @@ class WP_Navigation_Block_Renderer {
 			$markup = apply_block_hooks_to_content_from_post_object( $markup, $navigation_post );
 			$blocks = parse_blocks( $markup );
 
-			// TODO - this uses the full navigation block attributes for the
-			// context which could be refined.
+			// Apply display depth limit if set.
+			$depth = isset( $attributes['depth'] ) ? (int) $attributes['depth'] : 0;
+			if ( $depth > 0 ) {
+				$blocks = static::filter_parsed_blocks_by_depth( $blocks, $depth );
+			}
+
 			return new WP_Block_List( $blocks, $attributes );
 		}
 	}
@@ -322,6 +374,12 @@ class WP_Navigation_Block_Renderer {
 		// Fallback my have been filtered so do basic test for validity.
 		if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
 			return new WP_Block_List( array(), $attributes );
+		}
+
+		// Apply display depth limit if set.
+		$depth = isset( $attributes['depth'] ) ? (int) $attributes['depth'] : 0;
+		if ( $depth > 0 ) {
+			$fallback_blocks = static::filter_parsed_blocks_by_depth( $fallback_blocks, $depth );
 		}
 
 		return new WP_Block_List( $fallback_blocks, $attributes );
