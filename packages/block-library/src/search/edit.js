@@ -504,7 +504,7 @@ export default function SearchEdit( {
 						{ label: '<form>', value: 'form' },
 					] }
 					onChange={ ( value ) => {
-						setAttributes( { tagName: value || undefined } );
+						setAttributes( { tagName: value } );
 						// The help text is updated via aria-describedby, which
 						// is not re-announced while focus remains on the select.
 						// Announce the new description so it is not missed.
