@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   `ThemeProvider`: forward the `cornerRadius` preset to the document element when `isRoot` is set, so the `--wpds-border-radius-*` tokens also apply to `<html>`, matching the existing behavior for `color` and `cursor` tokens. [#79153](https://github.com/WordPress/gutenberg/pull/79153).
+-   `ThemeProvider`: forward the `cornerRadius` preset to the document element when `isRoot` is set, matching `color` and `cursor`. [#79153](https://github.com/WordPress/gutenberg/pull/79153).
 
 ### Breaking Changes
 
