@@ -16,6 +16,17 @@ import { useState } from '@wordpress/element';
 import DimensionsTool from '../';
 
 const EMPTY_OBJECT = {};
+const ASPECT_RATIO_OPTIONS = [
+	{ label: 'Original', value: 'auto' },
+	{ label: '16/9', value: '16/9' },
+	{ label: '4/3', value: '4/3' },
+	{
+		label: 'Custom',
+		value: 'custom',
+		disabled: true,
+		hidden: true,
+	},
+];
 
 function Example( { initialValue, onChange, ...props } ) {
 	const [ value, setValue ] = useState( initialValue );
@@ -33,16 +44,27 @@ function Example( { initialValue, onChange, ...props } ) {
 				} }
 				defaultScale="cover"
 				defaultAspectRatio="auto"
-				aspectRatioOptions={ [
-					{ label: 'Original', value: 'auto' },
-					{ label: '16/9', value: '16/9' },
-					{
-						label: 'Custom',
-						value: 'custom',
-						disabled: true,
-						hidden: true,
-					},
-				] }
+				aspectRatioOptions={ ASPECT_RATIO_OPTIONS }
+				value={ value }
+				{ ...props }
+			/>
+		</ToolsPanel>
+	);
+}
+
+function ControlledExample( { value, onChange, ...props } ) {
+	return (
+		<ToolsPanel
+			label="Dimensions"
+			panelId="panel-id"
+			resetAll={ () => onChange( EMPTY_OBJECT ) }
+		>
+			<DimensionsTool
+				panelId="panel-id"
+				onChange={ onChange }
+				defaultScale="cover"
+				defaultAspectRatio="auto"
+				aspectRatioOptions={ ASPECT_RATIO_OPTIONS }
 				value={ value }
 				{ ...props }
 			/>
@@ -60,6 +82,39 @@ function Example( { initialValue, onChange, ...props } ) {
 // properties are treated differently from missing properties.
 
 describe( 'DimensionsTool', () => {
+	describe( 'controlled values', () => {
+		it( 'updates the aspect ratio control when the value prop changes', () => {
+			const onChange = jest.fn();
+			const { rerender } = render(
+				<ControlledExample
+					value={ { aspectRatio: '16/9' } }
+					onChange={ onChange }
+				/>
+			);
+			const aspectRatioSelect = screen.getByRole( 'combobox', {
+				name: 'Aspect ratio',
+			} );
+
+			expect( aspectRatioSelect ).toHaveValue( '16/9' );
+
+			rerender(
+				<ControlledExample
+					value={ { aspectRatio: '4/3' } }
+					onChange={ onChange }
+				/>
+			);
+			expect( aspectRatioSelect ).toHaveValue( '4/3' );
+
+			rerender(
+				<ControlledExample
+					value={ EMPTY_OBJECT }
+					onChange={ onChange }
+				/>
+			);
+			expect( aspectRatioSelect ).toHaveValue( 'auto' );
+		} );
+	} );
+
 	describe( 'updating aspectRatio', () => {
 		it( 'when starting with empty initial state, setting aspectRatio also sets scale (0000) -> (1100)', async () => {
 			const user = userEvent.setup();
@@ -323,7 +378,30 @@ describe( 'DimensionsTool', () => {
 	} );
 
 	describe( 'updating scale', () => {
-		// No custom interactions here. Things should just update normally.
+		it( 'when default scale is cover, setting scale to fill preserves the fill value', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			const initialValue = {
+				aspectRatio: '16/9',
+				scale: 'cover',
+			};
+
+			render(
+				<Example initialValue={ initialValue } onChange={ onChange } />
+			);
+
+			const scaleFillRadio = screen.getByRole( 'radio', {
+				name: 'Fill',
+			} );
+
+			await user.click( scaleFillRadio );
+			expect( scaleFillRadio ).toBeChecked();
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { aspectRatio: '16/9', scale: 'fill' } ],
+			] );
+		} );
 	} );
 
 	describe( 'updating dimensions', () => {
