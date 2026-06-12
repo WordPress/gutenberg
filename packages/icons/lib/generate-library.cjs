@@ -224,52 +224,78 @@ async function generateIndex() {
 }
 
 /**
- * Splits a CSS declaration list (the contents of a `style` attribute) on `;`,
- * ignoring semicolons that appear inside parentheses (e.g. an `url()` value) or
- * quoted strings (e.g. a base64 `data:` URI). A naive `split( ';' )` would
- * break such values apart.
+ * Parses a CSS declaration list (the contents of a `style` attribute) into an
+ * array of `[ key, value ]` tuples. Splits on `;` and the first un-quoted /
+ * un-parenthesised `:` per declaration, so semicolons and colons inside an
+ * `url()` value or a quoted string (e.g. a base64 `data:` URI) stay intact.
  *
- * @param {string} cssString - String of CSS properties.
- * @return {string[]} Declarations.
+ * Malformed declarations without a `key: value` colon, and declarations with
+ * an empty key, are dropped.
+ *
+ * @param {string} cssString String of CSS properties.
+ * @return {Array<[string, string]>} Declarations as `[ key, value ]` tuples.
  */
-function splitStyleDeclarations( cssString ) {
+function parseStyleDeclarations( cssString ) {
 	const declarations = [];
-	let current = '';
+	let key = '';
+	let value = '';
+	let inValue = false;
 	let parenDepth = 0;
 	let quote = null;
 	let escaped = false;
 
+	const finishDeclaration = () => {
+		const trimmedKey = key.trim();
+		if ( trimmedKey && inValue ) {
+			declarations.push( [ trimmedKey, value.trim() ] );
+		}
+		key = '';
+		value = '';
+		inValue = false;
+	};
+
+	const append = ( ch ) => {
+		if ( inValue ) {
+			value += ch;
+		} else {
+			key += ch;
+		}
+	};
+
 	for ( const char of cssString ) {
 		if ( escaped ) {
 			// Previous char was a backslash; this char is taken literally.
-			current += char;
+			append( char );
 			escaped = false;
 		} else if ( char === '\\' ) {
-			current += char;
+			append( char );
 			escaped = true;
 		} else if ( quote ) {
 			// Inside a quoted string; only the matching quote closes it.
 			if ( char === quote ) {
 				quote = null;
 			}
-			current += char;
+			append( char );
 		} else if ( char === '"' || char === "'" ) {
 			quote = char;
-			current += char;
+			append( char );
 		} else if ( char === '(' ) {
 			parenDepth++;
-			current += char;
+			append( char );
 		} else if ( char === ')' ) {
 			parenDepth = Math.max( 0, parenDepth - 1 );
-			current += char;
+			append( char );
 		} else if ( char === ';' && parenDepth === 0 ) {
-			declarations.push( current );
-			current = '';
+			finishDeclaration();
+		} else if ( char === ':' && parenDepth === 0 && ! inValue ) {
+			// First un-quoted, un-parenthesised colon separates key/value.
+			// Subsequent colons (e.g. in a `data:` URI) stay in the value.
+			inValue = true;
 		} else {
-			current += char;
+			append( char );
 		}
 	}
-	declarations.push( current );
+	finishDeclaration();
 
 	return declarations;
 }
@@ -310,19 +336,8 @@ function svgToTsx( svgContent ) {
 	// the CSS-string form so they remain valid SVG when read by non-React
 	// renderers (the PHP path, webpack SVG loaders, raw file preview).
 	jsxContent = jsxContent.replace( /\sstyle="([^"]*)"/g, ( _, cssString ) => {
-		const declarations = splitStyleDeclarations( cssString )
-			.map( ( decl ) => decl.trim() )
-			.filter( Boolean )
-			.map( ( decl ) => {
-				// Split on the first colon only: values can contain colons too
-				// (e.g. a `data:` URI), so only the first separates key/value.
-				const colonIndex = decl.indexOf( ':' );
-				// Skip malformed declarations that have no `key: value` colon.
-				if ( colonIndex === -1 ) {
-					return null;
-				}
-				const key = decl.slice( 0, colonIndex ).trim();
-				const value = decl.slice( colonIndex + 1 ).trim();
+		const declarations = parseStyleDeclarations( cssString )
+			.map( ( [ key, value ] ) => {
 				const camelKey = key.replace( /-([a-z])/g, ( _m, c ) =>
 					c.toUpperCase()
 				);
@@ -330,7 +345,6 @@ function svgToTsx( svgContent ) {
 				// string, so values containing quotes/backslashes stay valid.
 				return `${ camelKey }: ${ JSON.stringify( value ) }`;
 			} )
-			.filter( Boolean )
 			.join( ', ' );
 		return ` style={ { ${ declarations } } }`;
 	} );
@@ -396,6 +410,6 @@ if ( module === require.main ) {
 module.exports = {
 	generateTsxFiles,
 	// Exported for unit testing.
-	splitStyleDeclarations,
+	parseStyleDeclarations,
 	svgToTsx,
 };

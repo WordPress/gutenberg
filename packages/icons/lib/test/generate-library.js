@@ -2,55 +2,99 @@
  * Internal dependencies
  */
 const {
-	splitStyleDeclarations,
+	parseStyleDeclarations,
 	svgToTsx,
 } = require( '../generate-library.cjs' );
 
-describe( 'splitStyleDeclarations', () => {
-	it( 'splits a simple declaration list on semicolons', () => {
-		expect(
-			splitStyleDeclarations( 'fill: none; opacity: 0.25' ).map( ( d ) =>
-				d.trim()
-			)
-		).toEqual( [ 'fill: none', 'opacity: 0.25' ] );
+describe( 'parseStyleDeclarations', () => {
+	it( 'parses a simple declaration list into tuples', () => {
+		expect( parseStyleDeclarations( 'fill: none; opacity: 0.25' ) ).toEqual(
+			[
+				[ 'fill', 'none' ],
+				[ 'opacity', '0.25' ],
+			]
+		);
 	} );
 
 	it( 'does not split on semicolons inside an unquoted url() value', () => {
 		expect(
-			splitStyleDeclarations(
+			parseStyleDeclarations(
 				'background: url(data:image/png;base64,iVBOR;more); opacity: .5'
-			).map( ( d ) => d.trim() )
+			)
 		).toEqual( [
-			'background: url(data:image/png;base64,iVBOR;more)',
-			'opacity: .5',
+			[ 'background', 'url(data:image/png;base64,iVBOR;more)' ],
+			[ 'opacity', '.5' ],
 		] );
 	} );
 
 	it( 'does not split on semicolons inside a quoted url() value', () => {
 		expect(
-			splitStyleDeclarations(
+			parseStyleDeclarations(
 				'background: url("data:image/svg+xml;base64,AA=="); fill: none'
-			).map( ( d ) => d.trim() )
+			)
 		).toEqual( [
-			'background: url("data:image/svg+xml;base64,AA==")',
-			'fill: none',
+			[ 'background', 'url("data:image/svg+xml;base64,AA==")' ],
+			[ 'fill', 'none' ],
 		] );
 	} );
 
 	it( 'does not split on semicolons inside a quoted string value', () => {
-		expect(
-			splitStyleDeclarations( 'content: "a;b"; fill: red' ).map( ( d ) =>
-				d.trim()
-			)
-		).toEqual( [ 'content: "a;b"', 'fill: red' ] );
+		expect( parseStyleDeclarations( 'content: "a;b"; fill: red' ) ).toEqual(
+			[
+				[ 'content', '"a;b"' ],
+				[ 'fill', 'red' ],
+			]
+		);
 	} );
 
 	it( 'respects escaped quotes within a quoted value', () => {
 		expect(
-			splitStyleDeclarations( 'content: "a\\";b"; fill: red' ).map(
-				( d ) => d.trim()
+			parseStyleDeclarations( 'content: "a\\";b"; fill: red' )
+		).toEqual( [
+			[ 'content', '"a\\";b"' ],
+			[ 'fill', 'red' ],
+		] );
+	} );
+
+	it( 'only splits the key/value on the first un-quoted colon', () => {
+		// Colons in values (e.g. `data:` URI) stay in the value.
+		expect(
+			parseStyleDeclarations(
+				'background: url(data:image/png;base64,AA==)'
 			)
-		).toEqual( [ 'content: "a\\";b"', 'fill: red' ] );
+		).toEqual( [ [ 'background', 'url(data:image/png;base64,AA==)' ] ] );
+	} );
+
+	it( 'does not split on colons inside parentheses', () => {
+		expect(
+			parseStyleDeclarations(
+				'background: linear-gradient(red, blue); fill: green'
+			)
+		).toEqual( [
+			[ 'background', 'linear-gradient(red, blue)' ],
+			[ 'fill', 'green' ],
+		] );
+	} );
+
+	it( 'does not split on colons inside quoted strings', () => {
+		expect(
+			parseStyleDeclarations( 'content: "key:value"; fill: red' )
+		).toEqual( [
+			[ 'content', '"key:value"' ],
+			[ 'fill', 'red' ],
+		] );
+	} );
+
+	it( 'drops malformed declarations that have no colon', () => {
+		expect( parseStyleDeclarations( '; fill: none ;' ) ).toEqual( [
+			[ 'fill', 'none' ],
+		] );
+	} );
+
+	it( 'drops declarations with an empty key', () => {
+		expect( parseStyleDeclarations( ': value; fill: red' ) ).toEqual( [
+			[ 'fill', 'red' ],
+		] );
 	} );
 } );
 
