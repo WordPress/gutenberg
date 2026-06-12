@@ -8,11 +8,11 @@ import {
 	privateApis as corePrivateApis,
 	type WpTemplate,
 } from '@wordpress/core-data';
+import { unlock } from '@wordpress/lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import type { Template } from './types';
 
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );

@@ -19,6 +19,7 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
+		"@wordpress/lock-unlock": "file:../lock-unlock",
 		"@wordpress/patterns": "file:../../packages/patterns",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/views": "file:../../packages/views"

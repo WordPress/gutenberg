@@ -12,11 +12,11 @@ import {
 	type Media,
 } from '@wordpress/media-editor';
 import { useNavigate, useParams } from '@wordpress/route';
+import { unlock } from '@wordpress/lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import './style.scss';
 
 const { usePostFields } = unlock( editorPrivateApis );

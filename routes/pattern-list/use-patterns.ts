@@ -6,12 +6,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as patternPrivateApis } from '@wordpress/patterns';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { unlock } from '@wordpress/lock-unlock';
 
 /**
  * Internal dependencies
  */
 import { filterOutDuplicatesByName } from './utils';
-import { unlock } from '../lock-unlock';
 
 const {
 	PATTERN_TYPES,

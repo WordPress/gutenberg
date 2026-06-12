@@ -20,13 +20,13 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
+import { unlock } from '@wordpress/lock-unlock';
 
 /**
  * Internal dependencies
  */
 import { saveGuidelines } from '../api';
 import { store as coreGuidelinesStore } from '../store';
-import { unlock } from '../../lock-unlock';
 import './block-guideline-modal.scss';
 
 const { isContentBlock } = unlock( blocksPrivateApis );

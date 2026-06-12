@@ -3,11 +3,7 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+import { unlock } from '@wordpress/lock-unlock';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
