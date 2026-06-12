@@ -833,6 +833,34 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
+	test( 'should place the caret at the click position when clicking a block that is not selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Second' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+
+		// Click the first paragraph. The click lands at the center of the
+		// paragraph element, past the end of the short text, so the caret
+		// must be placed at the end of the text.
+		await editor.canvas.locator( 'p:text("First")' ).click();
+		await page.keyboard.type( '!' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First!' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
 	test( 'should not have a dead zone between blocks (lower)', async ( {
 		editor,
 		page,

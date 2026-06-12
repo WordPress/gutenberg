@@ -422,7 +422,7 @@ export function RichTextWrapper(
 	// focusability.
 	let tabIndex = props.tabIndex;
 	if ( ! shouldDisableEditing ) {
-		if ( hasEditableRoot && hasDefaultEditingMode ) {
+		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
 			tabIndex = props.tabIndex ?? 0;
 		} else if ( props.tabIndex === 0 ) {
 			tabIndex = null;

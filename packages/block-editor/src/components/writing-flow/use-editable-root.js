@@ -81,7 +81,20 @@ export default function useEditableRoot() {
 					node.contains( activeElement ) &&
 					getBlockClientId( activeElement ) === selectedClientId
 				) {
-					node.focus();
+					// Only move focus when the selection has settled within
+					// the focused element. If the selection is still outside,
+					// a mousedown just focused the element and the browser
+					// has not placed the caret yet; moving focus now would
+					// cancel the pending caret placement. The selection
+					// observer moves focus once the selection lands.
+					const selection =
+						node.ownerDocument.defaultView.getSelection();
+					if (
+						selection.anchorNode &&
+						activeElement.contains( selection.anchorNode )
+					) {
+						node.focus();
+					}
 				}
 			} else if (
 				node.getAttribute( 'contenteditable' ) === 'true' &&
