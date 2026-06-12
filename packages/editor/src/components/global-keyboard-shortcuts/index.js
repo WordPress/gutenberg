@@ -5,6 +5,10 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { __unstableSerializeAndClean } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -41,7 +45,11 @@ export default function EditorKeyboardShortcuts() {
 		isPostSavingLocked,
 		isListViewOpened,
 		getEditorMode,
+		getCurrentPostId,
+		getCurrentPostType,
 	} = useSelect( editorStore );
+	const { getEditedEntityRecord } = useSelect( coreStore );
+	const { createNotice } = useDispatch( noticesStore );
 
 	useShortcut(
 		'core/editor/toggle-mode',
@@ -116,6 +124,42 @@ export default function EditorKeyboardShortcuts() {
 				: 'edit-post/document';
 			enableComplementaryArea( 'core', sidebarToOpen );
 		}
+	} );
+
+	useShortcut( 'core/editor/copy-all', ( event ) => {
+		event.preventDefault();
+
+		const record = getEditedEntityRecord(
+			'postType',
+			getCurrentPostType(),
+			getCurrentPostId()
+		);
+
+		if ( ! record ) {
+			return;
+		}
+
+		let content = '';
+
+		// If the record has blocks, serialize them.
+		if ( record.blocks ) {
+			content = __unstableSerializeAndClean( record.blocks );
+			// If the record has content, use it.
+		} else if ( record.content ) {
+			content = record.content;
+		}
+
+		if ( ! content ) {
+			return;
+		}
+
+		// Copy to clipboard.
+		window?.navigator?.clipboard?.writeText( content ).then( () => {
+			createNotice( 'info', __( 'All blocks copied.' ), {
+				isDismissible: true,
+				type: 'snackbar',
+			} );
+		} );
 	} );
 
 	return null;

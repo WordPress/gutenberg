@@ -100,6 +100,16 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/editor/copy-all',
+			category: 'global',
+			description: __( 'Copy all blocks.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'c',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/editor/keyboard-shortcuts',
 			category: 'main',
 			description: __( 'Display these keyboard shortcuts.' ),
