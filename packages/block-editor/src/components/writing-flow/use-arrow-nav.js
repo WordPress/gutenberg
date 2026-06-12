@@ -288,13 +288,24 @@ export default function useArrowNav() {
 			const { keepCaretInsideBlock } = getSettings();
 
 			if ( shiftKey ) {
-				if (
-					isClosestTabbableABlock( target, isReverse ) &&
-					isNavEdge( target, isReverse )
-				) {
-					node.contentEditable = true;
-					// Firefox doesn't automatically move focus.
-					node.focus();
+				if ( isNavEdge( target, isReverse ) ) {
+					if ( isClosestTabbableABlock( target, isReverse ) ) {
+						node.contentEditable = true;
+						// Firefox doesn't automatically move focus.
+						node.focus();
+					} else if ( node.contentEditable === 'true' ) {
+						// There is no block to extend the selection into.
+						// Within an editable wrapper the selection could
+						// natively escape into surrounding editable elements
+						// (e.g. the post title), so keep it inside the block
+						// by extending it to the block's edge.
+						const selection = defaultView.getSelection();
+						selection.extend(
+							target,
+							isReverse ? 0 : target.childNodes.length
+						);
+						event.preventDefault();
+					}
 				}
 			} else if (
 				isVertical &&
