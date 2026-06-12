@@ -64,7 +64,6 @@
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.0.0",
 		"@flakiness/jest": "^1.2.0",
-		"@flakiness/playwright": "^1.13.0",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
 		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
@@ -89,10 +88,7 @@
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0",
-		"@flakiness/flakiness-report": {
-			"zod": "^4.1.12"
-		}
+		"jsdom": "26.1.0"
 	},
 	"scripts": {
 		"build": "npm run --workspace @wordpress/build-scripts build:all --",

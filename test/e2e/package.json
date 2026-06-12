@@ -21,6 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"devDependencies": {
+		"@flakiness/playwright": "^1.13.0",
 		"@playwright/test": "^1.58.2",
 		"@types/node": "^20.19.39",
 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
@@ -30,6 +31,11 @@
 		"filenamify": "^4.2.0",
 		"ws": "^8.18.3",
 		"y-websocket": "^3.0.0"
+	},
+	"overrides": {
+		"@flakiness/flakiness-report": {
+			"zod": "^4.1.12"
+		}
 	},
 	"publishConfig": {
 		"access": "public"
