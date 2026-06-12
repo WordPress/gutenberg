@@ -48,7 +48,7 @@
 
   <!-- Station 6: host -->
   <rect x="216" y="560" width="480" height="66" rx="9" fill="#fafbfc" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 5"/>
-  <text x="240" y="587" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#475569">Host <tspan font-size="11.5" font-weight="500" fill="#94a3b8">· any consumer</tspan></text>
+  <text x="240" y="587" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#475569">Host <tspan font-size="11.5" font-weight="500" fill="#94a3b8">· dashboard, sidebar, plugin panel…</tspan></text>
   <text x="240" y="608" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" fill="#64748b" opacity="0.9">owns layout · chrome · persistence</text>
 
   <!-- Seam annotations -->

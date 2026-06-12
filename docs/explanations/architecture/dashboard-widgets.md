@@ -72,7 +72,7 @@ Equally important is what the package does not do: no chrome, no layout, no pers
 
 A host is any context that renders widgets; the contract privileges none of them. The dashboard (`routes/dashboard/widget-dashboard/`) is the host this repository ships today, and it illustrates what a host owns: it calls `useWidgetTypes()`, owns the layout array and its persistence, wraps every instance in its own chrome (header, toolbars, error boundary, Suspense fallback), and passes `resolveWidgetModule` down through its context (overridable for tests and Storybook).
 
-The same `WidgetType` could equally be rendered by a sidebar, a plugin panel, or an application outside wp-admin; the choice of where and how to render belongs entirely to the consumer.
+The same `WidgetType` could equally be rendered by a sidebar, a plugin panel, or an application outside wp-admin; the choice of where and how to render belongs entirely to the host. Every host is a consumer of the package; not every consumer is a host: tests, Storybook, or a picker that only lists widget types consume the same contract without rendering anything.
 
 ## Why a standalone package
 

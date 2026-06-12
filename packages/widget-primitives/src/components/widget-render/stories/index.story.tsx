@@ -280,13 +280,13 @@ export const WithSettings: StoryObj = {
 		docs: {
 			description: {
 				story: `
-A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`. That single declaration is enough for a host to build a settings surface:
+A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`. That single declaration is enough for a host to build a settings UI:
 
 - The \`DataForm\` on the right is mounted straight from the schema, with no per-widget form wiring.
 - Validation comes from the same source: the \`greeting\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.
 - Edits flow into the rendered widget on the left through the shared attributes state.
 
-Any host can derive its settings UI this way, whatever shape that surface takes.
+Any host can derive its settings UI this way, whatever shape it takes.
 `,
 			},
 		},

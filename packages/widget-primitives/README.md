@@ -93,7 +93,7 @@ particular.
 
 The same `core/hello-world` widget can render in a dashboard grid, a sidebar
 within another page, a modal inserter, or a plugin panel. The choice of where to
-render belongs to the consumer; the registry knows nothing about it.
+render belongs to the host; the registry knows nothing about it.
 
 For `import( widget.renderModule )` to resolve at runtime, the render module
 needs to be available to the browser. The build pipeline registers each
