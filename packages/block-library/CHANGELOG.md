@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Removed the `@wordpress/block-library/babel-plugin` export. It was an internal transform for stripping experimental blocks from WordPress core builds and is no longer used by Gutenberg's build process.
+
 ## 9.48.0 (2026-06-10)
 
 ### Code Quality
