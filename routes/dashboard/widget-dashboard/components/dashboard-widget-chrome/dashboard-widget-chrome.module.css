@@ -21,13 +21,13 @@
  * to content focus, and to `:focus-visible` so a mouse click doesn't draw it.
  */
 .widgetChrome:has(.widgetChromeContent :focus-visible) {
-	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 	outline-offset: 2px;
 }
 
 .widgetChromeHeaderIcon {
 	display: inline-flex;
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 }
 
 /*

@@ -119,7 +119,11 @@ const DSTokensList = () => {
 	}, [] );
 
 	return (
-		<div style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
+		<div
+			style={ {
+				color: 'var( --wpds-color-foreground-content-neutral )',
+			} }
+		>
 			<h1>Design System Color tokens</h1>
 			<h2>Semantic tokens (can be consumed directly)</h2>
 			<ColorTokenTable tokens={ props.semanticProps } />
@@ -157,8 +161,8 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 							top: 0,
 							right: 0,
 							backgroundColor:
-								'var(--wpds-color-bg-surface-neutral)',
-							color: 'var( --wpds-color-fg-content-neutral )',
+								'var(--wpds-color-background-surface-neutral)',
+							color: 'var( --wpds-color-foreground-content-neutral )',
 							padding: '0.5rem',
 							borderRadius: '0.5rem',
 							boxShadow: '0 0 0.5rem 0 rgba(0, 0, 0, 0.1)',
@@ -191,8 +195,8 @@ const NestingDebug = ( { background = '', primary = '' } ) => (
 	<div
 		style={ {
 			padding: 'var(--wpds-dimension-padding-lg)',
-			color: 'var(--wpds-color-fg-content-neutral)',
-			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
+			color: 'var(--wpds-color-foreground-content-neutral)',
+			backgroundColor: 'var(--wpds-color-background-surface-neutral)',
 			display: 'flex',
 			alignItems: 'center',
 			flexWrap: 'wrap',
@@ -208,8 +212,8 @@ const NestingDebug = ( { background = '', primary = '' } ) => (
 				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
-					'var(--wpds-color-bg-interactive-brand-strong)',
-				color: 'var(--wpds-color-fg-interactive-brand-strong)',
+					'var(--wpds-color-background-interactive-brand-strong)',
+				color: 'var(--wpds-color-foreground-interactive-brand-strong)',
 			} }
 		>
 			primary
@@ -221,8 +225,8 @@ const NestingDebug = ( { background = '', primary = '' } ) => (
 				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
-					'var(--wpds-color-bg-interactive-neutral-weak-disabled)',
-				color: 'var(--wpds-color-fg-content-neutral)',
+					'var(--wpds-color-background-interactive-neutral-weak-disabled)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			Neutral
@@ -370,7 +374,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 				<IframeWithClonedTokenStyles>
 					<div
 						style={ {
-							color: 'var(--wpds-color-fg-content-neutral)',
+							color: 'var(--wpds-color-foreground-content-neutral)',
 						} }
 					>
 						In the iframe, but outside of `ThemeProvider`
@@ -389,7 +393,11 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 	},
 	args: {
 		children: (
-			<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } }>
+			<div
+				style={ {
+					color: 'var(--wpds-color-foreground-content-neutral)',
+				} }
+			>
 				Code is poetry.{ ' ' }
 				<span
 					style={ {
@@ -397,8 +405,8 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 						padding: 'var(--wpds-dimension-padding-sm)',
 						borderRadius: '0.25rem',
 						backgroundColor:
-							'var(--wpds-color-bg-interactive-brand-strong)',
-						color: 'var(--wpds-color-fg-interactive-brand-strong)',
+							'var(--wpds-color-background-interactive-brand-strong)',
+						color: 'var(--wpds-color-foreground-interactive-brand-strong)',
 					} }
 				>
 					primary

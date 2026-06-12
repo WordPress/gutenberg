@@ -16,7 +16,7 @@
 .urlBar {
 	flex-shrink: 0;
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
-	background: var(--wpds-color-bg-surface-neutral-weak);
+	background: var(--wpds-color-background-surface-neutral-weak);
 	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 }
 
@@ -25,7 +25,7 @@
 	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	border-radius: var(--wpds-border-radius-lg);
-	background: var(--wpds-color-bg-surface-neutral);
+	background: var(--wpds-color-background-surface-neutral);
 }
 
 .urlFavicon {
@@ -37,7 +37,7 @@
 
 .urlIcon {
 	flex-shrink: 0;
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .urlText {
@@ -46,7 +46,7 @@
 	overflow: hidden;
 	font-size: var(--wpds-typography-font-size-xs);
 	line-height: var(--wpds-typography-line-height-xs);
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
@@ -77,7 +77,7 @@
 	position: absolute;
 	inset: 0;
 	opacity: 0;
-	background: color-mix(in srgb, var(--wpds-color-fg-content-neutral-weak) 20%, transparent);
+	background: color-mix(in srgb, var(--wpds-color-foreground-content-neutral-weak) 20%, transparent);
 	backdrop-filter: blur(1px);
 }
 

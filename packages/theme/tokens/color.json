@@ -1095,7 +1095,7 @@
 				}
 			}
 		},
-		"bg": {
+		"background": {
 			"surface": {
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.surface2}",
@@ -1276,7 +1276,7 @@
 				"com.figma.scopes": [ "FRAME_FILL", "SHAPE_FILL" ]
 			}
 		},
-		"fg": {
+		"foreground": {
 			"content": {
 				"neutral": {
 					"$value": "{wpds-color.primitive.bg.fgSurface4}",
@@ -1491,10 +1491,8 @@
 				}
 			},
 			"focus": {
-				"brand": {
-					"$value": "{wpds-color.primitive.primary.stroke3}",
-					"$description": "Accessible stroke color applied to focus rings."
-				}
+				"$value": "{wpds-color.primitive.primary.stroke3}",
+				"$description": "Accessible stroke color applied to focus rings."
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "STROKE" ]
