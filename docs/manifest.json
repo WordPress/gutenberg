@@ -2898,6 +2898,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/widget-primitives",
+		"slug": "packages-widget-primitives",
+		"markdown_source": "../packages/widget-primitives/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/widgets",
 		"slug": "packages-widgets",
 		"markdown_source": "../packages/widgets/README.md",
