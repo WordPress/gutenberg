@@ -6,6 +6,13 @@
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '../theme-provider';
 
+// The global Jest setup maps CSS modules to an empty object, which would leave
+// the provider's scoping class `undefined`. Provide a real class name so the
+// generated selectors and the wrapper's class can be asserted meaningfully.
+jest.mock( '../style.module.css', () => ( {
+	root: 'theme-provider-root',
+} ) );
+
 function getProvider( container: HTMLElement ) {
 	return container.querySelector< HTMLElement >(
 		'[data-wpds-theme-provider-id]'
@@ -27,6 +34,7 @@ describe( 'ThemeProvider', () => {
 		const { container } = render( <ThemeProvider>x</ThemeProvider> );
 		const provider = getProvider( container );
 
+		expect( provider ).toHaveClass( 'theme-provider-root' );
 		expect( provider ).toHaveAttribute( 'data-wpds-theme-provider-id' );
 		expect( provider ).toHaveAttribute(
 			'data-wpds-root-provider',
@@ -63,8 +71,10 @@ describe( 'ThemeProvider', () => {
 			);
 			const styleText = getStyleText( container );
 
+			// The instance selector scopes to both the provider's class (with
+			// the intentional doubled specificity) and its unique instance id.
 			expect( styleText ).toContain(
-				`[data-wpds-theme-provider-id="${ instanceId }"]`
+				`.theme-provider-root.theme-provider-root[data-wpds-theme-provider-id="${ instanceId }"]`
 			);
 			// The generated declarations include the color tokens.
 			expect( styleText ).toContain( '--wp-admin-theme-color' );
@@ -109,9 +119,14 @@ describe( 'ThemeProvider', () => {
 				'data-wpds-root-provider',
 				'true'
 			);
-			const styleText = getStyleText( container );
-			expect( styleText ).toContain( ':root:has(' );
-			expect( styleText ).toContain( '[data-wpds-root-provider="true"]' );
+			const instanceId = getProvider( container )?.getAttribute(
+				'data-wpds-theme-provider-id'
+			);
+			// The document root is targeted via `:has()`, matching the
+			// provider's class, the root flag, and its unique instance id.
+			expect( getStyleText( container ) ).toContain(
+				`:root:has(.theme-provider-root[data-wpds-root-provider="true"][data-wpds-theme-provider-id="${ instanceId }"])`
+			);
 		} );
 	} );
 
