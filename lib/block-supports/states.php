@@ -91,6 +91,54 @@ function gutenberg_get_state_declarations_with_fallback_border_styles( $declarat
 }
 
 /**
+ * Adds fallback dimension styles for aspectRatio and height block-support values.
+ *
+ * @param array $state_style State style object.
+ * @return array State style object with fallback dimension styles applied where needed.
+ */
+function gutenberg_get_state_style_with_fallback_dimension_styles( $state_style ) {
+	if ( ! is_array( $state_style ) ) {
+		return $state_style;
+	}
+
+	$dimensions = isset( $state_style['dimensions'] ) && is_array( $state_style['dimensions'] )
+		? $state_style['dimensions']
+		: array();
+
+	if ( empty( $dimensions ) ) {
+		return $state_style;
+	}
+
+	if ( gutenberg_is_explicit_aspect_ratio_value( $dimensions['aspectRatio'] ?? null ) ) {
+		return array_replace_recursive(
+			$state_style,
+			array(
+				'dimensions' => array(
+					'minHeight' => 'unset',
+					'height'    => 'unset',
+				),
+			)
+		);
+	}
+
+	$has_min_height = isset( $dimensions['minHeight'] ) && ( is_string( $dimensions['minHeight'] ) || is_numeric( $dimensions['minHeight'] ) ) && '' !== trim( (string) $dimensions['minHeight'] );
+	$has_height     = isset( $dimensions['height'] ) && ( is_string( $dimensions['height'] ) || is_numeric( $dimensions['height'] ) ) && '' !== trim( (string) $dimensions['height'] );
+
+	if ( $has_min_height || $has_height ) {
+		return array_replace_recursive(
+			$state_style,
+			array(
+				'dimensions' => array(
+					'aspectRatio' => 'unset',
+				),
+			)
+		);
+	}
+
+	return $state_style;
+}
+
+/**
  * Adds a style fragment to a selector-keyed state style group.
  *
  * @param array       $groups   Selector-keyed style groups.
@@ -216,8 +264,9 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 		}
 
 		foreach ( gutenberg_get_state_style_groups( $state_style, $block_selectors ) as $group ) {
+			$style    = gutenberg_get_state_style_with_fallback_dimension_styles( $group['style'] );
 			$compiled = gutenberg_style_engine_get_styles(
-				gutenberg_normalize_state_style_for_css_output( $group['style'] )
+				gutenberg_normalize_state_style_for_css_output( $style )
 			);
 
 			if ( ! empty( $compiled['declarations'] ) ) {
@@ -431,8 +480,8 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 */
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
-		$declarations = array();
-		foreach ( $rule['declarations'] as $property => $value ) {
+		$declarations = $rule['declarations'];
+		foreach ( $declarations as $property => $value ) {
 			$declarations[ $property ] = is_string( $value ) && str_contains( $value, '!important' )
 				? $value
 				: $value . ' !important';
