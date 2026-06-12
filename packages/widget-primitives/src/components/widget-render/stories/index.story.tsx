@@ -34,32 +34,57 @@ import type { WidgetRenderProps, WidgetType } from '../../../types';
  */
 
 interface DemoAttributes {
-	message?: string;
-	tone?: 'neutral' | 'info' | 'caution';
+	greeting?: string;
+	world?: 'earth' | 'moon' | 'mars' | 'saturn';
 }
 
-const TONES: NonNullable< DemoAttributes[ 'tone' ] >[] = [
-	'neutral',
-	'info',
-	'caution',
+const WORLDS: {
+	value: NonNullable< DemoAttributes[ 'world' ] >;
+	label: string;
+	emoji: string;
+	background: string;
+}[] = [
+	{
+		value: 'earth',
+		label: 'World',
+		emoji: '🌍',
+		background: 'var(--wpds-color-bg-surface-info-weak)',
+	},
+	{
+		value: 'moon',
+		label: 'Moon',
+		emoji: '🌕',
+		background: 'var(--wpds-color-bg-surface-neutral)',
+	},
+	{
+		value: 'mars',
+		label: 'Mars',
+		emoji: '🔴',
+		background: 'var(--wpds-color-bg-surface-caution-weak)',
+	},
+	{
+		value: 'saturn',
+		label: 'Saturn',
+		emoji: '🪐',
+		background: 'var(--wpds-color-bg-surface-warning-weak)',
+	},
 ];
-
-const TONE_BACKGROUND: Record< string, string > = {
-	neutral: 'var(--wpds-color-bg-surface-neutral)',
-	info: 'var(--wpds-color-bg-surface-info-weak)',
-	caution: 'var(--wpds-color-bg-surface-caution-weak)',
-};
 
 function DemoWidget( {
 	attributes,
 	setAttributes,
 }: WidgetRenderProps< DemoAttributes > ) {
-	const { message = 'Hello World', tone = 'neutral' } = attributes ?? {};
+	const { greeting = 'Hello', world = 'earth' } = attributes ?? {};
+	const index = Math.max(
+		0,
+		WORLDS.findIndex( ( entry ) => entry.value === world )
+	);
+	const current = WORLDS[ index ];
 
 	return (
 		<div
 			style={ {
-				background: TONE_BACKGROUND[ tone ],
+				background: current.background,
 				border: '1px solid var(--wpds-color-stroke-surface-neutral)',
 				borderRadius: 'var(--wpds-border-radius-md)',
 				color: 'var(--wpds-color-fg-content-neutral)',
@@ -69,18 +94,20 @@ function DemoWidget( {
 				padding: 'var(--wpds-dimension-padding-xl)',
 			} }
 		>
-			<strong style={ { fontSize: '1.5em' } }>{ message }</strong>
+			<strong style={ { fontSize: '1.5em' } }>
+				{ `${ greeting }, ${ current.label }! ${ current.emoji }` }
+			</strong>
+
 			{ setAttributes && (
 				<button
 					onClick={ () =>
 						setAttributes( {
-							tone: TONES[
-								( TONES.indexOf( tone ) + 1 ) % TONES.length
-							],
+							world: WORLDS[ ( index + 1 ) % WORLDS.length ]
+								.value,
 						} )
 					}
 				>
-					Cycle tone
+					Next world
 				</button>
 			) }
 		</div>
@@ -95,28 +122,28 @@ const demoWidgetType: WidgetType< DemoAttributes > = {
 	apiVersion: 1,
 	name: 'demo/hello-world',
 	title: 'Hello World',
-	description: 'Minimal widget demonstrating the render contract.',
+	description: 'Minimal widget that greets worlds near and far.',
 	icon: wordpress,
 	renderModule: 'demo/widgets/hello-world/render',
 	attributes: [
 		{
-			id: 'message',
-			label: 'Message',
+			id: 'greeting',
+			label: 'Greeting',
 			type: 'text',
 			isValid: { required: true },
 		},
 		{
-			id: 'tone',
-			label: 'Tone',
+			id: 'world',
+			label: 'World',
 			type: 'text',
-			elements: TONES.map( ( tone ) => ( {
-				value: tone,
-				label: tone,
+			elements: WORLDS.map( ( { value, label } ) => ( {
+				value,
+				label,
 			} ) ),
 		},
 	] as Field< DemoAttributes >[],
 	example: {
-		attributes: { message: 'Hello World', tone: 'info' },
+		attributes: { greeting: 'Hello', world: 'mars' },
 	},
 };
 
@@ -183,7 +210,7 @@ export const Default: StoryObj = {
 The minimal contract between a host and a widget:
 
 - \`attributes\` flow into the widget as plain data.
-- The widget writes back through \`setAttributes\`. Here, the "Cycle tone" button updates the \`tone\` attribute from inside the widget.
+- The widget writes back through \`setAttributes\`. Here, the "Next world" button updates the \`world\` attribute from inside the widget.
 
 The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
 `,
@@ -256,7 +283,7 @@ export const WithSettings: StoryObj = {
 A widget type declares its settings as a dataviews \`Field[]\` under \`attributes\`. That single declaration is enough for a host to build a settings surface:
 
 - The \`DataForm\` on the right is mounted straight from the schema, with no per-widget form wiring.
-- Validation comes from the same source: the \`message\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.
+- Validation comes from the same source: the \`greeting\` field is marked as required, and \`useFormValidity\` surfaces the result in the form.
 - Edits flow into the rendered widget on the left through the shared attributes state.
 
 Any host can derive its settings UI this way, whatever shape that surface takes.
@@ -270,6 +297,7 @@ function WidgetInHostChrome() {
 	const [ attributes, setAttributes ] = useState< DemoAttributes >( {
 		...demoWidgetType.example?.attributes,
 	} );
+
 	const titleId = useId();
 
 	return (
