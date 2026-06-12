@@ -38,13 +38,15 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * 			</WidgetDashboard.NoWidgetsState>
  * 			<WidgetDashboard.Actions />
  * 			<WidgetDashboard.Widgets />
+ * 			<WidgetDashboard.Commands />
  * 		</WidgetDashboard>
  * 	);
  * }
  * ```
  *
- * `Actions` hosts the reset dialog, so include it (or rely on the default
- * children) for the command-palette "Reset to default" action to work.
+ * `Commands` is opt-in: compose it to register the dashboard's command
+ * palette commands. Its "Reset to default" command opens the dialog hosted
+ * by `Actions`, so pair the two.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -82,12 +84,11 @@ export const WidgetDashboard = Object.assign(
 						</>
 					) }
 
-					<Commands />
 					<Inserter />
 					<WidgetSettings />
 				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Actions, Widgets, WidgetChrome, NoWidgetsState }
+	{ Actions, Widgets, WidgetChrome, NoWidgetsState, Commands }
 );

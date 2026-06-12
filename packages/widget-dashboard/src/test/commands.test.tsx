@@ -93,6 +93,7 @@ function Harness( {
 			}
 			onGridSettingsChange={ withGridSettings ? () => {} : undefined }
 		>
+			<WidgetDashboard.Commands />
 			<CommandsProbe names={ COMMAND_NAMES } />
 		</WidgetDashboard>
 	);

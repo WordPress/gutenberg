@@ -97,6 +97,7 @@ function Dashboard() {
 				<WidgetDashboard.NoWidgetsState />
 				<WidgetDashboard.Widgets />
 			</Page>
+			<WidgetDashboard.Commands />
 		</WidgetDashboard>
 	);
 }

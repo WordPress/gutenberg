@@ -4,7 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
 </div>
 
-Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances: drag-to-reorder, resize, a modal inserter, per-widget settings, a layout-settings drawer, and command palette integration, all behind a consumer-controlled edit mode.
+Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances: drag-to-reorder, resize, a modal inserter, per-widget settings, a layout-settings drawer, and opt-in command palette integration, all behind a consumer-controlled edit mode.
 
 The engine owns no data. Widget types flow in via the `widgetTypes` prop (see [`@wordpress/widget-primitives`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives)), the consumer owns the committed `layout` array, and in-progress edits accumulate in an internal staging layer until the user commits them, at which point `onLayoutChange` fires with the fully updated array. Grid placement renders through [`@wordpress/grid`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/grid).
 
@@ -42,9 +42,10 @@ npm install @wordpress/theme
 import '@wordpress/theme/design-tokens.css';
 ```
 
-The dashboard registers its commands through `@wordpress/commands`; they
-surface wherever the host application mounts the command palette. Hosts
-without a command palette are unaffected.
+Command palette integration is opt-in: commands register only where the
+consumer composes `<WidgetDashboard.Commands />` (see
+[Compound components](#compound-components)), and they surface wherever the
+host application mounts the `@wordpress/commands` palette.
 
 ## Usage
 
@@ -143,6 +144,10 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 #### `<WidgetDashboard.Actions />`
 
 Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Layout settings" (when `onGridSettingsChange` is provided), "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+
+#### `<WidgetDashboard.Commands />`
+
+Opt-in command palette integration. When composed, it registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, switch layout model, reset to default) and sets the active command context. It renders nothing. The "Reset to default" command opens the dialog hosted by `<WidgetDashboard.Actions />`, so pair the two.
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
