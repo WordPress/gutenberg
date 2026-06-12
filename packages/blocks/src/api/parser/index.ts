@@ -218,8 +218,8 @@ export function parseRawBlock(
 
 	// Blocks with the `innerContent` support keep the interleaved static
 	// HTML fragments as the canonical source of their own markup, so the
-	// `save`-based validation and deprecation flows don't apply: the parsed
-	// content round-trips by construction.
+	// `save`-based validation and deprecation flows don't apply: serializing
+	// the parsed content reproduces the input by construction.
 	if ( hasBlockSupport( blockType, 'innerContent' ) ) {
 		parsedBlock.innerContent = normalizedBlock.innerContent ?? [
 			normalizedBlock.innerHTML,

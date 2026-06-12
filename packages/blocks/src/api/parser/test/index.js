@@ -536,7 +536,7 @@ describe( 'block parser', () => {
 			);
 		} );
 
-		it( 'should round-trip static HTML interleaved with inner blocks', () => {
+		it( 'should serialize parsed static HTML interleaved with inner blocks back to identical markup', () => {
 			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
 			registerBlockType( 'core/inner', innerBlockSettings );
 
@@ -550,7 +550,7 @@ describe( 'block parser', () => {
 			expect( serialize( parse( content ) ) ).toBe( content );
 		} );
 
-		it( 'should round-trip static HTML without inner blocks', () => {
+		it( 'should serialize parsed static HTML without inner blocks back to identical markup', () => {
 			registerBlockType( 'core/static-html', staticHtmlBlockSettings );
 
 			const content =
