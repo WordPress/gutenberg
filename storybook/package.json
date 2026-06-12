@@ -21,7 +21,8 @@
 	},
 	"exports": {
 		"./main": "./main.ts",
-		"./preview": "./preview.jsx"
+		"./preview": "./preview.jsx",
+		"./component-status": "./component-status.ts"
 	},
 	"devDependencies": {
 		"@emotion/is-prop-valid": "^1.4.0",

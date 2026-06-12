@@ -14,11 +14,6 @@ const meta: Meta< typeof VisuallyHidden > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'not-recommended',
-			whereUsed: 'global',
-			notes: 'Use `VisuallyHidden` from `@wordpress/ui` instead.',
-		},
 	},
 };
 export default meta;

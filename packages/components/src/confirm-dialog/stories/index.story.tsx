@@ -33,10 +33,6 @@ const meta: Meta< typeof ConfirmDialog > = {
 		controls: {
 			expanded: true,
 		},
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},
 };

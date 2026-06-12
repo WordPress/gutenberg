@@ -31,11 +31,6 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 		docs: {
 			source: { excludeDecorators: true },
 		},
-		componentStatus: {
-			status: 'not-recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`. Continue using `CustomSelectControl` (v1) for now.',
-		},
 	},
 	decorators: [
 		( Story ) => (

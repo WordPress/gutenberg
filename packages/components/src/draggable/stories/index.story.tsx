@@ -39,11 +39,6 @@ const meta: Meta< typeof Draggable > = {
 			// clone's `position: fixed` resolution.
 			story: { inline: false, height: '250px' },
 		},
-		componentStatus: {
-			status: 'use-with-caution',
-			whereUsed: 'global',
-			notes: 'May be deprecated.',
-		},
 	},
 };
 export default meta;

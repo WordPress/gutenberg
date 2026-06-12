@@ -10,11 +10,6 @@ const meta: Meta< typeof Icon > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'use-with-caution',
-			whereUsed: 'global',
-			notes: 'When rendering SVGs, use `Icon` from `@wordpress/ui` instead.',
-		},
 	},
 };
 export default meta;

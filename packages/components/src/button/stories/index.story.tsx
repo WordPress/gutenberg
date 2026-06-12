@@ -52,11 +52,6 @@ const meta: Meta< typeof Button > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `Button` in `@wordpress/ui`, but continue using for now.',
-		},
 	},
 };
 export default meta;

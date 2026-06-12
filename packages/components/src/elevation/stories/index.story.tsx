@@ -21,11 +21,6 @@ const meta: Meta< typeof Elevation > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'not-recommended',
-			whereUsed: 'global',
-			notes: 'Planned for deprecation. Use [elevation tokens](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
-		},
 	},
 };
 export default meta;

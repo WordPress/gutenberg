@@ -33,11 +33,6 @@ const meta: Meta< typeof SelectControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
-		},
 	},
 };
 export default meta;

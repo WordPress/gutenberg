@@ -25,11 +25,6 @@ const meta: Meta< typeof DateTimePicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'use-with-caution',
-			whereUsed: 'global',
-			notes: 'Consider using a `TextControl` with `type="date"` or `type="datetime-local"` instead.',
-		},
 	},
 };
 export default meta;

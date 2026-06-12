@@ -25,11 +25,6 @@ const meta: Meta< typeof BaseControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `Field` in `@wordpress/ui`, but continue using for now.',
-		},
 	},
 };
 export default meta;

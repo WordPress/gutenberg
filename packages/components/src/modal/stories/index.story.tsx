@@ -45,11 +45,6 @@ const meta: Meta< typeof Modal > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `Dialog` in `@wordpress/ui`, but continue using for now.',
-		},
 	},
 };
 export default meta;

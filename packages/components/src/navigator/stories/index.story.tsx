@@ -29,10 +29,6 @@ const meta: Meta< typeof Navigator > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 	decorators: [
 		( Story ) => {

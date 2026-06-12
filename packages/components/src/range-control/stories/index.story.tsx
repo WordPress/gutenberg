@@ -57,11 +57,6 @@ const meta: Meta< typeof RangeControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Will be superseded by `SliderControl` in `@wordpress/ui`, but continue using for now.',
-		},
 	},
 };
 export default meta;

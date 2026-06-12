@@ -32,10 +32,6 @@ const meta: Meta< typeof TreeGrid > = {
 	},
 	parameters: {
 		controls: { expanded: true },
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-		},
 	},
 };
 export default meta;

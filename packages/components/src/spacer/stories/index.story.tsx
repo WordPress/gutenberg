@@ -45,11 +45,6 @@ const meta: Meta< typeof Spacer > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'not-recommended',
-			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
-		},
 	},
 };
 export default meta;

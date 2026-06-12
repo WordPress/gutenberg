@@ -29,11 +29,6 @@ const meta: Meta< typeof Card > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
-		componentStatus: {
-			status: 'not-recommended',
-			whereUsed: 'global',
-			notes: 'Use `Card` or `CollapsibleCard` from `@wordpress/ui` instead.',
-		},
 	},
 };
 

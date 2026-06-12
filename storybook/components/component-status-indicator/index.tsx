@@ -1,22 +1,21 @@
 import { Markdown, useOf } from '@storybook/addon-docs/blocks';
+import { getComponentStatusFromStory } from '../../component-status';
 import { statuses } from './statuses';
 
 export function ComponentStatusIndicator() {
-	const resolvedOf = useOf( 'meta' );
+	const resolvedOf = useOf( 'story' );
 
-	if ( resolvedOf.type !== 'meta' ) {
+	if ( resolvedOf.type !== 'story' ) {
 		return null;
 	}
 
-	const { parameters } = resolvedOf.preparedMeta;
-	const componentStatus = parameters?.componentStatus;
+	const componentStatus = getComponentStatusFromStory( resolvedOf.story );
 
-	if ( ! componentStatus?.status ) {
+	if ( ! componentStatus ) {
 		return null;
 	}
 
-	const statusInfo =
-		statuses[ componentStatus.status as keyof typeof statuses ];
+	const statusInfo = statuses[ componentStatus.status ];
 
 	if ( ! statusInfo ) {
 		return null;

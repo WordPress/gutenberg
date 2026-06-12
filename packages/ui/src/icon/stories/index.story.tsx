@@ -19,13 +19,6 @@ const meta: Meta< typeof Icon > = {
 			);
 		},
 	],
-	parameters: {
-		componentStatus: {
-			status: 'recommended',
-			whereUsed: 'global',
-			notes: 'Prefer this component over the `Icon` component from `@wordpress/components` or `@wordpress/icons`.',
-		},
-	},
 };
 export default meta;
 
