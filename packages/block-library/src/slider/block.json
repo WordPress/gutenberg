@@ -29,6 +29,7 @@
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
+		"__experimentalExposeControlsToChildren": true,
 		"interactivity": true,
 		"color": {
 			"background": true,
@@ -42,6 +43,7 @@
 			"blockGap": true,
 			"margin": [ "top", "bottom" ],
 			"padding": true,
+			"__experimentalSkipSerialization": [ "blockGap" ],
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}

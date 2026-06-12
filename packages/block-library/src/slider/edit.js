@@ -61,50 +61,52 @@ function SliderEditorControls( { activeSlideIndex, slideCount } ) {
 	);
 
 	return (
-		<div
-			className="wp-block-slider__controls"
-			aria-label={ __( 'Slider controls' ) }
-			aria-hidden="true"
-		>
-			<button
-				type="button"
-				className="wp-block-slider__arrow wp-block-slider__arrow--previous"
-				aria-label={ __( 'Previous slide' ) }
-				disabled={ ! hasPrevious }
-				tabIndex={ -1 }
+		<>
+			<div
+				className="wp-block-slider__controls"
+				aria-label={ __( 'Slider controls' ) }
+				aria-hidden="true"
 			>
-				&lsaquo;
-			</button>
-			<div className="wp-block-slider__dots" aria-hidden="true">
-				<span
-					className={ clsx(
-						'wp-block-slider__dot',
-						'wp-block-slider__dot--previous',
-						{
-							'is-visible': hasPrevious,
-						}
-					) }
-				/>
-				<span className="wp-block-slider__dot wp-block-slider__dot--active is-visible is-active" />
-				<span
-					className={ clsx(
-						'wp-block-slider__dot',
-						'wp-block-slider__dot--next',
-						{
-							'is-visible': hasNext,
-						}
-					) }
-				/>
+				<button
+					type="button"
+					className="wp-block-slider__arrow wp-block-slider__arrow--previous"
+					aria-label={ __( 'Previous slide' ) }
+					disabled={ ! hasPrevious }
+					tabIndex={ -1 }
+				>
+					&lsaquo;
+				</button>
+				<div className="wp-block-slider__dots" aria-hidden="true">
+					<span
+						className={ clsx(
+							'wp-block-slider__dot',
+							'wp-block-slider__dot--previous',
+							{
+								'is-visible': hasPrevious,
+							}
+						) }
+					/>
+					<span className="wp-block-slider__dot wp-block-slider__dot--active is-visible is-active" />
+					<span
+						className={ clsx(
+							'wp-block-slider__dot',
+							'wp-block-slider__dot--next',
+							{
+								'is-visible': hasNext,
+							}
+						) }
+					/>
+				</div>
+				<button
+					type="button"
+					className="wp-block-slider__arrow wp-block-slider__arrow--next"
+					aria-label={ __( 'Next slide' ) }
+					disabled={ ! hasNext }
+					tabIndex={ -1 }
+				>
+					&rsaquo;
+				</button>
 			</div>
-			<button
-				type="button"
-				className="wp-block-slider__arrow wp-block-slider__arrow--next"
-				aria-label={ __( 'Next slide' ) }
-				disabled={ ! hasNext }
-				tabIndex={ -1 }
-			>
-				&rsaquo;
-			</button>
 			<span
 				className="wp-block-slider__status screen-reader-text"
 				aria-live="polite"
@@ -112,7 +114,7 @@ function SliderEditorControls( { activeSlideIndex, slideCount } ) {
 			>
 				{ slideStatus }
 			</span>
-		</div>
+		</>
 	);
 }
 
@@ -139,8 +141,11 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 			className: 'wp-block-slider__track',
 		},
 		{
+			__experimentalCaptureToolbars: true,
 			defaultBlock: { name: 'core/slide' },
 			directInsert: true,
+			orientation: 'horizontal',
+			renderAppender: false,
 			template: SLIDER_TEMPLATE,
 			templateInsertUpdatesSelection: true,
 		}

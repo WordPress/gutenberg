@@ -17,8 +17,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import SliderControls from '../slider/controls';
-
 const TEMPLATE = [
 	[
 		'core/paragraph',
@@ -31,31 +29,29 @@ const TEMPLATE = [
 export default function Edit( { clientId, context = {} } ) {
 	const editorActiveSlideIndex =
 		context[ 'core/slider-editorActiveSlideIndex' ] ?? 0;
-	const { activeSlideIndex, blockIndex, slideCount, sliderClientId } =
-		useSelect(
-			( select ) => {
-				const { getBlockCount, getBlockIndex, getBlockRootClientId } =
-					select( blockEditorStore );
-				const rootClientId = getBlockRootClientId( clientId );
-				const innerBlockCount = rootClientId
-					? getBlockCount( rootClientId )
-					: 0;
+	const { activeSlideIndex, blockIndex, slideCount } = useSelect(
+		( select ) => {
+			const { getBlockCount, getBlockIndex, getBlockRootClientId } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			const innerBlockCount = rootClientId
+				? getBlockCount( rootClientId )
+				: 0;
 
-				return {
-					activeSlideIndex: Math.max(
-						0,
-						Math.min(
-							editorActiveSlideIndex,
-							Math.max( innerBlockCount - 1, 0 )
-						)
-					),
-					blockIndex: getBlockIndex( clientId ),
-					slideCount: innerBlockCount,
-					sliderClientId: rootClientId,
-				};
-			},
-			[ clientId, editorActiveSlideIndex ]
-		);
+			return {
+				activeSlideIndex: Math.max(
+					0,
+					Math.min(
+						editorActiveSlideIndex,
+						Math.max( innerBlockCount - 1, 0 )
+					)
+				),
+				blockIndex: getBlockIndex( clientId ),
+				slideCount: innerBlockCount,
+			};
+		},
+		[ clientId, editorActiveSlideIndex ]
+	);
 	const isActive = blockIndex === activeSlideIndex;
 	const isPrevious = blockIndex === activeSlideIndex - 1;
 	const isNext = blockIndex === activeSlideIndex + 1;
@@ -67,7 +63,6 @@ export default function Edit( { clientId, context = {} } ) {
 			'is-editor-active-slide': isActive,
 			'is-editor-previous-slide': isPrevious,
 			'is-editor-next-slide': isNext,
-			'is-editor-hidden-slide': isHidden,
 			'is-editor-first-slide': isFirst,
 			'is-editor-last-slide': isLast,
 		} ),
@@ -79,10 +74,5 @@ export default function Edit( { clientId, context = {} } ) {
 		template: TEMPLATE,
 	} );
 
-	return (
-		<section { ...innerBlocksProps }>
-			<SliderControls sliderClientId={ sliderClientId } />
-			{ innerBlocksProps.children }
-		</section>
-	);
+	return <section { ...innerBlocksProps } />;
 }

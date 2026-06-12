@@ -315,31 +315,10 @@ const getAllBlocks = () => {
  * const coreBlocks = __experimentalGetCoreBlocks();
  * ```
  */
-export const __experimentalGetCoreBlocks = () => {
-	const blocks = getAllBlocks().filter(
+export const __experimentalGetCoreBlocks = () =>
+	getAllBlocks().filter(
 		( { metadata } ) => ! isBlockMetadataExperimental( metadata )
 	);
-
-	if ( window?.__experimentalEnableFormBlocks ) {
-		blocks.push( form );
-		blocks.push( formInput );
-		blocks.push( formSubmitButton );
-		blocks.push( formSubmissionNotification );
-	}
-
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tabList );
-		blocks.push( tabs );
-		blocks.push( tabPanel );
-		blocks.push( tabPanels );
-		blocks.push( playlist );
-		blocks.push( playlistTrack );
-		blocks.push( slider );
-		blocks.push( slide );
-	}
-
-	return blocks.filter( Boolean );
-};
 
 /**
  * Function to register core blocks provided by the block editor.

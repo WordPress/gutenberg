@@ -10,6 +10,8 @@ import {
 	DEFAULT_PEEK_AMOUNT,
 	DEFAULT_PEEK_UNIT,
 	getSliderStyle,
+	isZeroPeek,
+	ZERO_PEEK_CLASS,
 } from './utils';
 
 export default function save( { attributes } ) {
@@ -19,6 +21,7 @@ export default function save( { attributes } ) {
 		style,
 	} = attributes;
 	const blockProps = useBlockProps.save( {
+		className: isZeroPeek( peekAmount ) ? ZERO_PEEK_CLASS : undefined,
 		style: getSliderStyle( { peekAmount, peekUnit, style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps.save( {

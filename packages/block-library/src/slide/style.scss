@@ -18,6 +18,6 @@
 	margin-block-end: 0;
 }
 
-.wp-block-slide.has-background {
+:where(.wp-block-slide.has-background) {
 	padding: var(--wp--preset--spacing--40);
 }

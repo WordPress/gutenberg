@@ -43,7 +43,6 @@ export function getSliderStyle( {
 	const sliderGap = getSliderGapValue( style?.spacing?.blockGap );
 	const sliderStyle = {
 		'--wp--style--slider-peek': `${ amount }${ unit }`,
-		'--wp--style--slider-peek-double': `${ amount * 2 }${ unit }`,
 	};
 
 	if ( sliderGap ) {

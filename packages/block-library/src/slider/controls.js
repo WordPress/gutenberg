@@ -162,7 +162,7 @@ export default function SliderControls( { sliderClientId } ) {
 	};
 
 	return (
-		<BlockControls group="other">
+		<BlockControls group="other" __experimentalShareWithChildBlocks>
 			<ToolbarGroup>
 				<ToolbarButton
 					icon={ chevronLeft }
