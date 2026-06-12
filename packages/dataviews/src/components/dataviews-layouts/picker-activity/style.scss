@@ -40,7 +40,7 @@
 				width: var(--wpds-dimension-padding-md);
 
 				&::before {
-					height: calc(var(--wpds-dimension-base) * 3);
+					height: var(--wpds-dimension-size-3xs);
 				}
 			}
 			.dataviews-view-picker-activity__item-type-icon {
@@ -57,7 +57,7 @@
 				width: var(--wpds-dimension-size-sm);
 
 				&::before {
-					height: calc(var(--wpds-dimension-base) * 3);
+					height: var(--wpds-dimension-size-3xs);
 				}
 			}
 			.dataviews-view-picker-activity__item-type-icon {
@@ -75,7 +75,7 @@
 				width: var(--wpds-dimension-size-md);
 
 				&::before {
-					height: calc(var(--wpds-dimension-base) * 2);
+					height: var(--wpds-dimension-size-4xs);
 				}
 			}
 			.dataviews-view-picker-activity__item-type-icon {

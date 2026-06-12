@@ -46,8 +46,7 @@
 	// consistent across variants, matching `@wordpress/ui` Notice (`.title` /
 	// `.description` always use `--text-vertical-padding` whether or not `CloseIcon`
 	// is rendered).
-	// land in `@wordpress/theme`.
-	padding-block: calc((#{var(--wpds-dimension-size-sm)} - 1lh) / 2);
+	padding-block: calc((var(--wpds-dimension-size-sm) - 1lh) / 2);
 }
 
 .components-notice__actions {

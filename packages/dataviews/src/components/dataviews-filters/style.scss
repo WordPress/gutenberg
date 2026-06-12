@@ -88,7 +88,7 @@
 		}
 
 		&.has-reset {
-			padding-inline-end: calc(#{vars.$icon-size} + var(--wpds-dimension-padding-xs));
+			padding-inline-end: calc(var(--wpds-dimension-size-sm) + var(--wpds-dimension-padding-xs));
 		}
 
 		&:hover:not(&.is-not-clickable),
@@ -125,8 +125,8 @@
 	}
 
 	.dataviews-filters__summary-chip-remove {
-		width: vars.$icon-size;
-		height: vars.$icon-size;
+		width: var(--wpds-dimension-size-sm);
+		height: var(--wpds-dimension-size-sm);
 		border-radius: var(--wpds-border-radius-md);
 		border: 0;
 		padding: 0;
@@ -369,7 +369,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: vars.$icon-size;
+		width: var(--wpds-dimension-size-sm);
 
 		&:dir(ltr) {
 			transform: scaleX(-1);
