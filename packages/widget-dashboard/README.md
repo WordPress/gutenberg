@@ -126,7 +126,7 @@ Optional. Called when the user commits grid-settings edits. When omitted, the la
 
 #### `children`: `ReactNode`
 
-Optional. Composition slot for arbitrary dashboard markup. When omitted, the engine renders the default composition: the empty state, the actions, the widgets grid, and the command palette integration.
+Optional. Composition slot for arbitrary dashboard markup. When omitted, the engine renders the default composition: the empty state, the actions, the widgets grid, the command palette integration, and the layout-settings drawer.
 
 ## Compound components
 
@@ -144,11 +144,15 @@ Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard
 
 #### `<WidgetDashboard.Actions />`
 
-Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Layout settings" (when `onGridSettingsChange` is provided), "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below). Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
+Edit-mode toggle: a "Customize" button while `editMode` is off, and "Add widget", "Layout settings" (when `onGridSettingsChange` is provided), "Cancel", "Done" while it is on. Clicking "Customize" or "Done" fires `onEditChange` with the toggled value. Clicking "Add widget" opens the inserter (see below); "Layout settings" opens `<WidgetDashboard.LayoutSettingsDrawer />`, composed separately. Returns `null` when the dashboard is mounted without `onEditChange`, so surfaces that don't expose edit mode can keep `Actions` in their tree unconditionally.
 
 #### `<WidgetDashboard.Commands />`
 
 Command palette integration. It registers the dashboard's commands through `@wordpress/commands` (customize, add widgets, switch layout model, reset to default) and sets the active command context. It renders nothing. Ships in the default composition; when passing custom children, compose it to keep the integration. The "Reset to default" command opens the dialog hosted by `<WidgetDashboard.Actions />`, so pair the two.
+
+#### `<WidgetDashboard.LayoutSettingsDrawer />`
+
+Side drawer for grid-level settings (layout model, row height), editing the same staging layer as the rest of customize mode. Ships in the default composition; when passing custom children, compose it alongside `<WidgetDashboard.Actions />`, whose Layout settings button opens it. Renders nothing when `onGridSettingsChange` is omitted.
 
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
@@ -169,6 +173,7 @@ import { Page } from '@wordpress/admin-ui';
 		<WidgetDashboard.Widgets />
 	</Page>
 	<WidgetDashboard.Commands />
+	<WidgetDashboard.LayoutSettingsDrawer />
 </WidgetDashboard>;
 ```
 
@@ -184,7 +189,7 @@ The inserter has no opt-out today; hosts that want a custom widget-picking exper
 
 ## Grid settings
 
-The dashboard supports two grid models, configured through the `gridSettings` prop: the 2D packed `grid` model, where tiles declare explicit spans over uniform rows, and the content-driven `masonry` model, where heights follow content and resize is horizontal-only. The package owns the definition and editing of these settings (the layout-settings drawer in customize mode, the model-switch commands); the host owns persistence.
+The dashboard supports two grid models, configured through the `gridSettings` prop: the 2D packed `grid` model, where tiles declare explicit spans over uniform rows, and the content-driven `masonry` model, where heights follow content and resize is horizontal-only. The package owns the definition and editing of these settings (`<WidgetDashboard.LayoutSettingsDrawer />` in customize mode, the model-switch commands); the host owns persistence.
 
 The exported kit for building that persistence:
 

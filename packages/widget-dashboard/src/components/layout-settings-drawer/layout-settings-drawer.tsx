@@ -3,7 +3,7 @@
  */
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpress/use-recommended-components
 
@@ -11,6 +11,7 @@ import { Button, Drawer } from '@wordpress/ui'; // eslint-disable-line @wordpres
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { useDashboardUIContext } from '../../context/ui-context';
 import { migrateLayout } from '../../utils/migrate-layout';
 import {
 	presetToRowHeight,
@@ -19,7 +20,7 @@ import {
 } from '../../utils/row-height-presets';
 import {
 	WIDGET_DASHBOARD_COLUMN_COUNT,
-	type WidgetGridLayoutSettingsDrawer,
+	type WidgetGridLayoutSettings,
 	type WidgetGridModel,
 	type WidgetGridSettings,
 } from '../../types';
@@ -60,8 +61,7 @@ const fields: Field< WidgetGridSettings >[] = [
 			{ value: 'large', label: __( 'Large' ) },
 		],
 		getValue: ( { item } ) => {
-			const rowHeight = ( item as WidgetGridLayoutSettingsDrawer )
-				.rowHeight;
+			const rowHeight = ( item as WidgetGridLayoutSettings ).rowHeight;
 			if ( typeof rowHeight !== 'number' ) {
 				return 'medium';
 			}
@@ -78,18 +78,6 @@ const form: Form = {
 	layout: { type: 'regular', labelPosition: 'top' },
 	fields: [ 'model', 'rowHeight' ],
 };
-
-interface LayoutSettingsDrawerProps {
-	/**
-	 * Whether the drawer is visible.
-	 */
-	open: boolean;
-
-	/**
-	 * Callback to toggle the drawer.
-	 */
-	onOpenChange: ( open: boolean ) => void;
-}
 
 /**
  * Modal side drawer for grid-level settings (model, row height).
@@ -108,17 +96,16 @@ interface LayoutSettingsDrawerProps {
  * an Escape press, or any path other than the explicit Cancel/Save
  * buttons is treated as Cancel. None of these exit customize mode.
  *
- * Opened from the customize toolbar beside Add widget. Cancel and
- * dismiss revert only grid settings so in-progress widget layout
- * edits in the same customize session are preserved.
+ * Open state lives in the dashboard UI context; the customize
+ * toolbar (`Actions`) hosts the trigger. Ships in the default
+ * composition; when passing custom children, compose it alongside
+ * `Actions`. Renders nothing when grid settings are not editable.
+ * Cancel and dismiss revert only grid settings so in-progress widget
+ * layout edits in the same customize session are preserved.
  *
- * @param {LayoutSettingsDrawerProps} props Layout settings props.
- * @return {React.ReactNode} The layout settings component.
+ * @return {React.ReactNode} The layout settings drawer.
  */
-export function LayoutSettingsDrawer( {
-	open,
-	onOpenChange,
-}: LayoutSettingsDrawerProps ): React.ReactNode {
+export function LayoutSettingsDrawer(): React.ReactNode {
 	const {
 		gridSettings,
 		onGridSettingsChange,
@@ -128,7 +115,19 @@ export function LayoutSettingsDrawer( {
 		cancel: cancelStaging,
 		resetGridSettings,
 		hasUncommittedChanges,
+		canEditGridSettings,
+		editMode,
 	} = useDashboardInternalContext();
+
+	const { layoutSettingsOpen: open, setLayoutSettingsOpen: onOpenChange } =
+		useDashboardUIContext();
+
+	// Close when customize mode exits, whatever the exit path.
+	useEffect( () => {
+		if ( ! editMode && open ) {
+			onOpenChange( false );
+		}
+	}, [ editMode, open, onOpenChange ] );
 
 	const handleChange = useCallback(
 		( edits: Record< string, unknown > ) => {
@@ -172,6 +171,10 @@ export function LayoutSettingsDrawer( {
 		},
 		[ open, cancelStaging, onOpenChange ]
 	);
+
+	if ( ! canEditGridSettings ) {
+		return null;
+	}
 
 	return (
 		<Drawer.Root

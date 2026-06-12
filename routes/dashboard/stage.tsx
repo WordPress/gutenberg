@@ -98,6 +98,7 @@ function Dashboard() {
 				<WidgetDashboard.Widgets />
 			</Page>
 			<WidgetDashboard.Commands />
+			<WidgetDashboard.LayoutSettingsDrawer />
 		</WidgetDashboard>
 	);
 }

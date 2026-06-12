@@ -15,18 +15,16 @@ import { AlertDialog, Button, Stack } from '@wordpress/ui';
 import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
-import { LayoutSettingsDrawer } from '../layout-settings-drawer';
 import { MoreActionsDropdown } from '../more-actions-dropdown';
 import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 
 /**
  * Header chrome for the dashboard. Customize mode surfaces an edit
  * toolbar with Add widget, Layout settings (when grid settings are
- * editable), Cancel, and Done. Layout settings opens a side drawer
- * for model, column behavior, and row height; Save inside the drawer
- * commits the settings staging buffer without leaving customize mode.
- * Widget layout edits and grid settings share the same staging layer
- * while customize mode is active.
+ * editable), Cancel, and Done. The Layout settings button opens
+ * `LayoutSettingsDrawer`, composed separately; pair the two when
+ * passing custom children. Widget layout edits and grid settings
+ * share the same staging layer while customize mode is active.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
  * so hosts that don't expose edit mode can keep `Actions` in their
@@ -71,7 +69,6 @@ export function Actions(): React.ReactNode {
 
 	const {
 		setInserterOpen,
-		layoutSettingsOpen,
 		setLayoutSettingsOpen,
 		resetDialogOpen,
 		setResetDialogOpen,
@@ -102,12 +99,6 @@ export function Actions(): React.ReactNode {
 	const openLayoutSettings = useCallback( () => {
 		setLayoutSettingsOpen( true );
 	}, [ setLayoutSettingsOpen ] );
-
-	useEffect( () => {
-		if ( ! editMode && layoutSettingsOpen ) {
-			setLayoutSettingsOpen( false );
-		}
-	}, [ editMode, layoutSettingsOpen, setLayoutSettingsOpen ] );
 
 	const moreActionsItems: MoreActionsDropdownItem[] = [
 		{
@@ -212,13 +203,6 @@ export function Actions(): React.ReactNode {
 					confirmButtonText={ __( 'Reset' ) }
 				/>
 			</AlertDialog.Root>
-
-			{ canEditGridSettings && (
-				<LayoutSettingsDrawer
-					open={ layoutSettingsOpen }
-					onOpenChange={ setLayoutSettingsOpen }
-				/>
-			) }
 		</Stack>
 	);
 }

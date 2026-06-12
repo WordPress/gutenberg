@@ -6,6 +6,7 @@ import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
 import { Commands } from './components/commands';
 import { Inserter } from './components/inserter';
+import { LayoutSettingsDrawer } from './components/layout-settings-drawer';
 import { WidgetChrome } from './components/widget-chrome';
 import { WidgetSettings } from './components/widget-settings';
 import { Widgets } from './components/widgets';
@@ -39,16 +40,17 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * 			<WidgetDashboard.Actions />
  * 			<WidgetDashboard.Widgets />
  * 			<WidgetDashboard.Commands />
+ * 			<WidgetDashboard.LayoutSettingsDrawer />
  * 		</WidgetDashboard>
  * 	);
  * }
  * ```
  *
- * `Commands` registers the dashboard's command palette commands. It ships
- * in the default composition; when passing custom children, compose
- * `<WidgetDashboard.Commands />` to keep the palette integration. Its
- * "Reset to default" command opens the dialog hosted by `Actions`, so
- * pair the two.
+ * `Commands` and `LayoutSettingsDrawer` ship in the default composition;
+ * when passing custom children, compose them to keep the command palette
+ * integration and the layout-settings drawer. Both pair with `Actions`:
+ * the "Reset to default" command opens the dialog hosted there, and the
+ * toolbar's Layout settings button opens the drawer.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -84,6 +86,7 @@ export const WidgetDashboard = Object.assign(
 							<Actions />
 							<Widgets />
 							<Commands />
+							<LayoutSettingsDrawer />
 						</>
 					) }
 
@@ -93,5 +96,12 @@ export const WidgetDashboard = Object.assign(
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Actions, Widgets, WidgetChrome, NoWidgetsState, Commands }
+	{
+		Actions,
+		Widgets,
+		WidgetChrome,
+		NoWidgetsState,
+		Commands,
+		LayoutSettingsDrawer,
+	}
 );
