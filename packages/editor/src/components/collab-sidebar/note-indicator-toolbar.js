@@ -5,7 +5,11 @@ import { ToolbarButton } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,52 +19,24 @@ import { getAvatarBorderColor } from './utils';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
-export function NoteAvatarIndicator( { onClick, note } ) {
-	const threadParticipants = useMemo( () => {
-		if ( ! note ) {
-			return [];
-		}
-
-		const participantsMap = new Map();
-		const allNotes = [ note, ...note.reply ];
-
-		// Sort by date to show participants in chronological order.
-		allNotes.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) );
-
-		allNotes.forEach( ( entry ) => {
-			// Track thread participants (original author + repliers).
-			if ( entry.author_name && entry.author_avatar_urls ) {
-				if ( ! participantsMap.has( entry.author ) ) {
-					participantsMap.set( entry.author, {
-						name: entry.author_name,
-						avatar:
-							entry.author_avatar_urls?.[ '48' ] ||
-							entry.author_avatar_urls?.[ '96' ],
-						id: entry.author,
-						date: entry.date,
-					} );
-				}
-			}
-		} );
-
-		return Array.from( participantsMap.values() );
-	}, [ note ] );
-
-	if ( ! threadParticipants.length ) {
-		return null;
-	}
+function ThreadParticipants( { participants } ) {
+	const defaultAvatar = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings?.avatarURL;
+	}, [] );
 
 	// If there are more than 3 participants, show 2 avatars and a "+n" number.
 	const maxAvatars = 3;
-	const isOverflow = threadParticipants.length > maxAvatars;
+	const isOverflow = participants.length > maxAvatars;
 	const visibleParticipants = isOverflow
-		? threadParticipants.slice( 0, maxAvatars - 1 )
-		: threadParticipants;
+		? participants.slice( 0, maxAvatars - 1 )
+		: participants;
 	const overflowCount = Math.max(
 		0,
-		threadParticipants.length - visibleParticipants.length
+		participants.length - visibleParticipants.length
 	);
-	const threadHasMoreParticipants = threadParticipants.length > 100;
+	const threadHasMoreParticipants = participants.length > 100;
 
 	// If we hit the note limit, show "100+" instead of exact overflow count.
 	const overflowText =
@@ -73,6 +49,62 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 			  );
 
 	return (
+		<Stack direction="row" align="center" gap="xs">
+			{ visibleParticipants.map( ( participant ) => (
+				<img
+					key={ participant.id }
+					src={ participant.avatar || defaultAvatar }
+					alt={ participant.name }
+					className="editor-note-indicator__avatar"
+					style={ {
+						borderColor: getAvatarBorderColor( participant.id ),
+					} }
+				/>
+			) ) }
+			{ overflowCount > 0 && (
+				<span className="editor-note-indicator__overflow">
+					{ overflowText }
+				</span>
+			) }
+		</Stack>
+	);
+}
+
+export function NoteAvatarIndicator( { onClick, note } ) {
+	const threadParticipants = useMemo( () => {
+		if ( ! note ) {
+			return [];
+		}
+
+		// Track thread participants (original author + repliers), sorted by
+		// date so they appear in chronological order.
+		const participantsMap = new Map();
+		const allNotes = [ note, ...note.reply ].sort(
+			( a, b ) => new Date( a.date ) - new Date( b.date )
+		);
+
+		for ( const entry of allNotes ) {
+			if ( ! entry.author_name || participantsMap.has( entry.author ) ) {
+				continue;
+			}
+
+			participantsMap.set( entry.author, {
+				id: entry.author,
+				name: entry.author_name,
+				avatar:
+					entry.author_avatar_urls?.[ '48' ] ||
+					entry.author_avatar_urls?.[ '96' ],
+			} );
+		}
+
+		return Array.from( participantsMap.values() );
+	}, [ note ] );
+
+	if ( ! threadParticipants.length ) {
+		return null;
+	}
+
+	return (
 		<NoteIconToolbarSlotFill.Fill>
 			<ToolbarButton
 				className="editor-note-indicator"
@@ -80,26 +112,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 				onClick={ () => onClick() }
 				showTooltip
 			>
-				<Stack direction="row" align="center" gap="xs">
-					{ visibleParticipants.map( ( participant ) => (
-						<img
-							key={ participant.id }
-							src={ participant.avatar }
-							alt={ participant.name }
-							className="editor-note-indicator__avatar"
-							style={ {
-								borderColor: getAvatarBorderColor(
-									participant.id
-								),
-							} }
-						/>
-					) ) }
-					{ overflowCount > 0 && (
-						<span className="editor-note-indicator__overflow">
-							{ overflowText }
-						</span>
-					) }
-				</Stack>
+				<ThreadParticipants participants={ threadParticipants } />
 			</ToolbarButton>
 		</NoteIconToolbarSlotFill.Fill>
 	);

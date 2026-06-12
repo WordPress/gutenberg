@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/default-custom-properties";
@@ -32,7 +31,7 @@
 @use "./components/resizable-frame/style.scss" as *;
 @use "./components/pagination/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
-@use "./experimental-admin-bar-in-editor.scss" as *;
+@use "./experimental-omnibar.scss" as *;
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 ::view-transition-image-pair(root) {
@@ -62,7 +61,7 @@ body.js.site-editor-php {
 }
 
 body.js.site-editor-php {
-	background: $gray-900;
+	background: var(--wpds-color-bg-surface-neutral-weak);
 }
 
 .edit-site {

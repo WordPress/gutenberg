@@ -4,7 +4,7 @@
 import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
+import { layout as layoutIcon, plus } from '@wordpress/icons';
 import { store as viewportStore } from '@wordpress/viewport';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { AlertDialog, Button, Stack } from '@wordpress/ui';
@@ -20,18 +20,13 @@ import { MoreActionsDropdown } from '../more-actions-dropdown';
 import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
 
 /**
- * Header chrome for the dashboard. Two independent flows are exposed:
- *
- * - **Customize** (layout edits): toggles edit mode, surfaces the Add
- *   widgets / Cancel / Done toolbar. Commits the layout staging buffer
- *   on Done.
- * - **Layout settings** (more-actions dropdown entry): opens a side
- *   drawer with model, column behavior, and row height. Commits the
- *   settings staging buffer on Save inside the drawer.
- *
- * The two flows are mutually exclusive: the Layout settings entry is
- * disabled while edit mode is on so the settings drawer cannot
- * accumulate changes on top of pending layout edits, and vice versa.
+ * Header chrome for the dashboard. Customize mode surfaces an edit
+ * toolbar with Add widget, Layout settings (when grid settings are
+ * editable), Cancel, and Done. Layout settings opens a side drawer
+ * for model, column behavior, and row height; Save inside the drawer
+ * commits the settings staging buffer without leaving customize mode.
+ * Widget layout edits and grid settings share the same staging layer
+ * while customize mode is active.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
  * so hosts that don't expose edit mode can keep `Actions` in their
@@ -108,6 +103,12 @@ export function Actions(): React.ReactNode {
 		setLayoutSettingsOpen( true );
 	}, [ setLayoutSettingsOpen ] );
 
+	useEffect( () => {
+		if ( ! editMode && layoutSettingsOpen ) {
+			setLayoutSettingsOpen( false );
+		}
+	}, [ editMode, layoutSettingsOpen, setLayoutSettingsOpen ] );
+
 	const moreActionsItems: MoreActionsDropdownItem[] = [
 		{
 			label: __( 'Reset to default' ),
@@ -115,15 +116,6 @@ export function Actions(): React.ReactNode {
 			disabled: ! onLayoutReset,
 		},
 	];
-
-	if ( canEditGridSettings ) {
-		moreActionsItems.unshift( {
-			label: __( 'Layout settings' ),
-			onClick: openLayoutSettings,
-			disabled: editMode,
-			disabledTooltip: __( 'Disabled while editing widgets' ),
-		} );
-	}
 
 	if ( ! onEditChange ) {
 		return null;
@@ -150,6 +142,20 @@ export function Actions(): React.ReactNode {
 						{ ! isMobileViewport && <Button.Icon icon={ plus } /> }
 						{ __( 'Add widget' ) }
 					</Button>
+
+					{ canEditGridSettings && (
+						<Button
+							variant="minimal"
+							tone="brand"
+							size="compact"
+							onClick={ openLayoutSettings }
+						>
+							{ ! isMobileViewport && (
+								<Button.Icon icon={ layoutIcon } />
+							) }
+							{ __( 'Layout settings' ) }
+						</Button>
+					) }
 
 					<div
 						className={ styles.editActionsDivider }
