@@ -45,15 +45,17 @@ function generatePrimitiveColorTokens() {
 		);
 
 		// Build the ramps
-		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.bg );
+		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.background );
 		const accentRamps = [ ...Object.entries( DEFAULT_SEED_COLORS ) ]
-			.filter( ( [ scaleName ] ) => scaleName !== 'bg' )
+			.filter( ( [ scaleName ] ) => scaleName !== 'background' )
 			.map( ( [ scaleName, seed ] ) => ( {
 				scaleName,
 				ramp: buildAccentRamp( seed, bgRamp ),
 			} ) );
 
-		// Convert the ramp values in a DTCG compatible format
+		// Convert the ramp values in a DTCG compatible format.
+		// Note: the background seed maps to the `bg` design token group. The
+		// design system token naming intentionally keeps the `bg` convention.
 		[
 			{
 				scaleName: 'bg',
