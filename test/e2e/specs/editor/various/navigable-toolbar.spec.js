@@ -3,27 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-function expectBlockToHoldSelection( locator ) {
-	return expect
-		.poll( () =>
-			locator.evaluate( ( element ) => {
-				const { activeElement } = element.ownerDocument;
-				if ( element === activeElement ) {
-					return true;
-				}
-				const selection =
-					element.ownerDocument.defaultView.getSelection();
-				return (
-					!! activeElement?.isContentEditable &&
-					activeElement.contains( element ) &&
-					!! selection.anchorNode &&
-					element.contains( selection.anchorNode )
-				);
-			} )
-		)
-		.toBe( true );
-}
-
 test.use( {
 	BlockToolbarUtils: async ( { editor, page, pageUtils }, use ) => {
 		await use( new BlockToolbarUtils( { editor, page, pageUtils } ) );
@@ -118,11 +97,15 @@ test.describe( 'Block Toolbar', () => {
 			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
-			await expectBlockToHoldSelection(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-			);
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			await BlockToolbarUtils.focusBlockToolbar();
 			await expect(
