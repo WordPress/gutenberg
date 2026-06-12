@@ -754,43 +754,45 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						label={ __( 'Navigation button type' ) }
-						isShownByDefault
-						hasValue={ () => navigationButtonType !== 'icon' }
-						onDeselect={ () =>
-							setAttributes( {
-								navigationButtonType: 'icon',
-							} )
-						}
-					>
-						{ hasLightboxImages && (
-							<ToggleGroupControl
-								label={ __( 'Navigation button type' ) }
-								value={ navigationButtonType }
-								onChange={ ( value ) =>
-									setAttributes( {
-										navigationButtonType: value,
-									} )
-								}
-								isBlock
-								__next40pxDefaultSize
-								help={ __(
-									'Adjust the appearance of buttons in the lightbox.'
-								) }
-							>
-								{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
-									( option ) => (
-										<ToggleGroupControlOption
-											key={ option.value }
-											value={ option.value }
-											label={ option.label }
-										/>
-									)
-								) }
-							</ToggleGroupControl>
-						) }
-					</ToolsPanelItem>
+					{ lightboxSetting?.allowEditing && (
+						<ToolsPanelItem
+							label={ __( 'Navigation button type' ) }
+							isShownByDefault
+							hasValue={ () => navigationButtonType !== 'icon' }
+							onDeselect={ () =>
+								setAttributes( {
+									navigationButtonType: 'icon',
+								} )
+							}
+						>
+							{ hasLightboxImages && (
+								<ToggleGroupControl
+									label={ __( 'Navigation button type' ) }
+									value={ navigationButtonType }
+									onChange={ ( value ) =>
+										setAttributes( {
+											navigationButtonType: value,
+										} )
+									}
+									isBlock
+									__next40pxDefaultSize
+									help={ __(
+										'Adjust the appearance of buttons in the lightbox.'
+									) }
+								>
+									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
+										( option ) => (
+											<ToggleGroupControlOption
+												key={ option.value }
+												value={ option.value }
+												label={ option.label }
+											/>
+										)
+									) }
+								</ToggleGroupControl>
+							) }
+						</ToolsPanelItem>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<BlockControls group="block">
