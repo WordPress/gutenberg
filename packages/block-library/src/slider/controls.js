@@ -12,6 +12,19 @@ import { __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight, plus, trash } from '@wordpress/icons';
 
 const SLIDE_BLOCK_NAME = 'core/slide';
+const PARAGRAPH_BLOCK_NAME = 'core/paragraph';
+
+function createSlideBlock() {
+	return createBlock( SLIDE_BLOCK_NAME, {}, [
+		createBlock( PARAGRAPH_BLOCK_NAME, {
+			placeholder: __( 'Type / to choose a block' ),
+		} ),
+	] );
+}
+
+function getSlideSelectionClientId( slide ) {
+	return slide?.innerBlocks?.[ 0 ]?.clientId || slide?.clientId;
+}
 
 function getSelectedSlideClientId( select, sliderClientId, slides ) {
 	const {
@@ -133,7 +146,7 @@ export default function SliderControls( { sliderClientId } ) {
 	};
 
 	const addSlide = () => {
-		const newSlide = createBlock( SLIDE_BLOCK_NAME );
+		const newSlide = createSlideBlock();
 		const insertionIndex =
 			slideCount > 0 ? activeSlideIndex + 1 : undefined;
 
@@ -141,7 +154,7 @@ export default function SliderControls( { sliderClientId } ) {
 		setEditorActiveSlideIndex(
 			insertionIndex === undefined ? 0 : insertionIndex
 		);
-		selectBlock( newSlide.clientId );
+		selectBlock( getSlideSelectionClientId( newSlide ) );
 	};
 
 	const removeSlide = () => {
@@ -153,8 +166,12 @@ export default function SliderControls( { sliderClientId } ) {
 			activeSlideIndex >= slideCount - 1
 				? activeSlideIndex - 1
 				: activeSlideIndex;
+		const nextSlide =
+			activeSlideIndex >= slideCount - 1
+				? slides[ activeSlideIndex - 1 ]
+				: slides[ activeSlideIndex + 1 ];
 		const nextSlideClientId =
-			slides[ nextIndex ]?.clientId || sliderClientId;
+			getSlideSelectionClientId( nextSlide ) || sliderClientId;
 
 		setEditorActiveSlideIndex( nextIndex );
 		removeBlock( activeSlideClientId, false );
