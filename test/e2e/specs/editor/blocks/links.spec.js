@@ -3,34 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-/**
- * Asserts that the block element holds the selection: either the element has
- * focus itself, or a focused editing host contains it and the selection is
- * inside it. Blocks supporting `editableRoot` keep focus on the editing host.
- *
- * @param {import('@playwright/test').Locator} locator Block element locator.
- */
-function expectBlockToHoldSelection( locator ) {
-	return expect
-		.poll( () =>
-			locator.evaluate( ( element ) => {
-				const { activeElement } = element.ownerDocument;
-				if ( element === activeElement ) {
-					return true;
-				}
-				const selection =
-					element.ownerDocument.defaultView.getSelection();
-				return (
-					!! activeElement?.isContentEditable &&
-					activeElement.contains( element ) &&
-					!! selection.anchorNode &&
-					element.contains( selection.anchorNode )
-				);
-			} )
-		)
-		.toBe( true );
-}
-
 test.describe( 'Links', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -998,11 +970,15 @@ test.describe( 'Links', () => {
 			await richTextLink.click();
 
 			// Check the selection remains in the RichText.
-			await expectBlockToHoldSelection(
-				editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-			);
+			await expect
+				.poll( () =>
+					editor.ownsSelection(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: Paragraph',
+						} )
+					)
+				)
+				.toBe( true );
 
 			// Type to modify the link text.
 			await page.keyboard.type( ' is awesome' );

@@ -9,37 +9,6 @@ test.use( {
 	},
 } );
 
-/**
- * Asserts that the block element holds the selection: either the element has
- * focus itself, or a focused editing host contains it and the selection is
- * inside it. Blocks supporting `editableRoot` keep focus on the editing host.
- *
- * @param {import('@playwright/test').Locator} locator Block element locator.
- * @param {string}                             message Assertion message.
- */
-function expectBlockToHoldSelection( locator, message ) {
-	return expect
-		.poll(
-			() =>
-				locator.evaluate( ( element ) => {
-					const { activeElement } = element.ownerDocument;
-					if ( element === activeElement ) {
-						return true;
-					}
-					const selection =
-						element.ownerDocument.defaultView.getSelection();
-					return (
-						!! activeElement?.isContentEditable &&
-						activeElement.contains( element ) &&
-						!! selection.anchorNode &&
-						element.contains( selection.anchorNode )
-					);
-				} ),
-			message
-		)
-		.toBe( true );
-}
-
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
@@ -74,9 +43,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 				{ name: 'core/paragraph' },
 			] );
 
-		await expectBlockToHoldSelection(
-			editor.canvas.locator( '[data-type="core/paragraph"]' )
-		);
+		await expect
+			.poll( () =>
+				editor.ownsSelection(
+					editor.canvas.locator( '[data-type="core/paragraph"]' )
+				)
+			)
+			.toBe( true );
 
 		// Clear block selection.
 		await editor.canvas
@@ -89,10 +62,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			},
 		} );
 
-		await expectBlockToHoldSelection(
-			editor.canvas.locator( '[data-type="core/paragraph"]' ),
-			'should select the newly inserted paragraph block on second click'
-		);
+		await expect
+			.poll(
+				() =>
+					editor.ownsSelection(
+						editor.canvas.locator( '[data-type="core/paragraph"]' )
+					),
+				{
+					message:
+						'should select the newly inserted paragraph block on second click',
+				}
+			)
+			.toBe( true );
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {

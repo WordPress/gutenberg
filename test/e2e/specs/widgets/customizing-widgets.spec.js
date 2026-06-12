@@ -26,34 +26,6 @@ test.use( {
 	},
 } );
 
-/**
- * Asserts that the block element holds the selection: either the element has
- * focus itself, or a focused editing host contains it and the selection is
- * inside it. Blocks supporting `editableRoot` keep focus on the editing host.
- *
- * @param {import('@playwright/test').Locator} locator Block element locator.
- */
-function expectBlockToHoldSelection( locator ) {
-	return expect
-		.poll( () =>
-			locator.evaluate( ( element ) => {
-				const { activeElement } = element.ownerDocument;
-				if ( element === activeElement ) {
-					return true;
-				}
-				const selection =
-					element.ownerDocument.defaultView.getSelection();
-				return (
-					!! activeElement?.isContentEditable &&
-					activeElement.contains( element ) &&
-					!! selection.anchorNode &&
-					element.contains( selection.anchorNode )
-				);
-			} )
-		)
-		.toBe( true );
-}
-
 test.describe( 'Widgets Customizer', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// TODO: Ideally we can bundle our test theme directly in the repo.
@@ -263,6 +235,7 @@ test.describe( 'Widgets Customizer', () => {
 
 	test( 'should move focus to the block', async ( {
 		page,
+		editor,
 		requestUtils,
 		widgetsCustomizerPage,
 	} ) => {
@@ -295,12 +268,16 @@ test.describe( 'Widgets Customizer', () => {
 		const firstParagraphBlock = page.locator(
 			'role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
-		await expectBlockToHoldSelection( firstParagraphBlock );
+		await expect
+			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
+			.toBe( true );
 
 		// Expect to focus on a already focused widget.
 		await paragraphWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
 		await editParagraphWidget.click();
-		await expectBlockToHoldSelection( firstParagraphBlock );
+		await expect
+			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
+			.toBe( true );
 
 		const headingWidget = previewFrame.locator(
 			'.widget:has-text("First Heading")'
@@ -533,7 +510,9 @@ test.describe( 'Widgets Customizer', () => {
 			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
 		);
 		await expect( movedParagraphBlock ).toBeVisible();
-		await expectBlockToHoldSelection( movedParagraphBlock );
+		await expect
+			.poll( () => editor.ownsSelection( movedParagraphBlock ) )
+			.toBe( true );
 	} );
 
 	test( 'should not render Block Settings sections', async ( {
