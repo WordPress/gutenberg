@@ -3,6 +3,8 @@
  * Tests for Gutenberg_Content_Guidelines_Revisions_Controller initialization.
  *
  * @package gutenberg
+ *
+ * @group guidelines
  */
 class Gutenberg_Content_Guidelines_Revisions_Controller_Test extends WP_UnitTestCase {
 
