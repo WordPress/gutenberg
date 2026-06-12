@@ -36,6 +36,7 @@
 	},
 	"scripts": {
 		"test:e2e": "wp-scripts test-playwright --config playwright.config.ts",
+		"test:e2e:shard": "flakiness-playwright-shard --config playwright.config.ts",
 		"test:e2e:debug": "wp-scripts test-playwright --config playwright.config.ts --ui",
 		"test:e2e:rtc-websocket": "wp-scripts test-playwright --config playwright.rtc-websocket.config.ts",
 		"test:e2e:rtc-websocket:debug": "wp-scripts test-playwright --config playwright.rtc-websocket.config.ts --ui"
