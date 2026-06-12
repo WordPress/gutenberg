@@ -40,7 +40,7 @@ export function useDashboardContainerColumnCount(
 	const containerRef = useMergeRefs( [
 		setContainer,
 		resizeObserverRef,
-		forwardedRef,
+		forwardedRef ?? null,
 	] );
 
 	useLayoutEffect( () => {

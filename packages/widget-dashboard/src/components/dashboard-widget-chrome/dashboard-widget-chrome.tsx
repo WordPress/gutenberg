@@ -226,7 +226,7 @@ export const DashboardWidgetChrome = forwardRef<
 				ref={ ref }
 				className={ clsx( styles.widgetChrome, className ) }
 				aria-labelledby={ widgetType.title ? titleId : undefined }
-				inert={ editMode ? 'true' : undefined }
+				{ ...( editMode ? { inert: 'true' } : {} ) }
 			>
 				{ isHeaderHidden ? (
 					<VisuallyHidden>{ header }</VisuallyHidden>

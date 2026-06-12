@@ -17,7 +17,11 @@ export function normalizeGridSettings(
 		return settings;
 	}
 
-	const rowHeight = ( settings as WidgetGridLayoutSettings ).rowHeight;
+	// The guard above cannot narrow the union for TypeScript: `model` is
+	// optional and the check goes through `??`.
+	const gridSettings = settings as WidgetGridLayoutSettings;
+
+	const rowHeight = gridSettings.rowHeight;
 	const resolved =
 		typeof rowHeight === 'number'
 			? snapRowHeight( rowHeight )
@@ -28,7 +32,7 @@ export function normalizeGridSettings(
 	}
 
 	return {
-		...settings,
+		...gridSettings,
 		rowHeight: resolved,
 	};
 }
