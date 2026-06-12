@@ -335,45 +335,53 @@
 }
 
 [data-wpds-corner-radius='none'] {
-	/* Extra small radius */
+	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 0;
-	/* Small radius */
+	/* Standalone buttons, inputs, and compact controls. */
 	--wpds-border-radius-sm: 0;
-	/* Medium radius */
+	/* Menus, popovers, and other small portaled overlays. */
 	--wpds-border-radius-md: 0;
-	/* Large radius */
+	/* Cards, dialogs, notices, and other larger content containers. */
 	--wpds-border-radius-lg: 0;
+	/* Page and app shell surfaces. */
+	--wpds-border-radius-xl: 0;
 }
 
 [data-wpds-corner-radius='subtle'] {
-	/* Extra small radius */
+	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 1px;
-	/* Small radius */
+	/* Standalone buttons, inputs, and compact controls. */
 	--wpds-border-radius-sm: 2px;
-	/* Medium radius */
+	/* Menus, popovers, and other small portaled overlays. */
 	--wpds-border-radius-md: 4px;
-	/* Large radius */
+	/* Cards, dialogs, notices, and other larger content containers. */
 	--wpds-border-radius-lg: 8px;
+	/* Page and app shell surfaces. */
+	--wpds-border-radius-xl: 12px;
 }
 
 [data-wpds-corner-radius='moderate'] {
-	/* Extra small radius */
+	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 6px;
-	/* Small radius */
+	/* Standalone buttons, inputs, and compact controls. */
 	--wpds-border-radius-sm: 8px;
-	/* Medium radius */
+	/* Menus, popovers, and other small portaled overlays. */
 	--wpds-border-radius-md: 12px;
-	/* Large radius */
+	/* Cards, dialogs, notices, and other larger content containers. */
 	--wpds-border-radius-lg: 16px;
+	/* Page and app shell surfaces. */
+	--wpds-border-radius-xl: 20px;
 }
 
 [data-wpds-corner-radius='pronounced'] {
-	/* Extra small radius */
+	/* Buttons and other elements nested inside controls. */
 	--wpds-border-radius-xs: 18px;
-	/* Small radius */
+	/* Standalone buttons, inputs, and compact controls. */
 	--wpds-border-radius-sm: 20px;
-	/* Medium radius */
+	/* Menus, popovers, and other small portaled overlays. */
 	--wpds-border-radius-md: 22px;
-	/* Large radius */
+	/* Cards, dialogs, notices, and other larger content containers. */
 	--wpds-border-radius-lg: 24px;
+	/* Page and app shell surfaces. */
+	--wpds-border-radius-xl: 26px;
 }

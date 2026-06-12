@@ -28,6 +28,13 @@
 					"value": 8,
 					"unit": "px"
 				}
+			},
+			"xl": {
+				"$type": "dimension",
+				"$value": {
+					"value": 12,
+					"unit": "px"
+				}
 			}
 		}
 	}

@@ -69,7 +69,19 @@
 			},
 			"xl": {
 				"$value": { "value": 12, "unit": "px" },
-				"$description": "Page and app shell surfaces."
+				"$description": "Page and app shell surfaces.",
+				"$extensions": {
+					"mode": {
+						"corner-radius-none": { "value": 0, "unit": "px" },
+						"corner-radius-subtle": { "value": 12, "unit": "px" },
+						"corner-radius-moderate": { "value": 20, "unit": "px" },
+						"corner-radius-pronounced": {
+							"value": 26,
+							"unit": "px"
+						}
+					},
+					"com.figma.scopes": [ "CORNER_RADIUS" ]
+				}
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "CORNER_RADIUS" ]
