@@ -111,7 +111,6 @@ export default {
 		'background-track-neutral',
 		'stroke-interactive-brand-disabled',
 		'stroke-interactive-error-disabled',
-		'stroke-interactive-error-strong-disabled',
 		'stroke-interactive-neutral-disabled',
 		'stroke-surface-neutral',
 	],

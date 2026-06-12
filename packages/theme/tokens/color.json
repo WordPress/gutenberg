@@ -1544,10 +1544,6 @@
 				"error-strong": {
 					"$value": "{wpds-color.primitive.error.stroke3}",
 					"$description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
-				},
-				"error-strong-disabled": {
-					"$value": "{wpds-color.primitive.bg.stroke2}",
-					"$description": "Accessible stroke color used for interactive error-toned elements with strong emphasis, in their disabled state."
 				}
 			},
 			"focus": {

@@ -106,7 +106,6 @@ export default {
 	'--wpds-color-stroke-interactive-error-active': '#9d0000',
 	'--wpds-color-stroke-interactive-error-disabled': '#dbdbdb',
 	'--wpds-color-stroke-interactive-error-strong': '#cc1818',
-	'--wpds-color-stroke-interactive-error-strong-disabled': '#dbdbdb',
 	'--wpds-color-stroke-interactive-neutral': '#8d8d8d',
 	'--wpds-color-stroke-interactive-neutral-active': '#6e6e6e',
 	'--wpds-color-stroke-interactive-neutral-disabled': '#dbdbdb',

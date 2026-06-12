@@ -240,7 +240,6 @@ The interactive state of the element. The default (no modifier) is the idle stat
 | `--wpds-color-stroke-interactive-error-active`                | Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.                |
 | `--wpds-color-stroke-interactive-error-disabled`              | Accessible stroke color used for interactive error-toned elements with normal emphasis, in their disabled state.                            |
 | `--wpds-color-stroke-interactive-error-strong`                | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
-| `--wpds-color-stroke-interactive-error-strong-disabled`       | Accessible stroke color used for interactive error-toned elements with strong emphasis, in their disabled state.                            |
 | `--wpds-color-stroke-focus`                                   | Accessible stroke color applied to focus rings.                                                                                             |
 
 ### Cursor
