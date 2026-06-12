@@ -223,6 +223,7 @@ async function generateIndex() {
 	await writeFile( path.join( ICON_LIBRARY_DIR, 'index.ts' ), indexTemplate );
 }
 
+/**
  * Splits a CSS declaration list (the contents of a `style` attribute) on `;`,
  * ignoring semicolons that appear inside parentheses (e.g. an `url()` value) or
  * quoted strings (e.g. a base64 `data:` URI). A naive `split( ';' )` would
