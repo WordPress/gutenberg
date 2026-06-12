@@ -16,11 +16,13 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 	 * @param array  $args {
 	 *     Optional. Arguments for the icon.
 	 *
-	 *     @type int    $size  Width and height in pixels. Default 24.
-	 *     @type string $class Additional CSS class names.
+	 *     @type int    $size  Width and height in pixels. Pass 0 to leave the
+	 *                         SVG's intrinsic dimensions untouched. Default 24.
+	 *     @type string $class Additional CSS class names. Multiple classes may be
+	 *                         provided as a space-separated string.
 	 *     @type string $label Accessible label. If provided, the SVG gets
 	 *                         role="img" and aria-label. If omitted, the SVG
-	 *                         gets aria-hidden="true".
+	 *                         gets aria-hidden="true" and focusable="false".
 	 * }
 	 * @return string SVG markup for the icon, or empty string if not found.
 	 */
@@ -49,12 +51,15 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 			return '';
 		}
 
-		$processor->set_attribute( 'width', (string) $args['size'] );
-		$processor->set_attribute( 'height', (string) $args['size'] );
-		$processor->add_class( 'wp-icon' );
+		if ( ! empty( $args['size'] ) ) {
+			$processor->set_attribute( 'width', (string) $args['size'] );
+			$processor->set_attribute( 'height', (string) $args['size'] );
+		}
 
 		if ( ! empty( $args['class'] ) ) {
-			$processor->add_class( $args['class'] );
+			foreach ( preg_split( '/\s+/', $args['class'], -1, PREG_SPLIT_NO_EMPTY ) as $class_name ) {
+				$processor->add_class( $class_name );
+			}
 		}
 
 		if ( ! empty( $args['label'] ) ) {
@@ -65,6 +70,17 @@ if ( ! function_exists( 'wp_get_icon' ) ) {
 			$processor->set_attribute( 'focusable', 'false' );
 		}
 
-		return $processor->get_updated_html();
+		$html = $processor->get_updated_html();
+
+		/**
+		 * Filters the SVG markup returned by wp_get_icon().
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string $html The SVG markup.
+		 * @param string $name The namespaced icon name.
+		 * @param array  $args The arguments passed to wp_get_icon().
+		 */
+		return apply_filters( 'wp_icon_html', $html, $name, $args );
 	}
 }

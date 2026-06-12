@@ -19,13 +19,6 @@ function render_block_core_icon( $attributes ) {
 		return;
 	}
 
-	$registry = WP_Icons_Registry::get_instance();
-	$icon     = $registry->get_registered_icon( $attributes['icon'] );
-
-	if ( is_null( $icon ) ) {
-		return;
-	}
-
 	// Text color and background color.
 	$color_styles = array();
 
@@ -86,31 +79,29 @@ function render_block_core_icon( $attributes ) {
 		),
 	);
 
-	$processor = new WP_HTML_Tag_Processor( $icon['content'] );
-	$processor->next_tag( 'svg' );
+	$svg = wp_get_icon(
+		$attributes['icon'],
+		array(
+			'size'  => 0,
+			'class' => $styles['classnames'] ?? '',
+			'label' => $attributes['ariaLabel'] ?? '',
+		)
+	);
+
+	if ( '' === $svg ) {
+		return;
+	}
 
 	if ( ! empty( $styles['css'] ) ) {
-		$processor->set_attribute( 'style', $styles['css'] );
-	}
-	if ( ! empty( $styles['classnames'] ) ) {
-		$processor->add_class( $styles['classnames'] );
-	}
-
-	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : '';
-
-	if ( ! $aria_label ) {
-		// Icon is decorative, hide it from screen readers.
-		$processor->set_attribute( 'aria-hidden', 'true' );
-		$processor->set_attribute( 'focusable', 'false' );
-	} else {
-		$processor->set_attribute( 'role', 'img' );
-		$processor->set_attribute( 'aria-label', $aria_label );
+		$processor = new WP_HTML_Tag_Processor( $svg );
+		if ( $processor->next_tag( 'svg' ) ) {
+			$processor->set_attribute( 'style', $styles['css'] );
+			$svg = $processor->get_updated_html();
+		}
 	}
 
-	// Return the updated SVG markup.
-	$svg        = $processor->get_updated_html();
-	$attributes = get_block_wrapper_attributes();
-	return sprintf( '<div %s>%s</div>', $attributes, $svg );
+	$wrapper_attributes = get_block_wrapper_attributes();
+	return sprintf( '<div %s>%s</div>', $wrapper_attributes, $svg );
 }
 
 
