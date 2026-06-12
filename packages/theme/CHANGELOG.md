@@ -8,7 +8,7 @@
 
 ### Bug Fix
 
--   `ThemeProvider`: Strictly enforce the documented seed-color input contract for `color.primary` / `color.background`. Inputs outside sRGB (e.g. `oklch()`), previously accepted incidentally, now throw a clear error ([#NNNNN](https://github.com/WordPress/gutenberg/pull/NNNNN)).
+-   `ThemeProvider`: Strictly enforce the documented seed-color input contract for `color.primary` / `color.background`. Inputs outside sRGB (e.g. `oklch()`), previously accepted incidentally, now throw a clear error ([#79148](https://github.com/WordPress/gutenberg/pull/79148)).
 
 ## 0.15.0 (2026-06-10)
 
