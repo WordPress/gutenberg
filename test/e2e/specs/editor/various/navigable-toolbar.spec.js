@@ -3,6 +3,27 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+function expectBlockToHoldSelection( locator ) {
+	return expect
+		.poll( () =>
+			locator.evaluate( ( element ) => {
+				const { activeElement } = element.ownerDocument;
+				if ( element === activeElement ) {
+					return true;
+				}
+				const selection =
+					element.ownerDocument.defaultView.getSelection();
+				return (
+					!! activeElement?.isContentEditable &&
+					activeElement.contains( element ) &&
+					!! selection.anchorNode &&
+					element.contains( selection.anchorNode )
+				);
+			} )
+		)
+		.toBe( true );
+}
+
 test.use( {
 	BlockToolbarUtils: async ( { editor, page, pageUtils }, use ) => {
 		await use( new BlockToolbarUtils( { editor, page, pageUtils } ) );
@@ -97,11 +118,11 @@ test.describe( 'Block Toolbar', () => {
 			).toBeFocused();
 
 			await BlockToolbarUtils.focusBlock();
-			await expect(
+			await expectBlockToHoldSelection(
 				editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} )
-			).toBeFocused();
+			);
 
 			await BlockToolbarUtils.focusBlockToolbar();
 			await expect(
@@ -328,16 +349,41 @@ class BlockToolbarUtils {
 	}
 
 	async expectLabelToHaveFocus( label ) {
-		const ariaLabel = await this.page.evaluate( () => {
-			const { activeElement } =
-				document.activeElement.contentDocument ?? document;
-			return (
-				activeElement.getAttribute( 'aria-label' ) ||
-				activeElement.innerText
-			);
-		} );
+		// Poll: the focused element and its label may settle asynchronously
+		// (selection changes sync to the store on `selectionchange`). When a
+		// focused editing host owns the selection, the editable element
+		// containing the selection owns the focus.
+		const readActiveLabel = () =>
+			this.page.evaluate( () => {
+				const doc = document.activeElement.contentDocument ?? document;
+				let { activeElement } = doc;
+				const { anchorNode, focusNode } =
+					doc.defaultView.getSelection();
+				if (
+					activeElement.isContentEditable &&
+					anchorNode &&
+					activeElement.contains( anchorNode )
+				) {
+					const editable = (
+						anchorNode.nodeType === anchorNode.ELEMENT_NODE
+							? anchorNode
+							: anchorNode.parentElement
+					).closest( '[contenteditable="true"]' );
+					if (
+						editable &&
+						editable !== activeElement &&
+						editable.contains( focusNode )
+					) {
+						activeElement = editable;
+					}
+				}
+				return (
+					activeElement.getAttribute( 'aria-label' ) ||
+					activeElement.innerText
+				);
+			} );
 
-		expect( ariaLabel ).toBe( label );
+		await expect.poll( readActiveLabel ).toBe( label );
 	}
 
 	async testScrollable( scrollableElement, elementToTest ) {
