@@ -297,11 +297,16 @@ export default function useSelectionObserver() {
 
 						if (
 							richTextElement &&
-							ownerDocument.activeElement !== richTextElement &&
-							// If the rich text instance owns the selection
-							// (e.g. through a focused editing host), it syncs
-							// the selection itself.
-							! ownsSelection( richTextElement )
+							// The rich text instance syncs the selection
+							// itself when its element is editable and owns the
+							// selection (also through a focused editing host).
+							// It may be temporarily non-editable while a drag
+							// that started outside it is in progress (see
+							// rich-text's preventFocusCapture).
+							( richTextElement.contentEditable !== 'true' ||
+								( ownerDocument.activeElement !==
+									richTextElement &&
+									! ownsSelection( richTextElement ) ) )
 						) {
 							const range = selection.getRangeAt( 0 );
 							const richTextData = create( {
