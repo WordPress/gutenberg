@@ -146,7 +146,7 @@
 		margin-right: $grid-unit-30;
 		margin-right: 0;
 
-		// When the sidebar is a column in, the margin-right is not needed.
+		// When the sidebar is not a full page column, we offset the header to match the overall gutter.
 		@include break-small() {
 			margin-right: $grid-unit-30;
 		}
