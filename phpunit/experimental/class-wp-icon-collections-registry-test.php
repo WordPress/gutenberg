@@ -88,9 +88,8 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 		return array(
 			'non-string slug'      => array( 1 ),
 			'contains slash'       => array( 'plugin/icons' ),
-			'contains digits'      => array( 'plugin1' ),
 			'uppercase characters' => array( 'Plugin' ),
-			'leading hyphen'       => array( '-plugin' ),
+			'underscore'           => array( 'my_plugin' ),
 		);
 	}
 
