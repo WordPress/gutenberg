@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	Notice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -57,7 +57,7 @@ const fields = [
 		type: 'media' as const,
 		render: ( { item } ) => (
 			<div className="block-guidelines__icon">
-				<Icon icon={ item.icon ?? blockDefault } size={ 16 } />
+				<WCIcon icon={ item.icon ?? blockDefault } size={ 16 } />
 			</div>
 		),
 	},
@@ -231,7 +231,11 @@ export default function BlockGuidelines() {
 				</DataViews>
 			) }
 			<HStack>
-				<Button variant="primary" onClick={ openModal }>
+				<Button
+					variant="primary"
+					onClick={ openModal }
+					__next40pxDefaultSize
+				>
 					{ __( 'Add guidelines' ) }
 				</Button>
 			</HStack>

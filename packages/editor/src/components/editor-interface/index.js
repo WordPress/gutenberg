@@ -10,7 +10,11 @@ import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
+import {
+	BlockBreadcrumb,
+	BlockToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -32,7 +36,6 @@ import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
-import { MediaPreview } from '../media';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -47,14 +50,21 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-const Notices = () => (
-	<InlineNotices
-		pinnedNoticesClassName="editor-notices__pinned"
-		dismissibleNoticesClassName="editor-notices__dismissible"
-	>
-		<TemplateValidationNotice />
-	</InlineNotices>
-);
+function Notices() {
+	const isValidTemplate = useSelect( ( select ) => {
+		return select( blockEditorStore ).isValidTemplate();
+	}, [] );
+
+	return (
+		<InlineNotices
+			className="editor-notices"
+			pinnedNoticesClassName="editor-notices__pinned"
+			dismissibleNoticesClassName="editor-notices__dismissible"
+		>
+			{ ! isValidTemplate && <TemplateValidationNotice /> }
+		</InlineNotices>
+	);
+}
 
 export default function EditorInterface( {
 	className,
@@ -72,7 +82,6 @@ export default function EditorInterface( {
 		mode,
 		postId,
 		postType,
-		isAttachment,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
@@ -119,9 +128,6 @@ export default function EditorInterface( {
 			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
-			isAttachment:
-				getCurrentPostType() === 'attachment' &&
-				window?.__experimentalMediaEditor,
 			isRevisionsMode: _isRevisionsMode(),
 			showDiff: isShowingRevisionDiff(),
 		};
@@ -136,12 +142,9 @@ export default function EditorInterface( {
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
-	const shouldShowMediaEditor = !! isAttachment;
 	const shouldShowStylesCanvas =
-		! isAttachment &&
-		( showStylebook || stylesPath?.startsWith( '/revisions' ) );
-	const shouldShowBlockEditor =
-		! shouldShowMediaEditor && ! shouldShowStylesCanvas;
+		showStylebook || stylesPath?.startsWith( '/revisions' );
+	const shouldShowBlockEditor = ! shouldShowStylesCanvas;
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -200,7 +203,6 @@ export default function EditorInterface( {
 			}
 			editorNotices={ <Notices /> }
 			secondarySidebar={
-				! isAttachment &&
 				! isPreviewMode &&
 				mode === 'visual' &&
 				( ( isInserterOpened && <InserterSidebar /> ) ||
@@ -213,9 +215,6 @@ export default function EditorInterface( {
 			content={
 				<>
 					{ ! isDistractionFree && ! isPreviewMode && <Notices /> }
-					{ shouldShowMediaEditor && (
-						<MediaPreview { ...iframeProps } />
-					) }
 					{ shouldShowStylesCanvas && <StylesCanvas /> }
 					{ shouldShowBlockEditor && (
 						<>

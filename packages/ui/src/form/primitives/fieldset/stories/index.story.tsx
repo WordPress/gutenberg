@@ -6,9 +6,9 @@ const meta: Meta< typeof Fieldset.Root > = {
 	title: 'Design System/Components/Form/Primitives/Fieldset',
 	component: Fieldset.Root,
 	subcomponents: {
-		Legend: Fieldset.Legend,
-		Description: Fieldset.Description,
-		Details: Fieldset.Details,
+		'Fieldset.Legend': Fieldset.Legend,
+		'Fieldset.Description': Fieldset.Description,
+		'Fieldset.Details': Fieldset.Details,
 	},
 	parameters: {
 		componentStatus: {

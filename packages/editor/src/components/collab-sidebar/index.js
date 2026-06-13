@@ -24,8 +24,9 @@ import { Notes } from './notes';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
-import { useGlobalStylesContext } from '../global-styles-provider';
+import { useGlobalStyles } from '../global-styles';
 import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
+import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -53,6 +54,8 @@ function NotesSidebar( { postId } ) {
 				: false,
 		};
 	}, [] );
+
+	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -108,9 +111,11 @@ function NotesSidebar( { postId } ) {
 	}
 
 	function openNoteForBlock( targetClientId ) {
-		const target = notes.find(
-			( note ) => note.blockClientId === targetClientId
+		// A block can carry multiple threads; surface the most relevant.
+		const blockThreads = notes.filter(
+			( thread ) => thread.blockClientId === targetClientId
 		);
+		const target = pickPrimaryNote( blockThreads );
 		return focusNote( {
 			targetClientId,
 			noteId: target?.id ?? 'new',
@@ -118,28 +123,35 @@ function NotesSidebar( { postId } ) {
 		} );
 	}
 
+	function addNewNoteForBlock( targetClientId ) {
+		return focusNote( {
+			targetClientId,
+			noteId: 'new',
+			isApproved: false,
+		} );
+	}
+
 	useShortcut(
 		'core/editor/new-note',
 		( event ) => {
 			event.preventDefault();
-			openNoteForBlock( clientId );
+			addNewNoteForBlock( clientId );
 		},
 		{
-			// When multiple notes per block are supported. Remove note ID check.
-			// See: https://github.com/WordPress/gutenberg/pull/75147.
-			isDisabled:
-				isDistractionFree || isClassicBlock || ! clientId || !! noteId,
+			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
 		}
 	);
 
 	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStylesContext();
+	const { merged: GlobalStyles } = useGlobalStyles();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
-	// Find the current thread for the selected block.
-	const currentThread = noteId
-		? notes.find( ( thread ) => thread.id === noteId )
-		: null;
+	// Surface one thread for the avatar indicator.
+	const currentThreads =
+		blockNoteIds.length > 0
+			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
+			: [];
+	const currentThread = pickPrimaryNote( currentThreads );
 
 	if ( isDistractionFree ) {
 		return <AddNoteMenuItem isDistractionFree />;
@@ -154,7 +166,9 @@ function NotesSidebar( { postId } ) {
 				/>
 			) }
 			<AddNoteMenuItem
-				onClick={ ( menuClientId ) => openNoteForBlock( menuClientId ) }
+				onClick={ ( menuClientId ) =>
+					addNewNoteForBlock( menuClientId )
+				}
 			/>
 			{ showAllNotesSidebar && (
 				<PluginSidebar

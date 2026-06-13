@@ -174,6 +174,7 @@ export default function NavigationLinkEdit( {
 		clientId,
 		attributes,
 		setAttributes,
+		allowTextUpdate: true,
 	} );
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
@@ -337,7 +338,6 @@ export default function NavigationLinkEdit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			...blockProps,
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{

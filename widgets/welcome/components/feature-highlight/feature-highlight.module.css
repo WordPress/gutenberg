@@ -1,0 +1,8 @@
+.iconBox {
+	flex-shrink: 0;
+	inline-size: calc(2 * var(--wpds-dimension-padding-2xl));
+	block-size: calc(2 * var(--wpds-dimension-padding-2xl));
+	border-radius: var(--wpds-border-radius-md);
+	background-color: var(--wpds-color-background-interactive-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+}

@@ -43,11 +43,20 @@ test.describe( 'Collaboration with meta boxes', () => {
 			// collaborationSupported starts as true, then the meta box hook
 			// sets it to false once meta boxes are detected.
 			await page.waitForFunction(
-				() =>
-					window?.wp?.data
-						?.select( 'core/editor' )
-						?.isCollaborationEnabledForCurrentPost?.() === false,
-				undefined,
+				( consent ) => {
+					const privateApis = ( window as any ).wp.privateApis;
+					const { unlock } =
+						privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+							consent,
+							'@wordpress/core-data'
+						);
+					return (
+						unlock(
+							window.wp.data.select( 'core/editor' )
+						).isCollaborationEnabledForCurrentPost() === false
+					);
+				},
+				'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 				{ timeout: 15000 }
 			);
 
@@ -142,11 +151,20 @@ test.describe( 'Collaboration with meta boxes', () => {
 			// Verify collaboration remains enabled. The RTC-compatible meta
 			// box should not trigger the incompatibility lock-out.
 			await page.waitForFunction(
-				() =>
-					window?.wp?.data
-						?.select( 'core/editor' )
-						?.isCollaborationEnabledForCurrentPost?.() === true,
-				undefined,
+				( consent ) => {
+					const privateApis = ( window as any ).wp.privateApis;
+					const { unlock } =
+						privateApis.__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+							consent,
+							'@wordpress/core-data'
+						);
+					return (
+						unlock(
+							window.wp.data.select( 'core/editor' )
+						).isCollaborationEnabledForCurrentPost() === true
+					);
+				},
+				'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 				{ timeout: 15000 }
 			);
 
@@ -160,7 +178,7 @@ test.describe( 'Collaboration with meta boxes', () => {
 			const modal = page2.getByRole( 'dialog', {
 				name: 'This post is already being edited',
 			} );
-			await expect( modal ).not.toBeVisible();
+			await expect( modal ).toBeHidden();
 		} );
 	} );
 } );

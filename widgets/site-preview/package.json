@@ -1,0 +1,18 @@
+{
+	"name": "@wordpress/site-preview-widget",
+	"version": "1.0.0",
+	"private": true,
+	"dependencies": {
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/data": "file:../../packages/data",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/icons": "file:../../packages/icons",
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/url": "file:../../packages/url"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.27"
+	}
+}
