@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/mixins";
 
 .boot-navigation-item.components-item {
-	color: var(--wpds-color-fg-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	padding-inline: variables.$grid-unit-05;
 	padding-block: 0;
 	margin-inline: variables.$grid-unit-15;
@@ -25,7 +25,7 @@
 	&:hover,
 	&:focus,
 	&[aria-current="true"] {
-		color: var(--wpds-color-fg-interactive-brand-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
 	}
 
 	&.active {
@@ -37,7 +37,7 @@
 	}
 
 	&[aria-current="true"] {
-		color: var(--wpds-color-fg-interactive-brand-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
 		font-weight: variables.$font-weight-medium;
 	}
 

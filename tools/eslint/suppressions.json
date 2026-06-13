@@ -1073,11 +1073,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/post-taxonomies/flat-term-selector.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/post-template/create-new-template-modal.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2

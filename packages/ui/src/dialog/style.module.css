@@ -43,7 +43,7 @@
 			min-width: var(--wpds-dimension-surface-width-sm);
 			width: calc(100vw - 2 * var(--viewport-inset));
 			max-height: calc(100dvh - 2 * var(--viewport-inset));
-			background-color: var(--wpds-color-bg-surface-neutral-strong);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 			border-radius: var(--wpds-border-radius-lg);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--wpds-elevation-lg);
@@ -51,7 +51,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-md);
-			color: var(--wpds-color-fg-content-neutral);
+			color: var(--wpds-color-foreground-content-neutral);
 
 			&[data-starting-style],
 			&[data-ending-style] {

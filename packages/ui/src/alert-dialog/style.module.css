@@ -4,7 +4,7 @@
 	@layer components {
 		.error-message {
 			align-self: flex-end;
-			color: var(--wpds-color-fg-content-error);
+			color: var(--wpds-color-foreground-content-error);
 		}
 	}
 
@@ -30,10 +30,10 @@
 		}
 
 		.irreversible-action {
-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error-strong);
-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-strong-active);
+			--wp-ui-button-background-color: var(--wpds-color-background-interactive-error-strong);
+			--wp-ui-button-background-color-active: var(--wpds-color-background-interactive-error-strong-active);
+			--wp-ui-button-foreground-color: var(--wpds-color-foreground-interactive-error-strong);
+			--wp-ui-button-foreground-color-active: var(--wpds-color-foreground-interactive-error-strong-active);
 		}
 	}
 }
