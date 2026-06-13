@@ -352,6 +352,120 @@ HTML;
 	}
 
 	/**
+	 * Tests that the Post Date block's `isLink` attribute can be set through
+	 * a block bindings source.
+	 *
+	 * @covers ::gutenberg_block_bindings_render_block
+	 */
+	public function test_post_date_is_link_binding() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_status' => 'publish',
+			)
+		);
+
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function ( $source_args ) {
+					return $source_args['value'];
+				},
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:post-date {"datetime":"2024-01-15T10:30:00","format":"Y-m-d","metadata":{"bindings":{"isLink":{"source":"test/source","args":{"value":true}}}}} /-->
+HTML;
+
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0], array( 'postId' => $post_id ) );
+		$result        = $block->render();
+
+		$this->assertTrue(
+			$block->attributes['isLink'],
+			"The 'isLink' attribute should be updated with the value returned by the source."
+		);
+		$this->assertStringContainsString(
+			'<a href="' . esc_url( get_the_permalink( $post_id ) ) . '">',
+			$result,
+			'The block content should wrap the date in a link to the post when the bound value is true.'
+		);
+		$this->assertStringContainsString(
+			'<time datetime="2024-01-15T10:30:00">2024-01-15</time>',
+			$result,
+			'The block content should keep rendering the date from the `datetime` attribute.'
+		);
+
+		$block_content = <<<HTML
+<!-- wp:post-date {"datetime":"2024-01-15T10:30:00","format":"Y-m-d","isLink":true,"metadata":{"bindings":{"isLink":{"source":"test/source","args":{"value":false}}}}} /-->
+HTML;
+
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0], array( 'postId' => $post_id ) );
+		$result        = $block->render();
+
+		$this->assertFalse(
+			$block->attributes['isLink'],
+			"The 'isLink' attribute fallback value should be overridden by the value returned by the source."
+		);
+		$this->assertStringNotContainsString(
+			'<a href=',
+			$result,
+			'The block content should not wrap the date in a link when the bound value is false.'
+		);
+	}
+
+	/**
+	 * Tests that the Post Date block's `isLink` attribute supports the default
+	 * binding for pattern overrides.
+	 *
+	 * @covers ::gutenberg_block_bindings_render_block
+	 */
+	public function test_default_binding_for_pattern_overrides_post_date_is_link() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_status' => 'publish',
+			)
+		);
+
+		$block_content = <<<HTML
+<!-- wp:post-date {"datetime":"2024-01-15T10:30:00","format":"Y-m-d","metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"Test date"}} /-->
+HTML;
+
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'postId'            => $post_id,
+				'pattern/overrides' => array(
+					'Test date' => array(
+						'isLink' => true,
+					),
+				),
+			)
+		);
+
+		$result = $block->render();
+
+		$this->assertStringContainsString(
+			'<a href="' . esc_url( get_the_permalink( $post_id ) ) . '">',
+			$result,
+			'The block content should wrap the date in a link when the pattern override sets `isLink` to true.'
+		);
+		$this->assertStringContainsString(
+			'<time datetime="2024-01-15T10:30:00">2024-01-15</time>',
+			$result,
+			'The block content should keep rendering the date from the `datetime` attribute.'
+		);
+		$this->assertSame(
+			array( 'source' => 'core/pattern-overrides' ),
+			$block->attributes['metadata']['bindings']['isLink'],
+			'The __default binding should be expanded to include the `isLink` binding in the block metadata.'
+		);
+	}
+
+	/**
 	 * Tests that filter `block_bindings_source_value` is applied.
 	 */
 	public function test_filter_block_bindings_source_value() {
