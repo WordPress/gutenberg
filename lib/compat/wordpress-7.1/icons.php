@@ -84,8 +84,9 @@ function gutenberg_register_default_icon_collections() {
 	);
 }
 
-if ( has_action( 'init', '_wp_register_default_icon_collections' ) ) {
-	remove_action( 'init', '_wp_register_default_icon_collections' );
+$default_icon_collections_priority = has_action( 'init', '_wp_register_default_icon_collections' );
+if ( false !== $default_icon_collections_priority ) {
+	remove_action( 'init', '_wp_register_default_icon_collections', $default_icon_collections_priority );
 }
 add_action( 'init', 'gutenberg_register_default_icon_collections', 0 );
 
@@ -138,7 +139,8 @@ function gutenberg_register_default_icons() {
 	}
 }
 
-if ( has_action( 'init', '_wp_register_default_icons' ) ) {
-	remove_action( 'init', '_wp_register_default_icons' );
+$default_icons_priority = has_action( 'init', '_wp_register_default_icons' );
+if ( false !== $default_icons_priority ) {
+	remove_action( 'init', '_wp_register_default_icons', $default_icons_priority );
 }
 add_action( 'init', 'gutenberg_register_default_icons' );
