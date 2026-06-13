@@ -109,14 +109,15 @@ export interface CropperState {
  *
  * This type is intentionally not exported from the image-editor public barrel.
  * Consumers should drive state through the controller returned by
- * `useCropperState()` or through serializable `TransformOperation` values.
+ * `useCropperReducer()` (or a composite store) or through serializable
+ * `TransformOperation` values.
  */
 export type CropperAction =
 	/** Sets the loaded image metadata (natural size, src). */
 	| { type: 'SET_IMAGE'; payload: CropperState[ 'image' ] }
 	/** Sets the image pan offset. (Crop rectangle is SET_CROP_RECT.) */
 	| { type: 'SET_PAN'; payload: NormalizedPoint }
-	/** Sets the zoom level, clamped to [1, MAX_ZOOM]. */
+	/** Sets the zoom level, clamped to [coverage-aware min, MAX_ZOOM]. */
 	| { type: 'SET_ZOOM'; payload: number }
 	/**
 	 * Sets zoom and pan together atomically. Used by focal-point
@@ -159,6 +160,13 @@ export type ViewportAction =
 	| { type: 'RESET_VIEWPORT' };
 
 /**
+ * Direction of a crop resize handle. Eight compass positions: four
+ * corners and four edge midpoints. Used by stencil callbacks and any
+ * overlay that needs to know which handle the user is dragging.
+ */
+export type HandlePosition = 'n' | 's' | 'e' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
+
+/**
  * The contract for a pluggable stencil component.
  * Stencils render the crop area overlay and handle resize interactions.
  */
@@ -171,8 +179,14 @@ export interface StencilProps {
 	imageSize: Size;
 	/** Callback when the crop rectangle changes (during drag). */
 	onCropChange: ( rect: NormalizedRect ) => void;
-	/** Callback when a resize drag starts (pointerdown on handle). */
-	onResizeStart?: () => void;
+	/**
+	 * Callback when a resize interaction starts — pointerdown on a handle
+	 * or the first arrow-key press on a focused handle. The handle direction
+	 * is passed so downstream overlays can anchor to it. The argument is
+	 * optional to keep custom stencils that don't track a direction
+	 * backward-compatible.
+	 */
+	onResizeStart?: ( handle?: HandlePosition ) => void;
 	/** Callback when a resize drag ends (mouseup after handle drag). */
 	onResizeEnd?: () => void;
 	/** Optional fixed aspect ratio (width / height) in pixel space. */
@@ -190,4 +204,10 @@ export interface StencilProps {
 	};
 	/** Called when Escape is pressed on a resize handle. */
 	onEscape?: () => void;
+	/**
+	 * Minimum crop rect dimension in normalized space, per axis. Derived
+	 * by the host from a pixel-based floor (see `MIN_CROP_PIXELS`) and
+	 * the source image dimensions. Omit to use the stencil's default.
+	 */
+	minCropSize?: Size;
 }

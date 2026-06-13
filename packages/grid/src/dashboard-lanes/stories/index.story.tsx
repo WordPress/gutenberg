@@ -13,6 +13,7 @@ import { useState, useMemo } from '@wordpress/element';
  */
 import { DashboardLanes } from '..';
 import type { DashboardLanesLayoutItem } from '../types';
+import type { GridOverlayRenderProps } from '../../shared/types';
 
 const meta: Meta< typeof DashboardLanes > = {
 	title: 'Grid/DashboardLanes',
@@ -20,7 +21,6 @@ const meta: Meta< typeof DashboardLanes > = {
 	tags: [ 'status-experimental' ],
 	args: {
 		columns: 4,
-		spacing: 2,
 		flowTolerance: 16,
 		rowUnit: 4,
 		editMode: false,
@@ -35,10 +35,6 @@ const meta: Meta< typeof DashboardLanes > = {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
 				'Enables responsive mode. Per-lane lower bound in pixels.',
-		},
-		spacing: {
-			control: { type: 'number', min: 0, max: 16, step: 1 },
-			description: 'Gap multiplier (effective gap = spacing × 4px).',
 		},
 		flowTolerance: {
 			control: { type: 'number', min: 0, max: 64, step: 1 },
@@ -72,21 +68,23 @@ type Story = StoryObj< typeof DashboardLanes >;
 type Tone = 'brand' | 'info' | 'success' | 'warning' | 'error' | 'neutral';
 
 const bgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-bg-surface-brand)',
-	info: 'var(--wpds-color-bg-surface-info)',
-	success: 'var(--wpds-color-bg-surface-success)',
-	warning: 'var(--wpds-color-bg-surface-warning)',
-	error: 'var(--wpds-color-bg-surface-error)',
-	neutral: 'var(--wpds-color-bg-surface-neutral-weak)',
+	brand: 'var(--wpds-color-background-surface-brand)',
+	info: 'var(--wpds-color-background-surface-info)',
+	success: 'var(--wpds-color-background-surface-success)',
+	warning: 'var(--wpds-color-background-surface-warning)',
+	error: 'var(--wpds-color-background-surface-error)',
+	neutral: 'var(--wpds-color-background-surface-neutral-weak)',
 };
 
 const fgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-fg-content-info)',
-	info: 'var(--wpds-color-fg-content-info)',
-	success: 'var(--wpds-color-fg-content-success)',
-	warning: 'var(--wpds-color-fg-content-warning)',
-	error: 'var(--wpds-color-fg-content-error)',
-	neutral: 'var(--wpds-color-fg-content-neutral)',
+	// `brand` has no dedicated fg-content token in the design system,
+	// so neutral content reads safely against the brand surface tint.
+	brand: 'var(--wpds-color-foreground-content-neutral)',
+	info: 'var(--wpds-color-foreground-content-info)',
+	success: 'var(--wpds-color-foreground-content-success)',
+	warning: 'var(--wpds-color-foreground-content-warning)',
+	error: 'var(--wpds-color-foreground-content-error)',
+	neutral: 'var(--wpds-color-foreground-content-neutral)',
 };
 
 function Tile( {
@@ -222,6 +220,36 @@ export const Responsive: Story = {
 };
 
 /**
+ * Layered configuration: `columns` caps the lane count and
+ * `minColumnWidth` enforces a per-tile width floor. The surface
+ * renders up to `columns` lanes on wide containers and reduces the
+ * count on narrow ones whenever fitting all of them would push
+ * tiles below `minColumnWidth`.
+ */
+export const Layered: Story = {
+	args: {
+		columns: 4,
+		minColumnWidth: 200,
+		layout: [
+			{ key: 'a' },
+			{ key: 'b' },
+			{ key: 'c' },
+			{ key: 'd' },
+			{ key: 'e' },
+			{ key: 'f' },
+		],
+		children: [
+			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
+			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
+			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
+			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
+			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
+			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
+		],
+	},
+};
+
+/**
  * Items with `width: 2` span two lanes. The skyline picks a span
  * position that minimizes the resulting baseline across spanned
  * lanes.
@@ -258,11 +286,20 @@ export const Spanning: Story = {
  * Edit mode: drag to reorder, resize from the bottom-right corner
  * (horizontal only — heights are content-driven). Drop commits the
  * new layout via `onChangeLayout`.
+ *
+ * While `editMode` is on, `<DashboardLanes />` paints its default
+ * overlay behind the tiles to mark the lane tracks. Lanes paint
+ * columns only — there are no row markers because heights are
+ * content-driven.
+ *
+ * Theme the default look in place via `--wp-grid-overlay-tile-bg`,
+ * or replace the visual wholesale
+ * by passing `renderGridOverlay`. See the `Custom Grid Overlay`
+ * story below for a full override example.
  */
 export const EditMode: Story = {
 	args: {
 		columns: 4,
-		spacing: 2,
 		editMode: true,
 	},
 	render: function EditModeStory( args ) {
@@ -326,6 +363,153 @@ export const EditMode: Story = {
 				{ ...args }
 				layout={ layout }
 				onChangeLayout={ onChangeLayout }
+			>
+				{ tileElements }
+			</DashboardLanes>
+		);
+	},
+};
+
+/**
+ * Example custom overlay supplied to `<DashboardLanes />` through the
+ * `renderGridOverlay` prop. Receives `{ columns, isActive }` from the
+ * surface (no `rowHeight` because lane heights are content-driven).
+ * The custom must honor `isActive` for the same cross-fade behavior
+ * as the default; the surface always mounts the overlay.
+ *
+ * @param props          Render props supplied by the surface.
+ * @param props.columns  Number of lane tracks to mirror.
+ * @param props.isActive Whether the overlay should be visible.
+ */
+function NumberedLanesOverlay( { columns, isActive }: GridOverlayRenderProps ) {
+	return (
+		<div
+			aria-hidden
+			style={ {
+				position: 'absolute',
+				inset: 0,
+				display: 'grid',
+				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
+				gap: 'var(--wpds-dimension-gap-xl)',
+				pointerEvents: 'none',
+				opacity: isActive ? 1 : 0,
+				visibility: isActive ? 'visible' : 'hidden',
+				transition: isActive
+					? 'opacity 200ms ease, visibility 0s linear 0s'
+					: 'opacity 200ms ease, visibility 0s linear 200ms',
+				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-background-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
+			} }
+		>
+			{ Array.from( { length: columns } ).map( ( _, i ) => (
+				<div
+					key={ i }
+					style={ {
+						outline:
+							'1px dashed var(--wpds-color-stroke-surface-info)',
+						backgroundColor:
+							'color-mix(in srgb, var(--wpds-color-background-surface-info) 10%, transparent)',
+						position: 'relative',
+					} }
+				>
+					<span
+						style={ {
+							position: 'absolute',
+							top: 4,
+							insetInlineStart: 4,
+							fontSize: 10,
+							padding: '1px 6px',
+							borderRadius: 2,
+							background:
+								'var(--wpds-color-background-surface-info)',
+							color: 'var(--wpds-color-foreground-content-info)',
+							fontFamily:
+								'var(--wpds-typography-font-family-mono)',
+						} }
+					>
+						{ i + 1 }
+					</span>
+				</div>
+			) ) }
+		</div>
+	);
+}
+
+/**
+ * Replaces the surface's default edit-mode overlay with a custom
+ * visual through the `renderGridOverlay` prop. The same contract as
+ * `<DashboardGrid />`'s override path, with `rowHeight` omitted from
+ * the render props because lanes are content-driven vertically.
+ *
+ * Pass `renderGridOverlay={ () => null }` to suppress the overlay
+ * entirely while keeping `editMode` interactions on.
+ */
+export const CustomGridOverlayStory: Story = {
+	name: 'Custom Grid Overlay',
+	args: {
+		columns: 4,
+		editMode: true,
+	},
+	render: function CustomGridOverlayRender( args ) {
+		const initial: ( DashboardLanesLayoutItem & {
+			tone: Tone;
+			height: number;
+			label: string;
+		} )[] = [
+			{ key: 'a', tone: 'brand', height: 140, label: '140px' },
+			{ key: 'b', tone: 'info', height: 200, label: '200px' },
+			{
+				key: 'wide',
+				width: 2,
+				tone: 'success',
+				height: 120,
+				label: 'span 2',
+			},
+			{ key: 'c', tone: 'warning', height: 180, label: '180px' },
+			{ key: 'd', tone: 'error', height: 100, label: '100px' },
+			{ key: 'e', tone: 'neutral', height: 220, label: '220px' },
+		];
+
+		const [ tiles, setTiles ] = useState( initial );
+
+		const layout: DashboardLanesLayoutItem[] = tiles.map(
+			( { tone: _tone, height: _height, label: _label, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardLanesLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+						height: existing?.height ?? 100,
+						label: existing?.label ?? item.key,
+					};
+				} )
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile, i ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						height={ tile.height }
+						index={ i + 1 }
+					>
+						{ tile.label }
+					</Tile>
+				) ),
+			[ tiles ]
+		);
+
+		return (
+			<DashboardLanes
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ onChangeLayout }
+				renderGridOverlay={ NumberedLanesOverlay }
 			>
 				{ tileElements }
 			</DashboardLanes>

@@ -136,7 +136,11 @@ function hasKnownAttachmentMetadata( attachment ) {
 	return hasKnownAlt && hasKnownCaption;
 }
 
-export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
+export function useOpenImageMediaEditorModal( {
+	attributes,
+	setAttributes,
+	onClose,
+} ) {
 	// Keep this hook private to the Image block and pass the block attributes
 	// object so the callsite stays compact. Destructure only the attributes
 	// currently used for metadata sync; add more here if the sync policy grows.
@@ -147,11 +151,16 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			select( blockEditorStore ).getSettings()[ openMediaEditorModalKey ],
 		[]
 	);
-	// Track the block's current alt and caption in a ref so handleMediaUpdate
-	// can read the latest values without being listed as a dependency (which
-	// would recreate the callback and re-register the onUpdate handler on every
-	// keystroke while the modal is open).
-	const blockMetadataRef = useRef( { alt, caption: caption?.toString() } );
+	// Track the block's current attachment and metadata in a ref so
+	// handleMediaUpdate can read the latest values without being listed as
+	// dependencies (which would recreate the callback and re-register the
+	// onUpdate handler on every block change while the modal is open).
+	const blockAttributesRef = useRef( {
+		id,
+		url,
+		alt,
+		caption: caption?.toString(),
+	} );
 	// Snapshot of the attachment's metadata taken just before the modal opens,
 	// used as the baseline for detecting what changed during the editing session.
 	const mediaEditorMetadataBaselineRef = useRef();
@@ -160,8 +169,13 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 	const mediaEditorMetadataSyncRequestRef = useRef( 0 );
 
 	useEffect( () => {
-		blockMetadataRef.current = { alt, caption: caption?.toString() };
-	}, [ alt, caption ] );
+		blockAttributesRef.current = {
+			id,
+			url,
+			alt,
+			caption: caption?.toString(),
+		};
+	}, [ alt, caption, id, url ] );
 
 	const getCachedAttachmentRecord = useCallback(
 		( attachmentId ) => {
@@ -245,9 +259,16 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 			const syncRequest = ++mediaEditorMetadataSyncRequestRef.current;
 			const nextAttributes = {};
 
-			if ( newId !== id ) {
+			const currentBlockAttributes = blockAttributesRef.current;
+
+			if ( newId !== currentBlockAttributes.id ) {
 				nextAttributes.id = newId;
-				nextAttributes.url = newUrl ?? url;
+				nextAttributes.url = newUrl ?? currentBlockAttributes.url;
+				blockAttributesRef.current = {
+					...blockAttributesRef.current,
+					id: nextAttributes.id,
+					url: nextAttributes.url,
+				};
 			}
 
 			if ( originalAttachment ) {
@@ -270,27 +291,28 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 				// has independently customised on the block (i.e. values
 				// that don't match the pre-session attachment metadata)
 				// are left untouched.
+				const latestBlockAttributes = blockAttributesRef.current;
 				const resolvedMetadataAttributes =
 					getSyncedImageBlockAttributes(
-						blockMetadataRef.current,
+						latestBlockAttributes,
 						originalAttachment,
 						resolvedAttachment
 					);
 
 				if ( Object.keys( resolvedMetadataAttributes ).length ) {
 					Object.assign( nextAttributes, resolvedMetadataAttributes );
-					blockMetadataRef.current = {
-						...blockMetadataRef.current,
-						...resolvedMetadataAttributes,
-					};
 				}
 			}
 
 			if ( Object.keys( nextAttributes ).length ) {
+				blockAttributesRef.current = {
+					...blockAttributesRef.current,
+					...nextAttributes,
+				};
 				setAttributes( nextAttributes );
 			}
 		},
-		[ id, resolveFreshAttachmentRecord, setAttributes, url ]
+		[ resolveFreshAttachmentRecord, setAttributes ]
 	);
 
 	const openImageMediaEditorModal = useCallback( async () => {
@@ -306,7 +328,7 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 		const cachedAttachmentRecord = getCachedAttachmentRecord( id );
 		const fallbackAttachmentRecord =
 			getAttachmentFallbackForEmptyBlockMetadata(
-				blockMetadataRef.current
+				blockAttributesRef.current
 			);
 		const resolvedAttachmentRecord = hasKnownAttachmentMetadata(
 			cachedAttachmentRecord
@@ -324,11 +346,13 @@ export function useOpenImageMediaEditorModal( { attributes, setAttributes } ) {
 		openMediaEditorModal( {
 			id,
 			onUpdate: handleMediaUpdate,
+			onClose,
 		} );
 	}, [
 		getCachedAttachmentRecord,
 		handleMediaUpdate,
 		id,
+		onClose,
 		openMediaEditorModal,
 		resolveAttachmentRecord,
 	] );

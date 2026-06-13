@@ -24,6 +24,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	getRenderingMode,
 	getCurrentPost,
+	getCurrentPostType,
+	getCurrentPostId,
 	getEditorSettings,
 	getCurrentPostRevisionsCount,
 } from './selectors';
@@ -33,6 +35,7 @@ import {
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import { getTemplatePartIcon } from '../utils';
+import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -580,5 +583,38 @@ export const getPreviousRevision = createRegistrySelector(
 		}
 
 		return null;
+	}
+);
+
+/**
+ * Returns whether the collaboration is enabled for the current post.
+ *
+ * @return {boolean} Whether collaboration is enabled.
+ */
+export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
+	( select ) => ( state ) => {
+		// Return early, if collaboration is not supported.
+		if ( ! unlock( select( coreStore ) ).isCollaborationSupported() ) {
+			return false;
+		}
+
+		const currentPostType = getCurrentPostType( state );
+		const currentPostId = getCurrentPostId( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			currentPostType
+		);
+		const syncConfig = entityConfig?.syncConfig;
+
+		return Boolean(
+			syncConfig &&
+				syncConfig.supportsPersistence &&
+				window._wpCollaborationEnabled &&
+				false !==
+					syncConfig.shouldSync?.(
+						`postType/${ currentPostType }`,
+						currentPostId
+					)
+		);
 	}
 );

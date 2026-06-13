@@ -1,11 +1,14 @@
 import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { cog } from '@wordpress/icons';
+import { wordpress } from '@wordpress/icons';
 import { Button } from '../index';
 
 const meta: Meta< typeof Button > = {
 	title: 'Design System/Components/Button',
 	component: Button,
+	subcomponents: {
+		'Button.Icon': Button.Icon,
+	},
 	argTypes: {
 		'aria-pressed': {
 			control: { type: 'boolean' },
@@ -92,8 +95,8 @@ export const AllTonesAndVariants: Story = {
 		<div
 			style={ {
 				display: 'grid',
-				gridTemplateColumns: 'max-content repeat(2, min-content)',
-				color: 'var(--wpds-color-fg-content-neutral)',
+				gridTemplateColumns: 'max-content repeat(2, max-content)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			<div></div>
@@ -155,7 +158,7 @@ export const WithIcon: Story = {
 		...Default.args,
 		children: (
 			<>
-				<Button.Icon icon={ cog } />
+				<Button.Icon icon={ wordpress } />
 				Button
 			</>
 		),

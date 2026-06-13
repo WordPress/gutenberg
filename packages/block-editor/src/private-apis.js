@@ -16,6 +16,11 @@ import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
+import {
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
+} from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import BlockManager from './components/block-manager';
@@ -40,12 +45,14 @@ import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
 	deviceTypeKey,
+	onViewportStateChangeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
@@ -95,6 +102,9 @@ lock( privateApis, {
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
+	getStyleForState,
+	isDefaultBlockStyleState,
+	setStyleForState,
 	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
@@ -117,6 +127,7 @@ lock( privateApis, {
 	PrivateRichText,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
+	userPatternCategoriesSelectKey,
 	PrivateBlockPopover,
 	PrivatePublishDateTimePicker,
 	useSpacingSizes,
@@ -128,6 +139,7 @@ lock( privateApis, {
 	mediaEditKey,
 	getMediaSelectKey,
 	deviceTypeKey,
+	onViewportStateChangeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,

@@ -12,6 +12,31 @@ const { v4: uuid } = require( 'uuid' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
+ * Probes a remote JPEG for an embedded UltraHDR gain map.
+ *
+ * Loaded lazily so the wasm-vips runtime (~10MB) only instantiates when an
+ * UltraHDR test actually runs.
+ *
+ * @param {string} url Image URL to fetch.
+ * @return {Promise<{ width: number, height: number, hasGainmap: boolean }>} Probe result.
+ */
+async function probeUltraHdrUrl( url ) {
+	const { default: Vips } = await import( 'wasm-vips' );
+	const vips = await Vips( {} );
+	const response = await fetch( url );
+	if ( ! response.ok ) {
+		throw new Error( `Failed to fetch ${ url }: ${ response.status }` );
+	}
+	const bytes = new Uint8Array( await response.arrayBuffer() );
+	const image = vips.Image.uhdrloadBuffer( bytes );
+	return {
+		width: image.width,
+		height: image.pageHeight,
+		hasGainmap: !! image.gainmap,
+	};
+}
+
+/**
  * @typedef {import('@playwright/test').Page} Page
  */
 
@@ -270,6 +295,47 @@ test.describe( 'Client-side media processing', () => {
 		expect( media.media_details.height ).toBe( 150 );
 	} );
 
+	test( 'preserves UltraHDR gain map through sub-size resize', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_ultrahdr.jpeg'
+		);
+
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+		expect( media.media_details.width ).toBe( 1024 );
+		expect( media.media_details.height ).toBe( 768 );
+
+		// Default sub-sizes must be generated.
+		const sizes = media.media_details.sizes;
+		expect( sizes.thumbnail ).toBeDefined();
+		expect( sizes.medium ).toBeDefined();
+
+		// Every generated sub-size must still carry the embedded UltraHDR
+		// gain map. This proves the resize step routed through libvips's
+		// uhdrload/uhdrsave pipeline rather than the regular JPEG path
+		// (which would have stripped the gain map).
+		//
+		// `thumbnail` is a hard-cropped square (exercising the manual
+		// gain-map crop path) while `medium` is a proportional downscale
+		// (exercising libvips's automatic gain-map resize), so checking both
+		// covers both code paths end to end.
+		for ( const sizeName of [ 'thumbnail', 'medium' ] ) {
+			const size = sizes[ sizeName ];
+			const probed = await probeUltraHdrUrl( size.source_url );
+			expect( probed.hasGainmap ).toBe( true );
+			// The decoded base image must match the registered sub-size
+			// dimensions, confirming the gain map travels with a correctly
+			// resized/cropped image rather than a stale full-size one.
+			expect( probed.width ).toBe( size.width );
+			expect( probed.height ).toBe( size.height );
+		}
+	} );
+
 	test( 'scales oversized images and generates the standard sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,
@@ -472,6 +538,84 @@ test.describe( 'Client-side media processing', () => {
 		}
 	} );
 
+	test( 'renders srcset on the front end after publishing a CSM-uploaded image', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// Regression for the CSM srcset bug: when CSM uploads the unscaled
+		// original (then sideloads sub-sizes and a -scaled file), the block
+		// must end up storing a URL that matches a known size in the
+		// attachment metadata. Otherwise wp_calculate_image_srcset() returns
+		// false and the front-end `<img>` ships with no srcset.
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'5000x4000_e2e_test_image_oversized.jpeg'
+		);
+
+		const imageInEditor = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		// Wait for the full upload pipeline (including finalize) to settle.
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
+			timeout: 30_000,
+		} );
+		await expect(
+			page.getByRole( 'button', { name: 'Publish', exact: true } )
+		).toBeEnabled( { timeout: 30_000 } );
+
+		// Confirm the stored block URL was updated to the scaled file after
+		// finalize. Without the fix, the block would keep the unscaled
+		// original's URL and the assertion would fail.
+		const blockUrl = await page.evaluate( () => {
+			return window.wp.data
+				.select( 'core/block-editor' )
+				.getSelectedBlock()?.attributes?.url;
+		} );
+		expect( blockUrl ).toMatch( /-scaled\.jpe?g$/ );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+
+		// The fix: srcset must be present and reference the sub-sizes that
+		// CSM sideloaded. Without it, wp_calculate_image_srcset() returns
+		// false because the src basename doesn't match anything in
+		// $image_meta['sizes']. Require at least two width descriptors —
+		// core itself returns false (no attribute) when fewer than two
+		// candidates qualify.
+		await expect( imageDom ).toHaveAttribute( 'srcset', /\d+w.*\d+w/s );
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+		const media = await mediaProcessingUtils.getMediaDetails(
+			requestUtils,
+			imageId
+		);
+		// Sanity: the metadata used by core to build srcset is populated.
+		expect( media.media_details.sizes.medium ).toBeDefined();
+		expect( media.media_details.sizes.large ).toBeDefined();
+	} );
+
 	test( 'auto-rotates images based on EXIF orientation', async ( {
 		editor,
 		mediaProcessingUtils,
@@ -488,5 +632,125 @@ test.describe( 'Client-side media processing', () => {
 
 		expect( media.media_details.width ).toBe( 768 );
 		expect( media.media_details.height ).toBe( 1024 );
+	} );
+
+	test( 'recovers from a transient upload failure via automatic retry', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// Abort only the first attempt to create the attachment, then let
+		// the automatic retry through. A network-level abort surfaces from
+		// apiFetch as the retryable "Could not get a valid response" error.
+		let createAttempts = 0;
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				createAttempts += 1;
+				if ( createAttempts === 1 ) {
+					await route.abort( 'failed' );
+					return;
+				}
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		// Despite the first attempt failing, the automatic retry should
+		// recover the upload and resolve the block to a server URL. The
+		// generous timeout covers the retry backoff plus re-processing.
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 60_000,
+		} );
+
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+
+		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+		const media = await mediaProcessingUtils.getMediaDetails(
+			requestUtils,
+			imageId
+		);
+		expect( media.mime_type ).toBe( 'image/jpeg' );
+
+		// The first attempt failed, so the upload only succeeded because a
+		// retry ran — there must be at least two create attempts.
+		expect( createAttempts ).toBeGreaterThanOrEqual( 2 );
+
+		await page.unroute( '**/wp/v2/media**' );
+	} );
+
+	test( 'surfaces an error after exhausting upload retries', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+	} ) => {
+		// Read the configured retry budget from the store so the attempt
+		// count assertion tracks the default instead of hardcoding it.
+		const maxRetryAttempts = await page.evaluate(
+			() =>
+				window.wp.data.select( 'core/upload-media' ).getSettings().retry
+					.maxRetryAttempts
+		);
+
+		// Abort every attempt to create the attachment so the retry budget
+		// is fully spent.
+		let createAttempts = 0;
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			const request = route.request();
+			const isCreate =
+				request.method() === 'POST' &&
+				/\/wp\/v2\/media(\?|$)/.test( request.url() );
+			if ( isCreate ) {
+				createAttempts += 1;
+				await route.abort( 'failed' );
+				return;
+			}
+			await route.continue();
+		} );
+
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		// Once the initial attempt plus the full retry budget are spent, the
+		// failure surfaces as an error snackbar carrying the underlying
+		// fetch error message. The timeout covers the exponential backoff
+		// between attempts (~1s + ~2s + ~4s with the defaults).
+		const errorSnackbar = page
+			.locator( '.components-snackbar' )
+			.filter( { hasText: /could not get a valid response/i } );
+		await expect( errorSnackbar ).toBeVisible( { timeout: 60_000 } );
+
+		// Initial attempt plus the configured number of retries.
+		expect( createAttempts ).toBe( maxRetryAttempts + 1 );
+
+		await page.unroute( '**/wp/v2/media**' );
 	} );
 } );

@@ -7,7 +7,7 @@ const meta: Meta< typeof InputLayout > = {
 	title: 'Design System/Components/Form/Primitives/InputLayout',
 	component: InputLayout,
 	subcomponents: {
-		Slot: InputLayout.Slot,
+		'InputLayout.Slot': InputLayout.Slot,
 	},
 	parameters: {
 		componentStatus: {
