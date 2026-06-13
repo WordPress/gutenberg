@@ -182,6 +182,50 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Retrieves the content of a registered icon.
+	 *
+	 * Overridden so that the file validation is applied even when the base
+	 * `WP_Icons_Registry` is provided by WordPress core rather than the
+	 * Gutenberg compat shim.
+	 *
+	 * @param string $icon_name Icon name including namespace.
+	 * @return string|null The content of the icon, if found.
+	 */
+	protected function get_content( $icon_name ) {
+		if ( ! isset( $this->registered_icons[ $icon_name ]['content'] ) ) {
+			$file_path  = $this->registered_icons[ $icon_name ]['file_path'] ?? '';
+			$is_stringy = is_string( $file_path ) || ( is_object( $file_path ) && method_exists( $file_path, '__toString' ) );
+			$icon_path  = $is_stringy ? realpath( (string) $file_path ) : false;
+
+			if (
+				! is_string( $icon_path ) ||
+				! str_ends_with( $icon_path, '.svg' ) ||
+				! is_file( $icon_path ) ||
+				! is_readable( $icon_path )
+			) {
+				wp_trigger_error(
+					__METHOD__,
+					__( 'Icon file is missing or unreadable.', 'gutenberg' )
+				);
+				return null;
+			}
+
+			$content = $this->sanitize_icon_content( file_get_contents( $icon_path ) );
+
+			if ( empty( $content ) ) {
+				wp_trigger_error(
+					__METHOD__,
+					__( 'Icon content does not contain valid SVG markup.', 'gutenberg' )
+				);
+				return null;
+			}
+
+			$this->registered_icons[ $icon_name ]['content'] = $content;
+		}
+		return $this->registered_icons[ $icon_name ]['content'];
+	}
+
+	/**
 	 * Modified to also search in icon labels
 	 */
 	public function get_registered_icons( $search = '' ) {

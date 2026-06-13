@@ -13,6 +13,13 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	private $registry;
 
+	/**
+	 * Path to a temporary icon file created during a test, removed in tear_down.
+	 *
+	 * @var string|null
+	 */
+	private $temp_file = null;
+
 	public function set_up() {
 		parent::set_up();
 		$this->registry = WP_Icons_Registry_Gutenberg::get_instance();
@@ -42,8 +49,29 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 			$collections->unregister( 'test-collection' );
 		}
 
+		if ( $this->temp_file && file_exists( $this->temp_file ) ) {
+			unlink( $this->temp_file );
+		}
+		$this->temp_file = null;
+
 		$this->registry = null;
 		parent::tear_down();
+	}
+
+	/**
+	 * Builds a unique temporary icon file path with the given extension.
+	 *
+	 * @param string|null $contents  File contents, or null to leave the file uncreated.
+	 * @param string      $extension File extension, without the leading dot.
+	 * @return string Absolute path to the temporary file.
+	 */
+	private function create_temp_icon_file( $contents, $extension = 'svg' ) {
+		$dir             = get_temp_dir();
+		$this->temp_file = trailingslashit( $dir ) . wp_unique_filename( $dir, uniqid() . '.' . $extension );
+		if ( null !== $contents ) {
+			file_put_contents( $this->temp_file, $contents );
+		}
+		return $this->temp_file;
 	}
 
 	/**
@@ -86,7 +114,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	/**
 	 * Provides invalid namespaced icon names.
 	 *
-	 * @return array[]
+	 * @return array<string, array{0: mixed}>
 	 */
 	public function data_invalid_icon_names() {
 		return array(
@@ -235,5 +263,62 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 */
 	public function test_unregister_unknown_icon() {
 		$this->assertFalse( $this->registry->unregister( 'test-collection/ghost' ) );
+	}
+
+	/**
+	 * Should load the icon content from a readable SVG file referenced by `file_path`.
+	 */
+	public function test_get_content_reads_from_valid_file_path() {
+		$path = $this->create_temp_icon_file( '<svg><path d="M0 0"/></svg>' );
+
+		$this->register(
+			'test-collection/from-file',
+			array(
+				'label'     => 'From File',
+				'file_path' => $path,
+			)
+		);
+
+		$icon = $this->registry->get_registered_icon( 'test-collection/from-file' );
+		$this->assertStringContainsString( '<path', $icon['content'] );
+	}
+
+	/**
+	 * Provides icon files that cannot yield valid content.
+	 *
+	 * @return array<string, array{0: string|null, 1: string}> Data sets of [ $contents, $extension ].
+	 */
+	public function data_invalid_icon_files() {
+		return array(
+			'missing file'        => array( null, 'svg' ),
+			'non-svg extension'   => array( '<svg><path d="M0 0"/></svg>', 'txt' ),
+			'invalid svg content' => array( '', 'svg' ),
+		);
+	}
+
+	/**
+	 * Should return `null` content when the `file_path` is invalid.
+	 *
+	 * @dataProvider data_invalid_icon_files
+	 *
+	 * @param string|null $contents  File contents, or null to leave the file uncreated.
+	 * @param string      $extension File extension, without the leading dot.
+	 */
+	public function test_get_content_returns_null_for_invalid_file( $contents, $extension ) {
+		$path = $this->create_temp_icon_file( $contents, $extension );
+
+		$this->register(
+			'test-collection/invalid-file',
+			array(
+				'label'     => 'Invalid File',
+				'file_path' => $path,
+			)
+		);
+
+		add_filter( 'wp_trigger_error_trigger_error', '__return_false' );
+		$icon = $this->registry->get_registered_icon( 'test-collection/invalid-file' );
+		remove_filter( 'wp_trigger_error_trigger_error', '__return_false' );
+
+		$this->assertNull( $icon['content'] );
 	}
 }
