@@ -84,7 +84,7 @@ supports: {
 }
 ```
 
-## auto_register
+## autoRegister
 
 -   Type: `boolean`
 -   Default value: `false`
@@ -102,7 +102,7 @@ register_block_type( 'my-plugin/server-block', array(
 		);
 	},
 	'supports' => array(
-		'auto_register' => true,
+		'autoRegister' => true,
 	),
 ) );
 ```
@@ -608,6 +608,21 @@ When the block declares support for `color.text`, the attributes definition is e
     }
     ```
 
+## contentRole
+
+_**Note:** Since WordPress 6.9._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Marks the block itself as content. It is intended primarily for blocks that do not declare `content` attributes, or whose content is expressed only through their inner blocks. When enabled, content-only editing modes can still edit these blocks and allow inner blocks to be added or removed.
+
+```js
+supports: {
+	contentRole: true
+}
+```
+
 ## customClassName
 
 -   Type: `boolean`
@@ -629,8 +644,10 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `aspectRatio`: type `boolean`, default value `false`
     -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
+    -   `minWidth`: type `boolean`, default value `false`
     -   `width`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
@@ -638,17 +655,18 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	dimensions: {
-		aspectRatio: true // Enable aspect ratio control.
-		height: true // Enable height control.
-		minHeight: true // Enable min height control.
-		width: true // Enable width control.
+		aspectRatio: true, // Enable aspect ratio control.
+		height: true, // Enable height control.
+		minHeight: true, // Enable min height control.
+		minWidth: true, // Enable min width control.
+		width: true, // Enable width control.
 	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, `minWidth`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
@@ -657,6 +675,7 @@ attributes: {
             aspectRatio: "16/9",
             height: "40vh",
             minHeight: "50vh",
+            minWidth: "200px",
             width: "400px",
         }
     }
@@ -756,8 +775,7 @@ supports: {
 
 Indicates if the block is using Interactivity API features.
 
-The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation.
-Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
+The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation. See the [Client-Side Navigation Compatibility](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md) guide for details.
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
@@ -780,6 +798,8 @@ If you set `supports.interactivity` to `true`, it is equivalent to setting both 
     -   `allowCustomContentAndWideSize`: type `boolean`, default value `true`
 
 This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
+
+Note that for layout to work correctly, the block it applies to should have a classname as its selector. That classname will be concatenated with a layout type string to form the layout selector.
 
 ### layout.default
 
@@ -850,6 +870,25 @@ For the `flex` layout type only, determines display of the "Allow to wrap to mul
 -   Default value: `true`
 
 For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.
+
+## listView
+
+_**Note:** Since WordPress 7.0._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+Enables a List View panel in the block inspector for the block's inner blocks.
+
+When this support is enabled, the inspector shows a List View tree allowing users to inspect and manage the block's inner blocks from the sidebar instead of only using the global document List View.
+
+```js
+supports: {
+	listView: true
+}
+```
+
+The `listView` support only affects the editor UI and does not add any attributes to the block.
 
 ## lock
 

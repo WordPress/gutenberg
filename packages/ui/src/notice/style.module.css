@@ -1,0 +1,136 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.notice {
+			--icon-height: 24px;
+			--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
+
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-neutral-weak);
+			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-neutral);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-neutral);
+
+			container-type: inline-size;
+			display: grid;
+			align-items: start;
+			grid-template-columns: auto 1fr auto;
+			padding: var(--wpds-dimension-padding-md);
+			border: 1px solid var(--wp-ui-notice-border-color);
+			border-radius: var(--wpds-border-radius-lg);
+			background-color: var(--wp-ui-notice-background-color);
+		}
+
+		.icon {
+			grid-row: 1;
+			grid-column: 1;
+			margin-inline-end: var(--wpds-dimension-gap-xs);
+			color: var(--wp-ui-notice-decorative-icon-color);
+		}
+
+		.title {
+			grid-column: 2;
+
+			padding-block: var(--text-vertical-padding);
+
+			color: var(--wp-ui-notice-text-color);
+		}
+
+		.description {
+			grid-column: 2;
+
+			padding-block: var(--text-vertical-padding);
+
+			text-wrap: pretty;
+			color: var(--wp-ui-notice-text-color);
+		}
+
+		.actions {
+			grid-column: 2;
+
+			display: flex;
+			gap: var(--wpds-dimension-gap-md);
+			flex-wrap: wrap;
+		}
+
+		/* If .actions is not the only content, add top margin to match design specs */
+		.notice:has(.title) .actions,
+		.notice:has(.description) .actions {
+			margin-block-start: var(--wpds-dimension-gap-sm);
+		}
+
+		.action-button {
+			flex-shrink: 0;
+		}
+
+		.action-link {
+			flex-shrink: 0;
+
+			/* Add more horizontal space when following another action link/button */
+			&:not(:first-child) {
+				margin-inline-start: var(--wpds-dimension-gap-xs);
+			}
+
+			/* Add more horizontal space when followed by another action link/button */
+			&:not(:last-child) {
+				margin-inline-end: var(--wpds-dimension-gap-xs);
+			}
+		}
+
+		.close-icon {
+			grid-column: 3;
+			grid-row: 1;
+			margin-inline-start: var(--wpds-dimension-gap-xs);
+		}
+
+		.is-info {
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-info-weak);
+			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-info);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-info);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-info-weak);
+		}
+
+		.is-warning {
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-warning-weak);
+			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-warning);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-warning);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-warning-weak);
+		}
+
+		.is-success {
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-success-weak);
+			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-success);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-success);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-success-weak);
+		}
+
+		.is-error {
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-error-weak);
+			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-error);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-error);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-error-weak);
+		}
+
+		/* Matches --wpds-dimension-surface-width-sm (container queries don't support custom properties). */
+		@container (max-width: 320px) {
+			.notice:has(.title) .description,
+			.notice:has(.title) .actions {
+				grid-column: 1 / 3;
+			}
+		}
+	}
+
+	@layer compositions {
+		/* Override `Text` margin */
+		.action-link {
+			margin-block: auto;
+		}
+
+		/* Add partial transparency to CloseIcon and outline/minimal ActionButton
+		 * for a better look over tinted backgrounds */
+		.close-icon,
+		.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
+			--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-background-interactive-neutral-weak-active));
+		}
+	}
+}

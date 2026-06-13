@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -12,6 +12,7 @@ import { HStack } from '../../h-stack';
 import { Navigator, useNavigator } from '../';
 
 const meta: Meta< typeof Navigator > = {
+	tags: [ 'manifest' ],
 	component: Navigator,
 	subcomponents: {
 		Screen: Navigator.Screen,
@@ -28,6 +29,10 @@ const meta: Meta< typeof Navigator > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 	decorators: [
 		( Story ) => {
@@ -141,6 +146,7 @@ const NavigatorButtonWithSkipFocus = ( {
 
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...props }
 			style={ {
 				marginInline: '8px',

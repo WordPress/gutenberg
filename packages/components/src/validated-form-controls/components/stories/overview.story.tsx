@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import clsx from 'clsx';
 
@@ -149,7 +149,8 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 				>[ 'customValidity' ]
 			>( undefined );
 
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef =
+			useRef< ReturnType< typeof setTimeout > >( undefined );
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		const debouncedValidate = useCallback(

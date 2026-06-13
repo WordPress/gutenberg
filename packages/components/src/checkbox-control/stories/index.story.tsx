@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import { VStack } from '../../v-stack';
 import { HStack } from '../../h-stack';
 
 const meta: Meta< typeof CheckboxControl > = {
+	tags: [ 'manifest' ],
 	component: CheckboxControl,
 	title: 'Components/Selection & Input/Common/CheckboxControl',
 	id: 'components-checkboxcontrol',
@@ -34,6 +35,11 @@ const meta: Meta< typeof CheckboxControl > = {
 			exclude: [ 'heading' ],
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `CheckboxControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

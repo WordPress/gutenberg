@@ -97,6 +97,10 @@
 			margin-inline-end: $grid-unit;
 		}
 	}
+
+	.editor-revisions-header & {
+		clip-path: none;
+	}
 }
 
 /**

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -10,6 +10,7 @@ import { fn } from 'storybook/test';
 import SandBox from '..';
 
 const meta: Meta< typeof SandBox > = {
+	tags: [ 'manifest' ],
 	component: SandBox,
 	title: 'Components/Utilities/SandBox',
 	id: 'components-sandbox',
@@ -22,6 +23,10 @@ const meta: Meta< typeof SandBox > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

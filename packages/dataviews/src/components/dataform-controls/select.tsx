@@ -19,9 +19,11 @@ export default function Select< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { type, label, description, getValue, setValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const isMultiple = type === 'array';
 	const value = getValue( { item: data } ) ?? ( isMultiple ? [] : '' );
@@ -44,6 +46,7 @@ export default function Select< Item >( {
 	return (
 		<ValidatedSelectControl
 			required={ !! field.isValid?.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			value={ value }
@@ -53,6 +56,7 @@ export default function Select< Item >( {
 			__next40pxDefaultSize
 			hideLabelFromVision={ hideLabelFromVision }
 			multiple={ isMultiple }
+			disabled={ disabled }
 		/>
 	);
 }

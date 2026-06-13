@@ -118,9 +118,8 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 	</HStack>
 );
 
-const renderToggle =
-	( duotone, resetDuotone ) =>
-	( { onToggle, isOpen } ) => {
+const renderToggle = ( duotone, resetDuotone ) =>
+	function Toggle( { onToggle, isOpen } ) {
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {

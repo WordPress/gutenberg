@@ -5,6 +5,7 @@ build-style
 build-types
 build-wp
 node_modules
+.wasm-vips-build
 gutenberg.zip
 .content-entry.js
 coverage
@@ -16,12 +17,10 @@ coverage
 # Directories/files that may appear in your environment
 *.log
 yarn.lock
-results
 /artifacts
 /test/e2e/artifacts
 /perf-envs
 /composer.lock
-/ts-traces
 
 # The /.cache folder is needed for phpcs to cache results between runs, while other .cache folders must be ignored
 # It is not possible to re-include a file if a parent directory of that file is excluded
@@ -43,6 +42,7 @@ junit.xml
 
 # Local overrides
 .wp-env.override.json
+.wp-env.test.override.json
 playwright.config.override.ts
 phpcs.xml
 phpunit.xml
@@ -54,7 +54,6 @@ test/storybook-playwright/specs/*-snapshots/**
 test/gutenberg-test-themes/twentytwentyone
 test/gutenberg-test-themes/twentytwentythree
 test/gutenberg-test-themes/twentytwentyfour
-packages/react-native-editor/src/setup-local.js
 
 # Files related to applying patches
 *.rej

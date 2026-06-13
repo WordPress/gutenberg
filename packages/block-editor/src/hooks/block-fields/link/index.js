@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	Icon,
+	Icon as WCIcon,
 	__experimentalGrid as Grid,
 	Popover,
 } from '@wordpress/components';
@@ -18,7 +18,7 @@ import { prependHTTP } from '@wordpress/url';
 import LinkControl from '../../../components/link-control';
 import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
 
-export const NEW_TAB_REL = 'noreferrer noopener';
+export const NEW_TAB_REL = 'noopener';
 export const NEW_TAB_TARGET = '_blank';
 export const NOFOLLOW_REL = 'nofollow';
 
@@ -67,17 +67,11 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( { data, field, onChange, config = {} } ) {
+export default function Link( { data, field, onChange } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const { fieldDef } = config;
-	const updateAttributes = ( newValue ) => {
-		const mappedChanges = field.setValue( { item: data, value: newValue } );
-		onChange( mappedChanges );
-	};
-
 	const value = field.getValue( { item: data } );
 	const url = value?.url;
 	const rel = value?.rel || '';
@@ -110,7 +104,7 @@ export default function Link( { data, field, onChange, config = {} } ) {
 				>
 					{ url && (
 						<>
-							<Icon icon={ link } size={ 24 } />
+							<WCIcon icon={ link } size={ 24 } />
 							<span className="block-editor-content-only-controls__link-title">
 								{ url }
 							</span>
@@ -118,7 +112,7 @@ export default function Link( { data, field, onChange, config = {} } ) {
 					) }
 					{ ! url && (
 						<>
-							<Icon
+							<WCIcon
 								icon={ link }
 								size={ 24 }
 								style={ { opacity: 0.3 } }
@@ -145,52 +139,20 @@ export default function Link( { data, field, onChange, config = {} } ) {
 								...newValues,
 							} );
 
-							// Build update object dynamically based on what's in the mapping
-							const updateValue = { ...value };
-
-							if ( fieldDef?.mapping ) {
-								Object.keys( fieldDef.mapping ).forEach(
-									( key ) => {
-										if ( key === 'href' || key === 'url' ) {
-											updateValue[ key ] =
-												updatedAttrs.url;
-										} else if ( key === 'rel' ) {
-											updateValue[ key ] =
-												updatedAttrs.rel;
-										} else if (
-											key === 'target' ||
-											key === 'linkTarget'
-										) {
-											updateValue[ key ] =
-												updatedAttrs.linkTarget;
-										}
-									}
-								);
-							}
-
-							updateAttributes( updateValue );
+							onChange(
+								field.setValue( {
+									item: data,
+									value: updatedAttrs,
+								} )
+							);
 						} }
 						onRemove={ () => {
-							// Remove all link-related properties based on what's in the mapping
-							const removeValue = {};
-
-							if ( fieldDef?.mapping ) {
-								Object.keys( fieldDef.mapping ).forEach(
-									( key ) => {
-										if (
-											key === 'href' ||
-											key === 'url' ||
-											key === 'rel' ||
-											key === 'target' ||
-											key === 'linkTarget'
-										) {
-											removeValue[ key ] = undefined;
-										}
-									}
-								);
-							}
-
-							updateAttributes( removeValue );
+							onChange(
+								field.setValue( {
+									item: data,
+									value: {},
+								} )
+							);
 						} }
 					/>
 				</Popover>

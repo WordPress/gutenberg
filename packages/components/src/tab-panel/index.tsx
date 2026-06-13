@@ -246,4 +246,5 @@ const UnforwardedTabPanel = (
 };
 
 export const TabPanel = forwardRef( UnforwardedTabPanel );
+TabPanel.displayName = 'TabPanel';
 export default TabPanel;

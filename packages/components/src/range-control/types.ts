@@ -5,7 +5,7 @@ import type {
 	CSSProperties,
 	FocusEventHandler,
 	MouseEventHandler,
-	MutableRefObject,
+	RefObject,
 } from 'react';
 
 /**
@@ -114,10 +114,6 @@ export type RangeControlProps = Pick<
 		 * `undefined`.
 		 */
 		currentInput?: number;
-		/**
-		 * An icon to be shown above the slider next to its container title.
-		 */
-		icon?: string;
 		/**
 		 * The slider starting position, used when no `value` is passed.
 		 * The `initialPosition` will be clamped between the provided `min`
@@ -267,7 +263,7 @@ export type ThumbProps = {
 export type TooltipProps = {
 	show?: boolean;
 	placement?: string;
-	inputRef?: MutableRefObject< HTMLElement | undefined >;
+	inputRef?: RefObject< HTMLElement | null >;
 	tooltipPlacement?: string;
 	value?: ControlledRangeValue;
 	renderTooltipContent?: (

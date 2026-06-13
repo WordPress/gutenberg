@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import { createContext, useContext } from '@wordpress/element';
 import { Slot, Fill, Provider as SlotFillProvider } from '../';
 
 const meta: Meta< typeof Slot > = {
+	tags: [ 'manifest' ],
 	component: Slot,
 	title: 'Components/Utilities/SlotFill',
 	id: 'components-slotfill',
@@ -26,6 +27,10 @@ const meta: Meta< typeof Slot > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { state: 'open' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 

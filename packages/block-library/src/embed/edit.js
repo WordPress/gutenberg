@@ -1,21 +1,4 @@
 /**
- * Internal dependencies
- */
-import {
-	createUpgradedEmbedBlock,
-	getClassNames,
-	removeAspectRatioClasses,
-	fallback,
-	getEmbedInfoByProvider,
-	getMergedAttributesWithPreview,
-} from './util';
-import EmbedControls from './embed-controls';
-import { embedContentIcon } from './icons';
-import EmbedLoading from './embed-loading';
-import EmbedPlaceholder from './embed-placeholder';
-import EmbedPreview from './embed-preview';
-
-/**
  * External dependencies
  */
 import clsx from 'clsx';
@@ -26,11 +9,32 @@ import clsx from 'clsx';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
-import { getAuthority } from '@wordpress/url';
 import { Caption } from '../utils/caption';
+
+/**
+ * Internal dependencies
+ */
+import {
+	createUpgradedEmbedBlock,
+	findMoreSuitableBlock,
+	getClassNames,
+	rewriteXToTwitter,
+	removeAspectRatioClasses,
+	fallback,
+	getEmbedInfoByProvider,
+	getMergedAttributesWithPreview,
+} from './util';
+import EmbedControls from './embed-controls';
+import { embedContentIcon } from './icons';
+import EmbedLoading from './embed-loading';
+import EmbedPlaceholder from './embed-placeholder';
+import EmbedPreview from './embed-preview';
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -58,6 +62,8 @@ const EmbedEdit = ( props ) => {
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const { invalidateResolution } = useDispatch( coreStore );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const {
 		preview,
@@ -131,63 +137,61 @@ const EmbedEdit = ( props ) => {
 		} );
 	}
 
+	// When the preview can't be embedded, retry without any trailing slash.
 	useEffect( () => {
-		if ( preview?.html || ! cannotEmbed || ! hasResolved ) {
+		if ( ! cannotEmbed || ! hasResolved || ! attributesUrl ) {
 			return;
 		}
 
-		// At this stage, we're not fetching the preview and know it can't be embedded,
-		// so try removing any trailing slash, and resubmit.
 		const newURL = attributesUrl.replace( /\/$/, '' );
+		if ( newURL === attributesUrl ) {
+			return;
+		}
+
 		setURL( newURL );
 		setIsEditingURL( false );
+		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( { url: newURL } );
 	}, [
-		preview?.html,
 		attributesUrl,
 		cannotEmbed,
 		hasResolved,
 		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
-	// Try a different provider in case the embed url is not supported.
+	// Apply preview-derived attributes once the preview resolves.
 	useEffect( () => {
-		if ( ! cannotEmbed || fetching || ! url ) {
+		if ( ! preview || isEditingURL ) {
 			return;
 		}
 
-		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
-		if ( getAuthority( url ) === 'x.com' ) {
-			const newURL = new URL( url );
-			newURL.host = 'twitter.com';
-			setAttributes( { url: newURL.toString() } );
-		}
-	}, [ url, cannotEmbed, fetching, setAttributes ] );
+		const mergedAttributes = getMergedAttributes();
 
-	// Handle incoming preview.
-	useEffect( () => {
-		if ( preview && ! isEditingURL ) {
-			// When obtaining an incoming preview,
-			// we set the attributes derived from the preview data.
-			const mergedAttributes = getMergedAttributes();
-			const hasChanges = Object.keys( mergedAttributes ).some(
-				( key ) => mergedAttributes[ key ] !== attributes[ key ]
+		if ( onReplace ) {
+			const upgradedBlock = createUpgradedEmbedBlock(
+				props,
+				mergedAttributes
 			);
 
-			if ( hasChanges ) {
-				setAttributes( mergedAttributes );
+			if ( upgradedBlock ) {
+				// Mutate via setAttributes; onReplace would remount the
+				// block and clear the URL textbox on undo.
+				__unstableMarkNextChangeAsNotPersistent();
+				setAttributes( upgradedBlock.attributes );
+				return;
 			}
+		}
 
-			if ( onReplace ) {
-				const upgradedBlock = createUpgradedEmbedBlock(
-					props,
-					mergedAttributes
-				);
+		const hasChanges = Object.keys( mergedAttributes ).some(
+			( key ) => mergedAttributes[ key ] !== attributes[ key ]
+		);
 
-				if ( upgradedBlock ) {
-					onReplace( upgradedBlock );
-				}
-			}
+		if ( hasChanges ) {
+			// Merge into the URL-submit undo level so a single undo
+			// reverts both the submit and the preview-driven attributes.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( mergedAttributes );
 		}
 	}, [ preview, isEditingURL ] );
 
@@ -219,14 +223,19 @@ const EmbedEdit = ( props ) => {
 							event.preventDefault();
 						}
 
-						// If the embed URL was changed, we need to reset the aspect ratio class.
-						// To do this we have to remove the existing ratio class so it can be recalculated.
+						const rewrittenURL = rewriteXToTwitter( url );
 						const blockClass = removeAspectRatioClasses(
 							attributes.className
 						);
 
+						setURL( rewrittenURL );
+						setAttributes( {
+							url: rewrittenURL,
+							...findMoreSuitableBlock( rewrittenURL )
+								?.attributes,
+							className: blockClass,
+						} );
 						setIsEditingURL( false );
-						setAttributes( { url, className: blockClass } );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }

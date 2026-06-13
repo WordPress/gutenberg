@@ -70,7 +70,7 @@ status "Installing dependencies... 📦"
 npm cache verify
 npm ci
 status "Generating build... 👷‍♀️"
-npm run build -- --fast
+npm run build -- --skip-types
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
@@ -79,6 +79,8 @@ zip --recurse-paths --no-dir-entries \
 	gutenberg.php \
 	lib \
 	packages/block-serialization-default-parser/*.php \
+	packages/icons/src/manifest.php \
+	packages/icons/src/library/*.svg \
 	post-content.php \
 	build \
 	build-module \

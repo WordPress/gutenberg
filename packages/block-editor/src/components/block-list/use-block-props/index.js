@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useDisabled } from '@wordpress/compose';
+import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -107,6 +107,14 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		deviceType,
 	} = useContext( PrivateBlockContext );
 
+	const defaultViewRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			defaultViewRef.current = defaultView;
+		}
+	}, [] );
+
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -114,6 +122,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const isHoverEnabled = ! isWithinSectionBlock;
 	const mergedRefs = useMergeRefs( [
 		props.ref,
+		defaultViewRef,
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
@@ -144,6 +153,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const { isBlockCurrentlyHidden } = useBlockVisibility( {
 		blockVisibility,
 		deviceType,
+		view: defaultViewRef.current,
 	} );
 
 	// Ensures it warns only inside the `edit` implementation for the block.

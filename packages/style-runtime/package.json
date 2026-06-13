@@ -1,0 +1,47 @@
+{
+	"name": "@wordpress/style-runtime",
+	"version": "0.4.0",
+	"description": "Runtime helpers for injecting WordPress package styles.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"style",
+		"runtime"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-runtime/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/style-runtime"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"types": "build-types",
+	"sideEffects": false,
+	"publishConfig": {
+		"access": "public"
+	}
+}

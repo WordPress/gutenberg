@@ -18,6 +18,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import {
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../store/constants';
@@ -143,9 +144,10 @@ function StartPageOptionsModal( { onClose } ) {
 
 export default function StartPageOptions() {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const { isEditedPostDirty, isEditedPostEmpty } = useSelect( editorStore );
+	const { isEditedPostEmpty } = useSelect( editorStore );
+	const { getEntityRecordNonTransientEdits } = useSelect( coreStore );
 	const { isModalActive } = useSelect( interfaceStore );
-	const { enabled, postId } = useSelect( ( select ) => {
+	const { enabled, postType, postId } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const choosePatternModalEnabled = select( preferencesStore ).get(
 			'core',
@@ -153,9 +155,11 @@ export default function StartPageOptions() {
 		);
 		const currentPostType = getCurrentPostType();
 		return {
+			postType: currentPostType,
 			postId: getCurrentPostId(),
 			enabled:
 				choosePatternModalEnabled &&
+				ATTACHMENT_POST_TYPE !== currentPostType &&
 				TEMPLATE_POST_TYPE !== currentPostType &&
 				TEMPLATE_PART_POST_TYPE !== currentPostType,
 		};
@@ -164,7 +168,19 @@ export default function StartPageOptions() {
 	// Note: The `postId` ensures the effect re-runs when pages are switched without remounting the component.
 	// Examples: changing pages in the List View, creating a new page via Command Palette.
 	useEffect( () => {
-		const isFreshPage = ! isEditedPostDirty() && isEditedPostEmpty();
+		// Read non-transient edits directly. `isEditedPostDirty` /
+		// `hasEditsForEntityRecord` also return true while the CRDT
+		// sync manager's phantom save (fired off `receiveEntityRecords`
+		// at boot) is in flight, which would suppress the modal.
+		const hasEdits =
+			Object.keys(
+				getEntityRecordNonTransientEdits(
+					'postType',
+					postType,
+					postId
+				) ?? {}
+			).length > 0;
+		const isFreshPage = ! hasEdits && isEditedPostEmpty();
 		// Prevents immediately opening when features is enabled via preferences modal.
 		const isPreferencesModalActive = isModalActive( 'editor/preferences' );
 		if ( ! enabled || ! isFreshPage || isPreferencesModalActive ) {
@@ -175,8 +191,9 @@ export default function StartPageOptions() {
 		setIsOpen( true );
 	}, [
 		enabled,
+		postType,
 		postId,
-		isEditedPostDirty,
+		getEntityRecordNonTransientEdits,
 		isEditedPostEmpty,
 		isModalActive,
 	] );

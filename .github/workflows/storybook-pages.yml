@@ -18,7 +18,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -28,10 +28,13 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Build Storybook
+              env:
+                  NODE_OPTIONS: --max-old-space-size=8192
+                  NODE_ENV: production
               run: npm run storybook:build
 
             - name: Deploy
-              uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+              uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: ./storybook/build

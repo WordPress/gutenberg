@@ -295,5 +295,6 @@ const UnforwardedFontSizePicker = (
 };
 
 export const FontSizePicker = forwardRef( UnforwardedFontSizePicker );
+FontSizePicker.displayName = 'FontSizePicker';
 
 export default FontSizePicker;

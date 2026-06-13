@@ -16,6 +16,7 @@ import { createUndoManager } from '@wordpress/undo-manager';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { ConnectionErrorCode } from './sync';
 
 /** @typedef {import('./types').AnyFunction} AnyFunction */
 
@@ -214,8 +215,11 @@ function entity( entityConfig ) {
 						}
 
 						const nextState = { ...state };
+						const itemsList = Array.isArray( action.items )
+							? action.items
+							: [ action.items ];
 
-						for ( const record of action.items ) {
+						for ( const record of itemsList ) {
 							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
@@ -456,6 +460,22 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
+// Stores a snapshot of the sync undo manager's undo/redo availability so
+// core-data selectors can react to undo stack changes.
+export function syncUndoManagerState(
+	state = { hasRedo: false, hasUndo: false },
+	action
+) {
+	switch ( action.type ) {
+		case 'SYNC_UNDO_MANAGER_CHANGE':
+			return {
+				hasRedo: action.hasRedo,
+				hasUndo: action.hasUndo,
+			};
+	}
+	return state;
+}
+
 export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
@@ -660,6 +680,82 @@ export function editorAssets( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing sync connection states for entities.
+ * Keyed by "kind/name:id" (e.g., "postType/post:123").
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function syncConnectionStatuses( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			return {
+				...state,
+				[ key ]: action.status,
+			};
+		}
+		case 'CLEAR_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
+	}
+	return state;
+}
+
+/**
+ * Reducer managing whether collaboration is supported.
+ *
+ * Default to true, as collaboration is supported by default
+ * unless explicitly disabled due to unsupported conditions
+ * such as metaboxes.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function collaborationSupported( state = true, action ) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATION_SUPPORTED':
+			return action.supported;
+
+		case 'SET_SYNC_CONNECTION_STATUS':
+			if (
+				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
+				action.status?.error?.code
+			) {
+				return false;
+			}
+
+			return state;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing view configs, keyed by `kind/name`.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function viewConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEW_CONFIG':
+			return {
+				...state,
+				[ `${ action.kind }/${ action.name }` ]: action.config,
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -670,6 +766,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
+	syncUndoManagerState,
 	undoManager,
 	embedPreviews,
 	userPermissions,
@@ -682,4 +779,7 @@ export default combineReducers( {
 	registeredPostMeta,
 	editorSettings,
 	editorAssets,
+	syncConnectionStatuses,
+	collaborationSupported,
+	viewConfigs,
 } );

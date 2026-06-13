@@ -1,39 +1,45 @@
-/**
- * External dependencies
- */
-import { serialize } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import '../lib/register-color-spaces';
+import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
 import { buildRamp } from '../lib';
+import { getColorString } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
 const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
 const sStops = [ 100, 80, 60, 40, 20, 0 ];
-const hstops = [ 0, 60, 120, 180, 240, 300 ];
+const hStops = [ 0, 60, 120, 180, 240, 300 ];
 
-describe.skip( 'buildRamps', () => {
+describe( 'buildRamps', () => {
 	it( 'background ramp snapshots', () => {
-		const allBgColors = lStops.flatMap( ( l ) =>
+		// Generate a set of HSL colors across a broad perceivable range to test
+		// support for building ramps with various combinations of lightness,
+		// saturation, and hue. Convert to a serialized string format to mirror
+		// real-world consumer usage.
+		const allBgColors: string[] = lStops.flatMap( ( l ) =>
 			sStops.flatMap( ( s ) =>
-				hstops.map( ( h ) => `hsl(${ h }deg ${ s }% ${ l }%)` )
+				hStops.map( ( h ) =>
+					serialize(
+						to(
+							{
+								space: HSL,
+								coords: [ h, s, l ] as [
+									number,
+									number,
+									number,
+								],
+								alpha: 1,
+							},
+							sRGB
+						)
+					)
+				)
 			)
 		);
 
 		expect(
 			allBgColors.map( ( bg ) => {
 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
-				const seedOriginal = serialize( bg, {
-					format: 'hex',
-					inGamut: true,
-				} );
-				const seedComputed = serialize( ramp.ramp.surface2, {
-					format: 'hex',
-					inGamut: true,
-				} );
+				const seedOriginal = getColorString( bg );
+				const seedComputed = getColorString( ramp.ramp.surface2 );
 
 				return {
 					input: {
@@ -99,14 +105,8 @@ describe.skip( 'buildRamps', () => {
 			allPrimaryColors.map( ( primary ) =>
 				options.map( ( o ) => {
 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
-					const seedOriginal = serialize( primary, {
-						format: 'hex',
-						inGamut: true,
-					} );
-					const seedComputed = serialize( ramp.ramp.bgFill1, {
-						format: 'hex',
-						inGamut: true,
-					} );
+					const seedOriginal = getColorString( primary );
+					const seedComputed = getColorString( ramp.ramp.bgFill1 );
 
 					return {
 						input: {

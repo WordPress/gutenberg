@@ -126,7 +126,7 @@ function AuthorField( { item } ) {
 		<HStack alignment="left" spacing={ 0 }>
 			{ imageUrl && (
 				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
+					className={ clsx( 'fields-controls__author-avatar', {
 						'is-loaded': isImageLoaded,
 					} ) }
 				>
@@ -138,11 +138,11 @@ function AuthorField( { item } ) {
 				</div>
 			) }
 			{ ! imageUrl && (
-				<div className="page-templates-author-field__icon">
+				<div className="fields-controls__author-icon">
 					<Icon icon={ icon } />
 				</div>
 			) }
-			<span className="page-templates-author-field__name">{ text }</span>
+			<span className="fields-controls__author-name">{ text }</span>
 		</HStack>
 	);
 }

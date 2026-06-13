@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -33,10 +33,15 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -85,6 +90,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
+	help: 'Help text to describe the control.',
 	isBlock: true,
 	label: 'Label',
 };

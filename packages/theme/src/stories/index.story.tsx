@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	useEffect,
 	useState,
@@ -13,15 +6,10 @@ import {
 	useId,
 	createPortal,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { ThemeProvider } from '../theme-provider';
-import '../prebuilt/css/design-tokens.css';
 
 const meta: Meta< typeof ThemeProvider > = {
-	title: 'Design System/Theme Provider',
+	title: 'Design System/Theme/Theme Provider',
 	component: ThemeProvider,
 	args: {
 		isRoot: true,
@@ -35,7 +23,7 @@ const meta: Meta< typeof ThemeProvider > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-private' ],
 };
 export default meta;
 
@@ -131,8 +119,12 @@ const DSTokensList = () => {
 	}, [] );
 
 	return (
-		<div style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
-			<h1>DS Color tokens</h1>
+		<div
+			style={ {
+				color: 'var( --wpds-color-foreground-content-neutral )',
+			} }
+		>
+			<h1>Design System Color tokens</h1>
 			<h2>Semantic tokens (can be consumed directly)</h2>
 			<ColorTokenTable tokens={ props.semanticProps } />
 			<h2>Legacy tokens (should not be consumed directly)</h2>
@@ -169,8 +161,8 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 							top: 0,
 							right: 0,
 							backgroundColor:
-								'var(--wpds-color-bg-surface-neutral)',
-							color: 'var( --wpds-color-fg-content-neutral )',
+								'var(--wpds-color-background-surface-neutral)',
+							color: 'var( --wpds-color-foreground-content-neutral )',
 							padding: '0.5rem',
 							borderRadius: '0.5rem',
 							boxShadow: '0 0 0.5rem 0 rgba(0, 0, 0, 0.1)',
@@ -199,12 +191,12 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 	},
 };
 
-const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+const NestingDebug = ( { background = '', primary = '' } ) => (
 	<div
 		style={ {
-			padding: 'var(--wpds-dimension-padding-surface-sm)',
-			color: 'var(--wpds-color-fg-content-neutral)',
-			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
+			padding: 'var(--wpds-dimension-padding-lg)',
+			color: 'var(--wpds-color-foreground-content-neutral)',
+			backgroundColor: 'var(--wpds-color-background-surface-neutral)',
 			display: 'flex',
 			alignItems: 'center',
 			flexWrap: 'wrap',
@@ -212,16 +204,16 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 		} }
 	>
 		<pre style={ { margin: 0 } }>
-			bg: { bg } | primary: { primary } | density: { density }
+			background: { background } | primary: { primary }
 		</pre>
 		<span
 			style={ {
 				display: 'inline-block',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
-					'var(--wpds-color-bg-interactive-brand-strong)',
-				color: 'var(--wpds-color-fg-interactive-brand-strong)',
+					'var(--wpds-color-background-interactive-brand-strong)',
+				color: 'var(--wpds-color-foreground-interactive-brand-strong)',
 			} }
 		>
 			primary
@@ -230,11 +222,11 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 			style={ {
 				display: 'inline-block',
 				marginInlineStart: '0.25rem',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
-					'var(--wpds-color-bg-interactive-brand-weak-disabled)',
-				color: 'var(--wpds-color-fg-content-neutral)',
+					'var(--wpds-color-background-interactive-neutral-weak-disabled)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			Neutral
@@ -247,38 +239,32 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 		return (
 			<ThemeProvider>
 				<NestingDebug
-					bg="inherit (root)"
+					background="inherit (root)"
 					primary="inherit (root)"
-					density="inherit (root)"
 				/>
 				<div style={ { paddingInlineStart: '1rem' } }>
 					<ThemeProvider
 						color={ {
-							bg: '#1e1e1e',
+							background: '#1e1e1e',
 						} }
-						density="compact"
 					>
 						<NestingDebug
-							bg="#1e1e1e"
+							background="#1e1e1e"
 							primary="inherit (root)"
-							density="compact"
 						/>
 						<div style={ { paddingInlineStart: '1rem' } }>
 							<ThemeProvider>
 								<NestingDebug
-									bg="inherit (#1e1e1e)"
+									background="inherit (#1e1e1e)"
 									primary="inherit (root)"
-									density="inherit (compact)"
 								/>
 								<div style={ { paddingInlineStart: '1rem' } }>
 									<ThemeProvider
 										color={ { primary: 'hotpink' } }
-										density="default"
 									>
 										<NestingDebug
-											bg="inherit (#1e1e1e)"
+											background="inherit (#1e1e1e)"
 											primary="hotpink"
-											density="default"
 										/>
 										<div
 											style={ {
@@ -286,12 +272,13 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
 											} }
 										>
 											<ThemeProvider
-												color={ { bg: '#f8f8f8' } }
+												color={ {
+													background: '#f8f8f8',
+												} }
 											>
 												<NestingDebug
-													bg="#f8f8f8"
+													background="#f8f8f8"
 													primary="inherit (hotpink)"
-													density="inherit (default)"
 												/>
 											</ThemeProvider>
 										</div>
@@ -387,7 +374,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 				<IframeWithClonedTokenStyles>
 					<div
 						style={ {
-							color: 'var(--wpds-color-fg-content-neutral)',
+							color: 'var(--wpds-color-foreground-content-neutral)',
 						} }
 					>
 						In the iframe, but outside of `ThemeProvider`
@@ -406,16 +393,20 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 	},
 	args: {
 		children: (
-			<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } }>
+			<div
+				style={ {
+					color: 'var(--wpds-color-foreground-content-neutral)',
+				} }
+			>
 				Code is poetry.{ ' ' }
 				<span
 					style={ {
 						display: 'inline-block',
-						padding: 'var(--wpds-dimension-padding-surface-xs)',
+						padding: 'var(--wpds-dimension-padding-sm)',
 						borderRadius: '0.25rem',
 						backgroundColor:
-							'var(--wpds-color-bg-interactive-brand-strong)',
-						color: 'var(--wpds-color-fg-interactive-brand-strong)',
+							'var(--wpds-color-background-interactive-brand-strong)',
+						color: 'var(--wpds-color-foreground-interactive-brand-strong)',
 					} }
 				>
 					primary

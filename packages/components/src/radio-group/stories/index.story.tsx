@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -16,7 +16,7 @@ import { RadioGroup } from '..';
 import { Radio } from '../radio';
 
 const meta: Meta< typeof RadioGroup > = {
-	title: 'Components (Deprecated)/RadioGroup',
+	title: 'Components/Deprecated/RadioGroup',
 	id: 'components-radiogroup',
 	component: RadioGroup,
 	subcomponents: { Radio },

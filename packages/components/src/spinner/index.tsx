@@ -59,4 +59,5 @@ export function UnforwardedSpinner(
  * ```
  */
 export const Spinner = forwardRef( UnforwardedSpinner );
+Spinner.displayName = 'Spinner';
 export default Spinner;

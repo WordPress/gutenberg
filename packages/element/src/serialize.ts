@@ -46,7 +46,7 @@ import {
 import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
 
-/** @typedef {import('react').ReactElement} ReactElement */
+/** @typedef {React.ReactElement} ReactElement */
 
 const Context = createContext( undefined );
 Context.displayName = 'ElementContext';

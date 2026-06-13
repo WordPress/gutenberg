@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -31,6 +31,11 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 		docs: {
 			source: { excludeDecorators: true },
 		},
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`. Continue using `CustomSelectControl` (v1) for now.',
+		},
 	},
 	decorators: [
 		( Story ) => (
@@ -50,11 +55,11 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 export default meta;
 
 const Template: StoryFn< typeof CustomSelectControlV2 > = ( props ) => {
-	const [ value, setValue ] = useState< string | string[] >();
+	const [ value, setValue ] = useState< string | readonly string[] >();
 	return (
 		<CustomSelectControlV2
 			{ ...props }
-			onChange={ ( nextValue: string | string[] ) => {
+			onChange={ ( nextValue ) => {
 				setValue( nextValue );
 				props.onChange?.( nextValue );
 			} }
@@ -109,7 +114,7 @@ MultipleSelection.args = {
 	),
 };
 
-const renderItem = ( gravatar: string | string[] ) => {
+const renderItem = ( gravatar: string | readonly string[] ) => {
 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 	return (
 		<div style={ { display: 'flex', alignItems: 'center' } }>

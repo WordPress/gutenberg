@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/server-side-render",
-	"version": "6.13.0",
+	"version": "6.24.0",
 	"description": "The component used with WordPress to server-side render a preview of dynamic blocks to display in the editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,15 +34,17 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"wpScriptDefaultExport": true,
+	"types": "build-types/index.d.ts",
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import isURLLike from '../is-url-like';
+import isURLLike, { isHashLink, isRelativePath } from '../is-url-like';
 
 describe( 'isURLLike', () => {
 	it.each( [ 'https://wordpress.org', 'http://wordpress.org' ] )(
@@ -41,6 +41,13 @@ describe( 'isURLLike', () => {
 		expect( isURLLike( '#someinternallink' ) ).toBe( true );
 	} );
 
+	it.each( [ '/handbook', '/path/to/page', './relative', '../parent' ] )(
+		'returns true for relative paths (e.g. "%s")',
+		( testString ) => {
+			expect( isURLLike( testString ) ).toBe( true );
+		}
+	);
+
 	// use .each to test multiple cases
 	it.each( [
 		[ true, 'http://example.com' ],
@@ -63,4 +70,45 @@ describe( 'isURLLike', () => {
 			expect( isURLLike( testString ) ).toBe( expected );
 		}
 	);
+} );
+
+describe( 'isHashLink', () => {
+	it( 'returns true for valid hash links', () => {
+		expect( isHashLink( '#section' ) ).toBe( true );
+		expect( isHashLink( '#top' ) ).toBe( true );
+	} );
+
+	it( 'returns false for invalid links that start with #', () => {
+		expect( isHashLink( '# test with space' ) ).toBe( false );
+		expect( isHashLink( '#test#multiple' ) ).toBe( false );
+	} );
+
+	it( 'returns false for non-hash links', () => {
+		expect( isHashLink( '/page' ) ).toBe( false );
+		expect( isHashLink( 'https://example.com' ) ).toBe( false );
+		expect( isHashLink( 'not a link' ) ).toBe( false );
+	} );
+} );
+
+describe( 'isRelativePath', () => {
+	it( 'returns true for absolute paths starting with /', () => {
+		expect( isRelativePath( '/handbook' ) ).toBe( true );
+		expect( isRelativePath( '/path/to/page' ) ).toBe( true );
+	} );
+
+	it( 'returns true for relative paths starting with ./', () => {
+		expect( isRelativePath( './page' ) ).toBe( true );
+		expect( isRelativePath( './nested/page' ) ).toBe( true );
+	} );
+
+	it( 'returns true for parent relative paths starting with ../', () => {
+		expect( isRelativePath( '../page' ) ).toBe( true );
+		expect( isRelativePath( '../parent/page' ) ).toBe( true );
+	} );
+
+	it( 'returns false for non-relative paths', () => {
+		expect( isRelativePath( 'https://example.com' ) ).toBe( false );
+		expect( isRelativePath( '#section' ) ).toBe( false );
+		expect( isRelativePath( 'www.example.com' ) ).toBe( false );
+	} );
 } );

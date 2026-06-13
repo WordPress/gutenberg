@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -13,8 +13,13 @@ import { useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import DataViews from '../index';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../constants';
-import type { Action, View } from '../../types';
+import {
+	LAYOUT_ACTIVITY,
+	LAYOUT_GRID,
+	LAYOUT_LIST,
+	LAYOUT_TABLE,
+} from '../../constants';
+import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
@@ -33,10 +38,11 @@ const DEFAULT_VIEW = {
 	filters: [],
 };
 
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {},
-	[ LAYOUT_GRID ]: {},
-	[ LAYOUT_LIST ]: {},
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_TABLE ]: true,
+	[ LAYOUT_GRID ]: true,
+	[ LAYOUT_LIST ]: true,
+	[ LAYOUT_ACTIVITY ]: true,
 };
 
 const fields = [
@@ -147,6 +153,10 @@ function DataViewWrapper( {
 // jest.useFakeTimers();
 
 // Tests run against a DataView which is 500px wide.
+const mockUseViewportMatch = jest.fn(
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	( _viewport: string, _operator: string ) => false
+);
 jest.mock( '@wordpress/compose', () => {
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
@@ -160,6 +170,8 @@ jest.mock( '@wordpress/compose', () => {
 			}, 0 );
 			return () => {};
 		} ),
+		useViewportMatch: ( viewport: string, operator: string ): boolean =>
+			mockUseViewportMatch( viewport, operator ),
 	};
 } );
 
@@ -226,6 +238,59 @@ describe( 'DataViews component', () => {
 			/>
 		);
 		expect( screen.getByText( 'TEST TITLE' ) ).toBeInTheDocument();
+	} );
+
+	it( 'should trigger infinite scroll when the layout container scrolls', async () => {
+		const onChangeView = jest.fn();
+
+		if ( typeof global.IntersectionObserver === 'undefined' ) {
+			( global as any ).IntersectionObserver = jest.fn( () => ( {
+				observe: jest.fn(),
+				unobserve: jest.fn(),
+				disconnect: jest.fn(),
+			} ) );
+		}
+
+		const { container } = render(
+			<DataViewWrapper
+				view={ {
+					type: LAYOUT_GRID,
+					infiniteScrollEnabled: true,
+					perPage: 1,
+				} }
+				onChangeView={ onChangeView }
+			/>
+		);
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const layoutContainer = container.querySelector(
+			'.dataviews-layout__container'
+		) as HTMLDivElement;
+
+		Object.defineProperties( layoutContainer, {
+			scrollTop: {
+				configurable: true,
+				value: 500,
+			},
+			scrollHeight: {
+				configurable: true,
+				value: 1000,
+			},
+			clientHeight: {
+				configurable: true,
+				value: 500,
+			},
+		} );
+
+		fireEvent.scroll( layoutContainer );
+
+		await waitFor( () => {
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					infiniteScrollEnabled: true,
+					startPosition: 2,
+				} )
+			);
+		} );
 	} );
 
 	describe( 'in table view', () => {
@@ -617,6 +682,126 @@ describe( 'DataViews component', () => {
 			expect(
 				screen.getAllByRole( 'button', { name: 'Actions' } ).length
 			).toEqual( 3 );
+		} );
+	} );
+
+	describe( 'actions on mobile viewport', () => {
+		const testActions: Action< Data >[] = [
+			{
+				id: 'edit',
+				label: 'Edit',
+				isPrimary: true,
+				callback: () => {},
+			},
+		];
+
+		beforeEach( () => {
+			// Simulate mobile viewport
+			mockUseViewportMatch.mockImplementation(
+				( viewport: string, operator: string ) =>
+					viewport === 'medium' && operator === '<'
+			);
+		} );
+
+		afterEach( () => {
+			mockUseViewportMatch.mockImplementation( () => false );
+		} );
+
+		it( 'should show actions dropdown on mobile even when there is only one action in table layout', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: LAYOUT_TABLE,
+					} }
+					actions={ testActions }
+				/>
+			);
+			// On mobile, the dropdown should be visible even with only primary actions
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+			).toEqual( 3 );
+		} );
+
+		it( 'should show actions dropdown on mobile even when there is only one action in activity layout', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: LAYOUT_ACTIVITY,
+					} }
+					actions={ testActions }
+				/>
+			);
+			// On mobile, the dropdown should be visible even with only primary actions
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+			).toEqual( 3 );
+		} );
+	} );
+	describe( 'Default layouts', () => {
+		/**
+		 * A minimal wrapper that intentionally omits the `defaultLayouts` prop so
+		 * DataViews falls back to its internal DEFAULT_LAYOUTS constant
+		 * ({ table: true, grid: true, list: true }).
+		 */
+		function DataViewWrapperWithoutDefaultLayouts() {
+			const [ view, setView ] = useState< View >( {
+				...DEFAULT_VIEW,
+				fields: [ 'title', 'order', 'author' ],
+			} );
+
+			const { data: shownData, paginationInfo } = useMemo( () => {
+				return filterSortAndPaginate( data, view, fields );
+			}, [ view ] );
+
+			return (
+				<DataViews
+					getItemId={ ( item: Data ) => item.id.toString() }
+					paginationInfo={ paginationInfo }
+					data={ shownData }
+					view={ view }
+					fields={ fields }
+					onChangeView={ setView }
+					// No `defaultLayouts` prop — falls back to DEFAULT_LAYOUTS
+				/>
+			);
+		}
+
+		it( 'renders Table, Grid, and List layout options when defaultLayouts is not provided', async () => {
+			render( <DataViewWrapperWithoutDefaultLayouts /> );
+
+			const user = userEvent.setup();
+
+			// All three default layouts are available, so the Layout switcher
+			// button (rendered by ViewTypeMenu) must be present.
+			const layoutButton = screen.getByRole( 'button', {
+				name: 'Layout',
+			} );
+			expect( layoutButton ).toBeInTheDocument();
+
+			// Open the layout menu.
+			await user.click( layoutButton );
+
+			// Table, Grid, and List options must all appear.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).toBeInTheDocument();
+
+			// Table is the default active layout.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).not.toBeChecked();
 		} );
 	} );
 } );

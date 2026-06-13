@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "11.4.0",
+	"version": "14.0.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,12 +40,13 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
-		"@wordpress/primitives": "file:../primitives"
+		"@wordpress/primitives": "file:../primitives",
+		"change-case": "^4.1.2"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"
@@ -54,8 +55,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"prelint": "npm run build",
+		"prelint:js": "npm run build",
 		"prepare": "npm run build",
-		"build": "node lib/generate-library.cjs"
+		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs"
 	}
 }

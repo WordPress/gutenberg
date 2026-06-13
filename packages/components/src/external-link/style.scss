@@ -1,12 +1,44 @@
 .components-external-link {
+	color: var(--wpds-color-foreground-interactive-brand);
 	text-decoration: none;
+
+	// Match the `outset-ring--focus` utility used by `Link` in `@wordpress/ui`.
+	@media not ( prefers-reduced-motion ) {
+		transition: outline 0.1s ease-out;
+	}
+	// Outline width must be kept at 0 even with a transparent color,
+	// or else the outline will be visible in forced-colors mode.
+	outline: 0 solid transparent;
+	outline-offset: 1px;
+
+	&:visited {
+		color: var(--wpds-color-foreground-interactive-brand);
+	}
+
+	&:hover,
+	&:active {
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+
+	&:focus {
+		outline:
+			var(--wpds-border-width-focus) solid
+			var(--wpds-color-stroke-focus);
+		// Override style from wp-admin common.css.
+		box-shadow: none;
+		border-radius: 0;
+	}
 }
 
 .components-external-link__contents {
 	text-decoration: underline;
+	text-underline-offset: 0.2em;
+	text-decoration-thickness: from-font;
 }
 
 .components-external-link__icon {
-	margin-left: 0.5ch;
-	font-weight: 400;
+	line-height: 1;
+	display: inline-block;
+	margin-inline-start: var(--wpds-dimension-padding-xs);
+	font-weight: var(--wpds-typography-font-weight-regular);
 }

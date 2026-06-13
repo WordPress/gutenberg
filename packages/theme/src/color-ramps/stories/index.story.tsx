@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
@@ -19,7 +12,7 @@ const ColorGen = ( props: {
 };
 
 const meta: Meta< typeof ColorGen > = {
-	title: 'Design System/Theme Provider/Color Scales',
+	title: 'Design System/Theme/Theme Provider/Color Scales',
 	component: ColorGen,
 	argTypes: {
 		background: {
@@ -36,13 +29,12 @@ const meta: Meta< typeof ColorGen > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 
 export const Default: StoryObj< typeof ColorGen > = {
 	render: ( args ) => {
-		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
+		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.background;
 		const primarySeed = args.primary ?? DEFAULT_SEED_COLORS.primary;
 		const bgRamp = buildBgRamp( bgSeed );
 

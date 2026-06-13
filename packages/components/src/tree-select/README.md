@@ -118,7 +118,7 @@ If this property is added, an option will be added with this label to represent 
 
 ### `onChange`
 
- - Type: `(value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void`
+ - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void) | undefined`
  - Required: No
 
 A function that receives the value of the new option that is being selected as input.

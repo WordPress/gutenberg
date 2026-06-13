@@ -35,7 +35,10 @@ export const settings = {
 	__experimentalLabel( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
-		if ( context === 'list-view' && customName ) {
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
 			return customName;
 		}
 
@@ -72,41 +75,73 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'image',
 			label: __( 'Image' ),
 			type: 'media',
-			mapping: {
-				id: 'id',
-				url: 'url',
-				caption: 'caption',
-				alt: 'alt',
-			},
-			args: {
+			Edit: {
+				control: 'media', // TODO: replace with custom component
 				allowedTypes: [ 'image' ],
 				multiple: false,
 			},
+			getValue: ( { item } ) => ( {
+				id: item.id,
+				url: item.url,
+				alt: item.alt,
+				caption: item.caption,
+			} ),
+			setValue: ( { value } ) => ( {
+				id: value.id,
+				url: value.url,
+				alt: value.alt,
+				caption: value.caption,
+			} ),
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				url: 'href',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
-				destination: 'linkDestination',
-			},
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
+			getValue: ( { item } ) => ( {
+				url: item.href,
+				rel: item.rel,
+				linkTarget: item.linkTarget,
+			} ),
+			setValue: ( { value } ) => ( {
+				href: value.url,
+				rel: value.rel,
+				linkTarget: value.linkTarget,
+			} ),
+			isVisible: ( item ) => ! item.isDecorative,
 		},
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
+			isVisible: ( item ) => ! item.isDecorative,
 		},
 		{
 			id: 'alt',
 			label: __( 'Alt text' ),
 			type: 'text',
+			isVisible: ( item ) => ! item.isDecorative,
+		},
+		{
+			id: 'isDecorative',
+			label: __( 'Mark as decorative' ),
+			type: 'boolean',
+			setValue: ( { value } ) => ( {
+				isDecorative: value || undefined,
+				...( value && {
+					alt: '',
+					caption: undefined,
+					href: undefined,
+					linkDestination: undefined,
+					linkTarget: undefined,
+					rel: undefined,
+				} ),
+			} ),
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'image', 'link', 'caption', 'alt' ],
+		fields: [ 'image', 'link', 'caption', 'alt', 'isDecorative' ],
 	};
 }
 

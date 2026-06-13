@@ -87,24 +87,15 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
- * Handle special case dependencies for wp-block-library that depend on runtime conditions.
- *
- * This adds the 'editor' dependency conditionally based on experiments and classic block requirements.
- * All other script registrations are handled by the auto-generated build/scripts.php file.
+ * Adds the 'editor' dependency to wp-block-library, required by the Classic block.
  *
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_block_library_script_special_case( $scripts ) {
 	$handle = 'wp-block-library';
 	$script = $scripts->query( $handle, 'registered' );
-	if (
-		! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
-		! empty( $_GET['requiresTinymce'] ) ||
-		gutenberg_post_being_edited_requires_classic_block()
-	) {
-		if ( ! in_array( 'editor', $script->deps, true ) ) {
-			$script->deps[] = 'editor';
-		}
+	if ( ! in_array( 'editor', $script->deps, true ) ) {
+		$script->deps[] = 'editor';
 	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_block_library_script_special_case', 11 );
@@ -283,7 +274,7 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
  *
  * @since 6.1
  *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+ * @link https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
  *
  * @param array $options {
  *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
@@ -367,31 +358,39 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_vendor_scripts( $scripts ) {
-	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
-	gutenberg_override_script(
-		$scripts,
-		'react',
-		gutenberg_url( 'build/scripts/vendors/react' . $extension ),
-		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
-		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' ),
-		'18'
-	);
-	gutenberg_override_script(
-		$scripts,
-		'react-dom',
-		gutenberg_url( 'build/scripts/vendors/react-dom' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	// When the React 19 experiment is enabled, register React 19 vendor
+	// scripts under the `react`, `react-dom`, and `react-jsx-runtime` handles.
+	$use_react_19 = gutenberg_is_experiment_enabled( 'gutenberg-react-19' );
 
-	gutenberg_override_script(
-		$scripts,
-		'react-jsx-runtime',
-		gutenberg_url( 'build/scripts/vendors/react-jsx-runtime' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
+
+	foreach ( $vendor_handles as $handle ) {
+		$source       = $use_react_19 ? $handle . '-19' : $handle;
+		$asset_file   = $vendors_dir . $source . '.min.asset.php';
+		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
+		$dependencies = $asset['dependencies'] ?? array();
+		$version      = $asset['version'] ?? '0';
+
+		gutenberg_override_script(
+			$scripts,
+			$handle,
+			gutenberg_url( 'build/scripts/vendors/' . $source . $extension ),
+			$dependencies,
+			$version
+		);
+	}
+
+	// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry`
+	// as a dependency to `react` when `SCRIPT_DEBUG` is true. Preserve that here.
+	if ( SCRIPT_DEBUG ) {
+		$react = $scripts->query( 'react', 'registered' );
+		if ( $react && ! in_array( 'wp-react-refresh-entry', $react->deps, true ) ) {
+			$react->deps[] = 'wp-react-refresh-entry';
+		}
+	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
@@ -436,6 +435,20 @@ add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
+}
+
+/**
+ * Enqueue the vips loader script module in the block editor.
+ *
+ * This registers @wordpress/vips/worker as a dynamic dependency in the import map,
+ * enabling on-demand loading of the ~3.8MB WASM-based image processing module
+ * when client-side media processing is triggered via @wordpress/upload-media.
+ *
+ * @see packages/vips/src/loader.ts
+ */
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
+function gutenberg_enqueue_vips_loader() {
+	wp_enqueue_script_module( '@wordpress/vips/loader' );
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );

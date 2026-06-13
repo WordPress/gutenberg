@@ -470,6 +470,7 @@ _Properties_
 
 -   _id_ `string`: Unique identifier for the item.
 -   _name_ `string`: The type of block to create.
+-   _variationName_ `?string`: The target block variation name.
 -   _title_ `string`: Title of the item, as it appears in the inserter.
 -   _icon_ `string`: Dashicon for the item, as it appears in the inserter.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
@@ -1313,6 +1314,7 @@ _Parameters_
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+-   _initialPosition_ `0|-1|null`: Initial focus position. Setting it to null prevent focusing the inserted block.
 -   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_

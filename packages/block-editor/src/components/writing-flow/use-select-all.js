@@ -10,6 +10,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { isInsideRootBlock, getBlockClientId } from '../../utils/dom';
 
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
@@ -34,7 +35,27 @@ export default function useSelectAll() {
 
 			event.preventDefault();
 
+			const { ownerDocument } = event.target;
 			const [ firstSelectedClientId ] = selectedClientIds;
+			const activeClientId = getBlockClientId(
+				ownerDocument.activeElement
+			);
+
+			// Handle the case when an appender is selected.
+			if (
+				activeClientId &&
+				activeClientId !== firstSelectedClientId &&
+				! isInsideRootBlock(
+					ownerDocument.getElementById(
+						'block-' + firstSelectedClientId
+					),
+					ownerDocument.activeElement
+				)
+			) {
+				selectBlock( activeClientId );
+				return;
+			}
+
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );
 			const blockClientIds = getBlockOrder( rootClientId );
 

@@ -58,4 +58,5 @@ function UnforwardedToolbarItem(
 }
 
 export const ToolbarItem = forwardRef( UnforwardedToolbarItem );
+ToolbarItem.displayName = 'ToolbarItem';
 export default ToolbarItem;

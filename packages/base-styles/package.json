@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/base-styles",
-	"version": "6.13.0",
+	"version": "10.0.0",
 	"description": "Base SCSS utilities and variables for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -33,7 +33,6 @@
 		"./animations": "./_animations.scss",
 		"./breakpoints": "./_breakpoints.scss",
 		"./colors": "./_colors.scss",
-		"./colors.native": "./_colors.native.scss",
 		"./default-custom-properties": "./_default-custom-properties.scss",
 		"./functions": "./_functions.scss",
 		"./long-content-fade": "./_long-content-fade.scss",

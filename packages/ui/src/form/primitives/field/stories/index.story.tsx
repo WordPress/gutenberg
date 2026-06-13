@@ -1,17 +1,24 @@
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
-import '@wordpress/theme/design-tokens.css';
-import { Field } from '../../../..';
+import * as Field from '../';
+import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {
 	title: 'Design System/Components/Form/Primitives/Field',
 	component: Field.Root,
 	subcomponents: {
-		Item: Field.Item,
-		Label: Field.Label,
-		Control: Field.Control,
-		Description: Field.Description,
-		Details: Field.Details,
+		'Field.Item': Field.Item,
+		'Field.Label': Field.Label,
+		'Field.Control': Field.Control,
+		'Field.Description': Field.Description,
+		'Field.Details': Field.Details,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+		},
 	},
 };
 export default meta;
@@ -102,6 +109,23 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
 };
 
 /**
+ * When `hideFromVision` is set on `Field.Label`, the label is visually
+ * hidden but remains accessible to screen readers.
+ */
+export const HiddenLabel: StoryObj< typeof Field.Root > = {
+	args: {
+		children: (
+			<>
+				<Field.Label hideFromVision>Label</Field.Label>
+				<Field.Control
+					render={ <input type="text" placeholder="Placeholder" /> }
+				/>
+			</>
+		),
+	},
+};
+
+/**
  * To add rich content (such as links) to the description, use `Field.Details`.
  *
  * Although this content is not associated with the field using direct semantics,
@@ -119,13 +143,7 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
 				<Field.Control
 					render={ <input type="text" placeholder="Placeholder" /> }
 				/>
-				<Field.Details>
-					Details can include{ '	' }
-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
-						links to more information
-					</a>{ ' ' }
-					and other semantic elements.
-				</Field.Details>
+				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
 			</>
 		),
 	},

@@ -1,13 +1,8 @@
-/**
- * External dependencies
- */
-import type { StoryContext } from 'storybook/internal/types';
-
-/**
- * WordPress dependencies
- */
+import type { CornerRadiusPreset } from '@wordpress/theme';
 import { privateApis as themeApis } from '@wordpress/theme';
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import type { StoryContext } from 'storybook/internal/types';
+import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
 
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
@@ -27,24 +22,62 @@ export function WithDesignSystemTheme(
 	Story: React.ComponentType< any >,
 	context: StoryContext
 ) {
-	const isDesignSystemComponentsStory = context.id?.startsWith(
-		'design-system-components-'
+	const shouldApplyDesignSystemTheme = storyIdMatchesDesignSystemTheme(
+		context.id
 	);
-	if ( ! isDesignSystemComponentsStory ) {
+	if ( ! shouldApplyDesignSystemTheme ) {
 		return <Story { ...context } />;
 	}
 
 	const colorTheme = context.globals.dsColorTheme;
-	const density = context.globals.dsDensity;
+	const cursorControl = context.globals.dsCursorControl || undefined;
+	const cornerRadiusPreset =
+		( context.globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
 
 	let color;
 	if ( colorTheme === 'dark' ) {
-		color = { bg: '#1e1e1e', primary: '#3858e9' };
+		color = { background: '#1e1e1e', primary: '#3858e9' };
 	}
 
 	return (
-		<ThemeProvider color={ color } density={ density } isRoot>
-			<Story { ...context } />
+		<ThemeProvider
+			color={ color }
+			cursor={ cursorControl ? { control: cursorControl } : undefined }
+			cornerRadius={ cornerRadiusPreset }
+			isRoot
+		>
+			<div
+				style={
+					color?.background
+						? {
+								background:
+									'var(--wpds-color-background-surface-neutral-strong)',
+								padding:
+									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
+								outline:
+									'1px dashed var(--wpds-color-stroke-surface-neutral)',
+								outlineOffset: '2px',
+						  }
+						: undefined
+				}
+			>
+				<Story { ...context } />
+				{ color?.background && (
+					<small
+						style={ {
+							display: 'block',
+							opacity: 0.5,
+							marginTop: 'var(--wpds-dimension-gap-md)',
+							fontSize: 'var(--wpds-typography-font-size-xs)',
+							color: 'var(--wpds-color-foreground-content-neutral-weak)',
+							textTransform: 'uppercase',
+							textAlign: 'end',
+						} }
+					>
+						Themed background
+					</small>
+				) }
+			</div>
 		</ThemeProvider>
 	);
 }

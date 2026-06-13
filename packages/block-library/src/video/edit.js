@@ -27,6 +27,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -110,9 +111,10 @@ function VideoEdit( {
 
 	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
+			const url = prependHTTPS( newSrc );
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
-				attributes: { url: newSrc },
+				attributes: { url },
 			} );
 			if ( undefined !== embedBlock && onReplace ) {
 				onReplace( embedBlock );
@@ -120,7 +122,7 @@ function VideoEdit( {
 			}
 			setAttributes( {
 				blob: undefined,
-				src: newSrc,
+				src: url,
 				id: undefined,
 				poster: undefined,
 			} );

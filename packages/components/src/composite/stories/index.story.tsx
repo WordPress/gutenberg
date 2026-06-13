@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
@@ -46,6 +47,10 @@ const meta: Meta< typeof Composite > = {
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
+		},
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
 		},
 	},
 	decorators: [
@@ -235,7 +240,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 
 				// Render all context providers forwarded by the Slot via fillProps.
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup

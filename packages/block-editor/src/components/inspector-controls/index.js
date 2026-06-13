@@ -12,7 +12,7 @@ InspectorControls.Slot = InspectorControlsSlot;
 export const InspectorAdvancedControls = ( props ) => {
 	return <InspectorControlsFill { ...props } group="advanced" />;
 };
-InspectorAdvancedControls.Slot = ( props ) => {
+InspectorAdvancedControls.Slot = function Slot( props ) {
 	return <InspectorControlsSlot { ...props } group="advanced" />;
 };
 InspectorAdvancedControls.slotName = 'InspectorAdvancedControls';

@@ -1,6 +1,10 @@
 name: Storybook build and Smoke Tests
 
-on: pull_request
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
 
 # Cancels all previous workflow runs for pull requests that have not completed.
 concurrency:
@@ -23,7 +27,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -32,11 +36,22 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Build Storybook
+              env:
+                  NODE_OPTIONS: --max-old-space-size=8192
+                  NODE_ENV: test
               run: npm run storybook:build
+
+            - name: Validate manifest matches design-system-mcp contract
+              run: node packages/design-system-mcp/scripts/validate-manifest.mjs
+
+            - name: Build E2E Storybook
+              env:
+                  NODE_ENV: test
+              run: npm run storybook:e2e:build
 
             - name: Install test-runner and Playwright dependencies
               run: |
-                  npm install --no-save @storybook/test-runner@0.22.1
+                  npm install --no-save @storybook/test-runner@0.24.2
                   npx playwright install --with-deps
 
             - name: Serve Storybook and run tests

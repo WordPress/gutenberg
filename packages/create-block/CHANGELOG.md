@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+## 4.91.0 (2026-06-10)
+
+## 4.90.0 (2026-05-27)
+
+## 4.89.0 (2026-05-14)
+
+## 4.88.0 (2026-04-29)
+
+## 4.87.0 (2026-04-15)
+
+## 4.86.0 (2026-04-01)
+
+## 4.85.0 (2026-03-18)
+
+## 4.84.0 (2026-03-04)
+
+## 4.83.0 (2026-02-18)
+
+## 4.82.0 (2026-01-29)
+
+## 4.81.0 (2026-01-16)
+
 ### Bug Fixes
 
 -   Fixed scaffolded `package.json` dependencies to include WordPress packages used in default templates. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))

@@ -4,8 +4,8 @@
 import { Button, CheckboxControl } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
-import { __, sprintf, _n } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,6 +14,7 @@ import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
+import getFooterMessage from '../../utils/get-footer-message';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -31,14 +32,31 @@ function BulkSelectionCheckbox< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	disableSelectAll = false,
 }: {
 	selection: string[];
 	selectedItems: Item[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
+	disableSelectAll?: boolean;
 } ) {
+	const hasSelection = selection.length > 0;
 	const areAllSelected = selectedItems.length === data.length;
+
+	if ( disableSelectAll ) {
+		return (
+			<CheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				checked={ hasSelection }
+				disabled={ ! hasSelection }
+				onChange={ () => {
+					onChangeSelection( [] );
+				} }
+				aria-label={ __( 'Deselect all' ) }
+			/>
+		);
+	}
 
 	return (
 		<CheckboxControl
@@ -87,7 +105,7 @@ function ActionButtons< Item >( {
 	);
 
 	return (
-		<Stack direction="row" gap="2xs">
+		<Stack direction="row" gap="xs">
 			{ actions.map( ( action ) => {
 				// Only support actions with callbacks for DataViewsPicker.
 				// This is because many use cases of the picker will be already within modals.
@@ -134,27 +152,18 @@ export function DataViewsPickerFooter() {
 		onChangeSelection,
 		getItemId,
 		actions = EMPTY_ARRAY,
+		paginationInfo,
+		view,
 	} = useContext( DataViewsContext );
 
-	const selectionCount = selection.length;
 	const isMultiselect = useIsMultiselectPicker( actions );
 
-	const message =
-		selectionCount > 0
-			? sprintf(
-					/* translators: %d: number of items. */
-					_n(
-						'%d Item selected',
-						'%d Items selected',
-						selectionCount
-					),
-					selectionCount
-			  )
-			: sprintf(
-					/* translators: %d: number of items. */
-					_n( '%d Item', '%d Items', data.length ),
-					data.length
-			  );
+	const message = getFooterMessage(
+		selection.length,
+		data.length,
+		paginationInfo.totalItems,
+		!! view.infiniteScrollEnabled
+	);
 
 	const selectedItems = useMemo(
 		() =>
@@ -168,12 +177,12 @@ export function DataViewsPickerFooter() {
 			justify="space-between"
 			align="center"
 			className="dataviews-footer"
-			gap="xs"
+			gap="sm"
 		>
 			<Stack
 				direction="row"
 				className="dataviews-picker-footer__bulk-selection"
-				gap="sm"
+				gap="md"
 				align="center"
 			>
 				{ isMultiselect && (
@@ -183,6 +192,7 @@ export function DataViewsPickerFooter() {
 						onChangeSelection={ onChangeSelection }
 						data={ data }
 						getItemId={ getItemId }
+						disableSelectAll={ !! view.infiniteScrollEnabled }
 					/>
 				) }
 				<span className="dataviews-bulk-actions-footer__item-count">
