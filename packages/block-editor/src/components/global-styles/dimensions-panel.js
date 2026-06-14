@@ -32,7 +32,6 @@ import { setImmutably } from '../../utils/object';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	hasPseudoBlockStyleState,
-	isDefaultBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 
@@ -95,7 +94,7 @@ function hasWidth( settings ) {
 
 function hasAspectRatio( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
 	return (
-		isDefaultBlockStyleState( styleState ) &&
+		! hasPseudoBlockStyleState( styleState ) &&
 		settings?.dimensions?.aspectRatio
 	);
 }

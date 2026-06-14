@@ -13,18 +13,18 @@
 			background: transparent;
 			border: none;
 			outline: none;
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 			font-family: inherit;
 			font-size: inherit;
 			line-height: inherit;
 
 			&::placeholder {
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 			}
 
 			&:disabled,
 			&[aria-disabled="true"] {
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
