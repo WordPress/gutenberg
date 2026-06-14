@@ -48,25 +48,25 @@ const WORLDS: {
 		value: 'earth',
 		label: 'World',
 		emoji: '🌍',
-		background: 'var(--wpds-color-bg-surface-info-weak)',
+		background: 'var(--wpds-color-background-surface-info-weak)',
 	},
 	{
 		value: 'moon',
 		label: 'Moon',
 		emoji: '🌕',
-		background: 'var(--wpds-color-bg-surface-neutral)',
+		background: 'var(--wpds-color-background-surface-neutral)',
 	},
 	{
 		value: 'mars',
 		label: 'Mars',
 		emoji: '🔴',
-		background: 'var(--wpds-color-bg-surface-caution-weak)',
+		background: 'var(--wpds-color-background-surface-caution-weak)',
 	},
 	{
 		value: 'saturn',
 		label: 'Saturn',
 		emoji: '🪐',
-		background: 'var(--wpds-color-bg-surface-warning-weak)',
+		background: 'var(--wpds-color-background-surface-warning-weak)',
 	},
 ];
 
@@ -87,7 +87,7 @@ function DemoWidget( {
 				background: current.background,
 				border: '1px solid var(--wpds-color-stroke-surface-neutral)',
 				borderRadius: 'var(--wpds-border-radius-md)',
-				color: 'var(--wpds-color-fg-content-neutral)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 				display: 'grid',
 				gap: 'var(--wpds-dimension-gap-md)',
 				justifyItems: 'center',
@@ -308,10 +308,10 @@ function WidgetInHostChrome() {
 				// Striped background to tell the chrome apart from the render.
 				background: `repeating-linear-gradient(
 					45deg,
-					var(--wpds-color-bg-surface-neutral),
-					var(--wpds-color-bg-surface-neutral) 8px,
-					var(--wpds-color-bg-surface-neutral-weak) 8px,
-					var(--wpds-color-bg-surface-neutral-weak) 16px
+					var(--wpds-color-background-surface-neutral),
+					var(--wpds-color-background-surface-neutral) 8px,
+					var(--wpds-color-background-surface-neutral-weak) 8px,
+					var(--wpds-color-background-surface-neutral-weak) 16px
 				)`,
 				maxWidth: 480,
 			} }
