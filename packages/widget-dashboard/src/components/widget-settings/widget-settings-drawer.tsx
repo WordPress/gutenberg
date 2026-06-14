@@ -15,7 +15,7 @@ import { Button, Drawer } from '@wordpress/ui';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import { getWidgetSettingsTitle } from './utils';
-import styles from './widget-settings.module.css';
+import styles from './widget-settings-drawer.module.css';
 
 type WidgetAttributes = Record< string, unknown >;
 
@@ -42,7 +42,7 @@ type WidgetAttributes = Record< string, unknown >;
  *
  * @return {React.ReactNode} The settings drawer.
  */
-export function WidgetSettings(): React.ReactNode {
+export function WidgetSettingsDrawer(): React.ReactNode {
 	const {
 		layout,
 		onLayoutChange,

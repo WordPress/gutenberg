@@ -8,7 +8,7 @@ import { Commands } from './components/commands';
 import { Inserter } from './components/inserter';
 import { LayoutSettingsDrawer } from './components/layout-settings-drawer';
 import { WidgetChrome } from './components/widget-chrome';
-import { WidgetSettings } from './components/widget-settings';
+import { WidgetSettingsDrawer } from './components/widget-settings';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
 import { NoWidgetsState } from './components/no-widgets-state';
@@ -91,7 +91,7 @@ export const WidgetDashboard = Object.assign(
 					) }
 
 					<Inserter />
-					<WidgetSettings />
+					<WidgetSettingsDrawer />
 				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
 		);

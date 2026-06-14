@@ -26,7 +26,7 @@ interface DashboardUIContextValue {
 	/**
 	 * `uuid` of the instance whose settings drawer is open, or `null`
 	 * when no settings drawer is showing. The per-instance gear in the
-	 * chrome sets it; the single `WidgetSettings` drawer at the root reads
+	 * chrome sets it; the single `WidgetSettingsDrawer` at the root reads
 	 * it.
 	 */
 	settingsWidgetUuid: string | null;
