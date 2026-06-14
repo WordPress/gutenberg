@@ -208,6 +208,49 @@ describe( 'getStateStylesCSS', () => {
 			'.wp-block-test:hover { border-top-color: #0000ff !important; }\n.wp-block-test:hover { border-top-style: solid; }'
 		);
 	} );
+
+	it( 'adds important fallback dimensions when aspect ratio is set', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						aspectRatio: '16/9',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe(
+			'.wp-block-test { height: unset !important; min-height: unset !important; aspect-ratio: 16/9 !important; }'
+		);
+	} );
+
+	it( 'does not add fallback dimensions when aspect ratio is the default', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						aspectRatio: 'auto',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe( '.wp-block-test { aspect-ratio: auto !important; }' );
+	} );
+
+	it( 'adds important fallback aspect ratio when height is set', () => {
+		expect(
+			getStateStylesCSS(
+				{
+					dimensions: {
+						height: '20rem',
+					},
+				},
+				'.wp-block-test'
+			)
+		).toBe(
+			'.wp-block-test { height: 20rem !important; aspect-ratio: unset !important; }'
+		);
+	} );
 } );
 
 describe( 'getBlockStateStylesCSS', () => {
@@ -286,10 +329,24 @@ describe( 'getResponsiveStateCSSRules', () => {
 				},
 			},
 		} );
+
+		registerBlockType( 'test/state-image', {
+			apiVersion: 3,
+			title: 'State Image',
+			category: 'media',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				root: '.wp-block-test-state-image',
+				dimensions: '.wp-block-test-state-image img',
+			},
+		} );
 	} );
 
 	afterEach( () => {
 		unregisterBlockType( 'test/state-button' );
+		unregisterBlockType( 'test/state-image' );
 	} );
 
 	it( 'generates media-query scoped root styles for viewport states', () => {
@@ -322,6 +379,22 @@ describe( 'getResponsiveStateCSSRules', () => {
 			)
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 { width: 50% !important; }}',
+		] );
+	} );
+
+	it( 'outputs explicit fill object fit for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					mobile: {
+						dimensions: { objectFit: 'fill' },
+					},
+				},
+				'test/state-image',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 img { object-fit: fill !important; }}',
 		] );
 	} );
 

@@ -1,9 +1,9 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .components-notice {
-	--wp-components-notice-background-color: var(--wpds-color-bg-surface-info-weak);
+	--wp-components-notice-background-color: var(--wpds-color-background-surface-info-weak);
 	--wp-components-notice-border-color: var(--wpds-color-stroke-surface-info);
-	--wp-components-notice-text-color: var(--wpds-color-fg-content-info);
+	--wp-components-notice-text-color: var(--wpds-color-foreground-content-info);
 
 	box-sizing: border-box;
 	display: grid;
@@ -19,21 +19,21 @@
 	line-height: var(--wpds-typography-line-height-sm);
 
 	&.is-success {
-		--wp-components-notice-background-color: var(--wpds-color-bg-surface-success-weak);
+		--wp-components-notice-background-color: var(--wpds-color-background-surface-success-weak);
 		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-success);
-		--wp-components-notice-text-color: var(--wpds-color-fg-content-success);
+		--wp-components-notice-text-color: var(--wpds-color-foreground-content-success);
 	}
 
 	&.is-warning {
-		--wp-components-notice-background-color: var(--wpds-color-bg-surface-warning-weak);
+		--wp-components-notice-background-color: var(--wpds-color-background-surface-warning-weak);
 		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-warning);
-		--wp-components-notice-text-color: var(--wpds-color-fg-content-warning);
+		--wp-components-notice-text-color: var(--wpds-color-foreground-content-warning);
 	}
 
 	&.is-error {
-		--wp-components-notice-background-color: var(--wpds-color-bg-surface-error-weak);
+		--wp-components-notice-background-color: var(--wpds-color-background-surface-error-weak);
 		--wp-components-notice-border-color: var(--wpds-color-stroke-surface-error);
-		--wp-components-notice-text-color: var(--wpds-color-fg-content-error);
+		--wp-components-notice-text-color: var(--wpds-color-foreground-content-error);
 	}
 }
 
@@ -65,13 +65,13 @@
 .components-notice__dismiss {
 	grid-column: 2;
 	grid-row: 1;
-	color: var(--wpds-color-fg-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	margin-inline-start: var(--wpds-dimension-gap-xs);
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: var(--wpds-color-fg-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 		background-color: transparent;
 	}
 

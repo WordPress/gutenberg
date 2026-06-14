@@ -7,13 +7,13 @@
 	border-color: inherit;
 	border-collapse: collapse;
 	position: relative;
-	color: var(--wpds-color-fg-content-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin-bottom: auto;
 	background-color: inherit;
 
 	th {
 		text-align: left;
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-foreground-content-neutral);
 		font-weight: normal;
 		font-size: var(--wpds-typography-font-size-md);
 	}
@@ -28,7 +28,7 @@
 		&.dataviews-view-table__actions-column--sticky {
 			position: sticky;
 			right: 0;
-			background-color: var(--wp-dataviews-color-background, var(--wpds-color-bg-surface-neutral-strong));
+			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
 		}
 
 		&.dataviews-view-table__actions-column--stuck {
@@ -40,7 +40,7 @@
 				bottom: 0;
 				left: 0;
 				width: 1px;
-				background-color: var(--wpds-color-bg-surface-neutral);
+				background-color: var(--wpds-color-background-surface-neutral);
 			}
 		}
 
@@ -83,8 +83,8 @@
 		}
 
 		&.is-selected {
-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
-			color: var(--wpds-color-fg-content-neutral);
+			background-color: var(--wpds-color-background-interactive-brand-weak-active);
+			color: var(--wpds-color-foreground-content-neutral);
 
 			&,
 			& + tr {
@@ -92,7 +92,7 @@
 			}
 
 			.dataviews-view-table__actions-column--sticky {
-				background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
 			}
 		}
 
@@ -112,14 +112,14 @@
 			&:focus-within,
 			&:hover {
 				.dataviews-view-table__actions-column--sticky {
-					background-color: var(--wp-dataviews-color-background, var(--wpds-color-bg-surface-neutral-strong));
+					background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
 				}
 			}
 
 			&.is-selected,
 			&.is-selected:hover {
 				.dataviews-view-table__actions-column--sticky {
-					background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+					background-color: var(--wpds-color-background-interactive-brand-weak-active);
 				}
 			}
 		}
@@ -207,7 +207,7 @@
 		font-weight: var(--wpds-typography-font-weight-medium);
 
 		&:not(:hover) {
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		span {
@@ -281,7 +281,7 @@
 	overflow: hidden;
 	position: relative;
 	flex-shrink: 0;
-	background-color: var(--wpds-color-bg-surface-neutral-strong);
+	background-color: var(--wpds-color-background-surface-neutral-strong);
 	border-radius: var(--wpds-border-radius-md);
 
 	img {
@@ -314,7 +314,7 @@
 	.dataviews-view-table__group-header-cell {
 		font-weight: var(--wpds-typography-font-weight-medium);
 		padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
-		color: var(--wpds-color-fg-content-neutral);
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 }
 

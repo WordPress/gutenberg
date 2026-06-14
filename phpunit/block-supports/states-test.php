@@ -125,6 +125,81 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that fallback dimension styles are added for aspect ratio.
+	 *
+	 * @covers ::gutenberg_get_state_style_with_fallback_dimension_styles
+	 */
+	public function test_adds_fallback_dimension_styles_for_aspect_ratio() {
+		$actual = gutenberg_get_state_style_with_fallback_dimension_styles(
+			array(
+				'dimensions' => array(
+					'aspectRatio' => '16/9',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'dimensions' => array(
+					'aspectRatio' => '16/9',
+					'minHeight'   => 'unset',
+					'height'      => 'unset',
+				),
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that fallback dimension styles are not added for the default aspect ratio.
+	 *
+	 * @covers ::gutenberg_get_state_style_with_fallback_dimension_styles
+	 */
+	public function test_does_not_add_fallback_dimension_styles_for_default_aspect_ratio() {
+		$actual = gutenberg_get_state_style_with_fallback_dimension_styles(
+			array(
+				'dimensions' => array(
+					'aspectRatio' => 'auto',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'dimensions' => array(
+					'aspectRatio' => 'auto',
+				),
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that fallback aspectRatio styles are added for height.
+	 *
+	 * @covers ::gutenberg_get_state_style_with_fallback_dimension_styles
+	 */
+	public function test_adds_fallback_aspect_ratio_style_for_height() {
+		$actual = gutenberg_get_state_style_with_fallback_dimension_styles(
+			array(
+				'dimensions' => array(
+					'height' => '20rem',
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'dimensions' => array(
+					'height'      => '20rem',
+					'aspectRatio' => 'unset',
+				),
+			),
+			$actual
+		);
+	}
+
+	/**
 	 * Tests that modifier classes on the first compound selector are preserved
 	 * when state selectors are scoped to the block wrapper.
 	 *
@@ -736,6 +811,47 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString(
 			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a responsive element color generates media-query scoped CSS.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_element_color_generates_media_query_scoped_css() {
+		$this->ensure_block_registered( 'core/group' );
+
+		$block_content = '<div class="wp-block-group"><p><a href="#">Link</a></p></div>';
+		$block         = array(
+			'blockName' => 'core/group',
+			'attrs'     => array(
+				'style' => array(
+					'mobile' => array(
+						'elements' => array(
+							'link' => array(
+								'color' => array(
+									'text' => '#00ff00',
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<div class="wp-block-group (wp-states-[a-f0-9]{8})"><p><a href="#">Link<\/a><\/p><\/div>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . ' a:where(:not(.wp-element-button)){color:#00ff00 !important;}}',
 			$actual_stylesheet
 		);
 	}
