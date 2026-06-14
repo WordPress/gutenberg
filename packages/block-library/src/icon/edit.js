@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
+	Popover,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -20,15 +21,18 @@ import {
 	InspectorControls,
 	useBlockProps,
 	useBlockEditingMode,
+	LinkControl,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { link, linkOff } from '@wordpress/icons';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -36,6 +40,16 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
+import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
+import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
+
+const LINK_SETTINGS = [
+	...LinkControl.DEFAULT_LINK_SETTINGS,
+	{
+		id: 'nofollow',
+		title: __( 'Mark as nofollow' ),
+	},
+];
 
 const IconPlaceholder = ( { className, style } ) => (
 	<SVG
@@ -57,10 +71,12 @@ const IconPlaceholder = ( { className, style } ) => (
 	</SVG>
 );
 
-export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel } = attributes;
+export function Edit( { attributes, setAttributes, isSelected } ) {
+	const { icon, ariaLabel, url, linkTarget, rel } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
+	const [ isEditingURL, setIsEditingURL ] = useState( false );
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
@@ -68,6 +84,43 @@ export function Edit( { attributes, setAttributes } ) {
 	const spacingProps = useSpacingProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
+
+	const isURLSet = !! url;
+	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
+	const nofollow = !! rel?.includes( NOFOLLOW_REL );
+
+	const linkValue = useMemo(
+		() => ( { url, opensInNewTab, nofollow } ),
+		[ url, opensInNewTab, nofollow ]
+	);
+
+	function onKeyDown( event ) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			startEditing( event );
+		} else if ( isKeyboardEvent.primaryShift( event, 'k' ) ) {
+			unlink();
+		}
+	}
+
+	function startEditing( event ) {
+		event.preventDefault();
+		setIsEditingURL( true );
+	}
+
+	function unlink() {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsEditingURL( false );
+	}
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setIsEditingURL( false );
+		}
+	}, [ isSelected ] );
 
 	const { selectedIcon, allIcons = [] } = useSelect(
 		( select ) => {
@@ -87,6 +140,8 @@ export function Edit( { attributes, setAttributes } ) {
 
 	const iconToDisplay = selectedIcon?.content || '';
 
+	const blockProps = useBlockProps( { ref: setPopoverAnchor, onKeyDown } );
+
 	const blockControls = (
 		<>
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
@@ -97,6 +152,20 @@ export function Edit( { attributes, setAttributes } ) {
 				>
 					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
 				</ToolbarButton>
+			</BlockControls>
+			<BlockControls group="block">
+				<ToolbarButton
+					name="link"
+					icon={ isURLSet ? linkOff : link }
+					title={ isURLSet ? __( 'Unlink' ) : __( 'Link' ) }
+					shortcut={
+						isURLSet
+							? displayShortcut.primaryShift( 'k' )
+							: displayShortcut.primary( 'k' )
+					}
+					onClick={ isURLSet ? unlink : startEditing }
+					isActive={ isURLSet }
+				/>
 			</BlockControls>
 			{ isContentOnlyMode && icon && (
 				// Add some extra controls for content attributes when content only mode is active.
@@ -173,7 +242,7 @@ export function Edit( { attributes, setAttributes } ) {
 		<>
 			{ blockControls }
 			{ inspectorControls }
-			<div { ...useBlockProps() }>
+			<div { ...blockProps }>
 				{ icon ? (
 					<HtmlRenderer
 						html={ iconToDisplay }
@@ -208,6 +277,37 @@ export function Edit( { attributes, setAttributes } ) {
 					/>
 				) }
 			</div>
+			{ isSelected && ( isEditingURL || isURLSet ) && (
+				<Popover
+					placement="bottom"
+					onClose={ () => setIsEditingURL( false ) }
+					anchor={ popoverAnchor }
+					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName="__unstable-block-tools-after"
+					shift
+				>
+					<LinkControl
+						value={ linkValue }
+						onChange={ ( {
+							url: newURL,
+							opensInNewTab: newOpensInNewTab,
+							nofollow: newNofollow,
+						} ) =>
+							setAttributes(
+								getUpdatedLinkAttributes( {
+									rel,
+									url: newURL,
+									opensInNewTab: newOpensInNewTab,
+									nofollow: newNofollow,
+								} )
+							)
+						}
+						onRemove={ unlink }
+						forceIsEditingLink={ isEditingURL }
+						settings={ LINK_SETTINGS }
+					/>
+				</Popover>
+			) }
 			{ isInserterOpen && (
 				<CustomInserterModal
 					icons={ allIcons }
