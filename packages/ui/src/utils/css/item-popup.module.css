@@ -16,7 +16,7 @@
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			box-shadow: var(--wpds-elevation-md);
-			background-color: var(--wpds-color-bg-surface-neutral-strong);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
 		}
 
 		.list {
@@ -27,7 +27,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 
 		.list-scrollable-container {
@@ -91,8 +91,8 @@
 			}
 
 			&[data-highlighted]:not([aria-disabled="true"]) {
-				background-color: var(--wpds-color-bg-interactive-brand-weak-active);
-				color: var(--wpds-color-fg-interactive-neutral);
+				background-color: var(--wpds-color-background-interactive-brand-weak-active);
+				color: var(--wpds-color-foreground-interactive-neutral);
 				outline: none; /* Disable user agent focus ring */
 
 				@media ( forced-colors: active ) {
@@ -101,7 +101,7 @@
 			}
 
 			&[aria-disabled="true"] {
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					color: GrayText;
@@ -127,7 +127,7 @@
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
-			color: var(--wpds-color-fg-content-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
 	}

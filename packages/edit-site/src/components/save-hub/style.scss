@@ -1,7 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-save-hub {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 	flex-shrink: 0;
 	margin: 0;
@@ -25,7 +25,7 @@
 	&:not(.is-primary) {
 		&.is-busy,
 		&.is-busy[aria-disabled="true"]:hover {
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 		}
 	}
 }

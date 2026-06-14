@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
+-   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+
+### Breaking Changes
+
+-   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+-   Rename the `--wpds-color-stroke-focus-brand` design token to `--wpds-color-stroke-focus` ([#79125](https://github.com/WordPress/gutenberg/pull/79125)).
+
+### Bug Fixes
+
+-   `ThemeProvider`: Strictly enforce the documented seed-color input contract for `color.primary` / `color.background`. Inputs outside sRGB (e.g. `oklch()`), previously accepted incidentally, now throw a clear error ([#79148](https://github.com/WordPress/gutenberg/pull/79148)).
+
 ## 0.15.0 (2026-06-10)
 
 ### New Features
@@ -20,6 +34,10 @@
 ### Enhancements
 
 -   Increase the contrast target of `stroke1` from `2.6` to `2.9` so that, on the default scale, it lands between `gray100` and `gray200`. This regenerates `stroke1` for every ramp and updates the values of `--wpds-color-stroke-surface-{brand,error,info,success,warning,neutral-weak}` and `--wpds-color-bg-track-neutral-weak` ([#77599](https://github.com/WordPress/gutenberg/pull/77599)).
+
+### Internal
+
+-   Add Figma `WIDTH_HEIGHT` scopes to `--wpds-dimension-size-*` design tokens ([#79032](https://github.com/WordPress/gutenberg/pull/79032)).
 
 ## 0.14.0 (2026-05-27)
 
