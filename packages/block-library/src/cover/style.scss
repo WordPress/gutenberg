@@ -228,8 +228,7 @@
 
 .wp-block-cover-image,
 .wp-block-cover,
-.wp-block-cover__image-background,
-video.wp-block-cover__video-background {
+.wp-block-cover__image-background {
 	&.has-parallax {
 		background-attachment: fixed;
 		background-size: cover;
@@ -251,6 +250,40 @@ video.wp-block-cover__video-background {
 	&.is-repeated {
 		background-repeat: repeat;
 		background-size: auto;
+	}
+}
+
+// Fixed ("parallax") background effect for video. Unlike images, a <video>
+// element cannot use `background-attachment: fixed`, so it is pinned to the
+// viewport with `position: fixed` and clipped to the cover block's bounds.
+.wp-block-cover.has-parallax {
+	// Establish a clipping context so the fixed video stays within the block.
+	clip-path: inset(0);
+
+	video.wp-block-cover__video-background {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		pointer-events: none;
+		object-fit: cover;
+
+		// Mobile Safari handles fixed positioning poorly; fall back to a
+		// contained, non-fixed video that fills the cover block.
+		@supports (-webkit-touch-callout: inherit) {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+		}
+
+		// Respect OS-level reduced-motion preference: disable the parallax
+		// effect by containing the video to the cover block.
+		@media (prefers-reduced-motion: reduce) {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+		}
 	}
 }
 

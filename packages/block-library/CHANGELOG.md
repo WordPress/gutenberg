@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Cover: Allow video backgrounds to use the "Fixed background" (parallax) option, matching image backgrounds ([#52585](https://github.com/WordPress/gutenberg/issues/52585)).
+
 ## 9.48.0 (2026-06-10)
 
 ### Code Quality

@@ -134,7 +134,10 @@ export default function save( { attributes } ) {
 				<video
 					className={ clsx(
 						'wp-block-cover__video-background',
-						'intrinsic-ignore'
+						'intrinsic-ignore',
+						{
+							'has-parallax': hasParallax,
+						}
 					) }
 					autoPlay
 					muted

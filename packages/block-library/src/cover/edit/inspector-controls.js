@@ -303,43 +303,42 @@ export default function CoverInspectorControls( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ isImageBackground && (
-							<>
-								<ToolsPanelItem
+						{ ( isImageBackground || isVideoBackground ) && (
+							<ToolsPanelItem
+								label={ __( 'Fixed background' ) }
+								isShownByDefault
+								hasValue={ () => !! hasParallax }
+								onDeselect={ () =>
+									setAttributes( {
+										hasParallax: false,
+										focalPoint: undefined,
+									} )
+								}
+							>
+								<ToggleControl
 									label={ __( 'Fixed background' ) }
-									isShownByDefault
-									hasValue={ () => !! hasParallax }
-									onDeselect={ () =>
-										setAttributes( {
-											hasParallax: false,
-											focalPoint: undefined,
-										} )
-									}
-								>
-									<ToggleControl
-										label={ __( 'Fixed background' ) }
-										checked={ !! hasParallax }
-										onChange={ toggleParallax }
-									/>
-								</ToolsPanelItem>
-
-								<ToolsPanelItem
+									checked={ !! hasParallax }
+									onChange={ toggleParallax }
+								/>
+							</ToolsPanelItem>
+						) }
+						{ isImageBackground && (
+							<ToolsPanelItem
+								label={ __( 'Repeated background' ) }
+								isShownByDefault
+								hasValue={ () => isRepeated }
+								onDeselect={ () =>
+									setAttributes( {
+										isRepeated: false,
+									} )
+								}
+							>
+								<ToggleControl
 									label={ __( 'Repeated background' ) }
-									isShownByDefault
-									hasValue={ () => isRepeated }
-									onDeselect={ () =>
-										setAttributes( {
-											isRepeated: false,
-										} )
-									}
-								>
-									<ToggleControl
-										label={ __( 'Repeated background' ) }
-										checked={ isRepeated }
-										onChange={ toggleIsRepeated }
-									/>
-								</ToolsPanelItem>
-							</>
+									checked={ isRepeated }
+									onChange={ toggleIsRepeated }
+								/>
+							</ToolsPanelItem>
 						) }
 						{ showFocalPointPicker && (
 							<ToolsPanelItem

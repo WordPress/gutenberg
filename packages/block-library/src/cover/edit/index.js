@@ -694,7 +694,9 @@ function CoverEdit( {
 				{ url && isVideoBackground && (
 					<video
 						ref={ mediaElement }
-						className="wp-block-cover__video-background"
+						className={ clsx( 'wp-block-cover__video-background', {
+							'has-parallax': hasParallax,
+						} ) }
 						autoPlay
 						muted
 						loop
