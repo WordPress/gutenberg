@@ -24,6 +24,17 @@ import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { store as blockEditorStore } from '../store';
 
+/*
+ * Per-block list of bindable attributes hidden from the Attributes panel.
+ * Binding these attributes to incompatible sources through the generic UI
+ * could break the block (e.g. binding the Date block's `datetime` attribute
+ * to a non-date value). They remain bindable programmatically and through
+ * dedicated UI, like the Date block's variations.
+ */
+const HIDDEN_BLOCK_BINDINGS_PANEL_ATTRIBUTES = {
+	'core/post-date': [ 'datetime' ],
+};
+
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -39,7 +50,8 @@ const useToolsPanelDropdownMenuProps = () => {
 
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const blockContext = useContext( BlockContext );
-	const { removeAllBlockBindings } = useBlockBindingsUtils();
+	const { removeAllBlockBindings, updateBlockBindings } =
+		useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { bindableAttributes, hasCompatibleFields } = useSelect(
@@ -68,14 +80,25 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		[ blockName, blockContext ]
 	);
 
-	// Return early if there are no bindable attributes.
-	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+	const hiddenAttributes =
+		HIDDEN_BLOCK_BINDINGS_PANEL_ATTRIBUTES[ blockName ];
+	const visibleAttributes = hiddenAttributes
+		? bindableAttributes?.filter(
+				( attribute ) => ! hiddenAttributes.includes( attribute )
+		  )
+		: bindableAttributes;
+
+	// Return early if there are no bindable attributes to show.
+	if ( ! visibleAttributes || visibleAttributes.length === 0 ) {
 		return null;
 	}
 
 	const { bindings } = metadata || {};
+	const hasVisibleBindings = visibleAttributes.some(
+		( attribute ) => bindings?.[ attribute ] !== undefined
+	);
 
-	if ( bindings === undefined && ! hasCompatibleFields ) {
+	if ( ! hasVisibleBindings && ! hasCompatibleFields ) {
 		return null;
 	}
 
@@ -84,13 +107,25 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			<ToolsPanel
 				label={ __( 'Attributes' ) }
 				resetAll={ () => {
-					removeAllBlockBindings();
+					if ( hiddenAttributes?.length ) {
+						// Only remove the bindings shown in the panel, leaving the hidden ones untouched.
+						updateBlockBindings(
+							Object.fromEntries(
+								visibleAttributes.map( ( attribute ) => [
+									attribute,
+									undefined,
+								] )
+							)
+						);
+					} else {
+						removeAllBlockBindings();
+					}
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 				className="block-editor-bindings__panel"
 			>
 				<ItemGroup isBordered isSeparated>
-					{ bindableAttributes.map( ( attribute ) => (
+					{ visibleAttributes.map( ( attribute ) => (
 						<BlockBindingsAttributeControl
 							key={ attribute }
 							attribute={ attribute }
@@ -119,10 +154,8 @@ export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
 	hasSupport( name ) {
-		return ! [
-			'core/post-date',
-			'core/navigation-link',
-			'core/navigation-submenu',
-		].includes( name );
+		return ! [ 'core/navigation-link', 'core/navigation-submenu' ].includes(
+			name
+		);
 	},
 };

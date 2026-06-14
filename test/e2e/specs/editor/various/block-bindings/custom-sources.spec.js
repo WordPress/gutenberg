@@ -883,6 +883,26 @@ test.describe( 'Registered sources', () => {
 			await expect( contentAttribute ).toBeVisible();
 		} );
 
+		test( 'should be possible to connect the post date isLink attribute, but not datetime', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/post-date',
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const isLinkAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show isLink',
+			} );
+			await expect( isLinkAttribute ).toBeVisible();
+			// The `datetime` attribute is managed through the block variations,
+			// so it should be hidden from the Attributes panel.
+			const datetimeAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'Show datetime',
+			} );
+			await expect( datetimeAttribute ).toBeHidden();
+		} );
+
 		test( 'should be possible to connect the button supported attributes', async ( {
 			editor,
 			page,
