@@ -28,10 +28,10 @@
 		.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
 		.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
 		:focus-visible .outset-ring--focus-parent-visible {
-			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
-			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 
-			outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+			outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
 		}
 	}
 }

@@ -23,7 +23,7 @@
 	flex-direction: column;
 	font-size: var(--wpds-typography-font-size-md);
 	line-height: var(--wpds-typography-line-height-sm);
-	background-color: var(--wp-dataviews-color-background, var(--wpds-color-bg-surface-neutral-strong));
+	background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
 }
 
 .dataviews__view-actions,
@@ -82,7 +82,7 @@
 .dataviews-title-field {
 	font-size: var(--wpds-typography-font-size-md);
 	font-weight: var(--wpds-typography-font-weight-medium);
-	color: var(--wpds-color-fg-content-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	width: 100%;
@@ -94,10 +94,10 @@
 		overflow: hidden;
 		display: block;
 		flex-grow: 0;
-		color: var(--wpds-color-fg-interactive-neutral);
+		color: var(--wpds-color-foreground-interactive-neutral);
 
 		&:hover {
-			color: var(--wpds-color-fg-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-brand);
 		}
 		@include link-reset();
 	}
@@ -110,18 +110,18 @@
 		overflow: hidden;
 		display: block;
 		width: 100%;
-		color: var(--wpds-color-fg-interactive-neutral-active);
+		color: var(--wpds-color-foreground-interactive-neutral-active);
 		&:hover {
-			color: var(--wpds-color-fg-interactive-brand);
+			color: var(--wpds-color-foreground-interactive-brand);
 		}
 	}
 }
 
 .dataviews-title-field--clickable {
 	cursor: var(--wpds-cursor-control);
-	color: var(--wpds-color-fg-interactive-neutral);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	&:hover {
-		color: var(--wpds-color-fg-interactive-brand);
+		color: var(--wpds-color-foreground-interactive-brand);
 	}
 	@include link-reset();
 }
