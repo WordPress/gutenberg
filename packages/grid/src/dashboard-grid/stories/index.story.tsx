@@ -72,23 +72,23 @@ type Tone = 'brand' | 'info' | 'success' | 'warning' | 'error' | 'neutral';
 // fallbacks into each `var()` call. Using literal strings keeps the
 // `@wordpress/no-unknown-ds-tokens` lint rule happy.
 const bgTokens: Record< Tone, string > = {
-	brand: 'var(--wpds-color-bg-surface-brand)',
-	info: 'var(--wpds-color-bg-surface-info)',
-	success: 'var(--wpds-color-bg-surface-success)',
-	warning: 'var(--wpds-color-bg-surface-warning)',
-	error: 'var(--wpds-color-bg-surface-error)',
-	neutral: 'var(--wpds-color-bg-surface-neutral-weak)',
+	brand: 'var(--wpds-color-background-surface-brand)',
+	info: 'var(--wpds-color-background-surface-info)',
+	success: 'var(--wpds-color-background-surface-success)',
+	warning: 'var(--wpds-color-background-surface-warning)',
+	error: 'var(--wpds-color-background-surface-error)',
+	neutral: 'var(--wpds-color-background-surface-neutral-weak)',
 };
 
 const fgTokens: Record< Tone, string > = {
 	// `brand` has no dedicated fg-content token in the design system,
 	// so neutral content reads safely against the brand surface tint.
-	brand: 'var(--wpds-color-fg-content-neutral)',
-	info: 'var(--wpds-color-fg-content-info)',
-	success: 'var(--wpds-color-fg-content-success)',
-	warning: 'var(--wpds-color-fg-content-warning)',
-	error: 'var(--wpds-color-fg-content-error)',
-	neutral: 'var(--wpds-color-fg-content-neutral)',
+	brand: 'var(--wpds-color-foreground-content-neutral)',
+	info: 'var(--wpds-color-foreground-content-info)',
+	success: 'var(--wpds-color-foreground-content-success)',
+	warning: 'var(--wpds-color-foreground-content-warning)',
+	error: 'var(--wpds-color-foreground-content-error)',
+	neutral: 'var(--wpds-color-foreground-content-neutral)',
 };
 
 function Tile( {
@@ -195,13 +195,13 @@ function formatTileLabel( item: DashboardGridLayoutItem ): string {
 // Static token maps so the build-time token fallback plugin can inject
 // fallbacks into each `var()` call.
 const panelBgTokens: Record< 'warning' | 'success', string > = {
-	warning: 'var(--wpds-color-bg-surface-warning)',
-	success: 'var(--wpds-color-bg-surface-success)',
+	warning: 'var(--wpds-color-background-surface-warning)',
+	success: 'var(--wpds-color-background-surface-success)',
 };
 
 const panelFgTokens: Record< 'warning' | 'success', string > = {
-	warning: 'var(--wpds-color-fg-content-warning)',
-	success: 'var(--wpds-color-fg-content-success)',
+	warning: 'var(--wpds-color-foreground-content-warning)',
+	success: 'var(--wpds-color-foreground-content-success)',
 };
 
 const panelStrokeTokens: Record< 'warning' | 'success', string > = {
@@ -776,7 +776,7 @@ export const Customization: Story = {
 			'--wp-grid-drag-preview-scale': '1.08',
 			'--wp-grid-placeholder-opacity': '0.2',
 			'--wp-grid-placeholder-outline-color':
-				'var(--wpds-color-fg-content-warning)',
+				'var(--wpds-color-foreground-content-warning)',
 			'--wp-grid-placeholder-radius': '12px',
 		} as React.CSSProperties;
 
@@ -825,7 +825,7 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 				transition: isActive
 					? 'opacity 200ms ease, visibility 0s linear 0s'
 					: 'opacity 200ms ease, visibility 0s linear 200ms',
-				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
+				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-background-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
 			} }
 		>
 			{ Array.from( { length: columns } ).map( ( _, i ) => (
@@ -835,7 +835,7 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 						outline:
 							'1px dashed var(--wpds-color-stroke-surface-info)',
 						backgroundColor:
-							'color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent)',
+							'color-mix(in srgb, var(--wpds-color-background-surface-info) 10%, transparent)',
 						position: 'relative',
 					} }
 				>
@@ -847,8 +847,9 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
 							fontSize: 10,
 							padding: '1px 6px',
 							borderRadius: 2,
-							background: 'var(--wpds-color-bg-surface-info)',
-							color: 'var(--wpds-color-fg-content-info)',
+							background:
+								'var(--wpds-color-background-surface-info)',
+							color: 'var(--wpds-color-foreground-content-info)',
 							fontFamily:
 								'var(--wpds-typography-font-family-mono)',
 						} }

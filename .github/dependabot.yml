@@ -21,3 +21,15 @@ updates:
               update-types:
                   - minor
                   - patch
+
+    # Manage npm security updates only.
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'daily'
+      # disables noisy npm *version* updates across the monorepo;
+      # *security* updates ignore this limit and keep running.
+      open-pull-requests-limit: 0
+      labels:
+          - 'dependencies'
+          - '[Type] Build Tooling'

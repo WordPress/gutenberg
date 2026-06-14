@@ -11,6 +11,7 @@
 ### Breaking Changes
 
 -   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+-   Remove `tab` icon. ([#77439](https://github.com/WordPress/gutenberg/pull/77439))
 
 ## 13.2.0 (2026-05-27)
 
