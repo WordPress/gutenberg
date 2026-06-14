@@ -41,16 +41,21 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * 			<WidgetDashboard.Widgets />
  * 			<WidgetDashboard.Commands />
  * 			<WidgetDashboard.LayoutSettingsDrawer />
+ * 			<WidgetDashboard.Inserter />
+ * 			<WidgetDashboard.WidgetSettingsDrawer />
  * 		</WidgetDashboard>
  * 	);
  * }
  * ```
  *
- * `Commands` and `LayoutSettingsDrawer` ship in the default composition;
- * when passing custom children, compose them to keep the command palette
- * integration and the layout-settings drawer. Both pair with `Actions`:
- * the "Reset to default" command opens the dialog hosted there, and the
- * toolbar's Layout settings button opens the drawer.
+ * Every overlay ships in the default composition: `Commands`,
+ * `LayoutSettingsDrawer`, `Inserter`, and `WidgetSettingsDrawer`. When
+ * passing custom children, compose the ones you need; each reads its open
+ * state from context and renders nothing until triggered. `Actions` drives
+ * the triggers: its "Add widget" button opens `Inserter`, its "Layout
+ * settings" button opens `LayoutSettingsDrawer`, and the command palette's
+ * "Reset to default" opens the dialog `Actions` hosts. `WidgetSettingsDrawer`
+ * is opened by each tile's settings gear and works outside edit mode too.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -87,11 +92,10 @@ export const WidgetDashboard = Object.assign(
 							<Widgets />
 							<Commands />
 							<LayoutSettingsDrawer />
+							<Inserter />
+							<WidgetSettingsDrawer />
 						</>
 					) }
-
-					<Inserter />
-					<WidgetSettingsDrawer />
 				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
 		);
@@ -103,5 +107,7 @@ export const WidgetDashboard = Object.assign(
 		NoWidgetsState,
 		Commands,
 		LayoutSettingsDrawer,
+		Inserter,
+		WidgetSettingsDrawer,
 	}
 );

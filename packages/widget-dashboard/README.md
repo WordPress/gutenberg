@@ -4,7 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes. While it is published as 0.x, breaking changes may ship in minor releases.
 </div>
 
-Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances: drag-to-reorder, resize, a modal inserter, per-widget settings, a layout-settings drawer, and composable command palette integration, all behind a consumer-controlled edit mode.
+Stateless rendering engine for widget dashboards. `WidgetDashboard` renders an editable grid of widget instances, all behind a consumer-controlled edit mode: drag-to-reorder, resize, and a set of composable overlays (a modal inserter, per-widget settings, a layout-settings drawer, command palette integration) that ship in the default composition and can be composed individually.
 
 The engine owns no data. Widget types flow in via the `widgetTypes` prop (see [`@wordpress/widget-primitives`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/widget-primitives)), the consumer owns the committed `layout` array, and in-progress edits accumulate in an internal staging layer until the user commits them, at which point `onLayoutChange` fires with the fully updated array. Grid placement renders through [`@wordpress/grid`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/grid).
 
@@ -126,7 +126,7 @@ Optional. Called when the user commits grid-settings edits. When omitted, the la
 
 #### `children`: `ReactNode`
 
-Optional. Composition slot for arbitrary dashboard markup. When omitted, the engine renders the default composition: the empty state, the actions, the widgets grid, the command palette integration, and the layout-settings drawer.
+Optional. Composition slot for arbitrary dashboard markup. When omitted, the engine renders the default composition: the empty state, the actions, the widgets grid, the command palette integration, the layout-settings drawer, the inserter, and the per-widget settings drawer. When provided, compose whichever of those overlays you need.
 
 ## Compound components
 
@@ -154,6 +154,14 @@ Command palette integration. It registers the dashboard's commands through `@wor
 
 Side drawer for grid-level settings (layout model, row height), editing the same staging layer as the rest of customize mode. Ships in the default composition; when passing custom children, compose it alongside `<WidgetDashboard.Actions />`, whose Layout settings button opens it. Renders nothing when `onGridSettingsChange` is omitted.
 
+#### `<WidgetDashboard.Inserter />`
+
+Modal widget inserter (see [Inserting widgets](#inserting-widgets)). Ships in the default composition; when passing custom children, compose it to keep the "Add widget" flow, or omit it to provide a custom widget-picking experience. Reads its open state from context and renders nothing until the `Actions` "Add widget" button opens it.
+
+#### `<WidgetDashboard.WidgetSettingsDrawer />`
+
+Per-instance settings drawer. Opened by each tile's settings gear (in normal and customize mode), it edits the active widget's attributes through the staging layer. Ships in the default composition; when passing custom children, compose it to keep per-widget settings.
+
 `<Page>` from `@wordpress/admin-ui` exposes an `actions` slot used across admin screens (DataViews, WidgetDashboard, …). Plug `Actions` straight into it:
 
 ```tsx
@@ -174,6 +182,8 @@ import { Page } from '@wordpress/admin-ui';
 	</Page>
 	<WidgetDashboard.Commands />
 	<WidgetDashboard.LayoutSettingsDrawer />
+	<WidgetDashboard.Inserter />
+	<WidgetDashboard.WidgetSettingsDrawer />
 </WidgetDashboard>;
 ```
 
@@ -181,11 +191,11 @@ import { Page } from '@wordpress/admin-ui';
 
 ## Inserting widgets
 
-A modal-based inserter is mounted automatically inside `WidgetDashboard`. It stays hidden until the "Add widget" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
+`<WidgetDashboard.Inserter />` is a modal-based inserter, part of the default composition. It stays hidden until the "Add widget" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
 
 On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. The dialog closes after a successful insertion or when the user dismisses it.
 
-The inserter has no opt-out today; hosts that want a custom widget-picking experience should compose their own UI alongside `<WidgetDashboard.Widgets />` and avoid rendering `<WidgetDashboard.Actions />` (which exposes the trigger).
+Hosts that want a custom widget-picking experience pass custom children: omit `<WidgetDashboard.Inserter />`, compose their own UI alongside `<WidgetDashboard.Widgets />`, and skip the `<WidgetDashboard.Actions />` "Add widget" trigger.
 
 ## Grid settings
 
