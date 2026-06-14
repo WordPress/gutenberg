@@ -154,7 +154,7 @@ Command palette integration. It registers the dashboard's commands through `@wor
 
 Side drawer for grid-level settings (layout model, row height), editing the same staging layer as the rest of customize mode. Ships in the default composition; when passing custom children, compose it alongside `<WidgetDashboard.Actions />`, whose Layout settings button opens it. Renders nothing when `onGridSettingsChange` is omitted.
 
-#### `<WidgetDashboard.Inserter />`
+#### `<WidgetDashboard.WidgetInserter />`
 
 Modal widget inserter (see [Inserting widgets](#inserting-widgets)). Ships in the default composition; when passing custom children, compose it to keep the "Add widget" flow, or omit it to provide a custom widget-picking experience. Reads its open state from context and renders nothing until the `Actions` "Add widget" button opens it.
 
@@ -182,7 +182,7 @@ import { Page } from '@wordpress/admin-ui';
 	</Page>
 	<WidgetDashboard.Commands />
 	<WidgetDashboard.LayoutSettingsDrawer />
-	<WidgetDashboard.Inserter />
+	<WidgetDashboard.WidgetInserter />
 	<WidgetDashboard.WidgetSettingsDrawer />
 </WidgetDashboard>;
 ```
@@ -191,11 +191,11 @@ import { Page } from '@wordpress/admin-ui';
 
 ## Inserting widgets
 
-`<WidgetDashboard.Inserter />` is a modal-based inserter, part of the default composition. It stays hidden until the "Add widget" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
+`<WidgetDashboard.WidgetInserter />` is a modal-based inserter, part of the default composition. It stays hidden until the "Add widget" button in `<WidgetDashboard.Actions />` is clicked. The inserter lists every entry in the `widgetTypes` prop as a grid of live previews (each preview renders the type's `example` attributes through its own render module), supports search, and exposes a single "Select" action with bulk support so users can insert one or several widgets in a single layout change.
 
 On confirmation, the inserter creates instances (using each type's `example.attributes` as the initial values) and appends them to the staged layout. The dialog closes after a successful insertion or when the user dismisses it.
 
-Hosts that want a custom widget-picking experience pass custom children: omit `<WidgetDashboard.Inserter />`, compose their own UI alongside `<WidgetDashboard.Widgets />`, and skip the `<WidgetDashboard.Actions />` "Add widget" trigger.
+Hosts that want a custom widget-picking experience pass custom children: omit `<WidgetDashboard.WidgetInserter />`, compose their own UI alongside `<WidgetDashboard.Widgets />`, and skip the `<WidgetDashboard.Actions />` "Add widget" trigger.
 
 ## Grid settings
 

@@ -19,7 +19,7 @@ import { WidgetPicker } from '../widget-picker';
  * Modal-based widget inserter. The dialog stays hidden until `inserterOpen`
  * flips to `true` from any compound sharing the UI context.
  */
-export function Inserter() {
+export function WidgetInserter() {
 	const { layout, onLayoutChange } = useDashboardInternalContext();
 	const { inserterOpen, setInserterOpen } = useDashboardUIContext();
 

@@ -77,7 +77,7 @@ function Harness( {
 	);
 }
 
-describe( 'WidgetDashboard.Inserter', () => {
+describe( 'WidgetDashboard.WidgetInserter', () => {
 	it( 'is hidden until the "Add widget" trigger is clicked', () => {
 		render( <Harness /> );
 		expect(

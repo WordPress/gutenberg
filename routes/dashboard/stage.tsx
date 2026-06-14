@@ -99,7 +99,7 @@ function Dashboard() {
 			</Page>
 			<WidgetDashboard.Commands />
 			<WidgetDashboard.LayoutSettingsDrawer />
-			<WidgetDashboard.Inserter />
+			<WidgetDashboard.WidgetInserter />
 			<WidgetDashboard.WidgetSettingsDrawer />
 		</WidgetDashboard>
 	);

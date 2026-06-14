@@ -5,7 +5,7 @@ import { WidgetDashboardProvider } from './context/dashboard-context';
 import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
 import { Commands } from './components/commands';
-import { Inserter } from './components/inserter';
+import { WidgetInserter } from './components/widget-inserter';
 import { LayoutSettingsDrawer } from './components/layout-settings-drawer';
 import { WidgetChrome } from './components/widget-chrome';
 import { WidgetSettingsDrawer } from './components/widget-settings';
@@ -41,7 +41,7 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * 			<WidgetDashboard.Widgets />
  * 			<WidgetDashboard.Commands />
  * 			<WidgetDashboard.LayoutSettingsDrawer />
- * 			<WidgetDashboard.Inserter />
+ * 			<WidgetDashboard.WidgetInserter />
  * 			<WidgetDashboard.WidgetSettingsDrawer />
  * 		</WidgetDashboard>
  * 	);
@@ -49,10 +49,10 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * ```
  *
  * Every overlay ships in the default composition: `Commands`,
- * `LayoutSettingsDrawer`, `Inserter`, and `WidgetSettingsDrawer`. When
+ * `LayoutSettingsDrawer`, `WidgetInserter`, and `WidgetSettingsDrawer`. When
  * passing custom children, compose the ones you need; each reads its open
  * state from context and renders nothing until triggered. `Actions` drives
- * the triggers: its "Add widget" button opens `Inserter`, its "Layout
+ * the triggers: its "Add widget" button opens `WidgetInserter`, its "Layout
  * settings" button opens `LayoutSettingsDrawer`, and the command palette's
  * "Reset to default" opens the dialog `Actions` hosts. `WidgetSettingsDrawer`
  * is opened by each tile's settings gear and works outside edit mode too.
@@ -92,7 +92,7 @@ export const WidgetDashboard = Object.assign(
 							<Widgets />
 							<Commands />
 							<LayoutSettingsDrawer />
-							<Inserter />
+							<WidgetInserter />
 							<WidgetSettingsDrawer />
 						</>
 					) }
@@ -107,7 +107,7 @@ export const WidgetDashboard = Object.assign(
 		NoWidgetsState,
 		Commands,
 		LayoutSettingsDrawer,
-		Inserter,
+		WidgetInserter,
 		WidgetSettingsDrawer,
 	}
 );

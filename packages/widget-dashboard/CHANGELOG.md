@@ -9,7 +9,7 @@
     editable grid of widget instances, with staging of in-progress
     edits and a set of composable overlays that ship in the default
     composition (`Widgets`, `WidgetChrome`, `Actions`, `NoWidgetsState`,
-    `Commands`, `LayoutSettingsDrawer`, `Inserter`,
+    `Commands`, `LayoutSettingsDrawer`, `WidgetInserter`,
     `WidgetSettingsDrawer`).
 -   Grid-settings kit for host-side persistence: `WidgetGridSettings`,
     `DEFAULT_GRID`, `normalizeGridSettings`, `ROW_HEIGHT_PRESETS`,
