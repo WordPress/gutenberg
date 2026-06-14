@@ -10,8 +10,6 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalHStack as HStack,
-	// TODO: Replace this ZStack with ad hoc CSS.
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	MenuGroup,

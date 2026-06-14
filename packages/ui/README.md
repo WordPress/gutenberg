@@ -28,13 +28,13 @@ npm install @wordpress/ui
 
 As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
 
-### Within WordPress
+### Within standard WordPress editor screens
 
-Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+In standard WordPress editor screens (such as the post editor or the site editor), stylesheets, isolation styles, and layout styles are managed centrally by Gutenberg. You don't need to add any setup yourself — and you should avoid doing so in this shared context to prevent conflicts.
 
-### Outside WordPress
+### Elsewhere
 
-While the components ship with basic fallbacks for every CSS custom property, it's recommended that you install and load the design tokens stylesheet to support the full range of theming capabilities:
+The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
 
 ```
 npm install @wordpress/theme
@@ -46,7 +46,7 @@ import '@wordpress/theme/design-tokens.css';
 
 This stylesheet is universal and does not have a separate RTL version.
 
-Also, to ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
+To ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
 
 ```css
 .root {
@@ -54,13 +54,36 @@ Also, to ensure that portaled popovers appear correctly, add these isolation sty
 }
 ```
 
-Finally, in order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+In order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
 
 ```css
 body {
 	position: relative;
 }
 ```
+
+Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles, which can conflict in some applications which apply styles on bare element selectors (for example, `input { border-color: #aaa; }`). You should avoid these kinds of bare element selector styling if you can, preferring CSS classes instead where possible.
+
+If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-ui` layer, which you can use when defining your own layer order:
+
+```css
+@layer wp-ui, example-app;
+```
+
+#### Mixing with `@wordpress/components`
+
+If your app pairs `@wordpress/ui` with `@wordpress/components` overlays and bundles both packages directly (i.e. without relying on the `window.wp.components` global exposed by WordPress's script-loader), call `useEnableWpCompatOverlaySlot()` once from a long-lived root component:
+
+```tsx
+import { useEnableWpCompatOverlaySlot } from '@wordpress/ui';
+
+function App() {
+	useEnableWpCompatOverlaySlot();
+	return <YourApp />;
+}
+```
+
+This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
 ## Usage
 

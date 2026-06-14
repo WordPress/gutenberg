@@ -5,12 +5,13 @@ import { Icon } from '../index';
 const meta: Meta< typeof Icon > = {
 	title: 'Design System/Components/Icon',
 	component: Icon,
+	tags: [ 'manifest' ],
 	decorators: [
 		( Story ) => {
 			return (
 				<div
 					style={ {
-						color: 'var( --wpds-color-fg-content-neutral )',
+						color: 'var( --wpds-color-foreground-content-neutral )',
 					} }
 				>
 					<Story />
@@ -18,6 +19,13 @@ const meta: Meta< typeof Icon > = {
 			);
 		},
 	],
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Prefer this component over the `Icon` component from `@wordpress/components` or `@wordpress/icons`.',
+		},
+	},
 };
 export default meta;
 

@@ -12,12 +12,12 @@ import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { seen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useEditorSettings } from '@wordpress/lazy-editor';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { unlock } from '../lock-unlock';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
 	unlock( editorPrivateApis );
@@ -53,6 +53,7 @@ function Stage() {
 
 	return (
 		<Page
+			headingLevel={ 2 }
 			actions={
 				! isMobileViewport ? (
 					<HStack>

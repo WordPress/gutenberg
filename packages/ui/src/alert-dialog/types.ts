@@ -1,7 +1,9 @@
 import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import type { ComponentProps } from '../utils/types';
+
+export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;
 
 /**
  * The return type of `onConfirm`. Return `void` (or nothing) to auto-close
@@ -63,9 +65,15 @@ export interface PopupProps
 	extends ComponentProps< 'div' >,
 		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<AlertDialog.Portal />` with
+	 * custom `container`, `className`, or `style`. Overlay content is
+	 * rendered as this portal's children (do not pass `children` on the portal
+	 * element; they would be ignored).
+	 *
+	 * When omitted, `AlertDialog.Popup` uses `AlertDialog.Portal` with default
+	 * props.
 	 */
-	container?: _AlertDialog.Portal.Props[ 'container' ];
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
 	 * The semantic intent of the dialog, which determines its styling.
@@ -116,4 +124,21 @@ export interface PopupProps
 	 * @default 'Cancel'
 	 */
 	cancelButtonText?: string;
+
+	/**
+	 * When `true`, the dialog's title stays pinned to the top of the popup
+	 * as the body scrolls. When `false`, the title scrolls with the body.
+	 *
+	 * @default true
+	 */
+	stickyHeader?: boolean;
+
+	/**
+	 * When `true`, the dialog's action buttons (and error message, if any)
+	 * stay pinned to the bottom of the popup as the body scrolls. When
+	 * `false`, they scroll with the body.
+	 *
+	 * @default true
+	 */
+	stickyFooter?: boolean;
 }

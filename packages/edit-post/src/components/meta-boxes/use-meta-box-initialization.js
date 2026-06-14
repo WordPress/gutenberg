@@ -21,27 +21,30 @@ export const useMetaBoxInitialization = ( enabled ) => {
 	const {
 		isEnabledAndEditorReady,
 		isCollaborationEnabled,
-		hasMetaBoxes,
-		allMetaBoxes,
-		rtcCompatibleIds,
+		hasIncompatibleMetaBoxes,
+		hasActiveMetaBoxes,
 	} = useSelect(
-		( select ) => ( {
-			isEnabledAndEditorReady:
-				enabled && select( editorStore ).__unstableIsEditorReady(),
-			isCollaborationEnabled:
-				select( editorStore ).isCollaborationEnabledForCurrentPost(),
-			hasMetaBoxes: enabled
-				? select( editPostStore ).hasMetaBoxes()
-				: false,
-			allMetaBoxes: enabled
-				? select( editPostStore ).getAllMetaBoxes()
-				: undefined,
-			rtcCompatibleIds:
-				select( editPostStore ).getRtcCompatibleMetaBoxIds(),
-		} ),
+		( select ) => {
+			const {
+				__unstableIsEditorReady,
+				isCollaborationEnabledForCurrentPost,
+			} = unlock( select( editorStore ) );
+			return {
+				isEnabledAndEditorReady: enabled && __unstableIsEditorReady(),
+				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
+				hasIncompatibleMetaBoxes: enabled
+					? select( editPostStore )
+							.getAllMetaBoxes()
+							.some( ( metaBox ) => ! metaBox.__rtc_compatible )
+					: false,
+				hasActiveMetaBoxes:
+					enabled && select( editPostStore ).hasMetaBoxes(),
+			};
+		},
 		[ enabled ]
 	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
+	const { updateEditorSettings } = useDispatch( editorStore );
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
 
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
@@ -50,17 +53,18 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		if ( isEnabledAndEditorReady ) {
 			initializeMetaBoxes();
 
-			// Disable real-time collaboration when legacy meta boxes are detected.
-			// Meta boxes marked with __rtc_compatible_meta_box on the server
-			// have their IDs stored via setRtcCompatibleMetaBoxIds().
-			if ( isCollaborationEnabled ) {
-				const hasIncompatibleMetaBoxes = allMetaBoxes?.some(
-					( metaBox ) => ! rtcCompatibleIds.includes( metaBox.id )
-				);
+			// Disable real-time collaboration when incompatible meta boxes are detected.
+			if ( isCollaborationEnabled && hasIncompatibleMetaBoxes ) {
+				setCollaborationSupported( false );
+			}
 
-				if ( hasIncompatibleMetaBoxes ) {
-					setCollaborationSupported( false );
-				}
+			// Classic meta box values are saved through a separate
+			// admin-ajax submission that the in-editor revisions restore
+			// does not drive, so visual revisions would silently leave
+			// them untouched. Fall back to the classic revision.php
+			// admin screen instead.
+			if ( hasActiveMetaBoxes ) {
+				updateEditorSettings( { disableVisualRevisions: true } );
 			}
 		}
 	}, [
@@ -68,8 +72,8 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		initializeMetaBoxes,
 		isCollaborationEnabled,
 		setCollaborationSupported,
-		hasMetaBoxes,
-		allMetaBoxes,
-		rtcCompatibleIds,
+		hasIncompatibleMetaBoxes,
+		hasActiveMetaBoxes,
+		updateEditorSettings,
 	] );
 };

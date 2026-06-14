@@ -25,11 +25,11 @@ import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
 import { CreateTemplatePartModal } from '@wordpress/fields';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import {
 	DEFAULT_VIEW,
 	getActiveViewOverridesForTab,
@@ -249,6 +249,7 @@ function TemplatePartList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			headingLevel={ 2 }
 			subTitle={ postTypeObject.labels?.description }
 			className="template-part-page"
 			actions={

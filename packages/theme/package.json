@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.10.0",
+	"version": "0.15.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -75,28 +75,25 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": [
-		"src/color-ramps/lib/register-color-spaces.ts",
-		"build/color-ramps/lib/register-color-spaces.js",
-		"build-module/color-ramps/lib/register-color-spaces.mjs"
-	],
+	"sideEffects": false,
 	"dependencies": {
+		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/style-runtime": "file:../style-runtime",
 		"colorjs.io": "^0.6.0",
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
 		"@storybook/react-vite": "^10.2.8",
-		"@terrazzo/cli": "^0.10.2",
-		"@terrazzo/plugin-css": "^0.10.2",
-		"@terrazzo/token-tools": "^0.10.2",
+		"@terrazzo/parser": "^2.0.3",
+		"@terrazzo/plugin-css": "^2.0.3",
+		"@terrazzo/token-tools": "^2.0.3",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14",
-		"@types/node": "^20.17.10",
+		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
 		"storybook": "^10.2.8"
@@ -117,7 +114,7 @@
 	"scripts": {
 		"prelint:js": "npx esbuild src/prebuilt/js/design-tokens.mjs --format=cjs --outfile=build/prebuilt/js/design-tokens.cjs && node -e \"\"",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
-		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && cross-env NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
+		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && node --import=esbuild-esm-loader/register bin/build-design-tokens/index.ts",
 		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
 	}

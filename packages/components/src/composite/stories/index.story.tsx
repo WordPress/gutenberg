@@ -16,6 +16,7 @@ import { Composite } from '..';
 import { Tooltip } from '../../tooltip';
 
 const meta: Meta< typeof Composite > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Composite',
 	id: 'components-composite',
 	component: Composite,
@@ -48,7 +49,7 @@ const meta: Meta< typeof Composite > = {
 			canvas: { sourceState: 'shown' },
 		},
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

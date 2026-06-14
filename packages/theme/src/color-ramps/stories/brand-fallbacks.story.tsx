@@ -72,12 +72,10 @@ export default meta;
 export const Default: StoryObj< typeof Verifier > = {
 	render: ( { adminThemeColor } ) => (
 		<div
-			style={
-				{
-					'--wp-admin-theme-color': adminThemeColor,
-					fontSize: 13,
-				} as React.CSSProperties
-			}
+			style={ {
+				'--wp-admin-theme-color': adminThemeColor,
+				fontSize: 13,
+			} }
 		>
 			<p
 				style={ {

@@ -1,6 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	getBlockType,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
+import dimensions from '../dimensions';
 import { getDimensionsClassesAndStyles } from '../use-dimensions-props';
 
 describe( 'getDimensionsClassesAndStyles', () => {
@@ -76,6 +86,22 @@ describe( 'getDimensionsClassesAndStyles', () => {
 		} );
 	} );
 
+	it( 'should return minWidth style', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					minWidth: '200px',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: undefined,
+			style: {
+				minWidth: '200px',
+			},
+		} );
+	} );
+
 	it( 'should return all dimension styles when multiple are provided', () => {
 		const attributes = {
 			style: {
@@ -107,6 +133,67 @@ describe( 'getDimensionsClassesAndStyles', () => {
 			style: {
 				width: 'var(--wp--preset--dimension--custom-width)',
 			},
+		} );
+	} );
+} );
+
+describe( 'useBlockProps', () => {
+	const blockName = 'test/dimensions-with-aspect-ratio';
+
+	afterEach( () => {
+		if ( getBlockType( blockName ) ) {
+			unregisterBlockType( blockName );
+		}
+	} );
+
+	const registerDimensionsBlock = () =>
+		registerBlockType( blockName, {
+			apiVersion: 3,
+			title: 'Dimensions with aspect ratio',
+			category: 'text',
+			supports: {
+				dimensions: {
+					aspectRatio: true,
+				},
+			},
+		} );
+
+	it( 'unsets height styles when aspect ratio is explicit', () => {
+		registerDimensionsBlock();
+
+		expect(
+			dimensions.useBlockProps( {
+				name: blockName,
+				style: {
+					dimensions: {
+						aspectRatio: '16/9',
+					},
+				},
+			} )
+		).toEqual( {
+			className: 'has-aspect-ratio',
+			style: {
+				minHeight: 'unset',
+				height: 'unset',
+			},
+		} );
+	} );
+
+	it( 'does not unset height styles when aspect ratio is the default', () => {
+		registerDimensionsBlock();
+
+		expect(
+			dimensions.useBlockProps( {
+				name: blockName,
+				style: {
+					dimensions: {
+						aspectRatio: 'auto',
+					},
+				},
+			} )
+		).toEqual( {
+			className: '',
+			style: {},
 		} );
 	} );
 } );

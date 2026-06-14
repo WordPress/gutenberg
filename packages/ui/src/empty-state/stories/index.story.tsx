@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { search } from '@wordpress/icons';
-import { Button, EmptyState } from '../..';
+import { Button } from '../../button';
+import * as EmptyState from '../';
 
 const meta: Meta< typeof EmptyState.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/EmptyState',
 	component: EmptyState.Root,
 	subcomponents: {
@@ -11,6 +13,12 @@ const meta: Meta< typeof EmptyState.Root > = {
 		'EmptyState.Title': EmptyState.Title,
 		'EmptyState.Description': EmptyState.Description,
 		'EmptyState.Actions': EmptyState.Actions,
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

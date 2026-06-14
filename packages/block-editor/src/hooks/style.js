@@ -3,8 +3,11 @@
  */
 import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { useSelect } from '@wordpress/data';
+import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
+	getBlockType,
 	hasBlockSupport,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
@@ -26,14 +29,37 @@ import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
+	isExplicitAspectRatio,
 } from './dimensions';
 import {
+	cleanEmptyObject,
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
+import {
+	BlockStyleStateProvider,
+	DEFAULT_BLOCK_STYLE_STATE,
+	getStyleForState,
+	hasViewportBlockStyleState,
+	hasPseudoBlockStyleState,
+} from './block-style-state';
+import { VALID_BLOCK_PSEUDO_STATES } from './states';
+import { buildScopedBlockSelector } from './state-utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
+import { globalStylesDataKey } from '../store/private-keys';
+import { unlock } from '../lock-unlock';
+
+const BORDER_SIDES = [ 'Top', 'Right', 'Bottom', 'Left' ];
+
+// Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS and
+// packages/global-styles-engine/src/core/render.tsx.
+const RESPONSIVE_BREAKPOINTS = {
+	mobile: '@media (width <= 480px)',
+	tablet: '@media (480px < width <= 782px)',
+};
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -64,6 +90,365 @@ export function getInlineStyles( styles = {} ) {
 	} );
 
 	return output;
+}
+
+/**
+ * Returns fallback border styles for visible state border styles.
+ *
+ * State styles are emitted as stylesheet rules rather than inline styles, so
+ * they cannot rely on the block-library inline-style attribute fallback rules.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {Object|undefined} Style object containing fallback border styles.
+ */
+function getStateFallbackBorderStyles( stateStyles ) {
+	const border = stateStyles?.border;
+	if ( ! border ) {
+		return undefined;
+	}
+
+	const hasBorderStyle = !! border.style;
+	const hasBorderColor = !! border.color;
+	const hasBorderWidth = !! border.width;
+	const fallbackBorder = {};
+
+	if ( ! hasBorderStyle && ( hasBorderColor || hasBorderWidth ) ) {
+		fallbackBorder.style = 'solid';
+	}
+
+	BORDER_SIDES.forEach( ( side ) => {
+		const sideKey = side.toLowerCase();
+		const sideBorder = border[ sideKey ];
+		const hasSideStyle = !! sideBorder?.style;
+		const hasSideColor = !! sideBorder?.color;
+		const hasSideWidth = !! sideBorder?.width;
+
+		if (
+			! hasBorderStyle &&
+			! hasSideStyle &&
+			( hasSideColor || hasSideWidth )
+		) {
+			fallbackBorder[ sideKey ] = { style: 'solid' };
+		}
+	} );
+
+	return cleanEmptyObject( { border: cleanEmptyObject( fallbackBorder ) } );
+}
+
+/**
+ * Returns fallback dimension styles that keep state styles aligned with the
+ * default dimensions block-support output.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {Object|undefined} Style object containing fallback dimension styles.
+ */
+function getStateFallbackDimensionStyles( stateStyles ) {
+	const dimensions = stateStyles?.dimensions;
+	if ( ! dimensions ) {
+		return undefined;
+	}
+
+	if ( isExplicitAspectRatio( dimensions.aspectRatio ) ) {
+		return {
+			dimensions: {
+				minHeight: 'unset',
+				height: 'unset',
+			},
+		};
+	}
+
+	if ( dimensions.minHeight || dimensions.height ) {
+		return {
+			dimensions: {
+				aspectRatio: 'unset',
+			},
+		};
+	}
+}
+
+/**
+ * Generates CSS for a block instance state style object.
+ *
+ * State declarations need to win over preset utility classes, but fallback
+ * border styles should not become important because they must not override
+ * explicitly authored default border styles.
+ *
+ * @param {Object} stateStyles State style object.
+ * @param {string} selector    CSS selector for the generated style.
+ * @return {string} Generated stylesheet.
+ */
+export function getStateStylesCSS( stateStyles, selector ) {
+	const fallbackDimensionStyles =
+		getStateFallbackDimensionStyles( stateStyles );
+	const stylesWithDimensionFallbacks = fallbackDimensionStyles
+		? mergeStyleObjects( stateStyles, fallbackDimensionStyles )
+		: stateStyles;
+	const css = compileCSS( stylesWithDimensionFallbacks, { selector } );
+	const importantCSS = css ? css.replace( /;/g, ' !important;' ) : undefined;
+	const fallbackBorderStyles = getStateFallbackBorderStyles( stateStyles );
+	const fallbackCSS = fallbackBorderStyles
+		? compileCSS( fallbackBorderStyles, { selector } )
+		: undefined;
+
+	return [ importantCSS, fallbackCSS ].filter( Boolean ).join( '\n' );
+}
+
+function isPlainObject( value ) {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
+function mergeStyleObjects( target = {}, source = {} ) {
+	const merged = { ...target };
+
+	Object.entries( source ).forEach( ( [ key, value ] ) => {
+		merged[ key ] =
+			isPlainObject( value ) && isPlainObject( merged[ key ] )
+				? mergeStyleObjects( merged[ key ], value )
+				: value;
+	} );
+
+	return merged;
+}
+
+function addStyleGroup( groups, selector, style ) {
+	const key = selector || '';
+	const existing = groups.get( key ) || { selector, style: {} };
+
+	groups.set( key, {
+		selector,
+		style: mergeStyleObjects( existing.style, style ),
+	} );
+}
+
+function getStateStyleGroups( stateStyles, name ) {
+	const blockSelectors = getBlockType( name )?.selectors || {};
+	const groups = new Map();
+
+	Object.entries( stateStyles || {} ).forEach(
+		( [ feature, featureStyles ] ) => {
+			const featureSelectors = blockSelectors[ feature ];
+
+			if ( typeof featureSelectors === 'string' ) {
+				addStyleGroup( groups, featureSelectors, {
+					[ feature ]: featureStyles,
+				} );
+				return;
+			}
+
+			if (
+				isPlainObject( featureSelectors ) &&
+				isPlainObject( featureStyles )
+			) {
+				const remainingStyles = { ...featureStyles };
+
+				Object.entries( featureSelectors ).forEach(
+					( [ subfeature, subfeatureSelector ] ) => {
+						if (
+							subfeature === 'root' ||
+							typeof subfeatureSelector !== 'string' ||
+							! Object.hasOwn( featureStyles, subfeature )
+						) {
+							return;
+						}
+
+						addStyleGroup( groups, subfeatureSelector, {
+							[ feature ]: {
+								[ subfeature ]: featureStyles[ subfeature ],
+							},
+						} );
+						delete remainingStyles[ subfeature ];
+					}
+				);
+
+				if ( Object.keys( remainingStyles ).length ) {
+					addStyleGroup(
+						groups,
+						featureSelectors.root || blockSelectors.root,
+						{
+							[ feature ]: remainingStyles,
+						}
+					);
+				}
+				return;
+			}
+
+			addStyleGroup( groups, blockSelectors.root, {
+				[ feature ]: featureStyles,
+			} );
+		}
+	);
+
+	return Array.from( groups.values() );
+}
+
+/**
+ * Generates CSS for block instance state styles, honoring feature selectors.
+ *
+ * @param {Object}  stateStyles          State style object.
+ * @param {Object}  options              Generation options.
+ * @param {string}  options.name         Block name.
+ * @param {string}  options.baseSelector Block-instance scoping selector.
+ * @param {string=} options.state        Optional pseudo-state, e.g. ":hover".
+ * @return {string|undefined} Generated stylesheet.
+ */
+export function getBlockStateStylesCSS( stateStyles, options ) {
+	const { name, baseSelector, state = '' } = options;
+	const rules = getStateStyleGroups( stateStyles, name )
+		.map( ( { selector: blockSelector, style } ) =>
+			getStateStylesCSS(
+				style,
+				buildScopedBlockSelector( baseSelector, blockSelector, state )
+			)
+		)
+		.filter( Boolean );
+
+	return rules.length ? rules.join( '\n' ) : undefined;
+}
+
+/**
+ * Returns a style object with nested state/element keys removed.
+ *
+ * Viewport state objects can contain root declarations alongside nested
+ * `elements` and pseudo-state styles. Only root declarations should be passed
+ * to the style engine for the viewport root selector.
+ *
+ * @param {Object}   stateStyles Style object for a selected state.
+ * @param {string[]} nestedKeys  Keys to remove from the root style object.
+ * @return {Object|undefined} Root-only style object.
+ */
+function getRootStateStyles( stateStyles, nestedKeys ) {
+	if ( ! stateStyles ) {
+		return stateStyles;
+	}
+
+	const rootStyles = { ...stateStyles };
+	nestedKeys.forEach( ( key ) => {
+		delete rootStyles[ key ];
+	} );
+	return rootStyles;
+}
+
+/**
+ * Generates CSS rules for supported pseudo-state styles.
+ *
+ * @param {Object} style        Block style object containing pseudo-state styles.
+ * @param {string} name         Block name.
+ * @param {string} baseSelector Base selector used to scope generated CSS.
+ * @return {string[]} Generated CSS rule strings.
+ */
+function getPseudoStateCSSRules( style, name, baseSelector ) {
+	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ];
+	if ( ! validPseudoStates ) {
+		return [];
+	}
+
+	const cssRules = [];
+	validPseudoStates.forEach( ( pseudoState ) => {
+		const stateStyles = style?.[ pseudoState ];
+		if ( stateStyles ) {
+			const css = getBlockStateStylesCSS( stateStyles, {
+				name,
+				baseSelector,
+				state: pseudoState,
+			} );
+			if ( css ) {
+				cssRules.push( css );
+			}
+		}
+	} );
+	return cssRules;
+}
+
+/**
+ * Generates CSS rules for responsive block instance style states.
+ *
+ * Each responsive state can contain root styles, element styles, and nested
+ * pseudo-state styles. Generated rules are wrapped in the matching breakpoint
+ * media query.
+ *
+ * @param {Object} style        Block style object containing responsive states.
+ * @param {string} name         Block name.
+ * @param {string} baseSelector Base selector used to scope generated CSS.
+ * @return {string[]} Generated CSS rule strings.
+ */
+export function getResponsiveStateCSSRules( style, name, baseSelector ) {
+	const cssRules = [];
+	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
+	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
+
+	Object.entries( RESPONSIVE_BREAKPOINTS ).forEach(
+		( [ viewport, mediaQuery ] ) => {
+			const viewportStyles = style?.[ viewport ];
+			if ( ! viewportStyles ) {
+				return;
+			}
+
+			const viewportCSSRules = [];
+			const rootCSS = getBlockStateStylesCSS(
+				getRootStateStyles( viewportStyles, nestedStateKeys ),
+				{
+					name,
+					baseSelector,
+				}
+			);
+			if ( rootCSS ) {
+				viewportCSSRules.push( rootCSS );
+			}
+
+			const elementCSS = getElementCSSRules(
+				viewportStyles.elements,
+				name,
+				baseSelector
+			);
+			if ( elementCSS ) {
+				viewportCSSRules.push( elementCSS );
+			}
+
+			viewportCSSRules.push(
+				...getPseudoStateCSSRules( viewportStyles, name, baseSelector )
+			);
+
+			if ( viewportCSSRules.length ) {
+				cssRules.push(
+					`${ mediaQuery }{${ viewportCSSRules.join( '' ) }}`
+				);
+			}
+		}
+	);
+
+	return cssRules;
+}
+
+/**
+ * Returns the style value used to force-preview a selected state on canvas.
+ *
+ * Responsive pseudo states inherit from their default-viewport pseudo state.
+ * For example, selecting `mobile + :hover` should preview styles from
+ * `:hover`, with `mobile.:hover` values layered on top when present.
+ *
+ * @param {Object} style         Block style object.
+ * @param {Object} selectedState Selected block style state.
+ * @return {Object|undefined} Style value for the canvas preview.
+ */
+export function getCanvasStateStyleValue( style, selectedState ) {
+	const stateValue = getStyleForState( style, selectedState );
+	if ( ! hasViewportBlockStyleState( selectedState ) ) {
+		return stateValue;
+	}
+
+	const defaultViewportState = {
+		...selectedState,
+		viewport: DEFAULT_BLOCK_STYLE_STATE.viewport,
+	};
+	const defaultViewportStateValue = getStyleForState(
+		style,
+		defaultViewportState
+	);
+
+	if ( defaultViewportStateValue && stateValue ) {
+		return mergeGlobalStyles( defaultViewportStateValue, stateValue );
+	}
+	return stateValue || defaultViewportStateValue;
 }
 
 /**
@@ -327,35 +712,107 @@ function BlockStyleControls( {
 	clientId,
 	name,
 	setAttributes,
+	style,
 	__unstableParentLayout,
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
+	const { globalBlockStyles, selectedState, showStateOnCanvas } = useSelect(
+		( select ) => {
+			const blockEditorSelect = select( blockEditorStore );
+			const {
+				getSelectedBlockStyleState,
+				isSelectedBlockStyleStateShownOnCanvas,
+			} = unlock( blockEditorSelect );
+			const editorSettings = blockEditorSelect.getSettings();
+			return {
+				globalBlockStyles:
+					editorSettings?.[ globalStylesDataKey ]?.blocks?.[ name ],
+				selectedState: getSelectedBlockStyleState( clientId ),
+				showStateOnCanvas:
+					isSelectedBlockStyleStateShownOnCanvas( clientId ),
+			};
+		},
+		[ clientId, name ]
+	);
+	const isPseudoSelectorState = hasPseudoBlockStyleState( selectedState );
+
+	// Inject state styles onto the editor canvas so the selected state is
+	// visible while editing. Scoped to this block instance via data-block so
+	// other blocks of the same type are not affected. Must be called before
+	// any early returns because it is a hook.
+	const canvasStateCSS = useMemo( () => {
+		if ( ! showStateOnCanvas || ! isPseudoSelectorState ) {
+			return undefined;
+		}
+
+		const globalStateValue = getCanvasStateStyleValue(
+			globalBlockStyles,
+			selectedState
+		);
+		const instanceStateValue = getCanvasStateStyleValue(
+			style,
+			selectedState
+		);
+		let stateValue;
+
+		if ( globalStateValue && instanceStateValue ) {
+			stateValue = mergeGlobalStyles(
+				globalStateValue,
+				instanceStateValue
+			);
+		} else if ( instanceStateValue ) {
+			stateValue = instanceStateValue;
+		} else if ( globalStateValue ) {
+			stateValue = globalStateValue;
+		} else {
+			return undefined;
+		}
+
+		return getBlockStateStylesCSS( stateValue, {
+			name,
+			baseSelector: `[data-block="${ clientId }"]`,
+		} );
+	}, [
+		showStateOnCanvas,
+		isPseudoSelectorState,
+		globalBlockStyles,
+		style,
+		selectedState,
+		clientId,
+		name,
+	] );
+	useStyleOverride( { css: canvasStateCSS } );
+
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	const panelSettings = {
+		...settings,
+		typography: {
+			...settings.typography,
+			// The text alignment UI for individual blocks is rendered in
+			// the block toolbar, so disable it here.
+			textAlign: false,
+		},
+	};
+
 	const passedProps = {
 		clientId,
 		name,
 		setAttributes,
-		settings: {
-			...settings,
-			typography: {
-				...settings.typography,
-				// The text alignment UI for individual blocks is rendered in
-				// the block toolbar, so disable it here.
-				textAlign: false,
-			},
-		},
+		settings: panelSettings,
 	};
-	if ( blockEditingMode !== 'default' ) {
-		return null;
-	}
+
 	return (
-		<>
+		<BlockStyleStateProvider value={ selectedState }>
 			<ColorEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
-		</>
+		</BlockStyleStateProvider>
 	);
 }
 
@@ -469,11 +926,28 @@ function useBlockProps( { name, style } ) {
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 
-	const styles = useMemo(
-		() =>
-			getElementCSSRules( blockElementStyles, name, baseElementSelector ),
-		[ baseElementSelector, blockElementStyles, name ]
-	);
+	const styles = useMemo( () => {
+		const cssRules = [];
+
+		const elementCSS = getElementCSSRules(
+			blockElementStyles,
+			name,
+			baseElementSelector
+		);
+		if ( elementCSS ) {
+			cssRules.push( elementCSS );
+		}
+
+		cssRules.push(
+			...getPseudoStateCSSRules( style, name, baseElementSelector )
+		);
+
+		cssRules.push(
+			...getResponsiveStateCSSRules( style, name, baseElementSelector )
+		);
+
+		return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
+	}, [ baseElementSelector, blockElementStyles, name, style ] );
 
 	useStyleOverride( { css: styles } );
 

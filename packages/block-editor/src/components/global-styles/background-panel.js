@@ -5,7 +5,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useCallback, Platform } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
@@ -31,7 +31,7 @@ const DEFAULT_CONTROLS = {
  * @return {boolean}        Whether site settings has activated background panel.
  */
 export function useHasBackgroundControl( settings, feature ) {
-	return Platform.OS === 'web' && settings?.background?.[ feature ];
+	return settings?.background?.[ feature ];
 }
 
 /**
@@ -44,7 +44,7 @@ export function useHasBackgroundControl( settings, feature ) {
  */
 export function useHasBackgroundPanel( settings ) {
 	const { backgroundImage, gradient } = settings?.background || {};
-	return Platform.OS === 'web' && ( backgroundImage || gradient );
+	return backgroundImage || gradient;
 }
 
 /**

@@ -33,7 +33,7 @@ import type {
 } from '../../../types';
 import type { SetSelection } from '../../../types/private';
 import { GridItems } from '../utils/grid-items';
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
 import { useGridColumns } from '../grid/preview-size-picker';
 import {
@@ -175,7 +175,7 @@ function GridItem< Item >( {
 					>
 						{ badgeFields.map( ( field ) => {
 							return (
-								<Badge
+								<WCBadge
 									key={ field.id }
 									className="dataviews-view-picker-grid__field-value"
 								>
@@ -183,7 +183,7 @@ function GridItem< Item >( {
 										item={ item }
 										field={ field }
 									/>
-								</Badge>
+								</WCBadge>
 							);
 						} ) }
 					</Stack>

@@ -3,7 +3,8 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
-import { Composite, VisuallyHidden } from '@wordpress/components';
+import { Composite } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';

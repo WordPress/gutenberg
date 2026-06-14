@@ -280,7 +280,7 @@ _Parameters_
 
 _Returns_
 
--   `BlockType[]`: Block types that the blocks argument can be transformed to.
+-   `BlockTypeWithTransformMetadata[]`: Block types that the blocks argument can be transformed to.
 
 ### getSaveContent
 
@@ -504,10 +504,18 @@ Undocumented declaration.
 
 Converts an HTML string to known blocks.
 
+_Usage_
+
+```js
+import { rawHandler } from '@wordpress/blocks';
+
+const blocks = rawHandler( { HTML: '<p>Hello</p><p>World</p>' } );
+```
+
 _Parameters_
 
--   _$1_ `{ HTML?: string; }`:
--   _$1.HTML_ `string`: The HTML to convert.
+-   _options_ `{ HTML?: string; }`: Options.
+-   _options.HTML_ `string`: The HTML to convert.
 
 _Returns_
 
@@ -626,8 +634,8 @@ registerBlockType( 'namespace/block-name', {
 
 _Parameters_
 
--   _blockNameOrMetadata_ `string | Record< string, unknown >`: Block type name or its metadata.
--   _settings_ `Partial< BlockType >`: Block settings.
+-   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
+-   _settings_ `Partial< SettingsBlockConfiguration< Attributes > >`: Block settings.
 
 _Returns_
 
@@ -666,7 +674,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
--   _variation_ `BlockVariation`: Object describing a block variation.
+-   _variation_ `BlockVariation | BlockVariation[]`: Object describing a block variation.
 
 ### serialize
 
@@ -818,6 +826,7 @@ _Parameters_
 
 -   _blocks_ `Block[] | Block`: Blocks array or block object.
 -   _name_ `string`: Block name.
+-   _variationName_ `string`: Optional target block variation name.
 
 _Returns_
 
@@ -943,7 +952,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
--   _variationName_ `string`: Name of the variation defined for the block.
+-   _variationName_ `string | string[]`: Name of the variation defined for the block.
 
 ### updateCategory
 
