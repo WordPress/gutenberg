@@ -71,7 +71,6 @@
 		"@wordpress/vips": "file:./packages/vips",
 		"concurrently": "^3.5.0",
 		"cross-env": "^7.0.3",
-		"emojibase-data": "^17.0.0",
 		"eslint": "^10.0.0",
 		"eslint-formatter-compact": "^9.0.1",
 		"glob": "^7.1.2",

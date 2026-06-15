@@ -7,19 +7,26 @@
  * editor session), so the disk cost on the build artifact does not
  * translate into a network cost for users.
  *
- * Runs as a step in `bin/build.mjs`, after wp-build has populated
- * `build/`. Exits 0 even when emojibase-data is missing — the editor
- * gracefully degrades by hiding the "More emojis" trigger.
+ * Runs as a step in `tools/build-scripts/build.mjs`, after wp-build has
+ * populated `build/`. Exits 0 even when emojibase-data is missing — the
+ * editor gracefully degrades by hiding the "More emojis" trigger.
  */
 
 import { mkdir, copyFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
+const require = createRequire( import.meta.url );
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT_DIR = path.resolve( __dirname, '..' );
-const SRC_DIR = path.join( ROOT_DIR, 'node_modules', 'emojibase-data' );
+const ROOT_DIR = path.resolve( __dirname, '../..' );
+
+// Resolve emojibase-data via node module resolution so this works whether
+// the dependency is hoisted to the repo root or nested in this workspace.
+const SRC_DIR = path.dirname(
+	require.resolve( 'emojibase-data/package.json' )
+);
 const DEST_DIR = path.join( ROOT_DIR, 'build', 'emojibase-data' );
 
 // We only ever fetch data.json and messages.json. Shipping just those

@@ -9,7 +9,8 @@ import { speak } from '@wordpress/a11y';
 /**
  * Locales for which Emojibase ships translated labels and tags. Built
  * from the directory listing of the `emojibase-data` npm package, kept
- * in sync with the `LOCALES` set copied by `bin/copy-emojibase-data.mjs`.
+ * in sync with the `LOCALES` set copied by
+ * `tools/build-scripts/copy-emojibase-data.mjs`.
  */
 export const EMOJIBASE_LOCALES = new Set( [
 	'bn',

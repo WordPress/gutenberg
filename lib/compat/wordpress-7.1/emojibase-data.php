@@ -6,7 +6,7 @@
  * editor JS bundle.
  *
  * The data files are copied into `build/emojibase-data/{locale}/` at
- * plugin build time by `bin/copy-emojibase-data.mjs`.
+ * plugin build time by `tools/build-scripts/copy-emojibase-data.mjs`.
  *
  * @package gutenberg
  * @since   7.1.0

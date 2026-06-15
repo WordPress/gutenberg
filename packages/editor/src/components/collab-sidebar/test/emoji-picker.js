@@ -175,17 +175,17 @@ describe( 'searchEmojis', () => {
 } );
 
 describe( 'EMOJIBASE_LOCALES drift detection', () => {
-	// `bin/copy-emojibase-data.mjs` hardcodes a parallel `LOCALES`
+	// `tools/build-scripts/copy-emojibase-data.mjs` hardcodes a parallel `LOCALES`
 	// array — when the build runs it copies exactly those locale
 	// directories into `build/emojibase-data/`. If the JS set drifts
 	// from the build script, the picker either fetches a missing locale
 	// (broken UI) or never uses a locale that was needlessly shipped
 	// (wasted disk). Pin both here.
-	it( 'stays in sync with bin/copy-emojibase-data.mjs', () => {
+	it( 'stays in sync with tools/build-scripts/copy-emojibase-data.mjs', () => {
 		const buildScript = readFileSync(
 			path.resolve(
 				__dirname,
-				'../../../../../../bin/copy-emojibase-data.mjs'
+				'../../../../../../tools/build-scripts/copy-emojibase-data.mjs'
 			),
 			'utf8'
 		);

@@ -86,7 +86,7 @@ async function build() {
 
 	try {
 		/*
-		 * Step 0: Verify node_modules is in sync with package-lock.json.
+		 * Verify node_modules is in sync with package-lock.json.
 		 *
 		 * GUTENBERG_CHECK_INSTALLED_DEPS controls when this runs:
 		 *   - `BEFORE_BUILD` (default): pre-build gate.
@@ -163,7 +163,9 @@ async function build() {
 		// can fetch it from plugins_url() instead of bundling ~770KB of
 		// JSON into the main JS bundle.
 		console.log( '\n📦 Copying emojibase data...' );
-		await exec( 'node', [ './bin/copy-emojibase-data.mjs' ] );
+		await exec( 'node', [
+			path.join( __dirname, 'copy-emojibase-data.mjs' ),
+		] );
 
 		// Build blocks manifests
 		console.log( '\n📦 Building blocks manifests...' );
