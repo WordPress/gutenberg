@@ -3,6 +3,57 @@
  */
 // @ts-ignore
 import showdown from 'showdown';
+import { v4 as uuid } from 'uuid';
+
+const gutenbergFootnotes = () => {
+	return [
+		{
+			type: 'lang',
+			filter: ( text ) => {
+				const footnotes = new Map();
+
+				// Extract footnote definitions [^id]: content
+				text = text.replace(
+					/^\[\^([^\]]+)\]:\s*(.+)$/gm,
+					( match, id, content ) => {
+						const footnoteId = uuid();
+						footnotes.set( id, {
+							content: content.trim(),
+							id: footnoteId,
+						} );
+						return ''; // Remove the definition from main text
+					}
+				);
+
+				// Replace footnote references [^id] with WordPress-style footnotes
+				text = text.replace( /\[\^([^\]]+)\]/g, ( match, id ) => {
+					const footnote = footnotes.get( id );
+					if ( footnote ) {
+						return `<sup data-fn="${ footnote.id }" class="fn" contenteditable="false" data-rich-text-format-boundary="true"><a href="#${ footnote.id }-link" id="${ footnote.id }-link">${ id }</a></sup>`;
+					}
+					return match;
+				} );
+
+				// Add footnotes block at the end if there are footnotes
+				if ( footnotes.size > 0 ) {
+					const footnoteItems = Array.from( footnotes.values() )
+						.map( ( footnote ) => {
+							return `<li><span role="textbox" aria-multiline="true" id="${ footnote.id }" contenteditable="false" class="block-editor-rich-text__editable rich-text" data-wp-block-attribute-key="${ footnote.id }" style="white-space: pre-wrap; min-width: 1px;"> ${ footnote.content } </span> <a href="#${ footnote.id }-link">↩︎</a></li>`;
+						} )
+						.join( '' );
+
+					const blockId = uuid();
+
+					const footnotesBlock = `<ol tabindex="0" draggable="true" class="block-editor-block-list__block wp-block wp-block-footnotes" id="block-${ blockId }" role="document" aria-label="Block: Footnotes" data-block="${ blockId }" data-type="core/footnotes" data-title="Footnotes">${ footnoteItems }</ol>`;
+
+					text += '\n\n' + footnotesBlock;
+				}
+
+				return text;
+			},
+		},
+	];
+};
 
 // Reuse the same showdown converter.
 const converter = new showdown.Converter( {
@@ -12,6 +63,7 @@ const converter = new showdown.Converter( {
 	omitExtraWLInCodeBlocks: true,
 	simpleLineBreaks: true,
 	strikethrough: true,
+	extensions: [ gutenbergFootnotes ],
 } );
 
 /**

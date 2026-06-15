@@ -21,7 +21,7 @@
  *
  * @type {ContentSchema}
  */
-const textContentSchema = {
+export const textContentSchema = {
 	strong: {},
 	em: {},
 	s: {},

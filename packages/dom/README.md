@@ -375,6 +375,18 @@ _Returns_
 
 -   `string`: The sanitized HTML.
 
+### textContentSchema
+
+All text-level semantic elements.
+
+_Related_
+
+-   <https://html.spec.whatwg.org/multipage/text-level-semantics.html>
+
+_Type_
+
+-   `ContentSchema`
+
 ### unwrap
 
 Unwrap the given node. This means any child nodes are moved to the parent.
