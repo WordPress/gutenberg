@@ -30,10 +30,14 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import type { CropperController } from '../hooks/use-cropper-reducer';
-import { getImageFit, getRotatedBBox } from '../../core/camera';
+import { getImageFit, getRotatedBBox, getViewScale } from '../../core/camera';
 import { getImageCropBounds, getMinZoom } from '../../core/containment';
-import { getMinCropPixels } from '../../core/stencil-math';
+import {
+	MAX_VIEW_SCALE,
+	SETTLE_TARGET_CANVAS_FILL,
+} from '../../core/constants';
 import { computeInscribedRect } from '../../core/crop-rect';
+import { getMinCropPixels } from '../../core/stencil-math';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -268,42 +272,6 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// Per-axis minimum crop size in normalized space, expressing a
-	// pixel floor on the captured source region. cropRect is normalized
-	// in the viewport's snap-rotation bbox; the captured source-pixel
-	// width is `cropRect.width * bbox.width / zoom`, so the normalized
-	// floor scales with `zoom` to keep the source-pixel floor constant.
-	// Without this, SETTLE_CROP zooms in proportional to the shrink and
-	// successive drags can crop arbitrarily small.
-	//
-	// The source-pixel floor is resolved per display scale so the crop
-	// stays grabbable: a large image fit into a small canvas would render
-	// the 24px floor only a few CSS pixels wide. `elementSize.width /
-	// naturalWidth` is the fit scale; × zoom gives CSS px per source px.
-	const minCropSize: Size | undefined = useMemo( () => {
-		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
-			return undefined;
-		}
-		const snapRotation = Math.round( state.rotation / 90 ) * 90;
-		const bbox = getRotatedBBox(
-			naturalWidth,
-			naturalHeight,
-			snapRotation
-		);
-		const displayScale = ( elementSize.width / naturalWidth ) * state.zoom;
-		const minPixels = getMinCropPixels( displayScale );
-		return {
-			width: Math.min( 1, ( minPixels * state.zoom ) / bbox.width ),
-			height: Math.min( 1, ( minPixels * state.zoom ) / bbox.height ),
-		};
-	}, [
-		naturalWidth,
-		naturalHeight,
-		state.rotation,
-		state.zoom,
-		elementSize.width,
-	] );
-
 	// Report the rendered image size to the controller. Composite
 	// controllers need it to compute aspect-ratio reshapes from the
 	// reducer (the dropdown dispatches without DOM access); pure
@@ -411,6 +379,77 @@ function CropperInner(
 		null
 	);
 
+	// Presentational magnification so the at-rest crop fills the canvas. The
+	// crop overlay is laid out as `cropRect * visualSize` (the contain-fit
+	// footprint, no zoom), so a crop whose aspect differs from the image's can
+	// render far smaller than the canvas allows. Scaling `elementSize` and
+	// `visualSize` together magnifies the whole scene uniformly — image,
+	// overlays, and the pixel->normalized interaction math — and the root's
+	// `overflow: hidden` clips the image bleed. Magnifying around the footprint
+	// centre keeps the crop centred only because the at-rest crop is always
+	// centred (SETTLE_CROP, computeInscribedRect, and the initial full-frame
+	// crop all centre it).
+	const viewScaleRest = useMemo(
+		() =>
+			getViewScale(
+				state.cropRect,
+				canvasSize,
+				visualSize,
+				SETTLE_TARGET_CANVAS_FILL,
+				MAX_VIEW_SCALE
+			),
+		[ state.cropRect, canvasSize, visualSize ]
+	);
+	// During a resize the magnification is frozen at its pre-drag value rather
+	// than recomputed per pointer move: recomputing live would zoom the scene
+	// under the cursor, and snapping to 1 would reset the zoom the moment a
+	// handle is grabbed. `handleResizeStart` snapshots the current rest value
+	// into `frozenViewScale`; on release the settle recomputes from the new crop.
+	const [ frozenViewScale, setFrozenViewScale ] = useState( 1 );
+	const viewScale = isResizing ? frozenViewScale : viewScaleRest;
+	const scaledVisualSize = useMemo(
+		() => ( {
+			width: visualSize.width * viewScale,
+			height: visualSize.height * viewScale,
+		} ),
+		[ visualSize.width, visualSize.height, viewScale ]
+	);
+
+	// Per-axis minimum crop size in normalized space, expressing a pixel floor
+	// on the captured source region. cropRect is normalized in the viewport's
+	// snap-rotation bbox; the captured source-pixel width is
+	// `cropRect.width * bbox.width / zoom`, so the normalized floor scales with
+	// `zoom` to keep the source-pixel floor constant. The floor itself adapts to
+	// the on-screen display scale (fit × zoom × view scale) via
+	// `getMinCropPixels`, so on a large image shown small the crop can't shrink
+	// until the handles collapse — it yields to the 24px source floor only once
+	// the image is shown large enough.
+	const minCropSize: Size | undefined = useMemo( () => {
+		if ( naturalWidth <= 0 || naturalHeight <= 0 ) {
+			return undefined;
+		}
+		const snapRotation = Math.round( state.rotation / 90 ) * 90;
+		const bbox = getRotatedBBox(
+			naturalWidth,
+			naturalHeight,
+			snapRotation
+		);
+		const displayScale =
+			( elementSize.width / naturalWidth ) * state.zoom * viewScale;
+		const minPixels = getMinCropPixels( displayScale );
+		return {
+			width: Math.min( 1, ( minPixels * state.zoom ) / bbox.width ),
+			height: Math.min( 1, ( minPixels * state.zoom ) / bbox.height ),
+		};
+	}, [
+		naturalWidth,
+		naturalHeight,
+		state.rotation,
+		state.zoom,
+		elementSize.width,
+		viewScale,
+	] );
+
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
 		handlers,
@@ -418,7 +457,7 @@ function CropperInner(
 		isDragging,
 		isZooming,
 		isPlacementActive: isInteractionPlacementActive,
-	} = useInteraction( state, controller, canvasSize, visualSize, {
+	} = useInteraction( state, controller, canvasSize, scaledVisualSize, {
 		minZoom: effectiveMinZoom,
 		maxZoom,
 		onGestureStart,
@@ -483,7 +522,10 @@ function CropperInner(
 		};
 	}, [ onWheelNative ] );
 
-	// Use the transform style hook for the image CSS transform.
+	// Use the unscaled contain-fit footprint here. `imageStyle` prepends
+	// `scale(viewScale)` to this matrix, so pan translations are magnified with
+	// the rest of the scene; using `scaledVisualSize` here would apply viewScale
+	// to pan twice.
 	const transformString = useTransformStyle( state, visualSize );
 
 	/**
@@ -515,30 +557,32 @@ function CropperInner(
 			// visible even when the crop extends beyond the canvas edge.
 			if (
 				isResizingRef.current &&
-				visualSize.width > 0 &&
-				visualSize.height > 0
+				scaledVisualSize.width > 0 &&
+				scaledVisualSize.height > 0
 			) {
-				const offsetX = ( canvasSize.width - visualSize.width ) / 2;
-				const offsetY = ( canvasSize.height - visualSize.height ) / 2;
+				const offsetX =
+					( canvasSize.width - scaledVisualSize.width ) / 2;
+				const offsetY =
+					( canvasSize.height - scaledVisualSize.height ) / 2;
 				const rightOverflow = Math.max(
 					0,
 					offsetX +
-						( rect.x + rect.width ) * visualSize.width -
+						( rect.x + rect.width ) * scaledVisualSize.width -
 						canvasSize.width
 				);
 				const leftOverflow = Math.max(
 					0,
-					-( offsetX + rect.x * visualSize.width )
+					-( offsetX + rect.x * scaledVisualSize.width )
 				);
 				const bottomOverflow = Math.max(
 					0,
 					offsetY +
-						( rect.y + rect.height ) * visualSize.height -
+						( rect.y + rect.height ) * scaledVisualSize.height -
 						canvasSize.height
 				);
 				const topOverflow = Math.max(
 					0,
-					-( offsetY + rect.y * visualSize.height )
+					-( offsetY + rect.y * scaledVisualSize.height )
 				);
 				setViewportPan( {
 					x: -rightOverflow + leftOverflow,
@@ -546,7 +590,7 @@ function CropperInner(
 				} );
 			}
 		},
-		[ setCropRect, setViewportPan, canvasSize, visualSize ]
+		[ setCropRect, setViewportPan, canvasSize, scaledVisualSize ]
 	);
 
 	// Settling animation: brief linear transition after resize end.
@@ -593,6 +637,9 @@ function CropperInner(
 
 	const handleResizeStart = useCallback(
 		( handle?: HandlePosition ) => {
+			// Freeze the magnification at its current value so grabbing a
+			// handle doesn't reset the zoom; it holds for the whole drag.
+			setFrozenViewScale( viewScaleRest );
 			isResizingRef.current = true;
 			setIsResizing( true );
 			setActiveHandle( handle ?? null );
@@ -605,7 +652,7 @@ function CropperInner(
 			resetViewport();
 			onGestureStart?.();
 		},
-		[ onGestureStart, resetViewport ]
+		[ onGestureStart, resetViewport, viewScaleRest ]
 	);
 
 	/**
@@ -640,13 +687,27 @@ function CropperInner(
 		? 'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out'
 		: undefined;
 
-	// Compute the image's CSS style.
+	// Compute the image's CSS style. The element keeps its contain-fit box; the
+	// view-scale magnification is folded into the transform as an outer
+	// `scale()` so the whole settle motion (zoom, pan, and magnification) is one
+	// coherent transform that interpolates as a unit — the image slides/scales
+	// to its position rather than animating its box separately. Magnifying
+	// around the centred box keeps the (centred) crop centred.
 	const imageStyle = useMemo( (): React.CSSProperties => {
 		if ( elementSize.width === 0 || elementSize.height === 0 ) {
 			return {};
 		}
 		const centerX = ( canvasSize.width - elementSize.width ) / 2;
 		const centerY = ( canvasSize.height - elementSize.height ) / 2;
+		// CSS pixels rendered per source pixel: the contain fit
+		// (elementSize / natural), times zoom and the view-scale magnification.
+		// Above 1:1 the image is upscaled, so render nearest-neighbour to keep
+		// pixel boundaries crisp (e.g. small images the cropper magnifies);
+		// below 1:1 leave smoothing on for downscaled large images.
+		const displayScale =
+			naturalWidth > 0
+				? ( elementSize.width / naturalWidth ) * state.zoom * viewScale
+				: 0;
 		return {
 			width: elementSize.width,
 			height: elementSize.height,
@@ -654,10 +715,25 @@ function CropperInner(
 			maxHeight: elementSize.height,
 			left: centerX,
 			top: centerY,
-			transform: transformString,
+			// Always lead with `scale()` (identity at rest) so the transform's
+			// function list stays structurally constant across rest, resize, and
+			// settle. A conditional that dropped `scale()` at viewScale === 1
+			// would change the list shape exactly when the settle transition
+			// crosses 1:1, forcing the browser to fall back to matrix-decomposition
+			// interpolation instead of interpolating each function in turn.
+			transform: `scale(${ viewScale }) ${ transformString }`,
 			transition: imageTransition,
+			imageRendering: displayScale > 1 ? 'pixelated' : undefined,
 		};
-	}, [ canvasSize, elementSize, transformString, imageTransition ] );
+	}, [
+		canvasSize,
+		elementSize,
+		naturalWidth,
+		state.zoom,
+		transformString,
+		imageTransition,
+		viewScale,
+	] );
 
 	// Viewport pan CSS transform for the stage div. Applied during resize
 	// drags to keep handles visible when the crop extends past the canvas edge.
@@ -674,7 +750,14 @@ function CropperInner(
 			willChange,
 		};
 	} else if ( settling ) {
-		stageStyle = { transition: settleTransition, willChange };
+		// Animate the viewport pan back to an explicit identity translate rather
+		// than dropping the transform property, so the reset eases instead of
+		// snapping (transitions to a removed transform are unreliable).
+		stageStyle = {
+			transform: 'translate(0px, 0px)',
+			transition: settleTransition,
+			willChange,
+		};
 	}
 
 	// Forward the root element to the consumer's ref.
@@ -763,6 +846,7 @@ function CropperInner(
 					{ /* The image layer */ }
 					<img
 						className="wp-media-editor-image-editor__image"
+						data-testid="cropper-image"
 						src={ src }
 						alt=""
 						onLoad={ handleImageLoad }
@@ -775,7 +859,7 @@ function CropperInner(
 						<DimmingOverlay
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
-							imageSize={ visualSize }
+							imageSize={ scaledVisualSize }
 							transition={ settleStencilTransition }
 						/>
 					) }
@@ -784,7 +868,7 @@ function CropperInner(
 					<StencilComponent
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
-						imageSize={ visualSize }
+						imageSize={ scaledVisualSize }
 						onCropChange={ handleCropChange }
 						onResizeStart={ handleResizeStart }
 						onResizeEnd={ handleResizeEnd }
@@ -801,7 +885,7 @@ function CropperInner(
 						<GridOverlay
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
-							imageSize={ visualSize }
+							imageSize={ scaledVisualSize }
 						/>
 					) }
 
@@ -810,7 +894,7 @@ function CropperInner(
 						<DimensionsOverlay
 							cropRect={ state.cropRect }
 							containerSize={ canvasSize }
-							imageSize={ visualSize }
+							imageSize={ scaledVisualSize }
 							activeHandle={ activeHandle }
 							outputWidth={ outputSize.width }
 							outputHeight={ outputSize.height }
