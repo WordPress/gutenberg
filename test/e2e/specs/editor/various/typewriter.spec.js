@@ -32,9 +32,9 @@ test.describe( 'Typewriter', () => {
 		// The page shouldn't be scrolled when it's being filled.
 		await page.keyboard.press( 'Enter' );
 
-		expect(
-			await typewriterUtils.getCaretPosition()
-		).toBeGreaterThanOrEqual( initialPosition );
+		await expect
+			.poll( () => typewriterUtils.getCaretPosition() )
+			.toBeGreaterThanOrEqual( initialPosition );
 
 		// Create blocks until the typewriter effect kicks in.
 		while (
@@ -55,9 +55,9 @@ test.describe( 'Typewriter', () => {
 		// Now the scroll position should be maintained.
 		await page.keyboard.press( 'Enter' );
 
-		expect(
-			await typewriterUtils.getDiff( newPosition )
-		).toBeLessThanOrEqual( BUFFER );
+		await expect
+			.poll( () => typewriterUtils.getDiff( newPosition ) )
+			.toBeLessThanOrEqual( BUFFER );
 
 		// Type until the text wraps.
 		while (
@@ -76,17 +76,17 @@ test.describe( 'Typewriter', () => {
 			await page.keyboard.type( 'a' );
 		}
 
-		expect(
-			await typewriterUtils.getDiff( newPosition )
-		).toBeLessThanOrEqual( BUFFER );
+		await expect
+			.poll( () => typewriterUtils.getDiff( newPosition ) )
+			.toBeLessThanOrEqual( BUFFER );
 
 		// Pressing backspace will reposition the caret to the previous line.
 		// Scroll position should be adjusted again.
 		await page.keyboard.press( 'Backspace' );
 
-		expect(
-			await typewriterUtils.getDiff( newPosition )
-		).toBeLessThanOrEqual( BUFFER );
+		await expect
+			.poll( () => typewriterUtils.getDiff( newPosition ) )
+			.toBeLessThanOrEqual( BUFFER );
 
 		// Should reset scroll position to maintain.
 		await page.keyboard.press( 'ArrowUp' );
@@ -98,9 +98,9 @@ test.describe( 'Typewriter', () => {
 		// Should be scrolled to new position.
 		await page.keyboard.press( 'Enter' );
 
-		expect(
-			await typewriterUtils.getDiff( positionAfterArrowUp )
-		).toBeLessThanOrEqual( BUFFER );
+		await expect
+			.poll( () => typewriterUtils.getDiff( positionAfterArrowUp ) )
+			.toBeLessThanOrEqual( BUFFER );
 	} );
 
 	test( 'should maintain caret position after scroll', async ( {
@@ -161,7 +161,9 @@ test.describe( 'Typewriter', () => {
 			);
 		} );
 
-		expect( await typewriterUtils.getDiff( initialPosition ) ).toBe( 0 );
+		await expect
+			.poll( () => typewriterUtils.getDiff( initialPosition ) )
+			.toBe( 0 );
 	} );
 
 	test( 'should maintain caret position after leaving last editable', async ( {
@@ -179,9 +181,9 @@ test.describe( 'Typewriter', () => {
 		const initialPosition = await typewriterUtils.getCaretPosition();
 
 		// Should maintain scroll position.
-		expect(
-			await typewriterUtils.getDiff( initialPosition )
-		).toBeLessThanOrEqual( BUFFER );
+		await expect
+			.poll( () => typewriterUtils.getDiff( initialPosition ) )
+			.toBeLessThanOrEqual( BUFFER );
 	} );
 
 	test( 'should scroll caret into view from the top', async ( {
@@ -243,9 +245,9 @@ test.describe( 'Typewriter', () => {
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
 
-		expect(
-			await typewriterUtils.getDiff( newBottomPosition )
-		).toBeLessThanOrEqual( BUFFER );
+		await expect
+			.poll( () => typewriterUtils.getDiff( newBottomPosition ) )
+			.toBeLessThanOrEqual( BUFFER );
 
 		await page.keyboard.press( 'Backspace' );
 
@@ -275,9 +277,9 @@ test.describe( 'Typewriter', () => {
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
 
-		expect(
-			await typewriterUtils.getDiff( newTopPosition )
-		).toBeLessThanOrEqual( BUFFER );
+		await expect
+			.poll( () => typewriterUtils.getDiff( newTopPosition ) )
+			.toBeLessThanOrEqual( BUFFER );
 	} );
 } );
 
