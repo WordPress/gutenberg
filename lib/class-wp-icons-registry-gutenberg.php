@@ -832,6 +832,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		while ( $processor->next_token() && $processor->get_current_depth() >= $depth ) {
 			$svg .= $processor->serialize_token();
 		}
+		if (
+			null !== $processor->get_last_error()
+			|| $processor->paused_at_incomplete_token()
+		) {
+			return '';
+		}
 		$svg .= '</svg>';
 		return wp_kses( $svg, $allowed_tags );
 	}

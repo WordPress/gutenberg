@@ -168,7 +168,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M0 0h24v24H0z" /></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" /></svg>',
 			),
-
 			// Dangerous content is stripped (wp_kses).
 			'strips foreignObject but keeps text content' => array(
 				'<svg xmlns="http://www.w3.org/2000/svg"><foreignObject><p>paragraph content</p><script>alert(1)</script></foreignObject><path d="M0 0h24v24H0z" /></svg>',
@@ -194,7 +193,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0"/><iframe src="evil"></iframe><object data="x" /></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
 			),
-
 			// Returns empty string when input is not SVG.
 			'returns empty for empty string'              => array(
 				'',
@@ -216,7 +214,6 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<p>before</p><svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0" /></svg>',
 				'',
 			),
-
 			// Root SVG element.
 			'preserves root svg element'                  => array(
 				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" width="24" height="24" class="icon" aria-hidden="true"><path d="M0 0" fill="currentColor" /></svg>',
@@ -283,6 +280,15 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 			'preserves animation elements'                => array(
 				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributeName="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path><path d="M0 0"><set attributeName="opacity" to="0.5" begin="1s" /></path></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"><animate attributename="opacity" from="1" to="0.5" dur="1s" /><animateTransform attributename="transform" type="rotate" from="0 12 12" to="360 12 12" dur="2s" /><path d="M0,0 L10,10"><animateMotion path="M0,0 L24,24" dur="1s" /></path><path d="M0 0"><set attributename="opacity" to="0.5" begin="1s" /></path></svg>',
+			),
+			// Returns empty string when the processor cannot fully parse the SVG.
+			'returns empty when paused on incomplete token' => array(
+				'<svg><path d="M0 0"',
+				'',
+			),
+			'returns empty when processor errors on unsupported markup' => array(
+				'<svg><foreignObject><table>TEXT NOT SUPPORTED HERE!',
+				'',
 			),
 		);
 	}
