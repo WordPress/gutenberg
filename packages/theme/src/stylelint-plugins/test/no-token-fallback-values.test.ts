@@ -1,6 +1,13 @@
+/**
+ * @jest-environment node
+ */
+import plugin from '../no-token-fallback-values.mjs';
 import { getStylelintResult } from './utils';
 
-const CONFIG = './.stylelintrc.no-token-fallback-values.json';
+const CONFIG = {
+	plugins: [ plugin ],
+	rules: { 'plugin-wpds/no-token-fallback-values': true },
+};
 
 describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
 	let result: ReturnType< typeof getStylelintResult >;

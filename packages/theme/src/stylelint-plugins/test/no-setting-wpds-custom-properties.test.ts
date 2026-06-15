@@ -1,6 +1,13 @@
+/**
+ * @jest-environment node
+ */
+import plugin from '../no-setting-wpds-custom-properties.mjs';
 import { getStylelintResult } from './utils';
 
-const CONFIG = './.stylelintrc.no-setting-wpds-custom-properties.json';
+const CONFIG = {
+	plugins: [ plugin ],
+	rules: { 'plugin-wpds/no-setting-wpds-custom-properties': true },
+};
 
 describe( 'flags no warnings with valid wpds custom properties css', () => {
 	let result: ReturnType< typeof getStylelintResult >;
