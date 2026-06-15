@@ -29,7 +29,7 @@ Semantic tokens follow a consistent naming pattern that encodes the token's purp
 
 **Semantic tokens** are the public API of the design system's tokens. They map to primitive token values, but the values are incidental, and a consumer is expected to choose a semantic token based on their specific use-case. The design system provides semantic tokens to cover a breadth of use-cases that are standardized at a design systems level.
 
-This structure is meant to shift the emphasis away from the values themselves and toward the meaning and purpose that the tokens represent. Ultimately, the tokens still map to raw values that affect how a component is styled and those values should be internally consistent, but the primitive layer is an incidental concern of the theming internals and not a consideration of the end-user of the design system.
+This structure is meant to **shift the emphasis away from the values themselves and toward the meaning and purpose that the tokens represent**. Ultimately, the tokens still map to raw values that affect how a component is styled and those values should be internally consistent, but the primitive layer is an incidental concern of the theming internals and not a consideration of the end-user of the design system.
 
 Example:
 
