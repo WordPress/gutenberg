@@ -353,6 +353,26 @@ describe( 'RectangleStencil', () => {
 			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
 		} );
 
+		it( 'settles the resize on pointercancel', () => {
+			const { onResizeStart, onResizeEnd } = renderStencil();
+			const [ firstHandle ] = screen.getAllByRole( 'button' );
+
+			fireEvent.pointerDown( firstHandle, {
+				button: 0,
+				clientX: 100,
+				clientY: 100,
+				pointerId: 1,
+			} );
+
+			expect( onResizeStart ).toHaveBeenCalledTimes( 1 );
+			expect( onResizeEnd ).not.toHaveBeenCalled();
+
+			fireEvent.pointerCancel( firstHandle, { pointerId: 1 } );
+			fireEvent.pointerUp( firstHandle, { pointerId: 1 } );
+
+			expect( onResizeEnd ).toHaveBeenCalledTimes( 1 );
+		} );
+
 		it( 'focuses the handle button after a pointer drag ends', () => {
 			renderStencil();
 			const [ firstHandle ] = screen.getAllByRole( 'button' );

@@ -53,6 +53,7 @@ import {
 } from '../../core/source-region';
 import { ViewportProvider, useViewport } from './viewport-provider';
 import { VISUALLY_HIDDEN_STYLE } from '../visually-hidden-style';
+import { isCropVisuallyUnreachable } from './crop-reachability';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
@@ -775,6 +776,64 @@ function CropperInner(
 			clearTimeout( settleTimerRef.current );
 		};
 	}, [] );
+
+	const recoveryKeyRef = useRef< string | null >( null );
+	useEffect( () => {
+		// Last-resort recovery for rogue idle states where the crop has ended up
+		// outside the visible canvas and the user cannot reach the handles. This
+		// deliberately does not run during any active interaction or settle.
+		if (
+			! state.image ||
+			isResizing ||
+			settling ||
+			isDragging ||
+			isZooming ||
+			isPlacementActive ||
+			isInteractionPlacementActive
+		) {
+			recoveryKeyRef.current = null;
+			return;
+		}
+
+		if (
+			! isCropVisuallyUnreachable(
+				state.cropRect,
+				canvasSize,
+				scaledVisualSize,
+				viewportState.pan
+			)
+		) {
+			recoveryKeyRef.current = null;
+			return;
+		}
+
+		const recoveryKey = JSON.stringify( {
+			cropRect: state.cropRect,
+			canvasSize,
+			scaledVisualSize,
+			viewportPan: viewportState.pan,
+		} );
+		if ( recoveryKeyRef.current === recoveryKey ) {
+			return;
+		}
+		recoveryKeyRef.current = recoveryKey;
+		resetViewport();
+		settleCrop();
+	}, [
+		state.image,
+		state.cropRect,
+		canvasSize,
+		scaledVisualSize,
+		viewportState.pan,
+		isResizing,
+		settling,
+		isDragging,
+		isZooming,
+		isPlacementActive,
+		isInteractionPlacementActive,
+		resetViewport,
+		settleCrop,
+	] );
 
 	const isInteractiveGrid = showGrid === 'interactive';
 	const showInteractiveGrid =

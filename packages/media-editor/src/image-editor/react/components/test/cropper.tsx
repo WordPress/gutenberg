@@ -570,6 +570,48 @@ describe( 'Cropper', () => {
 		jest.useRealTimers();
 	} );
 
+	it( 'settles an idle crop that is no longer visible in the canvas', async () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			cropRect: { x: 2, y: 0.25, width: 0.5, height: 0.5 },
+		};
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		await waitFor( () =>
+			expect( controller.settleCrop ).toHaveBeenCalledTimes( 1 )
+		);
+	} );
+
+	it( 'does not settle visible crops near the canvas edge', async () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			cropRect: { x: -0.02, y: 0.25, width: 0.5, height: 0.5 },
+		};
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		await screen.findByTestId( 'cropper-stencil' );
+
+		expect( controller.settleCrop ).not.toHaveBeenCalled();
+	} );
+
 	it( 'ignores wheel zoom while a crop resize is active', async () => {
 		const controller = createController();
 		render(

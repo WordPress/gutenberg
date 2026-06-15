@@ -312,6 +312,7 @@ export function RectangleStencil( {
 				}
 				el.removeEventListener( 'pointermove', onMove );
 				el.removeEventListener( 'pointerup', onEnd );
+				el.removeEventListener( 'pointercancel', onEnd );
 				el.removeEventListener( 'lostpointercapture', onEnd );
 				activePointerResizeRef.current = null;
 				if ( notifyResizeEnd ) {
@@ -331,6 +332,7 @@ export function RectangleStencil( {
 
 			el.addEventListener( 'pointermove', onMove );
 			el.addEventListener( 'pointerup', onEnd );
+			el.addEventListener( 'pointercancel', onEnd );
 			el.addEventListener( 'lostpointercapture', onEnd );
 			activePointerResizeRef.current = { cancel: cancelResize };
 
