@@ -8,7 +8,8 @@
 			"overlayMenu": "mobile",
 			"icon": "handle",
 			"hasIcon": true,
-			"maxNestingLevel": 5
+			"maxNestingLevel": 5,
+			"depth": 5
 		},
 		"innerBlocks": []
 	}
