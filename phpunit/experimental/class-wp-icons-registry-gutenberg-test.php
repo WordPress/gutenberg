@@ -155,6 +155,20 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 * @return array[] Array of arrays with input and expected sanitized output.
 	 */
 	public function data_sanitize_icon_content() {
+		/*
+		 * WordPress 7.1 preserves the `xmlns:xlink` namespace attribute when
+		 * serializing inline SVG through WP_HTML_Processor; WordPress 7.0 strips
+		 * it. Branch the expectation so the test passes on both the current and
+		 * the previous WordPress version exercised in CI.
+		 *
+		 * @see https://core.trac.wordpress.org/changeset/62492
+		 *
+		 * TODO: Remove this conditional once WordPress 7.0 support is dropped.
+		 */
+		$xlink = is_wp_version_compatible( '7.1' )
+			? ' xmlns:xlink="http://www.w3.org/1999/xlink"'
+			: '';
+
 		return array(
 			'extracts only first svg when multiple present' => array(
 				'<svg xmlns="http://www.w3.org/2000/svg"><path d="first"/></svg><svg xmlns="http://www.w3.org/2000/svg"><path d="second"/></svg>',
@@ -164,9 +178,9 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 				'<svg xmlns="http://www.w3.org/2000/svg"><p>paragraph content</p><path d="M0 0h24v24H0z" /><div>div content</div></svg>',
 				'<svg xmlns="http://www.w3.org/2000/svg"></svg>',
 			),
-			'strips namespace attributes'                 => array(
+			'handles xmlns:xlink namespace attribute'     => array(
 				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M0 0h24v24H0z" /></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"' . $xlink . '><path d="M0 0h24v24H0z" /></svg>',
 			),
 			// Dangerous content is stripped (wp_kses).
 			'strips foreignObject but keeps text content' => array(
@@ -217,7 +231,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 			// Root SVG element.
 			'preserves root svg element'                  => array(
 				'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" width="24" height="24" class="icon" aria-hidden="true"><path d="M0 0" fill="currentColor" /></svg>',
-				'<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" preserveaspectratio="xMidYMid meet" width="24" height="24" class="icon" aria-hidden="true"><path d="M0 0" fill="currentColor" /></svg>',
+				'<svg xmlns="http://www.w3.org/2000/svg"' . $xlink . ' viewbox="0 0 24 24" preserveaspectratio="xMidYMid meet" width="24" height="24" class="icon" aria-hidden="true"><path d="M0 0" fill="currentColor" /></svg>',
 			),
 			// Basic shape elements.
 			'preserves basic shape elements'              => array(
