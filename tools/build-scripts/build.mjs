@@ -159,13 +159,13 @@ async function build() {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
-		// Step 7.4: Copy emojibase locale data into build/ so the editor
+		// Copy emojibase locale data into build/ so the editor
 		// can fetch it from plugins_url() instead of bundling ~770KB of
 		// JSON into the main JS bundle.
 		console.log( '\n📦 Copying emojibase data...' );
 		await exec( 'node', [ './bin/copy-emojibase-data.mjs' ] );
 
-		// Step 7.5: Build blocks manifests
+		// Build blocks manifests
 		console.log( '\n📦 Building blocks manifests...' );
 		const blocksDirs = [
 			{
