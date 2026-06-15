@@ -13,11 +13,7 @@ import { useSelect } from '@wordpress/data';
  */
 import PostViewLink from '../';
 
-jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// Allow tweaking the returned data on each test.
-	const mock = jest.fn();
-	return mock;
-} );
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
 
 const DEFAULTS = {
 	postType: { labels: { view_item: 'View Post' } },
@@ -49,9 +45,7 @@ describe( 'PostViewLink', () => {
 	} );
 
 	it( 'falls back to "View post" without crashing when the post type has no labels', () => {
-		// Regression test for #62918: some custom post types are registered
-		// without a `labels` object (e.g. `wp_template_part`). Accessing
-		// `labels.view_item` on those used to throw.
+		// See https://github.com/WordPress/gutenberg/issues/62918.
 		setupUseSelectMock( { postType: {} } );
 		render( <PostViewLink /> );
 		expect( screen.getByLabelText( 'View post' ) ).toBeInTheDocument();

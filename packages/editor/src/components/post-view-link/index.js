@@ -24,10 +24,6 @@ export default function PostViewLink() {
 			return {
 				permalink: select( editorStore ).getPermalink(),
 				isPublished: select( editorStore ).isCurrentPostPublished(),
-				// Guard against post types that don't expose `labels` (e.g.
-				// `wp_template_part` or custom post types registered without
-				// the `labels` argument). Falling back to the default
-				// translatable label below.
 				label: postType?.labels?.view_item,
 				hasLoaded: !! postType,
 				showIconLabels: get( 'core', 'showIconLabels' ),

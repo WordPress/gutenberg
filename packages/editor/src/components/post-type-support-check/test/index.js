@@ -55,9 +55,6 @@ describe( 'PostTypeSupportCheck', () => {
 	} );
 
 	it( 'does not crash when the post type has no `supports` object', () => {
-		// Regression test for #62918: some custom post types (e.g.
-		// `wp_template_part`) are registered without a `supports` argument,
-		// so `postType.supports` is undefined.
 		setupUseSelectMock( {} );
 		const { container } = render(
 			<PostTypeSupportCheck supportKeys="title">
