@@ -26,6 +26,10 @@ describe( 'useThemeProviderStyles', () => {
 				background: DEFAULT_SEED_COLORS.background,
 			} );
 			expect( result.current.resolvedSettings.cursor ).toBeUndefined();
+			// `cornerRadius` falls back to the prebuilt default.
+			expect( result.current.resolvedSettings.cornerRadius ).toBe(
+				'subtle'
+			);
 		} );
 
 		it( 'uses locally provided settings', () => {
@@ -33,6 +37,7 @@ describe( 'useThemeProviderStyles', () => {
 				useThemeProviderStyles( {
 					color: { primary: '#1e90ff', background: '#f8f8f8' },
 					cursor: { control: 'pointer' },
+					cornerRadius: 'moderate',
 				} )
 			);
 
@@ -43,6 +48,9 @@ describe( 'useThemeProviderStyles', () => {
 			expect( result.current.resolvedSettings.cursor ).toEqual( {
 				control: 'pointer',
 			} );
+			expect( result.current.resolvedSettings.cornerRadius ).toBe(
+				'moderate'
+			);
 		} );
 
 		describe( 'within a parent provider', () => {
@@ -50,6 +58,7 @@ describe( 'useThemeProviderStyles', () => {
 				<ThemeProvider
 					color={ { primary: '#abcdef', background: '#222222' } }
 					cursor={ { control: 'pointer' } }
+					cornerRadius="pronounced"
 				>
 					{ children }
 				</ThemeProvider>
@@ -67,6 +76,9 @@ describe( 'useThemeProviderStyles', () => {
 				expect( result.current.resolvedSettings.cursor ).toEqual( {
 					control: 'pointer',
 				} );
+				expect( result.current.resolvedSettings.cornerRadius ).toBe(
+					'pronounced'
+				);
 			} );
 
 			it( 'resolves each setting independently: local wins, unset inherits', () => {
@@ -84,10 +96,13 @@ describe( 'useThemeProviderStyles', () => {
 					// `background` keeps inheriting from the parent.
 					background: '#222222',
 				} );
-				// `cursor` keeps inheriting from the parent.
+				// `cursor` and `cornerRadius` keep inheriting from the parent.
 				expect( result.current.resolvedSettings.cursor ).toEqual( {
 					control: 'pointer',
 				} );
+				expect( result.current.resolvedSettings.cornerRadius ).toBe(
+					'pronounced'
+				);
 			} );
 		} );
 	} );

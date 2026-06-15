@@ -79,6 +79,32 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, CURSOR_CONTROL ) ).toBe( 'pointer' );
 	} );
 
+	describe( 'cornerRadius', () => {
+		it( 'reflects the preset as a data attribute', () => {
+			render(
+				<ThemeProvider cornerRadius="pronounced">
+					<div data-testid="child">x</div>
+				</ThemeProvider>
+			);
+
+			expect(
+				getScopingProvider( screen.getByTestId( 'child' ) )
+			).toHaveAttribute( 'data-wpds-corner-radius', 'pronounced' );
+		} );
+
+		it( 'defaults to the subtle preset', () => {
+			render(
+				<ThemeProvider>
+					<div data-testid="child">x</div>
+				</ThemeProvider>
+			);
+
+			expect(
+				getScopingProvider( screen.getByTestId( 'child' ) )
+			).toHaveAttribute( 'data-wpds-corner-radius', 'subtle' );
+		} );
+	} );
+
 	describe( 'isRoot', () => {
 		it( 'defines the token on the document root', () => {
 			render(
@@ -109,6 +135,7 @@ describe( 'ThemeProvider', () => {
 				<ThemeProvider
 					color={ { primary: PRIMARY, background: BACKGROUND } }
 					cursor={ { control: 'pointer' } }
+					cornerRadius="pronounced"
 				>
 					<ThemeProvider>
 						<div data-testid="inheriting">a</div>
@@ -130,12 +157,20 @@ describe( 'ThemeProvider', () => {
 			expect( readProp( inheriting, BRAND_BG ) ).toBe( PRIMARY );
 			expect( readProp( inheriting, SURFACE_BG ) ).toBe( BACKGROUND );
 			expect( readProp( inheriting, CURSOR_CONTROL ) ).toBe( 'pointer' );
+			expect( inheriting ).toHaveAttribute(
+				'data-wpds-corner-radius',
+				'pronounced'
+			);
 
 			// A nested provider overrides only what it defines (`primary`),
-			// inheriting the rest (`background`, `cursor`).
+			// inheriting the rest (`background`, `cursor`, `cornerRadius`).
 			expect( readProp( overriding, BRAND_BG ) ).toBe( OTHER_PRIMARY );
 			expect( readProp( overriding, SURFACE_BG ) ).toBe( BACKGROUND );
 			expect( readProp( overriding, CURSOR_CONTROL ) ).toBe( 'pointer' );
+			expect( overriding ).toHaveAttribute(
+				'data-wpds-corner-radius',
+				'pronounced'
+			);
 		} );
 	} );
 } );
