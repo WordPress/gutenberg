@@ -12,7 +12,7 @@ export const settings = {
 	icon,
 	example: {
 		attributes: {
-			icon: 'core/audio',
+			icon: 'core/info',
 			style: {
 				dimensions: {
 					width: '48px',

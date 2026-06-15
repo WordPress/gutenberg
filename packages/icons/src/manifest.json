@@ -1579,11 +1579,6 @@
 		"public": true
 	},
 	{
-		"slug": "tab",
-		"label": "Tab",
-		"filePath": "library/tab.svg"
-	},
-	{
 		"slug": "tab-list",
 		"label": "Tab List",
 		"filePath": "library/tab-list.svg"
@@ -1645,9 +1640,9 @@
 		"filePath": "library/thumbs-up.svg"
 	},
 	{
-		"slug": "time-to-read",
-		"label": "Time To Read",
-		"filePath": "library/time-to-read.svg"
+		"slug": "time",
+		"label": "Time",
+		"filePath": "library/time.svg"
 	},
 	{
 		"slug": "tip",

@@ -1,6 +1,6 @@
 /* Translucent surface so the gear stays legible over any widget background. */
 .widgetSettingsToolbar {
-	background: color-mix(in srgb, var(--wpds-color-bg-surface-neutral) 40%, transparent);
+	background: color-mix(in srgb, var(--wpds-color-background-surface-neutral) 40%, transparent);
 	opacity: 0;
 	pointer-events: none;
 }

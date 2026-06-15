@@ -134,9 +134,7 @@ export function RectangleStencil( {
 		} ),
 		[ boundsMinX, boundsMinY, boundsMaxX, boundsMaxY ]
 	);
-	const keyboardSettleTimerRef = useRef<
-		ReturnType< typeof setTimeout > | undefined
-	>( undefined );
+	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
 	const keyboardResizeActiveRef = useRef( false );
 	const resizeHandleDescriptionId = useId();
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
@@ -490,6 +488,7 @@ export function RectangleStencil( {
 	return (
 		<div
 			className="wp-media-editor-image-editor__stencil"
+			data-testid="cropper-stencil"
 			style={ {
 				left,
 				top,

@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 11.8.0 (2026-06-10)
+
+### Enhancements
+
+-   Use partial clones (`--filter=blob:none`) when downloading git sources and the PHPUnit test suite to reduce download size. ([#78918](https://github.com/WordPress/gutenberg/pull/78918))
+
+### Bug Fixes
+
+-   Replace `extract-zip` with `adm-zip` to fix silent hang on Node 24.16.0 (libuv 1.52.1) when downloading URL-based zip sources. ([#78762](https://github.com/WordPress/gutenberg/issues/78762))
+
+## 11.7.0 (2026-05-27)
+
 ## 11.6.0 (2026-05-14)
 
 ## 11.5.0 (2026-04-29)

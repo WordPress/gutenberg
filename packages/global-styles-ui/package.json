@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/global-styles-ui",
-	"version": "1.13.0",
+	"version": "1.15.0",
 	"description": "Global Styles UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -42,7 +42,6 @@
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
 	},
-	"react-native": "src/index",
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -60,13 +59,24 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
 		"change-case": "^4.1.2",
-		"clsx": "^2.1.0",
-		"colord": "^2.7.0"
+		"clsx": "^2.1.1",
+		"colord": "^2.9.3"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2"
 	},
 	"peerDependencies": {
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"@types/react": "^18.3.27",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

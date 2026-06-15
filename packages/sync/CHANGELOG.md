@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.48.0 (2026-06-10)
+
+-   Prevent RTC polling interval filters from slowing active HTTP polling.
+
+## 1.47.0 (2026-05-27)
+
 ## 1.46.0 (2026-05-14)
 
 ## 1.45.0 (2026-04-29)

@@ -8,7 +8,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
 import { check } from '@wordpress/icons';
 import { EntitiesSavedStates } from '@wordpress/editor';
-import { Button, Modal, Tooltip as WCTooltip } from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+import { Tooltip } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -82,28 +84,37 @@ export default function SaveButton() {
 		);
 	};
 	const label = getLabel();
+	const shortcut = displayShortcut.primary( 's' );
 
 	return (
 		<>
-			<WCTooltip
-				text={ hasChanges ? label : undefined }
-				shortcut={ displayShortcut.primary( 's' ) }
-			>
-				<Button
-					variant="primary"
-					size="compact"
-					onClick={ () => setIsSaveViewOpened( true ) }
-					onBlur={ hideSavedState }
-					disabled={ disabled }
-					accessibleWhenDisabled
-					isBusy={ isSaving }
-					aria-keyshortcuts={ rawShortcut.primary( 's' ) }
-					className="boot-save-button"
-					icon={ isInSavedState ? check : undefined }
-				>
-					{ label }
-				</Button>
-			</WCTooltip>
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={
+						<Button
+							variant="primary"
+							size="compact"
+							onClick={ () => setIsSaveViewOpened( true ) }
+							onBlur={ hideSavedState }
+							disabled={ disabled }
+							accessibleWhenDisabled
+							isBusy={ isSaving }
+							aria-keyshortcuts={ rawShortcut.primary( 's' ) }
+							className="boot-save-button"
+							icon={ isInSavedState ? check : undefined }
+						>
+							{ label }
+						</Button>
+					}
+				/>
+				<Tooltip.Popup>
+					{ hasChanges && <span>{ label }</span> }
+					{ /* TODO: replace with a future `@wordpress/ui` `Shortcut` primitive once available */ }
+					<span className="boot-save-button__shortcut">
+						{ shortcut }
+					</span>
+				</Tooltip.Popup>
+			</Tooltip.Root>
 			{ isSaveViewOpen && (
 				<Modal
 					title={ __( 'Review changes' ) }

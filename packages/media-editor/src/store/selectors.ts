@@ -14,3 +14,7 @@ export function getId( state: State ): number | null {
 export function getOnUpdate( state: State ) {
 	return state.onUpdate;
 }
+
+export function getOnClose( state: State ) {
+	return state.onClose;
+}

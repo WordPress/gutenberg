@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Icon Block: Insert with a default icon instead of an empty placeholder ([#79111](https://github.com/WordPress/gutenberg/pull/79111)).
+
+## 9.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+-   Page List: derive `isNested` from a new `core/isInsideSubmenu` block context provided by Navigation Submenu, replacing the self-setting attribute pattern that was dirtying related entities ([#79015](https://github.com/WordPress/gutenberg/issues/79015)).
+
+## 9.47.0 (2026-05-27)
+
 ### Internal
 
 -   Gallery editor: remove `Notice` positioning overrides that conflicted with the updated `Notice` layout ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
