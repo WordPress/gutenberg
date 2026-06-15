@@ -488,6 +488,21 @@ describe( 'Cropper', () => {
 		return match ? parseFloat( match[ 1 ] ) : 1;
 	}
 
+	function imageTransformParts(): { viewScale: number; matrix: number[] } {
+		const img = screen.getByTestId< HTMLImageElement >( 'cropper-image' );
+		const match = img.style.transform.match(
+			/^scale\(\s*([^)]+?)\s*\)\s+matrix\(([^)]+)\)/
+		);
+		expect( match ).not.toBeNull();
+		const [ , viewScale, matrix ] = match as RegExpMatchArray;
+		return {
+			viewScale: parseFloat( viewScale ),
+			matrix: matrix
+				.split( ',' )
+				.map( ( value ) => parseFloat( value.trim() ) ),
+		};
+	}
+
 	it( 'magnifies the scene so an under-filling crop fills the canvas at rest', () => {
 		const controller = createController();
 		controller.state = {
@@ -502,6 +517,27 @@ describe( 'Cropper', () => {
 		// Footprint is 133.33x400. The square crop's binding axis (height) fills
 		// to 0.8 * 400, so the image magnifies by 0.8 * 400 / 133.33 = 2.4.
 		expect( imageScale() ).toBeCloseTo( 2.4, 2 );
+	} );
+
+	it( 'computes image pan from the unscaled footprint before applying view scale', () => {
+		const controller = createController();
+		controller.state = {
+			...controller.state,
+			image: TALL_IMAGE,
+			cropRect: { x: 0, y: 1 / 3, width: 1, height: 1 / 3 },
+			pan: { x: 0.1, y: -0.05 },
+		};
+		render( <Cropper src="tall.jpg" controller={ controller } /> );
+
+		const { viewScale, matrix } = imageTransformParts();
+
+		expect( viewScale ).toBeCloseTo( 2.4, 2 );
+		// Pan translations are produced by useTransformStyle from the unscaled
+		// 133.33x400 footprint, then magnified by the leading scale(viewScale).
+		// If useTransformStyle received scaledVisualSize, these would be 32 and
+		// -48 instead.
+		expect( matrix[ 4 ] ).toBeCloseTo( ( 400 / 3 ) * 0.1, 5 );
+		expect( matrix[ 5 ] ).toBeCloseTo( 400 * -0.05, 5 );
 	} );
 
 	it( 'positions crop overlays against the magnified footprint', () => {

@@ -522,7 +522,10 @@ function CropperInner(
 		};
 	}, [ onWheelNative ] );
 
-	// Use the transform style hook for the image CSS transform.
+	// Use the unscaled contain-fit footprint here. `imageStyle` prepends
+	// `scale(viewScale)` to this matrix, so pan translations are magnified with
+	// the rest of the scene; using `scaledVisualSize` here would apply viewScale
+	// to pan twice.
 	const transformString = useTransformStyle( state, visualSize );
 
 	/**
