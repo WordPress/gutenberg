@@ -119,6 +119,16 @@ import {
 	type YBlockAttributes,
 } from '../crdt-blocks';
 import { getCachedRichTextData, createRichTextDataCache } from '../crdt-text';
+import { asHtmlStringIndex, asRichTextOffset } from '../crdt-utils';
+import { type WPBlockSelection } from '../../types';
+
+function createCursorSelection( offset: number ): WPBlockSelection {
+	return {
+		attributeKey: 'content',
+		clientId: 'block-1',
+		offset: asRichTextOffset( offset ),
+	};
+}
 
 describe( 'crdt-blocks', () => {
 	let doc: Y.Doc;
@@ -180,6 +190,78 @@ describe( 'crdt-blocks', () => {
 
 			expect( yblocks.length ).toBe( 1 );
 			const block = yblocks.get( 0 );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
+		it( 'updates the clientId when an updated block arrives with a different clientId', () => {
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'initial-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'initial-id' );
+
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'updated-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'updated-id' );
+			const content = (
+				block.get( 'attributes' ) as YBlockAttributes
+			 ).get( 'content' ) as Y.Text;
+			expect( content.toString() ).toBe( 'Updated content' );
+		} );
+
+		it( 'preserves the local clientId when requested for reparsed content blocks', () => {
+			// Simulates the Code Editor flow: the sender re-parses raw HTML on
+			// every keystroke, which mints a fresh clientId for every block.
+			// The Y.Doc's clientId should stay stable so remote peers don't
+			// remount the block (and any embed iframe within it).
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Initial content' },
+					innerBlocks: [],
+					clientId: 'stable-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+			expect( yblocks.get( 0 ).get( 'clientId' ) ).toBe( 'stable-id' );
+
+			const reparsedBlocks: Block[] = [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Updated content' },
+					innerBlocks: [],
+					clientId: 'freshly-parsed-id',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, reparsedBlocks, null, {
+				preserveClientIds: true,
+			} );
+
+			expect( yblocks.length ).toBe( 1 );
+			const block = yblocks.get( 0 );
+			expect( block.get( 'clientId' ) ).toBe( 'stable-id' );
 			const content = (
 				block.get( 'attributes' ) as YBlockAttributes
 			 ).get( 'content' ) as Y.Text;
@@ -1006,6 +1088,7 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
@@ -1016,10 +1099,15 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'XHello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
-			mergeCrdtBlocks( yblocks, updatedBlocks, 0 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 0 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -1034,6 +1122,7 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
@@ -1044,10 +1133,15 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World!' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
-			mergeCrdtBlocks( yblocks, updatedBlocks, 11 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 11 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -1062,6 +1156,7 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
@@ -1072,10 +1167,15 @@ describe( 'crdt-blocks', () => {
 					name: 'core/paragraph',
 					attributes: { content: 'Hello World' },
 					innerBlocks: [],
+					clientId: 'block-1',
 				},
 			];
 
-			mergeCrdtBlocks( yblocks, updatedBlocks, 999 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 999 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2602,7 +2702,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor after 'Hello 😀' = 6 + 2 = 8
-			mergeCrdtBlocks( yblocks, updatedBlocks, 8 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 8 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2633,7 +2737,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor at position 6 (after 'Hello ', emoji was deleted)
-			mergeCrdtBlocks( yblocks, updatedBlocks, 6 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 6 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2664,7 +2772,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor after 'a😀x' = 1 + 2 + 1 = 4
-			mergeCrdtBlocks( yblocks, updatedBlocks, 4 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 4 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2696,7 +2808,11 @@ describe( 'crdt-blocks', () => {
 			];
 
 			// Cursor after '😀 hello ' = 2 + 7 = 9
-			mergeCrdtBlocks( yblocks, updatedBlocks, 9 );
+			mergeCrdtBlocks(
+				yblocks,
+				updatedBlocks,
+				createCursorSelection( 9 )
+			);
 
 			const block = yblocks.get( 0 );
 			const content = (
@@ -2729,7 +2845,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a😀b' );
 
-			mergeRichTextUpdate( yText, 'a😀c', 4 );
+			mergeRichTextUpdate( yText, 'a😀c', asHtmlStringIndex( 4 ) );
 
 			expect( yText.toString() ).toBe( 'a😀c' );
 		} );
@@ -2738,7 +2854,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'ab' );
 
-			mergeRichTextUpdate( yText, 'a😀b', 3 );
+			mergeRichTextUpdate( yText, 'a😀b', asHtmlStringIndex( 3 ) );
 
 			expect( yText.toString() ).toBe( 'a😀b' );
 		} );
@@ -2747,7 +2863,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a😀b' );
 
-			mergeRichTextUpdate( yText, 'ab', 1 );
+			mergeRichTextUpdate( yText, 'ab', asHtmlStringIndex( 1 ) );
 
 			expect( yText.toString() ).toBe( 'ab' );
 		} );
@@ -2756,7 +2872,11 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'Hello 😀 World 🎉' );
 
-			mergeRichTextUpdate( yText, 'Hello 😀 Beautiful World 🎉', 19 );
+			mergeRichTextUpdate(
+				yText,
+				'Hello 😀 Beautiful World 🎉',
+				asHtmlStringIndex( 19 )
+			);
 
 			expect( yText.toString() ).toBe( 'Hello 😀 Beautiful World 🎉' );
 		} );
@@ -2766,7 +2886,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a🏳️‍🌈b' );
 
-			mergeRichTextUpdate( yText, 'a🏳️‍🌈xb', 7 );
+			mergeRichTextUpdate( yText, 'a🏳️‍🌈xb', asHtmlStringIndex( 7 ) );
 
 			expect( yText.toString() ).toBe( 'a🏳️‍🌈xb' );
 		} );
@@ -2776,9 +2896,29 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'Hi 👋🏽' );
 
-			mergeRichTextUpdate( yText, 'Hi 👋🏽!', 6 );
+			mergeRichTextUpdate( yText, 'Hi 👋🏽!', asHtmlStringIndex( 6 ) );
 
 			expect( yText.toString() ).toBe( 'Hi 👋🏽!' );
+		} );
+	} );
+
+	describe( 'mergeRichTextUpdate - rapid typing', () => {
+		it( 'appends repeated text one character at a time with cursor hints', () => {
+			const text =
+				'987654321098765432109876543210987654321098765432109876543210';
+			const yText = doc.getText( 'test' );
+			yText.insert( 0, 'p1' );
+
+			for ( let i = 1; i <= text.length; i++ ) {
+				const value = `p1${ text.slice( 0, i ) }`;
+				mergeRichTextUpdate(
+					yText,
+					value,
+					asHtmlStringIndex( value.length )
+				);
+			}
+
+			expect( yText.toString() ).toBe( `p1${ text }` );
 		} );
 	} );
 
@@ -2812,7 +2952,11 @@ describe( 'crdt-blocks', () => {
 				];
 
 				// Cursor after '𠮷野家は美味しい' = 2+1+1+1+1+1+1+1 = 9
-				mergeCrdtBlocks( yblocks, updatedBlocks, 9 );
+				mergeCrdtBlocks(
+					yblocks,
+					updatedBlocks,
+					createCursorSelection( 9 )
+				);
 
 				const block = yblocks.get( 0 );
 				const content = (
@@ -2843,7 +2987,11 @@ describe( 'crdt-blocks', () => {
 					},
 				];
 
-				mergeCrdtBlocks( yblocks, updatedBlocks, 18 );
+				mergeCrdtBlocks(
+					yblocks,
+					updatedBlocks,
+					createCursorSelection( 18 )
+				);
 
 				const block = yblocks.get( 0 );
 				const content = (
@@ -2867,7 +3015,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𠮷b' );
 
-				mergeRichTextUpdate( yText, 'a𠮷xb', 4 );
+				mergeRichTextUpdate( yText, 'a𠮷xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𠮷xb' );
 			} );
@@ -2877,7 +3025,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𝐀b' );
 
-				mergeRichTextUpdate( yText, 'a𝐀xb', 4 );
+				mergeRichTextUpdate( yText, 'a𝐀xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𝐀xb' );
 			} );
@@ -2897,7 +3045,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𝄞b' );
 
-				mergeRichTextUpdate( yText, 'a𝄞xb', 4 );
+				mergeRichTextUpdate( yText, 'a𝄞xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𝄞xb' );
 			} );

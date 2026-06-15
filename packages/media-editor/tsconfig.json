@@ -8,12 +8,16 @@
 	"references": [
 		{ "path": "../api-fetch" },
 		{ "path": "../components" },
+		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
+		{ "path": "../date" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../keyboard-shortcuts" },
+		{ "path": "../keycodes" },
 		{ "path": "../notices" },
 		{ "path": "../private-apis" },
 		{ "path": "../ui" }

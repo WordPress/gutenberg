@@ -33,12 +33,6 @@ const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
 	{ id: 'pointer', title: 'Pointer' },
 ];
 
-const DENSITY_OPTIONS: ThemeOption[] = [
-	{ id: 'compact', title: 'Compact' },
-	{ id: '', title: 'Default' },
-	{ id: 'comfortable', title: 'Comfortable' },
-];
-
 function ThemeTooltipMessage( {
 	title,
 	globalName,
@@ -66,11 +60,6 @@ const ThemeTool = () => {
 	const tooltip = createElement(
 		Fragment,
 		null,
-		createElement( ThemeTooltipMessage, {
-			title: 'Density',
-			globalName: 'dsDensity',
-			options: DENSITY_OPTIONS,
-		} ),
 		createElement( ThemeTooltipMessage, {
 			title: 'Color',
 			globalName: 'dsColorTheme',

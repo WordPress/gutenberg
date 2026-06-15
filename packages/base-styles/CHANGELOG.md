@@ -2,13 +2,60 @@
 
 ## Unreleased
 
+## 10.0.0 (2026-06-10)
+
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717)):
+-   Remove the following entries from the `z-index()` helper ([#77773](https://github.com/WordPress/gutenberg/pull/77773)):
+   -   `.nux-dot-tip`
+
+## 9.0.0 (2026-05-27)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315), [#78362](https://github.com/WordPress/gutenberg/pull/78362)):
+    -   `.components-modal__header`
+    -   `.dataviews-footer`
+    -   `.dataviews-view-grid__card .dataviews-selection-checkbox`
+    -   `.dataviews-view-table thead`
+
+## 8.0.0 (2026-05-14)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808), [#78180](https://github.com/WordPress/gutenberg/pull/78180), [#78181](https://github.com/WordPress/gutenberg/pull/78181), [#78309](https://github.com/WordPress/gutenberg/pull/78309)):
+    -   `.block-editor-block-manager__category-title`
+    -   `.block-editor-block-manager__disabled-blocks-count`
+    -   `.block-library-query-pattern__selection-search`
+    -   `.block-library-template-part__selection-search`
+    -   `.components-popover__close`
+    -   `.edit-post-meta-boxes-area .spinner`
+    -   `.edit-post-meta-boxes-area.is-loading::before`
+    -   `.edit-site-layout__canvas-container.is-resizing::after`
+    -   `.edit-site-layout__canvas-container`
+    -   `.edit-site-layout__sidebar`
+    -   `.edit-site-sidebar-navigation-screen__title-icon`
+    -   `.edit-site-templates__dataviews-list-pagination`
+    -   `.editor-post-template__swap-template-search`
+    -   `.editor-start-page-options__modal__actions`
+    -   `.editor-start-template-options__modal__actions`
+    -   `.editor-text-editor__toolbar`
+    -   `.wp-block-cover__image-background`
+    -   `.wp-block-cover__inner-container`
+    -   `.wp-block-cover__video-background`
+    -   `.wp-block-cover.has-background-dim::before`
+    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
+
+## 7.0.0 (2026-04-29)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77774](https://github.com/WordPress/gutenberg/pull/77774)):
     -   `.block-editor-block-contextual-toolbar`
     -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
     -   `.block-editor-block-list__block::before`
     -   `.block-editor-block-list__block.has-block-overlay`
+    -   `.block-editor-block-list__block .reusable-block-edit-panel *`
     -   `.block-editor-block-list__insertion-point`
     -   `.block-editor-block-switcher__arrow`
     -   `.block-editor-url-input__suggestions`

@@ -95,6 +95,7 @@ export function PageAttributesParent() {
 			if ( !! fieldValue ) {
 				query.search = fieldValue;
 				query.orderby = 'relevance';
+				query.search_columns = [ 'post_title' ];
 			}
 
 			const parentPost = pageId

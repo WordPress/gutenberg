@@ -30,23 +30,21 @@ export function WithDesignSystemTheme(
 
 	const colorTheme = context.globals.dsColorTheme;
 	const cursorControl = context.globals.dsCursorControl || undefined;
-	const density = context.globals.dsDensity;
 
 	let color;
 	if ( colorTheme === 'dark' ) {
-		color = { bg: '#1e1e1e', primary: '#3858e9' };
+		color = { background: '#1e1e1e', primary: '#3858e9' };
 	}
 
 	return (
 		<ThemeProvider
 			color={ color }
 			cursor={ cursorControl ? { control: cursorControl } : undefined }
-			density={ density }
 			isRoot
 		>
 			<div
 				style={
-					color?.bg
+					color?.background
 						? {
 								background:
 									'var(--wpds-color-bg-surface-neutral-strong)',
@@ -60,7 +58,7 @@ export function WithDesignSystemTheme(
 				}
 			>
 				<Story { ...context } />
-				{ color?.bg && (
+				{ color?.background && (
 					<small
 						style={ {
 							display: 'block',

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
@@ -15,7 +15,11 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread } from './utils';
+import {
+	focusNoteThread,
+	getNoteIdsFromMetadata,
+	pickPrimaryNote,
+} from './utils';
 import { useFloatingBoard, useNoteActions } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
@@ -40,7 +44,7 @@ export function Notes( {
 		useDispatch( blockEditorStore )
 	);
 
-	const { blockNoteId, selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { noteId, selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
@@ -49,7 +53,7 @@ export function Notes( {
 			} = select( blockEditorStore );
 			const clientId = getSelectedBlockClientId();
 			return {
-				blockNoteId: clientId
+				noteId: clientId
 					? getBlockAttributes( clientId )?.metadata?.noteId
 					: null,
 				selectedBlockClientId: clientId,
@@ -84,15 +88,15 @@ export function Notes( {
 		};
 		const out = [];
 		orderedBlockIds.forEach( ( blockId ) => {
+			// Blocks can carry multiple notes — surface them all.
+			const threadsForBlock = notes.filter(
+				( t ) => t.blockClientId === blockId
+			);
+			out.push( ...threadsForBlock );
 			if ( blockId === selectedBlockClientId ) {
+				// Place the new note placeholder after the block's existing
+				// threads so the form appears alongside them.
 				out.push( newNoteThread );
-			} else {
-				const threadForBlock = notes.find(
-					( t ) => t.blockClientId === blockId
-				);
-				if ( threadForBlock ) {
-					out.push( threadForBlock );
-				}
 			}
 		} );
 		return out;
@@ -118,12 +122,15 @@ export function Notes( {
 			return;
 		}
 
-		if ( nextThread ) {
-			selectNote( nextThread.id );
-			focusNoteThread( nextThread.id, sidebarRef.current );
-		} else if ( prevThread ) {
-			selectNote( prevThread.id );
-			focusNoteThread( prevThread.id, sidebarRef.current );
+		const adjacentThread = nextThread ?? prevThread;
+		if ( adjacentThread ) {
+			selectNote( adjacentThread.id );
+			focusNoteThread( adjacentThread.id, sidebarRef.current );
+			if ( adjacentThread.blockClientId ) {
+				toggleBlockSpotlight( adjacentThread.blockClientId, true );
+				// Pass `null` as the second parameter to prevent focusing the block.
+				selectBlock( adjacentThread.blockClientId, null );
+			}
 		} else {
 			selectNote( undefined );
 			toggleBlockSpotlight( note.blockClientId, false );
@@ -132,10 +139,28 @@ export function Notes( {
 		}
 	};
 
-	// Auto-select the related note thread when a block is selected.
+	// Pick the most relevant thread for the selected block. Derived outside
+	// the effect so the effect body stays minimal.
+	const targetNoteId = useMemo( () => {
+		const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
+		const blockThreads = notes.filter( ( t ) =>
+			blockNoteIds.includes( t.id )
+		);
+		return pickPrimaryNote( blockThreads )?.id;
+	}, [ noteId, notes ] );
+
+	// Sync the selected note to the new block's primary thread when the
+	// block context changes. The ref tracks the previous block id so the
+	// effect only fires on block transitions, leaving in-block note changes
+	// (Escape, Cancel, "new" form) alone.
+	const prevBlockIdRef = useRef( selectedBlockClientId );
 	useEffect( () => {
-		selectNote( blockNoteId ?? undefined );
-	}, [ blockNoteId, selectNote ] );
+		if ( prevBlockIdRef.current === selectedBlockClientId ) {
+			return;
+		}
+		prevBlockIdRef.current = selectedBlockClientId;
+		selectNote( targetNoteId );
+	}, [ selectedBlockClientId, targetNoteId, selectNote ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {

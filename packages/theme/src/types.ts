@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { type ReactNode } from 'react';
 
 export interface ThemeProviderSettings {
@@ -9,19 +6,21 @@ export interface ThemeProviderSettings {
 	 */
 	color?: {
 		/**
-		 * The primary seed color to use for the theme.
+		 * The primary seed color to use for the theme. Accepts a hex string
+		 * (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
 		primary?: string;
 		/**
-		 * The background seed color to use for the theme.
+		 * The background seed color to use for the theme. Accepts a hex string
+		 * (e.g. `#f8f8f8`), an `rgb(...)` string, or a CSS color keyword.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
-		bg?: string;
+		background?: string;
 	};
 
 	/**
@@ -37,15 +36,6 @@ export interface ThemeProviderSettings {
 		 */
 		control?: 'default' | 'pointer';
 	};
-
-	/**
-	 * The density of the theme. If left unspecified, the theme inherits from
-	 * the density of the closest `ThemeProvider`, or uses the default density
-	 * if there is no inherited density.
-	 *
-	 * @default undefined
-	 */
-	density?: undefined | 'default' | 'compact' | 'comfortable';
 }
 
 export interface ThemeProviderProps extends ThemeProviderSettings {

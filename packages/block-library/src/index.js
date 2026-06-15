@@ -135,7 +135,6 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
-import * as tab from './tab';
 import * as tabPanel from './tab-panel';
 import * as tabPanels from './tab-panels';
 import * as table from './table';
@@ -287,7 +286,6 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
 		blocks.push( tabList );
 		blocks.push( tabs );
 		blocks.push( tabPanel );
@@ -296,22 +294,9 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 	}
 
-	// When in a WordPress context, conditionally
-	// add the classic block and TinyMCE editor
-	// under any of the following conditions:
-	//   - the current post contains a classic block
-	//   - the experiment to disable TinyMCE isn't active.
-	//   - a query argument specifies that TinyMCE should be loaded
-	if (
-		window?.wp?.oldEditor &&
-		( window?.wp?.needsClassicBlock ||
-			! window?.__experimentalDisableTinymce ||
-			!! new URLSearchParams( window?.location?.search ).get(
-				'requiresTinymce'
-			) )
-	) {
-		blocks.push( classic );
-	}
+	// Always register the classic block. Inserter availability is controlled
+	// by the block's `supports.inserter` value in `freeform/init`.
+	blocks.push( classic );
 
 	return blocks.filter( Boolean );
 };
