@@ -1,7 +1,6 @@
-/**
- * External dependencies
- */
 import { type ReactNode } from 'react';
+
+export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
 
 export interface ThemeProviderSettings {
 	/**
@@ -9,29 +8,55 @@ export interface ThemeProviderSettings {
 	 */
 	color?: {
 		/**
-		 * The primary seed color to use for the theme.
+		 * The primary seed color to use for the theme. Accepts an
+		 * sRGB-parseable string: a hex value (e.g. `#3858e9`), an
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Other
+		 * CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted
+		 * and throw an error.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
 		primary?: string;
 		/**
-		 * The background seed color to use for the theme.
+		 * The background seed color to use for the theme. Accepts an
+		 * sRGB-parseable string: a hex value (e.g. `#f8f8f8`), an
+		 * `rgb()`/`rgba()` string, or a CSS named color (e.g. `'blue'`). Other
+		 * CSS color spaces (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted
+		 * and throw an error.
 		 *
 		 * By default, it inherits from parent `ThemeProvider`,
 		 * and fallbacks to statically built CSS.
 		 */
-		bg?: string;
+		background?: string;
 	};
 
 	/**
-	 * The density of the theme. If left unspecified, the theme inherits from
-	 * the density of the closest `ThemeProvider`, or uses the default density
-	 * if there is no inherited density.
-	 *
-	 * @default undefined
+	 * The set of cursor options to apply to the theme.
 	 */
-	density?: undefined | 'default' | 'compact' | 'comfortable';
+	cursor?: {
+		/**
+		 * The cursor style for interactive controls that are not links
+		 * (e.g. buttons, checkboxes, and toggles).
+		 *
+		 * By default, it inherits from the parent `ThemeProvider`,
+		 * and falls back to the prebuilt default (`default`).
+		 */
+		control?: 'default' | 'pointer';
+	};
+
+	/**
+	 * Overall roundness preset for the theme subtree: `none` (square corners),
+	 * `subtle`, `moderate`, or `pronounced` (most rounded).
+	 *
+	 * This scales the individual `--wpds-border-radius-*` token sizes for the
+	 * subtree; it sets the overall amount of roundness, not a single token
+	 * size.
+	 *
+	 * By default, it inherits from the parent `ThemeProvider`,
+	 * and falls back to the prebuilt default (`subtle`).
+	 */
+	cornerRadius?: CornerRadiusPreset;
 }
 
 export interface ThemeProviderProps extends ThemeProviderSettings {

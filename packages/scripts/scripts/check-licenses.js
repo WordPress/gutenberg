@@ -1,13 +1,12 @@
 /**
- * External dependencies
- */
-const spawn = require( 'cross-spawn' );
-
-/**
  * Internal dependencies
  */
 const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
-const { checkDeps, getLicenses } = require( '../utils/license' );
+const {
+	checkDeps,
+	collectDeps,
+	readPackageJson,
+} = require( '../utils/license' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -29,22 +28,33 @@ const ignored = hasArgInCLI( '--ignore' )
 			.map( ( moduleName ) => moduleName.trim() )
 	: [];
 
-let query = '';
-if ( prod ) {
-	query += '.prod';
-} else if ( dev ) {
-	query += '.dev';
-} else {
-	query += '*';
+const cwd = process.cwd();
+const pkgJson = readPackageJson( cwd );
+
+if ( ! pkgJson ) {
+	process.stdout.write(
+		'Unable to find package.json in current directory.\n'
+	);
+	process.exit( 1 );
 }
 
-query += `:not(${ getLicenses( gpl2 )
-	.map( ( license ) => `[license=${ JSON.stringify( license ) }]` )
-	.join( ',' ) })`;
+let depsToCheck = {};
+if ( prod ) {
+	depsToCheck = pkgJson.dependencies || {};
+} else if ( dev ) {
+	depsToCheck = pkgJson.devDependencies || {};
+} else {
+	depsToCheck = {
+		...( pkgJson.dependencies || {} ),
+		...( pkgJson.devDependencies || {} ),
+	};
+}
 
-// Use `npm query` to grab a list of all the packages.
-const child = spawn.sync( 'npm', [ 'query', query ] );
+const depsMap = new Map();
+collectDeps( depsToCheck, cwd, {
+	gpl2,
+	depsMap,
+	visited: new Set(),
+} );
 
-const packages = JSON.parse( child.stdout.toString() );
-
-checkDeps( packages, { ignored, gpl2 } );
+checkDeps( Array.from( depsMap.values() ), { ignored, gpl2 } );

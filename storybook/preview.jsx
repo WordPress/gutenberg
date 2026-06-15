@@ -58,7 +58,8 @@ export const globalTypes = {
 		},
 	},
 	dsColorTheme: {},
-	dsDensity: {},
+	dsCursorControl: {},
+	dsCornerRadius: {},
 };
 
 export const decorators = [
@@ -250,4 +251,4 @@ export const parameters = {
 	},
 };
 
-export const tags = [ 'autodocs' ];
+export const tags = [ 'autodocs', '!manifest' ];

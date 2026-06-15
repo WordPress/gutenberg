@@ -1,0 +1,54 @@
+{
+	"name": "@wordpress/design-system-mcp",
+	"version": "0.5.0",
+	"description": "MCP server for the WordPress Design System.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"design-system",
+		"mcp"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/design-system-mcp/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/design-system-mcp"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=20.10.0",
+		"npm": ">=10.2.3"
+	},
+	"files": [
+		"bin",
+		"build-module",
+		"build-types"
+	],
+	"type": "module",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"bin": {
+		"design-system-mcp": "./bin/design-system-mcp.mjs"
+	},
+	"dependencies": {
+		"@cfworker/json-schema": "^4.1.1",
+		"@modelcontextprotocol/server": "^2.0.0-alpha.2",
+		"zod": "^4.3.6"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.5.14"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

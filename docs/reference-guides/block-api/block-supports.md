@@ -644,8 +644,10 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `aspectRatio`: type `boolean`, default value `false`
     -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
+    -   `minWidth`: type `boolean`, default value `false`
     -   `width`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
@@ -653,17 +655,18 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
 	dimensions: {
-		aspectRatio: true // Enable aspect ratio control.
-		height: true // Enable height control.
-		minHeight: true // Enable min height control.
-		width: true // Enable width control.
+		aspectRatio: true, // Enable aspect ratio control.
+		height: true, // Enable height control.
+		minHeight: true, // Enable min height control.
+		minWidth: true, // Enable min width control.
+		width: true, // Enable width control.
 	}
 }
 ```
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, `minWidth`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
@@ -672,6 +675,7 @@ attributes: {
             aspectRatio: "16/9",
             height: "40vh",
             minHeight: "50vh",
+            minWidth: "200px",
             width: "400px",
         }
     }
@@ -771,8 +775,7 @@ supports: {
 
 Indicates if the block is using Interactivity API features.
 
-The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation.
-Set it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.
+The `clientNavigation` sub-property indicates whether a block is compatible with the Interactivity API client-side navigation. See the [Client-Side Navigation Compatibility](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility.md) guide for details.
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
@@ -831,7 +834,7 @@ For the `flow` layout type only, determines display of the "Inner blocks use con
 -   Type: `boolean`
 -   Default value: `false`
 
-For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.
+For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max width/Fixed) on all child blocks of the flex block.
 
 ### layout.allowVerticalAlignment
 

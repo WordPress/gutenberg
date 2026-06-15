@@ -30,7 +30,7 @@ export interface BaseState {
  * The editor state includes information about the collaborator's current selection.
  */
 export interface EditorState {
-	selection: SelectionState;
+	selection?: SelectionState;
 }
 
 /**

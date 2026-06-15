@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 32.4.0 (2026-06-10)
+
+## 32.3.0 (2026-05-27)
+
+## 32.2.0 (2026-05-14)
+
+## 32.1.0 (2026-04-29)
+
+## 32.0.0 (2026-04-15)
+
+### Breaking Changes
+
+-   The bundled `eslint` dependency has been upgraded from v8 to v10 ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The `lint-js` script now uses flat config (`eslint.config.*`) by default. Legacy `.eslintrc.*` files are still detected as a fallback, but this support is deprecated and will be removed in a future version ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+-   The default config shipped with `wp-scripts` has changed from `config/.eslintrc.js` to `config/eslint.config.cjs` ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).
+
+## 31.8.0 (2026-04-01)
+
+## 31.7.0 (2026-03-18)
+
 ## 31.6.0 (2026-03-04)
 
 ## 31.5.0 (2026-02-18)

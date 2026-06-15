@@ -55,8 +55,10 @@
 	max-width: 70%;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	@include break-medium() {
-		padding-left: $grid-unit-30;
+	.editor-document-bar.has-shortcut & {
+		@include break-medium() {
+			padding-left: $grid-unit-30;
+		}
 	}
 
 	h1 {

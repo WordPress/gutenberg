@@ -1,0 +1,110 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+// `className` on `<Modal>` is applied to `.components-modal__frame`, so this
+// bumps specificity over the shipped full-screen modal content rule and lets
+// the media editor run edge-to-edge inside the modal.
+.media-editor-modal.components-modal__frame .components-modal__content {
+	padding: 0;
+	margin-bottom: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.media-editor-modal.components-modal__frame .components-modal__children-container {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	min-height: 0;
+}
+
+// Footer chrome — two layouts driven by `is-wide` / `is-narrow` modifier
+// classes set from the media editor at the sidebar-collapse breakpoint.
+// Wide is a single flex row (History | Cancel/Save); narrow stacks via
+// `flex-direction: column` (image controls above the History |
+// Cancel/Save row). Each layout has its own JSX tree (not `order`
+// reshuffling, which the project's stylelint rule treats as an a11y red
+// flag), so DOM order always matches visual order.
+.media-editor-modal.components-modal__frame .media-editor-modal__footer {
+	flex-shrink: 0;
+	display: flex;
+	gap: $grid-unit-20;
+	// Borderless: sections are demarcated by the inset canvas panel and
+	// spacing, not divider lines. 16px top / 32px sides / 24px bottom.
+	padding: $grid-unit-20 $grid-unit-40 $grid-unit-30;
+	background: $white;
+	// Above the `.interface-interface-skeleton__sidebar` which has a z-index of 100000.
+	z-index: z-index(".media-editor-modal__footer");
+
+	&.is-wide {
+		flex-direction: row;
+		align-items: center;
+
+		// Panel mode: the footer holds only History (left) and
+		// Cancel/Save (right). `margin-left: auto` pins the actions to the
+		// right edge whether or not History renders (e.g. non-image
+		// attachments show only `FooterActions`).
+		.media-editor__footer-actions {
+			margin-left: auto;
+		}
+	}
+
+	&.is-narrow {
+		flex-direction: column;
+	}
+
+	// Narrow only: image controls sit on their own row, centered.
+	&.is-narrow > .media-editor-image-controls {
+		align-self: center;
+	}
+}
+
+// Secondary row used by medium (History + Image controls + Cancel/Save) and
+// narrow (History + Cancel/Save). `margin-left: auto` on the image controls
+// cluster and on Cancel/Save splits any free space — History gets the
+// left edge, Cancel/Save the right edge, and the image controls (when
+// present, i.e. medium only) approximately centers. Exact centering only
+// holds when History and Cancel/Save have matching widths; in practice
+// they're close enough that the offset is imperceptible.
+.media-editor-modal__footer-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $grid-unit-20;
+
+	.media-editor-image-controls,
+	.media-editor__footer-actions {
+		margin-left: auto;
+	}
+}
+
+// Active (enabled) undo/redo icon buttons take the admin accent colour so
+// they read as live alongside the Reset/Cancel/Save actions. Disabled
+// buttons (rendered with `aria-disabled` via `accessibleWhenDisabled`)
+// keep the default muted icon colour.
+// NOTE: overrides @wordpress/components Button internals (`.components-button`,
+// `.has-icon`), scoped to our history-actions wrapper. Update if renamed.
+.media-editor__history-actions .components-button.has-icon:not([aria-disabled="true"]) {
+	color: var(--wp-admin-theme-color);
+}
+
+.media-editor-modal {
+	display: flex;
+	flex-direction: column;
+}
+
+// `<SnackbarNotices>` renders `.components-snackbar-list` with
+// `position: absolute; width: 100%`. Portaled to `<body>` it has no
+// positioned ancestor, so it collapses to a 0-size box at the document
+// origin and would also be painted under the modal overlay since both
+// share the default snackbar z-index. `snackbar-container` fixes the
+// list to the viewport bottom; the elevated z-index (registered in
+// base-styles) lifts it above the modal overlay and any popovers that
+// may open inside the modal.
+.media-editor-modal__snackbar {
+	@include snackbar-container();
+	z-index: z-index(".components-snackbar-list.media-editor-modal__snackbar");
+}

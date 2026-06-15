@@ -1,0 +1,34 @@
+.banner {
+	--banner-bg: var(--wpds-color-background-interactive-neutral-strong);
+	--banner-fg: var(--wpds-color-foreground-interactive-neutral-strong);
+	--banner-accent-brand: var(--wpds-color-background-interactive-brand-strong);
+	--banner-accent-warm: color-mix(in srgb, var(--wpds-color-stroke-surface-warning) 60%, var(--wpds-color-background-surface-neutral-strong));
+	--banner-accent-dark: var(--wpds-color-foreground-content-neutral);
+	--banner-glint: color-mix(in srgb, var(--banner-fg) 80%, var(--banner-accent-warm));
+
+	position: relative;
+	padding: var(--wpds-dimension-padding-3xl);
+	background-color: var(--banner-bg);
+	background-image: linear-gradient(108deg, var(--banner-bg) 0%, var(--banner-bg) 26%, var(--banner-accent-brand) 66%, var(--banner-accent-warm) 100%);
+	color: var(--banner-fg);
+	/* Responsive hero height: scales with tile width, floored and capped. */
+	min-height: clamp(180px, 20cqi, 320px);
+	overflow: hidden;
+}
+
+.bannerContent {
+	position: relative;
+	z-index: 1;
+}
+
+.bannerLink {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 0.2em;
+}
+
+@container (max-width: 420px) {
+	.banner {
+		padding: var(--wpds-dimension-padding-lg);
+	}
+}

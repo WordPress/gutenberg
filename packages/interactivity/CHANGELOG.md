@@ -2,10 +2,25 @@
 
 ## Unreleased
 
+## 6.48.0 (2026-06-10)
+
+## 6.47.0 (2026-05-27)
+
+## 6.46.0 (2026-05-14)
+
+## 6.45.0 (2026-04-29)
+
+## 6.44.0 (2026-04-15)
+
+## 6.43.0 (2026-04-01)
+
+## 6.42.0 (2026-03-18)
+
 ### Bug Fixes
 
 -   Fix `sessionId` generation crashing in non-secure (non-HTTPS) contexts. ([#76151](https://github.com/WordPress/gutenberg/pull/76151))
 -   Add `initialVdomPromise` synchronization promise to ensure the router waits for hydration to complete before initializing, fixing dead DOM on Safari and Firefox. ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+-   Fix unexpected full page reload on anchor links. ([#76520](https://github.com/WordPress/gutenberg/pull/76520))
 
 ## 6.41.0 (2026-03-04)
 

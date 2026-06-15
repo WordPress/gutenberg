@@ -1,9 +1,12 @@
-import {
-	privateApis as coreDataPrivateApis,
-	SelectionType,
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import type {
+	CoreDataPrivateApis,
+	ResolvedSelection,
+	PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import type { ResolvedSelection } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
@@ -14,6 +17,10 @@ import type { SelectionRect } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
+	CoreDataPrivateApis,
+	'SelectionType'
+>;
 
 export type { SelectionRect };
 
@@ -25,6 +32,7 @@ export interface CursorData {
 	x: number;
 	y: number;
 	height: number;
+	isMe?: boolean;
 	selectionRects?: SelectionRect[];
 }
 
@@ -54,6 +62,12 @@ export function useRenderCursors(
 		postType ?? null
 	);
 
+	const showOwnCursor = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showCollaborationCursor' ),
+		[]
+	);
+
 	const [ cursorPositions, setCursorPositions ] = useState< CursorData[] >(
 		[]
 	);
@@ -78,8 +92,12 @@ export function useRenderCursors(
 
 		const results: CursorData[] = [];
 
-		sortedUsers.forEach( ( user: any ) => {
-			if ( user.isMe ) {
+		const hasOtherCollaborators = sortedUsers.some(
+			( u: ActiveCollaborator ) => ! u.isMe
+		);
+
+		sortedUsers.forEach( ( user: ActiveCollaborator ) => {
+			if ( user.isMe && ( ! showOwnCursor || ! hasOtherCollaborators ) ) {
 				return;
 			}
 
@@ -88,8 +106,9 @@ export function useRenderCursors(
 			};
 
 			let start: ResolvedSelection = {
-				textIndex: null,
+				richTextOffset: null,
 				localClientId: null,
+				attributeKey: null,
 			};
 			let end: ResolvedSelection | undefined;
 
@@ -122,7 +141,9 @@ export function useRenderCursors(
 
 			const userName = user.collaboratorInfo.name;
 			const clientId = user.clientId;
-			const color = getAvatarBorderColor( user.collaboratorInfo.id );
+			const color = user.isMe
+				? 'var(--wp-admin-theme-color)'
+				: getAvatarBorderColor( user.collaboratorInfo.id );
 			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
 
 			const selectionVisual = computeSelectionVisual(
@@ -138,6 +159,7 @@ export function useRenderCursors(
 					clientId,
 					color,
 					avatarUrl,
+					isMe: user.isMe,
 					...selectionVisual.coords,
 				};
 
@@ -155,6 +177,7 @@ export function useRenderCursors(
 		resolveSelection,
 		overlayElement,
 		sortedUsers,
+		showOwnCursor,
 		recomputeToken,
 	] );
 

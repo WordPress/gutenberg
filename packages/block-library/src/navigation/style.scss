@@ -27,9 +27,6 @@ $navigation-icon-size: 24px;
 	ul,
 	ul li {
 		list-style: none;
-
-		// Overrides generic ".entry-content li" styles on the front end.
-		padding: 0;
 	}
 
 	// Menu item container.
@@ -154,6 +151,11 @@ $navigation-icon-size: 24px;
 		--navigation-layout-justification-setting: space-between;
 		--navigation-layout-justify: space-between;
 	}
+}
+
+// Low specificity padding to not override global styles.
+:where(.wp-block-navigation) ul li {
+	padding: 0;
 }
 
 // Styles for submenu flyout.

@@ -56,6 +56,8 @@ describe( 'generate', () => {
 					},
 					dimensions: {
 						minHeight: '50vh',
+						minWidth: '25vw',
+						objectFit: 'cover',
 					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
@@ -89,7 +91,7 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-transform: uppercase; }"
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; min-width: 25vw; object-fit: cover; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-transform: uppercase; }"
 		);
 	} );
 
@@ -241,6 +243,7 @@ describe( 'getCSSRules', () => {
 					},
 					dimensions: {
 						minHeight: '50vh',
+						minWidth: '25vw',
 					},
 					spacing: {
 						padding: { top: '10px', bottom: '5px' },
@@ -289,6 +292,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'minHeight',
 				value: '50vh',
+			},
+			{
+				selector: '.some-selector',
+				key: 'minWidth',
+				value: '25vw',
 			},
 			{
 				selector: '.some-selector',
@@ -453,6 +461,74 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'backgroundImage',
 				value: "linear-gradient(to bottom,rgb(255 255 0 / 50%),rgb(0 0 255 / 50%), url('https://example.com/image.jpg')",
+			},
+		] );
+	} );
+
+	it( 'should comma-separate background gradient and background image into a single background-image value', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundImage: {
+							url: 'https://example.com/image.jpg',
+						},
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: "linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%), url( 'https://example.com/image.jpg' )",
+			},
+		] );
+	} );
+
+	it( 'should output only gradient as background-image when no background image is set', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						gradient:
+							'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: 'linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%)',
+			},
+		] );
+	} );
+
+	it( 'should resolve background gradient preset slug to CSS custom property', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						gradient: 'var:preset|gradient|vivid-cyan-blue',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: 'var(--wp--preset--gradient--vivid-cyan-blue)',
 			},
 		] );
 	} );

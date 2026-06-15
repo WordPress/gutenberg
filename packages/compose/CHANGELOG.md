@@ -2,6 +2,54 @@
 
 ## Unreleased
 
+## 8.1.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Documentation
+
+-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+
+## 8.0.0 (2026-05-27)
+
+### Breaking Changes
+
+-   `useDialog`: The returned `props` object now exposes an `onKeyDown` handler. Consumers that spread it onto a wrapper which also receives an `onKeyDown` from elsewhere should pass that handler via the new `onKeyDown` option (which merges it with close-on-Escape) or merge the two themselves ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
+
+### Enhancements
+
+-   `useMergeRefs`: Support cleanup functions returned by inner ref callbacks (React 19 ref callback cleanup pattern). Inner refs that return a cleanup have it invoked at teardown instead of being called with `null`.
+
+### Bug Fixes
+
+-   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
+-   `useDialog`: Handle Escape via React `onKeyDown` so portaled descendants can stop propagation to prevent the dialog from closing ([#78433](https://github.com/WordPress/gutenberg/pull/78433)).
+-   `useMediaQuery`, `useViewportMatch`: Resolve the `view` default lazily so the hooks no longer throw `ReferenceError: window is not defined` during server-side rendering. Regression from [#76446](https://github.com/WordPress/gutenberg/pull/76446).
+
+### Deprecations
+
+-   The `pure` HoC now logs a runtime deprecation warning. Use `memo` or `PureComponent` from `@wordpress/element` instead.
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+## 7.44.0 (2026-04-15)
+
+## 7.43.0 (2026-04-01)
+
+### Bug Fixes
+
+-   `useDialog`: Add `event.stopPropagation()` to the Escape key handler to prevent the event from bubbling to parent overlays ([#76861](https://github.com/WordPress/gutenberg/pull/76861)).
+
+## 7.42.0 (2026-03-18)
+
+### New Features
+
+-   Hooks `useMediaQuery` and `useViewportMatch` accept a new optional `view` argument of type `Window`, which enables consumers to perform media queries in a window other than the global one (e.g. an iframe) ([#76446](https://github.com/WordPress/gutenberg/pull/76446)).
+
 ## 7.41.0 (2026-03-04)
 
 ## 7.40.0 (2026-02-18)

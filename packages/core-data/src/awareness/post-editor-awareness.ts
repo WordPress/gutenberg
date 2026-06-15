@@ -10,21 +10,34 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
-import { getBlockPathInYdoc, resolveBlockClientIdByPath } from './block-lookup';
+import {
+	getBlockPathInYdoc,
+	getContainingBlockYMap,
+	resolveBlockClientIdByPath,
+} from './block-lookup';
 import {
 	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
 import {
+	asHtmlStringIndex,
+	htmlIndexToRichTextOffset,
+} from '../utils/crdt-utils';
+import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
+	SelectionDirection,
 } from '../utils/crdt-user-selections';
 
-import { SelectionDirection } from '../types';
-import type { SelectionState, WPBlockSelection } from '../types';
+import type {
+	ResolvedSelection,
+	SelectionState,
+	WPBlockSelection,
+} from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
+import type { EditorStoreBlock } from './block-lookup';
 import type {
 	DebugCollaboratorData,
 	EditorState,
@@ -212,6 +225,10 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			return state1 === state2;
 		}
 
+		if ( ! state1.selection || ! state2.selection ) {
+			return state1.selection === state2.selection;
+		}
+
 		return areSelectionsStatesEqual( state1.selection, state2.selection );
 	}
 
@@ -229,14 +246,19 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
 	 *
 	 * @param selection - The selection state.
-	 * @return The text index and block client ID, or nulls if not resolvable.
+	 * @param blocks    - The tree of block-editor store post content blocks.
+	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
 	 */
-	public convertSelectionStateToAbsolute( selection: SelectionState ): {
-		textIndex: number | null;
-		localClientId: string | null;
-	} {
+	public convertSelectionStateToAbsolute(
+		selection: SelectionState,
+		blocks: EditorStoreBlock[]
+	): ResolvedSelection {
 		if ( selection.type === SelectionType.None ) {
-			return { textIndex: null, localClientId: null };
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
@@ -254,12 +276,16 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				if ( block instanceof Y.Map ) {
 					const path = getBlockPathInYdoc( block );
 					localClientId = path
-						? resolveBlockClientIdByPath( path )
+						? resolveBlockClientIdByPath( path, blocks )
 						: null;
 				}
 			}
 
-			return { textIndex: null, localClientId };
+			return {
+				richTextOffset: null,
+				localClientId,
+				attributeKey: null,
+			};
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -274,16 +300,27 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		if ( ! absolutePosition ) {
-			return { textIndex: null, localClientId: null };
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
 		}
 
-		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
-		const yType = absolutePosition.type.parent?.parent;
-		const path =
-			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
-		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
+		const yType = getContainingBlockYMap( absolutePosition.type );
+		const path = yType ? getBlockPathInYdoc( yType ) : null;
+		const localClientId = path
+			? resolveBlockClientIdByPath( path, blocks )
+			: null;
 
-		return { textIndex: absolutePosition.index, localClientId };
+		return {
+			richTextOffset: htmlIndexToRichTextOffset(
+				absolutePosition.type.toString(),
+				asHtmlStringIndex( absolutePosition.index )
+			),
+			localClientId,
+			attributeKey: cursorPos.attributeKey ?? null,
+		};
 	}
 
 	/**

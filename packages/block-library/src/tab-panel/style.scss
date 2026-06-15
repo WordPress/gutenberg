@@ -1,4 +1,6 @@
 .wp-block-tab-panel {
-	flex-grow: 1;
-	min-width: 0;
+	&[hidden],
+	&:empty {
+		display: none !important;
+	}
 }

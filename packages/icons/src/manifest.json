@@ -1579,24 +1579,19 @@
 		"public": true
 	},
 	{
-		"slug": "tab",
-		"label": "Tab",
-		"filePath": "library/tab.svg"
+		"slug": "tab-list",
+		"label": "Tab List",
+		"filePath": "library/tab-list.svg"
+	},
+	{
+		"slug": "tab-panel",
+		"label": "Tab Panel",
+		"filePath": "library/tab-panel.svg"
 	},
 	{
 		"slug": "tabs",
 		"label": "Tabs",
 		"filePath": "library/tabs.svg"
-	},
-	{
-		"slug": "tabs-menu",
-		"label": "Tabs Menu",
-		"filePath": "library/tabs-menu.svg"
-	},
-	{
-		"slug": "tabs-menu-item",
-		"label": "Tabs Menu Item",
-		"filePath": "library/tabs-menu-item.svg"
 	},
 	{
 		"slug": "tag",
@@ -1645,9 +1640,9 @@
 		"filePath": "library/thumbs-up.svg"
 	},
 	{
-		"slug": "time-to-read",
-		"label": "Time To Read",
-		"filePath": "library/time-to-read.svg"
+		"slug": "time",
+		"label": "Time",
+		"filePath": "library/time.svg"
 	},
 	{
 		"slug": "tip",

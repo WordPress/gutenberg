@@ -2,18 +2,14 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { version as reactVersion } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	useMergeRefs,
-	useRefEffect,
-	useDisabled,
-	useViewportMatch,
-} from '@wordpress/compose';
+import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
@@ -24,8 +20,6 @@ import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
-
-const ViewportWidthProvider = useViewportMatch.__experimentalWidthProvider;
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
@@ -109,6 +103,12 @@ function getIframeSrc( resolvedAssets ) {
 		return src;
 	}
 
+	let body = '';
+	if ( reactVersion.split( '.' )[ 0 ] === '18' ) {
+		body =
+			'<body><script>document.currentScript.parentElement.remove()</script></body>';
+	}
+
 	// Correct doctype is required to enable rendering in standards mode.
 	// Also preload the styles to avoid a flash of unstyled content.
 	const html = `<!doctype html>
@@ -132,9 +132,7 @@ function getIframeSrc( resolvedAssets ) {
 		${ resolvedAssets.styles ?? '' }
 		${ resolvedAssets.scripts ?? '' }
 	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
+	${ body }
 </html>`;
 
 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
@@ -271,7 +269,6 @@ function Iframe( {
 	const {
 		contentResizeListener,
 		containerResizeListener,
-		containerWidth,
 		isZoomedOut,
 		scaleContainerWidth,
 	} = useScaleCanvas( {
@@ -368,9 +365,7 @@ function Iframe( {
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
-								<ViewportWidthProvider value={ containerWidth }>
-									{ children }
-								</ViewportWidthProvider>
+								{ children }
 							</StyleProvider>
 						</body>,
 						iframeDocument.documentElement

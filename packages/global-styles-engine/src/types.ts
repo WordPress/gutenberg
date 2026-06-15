@@ -185,47 +185,6 @@ export interface SpacingSettings {
 }
 
 // =============================================================================
-// BLOCK SYSTEM TYPES (need to move to the blocks package eventually)
-// =============================================================================
-
-/**
- * Block type definition with global styles support
- */
-export interface BlockType {
-	name: string;
-	title: string;
-	category: string;
-	example?: any;
-	attributes?: Record< string, unknown >;
-	supports?: {
-		__experimentalSelector?: string;
-		inserter?: boolean;
-		spacing?:
-			| boolean
-			| {
-					blockGap?:
-						| boolean
-						| string[]
-						| {
-								__experimentalDefault?: string;
-								sides: string[];
-						  };
-			  };
-		[ key: string ]: unknown;
-	};
-	selectors?: Record< string, string | Record< string, string > >;
-}
-
-/**
- * Block style variation
- */
-export interface BlockStyleVariation {
-	name: string;
-	label: string;
-	styles?: Record< string, any >;
-}
-
-// =============================================================================
 // GLOBAL STYLES STRUCTURE TYPES
 // =============================================================================
 

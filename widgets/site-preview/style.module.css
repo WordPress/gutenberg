@@ -1,0 +1,93 @@
+.container {
+	/*
+	 * The preview is built from absolutely-positioned layers (iframe, overlay),
+	 * so it has no intrinsic block size. `height: 100%` fills a fixed-height grid
+	 * tile exactly; on a content-driven (masonry) surface it resolves to auto, so
+	 * `aspect-ratio` derives the height from the width. `width: 100%` pins the
+	 * inline size so the aspect ratio only ever drives the block axis — without
+	 * it, a tall narrow tile would size the width from the height and overflow.
+	 */
+	width: 100%;
+	height: 100%;
+	aspect-ratio: 3 / 4;
+	overflow: hidden;
+}
+
+.urlBar {
+	flex-shrink: 0;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.urlField {
+	min-width: 0;
+	padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-radius: var(--wpds-border-radius-lg);
+	background: var(--wpds-color-background-surface-neutral);
+}
+
+.urlFavicon {
+	flex-shrink: 0;
+	width: var(--wpds-typography-font-size-xs);
+	height: var(--wpds-typography-font-size-xs);
+	object-fit: contain;
+}
+
+.urlIcon {
+	flex-shrink: 0;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.urlText {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	font-size: var(--wpds-typography-font-size-xs);
+	line-height: var(--wpds-typography-line-height-xs);
+	color: var(--wpds-color-foreground-content-neutral);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.previewWrap {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+}
+
+.loading {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+}
+
+.iframe {
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 50%;
+	width: 250%;
+	min-height: 375%;
+	transform: translate(-50%, 0) scale(0.4);
+	transform-origin: center top;
+}
+
+.overlay {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	background: color-mix(in srgb, var(--wpds-color-foreground-content-neutral-weak) 20%, transparent);
+	backdrop-filter: blur(1px);
+}
+
+.previewWrap:hover .overlay,
+.previewWrap:focus-within .overlay {
+	opacity: 1;
+}
+
+@media not (prefers-reduced-motion) {
+	.overlay {
+		transition: opacity var(--wpds-motion-duration-lg) var(--wpds-motion-easing-expressive);
+	}
+}

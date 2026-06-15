@@ -1,0 +1,48 @@
+// Styles for the experimental omnibar.
+
+body.has-admin-bar-in-editor {
+	#wpadminbar {
+		display: block;
+	}
+
+	.boot-canvas-back-button__link {
+		background: transparent;
+	}
+
+	.boot-canvas-back-button__icon {
+		background-color: transparent;
+	}
+
+	#site-editor-v2-app {
+		position: fixed;
+		top: 32px;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: calc(100vh - 32px) !important;
+	}
+
+	.boot-layout.has-full-canvas .boot-layout__canvas {
+		top: 32px;
+		height: calc(100vh - 32px);
+	}
+
+	@media (max-width: 782px) {
+		#site-editor-v2-app {
+			top: 46px;
+			height: calc(100vh - 46px) !important;
+		}
+
+		.boot-layout__stage,
+		.boot-layout__inspector,
+		.boot-layout__canvas:not(.has-mobile-drawer),
+		.boot-layout.has-full-canvas .boot-layout__canvas {
+			top: 46px;
+			height: calc(100vh - 46px);
+		}
+
+		.boot-layout__mobile-sidebar-drawer {
+			top: 46px;
+		}
+	}
+}

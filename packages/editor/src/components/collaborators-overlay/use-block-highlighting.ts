@@ -3,8 +3,8 @@
  */
 import {
 	privateApis as coreDataPrivateApis,
-	SelectionType,
-	type PostEditorAwarenessState,
+	type CoreDataPrivateApis,
+	type PostEditorAwarenessState as ActiveCollaborator,
 } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 
@@ -18,6 +18,10 @@ import { useDebouncedRecompute } from './use-debounced-recompute';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
+	CoreDataPrivateApis,
+	'SelectionType'
+>;
 
 export interface BlockHighlightData {
 	blockId: string;
@@ -50,7 +54,7 @@ export function useBlockHighlighting(
 	rerenderHighlightsAfterDelay: () => () => void;
 } {
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
-	const userStates: PostEditorAwarenessState[] = useActiveCollaborators(
+	const userStates: ActiveCollaborator[] = useActiveCollaborators(
 		postId ?? null,
 		postType ?? null
 	);
@@ -82,12 +86,13 @@ export function useBlockHighlighting(
 		// same block, only the first one gets the highlight and avatar label.
 		const seen = new Set< string >();
 		const blocksToHighlight = userStates
-			.filter(
-				( userState ) =>
-					! userState.isMe &&
+			.filter( ( userState: ActiveCollaborator ) => {
+				const isWholeBlockSelected =
 					userState.editorState?.selection?.type ===
-						SelectionType.WholeBlock
-			)
+					SelectionType.WholeBlock;
+
+				return ! userState.isMe && isWholeBlockSelected;
+			} )
 			.map( ( userState ) => {
 				let localClientId;
 				try {
@@ -104,9 +109,9 @@ export function useBlockHighlighting(
 
 				return {
 					blockId: localClientId,
-					color: getAvatarBorderColor(
-						userState.collaboratorInfo.id
-					),
+					color: userState.isMe
+						? 'var(--wp-admin-theme-color)'
+						: getAvatarBorderColor( userState.collaboratorInfo.id ),
 					userName: userState.collaboratorInfo.name,
 					avatarUrl: getAvatarUrl(
 						userState.collaboratorInfo.avatar_urls

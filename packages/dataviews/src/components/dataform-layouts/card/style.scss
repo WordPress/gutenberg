@@ -1,25 +1,25 @@
-@use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/mixins" as *;
-
-.dataforms-layouts-card__field-header-label {
-	@include heading-large();
-}
-
 .dataforms-layouts-card__field {
 	width: 100%;
 }
 
+.dataforms-layouts-card__field-header-content {
+	min-height: 24px; // TODO: use size / height DS token when available
+}
+
+.dataforms-layouts-card__field-header-content-description {
+	display: contents;
+}
+
 .dataforms-layouts-card__field-description {
-	color: $gray-700;
+	color: var(--wpds-color-foreground-content-neutral-weak);
 	display: block;
-	font-size: $font-size-medium;
-	margin-bottom: $grid-unit-20;
+	font-size: var(--wpds-typography-font-size-md);
+	margin-bottom: var(--wpds-dimension-gap-lg);
 }
 
 .dataforms-layouts-card__field-summary {
 	display: flex;
 	flex-direction: row;
-	gap: $grid-unit-20;
+	gap: var(--wpds-dimension-gap-lg);
 	align-items: center;
 }
