@@ -870,7 +870,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'blockName' => 'core/paragraph',
 			'attrs'     => array(
 				'style' => array(
-					'mobile' => array(
+					'@mobile' => array(
 						'color' => array(
 							'text' => '#ff0000',
 						),
@@ -907,7 +907,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'blockName' => 'core/group',
 			'attrs'     => array(
 				'style' => array(
-					'mobile' => array(
+					'@mobile' => array(
 						'elements' => array(
 							'link' => array(
 								'color' => array(
@@ -951,7 +951,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'blockName' => 'core/button',
 			'attrs'     => array(
 				'style' => array(
-					'mobile' => array(
+					'@mobile' => array(
 						':hover' => array(
 							'color' => array(
 								'background' => '#ff00d0',
@@ -999,7 +999,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'blockName' => 'core/button',
 			'attrs'     => array(
 				'style' => array(
-					'mobile' => array(
+					'@mobile' => array(
 						'color'      => array(
 							'background' => '#ff00d0',
 						),
@@ -1072,7 +1072,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 						'type' => 'default',
 					),
 					'style'  => array(
-						'mobile' => array(
+						'@mobile' => array(
 							'spacing' => array(
 								'blockGap' => '12px',
 							),
@@ -1135,7 +1135,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 						'type' => 'flex',
 					),
 					'style'  => array(
-						'mobile' => array(
+						'@mobile' => array(
 							'spacing' => array(
 								'blockGap' => '12px',
 							),
@@ -1187,7 +1187,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 					'type' => 'grid',
 				),
 				'style'  => array(
-					'mobile' => array(
+					'@mobile' => array(
 						'layout' => array(
 							'minimumColumnWidth' => '8rem',
 						),
@@ -1235,7 +1235,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 					'type' => 'grid',
 				),
 				'style'  => array(
-					'mobile' => array(
+					'@mobile' => array(
 						'layout' => array(
 							'columnCount' => 3,
 						),
@@ -1290,7 +1290,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			array(
 				'attrs' => array(
 					'style' => array(
-						'mobile' => array(
+						'@mobile' => array(
 							'layout' => array(
 								'columnCount' => 3,
 							),
@@ -1304,7 +1304,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			array(
 				'attrs' => array(
 					'style' => array(
-						'mobile' => array(
+						'@mobile' => array(
 							'layout' => array(
 								'columnCount' => 4,
 							),
@@ -1374,7 +1374,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 						'type' => 'grid',
 					),
 					'style'  => array(
-						'mobile' => array(
+						'@mobile' => array(
 							'layout'  => array(
 								'columnCount' => 3,
 							),
@@ -1438,7 +1438,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 						'minimumColumnWidth' => '12rem',
 					),
 					'style'  => array(
-						'tablet' => array(
+						'@tablet' => array(
 							'spacing' => array(
 								'blockGap' => '12px',
 							),
@@ -1485,7 +1485,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'innerContent' => array( '<p>Some text.</p>' ),
 			'attrs'        => array(
 				'style' => array(
-					'mobile' => array(
+					'@mobile' => array(
 						'layout' => array(
 							'columnSpan' => '2',
 						),
@@ -1546,7 +1546,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 					'type' => 'grid',
 				),
 				'style'  => array(
-					'mobile' => array(
+					'@mobile' => array(
 						'layout' => array(
 							'columnCount' => 3,
 						),

@@ -682,7 +682,7 @@ describe( 'global styles renderer', () => {
 													text: 'blue',
 												},
 											},
-											mobile: {
+											'@mobile': {
 												color: {
 													text: 'green',
 												},
@@ -790,7 +790,7 @@ describe( 'global styles renderer', () => {
 									text: 'blue',
 								},
 							},
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'red',
 								},
@@ -832,7 +832,7 @@ describe( 'global styles renderer', () => {
 							text: 'blue',
 						},
 					},
-					mobile: {
+					'@mobile': {
 						color: {
 							text: 'green',
 						},
@@ -945,7 +945,7 @@ describe( 'global styles renderer', () => {
 											width: '20rem',
 										},
 									},
-									tablet: {
+									'@tablet': {
 										color: {
 											text: 'red',
 										},
@@ -1009,7 +1009,7 @@ describe( 'global styles renderer', () => {
 							color: {
 								text: 'red',
 							},
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'blue',
 								},
@@ -1050,7 +1050,7 @@ describe( 'global styles renderer', () => {
 									text: 'blue',
 								},
 							},
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'red',
 								},
@@ -1095,7 +1095,7 @@ describe( 'global styles renderer', () => {
 							dimensions: {
 								width: '25%',
 							},
-							mobile: {
+							'@mobile': {
 								dimensions: {
 									width: '50%',
 								},
@@ -1140,7 +1140,7 @@ describe( 'global styles renderer', () => {
 							color: {
 								text: 'blue',
 							},
-							mobile: {
+							'@mobile': {
 								color: {
 									text: 'red',
 								},
@@ -1180,7 +1180,7 @@ describe( 'global styles renderer', () => {
 									color: {
 										text: 'green',
 									},
-									mobile: {
+									'@mobile': {
 										color: {
 											text: 'yellow',
 										},

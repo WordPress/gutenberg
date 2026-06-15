@@ -232,8 +232,8 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
  * Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
  */
 const RESPONSIVE_BREAKPOINTS: Record< string, string > = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+	'@mobile': '@media (width <= 480px)',
+	'@tablet': '@media (480px < width <= 782px)',
 };
 
 /**

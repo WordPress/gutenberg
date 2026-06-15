@@ -24,8 +24,8 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
 // Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
 const RESPONSIVE_BREAKPOINTS = {
-	mobile: '@media (width <= 480px)',
-	tablet: '@media (480px < width <= 782px)',
+	'@mobile': '@media (width <= 480px)',
+	'@tablet': '@media (480px < width <= 782px)',
 };
 
 // These are the serialized `selfStretch` values. `max` used to be called
