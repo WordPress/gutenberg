@@ -42,16 +42,16 @@ Example:
 				"10": {
 					"$value": { "value": 4, "unit": "px" }
 				}
-            },
-            // ...
-        }
+				// ...
+			}
+		},
 		"padding": {
 			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}"
-			},
-            // ...
-        }
-    }
+			}
+			// ...
+		}
+	}
 }
 ```
 
