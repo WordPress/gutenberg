@@ -104,8 +104,17 @@ function setContentEditableWrapper( node, value ) {
 	if ( node.contentEditable !== String( value ) ) {
 		node.contentEditable = value;
 
-		// Firefox doesn't automatically move focus.
 		if ( value ) {
+			// Only move focus to the wrapper once it is actually an editing
+			// host. If it did not become one (e.g. JSDOM does not implement
+			// contentEditable), it must not claim focus from the block's
+			// editable element.
+			if ( ! node.isContentEditable ) {
+				node.contentEditable = false;
+				return;
+			}
+
+			// Firefox doesn't automatically move focus.
 			node.focus();
 		}
 	}
