@@ -37,7 +37,7 @@ let vipsPromise: Promise< typeof Vips > | undefined;
  * loads them (including the HEIF dynamic library) by fetching a URL, so the
  * bytes are wrapped in a Blob URL the first time each is requested.
  */
-const wasmUrls = new WeakMap< Uint8Array, string >();
+const wasmUrls = new WeakMap< Uint8Array< ArrayBuffer >, string >();
 
 /**
  * Returns a Blob URL for an inlined WASM binary, creating it on first use.
@@ -45,7 +45,7 @@ const wasmUrls = new WeakMap< Uint8Array, string >();
  * @param bytes The inlined WASM binary.
  * @return A Blob URL pointing at the binary.
  */
-function getWasmUrl( bytes: Uint8Array ): string {
+function getWasmUrl( bytes: Uint8Array< ArrayBuffer > ): string {
 	let url = wasmUrls.get( bytes );
 	if ( ! url ) {
 		url = URL.createObjectURL(
