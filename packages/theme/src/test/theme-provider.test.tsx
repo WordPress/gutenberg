@@ -18,8 +18,9 @@ jest.mock( '../style.module.css', () => ( {
 // the expected values predictable. (Extreme seeds get snapped into the accessible
 // ramp, so the seeds below are deliberately mid-range/light hex values that
 // round-trip. Ramp generation itself is covered by the color-ramps tests.)
-const BRAND_BG = '--wpds-color-bg-interactive-brand-strong';
-const SURFACE_BG = '--wpds-color-bg-surface-neutral';
+const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
+const SURFACE_BG = '--wpds-color-background-surface-neutral';
+const CURSOR_CONTROL = '--wpds-cursor-control';
 const PRIMARY = '#1e90ff';
 const OTHER_PRIMARY = '#8e44ad';
 const BACKGROUND = '#f8f8f8';
@@ -40,25 +41,17 @@ describe( 'ThemeProvider', () => {
 		expect( screen.getByText( 'content' ) ).toBeInTheDocument();
 	} );
 
-	it( 'defines the brand color token from the primary seed within its subtree', () => {
+	it( 'defines the color tokens from the seeds within its subtree', () => {
 		render(
-			<ThemeProvider color={ { primary: PRIMARY } }>
+			<ThemeProvider
+				color={ { primary: PRIMARY, background: BACKGROUND } }
+			>
 				<div data-testid="child">x</div>
 			</ThemeProvider>
 		);
 
 		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
 		expect( readProp( provider, BRAND_BG ) ).toBe( PRIMARY );
-	} );
-
-	it( 'defines the surface color token from the background seed within its subtree', () => {
-		render(
-			<ThemeProvider color={ { background: BACKGROUND } }>
-				<div data-testid="child">x</div>
-			</ThemeProvider>
-		);
-
-		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
@@ -83,9 +76,7 @@ describe( 'ThemeProvider', () => {
 		);
 
 		const provider = getScopingProvider( screen.getByTestId( 'child' ) );
-		expect( readProp( provider, '--wpds-cursor-control' ) ).toBe(
-			'pointer'
-		);
+		expect( readProp( provider, CURSOR_CONTROL ) ).toBe( 'pointer' );
 	} );
 
 	describe( 'isRoot', () => {
@@ -113,10 +104,12 @@ describe( 'ThemeProvider', () => {
 	} );
 
 	describe( 'nested providers', () => {
-		it( 'inherits the parent value, and a nested provider can override it', () => {
+		it( 'overrides the settings it defines and inherits the rest', () => {
 			render(
-				<ThemeProvider color={ { primary: PRIMARY } }>
-					<div data-testid="parent">p</div>
+				<ThemeProvider
+					color={ { primary: PRIMARY, background: BACKGROUND } }
+					cursor={ { control: 'pointer' } }
+				>
 					<ThemeProvider>
 						<div data-testid="inheriting">a</div>
 					</ThemeProvider>
@@ -126,7 +119,6 @@ describe( 'ThemeProvider', () => {
 				</ThemeProvider>
 			);
 
-			const parent = getScopingProvider( screen.getByTestId( 'parent' ) );
 			const inheriting = getScopingProvider(
 				screen.getByTestId( 'inheriting' )
 			);
@@ -134,49 +126,16 @@ describe( 'ThemeProvider', () => {
 				screen.getByTestId( 'overriding' )
 			);
 
-			expect( readProp( parent, BRAND_BG ) ).toBe( PRIMARY );
-			// A nested provider without its own `color` inherits the parent's.
+			// A nested provider with no settings of its own inherits everything.
 			expect( readProp( inheriting, BRAND_BG ) ).toBe( PRIMARY );
-			// A nested provider with its own `color` overrides the parent's.
+			expect( readProp( inheriting, SURFACE_BG ) ).toBe( BACKGROUND );
+			expect( readProp( inheriting, CURSOR_CONTROL ) ).toBe( 'pointer' );
+
+			// A nested provider overrides only what it defines (`primary`),
+			// inheriting the rest (`background`, `cursor`).
 			expect( readProp( overriding, BRAND_BG ) ).toBe( OTHER_PRIMARY );
-		} );
-
-		it( 'overrides only the provided color, inheriting the rest', () => {
-			render(
-				<ThemeProvider
-					color={ { primary: PRIMARY, background: BACKGROUND } }
-				>
-					<ThemeProvider color={ { primary: OTHER_PRIMARY } }>
-						<div data-testid="child">c</div>
-					</ThemeProvider>
-				</ThemeProvider>
-			);
-
-			const child = getScopingProvider( screen.getByTestId( 'child' ) );
-			// `primary` is overridden by the nested provider...
-			expect( readProp( child, BRAND_BG ) ).toBe( OTHER_PRIMARY );
-			// ...while `background` keeps inheriting from the parent.
-			expect( readProp( child, SURFACE_BG ) ).toBe( BACKGROUND );
-		} );
-
-		it( 'inherits cursor while overriding color', () => {
-			render(
-				<ThemeProvider
-					color={ { primary: PRIMARY } }
-					cursor={ { control: 'pointer' } }
-				>
-					<ThemeProvider color={ { primary: OTHER_PRIMARY } }>
-						<div data-testid="child">c</div>
-					</ThemeProvider>
-				</ThemeProvider>
-			);
-
-			const child = getScopingProvider( screen.getByTestId( 'child' ) );
-			expect( readProp( child, BRAND_BG ) ).toBe( OTHER_PRIMARY );
-			// `cursor` is a separate settings group and keeps inheriting.
-			expect( readProp( child, '--wpds-cursor-control' ) ).toBe(
-				'pointer'
-			);
+			expect( readProp( overriding, SURFACE_BG ) ).toBe( BACKGROUND );
+			expect( readProp( overriding, CURSOR_CONTROL ) ).toBe( 'pointer' );
 		} );
 	} );
 } );
