@@ -37,7 +37,7 @@ import { Tooltip } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { default as SiteHub, SiteHubMobile } from '../site-hub';
+import { SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
 import SaveKeyboardShortcut from '../save-keyboard-shortcut';
@@ -58,9 +58,7 @@ function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
-	const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
-	const showDesktopSiteHub = ! hasAdminBarInEditor;
-	const showMobileSiteHub = ! hasAdminBarInEditor || routeKey !== 'home';
+	const showMobileSiteHub = routeKey !== 'home';
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -138,14 +136,6 @@ function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										{ showDesktopSiteHub && (
-											<SiteHub
-												ref={ toggleRef }
-												isTransparent={
-													isResizableFrameOversized
-												}
-											/>
-										) }
 										<SidebarNavigationProvider>
 											<SidebarContent
 												shouldAnimate={

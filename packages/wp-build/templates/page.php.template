@@ -258,7 +258,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			body {
 				margin: 0;
 			}
-			#wpadminbar { display: none; }
 		</style>
 	<?php
 	global $hook_suffix;

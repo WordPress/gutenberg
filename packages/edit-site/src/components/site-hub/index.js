@@ -117,18 +117,14 @@ export const SiteHubMobile = memo(
 		const { path } = useLocation();
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
-		const hasAdminBarInEditor = window.__experimentalAdminBarInEditor;
 
 		const {
 			dashboardLink,
-			homeUrl,
-			siteTitle,
 			isBlockTheme,
 			isClassicThemeWithStyleBookSupport,
 		} = useSelect( ( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
-			const { getEntityRecord, getCurrentTheme } = select( coreStore );
-			const _site = getEntityRecord( 'root', 'site' );
+			const { getCurrentTheme } = select( coreStore );
 			const currentTheme = getCurrentTheme();
 			const settings = getSettings();
 			const supportsEditorStyles =
@@ -138,18 +134,12 @@ export const SiteHubMobile = memo(
 
 			return {
 				dashboardLink: settings.__experimentalDashboardLink,
-				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
-				siteTitle:
-					! _site?.title && !! _site?.url
-						? filterURLForDisplay( _site?.url )
-						: _site?.title,
 				isBlockTheme: currentTheme?.is_block_theme,
 				isClassicThemeWithStyleBookSupport:
 					! currentTheme?.is_block_theme &&
 					( supportsEditorStyles || hasThemeJson ),
 			};
 		}, [] );
-		const { open: openCommandCenter } = useDispatch( commandsStore );
 
 		let backPath;
 
@@ -200,46 +190,12 @@ export const SiteHubMobile = memo(
 							} }
 							{ ...backButtonProps }
 						>
-							{ hasAdminBarInEditor ? (
-								<Icon
-									icon={
-										isRTL() ? arrowUpRight : arrowUpLeft
-									}
-									size={ 48 }
-								/>
-							) : (
-								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-							) }
+							<Icon
+								icon={ isRTL() ? arrowUpRight : arrowUpLeft }
+								size={ 48 }
+							/>
 						</Button>
 					</div>
-
-					<HStack>
-						<div className="edit-site-site-hub__title">
-							<Button
-								__next40pxDefaultSize
-								variant="link"
-								href={ homeUrl }
-								target="_blank"
-								label={ __( 'View site (opens in a new tab)' ) }
-							>
-								{ decodeEntities( siteTitle ) }
-							</Button>
-						</div>
-						<HStack
-							spacing={ 0 }
-							expanded={ false }
-							className="edit-site-site-hub__actions"
-						>
-							<Button
-								__next40pxDefaultSize
-								className="edit-site-site-hub_toggle-command-center"
-								icon={ search }
-								onClick={ () => openCommandCenter() }
-								label={ __( 'Open command palette' ) }
-								shortcut={ displayShortcut.primary( 'k' ) }
-							/>
-						</HStack>
-					</HStack>
 				</HStack>
 			</div>
 		);

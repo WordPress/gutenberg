@@ -53,12 +53,8 @@
 		}
 	}
 
-	.edit-site-editor__view-mode-toggle-icon {
-		svg,
-		img {
-			background: $gray-900;
-			display: block;
-		}
+	&:hover .edit-site-editor__back-icon {
+		color: var(--wp-admin-theme-color);
 	}
 }
 
@@ -71,16 +67,10 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-color: hsla(0, 0%, 80%);
+	background-color: transparent;
 	pointer-events: none;
 
 	svg {
 		fill: currentColor;
-	}
-
-	&.has-site-icon {
-		background-color: hsla(0, 0%, 100%, 0.6);
-		-webkit-backdrop-filter: saturate(180%) blur(15px);
-		backdrop-filter: saturate(180%) blur(15px);
 	}
 }
