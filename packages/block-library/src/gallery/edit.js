@@ -754,7 +754,7 @@ export default function GalleryEdit( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ lightboxSetting?.allowEditing && (
+					{ lightboxSetting?.allowEditing && hasLightboxImages && (
 						<ToolsPanelItem
 							label={ __( 'Navigation button type' ) }
 							isShownByDefault
@@ -765,32 +765,30 @@ export default function GalleryEdit( props ) {
 								} )
 							}
 						>
-							{ hasLightboxImages && (
-								<ToggleGroupControl
-									label={ __( 'Navigation button type' ) }
-									value={ navigationButtonType }
-									onChange={ ( value ) =>
-										setAttributes( {
-											navigationButtonType: value,
-										} )
-									}
-									isBlock
-									__next40pxDefaultSize
-									help={ __(
-										'Adjust the appearance of buttons in the lightbox.'
-									) }
-								>
-									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
-										( option ) => (
-											<ToggleGroupControlOption
-												key={ option.value }
-												value={ option.value }
-												label={ option.label }
-											/>
-										)
-									) }
-								</ToggleGroupControl>
-							) }
+							<ToggleGroupControl
+								label={ __( 'Navigation button type' ) }
+								value={ navigationButtonType }
+								onChange={ ( value ) =>
+									setAttributes( {
+										navigationButtonType: value,
+									} )
+								}
+								isBlock
+								__next40pxDefaultSize
+								help={ __(
+									'Adjust the appearance of buttons in the lightbox.'
+								) }
+							>
+								{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
+									( option ) => (
+										<ToggleGroupControlOption
+											key={ option.value }
+											value={ option.value }
+											label={ option.label }
+										/>
+									)
+								) }
+							</ToggleGroupControl>
 						</ToolsPanelItem>
 					) }
 				</ToolsPanel>
