@@ -68,6 +68,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'clearBlockSelection',
 	'codeEditingEnabled',
 	'colors',
+	'disableContentOnlyForTemplateParts',
 	'disableContentOnlyForUnsyncedPatterns',
 	'disableCustomColors',
 	'disableCustomFontSizes',
@@ -414,6 +415,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			// When in template-locked mode (e.g., "Show Template" in the post editor),
 			// don't treat template parts as contentOnly sections.
 			disableContentOnlyForTemplateParts:
+				settings.disableContentOnlyForTemplateParts ||
 				renderingMode === 'template-locked',
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 			[ onViewportStateChangeKey ]: updateDeviceTypeForViewportState,
