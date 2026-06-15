@@ -271,7 +271,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 					),
 					'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
 			'background gradient with hsl colors and image combined' => array(
@@ -287,7 +287,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 					),
 					'gradient'        => 'linear-gradient(135deg,hsl(0,100%,50%) 0%,hsl(240,100%,50%) 100%)',
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,hsl(0,100%,50%) 0%,hsl(240,100%,50%) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,hsl(0,100%,50%) 0%,hsl(240,100%,50%) 100%), url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
 			'background image style is not applied if the block does not support background image' => array(
