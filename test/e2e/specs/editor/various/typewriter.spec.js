@@ -291,9 +291,20 @@ class TypewriterUtils {
 
 	async getCaretPosition() {
 		return await this.#page.evaluate( () => {
-			return window.wp.dom.computeCaretRect(
-				document.activeElement?.contentWindow ?? window
-			).y;
+			// Wait for one animation frame before measuring. When the selected
+			// block supports an editable root, the writing flow wrapper holds
+			// focus instead of the block's editable element, so a keystroke
+			// does not move the browser's focus to the new caret. The
+			// typewriter's scroll compensation then lands on the next
+			// animation frame rather than synchronously, so the caret reaches
+			// its final position one frame later. Without the wrapper this is
+			// effectively a no-op.
+			return new Promise( ( resolve ) => {
+				const view = document.activeElement?.contentWindow ?? window;
+				view.requestAnimationFrame( () => {
+					resolve( window.wp.dom.computeCaretRect( view ).y );
+				} );
+			} );
 		} );
 	}
 
