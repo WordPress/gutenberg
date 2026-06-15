@@ -317,13 +317,27 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		return array_key_exists( $property, $viewport_overrides );
 	};
 
-	$self_stretch = $child_layout['selfStretch'] ?? null;
+	$self_stretch      = $child_layout['selfStretch'] ?? null;
+	$base_self_stretch = $base_child_layout['selfStretch'] ?? null;
 
 	if ( null === $viewport_overrides || $has_viewport_property_override( 'selfStretch' ) || $has_viewport_property_override( 'flexSize' ) ) {
+		if (
+			null !== $viewport_overrides &&
+			( 'fit' === $self_stretch || 'fill' === $self_stretch ) &&
+			( 'fixed' === $base_self_stretch || 'fixedNoShrink' === $base_self_stretch ) &&
+			isset( $base_child_layout['flexSize'] )
+		) {
+			$child_layout_declarations['flex-basis'] = 'unset';
+			if ( 'fixedNoShrink' === $base_self_stretch ) {
+				$child_layout_declarations['flex-shrink'] = 'unset';
+			}
+		}
 		if ( ( 'fixed' === $self_stretch || 'fixedNoShrink' === $self_stretch ) && isset( $child_layout['flexSize'] ) ) {
 			$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
 			if ( 'fixedNoShrink' === $self_stretch ) {
 				$child_layout_declarations['flex-shrink'] = '0';
+			} elseif ( null !== $viewport_overrides && 'fixedNoShrink' === $base_self_stretch ) {
+				$child_layout_declarations['flex-shrink'] = 'unset';
 			}
 			$child_layout_declarations['box-sizing'] = 'border-box';
 		} elseif ( 'fill' === $self_stretch ) {

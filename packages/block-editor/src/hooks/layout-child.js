@@ -60,6 +60,7 @@ export function getChildLayoutStyleRules( {
 		columnSpan,
 		rowSpan,
 	} = effectiveLayout;
+	const baseSelfStretch = layout.selfStretch;
 	const { columnCount, minimumColumnWidth } = parentLayout;
 	const rules = [];
 
@@ -70,12 +71,29 @@ export function getChildLayoutStyleRules( {
 		hasViewportOverride( 'flexSize' )
 	) {
 		if (
+			hasViewportOverrides &&
+			( selfStretch === 'fit' || selfStretch === 'fill' ) &&
+			( baseSelfStretch === 'fixed' ||
+				baseSelfStretch === 'fixedNoShrink' ) &&
+			layout.flexSize
+		) {
+			declarations[ 'flex-basis' ] = 'unset';
+			if ( baseSelfStretch === 'fixedNoShrink' ) {
+				declarations[ 'flex-shrink' ] = 'unset';
+			}
+		}
+		if (
 			( selfStretch === 'fixed' || selfStretch === 'fixedNoShrink' ) &&
 			flexSize
 		) {
 			declarations[ 'flex-basis' ] = flexSize;
 			if ( selfStretch === 'fixedNoShrink' ) {
 				declarations[ 'flex-shrink' ] = '0';
+			} else if (
+				hasViewportOverrides &&
+				baseSelfStretch === 'fixedNoShrink'
+			) {
+				declarations[ 'flex-shrink' ] = 'unset';
 			}
 			declarations[ 'box-sizing' ] = 'border-box';
 		} else if ( selfStretch === 'fill' ) {

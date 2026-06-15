@@ -450,7 +450,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 */
 	public function data_gutenberg_get_child_layout_style_rules() {
 		return array(
-			'legacy fixed sizing remains shrinkable' => array(
+			'legacy fixed sizing remains shrinkable'      => array(
 				'child_layout'       => array(
 					'selfStretch' => 'fixed',
 					'flexSize'    => '320px',
@@ -466,7 +466,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'fixed sizing can opt out of shrinking'  => array(
+			'fixed sizing can opt out of shrinking'       => array(
 				'child_layout'       => array(
 					'selfStretch' => 'fixedNoShrink',
 					'flexSize'    => '320px',
@@ -483,7 +483,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'viewport overrides can switch fixedNoShrink to max width' => array(
+			'viewport overrides can switch fixedNoShrink to max' => array(
 				'child_layout'       => array(
 					'selfStretch' => 'fixedNoShrink',
 					'flexSize'    => '320px',
@@ -495,8 +495,81 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					array(
 						'selector'     => '.wp-container-content-test',
 						'declarations' => array(
-							'flex-basis' => '320px',
-							'box-sizing' => 'border-box',
+							'flex-basis'  => '320px',
+							'flex-shrink' => 'unset',
+							'box-sizing'  => 'border-box',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to fit' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fit',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => 'unset',
+							'flex-shrink' => 'unset',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixed to fit'  => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fit',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => 'unset',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixedNoShrink to grow' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixedNoShrink',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fill',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis'  => 'unset',
+							'flex-shrink' => 'unset',
+							'flex-grow'   => '1',
+						),
+					),
+				),
+			),
+			'viewport overrides can switch fixed to grow' => array(
+				'child_layout'       => array(
+					'selfStretch' => 'fixed',
+					'flexSize'    => '320px',
+				),
+				'viewport_overrides' => array(
+					'selfStretch' => 'fill',
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'flex-basis' => 'unset',
+							'flex-grow'  => '1',
 						),
 					),
 				),
