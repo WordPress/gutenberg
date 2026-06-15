@@ -16,7 +16,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 				fontWeight: 'var(--wpds-typography-font-weight-regular)',
 				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
-				color: 'var(--wpds-color-fg-content-neutral-weak)',
+				color: 'var(--wpds-color-foreground-content-neutral-weak)',
 			} }
 		>
 			{ children }

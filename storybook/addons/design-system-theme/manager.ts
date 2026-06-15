@@ -33,6 +33,14 @@ const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
 	{ id: 'pointer', title: 'Pointer' },
 ];
 
+const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
+	{ id: '', title: 'Default' },
+	{ id: 'none', title: 'None' },
+	{ id: 'subtle', title: 'Subtle' },
+	{ id: 'moderate', title: 'Moderate' },
+	{ id: 'pronounced', title: 'Pronounced' },
+];
+
 function ThemeTooltipMessage( {
 	title,
 	globalName,
@@ -69,6 +77,11 @@ const ThemeTool = () => {
 			title: 'Cursor control',
 			globalName: 'dsCursorControl',
 			options: CURSOR_CONTROL_OPTIONS,
+		} ),
+		createElement( ThemeTooltipMessage, {
+			title: 'Corner radius',
+			globalName: 'dsCornerRadius',
+			options: CORNER_RADIUS_OPTIONS,
 		} )
 	);
 

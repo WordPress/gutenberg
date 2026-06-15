@@ -6,10 +6,10 @@
 			--icon-height: 24px;
 			--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
 
-			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-neutral-weak);
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-neutral-weak);
 			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
-			--wp-ui-notice-text-color: var(--wpds-color-fg-content-neutral);
-			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-neutral);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-neutral);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-neutral);
 
 			container-type: inline-size;
 			display: grid;
@@ -84,31 +84,31 @@
 		}
 
 		.is-info {
-			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-info-weak);
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-info-weak);
 			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-info);
-			--wp-ui-notice-text-color: var(--wpds-color-fg-content-info);
-			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-info-weak);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-info);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-info-weak);
 		}
 
 		.is-warning {
-			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-warning-weak);
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-warning-weak);
 			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-warning);
-			--wp-ui-notice-text-color: var(--wpds-color-fg-content-warning);
-			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-warning-weak);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-warning);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-warning-weak);
 		}
 
 		.is-success {
-			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-success-weak);
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-success-weak);
 			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-success);
-			--wp-ui-notice-text-color: var(--wpds-color-fg-content-success);
-			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-success-weak);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-success);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-success-weak);
 		}
 
 		.is-error {
-			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-error-weak);
+			--wp-ui-notice-background-color: var(--wpds-color-background-surface-error-weak);
 			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-error);
-			--wp-ui-notice-text-color: var(--wpds-color-fg-content-error);
-			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
+			--wp-ui-notice-text-color: var(--wpds-color-foreground-content-error);
+			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-error-weak);
 		}
 
 		/* Matches --wpds-dimension-surface-width-sm (container queries don't support custom properties). */
@@ -130,7 +130,7 @@
 		 * for a better look over tinted backgrounds */
 		.close-icon,
 		.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
-			--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-bg-interactive-neutral-weak-active));
+			--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-background-interactive-neutral-weak-active));
 		}
 	}
 }

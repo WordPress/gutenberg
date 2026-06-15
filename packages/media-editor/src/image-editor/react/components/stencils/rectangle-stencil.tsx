@@ -488,6 +488,7 @@ export function RectangleStencil( {
 	return (
 		<div
 			className="wp-media-editor-image-editor__stencil"
+			data-testid="cropper-stencil"
 			style={ {
 				left,
 				top,
