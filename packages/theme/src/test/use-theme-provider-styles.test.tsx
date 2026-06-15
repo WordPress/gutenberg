@@ -16,8 +16,6 @@ import { ThemeProvider } from '../theme-provider';
 import { useThemeProviderStyles } from '../use-theme-provider-styles';
 import { DEFAULT_SEED_COLORS } from '../color-ramps';
 
-type Styles = Record< string, string >;
-
 describe( 'useThemeProviderStyles', () => {
 	describe( 'resolvedSettings', () => {
 		it( 'falls back to the default seed colors and no cursor', () => {
@@ -38,9 +36,12 @@ describe( 'useThemeProviderStyles', () => {
 				} )
 			);
 
-			expect( result.current.resolvedSettings ).toEqual( {
-				color: { primary: '#1e90ff', background: '#f8f8f8' },
-				cursor: { control: 'pointer' },
+			expect( result.current.resolvedSettings.color ).toEqual( {
+				primary: '#1e90ff',
+				background: '#f8f8f8',
+			} );
+			expect( result.current.resolvedSettings.cursor ).toEqual( {
+				control: 'pointer',
 			} );
 		} );
 
@@ -59,9 +60,12 @@ describe( 'useThemeProviderStyles', () => {
 					wrapper,
 				} );
 
-				expect( result.current.resolvedSettings ).toEqual( {
-					color: { primary: '#abcdef', background: '#222222' },
-					cursor: { control: 'pointer' },
+				expect( result.current.resolvedSettings.color ).toEqual( {
+					primary: '#abcdef',
+					background: '#222222',
+				} );
+				expect( result.current.resolvedSettings.cursor ).toEqual( {
+					control: 'pointer',
 				} );
 			} );
 
@@ -74,11 +78,15 @@ describe( 'useThemeProviderStyles', () => {
 					{ wrapper }
 				);
 
-				expect( result.current.resolvedSettings ).toEqual( {
+				expect( result.current.resolvedSettings.color ).toEqual( {
 					// Provided locally.
-					color: { primary: '#00ff00', background: '#222222' },
-					// `background` and `cursor` keep inheriting from the parent.
-					cursor: { control: 'pointer' },
+					primary: '#00ff00',
+					// `background` keeps inheriting from the parent.
+					background: '#222222',
+				} );
+				// `cursor` keeps inheriting from the parent.
+				expect( result.current.resolvedSettings.cursor ).toEqual( {
+					control: 'pointer',
 				} );
 			} );
 		} );
@@ -89,7 +97,7 @@ describe( 'useThemeProviderStyles', () => {
 			const { result } = renderHook( () =>
 				useThemeProviderStyles( { color: { primary: '#1e90ff' } } )
 			);
-			const styles = result.current.themeProviderStyles as Styles;
+			const styles = result.current.themeProviderStyles;
 
 			expect( styles[ '--wp-admin-theme-color' ] ).toBe( '#1e90ff' );
 			expect( styles[ '--wp-admin-theme-color--rgb' ] ).toBe(
@@ -99,16 +107,16 @@ describe( 'useThemeProviderStyles', () => {
 
 		it( 'aliases the wp-components colors onto the wp-admin and semantic tokens', () => {
 			const { result } = renderHook( () => useThemeProviderStyles() );
-			const styles = result.current.themeProviderStyles as Styles;
+			const styles = result.current.themeProviderStyles;
 
 			expect( styles[ '--wp-components-color-accent' ] ).toBe(
 				'var(--wp-admin-theme-color)'
 			);
 			expect( styles[ '--wp-components-color-accent-inverted' ] ).toBe(
-				'var(--wpds-color-fg-interactive-brand-strong)'
+				'var(--wpds-color-foreground-interactive-brand-strong)'
 			);
 			expect( styles[ '--wp-components-color-background' ] ).toBe(
-				'var(--wpds-color-bg-surface-neutral-strong)'
+				'var(--wpds-color-background-surface-neutral-strong)'
 			);
 		} );
 	} );
@@ -120,9 +128,7 @@ describe( 'useThemeProviderStyles', () => {
 			);
 
 			expect(
-				( result.current.themeProviderStyles as Styles )[
-					'--wpds-cursor-control'
-				]
+				result.current.themeProviderStyles[ '--wpds-cursor-control' ]
 			).toBe( 'pointer' );
 		} );
 
