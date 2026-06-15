@@ -103,18 +103,16 @@ export function Edit( { attributes, setAttributes } ) {
 	const blockControls = (
 		<>
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
-				<ToolbarGroup>
-					<ToolbarButton
-						onClick={ () => {
-							setInserterOpen( true );
-						} }
-					>
-						{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
+				<ToolbarButton
+					onClick={ () => {
+						setInserterOpen( true );
+					} }
+				>
+					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
+				</ToolbarButton>
 			</BlockControls>
 			{ icon && (
-				<BlockControls group="other">
+				<BlockControls group="block">
 					<ToolbarGroup>
 						<ToolbarButton
 							icon={ flipHorizontalIcon }
