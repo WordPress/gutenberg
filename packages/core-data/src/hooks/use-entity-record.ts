@@ -34,6 +34,16 @@ export interface EntityRecordResolution< RecordType > {
 	isResolving: boolean;
 
 	/**
+	 * Is the record still being saved?
+	 */
+	isSaving: boolean;
+
+	/**
+	 * Is the record still being deleted?
+	 */
+	isDeleting: boolean;
+
+	/**
 	 * Does the record have any local edits?
 	 */
 	hasEdits: boolean;
@@ -169,13 +179,15 @@ export default function useEntityRecord< RecordType >(
 		[ editEntityRecord, kind, name, recordId, saveEditedEntityRecord ]
 	);
 
-	const { editedRecord, hasEdits, edits } = useSelect(
+	const { editedRecord, hasEdits, edits, isSaving, isDeleting } = useSelect(
 		( select ) => {
 			if ( ! options.enabled ) {
 				return {
 					editedRecord: EMPTY_OBJECT,
 					hasEdits: false,
 					edits: EMPTY_OBJECT,
+					isSaving: false,
+					isDeleting: false,
 				};
 			}
 
@@ -191,6 +203,16 @@ export default function useEntityRecord< RecordType >(
 					recordId
 				),
 				edits: select( coreStore ).getEntityRecordNonTransientEdits(
+					kind,
+					name,
+					recordId
+				),
+				isSaving: select( coreStore ).isSavingEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				isDeleting: select( coreStore ).isDeletingEntityRecord(
 					kind,
 					name,
 					recordId
@@ -217,6 +239,8 @@ export default function useEntityRecord< RecordType >(
 		editedRecord,
 		hasEdits,
 		edits,
+		isSaving,
+		isDeleting,
 		...querySelectRest,
 		...mutations,
 	};
