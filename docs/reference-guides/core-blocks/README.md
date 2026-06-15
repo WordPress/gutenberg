@@ -446,7 +446,7 @@ Insert an SVG icon.
 -	**Name:** [core/icon](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-icon/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 -	**Supports:** align (center, left, right), anchor, ariaLabel, color (background, text), dimensions (width), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
--	**Attributes:** icon
+-	**Attributes:** flipHorizontal, flipVertical, icon, rotation
 
 ## Image
 

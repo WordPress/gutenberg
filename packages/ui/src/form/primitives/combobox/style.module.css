@@ -15,17 +15,17 @@
 			min-height: 24px;
 			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 12px;
-			background-color: var(--wpds-color-bg-interactive-neutral-weak);
+			background-color: var(--wpds-color-background-interactive-neutral-weak);
 			font-size: var(--wpds-typography-font-size-md);
-			color: var(--wpds-color-fg-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-neutral);
 			cursor: default;
 
 			&:not([data-disabled]):has(button:not(:disabled, [aria-disabled="true"]):hover),
 			&:not([data-disabled]):focus {
-				background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 				border-color: var(--wpds-color-stroke-interactive-neutral-active);
 				outline: none;
-				color: var(--wpds-color-fg-interactive-neutral-active);
+				color: var(--wpds-color-foreground-interactive-neutral-active);
 
 				@media ( forced-colors: active ) {
 					background-color: SelectedItem;
@@ -33,9 +33,9 @@
 			}
 
 			&[data-disabled] {
-				background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
-				color: var(--wpds-color-fg-interactive-neutral-disabled);
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media ( forced-colors: active ) {
 					border-color: GrayText;
