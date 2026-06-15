@@ -216,7 +216,7 @@ export function getExamplesForSinglePageUse( examples ) {
  * @return {Array} Updated examples with variation applied.
  */
 function applyBlockVariationsToExamples( examples, variation ) {
-	if ( ! variation || ! examples ) {
+	if ( ! variation ) {
 		return examples;
 	}
 	return examples.map( ( example ) => {
@@ -500,7 +500,7 @@ export const StyleBookPreview = ( {
 			return { examples: examplesForSinglePageUse };
 		}
 
-		if ( blockVariation ) {
+		if ( blockVariation && filteredExamples?.examples?.length ) {
 			return {
 				examples: applyBlockVariationsToExamples(
 					filteredExamples.examples,
