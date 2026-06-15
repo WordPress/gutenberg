@@ -12,8 +12,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * Registers an icon.
 	 *
 	 * @param string $icon_name       Namespaced icon name in the form "collection/icon-name"
-	 *                                (e.g. "core/arrow-left"). When the collection prefix is
-	 *                                omitted, the icon is registered under the "core" collection.
+	 *                                (e.g. "core/arrow-left").
 	 * @param array  $icon_properties {
 	 *     List of properties for the icon.
 	 *
@@ -35,13 +34,18 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		// Split the namespaced name into a collection slug and an unqualified icon name.
-		if ( false !== strpos( $icon_name, '/' ) ) {
-			list( $collection, $unqualified_name ) = explode( '/', $icon_name, 2 );
-		} else {
-			$collection       = 'core';
-			$unqualified_name = $icon_name;
+		// Require a namespaced name in the form "collection/icon-name".
+		if ( false === strpos( $icon_name, '/' ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Icon name must be namespaced in the form "collection/icon-name".', 'gutenberg' ),
+				'7.1.0'
+			);
+			return false;
 		}
+
+		// Split the namespaced name into a collection slug and an unqualified icon name.
+		list( $collection, $unqualified_name ) = explode( '/', $icon_name, 2 );
 
 		if ( preg_match( '/[A-Z]/', $unqualified_name ) ) {
 			_doing_it_wrong(

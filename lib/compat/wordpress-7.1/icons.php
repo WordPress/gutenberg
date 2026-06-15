@@ -40,8 +40,10 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	 * Registers a new icon.
 	 *
 	 * @param string $icon_name Namespaced icon name in the form "collection/icon-name"
-	 *                          (e.g. "core/arrow-left"). When the collection prefix is
-	 *                          omitted, the icon is registered under the "core" collection.
+	 *                          (e.g. "my-plugin/arrow-left"). The "core" collection is
+	 *                          reserved for WordPress core icons; third-party code should
+	 *                          register icons under its own collection rather than the
+	 *                          "core" collection.
 	 * @param array  $args {
 	 *     List of properties for the icon.
 	 *

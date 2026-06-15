@@ -161,18 +161,21 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should default `collection` to "core" when omitted.
+	 * Should reject a non-namespaced icon name.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
 	 */
-	public function test_register_defaults_collection_to_core() {
+	public function test_register_rejects_non_namespaced_name() {
 		$result = $this->register(
-			'defaulted-icon',
+			'non-namespaced-icon',
 			array(
 				'label'   => 'Icon',
 				'content' => '<svg></svg>',
 			)
 		);
-		$this->assertTrue( $result );
-		$this->assertTrue( $this->registry->is_registered( 'core/defaulted-icon' ) );
+		$this->assertFalse( $result );
+		$this->assertFalse( $this->registry->is_registered( 'core/non-namespaced-icon' ) );
+		$this->assertFalse( $this->registry->is_registered( 'non-namespaced-icon' ) );
 	}
 
 	/**
