@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Icon Block: Insert with a default icon instead of an empty placeholder ([#79111](https://github.com/WordPress/gutenberg/pull/79111)).
+
 ## 9.48.0 (2026-06-10)
 
 ### Code Quality
