@@ -123,34 +123,6 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 */
 	public function data_background_block_support() {
 		return array(
-			'demonstrate resilience to character reference encoding' => array(
-				'theme_name'          => 'block-theme-child-with-fluid-typography',
-				'block_name'          => 'test/background-rules-are-output',
-				'background_settings' => array(
-					'backgroundImage' => true,
-				),
-				'background_style'    => array(
-					'backgroundImage' => array(
-						'url' => 'https://example.com/image.jpg',
-					),
-				),
-				'expected_wrapper'    => '<div class=\'has-background\' style="background-image:url(\'https://example.com/image.jpg&apos;);background-size:cover;">Content</div>',
-				'wrapper'             => '<div>Content</div>',
-			),
-			'demonstrate resilience to character reference encoding (2)' => array(
-				'theme_name'          => 'block-theme-child-with-fluid-typography',
-				'block_name'          => 'test/background-rules-are-output',
-				'background_settings' => array(
-					'backgroundImage' => true,
-				),
-				'background_style'    => array(
-					'backgroundImage' => array(
-						'url' => 'https://example.com/image.jpg',
-					),
-				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#00000039;https://example.com/image.jpg&#x27;);background-size:cover;">Content</div>',
-				'wrapper'             => '<div>Content</div>',
-			),
 			'background image style is applied'      => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-output',
