@@ -39,6 +39,16 @@ function stringifyValue( value ) {
 }
 
 /**
+ * Determines whether a meta value should be treated as empty.
+ *
+ * @param {string} str The stringified value.
+ * @return {boolean} Whether the value is effectively empty.
+ */
+function isEmptyMeta( str ) {
+	return ! str || str === '[]' || str === '{}';
+}
+
+/**
  * Panel that shows meta field diffs between the current revision and
  * the previous revision in the document sidebar during revision mode.
  */
@@ -72,7 +82,7 @@ export default function RevisionFieldsDiffPanel() {
 			const revStr = stringifyValue( revisionMeta[ key ] );
 			const prevStr = stringifyValue( previousMeta[ key ] );
 
-			if ( ! revStr && ! prevStr ) {
+			if ( isEmptyMeta( revStr ) && isEmptyMeta( prevStr ) ) {
 				continue;
 			}
 
