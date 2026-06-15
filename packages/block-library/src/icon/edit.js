@@ -113,37 +113,35 @@ export function Edit( { attributes, setAttributes } ) {
 			</BlockControls>
 			{ icon && (
 				<BlockControls group="block">
-					<ToolbarGroup>
-						<ToolbarButton
-							icon={ flipHorizontalIcon }
-							label={ __( 'Flip horizontal' ) }
-							isPressed={ flipHorizontal }
-							onClick={ () =>
-								setAttributes( {
-									flipHorizontal: ! flipHorizontal,
-								} )
-							}
-						/>
-						<ToolbarButton
-							icon={ flipVerticalIcon }
-							label={ __( 'Flip vertical' ) }
-							isPressed={ flipVertical }
-							onClick={ () =>
-								setAttributes( {
-									flipVertical: ! flipVertical,
-								} )
-							}
-						/>
-						<ToolbarButton
-							icon={ rotateRight }
-							label={ __( 'Rotate' ) }
-							onClick={ () =>
-								setAttributes( {
-									rotation: ( ( rotation || 0 ) + 90 ) % 360,
-								} )
-							}
-						/>
-					</ToolbarGroup>
+					<ToolbarButton
+						icon={ flipHorizontalIcon }
+						label={ __( 'Flip horizontal' ) }
+						isPressed={ flipHorizontal }
+						onClick={ () =>
+							setAttributes( {
+								flipHorizontal: ! flipHorizontal,
+							} )
+						}
+					/>
+					<ToolbarButton
+						icon={ flipVerticalIcon }
+						label={ __( 'Flip vertical' ) }
+						isPressed={ flipVertical }
+						onClick={ () =>
+							setAttributes( {
+								flipVertical: ! flipVertical,
+							} )
+						}
+					/>
+					<ToolbarButton
+						icon={ rotateRight }
+						label={ __( 'Rotate' ) }
+						onClick={ () =>
+							setAttributes( {
+								rotation: ( ( rotation || 0 ) + 90 ) % 360,
+							} )
+						}
+					/>
 				</BlockControls>
 			) }
 			{ isContentOnlyMode && icon && (
