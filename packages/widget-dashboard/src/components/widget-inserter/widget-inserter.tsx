@@ -16,8 +16,11 @@ import { createDashboardWidget } from '../../utils/create-dashboard-widget';
 import { WidgetPicker } from '../widget-picker';
 
 /**
- * Modal-based widget inserter. The dialog stays hidden until `inserterOpen`
- * flips to `true` from any compound sharing the UI context.
+ * Modal-based widget inserter, mounted by the engine as a target. It shows
+ * while `inserterOpen` is `true` in the shared UI context and hides
+ * otherwise. Trigger and target meet only through that state: the "Add
+ * widget" button, the command palette, or any future caller can open it
+ * without holding a reference to it.
  */
 export function WidgetInserter() {
 	const { layout, onLayoutChange } = useDashboardInternalContext();
