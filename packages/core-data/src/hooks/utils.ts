@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import type { ResolutionStatus } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import { Status } from './constants';
@@ -10,7 +15,7 @@ import { Status } from './constants';
  * @param resolutionStatus Status returned by the `getResolutionState` selector.
  * @return Resolution info object.
  */
-export function getResolutionStatus( resolutionStatus?: string ) {
+export function getResolutionStatus( resolutionStatus?: ResolutionStatus ) {
 	let status: Status;
 	switch ( resolutionStatus ) {
 		case 'resolving':

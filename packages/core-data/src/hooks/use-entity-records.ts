@@ -136,7 +136,7 @@ export default function useEntityRecords< RecordType >(
 					kind,
 					name,
 					queryArgs
-				),
+				) as RecordType[] | null,
 				totalItems: storeSelectors.getEntityRecordsTotalItems(
 					kind,
 					name,
@@ -158,7 +158,7 @@ export default function useEntityRecords< RecordType >(
 		totalItems,
 		totalPages,
 		...rest,
-	} as EntityRecordsResolution< RecordType >;
+	};
 }
 
 export function useDeprecatedEntityRecords(
