@@ -32,6 +32,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useState } from '@wordpress/element';
+import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 
@@ -42,7 +43,27 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
 
-export function Edit( { attributes, setAttributes } ) {
+const IconPlaceholder = ( { className, style } ) => (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 60 60"
+		preserveAspectRatio="none"
+		fill="none"
+		aria-hidden="true"
+		className={ clsx( 'wp-block-icon__placeholder', className ) }
+		style={ style }
+	>
+		<Rect width="60" height="60" fill="currentColor" fillOpacity={ 0.1 } />
+		<Path
+			vectorEffect="non-scaling-stroke"
+			stroke="currentColor"
+			strokeOpacity={ 0.25 }
+			d="M60 60 0 0"
+		/>
+	</SVG>
+);
+
+export function Edit( { attributes, setAttributes, clientId } ) {
 	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
 		attributes;
 
@@ -63,28 +84,34 @@ export function Edit( { attributes, setAttributes } ) {
 				selectedIcon: icon
 					? getEntityRecord( 'root', 'icon', icon )
 					: null,
-				allIcons:
-					isInserterOpen || ! icon
-						? getEntityRecords( 'root', 'icon' )
-						: undefined,
+				allIcons: isInserterOpen
+					? getEntityRecords( 'root', 'icon' )
+					: undefined,
 			};
 		},
 		[ isInserterOpen, icon ]
 	);
 
+	const wasJustInserted = useSelect(
+		( select ) =>
+			select( blockEditorStore ).wasBlockJustInserted( clientId ),
+		[ clientId ]
+	);
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	// Default newly inserted Icon blocks to the info icon. Blocks saved in a
+	// placeholder state (no icon) are left untouched, so loading a post never
+	// silently alters existing content.
 	useEffect( () => {
-		if ( ! icon && allIcons?.length ) {
-			const randomIcon =
-				allIcons[ Math.floor( Math.random() * allIcons.length ) ];
+		if ( ! icon && wasJustInserted ) {
+			// This side-effect should not create an undo level.
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { icon: randomIcon.name } );
+			setAttributes( { icon: 'core/info' } );
 		}
 	}, [
 		icon,
-		allIcons,
+		wasJustInserted,
 		setAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
