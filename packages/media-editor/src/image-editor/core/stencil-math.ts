@@ -14,11 +14,12 @@ export type { HandlePosition };
  * avoids sub-pixel crops, and an on-screen floor (`MIN_CROP_SCREEN_PX`) that
  * keeps the crop large enough to grab. The on-screen floor converted to source
  * pixels is `MIN_CROP_SCREEN_PX / displayScale`; the binding constraint is the
- * larger of the two. When zoomed out (small `displayScale`) the on-screen floor
- * dominates; once the image is shown large enough the source-pixel floor takes
- * over.
+ * larger of the two. When the image is shown small (small `displayScale`) the
+ * on-screen floor dominates; once it is shown large enough the source-pixel
+ * floor takes over.
  *
- * @param displayScale CSS pixels rendered per source pixel (fit scale × zoom).
+ * @param displayScale CSS pixels rendered per source pixel
+ *                     (fit scale × zoom × view scale).
  * @return Minimum crop dimension in source-image pixels.
  */
 export function getMinCropPixels( displayScale: number ): number {

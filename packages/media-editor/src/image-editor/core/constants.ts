@@ -42,6 +42,21 @@ export const MIN_CROP_PIXELS = 24;
 export const MIN_CROP_SCREEN_PX = 44;
 
 /**
+ * Fraction of the constraining canvas axis the settled crop should occupy on
+ * screen. When a crop is shown smaller than this (e.g. a square crop in a tall
+ * image, capped by the contain-fit footprint's narrow axis), the view magnifies
+ * to fill the canvas. `1` = always fill the canvas; lower = rescue only the
+ * under-filled cases. See `getViewScale`.
+ */
+export const SETTLE_TARGET_CANVAS_FILL = 0.8;
+
+/**
+ * Upper bound on the presentational view magnification (`getViewScale`).
+ * Prevents a near-degenerate crop from magnifying the scene without limit.
+ */
+export const MAX_VIEW_SCALE = 8;
+
+/**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
  * This could be made configurable as a prop to the Cropper component.
  */

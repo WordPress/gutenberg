@@ -1,6 +1,5 @@
 import { flushSync } from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
-import type { Root } from 'react-dom/client';
 
 const internalsKey = '_reactInternals';
 
@@ -8,7 +7,7 @@ const internalsKey = '_reactInternals';
 const HostComponent = 5;
 const HostText = 6;
 
-function findCurrentFiber( fiber: any ): any {
+function findCurrentFiber( fiber ) {
 	if ( ! fiber.alternate ) {
 		// First mount — only one version exists, and it's current.
 		return fiber;
@@ -30,7 +29,7 @@ function findCurrentFiber( fiber: any ): any {
 	return fiber.alternate;
 }
 
-function findHostFiber( fiber: any ): any {
+function findHostFiber( fiber ) {
 	const current = findCurrentFiber( fiber );
 	if ( ! current ) {
 		return null;
@@ -38,7 +37,7 @@ function findHostFiber( fiber: any ): any {
 	return findHostFiberImpl( current );
 }
 
-function findHostFiberImpl( fiber: any ): any {
+function findHostFiberImpl( fiber ) {
 	if ( fiber.tag === HostComponent || fiber.tag === HostText ) {
 		return fiber;
 	}
@@ -55,13 +54,13 @@ function findHostFiberImpl( fiber: any ): any {
 	return null;
 }
 
-export function findDOMNode( instance: any ): Element | Text | null {
+export function findDOMNode( instance ) {
 	if ( instance === null || instance === undefined ) {
 		return null;
 	}
 
 	if ( instance.nodeType !== undefined ) {
-		return instance as Element | Text;
+		return instance;
 	}
 
 	const fiber = instance[ internalsKey ];
@@ -79,13 +78,9 @@ export function findDOMNode( instance: any ): Element | Text | null {
 	return hostFiber?.stateNode ?? null;
 }
 
-const roots = new WeakMap< Element, Root >();
+const roots = new WeakMap();
 
-export function render(
-	element: React.ReactNode,
-	container: Element,
-	callback?: () => void
-): void {
+export function render( element, container, callback ) {
 	let root = roots.get( container );
 	if ( ! root ) {
 		root = createRoot( container );
@@ -101,11 +96,7 @@ export function render(
 	}
 }
 
-export function hydrate(
-	element: React.ReactNode,
-	container: Element,
-	callback?: () => void
-): void {
+export function hydrate( element, container, callback ) {
 	let root = roots.get( container );
 	if ( ! root ) {
 		root = hydrateRoot( container, element );
@@ -119,7 +110,7 @@ export function hydrate(
 	}
 }
 
-export function unmountComponentAtNode( container: Element ): boolean {
+export function unmountComponentAtNode( container ) {
 	const root = roots.get( container );
 	if ( ! root ) {
 		return false;
