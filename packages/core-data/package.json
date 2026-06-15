@@ -48,7 +48,6 @@
 		"build-module/index.mjs"
 	],
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
@@ -80,8 +79,14 @@
 		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

@@ -3,6 +3,32 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Activates a theme, retrying on the transient "socket hang up"
+ * (ECONNRESET) connection error that intermittently occurs in CI.
+ *
+ * See https://github.com/WordPress/gutenberg/issues/74483.
+ *
+ * @param {Object} requestUtils Playwright request utils.
+ * @param {string} themeSlug    Theme slug to activate.
+ */
+async function activateThemeWithRetry( requestUtils, themeSlug ) {
+	const maxAttempts = 3;
+	for ( let attempt = 1; attempt <= maxAttempts; attempt++ ) {
+		try {
+			await requestUtils.activateTheme( themeSlug );
+			return;
+		} catch ( error ) {
+			const isTransient = /socket hang up|ECONNRESET/i.test(
+				error?.message ?? ''
+			);
+			if ( ! isTransient || attempt === maxAttempts ) {
+				throw error;
+			}
+		}
+	}
+}
+
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
 	await page.getByRole( 'button', { name: 'Add page' } ).click();
@@ -69,7 +95,7 @@ async function addPageContent( editor, page ) {
 
 test.describe( 'Pages', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'emptytheme' );
+		await activateThemeWithRetry( requestUtils, 'emptytheme' );
 		await Promise.all( [
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllPages(),
@@ -85,7 +111,7 @@ test.describe( 'Pages', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
+		await activateThemeWithRetry( requestUtils, 'twentytwentyone' );
 		await Promise.all( [
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllPages(),
