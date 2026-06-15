@@ -55,7 +55,11 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
+	const {
+		showBlockBreadcrumbsOption,
+		showCollaborationOptions,
+		showCollaborationNotifications,
+	} = useSelect(
 		( select ) => {
 			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
 				unlock( select( editorStore ) );
@@ -69,6 +73,8 @@ function PreferencesModalContents( { extraSections = {} } ) {
 					isRichEditingEnabled,
 				showCollaborationOptions:
 					isCollaborationEnabledForCurrentPost(),
+				showCollaborationNotifications:
+					get( 'core', 'showCollaborationNotifications' ) ?? true,
 			};
 		},
 		[ isLargeViewport ]
@@ -147,6 +153,30 @@ function PreferencesModalContents( { extraSections = {} } ) {
 												'Show collaboration notifications'
 											) }
 										/>
+										{ showCollaborationNotifications && (
+											<>
+												<PreferenceToggleControl
+													scope="core"
+													featureName="showCollaborationPresenceNotifications"
+													help={ __(
+														'Show notifications when collaborators join or leave the post.'
+													) }
+													label={ __(
+														'Show collaborator presence notifications'
+													) }
+												/>
+												<PreferenceToggleControl
+													scope="core"
+													featureName="showCollaborationPostSaveNotifications"
+													help={ __(
+														'Show notifications when collaborators save, update, or publish the post.'
+													) }
+													label={ __(
+														'Show post update notifications'
+													) }
+												/>
+											</>
+										) }
 									</>
 								) }
 							</PreferencesModalSection>
@@ -362,6 +392,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 		[
 			showBlockBreadcrumbsOption,
 			showCollaborationOptions,
+			showCollaborationNotifications,
 			extraSections,
 			setIsInserterOpened,
 			setIsListViewOpened,

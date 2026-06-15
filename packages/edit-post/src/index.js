@@ -80,6 +80,8 @@ export function initializeEditor(
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
 		showCollaborationNotifications: true,
+		showCollaborationPresenceNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {

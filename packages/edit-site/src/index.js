@@ -75,6 +75,8 @@ export function initializeEditor( id, settings ) {
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
 		showCollaborationNotifications: true,
+		showCollaborationPresenceNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {

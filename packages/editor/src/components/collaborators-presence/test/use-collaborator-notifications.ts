@@ -26,6 +26,8 @@ let mockEditorState = {
 	postStatus: 'draft',
 	isCollaborationEnabled: true,
 	showCollaborationNotifications: true,
+	showCollaborationPresenceNotifications: true,
+	showCollaborationPostSaveNotifications: true,
 };
 
 jest.mock( '@wordpress/data', () => ( {
@@ -119,11 +121,17 @@ function buildMockSelect() {
 		if ( storeKey === 'core/preferences' ) {
 			return {
 				get: ( scope: string, name: string ) => {
-					if (
-						scope === 'core' &&
-						name === 'showCollaborationNotifications'
-					) {
-						return mockEditorState.showCollaborationNotifications;
+					const preferenceValues: Record< string, boolean > = {
+						showCollaborationNotifications:
+							mockEditorState.showCollaborationNotifications,
+						showCollaborationPresenceNotifications:
+							mockEditorState.showCollaborationPresenceNotifications,
+						showCollaborationPostSaveNotifications:
+							mockEditorState.showCollaborationPostSaveNotifications,
+					};
+
+					if ( scope === 'core' && name in preferenceValues ) {
+						return preferenceValues[ name ];
 					}
 					return undefined;
 				},
@@ -149,6 +157,8 @@ beforeEach( () => {
 		postStatus: 'draft',
 		isCollaborationEnabled: true,
 		showCollaborationNotifications: true,
+		showCollaborationPresenceNotifications: true,
+		showCollaborationPostSaveNotifications: true,
 	};
 	mockCreateNotice.mockClear();
 	( useSelect as jest.Mock ).mockImplementation( ( selector: Function ) =>
@@ -379,6 +389,64 @@ describe( 'useCollaboratorNotifications', () => {
 
 			expect( lastJoinPostId ).toBeNull();
 			expect( lastLeavePostId ).toBeNull();
+			expect( lastSavePostId ).toBeNull();
+		} );
+
+		it( 'does not fire leave notification after global notifications are disabled', () => {
+			const alice = makeCollaborator();
+			const { rerender } = renderHook( () =>
+				useCollaboratorNotifications( 123, 'post' )
+			);
+
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationNotifications: false,
+			};
+			rerender();
+
+			mockOnLeaveCallback?.( alice );
+
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+
+		it( 'passes null postId to join and leave hooks when presence notifications are disabled', () => {
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationPresenceNotifications: false,
+			};
+			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
+
+			expect( lastJoinPostId ).toBeNull();
+			expect( lastLeavePostId ).toBeNull();
+			expect( lastSavePostId ).toBe( 123 );
+		} );
+
+		it( 'does not fire leave notification after presence notifications are disabled', () => {
+			const alice = makeCollaborator();
+			const { rerender } = renderHook( () =>
+				useCollaboratorNotifications( 123, 'post' )
+			);
+
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationPresenceNotifications: false,
+			};
+			rerender();
+
+			mockOnLeaveCallback?.( alice );
+
+			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+
+		it( 'passes null postId only to the post save hook when post update notifications are disabled', () => {
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationPostSaveNotifications: false,
+			};
+			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
+
+			expect( lastJoinPostId ).toBe( 123 );
+			expect( lastLeavePostId ).toBe( 123 );
 			expect( lastSavePostId ).toBeNull();
 		} );
 

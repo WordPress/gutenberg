@@ -68,43 +68,75 @@ export function useCollaboratorNotifications(
 	postId: number | null,
 	postType: string | null
 ): void {
-	const { postStatus, isCollaborationEnabled, showNotifications } = useSelect(
-		( select ) => {
-			const {
-				getCurrentPostAttribute,
-				isCollaborationEnabledForCurrentPost,
-			} = unlock( select( editorStore ) );
-			return {
-				postStatus: getCurrentPostAttribute( 'status' ) as
-					| string
-					| undefined,
-				isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
-				showNotifications:
-					select( preferencesStore ).get(
-						'core',
-						'showCollaborationNotifications'
-					) ?? true,
-			};
-		},
-		[]
-	);
+	const {
+		postStatus,
+		isCollaborationEnabled,
+		showNotifications,
+		showPresenceNotifications,
+		showPostSaveNotifications,
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentPostAttribute,
+			isCollaborationEnabledForCurrentPost,
+		} = unlock( select( editorStore ) );
+		return {
+			postStatus: getCurrentPostAttribute( 'status' ) as
+				| string
+				| undefined,
+			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
+			showNotifications:
+				select( preferencesStore ).get(
+					'core',
+					'showCollaborationNotifications'
+				) ?? true,
+			showPresenceNotifications:
+				select( preferencesStore ).get(
+					'core',
+					'showCollaborationPresenceNotifications'
+				) ?? true,
+			showPostSaveNotifications:
+				select( preferencesStore ).get(
+					'core',
+					'showCollaborationPostSaveNotifications'
+				) ?? true,
+		};
+	}, [] );
 
 	const { createNotice } = useDispatch( noticesStore );
 
 	// Pass null when collaboration is disabled or notifications are
 	// turned off to prevent the hooks from subscribing to awareness state.
 	const shouldSubscribe = isCollaborationEnabled && showNotifications;
-	const effectivePostId = shouldSubscribe ? postId : null;
-	const effectivePostType = shouldSubscribe ? postType : null;
+	const shouldShowPresenceNotifications =
+		shouldSubscribe && showPresenceNotifications;
+	const shouldShowPostSaveNotifications =
+		shouldSubscribe && showPostSaveNotifications;
+	// Null post IDs unsubscribe hooks; callback guards handle events already queued then.
+	const effectivePresencePostId = shouldShowPresenceNotifications
+		? postId
+		: null;
+	const effectivePresencePostType = shouldShowPresenceNotifications
+		? postType
+		: null;
+	const effectivePostSavePostId = shouldShowPostSaveNotifications
+		? postId
+		: null;
+	const effectivePostSavePostType = shouldShowPostSaveNotifications
+		? postType
+		: null;
 
 	useOnCollaboratorJoin(
-		effectivePostId,
-		effectivePostType,
+		effectivePresencePostId,
+		effectivePresencePostType,
 		useCallback(
 			(
 				collaborator: PostEditorAwarenessState,
 				me?: PostEditorAwarenessState
 			) => {
+				if ( ! shouldShowPresenceNotifications ) {
+					return;
+				}
+
 				/*
 				 * Skip collaborators who were present before the current user
 				 * joined. Their enteredAt is earlier than ours, meaning we're
@@ -132,15 +164,19 @@ export function useCollaboratorNotifications(
 					}
 				);
 			},
-			[ createNotice ]
+			[ createNotice, shouldShowPresenceNotifications ]
 		)
 	);
 
 	useOnCollaboratorLeave(
-		effectivePostId,
-		effectivePostType,
+		effectivePresencePostId,
+		effectivePresencePostType,
 		useCallback(
 			( collaborator: PostEditorAwarenessState ) => {
+				if ( ! shouldShowPresenceNotifications ) {
+					return;
+				}
+
 				void createNotice(
 					'info',
 					sprintf(
@@ -155,20 +191,20 @@ export function useCollaboratorNotifications(
 					}
 				);
 			},
-			[ createNotice ]
+			[ createNotice, shouldShowPresenceNotifications ]
 		)
 	);
 
 	useOnPostSave(
-		effectivePostId,
-		effectivePostType,
+		effectivePostSavePostId,
+		effectivePostSavePostType,
 		useCallback(
 			(
 				saveEvent: PostSaveEvent,
 				saver: PostEditorAwarenessState,
 				prevEvent: PostSaveEvent | null
 			) => {
-				if ( ! postStatus ) {
+				if ( ! shouldShowPostSaveNotifications || ! postStatus ) {
 					return;
 				}
 
@@ -197,7 +233,7 @@ export function useCollaboratorNotifications(
 					isDismissible: false,
 				} );
 			},
-			[ createNotice, postStatus ]
+			[ createNotice, postStatus, shouldShowPostSaveNotifications ]
 		)
 	);
 }
