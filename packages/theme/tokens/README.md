@@ -1,4 +1,4 @@
-# Design Tokens Mantainer's Guide
+# Design Tokens Maintainer's Guide
 
 Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
 
