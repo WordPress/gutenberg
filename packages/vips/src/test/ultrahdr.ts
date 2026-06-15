@@ -35,7 +35,7 @@ class MockVipsImage {
 	static uhdrloadBuffer = mockUhdrLoadBuffer;
 }
 
-jest.mock( 'wasm-vips', () =>
+jest.mock( 'wasm-vips-hbd', () =>
 	jest.fn( () => ( {
 		Image: MockVipsImage,
 		// getVips() calls Cache.max(0) to disable libvips's operation cache.
