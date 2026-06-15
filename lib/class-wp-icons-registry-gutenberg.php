@@ -34,7 +34,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		// Require a namespaced name in the form "collection/icon-name".
 		if ( false === strpos( $icon_name, '/' ) ) {
 			_doing_it_wrong(
 				__METHOD__,
@@ -44,7 +43,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		// Split the namespaced name into a collection slug and an unqualified icon name.
 		list( $collection, $unqualified_name ) = explode( '/', $icon_name, 2 );
 
 		if ( preg_match( '/[A-Z]/', $unqualified_name ) ) {
