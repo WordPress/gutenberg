@@ -12,6 +12,7 @@ import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { applyFilters } from '@wordpress/hooks';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
@@ -60,6 +61,16 @@ export function initializeEditor( id, settings ) {
 		welcomeGuideTemplate: true,
 	} );
 
+	const collaborationNotificationPreferenceDefaults = applyFilters(
+		'editor.CollaborationNotificationPreferenceDefaults',
+		{
+			showCollaborationNotifications: true,
+			showCollaborationPresenceNotifications: true,
+			showCollaborationPostSaveNotifications: true,
+		},
+		'core/edit-site'
+	);
+
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
 		distractionFree: false,
@@ -74,9 +85,12 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
-		showCollaborationNotifications: true,
-		showCollaborationPresenceNotifications: true,
-		showCollaborationPostSaveNotifications: true,
+		showCollaborationNotifications:
+			collaborationNotificationPreferenceDefaults.showCollaborationNotifications,
+		showCollaborationPresenceNotifications:
+			collaborationNotificationPreferenceDefaults.showCollaborationPresenceNotifications,
+		showCollaborationPostSaveNotifications:
+			collaborationNotificationPreferenceDefaults.showCollaborationPostSaveNotifications,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {
