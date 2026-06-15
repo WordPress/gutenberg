@@ -183,22 +183,75 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 * @return string The sanitized icon SVG content.
 	 */
 	protected function sanitize_icon_content( $icon_content ) {
-		// Core attributes applicable to most elements.
+		// Core attributes applicable to most elements. `data-*` is a wildcard
+		// supported by wp_kses() and matches any data attribute.
 		$core_attributes = array(
-			'id'    => true,
-			'class' => true,
-			'style' => true,
+			'id'     => true,
+			'class'  => true,
+			'style'  => true,
+			'data-*' => true,
 		);
 
-		// ARIA and accessibility attributes.
+		/*
+		 * ARIA and accessibility attributes. wp_kses() does not support an
+		 * `aria-*` wildcard, so every ARIA state and property is listed
+		 * explicitly. The list mirrors the WAI-ARIA states and properties.
+		 *
+		 * @see https://www.w3.org/TR/wai-aria-1.2/#state_prop_def
+		 */
 		$aria_attributes = array(
-			'aria-hidden'      => true,
-			'aria-label'       => true,
-			'aria-labelledby'  => true,
-			'aria-describedby' => true,
-			'role'             => true,
-			'focusable'        => true,
-			'tabindex'         => true,
+			'aria-activedescendant' => true,
+			'aria-atomic'           => true,
+			'aria-autocomplete'     => true,
+			'aria-busy'             => true,
+			'aria-checked'          => true,
+			'aria-colcount'         => true,
+			'aria-colindex'         => true,
+			'aria-colspan'          => true,
+			'aria-controls'         => true,
+			'aria-current'          => true,
+			'aria-describedby'      => true,
+			'aria-description'      => true,
+			'aria-details'          => true,
+			'aria-disabled'         => true,
+			'aria-dropeffect'       => true,
+			'aria-errormessage'     => true,
+			'aria-expanded'         => true,
+			'aria-flowto'           => true,
+			'aria-grabbed'          => true,
+			'aria-haspopup'         => true,
+			'aria-hidden'           => true,
+			'aria-invalid'          => true,
+			'aria-keyshortcuts'     => true,
+			'aria-label'            => true,
+			'aria-labelledby'       => true,
+			'aria-level'            => true,
+			'aria-live'             => true,
+			'aria-modal'            => true,
+			'aria-multiline'        => true,
+			'aria-multiselectable'  => true,
+			'aria-orientation'      => true,
+			'aria-owns'             => true,
+			'aria-placeholder'      => true,
+			'aria-posinset'         => true,
+			'aria-pressed'          => true,
+			'aria-readonly'         => true,
+			'aria-relevant'         => true,
+			'aria-required'         => true,
+			'aria-roledescription'  => true,
+			'aria-rowcount'         => true,
+			'aria-rowindex'         => true,
+			'aria-rowspan'          => true,
+			'aria-selected'         => true,
+			'aria-setsize'          => true,
+			'aria-sort'             => true,
+			'aria-valuemax'         => true,
+			'aria-valuemin'         => true,
+			'aria-valuenow'         => true,
+			'aria-valuetext'        => true,
+			'role'                  => true,
+			'focusable'             => true,
+			'tabindex'              => true,
 		);
 
 		// Presentation attributes for graphics elements (shapes, text, use, image).
