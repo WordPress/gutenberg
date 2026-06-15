@@ -68,12 +68,6 @@ function gutenberg_add_svg_to_safe_style_css( $attr ) {
 		'vector-effect',
 	);
 
-	foreach ( $svg_properties as $property ) {
-		if ( ! in_array( $property, $attr, true ) ) {
-			$attr[] = $property;
-		}
-	}
-
-	return $attr;
+	return array_unique( array_merge( $attr, $svg_properties ) );
 }
 add_filter( 'safe_style_css', 'gutenberg_add_svg_to_safe_style_css' );
