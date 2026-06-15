@@ -729,10 +729,12 @@ test.describe( 'Block Notes', () => {
 					name: 'Block: Paragraph',
 				} )
 				.nth( 1 );
-			await expect(
-				secondBlock,
-				"focus should move to the block if there isn't a next or previous note"
-			).toBeFocused();
+			await expect
+				.poll(
+					() => editor.ownsSelection( secondBlock ),
+					"focus should move to the block if there isn't a next or previous note"
+				)
+				.toBe( true );
 		} );
 
 		test( 'should focus note thread when reply is deleted', async ( {
