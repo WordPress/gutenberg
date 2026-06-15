@@ -26,8 +26,8 @@ import { useSettings } from '../use-settings';
 function maxSizeLabel( parentLayout ) {
 	const { orientation = 'horizontal' } = parentLayout ?? {};
 	return orientation === 'horizontal'
-		? _x( 'Max width', 'Block with maximum width in flex layout' )
-		: _x( 'Max height', 'Block with maximum height in flex layout' );
+		? _x( 'Max', 'Block with maximum width in flex layout' )
+		: _x( 'Max', 'Block with maximum height in flex layout' );
 }
 
 function helpText( flexControlValue, parentLayout ) {

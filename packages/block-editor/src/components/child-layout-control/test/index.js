@@ -128,7 +128,7 @@ describe( 'ChildLayoutControl', () => {
 		} );
 	} );
 
-	it( 'shows legacy fixed flex sizing as max width', () => {
+	it( 'shows legacy fixed flex sizing as max', () => {
 		renderControl( {
 			parentLayout: {
 				type: 'flex',
@@ -140,9 +140,7 @@ describe( 'ChildLayoutControl', () => {
 			},
 		} );
 
-		expect(
-			screen.getByRole( 'radio', { name: 'Max width' } )
-		).toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'Max' } ) ).toBeChecked();
 	} );
 
 	it( 'sets fixedNoShrink when selecting fixed flex sizing', async () => {
@@ -166,7 +164,7 @@ describe( 'ChildLayoutControl', () => {
 		} );
 	} );
 
-	it( 'sets legacy fixed when selecting max width', async () => {
+	it( 'sets legacy fixed when selecting max sizing', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
@@ -182,7 +180,7 @@ describe( 'ChildLayoutControl', () => {
 			onChange,
 		} );
 
-		await user.click( screen.getByRole( 'radio', { name: 'Max width' } ) );
+		await user.click( screen.getByRole( 'radio', { name: 'Max' } ) );
 
 		expect( onChange ).toHaveBeenCalledWith( {
 			selfStretch: 'fixed',
