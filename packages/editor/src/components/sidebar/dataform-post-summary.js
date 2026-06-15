@@ -13,6 +13,7 @@ import { useViewConfig } from '@wordpress/views';
  * Internal dependencies
  */
 import PostCardPanel from '../post-card-panel';
+import { PostLastRevisionLink } from '../post-last-revision';
 import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
@@ -140,6 +141,12 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					form={ form }
 					onChange={ onChange }
 				/>
+				{ /*
+				 * This summary is currently shown only for posts and pages, but
+				 * `PostLastRevisionLink` already works well for templates,
+				 * template parts and wp_block.
+				 */ }
+				<PostLastRevisionLink />
 				<PostTrash onActionPerformed={ onActionPerformed } />
 			</VStack>
 		</PostPanelSection>
