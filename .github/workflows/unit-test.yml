@@ -186,8 +186,9 @@ jobs:
                       php: '8.2'
                     - event: 'pull_request'
                       multisite: true
-                    - event: 'pull_request'
-                      wordpress: 'previous major version'
+                    # Remove before merge: temporarily run the previous-WP tests on PRs too for validation.
+                    # - event: 'pull_request'
+                    #   wordpress: 'previous major version'
                     # On trunk/releases: Only test previous WP version with specific PHP versions
                     - php: '8.0'
                       wordpress: 'previous major version'
