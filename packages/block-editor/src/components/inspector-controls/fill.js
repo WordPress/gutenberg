@@ -58,12 +58,12 @@ export default function InspectorControlsFill( {
 	// - Template parts can show a settings tab (default, settings, advanced groups).
 	// - Other blocks cannot show a settings tab.
 	if ( context[ mayDisplayPatternEditingControlsKey ] ) {
-		// Template parts are allowed to show a settings tab to allow access to the
-		// 'Design' and 'Advanced' panels. Template parts have also historically supported
-		// any controls, so unlike regular patterns they continue to do so.
+		// Template parts have also historically supported
+		// any block inspector groups for extenders. The settings
+		// tab is also used by core for the 'Design' panel. Specifically
+		// for that block the restrictions on allowed groups are lessened.
 		const isTemplatePart = context.name === 'core/template-part';
 		const isPatternEditingGroup = PATTERN_EDITING_GROUPS.includes( group );
-
 		const canShowGroup = isTemplatePart || isPatternEditingGroup;
 
 		if ( ! canShowGroup ) {
