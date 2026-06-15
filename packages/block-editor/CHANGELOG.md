@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `PanelColorSettings`: Render `children` even when there are no colors or gradients available, instead of hiding the whole panel ([#12583](https://github.com/WordPress/gutenberg/issues/12583)).
+
 ## 15.21.0 (2026-06-10)
 
 ### Code Quality
