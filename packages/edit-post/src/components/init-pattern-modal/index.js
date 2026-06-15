@@ -30,7 +30,7 @@ export default function InitPatternModal() {
 			onRequestClose={ () => {
 				setIsModalOpen( false );
 			} }
-			overlayClassName="reusable-blocks-menu-items__convert-modal"
+			overlayClassName="patterns-create-modal"
 		>
 			<form
 				onSubmit={ ( event ) => {

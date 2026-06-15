@@ -1,10 +1,10 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "@wordpress/base-styles/z-index" as *;
 
 .patterns-menu-items__convert-modal {
-	z-index: z-index(".patterns-menu-items__convert-modal");
+	// Should be above the popover (dropdown).
+	z-index: 1000001;
 
 	// Fix the modal width to prevent added categories from stretching the modal.
 	[role="dialog"] > [role="document"] {
@@ -29,6 +29,11 @@
 		min-width: initial;
 		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
 	}
+}
+
+.patterns-create-modal {
+	// Should be above the popover (dropdown).
+	z-index: 1000001;
 }
 
 .patterns-create-modal__name-input input[type="text"] {
