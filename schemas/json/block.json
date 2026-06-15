@@ -495,7 +495,7 @@
 									"default": true
 								},
 								"allowSizingOnChildren": {
-									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Fill/Fixed) on all child blocks of the flex block.",
+									"description": "For the `flex` layout type only, determines display of sizing controls (Fit/Grow/Max/Fixed) on all child blocks of the flex block.",
 									"type": "boolean",
 									"default": false
 								},

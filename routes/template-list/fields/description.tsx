@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as corePrivateApis } from '@wordpress/core-data';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 

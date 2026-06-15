@@ -26,7 +26,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 import type { Post } from '@wordpress/core-data';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies

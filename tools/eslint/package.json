@@ -30,6 +30,8 @@
 		"@eslint/js": "^10.0.0",
 		"@wordpress/eslint-plugin": "file:../../packages/eslint-plugin",
 		"@wordpress/scripts": "file:../../packages/scripts",
+		"eslint": "^10.0.0",
+		"eslint-formatter-compact": "^9.0.1",
 		"eslint-import-resolver-typescript": "^4.4.4",
 		"eslint-plugin-import": "^2.31.0",
 		"eslint-plugin-jest": "^28.11.0",

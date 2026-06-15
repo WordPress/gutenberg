@@ -18,7 +18,7 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
-		"@wordpress/lock-unlock": "file:../lock-unlock",
+		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/url": "file:../../packages/url"
 	}

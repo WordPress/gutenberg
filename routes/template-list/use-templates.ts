@@ -8,7 +8,7 @@ import {
 	privateApis as corePrivateApis,
 	type WpTemplate,
 } from '@wordpress/core-data';
-import { unlock } from '@wordpress/lock-unlock';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 /**
  * Internal dependencies
