@@ -79,7 +79,6 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/element": "file:../element",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
@@ -98,15 +97,32 @@
 		"@types/node": "^20.19.39",
 		"esbuild": "^0.27.2",
 		"esbuild-esm-loader": "^0.3.3",
-		"storybook": "^10.2.8"
-	},
-	"peerDependencies": {
-		"react": "^18.0.0",
-		"react-dom": "^18.0.0",
+		"storybook": "^10.2.8",
 		"stylelint": "^16.8.2"
 	},
+	"peerDependencies": {
+		"@types/react": "^18.3.27",
+		"esbuild": "^0.27.2",
+		"postcss": "^8.0.0",
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0",
+		"stylelint": "^16.8.2",
+		"vite": "^7.3.2"
+	},
 	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"esbuild": {
+			"optional": true
+		},
+		"postcss": {
+			"optional": true
+		},
 		"stylelint": {
+			"optional": true
+		},
+		"vite": {
 			"optional": true
 		}
 	},

@@ -50,7 +50,6 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@types/react": "^18.3.27",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
@@ -82,7 +81,13 @@
 		"deep-freeze": "^0.0.1"
 	},
 	"peerDependencies": {
+		"@types/react": "^18.3.27",
 		"react": "^18.0.0"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"
