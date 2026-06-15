@@ -6,11 +6,10 @@ import { __, _x } from '@wordpress/i18n';
 import {
 	Modal,
 	Button,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	ToggleControl,
 	TextControl,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 
@@ -52,7 +51,7 @@ export default function InitPatternModal() {
 							} );
 						} }
 					>
-						<VStack spacing="5">
+						<Stack direction="column" gap="lg">
 							<TextControl
 								label={ __( 'Name' ) }
 								value={ title }
@@ -73,7 +72,7 @@ export default function InitPatternModal() {
 									);
 								} }
 							/>
-							<HStack justify="right">
+							<Stack justify="right">
 								<Button
 									__next40pxDefaultSize
 									variant="primary"
@@ -83,8 +82,8 @@ export default function InitPatternModal() {
 								>
 									{ __( 'Create' ) }
 								</Button>
-							</HStack>
-						</VStack>
+							</Stack>
+						</Stack>
 					</form>
 				</Modal>
 			) }
