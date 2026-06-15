@@ -2,13 +2,16 @@
 
 ## Unreleased
 
+## 0.15.0 (2026-06-10)
+
 ### Breaking Changes
 
--   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+-   Update CSS cascade layers from flat list to nested, replacing `wp-ui-utilities`, `wp-ui-components`, `wp-ui-compositions`, and `wp-ui-overrides` with a single layer `wp-ui` ([#78959](https://github.com/WordPress/gutenberg/pull/78959)).
+-   Revert React back to v18 ([#78940](https://github.com/WordPress/gutenberg/pull/78940)).
 
 ### Code Quality
 
--   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+-   Add missing `@types/react` dependency ([#78882](https://github.com/WordPress/gutenberg/pull/78882)).
 
 ### Bug Fixes
 
@@ -18,6 +21,8 @@
 
 ### Enhancements
 
+-   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
+-   `Popover`: Animate the popup open and closed ([#78885](https://github.com/WordPress/gutenberg/pull/78885)).
 -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
 
 ### Internal

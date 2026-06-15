@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.48.0 (2026-06-10)
+
 ### Enhancements
 
 -   The Site Editor now follows the user's admin color scheme ([#78397](https://github.com/WordPress/gutenberg/pull/78397)).

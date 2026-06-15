@@ -6,13 +6,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Platform,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -47,10 +41,7 @@ import {
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
+const SIDEBAR_ACTIVE_BY_DEFAULT = true;
 
 const SidebarContent = ( {
 	tabName,

@@ -31,6 +31,32 @@ export const MAX_ZOOM = 10;
 export const MIN_CROP_PIXELS = 24;
 
 /**
+ * Minimum on-screen crop rect dimension in CSS pixels. The source-pixel
+ * floor (`MIN_CROP_PIXELS`) keeps crops from going sub-pixel, but on a large
+ * image fit into a small canvas it can render only a few CSS pixels wide —
+ * too small to grab the resize handles. This floor keeps the crop operable
+ * regardless of display scale; it binds when zoomed out and yields to the
+ * source-pixel floor once the image is shown large enough. Sized to one
+ * handle touch target (`$handle-touch-target-size` in `cropper.scss`).
+ */
+export const MIN_CROP_SCREEN_PX = 44;
+
+/**
+ * Fraction of the constraining canvas axis the settled crop should occupy on
+ * screen. When a crop is shown smaller than this (e.g. a square crop in a tall
+ * image, capped by the contain-fit footprint's narrow axis), the view magnifies
+ * to fill the canvas. `1` = always fill the canvas; lower = rescue only the
+ * under-filled cases. See `getViewScale`.
+ */
+export const SETTLE_TARGET_CANVAS_FILL = 0.8;
+
+/**
+ * Upper bound on the presentational view magnification (`getViewScale`).
+ * Prevents a near-degenerate crop from magnifying the scene without limit.
+ */
+export const MAX_VIEW_SCALE = 8;
+
+/**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
  * This could be made configurable as a prop to the Cropper component.
  */
