@@ -11,7 +11,6 @@ import {
 	DropdownMenu,
 	TextControl,
 	ToolbarButton,
-	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -102,15 +101,6 @@ export function Edit( { attributes, setAttributes } ) {
 
 	const blockControls = (
 		<>
-			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
-				<ToolbarButton
-					onClick={ () => {
-						setInserterOpen( true );
-					} }
-				>
-					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
-				</ToolbarButton>
-			</BlockControls>
 			{ icon && (
 				<BlockControls group="block">
 					<ToolbarButton
@@ -144,37 +134,47 @@ export function Edit( { attributes, setAttributes } ) {
 					/>
 				</BlockControls>
 			) }
-			{ isContentOnlyMode && icon && (
-				// Add some extra controls for content attributes when content only mode is active.
-				// With content only mode active, the inspector is hidden, so users need another way
-				// to edit these attributes.
-				<BlockControls group="other">
-					<ToolbarGroup>
-						<DropdownMenu
-							icon=""
-							popoverProps={ {
-								className: 'is-alternate',
-							} }
-							text={ __( 'Label' ) }
-						>
-							{ () => (
-								<TextControl
-									className="wp-block-icon__toolbar-content"
-									label={ __( 'Label' ) }
-									value={ ariaLabel || '' }
-									onChange={ ( value ) =>
-										setAttributes( { ariaLabel: value } )
-									}
-									help={ __(
-										'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
-									) }
-									__next40pxDefaultSize
-								/>
-							) }
-						</DropdownMenu>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
+			<BlockControls group="other">
+				<ToolbarButton
+					onClick={ () => {
+						setInserterOpen( true );
+					} }
+				>
+					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
+				</ToolbarButton>
+				{ isContentOnlyMode && icon && (
+					// Add some extra controls for content attributes when content only mode is active.
+					// With content only mode active, the inspector is hidden, so users need another way
+					// to edit these attributes.
+					<DropdownMenu
+						icon=""
+						toggleProps={ {
+							as: ToolbarButton,
+						} }
+						popoverProps={ {
+							className: 'is-alternate',
+						} }
+						text={ __( 'Label' ) }
+					>
+						{ () => (
+							<TextControl
+								className="wp-block-icon__toolbar-content"
+								label={ __( 'Label' ) }
+								value={ ariaLabel || '' }
+								onChange={ ( value ) =>
+									setAttributes( {
+										ariaLabel: value,
+									} )
+								}
+								help={ __(
+									'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
+								) }
+								__next40pxDefaultSize
+							/>
+						) }
+					</DropdownMenu>
+				) }
+			</BlockControls>
 		</>
 	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
