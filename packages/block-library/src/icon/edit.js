@@ -16,6 +16,11 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
+	flipHorizontal as flipHorizontalIcon,
+	flipVertical as flipVerticalIcon,
+	rotateRight,
+} from '@wordpress/icons';
+import {
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
@@ -24,10 +29,11 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
@@ -57,8 +63,9 @@ const IconPlaceholder = ( { className, style } ) => (
 	</SVG>
 );
 
-export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel } = attributes;
+export function Edit( { attributes, setAttributes, clientId } ) {
+	const { icon, ariaLabel, flipHorizontal, flipVertical, rotation } =
+		attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
@@ -85,25 +92,93 @@ export function Edit( { attributes, setAttributes } ) {
 		[ isInserterOpen, icon ]
 	);
 
+	const wasJustInserted = useSelect(
+		( select ) =>
+			select( blockEditorStore ).wasBlockJustInserted( clientId ),
+		[ clientId ]
+	);
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	// Default newly inserted Icon blocks to the info icon. Blocks saved in a
+	// placeholder state (no icon) are left untouched, so loading a post never
+	// silently alters existing content.
+	useEffect( () => {
+		if ( ! icon && wasJustInserted ) {
+			// This side-effect should not create an undo level.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { icon: 'core/info' } );
+		}
+	}, [
+		icon,
+		wasJustInserted,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
 	const iconToDisplay = selectedIcon?.content || '';
+
+	const flipClasses = {
+		'is-flip-horizontal': flipHorizontal,
+		'is-flip-vertical': flipVertical,
+	};
+
+	const rotationStyle = rotation ? { rotate: `${ rotation }deg` } : {};
 
 	const blockControls = (
 		<>
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
-				<ToolbarButton
-					onClick={ () => {
-						setInserterOpen( true );
-					} }
-				>
-					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
-				</ToolbarButton>
+				<ToolbarGroup>
+					<ToolbarButton
+						onClick={ () => {
+							setInserterOpen( true );
+						} }
+					>
+						{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
 			</BlockControls>
+			{ icon && (
+				<BlockControls group="other">
+					<ToolbarGroup>
+						<ToolbarButton
+							icon={ flipHorizontalIcon }
+							label={ __( 'Flip horizontal' ) }
+							isPressed={ flipHorizontal }
+							onClick={ () =>
+								setAttributes( {
+									flipHorizontal: ! flipHorizontal,
+								} )
+							}
+						/>
+						<ToolbarButton
+							icon={ flipVerticalIcon }
+							label={ __( 'Flip vertical' ) }
+							isPressed={ flipVertical }
+							onClick={ () =>
+								setAttributes( {
+									flipVertical: ! flipVertical,
+								} )
+							}
+						/>
+						<ToolbarButton
+							icon={ rotateRight }
+							label={ __( 'Rotate' ) }
+							onClick={ () =>
+								setAttributes( {
+									rotation: ( ( rotation || 0 ) + 90 ) % 360,
+								} )
+							}
+						/>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
 			{ isContentOnlyMode && icon && (
 				// Add some extra controls for content attributes when content only mode is active.
 				// With content only mode active, the inspector is hidden, so users need another way
 				// to edit these attributes.
 				<BlockControls group="other">
-					<ToolbarGroup className="components-toolbar-group">
+					<ToolbarGroup>
 						<DropdownMenu
 							icon=""
 							popoverProps={ {
@@ -182,13 +257,15 @@ export function Edit( { attributes, setAttributes } ) {
 								colorProps.className,
 								borderProps.className,
 								spacingProps.className,
-								dimensionsProps.className
+								dimensionsProps.className,
+								flipClasses
 							),
 							style: {
 								...colorProps.style,
 								...borderProps.style,
 								...spacingProps.style,
 								...dimensionsProps.style,
+								...rotationStyle,
 							},
 						} }
 					/>
@@ -197,12 +274,14 @@ export function Edit( { attributes, setAttributes } ) {
 						className={ clsx(
 							borderProps.className,
 							spacingProps.className,
-							dimensionsProps.className
+							dimensionsProps.className,
+							flipClasses
 						) }
 						style={ {
 							...borderProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
+							...rotationStyle,
 							height: 'auto',
 						} }
 					/>
