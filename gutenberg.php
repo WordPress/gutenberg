@@ -12,7 +12,7 @@
  * @package gutenberg
  */
 
-defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSION', '6.8' );
+defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSION', '6.9' );
 
 gutenberg_pre_init();
 
