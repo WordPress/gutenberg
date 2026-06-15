@@ -21,14 +21,22 @@ import { unlock } from '../../lock-unlock';
  */
 export function useHasEditableRoot() {
 	return useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockName, getBlockEditingMode } =
-			select( blockEditorStore );
+		const {
+			getSelectedBlockClientId,
+			getBlockName,
+			getBlockEditingMode,
+			getBlockMode,
+		} = select( blockEditorStore );
 		const clientId = getSelectedBlockClientId();
 		return {
 			selectedClientId: clientId,
 			hasEditableRoot:
 				!! clientId &&
 				getBlockEditingMode( clientId ) === 'default' &&
+				// Not when the block is edited as HTML: there is no rich text
+				// to host then, only a textarea, which the editing host would
+				// interfere with.
+				getBlockMode( clientId ) === 'visual' &&
 				hasBlockSupport(
 					getBlockName( clientId ),
 					'editableRoot',

@@ -128,6 +128,7 @@ export default function useSelectionObserver() {
 		getBlockSelectionStart,
 		isMultiSelecting,
 		getBlockName,
+		getBlockMode,
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
@@ -191,6 +192,10 @@ export default function useSelectionObserver() {
 						// always move it), which must not re-enable the wrapper
 						// after another block has been selected.
 						collapsedClientId === getSelectedBlockClientId() &&
+						// Not while the block is edited as HTML: its content is
+						// a textarea, not rich text, which the editing host
+						// would interfere with.
+						getBlockMode( collapsedClientId ) === 'visual' &&
 						hasBlockSupport(
 							getBlockName( collapsedClientId ),
 							'editableRoot',
