@@ -27,8 +27,8 @@
 		"config",
 		"plugins",
 		"scripts",
-		"!scripts/test",
-		"utils"
+		"utils",
+		"!**/test"
 	],
 	"bin": {
 		"wp-scripts": "./bin/wp-scripts.js"
