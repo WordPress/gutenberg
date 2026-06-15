@@ -972,7 +972,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertStringContainsString(
-			'@media (width <= 480px){.' . $matches[0] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;}}',
+			'@media (width <= 480px){.' . $matches[0] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;background-image:unset !important;}}',
 			$actual_stylesheet
 		);
 	}
@@ -1025,7 +1025,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			$actual_stylesheet
 		);
 		$this->assertStringContainsString(
-			'.' . $matches[0] . ' .wp-block-button__link{background-color:#ff00d0 !important;}',
+			'.' . $matches[0] . ' .wp-block-button__link{background-color:#ff00d0 !important;background-image:unset !important;}',
 			$actual_stylesheet
 		);
 		$this->assertStringContainsString(
@@ -1739,7 +1739,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			$actual_stylesheet
 		);
 		$this->assertStringContainsString(
-			'.' . $parts['unique_class'] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;}',
+			'.' . $parts['unique_class'] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;background-image:unset !important;}',
 			$actual_stylesheet
 		);
 	}
