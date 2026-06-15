@@ -8,9 +8,9 @@ import { join } from 'path';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '../theme-provider';
 
-// Mock the CSS module so the provider's scoping class is a real, stable class
-// name. Without this the global Jest CSS mock leaves the class `undefined`, and
-// jsdom cannot match the generated rules to compute the custom properties.
+// Mock the CSS module so the provider's wrapper has a stable class. The tests
+// use this class as the scoping selector (in place of any instance-specific
+// attribute) and to read computed custom properties from the wrapper itself.
 jest.mock( '../style.module.css', () => ( {
 	root: 'theme-provider-root',
 } ) );
@@ -34,7 +34,7 @@ function readProp( element: Element, property: string ) {
 
 // The `ThemeProvider` wrapper element that scopes the given descendant.
 function getScopingProvider( element: Element ) {
-	return element.closest< HTMLElement >( '[data-wpds-theme-provider-id]' )!;
+	return element.closest< HTMLElement >( '.theme-provider-root' )!;
 }
 
 describe( 'ThemeProvider', () => {
@@ -131,8 +131,8 @@ describe( 'ThemeProvider', () => {
 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
 		} );
 
-		// Unlike color/cursor (emitted at runtime in the provider's own
-		// `<style>`), the `cornerRadius` preset resolves to
+		// Unlike color/cursor (applied as inline custom properties on the
+		// provider's wrapper), the `cornerRadius` preset resolves to
 		// `--wpds-border-radius-*` values through the prebuilt design-token CSS
 		// (the modes authored in `terrazzo.config.ts`). A root provider relies
 		// on that stylesheet's `:root:has( [data-wpds-root-provider='true']… )`

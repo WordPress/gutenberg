@@ -1,38 +1,8 @@
-import type { CSSProperties } from 'react';
-import { useMemo, useId } from '@wordpress/element';
+import { useMemo, useLayoutEffect } from '@wordpress/element';
 import { ThemeContext } from './context';
 import { useThemeProviderStyles } from './use-theme-provider-styles';
 import { type ThemeProviderProps } from './types';
 import styles from './style.module.css';
-
-function cssObjectToText( values: CSSProperties ) {
-	return Object.entries( values )
-		.map( ( [ key, value ] ) => `${ key }: ${ value };` )
-		.join( '' );
-}
-
-function generateCSSSelector( {
-	instanceId,
-	isRoot,
-}: {
-	instanceId: string;
-	isRoot: boolean;
-} ) {
-	const rootSel = `[data-wpds-root-provider="true"]`;
-	const instanceIdSel = `[data-wpds-theme-provider-id="${ instanceId }"]`;
-
-	const selectors = [];
-
-	if ( isRoot ) {
-		selectors.push(
-			`:root:has(.${ styles.root }${ rootSel }${ instanceIdSel })`
-		);
-	}
-
-	selectors.push( `.${ styles.root }.${ styles.root }${ instanceIdSel }` );
-
-	return selectors.join( ',' );
-}
 
 /**
  * Context provider that generates a theme from a set of seed color values and
@@ -46,8 +16,6 @@ export const ThemeProvider = ( {
 	cornerRadius,
 	isRoot = false,
 }: ThemeProviderProps ) => {
-	const instanceId = useId();
-
 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
 		color,
 		cursor,
@@ -63,26 +31,55 @@ export const ThemeProvider = ( {
 		[ resolvedSettings ]
 	);
 
+	// Mirror the wrapper's custom properties onto `document.documentElement`
+	// so they reach portals and anything else rendered outside the wrapper
+	// (e.g. the `html`/`body` background). Unlike the wrapper, `html` is a
+	// shared element, so we set/remove individual properties (preserving any
+	// prior value) instead of declaratively assigning a full style object.
+	useLayoutEffect( () => {
+		if ( ! isRoot || typeof document === 'undefined' ) {
+			return;
+		}
+		const root = document.documentElement;
+		const previous = new Map< string, string >();
+		const applied: string[] = [];
+
+		for ( const [ rawKey, rawValue ] of Object.entries(
+			themeProviderStyles
+		) ) {
+			if (
+				! rawKey.startsWith( '--' ) ||
+				rawValue === null ||
+				rawValue === undefined
+			) {
+				continue;
+			}
+			previous.set( rawKey, root.style.getPropertyValue( rawKey ) );
+			root.style.setProperty( rawKey, String( rawValue ) );
+			applied.push( rawKey );
+		}
+
+		return () => {
+			for ( const key of applied ) {
+				const prev = previous.get( key );
+				if ( prev ) {
+					root.style.setProperty( key, prev );
+				} else {
+					root.style.removeProperty( key );
+				}
+			}
+		};
+	}, [ isRoot, themeProviderStyles ] );
+
 	return (
-		<>
-			{ themeProviderStyles ? (
-				<style>
-					{ `${ generateCSSSelector( {
-						instanceId,
-						isRoot,
-					} ) } {${ cssObjectToText( themeProviderStyles ) }}` }
-				</style>
-			) : null }
-			<div
-				data-wpds-theme-provider-id={ instanceId }
-				data-wpds-root-provider={ isRoot || undefined }
-				data-wpds-corner-radius={ cornerRadiusPreset }
-				className={ styles.root }
-			>
-				<ThemeContext.Provider value={ contextValue }>
-					{ children }
-				</ThemeContext.Provider>
-			</div>
-		</>
+		<div
+			data-wpds-corner-radius={ cornerRadiusPreset }
+			className={ styles.root }
+			style={ themeProviderStyles }
+		>
+			<ThemeContext.Provider value={ contextValue }>
+				{ children }
+			</ThemeContext.Provider>
+		</div>
 	);
 };
