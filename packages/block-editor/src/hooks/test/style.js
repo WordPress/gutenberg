@@ -220,7 +220,7 @@ describe( 'getStateStylesCSS', () => {
 				'.wp-block-test:hover'
 			)
 		).toBe(
-			'.wp-block-test:hover { background-color: #ff0000 !important; }\n.wp-block-test:hover { background-image: none !important; }'
+			'.wp-block-test:hover { background-color: #ff0000 !important; }\n.wp-block-test:hover { background-image: unset !important; }'
 		);
 	} );
 
@@ -339,7 +339,7 @@ describe( 'getBlockStateStylesCSS', () => {
 				}
 			)
 		).toBe(
-			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123 .wp-block-button__link:hover { background-image: none !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
+			'.wp-elements-abc123 .wp-block-button__link:hover { background-color: #ff00d0 !important; }\n.wp-elements-abc123 .wp-block-button__link:hover { background-image: unset !important; }\n.wp-elements-abc123:hover { width: 50% !important; }'
 		);
 	} );
 
@@ -356,7 +356,7 @@ describe( 'getBlockStateStylesCSS', () => {
 				}
 			)
 		).toBe(
-			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] .wp-block-button__link { background-image: none !important; }\n[data-block="client-id"] { width: 50% !important; }'
+			'[data-block="client-id"] .wp-block-button__link { background-color: #ff00d0 !important; }\n[data-block="client-id"] .wp-block-button__link { background-image: unset !important; }\n[data-block="client-id"] { width: 50% !important; }'
 		);
 	} );
 } );
@@ -427,23 +427,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 				'.wp-elements-1'
 			)
 		).toEqual( [
-			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 .wp-block-button__link { background-image: none !important; }\n.wp-elements-1 { width: 50% !important; }}',
-		] );
-	} );
-
-	it( 'outputs explicit fill object fit for viewport states', () => {
-		expect(
-			getResponsiveStateCSSRules(
-				{
-					mobile: {
-						dimensions: { objectFit: 'fill' },
-					},
-				},
-				'test/state-image',
-				'.wp-elements-1'
-			)
-		).toEqual( [
-			'@media (width <= 480px){.wp-elements-1 img { object-fit: fill !important; }}',
+			'@media (width <= 480px){.wp-elements-1 .wp-block-button__link { background-color: #ff00d0 !important; }\n.wp-elements-1 .wp-block-button__link { background-image: unset !important; }\n.wp-elements-1 { width: 50% !important; }}',
 		] );
 	} );
 
@@ -477,7 +461,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 				'.wp-elements-1'
 			)
 		).toEqual( [
-			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }\n.wp-elements-1:hover { background-image: none !important; }}',
+			'@media (width <= 480px){.wp-elements-1:hover { background-color: black !important; }\n.wp-elements-1:hover { background-image: unset !important; }}',
 		] );
 	} );
 

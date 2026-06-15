@@ -164,7 +164,7 @@ function getStateBackgroundResetCSS( stateStyles, selector ) {
 		return undefined;
 	}
 
-	const declaration = 'background-image: none !important';
+	const declaration = 'background-image: unset !important';
 	return selector
 		? `${ selector } { ${ declaration }; }`
 		: `${ declaration };`;

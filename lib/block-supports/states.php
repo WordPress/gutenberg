@@ -113,12 +113,12 @@ function gutenberg_get_state_declarations_with_background_resets( $declarations 
 
 	/*
 	 * When the state sets a solid background-color but no gradient of its own,
-	 * emit `background-image: none !important` to clear any gradient (whether
+	 * emit `background-image: unset !important` to clear any gradient (whether
 	 * stored as the `background` shorthand or as `background-image`) that was
 	 * applied to the default / normal state via an inline style attribute.
 	 */
 	if ( $has_background_color && ! $has_background && ! $has_background_image ) {
-		$declarations['background-image'] = 'none !important';
+		$declarations['background-image'] = 'unset !important';
 	}
 
 	return $declarations;
