@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Attachments_Controller_6_9 class
+ * REST API: Gutenberg_REST_Attachments_Controller_7_1 class
  *
  * @package gutenberg
  */
@@ -10,22 +10,22 @@
  * This overrides the core WP_REST_Attachments_Controller to provide
  * support for filtering by multiple media types.
  *
- * @since 6.9.0
+ * @since 7.1.0
  *
  * @see WP_REST_Attachments_Controller
  */
-class Gutenberg_REST_Attachments_Controller_6_9 extends WP_REST_Attachments_Controller {
+class Gutenberg_REST_Attachments_Controller_7_1 extends WP_REST_Attachments_Controller {
 
 	/**
 	 * Determines the allowed query_vars for a get_items() response and
 	 * prepares for WP_Query.
 	 *
 	 * This overrides the parent method to add support for filtering by
-	 * multiple media types, which was added in WordPress 6.9.
+	 * multiple media types, which was added in WordPress 7.1.
 	 *
 	 * @since 4.7.0
-	 * @since 6.9.0 Added orderby_mime_type filter to add custom ordering.
-	 * @since 6.9.0 Extends the `media_type` and `mime_type` request arguments to support array values.
+	 * @since 7.1.0 Added orderby_mime_type filter to add custom ordering.
+	 * @since 7.1.0 Extends the `media_type` and `mime_type` request arguments to support array values.
 	 *
 	 * @param array           $prepared_args Optional. Array of prepared arguments. Default empty array.
 	 * @param WP_REST_Request $request       Optional. Request to prepare items for.
@@ -97,7 +97,7 @@ class Gutenberg_REST_Attachments_Controller_6_9 extends WP_REST_Attachments_Cont
 	 * Retrieves the query params for collections of attachments.
 	 *
 	 * @since 4.7.0
-	 * @since 6.9.0 Extends the `media_type` and `mime_type` request arguments to support array values.
+	 * @since 7.1.0 Extends the `media_type` and `mime_type` request arguments to support array values.
 	 *
 	 * @return array Query parameters for the attachment collection as an array.
 	 */
