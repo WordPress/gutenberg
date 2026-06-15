@@ -77,13 +77,13 @@
 
 .editor-collab-sidebar-panel__show-more-button {
 	width: fit-content;
-	color: var(--wpds-color-fg-interactive-brand);
+	color: var(--wpds-color-foreground-interactive-brand);
 	cursor: var(--wpds-cursor-control);
 
 	&:hover,
 	&:focus,
 	&:active {
-		color: var(--wpds-color-fg-interactive-brand-active);
+		color: var(--wpds-color-foreground-interactive-brand-active);
 	}
 }
 
