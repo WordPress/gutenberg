@@ -1339,11 +1339,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/font-library/upload-fonts.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/global-styles-ui/src/font-sizes/font-size.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2

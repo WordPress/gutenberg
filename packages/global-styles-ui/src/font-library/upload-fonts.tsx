@@ -3,8 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
+	Icon as WCIcon,
 	Button,
 	DropZone,
 	Notice,
@@ -12,7 +11,8 @@ import {
 	FlexItem,
 	ProgressBar,
 } from '@wordpress/components';
-import { Icon, upload } from '@wordpress/icons';
+import { Stack, Text } from '@wordpress/ui';
+import { upload } from '@wordpress/icons';
 import { useContext, useState } from '@wordpress/element';
 import type { FontFace } from '@wordpress/core-data';
 
@@ -212,7 +212,7 @@ function UploadFonts() {
 	return (
 		<div className="font-library__tabpanel-layout">
 			<DropZone onFilesDrop={ handleDropZone } />
-			<VStack className="font-library__local-fonts" justify="start">
+			<Stack className="font-library__local-fonts" direction="column">
 				{ notice && (
 					<Notice
 						status={ notice.type }
@@ -249,9 +249,14 @@ function UploadFonts() {
 								className="font-library__upload-area"
 								onClick={ openFileDialog }
 							>
-								<div className="font-library__upload-area__content">
-									<Icon
+								<Stack
+									direction="column"
+									align="center"
+									gap="sm"
+								>
+									<WCIcon
 										icon={ upload }
+										size={ 32 }
 										className="font-library__upload-area__icon"
 									/>
 									<Text className="font-library__upload-area__title">
@@ -262,17 +267,17 @@ function UploadFonts() {
 											'Drop files or click to select'
 										) }
 									</Text>
-								</div>
+								</Stack>
 							</Button>
 						) }
 					/>
 				) }
-				<WCText className="font-library__upload-area__text">
+				<Text className="font-library__upload-area__text">
 					{ __(
 						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .ttf, .otf, .woff, and .woff2.'
 					) }
-				</WCText>
-			</VStack>
+				</Text>
+			</Stack>
 		</div>
 	);
 }
