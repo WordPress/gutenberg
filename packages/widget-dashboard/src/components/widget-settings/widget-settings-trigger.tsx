@@ -32,7 +32,7 @@ export interface WidgetSettingsTriggerProps {
 /**
  * Per-instance gear that opens the shared settings drawer for its widget
  * by writing the instance `uuid` to the dashboard UI context. The single
- * `WidgetSettingsDrawer` at the root reacts to that change.
+ * `WidgetSettings` at the root reacts to that change.
  *
  * Returns `null` when the type declares no attributes, so chrome can mount
  * it unconditionally.

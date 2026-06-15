@@ -60,7 +60,6 @@ function Harness( {
 			} }
 		>
 			<WidgetDashboard.Actions />
-			<WidgetDashboard.LayoutSettingsDrawer />
 		</WidgetDashboard>
 	);
 }

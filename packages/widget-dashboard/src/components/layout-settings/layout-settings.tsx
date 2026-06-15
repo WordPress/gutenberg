@@ -96,16 +96,16 @@ const form: Form = {
  * an Escape press, or any path other than the explicit Cancel/Save
  * buttons is treated as Cancel. None of these exit customize mode.
  *
- * Open state lives in the dashboard UI context; the customize
- * toolbar (`Actions`) hosts the trigger. Ships in the default
- * composition; when passing custom children, compose it alongside
- * `Actions`. Renders nothing when grid settings are not editable.
- * Cancel and dismiss revert only grid settings so in-progress widget
- * layout edits in the same customize session are preserved.
+ * The engine mounts it; it shows while `layoutSettingsOpen` is `true`
+ * in the shared UI context, which any trigger can set (today, the
+ * Layout settings button in `Actions`). Renders nothing when grid
+ * settings are not editable. Cancel and dismiss revert only grid
+ * settings so in-progress widget layout edits in the same customize
+ * session are preserved.
  *
  * @return {React.ReactNode} The layout settings drawer.
  */
-export function LayoutSettingsDrawer(): React.ReactNode {
+export function LayoutSettings(): React.ReactNode {
 	const {
 		gridSettings,
 		onGridSettingsChange,

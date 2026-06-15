@@ -5,13 +5,14 @@ import { WidgetDashboardProvider } from './context/dashboard-context';
 import { WidgetDashboardUIProvider } from './context/ui-context';
 import { Actions } from './components/actions';
 import { Commands } from './components/commands';
-import { WidgetInserter } from './components/widget-inserter';
-import { LayoutSettingsDrawer } from './components/layout-settings-drawer';
+import { LayoutSettings } from './components/layout-settings';
+import { NoWidgetsState } from './components/no-widgets-state';
+import { ResetConfirmation } from './components/reset-confirmation';
 import { WidgetChrome } from './components/widget-chrome';
-import { WidgetSettingsDrawer } from './components/widget-settings';
+import { WidgetInserter } from './components/widget-inserter';
+import { WidgetSettings } from './components/widget-settings';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
-import { NoWidgetsState } from './components/no-widgets-state';
 
 /**
  * Stateless rendering engine for widget dashboards.
@@ -40,22 +41,17 @@ import { NoWidgetsState } from './components/no-widgets-state';
  * 			<WidgetDashboard.Actions />
  * 			<WidgetDashboard.Widgets />
  * 			<WidgetDashboard.Commands />
- * 			<WidgetDashboard.LayoutSettingsDrawer />
- * 			<WidgetDashboard.WidgetInserter />
- * 			<WidgetDashboard.WidgetSettingsDrawer />
  * 		</WidgetDashboard>
  * 	);
  * }
  * ```
  *
- * Every overlay ships in the default composition: `Commands`,
- * `LayoutSettingsDrawer`, `WidgetInserter`, and `WidgetSettingsDrawer`. When
- * passing custom children, compose the ones you need; each reads its open
- * state from context and renders nothing until triggered. `Actions` drives
- * the triggers: its "Add widget" button opens `WidgetInserter`, its "Layout
- * settings" button opens `LayoutSettingsDrawer`, and the command palette's
- * "Reset to default" opens the dialog `Actions` hosts. `WidgetSettingsDrawer`
- * is opened by each tile's settings gear and works outside edit mode too.
+ * Children compose the dashboard's triggers and chrome: `Actions`,
+ * `Widgets`, `Commands`, `NoWidgetsState`. The targets they open (the
+ * widget inserter, the layout and widget settings editors, the reset
+ * confirmation) are mounted by the engine and driven by shared UI state, so
+ * a trigger works wherever it is composed without a matching target in the
+ * tree. Omitting `children` renders the default arrangement.
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
@@ -91,23 +87,16 @@ export const WidgetDashboard = Object.assign(
 							<Actions />
 							<Widgets />
 							<Commands />
-							<LayoutSettingsDrawer />
-							<WidgetInserter />
-							<WidgetSettingsDrawer />
 						</>
 					) }
+
+					<WidgetInserter />
+					<LayoutSettings />
+					<WidgetSettings />
+					<ResetConfirmation />
 				</WidgetDashboardUIProvider>
 			</WidgetDashboardProvider>
 		);
 	},
-	{
-		Actions,
-		Widgets,
-		WidgetChrome,
-		NoWidgetsState,
-		Commands,
-		LayoutSettingsDrawer,
-		WidgetInserter,
-		WidgetSettingsDrawer,
-	}
+	{ Actions, Widgets, WidgetChrome, NoWidgetsState, Commands }
 );

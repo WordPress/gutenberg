@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { layout as layoutIcon, plus } from '@wordpress/icons';
 import { store as viewportStore } from '@wordpress/viewport';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { AlertDialog, Button, Stack } from '@wordpress/ui';
+import { Button, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -15,16 +15,17 @@ import { AlertDialog, Button, Stack } from '@wordpress/ui';
 import styles from './actions.module.css';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
-import { MoreActionsDropdown } from '../more-actions-dropdown';
-import type { MoreActionsDropdownItem } from '../more-actions-dropdown';
+import { ActionsMenu } from '../actions-menu';
+import type { ActionsMenuItem } from '../actions-menu';
 
 /**
- * Header chrome for the dashboard. Customize mode surfaces an edit
- * toolbar with Add widget, Layout settings (when grid settings are
- * editable), Cancel, and Done. The Layout settings button opens
- * `LayoutSettingsDrawer`, composed separately; pair the two when
- * passing custom children. Widget layout edits and grid settings
- * share the same staging layer while customize mode is active.
+ * Edit toolbar for the dashboard. Customize mode surfaces Add widget,
+ * Layout settings (when grid settings are editable), Cancel, and Done;
+ * otherwise a single Customize button. The buttons and the more-actions
+ * menu are triggers: they flip the lifted UI state that the dashboard's
+ * targets (the inserter, the settings editors, the reset confirmation)
+ * react to. Widget layout edits and grid settings share the same staging
+ * layer while customize mode is active.
  *
  * Returns `null` when the dashboard is mounted without `onEditChange`
  * so hosts that don't expose edit mode can keep `Actions` in their
@@ -67,12 +68,8 @@ export function Actions(): React.ReactNode {
 		return () => clearTimeout( exitTimeout );
 	}, [ editMode, isEditActionsMounted ] );
 
-	const {
-		setInserterOpen,
-		setLayoutSettingsOpen,
-		resetDialogOpen,
-		setResetDialogOpen,
-	} = useDashboardUIContext();
+	const { setInserterOpen, setLayoutSettingsOpen, setResetDialogOpen } =
+		useDashboardUIContext();
 	// @TODO: switch to using Admin UI declaratively for mobile viewport support once available.
 	// https://github.com/WordPress/gutenberg/issues/77628
 	const isMobileViewport = useSelect(
@@ -100,7 +97,7 @@ export function Actions(): React.ReactNode {
 		setLayoutSettingsOpen( true );
 	}, [ setLayoutSettingsOpen ] );
 
-	const moreActionsItems: MoreActionsDropdownItem[] = [
+	const menuItems: ActionsMenuItem[] = [
 		{
 			label: __( 'Reset to default' ),
 			onClick: () => setResetDialogOpen( true ),
@@ -183,26 +180,7 @@ export function Actions(): React.ReactNode {
 				</Button>
 			) }
 
-			<MoreActionsDropdown items={ moreActionsItems } />
-
-			<AlertDialog.Root
-				open={ resetDialogOpen }
-				onOpenChange={ setResetDialogOpen }
-				onConfirm={ async () => {
-					await onLayoutReset?.();
-					onEditChange?.( false );
-					setResetDialogOpen( false );
-				} }
-			>
-				<AlertDialog.Popup
-					intent="irreversible"
-					title={ __( 'Reset dashboard to default?' ) }
-					description={ __(
-						'All customizations will be permanently lost.'
-					) }
-					confirmButtonText={ __( 'Reset' ) }
-				/>
-			</AlertDialog.Root>
+			<ActionsMenu items={ menuItems } />
 		</Stack>
 	);
 }

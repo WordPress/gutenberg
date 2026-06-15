@@ -14,7 +14,7 @@ import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
 
-export interface MoreActionsDropdownItem {
+export interface ActionsMenuItem {
 	label: string;
 	onClick: () => void;
 	disabled?: boolean;
@@ -25,11 +25,11 @@ export interface MoreActionsDropdownItem {
 	disabledTooltip?: string;
 }
 
-interface MoreActionsDropdownProps {
-	items: MoreActionsDropdownItem[];
+interface ActionsMenuProps {
+	items: ActionsMenuItem[];
 }
 
-function MoreActionsMenuItem( { item }: { item: MoreActionsDropdownItem } ) {
+function ActionsMenuEntry( { item }: { item: ActionsMenuItem } ) {
 	const showDisabledTooltip = item.disabled && item.disabledTooltip;
 
 	const menuItem = (
@@ -67,8 +67,8 @@ function MoreActionsMenuItem( { item }: { item: MoreActionsDropdownItem } ) {
 }
 
 /**
- * Renders a vertical-three-dots dropdown that surfaces secondary
- * actions for the dashboard. Each entry in `items` becomes a menu
+ * Renders the dashboard's overflow menu: a vertical-three-dots trigger
+ * that surfaces secondary actions. Each entry in `items` becomes a menu
  * item; clicking it fires the entry's `onClick` and closes the menu.
  *
  * Trigger and items both delegate their visual presentation to the
@@ -77,15 +77,13 @@ function MoreActionsMenuItem( { item }: { item: MoreActionsDropdownItem } ) {
  * accessibility wiring (focus, keyboard, aria) stays with the menu
  * primitives.
  *
- * Returns `null` when `items` is empty so the dropdown collapses
+ * Returns `null` when `items` is empty so the menu collapses
  * gracefully without leaving an empty trigger in the toolbar.
  *
  * @param props
  * @param props.items Menu entries to render under the trigger.
  */
-export function MoreActionsDropdown( {
-	items,
-}: MoreActionsDropdownProps ): React.ReactNode {
+export function ActionsMenu( { items }: ActionsMenuProps ): React.ReactNode {
 	if ( items.length === 0 ) {
 		return null;
 	}
@@ -107,7 +105,7 @@ export function MoreActionsDropdown( {
 				<Tooltip.Provider delay={ 0 }>
 					<Menu.Group>
 						{ items.map( ( item, index ) => (
-							<MoreActionsMenuItem key={ index } item={ item } />
+							<ActionsMenuEntry key={ index } item={ item } />
 						) ) }
 					</Menu.Group>
 				</Tooltip.Provider>
