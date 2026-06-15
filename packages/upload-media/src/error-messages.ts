@@ -111,35 +111,6 @@ export function getErrorMessage(
 			),
 			action: __( 'The file may be corrupted. Try a different file.' ),
 		},
-		[ ErrorCode.NETWORK_ERROR ]: {
-			title: __( 'Network error' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'Failed to upload "%s" due to a network issue.' ),
-				fileName
-			),
-			action: __( 'Check your internet connection and try again.' ),
-		},
-		[ ErrorCode.TIMEOUT_ERROR ]: {
-			title: __( 'Upload timed out' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'The upload of "%s" took too long.' ),
-				fileName
-			),
-			action: __(
-				'Try uploading a smaller file or check your connection.'
-			),
-		},
-		[ ErrorCode.SERVER_ERROR ]: {
-			title: __( 'Server error' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'The server encountered an error processing "%s".' ),
-				fileName
-			),
-			action: __( 'Please try again later.' ),
-		},
 		[ ErrorCode.ABORTED ]: {
 			title: __( 'Upload cancelled' ),
 			description: sprintf(
