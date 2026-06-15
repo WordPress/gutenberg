@@ -31,11 +31,16 @@ export const ThemeProvider = ( {
 		[ resolvedSettings ]
 	);
 
-	// Mirror the wrapper's custom properties onto `document.documentElement`
-	// so they reach portals and anything else rendered outside the wrapper
-	// (e.g. the `html`/`body` background). Unlike the wrapper, `html` is a
-	// shared element, so we set/remove individual properties (preserving any
-	// prior value) instead of declaratively assigning a full style object.
+	// Mirror the wrapper's dynamic custom properties (color/cursor) onto
+	// `document.documentElement` so they reach portals and anything else
+	// rendered outside the wrapper (e.g. the `html`/`body` background, or
+	// PHP-rendered admin UI alongside the React app). Preset-based settings
+	// (e.g. `cornerRadius`) are forwarded declaratively by the prebuilt CSS
+	// via `:root:has([data-wpds-root-provider="true"]…)`; only the per-seed
+	// values that can't be expressed in a static stylesheet are synced here.
+	// Unlike the wrapper, `html` is a shared element, so we set/remove
+	// individual properties (preserving any prior value) instead of
+	// declaratively assigning a full style object.
 	useLayoutEffect( () => {
 		if ( ! isRoot || typeof document === 'undefined' ) {
 			return;
@@ -73,6 +78,7 @@ export const ThemeProvider = ( {
 
 	return (
 		<div
+			data-wpds-root-provider={ isRoot ? 'true' : undefined }
 			data-wpds-corner-radius={ cornerRadiusPreset }
 			className={ styles.root }
 			style={ themeProviderStyles }
