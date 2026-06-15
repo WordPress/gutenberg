@@ -4,6 +4,16 @@
  */
 
 export default {
+	transparent: [
+		'background-interactive-brand-weak',
+		'background-interactive-brand-weak-disabled',
+		'background-interactive-error',
+		'background-interactive-error-disabled',
+		'background-interactive-error-weak',
+		'background-interactive-error-weak-disabled',
+		'background-interactive-neutral-weak',
+		'background-interactive-neutral-weak-disabled',
+	],
 	'primary-bgFill1': [ 'background-interactive-brand-strong' ],
 	'primary-fgFill': [
 		'foreground-interactive-brand-strong',
