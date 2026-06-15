@@ -47,7 +47,7 @@ function AddSubmenuItem( {
 	const clientId = block.clientId;
 	const isUnsupportedBlock =
 		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( block.name );
-	const isHiddenByDepth = displayDepth > 0 && currentLevel >= displayDepth;
+	const isHiddenByDepth = displayDepth >= 0 && currentLevel > displayDepth;
 
 	const isDisabled = isUnsupportedBlock || isHiddenByDepth;
 
@@ -59,9 +59,7 @@ function AddSubmenuItem( {
 				isHiddenByDepth
 					? sprintf(
 							/* translators: %d: the maximum number of submenu levels shown on the front end */
-							__(
-								'Display depth is limited to %d level(s). This submenu will not appear on the front end.'
-							),
+							__( 'Display depth is limited to %d level(s).' ),
 							displayDepth
 					  )
 					: undefined

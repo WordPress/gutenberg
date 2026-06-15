@@ -32,7 +32,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	RangeControl,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -278,7 +277,6 @@ function Navigation( {
 		} = {},
 		hasIcon,
 		icon = 'handle',
-		depth,
 	} = attributes;
 
 	const ref = attributes.ref;
@@ -791,7 +789,6 @@ function Navigation( {
 								overlayMenu: 'mobile',
 								hasIcon: true,
 								icon: 'handle',
-								depth: 0,
 							} );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -895,28 +892,6 @@ function Navigation( {
 										{ submenuAccessibilityNotice }
 									</Notice>
 								) }
-								<ToolsPanelItem
-									hasValue={ () => !! depth && depth > 0 }
-									label={ __( 'Display depth' ) }
-									onDeselect={ () =>
-										setAttributes( { depth: 0 } )
-									}
-									isShownByDefault={ false }
-								>
-									<RangeControl
-										__next40pxDefaultSize
-										label={ __( 'Display depth' ) }
-										help={ __(
-											'Limit the number of submenu levels shown on the front end. Does not affect the editor.'
-										) }
-										value={ depth > 0 ? depth : 1 }
-										onChange={ ( value ) =>
-											setAttributes( { depth: value } )
-										}
-										min={ 1 }
-										max={ 6 }
-									/>
-								</ToolsPanelItem>
 							</>
 						) }
 					</ToolsPanel>

@@ -294,9 +294,9 @@ class WP_Navigation_Block_Renderer {
 
 		foreach ( $blocks as $block ) {
 			if ( 'core/navigation-submenu' === ( $block['blockName'] ?? null ) ) {
-				if ( $current_depth >= $max_depth ) {
-					$block['blockName']   = 'core/navigation-link';
-					$block['innerBlocks'] = array();
+				if ( $current_depth > $max_depth ) {
+					$block['blockName']    = 'core/navigation-link';
+					$block['innerBlocks']  = array();
 					$block['innerContent'] = array_values(
 						array_filter(
 							$block['innerContent'] ?? array(),
@@ -351,8 +351,8 @@ class WP_Navigation_Block_Renderer {
 			$blocks = parse_blocks( $markup );
 
 			// Apply display depth limit if set.
-			$depth = isset( $attributes['depth'] ) ? (int) $attributes['depth'] : 0;
-			if ( $depth > 0 ) {
+			$depth = isset( $attributes['depth'] ) ? (int) $attributes['depth'] : 5;
+			if ( $depth >= 0 ) {
 				$blocks = static::filter_parsed_blocks_by_depth( $blocks, $depth );
 			}
 
@@ -377,8 +377,8 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Apply display depth limit if set.
-		$depth = isset( $attributes['depth'] ) ? (int) $attributes['depth'] : 0;
-		if ( $depth > 0 ) {
+		$depth = isset( $attributes['depth'] ) ? (int) $attributes['depth'] : 5;
+		if ( $depth >= 0 ) {
 			$fallback_blocks = static::filter_parsed_blocks_by_depth( $fallback_blocks, $depth );
 		}
 
