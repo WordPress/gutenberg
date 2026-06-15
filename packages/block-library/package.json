@@ -28,8 +28,7 @@
 		"build-module",
 		"build-style",
 		"build-types",
-		"*.md",
-		"babel-plugin.cjs"
+		"*.md"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -38,7 +37,6 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./babel-plugin": "./babel-plugin.cjs",
 		"./build-module/*": "./build-module/*",
 		"./build-style/*": "./build-style/*",
 		"./package.json": "./package.json"
@@ -143,7 +141,6 @@
 		"uuid": "^14.0.0"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.25.7",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/react": "^16.3.2",
 		"@testing-library/user-event": "^14.6.1",
