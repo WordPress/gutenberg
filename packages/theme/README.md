@@ -52,15 +52,6 @@ For the best development experience, we recommend configuring the [build plugins
 
 If you use `@wordpress/build` to build your scripts, the build plugins are already enabled by default.
 
-### Architecture
-
-Internally, the design system uses a tiered token architecture:
-
--   **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
--   **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
-
-This separation allows the design system to maintain consistency while providing flexibility, since primitive values can be updated without changing the semantic token names that developers use in their code.
-
 ### Design Tokens
 
 Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
