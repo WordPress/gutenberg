@@ -27,6 +27,10 @@ import SpacerControls from './controls';
 import { MIN_SPACER_SIZE } from './constants';
 
 const { useSpacingSizes } = unlock( blockEditorPrivateApis );
+const PREFERENCES_STORE = 'core/preferences';
+
+const PREFERENCE_SCOPE = 'core/block-editor';
+const PREFERENCE_KEY = 'spacerLastUsedSize';
 
 const ResizableSpacer = ( {
 	orientation,
@@ -89,13 +93,31 @@ const SpacerEdit = ( {
 	setAttributes,
 	toggleSelection,
 	context,
+	clientId,
 	__unstableParentLayout: parentLayout,
 	className,
 } ) => {
-	const disableCustomSpacingSizes = useSelect( ( select ) => {
-		const editorSettings = select( blockEditorStore ).getSettings();
-		return editorSettings?.disableCustomSpacingSizes;
-	} );
+	const { disableCustomSpacingSizes, wasJustInserted, lastUsedSize } =
+		useSelect(
+			( select ) => {
+				const editorSettings = select( blockEditorStore ).getSettings();
+				const prefsStore = select( PREFERENCES_STORE );
+
+				return {
+					disableCustomSpacingSizes:
+						editorSettings?.disableCustomSpacingSizes,
+					wasJustInserted:
+						select( blockEditorStore ).wasBlockJustInserted(
+							clientId
+						),
+					lastUsedSize: prefsStore?.get(
+						PREFERENCE_SCOPE,
+						PREFERENCE_KEY
+					),
+				};
+			},
+			[ clientId ]
+		);
 	const { orientation } = context;
 	const {
 		orientation: parentOrientation,
@@ -127,6 +149,13 @@ const SpacerEdit = ( {
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+	const { set: setPreference } = useDispatch( PREFERENCES_STORE );
+
+	const setRememberedSize = ( nextSize ) => {
+		if ( nextSize && setPreference ) {
+			setPreference( PREFERENCE_SCOPE, PREFERENCE_KEY, nextSize );
+		}
+	};
 
 	const handleOnVerticalResizeStop = ( newHeight ) => {
 		onResizeStop();
@@ -145,6 +174,7 @@ const SpacerEdit = ( {
 		}
 
 		setAttributes( { height: newHeight } );
+		setRememberedSize( newHeight );
 		setTemporaryHeight( null );
 	};
 
@@ -165,8 +195,29 @@ const SpacerEdit = ( {
 		}
 
 		setAttributes( { width: newWidth } );
+		setRememberedSize( newWidth );
 		setTemporaryWidth( null );
 	};
+
+	useEffect( () => {
+		if ( ! wasJustInserted || ! lastUsedSize ) {
+			return;
+		}
+
+		// Apply remembered size only for newly inserted spacers.
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes(
+			inheritedOrientation === 'horizontal'
+				? { width: lastUsedSize }
+				: { height: lastUsedSize }
+		);
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		inheritedOrientation,
+		lastUsedSize,
+		setAttributes,
+		wasJustInserted,
+	] );
 
 	const getHeightForVerticalBlocks = () => {
 		if ( isFlexLayout ) {
@@ -365,6 +416,7 @@ const SpacerEdit = ( {
 			{ ! isFlexLayout && (
 				<SpacerControls
 					setAttributes={ setAttributes }
+					onSizeChange={ setRememberedSize }
 					height={ temporaryHeight || height }
 					width={ temporaryWidth || width }
 					orientation={ inheritedOrientation }

@@ -86,6 +86,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 
 export default function SpacerControls( {
 	setAttributes,
+	onSizeChange,
 	orientation,
 	height,
 	width,
@@ -98,6 +99,7 @@ export default function SpacerControls( {
 			<ToolsPanel
 				label={ __( 'Settings' ) }
 				resetAll={ () => {
+					onSizeChange?.( '100px' );
 					setAttributes( {
 						width: undefined,
 						height: '100px',
@@ -117,9 +119,10 @@ export default function SpacerControls( {
 						<DimensionInput
 							label={ __( 'Width' ) }
 							value={ width }
-							onChange={ ( nextWidth ) =>
-								setAttributes( { width: nextWidth } )
-							}
+							onChange={ ( nextWidth ) => {
+								onSizeChange?.( nextWidth );
+								setAttributes( { width: nextWidth } );
+							} }
 							isResizing={ isResizing }
 						/>
 					</ToolsPanelItem>
@@ -129,16 +132,18 @@ export default function SpacerControls( {
 						label={ __( 'Height' ) }
 						isShownByDefault
 						hasValue={ () => height !== '100px' }
-						onDeselect={ () =>
-							setAttributes( { height: '100px' } )
-						}
+						onDeselect={ () => {
+							onSizeChange?.( '100px' );
+							setAttributes( { height: '100px' } );
+						} }
 					>
 						<DimensionInput
 							label={ __( 'Height' ) }
 							value={ height }
-							onChange={ ( nextHeight ) =>
-								setAttributes( { height: nextHeight } )
-							}
+							onChange={ ( nextHeight ) => {
+								onSizeChange?.( nextHeight );
+								setAttributes( { height: nextHeight } );
+							} }
 							isResizing={ isResizing }
 						/>
 					</ToolsPanelItem>
