@@ -393,7 +393,6 @@ export default function EmojiPicker( { onSelect } ) {
 		<div className="editor-collab-sidebar-panel__picker">
 			<div className="editor-collab-sidebar-panel__picker-search">
 				<SearchControl
-					__nextHasNoMarginBottom
 					value={ query }
 					onChange={ setQuery }
 					placeholder={ __( 'Search emoji' ) }
